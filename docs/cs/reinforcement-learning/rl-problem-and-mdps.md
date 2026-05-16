@@ -115,8 +115,8 @@ flowchart LR
   S[State S_t] --> P["Policy pi(a | s)"]
   P --> A[Action A_t]
   A --> E["Environment dynamics p(s', r | s, a)"]
-  E --> R[Reward R_{t+1}]
-  E --> N[Next state S_{t+1}]
+  E --> R["Reward R_{t+1}"]
+  E --> N["Next state S_{t+1}"]
   R --> G[Return G_t]
   N --> S
   G --> V["Value estimates V_pi, Q_pi"]

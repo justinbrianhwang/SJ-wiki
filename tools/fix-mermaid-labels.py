@@ -33,7 +33,7 @@ import sys
 import pathlib
 
 
-HAZARDOUS = re.compile(r"[\(\)=\?:'<>&,;|\"]")
+HAZARDOUS = re.compile(r"[\(\)=\?:'<>&,;|\"\{\}]")
 
 # (open, close) pairs in priority order — longest opening literal first.
 NODE_BRACKETS = [

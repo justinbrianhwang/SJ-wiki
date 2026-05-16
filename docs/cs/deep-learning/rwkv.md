@@ -69,7 +69,7 @@ For long context, the paper fine-tunes by progressively increasing context lengt
 ```mermaid
 flowchart TD
   X[Token state x_t] --> Shift[Mix current and previous token with mu]
-  Prev[x_{t-1}] --> Shift
+  Prev["x_{t-1}"] --> Shift
   Shift --> R[Receptance r_t]
   Shift --> K[Key k_t]
   Shift --> V[Value v_t]

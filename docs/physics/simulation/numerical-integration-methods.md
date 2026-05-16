@@ -97,7 +97,7 @@ flowchart LR
   C -->|Trapezoidal| E[Average endpoint slopes]
   C -->|RK4| F[Weighted staged slopes]
   C -->|Adaptive RK| G[Compare high and low order estimates]
-  D --> H[x_{k+1}]
+  D --> H["x_{k+1}"]
   E --> H
   F --> H
   G --> I{"Error acceptable?"}
