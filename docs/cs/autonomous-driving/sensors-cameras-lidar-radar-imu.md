@@ -9,6 +9,10 @@ Autonomous driving is built on imperfect measurements. Cameras see texture and c
 
 This page is the sensor-level foundation for [perception](/cs/autonomous-driving/perception-object-detection-and-segmentation), [depth estimation](/cs/autonomous-driving/depth-estimation-and-stereo-vision), [sensor fusion](/cs/autonomous-driving/sensor-fusion), [localization](/cs/autonomous-driving/localization-and-hd-maps), and [safety analysis](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing). The practical lesson is that sensor choice is never just a bill-of-materials decision; it changes which algorithms are credible and which hazards must be mitigated.
 
+![A LiDAR point cloud image shows a street intersection reconstructed as colored three-dimensional points.](https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Ouster_OS1-64_lidar_point_cloud_of_intersection_of_Folsom_and_Dore_St%2C_San_Francisco.png/500px-Ouster_OS1-64_lidar_point_cloud_of_intersection_of_Folsom_and_Dore_St%2C_San_Francisco.png)
+
+*Figure: LiDAR point cloud of an urban intersection. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Ouster_OS1-64_lidar_point_cloud_of_intersection_of_Folsom_and_Dore_St,_San_Francisco.png), Dllu, CC BY 4.0.*
+
 ## Definitions
 
 A **camera** measures image irradiance on a pixel grid. Automotive cameras are usually monocular RGB or RCCB sensors with wide dynamic range. A **rolling shutter** exposes rows at slightly different times, which can bend fast-moving objects or distort images during vibration. A **global shutter** exposes all pixels at once, reducing motion distortion but often with cost or sensitivity trade-offs.

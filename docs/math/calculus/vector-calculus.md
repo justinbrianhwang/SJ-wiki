@@ -9,6 +9,10 @@ Vector calculus studies fields, flow, circulation, and flux. It connects line in
 
 These theorems are higher-dimensional versions of the Fundamental Theorem of Calculus. They say that an integral over a boundary can often be computed from information inside the region, or that an integral over a region can be converted to a boundary integral when that is easier.
 
+![Arrows rotate around the origin in a two-dimensional vector field.](https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Vector_field.svg/500px-Vector_field.svg.png)
+
+*Figure: A planar vector field, $f(x,y)=(-y,x)$. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Vector_field.svg), Fibonacci, public domain.*
+
 ## Definitions
 
 A vector field in the plane has form

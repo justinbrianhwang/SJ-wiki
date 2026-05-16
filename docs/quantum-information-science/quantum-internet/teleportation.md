@@ -11,6 +11,10 @@ The standard protocol was introduced by Bennett, Brassard, Crepeau, Jozsa, Peres
 
 Nielsen and Chuang Section 1.3.7 is the primary reference for the circuit derivation used on this page. Their emphasis is useful for networking: teleportation converts resources. One pre-shared EPR pair plus two classical bits can substitute for one use of an ideal qubit channel, while the original input is consumed by measurement.
 
+![Quantum teleportation circuit diagram showing a Bell measurement followed by classical controls for Bob's correction](https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Quantum_teleportation_circuit.svg/640px-Quantum_teleportation_circuit.svg.png)
+
+*Figure: Quantum circuit representation of the teleportation protocol. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quantum_teleportation_circuit.svg), Bender2k14, CC BY-SA 3.0.*
+
 ## Definitions
 
 Let Alice hold an unknown input qubit $A$,

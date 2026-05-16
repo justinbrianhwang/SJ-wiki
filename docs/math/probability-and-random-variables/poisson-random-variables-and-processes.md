@@ -9,6 +9,10 @@ The Poisson distribution models counts of rare events in a fixed region of time 
 
 The Poisson process extends this count model from one interval to an entire random counting function $N(t)$. Its central assumptions are independent increments, stationary increments, and a constant rate. From these assumptions come Poisson counts over intervals and exponential waiting times between events, linking this page to the continuous distributions later in the course.
 
+![Several Poisson probability mass functions are plotted for different rate parameters.](https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Poisson_pmf.svg/500px-Poisson_pmf.svg.png)
+
+*Figure: Poisson probability mass functions for several parameter values. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Poisson_pmf.svg), Skbkekas, CC BY 3.0.*
+
 ## Definitions
 
 A random variable $X$ has the **Poisson distribution** with parameter $\lambda\gt 0$ if

@@ -9,6 +9,10 @@ Oscillations: SHM, Damping, and Resonance covers simple harmonic motion, energy 
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
+![A simple-pendulum diagram shows the bob, string length, and angular displacement.](https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Simple_pendulum.svg/400px-Simple_pendulum.svg.png)
+
+*Figure: Simple pendulum geometry for small-angle oscillations. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Simple_pendulum.svg), Chris-martin, public domain.*
+
 ## Definitions
 
 - **Scope:** simple harmonic motion, energy exchange, damping, driving, and resonance.

@@ -9,6 +9,10 @@ Interference, Diffraction, and Gratings covers wave optics, phase, Young's exper
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
+![A double-slit diagram shows rays from two slits interfering on a distant screen.](https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Double_slit.svg/600px-Double_slit.svg.png)
+
+*Figure: Far-field geometry for double-slit interference. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Double_slit.svg), Epzcaw, CC BY-SA 3.0.*
+
 ## Definitions
 
 - **Scope:** wave optics, phase, Young's experiment, single-slit diffraction, and gratings.

@@ -9,6 +9,10 @@ Embedded processors are chosen under constraints that are different from desktop
 
 Lee and Seshia emphasize the distinction between an instruction set architecture and a processor realization. The ISA defines what instructions mean. A chip implements that ISA with pipelines, caches, buses, memories, peripherals, and parallel hardware. Two chips may run the same machine code but have very different timing, which is central in cyber-physical systems.
 
+![An Intel 8051 architecture diagram shows central microcontroller blocks and buses.](https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Intel_8051_arch.svg/500px-Intel_8051_arch.svg.png)
+
+*Figure: Intel 8051 microcontroller architecture. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_8051_arch.svg), Appaloosa, CC BY-SA 3.0.*
+
 ## Definitions
 
 An **instruction set architecture** (ISA) defines the instructions, registers, data sizes, and programmer-visible behavior of a processor family. A **processor realization** is a particular chip or core implementing an ISA.

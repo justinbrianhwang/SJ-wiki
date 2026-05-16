@@ -9,6 +9,10 @@ An operating system is the control layer that makes bare hardware usable. It hid
 
 This page sits at the entrance to the rest of operating systems. Processes, memory, files, I/O, protection, and security are not separate inventions; they are services exposed through interfaces and implemented inside a kernel structure. Understanding that split between interface and implementation makes later topics easier: a file descriptor, page table, interrupt handler, and scheduler queue are all parts of the same larger design problem.
 
+![A process state diagram shows transitions among new, ready, running, waiting, and terminated states.](https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Process_state.svg/500px-Process_state.svg.png)
+
+*Figure: Five-state process model used in operating systems. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Process_state.svg), MrDrBob, CC BY-SA 3.0.*
+
 ## Definitions
 
 An **operating system** is the software that manages hardware resources and provides services for programs. The textbook uses the common practical definition of the **kernel** as the program running at all times on the computer. System programs, libraries, command interpreters, graphical shells, daemons, and application programs may ship with an OS distribution, but they are not necessarily part of the kernel.

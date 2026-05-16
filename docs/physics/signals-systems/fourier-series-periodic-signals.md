@@ -9,6 +9,10 @@ Fourier series represent periodic signals as weighted sums of harmonically relat
 
 Continuous-time and discrete-time Fourier series share the same conceptual structure, but their details differ. Continuous-time periodic signals generally require infinitely many harmonics. Discrete-time periodic sequences have only finitely many distinct harmonics over one period because discrete-time frequency repeats every $2\pi$.
 
+![A Fourier-series visualization shows rotating phasors approximating a square wave.](https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Fourier_series_square_wave_circles_animation.svg/400px-Fourier_series_square_wave_circles_animation.svg.png)
+
+*Figure: First terms of a Fourier-series approximation to a square wave. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fourier_series_square_wave_circles_animation.svg), Cmglee, CC BY-SA 3.0.*
+
 ## Definitions
 
 For a continuous-time periodic signal with fundamental period $T_0$ and fundamental angular frequency

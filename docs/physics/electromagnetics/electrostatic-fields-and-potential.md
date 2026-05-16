@@ -9,6 +9,10 @@ Electrostatics studies electric fields produced by stationary charge distributio
 
 The value of electrostatics is larger than "charges at rest." Capacitance, insulation design, electrostatic sensors, semiconductor depletion regions, and many boundary-value methods all begin here. Later, time-varying electromagnetics keeps the same electric field concepts but couples them to magnetic fields through Faraday's law and the displacement current.
 
+![An electric-field-line diagram shows field lines from a positive charge to a negative charge.](https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/VFPt_charges_plus_minus_thumb.svg/400px-VFPt_charges_plus_minus_thumb.svg.png)
+
+*Figure: Electric field lines for a positive and negative point-charge pair. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:VFPt_charges_plus_minus_thumb.svg), Geek3, CC BY-SA 3.0.*
+
 ## Definitions
 
 Charge can be modeled in several idealized ways:

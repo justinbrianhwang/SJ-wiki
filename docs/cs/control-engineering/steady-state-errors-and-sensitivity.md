@@ -9,6 +9,10 @@ Steady-state error measures the accuracy left after transients have died out. In
 
 The chapter's main message is that low-frequency loop structure determines tracking accuracy. System type, static error constants, disturbance location, nonunity feedback, and parameter sensitivity all describe what remains after the fast behavior is gone. These ideas explain why integral action is so valuable and why gain alone often creates trade-offs with transient response.
 
+![A feedback loop block diagram shows an output signal returned to the input through a controller path.](https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Feedback_Loop.svg/500px-Feedback_Loop.svg.png)
+
+*Figure: Feedback loop block diagram in control theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Feedback_Loop.svg), Inductiveload, public domain.*
+
 ## Definitions
 
 For a unity negative-feedback system with forward transfer function $G(s)$,

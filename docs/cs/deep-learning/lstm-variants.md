@@ -9,6 +9,10 @@ The vanilla LSTM cell with input / forget / output gates is the most commonly ta
 
 For the baseline LSTM definition (cell state $C_t$, gates $i_t$, $f_t$, $o_t$, additive memory path), see [Gated RNNs and Sequence-to-Sequence](/cs/deep-learning/gated-rnns-seq2seq).
 
+![An LSTM cell diagram shows gates controlling information flow through cell state and hidden state paths.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Long_Short-Term_Memory.svg/500px-Long_Short-Term_Memory.svg.png)
+
+*Figure: Long short-term memory cell architecture. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Long_Short-Term_Memory.svg), fdeloche, CC BY-SA 4.0.*
+
 ## Quick reference
 
 | Variant | Year | Modification | When to use |

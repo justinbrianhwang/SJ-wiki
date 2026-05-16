@@ -9,6 +9,10 @@ The 8085 is the book's central microprocessor example. It is a good teaching CPU
 
 The architecture page sits between the simple microprocessor model and the instruction-set pages. It names the blocks that execute instructions, but it also explains why extra hardware is needed around the chip: the lower address bus is multiplexed with the data bus, memory and I/O chips need selection signals, and slow devices may require wait states.
 
+![A photograph shows an Intel C8085AH microprocessor chip package.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Intel_C8085AH.jpg/500px-Intel_C8085AH.jpg)
+
+*Figure: Intel C8085AH microprocessor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_C8085AH.jpg), Thomas Nguyen, CC BY-SA 4.0.*
+
 ## Definitions
 
 The **8085** is an 8-bit microprocessor with a 16-bit address bus. It can address 64 KiB of memory and has a separate I/O address space of 256 ports when I/O-mapped instructions are used.

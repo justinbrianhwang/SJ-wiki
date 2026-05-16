@@ -9,6 +9,10 @@ Continuous distributions model measurements that vary on intervals: times, lengt
 
 Lane et al.'s statistics text treats the normal distribution in depth and later introduces distributions such as $t$ and chi-square for inference. This probability page gives a theory-focused reference to the main continuous families, while cross-linking to statistics where the inferential use is the main topic.
 
+![Several exponential density curves are plotted for different rate parameters.](https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Exponential_pdf.svg/500px-Exponential_pdf.svg.png)
+
+*Figure: Exponential density functions for several rate parameters. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Exponential_pdf.svg), Skbkekas, CC BY 3.0.*
+
 ## Definitions
 
 A continuous random variable $X$ has density $f_X$ if

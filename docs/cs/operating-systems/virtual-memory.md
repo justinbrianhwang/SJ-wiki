@@ -9,6 +9,10 @@ Virtual memory lets a process execute even when not all of its pages are in phys
 
 The benefit has a cost: a missing page causes a page fault, and servicing a page fault may require disk or SSD I/O, page-table changes, and replacement of another page. The central questions are therefore when to bring pages in, which page to evict, how many frames each process should receive, and how to detect when the system is spending more time paging than executing.
 
+![A virtual memory diagram shows mappings between application addresses, physical memory, and secondary storage.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Virtual_memory.svg/500px-Virtual_memory.svg.png)
+
+*Figure: Virtual memory relating address spaces, RAM, and disk. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Virtual_memory.svg), Ehamberg, CC BY-SA 3.0.*
+
 ## Definitions
 
 **Virtual memory** is the technique of executing processes whose complete address spaces are not resident in physical memory. The logical address space may be much larger than RAM.

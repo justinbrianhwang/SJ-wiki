@@ -9,6 +9,10 @@ Numerical summaries compress a distribution into a few interpretable quantities.
 
 Compression always loses information. A mean does not show skewness, a standard deviation does not show outliers, and a percentile does not show whether nearby values are common or rare. Good summary work therefore pairs numbers with a graph and chooses statistics whose meanings fit the distribution shape and measurement level.
 
+![A labeled boxplot shows the median, quartiles, whiskers, and outliers of a distribution.](https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Boxplot.svg/500px-Boxplot.svg.png)
+
+*Figure: Components of a boxplot for summarizing a distribution. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Boxplot.svg), Jumanbar, CC BY-SA 3.0.*
+
 ## Definitions
 
 The **mean** of $n$ observations $x_1,\dots,x_n$ is

@@ -9,6 +9,10 @@ The singular value decomposition, or SVD, is a universal matrix factorization. U
 
 The geometric picture is especially useful: a matrix first rotates or reflects the input space, then stretches along coordinate axes by singular values, then rotates or reflects into the output space. Small singular values mark directions that are nearly lost; zero singular values mark directions that are completely collapsed.
 
+![A unit disk is transformed into an ellipse through the stages of a singular value decomposition.](https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Singular-Value-Decomposition.svg/500px-Singular-Value-Decomposition.svg.png)
+
+*Figure: Geometric decomposition of a matrix into rotations and scaling. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Singular-Value-Decomposition.svg), Georg-Johann, CC BY-SA 3.0.*
+
 ## Definitions
 
 For an $m\times n$ matrix $A$, a singular value decomposition is

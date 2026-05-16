@@ -9,6 +9,10 @@ Trees are connected graphs with no cycles. They are minimal connected structures
 
 Tree arguments are often simpler than general graph arguments because there is exactly one simple path between any two vertices. That uniqueness supports recursive definitions, induction proofs, traversal algorithms, and greedy optimization methods such as minimum spanning trees.
 
+![A rooted binary tree shows nodes connected in parent and child levels.](https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Binary_tree.svg/500px-Binary_tree.svg.png)
+
+*Figure: Example of a binary tree. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Binary_tree.svg), Derrick Coetzee, public domain.*
+
 ## Definitions
 
 A **tree** is a connected undirected graph with no simple circuits. A graph with no simple circuits but possibly several components is a **forest**. Each connected component of a forest is a tree.

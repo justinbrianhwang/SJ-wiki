@@ -9,6 +9,10 @@ Feynman diagrams are not cartoons added after a calculation. They are a compact 
 
 The physical value of the diagrammatic language is that it separates universal structure from algebra. Once the propagators and vertices are known, scattering amplitudes can be organized by the number of vertices or loops. Zee's early discussion of diagrams is meant to make this organization feel natural: forces arise because fields propagate between interaction events, and perturbation theory enumerates those events.
 
+![A Feynman diagram shows electron-positron annihilation followed by quark production and gluon radiation.](https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Feynman_Diagram_Gluon_Radiation.svg/500px-Feynman_Diagram_Gluon_Radiation.svg.png)
+
+*Figure: Feynman diagram for gluon radiation after electron-positron annihilation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Feynman_Diagram_Gluon_Radiation.svg), Joel Holdsworth, public domain.*
+
 ## Definitions
 
 For a theory split into free and interacting parts,

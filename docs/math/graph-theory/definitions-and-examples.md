@@ -9,6 +9,10 @@ Graphs are a way to keep only the incidence pattern of a network: which objects 
 
 This page fixes the vocabulary used throughout the graph theory section. The point is not to memorize names in isolation, but to recognize which features survive under redrawing, relabelling, deletion, contraction, and passage to standard families such as complete graphs, cycles, wheels, and bipartite graphs.
 
+![The Petersen graph is drawn with five outer vertices and five inner vertices connected in a star pattern.](https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Petersen_graph.svg/500px-Petersen_graph.svg.png)
+
+*Figure: The Petersen graph, a standard example in graph theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Petersen_graph.svg), David Benbennick, public domain.*
+
 ## Definitions
 
 A **graph** $G$ consists of a vertex set $V(G)$ and an edge family $E(G)$ whose members join vertices. In a **simple graph**, every edge is an unordered pair of two distinct vertices, and no pair occurs more than once. Thus a simple graph has no loops and no multiple edges. In a more general graph, a **loop** has both ends at the same vertex, and **parallel edges** are two or more edges with the same pair of endpoints.

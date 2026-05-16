@@ -9,6 +9,10 @@ The source includes a buses and protocols chapter covering serial communication 
 
 The common theme is that a bus is more than a wire. It defines electrical levels, direction rules, timing, addressing, framing, acknowledgements, and error checks. Software must follow the protocol's order exactly, while hardware must satisfy voltage, termination, pull-up, and distance requirements.
 
+![An SPI bus diagram shows one master selecting among three slave devices with separate chip-select lines.](https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/SPI_three_slaves.svg/500px-SPI_three_slaves.svg.png)
+
+*Figure: SPI bus with one master and three slave devices. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:SPI_three_slaves.svg), Cburnett, CC BY-SA 3.0.*
+
 ## Definitions
 
 **Serial communication** transmits data one bit at a time over one or a small number of signal lines. It contrasts with parallel transfer, where multiple bits move simultaneously.

@@ -9,6 +9,10 @@ Gravitation and Kepler's Laws covers Newtonian gravitation, orbital motion, grav
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
+![A Kepler-orbit diagram shows elliptical planetary paths and equal swept areas.](https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Kepler_laws_diagram.svg/400px-Kepler_laws_diagram.svg.png)
+
+*Figure: Kepler's laws visualized with elliptical orbits and area sweeping. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Kepler_laws_diagram.svg), Hankwang, CC BY-SA 3.0.*
+
 ## Definitions
 
 - **Scope:** Newtonian gravitation, orbital motion, gravitational potential energy, and Kepler's laws.

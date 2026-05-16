@@ -9,6 +9,10 @@ Data classification learns a model from labeled examples and uses it to assign l
 
 This page covers the core classification toolkit. The advanced page covers multiclass learning, rare classes, scalability, regression, semi-supervised learning, active learning, and ensembles.
 
+![A confusion matrix diagram shows true positives, true negatives, false positives, and false negatives in a contingency table.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/ConfusionMatrix.png/500px-ConfusionMatrix.png)
+
+*Figure: Confusion matrix for classification evaluation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ConfusionMatrix.png), Jackverr, CC BY-SA 3.0.*
+
 ## Definitions
 
 A **training set** consists of pairs $(X_i,y_i)$, where $X_i$ is a feature vector and $y_i$ is a class label.

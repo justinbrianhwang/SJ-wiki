@@ -9,6 +9,10 @@ Hashing (해싱) tries to make dictionary operations close to constant time by c
 
 The cost is that collisions are unavoidable: two distinct keys can map to the same table slot. A hashing implementation is therefore mostly a collision-management design. The source textbook's hashing chapter covers hash tables, hash functions, overflow handling, theoretical evaluation, dynamic hashing, and Bloom filters. This page focuses on the core curriculum pieces: open addressing and chaining.
 
+![A hash table diagram shows keys mapped to table slots with chained buckets for collisions.](https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Dsa_hash_table.svg/500px-Dsa_hash_table.svg.png)
+
+*Figure: Hash table using separate chaining for collisions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dsa_hash_table.svg), Amit6, public domain.*
+
 ## Definitions
 
 A **hash table** stores records in an array of size $m$. A **hash function** maps a key $k$ to an integer slot:

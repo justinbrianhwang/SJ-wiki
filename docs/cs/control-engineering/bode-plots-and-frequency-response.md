@@ -9,6 +9,10 @@ Frequency response studies the steady-state output of a stable linear system dri
 
 The value of frequency response is design visibility. Low-frequency gain relates to steady-state tracking. Crossover frequency relates to speed and bandwidth. Phase lag near crossover relates to overshoot and stability margin. Bode plots show these trade-offs in a form engineers can sketch, measure, and tune.
 
+![An asymptotic Bode plot shows magnitude and phase changing across logarithmic frequency.](https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Asymptotic_Bode_plot.svg/500px-Asymptotic_Bode_plot.svg.png)
+
+*Figure: Asymptotic Bode plot for frequency-response analysis. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Asymptotic_Bode_plot.svg), Mintz l, public domain.*
+
 ## Definitions
 
 For a transfer function $G(s)$, the frequency response is

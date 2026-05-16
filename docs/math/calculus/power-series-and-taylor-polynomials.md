@@ -9,6 +9,10 @@ Power series represent functions as infinite polynomials. Taylor polynomials use
 
 The key idea is local representation. A Taylor polynomial near $a$ is designed to match a function's value and derivatives at $a$. A Taylor series asks whether the infinite version actually converges back to the function, and on which interval that is true.
 
+![Several Taylor polynomial curves approximate the sine function near the origin.](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Taylor_Approximation_of_sin%28x%29.svg/500px-Taylor_Approximation_of_sin%28x%29.svg.png)
+
+*Figure: Taylor polynomial approximations to $\sin x$. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Taylor_Approximation_of_sin%28x%29.svg), MikeRun, CC BY-SA 4.0.*
+
 ## Definitions
 
 A power series centered at $a$ has form

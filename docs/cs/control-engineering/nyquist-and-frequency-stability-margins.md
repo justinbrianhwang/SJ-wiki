@@ -9,6 +9,10 @@ Nyquist analysis is the frequency-domain stability test that complements Routh-H
 
 The power of Nyquist is that it reasons from open-loop frequency response while accounting for open-loop unstable poles. Bode plots are easier to read for routine design, but Nyquist gives the underlying stability logic and handles cases where open-loop right-half-plane poles matter.
 
+![A Nyquist plot traces a complex frequency response curve in the real-imaginary plane.](https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Nyquist_plot.svg/500px-Nyquist_plot.svg.png)
+
+*Figure: Nyquist plot in the complex plane. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Nyquist_plot.svg), Engelec, public domain.*
+
 ## Definitions
 
 For a negative-feedback system with loop transfer function

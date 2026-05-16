@@ -9,6 +9,10 @@ Basic cache design chooses size, block size, associativity, and write policy. Ad
 
 H&P organizes cache optimizations around measurable causes of memory stalls. The right question is not "does this reduce misses?" but "which term in execution time does this improve, and what does it damage?" That framing is especially important once multicore processors create shared-cache contention and bandwidth pressure.
 
+![A cache hierarchy diagram shows progressively larger memory levels between CPU cores and main memory.](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Multi-level_Cache_Hierarchy.svg/500px-Multi-level_Cache_Hierarchy.svg.png)
+
+*Figure: Multi-level cache hierarchy between processors and memory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Multi-level_Cache_Hierarchy.svg), Ferry24.Milan, CC BY-SA 3.0.*
+
 ## Definitions
 
 Hit time is the time to access a cache when the requested block is present. Miss rate is the fraction of accesses that miss. Miss penalty is the additional time to service a miss from lower levels.

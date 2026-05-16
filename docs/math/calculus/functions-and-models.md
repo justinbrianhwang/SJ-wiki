@@ -9,6 +9,10 @@ Calculus begins by treating a changing quantity as a function: one input determi
 
 Models matter because real problems rarely arrive as polished formulas. A falling object, a cooling drink, a population, or a cost curve must first be represented by variables, units, and assumptions. The quality of the calculus that follows depends on the quality of that modeling step: the domain must match the physical situation, the units must be meaningful, and the graph should behave in a way that agrees with the context.
 
+![A sine curve and a cosine curve are plotted together across several periods.](https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Sine_and_Cosine.svg/500px-Sine_and_Cosine.svg.png)
+
+*Figure: Sine and cosine as standard function models. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sine_and_Cosine.svg), Inductiveload, public domain.*
+
 ## Definitions
 
 A function $f$ from a domain $D$ to a codomain is a rule assigning exactly one output $f(x)$ to each input $x \in D$. The graph is the set of ordered pairs

@@ -9,6 +9,10 @@ Instance-based learning postpones generalization until a query arrives. Instead 
 
 The central idea is locality. If similar instances tend to have similar target values, then nearby training examples are useful evidence. This is simple and powerful, but it makes the choice of distance metric, feature scaling, and local weighting extremely important.
 
+![A nearest-neighbor classification diagram shows a query point classified by nearby labeled examples.](https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/KnnClassification.svg/500px-KnnClassification.svg.png)
+
+*Figure: Example of k-nearest-neighbor classification. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:KnnClassification.svg), Antti Ajanki, CC BY-SA 3.0.*
+
 ## Definitions
 
 The k-nearest neighbor algorithm stores all training examples. To classify a query $x_q$, it finds the $k$ training examples closest to $x_q$ and predicts by majority vote:

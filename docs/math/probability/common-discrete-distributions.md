@@ -9,6 +9,10 @@ Discrete distributions model counts, categories, and waiting times measured in w
 
 The main skill is not memorizing formulas in isolation. It is matching the story to the assumptions: fixed number of independent trials, sampling with or without replacement, waiting until a success, or counting events that occur at an average rate. A wrong distribution can produce a polished but wrong answer.
 
+![A bar plot shows the probability mass function of a binomial distribution.](https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Binomial_distribution_pmf.svg/500px-Binomial_distribution_pmf.svg.png)
+
+*Figure: Binomial probability mass function. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Binomial_distribution_pmf.svg), Tayste, public domain.*
+
 ## Definitions
 
 A **Bernoulli** random variable records one success/failure trial:

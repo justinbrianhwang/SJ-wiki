@@ -9,6 +9,10 @@ Nonlinear systems are the rule rather than the exception in realistic simulation
 
 Linearization builds a local linear approximation around an equilibrium or trajectory. It does not make the original system linear; it gives a model that predicts small deviations near the chosen point. This is especially useful for controller design, small-signal frequency response, and quick stability checks before running large nonlinear simulations.
 
+![A Van der Pol phase-space diagram shows stable limit cycles for several parameter values.](https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/VanderPol-lc.svg/400px-VanderPol-lc.svg.png)
+
+*Figure: Stable limit-cycle behavior in the Van der Pol oscillator. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:VanderPol-lc.svg), Widdma, CC BY-SA 3.0.*
+
 ## Definitions
 
 A nonlinear state model has the form

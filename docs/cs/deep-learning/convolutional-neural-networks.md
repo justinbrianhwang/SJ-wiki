@@ -9,6 +9,10 @@ Convolutional neural networks exploit the structure of images. A fully connected
 
 The core insight is parameter sharing. A small kernel slides across an image and applies the same weights at every location. This makes the model efficient, encourages it to detect the same pattern anywhere in the image, and builds feature maps that preserve spatial layout. Padding, stride, channels, pooling, and stacked convolutional layers then turn this simple operation into a complete architecture such as LeNet.
 
+![A convolutional neural network diagram shows convolution and pooling layers feeding into dense classification layers.](https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Convolutional_Neural_Network.png/500px-Convolutional_Neural_Network.png)
+
+*Figure: Convolutional neural network architecture. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Convolutional_Neural_Network.png), Irisbox, CC BY 4.0.*
+
 ## Definitions
 
 For an input image $X$ and kernel $K$, the two-dimensional **cross-correlation** output is

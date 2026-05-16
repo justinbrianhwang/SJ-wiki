@@ -9,6 +9,10 @@ The book turns from the 8085 microprocessor to the 8051 microcontroller because 
 
 The 8051 is still small enough to understand at the register level. It is also different enough from the 8085 to teach microcontroller thinking: software configures hardware by writing SFRs, port pins may serve alternate functions, internal data memory has multiple regions, and bit-addressable storage makes single-bit control efficient.
 
+![An Intel 8051 architecture diagram shows central microcontroller blocks and buses.](https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Intel_8051_arch.svg/500px-Intel_8051_arch.svg.png)
+
+*Figure: Intel 8051 microcontroller architecture. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_8051_arch.svg), Appaloosa, CC BY-SA 3.0.*
+
 ## Definitions
 
 The **8051** is the original member of Intel's MCS-51 microcontroller family. The book's 8051 chapters cover the core CPU, internal memory, ports, timers, serial port, interrupts, and system connections. Later chapters discuss derivatives such as 89C51 devices.

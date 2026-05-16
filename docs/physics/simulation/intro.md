@@ -9,6 +9,10 @@ Simulation of dynamic systems studies how mathematical models evolve over time w
 
 These notes are written as working study pages. They emphasize model derivation, state-space form, numerical integration, MATLAB scripts, Simulink implementation, time-response interpretation, and verification. The goal is not to replace a textbook or software manual, but to give a coherent path from physical assumptions to a simulation result that can be checked, explained, and improved.
 
+![A Lorenz-attractor plot shows a butterfly-shaped trajectory in phase space.](https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Lorenz_system_r28_s10_b2-6666.png/500px-Lorenz_system_r28_s10_b2-6666.png)
+
+*Figure: Lorenz attractor as a canonical nonlinear dynamic-system trajectory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Lorenz_system_r28_s10_b2-6666.png), Wikimol, public domain.*
+
 ## Definitions
 
 A dynamic system is a system whose current behavior depends on stored information from the past. The stored information is represented by state variables. For a continuous-time system,

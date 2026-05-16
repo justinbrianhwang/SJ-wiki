@@ -9,6 +9,10 @@ Sequence modeling handles data where order matters: text, time series, speech, c
 
 RNNs are no longer the default architecture for large-scale language modeling, but they remain conceptually important. They introduce hidden states, truncated backpropagation through time, gradient clipping, teacher-forced sequence training, and the difference between training with known histories and generating one token at a time. These ideas reappear in encoder-decoder models, attention, transformers, and reinforcement learning.
 
+![A recurrent neural network diagram shows a compact recurrent cell and the same computation unfolded over time.](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Recurrent_neural_network_unfold.svg/500px-Recurrent_neural_network_unfold.svg.png)
+
+*Figure: Recurrent neural network shown compactly and unfolded through time. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Recurrent_neural_network_unfold.svg), fdeloche, CC BY-SA 4.0.*
+
 ## Definitions
 
 A **sequence** is an ordered list $(x_1,\ldots,x_T)$. In language modeling, $x_t$ may be a token. In time-series forecasting, it may be a real-valued observation.

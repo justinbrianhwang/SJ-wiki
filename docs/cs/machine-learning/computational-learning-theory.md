@@ -9,6 +9,10 @@ Computational learning theory asks what can be learned in principle, how much da
 
 This material remains foundational because it gives formal language for generalization. Modern models are often too large for the simplest finite-hypothesis bounds to be tight, but the discipline of stating a distribution, an error tolerance, a confidence level, and a hypothesis class is still essential.
 
+![A support vector machine diagram shows candidate separating hyperplanes and the maximum-margin separator.](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Svm_separating_hyperplanes_%28SVG%29.svg/500px-Svm_separating_hyperplanes_%28SVG%29.svg.png)
+
+*Figure: Maximum-margin separating hyperplane for an SVM. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Svm_separating_hyperplanes_%28SVG%29.svg), ZackWeinberg based on Cyc, CC BY-SA 3.0.*
+
 ## Definitions
 
 A concept class $C$ is a set of target concepts. A hypothesis space $H$ is the set of hypotheses available to the learner. In many analyses $C \subseteq H$, but agnostic settings allow the target to fall outside $H$.

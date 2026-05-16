@@ -9,6 +9,10 @@ Classification changes the target from a real number to a discrete class. D2L in
 
 The chapter also introduces a more careful view of generalization. Good training accuracy is not the goal; good performance on future data from the intended environment is the goal. Classification makes this distinction visible because accuracy, cross-entropy, class imbalance, distribution shift, and repeated test-set use can all tell different stories about the same model.
 
+![An overfitting diagram shows a classifier boundary that follows training points too closely.](https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Overfitting.svg/500px-Overfitting.svg.png)
+
+*Figure: Overfitting in a classifier decision boundary. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Overfitting.svg), Chabacano, CC BY-SA 4.0.*
+
 ## Definitions
 
 For $K$ classes, a classifier produces **logits** $o \in \mathbb{R}^K$. Logits are unconstrained scores, not probabilities. The **softmax** function maps logits to probabilities:

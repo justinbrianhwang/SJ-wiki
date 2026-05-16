@@ -9,6 +9,10 @@ Cluster analysis groups unlabeled data objects so that objects in the same group
 
 This page focuses on the main families from the basic clustering chapter. The next page covers advanced settings such as categorical data, scalability, high-dimensional clustering, semi-supervised clustering, visual supervision, and ensembles.
 
+![A DBSCAN diagram shows core points, border points, and noise under a density-based clustering rule.](https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/DBSCAN-Illustration.svg/500px-DBSCAN-Illustration.svg.png)
+
+*Figure: DBSCAN core, border, and noise points. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:DBSCAN-Illustration.svg), Chire, CC BY-SA 3.0.*
+
 ## Definitions
 
 A **clustering** partitions or organizes objects $X_1,\dots,X_n$ into groups $C_1,\dots,C_k$. Some algorithms create a hard partition where each object belongs to one cluster; others create soft memberships or hierarchical structures.

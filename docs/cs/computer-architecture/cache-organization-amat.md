@@ -9,6 +9,10 @@ Processors are much faster than main memory, so modern computers rely on a hiera
 
 The central cache question is quantitative: how much does a design reduce execution time, not just miss rate? A larger block may reduce compulsory misses but increase miss penalty. Higher associativity may reduce conflict misses but lengthen hit time. A bigger cache may reduce capacity misses while increasing power and access latency. Average memory access time, AMAT, is the first-order model that keeps these trade-offs visible.
 
+![A cache hierarchy diagram shows progressively larger memory levels between CPU cores and main memory.](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Multi-level_Cache_Hierarchy.svg/500px-Multi-level_Cache_Hierarchy.svg.png)
+
+*Figure: Multi-level cache hierarchy between processors and memory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Multi-level_Cache_Hierarchy.svg), Ferry24.Milan, CC BY-SA 3.0.*
+
 ## Definitions
 
 A cache block, or line, is the unit transferred between adjacent hierarchy levels. If a processor requests an address and the corresponding block is present in the cache, the access is a hit. Otherwise it is a miss, and a lower level must supply the block.

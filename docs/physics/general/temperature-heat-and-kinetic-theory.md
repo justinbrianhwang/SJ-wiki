@@ -9,6 +9,10 @@ Temperature, Heat, and Kinetic Theory covers temperature, heat transfer, phase c
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
+![A blackbody-radiation plot compares Planck curves with the Rayleigh-Jeans prediction.](https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Black_body.svg/600px-Black_body.svg.png)
+
+*Figure: Blackbody spectral radiance curves and the ultraviolet catastrophe. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Black_body.svg), Darth Kule, public domain.*
+
 ## Definitions
 
 - **Scope:** temperature, heat transfer, phase change, ideal gases, and molecular kinetic energy.

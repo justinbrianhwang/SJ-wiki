@@ -9,6 +9,10 @@ Frequency response describes how an LTI system changes sinusoidal or complex exp
 
 This page connects Fourier transforms, Laplace transforms, and $z$-transforms. In continuous time, the frequency response is $H(j\omega)$. In discrete time, it is $H(e^{j\Omega})$. In both cases, it is obtained from the impulse response of an LTI system and used through multiplication in the frequency domain.
 
+![A Butterworth-filter Bode plot shows magnitude and phase versus logarithmic frequency.](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Butterworth_filter_bode_plot.svg/600px-Butterworth_filter_bode_plot.svg.png)
+
+*Figure: Bode plot for a Butterworth low-pass filter. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Butterworth_filter_bode_plot.svg), Alejo2083, CC BY-SA 3.0.*
+
 ## Definitions
 
 For a continuous-time LTI system with impulse response $h(t)$, the frequency response is

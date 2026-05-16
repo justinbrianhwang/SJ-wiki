@@ -9,6 +9,10 @@ Deadlock is the failure mode where a set of processes can never make progress be
 
 Silberschatz, Galvin, and Gagne place the detailed deadlock discussion inside the synchronization chapter in the Essentials edition, while the broader dinosaur-book family often treats it as a full chapter. The topic deserves its own wiki page because the same ideas appear in mutexes, semaphores, memory allocation, file locks, device allocation, database transactions, and distributed systems.
 
+![A dining philosophers diagram shows five processes competing for shared forks around a table.](https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Dining_philosophers.svg/500px-Dining_philosophers.svg.png)
+
+*Figure: Dining philosophers as a synchronization and deadlock example. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dining_philosophers.svg), DnetSvg after Allen3, public domain.*
+
 ## Definitions
 
 A **deadlock** exists when every process in a set is waiting for an event that can be caused only by another process in the same set. The event is often the release of a resource.

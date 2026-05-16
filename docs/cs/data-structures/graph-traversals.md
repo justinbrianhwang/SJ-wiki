@@ -9,6 +9,10 @@ Graph traversal is the process of systematically visiting vertices reachable fro
 
 In the source textbook, traversal appears after graph representation because traversal is representation-sensitive. With adjacency lists, scanning all vertices and edges costs $O(V + E)$. With an adjacency matrix, finding neighbors of each vertex costs $O(V)$, giving $O(V^2)$ traversal time even for sparse graphs.
 
+![A breadth-first search tree diagram labels nodes in the order they are expanded level by level.](https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Breadth-first-tree.svg/500px-Breadth-first-tree.svg.png)
+
+*Figure: Breadth-first traversal order on a tree. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Breadth-first-tree.svg), Alexander Drichel, CC BY 3.0.*
+
 ## Definitions
 
 Given a graph $G = (V, E)$ and a start vertex `s`, a traversal maintains a set of visited vertices to avoid repeated work and infinite loops around cycles.

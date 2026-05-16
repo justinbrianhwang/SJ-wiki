@@ -9,6 +9,10 @@ Phase diagrams compress a large amount of thermodynamic information into a visua
 
 Atkins develops both pure-substance phase diagrams and mixture phase diagrams because the same chemical-potential idea controls vaporization, fusion, sublimation, azeotropes, eutectics, liquid crystals, and materials purification. A phase boundary is not just a line on a graph; it is the set of conditions where chemical potentials are equal across phases.
 
+![A phase diagram of water shows solid, liquid, vapor, triple point, and critical point regions on pressure-temperature axes.](https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Phase_diagram_of_water.svg/500px-Phase_diagram_of_water.svg.png)
+
+*Figure: Pressure-temperature phase diagram of water. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Phase_diagram_of_water.svg), Cmglee, CC BY-SA 3.0.*
+
 ## Definitions
 
 A **phase** is a form of matter uniform in chemical composition and physical state. A **component** is the minimum number of independent species needed to describe the composition of all phases. A **constituent** is an actual chemical species present.

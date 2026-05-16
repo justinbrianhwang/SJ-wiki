@@ -9,6 +9,10 @@ Fourier series represent periodic functions as sums of sines and cosines. The en
 
 The same idea solves boundary-value PDEs. If the boundary conditions match sine or cosine modes, the initial shape can be expanded in that basis and each mode evolves independently. Fourier series therefore connect approximation, signal analysis, heat flow, wave motion, and Sturm-Liouville theory.
 
+![Several partial sums of a Fourier series approximate a square wave.](https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Fourier_Series_Square_Wave.svg/500px-Fourier_Series_Square_Wave.svg.png)
+
+*Figure: Fourier-series approximations to a square wave. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fourier_Series_Square_Wave.svg), Guy vandegrift, CC0 1.0.*
+
 ## Definitions
 
 For a $2\pi$-periodic function,

@@ -216,6 +216,10 @@ The important warning is that the Heisenberg limit is a scaling law for an ideal
 
 ### Physical platforms
 
+![Atomic model of a nitrogen vacancy center in a diamond lattice with nitrogen and vacancy sites highlighted](https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Nitrogen-vacancy_center.png/250px-Nitrogen-vacancy_center.png)
+
+*Figure: Nitrogen-vacancy center in diamond, a common solid-state quantum sensor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Nitrogen-vacancy_center.png), NIST, public domain.*
+
 **NV centers in diamond.** A nitrogen-vacancy center is a point defect consisting of a substitutional nitrogen atom next to a vacancy in diamond. Its electronic ground state is a spin triplet, with magnetic sublevels often labeled $m_s=0$ and $m_s=\pm 1$. In many magnetometry experiments, $m_s=0$ and one of the $m_s=\pm 1$ states form an effective two-level sensor. Optical excitation polarizes the spin and spin-dependent fluorescence enables optically detected magnetic resonance (ODMR). NV sensors are useful because diamond is chemically robust, can host near-surface defects, and can operate from cryogenic conditions to room temperature. Applications include nanoscale magnetometry, current imaging, materials characterization, biology-compatible magnetic sensing, and microscale or nanoscale MRI concepts.
 
 **Atomic clocks.** Atomic clocks estimate frequency by comparing a local oscillator to a narrow atomic transition. Caesium fountain clocks define the SI second through the microwave hyperfine transition of $^{133}\mathrm{Cs}$, while optical clocks based on ions or neutral atoms such as Sr, Yb, and Hg use much higher transition frequencies and can reach fractional frequency uncertainty or instability in the low $10^{-18}$ range in leading laboratory systems. Clock comparisons are sensors of gravitational potential through relativistic redshift, tests of fundamental constants, and probes of possible new physics. They are also infrastructure for navigation, timing networks, geodesy, and frequency metrology.

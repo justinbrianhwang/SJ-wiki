@@ -9,6 +9,10 @@ Decision tree learning is one of the most practical algorithms in Mitchell's boo
 
 The chapter also introduces overfitting in a concrete way. A tree can keep growing until it matches every training example, but a perfectly fitted tree may generalize poorly. The tension among expressive trees, noisy data, small samples, and pruning remains central in modern tree methods such as random forests and gradient boosting, even though those methods go beyond Mitchell's 1997 scope.
 
+![An overfitting diagram shows a classifier boundary that follows training points too closely.](https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Overfitting.svg/500px-Overfitting.svg.png)
+
+*Figure: Overfitting in a classifier decision boundary. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Overfitting.svg), Chabacano, CC BY-SA 4.0.*
+
 ## Definitions
 
 A decision tree represents a function by internal decision nodes and leaf predictions. Each internal node tests an attribute. Each branch corresponds to an attribute value or threshold outcome. Each leaf gives the predicted class.

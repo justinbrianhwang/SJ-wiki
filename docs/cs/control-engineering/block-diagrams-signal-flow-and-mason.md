@@ -9,6 +9,10 @@ Real control systems are built from interconnected subsystems. Nise's reduction 
 
 The methods here are algebraic, but they are also organizational. A clean block diagram exposes where disturbances enter, where sensor dynamics sit, and which signals are internal. Signal-flow graphs provide a compact alternative when many loops interact. Mason's gain formula is especially useful when block-diagram reduction becomes visually messy.
 
+![A feedback loop block diagram shows an output signal returned to the input through a controller path.](https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Feedback_Loop.svg/500px-Feedback_Loop.svg.png)
+
+*Figure: Feedback loop block diagram in control theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Feedback_Loop.svg), Inductiveload, public domain.*
+
 ## Definitions
 
 A **block diagram** represents subsystem transfer functions as directed blocks connected by signals. A **summing junction** forms a signed algebraic sum. A **pickoff point** copies a signal without changing it.

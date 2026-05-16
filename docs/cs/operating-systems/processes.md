@@ -9,6 +9,10 @@ A process is a program in execution, but that phrase is only the beginning. The 
 
 Processes connect the user-level idea of "running a program" to the kernel-level mechanisms of scheduling, memory isolation, resource ownership, and interprocess communication. The process page therefore prepares for CPU scheduling, synchronization, virtual memory, file systems, and protection. Once a program becomes a process, it is no longer just code; it is a managed object in the kernel.
 
+![A process state diagram shows transitions among new, ready, running, waiting, and terminated states.](https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Process_state.svg/500px-Process_state.svg.png)
+
+*Figure: Five-state process model used in operating systems. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Process_state.svg), MrDrBob, CC BY-SA 3.0.*
+
 ## Definitions
 
 A **process** is an executing program with its current activity and resources. It includes a **text section** containing program code, a **data section** for global variables, a **heap** for dynamically allocated memory, and a **stack** for function calls, parameters, local variables, and return addresses.

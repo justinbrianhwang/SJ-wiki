@@ -9,6 +9,10 @@ A priority queue (우선순위 큐) stores items so that the most important item
 
 The source textbook introduces heaps in the tree chapter and later revisits advanced priority queues. The basic binary heap is the essential core. It combines two ideas: a complete binary-tree shape, which packs neatly into an array, and a heap-order property, which keeps the highest-priority key at the root.
 
+![A binary heap diagram shows a complete binary tree whose parent keys satisfy the heap order property.](https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Binary_heap.svg/500px-Binary_heap.svg.png)
+
+*Figure: Binary heap represented as a complete tree. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Binary_heap.svg), Wojciech Mula, CC BY-SA 3.0.*
+
 ## Definitions
 
 A **priority queue ADT** supports:

@@ -9,6 +9,10 @@ Adversarial robustness evaluation is unusually easy to get wrong. A model can lo
 
 This page gives a practical checklist for evaluating adversarial defenses. It covers robust accuracy, adaptive attacks, AutoAttack, RobustBench-style reporting, certified metrics, and common methodological errors. The goal is not to crown one benchmark as final, but to make robustness claims reproducible and threat-model-specific.
 
+![A precision and recall diagram shows the overlap between retrieved items and relevant items.](https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Precision_recall.svg/500px-Precision_recall.svg.png)
+
+*Figure: Precision and recall as set overlap. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Precision_recall.svg), kindlychung, CC0.*
+
 ## Definitions
 
 **Clean accuracy** is accuracy on unmodified test examples:

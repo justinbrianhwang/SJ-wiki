@@ -9,6 +9,10 @@ Mitchell's first chapter frames machine learning as the engineering problem of m
 
 The chapter's checkers example is also a compact design pattern for the whole book. A learner does not directly receive the perfect strategy. It receives experience, converts experience into training examples, searches a hypothesis space, and updates a performance system. The same pattern reappears in decision trees, neural networks, Bayesian classifiers, instance-based methods, explanation-based learning, and reinforcement learning.
 
+![An overfitting diagram shows a classifier boundary that follows training points too closely.](https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Overfitting.svg/500px-Overfitting.svg.png)
+
+*Figure: Overfitting in a classifier decision boundary. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Overfitting.svg), Chabacano, CC BY-SA 4.0.*
+
 ## Definitions
 
 A computer program learns from experience $E$ with respect to a class of tasks $T$ and performance measure $P$ if its performance at tasks in $T$, as measured by $P$, improves with experience $E$.

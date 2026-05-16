@@ -9,6 +9,10 @@ Magnetostatics studies magnetic fields produced by steady currents. The electros
 
 Two complementary field laws dominate the subject. Biot-Savart law is a source integral, useful for finite wires and loops. Ampere's law is an integral circulation law, powerful when symmetry makes the magnetic field simple along a closed path. Together they mirror the Coulomb/Gauss pairing from electrostatics.
 
+![A solenoid-field diagram shows magnetic field lines threading a coil.](https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/VFPt_Solenoid_correct2.svg/600px-VFPt_Solenoid_correct2.svg.png)
+
+*Figure: Magnetic field lines computed for a solenoid. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:VFPt_Solenoid_correct2.svg), Geek3, CC BY-SA 3.0.*
+
 ## Definitions
 
 The magnetic force on a charge $q$ moving with velocity $\vec u$ is

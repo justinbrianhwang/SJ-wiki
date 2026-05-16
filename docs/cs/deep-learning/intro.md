@@ -9,6 +9,10 @@ These notes follow Aston Zhang, Zachary C. Lipton, Mu Li, and Alexander J. Smola
 
 The later pages cover the main deep learning families: multilayer perceptrons, convolutional networks, recurrent networks, attention, transformers, NLP applications, computer vision systems, recommender systems, GANs, reinforcement learning, Gaussian processes, and hyperparameter optimization. Code examples use PyTorch for portability. For classical context, compare these notes with [machine learning](/cs/machine-learning/); for prerequisites, see [linear algebra](/math/linear-algebra/) and [probability](/math/probability-and-random-variables/).
 
+![A perceptron diagram shows weighted inputs combined and passed through an activation function to produce an output.](https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Perceptron.svg/500px-Perceptron.svg.png)
+
+*Figure: Perceptron unit with weighted inputs and activation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Perceptron.svg), Mat the w, CC BY-SA 3.0.*
+
 1. [Tensors and Data Preprocessing](/cs/deep-learning/tensors-data-preprocessing)
 2. [Math for Deep Learning](/cs/deep-learning/math-for-deep-learning)
 3. [Linear Regression and Training Loops](/cs/deep-learning/linear-regression-training)

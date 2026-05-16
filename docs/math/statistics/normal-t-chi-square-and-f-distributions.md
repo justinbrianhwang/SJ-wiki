@@ -9,6 +9,10 @@ Several continuous distributions appear repeatedly in introductory inference. Th
 
 These distributions are not just named curves. Each one describes the behavior of a particular statistic under assumptions. Understanding the statistic behind the curve prevents mechanical table lookup. For example, a $t$ statistic compares an estimated effect to its estimated standard error, while an $F$ statistic compares variance explained by a model to variance left unexplained.
 
+![Several Student t density curves are compared with the limiting normal curve.](https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Student_t_pdf.svg/500px-Student_t_pdf.svg.png)
+
+*Figure: Student $t$ density curves approaching the normal curve as degrees of freedom increase. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Student_t_pdf.svg), Skbkekas, CC BY 3.0.*
+
 ## Definitions
 
 A **normal distribution** with mean $\mu$ and standard deviation $\sigma$ is written

@@ -9,6 +9,10 @@ Data structures are organized ways to store data so that the operations a progra
 
 These notes follow the core scope of a Korean-language C data-structures textbook, *C로 쓴 자료구조론*, whose table of contents includes algorithm specification, abstract data types, arrays, stacks and queues, linked lists, trees, heaps, binary search trees, graphs, sorting, hashing, and advanced search structures. The pages here focus on the standard curriculum topics requested for SJ Wiki: the structures and algorithms most students are expected to implement and trace by hand in a Data Structures in C course.
 
+![A B-tree diagram shows multiple keys stored in each internal node and leaves at the same depth.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/B-tree.svg/500px-B-tree.svg.png)
+
+*Figure: B-tree node structure used in balanced search indexes. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:B-tree.svg), CyHawk, CC BY-SA 3.0.*
+
 ## Definitions
 
 A **data type** is a set of values together with operations on those values. In C, `int`, `double`, and pointer types are built in, while `struct` lets programmers define new record layouts.

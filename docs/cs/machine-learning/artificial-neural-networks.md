@@ -9,6 +9,10 @@ Mitchell's neural-network chapter predates the modern deep learning era, but man
 
 The chapter connects neural networks to the earlier checkers learner. Both use parameterized functions and error gradients. A perceptron is a linear threshold hypothesis; a multilayer network composes many differentiable units to represent nonlinear decision surfaces.
 
+![A perceptron diagram shows weighted inputs combined and passed through an activation function to produce an output.](https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Perceptron.svg/500px-Perceptron.svg.png)
+
+*Figure: Perceptron unit with weighted inputs and activation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Perceptron.svg), Mat the w, CC BY-SA 3.0.*
+
 ## Definitions
 
 A perceptron computes a weighted sum and passes it through a threshold:

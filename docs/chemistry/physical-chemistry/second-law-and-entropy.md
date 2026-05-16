@@ -9,6 +9,10 @@ The Second Law explains why energy conservation is not enough to predict change.
 
 In Atkins' treatment, entropy begins as a thermodynamic state function defined through reversible heat transfer, then gains a molecular interpretation through the number of accessible microstates. The bridge between those views is central to equilibrium, phase change, free energy, and statistical thermodynamics.
 
+![A pressure-volume diagram shows the four reversible steps of a Carnot cycle.](https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Carnot-cycle-p-V-diagram.svg/400px-Carnot-cycle-p-V-diagram.svg.png)
+
+*Figure: Carnot cycle shown on a pressure-volume diagram. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Carnot-cycle-p-V-diagram.svg), Derkleinebauer, public domain.*
+
 ## Definitions
 
 The thermodynamic definition of entropy change is

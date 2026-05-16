@@ -9,6 +9,10 @@ Timers, serial communication, and interrupts are where the 8051 becomes a practi
 
 The central habit is to configure the correct SFR bits, clear or test the correct flags, and understand which hardware event sets each flag. Once that is in place, an 8051 program can blink LEDs, count external pulses, generate a baud clock, receive characters, and service external events predictably.
 
+![An I2C bus diagram shows one master connected to several slave devices over shared SDA and SCL lines.](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/I2C.svg/500px-I2C.svg.png)
+
+*Figure: I2C bus with one master and several slave devices. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:I2C.svg), Cburnett, CC BY-SA 3.0.*
+
 ## Definitions
 
 The classic 8051 has **Timer 0** and **Timer 1**. Each can operate as a timer driven by the machine cycle clock or as a counter driven by external input pins. Later derivatives often add more timers or programmable counter arrays.

@@ -9,6 +9,10 @@ Trees (트리) organize data hierarchically rather than linearly. A binary tree 
 
 In the source textbook's tree chapter, binary trees appear before heaps and binary search trees because both are specialized binary-tree shapes. A heap uses a nearly complete binary tree with an order rule between parents and children. A binary search tree uses an ordering rule between the left subtree, root, and right subtree. Before those special cases make sense, the basic language of root, child, height, level, representation, and traversal must be clear.
 
+![A binary tree diagram shows a root node branching into left and right child subtrees.](https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Binary_tree.svg/500px-Binary_tree.svg.png)
+
+*Figure: Binary tree shape with left and right child links. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Binary_tree.svg), Derrick Coetzee, public domain.*
+
 ## Definitions
 
 A **tree** is a finite set of nodes that is either empty or consists of a distinguished **root** and zero or more disjoint subtrees. In a **binary tree**, each node has at most two subtrees: the left subtree and the right subtree. The left and right positions are distinct, so a node with only a left child is not the same shape as a node with only a right child.

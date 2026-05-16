@@ -9,6 +9,10 @@ Operating systems sit between applications and hardware. They make programs easi
 
 These notes follow the scope of *Operating System Concepts Essentials*, 2nd edition: overview and structure, process management, concurrency, scheduling, memory, virtual memory, storage, I/O, protection, security, and a Linux case study. The pages are written as study notes rather than a replacement for the textbook: they emphasize definitions, algorithms, trade-offs, worked examples, and the connections among topics.
 
+![A circular operating-system process state diagram shows scheduler transitions between process states.](https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Process_states.svg/500px-Process_states.svg.png)
+
+*Figure: Process-state transitions in a scheduler. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Process_states.svg), A3r0, public domain.*
+
 ## Definitions
 
 An **operating system** is software that manages computer hardware and provides services to application programs. At the center is the **kernel**, the privileged program that remains running and mediates access to hardware resources. Around it are system programs, libraries, shells, graphical environments, daemons, and applications.

@@ -9,6 +9,10 @@ Advanced clustering deals with cases where the clean numeric, moderate-size, low
 
 This page extends the core clustering methods. It is especially important in data mining because real data often contain categorical attributes, millions of records, sparse text features, local subspace structure, partial labels, or multiple incompatible clusterings.
 
+![A DBSCAN diagram shows core points, border points, and noise under a density-based clustering rule.](https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/DBSCAN-Illustration.svg/500px-DBSCAN-Illustration.svg.png)
+
+*Figure: DBSCAN core, border, and noise points. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:DBSCAN-Illustration.svg), Chire, CC BY-SA 3.0.*
+
 ## Definitions
 
 **Categorical clustering** groups records whose attributes are symbols rather than numeric values. Since arithmetic means are not defined, algorithms use modes, medoids, matching similarity, entropy, or probabilistic categorical models.

@@ -9,6 +9,10 @@ Computer architecture studies the contract between software and hardware, and th
 
 These notes follow the scope of *Computer Architecture: A Quantitative Approach*, 5th edition: quantitative design, memory hierarchy, instruction-level parallelism, data-level parallelism, thread-level parallelism, warehouse-scale computing, and supporting appendix topics such as instruction sets, pipelining, virtual memory, and storage. They are written as original study notes, with formulas, diagrams, worked examples, and small runnable models.
 
+![A von Neumann architecture diagram shows a CPU connected to memory through shared data and control paths.](https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Von_Neumann_Architecture.svg/500px-Von_Neumann_Architecture.svg.png)
+
+*Figure: Von Neumann computer architecture. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Von_Neumann_Architecture.svg), Kapooht, CC BY-SA 3.0.*
+
 ## Definitions
 
 Computer architecture includes three related layers:

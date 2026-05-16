@@ -9,6 +9,10 @@ The continuous distributions in the middle of MIT 18.440 each encode a different
 
 These distributions are not just a catalog. Their formulas explain why later theorems need hypotheses. The central limit theorem uses finite variance; the law of large numbers needs finite mean; the Cauchy distribution violates these assumptions. The exponential and gamma laws connect continuous densities back to Poisson processes.
 
+![Several normal density curves show changes in mean and variance.](https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Normal_Distribution_PDF.svg/500px-Normal_Distribution_PDF.svg.png)
+
+*Figure: Normal density functions with different means and variances. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Normal_Distribution_PDF.svg), Inductiveload, public domain.*
+
 ## Definitions
 
 A **standard normal** random variable has density

@@ -9,6 +9,10 @@ Repeated independent trials are the simplest laboratory for random variables. A 
 
 These distributions appear early in MIT 18.440 because they connect counting, independence, expectation, variance, and recursion. They also teach a useful modeling distinction: sometimes the number of trials is fixed and the number of successes is random; sometimes the number of successes is fixed and the waiting time is random.
 
+![A bar plot shows probabilities for different success counts in a binomial distribution.](https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Binomial_distribution_pmf.svg/500px-Binomial_distribution_pmf.svg.png)
+
+*Figure: Binomial probability mass function for repeated Bernoulli trials. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Binomial_distribution_pmf.svg), Tayste, public domain.*
+
 ## Definitions
 
 A **Bernoulli** random variable with parameter $p\in[0,1]$ takes values $1$ and $0$ with

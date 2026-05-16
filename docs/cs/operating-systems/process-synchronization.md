@@ -9,6 +9,10 @@ Process synchronization is the part of operating systems where concurrency becom
 
 The textbook develops synchronization from the critical-section problem through hardware support, mutex locks, semaphores, monitors, classic synchronization problems, and deadlocks. The common theme is controlled access: the OS and programs need ways to express "only one at a time," "wait until a condition is true," and "wake the right waiters without losing events."
 
+![A dining philosophers diagram shows five processes competing for shared forks around a table.](https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Dining_philosophers.svg/500px-Dining_philosophers.svg.png)
+
+*Figure: Dining philosophers as a synchronization and deadlock example. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dining_philosophers.svg), DnetSvg after Allen3, public domain.*
+
 ## Definitions
 
 A **race condition** occurs when the correctness of a result depends on the relative timing of concurrent operations. The simplest example is two threads executing `counter = counter + 1` at the same time. The statement looks atomic in source code, but it compiles into multiple load, add, and store operations.

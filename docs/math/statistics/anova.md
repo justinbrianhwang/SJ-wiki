@@ -9,6 +9,10 @@ Analysis of variance, or ANOVA, compares means by partitioning variability. Inst
 
 The name can be confusing: ANOVA tests hypotheses about means by analyzing variances. If group means are far apart relative to variation within groups, the between-group mean square becomes large compared with the within-group mean square, producing a large $F$ statistic. If group means differ only by the amount expected from within-group noise, the $F$ statistic tends to be near 1.
 
+![Several F distribution density curves are plotted for different numerator and denominator degrees of freedom.](https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/F-distribution_pdf.svg/500px-F-distribution_pdf.svg.png)
+
+*Figure: $F$ distribution density curves for several degrees-of-freedom choices. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:F-distribution_pdf.svg), IkamusumeFan, CC BY-SA 4.0.*
+
 ## Definitions
 
 In a **one-way ANOVA**, one categorical explanatory variable, called a factor, has $k$ levels or groups. The response variable is quantitative. The null hypothesis is

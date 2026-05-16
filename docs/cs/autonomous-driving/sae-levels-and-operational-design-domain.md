@@ -9,6 +9,10 @@ The SAE J3016 levels are the common vocabulary for describing how much of the dr
 
 This page gives the foundational taxonomy used throughout the autonomous-driving section. Later pages on [sensors](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu), [prediction](/cs/autonomous-driving/prediction-and-motion-forecasting), [planning](/cs/autonomous-driving/motion-planning), [control](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley), and [safety](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing) assume this distinction between capability, domain, fallback responsibility, and legal permission.
 
+![A driving automation levels table summarizes SAE levels from no automation to full automation.](https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Levels_of_Driving_Automation.png/500px-Levels_of_Driving_Automation.png)
+
+*Figure: Levels of driving automation for road vehicles. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Levels_of_Driving_Automation.png), Bryant Walker Smith, CC BY 3.0.*
+
 ## Definitions
 
 The **dynamic driving task** is the real-time operational and tactical work of driving: lateral control, longitudinal control, object and event detection, response planning, maneuver execution, and compliance with road rules. It excludes trip planning choices such as choosing to go to the airport, but it includes the driving actions needed to execute the trip.

@@ -9,6 +9,10 @@ D2L's modern CNN chapters show how image models evolved from LeNet into deeper, 
 
 These models are more than a historical sequence. They introduce reusable design ideas: blocks, bottlenecks, normalization, residual connections, concatenation, global average pooling, and computational tradeoffs between width, depth, and resolution. Modern vision models still rely on these ideas even when attention or hybrid architectures are added.
 
+![A convolutional neural network diagram shows convolution and pooling layers feeding into dense classification layers.](https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Convolutional_Neural_Network.png/500px-Convolutional_Neural_Network.png)
+
+*Figure: Convolutional neural network architecture. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Convolutional_Neural_Network.png), Irisbox, CC BY 4.0.*
+
 ## Definitions
 
 An **architecture block** is a repeated module with a recognizable input-output pattern. VGG blocks repeat $3 \times 3$ convolutions and pooling. Inception blocks run several branches in parallel. Residual blocks add an input to a learned transformation.

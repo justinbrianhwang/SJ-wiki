@@ -9,6 +9,10 @@ Natural language processing studies computational methods for analyzing, represe
 
 The notes are organized as a single merged course rather than as per-book summaries. When the books overlap, the pages usually follow Jurafsky and Martin for terminology and topic order, then add Eisenstein's notation or modeling perspective where it sharpens the math. When a topic is covered mainly by one book, the page says so implicitly through its emphasis: speech and modern prompting come mostly from Jurafsky and Martin, while weighted grammars, CRFs, and structured search draw heavily from Eisenstein.
 
+![A recurrent neural network diagram shows a compact recurrent cell and the same computation unfolded over time.](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Recurrent_neural_network_unfold.svg/500px-Recurrent_neural_network_unfold.svg.png)
+
+*Figure: Recurrent neural network shown compactly and unfolded through time. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Recurrent_neural_network_unfold.svg), fdeloche, CC BY-SA 4.0.*
+
 ## Definitions
 
 An **NLP task** maps linguistic input to a useful output: labels, spans, parse trees, entities, translations, answers, speech transcripts, synthetic speech, or generated text. Tasks vary by input and output structure. Classification maps one input to one label; sequence labeling maps tokens to labels; parsing maps a sentence to a tree or graph; generation maps context to a sequence.

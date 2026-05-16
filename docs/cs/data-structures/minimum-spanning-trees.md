@@ -9,6 +9,10 @@ A minimum spanning tree, or MST (최소 비용 신장 트리), connects all vert
 
 The source textbook places minimum-cost spanning trees after graph traversal and connected components. That sequence is logical. A spanning tree exists only inside a connected undirected graph; traversal explains reachability, and MST algorithms then ask which connecting edges are cheapest without forming unnecessary cycles.
 
+![A Prim algorithm diagram shows a weighted graph gradually growing a minimum spanning tree from one start vertex.](https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Prim%27s_algorithm.svg/500px-Prim%27s_algorithm.svg.png)
+
+*Figure: Prim algorithm growing a minimum spanning tree. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Prim%27s_algorithm.svg), Derrick Coetzee, CC0.*
+
 ## Definitions
 
 Let $G = (V, E)$ be a connected, undirected, weighted graph. A **spanning tree** is a subgraph $T = (V, E_T)$ that includes every vertex, is connected, and has no cycles. Any spanning tree of a graph with $\vert V\vert $ vertices has exactly $\vert V\vert  - 1$ edges.

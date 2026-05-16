@@ -9,6 +9,10 @@ Recurrent neural networks process sequences by carrying a hidden state forward t
 
 The core motivation is simple: language is not a fixed-size input. A word's interpretation can depend on earlier words, and sequence tasks require predictions at many positions. RNNs encode a prefix into a vector state; LSTMs improve that state with gates that control what is remembered, forgotten, and exposed.
 
+![An LSTM cell diagram shows gates controlling information flow through cell state and hidden state paths.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Long_Short-Term_Memory.svg/500px-Long_Short-Term_Memory.svg.png)
+
+*Figure: Long short-term memory cell architecture. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Long_Short-Term_Memory.svg), fdeloche, CC BY-SA 4.0.*
+
 ## Definitions
 
 A simple **recurrent neural network** updates a hidden state $h_t$ for each input $x_t$:

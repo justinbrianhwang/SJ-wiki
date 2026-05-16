@@ -9,6 +9,10 @@ Advanced classification covers supervised learning cases that go beyond a balanc
 
 This page extends the core classifiers. The unifying question is how to adapt a predictive model when labels are many, rare, expensive, partially missing, numeric, streaming, or noisy.
 
+![A support vector machine diagram shows candidate separating hyperplanes and the maximum-margin separator.](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Svm_separating_hyperplanes_%28SVG%29.svg/500px-Svm_separating_hyperplanes_%28SVG%29.svg.png)
+
+*Figure: Maximum-margin separating hyperplane for an SVM. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Svm_separating_hyperplanes_%28SVG%29.svg), ZackWeinberg based on Cyc, CC BY-SA 3.0.*
+
 ## Definitions
 
 **Multiclass classification** predicts one of more than two labels. Common reductions include one-vs-rest and one-vs-one binary classifiers.

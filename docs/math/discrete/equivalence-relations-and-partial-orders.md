@@ -9,6 +9,10 @@ Equivalence relations formalize sameness for a chosen purpose. Partial orders fo
 
 The contrast is useful. Equivalence relations collapse a set into blocks of objects considered the same, such as integers with the same remainder modulo $m$. Partial orders arrange objects by precedence or containment, such as tasks ordered by prerequisites or sets ordered by inclusion.
 
+![A Hasse diagram orders all subsets of a three-element set by inclusion.](https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Hasse_diagram_of_powerset_of_3.svg/500px-Hasse_diagram_of_powerset_of_3.svg.png)
+
+*Figure: Hasse diagram for the power set of a three-element set. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hasse_diagram_of_powerset_of_3.svg), KSmrq, CC BY-SA 3.0.*
+
 ## Definitions
 
 A relation $R$ on $A$ is an **equivalence relation** if it is reflexive, symmetric, and transitive.

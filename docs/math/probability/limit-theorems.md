@@ -9,6 +9,10 @@ Limit theorems explain why averages stabilize and why normal distributions appea
 
 Lane et al.'s sampling-distributions chapter uses the central limit theorem to explain why sample means are often nearly normal even when the parent population is not. This page focuses on the probability-theory statements and calculations, while the statistics section handles inference applications.
 
+![Simulated sample-mean distributions become more concentrated and bell-shaped as sample size increases.](https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Central_Limit_Theorem.png/500px-Central_Limit_Theorem.png)
+
+*Figure: Simulation illustrating convergence in the central limit theorem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Central_Limit_Theorem.png), Daniel Resende, CC BY-SA 4.0.*
+
 ## Definitions
 
 Let $X_1,X_2,\ldots$ be random variables with common mean $\mu$. The **sample mean** is

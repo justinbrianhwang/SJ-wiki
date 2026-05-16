@@ -9,6 +9,10 @@ A microprocessor is a programmable digital processing unit: it fetches instructi
 
 A microcomputer is the useful system built around the microprocessor. It includes memory, input/output circuits, clocks, reset circuitry, bus drivers, and the program that coordinates them. The important distinction is that a microprocessor such as the 8085 is mainly a CPU chip, while a microcontroller such as the 8051 also places RAM, ROM, timers, ports, and serial hardware on the same chip. The whole subject is about learning where each function lives and how software makes the hardware move in the required order.
 
+![A photograph shows an Intel C8085AH microprocessor chip package.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Intel_C8085AH.jpg/500px-Intel_C8085AH.jpg)
+
+*Figure: Intel C8085AH microprocessor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_C8085AH.jpg), Thomas Nguyen, CC BY-SA 4.0.*
+
 ## Definitions
 
 A **microprocessor** is an integrated circuit that contains the arithmetic logic unit, control unit, internal registers, and bus interface needed to execute instructions. It does not, by itself, include a complete user system. The classic 8085 is an 8-bit microprocessor: its main data operations are 8 bits wide, while its address bus is 16 bits wide.

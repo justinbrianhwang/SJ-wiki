@@ -9,6 +9,10 @@ Classical controllers add simple dynamics to reshape steady-state error, transie
 
 This page emphasizes what each compensator changes structurally. A controller is not chosen because its name is familiar; it is chosen because the plant's deficiencies are clear. If the system is too slow, lacks damping, or has inadequate phase margin, lead or derivative action may help. If tracking error is too large, integral or lag action may help. If both are inadequate, combined compensation is needed.
 
+![A feedback loop block diagram shows an output signal returned to the input through a controller path.](https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Feedback_Loop.svg/500px-Feedback_Loop.svg.png)
+
+*Figure: Feedback loop block diagram in control theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Feedback_Loop.svg), Inductiveload, public domain.*
+
 ## Definitions
 
 The ideal PID controller is

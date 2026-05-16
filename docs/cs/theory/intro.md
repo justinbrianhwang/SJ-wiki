@@ -9,6 +9,10 @@ Theory of computation studies computation before it becomes a particular program
 
 These notes follow the scope of Michael Sipser's *Introduction to the Theory of Computation*, third edition, without reproducing its text. They use the textbook as a map of topics: mathematical preliminaries, automata and languages, computability, decidability, reducibility, time complexity, space complexity, and selected advanced topics. Each page is written as a study note with definitions, key results, visual anchors, worked examples, code, pitfalls, and links to neighboring pages.
 
+![A Chomsky hierarchy diagram shows regular, context-free, context-sensitive, and recursively enumerable language classes nested inside one another.](https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Chomsky-hierarchy.svg/500px-Chomsky-hierarchy.svg.png)
+
+*Figure: Nested language classes in the Chomsky hierarchy. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Chomsky-hierarchy.svg), J. Finkelstein, CC BY-SA 3.0.*
+
 ## Definitions
 
 A **model of computation** is a mathematical object that describes what counts as a computation. In this course the main models are deterministic finite automata, nondeterministic finite automata, regular expressions, context-free grammars, pushdown automata, Turing machines, and variants of Turing machines. A model is useful when it is precise enough for proof and simple enough to reveal structure.

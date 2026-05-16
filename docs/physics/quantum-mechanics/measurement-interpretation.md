@@ -9,6 +9,10 @@ Measurement is where the formal rules meet the question of what quantum states m
 
 Sakurai discusses measurements from the start through Stern-Gerlach experiments and later through spin correlations and Bell inequalities. Ballentine is the major contrast source here: he strongly emphasizes an ensemble interpretation and resists reading the state vector as the complete physical condition of one individual system. The Gottfried-named notes include postulates, spin measurement, density matrices, and interpretation remarks. Schiff's older treatment is closer to traditional Copenhagen language.
 
+![A Stern-Gerlach diagram shows a silver-atom beam splitting in an inhomogeneous magnetic field.](https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Stern-Gerlach_experiment.svg/600px-Stern-Gerlach_experiment.svg.png)
+
+*Figure: Stern-Gerlach apparatus and the observed two-spot spin result. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Stern-Gerlach_experiment.svg), Tatoute, CC BY-SA 4.0.*
+
 ## Definitions
 
 For a projective measurement of an observable

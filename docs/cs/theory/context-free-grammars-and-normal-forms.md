@@ -9,6 +9,10 @@ Context-free grammars describe recursive syntax. They are stronger than finite a
 
 The grammar viewpoint is generative: a language is the set of terminal strings that can be derived from a start variable. The same language may have many grammars, and a grammar may admit several parse trees for one string. Normal forms such as Chomsky normal form make grammars easier to analyze and connect them to algorithms and pushdown automata.
 
+![A Chomsky hierarchy diagram shows regular, context-free, context-sensitive, and recursively enumerable language classes nested inside one another.](https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Chomsky-hierarchy.svg/500px-Chomsky-hierarchy.svg.png)
+
+*Figure: Nested language classes in the Chomsky hierarchy. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Chomsky-hierarchy.svg), J. Finkelstein, CC BY-SA 3.0.*
+
 ## Definitions
 
 A **context-free grammar**, or **CFG**, is a 4-tuple $(V,\Sigma,R,S)$. The set $V$ contains variables or nonterminals, $\Sigma$ contains terminals, $R$ is a finite set of production rules, and $S\in V$ is the start variable.

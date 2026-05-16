@@ -9,6 +9,10 @@ A Markov chain is a random process whose next state depends on the present state
 
 MIT 18.440 introduces finite-state Markov chains through examples such as weather models, then discusses ergodicity and stationarity. The main long-run question is whether the chain forgets its starting state and settles into stable state frequencies. Transition matrices make the calculations concrete.
 
+![A three-state Markov chain diagram labels directed transition probabilities.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Simple_markov_chain.svg/500px-Simple_markov_chain.svg.png)
+
+*Figure: Three-state Markov chain with directed transitions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Simple_markov_chain.svg), Chrislb, CC BY-SA 3.0.*
+
 ## Definitions
 
 Let the finite state space be

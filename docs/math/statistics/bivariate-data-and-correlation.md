@@ -9,6 +9,10 @@ Bivariate data record two variables on the same cases. The first statistical tas
 
 Association is useful even when causation is not justified. A scatterplot of study time and exam score can support prediction and reveal unusual cases. It does not, by itself, prove that more study caused the higher score. Students who study more may differ in preparation, attendance, motivation, or course load. The central statistical habit is to describe the relationship accurately while respecting what the study design can and cannot establish.
 
+![Many scatterplots show different patterns and Pearson correlation coefficients.](https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Correlation_examples2.svg/500px-Correlation_examples2.svg.png)
+
+*Figure: Scatterplots with varied Pearson correlation coefficients. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Correlation_examples2.svg), DenisBoigelot and Imagecreator, public domain.*
+
 ## Definitions
 
 A **bivariate data set** contains paired observations $(x_i,y_i)$ for $i=1,\dots,n$. Each pair belongs to the same case. The pairing is essential: a list of heights from one group and weights from another group is not bivariate data about body size.

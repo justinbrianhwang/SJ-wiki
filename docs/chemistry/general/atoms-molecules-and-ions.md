@@ -9,6 +9,10 @@ Atomic theory explains why matter combines in definite ratios and why chemical e
 
 In the Ebbing and Gammon sequence this topic sits near atomic theory, nuclear atom, isotopes, atomic masses, formulas, names, and balanced equations. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
+![A ball-and-stick model shows the bent geometry of a water molecule with oxygen in red and hydrogen atoms in white.](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Water-3D-balls.png/500px-Water-3D-balls.png)
+
+*Figure: Ball-and-stick model of a water molecule. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Water-3D-balls.png), Benjah-bmm27, public domain.*
+
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.

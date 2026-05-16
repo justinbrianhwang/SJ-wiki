@@ -9,6 +9,10 @@ Sampling connects continuous-time signals to discrete-time sequences. A sampler 
 
 The sampling theorem says exact reconstruction is possible for bandlimited signals when the sampling rate is high enough. If the sampling rate is too low, shifted copies of the spectrum overlap. That overlap is aliasing, and it is not merely a plotting artifact: different continuous-time frequencies produce the same discrete-time samples.
 
+![An aliasing graph shows two sine waves sharing the same sampled points.](https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/AliasingSines.svg/600px-AliasingSines.svg.png)
+
+*Figure: Aliasing when different continuous sinusoids agree at sampled instants. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:AliasingSines.svg), Moxfyre, CC BY-SA 3.0.*
+
 ## Definitions
 
 Uniform sampling of a continuous-time signal $x_c(t)$ with sampling period $T$ produces the sequence

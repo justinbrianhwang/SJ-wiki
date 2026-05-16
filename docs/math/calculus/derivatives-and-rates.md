@@ -9,6 +9,10 @@ The derivative measures instantaneous change. It turns the average slope of a se
 
 Derivatives are the first major payoff of limits. They connect local graph shape, rates with units, and linear approximation. A derivative is not only a formula to compute; it is a function that tells how another function is changing at every point where the limit exists.
 
+![A tangent line touches a curve at a point to illustrate the derivative as an instantaneous slope.](https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Derivative_with_tangent.svg/500px-Derivative_with_tangent.svg.png)
+
+*Figure: Tangent-line interpretation of a derivative. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Derivative_with_tangent.svg), Olivier Cleynen, CC0 1.0.*
+
 ## Definitions
 
 For a function $f$, the derivative at $a$ is

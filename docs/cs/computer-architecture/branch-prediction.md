@@ -9,6 +9,10 @@ Branches are small instructions with large architectural consequences. A pipelin
 
 Branch prediction is one of the clearest examples of quantitative design. The hardware is useful only because real programs have patterns: loops are usually taken until the final iteration, error paths are rarely taken, and branches often correlate with recent control flow. The value of a predictor depends on branch frequency, prediction accuracy, and misprediction penalty.
 
+![A five-stage pipeline diagram shows consecutive instructions occupying fetch, decode, execute, memory, and writeback stages.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/5_Stage_Pipeline.svg/500px-5_Stage_Pipeline.svg.png)
+
+*Figure: Classic five-stage processor pipeline. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:5_Stage_Pipeline.svg), Inductiveload, public domain.*
+
 ## Definitions
 
 A control hazard occurs when the next instruction address is uncertain. Conditional branches, indirect jumps, returns, and exceptions all affect instruction flow. A branch predictor guesses one or more of:

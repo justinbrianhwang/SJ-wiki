@@ -9,6 +9,10 @@ Basic RNNs carry hidden states through time, but they struggle to preserve usefu
 
 This page is a bridge between vanilla recurrence and attention-based models. Gating explains how neural networks can decide what to remember, what to forget, and what to expose. Encoder-decoder training introduces teacher forcing, padding masks, sequence loss, and decoding. Beam search then shows that prediction is not just a forward pass; it is a search problem over possible output sequences.
 
+![A recurrent neural network diagram shows a compact recurrent cell and the same computation unfolded over time.](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Recurrent_neural_network_unfold.svg/500px-Recurrent_neural_network_unfold.svg.png)
+
+*Figure: Recurrent neural network shown compactly and unfolded through time. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Recurrent_neural_network_unfold.svg), fdeloche, CC BY-SA 4.0.*
+
 ## Definitions
 
 A **GRU** modifies the RNN hidden-state update using gates. With input $X_t$ and previous hidden state $H_{t-1}$, the reset gate $R_t$ and update gate $Z_t$ are

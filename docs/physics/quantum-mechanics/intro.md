@@ -9,6 +9,10 @@ Quantum mechanics is the framework for physical systems whose states are probabi
 
 This section synthesizes four requested sources into one wiki sequence. Sakurai's *Modern Quantum Mechanics* supplies the primary structure: Stern-Gerlach motivation, Dirac notation, dynamics, angular momentum, symmetries, approximation methods, scattering, and identical particles. Ballentine supplies mathematical care, ensemble interpretation, density-operator emphasis, and scattering depth. The file named for Gottfried in the local source set extracts as graduate lecture notes that cite Gottfried/Yan and is used where it cleanly reinforces postulates, spin, dynamics, angular momentum, symmetries, and perturbation theory. Schiff is included as the classic wave-mechanics contrast where the topic naturally matches the older coordinate-representation style; this local copy is scanned/image-only through `pdftotext`, so no precise extracted page quotations are used from it.
 
+![A hydrogen-density plot shows electron probability patterns for several quantum numbers.](https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Hydrogen_Density_Plots.png/600px-Hydrogen_Density_Plots.png)
+
+*Figure: Hydrogen-atom probability-density plots for several energy levels. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hydrogen_Density_Plots.png), PoorLeno, public domain.*
+
 ## Definitions
 
 A **state** is represented by a ray in Hilbert space for a pure preparation, or by a density operator for a general preparation. A **ket** $\vert \psi\rangle$ is the abstract state vector; a **wave function** $\psi(x)=\langle x\vert \psi\rangle$ is one representation of that vector. A **bra** $\langle\psi\vert $ is the corresponding dual object.

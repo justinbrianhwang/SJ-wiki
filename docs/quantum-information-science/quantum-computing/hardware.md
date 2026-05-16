@@ -7,6 +7,10 @@ sidebar_position: 2
 
 Quantum hardware is the engineering layer that turns abstract qubits, gates, and measurements into controlled physical systems. The same circuit drawn in [algorithms](/quantum-information-science/quantum-computing/algorithms) looks very different in an ion trap, optical cavity, nuclear magnetic resonance experiment, superconducting chip, neutral-atom array, or photonic network, so hardware comparisons must track coherence, controllability, initialization, readout, connectivity, and compatibility with [error correction](/quantum-information-science/quantum-computing/error-correction).
 
+![IBM Quantum System One installed inside a cylindrical cryogenic hardware enclosure](https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/IBM_Quantum_System_One.jpg/361px-IBM_Quantum_System_One.jpg)
+
+*Figure: IBM Quantum System One as an example of superconducting quantum-computing hardware. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:IBM_Quantum_System_One.jpg), OJB Quantum, CC BY 4.0.*
+
 *This page synthesizes the wiki's earlier hardware draft with Chapter 7 of Nielsen and Chuang. N&C's central organizing idea is implementation requirements: represent quantum information robustly, perform controlled unitary transformations, prepare fiducial input states, and measure outputs. Modern superconducting, neutral-atom, and topological notes are supplementary context beyond the book's original platform emphasis.*
 
 ## Definitions

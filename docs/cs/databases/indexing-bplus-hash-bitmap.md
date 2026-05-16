@@ -9,6 +9,10 @@ An index is an auxiliary access structure that helps the DBMS find records witho
 
 Indexing belongs after storage because an index is itself stored in pages. B+ trees, hash indexes, and bitmap indexes support different query patterns. There is no universally best index. The right choice depends on equality versus range predicates, key cardinality, clustering, update frequency, and whether the workload is transactional or analytical.
 
+![A B-tree diagram shows multiple keys stored in each internal node and leaves at the same depth.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/B-tree.svg/500px-B-tree.svg.png)
+
+*Figure: B-tree node structure used in balanced search indexes. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:B-tree.svg), CyHawk, CC BY-SA 3.0.*
+
 ## Definitions
 
 A **search key** is the attribute or attribute set used to look up records in an index. It does not need to be a candidate key. For example, an index on `student(dept_name)` has a search key that may match many students.

@@ -9,6 +9,10 @@ Control turns a planned trajectory into steering, throttle, and braking commands
 
 This page introduces PID, pure pursuit, Stanley control, model predictive control, and the kinematic and dynamic bicycle models. It connects [motion planning](/cs/autonomous-driving/motion-planning) to [embedded implementation](/cs/embedded/) and [engineering math](/math/engineering-math/), because control is both mathematical and deeply physical.
 
+![A feedback loop block diagram shows an output signal returned to the input through a controller path.](https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Feedback_Loop.svg/500px-Feedback_Loop.svg.png)
+
+*Figure: Feedback loop block diagram in control theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Feedback_Loop.svg), Inductiveload, public domain.*
+
 ## Definitions
 
 **Longitudinal control** regulates speed, acceleration, and spacing using throttle and brakes. Adaptive cruise control and stop-and-go traffic control are longitudinal problems.

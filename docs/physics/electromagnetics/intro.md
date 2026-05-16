@@ -9,6 +9,10 @@ Applied electromagnetics studies how electric and magnetic fields are generated,
 
 The notes emphasize engineering use: choosing the right coordinate system, converting Maxwell's equations between differential and integral form, recognizing when lumped-circuit assumptions fail, matching impedances, applying boundary conditions, computing stored field energy, and using antenna gain and propagation loss in system calculations. Each detail page includes definitions, key formulas, at least one visual reference, worked examples, runnable code, common mistakes, and cross-links to neighboring mathematics, signals, and introductory physics material.
 
+![An electromagnetic-spectrum chart shows wavelength, frequency, radiation type, and blackbody temperature.](https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/EM_Spectrum_Properties_edit.svg/600px-EM_Spectrum_Properties_edit.svg.png)
+
+*Figure: Electromagnetic spectrum from radio waves through gamma rays. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:EM_Spectrum_Properties_edit.svg), Inductiveload, public domain.*
+
 1. [Waves, Phasors, and the Electromagnetic Spectrum](/physics/electromagnetics/waves-phasors-spectrum)
 2. [Vector Algebra and Coordinate Systems](/physics/electromagnetics/vector-algebra-coordinate-systems)
 3. [Gradient, Divergence, Curl, and Integral Theorems](/physics/electromagnetics/gradient-divergence-curl-integral-theorems)

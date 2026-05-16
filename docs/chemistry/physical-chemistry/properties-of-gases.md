@@ -9,6 +9,10 @@ Gases are the simplest macroscopic systems in physical chemistry because their p
 
 The perfect gas is the reference model: molecules are treated as point particles with negligible intermolecular forces except during collisions. Real gases depart from that model when attractions, repulsions, and finite molecular size become important, especially at high pressure and near condensation.
 
+![A Maxwell-Boltzmann distribution plot shows molecular speed distributions for several noble gases.](https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/MaxwellBoltzmann-en.svg/500px-MaxwellBoltzmann-en.svg.png)
+
+*Figure: Maxwell-Boltzmann molecular speed distributions for noble gases. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:MaxwellBoltzmann-en.svg), Pdbailey with SVG conversion by Lilyu, public domain.*
+
 ## Definitions
 
 A **state variable** is a property that describes the present condition of the system. For a simple pure gas, the usual variables are pressure $p$, volume $V$, temperature $T$, and amount $n$. An **equation of state** relates them:

@@ -9,6 +9,10 @@ A Markov chain is a model for random movement among states where the next state 
 
 This page introduces finite discrete-time Markov chains. The central objects are states, transition probabilities, transition matrices, multi-step probabilities, and stationary distributions. The emphasis is on computation and interpretation rather than advanced convergence theory.
 
+![A three-state Markov chain diagram shows directed transitions with probabilities between states.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Simple_markov_chain.svg/500px-Simple_markov_chain.svg.png)
+
+*Figure: Simple three-state Markov chain. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Simple_markov_chain.svg), Chrislb, CC BY-SA 3.0.*
+
 ## Definitions
 
 A **discrete-time stochastic process** is a sequence of random variables

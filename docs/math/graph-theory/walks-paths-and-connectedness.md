@@ -9,6 +9,10 @@ Walks and paths describe movement through a graph. They turn a static incidence 
 
 Connectedness is the first global property most students meet. It is also the first place where local information can mislead: a graph may have many high-degree vertices and still be disconnected, while a sparse graph may be connected because its few edges are arranged efficiently. The central habit is to track actual routes, not just degree counts.
 
+![A historical map of Konigsberg highlights the river and bridges used in the seven bridges problem.](https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Konigsberg_Bridge.png/500px-Konigsberg_Bridge.png)
+
+*Figure: The bridges of Konigsberg as a motivating graph-traversal problem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Konigsberg_Bridge.png), Merian-Erben, public domain.*
+
 ## Definitions
 
 A **walk** from $v_0$ to $v_k$ is an alternating sequence

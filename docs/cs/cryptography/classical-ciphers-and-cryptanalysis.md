@@ -9,6 +9,10 @@ Classical ciphers are the right place to begin cryptography because their design
 
 Katz and Lindell use these examples to motivate the modern move from clever-looking secrecy to definitions, assumptions, and proofs. Smart's treatment is more historical and computational: it gives more hand examples of shift, substitution, Vigenere, Enigma-like thinking, and the attacker's view. Read together, the sources make one point clear: a cipher is not secure because its rule looks complicated. It is secure only relative to a precise attack model.
 
+![A Caesar cipher diagram shows letters shifted by three positions from plaintext to ciphertext.](https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Caesar3.svg/500px-Caesar3.svg.png)
+
+*Figure: Caesar cipher with a shift of three. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Caesar3.svg), Cepheus, public domain.*
+
 ## Definitions
 
 A **plaintext** is the message before encryption. A **ciphertext** is the encoded output sent over an insecure channel. A **key** is the secret input that selects one transformation from a family of possible transformations. In a private-key cipher, sender and receiver share the same secret key.

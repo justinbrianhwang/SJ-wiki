@@ -9,6 +9,10 @@ Database systems are the software layer that lets people store, query, update, p
 
 These notes follow the structure and emphasis of Silberschatz, Korth, and Sudarshan's *Database System Concepts*, 7th edition, using the local source PDF's extracted table of contents as the roadmap. The pages are written as study notes rather than a replacement for the book: they compress the core definitions, algorithms, trade-offs, and worked examples needed to connect SQL practice with database internals.
 
+![A B-tree diagram shows multiple keys stored in each internal node and leaves at the same depth.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/B-tree.svg/500px-B-tree.svg.png)
+
+*Figure: B-tree node structure used in balanced search indexes. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:B-tree.svg), CyHawk, CC BY-SA 3.0.*
+
 ## Definitions
 
 A **database** is an organized collection of related data representing some part of the real world or an enterprise. A **database-management system (DBMS)** is the software system that defines, stores, queries, updates, protects, and administers that data. A **database system** is the DBMS plus the data, applications, users, and operating environment around it.

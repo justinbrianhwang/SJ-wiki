@@ -9,6 +9,10 @@ An instruction set architecture, or ISA, is the contract between software and ha
 
 H&P treats ISA design as one part of architecture, not the whole field. That distinction matters. A clean load-store ISA can simplify pipelining and compiler reasoning, but performance also depends on branch prediction, caches, memory systems, and implementation technology. This page focuses on ISA concepts using MIPS-like and RISC-V-like examples, while contrasting them with more complex CISC styles such as x86.
 
+![A von Neumann architecture diagram shows a CPU connected to memory through shared data and control paths.](https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Von_Neumann_Architecture.svg/500px-Von_Neumann_Architecture.svg.png)
+
+*Figure: Von Neumann computer architecture. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Von_Neumann_Architecture.svg), Kapooht, CC BY-SA 3.0.*
+
 ## Definitions
 
 An ISA specifies the programmer-visible behavior of a processor:

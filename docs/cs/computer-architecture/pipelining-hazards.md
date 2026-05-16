@@ -9,6 +9,10 @@ Pipelining overlaps the execution of multiple instructions by dividing processor
 
 The classic five-stage RISC pipeline is simple enough to reason about but rich enough to expose the central problems of processor implementation. Structural hazards occur when two instructions need the same hardware resource. Data hazards occur when an instruction needs a value that an earlier instruction has not yet produced. Control hazards occur when the next instruction address depends on a branch or jump that has not yet been resolved.
 
+![A five-stage pipeline diagram shows consecutive instructions occupying fetch, decode, execute, memory, and writeback stages.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/5_Stage_Pipeline.svg/500px-5_Stage_Pipeline.svg.png)
+
+*Figure: Classic five-stage processor pipeline. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:5_Stage_Pipeline.svg), Inductiveload, public domain.*
+
 ## Definitions
 
 The five standard stages are:

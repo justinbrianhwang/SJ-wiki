@@ -9,6 +9,10 @@ Control systems engineering studies how to make a dynamic system behave in a des
 
 The central idea is feedback. In an open-loop system the command passes forward to the plant without measuring the result. In a closed-loop system the output is sensed and compared with the reference, producing an error signal that drives correction. The price of feedback is extra hardware, modeling effort, and possible instability; the benefit is accuracy, disturbance rejection, and tunable dynamics. This page sets the vocabulary used by the modeling, response, stability, and design pages that follow.
 
+![A feedback loop block diagram shows an output signal returned to the input through a controller path.](https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Feedback_Loop.svg/500px-Feedback_Loop.svg.png)
+
+*Figure: Feedback loop block diagram in control theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Feedback_Loop.svg), Inductiveload, public domain.*
+
 ## Definitions
 
 A **control system** is an interconnection of components whose purpose is to cause an output, often called the controlled variable, to follow or regulate against an input, often called the reference or command. A **plant** or **process** is the physical subsystem being controlled: a motor-load assembly, furnace, aircraft attitude channel, chemical reactor, disk-drive head, or antenna. A **controller** produces the actuator signal that drives the plant.

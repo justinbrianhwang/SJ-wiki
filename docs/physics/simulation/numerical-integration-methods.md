@@ -9,6 +9,10 @@ Numerical integration converts a continuous-time state equation into a sequence 
 
 Klee and Allen introduce elementary methods before moving to Runge-Kutta, adaptive, multistep, stiff, and real-time-compatible techniques. The practical idea is simple: an integrator is a rule for using slope information. The engineering difficulty is choosing a rule and step size that produce an answer accurate enough, stable enough, and fast enough for the intended use.
 
+![A Runge-Kutta diagram shows intermediate slope estimates used to advance one step.](https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Runge-Kutta_slopes.svg/500px-Runge-Kutta_slopes.svg.png)
+
+*Figure: Intermediate slopes used by the classical fourth-order Runge-Kutta method. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Runge-Kutta_slopes.svg), HilberTraum, CC BY-SA 4.0.*
+
 ## Definitions
 
 For an initial value problem

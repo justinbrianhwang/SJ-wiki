@@ -9,6 +9,10 @@ Quantum algorithms are not faster because they "try all answers" and then reveal
 
 *This page synthesizes the wiki's earlier algorithm overview with Chapters 1, 5, and 6 of Nielsen and Chuang. The N&C emphasis is that QFT and search are the two canonical algorithmic engines: QFT exposes algebraic periodicity, while Grover's iterate performs an optimal two-dimensional amplitude rotation.*
 
+![Grover algorithm circuit diagram showing oracle and diffusion operations repeated before measurement](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Grover%27s_algorithm_circuit.svg/640px-Grover%27s_algorithm_circuit.svg.png)
+
+*Figure: Circuit-level sketch of Grover's search algorithm. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Grover%27s_algorithm_circuit.svg), Fawly, CC BY-SA 4.0.*
+
 ## Definitions
 
 A **quantum algorithm** is a uniform family of circuits followed by classical post-processing. Inputs may be classical bit strings, quantum states, or oracle access to a function. Costs may count gates, circuit depth, qubits, oracle calls, precision, or fault-tolerant logical resources. A speedup claim is meaningful only after the input model and output model are fixed.

@@ -9,6 +9,10 @@ CPU scheduling is the policy problem at the heart of multiprogramming: when seve
 
 The textbook presents scheduling after synchronization in this edition, but conceptually it builds on processes and threads. The scheduler chooses among ready execution contexts; the dispatcher performs the context switch; timers and blocking operations create opportunities to reconsider the choice. Different environments want different outcomes, so a batch server, desktop, mobile phone, and real-time controller should not all use the same simple rule.
 
+![A circular operating-system process state diagram shows scheduler transitions between process states.](https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Process_states.svg/500px-Process_states.svg.png)
+
+*Figure: Process-state transitions in a scheduler. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Process_states.svg), A3r0, public domain.*
+
 ## Definitions
 
 The **CPU scheduler** selects a process or thread from the ready queue. In operating systems that support kernel threads, the scheduled entities are usually kernel-level threads, even when people casually say "process scheduling."

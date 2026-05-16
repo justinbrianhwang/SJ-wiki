@@ -9,6 +9,10 @@ These notes follow the scanned textbook *Microprocessors & Microcontroller Syste
 
 The subject is about building a working digital system from a processor, memory, I/O circuits, and software. The 8085 chapters teach external bus thinking: address decoding, machine cycles, memory maps, I/O-mapped ports, DMA, and assembly programs. The 8051 chapters shift to microcontroller thinking: on-chip RAM, SFRs, ports, timers, serial communication, interrupts, and device interfacing. The later chapters show that once the vocabulary is clear, new controller families can be compared by memory organization, peripheral set, interrupt model, power modes, and programming style.
 
+![A photograph shows an Intel C8085AH microprocessor chip package.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Intel_C8085AH.jpg/500px-Intel_C8085AH.jpg)
+
+*Figure: Intel C8085AH microprocessor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_C8085AH.jpg), Thomas Nguyen, CC BY-SA 4.0.*
+
 ## Definitions
 
 A **microprocessor** is a CPU on an integrated circuit. In this course the main microprocessor is the Intel 8085, an 8-bit CPU with a 16-bit address bus. It requires external memory and I/O hardware to form a complete system.

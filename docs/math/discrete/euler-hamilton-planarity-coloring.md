@@ -9,6 +9,10 @@ Several classic graph questions ask for special traversals or drawings. Euler pa
 
 These problems look similar because they all concern graph structure, but their difficulty differs sharply. Euler paths have a complete degree test. Hamilton circuits do not have a simple necessary-and-sufficient degree test. Planarity has structural characterizations and useful inequalities. Coloring is easy to state but can be computationally difficult.
 
+![Three vertices on one side are connected to three vertices on the other side in the complete bipartite graph K three three.](https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Complete_bipartite_graph_K3%2C3.svg/500px-Complete_bipartite_graph_K3%2C3.svg.png)
+
+*Figure: The complete bipartite graph $K_{3,3}$, a classical nonplanar graph. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Complete_bipartite_graph_K3%2C3.svg), David Benbennick, public domain.*
+
 ## Definitions
 
 An **Euler path** uses every edge of a graph exactly once. An **Euler circuit** is an Euler path that starts and ends at the same vertex.

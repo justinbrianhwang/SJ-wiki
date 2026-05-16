@@ -9,6 +9,10 @@ Input and output are where sequential software meets a concurrent physical world
 
 Lee and Seshia use I/O to expose a central CPS tension. Software is written as ordered statements, but the environment is not ordered by the program. Polling, interrupts, GPIO, PWM, serial interfaces, buses, memory-mapped registers, and device drivers are all mechanisms for reconciling that mismatch.
 
+![An I2C bus diagram shows one master connected to several slave devices over shared SDA and SCL lines.](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/I2C.svg/500px-I2C.svg.png)
+
+*Figure: I2C bus with one master and several slave devices. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:I2C.svg), Cburnett, CC BY-SA 3.0.*
+
 ## Definitions
 
 **General-purpose input/output** (GPIO) pins can be configured by software as digital inputs or outputs. They expose logical values as voltage levels, subject to electrical limits.

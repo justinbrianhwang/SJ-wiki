@@ -9,6 +9,10 @@ Autonomous driving is a system-of-systems problem: sensors measure the world, pe
 
 This foundational section gives SJ Wiki a stable base for later paper and textbook deep-dives. The emphasis is practical and architectural: what each layer does, what math it relies on, what can go wrong, and how the layers connect. The pages use standard public terminology such as SAE J3016 automation levels, ODD, ISO 26262, SOTIF, sensor fusion, BEV representations, motion forecasting, model predictive control, and scenario-based validation.
 
+![A driving automation levels table summarizes SAE levels from no automation to full automation.](https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Levels_of_Driving_Automation.png/500px-Levels_of_Driving_Automation.png)
+
+*Figure: Levels of driving automation for road vehicles. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Levels_of_Driving_Automation.png), Bryant Walker Smith, CC BY 3.0.*
+
 ## Definitions
 
 An **autonomous vehicle**, in this section, is a road vehicle with software and hardware that can perform some or all of the dynamic driving task under specified conditions. The phrase is informal; precise responsibility depends on the SAE automation level and the operational design domain.

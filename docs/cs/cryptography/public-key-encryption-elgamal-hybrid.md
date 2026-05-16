@@ -9,6 +9,10 @@ Public-key encryption lets anyone encrypt to a receiver using a public key, whil
 
 Katz and Lindell present public-key encryption through CPA and CCA experiments, hybrid encryption, KEM/DEM, ElGamal, DDH-based encapsulation, and RSA-based schemes. Smart's public-key and hybrid-encryption chapters complement this with concrete RSA, ElGamal, Rabin, Paillier, and KEM/DEM explanations. The synthesis is that public-key encryption is mostly a key-establishment tool inside larger protocols.
 
+![A Diffie-Hellman key exchange diagram shows two parties deriving a shared secret from public values.](https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Diffie-Hellman_Key_Exchange.svg/500px-Diffie-Hellman_Key_Exchange.svg.png)
+
+*Figure: Diffie-Hellman key exchange idea. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Diffie-Hellman_Key_Exchange.svg), A.J. Vinck and Flugaal, public domain.*
+
 ## Definitions
 
 A **public-key encryption scheme** has:

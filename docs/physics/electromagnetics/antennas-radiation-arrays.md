@@ -9,6 +9,10 @@ Antennas convert guided electromagnetic energy into radiated waves and convert i
 
 Ulaby's antenna chapter develops the Hertzian dipole, half-wave dipole, radiation characteristics, Friis transmission, large apertures, and arrays. These topics are a practical culmination of Maxwell's equations, plane waves, power density, and boundary/guiding ideas from earlier pages.
 
+![A polar antenna-radiation diagram compares monopole antenna patterns for several lengths.](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Monopole_antenna_radiation_patterns.svg/600px-Monopole_antenna_radiation_patterns.svg.png)
+
+*Figure: Vertical radiation patterns for monopole antennas of different lengths. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Monopole_antenna_radiation_patterns.svg), Chetvorno, CC0 1.0.*
+
 ## Definitions
 
 The radiation pattern describes angular variation of radiated field or power. For a far-zone field, power density often has the form

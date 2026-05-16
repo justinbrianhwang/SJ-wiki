@@ -9,6 +9,10 @@ Mitchell's evaluation chapter gives the statistical machinery needed to say whet
 
 The chapter is intentionally practical. It introduces sample error, true error, confidence intervals, tests for comparing hypotheses, and paired tests for comparing learning algorithms. These tools connect directly to modern model evaluation, even though modern practice often uses larger datasets, cross-validation, bootstrap procedures, and benchmark suites.
 
+![An overfitting diagram shows a classifier boundary that follows training points too closely.](https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Overfitting.svg/500px-Overfitting.svg.png)
+
+*Figure: Overfitting in a classifier decision boundary. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Overfitting.svg), Chabacano, CC BY-SA 4.0.*
+
 ## Definitions
 
 Let $h$ be a hypothesis and $D$ be a sample of examples drawn independently from some distribution. For a discrete-valued target function, the sample error is:
