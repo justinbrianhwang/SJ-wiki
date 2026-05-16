@@ -1,5 +1,8 @@
-{
-  "label": "Dynamical Systems & Simulation",
-  "position": 6,
-  "link": { "type": "doc", "id": "physics/simulation/intro" }
+﻿{
+    "label":  "Dynamical Systems \u0026 Simulation",
+    "position":  7,
+    "link":  {
+                 "type":  "doc",
+                 "id":  "physics/simulation/intro"
+             }
 }

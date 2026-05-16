@@ -1,5 +1,5 @@
 ---
-title: "Probability and Random Variables"
+title: "Probability"
 sidebar_position: 1
 ---
 

@@ -1,0 +1,8 @@
+{
+  "label": "Machine Learning",
+  "position": 10,
+  "link": {
+    "type": "doc",
+    "id": "cs/machine-learning/intro"
+  }
+}

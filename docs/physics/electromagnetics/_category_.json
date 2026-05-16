@@ -1,0 +1,8 @@
+{
+  "label": "Electromagnetics",
+  "position": 3,
+  "link": {
+    "type": "doc",
+    "id": "physics/electromagnetics/intro"
+  }
+}

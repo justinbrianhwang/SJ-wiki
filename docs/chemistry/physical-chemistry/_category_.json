@@ -1,0 +1,8 @@
+{
+  "label": "Physical Chemistry",
+  "position": 2,
+  "link": {
+    "type": "doc",
+    "id": "chemistry/physical-chemistry/intro"
+  }
+}
