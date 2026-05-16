@@ -1,0 +1,5 @@
+{
+  "label": "Quantum Field Theory",
+  "position": 5,
+  "link": { "type": "doc", "id": "physics/quantum-field-theory/intro" }
+}

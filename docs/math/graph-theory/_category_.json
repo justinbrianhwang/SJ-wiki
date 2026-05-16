@@ -1,0 +1,8 @@
+{
+  "label": "Graph Theory",
+  "position": 8,
+  "link": {
+    "type": "doc",
+    "id": "math/graph-theory/intro"
+  }
+}

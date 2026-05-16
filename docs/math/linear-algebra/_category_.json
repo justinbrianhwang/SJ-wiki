@@ -1,0 +1,8 @@
+{
+  "label": "Linear Algebra",
+  "position": 2,
+  "link": {
+    "type": "doc",
+    "id": "math/linear-algebra/intro"
+  }
+}

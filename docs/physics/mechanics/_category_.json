@@ -1,0 +1,5 @@
+{
+  "label": "Mechanics (Statics & Dynamics)",
+  "position": 2,
+  "link": { "type": "doc", "id": "physics/mechanics/intro" }
+}

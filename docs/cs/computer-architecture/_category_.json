@@ -1,0 +1,8 @@
+{
+  "label": "Computer Architecture",
+  "position": 7,
+  "link": {
+    "type": "doc",
+    "id": "cs/computer-architecture/intro"
+  }
+}

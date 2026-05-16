@@ -1,0 +1,5 @@
+{
+  "label": "Quantum Mechanics",
+  "position": 4,
+  "link": { "type": "doc", "id": "physics/quantum-mechanics/intro" }
+}

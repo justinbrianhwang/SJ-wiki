@@ -1,0 +1,8 @@
+{
+  "label": "Discrete Mathematics",
+  "position": 6,
+  "link": {
+    "type": "doc",
+    "id": "math/discrete/intro"
+  }
+}

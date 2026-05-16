@@ -1,0 +1,8 @@
+{
+  "label": "Operating Systems",
+  "position": 5,
+  "link": {
+    "type": "doc",
+    "id": "cs/operating-systems/intro"
+  }
+}
