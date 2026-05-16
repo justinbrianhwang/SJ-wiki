@@ -56,6 +56,45 @@ This roadmap is not a product timeline. It is a vocabulary for capabilities. A d
 
 The best-known fielded QKD networks are not all the same. The Tokyo QKD network was an early metropolitan field test integrating several vendors and protocols. China's reported backbone and satellite-integrated network demonstrated large-scale trusted-relay QKD with fiber links and satellite-to-ground free-space links. These are important milestones, but the trust and operational assumptions remain different from an end-to-end entanglement-based quantum internet.
 
+### Field-deployed metropolitan networks with optical switches
+
+A near-term QKD network can be engineered as a managed key utility rather than as a single point-to-point rate experiment. De Toni et al. [1] report a four-node VenQCI metropolitan deployment in which efficient-BB84 devices, one-decoy weak coherent pulses, intermediate optical switches, MPLS classical networking, SKIP key delivery, and MACsec rekeying were operated for two months. The contribution is not a new security proof; it is a production-style systems result showing how QKD key generation, switching policy, key buffering, and classical network integration interact.
+
+The protocol layer is still ordinary QKD accounting. If Alice and Bob choose the key basis with probability $p_Z$ and the check basis with probability $p_X=1-p_Z$, the efficient-BB84 basis-match probability is
+
+$$
+p_{\mathrm{sift}}=p_Z^2+p_X^2.
+$$
+
+For $p_Z=0.9$, $p_{\mathrm{sift}}=0.82$, compared with $0.50$ for unbiased BB84. The practical tradeoff is that the smaller check-basis sample must still support a finite-key phase-error bound. For weak coherent pulses, decoy analysis is needed because the photon-number distribution is approximately
+
+$$
+\Pr(N=n)=e^{-\mu}\frac{\mu^n}{n!},
+\qquad
+\Pr(N\ge 2)=1-e^{-\mu}(1+\mu),
+$$
+
+so multi-photon pulses are not negligible over long runs. A teaching form of the decoy-state secret-key rate is
+
+$$
+R \ge q\left[Q_1(1-h_2(e_1))-f_{\mathrm{EC}}Q_{\mu}h_2(E_{\mu})\right],
+$$
+
+where $Q_1$ and $e_1$ bound the single-photon contribution, $Q_{\mu}$ and $E_{\mu}$ are observed signal-intensity gain and QBER, and $f_{\mathrm{EC}}$ charges reconciliation leakage.
+
+The network layer adds scheduling. In the reported line topology, optical switches at intermediate nodes let one QKD device serve neighboring spans over time rather than dedicating a separate device pair to every graph edge. A simple key-balancing controller captures the idea:
+
+```text
+for each switching epoch:
+    choose the adjacent link with the lowest key_buffer / target_buffer
+    connect the optical switch to that link
+    run QKD until a block target or time limit is reached
+    deliver fresh key blocks to the key-management layer
+    keep local scheduling rules usable if the central controller is unavailable
+```
+
+As a scale check, a 500 kB sifted block accumulated in about six minutes corresponds to roughly $500\cdot1024\cdot8/360\approx11.4$ kbps of sifted detections. A 32-byte MACsec rekey each minute needs only $256/60\approx4.3$ bits/s of key material before accounting for reserves and policy overhead. The deployment result in [1] is therefore best read as evidence that, on short metropolitan spans, orchestration and integration can dominate the engineering story once the raw optical link is stable.
+
 ## Visual
 
 ```mermaid
@@ -246,3 +285,7 @@ The graph marks whether an edge is acceptable for a trusted-node QKD service. A 
 - [Quantum Computing Hardware](/quantum-information-science/quantum-computing/hardware) and [Quantum Error Correction](/quantum-information-science/quantum-computing/error-correction) for memories, gates, and fault-tolerant ingredients.
 - [TLS Protocol Overview](/cs/cryptography/tls-protocol-overview), [Authenticated Encryption GCM](/cs/cryptography/authenticated-encryption-gcm), and [Message Authentication Codes](/cs/cryptography/message-authentication-codes) for the classical network-security mechanisms that still surround QKD.
 - Nielsen and Chuang, *Quantum Computation and Quantum Information*, Chapters 8 and 12, for the quantum-channel and QKD foundations behind the network abstractions.
+
+## References
+
+[1] A. De Toni, E. Bortolozzo, A. Emanuele, M. Venturini, L. Calderaro, M. Avesani, G. Vallone, P. Villoresi. *Long-term analysis of efficient-BB84 4-node network with optical switches in metropolitan environment*. arXiv:2510.16867v1, 2025.

@@ -72,6 +72,105 @@ Square Attack is a strong score-based or decision-flavored black-box method for 
 
 Black-box attacks expose a central evaluation point: limited-query robustness is not the same as true robustness. A model may survive 100 queries but fail at 10,000 queries. Conversely, a defense that hides scores can reduce practical attack success without providing a mathematical certificate. The claim must name the feedback channel and budget.
 
+## Representative query attacks
+
+### Score-based finite-difference optimization
+
+Chen et al. [1] introduced ZOO as a direct score-query analogue of white-box optimization attacks. The attacker cannot backpropagate through the target model, but if the API returns enough information to compute a scalar loss $J(x)$, finite differences can estimate input-gradient coordinates:
+
+$$
+\frac{\partial J}{\partial x_i}
+\approx
+\frac{J(x+\sigma e_i)-J(x-\sigma e_i)}{2\sigma}.
+$$
+
+One full central-difference estimate for a $d$-dimensional input costs $2d$ target queries. For a $28\times28$ grayscale image, $d=784$, so one full gradient costs $1{,}568$ queries before any optimizer iterations. This query scaling is why practical score-based attacks often sample coordinates, resize the attack variable, or use random-direction estimators instead of estimating every coordinate.
+
+Compact pseudo-code:
+
+```text
+for coordinate i in sampled_coordinates:
+    grad[i] = (loss(query(x + sigma * e_i)) - loss(query(x - sigma * e_i))) / (2 * sigma)
+x_adv = project(x_adv + alpha * attack_direction(grad))
+```
+
+ZOO is only valid under a score-query threat model. If the deployed system returns only labels, the attacker has a different and harder interface.
+
+### Decision-only boundary search
+
+Brendel, Rauber, and Bethge [2] showed that hard labels alone can still be enough to find small adversarial perturbations. Boundary Attack starts from an already adversarial input and proposes random moves that both explore along the decision boundary and move toward the clean input.
+
+A simplified proposal from current adversarial point $x^t$ is:
+
+$$
+x^{t+1}=x^t+\eta_{\perp}u_{\perp}+\eta_{\parallel}(x-x^t),
+$$
+
+where $u_{\perp}$ is approximately orthogonal to $x-x^t$. The proposal is accepted only if the label oracle still returns an adversarial decision:
+
+$$
+q(x^{t+1})\ne q(x).
+$$
+
+Worked micro-example: if $q(x)=3$ and a random starting image $z$ has $q(z)=8$, then $z$ is a valid untargeted starting point because $8\ne3$. The attack then spends label queries reducing $\|z-x\|_p$ while staying on the wrong side of the boundary.
+
+Boundary-style results must report how the initial adversarial point was obtained, the distance metric, the query budget, and failures at the budget limit. Attack success is evidence of vulnerability; attack failure under finite labels is not a certificate.
+
+### Random-search square proposals
+
+Andriushchenko et al. [3] introduced Square Attack as a query-efficient score-based random search method. Instead of reconstructing a full gradient, it samples localized square updates, evaluates a margin objective, and keeps updates that improve the attack.
+
+For untargeted logits $Z$, a common margin is:
+
+$$
+J(x')=Z_y(x')-\max_{k\ne y}Z_k(x').
+$$
+
+The attack minimizes $J$ and succeeds once $J\lt 0$. Its accept/reject rule is:
+
+$$
+\delta^{t+1}=
+\begin{cases}
+\delta', & J(x+\delta')<J(x+\delta^t),\\
+\delta^t, & \text{otherwise.}
+\end{cases}
+$$
+
+Compact pseudo-code:
+
+```text
+delta = random_norm_valid_initialization()
+while queries remain and margin(x + delta) >= 0:
+    proposal = change_values_inside_random_square(delta)
+    proposal = project_to_norm_ball(proposal)
+    if margin(x + proposal) < margin(x + delta):
+        delta = proposal
+```
+
+The square-size schedule is part of the attack: large squares explore early and smaller squares refine later. Because the method is gradient-free, success against a model that defeats naive PGD is a useful gradient-masking diagnostic.
+
+### Sparse evolutionary search
+
+Su, Vargas, and Sakurai [4] used differential evolution to show that a black-box optimizer can sometimes fool image classifiers by changing one pixel. The threat model is not an imperceptible $\ell_\infty$ ball; it is an $\ell_0$ sparsity constraint plus score-query optimization.
+
+For an RGB image, one candidate can be represented as:
+
+$$
+a=(u,v,r,g,b),
+$$
+
+where $(u,v)$ is the pixel location and $(r,g,b)$ are replacement channel values. A targeted fitness can be:
+
+$$
+F(a)=p_t(x_a),
+$$
+
+where $x_a$ is the image after applying candidate edit $a$. Differential evolution mutates and crosses over candidate edits, queries the model, and keeps candidates with better fitness.
+
+Worked micro-example: for a $32\times32$ RGB image, the search vector has five fields and $32\cdot32=1024$ possible pixel locations before considering color values. The low-dimensional search space makes evolutionary optimization plausible, but every candidate evaluation is still a target query.
+
+One-pixel results should be treated as sparse black-box stress tests. They are not directly comparable to $\ell_\infty$ PGD results unless the threat sets are explicitly separated.
+
 ## Visual
 
 ```mermaid
@@ -96,6 +195,7 @@ flowchart TD
 | NES | Scores/logits | Random directional queries | Lower-dimensional gradient estimate | Noisy, needs tuning |
 | SPSA | Scores/logits or scalar loss | Simultaneous random perturbations | Simple and scalable | Variance and step-size sensitivity |
 | Square Attack | Scores or decisions depending setup | Random localized updates | Query-efficient, gradient-free | Still approximate |
+| One Pixel Attack | Scores/probabilities | Evolutionary sparse edits | Extreme low-dimensional sparse search | Narrow threat model |
 | Boundary attack | Decisions only | Boundary-following search | Works with hard labels | Needs adversarial starting point |
 
 ## Worked example 1: Finite-difference gradient cost
@@ -218,6 +318,15 @@ This sketch assumes score access sufficient to compute cross-entropy from logits
 
 - Papernot et al., work on substitute models and transfer attacks.
 - Chen et al., "ZOO: Zeroth Order Optimization Based Black-box Attacks to Deep Neural Networks."
+- Brendel, Rauber, and Bethge, "Decision-Based Adversarial Attacks."
 - Ilyas et al., work on black-box adversarial attacks with limited queries and priors.
 - Uesato et al., work on adversarial risk and black-box attacks.
 - Andriushchenko et al., "Square Attack: A Query-Efficient Black-Box Adversarial Attack via Random Search."
+- Su, Vargas, and Sakurai, "One Pixel Attack for Fooling Deep Neural Networks."
+
+## References
+
+[1] P.-Y. Chen, H. Zhang, Y. Sharma, J. Yi, C.-J. Hsieh. *ZOO: Zeroth Order Optimization Based Black-box Attacks to Deep Neural Networks without Training Substitute Models*. AISec 2017.
+[2] W. Brendel, J. Rauber, M. Bethge. *Decision-Based Adversarial Attacks: Reliable Attacks Against Black-Box Machine Learning Models*. ICLR 2018.
+[3] M. Andriushchenko, F. Croce, N. Flammarion, M. Hein. *Square Attack: A Query-Efficient Black-Box Adversarial Attack via Random Search*. ECCV 2020.
+[4] J. Su, D. Vargas, K. Sakurai. *One Pixel Attack for Fooling Deep Neural Networks*. IEEE Transactions on Evolutionary Computation 2019.

@@ -231,7 +231,3 @@ print("fidelity  =", abs(np.vdot(psi, corrected)) ** 2)
 - [BB84 Protocol](/quantum-information-science/quantum-communication/bb84)
 - [Quantum Error Correction](/quantum-information-science/quantum-computing/error-correction)
 - [Density Operator, Entanglement, and Decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence)
-
-## Deep-dive papers
-
-- [Entanglement Swapping with Time-Bin Telecom Qubits (Davis et al., 2025)](/quantum-information-science/quantum-internet/entanglement-swapping-time-bin-telecom) explains a deployable 1536.4 nm time-bin entanglement-swapping system with SNSPD heralding, characteristic-function modeling, and source-independent QKD implications.

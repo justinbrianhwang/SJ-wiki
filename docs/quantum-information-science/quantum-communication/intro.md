@@ -224,8 +224,3 @@ This deliberately omits loss, dark counts, finite-key confidence intervals, and 
 - [Classical Cryptography](/cs/cryptography/intro) for symmetric encryption, authentication, public-key assumptions, and protocol design baselines.
 - [Postulates of Quantum Mechanics](/physics/quantum-mechanics/postulates-of-quantum-mechanics), [Measurement and Interpretation](/physics/quantum-mechanics/measurement-interpretation), and [Dirac Notation and Hilbert Spaces](/physics/quantum-mechanics/dirac-notation-hilbert-spaces) for the physics used by the security intuition.
 - Nielsen and Chuang, *Quantum Computation and Quantum Information*, Chapters 8 and 12, for the canonical textbook treatment of quantum channels, accessible information, Holevo bounds, and BB84 security.
-
-## Deep-dive papers
-
-- [Efficient-BB84 Metropolitan Network (2025)](/quantum-information-science/quantum-communication/efficient-bb84-metropolitan-network): VenQCI deployment study of efficient-BB84, optical link switching, MACsec integration, and two-month metropolitan QKD operation.
-- [QKD Security Proofs, Attacks, and Network Integration (2025)](/quantum-information-science/quantum-communication/qkd-security-proofs-and-attacks-review): merged review of QKD protocol families, proof models, PNS and Trojan-horse attacks, jamming, QECC context, and classical-network deployment caveats.

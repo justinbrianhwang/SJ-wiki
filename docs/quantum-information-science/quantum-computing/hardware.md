@@ -47,6 +47,8 @@ Important hardware metrics include:
 
 **Superconducting circuits** are the dominant modern solid-state gate-model platform. Transmons are nonlinear microwave oscillators made from Josephson junctions and capacitors. The transmon regime reduces charge-noise sensitivity, while resonators and tunable couplers supply readout and entangling gates. This is a modern successor to the superconducting charge and flux proposals N&C discuss in their "other implementation schemes" section.
 
+**Silicon spin qubits** encode quantum information in electron or nuclear spin states in isotopically purified silicon, often using donors or quantum dots. Their appeal is compatibility with mature semiconductor fabrication and potentially long coherence; their scaling pressure is precise placement, addressability, exchange or hyperfine control, readout, and integration into repeated [error-correction](/quantum-information-science/quantum-computing/error-correction) cycles.
+
 **Neutral atoms** use optically trapped atoms in tweezer arrays or lattices. Rydberg excitation creates strong controllable interactions through blockade, giving flexible geometries for simulation and gate-model experiments. N&C mention optical-lattice proposals; modern tweezer arrays are a later development.
 
 **Topological proposals** encode information nonlocally, often using anyons or Majorana zero modes. The appeal is hardware-level protection from some local noise processes. The conservative status is that topological quantum computing remains an active research program rather than an established scalable production platform.
@@ -117,6 +119,73 @@ $$
 
 A device with beautiful isolated qubits but slow, noisy, or destructive measurement may be poor for fault tolerance. Conversely, a platform with modest coherence can still be competitive if its gates and measurements are fast, parallel, and repeatable.
 
+### Encoded logical operations in silicon spin hardware
+
+Zhang, Xu, Zhang, Duan, and collaborators [1] demonstrated an encoded logical workflow in a phosphorus-donor silicon processor. The contribution was not long-distance error correction; it was a compact logical-control stack: prepare states in a $[[4,2,2]]$ detection code, perform logical Clifford operations, inject a non-Clifford $T$ gate by measurement using an extra nuclear-spin ancilla, and run a two-logical-qubit VQE-style chemistry demonstration.
+
+The $[[4,2,2]]$ code encodes two logical qubits in four physical spin qubits and detects, rather than corrects, arbitrary single-qubit errors. Its stabilizers can be written as
+
+$$
+S_X=X_1X_2X_3X_4,
+\qquad
+S_Z=Z_1Z_2Z_3Z_4.
+$$
+
+A convenient logical basis is
+
+$$
+\begin{aligned}
+|00\rangle_L &= \frac{|0000\rangle+|1111\rangle}{\sqrt{2}},\\
+|01\rangle_L &= \frac{|0011\rangle+|1100\rangle}{\sqrt{2}},\\
+|10\rangle_L &= \frac{|0101\rangle+|1010\rangle}{\sqrt{2}},\\
+|11\rangle_L &= \frac{|0110\rangle+|1001\rangle}{\sqrt{2}}.
+\end{aligned}
+$$
+
+Each codeword is a $+1$ eigenstate of both stabilizers. For example,
+
+$$
+S_X|10\rangle_L
+=\frac{|1010\rangle+|0101\rangle}{\sqrt{2}}
+=|10\rangle_L,
+$$
+
+and both computational-basis components of $\vert 10\rangle_L$ have even parity, so $S_Z\vert 10\rangle_L=\vert 10\rangle_L$. A single physical $X$ or $Z$ error flips at least one stabilizer parity, which lets the experiment project data back into the logical subspace during postprocessing.
+
+Logical Pauli operators are represented by multi-spin physical operators such as
+
+$$
+X_LI_L \leftrightarrow X_1X_3,
+\qquad
+I_LX_L \leftrightarrow X_1X_2,
+$$
+
+and
+
+$$
+Z_LI_L \leftrightarrow Z_1Z_2,
+\qquad
+I_LZ_L \leftrightarrow Z_1Z_3.
+$$
+
+The hardware point is that a donor cluster can provide high connectivity through shared electron-mediated control, making these multi-qubit logical operations accessible in a small device. The limitation is equally important: postprocessed parity projection and distance-2 detection are not substitutes for repeated real-time syndrome correction. Scaling this direction requires arrays of donor clusters, better readout, and a path from detected errors to corrected logical operation.
+
+The two-logical-qubit application used expectation values of a Hamiltonian of the form
+
+$$
+H=g_0+g_1Z_LI_L+g_2I_LZ_L+g_3Z_LZ_L+g_4X_LX_L+g_5Y_LY_L.
+$$
+
+Given coefficients $g_i$ and measured logical observables, the energy estimate is the ordinary linear combination
+
+$$
+\langle H\rangle
+=g_0+g_1\langle ZI\rangle+g_2\langle IZ\rangle+g_3\langle ZZ\rangle
++g_4\langle XX\rangle+g_5\langle YY\rangle.
+$$
+
+This makes the experiment a useful hardware milestone for encoded control and mitigation, not evidence of a chemistry speedup.
+
 ## Visual
 
 ```mermaid
@@ -138,6 +207,7 @@ flowchart TD
 | Trapped ions | Internal states plus motional bus | Long coherence and high-fidelity control | Gate speed, motional heating, large-chain crowding, modular interconnects |
 | NMR | Ensemble nuclear-spin control | Historically important pulse control and small algorithms | Exponential signal loss in effective-pure-state schemes |
 | Superconducting circuits | Mentioned as charge/flux proposals; modern transmons extend this line | Fast gates, lithographic scaling, strong control stack | Cryogenic wiring, crosstalk, leakage, calibration drift |
+| Silicon spin qubits | Mostly beyond N&C's main platform treatment | Long spin coherence and semiconductor manufacturing path | Placement, readout, donor or dot integration, repeated syndrome extraction |
 | Neutral atoms | Optical-lattice proposals; modern tweezers are supplementary | Large flexible arrays and Rydberg interactions | Atom loss, loading, uniformity, mid-circuit measurement |
 | Topological proposals | Mostly beyond N&C's main treatment | Possible passive protection from local noise | Experimental maturity and controllable logical gates |
 
@@ -288,3 +358,7 @@ print(f"NMR polarization at 500 MHz and 300 K: {epsilon:.2e}")
 - H. Jeff Kimble and collaborators, cavity-QED and quantum-network experiments.
 - Emanuel Knill, Raymond Laflamme, and Gerald Milburn, linear-optics quantum computation.
 - Michel Devoret, Robert Schoelkopf, and collaborators, reviews on superconducting circuits and circuit QED.
+
+## References
+
+[1] C. Zhang, F. Xu, S. Zhang, M. Duan, et al. *Universal logical operations in a silicon quantum processor*. Nature Nanotechnology (2026).

@@ -79,6 +79,112 @@ A careful physical report should include the full measurement protocol. For a vi
 
 Patch defenses need the same care. Cropping, blurring, JPEG compression, random resizing, or patch detectors may stop a naive patch while failing against an adaptive patch optimized through those transformations. A defense should therefore report adaptive patch optimization, not only performance against a patch generated for an undefended model.
 
+## Universal and physical attack patterns
+
+### Image-agnostic universal perturbations
+
+Moosavi-Dezfooli et al. [1] showed that one shared perturbation vector can fool many natural images. This is a digital norm-bounded attack rather than a physical attack by itself, but it belongs in the same conceptual family as patches because one learned pattern is reused across a distribution.
+
+The standard universal objective measures fooling rate:
+
+$$
+\Pr_{x\sim\mathcal{D}}[\hat{k}(x+v)\ne\hat{k}(x)]
+$$
+
+under a shared budget:
+
+$$
+\|v\|_p\le \xi.
+$$
+
+The original construction loops over a dataset. If $x_i+v$ is already fooled, keep $v$. Otherwise compute a small extra perturbation $\Delta v_i$, often with a boundary method such as DeepFool, and project:
+
+$$
+v\leftarrow \Pi_{p,\xi}(v+\Delta v_i).
+$$
+
+Worked micro-example: if a universal perturbation changes predictions on $720$ of $1000$ held-out images, the prediction-change fooling rate is $720/1000=72\%$. A report must say whether the metric is prediction change or ground-truth error, because those count different failures.
+
+Compact pseudo-code:
+
+```text
+v = 0
+for pass in dataset_passes:
+    for x in construction_set:
+        if model(x + v) still predicts model(x):
+            v = project(v + per_image_boundary_step(x + v), radius)
+report fooling rate on held-out data
+```
+
+Universal perturbations are useful for studying shared decision-boundary geometry and transfer. They do not imply physical robustness unless the optimization includes print, placement, sensor, or channel transformations.
+
+### Localized universal patches
+
+Brown et al. [2] introduced adversarial patches: visible, localized patterns optimized to dominate a classifier's prediction across images and transformations. The contribution was to shift attention from tiny imperceptible perturbations to robust artifacts that may be obvious to humans but still dangerous for a perception system expected to ignore irrelevant regions.
+
+With mask $m_T$ and transformed patch $T(p)$, compositing is:
+
+$$
+x'=(1-m_T)\odot x+m_T\odot T(p).
+$$
+
+A targeted EOT objective is:
+
+$$
+\max_p
+\mathbb{E}_{x\sim\mathcal{D},\ \tau\sim\mathcal{T}}
+\left[
+\log p_t(A(x,p,\tau))
+\right],
+$$
+
+where $\mathcal{T}$ samples scale, rotation, location, brightness, and other viewing variables. The patch update backpropagates through the transformation and overlay operation into the patch pixels.
+
+Worked micro-example: a $40\times40$ patch in a $224\times224$ image covers:
+
+$$
+\frac{40\cdot40}{224\cdot224}\approx 3.19\%.
+$$
+
+This area budget is not comparable to an $\ell_\infty$ radius such as $8/255$; it describes a localized visible capability.
+
+Compact pseudo-code:
+
+```text
+for each optimization step:
+    sample images and transformations
+    overlay transformed patch
+    minimize target-class loss averaged over samples
+    clamp patch to valid printable values
+```
+
+Patch reports should state area, shape, allowed locations, transformation distribution, target behavior, and whether the result is digital, printed, or physically photographed.
+
+### Robust physical road-sign markings
+
+Eykholt et al. [3] developed robust physical perturbations for road-sign classifiers, including sticker-like and poster-like stop-sign attacks. The key contribution was not just a stop-sign demo; it was the RP2 pattern of optimizing a printable, masked perturbation over a distribution of physical viewing conditions.
+
+For target class $y_t$, an RP2-style objective is:
+
+$$
+\min_p
+\mathbb{E}_{\omega\sim\Omega}
+\left[
+\mathcal{L}(f(T(x,p;\omega)),y_t)
+\right]
++\lambda R(p),
+$$
+
+where $\omega$ includes viewpoint, scale, lighting, distance, blur, and camera effects, and $R(p)$ regularizes visual change or printability. With a sticker mask:
+
+$$
+x'=(1-m)\odot x+m\odot p.
+$$
+
+Worked micro-example: if three transformed views have target losses $0.8$, $1.1$, and $0.5$, the EOT estimate is $0.8$. If $R(p)=0.2$ and $\lambda=0.5$, the total objective estimate is $0.8+0.1=0.9$.
+
+This attack family illustrates why physical evaluation must report distance, angle, lighting, camera, print medium, number of trials, and failed attempts. A cropped sign classifier result is not automatically a result for a full driving stack.
+
 ## Visual
 
 ```mermaid
@@ -233,3 +339,9 @@ This sketch shows the EOT pattern: apply the same learnable patch under several 
 - Eykholt et al., "Robust Physical-World Attacks on Deep Learning Visual Classification."
 - Brown et al., "Adversarial Patch."
 - Sharif et al., work on adversarial eyeglass frames for face recognition.
+
+## References
+
+[1] S.-M. Moosavi-Dezfooli, A. Fawzi, O. Fawzi, P. Frossard. *Universal Adversarial Perturbations*. CVPR 2017.
+[2] T. B. Brown, D. Mane, A. Roy, M. Abadi, J. Gilmer. *Adversarial Patch*. arXiv 2017.
+[3] K. Eykholt, I. Evtimov, E. Fernandes, B. Li, A. Rahmati, C. Xiao, A. Prakash, T. Kohno, D. Song. *Robust Physical-World Attacks on Deep Learning Visual Classification*. CVPR 2018.

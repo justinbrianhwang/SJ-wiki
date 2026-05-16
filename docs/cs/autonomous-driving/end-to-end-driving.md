@@ -57,6 +57,132 @@ Safety wrappers are not an admission that learning failed. They are how learned 
 
 Training data also encodes driving culture and policy choices. Human demonstrations may include rolling stops, aggressive merges, or local habits that are not acceptable for an automated system. Imitation learning therefore needs data curation and policy filtering, not only more miles.
 
+### Classical pipelines as the baseline
+
+End-to-end systems should be compared against the classical autonomy stack they aim to simplify. The DARPA Urban Challenge work by Patz and collaborators [1] is useful because it predates modern deep learning but already contains the main system pattern: sensors, fused world view, context reasoning, tactical commands, path tracking, and PID control.
+
+The competition architecture can be summarized as:
+
+$$
+\text{sensors}\rightarrow\text{world view}\rightarrow\text{reasoning}\rightarrow\text{tactical command}\rightarrow\text{control}.
+$$
+
+Route Network Definition Files acted like early lane graphs, Mission Definition Files acted like route goals, and context reasoning handled stop signs, blocked roads, passing, and intersections. A simple follow-the-carrot controller selected a lookahead point $g=(x_g,y_g)$ and used curvature:
+
+$$
+\kappa\approx\frac{2y_g}{x_g^2+y_g^2}.
+$$
+
+Worked example: if the lookahead point is $(10,2)$ m, then $\kappa=4/104=0.0385\ \mathrm{m}^{-1}$, a turning radius of about 26 m. The lesson is not that this controller is sufficient for modern robotaxis; it is that understandable interfaces and fallback behavior were already central before neural policies entered the stack.
+
+### Mid-level and privileged imitation
+
+Behavior cloning fails when closed-loop errors push the vehicle into states absent from expert logs. ChauffeurNet [2] addressed this by using a mid-level top-down scene representation, predicting future ego waypoints, synthesizing perturbations, and adding losses for collisions, off-road motion, and lack of progress:
+
+$$
+L=L_{\mathrm{imit}}+\lambda_cL_{\mathrm{collision}}+\lambda_rL_{\mathrm{road}}+\lambda_pL_{\mathrm{progress}}.
+$$
+
+This is still a learned driving policy, but it is not raw pixels to steering. The upstream stack provides boxes, road geometry, route, and traffic-light context; a controller tracks the predicted trajectory. That mid-to-mid interface remains influential because it gives the learner a planning-shaped input and a controllable output.
+
+Learning by Cheating [3] used a different training decomposition. A privileged teacher first learns from simulator ground truth such as BEV lanes, objects, and traffic lights; a deployable camera-based student then distills that teacher:
+
+$$
+\text{expert demonstrations}\rightarrow\text{privileged teacher}\rightarrow\text{sensorimotor student}.
+$$
+
+The method is valuable as a supervision strategy, not as a claim that real vehicles may use privileged state. It separates "learn to act" from "learn to see" and gives the student command-conditioned waypoint labels in simulator states where ordinary demonstrations may provide only one branch.
+
+Dynamic conditional imitation learning [4] shows how learned control can be embedded in explicit mapping and routing. It fuses camera and LiDAR features for command-conditioned control, maintains an occupancy grid, detects blockages, and replans the route when the current command stream becomes invalid. A log-odds occupancy update has the form:
+
+$$
+\ell_t(c)=\ell_{t-1}(c)+\log\frac{p(c\mid z_t)}{1-p(c\mid z_t)}-\ell_0(c).
+$$
+
+Compact pseudo-code for this hybrid pattern:
+
+```python
+features = fuse(camera_encoder(image), lidar_encoder(lidar_grid))
+control = command_head(features, route_command, ego_state)
+grid = update_occupancy(grid, lidar_grid)
+if blocked(route_edge, grid):
+    route_command = replan_route(map_graph, blocked_edges)
+```
+
+The common theme is that imitation learning improves when the training distribution includes mistakes, the output is a trajectory or waypoint sequence, and explicit system modules handle facts that are easier to specify than to infer.
+
+### Transformer fusion for learned driving policies
+
+Multi-modal end-to-end policies must decide where sensor streams meet. TransFuser [5] uses transformer attention to fuse camera and LiDAR features at multiple scales before predicting waypoints. Its contribution is global cross-modal context: a traffic light in an image, an obstacle in BEV, and the ego route may be far apart in feature coordinates but tightly related for driving.
+
+Self-attention over concatenated image and LiDAR tokens computes:
+
+$$
+\mathrm{Attention}(Q,K,V)=\mathrm{softmax}\left(\frac{QK^\top}{\sqrt{d}}\right)V.
+$$
+
+If one scale has 64 image tokens and 64 LiDAR tokens, one attention head computes $(128)^2=16384$ pairwise scores. This explains both the appeal and the cost of transformer fusion.
+
+InterFuser [6] adds a second lesson: a learned driving policy should expose intermediate signals that safety logic can inspect. It predicts waypoints plus interpretable features such as object density and traffic-rule signals, then uses a safety controller to filter or adjust the final action:
+
+$$
+\mathcal{U}_{\mathrm{safe}}=\{u:g_j(u,M_t)\le 0,\ j=1,\ldots,J\}.
+$$
+
+Worked example: if a proposed waypoint $(8,0)$ m is only $0.54$ m from an obstacle and the clearance threshold is $1.0$ m, the controller should reject or modify it. The intermediate "mind map" is useful only because it participates in the action interface; a post-hoc explanation with no operational role would be much weaker.
+
+### Planning-oriented full-stack learning
+
+Unified learned stacks try to train perception, prediction, and planning around the final ego plan rather than around isolated module metrics. UniAD [7] uses query-based transformer modules for tracks, map elements, motion forecasts, occupancy, and ego planning. A simplified information flow is:
+
+$$
+Q_{\mathrm{track}}\rightarrow Q_{\mathrm{motion}}\rightarrow Q_{\mathrm{ego}}\rightarrow \hat{Y}_{\mathrm{ego}}.
+$$
+
+This is not merely "many heads on one backbone." Track queries carry dynamic agents, map queries carry road structure, motion queries carry future hypotheses, occupancy gives dense risk, and the ego query attends to them before producing waypoints. The design makes the plan the organizing objective.
+
+VAD [8] takes a vectorized route through the same problem. Instead of relying only on dense raster maps, it predicts agent and map vectors and applies explicit vector constraints for collision, boundary, and lane-direction consistency:
+
+$$
+\hat{Y}_{\mathrm{ego}}=f(q_{\mathrm{ego}},Q_a,Q_m,s_{\mathrm{ego}},c).
+$$
+
+A simple collision margin to predicted agent waypoints is:
+
+$$
+L_{\mathrm{coll}}=\frac{1}{T}\sum_t\max_i\max(0,r-\|\hat{y}_t-\hat{a}_{i,t}\|_2).
+$$
+
+Worked example: if an ego waypoint is $(5.0,1.0)$ m and a predicted agent waypoint is $(5.6,1.3)$ m, the distance is $\sqrt{0.45}=0.671$ m. With radius $r=1.0$ m, the violation is $0.329$ m. This is the classical planning instinct, written as a differentiable or trainable vector constraint inside a learned planner.
+
+The practical tradeoff is complexity. Unified models can improve task coordination, but they are harder to train, debug, schedule, and validate. Production systems usually still need independent monitors and fallback behavior even when the main planner is learned.
+
+### Generative planning and world models
+
+World models learn future scene distributions conditioned on observations, actions, maps, text, or traffic structure. DriveDreamer [9] and GAIA-1 [10] are representative generative driving systems: the first uses diffusion and traffic-structure conditioning, while the second uses latent sequence modeling with video, text, and action inputs. The planning-relevant object is an action-conditioned future:
+
+$$
+p_\theta(s_{t+1:t+T}\mid s_{\le t},a^{\mathrm{ego}}_{t:t+T},c).
+$$
+
+Rendering realism is not enough. A world model used for planning must preserve geometry, traffic rules, and causal reaction. If ego braking and ego acceleration generate the same future, the model is not action-grounded enough to evaluate plans.
+
+Diffusion planners generate ego trajectories by iterative denoising:
+
+$$
+x_{t-\Delta t}=F_\theta(x_t,c,t),
+$$
+
+then score or constrain the resulting candidates. Hydra-MDP [11] uses multi-target teacher-student distillation so a learned planner can absorb human and rule-based planning signals. DiffVLA [12] combines VLM guidance with sparse-dense diffusion planning. A 2026 Autoware/AWSIM benchmark [13] showed why deployment details matter by decomposing a monolithic diffusion planner, moving the solver loop into C++, and measuring solver order, step count, and latency inside ROS 2.
+
+Runtime is part of the algorithm. If the context encoder takes 18 ms, each denoising step takes 9 ms, and post-processing takes 4 ms, then:
+
+$$
+T_{\mathrm{plan}}=18+9N+4=22+9N.
+$$
+
+Three steps take 49 ms, seven take 85 ms, and ten take 112 ms. Under a 100 ms planning budget, the ten-step version is not deployable no matter how good it looks offline. A diffusion planner needs candidate scoring, constraint checks, and a fallback when no sampled trajectory is safe or the solver overruns.
+
 ## Visual
 
 ```mermaid
@@ -184,3 +310,19 @@ print(model(image, command, ego).shape)
 - [Deep learning](/cs/deep-learning/)
 - [Reinforcement learning](/cs/reinforcement-learning/)
 - Further reading: Pomerleau's ALVINN, NVIDIA PilotNet, conditional imitation learning for driving, DAgger, Dreamer world models, and public technical talks from major AV developers.
+
+## References
+
+[1] J. Patz et al. *A Practical Approach to Robotic Design for the DARPA Urban Challenge*. Journal of Field Robotics, 2008.
+[2] M. Bansal, A. Krizhevsky, A. Ogale. *ChauffeurNet: Learning to Drive by Imitating the Best and Synthesizing the Worst*. arXiv, 2018.
+[3] D. Chen, B. Zhou, V. Koltun. *Learning by Cheating*. CoRL 2019.
+[4] H. M. Eraqi, M. N. Moustafa, J. Honer. *Dynamic Conditional Imitation Learning for Autonomous Driving*. IEEE Transactions on Intelligent Transportation Systems, 2022.
+[5] P. Chitta, A. Prakash, B. Jaeger, Z. Yu, K. Renz, A. Geiger. *TransFuser: Imitation with Transformer-Based Sensor Fusion for Autonomous Driving*. 2022.
+[6] H. Shao, L. Wang, R. Chen, H. Li, Y. Liu. *Safety-Enhanced Autonomous Driving Using Interpretable Sensor Fusion Transformer*. CoRL 2022.
+[7] Y. Hu et al. *Planning-oriented Autonomous Driving*. CVPR 2023.
+[8] B. Jiang et al. *VAD: Vectorized Scene Representation for Efficient Autonomous Driving*. 2023.
+[9] X. Wang et al. *DriveDreamer: Towards Real-world-driven World Models for Autonomous Driving*. 2023.
+[10] A. Hu, L. Russell, H. Yeo, M. Murez, G. Fedoseev, A. Kendall et al. *GAIA-1: A Generative World Model for Autonomous Driving*. 2023.
+[11] Z. Li, K. Li, S. Wang, S. Lan, Z. Yu, Y. Ji, Z. Li, Z. Zhu, J. Kautz, Z. Wu, Y.-G. Jiang, J. M. Alvarez. *Hydra-MDP: End-to-end Multimodal Planning with Multi-target Hydra-Distillation*. arXiv, 2024.
+[12] A. Jiang, Y. Gao, Z. Sun, Y. Wang, J. Wang, J. Chai, Q. Cao, Y. Heng, H. Jiang, Y. Dong, Z. Zhang, X. Guo, H. Sun, H. Zhao. *DiffVLA: Vision-Language Guided Diffusion Planning for Autonomous Driving*. arXiv, 2025.
+[13] Y. Li, S. Thompson, Y. Zhang, E. Javanmardi, M. Tsukada. *An Open-Source Modular Benchmark for Diffusion-Based Motion Planning in Closed-Loop Autonomous Driving*. arXiv, 2026.

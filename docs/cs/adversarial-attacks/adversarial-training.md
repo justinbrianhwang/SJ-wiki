@@ -70,7 +70,7 @@ $$
 \right].
 $$
 
-Madry-style PGD adversarial training popularized a practical version of this objective for deep networks. The inner PGD attack is not guaranteed to find the exact maximum, but multi-step PGD with random starts is a strong first-order adversary for many norm-bounded image settings. The defense claim should therefore say "robust against the evaluated $\ell_p$ PGD or AutoAttack threat model," not "robust to all attacks."
+Madry-style PGD adversarial training popularized a practical version of this objective for deep networks. The [inner PGD attack](/cs/adversarial-attacks/white-box-attacks#iterative-projected-gradient-methods) is not guaranteed to find the exact maximum, but multi-step PGD with random starts is a strong first-order adversary for many norm-bounded image settings. The defense claim should therefore say "robust against the evaluated $\ell_p$ PGD or AutoAttack threat model," not "robust to all attacks."
 
 Adversarial training changes the learned representation. Models trained robustly often have smoother input gradients, larger margins in the chosen threat set, and features that align better with human-perceptible structure. But robustness is threat-model-specific. A model trained for $\ell_\infty$ radius $\epsilon$ is not automatically robust to patches, rotations, corruptions, or unrestricted semantic changes.
 
@@ -217,7 +217,7 @@ This is the basic PGD adversarial-training loop. Production code should handle b
 ## Connections
 
 - [Mathematical formulation](/cs/adversarial-attacks/mathematical-formulation) gives the robust risk objective.
-- [White-box attacks](/cs/adversarial-attacks/white-box-attacks) supplies the PGD inner maximization.
+- [White-box attacks](/cs/adversarial-attacks/white-box-attacks#iterative-projected-gradient-methods) supplies the PGD inner maximization.
 - [Certified defenses and randomized smoothing](/cs/adversarial-attacks/certified-defenses-and-randomized-smoothing) distinguishes empirical robustness from proofs.
 - [Robustness-accuracy tradeoff](/cs/adversarial-attacks/robustness-accuracy-tradeoff) focuses on why robustness can reduce clean accuracy.
 - [Evaluation and benchmarks](/cs/adversarial-attacks/evaluation-and-benchmarks) explains how to test adversarially trained models.

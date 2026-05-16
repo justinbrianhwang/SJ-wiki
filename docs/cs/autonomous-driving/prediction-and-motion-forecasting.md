@@ -69,6 +69,69 @@ $$
 
 For multimodal outputs, benchmarks often report minADE or minFDE across the best of $K$ modes, sometimes combined with probability calibration. A model that produces many guesses can look good under min error but still be poorly calibrated.
 
+### Vectorized scene representations
+
+Forecasting systems need to represent both agent motion and road topology. VectorNet [1] replaced rasterized BEV map images with typed polylines for lanes, crosswalks, stop lines, traffic controls, and agent histories. LaneGCN [2] pushed this further by treating the HD map as a directed lane graph with predecessor, successor, left-neighbor, and right-neighbor edges.
+
+A vectorized scene can be written as:
+
+$$
+\mathcal{S}=\mathcal{A}_{\mathrm{hist}}\cup\mathcal{M}_{\mathrm{lanes}}\cup\mathcal{M}_{\mathrm{crosswalks}}\cup\mathcal{T}_{\mathrm{signals}}.
+$$
+
+For a polyline with points $q_0,\ldots,q_m$, consecutive points produce vector tokens:
+
+$$
+v_i=(q_i,q_{i+1},a_i),
+$$
+
+where $a_i$ stores type, direction, traffic-light state, timestamp, or polyline id. A local polyline encoder pools vectors belonging to the same entity, then a global graph or attention layer models interactions among lanes and agents:
+
+$$
+z_p=\mathrm{Attention}(f_p,\{f_q\}_{q=1}^{M}).
+$$
+
+LaneGCN [2] makes the map topology explicit with relation-specific graph convolution:
+
+$$
+h_i^{(\ell+1)}
+=\phi\left(W_0h_i^{(\ell)}+\sum_r\sum_{j\in\mathcal{N}_r(i)}W_rh_j^{(\ell)}\right).
+$$
+
+Worked example: if lane $L_2$ has successor $L_3$ and left neighbor $L_5$, then straight continuation into $L_3$ and a left lane change into $L_5$ are map-supported modes. A proposed right-lane future is not supported unless the graph also contains a right-neighbor edge. This does not prove the agent will obey the map, but it gives the predictor a strong structural prior.
+
+### Hierarchical multi-agent forecasting
+
+Target-centric forecasting often normalizes and re-runs the scene once per agent. That is expensive and can produce inconsistent joint futures. HiVT [3] keeps vectorized inputs but separates local context extraction from global interaction: each modeled agent receives a local region of nearby agent and lane vectors, then agent-level context tokens exchange information globally.
+
+The computational motivation is simple. Direct attention over $N$ agents with $T$ history vectors and $L$ lane vectors has token count $NT+L$ and quadratic cost:
+
+$$
+O((NT+L)^2).
+$$
+
+A hierarchy compresses local regions first, then performs global attention over roughly $N$ agent tokens. If $N=20$, $T=20$, and $L=300$, direct global attention sees $700^2=490000$ pairwise interactions, while agent-level global attention sees $20^2=400$ pairs. Local work still costs compute, but global scene interaction becomes much cheaper.
+
+HiVT [3] also highlights translation and rotation structure. Displacement features such as $\Delta p_t=p_t-p_{t-1}$ are invariant to global translation, so the model does not need to relearn the same motion at every city coordinate. A planner benefits because it receives multi-agent futures from one shared scene context instead of many isolated per-agent forecasts.
+
+### Tracking-aware prediction interfaces
+
+Prediction depends on track continuity. PnPNet [4] put tracking inside an end-to-end trainable perception-prediction subsystem rather than treating it as post-processing after detection. The useful abstraction is a track memory that carries object identity, history, and learned features into the forecasting head.
+
+For a track $q$ and detection $d$, a learned association score can use track features, detection features, spatial displacement, and time gap:
+
+$$
+s(q,d)=\psi([h_q,h_d,\Delta x,\Delta y,\Delta t]).
+$$
+
+The tracker updates memory, and the predictor forecasts from trajectory-level actor features:
+
+$$
+\hat{Y}_i=[(\hat{x}_{i,1},\hat{y}_{i,1}),\ldots,(\hat{x}_{i,T},\hat{y}_{i,T})].
+$$
+
+Worked example: a vehicle observed at $x=0,2,4$ m at one-second intervals is occluded at $t=3$. A frame-only detector has no current box, but a track memory estimates velocity $2$ m/s, carries the state to $x=6$ m, and forecasts $x=10$ m at $t=5$. That continuity is often the difference between a usable forecast and a flickering object interface.
+
 Prediction is coupled to planning. The ego vehicle's future action changes other agents' futures. If the ego slows, another car may merge; if the ego accelerates, it may not. A purely open-loop predictor can be inconsistent with the planner's chosen trajectory. Interactive prediction and game-theoretic planning address this coupling, but they are harder to validate.
 
 Probability calibration matters. If a predictor assigns 90 percent probability to a crossing pedestrian mode, then over many similar cases that mode should occur about 90 percent of the time. Poorly calibrated probabilities can make planning either timid or reckless. A model with good minFDE but bad calibration may produce one accurate trajectory among many candidates while assigning it the wrong probability.
@@ -211,3 +274,10 @@ print("ADE, FDE:", ade_fde(forecast, truth))
 - [Deep learning](/cs/deep-learning/)
 - [Reinforcement learning](/cs/reinforcement-learning/)
 - Further reading: Social-LSTM, Trajectron++, VectorNet, TNT, LaneGCN, Argoverse forecasting, and Waymo Open Motion Dataset papers.
+
+## References
+
+[1] J. Gao, C. Sun, H. Zhao, Y. Shen, D. Anguelov, C. Li, C. Schmid. *VectorNet: Encoding HD Maps and Agent Dynamics from Vectorized Representation*. CVPR 2020.
+[2] M. Liang, B. Yang, R. Hu, Y. Chen, R. Liao, S. Feng, R. Urtasun. *Learning Lane Graph Representations for Motion Forecasting*. ECCV 2020.
+[3] Z. Zhou, L. Ye, J. Wang, K. Wu, K. Lu. *HiVT: Hierarchical Vector Transformer for Multi-Agent Motion Prediction*. CVPR 2022.
+[4] M. Liang, B. Yang, S. Zeng, Y. Chen, R. Hu, S. Casas, R. Urtasun. *PnPNet: End-to-End Perception and Prediction with Tracking in the Loop*. CVPR 2020.

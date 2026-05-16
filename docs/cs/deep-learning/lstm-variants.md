@@ -134,7 +134,7 @@ In 2024 Beck et al. revived LSTM with two new cells designed to compete with Tra
 - **sLSTM** keeps a scalar memory cell but uses **exponential gating** $i_t = \exp(\cdot)$ and $f_t = \exp(\cdot)$ with a normalizer state, allowing the cell to forget arbitrarily fast and remember arbitrarily long.
 - **mLSTM** replaces the scalar cell with a **matrix memory** $C_t \in \mathbb{R}^{d \times d}$, updated by an outer product of key and value vectors — directly analogous to a linear-attention KV cache.
 
-Empirically xLSTM matches or beats Mamba on some language-modeling benchmarks at similar scale. See [Mamba](/cs/deep-learning/mamba) and the broader linear-attention family for context.
+Empirically xLSTM matches or beats some modern linear-time sequence models on selected language-modeling benchmarks at similar scale. See [Efficient Sequence Modeling](/cs/deep-learning/efficient-sequence-modeling) for the broader linear-attention, recurrent, and state-space context.
 
 ## Choosing a variant in practice
 
@@ -153,7 +153,7 @@ flowchart TD
   J -- no --> L[Vanilla LSTM]
 ```
 
-Or — and this is the honest 2025 recommendation — **consider whether you should be using an LSTM at all**. For most sequence problems the practical choice is a Transformer (see [Attention Is All You Need](/cs/deep-learning/attention-is-all-you-need)) or a modern linear-time alternative ([Mamba](/cs/deep-learning/mamba), [RWKV](/cs/deep-learning/rwkv), [Griffin](/cs/deep-learning/griffin)). LSTMs remain useful for:
+Or — and this is the honest 2025 recommendation — **consider whether you should be using an LSTM at all**. For most sequence problems the practical choice is a Transformer (see [Attention and Transformers](/cs/deep-learning/attention-transformers)) or a modern linear-time alternative (see [Efficient Sequence Modeling](/cs/deep-learning/efficient-sequence-modeling)). LSTMs remain useful for:
 
 - Online / streaming inference where the model truly cannot look ahead and a tiny constant-memory state matters
 - Edge devices where Transformer key-value cache memory is unaffordable
@@ -208,5 +208,5 @@ This module is a standard sequence tagger: BiLSTM with forget-bias init at 1.0, 
 
 - [Gated RNNs and Sequence-to-Sequence](/cs/deep-learning/gated-rnns-seq2seq) — vanilla LSTM + GRU intro
 - [Sequence Modeling and RNNs](/cs/deep-learning/sequence-modeling-rnns) — base RNN before gates
-- [Attention Is All You Need](/cs/deep-learning/attention-is-all-you-need) — the architecture that displaced LSTM for most tasks
-- [Mamba](/cs/deep-learning/mamba), [RWKV](/cs/deep-learning/rwkv), [Griffin](/cs/deep-learning/griffin) — modern linear-time sequence models that revisit RNN ideas
+- [Attention and Transformers](/cs/deep-learning/attention-transformers) — the architecture family that displaced LSTM for most tasks
+- [Efficient Sequence Modeling](/cs/deep-learning/efficient-sequence-modeling) — modern linear-time and hybrid sequence models that revisit RNN ideas

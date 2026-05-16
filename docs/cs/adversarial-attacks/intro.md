@@ -7,7 +7,7 @@ sidebar_position: 1
 
 Adversarial machine learning studies how learned systems fail when inputs, training data, feedback, or surrounding context are chosen by an adversary rather than sampled passively from the test distribution. In the modern deep-learning setting, the canonical example is an adversarial image $x' = x+\delta$ that looks nearly unchanged to a human but causes a classifier to predict the wrong label. The same discipline now reaches text, speech, reinforcement learning, retrieval systems, tool-using LLM agents, and physical-world perception.
 
-This section is the foundational layer for SJ Wiki. It does not deep-dive individual papers yet; instead it defines the vocabulary, threat models, mathematical formulations, attack families, defenses, and evaluation rules that later paper notes will reuse. The central habit is security-style precision: every robustness claim must state the attacker's goal, knowledge, capability, and budget.
+This section is the foundational layer for SJ Wiki. It organizes adversarial ML as topical chapters with papers cited inline: vocabulary, threat models, mathematical formulations, attack families, defenses, and evaluation rules. The central habit is security-style precision: every robustness claim must state the attacker's goal, knowledge, capability, and budget.
 
 ## Definitions
 
@@ -111,6 +111,7 @@ The section is organized as follows:
 10. [Evaluation and Benchmarks](/cs/adversarial-attacks/evaluation-and-benchmarks): RobustBench, AutoAttack, adaptive attacks, robust accuracy, and reporting discipline.
 11. [Robustness-Accuracy Tradeoff](/cs/adversarial-attacks/robustness-accuracy-tradeoff): natural risk, robust risk, boundary error, margins, and data scaling.
 12. [Attacks on LLMs and Other Modalities](/cs/adversarial-attacks/attacks-on-llms-and-other-modalities): text, audio, RL, multimodal, jailbreaks, and prompt injection at overview level.
+13. [Data Poisoning and Backdoors](/cs/adversarial-attacks/data-poisoning-and-backdoors): training-time compromise, triggers, clean accuracy, attack success rate, and supply-chain risk.
 
 ## Visual
 
@@ -144,6 +145,7 @@ flowchart TD
 | Empirical defense | What attacks did the model survive? | [Adversarial training](/cs/adversarial-attacks/adversarial-training) |
 | Certified defense | What has been proven impossible? | [Certified defenses](/cs/adversarial-attacks/certified-defenses-and-randomized-smoothing) |
 | Evaluation | Is the robustness claim actually supported? | [Evaluation and benchmarks](/cs/adversarial-attacks/evaluation-and-benchmarks) |
+| Training-time attack | What if the model was compromised before deployment? | [Data poisoning and backdoors](/cs/adversarial-attacks/data-poisoning-and-backdoors) |
 
 ## Worked example 1: Parsing a robustness claim
 
@@ -276,28 +278,3 @@ This toy class is a guardrail for writing robustness claims. It forces the write
 - Madry et al., "Towards Deep Learning Models Resistant to Adversarial Attacks."
 - Carlini and Wagner, "Towards Evaluating the Robustness of Neural Networks."
 - Athalye, Carlini, and Wagner, "Obfuscated Gradients Give a False Sense of Security."
-
-## Attack and defense deep-dives
-
-The pages below are paper-grounded deep-dives on named attacks, defenses, and evaluation methods. They are ordered roughly from core image attacks to black-box methods, physical attacks, backdoors, and non-image modalities.
-
-1. [FGSM](/cs/adversarial-attacks/fgsm)
-2. [PGD](/cs/adversarial-attacks/pgd)
-3. [DeepFool](/cs/adversarial-attacks/deepfool)
-4. [C&W attack](/cs/adversarial-attacks/carlini-wagner-attack)
-5. [Universal adversarial perturbations](/cs/adversarial-attacks/universal-adversarial-perturbations)
-6. [EAD elastic-net attack](/cs/adversarial-attacks/ead-elastic-net-attack)
-7. [Momentum Iterative FGSM](/cs/adversarial-attacks/momentum-iterative-fgsm)
-8. [Boundary Attack](/cs/adversarial-attacks/boundary-attack)
-9. [ZOO](/cs/adversarial-attacks/zoo)
-10. [Square Attack](/cs/adversarial-attacks/square-attack)
-11. [One Pixel Attack](/cs/adversarial-attacks/one-pixel-attack)
-12. [Adaptive Auto Attack](/cs/adversarial-attacks/adaptive-autoattack)
-13. [Adversarial Patch](/cs/adversarial-attacks/adversarial-patch)
-14. [Physical stop-sign attack](/cs/adversarial-attacks/physical-stop-sign-attack)
-15. [BadNets backdoor](/cs/adversarial-attacks/badnets-backdoor)
-16. [Audio adversarial examples](/cs/adversarial-attacks/audio-adversarial-examples)
-17. [HotFlip](/cs/adversarial-attacks/hotflip)
-18. [TextFooler](/cs/adversarial-attacks/textfooler)
-19. [BERT-Attack](/cs/adversarial-attacks/bert-attack)
-20. [RF universal adversarial perturbations](/cs/adversarial-attacks/rf-universal-adversarial-perturbations)

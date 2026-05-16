@@ -79,6 +79,65 @@ Subsets require caution. Evaluating on 1000 examples can be reasonable for expen
 
 A useful habit is to phrase every table caption as a threat-model statement. If the caption cannot fit the norm, radius, access model, attack suite, and data split, the table is probably underspecified.
 
+## Adaptive attack suites
+
+### Ensemble baselines for empirical robustness
+
+Croce and Hein [1] introduced AutoAttack as an ensemble-style protocol for reliable empirical evaluation under standard norm-bounded threat models. The point is not that any finite suite is exhaustive; it is that combining attacks with different losses and search behavior reduces the chance that a single mis-tuned PGD run gives a misleading robustness number.
+
+The evaluation logic is:
+
+$$
+\mathrm{Acc}_{\mathrm{rob}}(\mathcal{A})
+=
+\frac{1}{n}\sum_{i=1}^{n}
+\mathbf{1}\left[
+\forall A\in\mathcal{A},\ h(A(x_i,y_i))=y_i
+\right],
+$$
+
+where $\mathcal{A}$ is the chosen attack suite. If any attack in the suite finds a valid adversarial example, the example is counted as non-robust under that empirical protocol.
+
+Compact pseudo-code:
+
+```text
+robust = initially_correct_examples
+for attack in attack_suite:
+    x_adv = attack(model, remaining_robust_examples)
+    robust = robust AND model(x_adv) == y
+report clean accuracy, robust accuracy, and threat model
+```
+
+This style of evaluation is useful for standard benchmarks, but unusual defenses with randomness, detectors, nondifferentiable preprocessing, or nonstandard threat models still require custom adaptive attacks.
+
+### Budget-aware adaptive evaluation
+
+Liu et al. [2] proposed Adaptive Auto Attack, often abbreviated A3, for practical robustness testing under finite attack budgets. Its contribution is evaluation efficiency: use adaptive direction initialization and online discarding so that computation is spent on examples more likely to reveal additional failures.
+
+If a naive evaluation gives every example the same attack budget:
+
+$$
+T_i=T\quad\text{for all }i,
+$$
+
+an adaptive evaluator reallocates effort based on observed margins, progress, and prior successes:
+
+$$
+T_i \leftarrow T_i+\Delta T_i.
+$$
+
+The result is still empirical. If the attack finds $s$ failures among $n$ examples, the robust accuracy under that evaluation is:
+
+$$
+\widehat{\mathrm{Acc}}_{\mathrm{rob}}
+=
+\frac{n-s}{n}.
+$$
+
+Worked micro-example: on $1000$ images, if an adaptive attack finds adversarial examples for $430$, the empirical robust accuracy is $(1000-430)/1000=57\%$. The true robust accuracy under the threat model could be lower because a stronger future attack may find more failures.
+
+Adaptive discarding must be reported carefully. A fair comparison specifies the discard rule, total iteration or gradient budget, active-set accounting, and how failed, discarded, and already-successful examples are counted.
+
 ## Visual
 
 ```mermaid
@@ -238,3 +297,8 @@ This code separates clean accuracy, robust accuracy over the full batch, and att
 - Carlini et al., work on adaptive attacks and evaluating defenses.
 - Athalye, Carlini, and Wagner, "Obfuscated Gradients Give a False Sense of Security."
 - Tramer et al., work on adaptive attacks against defenses.
+
+## References
+
+[1] F. Croce, M. Hein. *Reliable Evaluation of Adversarial Robustness with an Ensemble of Diverse Parameter-free Attacks*. ICML 2020.
+[2] Y. Liu, Y. Cheng, L. Gao, X. Liu, Q. Zhang, J. Song. *Practical Evaluation of Adversarial Robustness via Adaptive Auto Attack*. CVPR 2022.

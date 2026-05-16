@@ -60,6 +60,39 @@ where $K$ is the camera intrinsic matrix, $\pi$ is projection, and $\rho$ is a r
 
 Depth completion can be framed as sensor fusion at the pixel or BEV level. Sparse lidar points projected into the image give accurate depth samples. A model uses image edges and semantics to propagate those samples while preserving discontinuities at object boundaries.
 
+### Multi-view acoustic depth reconstruction
+
+Depth estimation is not only a camera problem. Forward-looking sonar in underwater autonomy measures range and bearing but compresses elevation, so a single 2D sonar image can correspond to many possible 3D surfaces. MV3D [1] uses a batch of sonar views from a linear scan to predict multiple depth maps, then back-projects and fuses them into a 3D reconstruction.
+
+For a sonar return with range $r$, bearing $\theta$, and inferred elevation $\phi$, a simple back-projection is:
+
+$$
+x=r\cos\phi\cos\theta,\qquad
+y=r\cos\phi\sin\theta,\qquad
+z=r\sin\phi.
+$$
+
+The learning problem is to infer the missing elevation and surface geometry from multi-view acoustic appearance, shadows, and motion. MV3D [1] trains on synthetic sonar-depth pairs, uses style transfer to reduce the synthetic-to-real gap, and evaluates geometry with Chamfer distance:
+
+$$
+d_{\mathrm{CD}}(P,Q)=
+\frac{1}{|P|}\sum_{p\in P}\min_{q\in Q}\|p-q\|_2^2+
+\frac{1}{|Q|}\sum_{q\in Q}\min_{p\in P}\|q-p\|_2^2.
+$$
+
+Pseudo-code for the reconstruction interface:
+
+```python
+depth_maps = sonar_depth_model(scan_batch)
+clouds = []
+for depth, pose in zip(depth_maps, virtual_camera_poses):
+    local_cloud = backproject_sonar_depth(depth)
+    clouds.append(transform(local_cloud, pose))
+reconstruction = fuse_point_clouds(clouds)
+```
+
+Worked example: if $r=4$ m, $\theta=30^\circ$, and $\phi=10^\circ$, then $x\approx4(0.985)(0.866)=3.41$ m, $y\approx4(0.985)(0.5)=1.97$ m, and $z\approx4(0.174)=0.70$ m. The example is underwater rather than road driving, but the lesson transfers: each sensor has its own projection ambiguity, and the depth model must respect that physics.
+
 Temporal depth adds another source of geometry. If the camera moves and a scene point is static, multiple frames provide parallax, much like a virtual stereo baseline. This is useful for monocular video, but it depends on accurate ego motion and static-scene assumptions. Moving vehicles, pedestrians, shadows, reflections, and rolling-shutter effects break the simple geometry. AV systems often separate static structure from dynamic agents before trusting temporal depth.
 
 Road-plane assumptions are helpful but dangerous. If the camera height and pitch are known, pixels below the horizon can be intersected with an estimated ground plane to get approximate distance. This works for flat roads and lane markings, but hills, banked curves, speed bumps, dips, and camera pitch changes can create large errors. A robust system treats the road plane as a hypothesis with uncertainty, not as a universal truth.
@@ -181,3 +214,7 @@ for d, z, s in zip(disparities, depths, sigmas):
 - [Deep learning](/cs/deep-learning/)
 - [Engineering math and projective geometry](/math/engineering-math/)
 - Further reading: Hartley and Zisserman, *Multiple View Geometry*; Monodepth2; MiDaS; DPT; KITTI stereo and depth completion benchmarks.
+
+## References
+
+[1] N. Jaber, M. Wehbe, A. Christensen, F. Kirchner. *MV3D: Multi-View 3D Reconstruction of Objects Using Forward-Looking Sonar*. IEEE Robotics and Automation Letters, 2025.

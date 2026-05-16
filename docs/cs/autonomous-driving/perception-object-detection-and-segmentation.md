@@ -33,7 +33,83 @@ $$
 
 ## Key results
 
-Modern AV perception draws from several detector families. One-stage detectors such as YOLO and RetinaNet directly predict boxes from dense feature maps. Two-stage detectors generate proposals and refine them. Transformer-based detectors such as DETR use set prediction and bipartite matching to avoid hand-designed anchor assignment. 3D lidar detectors such as PointPillars convert point clouds into pseudo-images, while CenterPoint detects object centers in bird's-eye view. Camera-only 3D detection often predicts depth, lifts image features into 3D or BEV, and reasons over multiple cameras and time.
+Modern AV perception draws from several detector families. One-stage detectors such as YOLO and RetinaNet directly predict boxes from dense feature maps. Two-stage detectors generate proposals and refine them. Transformer-based detectors such as DETR use set prediction and bipartite matching to avoid hand-designed anchor assignment. 3D lidar detectors such as PointPillars [1] convert point clouds into pseudo-images, while CenterPoint [2] detects object centers in bird's-eye view. Camera-only 3D detection often predicts depth, lifts image features into 3D or BEV, and reasons over multiple cameras and time.
+
+### Pillar-based 3D detection
+
+Pillar-based LiDAR detection summarizes each vertical column of a point cloud into one learned feature, then scatters those features into a BEV pseudo-image. PointPillars [1] showed that this representation can avoid expensive 3D convolution while preserving enough road-scene geometry for real-time 3D detection.
+
+If the detection range is divided into ground-plane cells of size $\Delta x \times \Delta y$, a point $(x,y,z,r)$ maps to pillar indices:
+
+$$
+i=\left\lfloor\frac{x-x_{\min}}{\Delta x}\right\rfloor,\qquad
+j=\left\lfloor\frac{y-y_{\min}}{\Delta y}\right\rfloor.
+$$
+
+Each point is decorated with local offsets before pooling, for example:
+
+$$
+\hat{p}=[x,y,z,r,x-\bar{x}_k,y-\bar{y}_k,z-\bar{z}_k,x-x_k^c,y-y_k^c],
+$$
+
+where $(\bar{x}_k,\bar{y}_k,\bar{z}_k)$ is the mean point in pillar $k$ and $(x_k^c,y_k^c)$ is the pillar center. The pillar feature is a permutation-invariant pooled point feature:
+
+$$
+f_k=\max_{n=1,\ldots,N_k}\phi(\hat{p}_{kn}),
+$$
+
+with the max taken channelwise. After scattering $f_k$ to cell $(i_k,j_k)$, a standard 2D CNN can detect oriented 3D boxes in BEV.
+
+Compact pseudo-code:
+
+```python
+for point in lidar_points:
+    cell = floor((point.xy - origin_xy) / pillar_size_xy)
+    pillars[cell].append(point)
+
+for cell, points in pillars.items():
+    decorated = add_mean_and_center_offsets(points, cell)
+    feature[cell] = max_pool(shared_mlp(decorated))
+
+bev = scatter(feature)
+boxes = detection_head(backbone_2d(bev))
+```
+
+Worked example: with $x \in [0,4)$, $y \in [-2,2)$, and $\Delta x=\Delta y=1$, points $(0.2,-1.4,0.6)$ and $(0.7,-1.1,0.4)$ both fall in pillar $(0,0)$. Their pillar mean is $(0.45,-1.25,0.5)$, so the first point's mean-centered offset is $(-0.25,-0.15,0.10)$. The network sees both absolute position and local shape before it compresses the pillar.
+
+The main tradeoff is vertical compression. Pillars are fast and well matched to road BEV reasoning, but overpasses, stacked objects, steep grades, and unusual vertical structure can be harder to represent when all height variation in one column is summarized by one feature.
+
+### Center-based 3D detection and tracking
+
+Anchor-based 3D detectors tile BEV space with many candidate boxes, sizes, and yaw priors. Center-based detectors instead predict object-center heatmaps and regress box attributes only at likely centers. CenterPoint [2] made this idea practical for LiDAR 3D detection and short-term tracking.
+
+For each class $k$, the detector predicts a heatmap:
+
+$$
+\hat{Y}\in[0,1]^{H\times W\times K},
+$$
+
+whose local maxima are object centers. At a center cell it regresses:
+
+$$
+\hat{b}=(\Delta x,\Delta y,z,w,l,h,\sin\theta,\cos\theta,v_x,v_y).
+$$
+
+The offsets correct feature-stride quantization, $(w,l,h)$ and $z$ reconstruct the 3D box, $\sin\theta,\cos\theta$ avoid the yaw discontinuity at $\pm\pi$, and velocity supports tracking. A Gaussian target around the annotated center gives smoother supervision than a single positive pixel:
+
+$$
+Y_{xyk}=\exp\left(-\frac{(x-q_x)^2+(y-q_y)^2}{2\sigma^2}\right).
+$$
+
+Worked example: suppose the output stride is $0.5$ m, the grid origin is $(0,-20)$ m, and a car center is $(12.3,-4.1)$ m. The grid coordinates are $(24.6,31.8)$, so the heatmap peak is at cell $(24,31)$ and the offset target is $(0.6,0.8)$. Multiplying the offset by stride restores the metric correction $(0.3,0.4)$ m.
+
+For short-term tracking, a detected center $c_t$ with predicted velocity $\hat{v}$ can be projected to the previous frame:
+
+$$
+\hat{c}_{t-1}=c_t-\hat{v}\Delta t.
+$$
+
+The tracker links this projected center to a nearby previous track. This is not a full tracking theory, but it is a useful perception interface: detection, velocity, and track association all operate on the same center representation.
 
 The precision-recall tradeoff matters more than raw accuracy. Precision is:
 
@@ -214,3 +290,8 @@ print(greedy_match(pred, gt, threshold=0.5))
 - [Deep learning](/cs/deep-learning/)
 - [Adversarial attacks on AV perception](/cs/autonomous-driving/adversarial-and-physical-attacks-on-av)
 - Further reading: YOLO, RetinaNet, DETR, PointPillars, CenterPoint, Mask R-CNN, Panoptic FPN, and nuScenes or Waymo Open Dataset benchmark papers.
+
+## References
+
+[1] A. H. Lang, S. Vora, H. Caesar, L. Zhou, J. Yang, O. Beijbom. *PointPillars: Fast Encoders for Object Detection from Point Clouds*. CVPR 2019.
+[2] T. Yin, X. Zhou, P. Krahenbuhl. *Center-based 3D Object Detection and Tracking*. CVPR 2021.

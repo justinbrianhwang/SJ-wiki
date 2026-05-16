@@ -204,9 +204,9 @@ print("output shape:", z.shape)
 print("attention weight shape:", attn_weights.shape)
 ```
 
-## Original Transformer: Attention Is All You Need
+## Encoder-decoder Transformer architecture
 
-Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, and Illia Polosukhin, "Attention Is All You Need," was posted in June 2017 and presented at NeurIPS 2017. Its historical setting matters: neural machine translation was dominated by recurrent encoder-decoder systems, often LSTMs or GRUs with an attention mechanism over encoder states. The Transformer kept the encoder-decoder translation interface, but removed recurrence and convolution from the sequence transduction core. That made training much more parallel over positions and gave every token a short path to every other token through self-attention.
+Vaswani et al. [1] introduced the Transformer in the setting of neural machine translation, where strong systems were mostly recurrent encoder-decoders, often LSTMs or GRUs with an attention mechanism over encoder states. The Transformer kept the encoder-decoder translation interface, but removed recurrence and convolution from the sequence transduction core. That made training much more parallel over positions and gave every token a short path to every other token through self-attention.
 
 The original model is an encoder-decoder architecture. The encoder has $N=6$ identical layers. Each encoder layer contains multi-head self-attention followed by a position-wise feed-forward network, with residual connections and layer normalization around both sublayers. The decoder also has $N=6$ layers, but each decoder layer has three sublayers: masked decoder self-attention, encoder-decoder cross-attention, and the same position-wise feed-forward network. In the base model, $d_{\mathrm{model}}=512$, $d_{\mathrm{ff}}=2048$, and there are $h=8$ attention heads with $d_k=d_v=64$. The big model uses a wider configuration, but the same conceptual stack.
 
@@ -264,7 +264,97 @@ $$
 
 with $\mathrm{warmup}=4000$. The paper also used dropout and label smoothing with value $0.1$. As reported in the paper, the big Transformer reached 28.4 BLEU on WMT 2014 English-German and about 41.0 BLEU on WMT 2014 English-French, while training far faster than prior recurrent and convolutional systems in the comparison table.
 
-The landmark contribution was not merely a better translation score. The paper showed that recurrence was not necessary for high-quality sequence transduction. Self-attention reduced the maximum path length between positions to a constant number of layers, made training parallel over sequence positions, and supplied a modular block that later scaled into large language models. The same encoder idea was adapted to images in [Vision Transformer](/cs/deep-learning/vision-transformer). The long-context cost of its $L\times L$ attention matrix motivated attention alternatives such as [Hyena](/cs/deep-learning/hyena), [RWKV](/cs/deep-learning/rwkv), and [Mamba](/cs/deep-learning/mamba). Recent hybrids such as [Griffin](/cs/deep-learning/griffin) and [Jamba](/cs/deep-learning/jamba) keep some attention while replacing many global-attention layers with recurrent or state-space mixers.
+The landmark contribution was not merely a better translation score. The paper showed that recurrence was not necessary for high-quality sequence transduction. Self-attention reduced the maximum path length between positions to a constant number of layers, made training parallel over sequence positions, and supplied a modular block that later scaled into large language models. The same encoder idea can be adapted to image patches, while the long-context cost of its $L\times L$ attention matrix motivates the alternatives in [Efficient Sequence Modeling](/cs/deep-learning/efficient-sequence-modeling).
+
+## Transformer encoders for image patches
+
+Dosovitskiy et al. [2] showed that an almost standard Transformer encoder can classify images when the image is represented as a sequence of fixed-size patches. The contribution was not a new attention formula; it was the clean patch-token interface that made image recognition look like sequence modeling and showed that large-scale pretraining can compensate for weaker built-in vision priors.
+
+For an image with shape $H\times W\times C$ and patch size $P\times P$, the number of nonoverlapping image tokens is
+
+$$
+N=\frac{HW}{P^2}.
+$$
+
+Each flattened patch has dimension $P^2C$ and is projected to Transformer width $D$. With a learned class token and learned position embeddings, the input sequence is
+
+$$
+z_0=[x_{\mathrm{class}}; x_p^1E; x_p^2E;\ldots;x_p^NE]+E_{\mathrm{pos}},
+$$
+
+where $E\in\mathbb{R}^{(P^2C)\times D}$. The encoder can then use the same pre-norm block pattern as an NLP Transformer encoder:
+
+$$
+\begin{aligned}
+z'_\ell &= \mathrm{MSA}(\mathrm{LN}(z_{\ell-1}))+z_{\ell-1},\\
+z_\ell &= \mathrm{MLP}(\mathrm{LN}(z'_\ell))+z'_\ell.
+\end{aligned}
+$$
+
+The classifier reads the final class-token representation, usually after a layer normalization:
+
+$$
+y=\mathrm{LN}(z_L^0).
+$$
+
+```mermaid
+flowchart LR
+  Img[Image] --> Patch[Split into P x P patches]
+  Patch --> Flat[Flatten patches]
+  Flat --> Proj[Linear patch embeddings]
+  CLS[Class token] --> Seq[Patch-token sequence]
+  Proj --> Seq
+  Pos[Position embeddings] --> Add[Add positions]
+  Seq --> Add
+  Add --> Enc[Transformer encoder stack]
+  Enc --> Head[Class-token head]
+```
+
+The tradeoff is data efficiency versus architectural flexibility. CNNs hard-code locality, weight sharing, and translation equivariance, so they are strong on moderate image datasets. A patch-token Transformer has fewer image-specific priors, so it usually needs larger pretraining data or stronger regularization to match CNNs from scratch. The upside is a generic token mixer that scales well when pretraining data is large and that transfers naturally to masked image modeling, multimodal models, and video or high-resolution patch sequences.
+
+Patch size is a real computational choice. Smaller patches preserve more detail, but they increase sequence length and therefore attention cost. A $224\times224$ RGB image with $16\times16$ patches has
+
+$$
+(224/16)^2=14^2=196
+$$
+
+image tokens, or 197 tokens after adding the class token. Fine-tuning the same model at $384\times384$ gives
+
+$$
+(384/16)^2=24^2=576
+$$
+
+image tokens, or 577 tokens with the class token. Since attention logits scale like $T^2$, the per-head attention-score count grows by
+
+$$
+\frac{577^2}{197^2}\approx 8.58.
+$$
+
+This is much larger than the image-area ratio of about $2.94$, which is why high-resolution patch attention quickly becomes a computational-performance problem.
+
+```python
+import torch
+import torch.nn as nn
+
+class PatchEmbedding(nn.Module):
+    def __init__(self, image_size=224, patch_size=16, channels=3, dim=768):
+        super().__init__()
+        assert image_size % patch_size == 0
+        self.num_patches = (image_size // patch_size) ** 2
+        self.proj = nn.Conv2d(channels, dim, kernel_size=patch_size, stride=patch_size)
+        self.cls = nn.Parameter(torch.zeros(1, 1, dim))
+        self.pos = nn.Parameter(torch.zeros(1, self.num_patches + 1, dim))
+
+    def forward(self, x):
+        b = x.size(0)
+        patches = self.proj(x).flatten(2).transpose(1, 2)
+        cls = self.cls.expand(b, -1, -1)
+        return torch.cat([cls, patches], dim=1) + self.pos
+
+x = torch.randn(2, 3, 224, 224)
+z = PatchEmbedding()(x)
+print(z.shape)  # [2, 197, 768]
+```
 
 ## Common pitfalls
 
@@ -274,11 +364,19 @@ The landmark contribution was not merely a better translation score. The paper s
 - Ignoring padding masks, which lets the model attend to artificial padding tokens.
 - Treating attention weights as complete explanations. They are useful diagnostics but not proof of causal importance.
 - Underestimating the memory cost of the $T \times T$ attention matrix for long sequences.
+- Treating patch size as cosmetic in vision Transformers. Halving patch size roughly quadruples image-token count.
 
 ## Connections
 
 - [Gated RNNs and sequence-to-sequence](/cs/deep-learning/gated-rnns-seq2seq)
 - [Pretrained transformers and BERT](/cs/deep-learning/pretrained-transformers-nlp)
+- [Computer Vision Applications](/cs/deep-learning/computer-vision-applications)
+- [Efficient Sequence Modeling](/cs/deep-learning/efficient-sequence-modeling)
 - [Natural language processing](/cs/nlp/)
 - [Linear algebra](/math/linear-algebra/)
 - [Machine learning](/cs/machine-learning/)
+
+## References
+
+[1] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, L. Kaiser, I. Polosukhin. *Attention Is All You Need*. NeurIPS 2017.
+[2] A. Dosovitskiy, L. Beyer, A. Kolesnikov, D. Weissenborn, X. Zhai, T. Unterthiner, M. Dehghani, M. Minderer, G. Heigold, S. Gelly, J. Uszkoreit, N. Houlsby. *An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale*. ICLR 2021.

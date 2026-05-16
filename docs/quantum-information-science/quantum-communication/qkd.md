@@ -110,6 +110,47 @@ The major QKD protocol families can be read as variations on which quantum state
 
 Nielsen and Chuang's Chapter 8 noise model is also relevant. Real QKD channels are quantum operations: loss, depolarization, phase damping, detector dark counts, and source imperfections change the ensemble reaching Bob and Eve. The proof must connect observed classical statistics back to a bounded family of quantum states or channels. That bridge is where ideal textbook protocols become engineering security analyses.
 
+### Comprehensive security proofs and practical attacks
+
+Recent review work is useful as a checklist for the gap between theorem and device. Jha, Parakh, and Subramaniam [1] organize QKD around protocol families, security-proof styles, practical attacks, error correction, and quantum-augmented networks. Nair [2] gives the deployment-facing companion view: QKD is inserted into classical networks with authenticated control channels, trusted relays or special-purpose quantum links, and ordinary key-management policy rather than replacing the rest of cryptography.
+
+A compact security workflow is:
+
+```text
+choose protocol family and device model
+collect quantum-channel statistics
+bound single-photon, phase-error, or covariance parameters
+subtract public reconciliation leakage
+privacy-amplify to a composable key length
+abort if the finite-key lower bound is nonpositive
+```
+
+For weak coherent BB84, the first hardware-specific issue is photon-number statistics. With phase-randomized mean photon number $\mu$,
+
+$$
+\Pr(N=n)=e^{-\mu}\frac{\mu^n}{n!},
+\qquad
+\Pr(N\ge2)=1-e^{-\mu}(1+\mu).
+$$
+
+At $\mu=0.2$, $\Pr(N\ge2)\approx0.0176$, so $10^9$ emitted pulses contain about $1.76\times10^7$ multi-photon pulses in expectation. That is why photon-number-splitting attacks are not a corner case and why decoy states are part of the proof model, not a performance tweak.
+
+Side-channel attacks are best classified by which assumption they break. A Trojan-horse attack probes device settings through back-reflections; detector blinding and timing attacks make Bob's click model false; local-oscillator manipulation corrupts CV-QKD shot-noise calibration; jamming raises QBER or suppresses detections without necessarily learning the key. A simple availability model mixes the intended state $\rho$ with injected noise:
+
+$$
+\rho_{\mathrm{channel}}=(1-p)\rho+p\rho_E.
+$$
+
+For a polarization rotation $\theta$, a teaching estimate of induced error is
+
+$$
+Q_{\mathrm{ind}}=\sin^2\theta.
+$$
+
+A $16^\circ$ rotation gives $Q_{\mathrm{ind}}\approx0.076$, which can force aborts even if Eve gains no clean key information. This separates confidentiality failures from service availability failures.
+
+The error-correction language also needs care. In link-level QKD, information reconciliation corrects Alice's and Bob's classical strings and leaks public information that must be subtracted. Quantum error-correcting codes, including CSS and stabilizer codes reviewed in [1], become central when the network is preserving quantum states or entanglement before measurement, as in repeaters, DI-QKD testbeds, and quantum memories. They do not retroactively protect a key that has already leaked through a bad device model.
+
 ## Visual
 
 ```mermaid
@@ -335,3 +376,8 @@ This NumPy sketch computes the Holevo quantity for two pure qubit states and a s
 - [Classical Cryptography](/cs/cryptography/intro), [Computational Security Definitions](/cs/cryptography/computational-security-definitions), and [Message Authentication Codes](/cs/cryptography/message-authentication-codes) for protocol-security language and authentication.
 - [Post-Quantum Cryptography](/quantum-information-science/quantum-security/pqc) and [Quantum-Safe Cryptography](/quantum-information-science/quantum-security/quantum-safe-crypto) for the classical alternative to deploying QKD.
 - Primary textbook reference: Nielsen and Chuang, *Quantum Computation and Quantum Information*, Chapters 8 and 12, especially quantum operations, Holevo's theorem, privacy amplification, and the BB84 security proof.
+
+## References
+
+[1] N. Jha, A. Parakh, M. Subramaniam. *Quantum Key Distribution: Bridging Theoretical Security Proofs, Practical Attacks, and Error Correction for Quantum-Augmented Networks*. arXiv:2511.20602v1, 2025.
+[2] V. Nair. *Exploring Quantum Key Distribution (QKD) Protocols for Secure Communication Over Classical Networks*. Journal of Recent Trends in Computer Science and Engineering 13(2), 20-29, 2025.

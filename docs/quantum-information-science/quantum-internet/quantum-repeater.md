@@ -67,6 +67,61 @@ $$
 
 where a Bell measurement on $B,C$ announces which Pauli frame $\sigma_k$ applies to the remote pair $A,D$. The Pauli correction can be applied physically or tracked in software until the pair is consumed by [teleportation](/quantum-information-science/quantum-internet/teleportation).
 
+### Deployable telecom-band entanglement swapping
+
+Entanglement swapping becomes a repeater primitive only when it is compatible with realistic photonic hardware, timing, and heralding. Davis et al. [1] demonstrated conditional swapping between time-bin qubits at 1536.4 nm using modular fiber-coupled components: electro-optic pulse carving, PPLN nonlinear waveguides, telecom-band SPDC pairs, Charlie's beamsplitter Bell-state measurement, SNSPDs, and time-tagged coincidence logic. The contribution is a deployability-oriented photonic swapping experiment, not a complete repeater node with long-lived memories.
+
+A time-bin qubit has the form
+
+$$
+\lvert\psi\rangle=\alpha\lvert e\rangle+\beta\lvert \ell\rangle,
+\qquad
+\lvert\alpha\rvert^2+\lvert\beta\rvert^2=1,
+$$
+
+where $e$ and $\ell$ denote early and late arrival bins. The two sources ideally emit
+
+$$
+\lvert\Phi^+\rangle
+=\frac{\lvert ee\rangle+\lvert \ell\ell\rangle}{\sqrt{2}}.
+$$
+
+If Charlie projects the two middle photons onto
+
+$$
+\lvert\Psi^-\rangle
+=\frac{\lvert e\ell\rangle-\lvert \ell e\rangle}{\sqrt{2}},
+$$
+
+then the remote idler photons are projected into the corresponding Bell state up to the experiment's phase convention. In the ideal algebra,
+
+$$
+{}_{CD}\langle\Psi^-|
+\lvert\Phi^+\rangle_{AC}\lvert\Phi^+\rangle_{DB}
+\propto
+\lvert e_A\ell_B\rangle-\lvert \ell_A e_B\rangle.
+$$
+
+The reported time-bin separation was 346 ps, large compared with tens-of-picoseconds SNSPD timing jitter, and the source clock was 200 MHz. A useful worked calculation is the visibility-to-fidelity conversion used for Bell-state measurements:
+
+$$
+F_{\mathrm{swap}}=\frac{3V_{\mathrm{swap}}+1}{4}.
+$$
+
+With $V_{\mathrm{swap}}=0.831$, this gives
+
+$$
+F_{\mathrm{swap}}=\frac{3(0.831)+1}{4}=0.87325,
+$$
+
+or about $87.3\%$. For the source-independent QKD analysis in [1], the measured error rates $e_t=0.011$ and $e_p=0.079$ with reconciliation efficiency $f=1.22$ give
+
+$$
+\frac{R}{R_s}=1-fH_2(e_t)-H_2(e_p)\approx0.50
+$$
+
+secret bits per sifted bit under the paper's assumptions. That is a conditional fraction, not the optical swapping rate; the reported swapping rate was about $0.01$ Hz. The repeater lesson is therefore two-sided: telecom-band time-bin swapping can reach nonclassical fidelity with deployable components, but useful long-distance repeaters still need much higher rates, lower loss, stronger indistinguishability, multiplexing, and memory-compatible interfaces.
+
 The channel-state viewpoint turns this into an error-accounting rule. If an elementary link is represented by a Bell-diagonal Choi state, then swapping combines Bell error labels, local memories add additional Kraus noise while a link waits, and purification is an LOCC map on several copies of those shared states. This is why a repeater performance model normally tracks both rate and state quality; a high heralding rate with a poor Choi state may be less useful than a slower link that distills efficiently.
 
 Nielsen and Chuang Chapter 12 connects entanglement distillation with quantum communication. If Alice sends halves of Bell pairs through a noisy channel and then Alice and Bob distill the resulting shared mixed states, the distilled Bell pairs can teleport unknown qubits reliably. Thus distillation can function as an error-correction method for a communication channel, with the achievable rate controlled by the distillable entanglement of the channel-generated state. Repeaters add spatial segmentation and memories to that information-theoretic idea.
@@ -271,3 +326,7 @@ print("amplitude-damping Choi fidelity:", np.real(bell.conj() @ J @ bell))
 - [Quantum Key Distribution](/quantum-information-science/quantum-communication/qkd)
 - [Quantum Error Correction](/quantum-information-science/quantum-computing/error-correction)
 - [Density Operator, Entanglement, and Decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence)
+
+## References
+
+[1] S. I. Davis, R. Valivarthi, A. Cameron, C. Pena, S. Xie, L. Narvaez, N. Lauk, C. Li, K. Taylor, R. Youssef, C. Wang, K. Kapoor, B. Korzh, N. Sinclair, M. Shaw, P. Spentzouris, M. Spiropulu. *Entanglement swapping systems toward a quantum internet*. arXiv:2503.18906, 2025.

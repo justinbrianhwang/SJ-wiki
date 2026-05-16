@@ -127,6 +127,227 @@ Fault tolerance adds a propagation constraint. A recovery circuit is not enough 
 
 Surface codes are a modern stabilizer-family continuation of this story. Local star and plaquette checks on a two-dimensional lattice make them attractive for hardware with local connectivity. They are not the main code family developed in N&C, but they use the same stabilizer and syndrome logic.
 
+## Modern QEC milestones
+
+Modern experiments and proposals test different parts of the fault-tolerant stack. A surface-code memory tests distance scaling; bosonic codes test whether one oscillator can absorb part of the redundancy; learned decoders test the latency bottleneck; and logical-gate diagnostics test whether syndrome measurements are reliable enough to drive operations, not only memory.
+
+### Surface code memory below threshold
+
+Google Quantum AI and collaborators [1] showed a superconducting surface-code memory whose fitted logical error per cycle decreased as the code distance increased. The contribution was a full system benchmark: ZXXZ-style rotated surface-code patches on Willow hardware, leakage removal, repeated syndrome extraction, high-accuracy offline decoding, and a separate distance-5 real-time decoding demonstration.
+
+For a rotated distance-$d$ surface-code memory, the usual physical footprint before extra leakage-removal qubits is
+
+$$
+N_{\mathrm{surface}}=2d^2-1,
+\qquad
+N_{\mathrm{data}}=d^2,
+\qquad
+N_{\mathrm{measure}}=d^2-1.
+$$
+
+Below threshold, the idealized scaling is often summarized as
+
+$$
+\epsilon_L(d)\approx A\left(\frac{p}{p_{\mathrm{thr}}}\right)^{(d+1)/2},
+$$
+
+where $\epsilon_L(d)$ is the logical error per cycle, $p$ is a physical error proxy, and $p_{\mathrm{thr}}$ is the threshold. A practical distance-step figure of merit is
+
+$$
+\Lambda_{d,d+2}=\frac{\epsilon_L(d)}{\epsilon_L(d+2)}.
+$$
+
+The below-threshold signature is $\Lambda_{d,d+2}\gt 1$: adding physical qubits makes the logical memory better. In the Willow distance-7 run, the code used $49$ data qubits, $48$ measurement qubits, and $4$ leakage-removal qubits, so the count checks as
+
+$$
+2(7^2)-1+4=101.
+$$
+
+This is a memory milestone rather than a complete logical processor. It demonstrates distance scaling and break-even lifetime under the reported conditions, while logical gates, routing, magic-state production, and large-scale scheduling remain separate requirements.
+
+### Concatenated bosonic codes
+
+Putterman, Noh, Hann, and collaborators [2] demonstrated a bosonic route to hardware-efficient memory: suppress one Pauli error type inside a stabilized cat oscillator, then correct the dominant residual error with a small repetition code. The contribution is the concatenation itself in hardware: five cat data modes, four transmon syndrome ancillas, bias-preserving controlled operations, erasure-aware decoding, and an in-device distance-3 versus distance-5 comparison.
+
+The cat-qubit basis is approximately
+
+$$
+|0\rangle_c\approx|\alpha\rangle,
+\qquad
+|1\rangle_c\approx|-\alpha\rangle.
+$$
+
+Increasing $\vert \alpha\vert ^2$ separates the coherent states and suppresses bit flips, but it also increases exposure to photon-loss-induced phase flips. A simplified biased-noise summary is
+
+$$
+\Gamma_X\propto e^{-c|\alpha|^2},
+\qquad
+\Gamma_Z\propto |\alpha|^2\kappa_1,
+\qquad
+\frac{\Gamma_Z}{\Gamma_X}\gg 1.
+$$
+
+The outer repetition code measures neighboring checks
+
+$$
+S_i=X_iX_{i+1},
+\qquad i=1,\ldots,d-1,
+$$
+
+which detect phase flips in the cat basis. One distance-5 cycle has four checks, and each check touches two neighboring cat qubits, so it uses
+
+$$
+2(d-1)=2(5-1)=8
+$$
+
+cat-ancilla controlled interactions before measurement and reset. A compact syndrome-cycle sketch is:
+
+```text
+repeat each QEC cycle:
+    stabilize each oscillator toward the cat manifold
+    for each neighbor pair (i, i+1):
+        entangle ancilla with X_i X_{i+1}
+        measure ancilla, keeping erasure information
+    compare consecutive syndromes to form detection events
+    decode likely phase-flip history with matching
+```
+
+The main lesson is not that repetition codes are new; it is that strong physical noise bias changes what the outer code must do. The architecture improves hardware efficiency only while uncorrected cat bit flips remain rare enough that they do not set the logical-error floor.
+
+### Beyond break-even with bosonic qudit codes
+
+Brock, Singh, Eickbusch, Sivak, Ding, Frunzio, Girvin, and Devoret [3] extended bosonic error correction beyond qubits by demonstrating finite-energy GKP qutrit and ququart memories beyond break-even. The contribution is a high-dimensional logical memory in one superconducting cavity, stabilized through optimized small-big-small control rounds using a transmon ancilla.
+
+With displacement
+
+$$
+D(\alpha)=\exp(\alpha a^\dagger-\alpha^*a),
+$$
+
+a square GKP qudit of dimension $d$ can be described by stabilizer displacements
+
+$$
+S_X=D(\ell_d),
+\qquad
+S_Z=D(i\ell_d),
+\qquad
+\ell_d=\sqrt{\pi d},
+$$
+
+and generalized logical Paulis
+
+$$
+X_d=D\left(\sqrt{\frac{\pi}{d}}\right),
+\qquad
+Z_d=D\left(i\sqrt{\frac{\pi}{d}}\right).
+$$
+
+They obey
+
+$$
+Z_dX_d=\omega_dX_dZ_d,
+\qquad
+\omega_d=e^{2\pi i/d}.
+$$
+
+For $d=3$, the phase is $\omega_3=-1/2+i\sqrt{3}/2$, so qutrit Paulis do not simply anticommute with a sign. The break-even metric compares effective memory lifetimes or decay rates:
+
+$$
+G_d=\frac{\gamma_{\mathrm{physical}}}{\gamma_{\mathrm{logical}}}
+=\frac{T_{\mathrm{logical}}}{T_{\mathrm{physical}}}.
+$$
+
+For example, a qutrit logical lifetime of $886\,\mu\mathrm{s}$ with $G_3=1.82$ corresponds to a physical comparator lifetime of
+
+$$
+T_{\mathrm{physical}}\approx \frac{886}{1.82}\,\mu\mathrm{s}\approx 487\,\mu\mathrm{s}.
+$$
+
+The result shows that qudit memories can be error-corrected beyond a matched physical baseline. It does not yet supply a universal high-dimensional fault-tolerant processor, because scalable entangling logical gates and concatenation remain separate problems.
+
+### Learned decoders for real-time error correction
+
+Zhang [4] proposed using a trained quantum circuit as the decoder for a noisy protected quantum circuit. The contribution is conceptual and numerical rather than experimental: decoding is framed as a syndrome-conditioned quantum sampling task, with simulations on surface-code memories up to distance 7 showing performance comparable to minimum-weight perfect matching under the tested circuit-level noise model.
+
+Let the measured syndrome be
+
+$$
+s=(s_1,\ldots,s_m)\in\{0,1\}^m,
+$$
+
+and let a code with $k$ logical qubits have a logical sector label
+
+$$
+\ell\in\{0,1\}^{2k}.
+$$
+
+Classical maximum-likelihood decoding estimates
+
+$$
+\ell^*(s)=\arg\max_\ell P(\ell\mid s).
+$$
+
+The learned quantum decoder instead implements a parameterized circuit $B_\theta(s)$ whose gates depend on syndrome bits and whose measurement samples
+
+$$
+q_\theta(\ell\mid s)\approx P(\ell\mid s).
+$$
+
+Training can use the same cross-entropy objective as a neural decoder:
+
+$$
+\mathcal{L}(\theta)
+=-\frac{1}{N}\sum_{j=1}^N\log q_\theta(\ell^{(j)}\mid s^{(j)}).
+$$
+
+A deployment sketch is:
+
+```text
+offline:
+    generate labeled pairs (syndrome, logical sector)
+    train B_theta to maximize probability of the labeled sector
+
+online:
+    stream syndrome bits from the protected circuit
+    run B_theta(s) on decoder qubits
+    sample candidate logical sectors
+    update the Pauli frame using the most likely sector
+```
+
+The open engineering question is whether a decoder circuit remains useful once its own noise, calibration, routing, and training cost are included. Its value in this chapter is to make the decoder latency problem explicit: QEC is only real-time if the syndrome-to-frame-update path keeps up with the hardware cycle.
+
+### Failure modes of fault-tolerant gates
+
+Harper, Laine, Hockings, McLauchlan, Nixon, Brown, and Bartlett [5] separated two failure mechanisms that are easy to conflate: logical-memory decay and measurement-driven logical-gate failure. The contribution is a diagnostic framework on a heavy-hex subsystem-code patch, showing that faster syndrome extraction and reset removal can improve memory while repeated-measurement stability tests reveal the measurement faults that would limit lattice-surgery-style gates.
+
+A memory experiment fits the logical success probability over syndrome rounds as
+
+$$
+P_{\mathrm{success}}(t)=A p^t+\frac{1}{2},
+$$
+
+with a per-round logical fidelity convention
+
+$$
+F_{\mathrm{round}}=\frac{1+p}{2}.
+$$
+
+Thus a fitted $p=0.92$ means
+
+$$
+F_{\mathrm{round}}=\frac{1+0.92}{2}=0.96.
+$$
+
+But a logical gate driven by repeated stabilizer measurements can fail even when the memory survives, because time-like strings of measurement errors can flip the inferred logical measurement. A stability experiment probes that class of failure by checking whether repeated stabilizer products remain self-consistent. The same hardware can therefore have two different optimization targets:
+
+| Diagnostic | Main error direction | Design lever |
+|---|---|---|
+| Memory experiment | Space-like data-error chains | Better gates, less idle time, better placement |
+| Stability experiment | Time-like measurement-error chains | Better mid-circuit measurement and enough repetitions |
+| Lattice surgery | Both together | Balance code distance $d$ and measurement rounds $t$ |
+
+The practical lesson is that "a good logical memory" is not the same statement as "a good fault-tolerant logical gate." Mid-circuit measurement time, assignment error, reset noise, and decoder timing enter the gate budget directly.
+
 ## Visual
 
 ```mermaid
@@ -323,3 +544,11 @@ for name, pauli in errors.items():
 - A. Robert Calderbank and Peter Shor; Andrew Steane, CSS code constructions.
 - Alexei Kitaev, toric code and fault-tolerant quantum computation by anyons.
 - John Preskill, lecture notes on fault-tolerant quantum computation.
+
+## References
+
+[1] Google Quantum AI and Collaborators. *Quantum error correction below the surface code threshold*. Nature 638, 920-926 (2025).
+[2] H. Putterman, K. Noh, C. T. Hann, et al. *Hardware-efficient quantum error correction via concatenated bosonic qubits*. Nature 638, 927-934 (2025).
+[3] B. L. Brock, S. Singh, A. Eickbusch, V. V. Sivak, A. Z. Ding, L. Frunzio, S. M. Girvin, M. H. Devoret. *Quantum error correction of qudits beyond break-even*. Nature 641, 612-617 (2025).
+[4] P. Zhang. *Correcting a noisy quantum computer using a quantum computer*. arXiv:2506.08331 (2025).
+[5] R. Harper, C. Laine, E. T. Hockings, C. McLauchlan, G. M. Nixon, B. J. Brown, S. D. Bartlett. *Characterising the failure mechanisms of error-corrected quantum logic gates*. Nature Communications (2026).
