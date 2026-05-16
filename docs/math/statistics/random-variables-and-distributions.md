@@ -94,6 +94,8 @@ where $x_1+\cdots+x_c=n$.
 
 The Poisson distribution can approximate a binomial distribution when $n$ is large, $p$ is small, and $\lambda=np$ is moderate. This approximation is useful for rare-event counts, but it should not hide the assumptions: events should occur independently and at a stable average rate across the interval.
 
+Distribution choice is also a modeling claim. If a call center receives more calls during lunch than at midnight, a single Poisson rate for the whole day may be too crude even if the total count is a nonnegative integer. If survey responses are clustered by classroom, a binomial model that treats every student response as independent may underestimate variability. If a quality inspector samples a large warehouse without replacement but the sample is tiny relative to the warehouse, a binomial approximation may be acceptable. The formulas become useful only after the data-generating process has been described clearly enough to defend the assumptions.
+
 ## Visual
 
 | Distribution | Random variable | Parameters | Mean | Variance | Typical setting |

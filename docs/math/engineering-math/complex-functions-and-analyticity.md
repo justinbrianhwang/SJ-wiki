@@ -103,7 +103,7 @@ The real and imaginary parts of analytic functions form orthogonal families of l
 
 ```mermaid
 flowchart TD
-  A["f(z) = u("#quot;x,y#quot;") + i v("#quot;x,y#quot;")"] --> B{"Cauchy-Riemann equations?"}
+  A["f(z) = u("#quot;#quot;x,y#quot;#quot;") + i v("#quot;#quot;x,y#quot;#quot;")"] --> B{"Cauchy-Riemann equations?"}
   B -->|with smooth partials| C[Analytic]
   C --> D[u and v harmonic]
   C --> E[Local power series]

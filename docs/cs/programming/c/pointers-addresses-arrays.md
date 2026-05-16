@@ -70,6 +70,18 @@ Arrays in function parameters do not carry their length. A function that receive
 
 `void *` is the generic object pointer type in ANSI C. It can hold any object pointer and be converted back without loss of information, but it cannot be dereferenced directly because it has no pointed-to object type.
 
+Pointer notation should not be confused with ownership. A pointer may point to an object it owns, an object owned by its caller, a string literal with static storage duration, an element inside an array, or one-past the end of an array for traversal. The syntax alone does not tell you which case applies. K&R examples are short enough that ownership is visible nearby; in larger programs, comments, naming, and function contracts must make it explicit.
+
+The "one past the end" rule is a deliberate convenience for loops. A pointer may be advanced to the position just after the last array element and compared with other pointers into the same array, but it must not be dereferenced there. This supports idioms such as `for (p = a; p < a + n; ++p)`. The pointer `a + n` is a boundary marker, not an object.
+
+Arrays decay to pointers in most expressions, but not all. `sizeof a` for an actual array object gives the size of the whole array, while `sizeof p` for a pointer gives the size of the pointer itself. The address operator also differs: `&a` has type pointer to the whole array, not pointer to the first element, even though the numeric address is often the same. These distinctions explain why function parameters lose array length information while local arrays still have it available to `sizeof`.
+
+K&R's pointer style is compact because it keeps the current position in the pointer itself. That is natural for stream-like traversal: advance through a string until the terminator, advance through an array until a boundary pointer, or advance through arguments until the count is exhausted. The cost is that the original starting address may be lost if it is not saved. When the original allocation must later be freed, keep a separate owner pointer and use another pointer for walking.
+
+Pointer types also document scale. An `int *` says that `p + 1` moves by one `int`; a `struct node *` says it moves by one node if it is part of an array of nodes. Casting everything to `char *` may be useful for byte-level work, but it discards that scaling information and should signal a low-level operation.
+
+The safest pointer loops have an explicit boundary or sentinel. A string loop uses `'\0'` as its sentinel. An array loop should use a count or an end pointer computed from the same array. Avoid loops whose stopping condition depends on memory outside the object; C will not detect that mistake before the program has already executed undefined behavior.
+
 ## Visual
 
 ```text

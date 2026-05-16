@@ -61,6 +61,14 @@ Initialization depends on storage duration. External and static objects default 
 
 Recursion is often clearer for recursive data or divide-and-conquer algorithms. K&R uses recursive `printd` and quicksort to show the idea. Recursion is not automatically faster and may not save storage, but it can match the problem structure closely.
 
+A well-structured C program has two interfaces: the interface visible to other source files, and the private interface inside one source file. K&R's calculator example separates stack operations, input operations, and the main evaluator. The public functions need prototypes in a shared header. The private arrays and helper functions should stay in the implementation file, often marked `static`. This keeps the linker namespace small and makes accidental coupling less likely.
+
+The distinction between declaration and definition is more than vocabulary. A function prototype declares how a function may be called. A function definition supplies code. An external variable declaration with `extern` announces an object defined elsewhere. An external variable definition actually allocates storage. Header files should normally contain declarations; source files should contain definitions. If that rule is followed, each translation unit receives the same type information, and the linker sees exactly one storage definition for each external object.
+
+K&R's treatment of recursion also prepares for structures and trees. Recursive calls are not magic: every call has its own parameters and automatic variables, and all calls share external or static objects. That means a recursive function should avoid unnecessary shared mutable state. Passing the current node, current index, or current range as an argument usually makes the function easier to reason about and safer to reuse.
+
+Function return values are part of the interface and should be chosen deliberately. A predicate can return `int` with zero for false and nonzero for true. A converter can return a status while writing the converted value through a pointer argument, as K&R's `getint` later does. A command-style function can return `void` only when there is genuinely no useful result or failure status for the caller to inspect.
+
 ## Visual
 
 ```mermaid

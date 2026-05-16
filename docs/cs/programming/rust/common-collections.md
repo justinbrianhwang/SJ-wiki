@@ -35,6 +35,22 @@ The fourth key result is that `get`, `match`, and `Option` are preferred when ab
 
 Proof sketch for vector reallocation safety: a vector's elements are contiguous. If capacity is full and `push` needs more space, the vector may allocate a new buffer and copy or move elements there. Any old element reference would then point at invalid memory. Rust rejects simultaneous element reference use and mutation that could reallocate, so the invalid pointer cannot be created in safe Rust.
 
+Another result is that collection APIs reveal whether they consume, borrow, or mutate. `into_iter` on a vector consumes the vector and yields owned elements. `iter` borrows the vector and yields shared references. `iter_mut` mutably borrows the vector and yields mutable references. The same names appear throughout Rust because they encode ownership policy directly in the method call. Choosing among them is not just a performance choice. It decides whether the original collection remains usable, whether elements can be changed, and whether output values borrow from the input.
+
+For strings, the comparable lesson is that text APIs force a choice of interpretation. `bytes()` sees raw UTF-8 bytes. `chars()` sees Unicode scalar values. Methods such as `split_whitespace` or `lines` produce string slices that respect textual boundaries. This is why many Rust string programs avoid indexing entirely. They ask the library for the kind of textual unit they actually mean.
+
+Hash maps add one more ownership lesson. Inserting a key-value pair moves owned keys and values into the map, because the map must keep them alive independently of the caller's stack frame. If the caller needs to keep using the same owned strings, it can clone them, store references with suitable lifetimes, or restructure the program so the map becomes the owner. Each choice says something different about who is responsible for the data.
+
+Capacity is the performance side of the same model. `Vec`, `String`, and `HashMap` can reserve space ahead of time when the program has a good size estimate. Reserving is not required for correctness, but it can reduce reallocations and rehashing in tight loops.
+
+The best collection choice starts with access pattern, not habit. Ask whether the program needs order, key lookup, text mutation, borrowed views, or ownership transfer, then choose the type that states that need.
+
+The type should make the common operation obvious.
+
+That choice is part of the design.
+
+It shapes later APIs.
+
 ## Visual
 
 ```text

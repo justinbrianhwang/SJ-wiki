@@ -71,6 +71,20 @@ The fourth key result is that `Option<T>` removes null from ordinary Rust APIs. 
 
 Proof sketch for `Option<T>`: if a function returns `Option<u32>`, the caller cannot accidentally add the result to another number. The result is not a `u32`; it is either `Some(number)` or `None`. To get the number, code must use `match`, `if let`, combinator methods, or another explicit handling strategy. The type forces the absence case into the program logic.
 
+Another result is that method receivers communicate ownership policy. A builder-like method that takes `self` can consume an old value and return a transformed one. A measurement method such as `area` should take `&self` because it only observes. A method such as `rename` should take `&mut self` if it changes fields in place. This receiver choice is part of the API. Callers can see whether a method will leave the original value usable, require exclusive access, or move the value entirely.
+
+Struct and enum definitions also influence debugging. The book introduces derived `Debug` output because custom types cannot be printed automatically with the normal display formatter. Deriving `Debug` is not just a convenience for examples; it is a common early step when designing a type because it lets tests, logs, and failing assertions show the actual field values. The `dbg!` macro is another development tool: it takes ownership of an expression unless the expression is borrowed, prints file and line information, and returns the value. That behavior follows the same ownership rules as any other function or macro call, so even debugging tools teach the core model.
+
+Enums are especially valuable when a program would otherwise maintain parallel fields. A message type with a `kind` string, optional coordinates, optional text, and optional color values allows combinations that do not make sense. An enum variant carries only the data for that case. This makes invalid states harder to construct and makes later `match` expressions a complete checklist of possibilities. In Rust, good type design often means moving rules from comments into the shape of the data.
+
+The same principle applies to structs: if two values must change together, putting them in one struct with methods can protect the relationship better than passing them around separately.
+
+This is why Rust examples often become clearer after naming a type. A name gives the compiler, tests, and readers one place to attach behavior.
+
+Unnamed groups rarely scale as requirements grow.
+
+Names carry invariants.
+
 ## Visual
 
 ```mermaid

@@ -96,6 +96,14 @@ Unions require an external tag or convention to know which member is valid. Read
 
 Bit fields are convenient for named flags, but almost every layout detail is implementation-defined: allocation order, alignment, whether fields cross storage units, and exact container choices. Use them for compact in-memory flags when portability of binary layout is not required; use masks when layout must be controlled.
 
+Structure layout is visible enough to matter, but not fully portable at the byte level. The compiler may insert padding between members so that each member is properly aligned. It may also add padding at the end so arrays of the structure keep every element aligned. This means `sizeof(struct point)` is not always the sum of the member sizes in more complicated structures. Code should use `sizeof object` rather than hand-computed sizes.
+
+Designing a structure is also an interface decision. If functions accept and return a small structure such as `struct point`, callers can treat it as a value. If functions accept a pointer to a structure, callers must think about mutation, null pointers, and object lifetime. K&R presents all three approaches: separate scalar arguments, structure values, and structure pointers. The right choice depends on size, clarity, and whether the function needs to modify the original object.
+
+Unions and bit fields are closest to representation-level programming. They are useful in compilers, interpreters, packed state, and low-level interfaces, but they should not be used simply to avoid writing separate fields. If the program needs a variant value, pair the union with an explicit tag. If the program needs named boolean flags and does not expose the binary layout, bit fields can be clear. If the program needs portable serialized bits, masks and explicit shifts are usually better.
+
+Arrays of structures and pointers to structures usually appear together. An array gives compact storage and direct indexing; a pointer lets functions operate on one element without copying it. K&R's table examples use both patterns. The expression `tab[i].name` selects from an array element, while `np->name` selects through a pointer as a linked list is traversed.
+
 ## Visual
 
 ```mermaid
@@ -134,17 +142,21 @@ Method:
 
 2. Compute minimum coordinates:
 
-   $$\begin{aligned}
+$$
+\begin{aligned}
    x_{\min} &= \min(8, 3) = 3 \\
    y_{\min} &= \min(2, 9) = 2
-   \end{aligned}$$
+   \end{aligned}
+$$
 
 3. Compute maximum coordinates:
 
-   $$\begin{aligned}
+$$
+\begin{aligned}
    x_{\max} &= \max(8, 3) = 8 \\
    y_{\max} &= \max(2, 9) = 9
-   \end{aligned}$$
+   \end{aligned}
+$$
 
 4. Assign:
 

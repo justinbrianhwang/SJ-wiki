@@ -46,6 +46,8 @@ The proof idea is simple. If `parse` returns `Ok(num)`, the `match` expression e
 
 The fourth result is that Cargo's dependency resolution is visible. Adding `rand` may compile several transitive crates because `rand` depends on other crates. Cargo records the exact resolved versions in `Cargo.lock`, which gives repeatable builds.
 
+A fifth result is that the compiler's type errors are part of the project, not interruptions from outside it. The first comparison attempt fails because `guess` is a `String` and `secret_number` is inferred as a number. That error teaches three things at once: Rust will not guess a conversion, `cmp` compares values of compatible types, and annotations can guide inference. The fix is not to weaken the type system; the fix is to explicitly transform the user's line into a `u32`. Likewise, the unused-`Result` warning from `read_line` is not cosmetic. It tells the programmer that an operation may have failed and that the returned value carries information. Even when the early version uses `expect`, the code is acknowledging failure. The final version goes further by matching on parse errors and continuing the loop. This is the book's first demonstration of a Rust pattern that repeats everywhere: make invalid or fallible states explicit, then decide locally whether to recover, propagate, or stop.
+
 ## Visual
 
 ```mermaid

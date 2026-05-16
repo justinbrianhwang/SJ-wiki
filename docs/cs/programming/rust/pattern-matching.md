@@ -43,6 +43,12 @@ The fourth key result is that `_` and names beginning with underscore are differ
 
 Proof sketch for exhaustiveness: an enum definition lists all possible variants. A `match` over that enum can be checked against the variant set. If any variant is not represented by a pattern and no wildcard covers it, there exists an input for which the expression has no result. Rust rejects that program.
 
+Pattern matching also clarifies ownership at the point where data is opened. Matching on an owned enum can move owned fields out of the enum. Matching on a reference, such as `match &message`, generally binds references to the fields instead. This distinction is useful when working with `String`, `Vec<T>`, or other non-`Copy` data. If a later line still needs the original value, match by reference or use patterns such as `ref` where appropriate. The book's later pattern chapter emphasizes that patterns are not only for `match`: they appear in `let`, `for`, function parameters, and closures. That means the same move-versus-borrow awareness applies in many places, not only in large enum matches.
+
+A final practical rule is to prefer the pattern form that matches the data's real shape. If the logic cares about only one variant, `if let` may communicate that better than a full `match`. If every variant has meaning, a full `match` is better because exhaustiveness protects future changes.
+
+When an enum grows, exhaustive matches become a useful to-do list because the compiler points at every site that needs a decision.
+
 ## Visual
 
 ```mermaid

@@ -42,6 +42,24 @@ The fourth key result is that error conversion can happen during propagation. Th
 
 Proof sketch for `?`: suppose a function returns `Result<String, io::Error>`. Inside it, `File::open(path)?` is valid because `File::open` returns `Result<File, io::Error>`. If opening succeeds, the expression yields the `File`. If opening fails, the whole function immediately returns `Err(error)`. Therefore later code only runs in the success case.
 
+The book also distinguishes examples from production-facing decisions. In a teaching example, `expect("Failed to read line")` is acceptable because it keeps attention on the concept being introduced. In a library, the same choice would be too forceful because it ends the caller's program. A useful rule is to ask who has enough context to decide what should happen. If the current function can repair the problem, handle it locally. If the caller knows the policy, return `Result`. If the state proves a bug in the program itself, panic may be the clearest signal. This question keeps error handling from becoming mechanical.
+
+Another practical result is that error messages are part of the interface for command-line tools. `eprintln!` sends diagnostics to standard error, allowing standard output to remain machine-readable or pipe-friendly. This small distinction becomes important in the `minigrep` project, where successful search results and failure messages should not be mixed.
+
+The `Result` type also composes with other language features. It can be matched directly, converted with methods such as `map_err`, returned from tests, and used as the return type of `main`. This makes error handling a normal part of expression-oriented Rust rather than a separate exception mechanism. The code path that succeeds and the code path that fails are both visible in types.
+
+Choosing an error type is therefore a design step. Small binaries can often return `Box<dyn Error>` from top-level functions to keep examples compact. Libraries usually benefit from a specific error enum or structured error type so callers can react to different failures without string matching.
+
+When reading Rust code, follow the `Result` outward. The place where an error is created, enriched, propagated, logged, or converted often reveals which layer owns the recovery policy.
+
+That layer is where the user-facing decision belongs.
+
+Lower layers should preserve enough context for that decision.
+
+Do not discard causes too early.
+
+Keep context intact.
+
 ## Visual
 
 ```mermaid

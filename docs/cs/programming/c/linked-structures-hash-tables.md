@@ -70,6 +70,14 @@ Hash tables trade ordered traversal for faster lookup. A good hash function dist
 
 Insertion at the front of a linked list is simple and common. K&R's `install` inserts a new hash entry by setting `np->next` to the current bucket head, then setting the bucket head to `np`.
 
+The tree and hash-table examples also introduce ownership boundaries. A node owns the storage for its copied word, and the table owns the nodes chained from each bucket. That means an insertion routine is responsible not only for linking pointers but also for deciding what happens on allocation failure and replacement. If a replacement definition is installed, the old definition string must be freed after the program has decided it no longer needs that storage. If allocating the new definition fails, the table should not be left in a half-updated state.
+
+Traversal order is part of the data structure contract. A binary search tree can produce sorted output without a separate sorting step because the left/current/right traversal matches the ordering invariant. A hash table cannot do that naturally; it is optimized for lookup by hash value, not ordered enumeration. When choosing between the two, the question is not only "which is faster?" but also "what operations must be natural?" K&R's word counter wants sorted output, so a tree is appropriate. A macro definition table wants fast lookup by name, so a hash table is appropriate.
+
+The examples also show why C programmers often write small allocation wrappers. A helper such as `talloc` or `xstrdup` concentrates allocation details, casts in older code, and initialization decisions in one place. That does not remove the need to check failures, but it prevents every caller from repeating the same `malloc(sizeof(struct tnode))` expression and forgetting one member.
+
+Deletion is harder than insertion in both trees and hash lists because it must preserve the surrounding links. Removing a hash-table node requires remembering the previous node or using a pointer-to-pointer technique. Removing a tree node may require replacing it with a child or successor. K&R leaves some of this as exercises, which is appropriate: deletion tests whether the representation invariant is really understood.
+
 ## Visual
 
 ```mermaid
@@ -235,6 +243,19 @@ void treeprint(const struct tnode *p)
         printf("%4d %s\n", p->count, p->word);
         treeprint(p->right);
     }
+}
+
+int main(void)
+{
+    struct tnode *root = NULL;
+    const char *words[] = { "dog", "cat", "eel", "dog" };
+    size_t n = sizeof words / sizeof words[0];
+
+    for (size_t i = 0; i < n; ++i)
+        root = addtree(root, words[i]);
+
+    treeprint(root);
+    return 0;
 }
 ```
 

@@ -107,7 +107,7 @@ flowchart TD
   A[Selection problem] --> B{"Does order matter?"}
   B -->|yes| C{"Can items repeat?"}
   C -->|yes| D[n^r]
-  C -->|no| E["P("#quot;n,r#quot;")"]
+  C -->|no| E["P("#quot;#quot;n,r#quot;#quot;")"]
   B -->|no| F{"Can items repeat?"}
   F -->|yes| G[stars and bars]
   F -->|no| H[binomial coefficient]

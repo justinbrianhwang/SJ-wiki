@@ -55,6 +55,8 @@ Proof sketch for the Cargo workflow:
 
 This chain explains why Rust projects normally do not scatter compiled files beside source files. Cargo owns the `target` directory, while source, tests, examples, and manifests stay readable.
 
+A final practical result is that the installed toolchain includes documentation and supporting tools, not only a compiler. The book points learners toward local documentation because standard-library APIs are part of everyday Rust work. When a method such as `read_to_string`, `args`, or `HashMap::entry` appears, the fastest reliable next step is often to read its docs. In a normal `rustup` installation, `rustup doc` opens local documentation, and `cargo doc --open` builds documentation for the current package and dependencies. This reinforces a productive habit: do not memorize every API; learn how to inspect signatures, trait bounds, examples, and return types. The same habit later helps with compiler errors. Rust diagnostics frequently name a trait, type, lifetime, or method candidate, and Cargo gives you a stable way to reproduce the same build while investigating.
+
 ## Visual
 
 ```mermaid

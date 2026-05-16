@@ -79,6 +79,18 @@ The preprocessor has no understanding of C types. A macro can create invalid C, 
 
 `static` file scope supports separate compilation by hiding names from the linker. A source file can expose only its intended public functions while keeping helper functions and state private. This is the closest C gets to a built-in module system in K&R's style.
 
+A useful header is small, stable, and free of surprising storage allocation. It should tell users what they may call and what types they may use. It should not silently define objects that every including file will instantiate. K&R's examples use headers to share declarations; that habit scales to libraries where changing a header forces many source files to recompile, so unnecessary includes have real build cost.
+
+Conditional compilation should isolate real variation, not create many hidden programs in one file. It is appropriate for include guards, feature availability, debug-only checks, and small platform differences. It becomes dangerous when large unrelated branches are selected by macros because only one branch may be regularly compiled. The preprocessor can hide syntax errors from the compiler until a rarely used configuration is enabled.
+
+Macros that behave like statements need special care. A multi-statement macro should usually be wrapped in `do { ... } while (0)` so it behaves like one statement in an `if` or `else` context. K&R's macro chapter focuses on expression macros, but the same principle applies: macro expansion must preserve the syntax expected by the caller.
+
+The preprocessor is also the first phase where portability decisions appear. A header may choose one system header on BSD-like systems and another on System V-like systems, or it may expose a common typedef that hides those differences from the rest of the program. K&R's conditional-inclusion examples are small, but the same method is used in real libraries to keep platform-specific details from leaking everywhere.
+
+At the same time, preprocessing can make debugging harder because the compiler sees the expanded program, not the source as written. When a macro produces confusing errors, inspect the expansion or temporarily replace the macro with a function. Good macro design minimizes the distance between the source expression and the expanded meaning.
+
+Separate compilation also affects build dependencies. If a public header changes, every source file that includes it may need recompilation. If a private helper in one `.c` file changes, only that file should need recompilation. Keeping interfaces narrow is therefore both a design improvement and a practical build-time improvement.
+
 ## Visual
 
 ```mermaid
@@ -131,11 +143,13 @@ Method:
 
 3. Apply precedence:
 
-   $$\begin{aligned}
+$$
+\begin{aligned}
    a + 1 * a + 1 &= 3 + 1 * 3 + 1 \\
    &= 3 + 3 + 1 \\
    &= 7
-   \end{aligned}$$
+   \end{aligned}
+$$
 
 4. Correct macro:
 
@@ -151,10 +165,12 @@ Method:
 
 6. Evaluate:
 
-   $$\begin{aligned}
+$$
+\begin{aligned}
    (3 + 1)(3 + 1) &= 4 \times 4 \\
    &= 16
-   \end{aligned}$$
+   \end{aligned}
+$$
 
 Checked answer: the unparenthesized macro produces `7`; the parenthesized macro produces `16`.
 
@@ -227,6 +243,20 @@ double pop(void)
 
     fprintf(stderr, "stack empty\n");
     return 0.0;
+}
+```
+
+```c
+/* main.c: compile with stack.c */
+#include <stdio.h>
+#include "calc.h"
+
+int main(void)
+{
+    push(3.0);
+    push(4.5);
+    printf("%.1f\n", pop() + pop());
+    return 0;
 }
 ```
 

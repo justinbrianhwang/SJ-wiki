@@ -48,6 +48,24 @@ The fourth key result is that Rust can optimize iterator chains heavily. The boo
 
 Proof sketch for laziness: `map` returns a new iterator value that stores the original iterator and the closure. It does not call the closure immediately. The closure is called only when `next` is called on the mapped iterator, or when a consumer such as `collect` repeatedly calls `next`.
 
+A related result is that iterator chains separate "what sequence should be produced" from "when is it demanded." This makes many transformations easier to read, but it also means side effects inside adapters should be treated carefully. A `map` closure that prints text will not print anything until the iterator is consumed. If the purpose is side effects, a `for` loop or `for_each` is usually clearer.
+
+The capture traits explain why closure types appear in APIs. A function that accepts `F: Fn()` promises it will only call the closure through shared access. A function that accepts `F: FnMut()` may call a closure that changes captured state. A function that accepts `F: FnOnce()` may consume the closure. Thread spawning uses `FnOnce` because the closure is run once, and it may need to move captured values into the new thread. These trait bounds are the type-level form of the same capture behavior seen in examples.
+
+Iterators also make ownership flow visible. `iter` lets many read-only pipelines inspect data without consuming it. `iter_mut` supports in-place updates while preserving the collection. `into_iter` consumes the collection and is often the right choice when the pipeline should produce owned output. Choosing the wrong entry point is a common source of move or borrow errors, but the fix is usually conceptual: decide whether the pipeline should read, mutate, or take ownership.
+
+Because adapters are composable, it is tempting to make every loop a chain. The better rule is readability. A short transform-filter-collect pipeline is often excellent. A chain with hidden side effects, complex branching, and hard-to-name closures may be clearer as a `for` loop.
+
+Iterator return types can also guide API design. Returning `Vec<T>` says the function eagerly produced owned results. Returning `impl Iterator<Item = T>` says the caller can consume a generated sequence lazily. Returning references from an iterator ties the iterator to borrowed input. Each choice has lifetime and ownership consequences, so iterator-heavy code should still be read through the same ownership lens as the rest of Rust.
+
+This is why iterator examples should always identify the item type. Many confusing compiler errors become straightforward once you know whether the closure receives `T`, `&T`, or `&mut T`.
+
+After that, ownership of the pipeline is usually clear.
+
+Name intermediate iterators when clarity improves.
+
+Then optimize only after measuring.
+
 ## Visual
 
 ```mermaid

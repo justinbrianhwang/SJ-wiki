@@ -80,6 +80,14 @@ Recursive-descent parsing is a natural way to decode declarations. K&R's `dcl` p
 
 Use `typedef` for clarity, not to hide pointer semantics accidentally. A type name such as `Compare` improves readability. A type name such as `String` for `char *` can be convenient, but may obscure which variables are pointers and which objects are mutable.
 
+The safest way to design a callback interface is to write the function pointer type first, then write every callback to match it exactly. A sorting function might require a comparison that accepts two `const void *` arguments and returns an `int`. That is a contract, not just a convenient shape. If a comparison function accepts `char *` instead and is forced into place with a cast, the compiler may stop warning while the program still has undefined behavior when the call is made through the wrong type.
+
+Complex declarations become less intimidating when separated into two questions: what object is being declared, and what expression involving that object has the base type? In `int (*pf)(void)`, the expression `(*pf)()` is an `int`; therefore `pf` is a pointer to a function returning `int`. In `char *argv[]`, the expression `*argv[i]` is a `char`; therefore `argv` is an array of pointers to `char`. This is the "declaration follows use" idea that K&R highlights repeatedly.
+
+There is also a design lesson in K&R's declaration parser. The grammar is small, but it is recursive, so the parser mirrors the grammar with mutually recursive functions. That style appears throughout C systems code: instead of flattening a nested concept into a large switch, write one function per grammar level or representation level. It makes the hard syntax manageable and gives each helper a narrow responsibility.
+
+When a declaration still feels unreadable, introduce names for stable concepts. A `typedef` for a callback type, a structure tag for a record, or a small wrapper function around a cast can turn a declaration from a puzzle into an interface. This is not a retreat from C's syntax; it is how experienced C code keeps the hard parts localized. K&R's own examples use `typedef` for tree pointers and allocator headers for this reason.
+
 ## Visual
 
 ```mermaid
@@ -119,10 +127,12 @@ Method:
 
 2. Numeric comparison converts leading numeric values:
 
-   $$\begin{aligned}
+$$
+\begin{aligned}
    atof("10") &= 10.0 \\
    atof("2") &= 2.0
-   \end{aligned}$$
+   \end{aligned}
+$$
 
 3. Numeric comparison function:
 

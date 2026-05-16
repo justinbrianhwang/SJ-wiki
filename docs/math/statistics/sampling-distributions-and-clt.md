@@ -73,6 +73,12 @@ $$
 
 The same conceptual rule applies: the statistic varies from sample to sample, but its distribution has a predictable center and spread if the sampling process is understood.
 
+Sampling distributions should not be confused with bootstrap distributions, simulated histograms of raw data, or the distribution of a population. A sampling distribution is a theoretical repeated-sampling object tied to a statistic and a sample size. In teaching, we often approximate it by simulation: repeatedly draw samples, compute the statistic, and plot the results. That simulation is useful because it makes the repeated-sampling idea visible, but the target concept is still the distribution that would arise from the sampling design. This distinction becomes important when interpreting standard errors: a standard error of 2 grams for a mean does not mean individual packages usually vary by 2 grams; it means sample means of that size usually vary by about 2 grams.
+
+The CLT also explains why inference can be more stable for averages than for individual outcomes. Individual delivery times may be right-skewed because unusually long delays are possible, but the average of many deliveries has less relative skew and smaller spread. This does not make every sample size "large enough." A sample of 10 from a mildly skewed population may work reasonably, while a sample of 100 from a population with extreme outliers or strong dependence may still be difficult. The theorem is a guide to approximation, not permission to ignore the data-generating process.
+
+In practice, always pair the CLT with a plot of the original data and a clear statement of sampling independence.
+
 ## Visual
 
 ```mermaid
@@ -96,7 +102,7 @@ flowchart LR
 
 ## Worked example 1: Standard error of the mean
 
-Problem: A manufacturer knows that fill weights for a product have mean $\mu=500$ grams and standard deviation $\sigma=12$ grams. Random samples of $n=36$ packages are taken. Find the mean and standard error of $\bar{X}$, and compute $P(\bar{X}>503)$ assuming the CLT approximation is appropriate.
+Problem: A manufacturer knows that fill weights for a product have mean $\mu=500$ grams and standard deviation $\sigma=12$ grams. Random samples of $n=36$ packages are taken. Find the mean and standard error of $\bar{X}$, and compute $P(\bar{X}\gt 503)$ assuming the CLT approximation is appropriate.
 
 Method:
 

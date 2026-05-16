@@ -52,6 +52,10 @@ The fourth key result is that `for` is the usual safe loop for collections. Inde
 
 Proof sketch for expression returns: a Rust function with return type `i32` can end with `x + 1` because the expression's value is used as the function result. If the line becomes `x + 1;`, the semicolon turns it into a statement whose value is `()`, the unit type. The compiler rejects the mismatch because `()` is not `i32`.
 
+Another important result is that Rust's basic constructs are designed to remove ambiguous intent. Constants must be annotated and are always immutable, which makes them different from ordinary `let` bindings. Arrays record their length as part of their type, so `[i32; 5]` and `[i32; 4]` are different array types. Tuples can be destructured when the positions have local meaning, but structs become better once those positions need durable names. Control flow follows the same philosophy. A `while` loop says "repeat while this condition remains true." A `for` loop says "visit each item produced by this iterable value." A bare `loop` says "repeat until the body explicitly breaks." When readers see the form, they learn the programmer's intent before reading every line. That clarity matters later because ownership and borrowing errors are easier to reason about when mutation and control flow are already explicit.
+
+The chapter is also the first place to build a habit of reading compiler feedback literally. If a branch returns an integer and the other returns a string slice, the compiler is not complaining about style; it is pointing out that the variable would have no single type.
+
 ## Visual
 
 | Concept | Rust form | What the compiler enforces | Small example |

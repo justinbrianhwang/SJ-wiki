@@ -223,7 +223,7 @@ The S-matrix viewpoint packages scattering as a map from incoming asymptotic sta
 
 Coulomb scattering is a special warning case. The formulas for short-range potentials assume an asymptotic form with a plane wave plus an outgoing spherical wave. The Coulomb potential falls off slowly, so its long-range phase modifies the usual assumptions. Rutherford scattering is recovered, but the derivation needs care. If a potential is not short-ranged, do not apply short-range scattering formulas without checking their conditions.
 
-Experimentally, cross sections are often averaged over spin states, detector acceptance, energy spread, and target structure. A clean formula such as $d\sigma/d\Omega=|f|^2$ is the core theoretical object, but comparing to data may require summing or averaging over unresolved quantum numbers. This is another place where density matrices and identical-particle symmetries enter practical scattering.
+Experimentally, cross sections are often averaged over spin states, detector acceptance, energy spread, and target structure. A clean formula such as $d\sigma/d\Omega=\vert f\vert ^2$ is the core theoretical object, but comparing to data may require summing or averaging over unresolved quantum numbers. This is another place where density matrices and identical-particle symmetries enter practical scattering.
 
 For consistency checks, examine the forward direction, low-energy limit, and unitarity. The forward amplitude is constrained by the optical theorem, low-energy behavior should match the expected dominant partial wave, and probabilities across all open channels must not exceed the incoming flux. These checks are often more revealing than algebraic simplification.
 

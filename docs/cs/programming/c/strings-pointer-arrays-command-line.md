@@ -67,6 +67,18 @@ Pointer-based traversal is a K&R idiom. A loop such as `while (*s++ = *t++) ;` c
 
 Command-line option parsing often uses pointer increments. K&R's `find` example advances `argv` through option strings beginning with `-`, then walks each option character with pointer expressions. The idiom is compact, but expressions such as `(*++argv)[0]` should be used sparingly and documented by surrounding code structure.
 
+String functions rely on the terminator, not on separately stored length. That gives C strings their simple representation, but it means every string operation must be able to find `'\0'` within valid storage. A missing terminator turns `strlen`, `strcpy`, `printf("%s")`, and many other functions into out-of-bounds reads. K&R's line-reading code explicitly writes the terminator after filling the buffer; that final assignment is not optional.
+
+Pointer arrays are also a memory-management technique. In the line-sorting program, the text of each line is stored once, while an array of pointers records the order. Sorting swaps pointers rather than moving entire lines. This is faster, but it also means the pointers must remain valid for the whole sort. If the lines were stored in a single temporary buffer reused for every input line, all pointers would end up pointing at the same overwritten storage.
+
+For command-line arguments, remember that the environment owns the original strings. A program may inspect them and often can modify them on hosted systems, but portable code should not depend on modifying `argv` strings unless the standard and target environment permit the intended use. It is always fine to copy an argument into program-owned storage when mutation is needed.
+
+A useful mental model is that `argv` is already an array of strings in the same style K&R builds manually for sorted input lines. `argv` itself is a pointer to the first element of an array of `char *`; each element points at a null-terminated string. Incrementing `argv` walks the vector, while incrementing `argv[0]` walks characters inside one string. K&R shows both moves, and confusing them changes the level of traversal.
+
+When parsing options, keep the remaining argument count and pointer position consistent. If `argc` says one argument remains, `argv` should point at it. This invariant makes it easier to detect missing operands and illegal extra arguments.
+
+The same invariant applies to arrays of line pointers: the count says how many entries are valid, and the pointer array stores only those entries. Never sort or print uninitialized pointer slots beyond the count.
+
 ## Visual
 
 ```text

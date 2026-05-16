@@ -37,6 +37,8 @@ The fourth key result is that slices tie derived views to the borrowed owner. If
 
 Proof sketch for moves: a `String` contains a pointer to heap memory. If assigning `s1` to `s2` left both bindings valid, both bindings would attempt to free the same heap allocation at scope end. Rust avoids this by invalidating `s1` after the move. Therefore exactly one owner remains responsible for `drop`.
 
+The last-use behavior of borrows is also worth making explicit. Modern Rust does not require every borrow to last until the end of its lexical block. A borrow usually ends at its final use, which is why code can print an immutable reference and then later take a mutable reference to the same owner. This is not a loophole; it is the compiler proving that the two uses do not overlap. The rule remains the same: shared reads may coexist, but exclusive mutation may not overlap with any other active access.
+
 ## Visual
 
 ```mermaid

@@ -66,6 +66,12 @@ The comma operator evaluates left to right and yields the right operand's value.
 
 `goto` is not needed for ordinary loops or decisions. Its defensible use in C is narrow: breaking out of multiple nested loops, or jumping to shared cleanup code after partial resource acquisition. Even then, the label should be close and the invariant should be obvious.
 
+The chapter also reinforces a style rule that is easy to underestimate: control flow should make the exceptional cases visible. In K&R examples, normal loops usually have a short body and a clear termination condition. When a loop has several exits, each exit has a reason: `return` because the answer is known, `break` because a search failed or completed, or `continue` because the current item should be skipped. This is especially important in C because there is no built-in exception mechanism and no automatic cleanup for local resources. The visible path through the function is the error-handling design.
+
+For search and parsing code, the loop invariant is the most useful way to reason. In binary search, the invariant is that if the target is present, it lies between `low` and `high` inclusive. Every update must preserve that fact while shrinking the range. In a character scanner, the invariant might be that all characters before the current pointer have already been classified. K&R does not use the term heavily, but the examples are written so these invariants can be checked by inspection.
+
+Another practical result is that C statements compose without hidden blocks. An `if` controls exactly one statement unless braces create a compound statement. A `for` loop controls exactly one statement. This is why adding a second line under a loop without braces is a classic maintenance bug. K&R's compact formatting works when the controlled statement is truly one statement; modern code often adds braces consistently because edits are common and compilers will not infer intent from indentation.
+
 ## Visual
 
 ```mermaid

@@ -61,6 +61,14 @@ Bitwise operators manipulate integer representations. They are essential for fla
 
 Precedence is not the same as evaluation order. Precedence decides how an expression groups; it does not generally decide which operand is evaluated first. K&R repeatedly warns against expressions that modify an object more than once between sequence points, such as `a[i] = i++`, because their behavior is undefined.
 
+The type system is deliberately small, but it is not weak in the sense of being irrelevant. Every operator has operand requirements and a result type. `%` requires integer operands. `&&` and `||` produce `0` or `1`. A comparison also produces `0` or `1`. Assignment expressions have the value stored in the left operand, which is why chained assignment works. These rules are what allow compact idioms such as `while ((c = getchar()) != EOF)` to be both legal and meaningful.
+
+Implementation-defined behavior is part of writing portable C. The exact size of `int`, whether plain `char` is signed, and the representation of negative integers were historically machine-dependent. K&R points readers toward `<limits.h>` and `<float.h>` for machine properties rather than hard-coding assumptions. Modern machines are more uniform than the machines K&R had to support, but portable code should still ask the implementation through standard macros where possible.
+
+The conditional operator `?:` is an expression, not a statement. That means it can be used in initializers, arguments, and return statements when the two alternatives are simple values. K&R uses it for compact choices such as selecting a sign or choosing a space after an argument. It should not replace a clear `if` when each branch has several side effects.
+
+Declarations are part of expression safety. A variable declared `const` communicates that assignments through that name are not permitted. An unsigned type communicates modular arithmetic for that object. A cast communicates an explicit conversion, but it can also silence useful warnings. K&R uses casts where representation boundaries are real, such as generic allocation; they should not be used merely to force an expression past the compiler.
+
 ## Visual
 
 | Concept | Example | Result or rule | Note |
@@ -99,11 +107,13 @@ Method:
 
 2. Compute the index:
 
-   $$\begin{aligned}
+$$
+\begin{aligned}
    index &= c - '0' \\
    &= '7' - '0' \\
    &= 7
-   \end{aligned}$$
+   \end{aligned}
+$$
 
 3. Increment the counter:
 
@@ -138,10 +148,12 @@ unsigned flags = 0;
 
    In octal:
 
-   $$\begin{aligned}
+$$
+\begin{aligned}
    EXTERNAL | STATIC &= 02 | 04 \\
    &= 06
-   \end{aligned}$$
+   \end{aligned}
+$$
 
    So `flags` becomes `06`.
 

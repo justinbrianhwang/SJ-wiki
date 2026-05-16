@@ -73,6 +73,22 @@ Redirection and pipes make simple filters powerful. A program written with `getc
 
 Variable-length argument functions use `<stdarg.h>`. K&R's `minprintf` example shows `va_list`, `va_start`, `va_arg`, and `va_end`. The format string is the only guide for interpreting the unnamed arguments.
 
+The most reliable formatted-input pattern is often two-stage: read a whole line, then parse the line. This avoids the surprise that `scanf` treats newlines as whitespace for most conversions and may leave an unmatched character waiting for the next input call. A line buffer gives the program a complete record to validate, echo in an error message, or parse with multiple possible formats using `sscanf`.
+
+Formatted output has a similar separation of concerns. A conversion specification controls representation, not computation. If a value must be rounded, clamped, converted to units, or checked for range, do that before the `printf` call. Then the format string should only decide width, precision, base, sign display, and alignment. K&R's examples are readable because the arithmetic and the formatting are close but not tangled.
+
+Because `printf` and `scanf` are variadic, their safety depends heavily on the format string. Modern compilers can check literal format strings against arguments, but they cannot fully protect dynamically constructed formats. Treat the format string as code, not data. In particular, never pass untrusted input as the format argument; print it through `%s`.
+
+K&R's stream examples are also a lesson in composability. A program that reads from `stdin` and writes to `stdout` can be tested with typed input, redirected files, or a pipeline. The program does not need to know which source is attached. That is why the tutorial begins with standard streams instead of named files: the simplest interface is already general enough for many command-line tools.
+
+For formatted input, the destination object controls the pointer type. `%d` needs `int *`, `%ld` needs `long *`, `%f` needs `float *`, and `%lf` needs `double *`. This differs from `printf`, where `float` arguments are promoted to `double`. Remembering that contrast prevents one of the most common mistakes students make when moving from output to input.
+
+Buffering is another reason to understand streams as objects. Output to a terminal may be line-buffered, output to a file may be fully buffered, and `stderr` is often unbuffered or differently buffered so diagnostics appear promptly. A program that prints a prompt without a newline may need `fflush(stdout)` before waiting for input. K&R does not dwell on buffering early, but it explains many observations students otherwise attribute to the compiler.
+
+Finally, formatted I/O is not a parser generator. `scanf` is useful for simple, regular input, but it is awkward for diagnostics, optional fields, and recovery after errors. K&R's more careful examples often use character input or line input when the program needs control. That is a good rule: use `scanf` when the input format is genuinely simple; otherwise read text explicitly and parse it in smaller steps.
+
+This is why many robust C tools use a layered pattern: get a line, validate the line, convert fields, then act. Each layer has one failure mode to report.
+
 ## Visual
 
 ```mermaid

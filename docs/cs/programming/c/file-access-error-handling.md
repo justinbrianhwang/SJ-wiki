@@ -73,6 +73,16 @@ Update mode requires care. When a stream is open for both reading and writing, t
 
 File status and conversion status differ. End-of-file, I/O error, and parse failure are different conditions. Use return values first, then `feof`, `ferror`, or `perror` when needed.
 
+The portable stream interface is intentionally higher-level than UNIX file descriptors. A `FILE *` stream may buffer input, buffer output, translate text newlines, and remember error and end-of-file indicators. This is why a program should not treat the stream as if it were only a thin integer handle. The stream object belongs to the library, and the program interacts with it through functions. That extra layer is what lets the same source code read a text file on systems with different physical newline representations.
+
+Error handling should preserve useful context. A message such as `cannot open file` is less useful than `prog: cannot open notes.txt`. K&R examples often include the program name and the file name, and modern code can add `perror` or `strerror(errno)` to include the system reason. The important design rule is to report errors on the diagnostic stream without corrupting normal output. A filter that writes transformed data to `stdout` should keep errors on `stderr` so it can still be used safely in a pipeline.
+
+When processing files, decide whether the program is record-oriented, line-oriented, or byte-oriented. `fgets` is line-oriented but bounded by a buffer; `getc` is character-oriented; `fread` is byte/block-oriented and does not interpret text. Mixing these approaches without a clear reason often creates off-by-one bugs or leaves unread data in the stream. K&R's examples usually pick one model per program, which keeps the loop condition and the error checks simple.
+
+A second design choice is whether an error should stop the whole program or only skip one file. A command that processes many filenames often reports an error for one name, increments a failure status, and continues with the remaining names. A command whose output would be meaningless after a failed write should stop immediately. C leaves that policy to the program, so return statuses and cleanup paths should be chosen deliberately.
+
+The file-positioning functions add another layer of state. After `fseek`, the next input or output operation observes the new position. This is useful for fixed-size records and binary files, but text streams can have implementation-specific restrictions on meaningful offsets. When portability matters, use positions returned by `ftell` or stay with sequential processing.
+
 ## Visual
 
 ```mermaid

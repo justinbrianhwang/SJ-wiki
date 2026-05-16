@@ -37,6 +37,16 @@ The fourth key result is that idiomatic `use` paths often import a parent module
 
 Proof sketch for privacy: if a module exposes a function that constructs a value but keeps the fields private, outside code cannot build invalid values directly. It must call the public function or methods, which can enforce checks. The compiler enforces this boundary during name resolution and field access.
 
+A practical result is that module design should follow the reader's path through the API, not only the author's file organization. Internal files may be split for maintainability, but public names should guide users toward the stable concepts they need. Re-exporting with `pub use` can make a deep internal path appear as a short public path. That is useful when the internal module tree is more detailed than the public API should be. It is also a commitment: downstream users may write that re-exported path in their code. Therefore the question is not "can this compile if it is public?" but "do I want to support this name as part of the crate's interface?" This is why module privacy belongs with API design rather than with mere housekeeping.
+
+The file-system forms introduced by the book are another source of precision. A module named `garden` may live in `src/garden.rs` or `src/garden/mod.rs`, and a child module named `vegetables` may live in `src/garden/vegetables.rs` or `src/garden/vegetables/mod.rs`. Modern Rust style usually prefers the non-`mod.rs` file when possible, but the important point is that the `mod garden;` declaration is what tells the compiler to include that module.
+
+This is why missing-module errors should be read as name-resolution errors first and file-placement errors second. Rust is asking whether the declared module can be found and whether the requested path is visible from the current location.
+
+Good module names are therefore part of readability: they should explain ownership of concepts, not mirror every temporary implementation detail.
+
+As a project evolves, moving code between private modules should be cheap. Moving public paths is expensive because users may depend on them.
+
 ## Visual
 
 ```mermaid

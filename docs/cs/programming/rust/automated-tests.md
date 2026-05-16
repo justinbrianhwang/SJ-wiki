@@ -37,6 +37,20 @@ The fourth key result is that test filtering and output controls keep large suit
 
 Proof sketch for a unit test: a `#[cfg(test)]` module is compiled only when testing. Inside that module, `use super::*;` imports the parent module's items. A `#[test]` function calls the item and uses assertions. If an assertion fails, the panic is captured by the test harness and reported as a failed test.
 
+Another key result is that tests should make behavior precise rather than merely increase a count. A good test name states a condition and an expected outcome: `larger_can_hold_smaller`, `rejects_empty_query`, or `case_insensitive_search_finds_mixed_case`. The body should arrange the smallest useful data, act once, and assert the observable result. This shape makes failures diagnostic. When a test fails, the name and assertion output should point toward the broken behavior without requiring the reader to reconstruct the entire program.
+
+The book's distinction between unit and integration tests also matters for refactoring. Unit tests can protect tricky internal helpers, but they may need updates when internals are reorganized. Integration tests are usually more stable because they call the public API. A healthy Rust crate often uses both: unit tests for edge cases close to the implementation, and integration tests for the behavior promised to users.
+
+Tests also interact with ownership in ordinary ways. If a test constructs a value and passes it by value into the function under test, that value may be moved and unavailable for later assertions. Borrowing test fixtures can make assertions clearer when the original value must be inspected afterward. Conversely, moving a fixture can be the right choice when the function is supposed to consume ownership. Good tests therefore check not only output values but also the intended ownership contract of the API.
+
+Finally, failure messages should be written for the future maintainer. Assertion macros accept custom messages, and `expect` can explain setup assumptions. A test that fails with "called unwrap on Err" is less useful than one that says which fixture file, parse rule, or invariant was expected. The test harness reports the failing function name, but the assertion should report the broken fact.
+
+`cargo test` options are part of this workflow. Running one test by name keeps the feedback loop small while debugging. Running the whole suite before a commit checks interactions. Running ignored tests explicitly is useful for slow or environment-dependent cases. The command structure mirrors Rust's larger style: be explicit about the scope of work being requested.
+
+For study notes, record the command that proves the behavior. A test example is incomplete if it shows only the function and not how `cargo test` selects, runs, and reports it.
+
+That command is part of the checked answer.
+
 ## Visual
 
 ```mermaid

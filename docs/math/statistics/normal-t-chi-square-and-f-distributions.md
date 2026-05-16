@@ -83,6 +83,10 @@ $$
 
 Large chi-square or $F$ statistics often indicate evidence against a null model, but "large" must be judged relative to the appropriate degrees of freedom.
 
+These distributions also differ in how their tails are used. Normal and $t$ tests for means often use one or two tails depending on the alternative hypothesis. Chi-square goodness-of-fit and independence tests use the upper tail because larger squared discrepancies are more inconsistent with the null; a statistic near zero means observed counts are unusually close to expected counts, not evidence against the model in the usual test. ANOVA $F$ tests also use the upper tail because the statistic is a ratio of explained to unexplained variance. Remembering the statistic's construction is more reliable than memorizing tail directions.
+
+Degrees of freedom can be read as the amount of independent information left after estimating constraints. In a one-sample $t$ test, estimating the sample mean uses one constraint, leaving $n-1$ degrees of freedom for variability. In a chi-square table, fixed totals reduce how many cells can vary freely. This interpretation helps explain why larger samples make $t$ distributions look more normal and why changing the number of categories changes the chi-square reference curve.
+
 ## Visual
 
 | Distribution | Support | Shape | Key parameters | Common statistic |

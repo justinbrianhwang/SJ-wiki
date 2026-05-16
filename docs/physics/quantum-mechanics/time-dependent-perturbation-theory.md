@@ -246,7 +246,7 @@ Selection rules still matter in time-dependent problems. A harmonic electric-dip
 
 Pulse duration controls energy resolution. A perturbation applied for a short time has a broad frequency spectrum, so it can drive a range of transitions. A long nearly monochromatic drive selects a narrow energy window. This is the time-energy Fourier relationship behind spectroscopy, and it is more precise than saying energy is "violated" for short times. The full system still evolves according to the time-dependent Hamiltonian; the finite-time amplitude simply has a broadened response.
 
-For checks, take limits. At $t=0$ transition probabilities must vanish. For very weak coupling they should scale as $|V|^2$. Near resonance they should grow much more efficiently than far off resonance. If these trends fail, the phase convention or time integral is likely wrong.
+For checks, take limits. At $t=0$ transition probabilities must vanish. For very weak coupling they should scale as $\vert V\vert ^2$. Near resonance they should grow much more efficiently than far off resonance. If these trends fail, the phase convention or time integral is likely wrong.
 
 ## Connections
 

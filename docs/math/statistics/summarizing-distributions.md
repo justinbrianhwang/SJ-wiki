@@ -81,6 +81,10 @@ $$
 
 This rule is descriptive and approximate. It should not be applied blindly to strongly skewed, bounded, discrete, or multimodal distributions.
 
+Summary choice should also follow the decision being made. If a city reports household income to describe the "typical" resident, the median is often preferred because a few very high incomes can pull the mean upward. If a factory monitors fill weights from a stable machine, the mean and standard deviation are often more useful because symmetric random variation around a target is expected. If a teacher reports class performance, the median, quartiles, and score distribution may be more informative than the mean alone. The right summary is the one that preserves the feature of the data most relevant to the question while making its limitations visible.
+
+For any numerical summary, attach units and sample context. A standard deviation of 4 means very different things if the unit is seconds, dollars, kilograms, or points on a 5-point scale. Likewise, a median computed from 12 observations should be presented more cautiously than a median computed from 12,000 observations collected by a careful sampling design.
+
 ## Visual
 
 | Summary | Formula or rule | Resistant to outliers? | Best use |

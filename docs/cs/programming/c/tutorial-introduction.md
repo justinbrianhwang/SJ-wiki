@@ -67,6 +67,10 @@ Function arguments are passed by value. A function receives copies of scalar arg
 
 External variables are objects defined outside any function. They exist for the whole execution of the program and can be seen by multiple functions when declared properly. K&R shows an external-variable version of the longest-line program, but treats it as inferior because hidden data connections make programs harder to reason about.
 
+The tutorial chapter also establishes K&R's example-driven method. Each program is complete enough to compile, but it is also deliberately small enough that one new idea is visible: a temperature table for arithmetic and loops, file copying for `EOF`, word counting for state, digit counting for arrays, `power` for functions, and longest-line for character arrays. This matters when studying C because isolated syntax rules are less useful than seeing how storage, control flow, and library calls cooperate in a real loop.
+
+One more early lesson is that C does little implicitly for safety. A character array has exactly the size declared. A function using a buffer must know its limit. A string must be terminated. The language will not remember a line length for you or stop a write past the end of an array. K&R introduces these constraints gently, but they are the same constraints that govern advanced C.
+
 ## Visual
 
 ```mermaid
@@ -108,21 +112,25 @@ Method:
 
 4. Evaluate for `F = 80`:
 
-   $$\begin{aligned}
+$$
+\begin{aligned}
    C_{\text{int}} &= 5 \times (80 - 32) / 9 \\
    &= 5 \times 48 / 9 \\
    &= 240 / 9 \\
    &= 26
-   \end{aligned}$$
+   \end{aligned}
+$$
 
    Integer division discards the fractional part.
 
 5. Evaluate the floating version:
 
-   $$\begin{aligned}
+$$
+\begin{aligned}
    C_{\text{float}} &= 0.555555\ldots \times 48 \\
    &= 26.6666\ldots
-   \end{aligned}$$
+   \end{aligned}
+$$
 
 Checked answer: for `80 F`, the integer table prints `26`, while a table formatted with one decimal place prints about `26.7`. Both come from the same formula, but the types of the operands control the calculation.
 

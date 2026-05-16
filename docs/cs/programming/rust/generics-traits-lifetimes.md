@@ -62,6 +62,16 @@ The fourth key result is that lifetimes prevent dangling references. If a functi
 
 Proof sketch for `longest`: the returned reference is either `x` or `y`. If the caller stores the result longer than one of those inputs lives, there is a possible path where the result points to dropped data. The annotation `<'a>` tells Rust the result cannot outlive the shorter input lifetime, eliminating that possibility.
 
+The lifetime elision rules explain why many reference-returning functions do not show lifetime syntax even though lifetimes still exist. The compiler can infer lifetimes in common patterns: each input reference gets its own lifetime parameter, a single input lifetime is assigned to output references, and methods with `&self` often tie output references to `self`. When these rules are insufficient, annotations become necessary. Therefore lifetime syntax is not a feature to add everywhere; it is a way to document relationships that inference cannot determine.
+
+Traits also support API evolution through default methods. A trait can require one core method and provide another method in terms of it. Implementors write the essential behavior, while callers get a richer interface. This pattern appears throughout the standard library and is one reason trait design deserves care: default behavior becomes part of what implementors and users expect.
+
+Generic structs and enums follow the same rules as generic functions. `Option<T>` and `Result<T, E>` are not special syntax; they are generic enums whose variants carry type parameters. Seeing them this way helps connect everyday error handling with the broader abstraction system. A program can define its own generic enum when the standard ones do not model the domain precisely enough.
+
+The practical sequence is: write the concrete version first, notice real duplication, then introduce generics and trait bounds that exactly match the operations used. Prematurely generic code is often harder to read than two simple concrete functions.
+
+For lifetimes, the parallel rule is to start with ordinary references and add explicit annotations only when the compiler needs a relationship stated.
+
 ## Visual
 
 ```mermaid

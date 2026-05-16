@@ -57,6 +57,8 @@ The squared correlation $r^2$ has a special interpretation in simple linear regr
 
 Several cautions are essential. Restricting the range of one variable can reduce correlation. Combining different subgroups can create or hide associations. Outliers can inflate or deflate $r$. Categorical variables require different tools unless encoded with a meaningful design. Most importantly, correlation does not imply causation; an association may be caused by $x$, by $y$, by a third variable, by selection effects, or by coincidence.
 
+A useful reporting sentence for correlation has four parts: direction, form, strength, and context. For example, "Among the 86 sampled apartments, rent and floor area had a strong positive roughly linear association." This is better than saying only "$r=0.82$." The number gives a compact measure, but the sentence reminds the reader what cases were studied, what variables were paired, and that the association is being described as linear. If the scatterplot shows curvature, clusters, or unequal spread, report those features before relying on a single correlation coefficient.
+
 ## Visual
 
 ```mermaid

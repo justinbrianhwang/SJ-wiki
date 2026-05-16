@@ -91,6 +91,8 @@ where order does not matter.
 
 A probability model must match the mechanism. Drawing cards without replacement creates dependence between draws. Tossing a fair coin repeatedly is often modeled as independent trials. Sampling people from a finite population without replacement is not exactly independent, although independence may be a useful approximation when the population is much larger than the sample.
 
+When solving applied probability problems, translate words into events before computing. Phrases such as "at least one," "exactly two," "given that," and "either" have mathematical meanings. "At least one" is often easiest through the complement rule; "given that" changes the denominator; "either" usually calls for the addition rule; and "exactly" often requires counting the favorable arrangements. Writing the event first prevents many arithmetic errors because the formula then follows the structure of the event rather than the surface wording of the story.
+
 ## Visual
 
 ```mermaid

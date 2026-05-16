@@ -75,7 +75,7 @@ The first formula has a classic pairing proof. Write $S=1+2+\cdots+n$ and also $
 ```mermaid
 graph LR
   A1[a in A] -->|f| B1["f(a) in B"]
-  B1 -->|g| C1["g("#quot;f(a#quot;")) in C"]
+  B1 -->|g| C1["g("#quot;#quot;f(a#quot;#quot;")) in C"]
   A1 -->|g compose f| C1
 ```
 
