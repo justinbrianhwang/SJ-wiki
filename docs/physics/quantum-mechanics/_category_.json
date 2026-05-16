@@ -1,8 +1,8 @@
-﻿{
-    "label":  "Quantum Mechanics",
-    "position":  5,
-    "link":  {
-                 "type":  "doc",
-                 "id":  "physics/quantum-mechanics/intro"
-             }
+{
+  "label": "Quantum Mechanics",
+  "position": 5,
+  "link": {
+    "type": "doc",
+    "id": "physics/quantum-mechanics/intro"
+  }
 }

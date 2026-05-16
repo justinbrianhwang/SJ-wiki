@@ -28,3 +28,15 @@ The later pages cover the main deep learning families: multilayer perceptrons, c
 17. [Generative Adversarial Networks](/cs/deep-learning/generative-adversarial-networks)
 18. [Recommender Systems](/cs/deep-learning/recommender-systems)
 19. [Reinforcement Learning and Bayesian Tuning](/cs/deep-learning/reinforcement-learning-and-bayesian-tuning)
+
+## Papers and Modern Architectures
+
+These paper deep dives continue the sequence with efficient attention, patch-token vision models, recurrent language models, state-space sequence models, and hybrid long-context architectures.
+
+1. [Attention and Transformers, including Attention Is All You Need](/cs/deep-learning/attention-transformers)
+2. [Vision Transformer](/cs/deep-learning/vision-transformer)
+3. [Hyena Hierarchy](/cs/deep-learning/hyena)
+4. [RWKV](/cs/deep-learning/rwkv)
+5. [Mamba](/cs/deep-learning/mamba)
+6. [Griffin](/cs/deep-learning/griffin)
+7. [Jamba](/cs/deep-learning/jamba)

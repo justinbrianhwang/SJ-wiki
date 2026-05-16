@@ -204,6 +204,68 @@ print("output shape:", z.shape)
 print("attention weight shape:", attn_weights.shape)
 ```
 
+## Original Transformer: Attention Is All You Need
+
+Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, and Illia Polosukhin, "Attention Is All You Need," was posted in June 2017 and presented at NeurIPS 2017. Its historical setting matters: neural machine translation was dominated by recurrent encoder-decoder systems, often LSTMs or GRUs with an attention mechanism over encoder states. The Transformer kept the encoder-decoder translation interface, but removed recurrence and convolution from the sequence transduction core. That made training much more parallel over positions and gave every token a short path to every other token through self-attention.
+
+The original model is an encoder-decoder architecture. The encoder has $N=6$ identical layers. Each encoder layer contains multi-head self-attention followed by a position-wise feed-forward network, with residual connections and layer normalization around both sublayers. The decoder also has $N=6$ layers, but each decoder layer has three sublayers: masked decoder self-attention, encoder-decoder cross-attention, and the same position-wise feed-forward network. In the base model, $d_{\mathrm{model}}=512$, $d_{\mathrm{ff}}=2048$, and there are $h=8$ attention heads with $d_k=d_v=64$. The big model uses a wider configuration, but the same conceptual stack.
+
+```mermaid
+flowchart LR
+  Src[Source tokens] --> SE[Source embeddings plus sinusoidal PE]
+  SE --> Enc["Encoder stack N=6"]
+  Enc --> Memory[Encoder memory keys and values]
+  Tgt[Shifted target tokens] --> TE[Target embeddings plus sinusoidal PE]
+  TE --> MSA[Masked decoder self-attention]
+  MSA --> CA[Encoder-decoder cross-attention]
+  Memory --> CA
+  CA --> FFN[Decoder feed-forward]
+  FFN --> Softmax[Linear projection and softmax]
+```
+
+The paper uses three attention variants. **Encoder self-attention** uses source positions as queries, keys, and values, so every source token can see every other source token, aside from padding masks. **Decoder masked self-attention** uses target positions as queries, keys, and values, but masks future target positions so autoregressive training cannot leak the answer. **Encoder-decoder attention** uses decoder states as queries and encoder outputs as keys and values, allowing each target position to attend over the full source sentence.
+
+The central formula is scaled dot-product attention:
+
+$$
+\mathrm{Attention}(Q,K,V)=
+\mathrm{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V.
+$$
+
+Multi-head attention runs this operation in parallel after learned projections:
+
+$$
+\begin{aligned}
+\mathrm{MultiHead}(Q,K,V) &= \mathrm{Concat}(\mathrm{head}_1,\ldots,\mathrm{head}_h)W^O,\\
+\mathrm{head}_i &= \mathrm{Attention}(QW_i^Q,KW_i^K,VW_i^V).
+\end{aligned}
+$$
+
+Because the model has no recurrence or convolution, it needs an explicit order signal. The paper uses fixed sinusoidal positional encodings:
+
+$$
+\begin{aligned}
+PE_{(pos,2i)} &= \sin\left(\frac{pos}{10000^{2i/d_{\mathrm{model}}}}\right),\\
+PE_{(pos,2i+1)} &= \cos\left(\frac{pos}{10000^{2i/d_{\mathrm{model}}}}\right).
+\end{aligned}
+$$
+
+The feed-forward sublayer is applied independently at every position:
+
+$$
+\mathrm{FFN}(x)=\max(0,xW_1+b_1)W_2+b_2.
+$$
+
+Training used WMT 2014 English-German and English-French translation. The English-German setup used about 4.5 million sentence pairs with byte-pair encoding and a shared vocabulary of about 37K tokens. The English-French setup used about 36 million sentence pairs and a 32K word-piece vocabulary. Batches were formed by approximate sequence length and contained roughly 25K source tokens and 25K target tokens. The optimizer was Adam with $\beta_1=0.9$, $\beta_2=0.98$, $\epsilon=10^{-9}$, and the now-standard warmup/inverse-square-root learning-rate schedule:
+
+$$
+\mathrm{lrate}=d_{\mathrm{model}}^{-0.5}\min(\mathrm{step}^{-0.5},\mathrm{step}\cdot \mathrm{warmup}^{-1.5}),
+$$
+
+with $\mathrm{warmup}=4000$. The paper also used dropout and label smoothing with value $0.1$. As reported in the paper, the big Transformer reached 28.4 BLEU on WMT 2014 English-German and about 41.0 BLEU on WMT 2014 English-French, while training far faster than prior recurrent and convolutional systems in the comparison table.
+
+The landmark contribution was not merely a better translation score. The paper showed that recurrence was not necessary for high-quality sequence transduction. Self-attention reduced the maximum path length between positions to a constant number of layers, made training parallel over sequence positions, and supplied a modular block that later scaled into large language models. The same encoder idea was adapted to images in [Vision Transformer](/cs/deep-learning/vision-transformer). The long-context cost of its $L\times L$ attention matrix motivated attention alternatives such as [Hyena](/cs/deep-learning/hyena), [RWKV](/cs/deep-learning/rwkv), and [Mamba](/cs/deep-learning/mamba). Recent hybrids such as [Griffin](/cs/deep-learning/griffin) and [Jamba](/cs/deep-learning/jamba) keep some attention while replacing many global-attention layers with recurrent or state-space mixers.
+
 ## Common pitfalls
 
 - Forgetting positional information and expecting self-attention alone to know token order.

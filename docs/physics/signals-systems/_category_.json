@@ -1,8 +1,8 @@
-﻿{
-    "label":  "Signals \u0026 Systems",
-    "position":  4,
-    "link":  {
-                 "type":  "doc",
-                 "id":  "physics/signals-systems/intro"
-             }
+{
+  "label": "Signals & Systems",
+  "position": 4,
+  "link": {
+    "type": "doc",
+    "id": "physics/signals-systems/intro"
+  }
 }
