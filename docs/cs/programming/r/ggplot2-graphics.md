@@ -124,7 +124,7 @@ Method:
 library(ggplot2)
 
 cars <- mtcars
-cars$cyl <- factor(cars$cyl)
+cars$cyl \lt - factor(cars$cyl)
 
 ggplot(cars, aes(x = mpg)) +
   geom_histogram(binwidth = 3, fill = "gray70", color = "white") +
@@ -170,6 +170,26 @@ scatter_by_group <- function(df, x, y, color, facet = NULL) {
 
 scatter_by_group(iris, "Sepal.Length", "Petal.Length", "Species")
 ```
+
+The reusable function uses `.data[[x]]` so column names can be supplied as character strings. This is useful in programming with `ggplot2`, where a hard-coded call such as `aes(Sepal.Length, Petal.Length)` is simple interactively but not flexible inside a function. The function still keeps the mapping explicit: x, y, and color each come from named columns in the supplied data frame.
+
+The function also delays faceting until after the base plot is constructed. If `facet` is `NULL`, the plot is returned without panels. If `facet` is supplied, `facet_wrap(vars(.data[[facet]]))` adds a panel per level or value. This pattern is common in report code because one plotting function can support both an overview and grouped versions of the same relationship.
+
+Remember that a ggplot object is an object. You can assign it to `p`, add layers later with `p + ...`, print it, save it with `ggsave`, or return it from a function. This is different from base graphics, where commands draw directly on the active device. The object-oriented design makes `ggplot2` convenient for building plots piece by piece and reusing a shared theme or scale.
+
+Even with `ggplot2`, statistical judgment comes first. A smooth line should match the question, a color mapping should encode a meaningful variable, and facets should compare panels on a scale that supports comparison. The grammar makes complex graphics possible, but it does not decide which graphic is honest or useful.
+
+When debugging a ggplot, add one layer at a time. Start with `ggplot(data, aes(...)) + geom_point()` or another minimal geom. If that works, add color, then facets, then scales, then themes. This incremental process reveals whether the problem is data shape, mapping, statistical transformation, or styling. It is much faster than debugging a long plot expression all at once.
+
+The grammar also encourages consistency across a report. If several plots use the same grouping variable, reuse the same color scale and labels. If panels compare related variables, keep axis labels and themes consistent. Visual consistency reduces cognitive load and makes real differences in the data easier to see.
+
+For data that is not already in a convenient shape, reshape before plotting rather than fighting the plot call. A long data frame with one measurement column and one variable-name column often makes faceting, coloring, and grouping straightforward. Even when reshaping tools are outside this page, the principle remains: plot code should describe graphics, not hide data cleaning.
+
+When comparing base graphics and `ggplot2`, notice where state lives. Base graphics draws on the active device; `ggplot2` builds an object that can be printed later. This difference explains many workflow choices.
+
+That object can also be stored, modified, and saved, which makes repeated report graphics easier to manage.
+
+This makes plot construction feel closer to building a model object than drawing on paper.
 
 ## Common pitfalls
 

@@ -67,6 +67,12 @@ The fifth result is that dataclasses are ideal for plain data records with optio
 
 The sixth result is that class attributes and instance attributes differ. A class attribute is shared through the class; an instance attribute belongs to one object. Mutable class attributes are a frequent source of bugs.
 
+A seventh result is that classes are most useful when they protect a concept, not merely when they group names. A `Temperature` class can protect units and conversions. A `BankAccount` class can protect balance invariants. A `Rectangle` class can keep width, height, area, and validation together. By contrast, a class named `Utilities` that contains unrelated static methods usually adds ceremony without improving the model.
+
+An eighth result is that public attributes are acceptable in Python when the data is simple and no invariant is being enforced. Python does not require getter and setter methods for every field. Start with clear attributes. Introduce a property when access needs validation, conversion, lazy computation, or backward-compatible behavior. This keeps simple classes simple while leaving a path for future control.
+
+A final design result is to prefer composition when the relationship is "has-a" rather than "is-a." A `Report` may have a `Path`, a list of rows, and a formatter. It is not a kind of path or a kind of list. Inheritance is powerful, but a shallow object graph with explicit attributes is often easier to test and change.
+
 ## Visual
 
 ```mermaid
@@ -168,7 +174,6 @@ Dataclass method:
 from dataclasses import dataclass
 from math import hypot
 
-
 @dataclass(frozen=True)
 class Point:
     x: float
@@ -209,7 +214,6 @@ Checked answer: `Point(x=3, y=4)` and `5.0`.
 ```python
 from dataclasses import dataclass
 
-
 @dataclass
 class BankAccount:
     owner: str
@@ -227,7 +231,6 @@ class BankAccount:
             raise ValueError("insufficient funds")
         self.balance -= amount
 
-
 account = BankAccount("Ada", 100.0)
 account.deposit(25.0)
 account.withdraw(40.0)
@@ -235,6 +238,14 @@ print(account)
 ```
 
 The class keeps account rules near account data. Callers do not need to know every invariant; they use methods that enforce them.
+
+This does not mean every attribute must be hidden. The `owner` field is simple public data, while balance changes go through methods because they have rules. That mixture is idiomatic Python. Start with the simplest public shape that preserves correctness, then add properties or methods where the object has to protect itself. The design question is always practical: where can invalid state enter, and which method or constructor should stop it?
+
+For dataclasses, remember that generated methods are conveniences, not a complete domain model. Add explicit behavior when the object has rules.
+
+When deciding between a dictionary and a class, ask how many places need to know the field names and rules. A dictionary is fine when data is temporary and simple. A class is stronger when the same structure travels through many functions, must reject invalid state, or benefits from named behavior. For example, a dictionary can store `{"width": 3, "height": 4}`, but a `Rectangle` class can guarantee positive dimensions and provide `.area` without every caller repeating the formula.
+
+Classes also make refactoring safer when paired with tests. If all account updates pass through `deposit` and `withdraw`, changing the internal representation from dollars to cents affects fewer call sites. That is the practical value of encapsulation: not hiding code for its own sake, but limiting how much of the program must change when the implementation changes.
 
 ## Common pitfalls
 

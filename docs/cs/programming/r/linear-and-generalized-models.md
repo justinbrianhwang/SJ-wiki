@@ -13,9 +13,11 @@ The key idea is that a model is an explicit approximation. In simple linear regr
 
 A **linear model** represents a numeric response as a linear combination of predictors plus error:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 y_i &= \beta_0 + \beta_1x_{i1} + \cdots + \beta_px_{ip} + \epsilon_i.
-\end{aligned}$$
+\end{aligned}
+$$
 
 The function `lm(formula, data = ...)` fits linear models by least squares. A formula such as `mpg ~ wt + hp` means "model `mpg` using `wt` and `hp`."
 
@@ -45,9 +47,11 @@ Important model functions:
 
 The least-squares line minimizes the residual sum of squares:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 RSS &= \sum_{i=1}^{n}(y_i - \hat{y}_i)^2.
-\end{aligned}$$
+\end{aligned}
+$$
 
 For simple regression, the slope estimates the average change in response for a one-unit increase in the predictor. For multiple regression, a slope estimates the average change associated with one predictor while the other model predictors are held constant.
 
@@ -61,8 +65,8 @@ flowchart TD
   B --> C[Fit lm or glm]
   C --> D[Inspect coefficients]
   D --> E[Check diagnostics]
-  E --> F{Adequate?}
-  F -->|no| G[Transform, add terms, change family, or simplify]
+  E --> F{"Adequate?"}
+  F -->|no| G["Transform, add terms, change family, or simplify"]
   G --> C
   F -->|yes| H[Predict and interpret with uncertainty]
 ```
@@ -102,11 +106,13 @@ predict(fit, newdata = new_car)
 
 Manual check:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 \widehat{mpg} &= 37.285126 - 5.344472(3.0) \\
 &= 37.285126 - 16.033416 \\
 &= 21.251710.
-\end{aligned}$$
+\end{aligned}
+$$
 
 Checked answer: the prediction is about 21.25 mpg. The slope means that, in this fitted simple linear model, each additional 1000 pounds of weight is associated with about 5.34 fewer miles per gallon on average.
 
@@ -172,6 +178,22 @@ par(mfrow = c(2, 2))
 plot(fit)
 par(mfrow = c(1, 1))
 ```
+
+The diagnostic table turns model diagnostics into data, which makes them easier to sort, filter, and report. `standardized_residual` helps identify observations whose residuals are large relative to the model's estimated error scale. `leverage` identifies observations with unusual predictor combinations. `cooks_distance` combines residual size and leverage to flag points that strongly influence fitted coefficients.
+
+The four default `plot(fit)` panels are a compact diagnostic set for linear models: residuals versus fitted values for nonlinearity and unequal variance, a normal Q-Q plot for residual shape, scale-location for spread, and residuals versus leverage for influential points. These plots do not automatically approve or reject a model; they guide judgment about whether the linear approximation is reasonable for the analysis goal.
+
+For GLMs, diagnostic ideas remain but details change. Residual definitions differ, fitted values are on a mean scale determined by the family and link, and prediction uncertainty may need response-scale transformation. A logistic regression coefficient is naturally a log-odds coefficient; odds ratios can be obtained with `exp(coef(fit))`, while predicted probabilities require `predict(..., type = "response")`.
+
+Model selection should be documented as a modeling decision, not a mechanical search. If variables are chosen by theory, say so. If nested models are compared by partial F tests, record the nesting. If AIC is used, remember that it compares candidate models rather than proving the selected model is true. Diagnostics and interpretability remain part of the final choice.
+
+A strong regression report usually includes the model formula, data source, fitted coefficient table, interval or uncertainty summary, diagnostic comments, and a statement of the prediction or explanation goal. If categorical variables are used, report the reference levels. If transformations are used, interpret on the transformed scale or back-transform carefully. If interactions are used, avoid interpreting main effects as universal slopes.
+
+For prediction, distinguish confidence intervals for the mean response from prediction intervals for a new observation. In `predict.lm`, `interval = "confidence"` and `interval = "prediction"` answer different questions. The prediction interval is wider because it includes individual observation variability in addition to uncertainty about the fitted mean.
+
+Always connect coefficient interpretation to the formula actually fitted. A slope in `mpg ~ wt` is marginal with respect to that one predictor. A slope in `mpg ~ wt + hp` is conditional on horsepower. A slope inside an interaction depends on the other interacting variable. The same variable name can therefore carry different interpretations across models.
+
+Keep the fitted object, not only the printed summary. The object stores what later functions need for prediction, diagnostics, intervals, and plots.
 
 ## Common pitfalls
 

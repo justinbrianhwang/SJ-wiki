@@ -184,6 +184,20 @@ print(round(standardized, 2))
 print(crossprod(standardized))
 ```
 
+This code uses two matrix idioms worth knowing. `sweep(measurements, 2, colMeans(measurements), FUN = "-")` subtracts one column mean from each column. The margin value `2` means columns, matching the convention from `apply`. The second `sweep` divides each centered column by its column standard deviation. The result is a standardized matrix where each column is on a comparable scale.
+
+The final call, `crossprod(standardized)`, computes $X^T X$ more directly than `t(standardized) %*% standardized`. Cross-products appear in regression, covariance calculations, principal components, and many numerical algorithms. Even when you do not derive the linear algebra by hand, recognizing the shape helps: if `standardized` has four rows and three columns, then `crossprod(standardized)` has three rows and three columns because it compares columns with columns.
+
+When matrix code fails, inspect `dim()` before inspecting values. Most errors are dimension errors: incompatible matrix multiplication, a dropped dimension after subsetting, or a vector that was expected to be a column matrix. Keeping row and column names during examples also makes output easier to audit because a suspicious value can be traced back to a named observation and variable.
+
+For review, connect every matrix operation to its dimensions. Transpose swaps rows and columns. Element-wise addition requires matching dimensions or a deliberate recycling pattern. Matrix multiplication uses inner dimensions and produces the outer dimensions. Inversion is defined only for square, nonsingular matrices. These rules are often faster to check than the numeric entries themselves, and they prevent using the wrong operator.
+
+Arrays add one more habit: label dimensions conceptually. A three-dimensional simulation result might be `[replicate, variable, scenario]`; a different project might need `[row, column, time]`. R will store both as arrays, but the analyst must remember what each index means. Use `dimnames` when possible because named dimensions make extraction and summaries much easier to audit.
+
+Before leaving a matrix result, run a small plausibility check. Row sums, column sums, diagonal entries, or one hand-computed matrix product entry can reveal transposed inputs and fill-direction mistakes. These checks are not busywork; they are the matrix equivalent of checking a data frame with `head()` after import.
+
+If a matrix is feeding a statistical model, remember that rows normally represent observations and columns represent variables or constructed features. Keeping that convention stable makes later regression and diagnostic pages easier to understand.
+
 ## Common pitfalls
 
 - Expecting `matrix(1:6, nrow = 2)` to fill by row. R fills by column unless `byrow = TRUE`.

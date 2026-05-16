@@ -54,7 +54,7 @@ flowchart TD
   B -->|list or data frame columns| D[lapply or vapply]
   B -->|need simplified quick result| E[sapply]
   B -->|several inputs in parallel| F[mapply]
-  D --> G{Reusable function?}
+  D --> G{"Reusable function?"}
   G -->|yes| H[vapply with FUN.VALUE]
   G -->|no| I[lapply for flexible output]
 ```
@@ -163,6 +163,20 @@ summarize_numeric <- function(df, cols) {
 
 print(summarize_numeric(mtcars, c("mpg", "disp", "hp", "wt")))
 ```
+
+The helper deliberately uses `lapply` and `vapply` together. `lapply(stats, ...)` iterates over a list of functions because each list element is itself a function object. Inside that outer loop, `vapply(selected, fun, numeric(1))` iterates over the selected columns and requires one numeric result per column. The final `as.data.frame(pieces)` turns a list of equal-length named vectors into a rectangular summary.
+
+This nesting is easier to understand if you read from the inside out. For one statistic, such as the mean, apply that statistic to every selected column. Then repeat the same column-wise operation for every statistic in the `stats` list. The output has variables as rows and statistics as columns because each statistic returns one value per variable.
+
+Apply functions are not a substitute for understanding data shape. Before choosing an apply function, identify the unit of iteration: rows of a matrix, columns of a data frame, elements of a list, or parallel elements of several vectors. Then identify the expected output of one iteration. If one iteration returns one number, `vapply(..., numeric(1))` is natural. If it returns a fitted model or a mixed object, `lapply` is natural. If it returns values whose shape can vary, do not force simplification too early.
+
+For teaching and debugging, an explicit `for` loop can be clearer than a dense anonymous function. Once the loop body is stable, replacing it with an apply function may reduce boilerplate. Clarity is the standard, not cleverness.
+
+A practical comparison is to write the same operation both ways. First, use a `for` loop with a preallocated result vector and comments. Second, use `vapply` with the same helper function. If both produce identical output, the apply version is a compact expression of the same loop. If the apply version is hard to read, keep the loop. R style favors vectorization, but maintainable analysis favors code that future readers can verify.
+
+Be especially careful when applying functions that return models, plots, or tests. Those results are complex objects, so `lapply` is usually the right first container. Afterward, extract the specific scalar summaries needed for a report with `vapply`. This two-stage approach avoids premature simplification while still producing clean summary tables.
+
+When an apply call is confusing, rewrite it as a loop on paper. Identify the first input, the function call made for that input, and the first returned value. Then generalize. This small exercise turns apply syntax from magic into ordinary repeated evaluation.
 
 ## Common pitfalls
 

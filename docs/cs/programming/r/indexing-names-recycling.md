@@ -152,6 +152,16 @@ result <- data.frame(
 print(result)
 ```
 
+The helper function is intentionally defensive. It does not let a missing name silently turn into `NA`; it checks the requested names first and stops with a clear message if any are absent. This is especially useful in analysis scripts that depend on column names or named summary vectors. A typo such as `"cofee"` should be caught at the lookup step, not several calculations later after an `NA` has contaminated a result.
+
+Indexing code is easiest to debug when the index object has a name and can be inspected. Instead of writing one dense expression, split it into `bad <- temp == -99 | temp > 60`, then inspect `bad`, then assign `temp[bad] <- NA`. For named extraction, create `required <- c("tea", "coffee")`, check `setdiff(required, names(sales))`, and only then extract. These intermediate objects document intent and make it clear whether the index is positional, logical, or character.
+
+Recycling deserves the same explicitness. Scalar recycling is idiomatic and safe in expressions like `x + 1`; the scalar is meant to apply to every element. Longer recycling should be rare in analysis code unless the repeating pattern is part of the design, such as alternating treatment labels. If you do intend a pattern, create it with `rep(..., length.out = length(x))` so the code says the pattern is deliberate.
+
+One reliable way to study indexing is to write the index object separately and print it. For example, create `keep <- names(sales) %in% c("tea", "coffee")`, inspect `keep`, and then run `sales[keep]`. This makes the relationship between names, logical values, and extracted elements visible. The same method works for data-frame rows: build `rows <- df$score >= 80`, check `table(rows)`, and then subset.
+
+When replacing values, verify both the number of target positions and the replacement length. Replacing five positions with one value is normal because the one value is recycled intentionally. Replacing five positions with two values is suspicious because the pattern will recycle unevenly or fail. If a replacement expresses a rule, consider computing the replacement vector explicitly so the operation can be checked before assignment.
+
 ## Common pitfalls
 
 - Forgetting that R indexes from 1. `x[0]` returns an empty vector; it does not return the first value.

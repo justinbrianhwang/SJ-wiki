@@ -151,6 +151,10 @@ plot(
 )
 ```
 
+Read this startup script as a miniature version of a full analysis. The package loading happens before any analysis objects are created. The raw data vector is small enough to type by hand, but in a real project the same position would usually be occupied by a file import. The summary table is stored as an object before it is printed, which makes it available for later writing, testing, or plotting. The plot call uses explicit labels so the figure can stand alone in a report.
+
+A useful self-check is to restart R and run the script from the first line. If it succeeds, the script is not relying on hidden objects in the global environment. If it fails, the error usually points to a missing package, a wrong working directory, an object created only in the console, or a line that needs to appear earlier. This restart-and-run habit is one of the fastest ways to move from interactive exploration to reproducible work.
+
 ## Common pitfalls
 
 - Treating the console as the only record. Console work is useful for discovery, but a script is the durable record.

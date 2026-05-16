@@ -48,8 +48,8 @@ S4 is stricter and useful for complex systems that need validation. Many Biocond
 
 ```mermaid
 flowchart TD
-  A[Call summary(x)] --> B[summary generic]
-  B --> C{class(x)}
+  A["Call summary(x)"] --> B[summary generic]
+  B --> C{"class(x)"}
   C -->|lm| D[summary.lm]
   C -->|data.frame| E[summary.data.frame]
   C -->|factor| F[summary.factor]
@@ -167,6 +167,28 @@ print.summary.quiz_result <- function(x, ...) {
 result <- new_quiz_result("Bo", 13, 20)
 summary(result)
 ```
+
+This small class demonstrates the same pattern used by many base R objects. A constructor creates a valid object, the class attribute identifies it, and generic functions provide user-facing behavior. `print(result)` gives a compact display of the object itself. `summary(result)` creates a different object with derived information. `print(summary(result))` then formats that summary object. Each step is ordinary R code plus naming conventions.
+
+The constructor is important because S3 itself does not prevent invalid objects. Without `new_quiz_result`, someone could create `list(name = "Ana", score = 30, total = 20)` and assign class `"quiz_result"`, producing an impossible score. A constructor centralizes validation and keeps methods simpler because methods can assume the object was built correctly.
+
+For analysis users, the practical value of object-oriented R is extraction discipline. Instead of digging through every list component of an `lm` object, use `coef`, `resid`, `fitted`, `predict`, `summary`, and `confint`. These functions express intent and let the class decide the correct method. Direct component access is still useful for learning and debugging, but documented extractors are more stable.
+
+S4 follows the same broad idea with stronger rules. It is less common in introductory examples, but when you see `object@slot`, read it as formal slot access rather than list extraction. The stricter structure is helpful in large package ecosystems where objects need validation and predictable components.
+
+To study S3 dispatch, use `methods()` and `getS3method()`. For example, `methods("plot")` reveals many class-specific plot methods, and `getS3method("summary", "lm")` retrieves the method used for linear-model summaries. You do not need to memorize the method bodies, but seeing that they exist makes generic behavior less mysterious.
+
+The safest way to extend R with a small class is to write a constructor, a validator if needed, and a few methods for common generics such as `print`, `summary`, or `plot`. Keep the underlying object simple and document its components. If the class becomes complex enough that informal conventions are fragile, that is a sign to consider a more formal system or an existing package structure.
+
+For everyday analysis, you do not need to design many classes, but you do need to recognize them. If an object prints in a polished way, assume there is structure underneath. Use `class()`, `str()`, and documented extractors before reaching into components. That keeps analysis code aligned with the methods the package author intended.
+
+This is especially important for objects returned by statistical functions. A hypothesis test, model, or clustering result may print only a few lines while storing estimates, data names, residuals, call information, or diagnostic quantities. Class-aware extractors preserve meaning and protect code from internal layout changes. Treat printed output as a view, not as the whole object.
+
+When in doubt, compare `print(x)` with `str(x)`; the contrast shows why classes are useful.
+
+That comparison also teaches which extractor functions are worth learning next.
+
+It is a small habit with large payoff in debugging.
 
 ## Common pitfalls
 

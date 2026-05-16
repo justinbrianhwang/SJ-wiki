@@ -68,13 +68,19 @@ The fifth result is that standard formats deserve standard parsers. Use `json` f
 
 The sixth result is that paths and files should be validated at the boundary. Check whether a path exists when absence is expected, create directories when needed, and raise clear errors when input is invalid.
 
+A seventh result is that file formats are contracts. A text file with one float per line is simple, but it cannot store units, timestamps, sensor names, or missing values without inventing extra conventions. CSV handles tables. JSON handles nested records. Plain text handles human-readable logs. Choosing a format is part of the design, not an afterthought. When another program will read the file, document or enforce the schema.
+
+An eighth result is that file writes should be considered failure-prone. A disk can be full, a directory can be missing, or a file can be locked by another process. For important data, write to a temporary file and then replace the target, or use a database designed for transactional updates. That is beyond beginner exercises, but the habit begins with not ignoring exceptions from file operations.
+
+Finally, keep parsing and computation separate. A reader function should convert file text into structured Python values. A calculation function should accept those values without knowing which file they came from. This makes it possible to test the calculation with in-memory sample data and test the parser with tiny fixture files.
+
 ## Visual
 
 ```mermaid
 sequenceDiagram
   participant Program
   participant FileSystem
-  Program->>FileSystem: open(path, mode, encoding)
+  Program->>FileSystem: open("path, mode, encoding")
   FileSystem-->>Program: file object
   Program->>Program: read or write records
   Program->>FileSystem: close()
@@ -197,13 +203,11 @@ The structure is explicit, so a later script does not have to guess which line m
 import csv
 from pathlib import Path
 
-
 def write_readings_csv(path, rows):
     with path.open("w", newline="", encoding="utf-8") as file:
         writer = csv.DictWriter(file, fieldnames=["time_s", "temp_c"])
         writer.writeheader()
         writer.writerows(rows)
-
 
 def read_readings_csv(path):
     with path.open("r", newline="", encoding="utf-8") as file:
@@ -213,7 +217,6 @@ def read_readings_csv(path):
             for row in reader
         ]
 
-
 path = Path("readings.csv")
 rows = [{"time_s": 0, "temp_c": 21.5}, {"time_s": 10, "temp_c": 22.0}]
 write_readings_csv(path, rows)
@@ -221,6 +224,8 @@ print(read_readings_csv(path))
 ```
 
 The `csv` module handles delimiters and newlines more reliably than manual string concatenation.
+
+This code also separates serialization from calculation. The writer receives rows that are already structured, and the reader returns rows with corrected types. A later average-temperature function should not need to know that the data came from CSV. That separation is what makes the file layer replaceable: the same calculation could be fed by JSON, a database query, or a hard-coded test list. Good file code turns external bytes into internal values and back again with as little hidden policy as possible.
 
 ## Common pitfalls
 

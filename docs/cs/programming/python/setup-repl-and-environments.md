@@ -171,7 +171,6 @@ Conclusion: the REPL helped validate the expression; the script made it reusable
 from pathlib import Path
 import sys
 
-
 def describe_runtime() -> None:
     print("Python executable:", sys.executable)
     print("Python version:", sys.version.split()[0])
@@ -184,12 +183,13 @@ def describe_runtime() -> None:
     else:
         print("pip module:", Path(pip.__file__).parent)
 
-
 if __name__ == "__main__":
     describe_runtime()
 ```
 
 This script is useful when an editor seems to run a different Python than the terminal. It prints the exact interpreter path, which is often the fastest way to diagnose environment confusion.
+
+Use the output as a baseline note when asking for help or debugging package problems. If two tools report different executable paths, treat them as different Python installations until proven otherwise. If a package imports in one place and fails in another, rerun this diagnostic in both places before reinstalling anything. That habit prevents random package changes and keeps environment work factual.
 
 ## Common pitfalls
 

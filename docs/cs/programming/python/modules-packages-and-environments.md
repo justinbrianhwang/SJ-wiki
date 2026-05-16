@@ -57,6 +57,12 @@ The fifth result is that environment isolation prevents accidental dependencies.
 
 The sixth result is that module design is about stable boundaries. Put functions and classes that are reused together. Avoid circular imports where module A imports B and B imports A; they often signal that shared logic belongs in a third module.
 
+A seventh result is that import time should be boring. A module should define functions, classes, constants, and lightweight configuration when imported. It should not ask the user for input, open a GUI, start a server, download data, or run a long calculation unless that is the documented purpose of importing it. This is why examples often place demonstration code under the `if __name__ == "__main__":` guard: the file can be both imported as a module and run as a script.
+
+An eighth result is that package boundaries should match ownership of ideas. A project might have `io.py` for reading files, `models.py` for data classes, `analysis.py` for calculations, and `plotting.py` for visual output. That organization is not mandatory, but it illustrates a principle: files should be named after responsibilities, not after vague stages such as `misc.py` or `stuff.py`. Vague module names tend to collect unrelated code.
+
+Finally, environment files are part of project communication. A short `requirements.txt` or Conda environment file tells another person how to reproduce the imports. Without it, a project depends on memory and local machine history. When a script imports third-party packages, update the dependency record at the same time as the code.
+
 ## Visual
 
 ```mermaid
@@ -97,7 +103,6 @@ Method:
 ```python
 def c2f(celsius):
     return celsius * 9 / 5 + 32
-
 
 def f2c(fahrenheit):
     return (fahrenheit - 32) * 5 / 9
@@ -172,13 +177,11 @@ import importlib.util
 import sys
 from pathlib import Path
 
-
 def module_location(module_name):
     spec = importlib.util.find_spec(module_name)
     if spec is None:
         return None
     return spec.origin
-
 
 print("Interpreter:", sys.executable)
 print("Working directory:", Path.cwd())
@@ -189,6 +192,8 @@ for name in ["math", "json", "numpy"]:
 ```
 
 This diagnostic script reports which interpreter is running and where selected modules resolve. It helps detect shadowing and missing dependencies.
+
+Run this script from the same place that runs the failing program: the editor's run button, the terminal, a notebook cell, or a scheduled task. Environment problems are context problems. A command that works in one terminal does not prove that a notebook kernel, IDE debugger, or service account uses the same interpreter. When documenting a project, include the command used to create the environment and the command used to run the program so another person can reproduce both steps.
 
 ## Common pitfalls
 

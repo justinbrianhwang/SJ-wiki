@@ -36,9 +36,11 @@ R's distribution naming pattern is the main result:
 
 For continuous distributions, point probabilities are zero. `dnorm(0)` is a density height, not $P(X = 0)$. To get interval probabilities, subtract CDF values:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 P(a < X < b) &= F(b) - F(a).
-\end{aligned}$$
+\end{aligned}
+$$
 
 For discrete distributions, `dbinom(3, size = 10, prob = 0.4)` is the probability of exactly 3 successes. A cumulative statement such as "at most 3 successes" uses `pbinom(3, size = 10, prob = 0.4)`.
 
@@ -48,10 +50,10 @@ Simulation should be reproducible when used in notes, reports, or tests. `set.se
 
 ```mermaid
 flowchart LR
-  A[Distribution family root: norm, binom, pois] --> B[d: density or mass]
-  A --> C[p: cumulative probability]
-  A --> D[q: quantile]
-  A --> E[r: random generation]
+  A["Distribution family root: norm, binom, pois"] --> B["d: density or mass"]
+  A --> C["p: cumulative probability"]
+  A --> D["q: quantile"]
+  A --> E["r: random generation"]
   C --> F[Interval probability by subtraction]
   D --> G[Critical values]
   E --> H[Simulation]
@@ -73,7 +75,7 @@ Problem: suppose exam scores are approximately normal with mean 75 and standard 
 Method:
 
 1. Define $X \sim N(75, 8^2)$.
-2. Use the CDF identity $P(70 < X < 90) = F(90) - F(70)$.
+2. Use the CDF identity $P(70 \lt  X \lt  90) = F(90) - F(70)$.
 3. Compute both cumulative probabilities with `pnorm`.
 4. Subtract.
 5. Sanity-check using z-scores.
@@ -160,6 +162,22 @@ plot(
 )
 points(comparison$successes, comparison$simulated, pch = 19)
 ```
+
+The simulation table is a useful bridge between probability theory and data analysis. The `theoretical` column is what the binomial model says before data are simulated. The `simulated` column is what happened in 10,000 pseudo-random experiments. The two columns should be close, but not identical, because simulation has sampling variability. Increasing `n_sim` usually makes the simulated proportions move closer to the theoretical probabilities.
+
+This code also illustrates why factor levels are supplied in `table(factor(simulated, levels = 0:size))`. Without explicit levels, outcomes that did not occur in the simulation would be absent from the table, shortening the result and misaligning it with `0:size`. By declaring all possible success counts, the simulated and theoretical vectors have the same length and refer to the same outcomes.
+
+When using distribution functions, name the event in words before coding it. "Exactly 3" becomes `dbinom(3, ...)`. "At most 3" becomes `pbinom(3, ...)`. "More than 3" becomes `pbinom(3, ..., lower.tail = FALSE)` or `1 - pbinom(3, ...)`. "Between 70 and 90" for a continuous variable becomes a difference of two CDF values. Translating the event first prevents off-by-one errors and wrong-tail errors.
+
+Simulation is also a diagnostic tool. If a theoretical probability calculation seems suspicious, simulate the experiment and compare the approximate frequency. Disagreement usually means either the formula was coded incorrectly or the simulation does not match the same assumptions.
+
+Distribution functions also support inference pages. Critical values in confidence intervals come from quantile functions such as `qt` and `qnorm`. P-values often come from cumulative probabilities such as `pt`, `pnorm`, or `pchisq`. Random generators support power simulations and teaching demonstrations. Learning the `d`, `p`, `q`, `r` pattern once pays off across most of introductory statistics.
+
+Parameterization must be checked from the help page. For example, normal functions use `mean` and `sd`, while exponential functions use `rate` by default, and some distributions offer alternative parameter names. A mathematically correct idea can become wrong code if the parameter is supplied on the wrong scale. When in doubt, run a small sanity check, such as verifying the simulated mean is close to the theoretical mean.
+
+Graphing a distribution is often the fastest sanity check. A discrete mass function should have bars at possible values whose heights sum to one. A continuous density should have plausible shape and scale, but areas, not point heights, represent probabilities. Pairing probability calculations with plots makes tail direction and endpoint choices easier to verify.
+
+When a result is a probability, check that it lies between 0 and 1. When a result is a quantile, check that it is on the original measurement scale. This simple distinction catches many prefix mix-ups.
 
 ## Common pitfalls
 

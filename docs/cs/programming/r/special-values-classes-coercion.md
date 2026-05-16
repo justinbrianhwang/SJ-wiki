@@ -46,7 +46,7 @@ Missing values require explicit policy. Removing rows with missing values may be
 
 ```mermaid
 flowchart TD
-  A[Input values] --> B{Special values present?}
+  A[Input values] --> B{"Special values present?"}
   B -->|NA| C[Decide missing-data policy]
   B -->|NaN or Inf| D[Check numeric operation]
   B -->|NULL| E[Check absent object or component]
@@ -159,6 +159,16 @@ example <- data.frame(
 
 print(audit_frame(example))
 ```
+
+The audit function separates three related questions. `class` tells you how R methods will treat a column; `type` tells you how the column is stored; missing counts tell you whether ordinary summaries will return `NA`. A date column, for example, has a class that makes printing and plotting date-aware even though its storage is numeric internally. A factor column has integer storage, but its levels supply the categorical meaning.
+
+For numeric columns, the `finite_missing` count is stricter than `missing`. It flags `Inf` and `NaN` as well as `NA`, which is useful before modeling. A regression can fail or produce meaningless estimates if a transformed predictor contains infinite values from `log(0)` or division by zero. Finding those values near import or cleaning is much cheaper than discovering them after a long analysis pipeline.
+
+Coercion should be treated as a data-cleaning step, not a quick fix. If `as.numeric()` introduces `NA`, record which raw values failed. If a factor must become numeric labels, convert through character and then inspect the result. If a column should be a date, use `as.Date()` with the expected format and check for missing values afterward. Every conversion is an assumption about what the data means.
+
+In reports, include enough of this audit to make the analysis credible. A short sentence such as "Two response values coded as `-99` were converted to missing, and no infinite values remained after log transformation" is often more valuable than another decimal place in a model coefficient.
+
+As a final check, distinguish "unknown," "undefined," and "absent" in your own words before coding. Use `NA` for an unknown observed slot, recognize `NaN` as an undefined numeric result, and reserve `NULL` for no component or no argument. Those meanings lead to different code and different analysis decisions.
 
 ## Common pitfalls
 

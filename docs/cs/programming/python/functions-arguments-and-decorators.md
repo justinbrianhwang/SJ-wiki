@@ -97,13 +97,19 @@ def area(width: float, height: float) -> float:
     return width * height
 ```
 
+A seventh result is that function size should follow testability. A function that reads input, parses text, calculates a value, writes a file, and prints a report has too many reasons to change. Splitting those steps into `parse_input`, `calculate`, `save`, and `display` creates small contracts. The calculation can be tested without files. The file writer can be tested with temporary paths. The display function can be changed without touching the formula.
+
+An eighth result is that argument order is part of the interface. Put required, stable, central parameters first. Put optional tuning parameters after them, usually with defaults. If a call has several boolean flags or numbers whose meaning is not obvious, keyword arguments are clearer than positional arguments. `plot(values, normalize=True, window=5)` is easier to review than `plot(values, True, 5)`.
+
+Finally, decorators should be introduced only when the repeated pattern is real. Logging, timing, caching, authorization, validation, and retry behavior are common decorator uses. A decorator used once may hide more than it helps. Before writing one, ask whether a direct helper function or context manager would make the control flow more visible.
+
 ## Visual
 
 ```mermaid
 flowchart LR
   A[Caller] -->|arguments| B[Function parameters]
   B --> C[Local variables]
-  C --> D{return reached?}
+  C --> D{"return reached?"}
   D -->|yes| E[Return value]
   D -->|no| F[None]
   E --> A
@@ -137,10 +143,8 @@ Work:
 def c2f(celsius):
     return celsius * 9 / 5 + 32
 
-
 def f2c(fahrenheit):
     return (fahrenheit - 32) * 5 / 9
-
 
 freezing_f = c2f(0)
 boiling_f = c2f(100)
@@ -203,7 +207,6 @@ Work:
 from functools import wraps
 from time import perf_counter, sleep
 
-
 def timed(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -213,7 +216,6 @@ def timed(func):
         print(f"{func.__name__} took {elapsed:.3f} s")
         return result
     return wrapper
-
 
 @timed
 def wait_and_add(a, b):
@@ -243,7 +245,6 @@ Checked answer: `answer` is `5`, and a timing line near `0.200 s` is printed.
 ```python
 from functools import wraps
 
-
 def require_non_empty(func):
     @wraps(func)
     def wrapper(values, *args, **kwargs):
@@ -252,16 +253,16 @@ def require_non_empty(func):
         return func(values, *args, **kwargs)
     return wrapper
 
-
 @require_non_empty
 def mean(values):
     return sum(values) / len(values)
-
 
 print(mean([10, 20, 30]))
 ```
 
 The decorator separates validation from the average formula. For small programs this may be more abstraction than necessary; it becomes useful when the same validation wraps several functions.
+
+In ordinary coursework, write the direct version first. After two or three functions repeat the same validation, timing, logging, or conversion code, then consider a decorator. This keeps the abstraction earned by repetition. The same discipline applies to `*args`, `**kwargs`, and higher-order functions: they are valuable when they simplify a real calling pattern, but they can make beginner code harder to trace if introduced before the basic function contract is stable.
 
 ## Common pitfalls
 

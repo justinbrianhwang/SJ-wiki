@@ -67,6 +67,12 @@ The fourth result is that truth values follow clear rules. `False`, `None`, nume
 
 The fifth result is that readable naming is part of correctness. A name such as `temperature_c` carries units; `t` does not. In short exercises, `x` and `y` are acceptable. In programs that will be reread, descriptive names prevent mistakes.
 
+A sixth result is that Python's apparent freedom should be balanced with local discipline. Because the interpreter does not require declarations, programmers have to create clarity through naming, small functions, and checks near the boundary of the program. If a value arrives from `input()`, a file, JSON, command-line arguments, or a web request, its type should be treated as unknown until converted or validated. Inside the core of a program, values should have stable meanings. For example, avoid using `value` as text in one half of a function and as a float in the other half. Use `value_text` for the raw string and `value` or `value_c` for the converted number.
+
+A seventh result is that syntax errors and type errors point to different stages of understanding. A syntax error means Python could not parse the program; inspect punctuation, indentation, quotes, colons, and parentheses. A type error means Python understood the statement but rejected the operation for the values supplied at runtime. Reading that distinction early makes later debugging easier. When a beginner sees `TypeError: can only concatenate str (not "int") to str`, the fix is not random punctuation; it is a conversion or a different operation.
+
+Finally, comments and docstrings should not compensate for vague code. If a comment says `# convert celsius to fahrenheit`, the function name `celsius_to_fahrenheit` is better. Use comments for assumptions that are not visible in the syntax: units from a sensor, why a threshold is chosen, or why a value is rounded before comparison.
+
 ## Visual
 
 ```mermaid
@@ -191,7 +197,6 @@ def summarize_value(name, value):
     print(f"  value = {value!r}")
     print(f"  type  = {type(value).__name__}")
     print(f"  truth = {bool(value)}")
-
 
 values = {
     "count": 0,

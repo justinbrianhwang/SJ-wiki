@@ -74,6 +74,17 @@ The fourth result is that mutability controls aliasing. A tuple cannot be resize
 
 The fifth result is that comprehensions often express container transformations better than manual loops, provided the transformation is simple. A list comprehension builds a list, a set comprehension builds a set, and a dictionary comprehension builds a dictionary.
 
+A sixth result is that containers can model records, relationships, and indexes. A list of dictionaries is natural for rows read from JSON or CSV. A dictionary of lists is natural for grouping scores by student. A dictionary whose values are dictionaries can model nested lookup, but it can also become hard to validate. When a container structure needs a long explanation, consider whether a dataclass or small class would make the data shape explicit.
+
+A seventh result is that ordering should be intentional. Lists and tuples are ordered by position. Dictionaries preserve insertion order in modern Python, but they are still primarily key-value structures. Sets should not be used when meaningful output order is required. If a report must be stable, sort the data at the point of output:
+
+```python
+for name in sorted(scores):
+    print(name, scores[name])
+```
+
+An eighth result is that container operations often communicate complexity. `if item in seen_set` tells readers that membership is central and expected to be efficient. `for key, value in mapping.items()` tells readers that both sides of a mapping are needed. `name, score = row` tells readers that the tuple has exactly two fields. These small idioms reduce the amount of mental bookkeeping needed to read a program.
+
 ## Visual
 
 | Container | Ordered | Mutable | Unique values | Main operation | Literal |
@@ -198,20 +209,17 @@ If only the set of duplicated IDs is needed, use `duplicate_ids = set(duplicates
 ```python
 from collections import defaultdict
 
-
 def group_scores(rows):
     grouped = defaultdict(list)
     for name, score in rows:
         grouped[name].append(score)
     return dict(grouped)
 
-
 def average_scores(grouped):
     return {
         name: sum(scores) / len(scores)
         for name, scores in grouped.items()
     }
-
 
 attempts = [("Ada", 82), ("Grace", 91), ("Ada", 95), ("Linus", 78)]
 grouped = group_scores(attempts)
@@ -222,6 +230,12 @@ print(averages)
 ```
 
 This snippet combines tuples for records, a dictionary for grouping, lists for collected scores, and a dictionary comprehension for final averages.
+
+The same pattern appears in many data-processing scripts. First, choose a record shape for one observation. Second, choose an index or grouping container for the question being asked. Third, compute a derived result in a separate pass. Keeping these stages separate makes it easier to print intermediate structures and to test each part. If grouping is wrong, inspect `grouped`; if averaging is wrong, test `average_scores` with a small hand-built dictionary.
+
+When performance matters, this structure also gives you a clear place to improve. You can replace a list with a set for membership, a dictionary with `Counter` for counting, or a list of dictionaries with a pandas DataFrame for tabular analysis.
+
+For learning, inspect containers with `repr()` or the debugger rather than only printing final answers. Seeing the intermediate list, set, or dictionary often reveals whether the program grouped by the right key, preserved the needed order, or accidentally reused the same mutable object.
 
 ## Common pitfalls
 

@@ -63,20 +63,26 @@ The fifth result is that debugging is faster when you can reproduce the failure.
 
 The sixth result is that logging is often better than scattered `print()` statements in larger programs. The standard `logging` module can include timestamps, severity levels, module names, and output destinations.
 
+A seventh result is that an exception message should help the next person act. `ValueError("bad")` is technically an error, but `ValueError("window must be positive")` tells the caller what rule was violated. Include the invalid value when it is safe and useful, especially at boundaries such as command-line arguments or input files. Avoid messages that expose secrets such as passwords, tokens, or private data.
+
+An eighth result is that debugging benefits from narrowing. If a script fails after reading a file, transforming data, plotting, and saving output, do not inspect all of it at once. First confirm that the file was read. Then confirm the parsed data shape. Then confirm the transformation on one row. Then confirm the plot input. Each confirmation reduces the search space. This is the same reason tests are valuable: they make assumptions executable.
+
+Finally, not every exception should be recovered from. A command-line tool may catch invalid user input and show a friendly message. A library function should often raise a clear exception and let the caller decide. A program that silently "recovers" from corrupt data may produce a wrong answer, which is worse than stopping with a useful traceback.
+
 ## Visual
 
 ```mermaid
 flowchart TD
-  A[Run code] --> B{Syntax valid?}
+  A[Run code] --> B{"Syntax valid?"}
   B -->|no| C[Fix SyntaxError]
   B -->|yes| D[Execute statements]
-  D --> E{Exception raised?}
+  D --> E{"Exception raised?"}
   E -->|no| F[Normal result]
-  E -->|yes| G{Matching except?}
+  E -->|yes| G{"Matching except?"}
   G -->|yes| H[Handle exception]
   G -->|no| I[Traceback and stop]
   H --> J[Optional else/finally flow]
-  I --> K[Debug with traceback, tests, breakpoints]
+  I --> K["Debug with traceback, tests, breakpoints"]
 ```
 
 | Exception | Common cause | Better response |
@@ -191,12 +197,10 @@ import logging
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
-
 def safe_mean(values):
     if not values:
         raise ValueError("cannot compute mean of empty data")
     return sum(values) / len(values)
-
 
 datasets = [[1, 2, 3], [], [10, 20]]
 
@@ -210,6 +214,8 @@ for data in datasets:
 ```
 
 The snippet uses explicit validation, a narrow exception handler, and logging with severity levels.
+
+The loop is intentionally written so one bad dataset does not stop later datasets from being processed. That is a recovery policy, and it belongs at the level that owns the batch. The `safe_mean` function itself does not decide to skip anything; it raises a clear exception. This separation keeps the calculation honest and lets different callers choose different policies. A command-line report might skip bad input, while a test or scientific analysis might stop immediately.
 
 ## Common pitfalls
 

@@ -56,7 +56,7 @@ flowchart TD
   C --> D[Add points or lines]
   D --> E[Add fitted line]
   E --> F[Add text and legend]
-  F --> G{File device?}
+  F --> G{"File device?"}
   G -->|yes| H[dev.off]
   G -->|no| I[Inspect interactively]
 ```
@@ -189,6 +189,22 @@ out_file <- tempfile(fileext = ".png")
 save_mpg_plot(out_file)
 file.exists(out_file)
 ```
+
+The plotting function uses `on.exit(dev.off(), add = TRUE)` so the device is closed even if a later plotting command fails. This is a robust pattern for scripts that write graphics files. Without it, an error between `png()` and `dev.off()` can leave the file incomplete or leave the graphics device open for later plots.
+
+The order of drawing commands matters in base graphics. The first `plot()` call establishes the axes and coordinate system. `grid()` is then drawn before the final points so the grid does not cover the data. The second `points()` call redraws the data in the desired color after the grid. Finally, `abline()` draws the fitted line. If these commands were reordered, later layers could obscure earlier ones.
+
+Base graphics reward incremental development. Start with the simplest plot that shows the data. Add labels. Add a model line or reference line only if it supports the question. Add a legend only when the visual encoding is not self-evident. Then move the finished sequence into a function if the same plot must be regenerated. This workflow keeps graphics tied to analysis rather than turning them into one-off manual artifacts.
+
+When exporting, check the file dimensions and resolution. A plot that looks fine in an interactive pane may have cramped labels in a small PNG or excessive whitespace in a PDF. Scripted devices let you tune `width`, `height`, and `res` in a reproducible way.
+
+A good base plot can usually be reconstructed from four questions: what data define the coordinate system, what additional elements are layered, what annotations explain the encodings, and what device captures the result? If any answer is missing, the plot is either not reproducible or not self-explanatory. This is why high-level calls, low-level additions, legends, and device management are all part of the same skill.
+
+For multi-panel figures, plan the comparison before setting `mfrow`. Shared scales make panels easier to compare; different scales may reveal within-panel detail but can exaggerate differences. Base graphics gives you the controls, but the analyst must choose whether comparability or local detail is more important for the question.
+
+Base graphics is also useful for quick model diagnostics because many modeling functions already provide plot methods. Calling `plot(fit)` for an `lm` object produces a standard diagnostic set without loading another package. Understanding devices, layouts, and graphical parameters makes those built-in diagnostics easier to save and interpret.
+
+For review, redraw one plot from scratch with only the code in the script. If the figure cannot be reproduced, some step was manual or hidden.
 
 ## Common pitfalls
 

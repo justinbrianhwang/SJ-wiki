@@ -13,17 +13,21 @@ In R, descriptive statistics are mostly vector operations plus grouping. You com
 
 The **mean** is the arithmetic average:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 \bar{x} &= \frac{1}{n}\sum_{i=1}^{n} x_i.
-\end{aligned}$$
+\end{aligned}
+$$
 
 The **median** is the middle value after sorting, or the average of the two middle values for an even sample size. It is more resistant to outliers than the mean.
 
 The **variance** measures average squared deviation from the mean. R's `var()` computes the sample variance:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 s^2 &= \frac{1}{n - 1}\sum_{i=1}^{n}(x_i - \bar{x})^2.
-\end{aligned}$$
+\end{aligned}
+$$
 
 The **standard deviation** is the square root of variance. It returns to the original measurement units.
 
@@ -85,13 +89,15 @@ Method:
 
 Manual work:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 \bar{x} &= \frac{4 + 6 + 8 + 10}{4} = 7 \\
 x_i - \bar{x} &= -3, -1, 1, 3 \\
 (x_i - \bar{x})^2 &= 9, 1, 1, 9 \\
 s^2 &= \frac{9 + 1 + 1 + 9}{4 - 1} = \frac{20}{3} \\
 s &= \sqrt{20/3} \approx 2.582.
-\end{aligned}$$
+\end{aligned}
+$$
 
 ```r
 x <- c(4, 6, 8, 10)
@@ -171,6 +177,24 @@ describe_by <- function(df, value, group) {
 
 print(describe_by(mtcars, value = "mpg", group = "cyl"))
 ```
+
+The grouped summary includes both location and spread. The mean and median describe center; standard deviation and quartiles describe variability; `n` tells how many observations support the group. Reporting only a mean would hide whether the group is stable, skewed, or based on very few rows. In small data sets such as `mtcars`, the count is especially important because a single unusual observation can noticeably change a group mean.
+
+The function removes missing values inside each group before computing summaries. That choice is visible in the code, but a production report should also report how many values were removed. One simple extension is to store `missing = sum(is.na(x))` before `x <- x[!is.na(x)]`. This avoids the common problem of comparing group means computed from different effective sample sizes without noticing it.
+
+Descriptive statistics should usually be paired with graphics. A mean and standard deviation are compact, but they do not show multimodality, outliers, or nonlinear relationships. A histogram, boxplot, or scatterplot often reveals whether the numerical summary is appropriate. For example, if the mean and median are far apart, inspect a plot before using the mean as the main description.
+
+Finally, choose summaries that match the measurement scale. Means and standard deviations make sense for interval-like numeric variables. Counts and proportions make sense for categories. Medians and IQRs are often better for skewed numeric variables. Factor codes should not be averaged unless the coding itself is a meaningful numeric scale.
+
+For a complete first-pass report, combine four ingredients: sample size, missing-value count, a center summary, and a spread summary. For a numeric variable, that might be `n`, missing, mean, median, standard deviation, and IQR. For a categorical variable, it might be total count, missing count, category counts, and category proportions. This report is simple, but it catches many data-quality problems before inference begins.
+
+Descriptive statistics also guide model choice. Strong skew may suggest a transformation or a robust method. Unequal group spreads may affect a test choice. Outliers may motivate diagnostics rather than automatic deletion. A near-zero variance predictor may be useless in a model. Treat summaries as the first conversation with the data, not as a box to check before running more impressive functions.
+
+In coursework, show at least one manual calculation for a summary before relying on R output. Computing one mean, one variance, or one table count by hand builds trust in the function and clarifies the denominator or counting rule. After that, R can scale the same idea across groups and columns.
+
+After summaries are computed, preserve units in labels or table names. A mean of `3.2` is ambiguous; a mean weight of `3.2 thousand pounds` is interpretable.
+
+Clear units also prevent mixing incompatible measurements in later comparisons.
 
 ## Common pitfalls
 

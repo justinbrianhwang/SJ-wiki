@@ -59,12 +59,12 @@ flowchart TD
   B --> C[Bind argument values]
   C --> D[Run body]
   D --> E{Name needed}
-  E --> F{Found locally?}
+  E --> F{"Found locally?"}
   F -->|yes| G[Use local value]
   F -->|no| H[Look in enclosing environments]
-  H --> I{Found?}
+  H --> I{"Found?"}
   I -->|yes| J[Use enclosing value]
-  I -->|no| K[Error: object not found]
+  I -->|no| K["Error: object not found"]
   G --> L[Return result]
   J --> L
 ```
@@ -184,6 +184,18 @@ responses <- c("mpg", "hp")
 results <- lapply(responses, fit_response, predictor = "wt", data = mtcars)
 print(do.call(rbind, results))
 ```
+
+This function is small, but it demonstrates several programming habits. It checks whether requested columns exist before constructing a formula. It creates the formula inside the function, which keeps the calling code concise. It returns a named vector of results rather than printing inside the function. That makes the function composable: `lapply` can call it repeatedly, and `do.call(rbind, ...)` can combine the returned values.
+
+Scoping is the reason `fit_response` works safely. The names `response`, `predictor`, `data`, `form`, and `fit` are local to each call. If a global object named `fit` already exists, it is not overwritten by the local `fit`. If a global object named `response` exists, it does not change the argument value passed to the function. This local isolation is one of the main reasons to write functions even for moderately small analyses.
+
+When a function starts to need many options, resist the urge to read them from global variables. Add arguments with sensible defaults. For example, a modeling helper might accept `conf_level = 0.95` or `na_action = na.omit`. Defaults keep common calls short, while arguments keep the dependency visible. Hidden global state makes code look shorter but makes results harder to reproduce.
+
+Loops remain useful when each iteration changes state or when the algorithm is easiest to describe step by step. Apply functions are useful when the same independent operation is applied to many inputs. The best R code uses both styles where they make the program clearer.
+
+When debugging a function, test it with the smallest input that exercises the important branch. For a validation branch, pass a deliberately wrong type. For an empty-input branch, pass `numeric(0)`. For a normal branch, pass two or three values where the answer can be checked by hand. This style catches mistakes in control flow before the function is used on a full data set.
+
+Scoping can be studied by intentionally creating names in different places. Create `x <- 10` globally, then define `f <- function(x) x + 1`, and call `f(3)`. The result is 4 because the argument named `x` inside the function masks the global `x`. This is not a trick; it is the rule that makes functions reliable. Inputs should be passed as arguments, not guessed from the surrounding workspace.
 
 ## Common pitfalls
 

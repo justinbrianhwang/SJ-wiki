@@ -113,7 +113,7 @@ plants <- data.frame(
   growth = c(4.8, 5.1, 6.0, 6.4)
 )
 
-plants$group <- factor(plants$group, levels = c("control", "fertilizer"))
+plants$group \lt - factor(plants$group, levels = c("control", "fertilizer"))
 fit <- lm(growth ~ group, data = plants)
 coef(fit)
 #      (Intercept) groupfertilizer
@@ -137,7 +137,7 @@ species_mean <- tapply(iris$Petal.Length, iris$Species, mean)
 ordered_species <- names(sort(species_mean))
 
 iris2 <- iris
-iris2$Species <- factor(iris2$Species, levels = ordered_species)
+iris2$Species \lt - factor(iris2$Species, levels = ordered_species)
 
 print(species_mean)
 print(levels(iris2$Species))
@@ -151,6 +151,22 @@ boxplot(
   main = "Iris petal length by species"
 )
 ```
+
+This example orders a factor by a statistic rather than by spelling. That is often the right choice for exploratory plots because the visual order now carries information: species with smaller average petal length appear first, and species with larger average petal length appear later. The data values did not change; only the level order changed. This distinction matters because reordering a factor affects tables, model reference levels, legends, and axis order, but it does not alter the underlying observations.
+
+When categories enter a model, document the reference level before interpreting coefficients. In a treatment comparison, the reference level is often the control group. In an ordered severity scale, the lowest severity is often the baseline. If the reference is arbitrary, use `relevel()` or explicit `levels = ...` to make the choice visible. A coefficient sign can flip when the reference changes even though fitted values and group means are unchanged.
+
+Factors are also useful for preserving empty categories. If a subset contains no observations from one level, a factor can still remember that the level exists. That is helpful for consistent plots across subsets, but it can surprise summaries. Use `droplevels()` when the subset should forget unused categories, and avoid it when consistent category structure is needed.
+
+A good factor audit has three lines: `class(x)`, `levels(x)`, and `table(x, useNA = "ifany")`. The class confirms that R will treat the variable categorically. The levels show order and reference candidates. The table shows observed counts and missingness. If any of those three checks is surprising, fix the factor before plotting or modeling.
+
+For ordered factors, be precise about whether arithmetic is meaningful. The levels `"low"`, `"medium"`, and `"high"` have order, but the distance from low to medium may not equal the distance from medium to high. R can compare ordered factors, but that does not automatically make them interval-scale measurements. Choose summaries and models that match the scientific meaning of the scale.
+
+When a factor appears in several related analyses, define its levels once near the cleaning step rather than redefining them inside each plot or model. That keeps tables, plots, and coefficient interpretations consistent. It also makes intentional changes, such as switching the reference group, easy to find in the script.
+
+For review, compare a character vector and a factor side by side with `str()`. The printed labels can look similar, but the factor carries levels and class information. That extra structure is what modeling and plotting functions use to treat the variable as categorical.
+
+If the order of categories would change the story in a table or plot, set it explicitly rather than accepting a default.
 
 ## Common pitfalls
 

@@ -90,6 +90,12 @@ The fifth result is that `str` and `bytes` are different. Files opened in text m
 open("data.txt", encoding="utf-8")
 ```
 
+A sixth result is that text processing should state its assumptions. If a line is expected to have exactly three comma-separated fields, check that it does. If a label is expected to be uppercase, either normalize it with `.upper()` or reject invalid input. Silent string cleanup can be useful for user convenience, but it can also hide bad data. Decide whether the program is accepting flexible human input or enforcing a machine-readable format.
+
+A seventh result is that formatting is a separate concern from storage. A temperature may be stored as the float `21.4567`, displayed as `"21.5 C"`, and written to JSON as `21.4567`. If the program stores the displayed text, later calculations must parse it again and may lose precision. Keep raw values in appropriate types, then format at the boundary where a human reads the output.
+
+Finally, regular expressions should have names when they encode a rule. A line such as `if re.match(r"^[A-Z]\d{3}$", code):` is acceptable in a short script, but a named compiled pattern such as `SAMPLE_CODE_RE` tells future readers that the expression represents a domain rule. When a pattern becomes difficult to read, use verbose mode or split the problem into simpler string operations.
+
 ## Visual
 
 ```text
@@ -206,7 +212,6 @@ def normalize_name(text):
     parts = text.strip().split()
     return " ".join(part.capitalize() for part in parts)
 
-
 def parse_key_value_line(line):
     result = {}
     for field in line.strip().split(","):
@@ -216,7 +221,6 @@ def parse_key_value_line(line):
         result[key.strip().lower()] = value.strip()
     return result
 
-
 name = normalize_name("  ada   lovelace ")
 record = parse_key_value_line("time=10, temp=22.5, status=OK")
 
@@ -225,6 +229,12 @@ print(record)
 ```
 
 The code demonstrates whitespace normalization, splitting, joining, generator expressions, case normalization, and defensive handling of empty fields.
+
+Treat this style of parser as appropriate for controlled, simple formats. It is a good fit when the input is produced by your own script or by a small exercise. It is not a full replacement for `csv`, `json`, or a formal parser when input can contain quoting, escaping, nested structures, or user-controlled edge cases. A useful test is to write down one malformed input and decide whether the parser should reject it or clean it. If that decision matters, encode it as a test.
+
+For human names, capitalization rules are culturally complex; the function here is only a programming example, not a universal name normalizer.
+
+For text-processing exercises, keep a short list of sample inputs beside the parser: a normal case, an empty case, a case with extra whitespace, and one invalid case. These examples document the contract better than prose alone and can later become tests.
 
 ## Common pitfalls
 

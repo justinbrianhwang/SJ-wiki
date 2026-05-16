@@ -43,6 +43,12 @@ The fourth result is that strings and containers define some familiar operators 
 
 The fifth result is that equality and identity are separate questions. `==` asks whether values are equal according to their type's equality rule. `is` asks whether two names refer to the exact same object. Use `is` for `None`, singletons, and identity checks; use `==` for value equality.
 
+A sixth result is that operators are often overloaded by type, so the same symbol can express related but different ideas. `+` adds numbers, concatenates strings, concatenates lists, and can be defined by custom classes. `in` tests substring membership for strings, element membership for lists and sets, and key membership for dictionaries. This is convenient, but it means every expression should be read together with the types of the operands. If the operands are unclear, introduce intermediate names or use `type()` while debugging.
+
+A seventh result is that expressions are easier to test when they are decomposed. Consider a single long line that calculates a billing total, applies a discount, applies tax, and rounds the result. Python can evaluate it, but a reader has to reconstruct the business rule from precedence. Splitting the expression into `subtotal`, `discount`, `tax`, and `total` creates natural inspection points and test assertions. This is especially useful with floating-point arithmetic, where rounding at the wrong stage can change results.
+
+The final practical result is that boolean expressions should avoid hidden work. A condition such as `if user and user.is_active and expensive_check(user):` is valid and uses short-circuiting well: the expensive check runs only when earlier checks pass. But a condition that mutates data, reads files, or logs messages as a side effect is harder to reason about. Keep boolean expressions mostly about asking questions, not changing state. When state must change, put that step on its own line before the condition.
+
 ## Visual
 
 | Category | Operators | Example | Result |
@@ -195,13 +201,18 @@ def split_seconds(total_seconds):
     seconds = remaining % 60
     return hours, minutes, seconds
 
-
 for value in [59, 60, 3599, 3600, 3671]:
     h, m, s = split_seconds(value)
     print(f"{value:4d} seconds -> {h:02d}:{m:02d}:{s:02d}")
 ```
 
 This snippet uses arithmetic, comparison, tuple return values, and formatted strings. It is also easy to test because each input has a deterministic output.
+
+When adapting this pattern, test boundary values deliberately. For time splitting, boundaries include `0`, `59`, `60`, `3599`, and `3600`. These values reveal whether floor division and modulo are being used correctly. The same idea applies to pagination, array chunking, and unit conversion: choose examples that sit exactly on the boundary and one step to either side. Operators often fail at edges, not in the middle of ordinary-looking input.
+
+Also notice that the function raises an exception before doing arithmetic on invalid data. That is better than returning a strange value such as `None` or `-1` for a duration. Arithmetic functions should either return a valid numeric result or fail loudly with a useful message.
+
+For student exercises, write the expected arithmetic beside at least one test case. If the code says `total % 3600`, the notes should show the subtraction that produces the same remainder. This habit catches precedence mistakes and makes the program easier to review without running it.
 
 ## Common pitfalls
 

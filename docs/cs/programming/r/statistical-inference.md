@@ -40,9 +40,11 @@ Standard R inference functions include:
 
 For a one-sample t confidence interval:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 \bar{x} \pm t_{\alpha/2, n - 1}\frac{s}{\sqrt{n}}.
-\end{aligned}$$
+\end{aligned}
+$$
 
 The t test assumes independent observations and, for small samples, roughly normal data or at least no severe outliers. Two-sample t tests add assumptions about group independence and use Welch's unequal-variance version by default in R.
 
@@ -55,8 +57,8 @@ flowchart TD
   A[Research question] --> B[Identify response and groups]
   B --> C[Describe data and plot]
   C --> D{Outcome type}
-  D -->|numeric, one/two means| E[t.test]
-  D -->|numeric, 3+ groups| F[aov or kruskal.test]
+  D -->|"numeric, one/two means"| E[t.test]
+  D -->|"numeric, 3+ groups"| F[aov or kruskal.test]
   D -->|proportion| G[prop.test]
   D -->|categorical counts| H[chisq.test]
   E --> I[Check assumptions and interpret interval/p-value]
@@ -180,6 +182,18 @@ compare_two_groups <- function(df, response, group) {
 iris2 <- subset(iris, Species != "virginica")
 print(compare_two_groups(iris2, "Sepal.Length", "Species"))
 ```
+
+The helper returns both descriptive and inferential output because a test without context is incomplete. The group means, standard deviations, and counts tell the reader what the sample looks like. The t test adds an interval and p-value for a specific comparison. If the descriptive output showed a severe imbalance in sample sizes or obvious outliers, the test result would need more caution.
+
+The formula `y ~ g` inside `t.test` is a compact interface: numeric response on the left, two-level group on the right. The function uses Welch's two-sample t test by default, which does not assume equal variances. That default is often safer than the equal-variance pooled test, but it still assumes independent observations and a response scale where comparing means is meaningful.
+
+Inference code should be paired with a written claim. A good result statement includes the estimate, interval, p-value when relevant, and the population or process being discussed. For example: "In this sample, setosa had a lower mean sepal length than versicolor; the Welch interval for the difference excludes zero." That is more informative than "the result was significant."
+
+For categorical tests, inspect expected counts and the study design. A chi-square test of association is not appropriate for every table, especially with small expected counts or dependent observations. R will often warn about approximation quality, and those warnings should be treated as part of the result, not console noise.
+
+A useful inference checklist is: parameter, estimate, uncertainty, assumptions, and conclusion. The parameter says what population quantity is being discussed. The estimate says what the sample suggests. The interval or test statistic describes uncertainty. Assumptions define when the procedure is trustworthy. The conclusion translates the output back into the original question.
+
+Power and error concepts belong in planning, not only after a test. A tiny study may fail to detect an important effect. A huge study may detect a negligible effect. R can compute or simulate power for many designs, but the analyst must decide what effect size is practically meaningful. Statistical significance and practical importance should be reported separately.
 
 ## Common pitfalls
 

@@ -50,14 +50,14 @@ The z-matrix orientation matters. Rows and columns must align with the x and y v
 
 ```mermaid
 flowchart TD
-  A[Choose variables] --> B{Need extra dimension?}
-  B -->|category| C[Color, shape, panels]
-  B -->|numeric z over x-y grid| D[Contour, image, surface]
+  A[Choose variables] --> B{"Need extra dimension?"}
+  B -->|category| C["Color, shape, panels"]
+  B -->|numeric z over x-y grid| D["Contour, image, surface"]
   B -->|3D coordinates| E[Interactive 3D or projections]
   C --> F[Choose suitable palette]
   D --> F
   E --> F
-  F --> G[Annotate axes, legend, and scale]
+  F --> G["Annotate axes, legend, and scale"]
 ```
 
 ```text
@@ -164,6 +164,20 @@ plot_lm_surface <- function(fit, data, xvar, yvar, n = 50) {
 fit <- lm(mpg ~ wt + hp, data = mtcars)
 plot_lm_surface(fit, mtcars, "wt", "hp")
 ```
+
+The reusable surface function assumes that the model can predict from only `xvar` and `yvar`. That is true for `lm(mpg ~ wt + hp, data = mtcars)`, but it would not be enough for a model with additional predictors unless those predictors were fixed at reference values. This is an important modeling-graphics issue: every surface is a slice through a model, and the slice must be described.
+
+The code uses `image` plus `contour` rather than `persp` because a 2D view is often easier to read. Color shows the fitted response level, contour lines show equal fitted values, and points show where observed data exist. The observed points are crucial: they reveal whether the surface is supported by data or whether large regions are extrapolation.
+
+When plotting in higher dimensions, decide what the viewer must compare. If exact numeric values matter, a contour with labeled levels or a heat map with a legend is usually better than a tilted 3D surface. If shape and interaction are the main message, a perspective or interactive plot may help. If categories are involved, facets may be clearer than adding another color scale.
+
+Advanced graphics should still be reproducible. Store palette choices, device sizes, and grid definitions in code. Avoid manual rotation or point-and-click annotation as the only copy of an important figure unless the coordinates or view settings are saved.
+
+Color deserves particular care in higher-dimensional graphics. A palette should be perceptually ordered when it represents magnitude, and it should remain interpretable when printed or viewed by readers with color-vision differences. Avoid rainbow-like palettes for ordered data because equal numeric steps do not look like equal visual steps. Prefer palettes with a clear light-to-dark progression or a meaningful diverging midpoint.
+
+Interactive 3D plots are useful for exploration, but static notes need a stable view. If an interactive view reveals an important structure, capture the camera angle, axis labels, and color mapping in code or a written caption. Otherwise, a reader cannot reproduce what the analyst saw. Often the final report should include a 2D projection, contour, or set of facets even if interactive rotation was useful during exploration.
+
+For surfaces and contours, always state what the z-value represents. It might be a mathematical function, a fitted response, a density estimate, a residual, or an error surface. The same visual form can mean very different things depending on that definition, so captions and axis labels are part of the analysis.
 
 ## Common pitfalls
 

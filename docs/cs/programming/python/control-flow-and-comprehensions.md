@@ -77,6 +77,12 @@ The fifth result is that comprehensions are expressions, not a replacement for e
 
 The sixth result is that loop `else` exists in Python. A loop's `else` block runs only if the loop finishes without `break`. It is useful for search problems, but many teams use it sparingly because it is unfamiliar.
 
+A seventh result is that control flow should make the normal path obvious. If a function rejects invalid input, it is often clearer to return or raise early, then leave the main logic unindented. For example, a function can start with `if window <= 0: raise ValueError(...)` and then proceed with the algorithm. This keeps the successful path from being buried under several levels of nested `if` statements.
+
+An eighth result is that loops usually combine one of a few patterns: transform each item, filter items, accumulate a summary, search for one item, or coordinate side effects such as writing lines to a file. Naming the pattern helps choose the construct. Transformation and filtering often fit comprehensions. Accumulation often fits `sum`, `min`, `max`, `Counter`, or a direct loop. Searching often fits a loop with `break`, `next(...)`, or a helper function that returns as soon as the target is found.
+
+A final practical result is to keep loop bodies small enough that the iteration variable remains meaningful. When a loop body grows into several conceptual stages, extract a function. A loop such as `for row in rows: process_row(row)` is not less serious than a long inlined body; it is usually easier to test and debug. This style also improves error handling because the helper function can validate one row at a time and report which row failed.
+
 ## Visual
 
 ```mermaid
@@ -217,13 +223,14 @@ def moving_average(values, window):
         averages.append(sum(chunk) / window)
     return averages
 
-
 temperatures = [20, 22, 21, 24, 25, 23]
 print(moving_average(temperatures, 3))
 print([value for value in temperatures if value >= 23])
 ```
 
 The function uses `if` for validation, `range()` for controlled indexing, slicing to extract each window, and a comprehension to filter high readings.
+
+The example also shows a useful split between loop logic and one-line filtering. The moving average needs several steps, so a normal loop is easier to inspect. The high-temperature filter is a direct "keep values meeting this condition" operation, so the comprehension is clear. This is a good rule of thumb: use the construct that makes the shape of the work visible. If a comprehension starts needing comments, temporary variables, or exception handling, promote it back to a loop.
 
 ## Common pitfalls
 

@@ -120,7 +120,7 @@ students <- data.frame(
   score = c(91, 78, 85, 68)
 )
 
-students$passed <- students$score >= 70
+students$passed \lt - students$score >= 70
 selected <- students$passed & students$score >= 85
 
 students[selected, c("name", "section", "score")]
@@ -140,7 +140,7 @@ This example shows why data frames dominate analysis code: each variable keeps i
 
 cars <- mtcars
 cars$model <- rownames(mtcars)
-cars$cyl_group <- paste(cars$cyl, "cyl")
+cars$cyl_group \lt - paste(cars$cyl, "cyl")
 
 mpg_by_cyl <- aggregate(
   mpg ~ cyl_group,
@@ -157,6 +157,18 @@ clean_summary <- data.frame(
 
 print(clean_summary)
 ```
+
+The `aggregate` example shows why lists and data frames often meet in real code. The anonymous function returns three numbers, so `aggregate` stores those three numbers in a matrix-like column. That result is technically valid but not always convenient for reporting, so the code rebuilds it as a cleaner data frame. This is a common R pattern: a function returns a structured object, and you inspect it with `str()` before deciding how to extract or reshape the pieces you need.
+
+For data frames, prefer column names over hard-coded column positions in analysis code. `cars[, c("mpg", "wt")]` remains correct if the data frame gains a new first column, while `cars[, c(1, 2)]` may silently select the wrong variables after reordering. Positional indexing is fine for small demonstrations and matrix algebra, but named indexing is usually more robust for data analysis.
+
+Lists also explain model objects. A fitted model from `lm` is a list with components such as coefficients, residuals, fitted values, and the original call, plus a class attribute. You can extract pieces directly, but generic functions such as `coef`, `resid`, and `summary` are safer because they express the intended operation and respect the object's class.
+
+When working with data frames, keep a simple invariant in mind: columns are variables, rows are observations, and every column has the same row count. Many errors violate that invariant. A new column of the wrong length is recycled or rejected. A row filter of the wrong length can recycle. A merge or row bind can duplicate, drop, or reorder observations if keys are not understood. Checking `nrow`, `names`, and a stable identifier column after each major operation prevents quiet damage.
+
+Lists are best when pieces are related but not rectangular. A model result, an import audit, or a simulation output may naturally contain a data frame, a vector of parameters, warnings, and metadata. Do not force such objects into a data frame too early. Keep the list while components have different shapes, then extract a rectangular summary only when you know what should become rows and columns.
+
+For practice, use `str()` on every unfamiliar list or data frame before extracting from it. The structure display answers the questions that printed output hides: what are the component names, what are the column classes, how long is each piece, and whether nested objects are present. This habit makes later model objects much less intimidating.
 
 ## Common pitfalls
 

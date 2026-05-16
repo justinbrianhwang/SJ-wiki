@@ -57,12 +57,12 @@ clean_data <- readRDS("clean_data.rds")
 ```mermaid
 flowchart TD
   A[Raw file] --> B[Read with explicit function]
-  B --> C[Inspect dim, names, str, summary]
-  C --> D{Classes and missing values correct?}
+  B --> C["Inspect dim, names, str, summary"]
+  C --> D{"Classes and missing values correct?"}
   D -->|no| E[Clean and coerce deliberately]
   E --> C
   D -->|yes| F[Analyze]
-  F --> G[Write tables, RDS objects, or plots]
+  F --> G["Write tables, RDS objects, or plots"]
   G --> H[Keep raw data unchanged]
 ```
 
@@ -95,7 +95,7 @@ txt <- "id,group,response
 4,treated,6.9"
 
 dat <- read.csv(textConnection(txt), na.strings = ".")
-dat$group <- factor(dat$group, levels = c("control", "treated"))
+dat$group \lt - factor(dat$group, levels = c("control", "treated"))
 
 str(dat)
 # 'data.frame': 4 obs. of  3 variables:
@@ -178,6 +178,18 @@ C,15,ok"
 example <- read.csv(textConnection(txt), na.strings = ".")
 print(check_import(example))
 ```
+
+The checker returns a list rather than only printing text because the pieces may be useful later. `dimensions` can be compared with an expected row and column count. `report` can be written to a quality-control file. `preview` can be displayed in an interactive session. Returning structured information makes the function useful in both exploratory and scripted contexts.
+
+File import is also where reproducibility often breaks. A script that reads `"mydata.csv"` depends on the working directory; a script that reads `"data/mydata.csv"` inside an RStudio project is clearer. A script that says `na.strings = c("", "NA", ".")` documents missing-value conventions; a script that accepts defaults leaves readers guessing. If an Excel file is required, the package dependency should be visible near the top of the script, and the sheet name or sheet number should be specified.
+
+For saving, choose the format according to the next user. CSV is excellent for exchanging rectangular data with non-R tools, but it loses some R-specific classes and attributes. RDS is excellent for preserving one cleaned R object inside an R workflow. RData can save multiple objects, but it can also clutter an environment when loaded. Plot files are outputs, not data; save them from code so they can be regenerated after any change.
+
+Finally, never overwrite raw data as part of cleaning. Write cleaned data to a new file or object. That single rule makes it possible to rerun the analysis, audit decisions, and recover when a cleaning assumption changes.
+
+For larger projects, keep a small data dictionary beside the import code. It should name each column, its intended class, allowed missing codes, units, and any factor levels. The import script can then be checked against that dictionary: numeric columns should be numeric, categorical columns should have expected levels, and dates should parse without unexpected `NA`s. This is a practical way to turn informal knowledge about a file into reproducible validation.
+
+It is also useful to separate input paths and output paths. A common project layout has `data/raw`, `data/clean`, `figures`, and `results`. The exact names are less important than the separation. Raw data are read-only inputs; clean data are reproducible outputs; figures and result tables are generated artifacts. This organization makes scripts easier to rerun and reduces the chance of confusing source material with derived material.
 
 ## Common pitfalls
 

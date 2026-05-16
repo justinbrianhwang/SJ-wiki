@@ -25,10 +25,12 @@ A **vector** is an ordered collection of elements of the same atomic type. Commo
 
 The most important rule is that arithmetic between vectors works position by position. If the vectors have the same length, the rule is direct:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 (x_1, x_2, x_3) + (y_1, y_2, y_3)
 &= (x_1 + y_1, x_2 + y_2, x_3 + y_3).
-\end{aligned}$$
+\end{aligned}
+$$
 
 If one vector has length one, R recycles that single value. This is why `scores / 10` divides every score by 10. Recycling of longer unequal lengths is legal in some cases but risky; it is covered more carefully in the indexing page.
 
@@ -141,12 +143,22 @@ summary_table <- data.frame(
   maximum = vapply(mtcars[vars], max, numeric(1))
 )
 
-summary_table$range_width <- summary_table$maximum - summary_table$minimum
+summary_table$range_width \lt - summary_table$maximum - summary_table$minimum
 print(summary_table)
 
 efficient <- mtcars$mpg >= 25
 print(mtcars[efficient, c("mpg", "cyl", "hp", "wt")])
 ```
+
+The snippet contains three vector patterns that appear throughout R. First, `vapply(mtcars[vars], mean, numeric(1))` treats the selected data-frame columns as a list of numeric vectors and insists that each mean is one number. Second, `summary_table$range_width \lt - ...` creates a new column by subtracting two existing numeric vectors element by element. Third, `efficient \lt - mtcars$mpg >= 25` creates a logical vector with one value per row, and that vector selects rows from the data frame.
+
+When studying vectorized code, always ask two shape questions: what is the length of each input, and what is the length of the output? For `mtcars$mpg \gt = 25`, the input has length 32 and the output also has length 32. For `mean(mtcars$mpg)`, the input has length 32 and the output has length 1. For `mtcars[efficient, c("mpg", "cyl", "hp", "wt")]`, the row filter has length 32, and the column index has length 4, so the result is a data frame with selected rows and four columns.
+
+This shape discipline prevents many beginner mistakes. If a comparison produces one logical value, it can control an `if` statement. If it produces many logical values, it is probably a filter. If a summary produces one number, it can be stored in a table of summaries. If an arithmetic operation unexpectedly produces a warning about recycling, stop and check whether the two input lengths were intended to align.
+
+For exam-style work, practice translating sentences into vector expressions. "Cars with at least 100 horsepower" becomes `mtcars$hp \gt = 100`. "Cars with at least 100 horsepower and fewer than 6 cylinders" becomes `mtcars$hp >= 100 & mtcars$cyl < 6`. "How many?" wraps the logical vector in `sum()`. "Which values?" uses the logical vector inside brackets. This translation is the bridge from arithmetic to data analysis.
+
+Also practice predicting output type before running code. A comparison returns logical values, arithmetic returns numeric values when inputs are numeric, `paste()` returns character values, and summaries usually return shorter numeric results. If the predicted type and actual type differ, inspect coercion. Mixed vectors and imported data are common places where a numeric-looking value is actually character.
 
 ## Common pitfalls
 
