@@ -81,15 +81,52 @@ Within a closed protocol, that symmetry is often acceptable and much faster than
 ## Visual
 
 ```mermaid
-sequenceDiagram
-  participant S as Sender
-  participant R as Receiver
-  participant A as Attacker
-  S->>S: t = Mac_k(m)
-  S->>R: m, t
-  A-->>R: maybe modify m or t
-  R->>R: accept iff Vrfy_k("m,t")=1
+flowchart TB
+  subgraph HMAC["HMAC inner/outer hash structure"]
+    direction TB
+    Key["Key K padded or hashed to block size"]
+    Ipad["K xor ipad"]
+    Opad["K xor opad"]
+    Msg["Message m: arbitrary length"]
+    Inner["Inner hash: H((K xor ipad) || m)"]
+    Outer["Outer hash: H((K xor opad) || inner)"]
+    Tag["Tag t"]
+    Key --> Ipad --> Inner
+    Msg --> Inner
+    Key --> Opad --> Outer
+    Inner --> Outer --> Tag
+  end
+
+  subgraph CBCMAC["CBC-MAC fixed-length chain"]
+    direction LR
+    IV0["IV = 0"]
+    M1["m1"]
+    M2["m2"]
+    M3["m3"]
+    X1(("xor"))
+    X2(("xor"))
+    X3(("xor"))
+    F1["E_K"]
+    F2["E_K"]
+    F3["E_K"]
+    C1["state1"]
+    C2["state2"]
+    Tag2["Tag = final state"]
+    IV0 --> X1
+    M1 --> X1 --> F1 --> C1 --> X2
+    M2 --> X2 --> F2 --> C2 --> X3
+    M3 --> X3 --> F3 --> Tag2
+  end
+
+  Sender["Sender sends: m, t"] --> Verify["Receiver recomputes MAC and compares in constant time"]
+  Tag --> Sender
+  Tag2 --> Sender
+  Verify --> Accept{"Tags equal and context valid?"}
+  Accept -->|"Yes"| OK(("Accept message"))
+  Accept -->|"No"| Reject(("Reject without parsing as trusted"))
 ```
+
+This diagram shows MACs as constructions rather than just sender/receiver arrows. HMAC separates the inner and outer keyed hash domains, while CBC-MAC chains block-cipher outputs and uses the final state as the tag under fixed-length or length-protected conditions.
 
 | Construction | Message length | Main assumption | Main warning |
 |---|---|---|---|

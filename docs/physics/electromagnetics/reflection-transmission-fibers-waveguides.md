@@ -115,17 +115,38 @@ Single-mode operation is often a design goal because multiple propagating modes 
 ## Visual
 
 ```mermaid
-flowchart LR
-  A[Incident plane wave] --> B{Boundary}
-  B --> C[Reflected wave]
-  B --> D[Transmitted wave]
-  D --> E[Snell refraction]
-  C --> F[Polarization-dependent coefficient]
-  E --> G{"Guide structure?"}
-  G -->|dielectric core| H[Optical fiber]
-  G -->|metal walls| I[Rectangular waveguide modes]
-  I --> J[Cutoff and TE/TM modes]
+flowchart TB
+  Incident["Incident plane wave<br/>frequency, angle, polarization"] --> Interface["Material boundary<br/>epsilon, mu, eta, normal direction"]
+  Interface --> Boundary["boundary conditions<br/>tangential E and H continuity"]
+  Boundary --> Fresnel["Fresnel coefficients<br/>reflection and transmission depend on polarization"]
+  Fresnel --> Snell["Snell refraction<br/>phase matching along interface"]
+  Snell --> TIR{"total internal reflection possible?"}
+  TIR -- "yes" --> Evanescent["evanescent field in lower-index medium"]
+  TIR -- "no" --> Transmitted["propagating transmitted wave"]
+
+  subgraph Fiber["Dielectric fiber architecture"]
+    direction TB
+    Core["core index greater than cladding"] --> ModesF["guided modes from boundary conditions"]
+    ModesF --> Single["single-mode condition<br/>only fundamental mode propagates"]
+    ModesF --> Multi["multimode behavior<br/>modal dispersion and pulse broadening"]
+  end
+
+  subgraph Guide["Rectangular waveguide architecture"]
+    direction TB
+    PEC["metal walls impose tangential E = 0"] --> TE_TM["TE/TM mode families<br/>integers m,n set transverse pattern"]
+    TE_TM --> Cutoff["cutoff frequency f_c,mn<br/>propagates only above cutoff"]
+    Cutoff --> Dominant["dominant TE10 mode for a wider than b"]
+    Cutoff --> Dispersion["phase/group velocity and guide wavelength"]
+  end
+
+  Evanescent --> Core
+  Transmitted --> Core
+  Interface --> PEC
+  Dominant --> Output(("guided-wave model"))
+  Single --> Output
 ```
+
+This diagram separates boundary scattering from guided-wave structure. The top pipeline applies electromagnetic boundary conditions to produce Fresnel reflection, transmission, refraction, and possible evanescent fields. The fiber and rectangular-waveguide subgraphs then show how those boundary facts become modal guidance, cutoff conditions, dominant modes, and dispersion.
 
 | Phenomenon | Condition | Result |
 |---|---|---|

@@ -68,13 +68,48 @@ Error analysis should distinguish head errors from label errors. A parser may at
 ## Visual
 
 ```mermaid
-graph TD
-  ROOT("(ROOT")) -->|root| saw
-  saw -->|nsubj| I
-  saw -->|obj| dog
-  dog -->|det| the
-  dog -->|amod| brown
+flowchart TB
+  subgraph Sentence["Dependency tree for: I saw the brown dog"]
+    direction TB
+    ROOT["ROOT"]
+    Saw["saw"]
+    I["I"]
+    Dog["dog"]
+    The["the"]
+    Brown["brown"]
+    ROOT -- "root" --> Saw
+    Saw -- "nsubj" --> I
+    Saw -- "obj" --> Dog
+    Dog -- "det" --> The
+    Dog -- "amod" --> Brown
+  end
+
+  subgraph Transition["Arc-standard transition parser state"]
+    direction TB
+    State0["#quot;Stack = [ROOT"], Buffer = ["I, saw, the, brown, dog"], Arcs = {}"]
+    Shift1["SHIFT I, SHIFT saw"]
+    LeftArc["LEFT-ARC(nsubj): add saw -> I and pop I"]
+    ShiftRest["SHIFT the, SHIFT brown, SHIFT dog"]
+    ModArcs["LEFT-ARC(det), LEFT-ARC(amod): attach modifiers to dog"]
+    ObjArc["RIGHT-ARC(obj): add saw -> dog and pop dog"]
+    RootArc["RIGHT-ARC(root): add ROOT -> saw"]
+    State0 --> Shift1 --> LeftArc --> ShiftRest --> ModArcs --> ObjArc --> RootArc
+  end
+
+  subgraph GraphBased["Graph-based parser alternative"]
+    direction TB
+    Encoder["Contextual encoder for n tokens"]
+    ArcScores["Arc score tensor: heads (n+1) x modifiers n x labels"]
+    Constraint["Tree constraint: one head per token, connected, acyclic"]
+    Inference["Inference: projective DP or nonprojective MST"]
+    Encoder --> ArcScores --> Constraint --> Inference
+  end
+
+  RootArc --> Complete(("complete dependency tree"))
+  Inference --> Complete
 ```
+
+The upper tree shows the final labeled arcs, while the transition parser expands how stack, buffer, and arc set evolve until every token has a head. The graph-based branch exposes the alternative architecture: score all head-modifier-label triples, then enforce the global tree constraint with dynamic programming or maximum-spanning-tree inference.
 
 | Parser type | Search unit | Strength | Weakness |
 |---|---|---|---|

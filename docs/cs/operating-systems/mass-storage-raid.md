@@ -75,16 +75,54 @@ Storage policies should therefore be tested under both normal load and simulated
 ## Visual
 
 ```mermaid
-flowchart LR
-  App[Application read/write] --> FS[File system]
-  FS --> Cache[Buffer/page cache]
-  Cache --> Block[Block I/O layer]
-  Block --> Sched[Disk scheduler]
-  Sched --> Ctrl[Storage controller]
-  Ctrl --> Disk["(HDD / SSD / RAID)"]
+flowchart TB
+  App["Application read/write request"] --> FS["File system maps file offset to logical blocks"]
+  FS --> Cache{"Page or buffer cache hit?"}
+  Cache -- "hit" --> Done(("Return data or absorb write"))
+  Cache -- "miss or writeback" --> BIO["Block I/O request: LBA, length, read/write"]
+  BIO --> Merge["Merge adjacent requests and assign priority"]
+  Merge --> Queue["Device queue: pending LBAs"]
+
+  subgraph DiskSched["Mechanical disk scheduling example"]
+    direction LR
+    H0["Head at 53"] --> H1["65"]
+    H1 --> H2["67"]
+    H2 --> H3["37"]
+    H3 --> H4["14"]
+    H4 --> H5["98"]
+    H5 --> H6["122"]
+    H6 --> H7["124"]
+    H7 --> H8["183"]
+  end
+
+  Queue --> Policy{"Scheduling policy"}
+  Policy -- "SSTF" --> DiskSched
+  Policy -- "SCAN / LOOK" --> Sweep["Directional sweep over request cylinders"]
+  Policy -- "NVMe / SSD" --> NVMe["Batch, preserve queue depth, avoid needless writes"]
+
+  DiskSched --> Driver["Device driver issues command"]
+  Sweep --> Driver
+  NVMe --> Driver
+  Driver --> Controller["Controller cache, DMA engine, firmware queue"]
+
+  subgraph RAID5["RAID 5 stripe, four disks"]
+    direction LR
+    S0["Disk 0: data A0"]
+    S1["Disk 1: data A1"]
+    S2["Disk 2: data A2"]
+    SP["Disk 3: parity P = A0 xor A1 xor A2"]
+  end
+
+  Controller --> Media{"Storage target"}
+  Media -- "single HDD/SSD" --> Device["Physical sectors or flash pages"]
+  Media -- "array" --> RAID5
+  Device --> Interrupt["Completion interrupt or polling completion"]
+  RAID5 --> Interrupt
+  Interrupt --> Wake["Wake blocked thread and complete BIO"]
+  Wake --> Done
 ```
 
-The file system is not the final stop. Requests pass through caching, block mapping, scheduling, and controller queues before reaching storage.
+This storage-stack diagram follows a request from a file offset through cache, block I/O, scheduling, driver submission, controller execution, and completion. The disk-scheduling branch includes the SSTF head-movement order from the worked example, while the SSD/NVMe branch shows why modern devices emphasize queue depth and write behavior instead of cylinder seek distance. The RAID 5 subgraph labels data and parity placement so the storage target is not treated as a single opaque box.
 
 ## Worked example 1: SSTF disk scheduling
 

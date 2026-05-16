@@ -9,10 +9,6 @@ Advanced clustering deals with cases where the clean numeric, moderate-size, low
 
 This page extends the core clustering methods. It is especially important in data mining because real data often contain categorical attributes, millions of records, sparse text features, local subspace structure, partial labels, or multiple incompatible clusterings.
 
-![A DBSCAN diagram shows core points, border points, and noise under a density-based clustering rule.](https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/DBSCAN-Illustration.svg/500px-DBSCAN-Illustration.svg.png)
-
-*Figure: DBSCAN core, border, and noise points. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:DBSCAN-Illustration.svg), Chire, CC BY-SA 3.0.*
-
 ## Definitions
 
 **Categorical clustering** groups records whose attributes are symbols rather than numeric values. Since arithmetic means are not defined, algorithms use modes, medoids, matching similarity, entropy, or probabilistic categorical models.
@@ -54,21 +50,39 @@ A **cluster ensemble** combines multiple clusterings into a consensus clustering
 ## Visual
 
 ```mermaid
-flowchart LR
-  A[Advanced clustering problem] --> B{Data challenge}
-  B -->|categorical| C["k-modes, entropy, medoids"]
-  B -->|massive| D["sampling, summaries, scalable passes"]
-  B -->|high dimensional| E[subspace or projected clustering]
-  B -->|partial labels| F[semi-supervised constraints]
-  B -->|unstable solutions| G[cluster ensembles]
-  B -->|human insight| H[visual or interactive steering]
-  C --> I[Validate against task]
-  D --> I
-  E --> I
-  F --> I
-  G --> I
-  H --> I
+flowchart TB
+  X["Point x_i in feature space"] --> Region["epsilon-neighborhood N_eps(x_i)"]
+  Region --> Count{"|#quot;N_eps(x_i)#quot;| >= MinPts?"}
+  Count -- "yes" --> Core["Core point: can expand a cluster"]
+  Count -- "no, within eps of a core" --> Border["Border point: assigned but does not expand"]
+  Count -- "no, not density-reachable" --> Noise["Noise/outlier"]
+
+  Core --> Seed["Create or extend seed queue"]
+  Seed --> Pop["Pop unvisited neighbor y"]
+  Pop --> Visit{"Has y been visited?"}
+  Visit -- "no" --> Query["Range query N_eps(y)"]
+  Query --> IsCore{"|#quot;N_eps(y)#quot;| >= MinPts?"}
+  IsCore -- "yes" --> Merge["Add y's neighbors to seed queue"]
+  IsCore -- "no" --> Assign["Assign y as border if reachable"]
+  Merge --> Pop
+  Assign --> Pop
+  Visit -- "yes" --> Pop
+  Pop --> Done{"Seed queue empty?"}
+  Done -- "no" --> Pop
+  Done -- "yes" --> Cluster(("Density-connected cluster complete"))
+
+  subgraph Scalable["Scalable and high-dimensional adaptations"]
+    direction TB
+    CF["BIRCH-style cluster features: N, LS, SS"]
+    Subspace["Subspace/projected clustering: cluster-specific relevant dimensions"]
+    Constraints["Must-link and cannot-link constraints"]
+    Ensemble["Co-association matrix for cluster ensembles"]
+  end
+
+  Cluster -. "summaries or constraints can replace raw expansion in advanced settings" .-> Scalable
 ```
+
+This DBSCAN-centered diagram makes density reachability explicit. A point becomes core, border, or noise from the `epsilon` range query and `MinPts` count, and clusters grow by repeatedly expanding core-neighborhood seed queues. The scalable/high-dimensional side branch connects the same clustering problem to summaries, subspaces, constraints, and ensembles that the advanced chapter discusses.
 
 | Challenge | Why basic k-means struggles | Typical adaptation |
 |---|---|---|

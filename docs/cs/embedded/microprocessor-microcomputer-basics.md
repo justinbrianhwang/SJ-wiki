@@ -9,10 +9,6 @@ A microprocessor is a programmable digital processing unit: it fetches instructi
 
 A microcomputer is the useful system built around the microprocessor. It includes memory, input/output circuits, clocks, reset circuitry, bus drivers, and the program that coordinates them. The important distinction is that a microprocessor such as the 8085 is mainly a CPU chip, while a microcontroller such as the 8051 also places RAM, ROM, timers, ports, and serial hardware on the same chip. The whole subject is about learning where each function lives and how software makes the hardware move in the required order.
 
-![A photograph shows an Intel C8085AH microprocessor chip package.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Intel_C8085AH.jpg/500px-Intel_C8085AH.jpg)
-
-*Figure: Intel C8085AH microprocessor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_C8085AH.jpg), Thomas Nguyen, CC BY-SA 4.0.*
-
 ## Definitions
 
 A **microprocessor** is an integrated circuit that contains the arithmetic logic unit, control unit, internal registers, and bus interface needed to execute instructions. It does not, by itself, include a complete user system. The classic 8085 is an 8-bit microprocessor: its main data operations are 8 bits wide, while its address bus is 16 bits wide.
@@ -54,19 +50,43 @@ Finally, the stored-program idea is central: instructions and data are both bina
 ## Visual
 
 ```mermaid
-graph LR
-  Clock[Clock and reset] --> CPU[Microprocessor CPU]
-  CPU -->|address bus| Decode[Address decoder]
-  Decode --> ROM[Program ROM]
-  Decode --> RAM[Data RAM]
-  Decode --> IO[I/O interface]
-  ROM -->|data bus| CPU
-  RAM <-->|data bus| CPU
-  IO <-->|data bus| CPU
-  CPU -->|"RD, WR, status"| ROM
-  CPU -->|"RD, WR, status"| RAM
-  CPU -->|"RD, WR, status"| IO
+flowchart TB
+  Clock["Clock and reset circuit"] --> Sequencer["Control unit and instruction sequencer"]
+  Sequencer --> Fetch["Fetch opcode from memory at PC"]
+  Fetch --> Decode["Instruction decoder generates control signals"]
+  Decode --> Execute["Execute: register transfer, ALU op, memory/I/O access, or branch"]
+  Execute --> Fetch
+
+  subgraph CPU["Microprocessor CPU chip"]
+    direction TB
+    PC["Program counter: next instruction address"]
+    IR["Instruction register"]
+    Regs["Register file: accumulator, general registers, SP"]
+    ALU["ALU and flags"]
+    BusIF["Bus interface: address, data, control"]
+    PC --> BusIF
+    BusIF --> IR
+    IR --> Decode
+    Regs --> ALU
+    ALU --> Regs
+  end
+
+  subgraph SystemBus["External microcomputer bus"]
+    direction TB
+    Addr["Address bus selects location"]
+    Data["Data bus transfers opcode/data byte"]
+    Ctrl["Control bus: RD, WR, IO/M, interrupt, READY"]
+  end
+
+  BusIF --> SystemBus
+  SystemBus --> Decoder["Address decoder and chip select logic"]
+  Decoder --> ROM["Program ROM/EPROM"]
+  Decoder --> RAM["Data RAM and stack"]
+  Decoder --> IO["I/O interface or peripheral chip"]
+  IO --> Devices["Switches, LEDs, ADC/DAC, keyboard, display"]
 ```
+
+This microcomputer diagram expands the stored-program cycle into CPU blocks and external system buses. The PC, instruction register, decoder, register file, ALU, flags, and bus interface cooperate on every fetch-decode-execute cycle, while address, data, and control buses connect the chip to ROM, RAM, and I/O. The decoder and control signals make clear why a microprocessor alone is not a complete embedded system.
 
 | Concept | 8085-style microprocessor system | 8051-style microcontroller system |
 |---|---|---|

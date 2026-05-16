@@ -65,17 +65,60 @@ In short, AEAD security is a contract among the primitive, nonce allocation, tag
 ## Visual
 
 ```mermaid
-flowchart LR
-  A[Associated data A] --> T[MAC / GHASH]
-  M[Message m] --> E[CTR encryption]
-  N[Nonce N] --> E
-  N --> T
-  E --> C[Ciphertext c]
-  C --> T
-  T --> G[Tag t]
-  C --> OUT["(#quot;c,t#quot;)"]
-  G --> OUT
+flowchart TB
+  K["AES key K"]
+  N["Nonce N, unique per key"]
+  A["Associated data A: authenticated but not encrypted"]
+  M["Plaintext blocks M1..Mn"]
+
+  subgraph CTR["CTR encryption path"]
+    direction TB
+    J0["Initial counter block J0 from nonce"]
+    Ctr1["inc32(J0)"]
+    Ctr2["inc32(J0)+1"]
+    S1["S1 = E_K(ctr1)"]
+    S2["S2 = E_K(ctr2)"]
+    Xor1(("xor"))
+    Xor2(("xor"))
+    C1["C1 = M1 xor S1"]
+    C2["C2 = M2 xor S2"]
+    J0 --> Ctr1 --> S1 --> Xor1 --> C1
+    J0 --> Ctr2 --> S2 --> Xor2 --> C2
+    M --> Xor1
+    M --> Xor2
+  end
+
+  subgraph Auth["GHASH authentication path"]
+    direction TB
+    H["Hash subkey H = E_K(0^128)"]
+    Blocks["GHASH input: A blocks || C blocks ||#quot; len(A) #quot;|| len(C)"]
+    Mul["Polynomial multiplication in GF(2^128)"]
+    S["Authentication accumulator S"]
+    Mask["Tag mask E_K(J0)"]
+    TagXor(("xor"))
+    T["Tag t = S xor E_K(J0)"]
+    H --> Mul
+    Blocks --> Mul --> S --> TagXor --> T
+    Mask --> TagXor
+  end
+
+  K --> H
+  K --> S1
+  K --> S2
+  K --> Mask
+  N --> J0
+  A --> Blocks
+  C1 --> Blocks
+  C2 --> Blocks
+  C1 --> Out["Output: nonce, ciphertext, tag"]
+  C2 --> Out
+  T --> Out
+
+  Out --> Verify["Decrypt only after recomputing GHASH and checking tag"]
+  Verify --> Plain(("Plaintext or reject"))
 ```
+
+This diagram breaks AES-GCM into its two coupled paths: CTR mode encrypts plaintext with AES-derived keystream blocks, and GHASH authenticates associated data, ciphertext, and lengths. The tag is the GHASH accumulator masked by `E_K(J0)`, so nonce uniqueness and verify-before-release behavior are part of the security contract.
 
 | Composition | Receiver order | Typical status | Main risk |
 |---|---|---|---|

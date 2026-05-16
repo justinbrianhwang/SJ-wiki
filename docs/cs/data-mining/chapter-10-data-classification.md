@@ -9,10 +9,6 @@ Data classification learns a model from labeled examples and uses it to assign l
 
 This page covers the core classification toolkit. The advanced page covers multiclass learning, rare classes, scalability, regression, semi-supervised learning, active learning, and ensembles.
 
-![A confusion matrix diagram shows true positives, true negatives, false positives, and false negatives in a contingency table.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/ConfusionMatrix.png/500px-ConfusionMatrix.png)
-
-*Figure: Confusion matrix for classification evaluation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ConfusionMatrix.png), Jackverr, CC BY-SA 3.0.*
-
 ## Definitions
 
 A **training set** consists of pairs $(X_i,y_i)$, where $X_i$ is a feature vector and $y_i$ is a class label.
@@ -76,22 +72,75 @@ $$
 ## Visual
 
 ```mermaid
-flowchart TD
-  A[Labeled data] --> B[Feature selection and preprocessing]
-  B --> C{Model family}
-  C -->|interpretable splits| D[Decision tree]
-  C -->|if-then logic| E[Rule classifier]
-  C -->|probabilities| F[Naive Bayes]
-  C -->|margin| G[SVM]
-  C -->|nonlinear representation| H[Neural network]
-  C -->|local examples| I[kNN]
-  D --> J[Validation]
-  E --> J
-  F --> J
-  G --> J
-  H --> J
-  I --> J
+flowchart TB
+  Data["#quot;Training table X: [N x d"] with labels y: [N]"] --> Split["Train/validation/test split before fitting preprocessing"]
+  Split --> Prep["Fit preprocessing on train only: imputation, scaling, encoding, feature selection"]
+  Prep --> Family{Choose model family and supervision objective}
+
+  subgraph Tree["Decision-tree path"]
+    direction TB
+    T0["Node data with class counts"]
+    T1["Evaluate candidate feature tests by information gain or Gini reduction"]
+    T2["Split into child nodes; recurse until stopping rule"]
+    T3["Leaf predicts class distribution"]
+    T0 --> T1 --> T2 --> T3
+  end
+
+  subgraph NB["Naive Bayes path"]
+    direction TB
+    NB0["Estimate priors P(y)"]
+    NB1["Estimate likelihoods P(x_j | y) with smoothing"]
+    NB2["Score classes: log P(y) + sum_j log P(x_j | y)"]
+    NB3["Predict argmax score or calibrated posterior"]
+    NB0 --> NB1 --> NB2 --> NB3
+  end
+
+  subgraph SVM["SVM maximum-margin path"]
+    direction TB
+    SVP["Positive support vectors on margin w*x + b = +1"]
+    Boundary["Decision boundary w*x + b = 0"]
+    SVN["Negative support vectors on margin w*x + b = -1"]
+    Margin["Margin width = 2 / ||w||"]
+    Soft["Soft-margin hinge loss with penalty C for violations"]
+    Kernel["Optional kernel K(x_i, x_j) for nonlinear feature space"]
+    SVP --> Boundary
+    SVN --> Boundary
+    Boundary --> Margin --> Soft --> Kernel
+  end
+
+  subgraph NN["Neural-network path"]
+    direction TB
+    N0["Dense or task-specific layers"]
+    N1["Nonlinear activations"]
+    N2["Loss: cross-entropy or cost-weighted variant"]
+    N3["Backpropagation and optimizer update weights"]
+    N0 --> N1 --> N2 --> N3
+  end
+
+  subgraph KNN["k-nearest-neighbor path"]
+    direction TB
+    K0["Store scaled training examples"]
+    K1["At query, compute distances to examples"]
+    K2["Select k nearest neighbors"]
+    K3["Vote or distance-weighted vote"]
+    K0 --> K1 --> K2 --> K3
+  end
+
+  Family --> Tree
+  Family --> NB
+  Family --> SVM
+  Family --> NN
+  Family --> KNN
+  Tree --> Eval["Validation: metrics, threshold, calibration, error analysis"]
+  NB --> Eval
+  SVM --> Eval
+  NN --> Eval
+  KNN --> Eval
+  Eval --> Test["Final untouched test estimate"]
+  Test --> Deployed("(#quot;classifier f(x") with documented preprocessing contract"))
 ```
+
+The classification diagram makes preprocessing, model-family internals, and validation part of one deployable system instead of treating the classifier as a black box. The SVM branch includes the decision boundary, the two margin hyperplanes, support vectors, soft-margin violations, and the kernel option; the other branches expose their own sufficient statistics, split criteria, parameters, or stored examples.
 
 | Classifier | Strength | Main hyperparameters | Good first use |
 |---|---|---|---|

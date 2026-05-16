@@ -80,14 +80,40 @@ When teaching or debugging these models, always draw the trellis. The trellis ma
 ## Visual
 
 ```mermaid
-flowchart LR
-  W1[Janet] --> Y1[NNP]
-  W2[will] --> Y2[MD]
-  W3[back] --> Y3[VB]
-  W4[the] --> Y4[DT]
-  W5[bill] --> Y5[NN]
-  Y1 --> Y2 --> Y3 --> Y4 --> Y5
+flowchart TB
+  Tokens["Observed tokens w_1..w_T"] --> Feats["Feature extraction: word shape, suffix, capitalization, context, neural state"]
+
+  subgraph Chain["Linear-chain HMM/CRF factor graph"]
+    direction LR
+    Start["START"] --> Y1["y_1"]
+    Y1 --> Y2["y_2"]
+    Y2 --> Y3["y_3"]
+    Y3 --> YT["y_T"]
+    Y1 --- O1["w_1 features"]
+    Y2 --- O2["w_2 features"]
+    Y3 --- O3["w_3 features"]
+    YT --- OT["w_T features"]
+  end
+
+  Feats --> O1
+  Feats --> O2
+  Feats --> O3
+  Feats --> OT
+
+  subgraph Trellis["Viterbi trellis"]
+    direction TB
+    V1["v_t(k): best score ending in tag k at position t"]
+    Rec["v_t(k) = max_j v_(t-1)(j) + transition(j,k) + emission/feature score(k,t)"]
+    Back["Backpointer stores best previous tag j"]
+    V1 --> Rec
+    Rec --> Back
+  end
+
+  Chain --> Trellis
+  Back --> Decode(("Best tag sequence y_1..y_T"))
 ```
+
+This sequence-labeling diagram shows the chain structure and the dynamic-programming decoder. Observed token features connect to each position, adjacent tags contribute transition scores, and Viterbi stores the best score ending in each tag plus a backpointer. The recurrence makes the `O(TK^2)` computation visible: every tag at position `t` considers every previous tag.
 
 | Model | Probability modeled | Features | Decoding | Main weakness |
 |---|---|---|---|---|

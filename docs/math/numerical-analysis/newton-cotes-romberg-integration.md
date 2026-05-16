@@ -79,13 +79,27 @@ For study purposes, the most useful habit is to separate four layers: the contin
 | Romberg | nested trapezoids | increases by column | high for smooth functions | smooth non-singular integrands |
 
 ```mermaid
-graph TD
-  A["Composite trapezoid T(h)"] --> B["Refine to T(h/2)"]
-  B --> C[Cancel h squared error]
-  C --> D[Refine again]
-  D --> E[Cancel h fourth error]
-  E --> F[Romberg table estimate]
+flowchart TB
+  Integral["#quot;Integral on [a,b"]<br/>choose panel count and tolerance"] --> Base{"Newton-Cotes rule"}
+  Base -- "trapezoid" --> Trap["composite trapezoid T(h)<br/>endpoint-weighted panels"]
+  Base -- "Simpson" --> Simp["composite Simpson<br/>pairs of panels, even subinterval count"]
+  Base -- "midpoint" --> Mid["composite midpoint<br/>open panel centers"]
+
+  Trap --> Refine["halve h<br/>reuse old function values and add new midpoints"]
+  Refine --> T2["T(h/2)"]
+  T2 --> R11["Richardson extrapolation<br/>R(1,1) = T(h/2) + (T(h/2)-T(h))/3"]
+  R11 --> More{"need higher accuracy?"}
+  More -- "yes" --> Table["Romberg table<br/>R(k,j) cancels next even-power error term"]
+  Table --> Conv{"successive entries stable?"}
+  Conv -- "no" --> Refine
+  Conv -- "yes" --> Estimate["report Romberg estimate and error indicator"]
+  More -- "no" --> Estimate
+  Simp --> Estimate
+  Mid --> Estimate
+  Estimate --> Result(("integral estimate"))
 ```
+
+This integration diagram shows Newton-Cotes rules as panel-based approximations and Romberg integration as a nested refinement controller. The trapezoid path explicitly reuses function values after halving $h$, then Richardson extrapolation cancels the leading even-power error terms. The stability check on the Romberg table is the diagnostic that decides whether more refinement is justified.
 
 ## Worked example 1: trapezoidal and Simpson rules for $x^2$
 

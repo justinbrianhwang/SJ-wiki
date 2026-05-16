@@ -151,24 +151,56 @@ Small-scale demonstrations have validated pieces of the stack. Delft/QuTech expe
 
 ```mermaid
 flowchart LR
-  A["Alice"] --- L1["Link 0"]
-  L1 --- R1["Repeater 1"]
-  R1 --- L2["Link 1"]
-  L2 --- R2["Repeater 2"]
-  R2 --- L3["Link 2"]
-  L3 --- R3["Repeater 3"]
-  R3 --- L4["Link 3"]
-  L4 --- B["Bob"]
-  R1 --> S1["Swap"]
-  R2 --> S1
-  R2 --> S2["Swap"]
-  R3 --> S2
-  S1 --> N1["Longer pair"]
-  S2 --> N2["Longer pair"]
-  N1 --> F["Final swap"]
-  N2 --> F
-  F --> AB["End-to-end entanglement"]
+  subgraph BDCZ["BDCZ nested repeater"]
+    direction TB
+    A["Alice memory"] --- L0["elementary link<br/>heralded pair"]
+    L0 --- R1["Repeater R1<br/>two memories"]
+    R1 --- L1["elementary link<br/>heralded pair"]
+    L1 --- R2["Repeater R2<br/>two memories"]
+    R2 --- L2["elementary link<br/>heralded pair"]
+    L2 --- R3["Repeater R3<br/>two memories"]
+    R3 --- L3["elementary link<br/>heralded pair"]
+    L3 --- B["Bob memory"]
+    L0 --> D01["optional purification<br/>consume raw pairs -> higher F"]
+    L1 --> D12["optional purification<br/>local bilateral gates + compare bits"]
+    L2 --> D23["optional purification<br/>raise link fidelity"]
+    L3 --> D34["optional purification<br/>raise link fidelity"]
+    D01 --> S1["swap at R1<br/>Bell measurement"]
+    D12 --> S1
+    D23 --> S2["swap at R3<br/>Bell measurement"]
+    D34 --> S2
+    S1 --> P02["longer pair A-R2<br/>Pauli frame recorded"]
+    S2 --> P24["longer pair R2-B<br/>Pauli frame recorded"]
+    P02 --> SF["final swap at R2"]
+    P24 --> SF
+    SF --> AB["end-to-end pair A-B<br/>fidelity F_AB, rate R_AB"]
+  end
+
+  subgraph DLCZ["DLCZ memory-based link"]
+    direction TB
+    E1["ensemble 1<br/>collective ground state"] --> W1["weak write pulse<br/>rare spin-wave + Stokes photon"]
+    E2["ensemble 2<br/>collective ground state"] --> W2["weak write pulse<br/>rare spin-wave + Stokes photon"]
+    W1 --> BS["Stokes photons interfere<br/>beamsplitter + detector click"]
+    W2 --> BS
+    BS --> Herald["single click heralds<br/>entangled spin waves"]
+    Herald --> Read["read pulse<br/>spin wave -> photon"]
+    Read --> SwapD["photonic Bell measurement<br/>extend entanglement"]
+  end
+
+  subgraph Photonic["All-photonic repeater"]
+    direction TB
+    GSrc["large photonic graph-state source<br/>loss-tolerant encoded clusters"] --> Mux["multiplexing and switching<br/>choose surviving modes"]
+    Mux --> Fusion["fusion / Bell measurements<br/>linear optics + feed-forward"]
+    Fusion --> Enc["encoded logical link<br/>loss tolerance without long-lived memory"]
+    Enc --> End["end-to-end entanglement<br/>high photon overhead"]
+  end
+
+  Herald -. "classical herald" .-> D01
+  SwapD -. "module primitive" .-> S1
+  End -. "alternate architecture" .-> AB
 ```
+
+The repeater diagram compares three architectures in one place. The BDCZ block shows elementary links, optional purification, nested Bell-measurement swaps, and Pauli-frame propagation toward an end-to-end Bell pair; the DLCZ block expands one memory-based elementary link into write pulses, Stokes-photon interference, heralded spin waves, and readout. The all-photonic block shows the different tradeoff: large graph states and feed-forward reduce long-lived memory dependence but move the difficulty into source scale, loss tolerance, and switching.
 
 | Repeater family | Main resource | Strength | Main bottleneck |
 |---|---|---|---|

@@ -43,18 +43,50 @@ The practical map is to classify each cryptographic use by what quantum algorith
 
 ```mermaid
 flowchart TD
-  A["Cryptographic use"] --> B{"Primitive type"}
-  B --> C["RSA, DH, ECDH, ECDSA, DSA"]
-  B --> D["AES, ChaCha20, SHA-2, SHA-3"]
-  B --> E["Key distribution link"]
-  C --> F["Shor risk: replace with PQC"]
-  D --> G["Grover risk: increase security margin"]
-  E --> H["QKD possible for specialized hardware links"]
-  F --> I["ML-KEM for key establishment"]
-  F --> J["ML-DSA or SLH-DSA for signatures"]
-  G --> K["AES-256 and large hash outputs"]
-  H --> L["Still needs authentication and operations"]
+  Use["cryptographic use in system<br/>session, certificate, firmware, archive, VPN, device identity"] --> Class{"primitive class?"}
+
+  subgraph PublicKey["Public-key exposure"]
+    direction TB
+    Class -->|"RSA, DH, ECDH, ECDSA, DSA"| Shor["Shor-capable adversary<br/>factoring or discrete log breaks assumption"]
+    Shor --> Split{"role in protocol?"}
+    Split -->|"key establishment"| KEM["replace or hybridize with KEM<br/>ML-KEM now, HQC later for diversity"]
+    Split -->|"signature"| SIG["replace signature scheme<br/>ML-DSA, SLH-DSA, future FN-DSA"]
+    KEM --> HN["harvest-now risk reduced<br/>protect long-lived confidentiality"]
+    SIG --> Auth["authentication migration<br/>certificates, firmware, package signing"]
+  end
+
+  subgraph Symmetric["Symmetric and hash exposure"]
+    direction TB
+    Class -->|"AES, ChaCha20, SHA-2, SHA-3"| Grover["Grover-style search<br/>quadratic brute-force speedup"]
+    Grover --> Margin["increase margin where needed<br/>AES-256, large hash outputs"]
+    Margin --> HashCaveat["separate collision/preimage goals<br/>do not apply one rule blindly"]
+  end
+
+  subgraph QKD["Quantum key-distribution option"]
+    direction TB
+    Class -->|"specialized key-distribution link"| Link["QKD physical link<br/>quantum channel + authenticated classical channel"]
+    Link --> Trust["device and node trust model<br/>BB84, MDI, E91, trusted relay"]
+    Trust --> Ops["operations still required<br/>authentication, key management, monitoring"]
+  end
+
+  subgraph Migration["Migration architecture"]
+    direction LR
+    Inv["crypto inventory<br/>where primitives are used"] --> Life["data lifetime and exposure score"]
+    Life --> Target["target state<br/>PQC, hybrid, larger symmetric, or QKD"]
+    Target --> Test["interoperability and side-channel testing"]
+    Test --> Roll["staged rollout<br/>telemetry and rollback"]
+    Roll --> Retire["retire quantum-vulnerable algorithms"]
+    Retire --> Monitor["monitor standards and cryptanalysis"]
+    Monitor -. "crypto agility" .-> Target
+  end
+
+  HN --> Inv
+  Auth --> Inv
+  HashCaveat --> Inv
+  Ops --> Inv
 ```
+
+This diagram classifies a cryptographic use by the quantum algorithm that changes its security assumption, then routes it into a migration architecture. The public-key branch separates key establishment from signatures because confidentiality and authentication migrate on different clocks, while the symmetric branch shows Grover as a margin problem rather than a total break. The QKD branch is deliberately tied back to authentication and operations so it is not mistaken for a general replacement for PQC.
 
 | Area | Classical baseline | Main quantum impact | Typical response |
 |---|---|---|---|

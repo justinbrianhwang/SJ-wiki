@@ -152,16 +152,19 @@ Duality is another useful guide. Narrow signals in time tend to have broad spect
 
 ```mermaid
 flowchart LR
-  A["x(t)"] --> B[CTFT]
-  B --> C["X(j omega)"]
-  D["h(t)"] --> E[CTFT]
-  E --> F["H(j omega)"]
-  C --> G[Multiply spectra]
-  F --> G
-  G --> H["Y(j omega)"]
-  H --> I[Inverse CTFT]
-  I --> J["y(t)=x*h"]
+  Xtime["input x(t)<br/>units in time domain"] --> Xint["analysis integral<br/>X(jw)=integral x(t)e^(-jwt)dt"]
+  Htime["impulse response h(t)<br/>LTI system"] --> Hint["analysis integral<br/>H(jw)=integral h(t)e^(-jwt)dt"]
+  Xint --> Xspec["spectrum X(jw)<br/>amplitude, phase, bandwidth"]
+  Hint --> Hspec["frequency response H(jw)<br/>gain and phase by frequency"]
+  Xspec --> Mult["multiply spectra<br/>Y(jw)=X(jw)H(jw)"]
+  Hspec --> Mult
+  Mult --> Inv["inverse CTFT<br/>1/(2pi) integral Y(jw)e^(jwt)dw"]
+  Inv --> Ytime["output y(t)<br/>same as convolution x*h"]
+  Ytime --> Check["check convention, 2pi factors, and units"]
+  Check --> Out(("time-domain output"))
 ```
+
+This CTFT diagram shows the parallel analysis of an input signal and an LTI impulse response, followed by spectral multiplication and inverse synthesis. The shape transition is conceptual: time-domain functions become continuous spectra indexed by angular frequency, then return to a time-domain output. The convention check is explicit because $2\pi$ factors and units are the most common source of otherwise-correct transform errors.
 
 ## Worked example 1: transform of a decaying exponential
 

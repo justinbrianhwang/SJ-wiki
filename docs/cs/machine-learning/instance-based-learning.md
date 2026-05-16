@@ -9,10 +9,6 @@ Instance-based learning postpones generalization until a query arrives. Instead 
 
 The central idea is locality. If similar instances tend to have similar target values, then nearby training examples are useful evidence. This is simple and powerful, but it makes the choice of distance metric, feature scaling, and local weighting extremely important.
 
-![A nearest-neighbor classification diagram shows a query point classified by nearby labeled examples.](https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/KnnClassification.svg/500px-KnnClassification.svg.png)
-
-*Figure: Example of k-nearest-neighbor classification. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:KnnClassification.svg), Antti Ajanki, CC BY-SA 3.0.*
-
 ## Definitions
 
 The k-nearest neighbor algorithm stores all training examples. To classify a query $x_q$, it finds the $k$ training examples closest to $x_q$ and predicts by majority vote:
@@ -96,25 +92,40 @@ When the distance notion is wrong, storing more examples can simply make the lea
 
 ## Visual
 
-```text
-Feature space around query q
+```mermaid
+flowchart TB
+  Train["#quot;Training examples X: [N x d"], labels or targets y"] --> Scale["Fit scaling and metric parameters on training data"]
+  Scale --> Store["Store examples in memory or nearest-neighbor index"]
+  Query["#quot;Query point x_q: [d"]"] --> QScale["Apply the same scaling and feature mapping"]
+  QScale --> Dist["Compute distances d(x_q, x_i)"]
+  Store --> Dist
+  Dist --> Rank["Rank examples by distance"]
+  Rank --> Neigh["Neighborhood N_k(x_q): k nearest examples"]
 
-       x2
-        ^
-        |
-   A    |       B
-        |    o
-        |       o
-        | q *
-        |    o
-   A    | o
-        +-----------------> x1
+  subgraph Vote["Classification or regression output"]
+    direction TB
+    ClassVote["Class vote: argmax_y sum I(y_i = y)"]
+    Weighted["Distance-weighted vote or average with weights 1 / (d^2 + eps)"]
+    LocalFit["Locally weighted regression: fit local model around x_q"]
+    Neigh --> ClassVote
+    Neigh --> Weighted
+    Neigh --> LocalFit
+  end
 
-Nearest points around q vote or fit a local model.
-Farther points may be ignored or down-weighted.
+  subgraph Capacity["Bias-variance controls"]
+    direction TB
+    SmallK["Small k or narrow bandwidth: low bias, high variance"]
+    LargeK["Large k or wide bandwidth: higher bias, lower variance"]
+    Metric["Feature scaling and metric choose what counts as nearby"]
+    SmallK --> Metric
+    LargeK --> Metric
+  end
+
+  Vote --> Output(("prediction for x_q"))
+  Capacity -. "controls neighborhood shape" .-> Neigh
 ```
 
-The figure emphasizes that the model used for $q$ is built from the neighborhood of $q$, not from a single global partition learned in advance.
+This lazy-learning diagram shows the runtime path from stored training examples through query scaling, distance computation, neighbor selection, and the final vote or local regression. The dotted capacity branch makes the bias-variance tradeoff explicit: `k`, bandwidth, feature scaling, and metric choice determine which points are treated as local evidence for `x_q`.
 
 ## Worked example 1: k-NN classification
 

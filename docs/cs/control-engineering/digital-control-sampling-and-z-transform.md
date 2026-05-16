@@ -116,29 +116,32 @@ Then test it.
 
 ## Visual
 
-```text
-z-plane stability
-
-        Im
-         ^
-     .---|---.
-   .'    |    '.
-  /      |      \
- |       +-------> Re
-  \             /
-   '.       .'
-     '-----'
-
-stable poles are inside the unit circle
+```mermaid
+flowchart LR
+  R["Continuous reference r(t)"] --> SamplerR["#quot;Sampler: r[n"] = r(nT)"]
+  SamplerR --> Sum(("Σ"))
+  Yfb["#quot;Digital feedback y[n"]"] -->|"negative input"| Sum
+  Sum --> E["#quot;Error sequence e[n"]"]
+  E --> Delay["Computation / scheduling delay: z^-d"]
+  Delay --> Dz["Digital controller D(z): difference equation"]
+  Dz --> QuantU["DAC/PWM quantization"]
+  QuantU --> ZOH["Zero-order hold: u(t) held over [nT, (n+1)T)"]
+  ZOH --> Plant["Continuous plant G_p(s)"]
+  Dist["Disturbance d(t)"] --> Plant
+  Plant --> Y["Continuous output y(t)"]
+  Y --> AntiAlias["Anti-alias filter"]
+  AntiAlias --> ADC["ADC sampler + quantizer"]
+  ADC --> Yfb
+  Clock["Sampling clock period T"] -. "sets update instants" .-> SamplerR
+  Clock -. "sets update instants" .-> ADC
+  Clock -. "sets hold interval" .-> ZOH
+  Dz --> ZPlane["z-plane model: poles must lie inside the unit circle"]
+  Plant --> Mapping["Exact pole mapping for sampled modes: z = exp(sT)"]
+  ZPlane --> Output(("Sampled-data closed-loop response"))
+  Mapping --> Output
 ```
 
-| Digital block | Role | Main modeling issue |
-|---|---|---|
-| A/D converter | samples measured output | quantization and sampling rate |
-| digital computer | computes control law | delay and finite word length |
-| D/A converter | outputs command value | quantization |
-| zero-order hold | holds command between samples | hold-induced phase lag |
-| continuous plant | physical process | must be discretized or modeled with hold |
+This diagram shows the sampled-data loop with the sampler, digital controller, computation delay, DAC/PWM quantization, zero-order hold, continuous plant, anti-alias filter, and ADC feedback all in the signal path. The shape transition is explicit: continuous signals `r(t)` and `y(t)` become sequences `r[n]`, `e[n]`, and `y[n]`, while the hold converts the digital command back into a piecewise-constant continuous input.
 
 ## Worked example 1: mapping continuous poles to the z-plane
 

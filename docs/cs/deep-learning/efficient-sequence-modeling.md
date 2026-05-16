@@ -28,18 +28,116 @@ $$
 The problem is not only asymptotic notation. Doubling the context length quadruples the number of attention scores during training. At decode time, a long KV cache consumes memory bandwidth and reduces batch size. Efficient alternatives try to preserve enough of attention's strengths while changing one or more of these costs.
 
 ```mermaid
-flowchart LR
-  X[Token sequence] --> A[Full attention]
-  X --> C[Long convolution]
-  X --> R[Recurrent summary]
-  X --> S[State-space scan]
-  X --> H[Hybrid attention plus recurrence]
-  A --> A2["Direct pairwise access, O(T^2)"]
-  C --> C2["Global filters, O(T log T)"]
-  R --> R2["Fixed state, O(T)"]
-  S --> S2["Selective fixed state, O(T)"]
-  H --> H2[Bounded cache plus compressed memory]
+flowchart TB
+  X["#quot;Input sequence x: [N, T, d_model"]"] --> Norm["RMSNorm"]
+  Norm --> Expand["Input projection expands channels -> x_stream and gate z"]
+  Expand --> DW["Short depthwise conv 1D, causal, kernel k"]
+  DW --> Act["SiLU activation"]
+  Act --> Params["Selective parameter heads: Delta_t, B_t, C_t from token content"]
+  Params --> Discretize["Discretize SSM: Abar_t = exp(Delta_t * A), Bbar_t from Delta_t and B_t"]
+  Discretize --> Scan["Selective scan over time: h_t = Abar_t*h_{t-1} + Bbar_t*x_t"]
+  Scan --> Read["Readout y_t = C_t*h_t + D*x_t"]
+  Expand --> Gate["Gate z with SiLU"]
+  Gate --> Mul(("Elementwise gate"))
+  Read --> Mul
+  Mul --> OutProj["#quot;Output projection -> [N, T, d_model"]"]
+  OutProj --> Residual(("Residual add to block input"))
+  X -. "skip connection" .-> Residual
+  Scan -. "implemented by associative parallel scan, not a Python time loop" .-> OutProj
 ```
+
+The Mamba block starts with normalized token states, expands channels, applies a short causal depthwise convolution, and then generates input-dependent SSM parameters `Delta_t`, `B_t`, and `C_t`. The selective scan updates a fixed recurrent state while the output gate controls which scanned features pass through the projection. The dotted note highlights the implementation trick: the recurrence is trained with a fused associative scan even though it behaves like a recurrent state at inference.
+
+```mermaid
+flowchart TB
+  X["#quot;Input tokens x_t: [N, T, d"]"] --> MixPrev["Token shift mixes x_t with x_{t-1} per channel"]
+  MixPrev --> R["Receptance r_t = W_r mix_r(x_t, x_{t-1})"]
+  MixPrev --> K["Key k_t = W_k mix_k(x_t, x_{t-1})"]
+  MixPrev --> V["Value v_t = W_v mix_v(x_t, x_{t-1})"]
+  K --> WKV["Decayed WKV recurrence: numerator and denominator states"]
+  V --> WKV
+  WKV --> Gate["sigmoid(r_t) gates recurrent summary"]
+  R --> Gate
+  Gate --> WO["Output projection W_o"]
+  WO --> Add1(("Residual add"))
+  X -. "residual" .-> Add1
+  Add1 --> ChanNorm["LayerNorm"]
+  ChanNorm --> Cmix1["Channel mix: token shift + linear expansion"]
+  Cmix1 --> Cmix2["Squared ReLU or gated activation"]
+  Cmix2 --> Cmix3["Linear projection back to d"]
+  Cmix3 --> Add2(("Residual add"))
+  Add1 -. "residual" .-> Add2
+```
+
+RWKV combines an attention-like decayed key-value recurrence with a separate channel-mixing block. The time-mixing path uses token shift, keys, values, learned decay, and a receptance gate to maintain fixed-size numerator and denominator state instead of a growing KV cache. The residual channel-mixing path supplies the feed-forward capacity that a Transformer would normally place after attention.
+
+```mermaid
+flowchart TB
+  X["#quot;Input sequence: [N, T, d"]"] --> Proj["Linear projection into value stream v and gate streams x_1 ... x_N"]
+  Proj --> FilterNet["Implicit filter MLP over positions -> long filters h_1 ... h_N"]
+  FilterNet --> FFT["Causal FFT convolution with padding, O(T log T)"]
+  Proj --> Gate1["Data-controlled diagonal gates D_{x_i}"]
+  Gate1 --> Order1["Hyena order 1: gate value stream"]
+  FFT --> Order1
+  Order1 --> Order2["Repeat gate + long convolution for higher order"]
+  Order2 --> Out["#quot;Output projection -> [N, T, d"]"]
+  X -. "residual around operator" .-> Add(("Residual add"))
+  Out --> Add
+  FFT -. "padding enforces causal, aperiodic convolution" .-> Order2
+```
+
+Hyena replaces pairwise attention with a hierarchy of long implicit convolutions interleaved with data-controlled gates. The filter generator produces position-dependent long filters, and FFT convolution applies them efficiently over long contexts. The diagram calls out causal padding because circular convolution would leak future tokens.
+
+```mermaid
+flowchart TB
+  X["#quot;Input tokens: [N, T, d"]"] --> Norm1["RMSNorm"]
+  Norm1 --> RGLRU["RG-LRU: gated diagonal recurrence with input gate and recurrence gate"]
+  RGLRU --> AddR(("Residual add"))
+  X -. "residual" .-> AddR
+  AddR --> Norm2["RMSNorm"]
+  Norm2 --> LocalAttn["Local multi-query attention over sliding window W"]
+  LocalAttn --> AddA(("Residual add"))
+  AddR -. "residual" .-> AddA
+  AddA --> Norm3["RMSNorm"]
+  Norm3 --> MLP["Gated MLP / feed-forward block"]
+  MLP --> AddM(("Residual add"))
+  AddA -. "residual" .-> AddM
+  AddM --> Pattern["Layer pattern repeats recurrent blocks and occasional local attention"]
+  LocalAttn -. "bounded KV cache of window W" .-> Pattern
+  RGLRU -. "fixed recurrent state for older context" .-> Pattern
+```
+
+Griffin mixes fixed-state recurrence with bounded local attention. The RG-LRU branch compresses long history into a diagonal recurrent state, while the local attention branch preserves exact access to recent tokens inside a sliding window. The residual structure mirrors Transformer blocks but replaces most global attention with recurrence.
+
+```mermaid
+flowchart TB
+  In["#quot;Decoder input tokens: [N, T, d"]"] --> Block1["Jamba block 1: 8 layers"]
+  Block1 --> Block2["Jamba block 2: 8 layers"]
+  Block2 --> Block3["Jamba block 3: 8 layers"]
+  Block3 --> Block4["Jamba block 4: 8 layers"]
+  Block4 --> Head["LM head -> next-token logits"]
+
+  subgraph BlockDetail["Inside each 8-layer block"]
+    direction TB
+    Attn["1 Transformer attention layer, creates KV cache"] --> M1["Mamba layer 1"]
+    M1 --> M2["Mamba layer 2"]
+    M2 --> M3["Mamba layer 3"]
+    M3 --> M4["Mamba layer 4"]
+    M4 --> M5["Mamba layer 5"]
+    M5 --> M6["Mamba layer 6"]
+    M6 --> M7["Mamba layer 7"]
+    M2 --> MoE1["MoE MLP on scheduled layers: router selects top-2 of 16 experts"]
+    M4 --> MoE2["MoE MLP on scheduled layers"]
+    M6 --> MoE3["MoE MLP on scheduled layers"]
+  end
+
+  BlockDetail -. "4 attention layers total, 28 Mamba layers total in 32-layer stack" .-> Head
+  Attn -. "direct token access, reduced frequency" .-> Head
+  M1 -. "fixed-state sequence mixing" .-> Head
+  MoE1 -. "sparse active parameters per token" .-> Head
+```
+
+Jamba is a sparse hybrid decoder: only a small fraction of layers are attention layers, most sequence mixing is handled by Mamba layers, and scheduled MoE feed-forward layers add capacity with sparse activation. The block-detail subgraph shows the released pattern at a high level: one attention layer and seven Mamba layers per eight-layer block. Because only attention layers allocate KV cache, the architecture reduces long-context cache growth while preserving some direct token access.
 
 | Family | Token mixing idea | Training path | Decode memory | Main tradeoff |
 |---|---|---|---|---|
@@ -390,18 +488,24 @@ Jamba's paper-reported 256K-context memory comparison lists a large KV-cache red
 ## Choosing an efficient sequence model
 
 ```mermaid
-flowchart TD
-  A[Need long sequence model] --> B{"Need exact access to arbitrary old tokens?"}
-  B -- yes --> C["Use attention, retrieval, or a hybrid"]
-  B -- no --> D{"Need streaming decode with tiny state?"}
-  D -- yes --> E["Recurrent, RWKV-style, or SSM-style model"]
-  D -- no --> F{"Need very long training contexts?"}
-  F -- yes --> G[Long convolution or selective SSM]
-  F -- no --> H[Full attention may be simpler]
-  C --> I{"Recent exact access enough?"}
-  I -- yes --> J[Local attention plus recurrence]
-  I -- no --> K["Global attention, retrieval, or memory mechanism"]
+flowchart TB
+  A["Sequence workload: length T, width d, latency and memory budget"] --> B{"Must retrieve arbitrary old tokens exactly?"}
+  B -->|"yes"| C["Global attention, retrieval-augmented memory, or hybrid with enough attention layers"]
+  B -->|"no"| D{"Must decode with fixed or tiny state?"}
+  D -->|"yes"| E["RWKV or selective SSM: recurrent state does not grow with T"]
+  D -->|"no"| F{"Is training context extremely long?"}
+  F -->|"yes"| G["Hyena or Mamba: long convolution or selective scan kernels"]
+  F -->|"no"| H["Full attention remains the simplest baseline"]
+  C --> I{"Is exact recent-window access sufficient?"}
+  I -->|"yes"| J["Griffin-style local attention plus recurrence: bounded KV cache + compressed older memory"]
+  I -->|"no"| K["Global attention, external retrieval, or explicit memory mechanism"]
+  E --> L["Check hardware kernels, state size, and quality on recall-heavy tasks"]
+  G --> L
+  J --> L
+  H --> L
 ```
+
+The selection diagram is intentionally framed around I/O contracts: exact retrieval, decode-state growth, training context length, and hardware kernels. It links the architecture diagrams above to operational choices: RWKV and Mamba provide fixed-state decoding, Hyena and Mamba target long training contexts, Griffin bounds recent attention, and full attention remains the reference when quadratic cost is acceptable. The final check node keeps the comparison grounded in kernels and task-specific recall behavior rather than asymptotic notation alone.
 
 Use full attention when direct access and simplicity matter more than long-context cost. Use long convolutions when global filters and FFT kernels fit the workload. Use recurrent or SSM models when fixed-state inference is central. Use hybrids when the application needs both long-context efficiency and some exact token access.
 

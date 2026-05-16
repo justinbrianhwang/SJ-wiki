@@ -9,10 +9,6 @@ Control turns a planned trajectory into steering, throttle, and braking commands
 
 This page introduces PID, pure pursuit, Stanley control, model predictive control, and the kinematic and dynamic bicycle models. It connects [motion planning](/cs/autonomous-driving/motion-planning) to [embedded implementation](/cs/embedded/) and [engineering math](/math/engineering-math/), because control is both mathematical and deeply physical.
 
-![A feedback loop block diagram shows an output signal returned to the input through a controller path.](https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Feedback_Loop.svg/500px-Feedback_Loop.svg.png)
-
-*Figure: Feedback loop block diagram in control theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Feedback_Loop.svg), Inductiveload, public domain.*
-
 ## Definitions
 
 **Longitudinal control** regulates speed, acceleration, and spacing using throttle and brakes. Adaptive cruise control and stop-and-go traffic control are longitudinal problems.
@@ -100,13 +96,73 @@ Control handoff also matters. When a planner replans, cancels a lane change, or 
 
 ## Visual
 
-| Controller | Main input | Strengths | Weaknesses | Typical use |
-|---|---|---|---|---|
-| PID | Scalar error | Simple, robust, easy to tune | Limited for coupled constraints | Speed, acceleration, low-level loops |
-| Pure pursuit | Lookahead point | Geometric, stable with good lookahead | Corner cutting, sensitive lookahead | Path tracking, low-speed robots |
-| Stanley | Heading and cross-track error | Good path convergence, simple | Needs sign conventions and tuning | Lane/path tracking |
-| MPC | Model, constraints, reference | Handles multivariable constraints | Compute, model mismatch, infeasibility | Advanced trajectory tracking |
-| Dynamic control | Tire force model | Better near limits | Parameter-heavy | High-speed, low-friction, research |
+```mermaid
+flowchart TB
+  Ref["#quot;Planned trajectory: [t, x_ref, y_ref, yaw_ref, v_ref, kappa_ref"]"]
+  State["#quot;Estimated vehicle state: [x, y, yaw, v, a, yaw_rate"]"]
+
+  subgraph Error["Reference comparison"]
+    direction TB
+    Match["Nearest / preview point selection"]
+    Errors["Tracking errors: e_speed, e_cross, e_heading, curvature"]
+    Ref --> Match
+    State --> Match
+    Match --> Errors
+  end
+
+  subgraph PID["Longitudinal PID branch"]
+    direction TB
+    SpeedErr["Speed or spacing error e(t)"]
+    P["P term: Kp * e"]
+    I["I term: Ki * integral(e) with anti-windup"]
+    D["D term: Kd * de/dt with filter"]
+    SumPID(("sum"))
+    LongSat["Throttle/brake saturation and jerk limit"]
+    SpeedErr --> P --> SumPID
+    SpeedErr --> I --> SumPID
+    SpeedErr --> D --> SumPID
+    SumPID --> LongSat
+  end
+
+  subgraph Lateral["Pure pursuit / Stanley lateral branch"]
+    direction TB
+    Lookahead["Pure pursuit lookahead point: l_d = l_0 + k_v v"]
+    Alpha["Bearing alpha to lookahead"]
+    PP["delta_pp = atan(2L sin(alpha) / l_d)"]
+    Crosstrack["Stanley errors: e_cross, psi_e"]
+    Stan["delta_st = psi_e + atan(k e_cross / (v + epsilon))"]
+    Blend["Mode selection / blending / steering-rate limit"]
+    Lookahead --> Alpha --> PP --> Blend
+    Crosstrack --> Stan --> Blend
+  end
+
+  subgraph MPC["MPC tracking branch"]
+    direction TB
+    Model["Kinematic/dynamic bicycle model f(x,u)"]
+    Horizon["Horizon variables: x_0..x_N, u_0..u_N-1"]
+    Constraints["Constraints: tire friction, steering, accel, rate limits"]
+    Objective["Objective: tracking error + control effort + comfort"]
+    Solver["Real-time solver + warm start"]
+    FirstU["#quot;First control u_0 = [delta, accel"]"]
+    Model --> Horizon --> Constraints --> Objective --> Solver --> FirstU
+  end
+
+  Errors --> SpeedErr
+  Errors --> Lookahead
+  Errors --> Crosstrack
+  Ref --> Model
+  State --> Model
+  LongSat --> Arb["Command arbitration and health checks"]
+  Blend --> Arb
+  FirstU --> Arb
+  Arb --> Act["Actuators: steering rack, throttle, brakes"]
+  Act --> Plant["Vehicle plant: tires, road grade, delay, saturation"]
+  Plant --> Sensors["Sensors: IMU, wheel speed, steering angle, localization"]
+  Sensors -. "feedback state estimate" .-> State
+  Plant --> Output(("Tracked motion in road world"))
+```
+
+This diagram shows the control stack as a closed loop rather than a list of controller names. PID handles scalar longitudinal errors, pure pursuit and Stanley compute steering from geometric path errors, MPC solves a constrained horizon problem, and all branches pass through arbitration, actuator limits, vehicle dynamics, and sensor feedback.
 
 ## Worked example 1: Pure-pursuit steering
 

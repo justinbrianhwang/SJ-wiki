@@ -9,10 +9,6 @@ Frequency-response design uses Bode and Nyquist information to shape loop gain, 
 
 This method is especially practical when plant frequency response is measured experimentally. Even if a precise transfer function is uncertain, gain crossover, phase lag, resonant peaks, and delay effects can be observed. Lead compensation adds phase near crossover; lag compensation raises low-frequency gain while trying not to damage phase margin; lag-lead combines both.
 
-![An asymptotic Bode plot shows magnitude and phase changing across logarithmic frequency.](https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Asymptotic_Bode_plot.svg/500px-Asymptotic_Bode_plot.svg.png)
-
-*Figure: Asymptotic Bode plot for frequency-response analysis. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Asymptotic_Bode_plot.svg), Mintz l, public domain.*
-
 ## Definitions
 
 Let

@@ -9,10 +9,6 @@ These notes follow the scanned textbook *Microprocessors & Microcontroller Syste
 
 The subject is about building a working digital system from a processor, memory, I/O circuits, and software. The 8085 chapters teach external bus thinking: address decoding, machine cycles, memory maps, I/O-mapped ports, DMA, and assembly programs. The 8051 chapters shift to microcontroller thinking: on-chip RAM, SFRs, ports, timers, serial communication, interrupts, and device interfacing. The later chapters show that once the vocabulary is clear, new controller families can be compared by memory organization, peripheral set, interrupt model, power modes, and programming style.
 
-![A photograph shows an Intel C8085AH microprocessor chip package.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Intel_C8085AH.jpg/500px-Intel_C8085AH.jpg)
-
-*Figure: Intel C8085AH microprocessor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_C8085AH.jpg), Thomas Nguyen, CC BY-SA 4.0.*
-
 ## Definitions
 
 A **microprocessor** is a CPU on an integrated circuit. In this course the main microprocessor is the Intel 8085, an 8-bit CPU with a 16-bit address bus. It requires external memory and I/O hardware to form a complete system.
@@ -60,19 +56,44 @@ The sixth key result is that microcontroller families share patterns but not det
 ## Visual
 
 ```mermaid
-graph TD
-  Intro[Foundations] --> U1[8085 architecture]
-  U1 --> U2[8085 instruction set]
-  U2 --> U3[8085 programming patterns]
-  U3 --> U4[8085 I/O and memory interface]
-  U4 --> M1[8051 architecture]
-  M1 --> M2[8051 programming]
-  M2 --> M3["Timers, serial, interrupts"]
-  M3 --> P1[8255 and external devices]
-  P1 --> P2[Serial buses and protocols]
-  P2 --> P3[EEPROM and DS1307]
-  P3 --> D1["89C51, AVR, PIC derivatives"]
+flowchart TB
+  Goal["Embedded control task: sense, compute, actuate, communicate"] --> Choice{"Processor style"}
+  Choice -- "external-memory microprocessor" --> U8085["8085 CPU core"]
+  Choice -- "single-chip controller" --> M8051["8051 microcontroller core"]
+
+  subgraph Sys8085["8085-style microcomputer system"]
+    direction TB
+    Core85["CPU: A, flags, BC/DE/HL, PC, SP, ALU, control unit"]
+    Bus85["16-bit address bus; 8-bit data bus; AD0-AD7 multiplexed"]
+    Latch85["External latch captures A0-A7 on ALE"]
+    Decode85["Address decoder selects ROM, RAM, or I/O"]
+    PPI85["8255 or other peripheral interface"]
+    Core85 --> Bus85
+    Bus85 --> Latch85
+    Bus85 --> Decode85
+    Decode85 --> PPI85
+  end
+
+  subgraph Sys8051["8051-style microcontroller system"]
+    direction TB
+    Core51["CPU: A, B, PSW, DPTR, PC, SP"]
+    Mem51["On-chip program memory, internal RAM, SFR space"]
+    Ports51["Ports P0-P3 with alternate functions"]
+    Periph51["Timers, UART, interrupts, external-memory pins"]
+    Core51 --> Mem51
+    Core51 --> Ports51
+    Core51 --> Periph51
+  end
+
+  U8085 --> Sys8085
+  M8051 --> Sys8051
+  Sys8085 --> Devices["External devices: memory, switches, LEDs, ADC/DAC, serial transceivers"]
+  Sys8051 --> Devices
+  Devices --> Firmware["Firmware: memory map, polling/interrupts, timing, protocols"]
+  Firmware --> Result(("Working embedded system"))
 ```
+
+This overview diagram contrasts the two architectural styles used throughout the embedded notes. The 8085 path exposes external bus design, low-address latching, decoding, and peripheral chips, while the 8051 path shows how RAM, SFRs, ports, timers, serial hardware, and interrupts move on chip. The final firmware path makes the I/O contract explicit: software must match the memory map, timing signals, interrupts, and protocol behavior of the chosen hardware.
 
 | Study layer | Main question | Representative source topics |
 |---|---|---|

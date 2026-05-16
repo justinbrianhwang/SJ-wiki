@@ -69,17 +69,50 @@ Dijkstra, Bellman-Ford, and many dynamic-programming shortest-path algorithms di
 ## Visual
 
 ```mermaid
-graph LR
-  A("(A")) ---|4| B("(B"))
-  A ---|2| C("(C"))
-  C ---|1| B
-  B ---|5| D("(D"))
-  C ---|8| D
-  C ---|10| E("(E"))
-  D ---|2| E
+flowchart TB
+  Input["Weighted graph G = (V,E,w)<br/>example edges: AB4, AC2, CB1, BD5, CD8, CE10, DE2"] --> Task{"Choose problem"}
+
+  subgraph SP["Shortest-path algorithms"]
+    direction TB
+    DInit["Dijkstra input<br/>source A, nonnegative weights"] --> DPQ["priority queue of tentative distances<br/>d(A)=0, others infinity"]
+    DPQ --> DPick["extract unsettled vertex with smallest d"]
+    DPick --> DRelax["relax each outgoing edge<br/>if d(v) is greater than d(u) + w(u,v), update"]
+    DRelax --> DDone{"all reachable vertices settled?"}
+    DDone -- "no" --> DPick
+    DDone -- "yes" --> DOut["shortest-path tree and distances"]
+
+    BFInit["Bellman-Ford input<br/>negative weights allowed"] --> BFPass["repeat |V|-1 passes over all edges"]
+    BFPass --> BFRelax["relax every edge in fixed list"]
+    BFRelax --> BFCheck{"extra pass improves a distance?"}
+    BFCheck -- "yes" --> BFBad["reachable negative cycle"]
+    BFCheck -- "no" --> BFOut["shortest distances"]
+  end
+
+  subgraph MST["Minimum-spanning-tree algorithms"]
+    direction TB
+    KSort["Kruskal<br/>sort edges by increasing weight"] --> KScan["scan edges<br/>add if it connects different components"]
+    KScan --> KDSU["disjoint-set union tracks components"]
+    KDSU --> KDone{"|V|-1 edges chosen?"}
+    KDone -- "no" --> KScan
+    KDone -- "yes" --> KOut["MST edge set"]
+
+    PStart["Prim<br/>start from any vertex"] --> PCut["priority queue of cut edges"]
+    PCut --> PAdd["add lightest edge reaching outside tree"]
+    PAdd --> PUpdate["insert newly exposed crossing edges"]
+    PUpdate --> PDone{"all vertices included?"}
+    PDone -- "no" --> PCut
+    PDone -- "yes" --> POut["MST edge set"]
+  end
+
+  Task -- "SSSP, nonnegative weights" --> DInit
+  Task -- "SSSP, negative edges allowed" --> BFInit
+  Task -- "MST by sorted edges" --> KSort
+  Task -- "MST by growing cut" --> PStart
+  DRelax -. "local relaxation primitive" .-> BFRelax
+  KScan -. "cut and cycle properties" .-> PCut
 ```
 
-The shortest path from $A$ to $E$ is not necessarily the path with the fewest edges. Here $A-C-B-D-E$ has weight $2+1+5+2=10$, while $A-C-E$ has only two edges but weight $12$.
+This weighted-graph diagram keeps the example graph as input while exposing the algorithmic building blocks. Dijkstra and Bellman-Ford share the relaxation primitive but differ in scheduling and negative-weight handling; Kruskal and Prim share MST cut logic but grow the tree through different data structures. For the listed example, the shortest path from $A$ to $E$ is $A-C-B-D-E$ with weight $10$, while $A-C-E$ has fewer edges but weight $12$.
 
 ## Worked example 1: Dijkstra from a source
 

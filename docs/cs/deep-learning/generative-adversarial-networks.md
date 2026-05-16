@@ -75,16 +75,59 @@ Conditional GANs extend the same game by giving class labels or other conditions
 ## Visual
 
 ```mermaid
-flowchart LR
-  Z[Noise z] --> G[Generator]
-  G --> Fake[Fake samples]
-  Real[Real samples] --> D[Discriminator]
-  Fake --> D
-  D --> LR[Real/fake loss]
-  LR --> UD[Update discriminator]
-  D --> LG[Generator fooling loss]
-  LG --> UG[Update generator]
+flowchart TB
+  Real["#quot;Real batch x ~ p_data: [N, C, H, W"]"] --> DReal["Discriminator D(x) -> real logits"]
+  Z["#quot;Latent noise z ~ p_z: [N, d_z"]"] --> G["Generator G(z)"]
+  G --> Fake["#quot;Generated batch x_fake: [N, C, H, W"]"]
+  Fake --> Detach["Detach fake batch for discriminator step"]
+  Detach --> DFake["Discriminator D(x_fake.detach()) -> fake logits"]
+  DReal --> DLoss["D loss: BCE(real, 1) + BCE(fake, 0)"]
+  DFake --> DLoss
+  DLoss --> DStep["Update discriminator parameters only"]
+
+  Z2["Fresh latent noise z"] --> G2["Generator G(z)"]
+  G2 --> Fake2["Generated batch with gradients to G"]
+  Fake2 --> DForG["Discriminator D(x_fake) reused as fixed critic for this step"]
+  DForG --> GLoss["Non-saturating G loss: BCE(D(G(z)), 1)"]
+  GLoss --> GStep["Update generator parameters only"]
+  DStep -. "alternate updates" .-> Z2
+  GStep -. "next iteration" .-> Real
 ```
+
+The adversarial loop makes the detach boundary explicit: discriminator training uses generated samples without updating the generator, while generator training keeps the path through `G(z)` intact. Real and fake logits feed different binary targets for the discriminator, and the generator uses the discriminator response as a fooling loss. The alternating dotted arrows show why GAN optimization is nonstationary.
+
+```mermaid
+flowchart TB
+  subgraph DCGANG["DCGAN generator for 64 x 64 RGB"]
+    direction TB
+    Z["#quot;z: [N, 100, 1, 1"]"] --> T1["#quot;ConvTranspose 4 x 4, 1024, stride 1 -> [N, 1024, 4, 4"]"]
+    T1 --> B1["BatchNorm + ReLU"]
+    B1 --> T2["#quot;ConvTranspose 4 x 4, 512, stride 2, pad 1 -> [N, 512, 8, 8"]"]
+    T2 --> B2["BatchNorm + ReLU"]
+    B2 --> T3["#quot;ConvTranspose 4 x 4, 256, stride 2, pad 1 -> [N, 256, 16, 16"]"]
+    T3 --> B3["BatchNorm + ReLU"]
+    B3 --> T4["#quot;ConvTranspose 4 x 4, 128, stride 2, pad 1 -> [N, 128, 32, 32"]"]
+    T4 --> B4["BatchNorm + ReLU"]
+    B4 --> T5["#quot;ConvTranspose 4 x 4, 3, stride 2, pad 1 -> [N, 3, 64, 64"]"]
+    T5 --> Tanh["Tanh image output"]
+  end
+
+  subgraph DCGAND["DCGAN discriminator"]
+    direction TB
+    Img["#quot;Image: [N, 3, 64, 64"]"] --> C1["#quot;Conv 4 x 4, 128, stride 2, pad 1 -> [N, 128, 32, 32"]"]
+    C1 --> L1["LeakyReLU 0.2"]
+    L1 --> C2["#quot;Conv 4 x 4, 256, stride 2, pad 1 -> [N, 256, 16, 16"]"]
+    C2 --> D2["BatchNorm + LeakyReLU"]
+    D2 --> C3["#quot;Conv 4 x 4, 512, stride 2, pad 1 -> [N, 512, 8, 8"]"]
+    C3 --> D3["BatchNorm + LeakyReLU"]
+    D3 --> C4["#quot;Conv 4 x 4, 1024, stride 2, pad 1 -> [N, 1024, 4, 4"]"]
+    C4 --> D4["BatchNorm + LeakyReLU"]
+    D4 --> C5["#quot;Conv 4 x 4, 1, stride 1 -> [N, 1, 1, 1"]"]
+    C5 --> Logit(("Real/fake logit"))
+  end
+```
+
+The DCGAN generator progressively upsamples a latent 1 x 1 tensor to a 64 x 64 RGB image with transposed convolutions, batch normalization, and ReLU. The discriminator mirrors that shape path with strided convolutions, LeakyReLU, and a final scalar logit. The paired diagrams show the image prior: generation increases spatial resolution while discrimination collapses spatial evidence into a real/fake score.
 
 | Component | Input | Output | Training signal |
 |---|---|---|---|

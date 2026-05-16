@@ -89,14 +89,28 @@ State scaling also matters. If one state is a voltage near $10^{-3}$ and another
 
 ```mermaid
 flowchart LR
-  U["Input u(t)"] --> S1[State derivative f or Ax+Bu]
-  S1 --> INT[Integrator bank]
-  INT --> X["State x(t)"]
-  X --> S1
-  X --> OUT[Output map g or Cx+Du]
-  U --> OUT
-  OUT --> Y["Output y(t)"]
+  U["input u(t)<br/>known forcing or control"] --> Deriv["state-derivative map<br/>f(t,x,u,p) or A x + B u"]
+  P["parameters p<br/>units and nominal values"] --> Deriv
+  X["state x(t)<br/>ordered vector with initial x0"] --> Deriv
+  Deriv --> Solver["ODE solver or integrator bank<br/>advances x_dot to x"]
+  Solver --> X
+  X --> OutputMap["output map<br/>g(t,x,u,p) or C x + D u"]
+  U --> OutputMap
+  P --> OutputMap
+  OutputMap --> Y["output y(t)<br/>logged response"]
+
+  subgraph Linear["Linear analysis view"]
+    direction TB
+    Mat["matrices A, B, C, D<br/>shapes n x n, n x m, r x n, r x m"] --> Modes["modes from eigenvalues of A"]
+    Mat --> TF["transfer function<br/>G(s)=C(sI-A)^-1B+D"]
+    Mat --> IC["initial-condition response<br/>exp(A t)x0"]
+  end
+
+  Deriv -. "linearize or specialize" .-> Mat
+  Y --> Check["check state ordering, scaling, units, and hidden modes"]
 ```
+
+This state-space diagram makes the simulation interface explicit: inputs, parameters, and current state feed a derivative map, the solver advances the state, and an output map produces logged quantities. The linear-analysis subgraph shows the extra contracts available for LTI models: matrix shapes, modes, transfer functions, and initial-condition response. The final check node calls out the common implementation risks of state ordering and scaling.
 
 | Form | Main use | Strength | Limitation |
 |---|---|---|---|

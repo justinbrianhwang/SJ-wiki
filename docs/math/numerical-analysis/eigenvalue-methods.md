@@ -96,16 +96,39 @@ Eigenvalue computations should also report normalization and phase conventions f
 ## Visual
 
 ```mermaid
-graph TD
-  A[Matrix A] --> B{"Need one eigenvalue or many?"}
-  B -->|dominant one| C[Power method]
-  B -->|near a shift| D[Inverse iteration]
-  B -->|many or all| E[Reduction to Hessenberg or tridiagonal]
-  E --> F[Shifted QR iteration]
-  C --> G[Eigenpair residual]
-  D --> G
-  F --> G
+flowchart TB
+  Input["Matrix A<br/>size, symmetry, target spectrum"] --> Target{"Target eigeninformation"}
+
+  subgraph One["One or few eigenpairs"]
+    direction TB
+    StartV["choose normalized starting vector"] --> Power["power iteration<br/>v := A v / ||A v||"]
+    Power --> Rayleigh["Rayleigh quotient<br/>lambda = v^T A v / v^T v"]
+    TargetShift["choose shift sigma"] --> Inverse["inverse iteration<br/>solve (A - sigma I) z = v"]
+    Inverse --> Normalize["normalize z to next v"]
+    Normalize --> Rayleigh
+  end
+
+  subgraph Many["Many or all eigenvalues"]
+    direction TB
+    Reduce["orthogonal similarity reduction<br/>Hessenberg or tridiagonal form"] --> QR["shifted QR iteration<br/>A_k = Q_k R_k; A_{k+1} = R_k Q_k"]
+    QR --> Deflate{"small subdiagonal entry?"}
+    Deflate -- "yes" --> Split["deflate block and continue"]
+    Deflate -- "no" --> QR
+    Split --> Schur["Schur or diagonal form"]
+  end
+
+  Target -- "dominant magnitude" --> StartV
+  Target -- "near a shift" --> TargetShift
+  Target -- "full spectrum" --> Reduce
+  Rayleigh --> Resid["eigenpair residual<br/>||A v - lambda v||"]
+  Schur --> Resid
+  Resid --> Sens{"residual acceptable and gap adequate?"}
+  Sens -- "yes" --> Report["report eigenvalues/eigenvectors with normalization"]
+  Sens -- "no" --> Refine["change shift, restart, or use more stable method"]
+  Refine -. "retry" .-> Target
 ```
+
+This eigenvalue-method diagram separates single-eigenpair iterations from full-spectrum QR architecture. Power and inverse iteration feed a Rayleigh-quotient and residual check, while the QR path first reduces the matrix by similarity transformations and then deflates converged blocks. The sensitivity branch records that residual size must be interpreted with spectral gaps and matrix conditioning in mind.
 
 | Method | Target | Main cost | Convergence driver | Warning |
 |---|---|---|---|---|

@@ -138,16 +138,24 @@ Coupled reactions are central in biochemistry and electrochemistry. If an unfavo
 ## Visual
 
 ```mermaid
-flowchart LR
-  A[Choose reaction] --> B[Write stoichiometric numbers nu_J]
-  B --> C[Compute Q from activities]
-  C --> D["Delta_r G = Delta_r G deg + RT ln Q"]
-  D --> E{sign of Delta_r G}
-  E -->|negative| F[forward reaction lowers G]
-  E -->|positive| G[reverse reaction lowers G]
-  E -->|zero| H["equilibrium, Q=K"]
-  H --> I["Delta_r G deg = -RT ln K"]
+flowchart TB
+  Reaction["Choose balanced reaction<br/>sum nu_J A_J = 0"] --> Stoich["Assign stoichiometric numbers nu_J<br/>products positive, reactants negative"]
+  Stoich --> Activities["Measure or estimate activities a_J<br/>include standard states and nonideality"]
+  Activities --> Q["reaction quotient<br/>Q = product over a_J^(nu_J)"]
+  Q --> DG["driving force<br/>Delta_r G = Delta_r G_standard + R T ln Q"]
+  DG --> Direction{"sign of Delta_r G"}
+  Direction -- "negative" --> Forward["forward progress lowers G<br/>products favored at current composition"]
+  Direction -- "positive" --> Reverse["reverse progress lowers G<br/>reactants favored at current composition"]
+  Direction -- "zero" --> Eq["equilibrium<br/>Q = K and Delta_r G = 0"]
+  Eq --> K["standard relation<br/>Delta_r G_standard = -R T ln K"]
+  K --> Perturb{"composition, pressure, or temperature changed?"}
+  Perturb -- "composition or pressure" --> RecalcQ["recompute Q and direction"]
+  Perturb -- "temperature" --> VantHoff["update K with van't Hoff relation"]
+  RecalcQ -. "restore Delta_r G = 0" .-> Q
+  VantHoff -. "new equilibrium constant" .-> Q
 ```
+
+This chemical-equilibrium diagram shows the thermodynamic decision pipeline, not just the final condition. Stoichiometric numbers define the activity quotient, the quotient enters $\Delta_rG$, and the sign of that driving force routes the system toward products, reactants, or equilibrium. The perturbation loop explains Le Chatelier behavior quantitatively through recalculating $Q$ or changing $K$ with temperature.
 
 | Quantity | Meaning | Depends on current composition? | At equilibrium |
 |---|---|---:|---|

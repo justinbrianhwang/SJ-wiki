@@ -77,22 +77,64 @@ For nearly sorted arrays, insertion sort is often used as a finishing pass insid
 
 ```mermaid
 flowchart TD
-  A[Need to sort records] --> B{"Keys are fixed-width digits?"}
-  B -->|yes| C[Consider radix sort]
-  B -->|no| D{"Need stable output?"}
-  D -->|yes| E[Merge sort or insertion sort for small n]
-  D -->|no| F{"Need worst-case guarantee and in-place?"}
-  F -->|yes| G[Heap sort]
-  F -->|no| H[Quicksort with good pivot strategy]
+  Input["#quot;Input array A[0..n-1"]"] --> Choice{"Algorithm structure"}
+
+  subgraph Merge["Merge sort recursion"]
+    direction TB
+    M0["#quot;Split A[lo..hi"] at mid"]
+    M1["Recursively sort left half"]
+    M2["Recursively sort right half"]
+    M3["Merge two sorted runs into auxiliary array"]
+    M4["#quot;Copy merged run back to A[lo..hi"]"]
+    M0 --> M1
+    M0 --> M2
+    M1 --> M3
+    M2 --> M3
+    M3 --> M4
+  end
+
+  subgraph Quick["Quicksort partition"]
+    direction TB
+    Q0["Choose pivot, e.g. 6"]
+    Q1["Scan and swap so elements < pivot move left"]
+    Q2["Place pivot in final position"]
+    Q3["Recurse on left and right partitions"]
+    Q0 --> Q1
+    Q1 --> Q2
+    Q2 --> Q3
+  end
+
+  subgraph Heap["Heap sort"]
+    direction TB
+    H0["Build max heap bottom-up in array"]
+    H1["Swap root max with last unsorted slot"]
+    H2["Shrink heap size by one"]
+    H3["Sift down new root"]
+    H0 --> H1
+    H1 --> H2
+    H2 --> H3
+    H3 --> H1
+  end
+
+  subgraph Radix["Radix sort"]
+    direction TB
+    R0["For each digit from least to most significant"]
+    R1["Stable counting sort by current digit"]
+    R0 --> R1
+    R1 --> R0
+  end
+
+  Choice -- "stable comparison sort" --> Merge
+  Choice -- "cache-friendly average fast comparison sort" --> Quick
+  Choice -- "in-place worst-case n log n" --> Heap
+  Choice -- "fixed-width digit keys" --> Radix
+  Merge --> Output(("Sorted records"))
+  Quick --> Output
+  Heap --> Output
+  Radix --> Output
 ```
 
-Quicksort partition sketch:
-
-```text
-before: [9, 3, 7, 1, 6, 2, 8], pivot = 6
-after:  [3, 1, 2, 6, 7, 9, 8]
-          < pivot   pivot  > pivot
-```
+This sorting diagram compares the internal state machines of the major sorting families rather than only choosing among names. Merge sort labels the split-sort-merge-copy recursion, quicksort labels pivot partitioning and recursive subarrays, heap sort labels build-heap and repeated root removal, and radix sort labels stable digit passes. The output node is shared because all paths satisfy the same sorting contract while using different invariants, memory, and stability trade-offs.
 
 ## Worked example 1: insertion sort trace
 

@@ -9,10 +9,6 @@ Quantum mechanics is the framework for physical systems whose states are probabi
 
 This section synthesizes four requested sources into one wiki sequence. Sakurai's *Modern Quantum Mechanics* supplies the primary structure: Stern-Gerlach motivation, Dirac notation, dynamics, angular momentum, symmetries, approximation methods, scattering, and identical particles. Ballentine supplies mathematical care, ensemble interpretation, density-operator emphasis, and scattering depth. The file named for Gottfried in the local source set extracts as graduate lecture notes that cite Gottfried/Yan and is used where it cleanly reinforces postulates, spin, dynamics, angular momentum, symmetries, and perturbation theory. Schiff is included as the classic wave-mechanics contrast where the topic naturally matches the older coordinate-representation style; this local copy is scanned/image-only through `pdftotext`, so no precise extracted page quotations are used from it.
 
-![A hydrogen-density plot shows electron probability patterns for several quantum numbers.](https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Hydrogen_Density_Plots.png/600px-Hydrogen_Density_Plots.png)
-
-*Figure: Hydrogen-atom probability-density plots for several energy levels. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hydrogen_Density_Plots.png), PoorLeno, public domain.*
-
 ## Definitions
 
 A **state** is represented by a ray in Hilbert space for a pure preparation, or by a density operator for a general preparation. A **ket** $\vert \psi\rangle$ is the abstract state vector; a **wave function** $\psi(x)=\langle x\vert \psi\rangle$ is one representation of that vector. A **bra** $\langle\psi\vert $ is the corresponding dual object.
@@ -155,19 +151,20 @@ The chapter list is:
 
 ```mermaid
 flowchart TD
-  A[Postulates and Dirac notation] --> B[Spin-1/2 and Stern-Gerlach]
-  A --> C[Quantum dynamics]
-  C --> D[1D systems and oscillator]
-  D --> E[Angular momentum]
-  E --> F[Hydrogen and central potentials]
-  E --> G[Identical particles]
-  F --> H[Approximation methods]
-  H --> I[Scattering]
-  C --> J[Density operators]
-  C --> K[Path integrals]
-  J --> L[Measurement and interpretation]
-  E --> M[Symmetries and conservation laws]
+  Prep["Preparation procedure<br/>pure state psi or density operator rho"] --> State["Hilbert-space state<br/>normalization and superposition"]
+  State --> Observable["Observable operator A<br/>self-adjoint, spectral projectors P_a"]
+  Observable --> Basis["Represent state in measurement basis<br/>amplitudes in A basis or probabilities Tr(rho P_a)"]
+  Basis --> Born["Born rule<br/>P(a)=||P_a psi||^2 or Tr(rho P_a)"]
+  Born --> Outcome{"Measurement outcome selected?"}
+  Outcome -- "yes" --> Project["State update<br/>psi to normalized P_a psi<br/>rho to P_a rho P_a divided by Tr(rho P_a)"]
+  Outcome -- "no" --> Ensemble["Unconditioned prediction<br/>sum over possible outcomes"]
+  Project --> Dynamics["Time evolution after measurement<br/>U(t)=exp(-i H t / hbar)"]
+  Ensemble --> Dynamics
+  Dynamics --> Next["Next observable or experiment<br/>repeat the state-operator-measurement cycle"]
+  Next -. "new preparation context" .-> Prep
 ```
+
+This overview diagram presents the quantum-mechanics postulate pipeline rather than a chapter roadmap. The flow shows how a preparation becomes a Hilbert-space state, how an observable supplies projectors, how the Born rule produces probabilities, and how selected outcomes update the state before unitary time evolution resumes. The dotted return arrow emphasizes the experimental I/O contract: later predictions start from the state produced by the previous preparation or measurement.
 
 | Source | Role in this wiki | Distinct emphasis |
 |---|---|---|

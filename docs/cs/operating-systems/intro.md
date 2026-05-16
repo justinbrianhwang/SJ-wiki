@@ -9,10 +9,6 @@ Operating systems sit between applications and hardware. They make programs easi
 
 These notes follow the scope of *Operating System Concepts Essentials*, 2nd edition: overview and structure, process management, concurrency, scheduling, memory, virtual memory, storage, I/O, protection, security, and a Linux case study. The pages are written as study notes rather than a replacement for the textbook: they emphasize definitions, algorithms, trade-offs, worked examples, and the connections among topics.
 
-![A circular operating-system process state diagram shows scheduler transitions between process states.](https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Process_states.svg/500px-Process_states.svg.png)
-
-*Figure: Process-state transitions in a scheduler. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Process_states.svg), A3r0, public domain.*
-
 ## Definitions
 
 An **operating system** is software that manages computer hardware and provides services to application programs. At the center is the **kernel**, the privileged program that remains running and mediates access to hardware resources. Around it are system programs, libraries, shells, graphical environments, daemons, and applications.
@@ -81,26 +77,43 @@ Those questions connect the entire subject more reliably than memorizing isolate
 
 ```mermaid
 flowchart TB
-  Overview[OS services and structure] --> Proc[Processes]
-  Proc --> Threads[Threads]
-  Threads --> Sync[Process synchronization]
-  Sync --> Dead[Deadlocks]
-  Proc --> Sched[CPU scheduling]
-  Proc --> Mem[Main memory]
-  Mem --> VM[Virtual memory]
-  VM --> Storage[Mass storage]
-  Storage --> FSInterface[File-system interface]
-  FSInterface --> FSImpl[File-system implementation]
-  Storage --> IO[I/O systems]
-  FSInterface --> Protect[Protection]
-  Protect --> Sec[Security]
-  Overview --> Linux[Linux case study]
-  Sched --> Linux
-  VM --> Linux
-  FSImpl --> Linux
+  Apps["Applications and system programs"] --> API["Libraries and system-call ABI"]
+  API --> Trap["Trap into kernel mode"]
+
+  subgraph Kernel["Kernel control plane"]
+    direction TB
+    Syscall["System-call dispatcher and argument validation"]
+    Proc["Process and thread management: PCB/TCB, fork/exec, wait"]
+    Sched["CPU scheduler: ready queues, priorities, dispatch"]
+    Sync["Synchronization: locks, semaphores, wait queues"]
+    Mem["Memory manager: page tables, TLB shootdown, allocation"]
+    VM["Virtual memory: page faults, replacement, swap"]
+    FS["File systems and VFS: names, inodes, permissions"]
+    IO["I/O subsystem: drivers, interrupts, DMA, block queues"]
+    Protect["Protection and security: credentials, ACLs, capabilities"]
+  end
+
+  Trap --> Syscall
+  Syscall --> Proc
+  Syscall --> Mem
+  Syscall --> FS
+  Syscall --> IO
+  Syscall --> Protect
+  Proc --> Sched
+  Proc --> Sync
+  Sched --> Sync
+  Mem --> VM
+  FS --> VM
+  FS --> IO
+  IO --> HW["Hardware: CPUs, MMU, RAM, disks, NICs, timers"]
+  Sched --> HW
+  VM --> HW
+  Protect -. "policy checks on every shared object" .-> Proc
+  Protect -. "permission bits and credentials" .-> FS
+  Protect -. "user/kernel and page permissions" .-> Mem
 ```
 
-The dependency graph is not strictly linear, but it gives a practical reading order. Processes come early because scheduling, synchronization, memory ownership, files, and security all need an execution context to manage.
+This overview diagram shows the OS as a protected control plane rather than a loose topic list. Applications enter through a system-call ABI, the kernel dispatcher validates the request, and the internal subsystems cooperate through concrete structures such as PCBs, ready queues, page tables, inodes, and device queues. The dotted protection edges emphasize that security is not a final chapter bolted on later; it is checked along the paths that manipulate processes, files, memory, and devices.
 
 ## Worked example 1: classifying OS responsibilities
 
@@ -164,4 +177,3 @@ This code is intentionally simple: it mirrors the study strategy for the topic. 
 - [Virtual Memory](/cs/operating-systems/virtual-memory)
 - [File-System Implementation](/cs/operating-systems/file-system-implementation)
 - [Security](/cs/operating-systems/security)
-

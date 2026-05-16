@@ -79,13 +79,27 @@ For study purposes, the most useful habit is to separate four layers: the contin
 | $f[x_0,x_1,x_2]$ | second divided difference | coefficient of $(x-x_0)(x-x_1)$ |
 | $f[x_0,\ldots,x_n]$ | highest listed difference | coefficient of full product |
 
-```text
-x0   f[x0]
-           f[x0,x1]
-x1   f[x1]             f[x0,x1,x2]
-           f[x1,x2]
-x2   f[x2]
+```mermaid
+flowchart TB
+  Nodes["Ordered nodes<br/>x0, x1, ..., xn"] --> Values["#quot;first column<br/>f[x_i"] = y_i"]
+  Values --> Diff1["#quot;first divided differences<br/>f[x_i,x_{i+1}"]"]
+  Diff1 --> Diff2["higher columns<br/>recursive quotient differences"]
+  Diff2 --> Coeff["top row gives Newton coefficients<br/>c0, c1, ..., cn"]
+  Coeff --> Eval["nested evaluation<br/>P(x)=c0+(x-x0)(c1+(x-x1)(...))"]
+
+  subgraph Hermite["Hermite extension"]
+    direction TB
+    Repeat["repeat nodes for derivative data"] --> Deriv["use f'(x_i) for repeated divided difference"]
+    Deriv --> HCoeff["Hermite Newton coefficients<br/>value and slope matching"]
+  end
+
+  Nodes --> Repeat
+  HCoeff --> Eval
+  Eval --> Check["check node values, derivative matches, and ordering"]
+  Check --> Poly(("interpolating polynomial"))
 ```
+
+This diagram turns the divided-difference table into a dataflow: ordered nodes fill the value column, recursive differences fill higher columns, and the top row becomes Newton-form coefficients. The Hermite subgraph shows how repeated nodes and derivative data enter the same table architecture. The final check is important because node ordering and repeated-node handling control the polynomial actually being built.
 
 ## Worked example 1: Newton polynomial from divided differences
 

@@ -9,10 +9,6 @@ An instruction set architecture, or ISA, is the contract between software and ha
 
 H&P treats ISA design as one part of architecture, not the whole field. That distinction matters. A clean load-store ISA can simplify pipelining and compiler reasoning, but performance also depends on branch prediction, caches, memory systems, and implementation technology. This page focuses on ISA concepts using MIPS-like and RISC-V-like examples, while contrasting them with more complex CISC styles such as x86.
 
-![A von Neumann architecture diagram shows a CPU connected to memory through shared data and control paths.](https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Von_Neumann_Architecture.svg/500px-Von_Neumann_Architecture.svg.png)
-
-*Figure: Von Neumann computer architecture. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Von_Neumann_Architecture.svg), Kapooht, CC BY-SA 3.0.*
-
 ## Definitions
 
 An ISA specifies the programmer-visible behavior of a processor:
@@ -74,15 +70,34 @@ RISC-V-style teaching examples are useful because the visible rules are simple, 
 ## Visual
 
 ```mermaid
-flowchart LR
-    A[Source program] --> B[Compiler]
-    B --> C[ISA instructions]
-    C --> D[Decoder]
-    D --> E[Micro-ops or pipeline controls]
-    E --> F[Functional units]
-    F --> G[Architectural state]
-    G --> C
+flowchart TB
+    Source["Source program"] --> Compiler["Compiler and assembler"]
+    Compiler --> ISA["ISA-visible instruction stream"]
+
+    subgraph Contract["ISA contract"]
+      direction TB
+      Enc["Instruction encoding: opcode, register fields, immediates"]
+      Regs["Architectural registers: integer, FP/vector, PC, status"]
+      Mem["Memory operations: load/store, address modes, alignment"]
+      Ctrl["Control flow: branch, jump, call, return, exceptions"]
+      Priv["Privilege, atomics, fences, and memory ordering"]
+    end
+
+    ISA --> Contract
+    Contract --> Decode["Fetch/decode: fixed or variable length instruction boundaries"]
+    Decode --> Uops["Internal micro-ops or pipeline control signals"]
+    Uops --> Rename["Rename architectural registers to physical destinations"]
+    Rename --> Execute["Execute in ALU, load/store, branch, FP/vector units"]
+    Execute --> State["Retire to architectural state in program order"]
+    State --> ISA
+
+    Mem --> AGU["Address-generation unit computes base + offset"]
+    AGU --> Cache["Data cache and TLB access"]
+    Ctrl --> Predictor["Branch predictor and target buffer"]
+    Priv --> OS["OS trap/interrupt/virtualization interface"]
 ```
+
+This ISA diagram separates the programmer-visible contract from the microarchitecture that implements it. Encodings, registers, memory operations, control flow, privilege rules, atomics, and fences are stable ISA facts, while decode, micro-op formation, renaming, execution, and retirement are implementation choices. The side paths show why addressing modes, branch semantics, and privileged operations directly affect cache/TLB access, prediction, and operating-system control.
 
 | Design choice | RISC-style tendency | CISC-style tendency | Main trade-off |
 |---|---|---|---|

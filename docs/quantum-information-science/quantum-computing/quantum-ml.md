@@ -142,16 +142,48 @@ NISQ QML and fault-tolerant QML should be separated. NISQ QML uses shallow circu
 ## Visual
 
 ```mermaid
-flowchart LR
-  X["Classical data x"] --> F["Feature map U_phi(x)"]
-  F --> A["Trainable circuit U_theta"]
-  A --> N["Noise channel E"]
-  N --> M["POVM or observable measurement"]
-  M --> L["Loss estimate"]
-  L --> O["Classical optimizer"]
-  O --> A
-  L --> P["Prediction"]
+flowchart TB
+  subgraph VQE["VQE energy-estimation loop"]
+    direction LR
+    VH["Problem Hamiltonian<br/>H = sum_i h_i P_i"] --> VA["State ansatz<br/>U(theta)|0>^n"]
+    VA --> VE["Entangling layers<br/>R_y/R_z + CNOT/CZ pattern"]
+    VE --> VN["Device noise<br/>E_L o U_L ... E_1 o U_1"]
+    VN --> VM["Measure Pauli terms<br/>shots per P_i -> mean P_i"]
+    VM --> VL["Energy estimate<br/>E(theta) = sum_i h_i mean(P_i)"]
+    VL --> VO["Classical optimizer<br/>update theta"]
+    VO -. "parameter update" .-> VA
+  end
+
+  subgraph QAOA["QAOA alternating-operator circuit"]
+    direction LR
+    QInit["Initialize<br/>|+>^n"] --> QC1["Cost unitary<br/>exp(-i gamma_1 C)"]
+    QC1 --> QM1["Mixer unitary<br/>exp(-i beta_1 B)"]
+    QM1 --> QRep["Repeat p layers<br/>{gamma_l, beta_l}_{l=1}^p"]
+    QRep --> QMeas["Measure bit strings<br/>z in {0,1}^n"]
+    QMeas --> QScore["Classical objective<br/>C(z), sample mean, constraints"]
+    QScore --> QOpt["Classical optimizer<br/>update gamma, beta"]
+    QOpt -. "angles for next batch" .-> QC1
+  end
+
+  subgraph Kernel["Quantum kernel circuit"]
+    direction LR
+    Kx["#quot;Classical example x_i<br/>features [d"]"] --> KMap1["Feature map<br/>U_phi(x_i)|0>^n"]
+    Ky["#quot;Classical example x_j<br/>features [d"]"] --> KMap2["Inverse feature map<br/>U_phi(x_j)^dagger"]
+    KMap1 --> KMap2
+    KMap2 --> KZero["All-zero measurement<br/>Pr(0^n) = overlap squared"]
+    KZero --> KMat["Kernel matrix K_ij<br/>input to SVM or ridge model"]
+  end
+
+  Data["#quot;Training data<br/>X [N x d"], labels y [N]"] --> VA
+  Data --> QInit
+  Data --> Kx
+  Data --> Ky
+  VL --> Pred["Prediction or learned observable<br/>Tr(M rho(x,theta))"]
+  QScore --> Pred
+  KMat --> Pred
 ```
+
+The diagram separates three QML workflows that often get blurred together. VQE and QAOA are variational loops with explicit ansatz layers, measurements, noise, and optimizer feedback, while the kernel circuit estimates state overlaps by applying one feature map followed by the inverse of another. The labeled shapes show where classical tensors enter, where shot data leaves the device, and where parameters return through the dotted feedback arrows.
 
 | QML approach | Quantum object | N&C notation that clarifies it | Main risk |
 |---|---|---|---|

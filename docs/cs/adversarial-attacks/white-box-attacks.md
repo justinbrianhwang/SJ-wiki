@@ -333,16 +333,43 @@ These attacks are most useful when the evaluation question is low distortion, co
 | DeepFool | Iteratively cross local linear boundary | Often $\ell_2$ | Geometric boundary estimate | Not a full robust evaluation |
 
 ```mermaid
-flowchart LR
-  A[Clean input x] --> B[Compute input gradient]
-  B --> C{"One step?"}
-  C -->|yes| D[FGSM]
-  C -->|no| E[Iterative ascent]
-  E --> F[Project to threat set]
-  F --> G{"More steps or restarts?"}
-  G -->|yes| B
-  G -->|no| H[Return x_adv]
+flowchart TB
+  Clean["Clean input x, label y, model f_theta, loss L"]
+
+  subgraph PGD["PGD / iterative first-order attack"]
+    direction TB
+    Init["Initialize x_adv^0 = x + random delta in epsilon-ball"]
+    Grad["Compute gradient: grad_x L(f_theta(x_adv^t), y)"]
+    Step["Gradient step: x_adv^t + alpha * sign(grad) or normalized grad"]
+    Project["Project to threat set: Pi_{B_p(x, epsilon)}"]
+    Clip["#quot;Clip to valid input range: [0, 1"] or normalized bounds"]
+    Check{"More PGD steps or restarts?"}
+    Select["Select highest-loss successful adversarial example"]
+    Init --> Grad --> Step --> Project --> Clip --> Check
+    Check -->|"Yes"| Grad
+    Check -->|"No"| Select
+  end
+
+  subgraph CW["Carlini-Wagner-style optimization"]
+    direction TB
+    Param["Unconstrained variable w with tanh/box transform to x_adv"]
+    Objective["Objective: norm(x_adv - x) + c * max(logit_y - max logit_other + kappa, 0)"]
+    Optim["Adam/gradient descent on w"]
+    Binary["Binary search or schedule for coefficient c"]
+    Best["Keep lowest-distortion adversarial solution"]
+    Param --> Objective --> Optim --> Binary
+    Binary -->|"continue"| Objective
+    Binary -->|"done"| Best
+  end
+
+  Clean --> Init
+  Clean --> Param
+  Select --> Verify["Verify misclassification, norm budget, clipping, targeted/untargeted goal"]
+  Best --> Verify
+  Verify --> Output(("Return x_adv with attack metadata"))
 ```
+
+This diagram separates the two white-box loops that are often compressed into one arrow. PGD alternates gradient ascent, projection into the epsilon ball, and clipping to the valid input range, while C&W optimizes a distortion-plus-logit-margin objective with a coefficient search before returning the best verified adversarial example.
 
 ## Worked example 1: One FGSM step on normalized pixels
 

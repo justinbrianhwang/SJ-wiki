@@ -9,10 +9,6 @@ Fourier series represent periodic signals as weighted sums of harmonically relat
 
 Continuous-time and discrete-time Fourier series share the same conceptual structure, but their details differ. Continuous-time periodic signals generally require infinitely many harmonics. Discrete-time periodic sequences have only finitely many distinct harmonics over one period because discrete-time frequency repeats every $2\pi$.
 
-![A Fourier-series visualization shows rotating phasors approximating a square wave.](https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Fourier_series_square_wave_circles_animation.svg/400px-Fourier_series_square_wave_circles_animation.svg.png)
-
-*Figure: First terms of a Fourier-series approximation to a square wave. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fourier_series_square_wave_circles_animation.svg), Cmglee, CC BY-SA 3.0.*
-
 ## Definitions
 
 For a continuous-time periodic signal with fundamental period $T_0$ and fundamental angular frequency
@@ -167,13 +163,27 @@ Fourier series also separates waveform smoothness from spectral decay. Signals w
 | Power relation | $P=\sum_{k=-\infty}^{\infty}\vert a_k\vert ^2$ | $P=\sum_{k=0}^{N-1}\vert a_k\vert ^2$ |
 
 ```mermaid
-flowchart LR
-  A[Periodic signal] --> B[Average against harmonic k]
-  B --> C[Coefficient a_k]
-  C --> D[Line spectrum]
-  D --> E[LTI scales by H at harmonic]
-  E --> F[Output periodic signal]
+flowchart TB
+  Periodic["Periodic signal<br/>CT period T0 or DT period N"] --> Fundamental["Fundamental frequency<br/>w0=2pi/T0 or O0=2pi/N"]
+  Fundamental --> Analysis["Analysis step<br/>average against each harmonic basis function"]
+  Analysis --> Coeff["Fourier coefficients a_k<br/>line spectrum at harmonic indices"]
+  Coeff --> Synthesis["Synthesis<br/>sum a_k exp(j k w0 t) or finite DT sum"]
+  Synthesis --> Partial["Partial sum or finite harmonic set<br/>approximation and power accounting"]
+
+  subgraph LTIUse["LTI steady-state use"]
+    direction TB
+    Coeff --> Harmonic["each complex exponential is an eigenfunction"]
+    Harmonic --> Scale["scale coefficient by H at that harmonic"]
+    Scale --> OutputSeries["output Fourier series<br/>same harmonics, changed amplitudes/phases"]
+  end
+
+  Partial --> Convergence{"Signal regularity"}
+  Convergence -- "smooth" --> Fast["fast coefficient decay"]
+  Convergence -- "jump" --> Slow["slow decay and Gibbs behavior"]
+  OutputSeries --> Out(("periodic output"))
 ```
+
+This Fourier-series diagram shows the analysis/synthesis contract for periodic signals and the special LTI shortcut for steady-state outputs. Coefficients form a line spectrum at harmonics of the fundamental frequency, and an LTI system scales each line by its frequency response at that harmonic. The regularity branch explains why smooth signals need fewer modes than signals with jumps.
 
 ## Worked example 1: CTFS coefficients of a square wave
 

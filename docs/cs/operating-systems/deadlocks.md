@@ -9,10 +9,6 @@ Deadlock is the failure mode where a set of processes can never make progress be
 
 Silberschatz, Galvin, and Gagne place the detailed deadlock discussion inside the synchronization chapter in the Essentials edition, while the broader dinosaur-book family often treats it as a full chapter. The topic deserves its own wiki page because the same ideas appear in mutexes, semaphores, memory allocation, file locks, device allocation, database transactions, and distributed systems.
 
-![A dining philosophers diagram shows five processes competing for shared forks around a table.](https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Dining_philosophers.svg/500px-Dining_philosophers.svg.png)
-
-*Figure: Dining philosophers as a synchronization and deadlock example. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dining_philosophers.svg), DnetSvg after Allen3, public domain.*
-
 ## Definitions
 
 A **deadlock** exists when every process in a set is waiting for an event that can be caused only by another process in the same set. The event is often the release of a resource.
@@ -59,14 +55,48 @@ Deadlock proofs and fixes both become clearer when the exact resource graph is d
 ## Visual
 
 ```mermaid
-flowchart LR
-  P1("(P1")) -->|requests| R2[R2]
-  R1[R1] -->|assigned| P1
-  P2("(P2")) -->|requests| R1
-  R2[R2] -->|assigned| P2
+flowchart TB
+  subgraph RAG["Resource-allocation graph"]
+    direction LR
+    P1(("P1"))
+    P2(("P2"))
+    P3(("P3"))
+    R1["Resource R1: one instance"]
+    R2["Resource R2: one instance"]
+    R3["Resource R3: two instances"]
+    P1 -- "request" --> R2
+    R1 -- "assigned" --> P1
+    P2 -- "request" --> R1
+    R2 -- "assigned" --> P2
+    P2 -- "request" --> R3
+    R3 -- "assigned" --> P3
+  end
+
+  RAG --> Detect["Detection converts assignments and requests into wait-for edges"]
+
+  subgraph WFG["Wait-for graph"]
+    direction LR
+    W1(("P1"))
+    W2(("P2"))
+    W3(("P3"))
+    W1 -- "waits for R2 held by P2" --> W2
+    W2 -- "waits for R1 held by P1" --> W1
+    W2 -- "may wait for R3 held by P3" --> W3
+  end
+
+  Detect --> WFG
+  WFG --> Cycle{"Cycle among processes?"}
+  Cycle -- "yes, single-instance resources" --> Deadlock(("Deadlock"))
+  Cycle -- "yes, multi-instance resources" --> Need["Run matrix detection with Available, Allocation, Request"]
+  Need --> Victim{"Recovery choice"}
+  Victim -- "abort process" --> Abort["Release all resources held by victim"]
+  Victim -- "preempt resource" --> Rollback["Rollback to checkpoint if resource state is recoverable"]
+  Abort --> Recheck["Re-run detection"]
+  Rollback --> Recheck
+  Recheck --> Cycle
 ```
 
-The graph has a cycle: `P1` waits for `R2`, which is held by `P2`; `P2` waits for `R1`, which is held by `P1`. If `R1` and `R2` each have one instance, this cycle is a deadlock.
+This deadlock diagram shows both the resource-allocation graph and the derived wait-for graph. The explicit assignment and request edges reveal the `P1 -> P2 -> P1` cycle, while the extra multi-instance resource shows why a cycle is only immediately decisive for single-instance resources. The recovery branch makes the operational choices visible: abort a participant or preempt/rollback a recoverable resource, then re-run detection.
 
 ## Worked example 1: identifying the four conditions
 

@@ -76,27 +76,50 @@ A short proof sketch for dynamic dispatch is design-based rather than algebraic.
 ## Visual
 
 ```mermaid
-classDiagram
-  class Shape {
-    <<abstract>>
-    +area() double
-    +draw() void
-    +~Shape()
-  }
-  class Circle {
-    -radius double
-    +area() double
-    +draw() void
-  }
-  class Rectangle {
-    -width double
-    -height double
-    +area() double
-    +draw() void
-  }
-  Shape <|-- Circle
-  Shape <|-- Rectangle
+flowchart TB
+  BasePtr["Shape* p"] --> Obj{"Dynamic object layout"}
+
+  subgraph CircleObj["Circle object in memory"]
+    direction TB
+    Cvptr["vptr -> Circle vtable"]
+    Cbase["Shape base subobject"]
+    Cradius["double radius"]
+    Cvptr --> Cbase
+    Cbase --> Cradius
+  end
+
+  subgraph RectObj["Rectangle object in memory"]
+    direction TB
+    Rvptr["vptr -> Rectangle vtable"]
+    Rbase["Shape base subobject"]
+    Rw["double width"]
+    Rh["double height"]
+    Rvptr --> Rbase
+    Rbase --> Rw
+    Rw --> Rh
+  end
+
+  subgraph VTables["Virtual dispatch tables"]
+    direction TB
+    ShapeVT["Shape vtable: destructor slot, area slot, draw slot"]
+    CircleVT["Circle vtable: ~Circle, Circle::area, Circle::draw"]
+    RectVT["Rectangle vtable: ~Rectangle, Rectangle::area, Rectangle::draw"]
+  end
+
+  Obj -- "points to Circle" --> CircleObj
+  Obj -- "points to Rectangle" --> RectObj
+  Cvptr --> CircleVT
+  Rvptr --> RectVT
+  BasePtr --> Call["p->area()"]
+  Call --> Load["Load vptr from object"]
+  Load --> Slot["Read area function pointer from vtable slot"]
+  Slot --> Invoke(("Invoke override for dynamic type"))
+
+  Slice["Shape s = circle; object slicing"] --> ShapeOnly["Only Shape subobject copied; Circle radius lost"]
+  ShapeOnly -. "virtual call now dispatches as Shape object" .-> ShapeVT
 ```
+
+This C++ polymorphism diagram shows the usual object-layout mechanism behind virtual dispatch. A base pointer addresses the base subobject, the object stores a vptr, and the vptr selects a vtable whose fixed slot points to the dynamic type's override. The slicing branch makes the failure mode explicit: copying a derived object into a base object discards derived storage, so later calls no longer have a derived dynamic type to dispatch to.
 
 | Call form | Virtual? | Object expression | Binding result |
 |---|---:|---|---|

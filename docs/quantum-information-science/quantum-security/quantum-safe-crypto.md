@@ -44,16 +44,36 @@ The fifth result is that **migration remains open-ended**. The first standardize
 Quantum-safe migration is best treated as a lifecycle rather than a one-time algorithm swap.
 
 ```mermaid
-flowchart LR
-  A["Discover crypto use"] --> B["Classify primitive and role"]
-  B --> C["Score data lifetime and exposure"]
-  C --> D["Choose target: PQC or hybrid"]
-  D --> E["Test size, latency, parsing"]
-  E --> F["Stage rollout with telemetry"]
-  F --> G["Retire vulnerable algorithms"]
-  G --> H["Monitor standards and attacks"]
-  H --> D
+flowchart TB
+  subgraph TLS["Hybrid TLS 1.3 key establishment"]
+    direction LR
+    Client["ClientHello<br/>supported groups: X25519 + ML-KEM<br/>key_share: X25519 public, ML-KEM encaps key"] --> Server["ServerHello<br/>X25519 public share + ML-KEM ciphertext"]
+    Server --> CSecret["Client computes secrets<br/>ECDH(X25519) and ML-KEM decaps"]
+    Server --> SSecret["Server computes secrets<br/>ECDH(X25519) and ML-KEM encaps"]
+    CSecret --> Mix["hybrid combiner<br/>HKDF-Extract(classical_secret || pq_secret)"]
+    SSecret --> Mix
+    Mix --> Handshake["TLS handshake traffic secrets<br/>Finished MACs bind transcript"]
+    Handshake --> Cert["authentication layer<br/>classical cert now, PQ/hybrid cert when ecosystem supports it"]
+    Cert --> App["application traffic keys<br/>forward secrecy + harvest-now protection target"]
+  end
+
+  subgraph Agility["Crypto-agility migration sequence"]
+    direction LR
+    Inv["inventory<br/>TLS, VPN, SSH, S/MIME, code signing, firmware, backups"] --> Class["classify role<br/>KEX, signature, certificate, archive"]
+    Class --> Risk["risk score<br/>data lifetime, exposure, compliance date"]
+    Risk --> Lab["lab test<br/>message sizes, latency, middleboxes, parsers, HSMs"]
+    Lab --> Dual["dual-stack rollout<br/>negotiate classical, hybrid, or PQ-only by policy"]
+    Dual --> Tele["telemetry<br/>failure rate, downgrade attempts, performance"]
+    Tele --> Retire["retire RSA/ECC use<br/>disable vulnerable algorithms by deadline"]
+    Retire --> Watch["watch standards and attacks<br/>new KEMs, signatures, side-channel results"]
+    Watch -. "update policy and algorithms" .-> Dual
+  end
+
+  TLS --> Lab
+  Tele -. "detect downgrade or incompatibility" .-> Handshake
 ```
+
+The diagram combines a concrete hybrid TLS 1.3 handshake with the operational migration loop around it. The TLS branch shows classical X25519 and ML-KEM material being combined into handshake secrets, while authentication is called out separately because PQ signatures and certificates have different deployment constraints from KEMs. The migration branch tracks inventory, risk scoring, size and parser testing, staged rollout, telemetry, retirement, and standards monitoring.
 
 | Workstream | Assets to find | First migration action | Main risk |
 |---|---|---|---|

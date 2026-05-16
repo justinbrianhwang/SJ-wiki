@@ -9,10 +9,6 @@ After introducing structures, K&R immediately applies them to dynamic data struc
 
 The examples are small versions of real compiler and text-processing machinery. A tree stores sorted words with counts. A hash table stores names and replacement text for something like a macro processor. Both show why structures are more than grouped variables: a structure can point to another structure of the same type, creating a graph of objects.
 
-![A hash table diagram shows keys mapped to table slots with chained buckets for collisions.](https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Dsa_hash_table.svg/500px-Dsa_hash_table.svg.png)
-
-*Figure: Hash table using separate chaining for collisions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dsa_hash_table.svg), Amit6, public domain.*
-
 ## Definitions
 
 A self-referential structure contains pointers to the same structure type:

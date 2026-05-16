@@ -9,10 +9,6 @@ The book turns from the 8085 microprocessor to the 8051 microcontroller because 
 
 The 8051 is still small enough to understand at the register level. It is also different enough from the 8085 to teach microcontroller thinking: software configures hardware by writing SFRs, port pins may serve alternate functions, internal data memory has multiple regions, and bit-addressable storage makes single-bit control efficient.
 
-![An Intel 8051 architecture diagram shows central microcontroller blocks and buses.](https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Intel_8051_arch.svg/500px-Intel_8051_arch.svg.png)
-
-*Figure: Intel 8051 microcontroller architecture. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_8051_arch.svg), Appaloosa, CC BY-SA 3.0.*
-
 ## Definitions
 
 The **8051** is the original member of Intel's MCS-51 microcontroller family. The book's 8051 chapters cover the core CPU, internal memory, ports, timers, serial port, interrupts, and system connections. Later chapters discuss derivatives such as 89C51 devices.
@@ -51,17 +47,58 @@ An eighth key result is that alternate pin functions are part of the architectur
 
 ## Visual
 
-```text
-Classic 8051 internal data space
+```mermaid
+flowchart TB
+  subgraph CPU["8051 CPU core"]
+    direction TB
+    A["Accumulator A"]
+    B["B register for MUL/DIV"]
+    PSW["PSW: CY, AC, OV, P, RS1:RS0"]
+    DPTR["DPTR = DPH:DPL, 16-bit"]
+    PC["PC, 16-bit program counter"]
+    SP["SP, 8-bit stack pointer"]
+    ALU["ALU and Boolean bit processor"]
+    A --> ALU
+    B --> ALU
+    PSW --> ALU
+    DPTR --> ALU
+  end
 
-00H-07H  Register bank 0: R0-R7
-08H-0FH  Register bank 1: R0-R7
-10H-17H  Register bank 2: R0-R7
-18H-1FH  Register bank 3: R0-R7
-20H-2FH  Bit-addressable RAM, 128 bits
-30H-7FH  General-purpose RAM and stack
-80H-FFH  SFRs by direct addressing only
+  subgraph DataMem["Classic internal data memory"]
+    direction TB
+    Bank0["00H-07H: register bank 0, R0-R7"]
+    Bank1["08H-0FH: register bank 1, R0-R7"]
+    Bank2["10H-17H: register bank 2, R0-R7"]
+    Bank3["18H-1FH: register bank 3, R0-R7"]
+    BitRAM["20H-2FH: bit-addressable RAM, 128 bits"]
+    GPR["30H-7FH: general RAM and upward-growing stack"]
+  end
+
+  subgraph SFR["SFR direct address space, 80H-FFH"]
+    direction TB
+    Ports["P0, P1, P2, P3 port latches"]
+    Timers["TMOD, TCON, TH0/TL0, TH1/TL1"]
+    Serial["SCON, SBUF, PCON"]
+    Interrupts["IE, IP and interrupt flags"]
+  end
+
+  subgraph Memories["Separate memory spaces"]
+    direction LR
+    Program["Program memory read by fetch and MOVC"]
+    XData["External data memory read/write by MOVX"]
+    Internal["Internal RAM/SFR read/write by MOV"]
+  end
+
+  CPU --> DataMem
+  CPU --> SFR
+  CPU --> Memories
+  Ports --> Pins["Port pins P0-P3; alternate functions for address/data, serial, timers, interrupts"]
+  Timers --> Pins
+  Serial --> Pins
+  Interrupts --> CPU
 ```
+
+This 8051 diagram shows the CPU registers, internal RAM map, SFR control surface, separate memory spaces, and port alternate functions in one view. The four register banks, bit-addressable RAM, general RAM/stack region, and direct-only SFR range are labeled with their standard address ranges. The memory-space branch explains why `MOV`, `MOVC`, and `MOVX` are not interchangeable, while the port branch shows how peripheral functions share physical pins.
 
 | Resource | Classic 8051 role | Programming note |
 |---|---|---|

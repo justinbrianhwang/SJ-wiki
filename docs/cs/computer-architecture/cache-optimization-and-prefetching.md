@@ -9,10 +9,6 @@ Basic cache design chooses size, block size, associativity, and write policy. Ad
 
 H&P organizes cache optimizations around measurable causes of memory stalls. The right question is not "does this reduce misses?" but "which term in execution time does this improve, and what does it damage?" That framing is especially important once multicore processors create shared-cache contention and bandwidth pressure.
 
-![A cache hierarchy diagram shows progressively larger memory levels between CPU cores and main memory.](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Multi-level_Cache_Hierarchy.svg/500px-Multi-level_Cache_Hierarchy.svg.png)
-
-*Figure: Multi-level cache hierarchy between processors and memory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Multi-level_Cache_Hierarchy.svg), Ferry24.Milan, CC BY-SA 3.0.*
-
 ## Definitions
 
 Hit time is the time to access a cache when the requested block is present. Miss rate is the fraction of accesses that miss. Miss penalty is the additional time to service a miss from lower levels.
@@ -64,13 +60,44 @@ Energy can reverse a purely performance-based conclusion. A prefetcher that impr
 
 ```mermaid
 flowchart TD
-    A[Memory stall problem] --> B{"Dominant term?"}
-    B -->|Hit time| C[Small L1 or way prediction]
-    B -->|Miss rate| D["Associativity, size, blocking"]
-    B -->|Miss penalty| E["Multilevel cache, critical word first"]
-    B -->|Bandwidth| F["Banks, pipeline, nonblocking cache"]
-    B -->|Latency overlap| G[Hardware or compiler prefetch]
+    Access["Core memory access stream"] --> L1{"L1 cache hit?"}
+    L1 -- "hit" --> Return(("Return data in L1 hit time"))
+    L1 -- "miss" --> MSHR{"MSHR entry available?"}
+    MSHR -- "no" --> Stall["Stall until miss-tracking state frees"]
+    MSHR -- "yes" --> Track["Allocate MSHR: block address, waiting loads, target register tags"]
+    Track --> L2{"L2/LLC hit?"}
+    L2 -- "hit" --> Critical["Critical-word-first return to core"]
+    L2 -- "miss" --> DRAM["DRAM request through memory controller"]
+    DRAM --> Fill["Fill cache line, wake waiting loads, update replacement state"]
+    Critical --> Fill
+    Fill --> Return
+
+    subgraph Prefetch["Prefetch pipeline"]
+      direction TB
+      Detect["Detect stream or stride: A, A+S, A+2S"]
+      Distance["Choose distance d = ceil(memory latency / loop cycles)"]
+      Request["Issue prefetch into MSHR or prefetch queue"]
+      Useful{"Used before eviction?"}
+      Detect --> Distance
+      Distance --> Request
+      Request --> Useful
+    end
+
+    Access -. "address stream trains" .-> Detect
+    Request -. "competes for bandwidth and MSHRs" .-> MSHR
+    Useful -- "yes" --> Return
+    Useful -- "no" --> Pollution["Cache pollution and wasted bandwidth"]
+
+    subgraph Compiler["Compiler locality transformations"]
+      direction LR
+      Interchange["Loop interchange"] --> Blocking["Blocking/tiling"]
+      Blocking --> Padding["Padding/alignment"]
+    end
+
+    Compiler -. "changes access stream and working set" .-> Access
 ```
+
+This cache-optimization diagram ties specific mechanisms to the miss path rather than listing them as independent tricks. Nonblocking caches use MSHRs to keep hits and multiple misses in flight, critical-word-first reduces effective miss penalty, and prefetching competes for the same bandwidth and tracking entries it tries to help. The compiler-transform branch shows that loop order, tiling, and padding change the access stream before hardware ever sees it.
 
 | Optimization | Target | Helps most when | Can hurt by |
 |---|---|---|---|

@@ -9,10 +9,6 @@ Control systems engineering studies how to make a dynamic system behave in a des
 
 The central idea is feedback. In an open-loop system the command passes forward to the plant without measuring the result. In a closed-loop system the output is sensed and compared with the reference, producing an error signal that drives correction. The price of feedback is extra hardware, modeling effort, and possible instability; the benefit is accuracy, disturbance rejection, and tunable dynamics. This page sets the vocabulary used by the modeling, response, stability, and design pages that follow.
 
-![A feedback loop block diagram shows an output signal returned to the input through a controller path.](https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Feedback_Loop.svg/500px-Feedback_Loop.svg.png)
-
-*Figure: Feedback loop block diagram in control theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Feedback_Loop.svg), Inductiveload, public domain.*
-
 ## Definitions
 
 A **control system** is an interconnection of components whose purpose is to cause an output, often called the controlled variable, to follow or regulate against an input, often called the reference or command. A **plant** or **process** is the physical subsystem being controlled: a motor-load assembly, furnace, aircraft attitude channel, chemical reactor, disk-drive head, or antenna. A **controller** produces the actuator signal that drives the plant.
@@ -91,16 +87,26 @@ Finally, a control diagram should be read as a hypothesis. The arrows and transf
 
 ```mermaid
 flowchart LR
-  R["Reference"] --> S["Summing junction"]
-  S --> E["Error signal"]
-  E --> C["Controller"]
-  C --> A["Actuator"]
-  A --> P["Plant"]
-  P --> Y["Output"]
-  Y --> H["Sensor"]
-  H --> S
-  D["Disturbance"] --> P
+  R["R(s): reference / command"] --> Sum(("Σ"))
+  HOut["B(s): feedback signal"] -->|"negative input"| Sum
+  Sum --> E["E(s) = R(s) - B(s)"]
+  E --> C["Controller G_c(s): gain, PID, lead/lag"]
+  C --> U["U(s): actuator command"]
+  U --> Act["Actuator G_a(s): amplifier, valve, motor driver"]
+  Act --> PlantIn(("Σ"))
+  D["D(s): load disturbance"] --> PlantIn
+  PlantIn --> P["Plant G_p(s): physical process"]
+  P --> Y["C(s): controlled output"]
+  Y --> Sensor["Sensor / transducer H(s)"]
+  Sensor --> HOut
+  N["N(s): sensor noise"] --> SenseSum(("Σ"))
+  Sensor --> SenseSum
+  SenseSum --> HOut
+  Y --> Perf["Performance checks: transient response, steady-state error, stability"]
+  Perf -. "redesign gains or model" .-> C
 ```
+
+This diagram shows the classical feedback architecture with explicit reference `R(s)`, error `E(s)`, controller `G_c(s)`, actuator, plant `G_p(s)`, feedback sensor `H(s)`, output `C(s)`, disturbance, and sensor-noise entry points. The dotted redesign path emphasizes that feedback design iterates when measured transient response, steady-state error, or stability does not match the model.
 
 | Feature | Open-loop control | Closed-loop control |
 |---|---|---|

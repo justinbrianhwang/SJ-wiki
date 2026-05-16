@@ -81,16 +81,22 @@ Equilibria matter because simulations are often run as deviations from a steady 
 
 ```mermaid
 flowchart TD
-  A[Physical system and question] --> B[Choose boundary and states]
-  B --> C[Write conservation laws]
-  C --> D[Add constitutive relations]
-  D --> E[Check units and signs]
-  E --> F[Find equilibria or initial conditions]
-  F --> G[Implement in MATLAB or Simulink]
-  G --> H[Compare response with expected physics]
-  H -->|model inadequate| B
-  H -->|adequate| I[Use simulation for prediction or design]
+  Question["Physical system and modeling question<br/>what output or decision matters?"] --> Boundary["Choose boundary<br/>inputs, outputs, environment, neglected dynamics"]
+  Boundary --> States["Choose states<br/>stored energy or material inventory"]
+  States --> Balances["Write balances<br/>accumulation = inflow - outflow + generation"]
+  Balances --> Constitutive["Add constitutive relations<br/>friction, resistance, heat transfer, reaction laws"]
+  Constitutive --> Parameters["Collect parameters and units<br/>mass, capacitance, resistance, rate constants"]
+  Parameters --> Equations["Assemble ODE/DAE<br/>x_dot = f(t,x,u,p)"]
+  Equations --> Equilibrium["Find initial conditions and equilibria<br/>0 = f(x_bar,u_bar,p)"]
+  Equilibrium --> Audit["Audit model<br/>units, signs, limits, conservation, positivity"]
+  Audit --> Implement["Implement in MATLAB or Simulink<br/>derivative function or integrator diagram"]
+  Implement --> Compare["compare response with expected physics<br/>steady state, time constants, monotonicity, energy"]
+  Compare --> Decision{"model adequate for question?"}
+  Decision -- "no" --> Boundary
+  Decision -- "yes" --> Model(("usable continuous-time model"))
 ```
+
+This modeling diagram shows the derivation pipeline before any solver is chosen. The state and balance layers define the dynamic order, constitutive laws add physical closure, and parameter/unit checks constrain the equations. The feedback loop is intentionally at the boundary stage because an inadequate model often needs a revised system boundary, not just different numerical settings.
 
 | Modeling decision | Typical choice | Simulation consequence |
 |---|---|---|

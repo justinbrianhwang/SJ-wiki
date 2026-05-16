@@ -79,13 +79,63 @@ Real-time planning is also a scheduling problem. A theoretically better plan tha
 
 ## Visual
 
-| Planner family | Strengths | Weaknesses | Common AV use |
-|---|---|---|---|
-| A* and Hybrid A* | Clear costs, complete on discretized graph, good with maps | Grid resolution, high-dimensional cost, can be jerky | Parking, routing through constrained spaces |
-| RRT, RRT*, PRM | Handles continuous spaces and obstacles | Randomness, smoothing needed, hard with traffic rules | Research, unusual maneuvers, fallback planning |
-| Lattice planner | Structured, fast, vehicle-aware primitives | Depends on reference path and primitive design | Lane following, lane changes, highway planning |
-| Trajectory optimization | Smooth, constraint-aware, tunable comfort | Nonconvex obstacles, local minima, compute budget | Urban trajectory generation, MPC, refinement |
-| Learning-based planner | Can learn complex patterns from data | Validation, distribution shift, interpretability | Proposal generation, cost learning, end-to-end modules |
+```mermaid
+flowchart TB
+  Inputs["Planner inputs: ego state, route, map, tracks, predicted trajectories"]
+
+  subgraph Search["A* / Hybrid A* search expansion"]
+    direction TB
+    Discretize["#quot;State lattice or grid: [x, y, yaw, v"]"]
+    Open["Open set priority queue: f(n) = g(n) + h(n)"]
+    Pop{"Pop lowest f(n)"}
+    Primitive["Expand neighbors / motion primitives"]
+    Dynamics["Vehicle model check: curvature, steering, acceleration"]
+    Collision["Collision and rule check against obstacles and lanes"]
+    Cost["Update g(n): distance, time, comfort, risk"]
+    Goal{"Goal reached?"}
+    Path["Coarse path or maneuver corridor"]
+    Discretize --> Open --> Pop --> Primitive --> Dynamics --> Collision --> Cost --> Goal
+    Goal -->|"No"| Open
+    Goal -->|"Yes"| Path
+  end
+
+  subgraph Lattice["Road-structured candidate generation"]
+    direction TB
+    Frenet["Project route to Frenet frame: s, d"]
+    Sample["Sample terminal states: speed, time, lateral offset"]
+    Prims["Generate polynomial/lattice primitives"]
+    Rank["Rank candidates: progress, comfort, clearance, rule cost"]
+    Frenet --> Sample --> Prims --> Rank
+  end
+
+  subgraph MPC["Trajectory optimization / MPC loop"]
+    direction TB
+    Warm["Warm start from search/lattice/previous trajectory"]
+    Horizon["Decision variables: x_0..x_N, u_0..u_N-1"]
+    Dyn["Dynamics constraints: x_{t+1} = f(x_t, u_t)"]
+    Bounds["Bounds: steering, acceleration, jerk, road envelope"]
+    Obst["Obstacle constraints from prediction envelopes"]
+    Obj["Objective: tracking + comfort + progress + risk"]
+    Solver["QP/NLP/iLQR solver under time budget"]
+    Feasible{"Feasible before deadline?"}
+    First["Execute first segment / send reference to controller"]
+    Shift["Shift horizon, observe new state, warm start again"]
+    Warm --> Horizon --> Dyn --> Bounds --> Obst --> Obj --> Solver --> Feasible
+    Feasible -->|"Yes"| First --> Shift
+    Feasible -->|"No"| Fallback["Use safe stop / previous safe trajectory"]
+    Shift -. "receding horizon" .-> Warm
+  end
+
+  Inputs --> Discretize
+  Inputs --> Frenet
+  Path --> Warm
+  Rank --> Warm
+  Inputs --> Obst
+  First --> Output(("Planned trajectory: [t, x, y, yaw, v, a, curvature]"))
+  Fallback --> Output
+```
+
+This diagram expands planning into a search/candidate layer and a constrained optimization layer. A*/Hybrid A* makes graph expansion, heuristic priority, dynamics checks, and collision checks explicit, while MPC shows the finite-horizon variables, constraints, solver deadline, first-action execution, and dotted receding-horizon feedback.
 
 ## Worked example 1: A* priorities on a small grid
 

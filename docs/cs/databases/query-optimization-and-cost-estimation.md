@@ -83,15 +83,44 @@ Optimization time is itself a cost. For short queries, spending seconds searchin
 
 ```mermaid
 flowchart TD
-  A["SQL query"] --> B["Parse and rewrite"]
-  B --> C["Generate logical alternatives"]
-  C --> D["Estimate cardinalities"]
-  D --> E["Choose access paths"]
-  E --> F["Choose join order and algorithms"]
-  F --> G["Lowest estimated cost plan"]
-  H["Catalog statistics"] --> D
-  H --> E
+  SQL["SQL query with joins, filters, grouping, order"] --> Parse["Parse and bind names"]
+  Parse --> Canon["Canonical logical tree"]
+  Canon --> Rules["Rule-based rewrite: push selections, push projections, decorrelate subqueries"]
+
+  subgraph Search["Dynamic-programming search over join subsets"]
+    direction TB
+    Base["Best plan for each base relation: scan or index path"]
+    Pairs["Best plans for relation pairs: join order and algorithm"]
+    Triples["Best plans for triples and larger subsets"]
+    Final["Best complete plan with required output properties"]
+    Base --> Pairs
+    Pairs --> Triples
+    Triples --> Final
+  end
+
+  subgraph CostInputs["Cost and cardinality inputs"]
+    direction TB
+    Tuples["Table cardinality and page count"]
+    Hist["Histograms and most-common-values"]
+    NDV["Distinct-value counts and null fractions"]
+    Index["Index height, clustering factor, covering columns"]
+    Mem["Available work memory and parallel workers"]
+  end
+
+  Rules --> Search
+  CostInputs -. "selectivity, join size, I/O, CPU, memory estimates" .-> Search
+  Search --> Props{"Required physical properties?"}
+  Props -- "needs order" --> SortMerge["Prefer ordered index or sort-merge path if cheaper"]
+  Props -- "no order" --> HashPath["Prefer hash join or hash aggregation if cheaper"]
+  Props -- "small outer and indexed inner" --> IndexLoop["Index nested-loop path"]
+  SortMerge --> Winner["Lowest estimated cost physical plan"]
+  HashPath --> Winner
+  IndexLoop --> Winner
+  Winner --> Runtime["Executor measures actual rows and may feed plan feedback"]
+  Runtime -. "stale-statistics detection" .-> CostInputs
 ```
+
+This optimizer diagram opens the black box between SQL and the final plan. Rule rewrites reduce the logical tree, then dynamic programming builds the best plans for base relations, pairs, and larger join subsets while tracking cost and physical properties such as ordering. The cost-input subgraph names the statistics that drive the choice, and the feedback edge highlights why comparing estimated and actual rows is central to query tuning.
 
 | Statistic | Used for | Risk when stale or missing |
 | --- | --- | --- |

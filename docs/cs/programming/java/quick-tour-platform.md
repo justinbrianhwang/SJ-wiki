@@ -45,15 +45,34 @@ When studying the quick tour, separate three layers on every line. The syntax la
 
 ```mermaid
 flowchart TD
-  A[Java source file] --> B[javac compiler]
-  B --> C[class file bytecode]
-  C --> D[class loader]
-  D --> E[bytecode verifier]
-  E --> F[Java virtual machine]
-  F --> G[main method executes]
-  F --> H[standard library objects]
-  F --> I[garbage collector]
+  Source["Java source file: .java"] --> Javac["javac compiler: parse, type-check, generate bytecode"]
+  Javac --> ClassFile[".class file: constant pool, fields, methods, bytecode, attributes"]
+  ClassFile --> Loader["Class loader: locate, load, link, initialize classes"]
+  Loader --> Verify["Bytecode verifier: stack maps, type safety, access rules"]
+  Verify --> Runtime["JVM runtime data areas"]
+
+  subgraph Areas["Runtime data areas"]
+    direction TB
+    Heap["Heap: objects and arrays"]
+    Stacks["Per-thread Java stacks: frames, locals, operand stacks"]
+    Meta["Class metadata and constant pools"]
+    Native["Native method interface and stacks"]
+  end
+
+  Runtime --> Areas
+  Areas --> Main["#quot;Invoke public static void main(String["] args)"]
+  Main --> Interpreter["Interpreter executes bytecode initially"]
+  Interpreter --> Hot{"Hot method or loop?"}
+  Hot -- "yes" --> JIT["JIT compiler emits optimized native code"]
+  Hot -- "no" --> Interpreter
+  JIT --> NativeCode["Native machine code runs under JVM safepoints"]
+  NativeCode --> GC["Garbage collector traces reachable heap objects"]
+  Interpreter --> GC
+  GC --> Heap
+  Main --> Stdlib["Standard library objects: System.out, collections, I/O"]
 ```
+
+This Java platform diagram shows the complete path from source to execution. `javac` emits class-file bytecode, the class loader and verifier prepare it, the JVM stores class metadata, stacks, and heap objects, then interpretation and JIT compilation execute the program. The GC and standard-library edges show that memory management and library services are runtime architecture, not syntax-level conveniences.
 
 | Quick tour feature | Later detailed page |
 |---|---|

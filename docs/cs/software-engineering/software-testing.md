@@ -52,20 +52,51 @@ Boundary testing is based on the observation that mistakes happen at decision ed
 ## Visual
 
 ```mermaid
-flowchart TD
-  A[Specification] --> B[Functional subdomains]
-  B --> C[Test matrix]
-  D[Source code] --> E[Control flow graph]
-  E --> F[C0 and C1 coverage]
-  E --> G[Data flow tests]
-  B --> H[Boundary tests]
-  I[Operational profile] --> J[Random tests]
-  C --> K[Test suite]
-  F --> K
-  G --> K
-  H --> K
-  J --> K
+flowchart TB
+  subgraph Dev["Development side"]
+    direction TB
+    Req["User requirements"]
+    SysReq["System requirements"]
+    Arch["Architecture and subsystem design"]
+    Detail["Detailed module design"]
+    Code["Source code"]
+    Req --> SysReq --> Arch --> Detail --> Code
+  end
+
+  subgraph Test["Test side aligned to the V-model"]
+    direction TB
+    Unit["Unit tests: statements, branches, data-flow def-use pairs"]
+    Integration["Integration tests: APIs, contracts, subsystem interactions"]
+    System["System tests: end-to-end behavior, performance, reliability"]
+    Acceptance["Acceptance tests: user workflows and requirements fit"]
+    Code --> Unit --> Integration --> System --> Acceptance
+  end
+
+  subgraph Design["Test-design inputs"]
+    direction TB
+    Spec["Specification-based tests: equivalence classes and boundaries"]
+    CFG["Source-based tests: control-flow graph and path coverage"]
+    DataFlow["Data-flow tests: definitions, uses, anomalies"]
+    Profile["Operational profile: random/statistical tests"]
+    Matrix["Traceability and coverage matrix"]
+    Spec --> Matrix
+    CFG --> Matrix
+    DataFlow --> Matrix
+    Profile --> Matrix
+  end
+
+  Req -. "validated by" .-> Acceptance
+  SysReq -. "verified by" .-> System
+  Arch -. "verified by" .-> Integration
+  Detail -. "verified by" .-> Unit
+  Matrix --> Unit
+  Matrix --> Integration
+  Matrix --> System
+  Matrix --> Acceptance
+  Acceptance --> Report(("Test report: pass/fail, coverage, defects, residual risk"))
 ```
+
+This diagram turns the testing page into a V-model view: each development artifact has a matching test level, from detailed design/unit tests up to requirements/acceptance tests. The test-design input block shows how specification subdomains, control-flow coverage, data-flow criteria, and operational profiles feed the traceability matrix and final test report.
 
 | Criterion | Basis | Strength | Limitation |
 |---|---|---|---|

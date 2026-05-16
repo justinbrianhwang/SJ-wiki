@@ -9,10 +9,6 @@ Robust models often lose clean accuracy compared with standard models. This is n
 
 The tradeoff should not be oversold as an absolute law for every dataset and architecture. Better data, architectures, training methods, and scale can improve both clean and robust accuracy. But the tension is real enough that every robustness result should report both metrics and name the threat model. This page explains the formal decomposition, geometric intuition, and practical consequences.
 
-![An overfitting diagram shows a classifier boundary that follows training points too closely.](https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Overfitting.svg/500px-Overfitting.svg.png)
-
-*Figure: Overfitting in a classifier decision boundary. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Overfitting.svg), Chabacano, CC BY-SA 4.0.*
-
 ## Definitions
 
 The **natural risk** of classifier $h$ under distribution $\mathcal{D}$ is:

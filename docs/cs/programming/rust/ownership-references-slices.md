@@ -42,23 +42,33 @@ The last-use behavior of borrows is also worth making explicit. Modern Rust does
 ## Visual
 
 ```mermaid
-flowchart LR
-  A[String owner s] --> B["Heap buffer: hello"]
-  A --> C{Operation}
-  C -->|"let t = s"| D[ownership moves to t]
-  C -->|"let r = &s"| E[immutable borrow]
-  C -->|"let m = &mut s"| F[exclusive mutable borrow]
-  D --> G[s cannot be used]
-  E --> H["s can be read, not mutably changed while r is used"]
-  F --> I[only m can access until borrow ends]
+flowchart TB
+  Owner["Binding s owns String stack header: ptr, len, capacity"] --> Heap["Heap allocation: bytes for hello"]
+  Owner --> Op{"Operation requested"}
+  Op -- "let t = s" --> Move["Move ownership: copy stack header to t; invalidate s"]
+  Move --> Drop["Exactly one owner later runs drop on heap allocation"]
+  Op -- "let r = &s" --> Shared["Shared borrow &String or &str"]
+  Op -- "let m = &mut s" --> Mut["Exclusive mutable borrow &mut String"]
+  Op -- "let first = &s[0..5]" --> Slice["Slice: pointer plus length view into owned buffer"]
+
+  Shared --> BorrowCheck1{"Any active mutable borrow overlaps?"}
+  BorrowCheck1 -- "no" --> ReadOK["Multiple shared reads allowed until last use"]
+  BorrowCheck1 -- "yes" --> Error1(("Compile-time borrow error"))
+
+  Mut --> BorrowCheck2{"Any active shared or mutable borrow overlaps?"}
+  BorrowCheck2 -- "no" --> WriteOK["Exclusive mutation allowed until last use"]
+  BorrowCheck2 -- "yes" --> Error2(("Compile-time borrow error"))
+
+  Slice --> BorrowCheck3{"Owner mutated or dropped while slice is used?"}
+  BorrowCheck3 -- "no" --> ViewOK["Slice remains valid view"]
+  BorrowCheck3 -- "yes" --> Error3(("Compile-time lifetime/borrow error"))
+
+  ReadOK --> End["Borrow ends at last use under non-lexical lifetimes"]
+  WriteOK --> End
+  ViewOK --> End
 ```
 
-```text
-String on stack                    Heap allocation
-+------+-----+----------+          +---+---+---+---+---+
-| ptr  | len | capacity | -------> | h | e | l | l | o |
-+------+-----+----------+          +---+---+---+---+---+
-```
+This Rust ownership diagram shows the stack header, heap allocation, move semantics, shared borrow, mutable borrow, and slice view as separate mechanisms. The borrow-checker diamonds encode the core aliasing rule: many shared references or exactly one mutable reference, with no overlap. The slice path shows why Rust ties views to the owner's lifetime and forbids mutation or drop while the view is still used.
 
 | Form | Takes ownership? | Allows mutation? | Caller can keep using original? |
 |---|---:|---:|---:|

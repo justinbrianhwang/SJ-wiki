@@ -57,21 +57,40 @@ The eighth key result is that the 8255 is not a power driver. Its ports are logi
 ## Visual
 
 ```mermaid
-graph TD
-  CPU[8085 or 8051 bus] --> DB[8255 data bus buffer]
-  CPU --> CTRL[Read/write control logic]
-  CTRL --> CR[Control register]
-  CR --> GA[Group A control]
-  CR --> GB[Group B control]
-  GA --> PA[Port A 8 bits]
-  GA --> PCU[Port C upper bits]
-  GB --> PB[Port B 8 bits]
-  GB --> PCL[Port C lower bits]
-  PA --> DevA[External device A]
-  PB --> DevB[External device B]
-  PCU --> Handshake[Handshake or control]
-  PCL --> Handshake
+flowchart TB
+  CPU["CPU bus: D7-D0, A1-A0, RD, WR, CS, RESET"] --> DBuf["Data bus buffer"]
+  CPU --> RW["Read/write control logic"]
+  RW --> Select{"A1 A0 register select"}
+  Select -- "00" --> PAReg["Port A data latch/buffer, 8 bits"]
+  Select -- "01" --> PBReg["Port B data latch/buffer, 8 bits"]
+  Select -- "10" --> PCReg["Port C latch/buffer, upper and lower nibbles"]
+  Select -- "11" --> CtrlReg["Control register"]
+
+  CtrlReg --> CW{"Control word bit 7"}
+  CW -- "1: I/O mode set" --> GroupA["Group A control: Port A + PC7-PC4; modes 0,1,2"]
+  CW -- "1: I/O mode set" --> GroupB["Group B control: Port B + PC3-PC0; modes 0,1"]
+  CW -- "0: BSR mode" --> BSR["Set/reset one selected Port C bit"]
+  GroupA --> PAReg
+  GroupA --> PCUpper["PC7-PC4 handshake/status or simple I/O"]
+  GroupB --> PBReg
+  GroupB --> PCLower["PC3-PC0 handshake/status or simple I/O"]
+  BSR --> PCReg
+
+  subgraph Mode1["Mode 1 handshaked transfer example"]
+    direction LR
+    Dev["External device"] -- "STB or ACK" --> PCHandshake["Port C handshake lines"]
+    PCHandshake --> Status["IBF/OBF/INTR status"]
+    Status --> CPUService["CPU polls or services interrupt"]
+  end
+
+  PAReg <--> DevA["External 8-bit device on Port A"]
+  PBReg <--> DevB["External 8-bit device on Port B"]
+  PCReg <--> DevC["Control bits, handshake pins, LEDs, relays through drivers"]
+  PCUpper --> Mode1
+  PCLower --> Mode1
 ```
+
+This 8255 diagram separates the CPU bus interface, internal register selection, control-word decoding, group controls, port latches, and handshake roles. The `A1 A0` branch shows how Port A, Port B, Port C, and the control register are selected, while bit 7 of the control word separates I/O mode from bit set/reset mode. The Mode 1 subgraph makes clear that Port C bits may become handshake/status lines rather than ordinary GPIO pins.
 
 | Mode | Port behavior | Port C role | Typical application |
 |---|---|---|---|

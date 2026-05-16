@@ -9,10 +9,6 @@ Data mining is the study of collecting, preparing, modeling, and interpreting da
 
 These notes are detailed study pages for Aggarwal's *Data Mining: The Textbook*. They emphasize definitions, algorithmic ideas, worked numerical examples, pseudocode, and Python snippets. The goal is not to replace the book's full treatment, but to give a structured wiki path through the concepts that recur across chapters.
 
-![A DBSCAN diagram shows core points, border points, and noise under a density-based clustering rule.](https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/DBSCAN-Illustration.svg/500px-DBSCAN-Illustration.svg.png)
-
-*Figure: DBSCAN core, border, and noise points. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:DBSCAN-Illustration.svg), Chire, CC BY-SA 3.0.*
-
 ## Definitions
 
 **Data mining** is the process of collecting, cleaning, transforming, analyzing, and interpreting data to discover useful patterns, build predictive models, or identify unusual behavior.

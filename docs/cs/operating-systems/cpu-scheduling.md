@@ -9,10 +9,6 @@ CPU scheduling is the policy problem at the heart of multiprogramming: when seve
 
 The textbook presents scheduling after synchronization in this edition, but conceptually it builds on processes and threads. The scheduler chooses among ready execution contexts; the dispatcher performs the context switch; timers and blocking operations create opportunities to reconsider the choice. Different environments want different outcomes, so a batch server, desktop, mobile phone, and real-time controller should not all use the same simple rule.
 
-![A circular operating-system process state diagram shows scheduler transitions between process states.](https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Process_states.svg/500px-Process_states.svg.png)
-
-*Figure: Process-state transitions in a scheduler. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Process_states.svg), A3r0, public domain.*
-
 ## Definitions
 
 The **CPU scheduler** selects a process or thread from the ready queue. In operating systems that support kernel threads, the scheduled entities are usually kernel-level threads, even when people casually say "process scheduling."
@@ -71,17 +67,49 @@ Even in a small teaching example, state the arrival times explicitly; otherwise 
 ## Visual
 
 ```mermaid
-flowchart LR
-  Ready[Ready queue] --> Scheduler{CPU scheduler}
-  Scheduler -->|selects| Dispatch[Dispatcher]
-  Dispatch --> Running[Running thread]
-  Running -->|time slice expires| Ready
-  Running -->|I/O request| Wait[Wait queue]
-  Wait -->|I/O completion interrupt| Ready
-  Running -->|exit| Done[Terminated]
+flowchart TB
+  Arrival["Runnable threads wake or arrive with PCB/TCB state"] --> Classify{"Scheduling class"}
+  Classify -- "real-time" --> RTQ["RT ready queue: ordered by deadline or static priority"]
+  Classify -- "interactive" --> Q0["MLFQ level 0: short quantum, high priority"]
+  Classify -- "CPU-bound" --> Q1["MLFQ level 1..k: longer quantum, lower priority"]
+  Classify -- "fair-share" --> Fair["CFS-like tree: virtual runtime key"]
+
+  subgraph CoreSched["Per-CPU scheduling path"]
+    direction TB
+    Pick{"Pick highest eligible entity"}
+    Dispatch["Dispatcher: save old registers; load next registers; switch address space"]
+    Run["Running on CPU for quantum or until block/exit"]
+    Tick["Timer tick or accounting interrupt"]
+  end
+
+  RTQ --> Pick
+  Q0 --> Pick
+  Q1 --> Pick
+  Fair --> Pick
+  Pick --> Dispatch
+  Dispatch --> Run
+  Run --> Tick
+
+  Tick -- "quantum expired" --> Demote["Update CPU burst estimate; maybe demote or age"]
+  Demote --> Classify
+  Run -- "I/O, page fault, lock wait" --> Blocked["Blocked queue: device, sleep, futex, or page wait"]
+  Blocked -- "interrupt or wakeup" --> Classify
+  Run -- "voluntary yield" --> Classify
+  Run -- "exit" --> Done(("Terminated"))
+
+  subgraph ExampleGantt["Round-robin example, quantum = 4 ms"]
+    direction LR
+    G1["0-4 P1"] --> G2["4-8 P2"]
+    G2 --> G3["8-12 P3"]
+    G3 --> G4["12-16 P1"]
+    G4 --> G5["16-17 P3"]
+    G5 --> G6["17-19 P1"]
+  end
+
+  Pick -. "load balance / CPU affinity" .-> OtherCPU["Other CPU run queues"]
 ```
 
-Scheduling is not only a queue operation. Hardware timer interrupts, I/O completion interrupts, locks, and process exits all change which threads are ready.
+This scheduling diagram shows the real control path around the scheduler instead of only a single ready queue. Runnable entities enter policy-specific queues, the dispatcher performs the context switch, and timer or blocking events feed updated state back into the queues. The embedded Gantt row gives a concrete round-robin shape for a 4 ms quantum, while the dotted load-balancing edge shows that multiprocessor scheduling also has placement and affinity constraints.
 
 ## Worked example 1: comparing FCFS and SJF
 

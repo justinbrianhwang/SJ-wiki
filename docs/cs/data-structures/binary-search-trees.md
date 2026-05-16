@@ -9,10 +9,6 @@ A binary search tree, or BST (이진 탐색 트리), adds an ordering rule to th
 
 The main lesson is conditional. A BST is efficient when its height is small; it is inefficient when insertions create a chain. This is why the source textbook treats basic binary search trees before more advanced search trees. The basic BST explains the invariant and the update cases. Balanced trees then add mechanisms to protect the height.
 
-![A binary search tree diagram shows ordered keys arranged so smaller keys are on the left and larger keys are on the right.](https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Binary_search_tree.svg/500px-Binary_search_tree.svg.png)
-
-*Figure: Binary search tree with ordered recursive structure. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Binary_search_tree.svg), Derrick Coetzee, public domain.*
-
 ## Definitions
 
 A **binary search tree** is a binary tree in which every node with key `k` satisfies:

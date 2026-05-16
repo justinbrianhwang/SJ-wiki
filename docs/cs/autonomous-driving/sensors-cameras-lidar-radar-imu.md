@@ -9,10 +9,6 @@ Autonomous driving is built on imperfect measurements. Cameras see texture and c
 
 This page is the sensor-level foundation for [perception](/cs/autonomous-driving/perception-object-detection-and-segmentation), [depth estimation](/cs/autonomous-driving/depth-estimation-and-stereo-vision), [sensor fusion](/cs/autonomous-driving/sensor-fusion), [localization](/cs/autonomous-driving/localization-and-hd-maps), and [safety analysis](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing). The practical lesson is that sensor choice is never just a bill-of-materials decision; it changes which algorithms are credible and which hazards must be mitigated.
 
-![A LiDAR point cloud image shows a street intersection reconstructed as colored three-dimensional points.](https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Ouster_OS1-64_lidar_point_cloud_of_intersection_of_Folsom_and_Dore_St%2C_San_Francisco.png/500px-Ouster_OS1-64_lidar_point_cloud_of_intersection_of_Folsom_and_Dore_St%2C_San_Francisco.png)
-
-*Figure: LiDAR point cloud of an urban intersection. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Ouster_OS1-64_lidar_point_cloud_of_intersection_of_Folsom_and_Dore_St,_San_Francisco.png), Dllu, CC BY 4.0.*
-
 ## Definitions
 
 A **camera** measures image irradiance on a pixel grid. Automotive cameras are usually monocular RGB or RCCB sensors with wide dynamic range. A **rolling shutter** exposes rows at slightly different times, which can bend fast-moving objects or distort images during vibration. A **global shutter** exposes all pixels at once, reducing motion distortion but often with cost or sensitivity trade-offs.
@@ -76,14 +72,69 @@ Sensor failure modes must be treated as first-class design inputs. Cameras can s
 
 ## Visual
 
-| Sensor | Measures | Strengths | Weaknesses | Weather sensitivity | Typical AV role |
-|---|---|---|---|---|---|
-| Camera | Appearance, texture, color, bearing | Semantic detail, lane markings, signs, low cost | Depth ambiguity, glare, low light, rolling shutter | Fog, rain, snow, sun glare | Detection, segmentation, traffic lights, lanes |
-| LiDAR | 3D range and intensity | Accurate geometry, direct depth | Cost, sparse returns, adverse weather artifacts | Rain, snow, fog, dust | 3D detection, occupancy, localization |
-| Radar | Range, radial velocity, angle | Velocity, long range, some weather robustness | Lower angular resolution, ghosts, multipath | Usually better than camera and lidar | Tracking, cut-in detection, redundancy |
-| IMU | Acceleration, angular velocity | High rate, works in darkness and tunnels | Bias drift, no absolute position | Low weather sensitivity | Dead reckoning, stabilization, localization fusion |
-| GNSS | Global position and time | Absolute reference, common infrastructure | Multipath, outages, spoofing, jamming | Urban canyons and foliage matter | Global pose prior, map alignment |
-| Ultrasonic | Short-range distance | Cheap, useful near vehicle | Low resolution, short range | Rain, dirt, angled surfaces | Parking, curb and near-field checks |
+```mermaid
+flowchart TB
+  subgraph Camera["Camera processing chain"]
+    direction TB
+    CamRaw["#quot;Raw frames: [H, W, RGB/RCCB, t"]"]
+    CamISP["ISP + HDR merge + rectification"]
+    CamCal["Intrinsic/extrinsic calibration: K, distortion, T_cam_vehicle"]
+    CamFeat["#quot;Image CNN/ViT features: [C, H/stride, W/stride"]"]
+    CamOut["Outputs: 2D boxes, masks, lanes, lights, bearings"]
+    CamRaw --> CamISP --> CamCal --> CamFeat --> CamOut
+  end
+
+  subgraph Lidar["LiDAR processing chain"]
+    direction TB
+    LidarRaw["#quot;Packets/range image: [beam, azimuth, range, intensity, t"]"]
+    LidarMotion["Motion compensation with IMU/odometry"]
+    LidarCloud["#quot;Point cloud: [N, x, y, z, intensity"]"]
+    LidarVoxel["#quot;Voxel/pillarization: [C, X, Y, Z"] or ["C, X, Y"]"]
+    LidarOut["Outputs: 3D boxes, occupancy, freespace, landmarks"]
+    LidarRaw --> LidarMotion --> LidarCloud --> LidarVoxel --> LidarOut
+  end
+
+  subgraph Radar["Radar processing chain"]
+    direction TB
+    RadarRaw["#quot;FMCW ADC samples: [chirp, antenna, sample"]"]
+    FFT["Range FFT -> Doppler FFT -> angle estimation"]
+    RadarCFAR["CFAR detection + clustering"]
+    RadarTrack["Track filtering: range, bearing, radial velocity"]
+    RadarOut["Outputs: long-range tracks, cut-in velocity cues"]
+    RadarRaw --> FFT --> RadarCFAR --> RadarTrack --> RadarOut
+  end
+
+  subgraph Inertial["IMU, GNSS, odometry chain"]
+    direction TB
+    IMURaw["#quot;IMU: [a_x, a_y, a_z, gyro_x, gyro_y, gyro_z"] at high rate"]
+    Wheel["Wheel ticks + steering angle"]
+    GNSS["GNSS/RTK: position, time, covariance"]
+    Prop["Dead-reckoning propagation: x_t, P_t"]
+    Update["EKF/factor-graph update"]
+    Pose["Outputs: ego pose, velocity, covariance, time base"]
+    IMURaw --> Prop
+    Wheel --> Prop
+    GNSS --> Update
+    Prop --> Update --> Pose
+  end
+
+  subgraph NearField["Ultrasonic / near-field chain"]
+    direction TB
+    UltraRaw["Time-of-flight echo: short-range distance"]
+    UltraFilter["Echo filtering + mounting-angle compensation"]
+    UltraGrid["Near-field occupancy cells around vehicle"]
+    UltraRaw --> UltraFilter --> UltraGrid
+  end
+
+  CamOut -->|"semantics + bearing"| Fusion["Fusion-ready measurement set"]
+  LidarOut -->|"metric geometry"| Fusion
+  RadarOut -->|"range + Doppler"| Fusion
+  Pose -->|"ego motion + timestamps"| Fusion
+  UltraGrid -->|"parking/curb proximity"| Fusion
+  Fusion --> Final(("Perception/localization inputs"))
+```
+
+This diagram compares each sensor as a processing chain rather than a flat list: cameras produce semantic image features, lidar produces metric geometry, radar adds Doppler-rich tracks, and inertial/GNSS signals stabilize pose and timing. The arrows into the fusion-ready set show why calibration and timestamps are part of the sensor architecture, not bookkeeping after the fact.
 
 ## Worked example 1: Computing lidar range from time of flight
 
@@ -184,4 +235,3 @@ print(in_front)
 - [Physics of signals and systems](/physics/signals-systems/)
 - [Electromagnetics for radar and lidar](/physics/electromagnetics/)
 - Further reading: Thrun, Burgard, and Fox, *Probabilistic Robotics*; standard automotive radar texts; lidar sensor datasheets; camera calibration literature by Zhang and Hartley-Zisserman.
-

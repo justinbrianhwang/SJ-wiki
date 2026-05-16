@@ -63,15 +63,25 @@ Data preprocessing should also preserve reversibility where possible. Saving cat
 | One-hot features | `torch.Tensor` | `(batch, categories)` | Converts categories to numeric inputs |
 
 ```mermaid
-flowchart LR
-  A[Raw files or tables] --> B[Parse records]
-  B --> C[Split train validation test]
-  C --> D[Fit preprocessing on train only]
-  D --> E[Transform every split]
-  E --> F[TensorDataset]
-  F --> G[DataLoader minibatches]
-  G --> H[Model input tensors]
+flowchart TB
+  Raw["Raw files, tables, images, or text"] --> Parse["Parse records and labels"]
+  Parse --> Split["Split train / validation / test before fitting statistics"]
+  Split --> TrainStats["Fit train-only artifacts: means, stds, vocab, category map, label map"]
+  TrainStats --> Num["#quot;Numeric path: impute -> standardize -> float tensor [N, d_num"]"]
+  TrainStats --> Cat["#quot;Categorical path: one-hot or embedding ids -> [N, d_cat"]"]
+  TrainStats --> Seq["#quot;Sequence/image path: pad, crop, normalize -> [N, T"] or ["N, C, H, W"]"]
+  Num --> Join["Assemble feature tensors and targets"]
+  Cat --> Join
+  Seq --> Join
+  Join --> Dataset["Dataset object stores X, y, masks, and metadata"]
+  Dataset --> Loader["DataLoader: shuffle train, batch, collate, pin memory if useful"]
+  Loader --> Batch["Minibatch contract: features, target, valid lengths/masks"]
+  Batch --> Device["Move tensors to model device"]
+  Device --> Model(("Model-ready tensors"))
+  TrainStats -. "same artifacts reused without refitting" .-> Dataset
 ```
+
+The preprocessing diagram makes leakage boundaries visible: the split happens before normalization statistics, vocabularies, and category maps are fitted. Numeric, categorical, and sequence/image paths all converge into a dataset with explicit targets and masks. The final nodes show the runtime contract a model actually receives: minibatched tensors on the correct device.
 
 ## Worked example 1: broadcasting a minibatch
 

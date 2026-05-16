@@ -80,16 +80,30 @@ For study purposes, the most useful habit is to separate four layers: the contin
 ## Visual
 
 ```mermaid
-graph TD
-  A[Matrix A and right side b] --> B{"Need row swap?"}
-  B -->|yes| C[Apply permutation P]
-  B -->|no| D[Use current pivot]
-  C --> D
-  D --> E[Eliminate below pivot]
-  E --> F{"More columns?"}
-  F -->|yes| B
-  F -->|no| G["Triangular solves Ly=Pb and Ux=y"]
+flowchart TB
+  Input["Linear system<br/>A x = b, A is n by n"] --> Scale["Optional scaling and ordering<br/>reduce pivot growth"]
+  Scale --> ColLoop["For column k = 1 to n-1"]
+  ColLoop --> Pivot{"Partial pivot search<br/>largest |a_ik| for row i at least k"}
+  Pivot -- "pivot too small" --> Fail["singular or ill-conditioned warning"]
+  Pivot -- "usable pivot" --> Swap["swap rows in A and b<br/>record permutation P"]
+  Swap --> Mult["compute multipliers<br/>l_ik = a_ik / a_kk"]
+  Mult --> Elim["eliminate entries below pivot<br/>row_i := row_i - l_ik row_k"]
+  Elim --> More{"more columns?"}
+  More -- "yes" --> ColLoop
+  More -- "no" --> Factors["factors available<br/>P A = L U"]
+
+  subgraph Solve["Solve phase"]
+    direction TB
+    Forward["forward substitution<br/>L y = P b"] --> Back["back substitution<br/>U x = y"]
+    Back --> Resid["residual check<br/>r = b - A x"]
+  end
+
+  Factors --> Forward
+  Resid --> Output(("solution x"))
+  Resid -. "large residual or growth" .-> Scale
 ```
+
+The elimination architecture shows factorization as a pivot-search, row-swap, multiplier, and elimination loop, followed by triangular solves. Recording the permutation makes the solve contract explicit: the computed factors satisfy $PA=LU$, so the right side must become $Pb$ before forward substitution. The residual feedback highlights that a small-looking triangular solve is not enough when pivot growth or conditioning is poor.
 
 | Strategy | Factorization | Main benefit | Main risk |
 |---|---|---|---|

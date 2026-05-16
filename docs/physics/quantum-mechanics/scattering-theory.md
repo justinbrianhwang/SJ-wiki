@@ -82,14 +82,37 @@ Resonances occur when a phase shift passes rapidly through $\pi/2$. They signal 
 ## Visual
 
 ```mermaid
-flowchart LR
-  A[Incident beam] --> B[Localized target potential]
-  B --> C[Outgoing spherical wave]
-  C --> D["Amplitude f(theta)"]
-  D --> E[Differential cross section]
-  D --> F[Partial-wave phase shifts]
-  F --> G[Resonance or low-energy limit]
+flowchart TB
+  Input["Scattering setup<br/>incident plane wave with wave number k"] --> Potential["Localized potential V(r)<br/>or channel interaction"]
+  Potential --> Boundary["Asymptotic boundary condition<br/>incident wave + outgoing spherical wave"]
+  Boundary --> Amp["Scattering amplitude f(theta,phi)"]
+  Amp --> Cross["Observable cross sections<br/>d sigma/d Omega = |f|^2"]
+
+  subgraph Partial["Partial-wave architecture for central potentials"]
+    direction TB
+    Decomp["decompose into angular momentum channels<br/>l = 0,1,2,..."] --> Radial["solve radial Schrodinger equation<br/>regular at origin"]
+    Radial --> Phase["extract phase shifts delta_l<br/>from large-r behavior"]
+    Phase --> Sl["S_l = exp(2 i delta_l)<br/>unitarity per channel"]
+    Sl --> Sum["sum amplitude<br/>f(theta)=sum_l (2l+1)(e^(2i delta_l)-1)P_l(cos theta)/(2ik)"]
+    Sum --> Resonance["low energy s-wave or resonance<br/>delta_l near pi/2"]
+  end
+
+  subgraph Born["Born-series architecture"]
+    direction TB
+    LS["Lippmann-Schwinger equation<br/>scattering state equals free state plus outgoing Green term"] --> Series["T = V + V G0 V + V G0 V G0 V + ..."]
+    Series --> First["first Born amplitude<br/>Fourier component of V at q = k_f - k_i"]
+    Series --> Higher["higher Born terms<br/>multiple virtual scatterings"]
+    First --> Valid["valid for weak potentials or high energy"]
+  end
+
+  Potential --> Decomp
+  Potential --> LS
+  Sum --> Amp
+  First --> Amp
+  Amp --> Optical["optical theorem<br/>sigma_tot proportional to Im f(0)"]
 ```
+
+The scattering diagram shows the common I/O contract first: an incident wave and localized potential determine an outgoing amplitude and observable cross section. The partial-wave subgraph exposes the channel-by-channel route through radial equations, phase shifts, unitarity, and resonances; the Born subgraph exposes the Lippmann-Schwinger series and first-Born Fourier-transform approximation. The optical-theorem node links the forward amplitude back to total probability conservation.
 
 | Method | Best regime | Main output | Failure mode |
 |---|---|---|---|

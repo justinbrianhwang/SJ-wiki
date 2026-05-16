@@ -9,9 +9,20 @@ These notes follow Aston Zhang, Zachary C. Lipton, Mu Li, and Alexander J. Smola
 
 The later pages cover the main deep learning families: multilayer perceptrons, convolutional networks, recurrent networks, attention, transformers, NLP applications, computer vision systems, recommender systems, GANs, reinforcement learning, Gaussian processes, and hyperparameter optimization. Code examples use PyTorch for portability. For classical context, compare these notes with [machine learning](/cs/machine-learning/); for prerequisites, see [linear algebra](/math/linear-algebra/) and [probability](/math/probability-and-random-variables/).
 
-![A perceptron diagram shows weighted inputs combined and passed through an activation function to produce an output.](https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Perceptron.svg/500px-Perceptron.svg.png)
+```mermaid
+flowchart TB
+  Data["#quot;Data as tensors: tabular [N,d"], images ["N,C,H,W"], tokens ["N,T"]"] --> Model["Differentiable model: linear layers, MLPs, CNNs, RNNs, attention"]
+  Model --> Pred["Predictions: scalar, class logits, token logits, boxes, masks, scores"]
+  Target["Targets or self-supervised labels"] --> Loss["Scalar objective"]
+  Pred --> Loss
+  Loss --> Grad["Automatic differentiation computes parameter gradients"]
+  Grad --> Optim["Optimizer and schedule update weights"]
+  Optim -. "new parameters for next minibatch" .-> Model
+  Model --> Eval["Validation and deployment checks"]
+  Eval --> Data
+```
 
-*Figure: Perceptron unit with weighted inputs and activation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Perceptron.svg), Mat the w, CC BY-SA 3.0.*
+This overview diagram shows the repeated contract behind the chapter sequence. Data enters as shaped tensors, a differentiable model produces task-specific predictions, a scalar loss drives automatic differentiation, and an optimizer updates parameters for the next minibatch. The validation loop is separate from the gradient path because evaluation should measure behavior rather than train the model.
 
 1. [Tensors and Data Preprocessing](/cs/deep-learning/tensors-data-preprocessing)
 2. [Math for Deep Learning](/cs/deep-learning/math-for-deep-learning)

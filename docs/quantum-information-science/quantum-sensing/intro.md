@@ -216,10 +216,6 @@ The important warning is that the Heisenberg limit is a scaling law for an ideal
 
 ### Physical platforms
 
-![Atomic model of a nitrogen vacancy center in a diamond lattice with nitrogen and vacancy sites highlighted](https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Nitrogen-vacancy_center.png/250px-Nitrogen-vacancy_center.png)
-
-*Figure: Nitrogen-vacancy center in diamond, a common solid-state quantum sensor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Nitrogen-vacancy_center.png), NIST, public domain.*
-
 **NV centers in diamond.** A nitrogen-vacancy center is a point defect consisting of a substitutional nitrogen atom next to a vacancy in diamond. Its electronic ground state is a spin triplet, with magnetic sublevels often labeled $m_s=0$ and $m_s=\pm 1$. In many magnetometry experiments, $m_s=0$ and one of the $m_s=\pm 1$ states form an effective two-level sensor. Optical excitation polarizes the spin and spin-dependent fluorescence enables optically detected magnetic resonance (ODMR). NV sensors are useful because diamond is chemically robust, can host near-surface defects, and can operate from cryogenic conditions to room temperature. Applications include nanoscale magnetometry, current imaging, materials characterization, biology-compatible magnetic sensing, and microscale or nanoscale MRI concepts.
 
 **Atomic clocks.** Atomic clocks estimate frequency by comparing a local oscillator to a narrow atomic transition. Caesium fountain clocks define the SI second through the microwave hyperfine transition of $^{133}\mathrm{Cs}$, while optical clocks based on ions or neutral atoms such as Sr, Yb, and Hg use much higher transition frequencies and can reach fractional frequency uncertainty or instability in the low $10^{-18}$ range in leading laboratory systems. Clock comparisons are sensors of gravitational potential through relativistic redshift, tests of fundamental constants, and probes of possible new physics. They are also infrastructure for navigation, timing networks, geodesy, and frequency metrology.
@@ -235,17 +231,46 @@ The important warning is that the Heisenberg limit is a scaling law for an ideal
 ## Visual
 
 ```mermaid
-flowchart LR
-  A["Prepare probe state"] --> B["Interact with signal"]
-  B --> C["Accumulate parameter dependent phase"]
-  C --> D["Measure outcomes"]
-  D --> E["Estimator"]
-  E --> F["Uncertainty Delta theta"]
-  R["Resources: probes, time, energy, bandwidth"] --> A
-  R --> E
-  N["Noise: loss, decoherence, technical drift"] --> B
-  N --> D
+flowchart TB
+  subgraph Ramsey["Ramsey interferometry sequence"]
+    direction LR
+    R0["#quot;two-level probe<br/>|#quot;0>#quot;"] --> Rpi1["#quot;pi/2 pulse<br/>(#quot;|0>+|1>)/sqrt(2)#quot;"]
+    Rpi1 --> Rfree["free evolution time T<br/>phase phi = delta omega T + signal"]
+    Rfree --> Rpi2["second pi/2 pulse<br/>map phase to population"]
+    Rpi2 --> Rmeas["#quot;measure P0, P1<br/>shots [S"]"]
+    Rmeas --> Rest["phase/frequency estimator<br/>Delta phi -> Delta omega"]
+  end
+
+  subgraph NV["NV-center magnetometry block"]
+    direction LR
+    Green["green pump laser<br/>spin polarization to m_s=0"] --> Center["NV center in diamond<br/>effective spin states m_s=0 and m_s=+/-1"]
+    MW["microwave control<br/>pi/2, pi, dynamical-decoupling pulses"] --> Center
+    Field["magnetic field B(t)<br/>Zeeman shift"] --> Center
+    Center --> Red["red fluorescence<br/>spin-dependent brightness"]
+    Red --> Counter["#quot;photon counter / camera<br/>counts [S"]"]
+    Counter --> ODMR["ODMR fit<br/>resonance shift -> B estimate"]
+  end
+
+  subgraph Clock["Atomic-clock feedback loop"]
+    direction LR
+    LO["local oscillator laser or microwave<br/>frequency nu_LO"] --> AOM["AOM/EOM actuator<br/>controlled frequency shift"]
+    AOM --> Atoms["atoms or ions<br/>narrow transition nu_0"]
+    Atoms --> Probe["Ramsey or Rabi interrogation<br/>excitation probability"]
+    Probe --> Error["error signal<br/>left/right side of resonance"]
+    Error --> Servo["servo controller<br/>integrate frequency correction"]
+    Servo -. "feedback correction" .-> AOM
+    Servo --> ClockOut["clock output<br/>disciplined frequency and time scale"]
+  end
+
+  Noise["noise and resource budget<br/>decoherence, loss, dead time, photon shot noise, vibration"] --> Rfree
+  Noise --> Center
+  Noise --> Probe
+  Rest --> Sens["reported sensitivity<br/>Delta theta per sqrt(Hz) or Allan deviation"]
+  ODMR --> Sens
+  ClockOut --> Sens
 ```
+
+The diagram expands the generic prepare-interact-measure loop into three concrete sensing architectures. Ramsey interferometry labels the two $\pi/2$ pulses, free-evolution phase accumulation, shot-based readout, and estimator; the NV block shows green optical pumping, microwave spin control, magnetic-field interaction, and red fluorescence readout. The atomic-clock block makes the feedback path explicit: the measured atomic transition creates an error signal that steers the local oscillator through the actuator.
 
 | Platform | Parameter sensed | Typical sensitivity or scale | Frequency or time range | Maturity |
 |---|---|---:|---|---|

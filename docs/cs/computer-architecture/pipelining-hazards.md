@@ -9,10 +9,6 @@ Pipelining overlaps the execution of multiple instructions by dividing processor
 
 The classic five-stage RISC pipeline is simple enough to reason about but rich enough to expose the central problems of processor implementation. Structural hazards occur when two instructions need the same hardware resource. Data hazards occur when an instruction needs a value that an earlier instruction has not yet produced. Control hazards occur when the next instruction address depends on a branch or jump that has not yet been resolved.
 
-![A five-stage pipeline diagram shows consecutive instructions occupying fetch, decode, execute, memory, and writeback stages.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/5_Stage_Pipeline.svg/500px-5_Stage_Pipeline.svg.png)
-
-*Figure: Classic five-stage processor pipeline. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:5_Stage_Pipeline.svg), Inductiveload, public domain.*
-
 ## Definitions
 
 The five standard stages are:
@@ -77,24 +73,41 @@ Pipelining also changes exception handling. If several instructions are in fligh
 ## Visual
 
 ```mermaid
-gantt
-    title Five-stage pipeline with one load-use stall
-    dateFormat  X
-    axisFormat %s
-    section ld r1,0(r2)
-    IF  :0, 1
-    ID  :1, 1
-    EX  :2, 1
-    MEM :3, 1
-    WB  :4, 1
-    section add r3,r1,r4
-    IF  :1, 1
-    ID  :2, 1
-    STALL :3, 1
-    EX  :4, 1
-    MEM :5, 1
-    WB  :6, 1
+flowchart TB
+  PC["PC register"] --> IF["IF: instruction fetch from I-cache"]
+  IF --> IFID["IF/ID pipeline register: instruction, PC+4"]
+  IFID --> ID["ID: decode, register-file read, immediate generation"]
+  ID --> IDEX["ID/EX pipeline register: operands, control bits, rd/rs tags"]
+  IDEX --> EX["EX: ALU op, branch compare, effective address"]
+  EX --> EXMEM["EX/MEM pipeline register: ALU result, store data, destination"]
+  EXMEM --> MEM["MEM: D-cache load/store or pass ALU result"]
+  MEM --> MEMWB["MEM/WB pipeline register: load data or ALU result"]
+  MEMWB --> WB["WB: write register file"]
+  WB --> Regs["Register file"]
+  Regs --> ID
+
+  EXMEM -. "ALU result forwarding to EX operand mux" .-> EX
+  MEMWB -. "load/ALU forwarding to EX operand mux" .-> EX
+  MEMWB -. "write-before-read or bypass into ID" .-> ID
+
+  ID --> Hazard{"Hazard detection unit"}
+  Hazard -- "load-use: producer in EX, consumer in ID" --> Stall["Freeze PC and IF/ID; insert bubble into ID/EX"]
+  Stall --> IDEX
+  EX -- "branch taken or mispredicted" --> Flush["Flush wrong-path IF/ID and ID/EX entries"]
+  Flush --> PC
+
+  subgraph Timing["Load-use timing example"]
+    direction LR
+    T1["Cycle 1: ld IF"] --> T2["Cycle 2: ld ID, add IF"]
+    T2 --> T3["Cycle 3: ld EX, add ID"]
+    T3 --> T4["Cycle 4: ld MEM, bubble EX, add held in ID"]
+    T4 --> T5["Cycle 5: ld WB, add EX with forwarded load data"]
+  end
+
+  Hazard -. "creates one-cycle bubble" .-> Timing
 ```
+
+This five-stage pipeline diagram shows the stage boundaries, pipeline registers, forwarding paths, and interlock logic that make the textbook pipeline correct. ALU results can forward from EX/MEM or MEM/WB to the EX operand mux, but a load-use pair needs a bubble because the loaded data arrives too late for the next cycle's EX stage. The branch flush and PC feedback path make control hazards explicit rather than hiding them in a Gantt chart.
 
 | Hazard | Cause | Typical remedy | Residual cost |
 |---|---|---|---|

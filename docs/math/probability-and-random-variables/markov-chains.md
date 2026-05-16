@@ -9,10 +9,6 @@ A Markov chain is a random process whose next state depends on the present state
 
 MIT 18.440 introduces finite-state Markov chains through examples such as weather models, then discusses ergodicity and stationarity. The main long-run question is whether the chain forgets its starting state and settles into stable state frequencies. Transition matrices make the calculations concrete.
 
-![A three-state Markov chain diagram labels directed transition probabilities.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Simple_markov_chain.svg/500px-Simple_markov_chain.svg.png)
-
-*Figure: Three-state Markov chain with directed transitions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Simple_markov_chain.svg), Chrislb, CC BY-SA 3.0.*
-
 ## Definitions
 
 Let the finite state space be
@@ -111,12 +107,38 @@ Markov chains also connect to the law of large numbers. In an ergodic finite cha
 ## Visual
 
 ```mermaid
-graph LR
-  R["Rainy"] -->|"0.5"| R
-  R -->|"0.5"| S["Sunny"]
-  S -->|"0.2"| R
-  S -->|"0.8"| S
+flowchart LR
+  subgraph Weather["Two-state weather chain"]
+    direction LR
+    R(("Rainy")) -- "0.5 stay" --> R
+    R -- "0.5 switch" --> S(("Sunny"))
+    S -- "0.2 switch" --> R
+    S -- "0.8 stay" --> S
+  end
+
+  subgraph Evolution["Distribution evolution"]
+    direction TB
+    Mu0["#quot;initial distribution<br/>mu_0 = [P(R), P(S)"]"] --> Pmat["#quot;transition matrix<br/>P = [[0.5, 0.5"], ["0.2, 0.8"]]"]
+    Pmat --> Mu1["one step<br/>mu_1 = mu_0 P"]
+    Mu1 --> Mun["n steps<br/>mu_n = mu_0 P^n"]
+    Mun --> Flow["stationary flow balance<br/>pi_R P_RS = pi_S P_SR"]
+  end
+
+  subgraph Absorb["Absorbing-chain template"]
+    direction TB
+    Canon["reorder states<br/>transient first, absorbing last"] --> Block["#quot;block matrix<br/>P = [[Q, R"], ["0, I"]]"]
+    Block --> Fundamental["fundamental matrix<br/>N = (I - Q)^-1"]
+    Fundamental --> Outputs["absorption probabilities and expected hitting times"]
+  end
+
+  Weather --> Pmat
+  Flow --> Ergodic{"irreducible and aperiodic?"}
+  Ergodic -- "yes" --> Stable["long-run state frequencies equal pi"]
+  Ergodic -- "no" --> Diagnose["inspect closed classes or period"]
+  Diagnose -. "absorbing case" .-> Canon
 ```
+
+This Markov-chain architecture shows both a concrete weather state machine and the linear-algebra pipeline behind it. The transition matrix turns current distributions into future distributions, while flow balance gives the stationary distribution for the two-state example. The absorbing-chain subgraph adds the standard block form and fundamental matrix used when probability mass eventually enters terminal states.
 
 | Concept | Formula | Meaning |
 |---|---|---|

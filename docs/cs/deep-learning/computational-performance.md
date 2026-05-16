@@ -62,16 +62,68 @@ The simplest reliable performance habit is to change one variable at a time. Bat
 ## Visual
 
 ```mermaid
-flowchart LR
-  D[Disk or dataset] --> W[DataLoader workers]
-  W --> C[CPU preprocessing]
-  C --> T[Transfer to GPU]
-  T --> F[Forward kernels]
-  F --> B[Backward kernels]
-  B --> G[Gradient sync if multi-GPU]
-  G --> O[Optimizer step]
-  O --> F
+flowchart TB
+  subgraph DataParallel["Data parallel training"]
+    direction LR
+    DBatch["#quot;Global batch [N, ..."]"] --> Shard["Split batch into shards"]
+    Shard --> GPU0["GPU0 full model, shard 0"]
+    Shard --> GPU1["GPU1 full model, shard 1"]
+    GPU0 --> G0["Gradients dtheta_0"]
+    GPU1 --> G1["Gradients dtheta_1"]
+    G0 --> AR["All-reduce average gradients"]
+    G1 --> AR
+    AR --> DPUpdate["Each replica applies same optimizer step"]
+  end
+
+  subgraph ModelParallel["Layer/model parallelism"]
+    direction LR
+    MIn["#quot;Activation [N, d"]"] --> L0["Device 0: early layers"]
+    L0 --> Send01["Transfer activations"]
+    Send01 --> L1["Device 1: later layers"]
+    L1 --> MOut["Loss and backward reverse the transfers"]
+  end
+
+  subgraph PipelineParallel["Pipeline parallelism"]
+    direction LR
+    MB1["Microbatch 1"] --> P0["Stage 0"]
+    P0 --> P1["Stage 1"]
+    P1 --> P2["Stage 2"]
+    MB2["Microbatch 2"] --> P0
+    MB3["Microbatch 3"] --> P0
+    P2 --> Bubble["Pipeline bubbles at fill and drain"]
+  end
+
+  subgraph TensorParallel["Tensor parallel layer"]
+    direction LR
+    X["#quot;Input activation [N, d_in"]"] --> SplitW["Split weight matrix by columns or rows"]
+    SplitW --> T0["GPU0 partial matmul"]
+    SplitW --> T1["GPU1 partial matmul"]
+    T0 --> Gather["All-gather or reduce-scatter partial outputs"]
+    T1 --> Gather
+    Gather --> TY["#quot;Layer output [N, d_out"]"]
+  end
 ```
+
+This comparison shows four distinct ways to split training work. Data parallelism replicates the full model and synchronizes gradients, model parallelism moves activations between layer partitions, pipeline parallelism overlaps microbatches across stages, and tensor parallelism splits individual matrix multiplications. The communication node in each subgraph is the cost that determines whether the parallelism helps.
+
+```mermaid
+flowchart TB
+  Batch["FP32 input batch or normalized tensors"] --> Cast["Autocast selects FP16/BF16 for eligible ops"]
+  Cast --> Fwd["Forward kernels: matmul/conv in lower precision"]
+  Fwd --> Loss["Loss computed, often accumulated in FP32"]
+  Loss --> Scale{"Using FP16 loss scaling?"}
+  Scale -->|"yes"| Scaled["Scaled loss = loss * scale"]
+  Scale -->|"BF16 or no scaling"| Back["Backward pass"]
+  Scaled --> Back
+  Back --> Unscale["Unscale gradients and check inf/nan"]
+  Unscale --> Master["FP32 master weights and optimizer state"]
+  Back --> Master
+  Master --> Step["Optimizer step updates FP32 weights"]
+  Step --> CastWeights["Cast weights for next lower-precision forward"]
+  CastWeights -. "reduced activation memory and tensor-core throughput" .-> Fwd
+```
+
+The mixed-precision flow separates arithmetic precision from the master copy of trainable weights. Autocast uses FP16 or BF16 where kernels are efficient, while losses, gradient checks, optimizer states, and master weights remain in FP32 for stability. FP16 may require loss scaling to avoid gradient underflow; BF16 usually relies on its wider exponent range instead.
 
 | Bottleneck | Symptom | Typical fix |
 |---|---|---|

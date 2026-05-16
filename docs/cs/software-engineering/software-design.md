@@ -59,17 +59,72 @@ Traceability matrices reveal both omissions and surplus design. Blank requiremen
 ## Visual
 
 ```mermaid
-flowchart TD
-  A[Requirements] --> B[Development specification]
-  B --> C[Data design]
-  B --> D[Architectural design]
-  D --> E[Interface design]
-  E --> F[Procedural design]
-  C --> G[Implementable design document]
-  F --> G
-  G --> H[Source code]
-  B -. trace .-> G
+flowchart TB
+  Requirements["Requirements and quality attributes"] --> Architecture{"Architecture style decision"}
+
+  subgraph Layered["Layered architecture"]
+    direction TB
+    UI["Presentation layer"]
+    App["Application/service layer"]
+    Domain["Domain model and business rules"]
+    Data["Data access / persistence"]
+    DB[("Database / external systems")]
+    UI --> App --> Domain --> Data --> DB
+    Domain -. "do not depend upward" .-> UI
+  end
+
+  subgraph MVC["MVC architecture"]
+    direction TB
+    User["User input"]
+    Controller["Controller: interpret request and commands"]
+    Model["Model: state, domain rules, persistence boundary"]
+    View["View: render model state"]
+    User --> Controller --> Model --> View --> User
+    View -. "observes state / receives DTO" .-> Model
+  end
+
+  subgraph Microservices["Microservices architecture"]
+    direction TB
+    Gateway["API gateway / edge"]
+    SvcA["Service A: bounded context + database"]
+    SvcB["Service B: bounded context + database"]
+    SvcC["Service C: bounded context + database"]
+    Contracts["Versioned APIs, auth, observability, deployment pipeline"]
+    Gateway --> SvcA
+    Gateway --> SvcB
+    Gateway --> SvcC
+    SvcA --> Contracts
+    SvcB --> Contracts
+    SvcC --> Contracts
+  end
+
+  subgraph EventDriven["Event-driven architecture"]
+    direction TB
+    Producer["Command handler / producer"]
+    Broker["Event broker or log"]
+    Topic["Topic: domain events with schema"]
+    Consumer1["Consumer: projection/read model"]
+    Consumer2["Consumer: workflow/integration"]
+    Producer --> Broker --> Topic
+    Topic --> Consumer1
+    Topic --> Consumer2
+    Consumer2 -. "idempotency and retry policy" .-> Broker
+  end
+
+  Architecture --> UI
+  Architecture --> User
+  Architecture --> Gateway
+  Architecture --> Producer
+  DB --> DesignDoc["Implementable design: data, interfaces, modules, algorithms"]
+  View --> DesignDoc
+  Contracts --> DesignDoc
+  Consumer1 --> DesignDoc
+  Consumer2 --> DesignDoc
+  DesignDoc --> Trace["Traceability matrix: requirements to design elements"]
+  Trace --> Code(("Source code and tests"))
 ```
+
+This diagram expands software design into four common architectural styles and the design artifacts they imply. Layered and MVC diagrams show internal dependency direction, while microservices and event-driven blocks make service ownership, contracts, event schemas, retries, and observability part of the architecture rather than afterthoughts.
 
 | Design quality | Desired direction | Practical question |
 |---|---|---|

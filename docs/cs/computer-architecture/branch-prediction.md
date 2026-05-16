@@ -9,10 +9,6 @@ Branches are small instructions with large architectural consequences. A pipelin
 
 Branch prediction is one of the clearest examples of quantitative design. The hardware is useful only because real programs have patterns: loops are usually taken until the final iteration, error paths are rarely taken, and branches often correlate with recent control flow. The value of a predictor depends on branch frequency, prediction accuracy, and misprediction penalty.
 
-![A five-stage pipeline diagram shows consecutive instructions occupying fetch, decode, execute, memory, and writeback stages.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/5_Stage_Pipeline.svg/500px-5_Stage_Pipeline.svg.png)
-
-*Figure: Classic five-stage processor pipeline. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:5_Stage_Pipeline.svg), Inductiveload, public domain.*
-
 ## Definitions
 
 A control hazard occurs when the next instruction address is uncertain. Conditional branches, indirect jumps, returns, and exceptions all affect instruction flow. A branch predictor guesses one or more of:
@@ -66,21 +62,42 @@ The performance effect grows with pipeline depth and issue width. A wide process
 ## Visual
 
 ```mermaid
-stateDiagram-v2
-    [*] --> SN
-    SN: Strongly Not Taken
-    WN: Weakly Not Taken
-    WT: Weakly Taken
-    ST: Strongly Taken
-    SN --> SN: N
-    SN --> WN: T
-    WN --> SN: N
-    WN --> WT: T
-    WT --> WN: N
-    WT --> ST: T
-    ST --> WT: N
-    ST --> ST: T
+flowchart TB
+  PC["Fetch PC"] --> BTB{"BTB hit for PC?"}
+  PC --> GHR["Global history register: recent taken/not-taken bits"]
+  GHR --> XOR["gshare index = PC bits xor GHR"]
+  XOR --> PHT["Pattern history table entry: 2-bit saturating counter"]
+  PHT --> Dir{"Predict direction"}
+  BTB -- "hit and predicted taken" --> Target["Predicted target PC"]
+  BTB -- "miss or predicted not taken" --> Fall["Fall-through PC = PC + 4"]
+  Dir -- "counter 2 or 3" --> Target
+  Dir -- "counter 0 or 1" --> Fall
+  Target --> Fetch["Fetch predicted path"]
+  Fall --> Fetch
+  Fetch --> Resolve["Execute branch and compute actual outcome/target"]
+  Resolve --> Correct{"Prediction correct?"}
+  Correct -- "yes" --> Update["Update counter, BTB, and GHR"]
+  Correct -- "no" --> Flush["Flush wrong-path instructions and redirect fetch"]
+  Flush --> Update
+  Update --> PC
+
+  subgraph CounterFSM["2-bit counter state machine"]
+    direction LR
+    SN["0: strongly not taken"] -- "T" --> WN["1: weakly not taken"]
+    WN -- "T" --> WT["2: weakly taken"]
+    WT -- "T" --> ST["3: strongly taken"]
+    ST -- "N" --> WT
+    WT -- "N" --> WN
+    WN -- "N" --> SN
+    SN -- "N" --> SN
+    ST -- "T" --> ST
+  end
+
+  PHT -. "entry is one 2-bit FSM" .-> CounterFSM
+  Resolve -. "actual outcome trains predictor after branch resolves" .-> CounterFSM
 ```
+
+This branch-prediction diagram includes the direction predictor, target predictor, history register, update path, and recovery path. The gshare index combines PC bits with global history to select a 2-bit counter, while the BTB supplies a target early enough for fetch redirection. The embedded counter FSM shows why loops usually need two contrary outcomes to flip direction, and the flush edge shows the cost paid when speculation chooses the wrong path.
 
 | Predictor | State per branch | Strength | Weakness |
 |---|---:|---|---|

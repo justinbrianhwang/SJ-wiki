@@ -351,16 +351,81 @@ The practical lesson is that "a good logical memory" is not the same statement a
 ## Visual
 
 ```mermaid
-flowchart LR
-  R["Physical noise channel"] --> K["Kraus or Choi description"]
-  K --> P["Expand likely errors in Pauli basis"]
-  P --> S["Measure stabilizer generators"]
-  S --> Y["Syndrome bits"]
-  Y --> D["Classical decoder"]
-  D --> C["Correction or Pauli frame update"]
-  C --> L["Logical state preserved"]
-  L --> S
+flowchart TB
+  subgraph BitFlip["3-qubit bit-flip code"]
+    direction LR
+    BFIn["input qubit<br/>|#quot;psi> = alpha#quot;|0> + beta|1>"] --> BFC1["CNOT<br/>q0 -> q1"]
+    BFC1 --> BFC2["CNOT<br/>q0 -> q2"]
+    BFC2 --> BFEnc["encoded block<br/>alpha|#quot;000> + beta#quot;|111>"]
+    BFEnc --> BFNoise["single-X error channel<br/>I, X1, X2, or X3"]
+    BFNoise --> BFS1["measure stabilizer<br/>Z1 Z2 -> syndrome bit s12"]
+    BFNoise --> BFS2["measure stabilizer<br/>Z2 Z3 -> syndrome bit s23"]
+    BFS1 --> BFSyn["#quot;syndrome pair<br/>[s12, s23"]"]
+    BFS2 --> BFSyn
+    BFSyn --> BFDec{"decoder table<br/>which bit flipped?"}
+    BFDec -->|"["+,+"]"| BFI["do nothing"]
+    BFDec -->|"["-,+"]"| BFX1["apply X1"]
+    BFDec -->|"["-,-"]"| BFX2["apply X2"]
+    BFDec -->|"["+,-"]"| BFX3["apply X3"]
+    BFI --> BFOut["logical state restored<br/>up to correctable error"]
+    BFX1 --> BFOut
+    BFX2 --> BFOut
+    BFX3 --> BFOut
+  end
+
+  subgraph Shor9["9-qubit Shor code"]
+    direction LR
+    SHIn["input qubit<br/>alpha|#quot;0> + beta#quot;|1>"] --> SHPhase["phase-flip repetition<br/>alpha|#quot;+++> + beta#quot;|--->"]
+    SHPhase --> SHBit["bit-flip repetition inside each block<br/>3 blocks x 3 qubits"]
+    SHBit --> SHCode["codewords<br/>alpha(|#quot;000>+#quot;|111>)^3 + beta(|#quot;000>-#quot;|111>)^3"]
+    SHCode --> SHZ["within-block Z checks<br/>Z1Z2, Z2Z3, Z4Z5, Z5Z6, Z7Z8, Z8Z9"]
+    SHCode --> SHX["between-block X checks<br/>X1...X6 and X4...X9"]
+    SHZ --> SHSyn["bit-flip and phase-flip syndromes"]
+    SHX --> SHSyn
+    SHSyn --> SHRec["recovery<br/>correct one arbitrary single-qubit Pauli error"]
+  end
+
+  subgraph Steane7["7-qubit Steane CSS code"]
+    direction LR
+    STIn["logical input<br/>|psi_L>"] --> STEnc["#quot;Hamming-code CSS encoder<br/>[[7,1,3"]]"]
+    STEnc --> STData["7 data qubits<br/>distance 3, one logical qubit"]
+    STData --> STX["X stabilizers<br/>X1X3X5X7, X2X3X6X7, X4X5X6X7"]
+    STData --> STZ["Z stabilizers<br/>Z1Z3Z5Z7, Z2Z3Z6Z7, Z4Z5Z6Z7"]
+    STX --> STSyn["6 syndrome bits<br/>3 X-type + 3 Z-type"]
+    STZ --> STSyn
+    STSyn --> STCSS["CSS decoder<br/>separate bit-flip and phase-flip decoding"]
+    STCSS --> STOut["logical qubit preserved<br/>corrects any weight-1 Pauli"]
+  end
+
+  subgraph Surface["Surface-code patch and repeated rounds"]
+    direction TB
+    SD11(("data d11")) --- SX12["X-check ancilla"]
+    SX12 --- SD13(("data d13"))
+    SD11 --- SZ21["Z-check ancilla"]
+    SZ21 --- SD31(("data d31"))
+    SD13 --- SZ23["Z-check ancilla"]
+    SZ23 --- SD33(("data d33"))
+    SD31 --- SX32["X-check ancilla"]
+    SX32 --- SD33
+    SX12 --> SCRound["one stabilizer round<br/>prepare ancillas, CNOT schedule, measure, reset"]
+    SZ21 --> SCRound
+    SZ23 --> SCRound
+    SX32 --> SCRound
+    SCRound --> SCBits["syndrome differences<br/>space-time detection events"]
+    SCBits --> SCDec["classical decoder<br/>matching, union-find, or neural decoder"]
+    SCDec --> SCFrame["Pauli-frame update<br/>no immediate physical correction required"]
+    SCFrame -. "repeat for d or more rounds" .-> SCRound
+  end
+
+  Noise["physical noise model<br/>Kraus, Pauli, leakage, measurement error"] --> BFNoise
+  Noise --> SCRound
+  BFOut --> Goal["fault-tolerant goal<br/>logical information survives below threshold"]
+  SHRec --> Goal
+  STOut --> Goal
+  SCFrame --> Goal
 ```
+
+The diagram shows QEC at four scales: a full 3-qubit bit-flip encoding/syndrome/correction circuit, the nested structure of Shor's 9-qubit code, the CSS stabilizer split of the Steane code, and a surface-code patch with repeated ancilla rounds. The labeled syndrome paths make clear that the measurement reveals error information, not the encoded amplitudes. The dotted surface-code feedback arrow shows the ongoing decoder and Pauli-frame loop used in fault-tolerant operation.
 
 | Object | N&C notation | Role in QEC | Common mistake |
 |---|---|---|---|

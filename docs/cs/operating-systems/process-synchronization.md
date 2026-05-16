@@ -9,10 +9,6 @@ Process synchronization is the part of operating systems where concurrency becom
 
 The textbook develops synchronization from the critical-section problem through hardware support, mutex locks, semaphores, monitors, classic synchronization problems, and deadlocks. The common theme is controlled access: the OS and programs need ways to express "only one at a time," "wait until a condition is true," and "wake the right waiters without losing events."
 
-![A dining philosophers diagram shows five processes competing for shared forks around a table.](https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Dining_philosophers.svg/500px-Dining_philosophers.svg.png)
-
-*Figure: Dining philosophers as a synchronization and deadlock example. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dining_philosophers.svg), DnetSvg after Allen3, public domain.*
-
 ## Definitions
 
 A **race condition** occurs when the correctness of a result depends on the relative timing of concurrent operations. The simplest example is two threads executing `counter = counter + 1` at the same time. The statement looks atomic in source code, but it compiles into multiple load, add, and store operations.
@@ -61,27 +57,57 @@ Correct synchronization usually protects an invariant, not a line of code. For a
 ## Visual
 
 ```mermaid
-sequenceDiagram
-  participant P as Producer
-  participant E as empty semaphore
-  participant M as mutex
-  participant B as bounded buffer
-  participant F as full semaphore
-  participant C as Consumer
+flowchart TB
+  subgraph Producer["Producer thread"]
+    direction TB
+    P0["Produce item outside critical section"]
+    P1["wait(empty): reserve an empty slot"]
+    P2["wait(mutex): enter monitor/critical section"]
+    P3["#quot;buffer[in"] = item; in = (in + 1) mod N; count++"]
+    P4["signal(mutex): leave critical section"]
+    P5["signal(full): publish one filled slot"]
+  end
 
-  P->>E: wait(empty)
-  P->>M: wait(mutex)
-  P->>B: insert item
-  P->>M: signal(mutex)
-  P->>F: signal(full)
-  C->>F: wait(full)
-  C->>M: wait(mutex)
-  C->>B: remove item
-  C->>M: signal(mutex)
-  C->>E: signal(empty)
+  subgraph Shared["Bounded-buffer synchronization state"]
+    direction TB
+    Empty["Semaphore empty: initial N; counts free slots"]
+    Mutex["Binary semaphore mutex: initial 1; protects in/out/count"]
+    Full["Semaphore full: initial 0; counts occupied slots"]
+    Buffer["Circular buffer: N slots; indexes in and out; invariant 0 <= count <= N"]
+  end
+
+  subgraph Consumer["Consumer thread"]
+    direction TB
+    C1["wait(full): reserve a filled slot"]
+    C2["wait(mutex): enter monitor/critical section"]
+    C3["#quot;item = buffer[out"]; out = (out + 1) mod N; count--"]
+    C4["signal(mutex): leave critical section"]
+    C5["signal(empty): publish one free slot"]
+    C6["Consume item outside critical section"]
+  end
+
+  P0 --> P1
+  P1 --> P2
+  P2 --> P3
+  P3 --> P4
+  P4 --> P5
+  C1 --> C2
+  C2 --> C3
+  C3 --> C4
+  C4 --> C5
+  C5 --> C6
+
+  P1 -. "decrements or blocks on" .-> Empty
+  P2 -. "acquires" .-> Mutex
+  P3 -. "updates" .-> Buffer
+  P5 -. "increments" .-> Full
+  C1 -. "decrements or blocks on" .-> Full
+  C2 -. "acquires" .-> Mutex
+  C3 -. "updates" .-> Buffer
+  C5 -. "increments" .-> Empty
 ```
 
-The bounded-buffer protocol separates capacity control from mutual exclusion. `empty` and `full` track how many slots are usable; `mutex` protects the buffer's internal indexes and contents.
+This bounded-buffer diagram shows every synchronization object instead of only the call order. `empty` and `full` are counting semaphores that reserve capacity before either thread touches the buffer, while `mutex` protects the circular-buffer fields `in`, `out`, and `count`. The dotted arrows mark which shared object each operation modifies or waits on, making the invariant `0 <= count <= N` the center of the design.
 
 ## Worked example 1: lost update on a shared counter
 

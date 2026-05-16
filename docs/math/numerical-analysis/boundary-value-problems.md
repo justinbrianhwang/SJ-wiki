@@ -73,15 +73,36 @@ A useful BVP check is to compare the boundary residual with the interior residua
 ## Visual
 
 ```mermaid
-graph TD
-  A[BVP with conditions at a and b] --> B{Choose method}
-  B --> C["Shooting: guess missing initial slope"]
-  C --> D[Solve IVP]
-  D --> E[Adjust slope from endpoint residual]
-  B --> F["Finite differences: build grid"]
-  F --> G[Replace derivatives by algebraic equations]
-  G --> H[Solve linear or nonlinear system]
+flowchart TB
+  BVP["Boundary value problem<br/>ODE plus conditions at a and b"] --> Method{"Choose numerical architecture"}
+
+  subgraph Shooting["Shooting method"]
+    direction TB
+    Guess["guess missing initial data<br/>slope or parameter"] --> IVP["solve resulting IVP from a to b"]
+    IVP --> EndRes["compute endpoint residual<br/>computed y(b) minus boundary target"]
+    EndRes --> Update{"residual small?"}
+    Update -- "no" --> NewtonSecant["Newton or secant update for missing data"]
+    NewtonSecant --> Guess
+    Update -- "yes" --> ShootOut["accepted IVP trajectory"]
+  end
+
+  subgraph FD["Finite-difference method"]
+    direction TB
+    Grid["build grid<br/>x_0 = a, ..., x_N = b"] --> Unknowns["unknown interior values<br/>y_1, ..., y_{N-1}"]
+    Unknowns --> Stencil["replace derivatives by stencils<br/>centered, one-sided, or nonlinear"]
+    Stencil --> InsertBC["insert boundary conditions<br/>Dirichlet, Neumann, Robin"]
+    InsertBC --> Algebra["solve algebraic system<br/>linear banded solve or Newton"]
+    Algebra --> FDOut["grid solution"]
+  end
+
+  Method -- "reuse IVP solver" --> Guess
+  Method -- "global mesh solve" --> Grid
+  ShootOut --> Check["verify endpoint residual and interior equation residual"]
+  FDOut --> Check
+  Check --> Solution(("BVP approximation"))
 ```
+
+The BVP diagram separates shooting from finite differences because their state and failure modes are different. Shooting turns the BVP into repeated IVP solves driven by an endpoint residual, while finite differences build a grid, stencil equations, boundary insertions, and a global algebraic solve. The shared verification node requires both boundary and interior residual checks.
 
 | Method | Unknowns | Strength | Weakness |
 |---|---|---|---|

@@ -9,10 +9,6 @@ Mitchell's evaluation chapter gives the statistical machinery needed to say whet
 
 The chapter is intentionally practical. It introduces sample error, true error, confidence intervals, tests for comparing hypotheses, and paired tests for comparing learning algorithms. These tools connect directly to modern model evaluation, even though modern practice often uses larger datasets, cross-validation, bootstrap procedures, and benchmark suites.
 
-![An overfitting diagram shows a classifier boundary that follows training points too closely.](https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Overfitting.svg/500px-Overfitting.svg.png)
-
-*Figure: Overfitting in a classifier decision boundary. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Overfitting.svg), Chabacano, CC BY-SA 4.0.*
-
 ## Definitions
 
 Let $h$ be a hypothesis and $D$ be a sample of examples drawn independently from some distribution. For a discrete-valued target function, the sample error is:
@@ -115,20 +111,28 @@ The practical habit is to write down the evaluation protocol before tuning begin
 ## Visual
 
 ```mermaid
-flowchart LR
-    D[Available labeled data] --> Split{Split}
-    Split --> Train[Training set]
-    Split --> Val[Validation set]
-    Split --> Test[Test set]
-    Train --> Learn[Fit hypotheses]
-    Val --> Select[Choose model or prune]
-    Learn --> Select
-    Select --> Final[Final hypothesis]
-    Test --> Estimate[Estimate future error]
-    Final --> Estimate
+flowchart TB
+    D["Available labeled data from target distribution"] --> Split{"Protocol split or k-fold schedule fixed before tuning"}
+    Split --> Train["Training folds: fit parameters"]
+    Split --> Val["Validation folds: choose model class, pruning, hyperparameters"]
+    Split --> Test["Untouched test set: final estimate only"]
+    Train --> Learner["Learning algorithm produces candidate hypotheses h_1..h_m"]
+    Learner --> ValEval["Validation error selects one hypothesis or setting"]
+    Val --> ValEval
+    ValEval --> Final["Final trained hypothesis h*"]
+    Final --> TestEval["Evaluate h* on n independent test examples"]
+    Test --> TestEval
+    TestEval --> R["Count errors r and sample error p_hat = r/n"]
+    R --> CI["Confidence interval: p_hat +/- z * sqrt(p_hat(1-p_hat)/n)"]
+    R --> Compare["For algorithm comparison: paired split differences delta_i"]
+    Compare --> TTest["Paired t-test on mean(delta_i)"]
+    CI --> Report(("Report estimate, uncertainty, and protocol"))
+    TTest --> Report
+
+    ValEval -. "reusing test data for selection leaks information" .-> Test
 ```
 
-The central discipline is separation of roles. Training fits parameters, validation guides choices, and test data estimate final performance.
+This evaluation diagram separates the roles of training, validation, and test data and attaches the statistical estimates to the correct stage. Parameters are fit on training data, model choices are made on validation data, and the untouched test set produces the final sample error and confidence interval. The paired-comparison branch shows how matched split differences feed a t-test, while the dotted edge marks the leakage risk when test data influence selection.
 
 ## Worked example 1: Confidence interval for error
 

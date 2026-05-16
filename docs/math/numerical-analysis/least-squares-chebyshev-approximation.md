@@ -89,18 +89,31 @@ In practice, approximation results should also be reported with the chosen basis
 | Chebyshev/minimax | minimize $\|r\|_\infty$ | equioscillation | uniform worst-case control | harder to compute directly |
 | Chebyshev basis | stable polynomial basis | recurrence for $T_n$ | high-degree approximation | map intervals to $[-1,1]$ |
 
-```text
-Least squares spreads error in an L2 sense.
-Chebyshev approximation balances peak error.
+```mermaid
+flowchart TB
+  Data["Approximation data or function<br/>samples, weights, interval"] --> Objective{"Choose error objective"}
 
-error
-  ^      +E    +E
-  |     / \   / \
-  |----/---\-/---\-----
-  |   /     X     \
-  | -E     -E     -E
-  +--------------------> x
+  subgraph LS["Least-squares architecture"]
+    direction TB
+    Design["build design matrix A<br/>basis functions at sample points"] --> Solve["solve min ||A c - y||_2<br/>prefer QR over normal equations"]
+    Solve --> Resid["inspect residuals and conditioning"]
+  end
+
+  subgraph Cheb["Chebyshev/minimax architecture"]
+    direction TB
+    Map["#quot;map interval to [-1,1"]"] --> Basis["use Chebyshev basis T_n(x)<br/>stable recurrence"]
+    Basis --> Equi["minimax target<br/>alternating peak errors of equal magnitude"]
+    Equi --> Uniform["control ||error||_infinity"]
+  end
+
+  Objective -- "average squared error" --> Design
+  Objective -- "worst-case uniform error" --> Map
+  Resid --> Check["validate norm, residual pattern, and endpoint behavior"]
+  Uniform --> Check
+  Check --> Approx(("approximant"))
 ```
+
+This diagram separates least-squares and Chebyshev approximation by their error contracts. Least squares builds and solves a design-matrix problem in the 2-norm, while Chebyshev approximation maps the interval and targets balanced peak error in the infinity norm. The shared validation node reminds the reader to report the norm because "best" changes with the objective.
 
 ## Worked example 1: least squares line fit
 

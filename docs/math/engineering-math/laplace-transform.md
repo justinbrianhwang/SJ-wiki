@@ -140,14 +140,28 @@ The matrix $(sI-A)^{-1}$ exposes the same eigenvalue poles that appear in the ma
 
 ```mermaid
 flowchart LR
-  A[Time-domain IVP] --> B[Apply Laplace transform]
-  B --> C["Algebraic equation in Y(s)"]
-  C --> D[Partial fractions and shifts]
-  D --> E[Inverse transform]
-  E --> F[Time-domain solution]
-  A --> G[Initial conditions]
-  G --> C
+  Time["Time-domain problem<br/>ODE, input f(t), initial values"] --> Prep["Causal rewrite<br/>steps u(t-a), impulses, pieces"]
+  Prep --> Integral["Laplace transform<br/>F(s) = integral from 0 to infinity of f(t)e^(-st) dt"]
+  Integral --> ROC["Region of convergence<br/>growth rate and pole locations"]
+
+  subgraph Algebra["s-domain algebra"]
+    direction TB
+    Deriv["Derivative rules<br/>L{y'} = sY - y(0)"] --> Eq["Algebraic equation<br/>polynomial in s times Y(s)"]
+    Init["Initial conditions<br/>y(0), y'(0), ..."] --> Eq
+    Input["Input transform<br/>forcing, transfer function, or table entry"] --> Eq
+    Eq --> SolveY["Solve for Y(s)<br/>rational terms, shifts, exponentials"]
+  end
+
+  Time --> Deriv
+  Integral --> Input
+  SolveY --> Decomp["Partial fractions and shift theorems<br/>match table-compatible pieces"]
+  Decomp --> Inverse["Inverse Laplace transform<br/>Y(s) to y(t)"]
+  Inverse --> Check["Time-domain checks<br/>initial values, continuity jumps, final value stability"]
+  Check --> Solution("(#quot;Solution y(t")"))
+  Check -. "failed check" .-> Prep
 ```
+
+This diagram shows the full Laplace-transform solution pipeline, including the causal rewrite, transform integral, ROC awareness, derivative rules, initial-condition injection, algebraic solve, inverse transform, and validation checks. The s-domain subgraph is the key architecture: differential equations become algebraic equations because initial data enter through derivative transforms. The dotted feedback arrow marks the common failure mode where a step-function rewrite or stability assumption must be corrected.
 
 ## Worked example 1: Initial value problem
 

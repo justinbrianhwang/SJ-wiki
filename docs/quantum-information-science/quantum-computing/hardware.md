@@ -7,10 +7,6 @@ sidebar_position: 2
 
 Quantum hardware is the engineering layer that turns abstract qubits, gates, and measurements into controlled physical systems. The same circuit drawn in [algorithms](/quantum-information-science/quantum-computing/algorithms) looks very different in an ion trap, optical cavity, nuclear magnetic resonance experiment, superconducting chip, neutral-atom array, or photonic network, so hardware comparisons must track coherence, controllability, initialization, readout, connectivity, and compatibility with [error correction](/quantum-information-science/quantum-computing/error-correction).
 
-![IBM Quantum System One installed inside a cylindrical cryogenic hardware enclosure](https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/IBM_Quantum_System_One.jpg/361px-IBM_Quantum_System_One.jpg)
-
-*Figure: IBM Quantum System One as an example of superconducting quantum-computing hardware. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:IBM_Quantum_System_One.jpg), OJB Quantum, CC BY 4.0.*
-
 *This page synthesizes the wiki's earlier hardware draft with Chapter 7 of Nielsen and Chuang. N&C's central organizing idea is implementation requirements: represent quantum information robustly, perform controlled unitary transformations, prepare fiducial input states, and measure outputs. Modern superconducting, neutral-atom, and topological notes are supplementary context beyond the book's original platform emphasis.*
 
 ## Definitions
@@ -194,15 +190,62 @@ This makes the experiment a useful hardware milestone for encoded control and mi
 
 ```mermaid
 flowchart TD
-  P["Physical platform"] --> R["Represent qubit subspace"]
-  R --> I["Initialize fiducial state"]
-  I --> U["Control universal gates"]
-  U --> M["Measure selected qubits"]
-  M --> N["Infer noise channel"]
-  N --> Q["Run QEC cycle"]
-  Q --> A["Support algorithms"]
-  Q --> N
+  subgraph Transmon["Superconducting transmon module"]
+    direction TB
+    TCtrl["Room-temperature control rack<br/>AWG, DAC, microwave sources"] --> TXY["XY microwave drive<br/>X/Y rotations"]
+    TCtrl --> TZ["Flux or coupler bias<br/>frequency and ZZ tuning"]
+    TJ["Josephson junction<br/>nonlinear inductance E_J"] --- TCap["Shunt capacitor<br/>charging energy E_C"]
+    TJ --- TQ["Transmon qubit<br/>|#quot;0>, #quot;|1>, leakage |2>"]
+    TCap --- TQ
+    TXY --> TQ
+    TZ --> TQ
+    TQ --> TG["Entangling operation<br/>cross-resonance, iSWAP, CZ, or tunable coupler"]
+    TQ --> TRes["Readout resonator<br/>state-dependent frequency shift"]
+    TRes --> TPurcell["Purcell/filter chain<br/>protect qubit from readout loss"]
+    TPurcell --> TADC["#quot;Amplifier + ADC<br/>I/Q samples -> bit [0 or 1"]"]
+  end
+
+  subgraph IonTrap["Trapped-ion processor"]
+    direction TB
+    RF["RF electrodes<br/>radial confinement"] --> Trap["Linear Paul trap<br/>pseudopotential well"]
+    DC["Segmented DC electrodes<br/>axial confinement and shuttling"] --> Trap
+    Trap --> Chain["Ion chain<br/>N addressable qubits + shared motional modes"]
+    Cool["Doppler and sideband cooling lasers"] --> Chain
+    Raman["Raman or quadrupole beams<br/>1q gates and MS entangling gates"] --> Chain
+    Chain --> Motion["Motional bus<br/>collective modes mediate 2q gates"]
+    Motion --> IEnt["Mølmer-Sørensen gate<br/>XX(theta) on selected ions"]
+    Chain --> IDet["#quot;State-dependent fluorescence<br/>PMT/CCD camera -> bits [N"]"]
+  end
+
+  subgraph Photonic["Linear-optical photonic block"]
+    direction TB
+    Src["Single-photon or weak-coherent sources<br/>time-bin, polarization, or dual-rail"] --> Enc["Mode encoding<br/>logical |#quot;0>, #quot;|1> across optical modes"]
+    Enc --> Mesh["Interferometer mesh<br/>beamsplitters + phase shifters"]
+    Mesh --> NL["Optional nonlinear or measurement-induced gate<br/>KLM-style ancillas"]
+    NL --> FF["Fast feed-forward switch<br/>condition on detector clicks"]
+    FF --> Det["SNSPD/APD detectors<br/>click pattern -> sample bit string"]
+  end
+
+  subgraph Stack["Hardware-to-algorithm stack"]
+    direction TB
+    Spec["#quot;Circuit specification<br/>logical qubits [k"], depth [D], measurements"] --> Compile["Compiler and scheduler<br/>map gates to native operations"]
+    Compile --> Cal["Calibration loop<br/>Rabi, Ramsey, crosstalk, readout assignment"]
+    Cal --> Run["#quot;Execution batch<br/>shots [S"] with timing and reset"]
+    Run --> Noise["Noise model<br/>T1/T2, leakage, loss, SPAM, crosstalk"]
+    Noise --> QEC["QEC cycle<br/>syndrome measurement + decoder + Pauli frame"]
+    QEC --> Result["Algorithm result<br/>samples, expectation values, logical outcomes"]
+    QEC -. "decoder and calibration feedback" .-> Cal
+  end
+
+  TADC --> Cal
+  IDet --> Cal
+  Det --> Cal
+  Compile --> TXY
+  Compile --> Raman
+  Compile --> Mesh
 ```
+
+This diagram decomposes hardware into three concrete implementations rather than treating "qubit" as a black box. The transmon block shows the Josephson-junction-plus-capacitor circuit and dispersive readout chain, the ion-trap block separates RF/DC confinement from laser gates and fluorescence, and the photonic block shows source, interferometer, feed-forward, and detectors. The shared stack at the bottom makes the I/O contract explicit: a logical circuit is compiled to native controls, executed as shots, modeled as noise, and fed into QEC and calibration loops.
 
 | Platform | N&C emphasis | Strength | Main scaling pressure |
 |---|---|---|---|

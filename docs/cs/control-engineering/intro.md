@@ -11,10 +11,6 @@ The emphasis is practical: every model should state its assumptions, every contr
 
 The pages are written to be read in order, but they also work as references for specific tasks. If you are deriving a plant model, start with transfer functions, physical modeling, and state space. If you are checking a proposed design, use time response, Routh-Hurwitz, steady-state error, and margins. If you are implementing a controller, read the compensator, digital-control, and embedded connections carefully because sampling, saturation, and actuator limits often decide whether the textbook design survives contact with hardware.
 
-![A feedback loop block diagram shows an output signal returned to the input through a controller path.](https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Feedback_Loop.svg/500px-Feedback_Loop.svg.png)
-
-*Figure: Feedback loop block diagram in control theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Feedback_Loop.svg), Inductiveload, public domain.*
-
 ## Pages
 
 1. [Introduction to Feedback Control](/cs/control-engineering/introduction-to-feedback-control)

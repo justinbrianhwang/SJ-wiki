@@ -155,15 +155,43 @@ In baseband-equivalent analysis, engineers often use complex envelopes to avoid 
 
 ```mermaid
 flowchart LR
-  A["Message m(t)"] --> B[Multiply by carrier]
-  C[cos omega_c t] --> B
-  B --> D[Shifted sidebands]
-  D --> E[Channel]
-  E --> F[Multiply by synchronized carrier]
-  G[local oscillator] --> F
-  F --> H[Lowpass filter]
-  H --> I[Recovered message]
+  Message["Baseband message m(t)<br/>bandwidth B"] --> TXChoice{"Transmitter mapping"}
+
+  subgraph AM["Amplitude modulation path"]
+    direction TB
+    Carrier["carrier cos(omega_c t)"] --> Mixer["multiply by carrier<br/>DSB-SC or conventional AM"]
+    Message --> Mixer
+    Mixer --> Sidebands["shifted spectra<br/>copies around +/- omega_c"]
+    Sidebands --> TXFilter["bandpass filter and power amplifier"]
+  end
+
+  subgraph Angle["Angle modulation path"]
+    direction TB
+    Message --> Integrate["integrate or scale message<br/>instantaneous phase/frequency law"]
+    Integrate --> FM["FM/PM waveform<br/>many sidebands possible"]
+  end
+
+  TXChoice -- "AM or DSB-SC" --> Carrier
+  TXChoice -- "FM or PM" --> Integrate
+  TXFilter --> Channel["Channel<br/>attenuation, noise, bandwidth limits"]
+  FM --> Channel
+
+  subgraph RX["Receiver recovery"]
+    direction TB
+    Channel --> RF["front-end bandpass and gain"]
+    RF --> Sync{"carrier/phase reference available?"}
+    Sync -- "yes" --> Coherent["coherent mixer<br/>multiply by local oscillator"]
+    Sync -- "no, AM envelope" --> Envelope["envelope detector<br/>requires no overmodulation"]
+    Coherent --> LP["lowpass filter<br/>remove image near 2 omega_c"]
+    Envelope --> LP
+    LP --> Recover["recovered baseband estimate"]
+  end
+
+  Recover --> Check["check guard bands, carrier offset, phase error, and aliasing"]
+  Check --> Out(("received message"))
 ```
+
+The modulation diagram shows both transmitter and receiver sublayers. The AM path explicitly mixes the message with a carrier to create sidebands, while the angle-modulation path maps the message into instantaneous phase or frequency before entering the same channel. The receiver subgraph distinguishes coherent mixing from envelope detection and includes the lowpass recovery stage where carrier-offset and guard-band assumptions are checked.
 
 | Modulation type | Time-domain form | Spectrum effect | Typical recovery |
 |---|---|---|---|

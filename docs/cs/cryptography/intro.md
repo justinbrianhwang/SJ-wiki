@@ -9,10 +9,6 @@ Cryptography studies mathematical techniques for protecting information against 
 
 These notes combine two complementary sources. Katz and Lindell's *Introduction to Modern Cryptography*, 2nd edition, is the canonical source for formal definitions, provable-security style, reductions, symmetric and public-key constructions, and security experiments. `IntroToCrypto.pdf` is Nigel Smart's *Cryptography: An Introduction*, a different textbook with a more applied and historical presentation; it is especially useful for hand examples, classical ciphers, Enigma-era intuition, finite-field algorithms, implementation concerns, hybrid encryption, certificates, and zero-knowledge. The post-quantum page goes beyond both books because they predate the current NIST post-quantum standards.
 
-![An Enigma machine photograph shows the keyboard, lampboard, and rotor assembly used for electromechanical encryption.](https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/ENIGMA_machine_%282585357353%29.jpg/500px-ENIGMA_machine_%282585357353%29.jpg)
-
-*Figure: Enigma machine hardware used in classical cryptography history. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ENIGMA_machine_%282585357353%29.jpg), Erik Pitti, CC BY 2.0.*
-
 ## Definitions
 
 A **cryptographic primitive** is a basic tool with a security goal: encryption hides messages, a MAC authenticates messages under a shared key, a digital signature authenticates messages under a public key, a hash function compresses data with collision resistance, and a key exchange protocol establishes shared secrets.

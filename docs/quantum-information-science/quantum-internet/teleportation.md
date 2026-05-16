@@ -11,10 +11,6 @@ The standard protocol was introduced by Bennett, Brassard, Crepeau, Jozsa, Peres
 
 Nielsen and Chuang Section 1.3.7 is the primary reference for the circuit derivation used on this page. Their emphasis is useful for networking: teleportation converts resources. One pre-shared EPR pair plus two classical bits can substitute for one use of an ideal qubit channel, while the original input is consumed by measurement.
 
-![Quantum teleportation circuit diagram showing a Bell measurement followed by classical controls for Bob's correction](https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Quantum_teleportation_circuit.svg/640px-Quantum_teleportation_circuit.svg.png)
-
-*Figure: Quantum circuit representation of the teleportation protocol. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quantum_teleportation_circuit.svg), Bender2k14, CC BY-SA 3.0.*
-
 ## Definitions
 
 Let Alice hold an unknown input qubit $A$,
@@ -174,17 +170,38 @@ Experimental teleportation has been demonstrated in many physical settings. Earl
 ## Visual
 
 ```mermaid
-sequenceDiagram
-  participant A as Alice input A
-  participant B as Alice entangled qubit B
-  participant C as Bob qubit C
-  participant Net as Classical channel
-  A->>B: Bell measurement on A and B
-  B->>Net: two classical bits
-  Net->>C: correction instruction
-  C->>C: apply I X Z or XZ
-  C-->>C: output psi
+flowchart LR
+  subgraph BellPrep["Shared Bell-pair preparation"]
+    direction LR
+    B0["Alice entangled qubit B<br/>|0>"] --> BH["H"]
+    B1["Bob qubit C<br/>|0>"] --> BCX["CNOT<br/>B -> C"]
+    BH --> BCX
+    BCX --> Pair["shared |#quot;Phi+>_BC<br/>(#quot;|00>+|11>)/sqrt(2)"]
+  end
+
+  subgraph Alice["Alice Bell measurement"]
+    direction LR
+    Psi["input qubit A<br/>|#quot;psi> = alpha#quot;|0> + beta|1>"] --> ACX["CNOT<br/>A -> B"]
+    Pair --> Bwire["Alice half B"]
+    Bwire --> ACX
+    ACX --> AH["H on A"]
+    AH --> MA["measure A<br/>classical bit c0"]
+    ACX --> MB["measure B<br/>classical bit c1"]
+  end
+
+  subgraph Bob["Bob correction"]
+    direction LR
+    Pair --> Cwire["Bob half C<br/>state depends on c0,c1"]
+    Cwire --> XCorr["apply X if c1 = 1"]
+    XCorr --> ZCorr["apply Z if c0 = 1"]
+    ZCorr --> Out["output qubit at Bob<br/>|psi> recovered"]
+  end
+
+  MA -. "classical bit c0" .-> ZCorr
+  MB -. "classical bit c1" .-> XCorr
 ```
+
+The circuit shows all three resources in the teleportation identity: Alice's unknown input, the pre-shared Bell pair, and the two classical correction bits. Alice performs a CNOT and Hadamard before measuring both local qubits, which destroys the original input while producing $c_0$ and $c_1$. Bob's dotted classical controls select the $X$ and $Z$ Pauli corrections that reconstruct the input state on his qubit.
 
 | Resource consumed | Amount per teleported qubit | Why it is needed |
 |---|---:|---|

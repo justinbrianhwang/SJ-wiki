@@ -63,14 +63,38 @@ For study purposes, the most useful habit is to separate four layers: the contin
 
 ## Visual
 
-```text
-Tridiagonal structure stores only three diagonals.
+```mermaid
+flowchart TB
+  Matrix["Structured linear system<br/>dense SPD, tridiagonal, banded, or rectangular"] --> Class{"Matrix structure"}
 
-[ b0 c0  0  0 ]
-[ a1 b1 c1  0 ]
-[  0 a2 b2 c2 ]
-[  0  0 a3 b3 ]
+  subgraph Chol["Cholesky path"]
+    direction TB
+    SPD["symmetric positive definite A"] --> Factor["factor A = L L^T<br/>positive pivots required"]
+    Factor --> SolveSPD["forward solve L y = b<br/>back solve L^T x = y"]
+  end
+
+  subgraph Thomas["Tridiagonal Thomas path"]
+    direction TB
+    Diags["store three diagonals<br/>a_i lower, b_i main, c_i upper"] --> Forward["forward elimination<br/>modify b_i and right side"]
+    Forward --> Back["back substitution<br/>O(n) storage and work"]
+  end
+
+  subgraph QRpath["Rectangular QR path"]
+    direction TB
+    Tall["m by n matrix with m at least n"] --> QR["factor A = Q R<br/>orthogonal transformations"]
+    QR --> LS["least-squares solve<br/>R x = Q^T b"]
+  end
+
+  Class -- "SPD" --> SPD
+  Class -- "tridiagonal" --> Diags
+  Class -- "tall rectangular" --> Tall
+  SolveSPD --> Check["residual and structure-preservation check"]
+  Back --> Check
+  LS --> Check
+  Check --> Result(("structured solve"))
 ```
+
+This diagram replaces the static tridiagonal sketch with the decision architecture for special matrix systems. Cholesky, Thomas, and QR each expose their required matrix structure, factorization substeps, and solve phase. The shared check emphasizes that preserving structure is the source of the speedup, so residuals and storage patterns should both be audited.
 
 | Structure | Factorization or algorithm | Cost | Typical source |
 |---|---|---:|---|

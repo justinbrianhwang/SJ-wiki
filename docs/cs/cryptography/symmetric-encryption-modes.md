@@ -92,25 +92,51 @@ Most applications should not.
 ## Visual
 
 ```mermaid
-flowchart LR
-  subgraph ECB
-    M1[m1] --> E1[AES]
-    M2[m2] --> E2[AES]
-    E1 --> C1[c1]
-    E2 --> C2[c2]
+flowchart TB
+  subgraph ECB["ECB encryption of independent blocks"]
+    direction LR
+    E_M1["m1: 128-bit block"] --> E_AES1["E_K"]
+    E_M2["m2: 128-bit block"] --> E_AES2["E_K"]
+    E_AES1 --> E_C1["c1"]
+    E_AES2 --> E_C2["c2"]
+    E_M1 -. "equal plaintext blocks give equal ciphertext blocks" .-> E_M2
   end
-  subgraph CBC
-    IV[IV] --> X1[XOR]
-    A[m1] --> X1 --> B[AES] --> D[c1]
-    D --> X2[XOR]
-    E[m2] --> X2 --> F[AES] --> G[c2]
+
+  subgraph CBC["CBC encryption chain"]
+    direction LR
+    CBC_IV["IV: fresh unpredictable block"] --> CBC_X1(("xor"))
+    CBC_M1["m1"] --> CBC_X1 --> CBC_AES1["E_K"] --> CBC_C1["c1"]
+    CBC_C1 --> CBC_X2(("xor"))
+    CBC_M2["m2"] --> CBC_X2 --> CBC_AES2["E_K"] --> CBC_C2["c2"]
+    CBC_C2 --> CBC_X3(("xor"))
+    CBC_M3["m3"] --> CBC_X3 --> CBC_AES3["E_K"] --> CBC_C3["c3"]
   end
-  subgraph CTR
-    N["nonce,counter"] --> H[AES] --> S[pad]
-    P[m] --> X[XOR]
-    S --> X --> Q[c]
+
+  subgraph CTR["CTR keystream mode"]
+    direction LR
+    Nonce["Nonce N, never repeated with key K"] --> Ctr0["N || ctr0"]
+    Nonce --> Ctr1["N || ctr1"]
+    Ctr0 --> CTR_AES0["E_K"] --> Pad0["s0 keystream block"]
+    Ctr1 --> CTR_AES1["E_K"] --> Pad1["s1 keystream block"]
+    CTR_M0["m0"] --> CTR_X0(("xor")) --> CTR_C0["c0"]
+    Pad0 --> CTR_X0
+    CTR_M1["m1"] --> CTR_X1(("xor")) --> CTR_C1["c1"]
+    Pad1 --> CTR_X1
+  end
+
+  subgraph GCM["GCM high-level composition"]
+    direction LR
+    GCM_N["Nonce N"] --> GCM_CTR["CTR encryption"]
+    GCM_M["message blocks"] --> GCM_CTR --> GCM_C["ciphertext blocks"]
+    GCM_A["associated data A"] --> GHASH["GHASH over A, C, lengths"]
+    GCM_C --> GHASH
+    GCM_N --> TagMask["E_K(J0) tag mask"]
+    GHASH --> TagXor(("xor"))
+    TagMask --> TagXor --> GCM_T["authentication tag t"]
   end
 ```
+
+This diagram compares the data dependencies of ECB, CBC, CTR, and GCM at the block level. ECB has no chaining and leaks equality patterns, CBC feeds each ciphertext block into the next xor, CTR turns block encryption into a nonce/counter keystream, and GCM adds GHASH authentication over associated data and ciphertext.
 
 | Mode | Parallel encryption | Needs padding | IV/nonce rule | Main warning |
 |---|---:|---:|---|---|

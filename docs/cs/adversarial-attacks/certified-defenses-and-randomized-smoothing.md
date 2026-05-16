@@ -83,20 +83,59 @@ Certificates can be abstaining by design. If the verifier cannot prove the margi
 ## Visual
 
 ```mermaid
-flowchart TD
-  A[Robustness claim] --> B{Evidence type}
-  B -->|Attack did not find failure| C[Empirical robustness]
-  B -->|Verifier proves no failure| D[Certified robustness]
-  D --> E{Verifier family}
-  E -->|Noise probabilities| F[Randomized smoothing]
-  E -->|Intervals| G[IBP]
-  E -->|Affine relaxations| H[CROWN-style bounds]
-  E -->|Optimization relaxation| I[Convex or exact verification]
-  F --> J[Certified radius curve]
-  G --> J
-  H --> J
-  I --> J
+flowchart TB
+  Input["Input x with label y and threat set B_p(x, epsilon)"]
+
+  subgraph Smooth["Randomized smoothing certificate"]
+    direction TB
+    Noise["Sample Gaussian noise eta_i ~ N(0, sigma^2 I)"]
+    Noisy["Evaluate base classifier f(x + eta_i) for n samples"]
+    Counts["Class counts: top class A, runner-up B"]
+    Bounds["Confidence bounds: p_A lower, p_B upper"]
+    Radius["Certified L2 radius: R = sigma/2 * (Phi^-1(p_A) - Phi^-1(p_B))"]
+    Decision{"Radius meets target and A = y?"}
+    SmoothCert["Certified robust prediction inside L2 ball"]
+    Abstain["Abstain / not certified"]
+    Noise --> Noisy --> Counts --> Bounds --> Radius --> Decision
+    Decision -->|"Yes"| SmoothCert
+    Decision -->|"No"| Abstain
+  end
+
+  subgraph IBP["Interval bound propagation through a small network"]
+    direction TB
+    Box["Input interval: lower_0 = x - epsilon, upper_0 = x + epsilon"]
+    Linear1["Affine/conv layer: bound W x + b with sign-split weights"]
+    ReLU1["#quot;ReLU interval: [max(0, lower), max(0, upper)"]"]
+    Linear2["Next affine layer bounds"]
+    Logits["Logit intervals: lower_j, upper_j"]
+    Margin["Worst-case margin: lower_y - max_{j != y} upper_j"]
+    IBPCert{"Worst-case margin positive?"}
+    Proven["Certified no class change in input box"]
+    NotProven["Not proven: bound too loose or model not robust"]
+    Box --> Linear1 --> ReLU1 --> Linear2 --> Logits --> Margin --> IBPCert
+    IBPCert -->|"Yes"| Proven
+    IBPCert -->|"No"| NotProven
+  end
+
+  subgraph Relax["Other verifier families"]
+    direction TB
+    Crown["CROWN / linear relaxations: tighter affine upper/lower bounds"]
+    Convex["Convex relaxations or branch-and-bound"]
+    Exact["Exact small-network verification"]
+    Crown --> CertCurve["Certified accuracy vs radius curve"]
+    Convex --> CertCurve
+    Exact --> CertCurve
+  end
+
+  Input --> Noise
+  Input --> Box
+  SmoothCert --> CertCurve
+  Proven --> CertCurve
+  Abstain --> CertCurve
+  NotProven --> CertCurve
 ```
+
+This diagram shows randomized smoothing and IBP as two different certificate-producing architectures. Smoothing certifies a probabilistic decision radius from noisy votes, while IBP pushes lower and upper activation bounds layer by layer until the final logit margin either proves robustness or exposes a loose/failed certificate.
 
 | Method | Certificate norm or set | Main object bounded | Strength | Limitation |
 |---|---|---|---|---|

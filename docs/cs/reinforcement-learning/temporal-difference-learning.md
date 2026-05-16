@@ -93,16 +93,32 @@ Expected SARSA is a reminder that sampling is optional in parts of the target wh
 
 ```mermaid
 flowchart TD
-  Transition["Observe S_t, A_t, R_t+1, S_t+1"] --> Target{Choose TD target}
-  Target --> TD0["R + gamma V(S')"]
-  Target --> Sarsa["R + gamma Q(S', A')"]
-  Target --> Qlearn["R + gamma max_a Q(S', a)"]
-  Target --> Expected["R + gamma sum_a pi(a|S')Q(S',a)"]
-  TD0 --> Update[Old estimate + alpha target error]
-  Sarsa --> Update
-  Qlearn --> Update
-  Expected --> Update
+  Step["Experience tuple: S_t, A_t, R_(t+1), S_(t+1)"] --> Mode{"Prediction or control method"}
+  Mode -- "TD(0) prediction" --> TD0["Target = R + gamma V(S')"]
+  Mode -- "SARSA on-policy" --> NextAct["Choose A_(t+1) from behavior policy"]
+  NextAct --> Sarsa["Target = R + gamma Q(S', A')"]
+  Mode -- "Q-learning off-policy" --> Qlearn["Target = R + gamma max_a Q(S', a)"]
+  Mode -- "Expected SARSA" --> Expected["Target = R + gamma sum_a pi(a|S') Q(S',a)"]
+
+  TD0 --> Error["TD error delta = target - current estimate"]
+  Sarsa --> Error
+  Qlearn --> Error
+  Expected --> Error
+  Error --> Update["Update: estimate <- estimate + alpha * delta"]
+  Update --> Table["Value table or function approximator weights"]
+  Table -. "bootstrapped estimate supplies next target" .-> TD0
+  Table -. "behavior and target policies may differ" .-> Qlearn
+
+  subgraph DoubleQ["Double Q-learning target"]
+    direction LR
+    Q1["Use Q1 to select argmax action"] --> Q2["Use Q2 to evaluate selected action"]
+    Q2 --> Bias["Reduces maximization bias from noisy single estimate"]
+  end
+
+  Qlearn -. "decouple selection/evaluation variant" .-> DoubleQ
 ```
+
+This TD-learning diagram shows the shared update skeleton and the exact target chosen by each method. TD(0), SARSA, Q-learning, and Expected SARSA differ only in how they estimate the post-transition continuation value, but that choice determines prediction versus control and on-policy versus off-policy behavior. The Double Q-learning branch labels the selection/evaluation split that reduces maximization bias.
 
 | Method | Target uses | Policy relation | Learns online? | Typical use |
 |---|---|---|---|---|

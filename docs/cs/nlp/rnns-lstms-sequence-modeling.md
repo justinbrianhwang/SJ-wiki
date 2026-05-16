@@ -9,10 +9,6 @@ Recurrent neural networks process sequences by carrying a hidden state forward t
 
 The core motivation is simple: language is not a fixed-size input. A word's interpretation can depend on earlier words, and sequence tasks require predictions at many positions. RNNs encode a prefix into a vector state; LSTMs improve that state with gates that control what is remembered, forgotten, and exposed.
 
-![An LSTM cell diagram shows gates controlling information flow through cell state and hidden state paths.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Long_Short-Term_Memory.svg/500px-Long_Short-Term_Memory.svg.png)
-
-*Figure: Long short-term memory cell architecture. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Long_Short-Term_Memory.svg), fdeloche, CC BY-SA 4.0.*
-
 ## Definitions
 
 A simple **recurrent neural network** updates a hidden state $h_t$ for each input $x_t$:
@@ -82,17 +78,42 @@ In implementation, sequence batching creates subtle engineering details. Sentenc
 ## Visual
 
 ```mermaid
-flowchart LR
-  X1[x1] --> H1[h1]
-  H0[h0] --> H1
-  X2[x2] --> H2[h2]
-  H1 --> H2
-  X3[x3] --> H3[h3]
-  H2 --> H3
-  H1 --> Y1[y1]
-  H2 --> Y2[y2]
-  H3 --> Y3[y3]
+flowchart TB
+  subgraph Unroll["Sequence unrolled through time"]
+    direction LR
+    X1["x_1"] --> Cell1["LSTM cell t=1"]
+    X2["x_2"] --> Cell2["LSTM cell t=2"]
+    X3["x_3"] --> Cell3["LSTM cell t=3"]
+    Cell1 -- "h_1, c_1" --> Cell2
+    Cell2 -- "h_2, c_2" --> Cell3
+    Cell1 --> Y1["y_1"]
+    Cell2 --> Y2["y_2"]
+    Cell3 --> Y3["y_3"]
+  end
+
+  subgraph LSTM["One LSTM cell at time t"]
+    direction TB
+    Input["Input x_t and previous h_(t-1)"] --> Gates["Affine transforms plus sigmoid/tanh"]
+    Gates --> Forget["Forget gate f_t = sigmoid(W_f x_t + U_f h_(t-1) + b_f)"]
+    Gates --> InGate["Input gate i_t = sigmoid(W_i x_t + U_i h_(t-1) + b_i)"]
+    Gates --> Candidate["Candidate c_tilde = tanh(W_c x_t + U_c h_(t-1) + b_c)"]
+    Gates --> OutGate["Output gate o_t = sigmoid(W_o x_t + U_o h_(t-1) + b_o)"]
+    PrevC["Previous cell c_(t-1)"] --> Keep["Elementwise product f_t * c_(t-1)"]
+    Forget --> Keep
+    InGate --> Write["Elementwise product i_t * c_tilde"]
+    Candidate --> Write
+    Keep --> Add["Cell update c_t = f_t*c_(t-1) + i_t*c_tilde"]
+    Write --> Add
+    Add --> Expose["Hidden h_t = o_t * tanh(c_t)"]
+    OutGate --> Expose
+    Add --> NextC["Next cell state c_t"]
+    Expose --> NextH["Next hidden state h_t"]
+  end
+
+  Cell2 -. "same parameters reused at every time step" .-> LSTM
 ```
+
+This LSTM diagram shows both the unrolled recurrent computation and the internals of one cell. The cell labels the forget, input, candidate, and output gates, plus the additive cell-state update that carries information across time. The dotted edge emphasizes temporal parameter sharing: every time step uses the same gate equations while passing distinct `h_t` and `c_t` states forward.
 
 | Architecture | Input-output shape | Typical task | Limitation |
 |---|---|---|---|

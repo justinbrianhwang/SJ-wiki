@@ -9,10 +9,6 @@ Real control systems are built from interconnected subsystems. Nise's reduction 
 
 The methods here are algebraic, but they are also organizational. A clean block diagram exposes where disturbances enter, where sensor dynamics sit, and which signals are internal. Signal-flow graphs provide a compact alternative when many loops interact. Mason's gain formula is especially useful when block-diagram reduction becomes visually messy.
 
-![A feedback loop block diagram shows an output signal returned to the input through a controller path.](https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Feedback_Loop.svg/500px-Feedback_Loop.svg.png)
-
-*Figure: Feedback loop block diagram in control theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Feedback_Loop.svg), Inductiveload, public domain.*
-
 ## Definitions
 
 A **block diagram** represents subsystem transfer functions as directed blocks connected by signals. A **summing junction** forms a signed algebraic sum. A **pickoff point** copies a signal without changing it.
@@ -103,17 +99,52 @@ It also supports maintenance.
 ## Visual
 
 ```mermaid
-flowchart LR
-  R["R"] --> S["Sum"]
-  S --> G1["G1"]
-  G1 --> G2["G2"]
-  G2 --> Y["C"]
-  Y --> H["H"]
-  H --> S
-  D["Disturbance"] --> SD["Output sum"]
-  G2 --> SD
-  SD --> Y2["Measured output"]
+flowchart TB
+  subgraph Original["Unreduced block diagram with separate paths"]
+    direction LR
+    R["R(s)"] --> S1(("Σ"))
+    FB["-H(s)C(s)"] --> S1
+    S1 --> E["E(s)"]
+    E --> G1["G1(s)"]
+    G1 --> Pick["Pickoff: X(s)"]
+    Pick --> G2["G2(s)"]
+    G2 --> S2(("Σ"))
+    D["D(s): disturbance"] --> S2
+    S2 --> C["C(s)"]
+    C --> H["H(s)"]
+    H --> FB
+    Pick -. "copied internal signal for actuator/sensor sizing" .-> Internal["Internal signal X(s)"]
+  end
+
+  subgraph Algebra["Reduction rules preserved as signal equations"]
+    direction TB
+    Series["Series: G_eq = G1 * G2"]
+    Parallel["Parallel sum: G_eq = G1 + G2"]
+    Feedback["Negative feedback: G_eq = G / (1 + G H)"]
+    Move["Move pickoff/summing junction only with compensating G or 1/G factor"]
+    Series --> Feedback
+    Parallel --> Feedback
+    Move --> Feedback
+  end
+
+  subgraph Mason["Signal-flow graph for overlapping loops"]
+    direction LR
+    X0["R"] -->|"G1"| X1["x1"]
+    X1 -->|"G2"| X2["x2"]
+    X2 -->|"G3"| X3["C"]
+    X2 -->|"-H2"| X1
+    X3 -->|"-H1"| X1
+    X1 -->|"F"| X3
+    X3 --> MasonEq["T = sum(P_k Delta_k) / Delta"]
+  end
+
+  Internal --> Series
+  Internal --> X0
+  Feedback --> Reduced["Reduced transfer functions: C/R, C/D, E/R, internal signals"]
+  MasonEq --> Reduced
 ```
+
+This diagram keeps the unreduced control architecture, the algebraic reduction rules, and the Mason signal-flow alternative visible at the same time. The disturbance and internal pickoff paths show why a single collapsed `C(s)/R(s)` block is not enough when the design question involves disturbance rejection, sensor noise, actuator effort, or internal stability.
 
 | Interconnection | Formula | Stability denominator |
 |---|---|---|

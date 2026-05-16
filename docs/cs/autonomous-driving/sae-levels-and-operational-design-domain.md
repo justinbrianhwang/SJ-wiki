@@ -9,10 +9,6 @@ The SAE J3016 levels are the common vocabulary for describing how much of the dr
 
 This page gives the foundational taxonomy used throughout the autonomous-driving section. Later pages on [sensors](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu), [prediction](/cs/autonomous-driving/prediction-and-motion-forecasting), [planning](/cs/autonomous-driving/motion-planning), [control](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley), and [safety](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing) assume this distinction between capability, domain, fallback responsibility, and legal permission.
 
-![A driving automation levels table summarizes SAE levels from no automation to full automation.](https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Levels_of_Driving_Automation.png/500px-Levels_of_Driving_Automation.png)
-
-*Figure: Levels of driving automation for road vehicles. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Levels_of_Driving_Automation.png), Bryant Walker Smith, CC BY 3.0.*
-
 ## Definitions
 
 The **dynamic driving task** is the real-time operational and tactical work of driving: lateral control, longitudinal control, object and event detection, response planning, maneuver execution, and compliance with road rules. It excludes trip planning choices such as choosing to go to the airport, but it includes the driving actions needed to execute the trip.
@@ -64,18 +60,56 @@ The levels also do not specify architecture. A Level 4 system might use camera-o
 ## Visual
 
 ```mermaid
-flowchart TD
-  A["Trip request"] --> B{"Is route inside ODD?"}
-  B -->|"No"| C["Reject automation or request human driving"]
-  B -->|"Yes"| D["ADS performs dynamic driving task"]
-  D --> E{"ODD still valid?"}
-  E -->|"Yes"| F["Continue perception, prediction, planning, control"]
-  E -->|"No at Level 3"| G["Request fallback-ready user"]
-  E -->|"No at Level 4 or 5"| H["Execute minimal risk maneuver"]
-  G --> I{"User takes over?"}
-  I -->|"Yes"| J["Human resumes dynamic driving task"]
-  I -->|"No"| H
+flowchart TB
+  Request["Trip request: route, speed, road type, user state"] --> Gate{"Inside declared ODD?"}
+  Gate -->|"No"| Reject["Do not engage automation; human drives or reroute"]
+  Gate -->|"Yes"| Engage["Engage ADS / driver-support feature"]
+
+  subgraph ODD["ODD contract checked every cycle"]
+    direction TB
+    Road["Road domain: highway, campus, mapped lane graph"]
+    Env["Environment: daylight, visibility, rain/snow/fog limits"]
+    Speed["Speed and traffic envelope: v_min..v_max, density"]
+    System["System prerequisites: sensors healthy, map available, localization covariance"]
+    Legal["Geofence and regulatory permissions"]
+    Road --> Validity["ODD validity vector"]
+    Env --> Validity
+    Speed --> Validity
+    System --> Validity
+    Legal --> Validity
+  end
+
+  subgraph Stack["ADS dynamic-driving-task stack"]
+    direction TB
+    Sensors["Sensors: images, point cloud, radar, IMU/GNSS"]
+    Perception["Perception: objects, lanes, lights, freespace"]
+    Fusion["Fusion/localization: BEV + tracks + ego pose"]
+    Prediction["Prediction: agent future trajectories"]
+    Planning["Behavior + motion planning: maneuver and trajectory"]
+    Control["Control: steering, throttle, brake"]
+    Sensors -->|"raw measurements"| Perception
+    Perception -->|"detections + masks"| Fusion
+    Fusion -->|"tracks + pose + map context"| Prediction
+    Prediction -->|"future-trajectory set"| Planning
+    Planning -->|"trajectory command"| Control
+  end
+
+  Engage --> Sensors
+  Validity -. "ODD limits and fallback policy" .-> Perception
+  Validity -. "ODD limits and fallback policy" .-> Planning
+  Validity -. "ODD limits and fallback policy" .-> Control
+  Control --> Monitor{"ODD still valid and system healthy?"}
+  Monitor -->|"Yes"| Sensors
+  Monitor -->|"No, Level 2"| HumanNow["Human is already monitoring; issue warning/disengage"]
+  Monitor -->|"No, Level 3"| Takeover["Takeover request to fallback-ready user"]
+  Monitor -->|"No, Level 4/5"| MRM["Minimal risk maneuver: slow, stop, or pull over"]
+  Takeover --> UserTakes{"User takes over before deadline?"}
+  UserTakes -->|"Yes"| Manual["Human resumes dynamic driving task"]
+  UserTakes -->|"No"| MRM
+  HumanNow --> Manual
 ```
+
+This diagram separates SAE responsibility from architecture: the same perception, fusion, prediction, planning, and control stack can sit behind different fallback rules. The ODD validity vector feeds the running stack through dotted constraint paths, and the exit branch shows how Level 2, Level 3, and Level 4/5 differ when the domain is no longer valid.
 
 ## Worked example 1: Classifying a highway assistant
 
@@ -173,4 +207,3 @@ print("inside ODD:", inside, "reasons:", exit_reasons)
 - [Embedded systems](/cs/embedded/)
 - [Engineering math for state estimation and control](/math/engineering-math/)
 - Further reading: SAE J3016 terminology, NHTSA automated vehicle guidance, ISO 26262, ISO 21448, and Mobileye's Responsibility-Sensitive Safety papers.
-

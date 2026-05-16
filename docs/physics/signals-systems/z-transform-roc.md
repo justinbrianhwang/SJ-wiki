@@ -143,18 +143,34 @@ As with the Laplace transform, repeated poles produce polynomial factors in the 
 
 ## Visual
 
-```text
-z-plane ROC examples
+```mermaid
+flowchart TB
+  Seq["#quot;Discrete-time sequence x[n"]<br/>right-sided, left-sided, two-sided, or finite"] --> ZT["#quot;z-transform<br/>X(z)=sum x[n"] z^(-n)"]
+  ZT --> Poles["Pole-zero expression<br/>radii and angles in z-plane"]
+  ZT --> ROC{"Region of convergence"}
 
-right-sided sequence:      two-sided sequence:       left-sided sequence:
+  subgraph Shapes["ROC shapes"]
+    direction TB
+    Right["right-sided sequence<br/>outside outermost active pole"] --> Causal["causal rational system candidate"]
+    Left["left-sided sequence<br/>inside innermost active pole"] --> Anti["anti-causal candidate"]
+    Annulus["two-sided sequence<br/>annulus between pole radii"] --> Noncausal["noncausal candidate"]
+    FIR["finite-length sequence<br/>entire plane except possible 0 or infinity"] --> FIRStable["FIR stability if absolutely summable"]
+  end
 
-   pole radius r              r1 < |z| < r2             pole radius r
-      (x)                         (x)   (x)                 (x)
-       |                          |     |                    |
-       +==== ROC outward          +== ROC ==+          ROC inward ====+
-
-The unit circle must lie in the ROC for the DTFT to exist.
+  ROC -- "outside radius" --> Right
+  ROC -- "inside radius" --> Left
+  ROC -- "between radii" --> Annulus
+  ROC -- "finite support" --> FIR
+  Poles --> Exclude["ROC never crosses a pole"]
+  Causal --> DTFT{"unit circle inside ROC?"}
+  Anti --> DTFT
+  Noncausal --> DTFT
+  FIRStable --> DTFT
+  DTFT -- "yes" --> Freq["DTFT and H(e^jOmega) exist"]
+  DTFT -- "no" --> NoFreq["no ordinary frequency response"]
 ```
+
+The $z$-transform architecture mirrors the Laplace workflow but uses annular regions in the $z$-plane. The diagram shows how sidedness determines whether the ROC extends outward, inward, or between pole radii, while finite sequences occupy a special FIR branch. The unit-circle test is the discrete-time I/O contract for stability and frequency response.
 
 | Sequence/system type | ROC shape | Stability condition | Causality clue |
 |---|---|---|---|

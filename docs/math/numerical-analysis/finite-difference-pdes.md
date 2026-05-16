@@ -79,17 +79,40 @@ Grid refinement is the most important practical audit. Run the same PDE with hal
 
 ## Visual
 
-```text
-Five-point Laplace stencil:
+```mermaid
+flowchart TB
+  PDE["PDE model<br/>elliptic, parabolic, hyperbolic, or nonlinear"] --> Mesh["Choose mesh<br/>Delta x, Delta y, Delta t"]
+  Mesh --> BC["Encode boundary and initial data<br/>Dirichlet, Neumann, Robin"]
+  BC --> Stencil{"Choose stencil/update"}
 
-        u(i,j+1)
-            |
-u(i-1,j) - u(i,j) - u(i+1,j)
-            |
-        u(i,j-1)
+  subgraph Laplace["Five-point Laplace stencil"]
+    direction TB
+    North["u(i,j+1)"] --> Center["u(i,j)<br/>4 u(i,j) = neighbors sum"]
+    West["u(i-1,j)"] --> Center
+    East["u(i+1,j)"] --> Center
+    South["u(i,j-1)"] --> Center
+  end
 
-4*u(i,j) equals the sum of the four neighbors for Laplace's equation.
+  subgraph Heat["Explicit heat step"]
+    direction TB
+    Old["u_i^n and neighbors at time n"] --> CFL["r = alpha Delta t / Delta x^2<br/>require r at most 1/2 in 1D"]
+    CFL --> New["u_i^(n+1) = u_i^n + r(u_{i-1}^n - 2u_i^n + u_{i+1}^n)"]
+  end
+
+  subgraph Algebra["Sparse algebra"]
+    direction TB
+    Matrix["assemble sparse matrix or update operator<br/>tridiagonal, five-point, block sparse"] --> Solve["linear solve, nonlinear Newton, or time march"]
+    Solve --> Resid["discrete residual and grid-refinement check"]
+  end
+
+  Stencil -- "elliptic" --> North
+  Stencil -- "parabolic explicit" --> Old
+  Center --> Matrix
+  New --> Matrix
+  Resid --> Result(("PDE approximation"))
 ```
+
+The finite-difference diagram turns PDE discretization into a mesh, boundary-condition, stencil, sparse-algebra, and verification pipeline. The Laplace subgraph shows the five-point stencil with the center node coupled to its four neighbors, while the heat subgraph shows the explicit time update and CFL stability restriction. The final residual and grid-refinement checks are part of the architecture because stencil order alone does not guarantee a trustworthy PDE solve.
 
 | PDE type | Example | Common finite difference issue | Matrix/update pattern |
 |---|---|---|---|

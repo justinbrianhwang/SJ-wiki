@@ -113,14 +113,24 @@ Equilibrium intuition still helps in kinetics. If acceleration is small compared
 
 ```mermaid
 flowchart TD
-  A[Particle kinetics problem] --> B[Draw FBD with real forces]
-  B --> C[Choose coordinates matching motion]
-  C --> D[Write acceleration components]
-  D --> E[Resolve forces in same directions]
-  E --> F["Apply sum F = m a"]
-  F --> G[Add constraints if connected]
-  G --> H[Solve and check signs/units]
+  Problem["Particle kinetics problem<br/>known forces, path, or constraints"] --> FBD["Draw FBD with real forces<br/>no fictitious centripetal-force object"]
+  FBD --> Coordinates{"Choose coordinates matching motion"}
+  Coordinates -- "rectilinear or projectile" --> Cartesian["Cartesian components<br/>a_x, a_y, a_z"]
+  Coordinates -- "path known" --> TangentNormal["tangential-normal components<br/>a_t = dv/dt, a_n = v^2/rho"]
+  Coordinates -- "rotating/radial geometry" --> Polar["polar or cylindrical components<br/>a_r, a_theta"]
+  Cartesian --> Resolve["resolve forces in same directions"]
+  TangentNormal --> Resolve
+  Polar --> Resolve
+  Resolve --> Newton["Newton equations<br/>sum F_i = m a_i for each component"]
+  Newton --> Constraints{"connected particles or prescribed motion?"}
+  Constraints -- "yes" --> Kinematic["add cable, pulley, contact, or path constraints"]
+  Constraints -- "no" --> Solve
+  Kinematic --> Solve["solve for accelerations and unknown forces"]
+  Solve --> Check["check signs, units, contact validity, and limiting cases"]
+  Check --> Result(("particle motion/force solution"))
 ```
+
+The kinetics diagram keeps the free-body diagram separate from acceleration kinematics. The coordinate branch shows why straight, path-following, and polar problems use different acceleration components before the same Newton equation is applied. Constraint equations are shown as their own block because connected-particle problems are usually solved by coupling multiple FBDs through kinematics.
 
 | Motion description | Best components | Newton equations |
 |---|---|---|

@@ -82,17 +82,54 @@ Static embeddings are often evaluated with word similarity or analogy datasets, 
 | Contextual LM | transformer hidden states | token meaning in context | expensive and layer-dependent |
 
 ```mermaid
-flowchart TD
-  A[Corpus] --> B[Choose context definition]
-  B --> C[Build co-occurrence signal]
-  C --> D{Representation}
-  D --> E[Sparse TF-IDF or PPMI]
-  D --> F[Dense word2vec or GloVe]
-  D --> G[Contextual transformer states]
-  E --> H["Similarity, retrieval, features"]
-  F --> H
-  G --> H
+flowchart TB
+  Corpus["Corpus tokens"] --> Context["Choose context window or dependency context"]
+  Context --> Pairs["Observed positive word-context pairs (w,c)"]
+
+  subgraph Count["Count-based path"]
+    direction TB
+    Matrix["Word-context count matrix C(w,c)"]
+    Weight["Transform counts: TF-IDF, PMI, or PPMI"]
+    SVD["Optional SVD/LSA compression"]
+    Matrix --> Weight
+    Weight --> SVD
+  end
+
+  subgraph SGNS["word2vec skip-gram with negative sampling"]
+    direction TB
+    Target["Target embedding u_w"]
+    Pos["Positive context embedding v_c"]
+    Neg["k negative contexts sampled from noise distribution"]
+    DotPos["Maximize log sigmoid(v_c dot u_w)"]
+    DotNeg["Maximize sum_i log sigmoid(-v_n_i dot u_w)"]
+    Update["Update target and context vectors by SGD"]
+    Target --> DotPos
+    Pos --> DotPos
+    Target --> DotNeg
+    Neg --> DotNeg
+    DotPos --> Update
+    DotNeg --> Update
+  end
+
+  Pairs --> Matrix
+  Pairs --> Target
+  Update --> Dense["Dense static embeddings: one vector per word type"]
+  SVD --> Dense
+  Dense --> Use(("Cosine similarity, retrieval features, downstream NLP"))
+
+  subgraph Contextual["Contextual embedding path"]
+    direction TB
+    Sent["Sentence with token occurrence"]
+    Encoder["Transformer or BiLSTM encoder"]
+    TokenVec["Context-specific vector for this token occurrence"]
+    Sent --> Encoder
+    Encoder --> TokenVec
+  end
+
+  Contextual --> Use
 ```
+
+This embedding diagram separates count-based vector semantics from predictive skip-gram training and contextual encoders. The word2vec branch labels the target vector, positive context vector, negative samples, dot products, sigmoid objectives, and SGD update. The count branch shows TF-IDF/PMI/PPMI and optional SVD, while the contextual branch explains why modern encoders produce a different vector for each token occurrence.
 
 ## Worked example 1: TF-IDF by hand
 

@@ -149,18 +149,48 @@ Forecast freshness is another interface requirement: a good old prediction may b
 ## Visual
 
 ```mermaid
-flowchart TD
-  A["Agent history"] --> D["Forecast model"]
-  B["Map lanes and signals"] --> D
-  C["Neighbor agents"] --> D
-  E["Candidate ego plans"] --> D
-  D --> F["Mode 1: continue"]
-  D --> G["Mode 2: yield"]
-  D --> H["Mode 3: turn"]
-  F --> I["Risk-aware planning"]
-  G --> I
-  H --> I
+flowchart TB
+  Agents["#quot;Tracked agents: [A, T_hist, x, y, vx, vy, yaw, class"]"]
+  Map["Map polylines: lanes, boundaries, crosswalks, signals"]
+  Ego["Ego state and candidate ego plans"]
+
+  subgraph VectorNet["VectorNet-style vectorized scene encoder"]
+    direction TB
+    Vec["Polyline vectorization: agent segments + lane segments"]
+    SegMLP["Per-vector MLP: start/end pose, type, traffic state"]
+    PolyPool["#quot;Subgraph max-pool per polyline: [P, C"]"]
+    GlobalGraph["Global interaction graph: self-attention / GNN over polylines"]
+    GoalDecode["Goal/mode decoder: K endpoint hypotheses"]
+    TrajDecode["#quot;Trajectory decoder: [A, K, T_f, x, y"] + probabilities"]
+    Vec --> SegMLP --> PolyPool --> GlobalGraph --> GoalDecode --> TrajDecode
+  end
+
+  subgraph HiVT["HiVT-style hierarchical attention encoder"]
+    direction TB
+    LocalFrame["Agent-centric local coordinate frames"]
+    Temporal["Temporal self-attention over each agent history"]
+    MapCross["Agent-map cross-attention to nearby lanes and controls"]
+    LocalInteract["Local agent-agent attention inside neighborhoods"]
+    GlobalInteract["Global scene attention between neighborhood tokens"]
+    MultiModal["Multimodal decoder: intent, endpoint, trajectory"]
+    LocalFrame --> Temporal --> MapCross --> LocalInteract --> GlobalInteract --> MultiModal
+  end
+
+  Agents -->|"history vectors"| Vec
+  Map -->|"polyline vectors"| Vec
+  Agents -->|"normalized agent histories"| LocalFrame
+  Map -->|"nearby lane graph"| MapCross
+  Ego -->|"route and candidate ego futures"| GlobalGraph
+  Ego -->|"ego-plan conditioning"| GlobalInteract
+
+  TrajDecode --> Merge["Forecast set merge and calibration"]
+  MultiModal --> Merge
+  Merge --> Check["Kinematic checks: speed, yaw rate, collision plausibility"]
+  Check --> Output["Output: per-agent K future trajectories, probabilities, covariance"]
+  Output --> Planner(("Risk-aware behavior and motion planning"))
 ```
+
+This diagram shows two common forecasting architectures at sublayer level. VectorNet builds polyline embeddings and a global graph, while HiVT uses hierarchical temporal, map, local-interaction, and global-interaction attention; both produce multimodal future trajectories with probabilities for planning.
 
 ## Worked example 1: Constant-velocity forecast
 

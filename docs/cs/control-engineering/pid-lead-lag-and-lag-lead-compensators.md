@@ -9,10 +9,6 @@ Classical controllers add simple dynamics to reshape steady-state error, transie
 
 This page emphasizes what each compensator changes structurally. A controller is not chosen because its name is familiar; it is chosen because the plant's deficiencies are clear. If the system is too slow, lacks damping, or has inadequate phase margin, lead or derivative action may help. If tracking error is too large, integral or lag action may help. If both are inadequate, combined compensation is needed.
 
-![A feedback loop block diagram shows an output signal returned to the input through a controller path.](https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Feedback_Loop.svg/500px-Feedback_Loop.svg.png)
-
-*Figure: Feedback loop block diagram in control theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Feedback_Loop.svg), Inductiveload, public domain.*
-
 ## Definitions
 
 The ideal PID controller is
@@ -98,15 +94,58 @@ The best PID settings are plant-specific.
 ## Visual
 
 ```mermaid
-flowchart LR
-  E["Error"] --> P["P gain"]
-  E --> I["Integrator"]
-  E --> D["Filtered derivative"]
-  P --> SUM["Controller sum"]
-  I --> SUM
-  D --> SUM
-  SUM --> U["Actuator command"]
+flowchart TB
+  E["Error e(t) or E(s)"] --> Choice{"Compensator structure"}
+
+  subgraph PID["PID implementation blocks"]
+    direction TB
+    P["P: Kp, no pole or zero"]
+    I["I: Ki/s, pole at origin"]
+    D["Filtered D: Kd s / (tau_d s + 1), zero at origin, high-frequency pole"]
+    Sum(("Σ"))
+    Sat["Output saturation + anti-windup feedback"]
+    P --> Sum
+    I --> Sum
+    D --> Sum --> Sat
+    Sat -. "back-calculate or clamp integral state" .-> I
+  end
+
+  subgraph PoleZero["Pole-zero compensator library"]
+    direction TB
+    PI["PI: Kp(s + z_i) / s; pole at 0, zero at -z_i"]
+    PD["PD/lead-like: Kd(s + z_d); practical form adds pole at -p_f"]
+    Lead["Lead: K(s + z) / (s + p), zero closer to origin than pole"]
+    Lag["Lag: K(s + z) / (s + p), pole closer to origin than zero"]
+    LagLead["Lag-lead: lag low-frequency boost cascaded with lead phase boost"]
+    PI --> LagLead
+    PD --> LagLead
+    Lead --> LagLead
+    Lag --> LagLead
+  end
+
+  subgraph Frequency["Frequency-response effects"]
+    direction TB
+    Low["Low frequency: integral/lag raises loop gain for steady-state error"]
+    Cross["Crossover: lead/PD adds positive phase and damping margin"]
+    High["High frequency: derivative/lead can amplify noise unless filtered"]
+    Root["Root locus: zeros attract branches, poles repel branches"]
+    Low --> Cross --> High
+    Root --> Cross
+  end
+
+  Choice -->|"parallel PID"| P
+  Choice -->|"pole-zero design"| PI
+  PI --> Low
+  PD --> High
+  Lead --> Cross
+  Lag --> Low
+  LagLead --> Controller["Controller G_c(s)"]
+  Sat --> Controller
+  Controller --> PlantLoop["Closed-loop plant: G_c(s) G_p(s) / (1 + G_c(s) G_p(s) H(s))"]
+  PlantLoop --> Output(("Transient response, steady-state error, margins"))
 ```
+
+This diagram links PID terms to the same pole-zero language used for lead, lag, and lag-lead compensation. The lower blocks label where each compensator acts in frequency response: PI/lag improve low-frequency accuracy, lead/PD add phase near crossover, and derivative-like action needs filtering and anti-windup when the actuator saturates.
 
 | Frequency region | Lag action | Lead action |
 |---|---|---|

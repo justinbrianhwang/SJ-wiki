@@ -100,18 +100,52 @@ The optimizer state should be treated as part of training. Resuming from a check
 ## Visual
 
 ```mermaid
-flowchart TD
-  A[Choose minibatch] --> B[Compute gradient g_t]
-  B --> C{Optimizer}
-  C -->|SGD| D[Use g_t directly]
-  C -->|Momentum| E[Update velocity]
-  C -->|Adaptive| F[Update moment estimates]
-  D --> G[Apply learning rate schedule]
-  E --> G
-  F --> G
-  G --> H[Update parameters]
-  H --> A
+flowchart TB
+  Batch["Sample minibatch B_t"] --> Forward["Forward pass f_theta(x)"]
+  Forward --> Loss["Loss L_t, plus optional weight decay term"]
+  Loss --> Grad["Backprop gradient g_t = grad_theta L_t"]
+  Grad --> Clip{"Clip gradient norm?"}
+  Clip -->|"yes"| Gclip["Set g_t to min(1, theta_norm/||g_t||) * g_t"]
+  Clip -->|"no"| Graw["Use raw g_t"]
+  Gclip --> Route{"Optimizer state update"}
+  Graw --> Route
+
+  subgraph Momentum["Momentum / SGD branch"]
+    direction TB
+    Vprev["Velocity v_{t-1}"] --> Vnew["v_t = beta*v_{t-1} + g_t"]
+    Vnew --> StepM["Delta theta = eta_t * v_t"]
+  end
+
+  subgraph Adam["Adam / AdamW branch"]
+    direction TB
+    Mprev["First moment m_{t-1}"] --> Mnew["m_t = beta1*m_{t-1} + (1-beta1)*g_t"]
+    Sprev["Second moment v_{t-1}"] --> Snew["v_t = beta2*v_{t-1} + (1-beta2)*g_t^2"]
+    Mnew --> Mhat["m_hat = m_t / (1-beta1^t)"]
+    Snew --> Vhat["v_hat = v_t / (1-beta2^t)"]
+    Mhat --> StepA["Delta theta = eta_t * m_hat / (sqrt(v_hat)+epsilon)"]
+    Vhat --> StepA
+    Decay["AdamW decoupled weight decay shrinks theta separately"] -.-> StepA
+  end
+
+  subgraph Schedule["Learning-rate schedule"]
+    direction TB
+    Tstep["Step counter t"] --> Warm["Warmup ramp"]
+    Warm --> DecaySched["Cosine, step, exponential, or inverse-sqrt decay"]
+    DecaySched --> Eta["Current eta_t"]
+  end
+
+  Route -->|"SGD with momentum"| Vnew
+  Route -->|"Adam-style adaptive"| Mnew
+  Route -->|"Adam-style adaptive"| Snew
+  Eta --> StepM
+  Eta --> StepA
+  StepM --> Update["theta_t = theta_{t-1} - Delta theta"]
+  StepA --> Update
+  Update --> Checkpoint["Checkpoint model, optimizer state, scheduler state"]
+  Update -. "next minibatch uses updated theta" .-> Batch
 ```
+
+The optimizer diagram separates the raw gradient computation from optimizer state, learning-rate scheduling, and parameter updates. Momentum keeps a velocity state, while Adam keeps first and second moments and applies bias correction before the adaptive step. The schedule subgraph supplies `eta_t` to either branch, and the checkpoint node shows why optimizer and scheduler states are part of a reproducible training run.
 
 | Optimizer | Extra state | Strength | Main tuning concern |
 |---|---|---|---|

@@ -107,14 +107,22 @@ Loss changes bounce diagrams gradually rather than changing the reflection logic
 ## Visual
 
 ```mermaid
-sequenceDiagram
-  participant S as Source
-  participant L as Load
-  S->>L: launch V0+ after delay T
-  L-->>S: reflect Gamma_L V0+
-  S->>L: reflect Gamma_S Gamma_L V0+
-  L-->>S: reflect Gamma_L Gamma_S Gamma_L V0+
+flowchart LR
+  Step["source step through source resistance R_S"] --> Launch["launch incident wave<br/>V0+ = V_S Z0/(R_S + Z0)"]
+  Launch --> Travel1["propagate to load<br/>one-way delay T = l/u_p"]
+  Travel1 --> Load["load boundary Z_L<br/>Gamma_L = (Z_L - Z0)/(Z_L + Z0)"]
+  Load --> LoadUpdate["load voltage increment<br/>Delta V_L = (1 + Gamma_L)V_inc"]
+  Load --> ReflectL["reflected wave<br/>Gamma_L V_inc"]
+  ReflectL --> Travel2["propagate back to source<br/>another delay T"]
+  Travel2 --> Source["source boundary<br/>Gamma_S = (R_S - Z0)/(R_S + Z0)"]
+  Source --> SourceUpdate["source-end voltage increment<br/>(1 + Gamma_S)V_return"]
+  Source --> ReflectS["new forward wave<br/>Gamma_S Gamma_L V_inc"]
+  ReflectS -. "repeat bounce diagram" .-> Travel1
+  LoadUpdate --> Power["delivered power fraction<br/>1 - |Gamma_L|^2 for lossless real case"]
+  SourceUpdate --> TDR["TDR interpretation<br/>reflection sign and round-trip time locate discontinuity"]
 ```
+
+The transient transmission-line diagram shows the bounce-diagram architecture in block form. A source launches an incident wave, the load applies $\Gamma_L$, the returning wave meets the source coefficient $\Gamma_S$, and the sequence repeats with one-way delay $T$. The power and TDR nodes show how the same reflection updates explain energy delivery and discontinuity location.
 
 | Termination | Reflection coefficient | Step response tendency |
 |---|---:|---|

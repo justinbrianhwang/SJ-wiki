@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunksj_wiki=self.webpackChunksj_wiki||[]).push([["41962"],{34737(e,s,i){i.d(s,{createPieServices:()=>k.f});var k=i(10532);i(69302)}}]);

@@ -9,10 +9,6 @@ A process is a program in execution, but that phrase is only the beginning. The 
 
 Processes connect the user-level idea of "running a program" to the kernel-level mechanisms of scheduling, memory isolation, resource ownership, and interprocess communication. The process page therefore prepares for CPU scheduling, synchronization, virtual memory, file systems, and protection. Once a program becomes a process, it is no longer just code; it is a managed object in the kernel.
 
-![A process state diagram shows transitions among new, ready, running, waiting, and terminated states.](https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Process_state.svg/500px-Process_state.svg.png)
-
-*Figure: Five-state process model used in operating systems. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Process_state.svg), MrDrBob, CC BY-SA 3.0.*
-
 ## Definitions
 
 A **process** is an executing program with its current activity and resources. It includes a **text section** containing program code, a **data section** for global variables, a **heap** for dynamically allocated memory, and a **stack** for function calls, parameters, local variables, and return addresses.
@@ -56,18 +52,39 @@ A process is also a resource-accounting container. The kernel can charge CPU tim
 ## Visual
 
 ```mermaid
-stateDiagram-v2
-  [*] --> New
-  New --> Ready: admitted
-  Ready --> Running: scheduler dispatch
-  Running --> Ready: interrupt or preemption
-  Running --> Waiting: I/O or event wait
-  Waiting --> Ready: I/O or event completes
-  Running --> Terminated: exit
-  Terminated --> [*]
+flowchart TB
+  New["New process: PCB allocated; PID assigned; address space created"] --> Admit["Admit to memory and initialize scheduling fields"]
+  Admit --> ReadyQ["Ready queue: runnable PCBs waiting for CPU"]
+
+  subgraph DispatchPath["Scheduler and dispatcher"]
+    direction TB
+    Sched{"CPU scheduler chooses next PCB"}
+    Save["Save old PC and registers to old PCB"]
+    Load["Load selected PCB registers, page-table pointer, and PC"]
+    Mode["Return to user mode at selected PC"]
+  end
+
+  ReadyQ --> Sched
+  Sched --> Save
+  Save --> Load
+  Load --> Mode
+  Mode --> Running["Running: one thread executing on CPU"]
+
+  Running -- "timer interrupt or higher priority wakeup" --> Preempt["Preempt and enqueue old PCB"]
+  Preempt --> ReadyQ
+
+  Running -- "blocking syscall: read, wait, sleep, lock" --> WaitQ["Device or event wait queue"]
+  WaitQ -- "interrupt, signal, child exit, or lock release" --> Wake["Wakeup: mark ready and update PCB state"]
+  Wake --> ReadyQ
+
+  Running -- "exit or fatal signal" --> Zombie["Terminated or zombie: exit status retained"]
+  Zombie -- "parent wait collects status" --> Reaped(("Reaped; PCB released"))
+
+  ReadyQ -. "PCB links and priority fields" .-> Sched
+  WaitQ -. "blocked reason and saved context" .-> Wake
 ```
 
-This state machine is deliberately small. Real kernels have more internal states, but these five states explain why scheduling and blocking are different: a ready process is waiting for CPU time, while a waiting process is waiting for some external event.
+This process-state diagram separates runnable work from blocked work by showing the ready queue, device/event wait queues, and the PCB fields that move between them. The scheduler and dispatcher path makes context switching explicit: CPU state is saved to one PCB and restored from another before returning to user mode. The dotted arrows highlight metadata dependencies rather than direct execution flow, while the terminal path distinguishes process exit from final PCB reaping.
 
 ## Worked example 1: following a context switch
 

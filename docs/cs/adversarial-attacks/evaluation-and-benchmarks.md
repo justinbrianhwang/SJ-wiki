@@ -9,10 +9,6 @@ Adversarial robustness evaluation is unusually easy to get wrong. A model can lo
 
 This page gives a practical checklist for evaluating adversarial defenses. It covers robust accuracy, adaptive attacks, AutoAttack, RobustBench-style reporting, certified metrics, and common methodological errors. The goal is not to crown one benchmark as final, but to make robustness claims reproducible and threat-model-specific.
 
-![A precision and recall diagram shows the overlap between retrieved items and relevant items.](https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Precision_recall.svg/500px-Precision_recall.svg.png)
-
-*Figure: Precision and recall as set overlap. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Precision_recall.svg), kindlychung, CC0.*
-
 ## Definitions
 
 **Clean accuracy** is accuracy on unmodified test examples:
@@ -145,19 +141,55 @@ Adaptive discarding must be reported carefully. A fair comparison specifies the 
 ## Visual
 
 ```mermaid
-flowchart TD
-  A[Robustness claim] --> B[Specify threat model]
-  B --> C[Run clean evaluation]
-  C --> D[Run strong standard attacks]
-  D --> E{"Defense has preprocessing, randomness, detector, unusual loss?"}
-  E -->|yes| F[Design adaptive attacks]
-  E -->|no| G[Still test restarts and attack diversity]
-  F --> H[Report robust accuracy and failures]
-  G --> H
-  H --> I{"Certificate claimed?"}
-  I -->|yes| J[Report certified accuracy curve]
-  I -->|no| K[State empirical scope only]
+flowchart TB
+  Claim["Robustness claim: dataset, model, preprocessing, threat model"]
+  Threat["Specify norm, epsilon, white/black-box access, target, clipping range"]
+  Clean["Clean evaluation on unchanged test set"]
+
+  subgraph AutoAttack["AutoAttack-style fixed ensemble"]
+    direction TB
+    APGDCE["APGD-CE: adaptive step PGD on cross-entropy"]
+    APGDDLR["APGD-DLR: adaptive step PGD on logit-ratio loss"]
+    FAB["FAB: boundary attack with minimal-norm steps"]
+    Square["Square attack: query-based black-box search"]
+    EnsembleMerge["Take worst-case failure over attacks and restarts"]
+    APGDCE --> EnsembleMerge
+    APGDDLR --> EnsembleMerge
+    FAB --> EnsembleMerge
+    Square --> EnsembleMerge
+  end
+
+  subgraph Adaptive["Adaptive evaluation for defended pipelines"]
+    direction TB
+    Pipeline["Attack full pipeline: preprocessing, detector, randomness, classifier"]
+    GradCheck["Gradient sanity: loss curves, step-size sweep, restarts"]
+    BPDA["BPDA for non-differentiable or obfuscated steps"]
+    EOT["EOT for randomized defenses: average gradients over samples"]
+    Losses["Try CE, margin/DLR, targeted and untargeted losses"]
+    FailureAudit["Audit failures: NaNs, clipping bugs, skipped examples, rejected inputs"]
+    Pipeline --> GradCheck --> BPDA --> EOT --> Losses --> FailureAudit
+  end
+
+  subgraph Reporting["Reportable outputs"]
+    direction TB
+    RobustAcc["Robust accuracy on full test set"]
+    ASR["Attack success rate on initially correct examples"]
+    Curves["Accuracy-vs-epsilon and confidence intervals"]
+    Cert{"Certificate claimed?"}
+    CertCurve["Certified accuracy curve with verifier assumptions"]
+    Scope["Empirical scope only: no proof beyond attacks run"]
+    Cert -->|"Yes"| CertCurve
+    Cert -->|"No"| Scope
+  end
+
+  Claim --> Threat --> Clean --> APGDCE
+  Threat --> Pipeline
+  EnsembleMerge --> RobustAcc
+  FailureAudit --> RobustAcc
+  RobustAcc --> ASR --> Curves --> Cert
 ```
+
+This diagram expands evaluation into the fixed AutoAttack ensemble and the adaptive path needed for unusual defenses. The outputs distinguish empirical robust accuracy from certified accuracy, and the failure-audit blocks make preprocessing, randomness, skipped examples, and gradient masking visible rather than hidden in a single score.
 
 | Question | Bad answer | Better answer |
 |---|---|---|

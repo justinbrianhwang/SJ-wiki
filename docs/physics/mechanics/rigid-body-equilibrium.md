@@ -96,15 +96,26 @@ Equilibrium equations also check whether an assumed support can actually remain 
 ## Visual
 
 ```mermaid
-flowchart LR
-  A[Real support or contact] --> B[Idealized reaction model]
-  B --> C[Free-body diagram]
-  C --> D[Force balance]
-  C --> E[Moment balance]
-  D --> F[Reaction equations]
-  E --> F
-  F --> G[Check determinacy and signs]
+flowchart TB
+  Body["Choose rigid body or subassembly"] --> Supports["Identify supports and contacts<br/>pin, roller, fixed end, cable, slot, distributed load"]
+  Supports --> Ideal["Replace supports with ideal reactions<br/>force components and couples"]
+  Ideal --> Loads["Replace distributed loads if useful<br/>resultant and line of action"]
+  Loads --> FBD["Draw complete free-body diagram<br/>external forces only"]
+  FBD --> Axes["Choose axes and moment centers<br/>pick centers that eliminate unknowns"]
+  Axes --> ForceEq["force balances<br/>sum Fx=0, sum Fy=0"]
+  Axes --> MomentEq["moment balance<br/>sum M_O=0"]
+  ForceEq --> System["reaction equation system"]
+  MomentEq --> System
+  System --> Determinate{"statically determinate?"}
+  Determinate -- "yes" --> Solve["solve reactions and resultants"]
+  Determinate -- "no" --> NeedDeform["need deformation compatibility or material laws"]
+  Solve --> Physical{"reaction signs physically possible?"}
+  Physical -- "yes" --> Result(("rigid-body equilibrium solution"))
+  Physical -- "no" --> Revise["revise contact/support assumption"]
+  Revise -. "new FBD" .-> FBD
 ```
+
+The rigid-body equilibrium diagram extends the particle free-body workflow by adding support idealization, distributed-load replacement, moment-center selection, and determinacy checks. Force and moment balances feed the same reaction system, but indeterminate cases require deformation information beyond statics. The sign branch catches impossible support behavior, such as a roller pulling or a cable pushing.
 
 | 2D support | Reaction components | Allows rotation? | Typical notation |
 |---|---:|---:|---|

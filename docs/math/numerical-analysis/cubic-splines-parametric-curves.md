@@ -72,20 +72,38 @@ For study purposes, the most useful habit is to separate four layers: the contin
 
 ## Visual
 
-```text
-One high-degree polynomial may oscillate globally:
+```mermaid
+flowchart TB
+  Knots["Data knots<br/>(x_i, y_i), i = 0..n"] --> BC{"Boundary condition"}
+  BC -- "natural" --> Natural["S''(x0)=S''(xn)=0"]
+  BC -- "clamped" --> Clamped["specified endpoint slopes"]
+  BC -- "not-a-knot" --> Nak["third-derivative continuity near ends"]
+  BC -- "periodic" --> Periodic["wrap values and derivatives"]
 
-  o----\      /----o
-        \    /
-         \__/   o
-  o             /
-   \-----------/
+  Natural --> Equations
+  Clamped --> Equations
+  Nak --> Equations
+  Periodic --> Equations
+  Equations["assemble continuity equations<br/>value, first derivative, second derivative"] --> Tri["tridiagonal or cyclic system<br/>unknown second derivatives or slopes"]
+  Tri --> Solve["Thomas algorithm or cyclic solve"]
+  Solve --> Segments["#quot;local cubic pieces<br/>S_i(x) on [x_i, x_{i+1}"]"]
+  Segments --> Eval["evaluate only the containing segment"]
 
-A cubic spline changes one local cubic at a time:
+  subgraph Parametric["Parametric curve option"]
+    direction TB
+    Param["choose parameter t_i<br/>uniform, chord length, centripetal"] --> Xspline["spline x(t)"]
+    Param --> Yspline["spline y(t)"]
+    Xspline --> Curve["curve (x(t), y(t))"]
+    Yspline --> Curve
+  end
 
-  o---o---o---o---o
-    S0  S1  S2  S3
+  Knots --> Param
+  Eval --> Check["check continuity and endpoint behavior"]
+  Curve --> Check
+  Check --> Result(("spline or parametric curve"))
 ```
+
+The spline diagram shows why cubic splines are local rather than one global high-degree polynomial. Boundary choices feed a structured continuity system, usually tridiagonal, whose solution defines one cubic per knot interval. The parametric branch makes clear that curves are built by splining coordinates against a chosen parameter, so spacing choices affect the resulting geometry.
 
 | Boundary condition | Extra information | Best use | Risk |
 |---|---|---|---|

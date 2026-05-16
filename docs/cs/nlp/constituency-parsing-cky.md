@@ -66,19 +66,51 @@ For hand calculations, it is useful to separate the recognizer from the scorer. 
 
 ## Visual
 
-```text
-Sentence:  book the flight
+```mermaid
+flowchart TB
+  Sent["Sentence with boundaries: 0 book 1 the 2 flight 3"] --> Lex["Lexical initialization for length-1 spans"]
 
-CKY span chart:
+  subgraph Chart["CKY triangular chart cells"]
+    direction TB
+    C01["#quot;[0,1"]: V via V -> book"]
+    C12["#quot;[1,2"]: Det via Det -> the"]
+    C23["#quot;[2,3"]: N via N -> flight"]
+    C02["#quot;[0,2"]: empty after split k=1"]
+    C13["#quot;[1,3"]: NP via NP -> Det N, split k=2"]
+    C03["#quot;[0,3"]: S via S -> V NP, split k=1"]
+    C12 --> C13
+    C23 --> C13
+    C01 --> C03
+    C13 --> C03
+    C01 --> C02
+    C12 --> C02
+  end
 
-          [0,3] S
-       /-----------\
- [0,1] V       [1,3] NP
-               /------\
-          [1,2] Det  [2,3] N
-           the        flight
- book
+  Lex --> C01
+  Lex --> C12
+  Lex --> C23
+
+  subgraph Recurrence["Dynamic-programming recurrence"]
+    direction TB
+    Span["#quot;Target span [i,j"]"]
+    Split{"Choose split k with i < k < j"}
+    Left["#quot;Left cell [i,k"] contains B"]
+    Right["#quot;Right cell [k,j"] contains C"]
+    Rule["Grammar rule A -> B C"]
+    Add["#quot;Add A to [i,j"] and store backpointer ("A -> B C, k")"]
+    Span --> Split
+    Split --> Left
+    Split --> Right
+    Left --> Rule
+    Right --> Rule
+    Rule --> Add
+  end
+
+  C03 --> Tree["Recovered parse: S(V(book), NP(Det(the), N(flight)))"]
+  Tree --> Output(("recognized because S is in [0,3]"))
 ```
+
+The CKY visual lays out the chart cells by span length and shows the exact binary combinations that build `NP` and then `S`. The recurrence subgraph makes the I/O contract explicit: a rule `A -> B C` plus a split `k` converts two smaller completed spans into a larger span and stores the backpointer needed to reconstruct the tree.
 
 | Concept | In CKY | Why it matters |
 |---|---|---|

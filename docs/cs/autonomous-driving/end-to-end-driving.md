@@ -186,20 +186,79 @@ Three steps take 49 ms, seven take 85 ms, and ten take 112 ms. Under a 100 ms pl
 ## Visual
 
 ```mermaid
-flowchart LR
-  A["Sensor history"] --> B["Neural encoder"]
-  C["Route command"] --> B
-  D["Ego state"] --> B
-  B --> E{"Output design"}
-  E -->|"Controls"| F["Steering and acceleration"]
-  E -->|"Waypoints"| G["Trajectory controller"]
-  E -->|"BEV affordances"| H["Planner with safety constraints"]
-  F --> I["Closed-loop vehicle"]
-  G --> I
-  H --> I
-  I --> J["New observations"]
-  J --> A
+flowchart TB
+  Sensors["Sensor history: cameras, lidar/radar BEV, ego state"]
+  Route["Route command / navigation instruction"]
+
+  subgraph ChauffeurNet["ChauffeurNet-style imitation planner"]
+    direction TB
+    Raster["Rasterized top-down scene: lanes, agents, route, history"]
+    ConvEnc["Conv encoder: spatial affordance features"]
+    TrajHead["Trajectory head: future waypoints"]
+    Losses["Training losses: imitation + perturbation recovery + collision/rule penalties"]
+    Raster --> ConvEnc --> TrajHead
+    Losses -. "supervision during training" .-> TrajHead
+  end
+
+  subgraph TransFuser["TransFuser-style multimodal fusion"]
+    direction TB
+    CamCNN["Camera CNN features"]
+    LidarBEV["LiDAR BEV CNN features"]
+    Transformer["Transformer fusion: cross-modal attention"]
+    Waypoints["Waypoint / control head"]
+    CamCNN --> Transformer
+    LidarBEV --> Transformer --> Waypoints
+  end
+
+  subgraph UniAD["UniAD-style unified driving stack"]
+    direction TB
+    BEVEnc["Multi-view BEV encoder"]
+    TrackQ["Tracking queries: object states"]
+    MapQ["Map queries: lanes and boundaries"]
+    MotionQ["Motion queries: future agent modes"]
+    PlanQ["Planning query: ego trajectory"]
+    BEVEnc --> TrackQ --> MotionQ --> PlanQ
+    BEVEnc --> MapQ --> MotionQ
+    MapQ --> PlanQ
+  end
+
+  subgraph WorldVLA["World-model / VLA policy path"]
+    direction TB
+    Tokens["Video/BEV/language/action tokens"]
+    Memory["Temporal memory or latent world model"]
+    Rollout["Imagine rollouts / predict next scene tokens"]
+    Policy["Action decoder: waypoints, controls, or discrete actions"]
+    Tokens --> Memory --> Rollout --> Policy
+  end
+
+  Sensors --> Raster
+  Route --> Raster
+  Sensors --> CamCNN
+  Sensors --> LidarBEV
+  Route --> Waypoints
+  Sensors --> BEVEnc
+  Route --> PlanQ
+  Sensors --> Tokens
+  Route --> Tokens
+
+  TrajHead --> Interface["Action interface normalization"]
+  Waypoints --> Interface
+  PlanQ --> Interface
+  Policy --> Interface
+  Interface --> Choice{"Output contract"}
+  Choice -->|"direct controls"| Controls["Steering, throttle, brake"]
+  Choice -->|"waypoints"| Controller["Trajectory controller"]
+  Choice -->|"BEV affordances"| Planner["Rule/optimization planner with safety constraints"]
+  Controls --> Safety["Runtime safety wrapper: ODD, collision, comfort, fallback"]
+  Controller --> Safety
+  Planner --> Safety
+  Safety --> Vehicle["Closed-loop vehicle and road world"]
+  Vehicle --> Obs["New observations and logged interventions"]
+  Obs -. "closed-loop feedback / dataset aggregation" .-> Sensors
+  Obs -. "hard cases" .-> Losses
 ```
+
+This diagram compares end-to-end driving families by their internal contracts. ChauffeurNet uses rasterized top-down inputs and imitation losses, TransFuser fuses camera and lidar features with attention, UniAD exposes tracking/map/motion/planning queries, and world-model or VLA systems route tokens through memory and rollout before a safety wrapper turns outputs into vehicle motion.
 
 ## Worked example 1: Why route conditioning matters
 

@@ -71,13 +71,41 @@ For study purposes, the most useful habit is to separate four layers: the contin
 | Classical RK4 | 4 | 4 | no | reliable fixed-step baseline |
 
 ```mermaid
-graph LR
-  A[State w_i at t_i] --> B[Sample slope k1]
-  B --> C["Sample midpoint slopes k2,k3"]
-  C --> D[Sample endpoint slope k4]
-  D --> E[Weighted average slope]
-  E --> F[State w_i+1]
+flowchart TB
+  IVP["Initial value problem<br/>y' = f(t,y), y(t0)=y0"] --> Step["Choose step h and current state<br/>(t_i, w_i)"]
+  Step --> Method{"One-step method"}
+
+  subgraph Euler["Explicit Euler"]
+    direction TB
+    E1["k1 = f(t_i, w_i)"] --> E2["w_{i+1} = w_i + h k1<br/>global order 1"]
+  end
+
+  subgraph Taylor["Taylor method"]
+    direction TB
+    T1["evaluate f and required derivatives<br/>f_t, f_y, ..."] --> T2["add Taylor terms<br/>w_i + h f + h^2/2 y'' + ..."]
+  end
+
+  subgraph RK4["Classical RK4"]
+    direction TB
+    K1["k1 = f(t_i, w_i)"] --> K2["k2 = f(t_i+h/2, w_i+h k1/2)"]
+    K2 --> K3["k3 = f(t_i+h/2, w_i+h k2/2)"]
+    K3 --> K4["k4 = f(t_i+h, w_i+h k3)"]
+    K4 --> Mix["weighted slope<br/>(k1 + 2k2 + 2k3 + k4)/6"]
+    Mix --> ROut["w_{i+1} = w_i + h weighted slope<br/>global order 4"]
+  end
+
+  Method -- "1 slope" --> E1
+  Method -- "derivative formulas" --> T1
+  Method -- "4 staged slopes" --> K1
+  E2 --> Check["check step-halving error, stability, and qualitative behavior"]
+  T2 --> Check
+  ROut --> Check
+  Check --> Next{"more time steps?"}
+  Next -- "yes" --> Step
+  Next -- "no" --> Sol(("computed trajectory"))
 ```
+
+This diagram expands the one-step ODE update into the actual sublayers used by Euler, Taylor, and RK4. RK4 is shown with all four slope samples and the weighted average that advances the state from $(t_i,w_i)$ to $(t_{i+1},w_{i+1})$. The loop includes verification because a stable-looking trajectory still needs step-halving, stability, or qualitative checks.
 
 ## Worked example 1: Euler steps for a standard IVP
 

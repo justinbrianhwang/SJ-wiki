@@ -9,10 +9,6 @@ Timers, serial communication, and interrupts are where the 8051 becomes a practi
 
 The central habit is to configure the correct SFR bits, clear or test the correct flags, and understand which hardware event sets each flag. Once that is in place, an 8051 program can blink LEDs, count external pulses, generate a baud clock, receive characters, and service external events predictably.
 
-![An I2C bus diagram shows one master connected to several slave devices over shared SDA and SCL lines.](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/I2C.svg/500px-I2C.svg.png)
-
-*Figure: I2C bus with one master and several slave devices. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:I2C.svg), Cburnett, CC BY-SA 3.0.*
-
 ## Definitions
 
 The classic 8051 has **Timer 0** and **Timer 1**. Each can operate as a timer driven by the machine cycle clock or as a counter driven by external input pins. Later derivatives often add more timers or programmable counter arrays.
@@ -73,16 +69,35 @@ The ninth key result is that serial transmit and receive share the same interrup
 ## Visual
 
 ```mermaid
-stateDiagram-v2
-  [*] --> Configure
-  Configure --> RunTimer: set TMOD, load TH/TL, set TRx
-  RunTimer --> Overflow: TFx set
-  Overflow --> ISR: interrupt enabled
-  Overflow --> Polling: interrupt disabled
-  ISR --> ReloadOrClear: clear flag, reload if needed
-  Polling --> ReloadOrClear: program detects TFx
-  ReloadOrClear --> RunTimer
+flowchart TB
+  Osc["Oscillator clock"] --> Div["Classic 12-clock machine-cycle divider"]
+  Div --> T0["Timer 0: TH0/TL0 counter"]
+  Div --> T1["Timer 1: TH1/TL1 counter"]
+  Ext0["External pulse on T0 pin"] --> T0
+  Ext1["External pulse on T1 pin"] --> T1
+  TMOD["TMOD: timer/counter, gate, mode bits"] --> T0
+  TMOD --> T1
+  TCON["TCON: TR0/TR1 run bits and TF0/TF1 flags"] --> T0
+  TCON --> T1
+  T0 --> TF0["TF0 overflow flag"]
+  T1 --> TF1["TF1 overflow flag"]
+  T1 -. "mode 2 auto-reload baud clock" .-> UART["Serial port: SCON, SBUF, RI, TI"]
+
+  ExtInt["INT0/INT1 pins"] --> IEFlags["External interrupt flags IE0/IE1"]
+  UART --> SerialIRQ["Serial interrupt source: RI or TI set"]
+  TF0 --> IntCtl["Interrupt controller: IE enable bits and IP priority bits"]
+  TF1 --> IntCtl
+  IEFlags --> IntCtl
+  SerialIRQ --> IntCtl
+  IntCtl --> Vector{"Enabled and highest priority?"}
+  Vector -- "yes" --> Save["Finish current instruction; push return address; jump to vector"]
+  Save --> ISR["ISR: save used registers, service source, clear flag"]
+  ISR --> RETI["RETI restores interrupt state and returns"]
+  RETI --> Main(("Resume main program"))
+  Vector -- "no" --> Poll["Main code may poll flags"]
 ```
+
+This 8051 timer/serial/interrupt diagram shows the clock source, timer counters, mode/control SFRs, overflow flags, UART flags, interrupt enables, priorities, vectors, and ISR return path. Timer 1's dotted baud-rate edge explains the common serial-mode dependency, while the interrupt-controller branch makes polling versus interrupt service explicit. The diagram also shows the required software responsibilities inside an ISR: preserve state, service the source, clear the relevant flag, and return with `RETI`.
 
 | Feature | Main SFRs | Main flags/bits | Typical use |
 |---|---|---|---|

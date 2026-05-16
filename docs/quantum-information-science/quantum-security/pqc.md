@@ -57,18 +57,58 @@ The family tree below separates current deployment standards, future or alternat
 
 ```mermaid
 flowchart TD
-  A["Post-quantum public-key cryptography"] --> B["KEMs and encryption"]
-  A --> C["Digital signatures"]
-  B --> D["Lattice: ML-KEM final FIPS 203"]
-  B --> E["Code: HQC future standard"]
-  B --> F["Code: Classic McEliece not selected by NIST in 2025"]
-  B --> G["Isogeny: SIKE broken in 2022"]
-  C --> H["Lattice: ML-DSA final FIPS 204"]
-  C --> I["Hash: SLH-DSA final FIPS 205"]
-  C --> J["Hash stateful: XMSS and LMS"]
-  C --> K["NTRU lattice: FN-DSA planned FIPS 206"]
-  C --> L["Multivariate: Rainbow broken in 2022"]
+  subgraph LWE["LWE / Module-LWE hardness picture"]
+    direction LR
+    Secret["secret vector s<br/>small coefficients"] --> PublicA["public matrix A<br/>mod q"]
+    PublicA --> Product["linear product<br/>A*s mod q"]
+    Noise["small error e<br/>hides exact lattice point"] --> Sample["public sample<br/>b = A*s + e mod q"]
+    Product --> Sample
+    Sample --> Hard["attacker sees noisy lattice samples<br/>recovering s is closest-vector-like"]
+  end
+
+  subgraph Kyber["ML-KEM / Kyber-style KEM flow"]
+    direction LR
+    KG["KeyGen<br/>sample A, secrets s,e"] --> PK["public key<br/>t = A*s + e, seed for A"]
+    KG --> SK["secret key<br/>s plus decapsulation data"]
+    PK --> Enc["Encapsulate(pk)<br/>sample r,e1,e2; derive message m"]
+    Enc --> U["ciphertext part u<br/>A^T*r + e1"]
+    Enc --> V["ciphertext part v<br/>t^T*r + e2 + Encode(m)"]
+    U --> CT["ciphertext ct = (u,v)"]
+    V --> CT
+    Enc --> K1["shared secret K<br/>hash(m, ct)"]
+    CT --> Dec["Decapsulate(sk,ct)<br/>compute v - s^T*u"]
+    SK --> Dec
+    Dec --> FO["re-encrypt/check<br/>Fujisaki-Okamoto transform"]
+    FO --> K2["same K or implicit rejection"]
+  end
+
+  subgraph SPHINCS["SPHINCS+ / SLH-DSA hash-tree signature"]
+    direction TB
+    Msg["message M"] --> Rand["randomized message hash<br/>digest + tree address"]
+    Rand --> FORS["FORS few-time signature<br/>sign digest bits with hash leaves"]
+    FORS --> WOTS["WOTS+ one-time signatures<br/>authenticate subtree roots"]
+    WOTS --> XMSS["XMSS authentication paths<br/>sibling hashes up each subtree"]
+    XMSS --> Hyper["hypertree root<br/>public key root value"]
+    Hyper --> Sig["signature<br/>R, FORS sig, WOTS+ sigs, auth paths"]
+  end
+
+  subgraph Falcon["Falcon / FN-DSA NTRU-lattice signing"]
+    direction LR
+    NTRU["NTRU key relation<br/>f*G - g*F = q"] --> Trap["short trapdoor basis<br/>fast Fourier sampling"]
+    Msg2["message M"] --> HashPoint["hash-to-lattice point c"]
+    Trap --> SampleShort["Gaussian sampler<br/>short vector s near c"]
+    HashPoint --> SampleShort
+    SampleShort --> FSig["signature<br/>compressed short vector"]
+    FSig --> Verify["verify<br/>norm bound and NTRU congruence"]
+  end
+
+  Hard --> PK
+  K2 --> Deploy["deployment role<br/>KEM for TLS, VPN, messaging, key wrapping"]
+  Sig --> DeploySig["deployment role<br/>stateless hash-based signatures"]
+  Verify --> DeployFalcon["deployment role<br/>future compact lattice signatures"]
 ```
+
+The diagram replaces the family tree with mechanisms: noisy LWE samples, ML-KEM encapsulation/decapsulation, SLH-DSA's hypertree of hash-based signatures, and Falcon's NTRU-lattice trapdoor sampling. The ML-KEM branch labels the public key, ciphertext parts, FO check, and shared-secret derivation so it reads like a KEM rather than generic encryption. The signature branches show why SPHINCS+ is conservative but large and why Falcon/FN-DSA depends on short-vector sampling in an NTRU lattice.
 
 | Family and examples | Main hardness idea | Typical public key or ciphertext size | Signature size | Relative performance | Deployment note |
 |---|---|---|---|---|---|

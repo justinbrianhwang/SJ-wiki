@@ -9,10 +9,6 @@ Multilayer perceptrons extend linear models by composing affine transformations 
 
 The same flexibility creates new training issues. Deep networks can overfit, gradients can vanish or explode, initialization can make learning slow, and regularizers can change both optimization and generalization. D2L treats these as practical engineering concerns rather than isolated theory: activation choice, initialization, dropout, weight decay, and early stopping all shape the behavior of the same training loop.
 
-![An overfitting diagram shows a classifier boundary that follows training points too closely.](https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Overfitting.svg/500px-Overfitting.svg.png)
-
-*Figure: Overfitting in a classifier decision boundary. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Overfitting.svg), Chabacano, CC BY-SA 4.0.*
-
 ## Definitions
 
 An **MLP** with one hidden layer maps an input $x \in \mathbb{R}^d$ to
@@ -117,15 +113,38 @@ The MLP is also a reference model for non-image tabular features. Even when spec
 ## Visual
 
 ```mermaid
-flowchart LR
-  X[Input x] --> A1[Linear W1 x + b1]
-  A1 --> R1[Activation phi]
-  R1 --> D1[Dropout during training]
-  D1 --> A2[Linear W2 h + b2]
-  A2 --> O[Output logits]
-  O --> L[Loss]
-  L --> B[Backpropagation]
+flowchart TB
+  X["#quot;Input batch X: [N, d_in"]"] --> L1["#quot;Linear 1: W1 [d_in, h1"] + b1 -> ["N, h1"]"]
+  L1 --> A1["#quot;Activation phi, e.g. ReLU -> [N, h1"]"]
+  A1 --> D1["Dropout train only: mask m1 ~ Bernoulli(q), h1*m1/q"]
+  D1 --> L2["#quot;Linear 2: W2 [h1, h2"] + b2 -> ["N, h2"]"]
+  L2 --> A2["#quot;Activation phi -> [N, h2"]"]
+  A2 --> D2["Dropout train only: mask m2 ~ Bernoulli(q)"]
+  D2 --> L3["#quot;Output linear: W3 [h2, K"] + b3 -> logits ["N, K"]"]
+  L3 --> CE["Cross-entropy or task loss"]
+  CE --> Total["Regularized objective: loss + lambda/2 * ||W||_2^2"]
+
+  subgraph Backward["Backward/update paths"]
+    direction TB
+    G3["Gradients dL/dW3, dL/db3"]
+    G2["Gradients dL/dW2, dL/db2"]
+    G1["Gradients dL/dW1, dL/db1"]
+    WD["Weight decay adds lambda * W to weight gradients"]
+    Opt["Optimizer step updates trainable parameters"]
+  end
+
+  CE -. "backprop through logits" .-> G3
+  G3 -. "chain rule through dropout and activation" .-> G2
+  G2 -. "chain rule through dropout and activation" .-> G1
+  Total -. "L2 penalty path, weights only" .-> WD
+  WD --> Opt
+  G1 --> Opt
+  G2 --> Opt
+  G3 --> Opt
+  Opt -. "new W, b for next minibatch" .-> L1
 ```
+
+The MLP diagram keeps the batch dimension visible from input `[N, d_in]` through hidden layers and logits `[N, K]`. Dropout is shown as a training-only activation path, while weight decay is a separate objective path that adds `lambda * W` to weight gradients rather than changing the forward pass. The backward subgraph makes clear that regularization, dropout, and affine layers affect different parts of the training loop.
 
 | Technique | Main purpose | Training-time behavior | Evaluation-time behavior |
 |---|---|---|---|

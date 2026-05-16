@@ -62,19 +62,65 @@ Incident analysis should look for systemic causes, not only immediate triggers. 
 ## Visual
 
 ```mermaid
-flowchart TD
-  A["Define ODD and item"] --> B["Hazard analysis"]
-  B --> C["Safety goals and ASIL"]
-  C --> D["Functional safety requirements"]
-  C --> E["SOTIF performance limitations"]
-  D --> F["Architecture, diagnostics, fallback"]
-  E --> G["Scenario mining and validation"]
-  F --> H["Verification evidence"]
-  G --> H
-  H --> I["Safety case"]
-  I --> J["Release decision and field monitoring"]
-  J --> G
+flowchart TB
+  Item["Item definition: function, interfaces, ODD, vehicle context"]
+  HARA["Hazard analysis and risk assessment: severity, exposure, controllability"]
+  Goals["Safety goals + ASIL allocation"]
+
+  subgraph VModel["ISO 26262 V-model lifecycle"]
+    direction TB
+    FSC["Functional safety concept: safe states, FTTI, fallback"]
+    TSC["Technical safety concept: architecture, diagnostics, independence"]
+    HW["Hardware design: sensors, ECUs, power, watchdogs"]
+    SW["Software design: monitors, redundancy, freedom from interference"]
+    Impl["Implementation and integration"]
+    Unit["Unit tests + static analysis + fault injection"]
+    Integration["Integration tests: interface, timing, diagnostic coverage"]
+    Validation["Vehicle validation: safety goals met in ODD"]
+    FSC --> TSC --> HW --> SW --> Impl
+    Impl --> Unit --> Integration --> Validation
+    SW -. "traceability" .-> Unit
+    TSC -. "requirements trace" .-> Integration
+    FSC -. "safety goal trace" .-> Validation
+  end
+
+  subgraph SOTIF["SOTIF performance-limit loop"]
+    direction TB
+    Intended["Intended functionality and triggering conditions"]
+    KnownUnsafe["Known unsafe scenarios: insufficiencies and misuse"]
+    Unknown["Unknown unsafe scenarios from field data and exploration"]
+    ScenarioMining["Scenario mining: logs, simulation, adversarial search"]
+    Improve["Function improvement: perception, ODD limits, HMI, fallback"]
+    Intended --> KnownUnsafe --> ScenarioMining --> Improve
+    Unknown --> ScenarioMining
+    Improve -. "residual risk update" .-> Intended
+  end
+
+  subgraph ScenarioTest["Scenario-based test architecture"]
+    direction TB
+    Library["Scenario library: nominal, edge, fault, misuse, weather"]
+    Param["Parameter sweep: speeds, gaps, friction, visibility, latency"]
+    Sim["SIL/HIL/closed-loop simulation"]
+    Track["Proving-ground and road tests"]
+    Metrics["Metrics: collisions, TTC, RSS distance, disengagement, comfort"]
+    Library --> Param --> Sim --> Track --> Metrics
+  end
+
+  Item --> HARA --> Goals --> FSC
+  Item --> Intended
+  Goals --> Library
+  Validation --> Evidence["Verification evidence package"]
+  Metrics --> Evidence
+  Improve --> Evidence
+  Evidence --> Case["Safety case: claims, arguments, evidence"]
+  Case --> Release{"Release decision"}
+  Release -->|"approve with constraints"| Monitor["Field monitoring, incident review, ODD updates"]
+  Release -->|"not enough evidence"| Improve
+  Monitor -. "new scenarios and hazards" .-> Unknown
+  Monitor -. "change impact analysis" .-> Item
 ```
+
+This diagram combines the ISO 26262 V-model, SOTIF performance-limit loop, and scenario-testing pipeline. Requirements and safety goals flow down into architecture and implementation, evidence flows back up through verification and validation, and the dotted feedback paths show how field monitoring updates hazards, scenarios, ODD limits, and the safety case.
 
 ## Worked example 1: Qualitative ASIL reasoning
 

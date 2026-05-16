@@ -50,15 +50,31 @@ Finally, keep symbolic and particulate representations side by side. A balanced 
 ## Visual
 
 ```mermaid
-flowchart TD
-  A[Measure initial rates] --> B[Compare trials]
-  B --> C[Determine orders]
-  C --> D[Compute k]
-  D --> E[Choose integrated law]
-  E --> F[Predict concentration vs time]
-  C --> G[Test proposed mechanism]
-  G --> H[Rate-determining step consistency]
+flowchart TB
+  Obs["Raw data<br/>concentration, pressure, absorbance vs time"] --> Cal["Calibration and preprocessing<br/>signal to concentration, temperature held fixed"]
+  Cal --> Init["Initial-rate window<br/>small conversion, products negligible"]
+  Init --> Trials["Trial matrix<br/>vary one initial concentration at a time"]
+  Trials --> Orders["#quot;Determine orders<br/>rate = k[A"]^m[B]^n"]
+  Orders --> Units["Compute k and units<br/>zero: M s-1; first: s-1; second: M-1 s-1"]
+
+  Orders --> ModelChoice{"Need time prediction or mechanism test?"}
+  ModelChoice -- "time prediction" --> Integrated["#quot;Choose integrated law<br/>[A"], ln[A], or 1/[A] linear in t"]
+  Integrated --> HalfLife["Check half-life behavior<br/>order-dependent consistency"]
+  HalfLife --> Predict["#quot;Predict concentration profile<br/>[A"](t), rate(t), t1/2"]
+
+  ModelChoice -- "mechanism test" --> Elementary["List elementary steps<br/>molecularity gives step rate laws"]
+  Elementary --> RDS{"Single slow step adequate?"}
+  RDS -- "yes" --> Slow["Rate-determining step<br/>replace intermediates if needed"]
+  RDS -- "no" --> SSA["Steady-state or pre-equilibrium<br/>derive intermediate concentrations"]
+  Slow --> Derived["Derived rate law"]
+  SSA --> Derived
+  Derived --> Compare{"Matches measured law and stoichiometry?"}
+  Compare -- "yes" --> Plausible["Mechanism remains plausible<br/>test isotope/catalyst/product evidence"]
+  Compare -- "no" --> Revise["Reject or revise mechanism"]
+  Revise -. "new elementary steps" .-> Elementary
 ```
+
+This kinetics workflow distinguishes the measurement pipeline from the mechanistic pipeline. The left path turns calibrated concentration data into orders, rate constants, integrated laws, and time predictions; the right path tests elementary-step mechanisms with rate-determining, steady-state, or pre-equilibrium assumptions. The feedback arrow marks the scientific loop: a mechanism that does not reproduce the empirical rate law must be revised rather than patched numerically.
 
 | Order in A | Rate law | Linear plot | Half-life behavior |
 |---:|---|---|---|

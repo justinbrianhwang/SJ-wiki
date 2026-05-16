@@ -9,10 +9,6 @@ Quantum algorithms are not faster because they "try all answers" and then reveal
 
 *This page synthesizes the wiki's earlier algorithm overview with Chapters 1, 5, and 6 of Nielsen and Chuang. The N&C emphasis is that QFT and search are the two canonical algorithmic engines: QFT exposes algebraic periodicity, while Grover's iterate performs an optimal two-dimensional amplitude rotation.*
 
-![Grover algorithm circuit diagram showing oracle and diffusion operations repeated before measurement](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Grover%27s_algorithm_circuit.svg/640px-Grover%27s_algorithm_circuit.svg.png)
-
-*Figure: Circuit-level sketch of Grover's search algorithm. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Grover%27s_algorithm_circuit.svg), Fawly, CC BY-SA 4.0.*
-
 ## Definitions
 
 A **quantum algorithm** is a uniform family of circuits followed by classical post-processing. Inputs may be classical bit strings, quantum states, or oracle access to a function. Costs may count gates, circuit depth, qubits, oracle calls, precision, or fault-tolerant logical resources. A speedup claim is meaningful only after the input model and output model are fixed.
@@ -161,18 +157,100 @@ which gives $O(\sqrt{N/M})$ oracle calls. N&C also emphasize two limits: quantum
 ## Visual
 
 ```mermaid
-flowchart TD
-  P["Problem instance"] --> S{"Useful structure?"}
-  S -->|constant vs balanced promise| DJ["Deutsch-Jozsa"]
-  S -->|linear Boolean phase| BV["Bernstein-Vazirani"]
-  S -->|hidden xor period| SI["Simon's algorithm"]
-  S -->|multiplicative period| SH["Shor order finding"]
-  S -->|unitary eigenphase| PE["Phase estimation"]
-  S -->|marked subspace only| GR["Grover search"]
-  SH --> QFT["QFT and inverse QFT"]
-  PE --> QFT
-  GR --> AA["Amplitude amplification"]
+flowchart TB
+  subgraph DJ["Deutsch-Jozsa circuit"]
+    direction LR
+    DJx0["#quot;x register<br/>|#quot;0>^n#quot;"] --> DJHn["#quot;H on n query qubits<br/>2^(-n/2) sum_x #quot;|x>#quot;"]
+    DJy0["#quot;ancilla<br/>|#quot;1>#quot;"] --> DJHy["#quot;H on ancilla<br/>#quot;|1> -> |->#quot;"]
+    DJHn --> DJUf["Oracle U_f<br/>|#quot;x>#quot;|y> -> |#quot;x>#quot;|y xor f(x)>"]
+    DJHy --> DJUf
+    DJUf --> DJHn2["H on x register<br/>interference of (-1)^f(x)"]
+    DJUf --> DJAncOut["ancilla unchanged<br/>|->"]
+    DJHn2 --> DJM["Measure x<br/>0^n means constant; nonzero means balanced"]
+  end
+
+  subgraph BV["Bernstein-Vazirani circuit"]
+    direction LR
+    BVx0["x register<br/>|0>^n"] --> BVHn["H on n query qubits<br/>uniform superposition"]
+    BVy0["#quot;ancilla<br/>|#quot;1>#quot;"] --> BVHy["#quot;H on ancilla<br/>#quot;|->#quot;"]
+    BVHn --> BVUf["Oracle U_f for f(x)=a dot x xor b<br/>phase (-1)^(a dot x xor b)"]
+    BVHy --> BVUf
+    BVUf --> BVHn2["H on x register<br/>phase pattern -> bit string a"]
+    BVHn2 --> BVM["Measure x<br/>recover hidden string a in one query"]
+  end
+
+  subgraph Grover["Grover amplitude-amplification iterate"]
+    direction LR
+    GR0["#quot;search register<br/>|#quot;0>^n, N=2^n#quot;"] --> GRH["#quot;H^n<br/>uniform state #quot;|s>#quot;"]
+    GRH --> GRO["Oracle O_f<br/>marked states get phase -1"]
+    GRO --> GRD1["H^n"]
+    GRD1 --> GRD2["X^n"]
+    GRD2 --> GRD3["multi-controlled Z<br/>reflection about |0^n>"]
+    GRD3 --> GRD4["X^n"]
+    GRD4 --> GRD5["H^n<br/>diffusion reflection about |s>"]
+    GRD5 --> GRR{"repeat k ~= pi/4 sqrt(N/M)?"}
+    GRR -->|"yes"| GRO
+    GRR -->|"no"| GRM["Measure<br/>marked item with high probability"]
+  end
+
+  subgraph QFT["Quantum Fourier transform over N=2^n"]
+    direction LR
+    QIn["input register<br/>|j_1 ... j_n>"] --> QHn["qubit n<br/>H"]
+    QHn --> QR2["controlled phase R_2<br/>from qubit n-1"]
+    QR2 --> QR3["controlled phase R_3 ... R_n<br/>from earlier qubits"]
+    QR3 --> QNext["repeat ladder<br/>on qubits n-1 down to 1"]
+    QNext --> QSwap["bit-reversal swaps<br/>reverse output order"]
+    QSwap --> QOut["output amplitudes<br/>QFT_N |j>"]
+  end
+
+  subgraph QPE["Quantum phase estimation"]
+    direction LR
+    PEphase["phase register<br/>|0>^t"] --> PEH["H^t<br/>superposition over powers"]
+    PEeig["target register<br/>eigenstate |#quot;u>, U#quot;|u>=e^(2 pi i phi)|u>"] --> PECtrl["controlled-U^(2^k) ladder<br/>k=0 ... t-1"]
+    PEH --> PECtrl
+    PECtrl --> PEiqft["inverse QFT on phase register"]
+    PECtrl --> PEtarget["target remains |u><br/>up to measurement branch"]
+    PEiqft --> PEm["measure phase register<br/>t-bit estimate of phi"]
+  end
+
+  subgraph Shor["Shor order finding and factoring"]
+    direction LR
+    SHN["classical input<br/>odd composite N, random a"] --> SHG{"gcd(a,N)>1?"}
+    SHG -->|"yes"| SHFactor0["nontrivial factor found"]
+    SHG -->|"no"| SHReg["two registers<br/>|#quot;0>^t #quot;|1>"]
+    SHReg --> SHH["H on exponent register<br/>sum_x |#quot;x>#quot;|1>"]
+    SHH --> SHMod["modular exponentiation<br/>|#quot;x>#quot;|1> -> |#quot;x>#quot;|a^x mod N>"]
+    SHMod --> SHQFT["inverse QFT on exponent register"]
+    SHQFT --> SHMeas["measure c<br/>approx c/2^t ~= s/r"]
+    SHMeas --> SHCF["continued fractions<br/>recover candidate order r"]
+    SHCF --> SHCheck{"r even and a^(r/2) != -1 mod N?"}
+    SHCheck -->|"yes"| SHGCD["gcd(a^(r/2)-1,N), gcd(a^(r/2)+1,N)"]
+    SHCheck -->|"no"| SHRetry["retry with new a or more precision"]
+    SHGCD --> SHFactors["factors of N"]
+  end
+
+  subgraph HHL["HHL linear-system subroutine"]
+    direction LR
+    HHLb["input state<br/>|#quot;b> = sum_j beta_j #quot;|u_j>"] --> HHLpe["phase estimation<br/>controlled exp(iAt)"]
+    HHLpe --> HHLlam["eigenvalue register<br/>|lambda_j>"]
+    HHLanc["#quot;ancilla<br/>|#quot;0>#quot;"] --> HHLrot["#quot;controlled rotation<br/>#quot;|0> -> sqrt(1-C^2/lambda_j^2)|#quot;0> + C/lambda_j #quot;|1>#quot;"]
+    HHLlam --> HHLrot
+    HHLrot --> HHLun["inverse phase estimation<br/>uncompute lambda register"]
+    HHLun --> HHLpost["postselect or amplitude amplify<br/>ancilla = 1"]
+    HHLpost --> HHLx["output state<br/>proportional to A^(-1)|b>"]
+    HHLx --> HHLobs["estimate observables<br/>do not read full vector"]
+  end
+
+  DJM --> Kick["phase kickback<br/>function values become phases"]
+  BVM --> Kick
+  QOut --> Fourier["Fourier sampling<br/>periods and eigenphases"]
+  PEm --> Fourier
+  SHFactors --> Fourier
+  GRM --> Amp["amplitude amplification<br/>two-reflection rotation"]
+  HHLobs --> Linear["state-output linear algebra<br/>read observables only"]
 ```
+
+This diagram replaces the old taxonomy with circuit-level views of the core algorithms. The kickback circuits show the query register, ancilla preparation, oracle action, final Hadamards, and measurement contract; QFT and QPE expose the controlled-phase and controlled-power ladders used by Shor. Grover's loop shows the oracle and diffusion sub-operations explicitly, while HHL shows the phase-estimation, controlled-rotation, uncomputation, and postselection structure that makes its output a quantum state rather than a full classical vector.
 
 | Algorithmic pattern | N&C representative | Quantum operation | Classical post-processing | Main caveat |
 |---|---|---|---|---|

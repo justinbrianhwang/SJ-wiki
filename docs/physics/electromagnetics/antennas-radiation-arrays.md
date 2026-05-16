@@ -9,10 +9,6 @@ Antennas convert guided electromagnetic energy into radiated waves and convert i
 
 Ulaby's antenna chapter develops the Hertzian dipole, half-wave dipole, radiation characteristics, Friis transmission, large apertures, and arrays. These topics are a practical culmination of Maxwell's equations, plane waves, power density, and boundary/guiding ideas from earlier pages.
 
-![A polar antenna-radiation diagram compares monopole antenna patterns for several lengths.](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Monopole_antenna_radiation_patterns.svg/600px-Monopole_antenna_radiation_patterns.svg.png)
-
-*Figure: Vertical radiation patterns for monopole antennas of different lengths. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Monopole_antenna_radiation_patterns.svg), Chetvorno, CC0 1.0.*
-
 ## Definitions
 
 The radiation pattern describes angular variation of radiated field or power. For a far-zone field, power density often has the form
@@ -116,17 +112,30 @@ Input impedance is the terminal view of the same radiating structure. At resonan
 ## Visual
 
 ```mermaid
-flowchart TD
-  A[Time-varying current] --> B[Near fields]
-  B --> C[Far radiated fields]
-  C --> D[Power density]
-  D --> E[Radiation pattern]
-  E --> F[Directivity and gain]
-  F --> G[Link budget via Friis]
-  A --> H[Multiple elements]
-  H --> I[Array factor]
-  I --> J[Beam steering and sidelobes]
+flowchart TB
+  Feed["feed network<br/>source impedance, matching, polarization"] --> Current["antenna current distribution<br/>amplitude and phase along conductors or aperture"]
+  Current --> Near["reactive and radiating near fields<br/>stored energy plus induction fields"]
+  Near --> Far["far-zone fields<br/>transverse E and H, 1/r decay"]
+  Far --> Poynting["radiation intensity and power density<br/>Poynting vector"]
+  Poynting --> Pattern["radiation pattern<br/>main lobe, sidelobes, nulls, polarization"]
+  Pattern --> Metrics["directivity, gain, efficiency<br/>radiation resistance plus losses"]
+  Metrics --> Link["Friis or link budget<br/>P_r from P_t, gains, wavelength, range"]
+
+  subgraph Array["Array architecture"]
+    direction TB
+    Elements["N elements with spacing d"] --> Weights["element weights<br/>amplitude taper and progressive phase alpha"]
+    Weights --> AF["array factor<br/>sum exp(j n(kd cos theta + alpha))"]
+    AF --> Beam["beam steering<br/>main lobe where kd cos theta + alpha = 0"]
+    AF --> Sidelobes["sidelobes and grating lobes<br/>spacing and taper constraints"]
+  end
+
+  Current --> Elements
+  Beam --> Metrics
+  Sidelobes --> Pattern
+  Link --> Result(("antenna system performance"))
 ```
+
+The antenna diagram follows energy from the feed into a current distribution, near fields, far fields, radiation pattern, gain metrics, and link budget. The array subgraph expands the multi-element case into element spacing, amplitude/phase weights, array factor, beam steering, sidelobes, and grating-lobe constraints. Feed match, polarization, gain, and pattern are shown as coupled parts of one antenna system rather than separate formulas.
 
 | Antenna concept | Meaning | Key formula |
 |---|---|---|

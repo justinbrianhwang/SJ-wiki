@@ -49,14 +49,45 @@ Deterministic CFLs are especially relevant when an input marker determines the s
 ## Visual
 
 ```mermaid
-stateDiagram-v2
-  [*] --> push
-  push --> push: read 0, push X
-  push --> pop: read 1, pop X
-  pop --> pop: read 1, pop X
-  pop --> accept: epsilon, bottom
-  accept --> [*]
+flowchart TB
+  Tape["Input tape: 0 0 0 1 1 1"] --> Head["Input head: moves right when a symbol is consumed"]
+  Stack["Stack top -> X | X | X | $ <- bottom marker"] --> Top["Only the top stack symbol is visible"]
+  Head --> Control{Finite control state}
+  Top --> Control
+
+  subgraph DPDA["DPDA for 0^n 1^n"]
+    direction TB
+    Push["push state: still reading the 0 block"]
+    Push0["read 0 with top $ or X: push X and move right"]
+    Switch["read first 1 with top X: pop X, enter pop state"]
+    Pop["pop state: reading the 1 block"]
+    Pop1["read 1 with top X: pop X and move right"]
+    End["input exhausted with top $"]
+    Bad0["read 0 in pop state, or pop from $ before input ends"]
+    Push --> Push0 --> Push
+    Push --> Switch --> Pop
+    Pop --> Pop1 --> Pop
+    Pop --> End --> Accept(("accept"))
+    Pop --> Bad0 --> Reject(("reject"))
+  end
+
+  Control --> Push
+
+  subgraph NPDA["NPDA pattern for unmarked palindromes"]
+    direction TB
+    P1["phase 1: push each input symbol"]
+    Guess{"epsilon choice: guess midpoint"}
+    P2["phase 2: read symbol and require matching stack pop"]
+    PAcc["input exhausted and stack at bottom"]
+    P1 -- "read 0 or 1 / push same symbol" --> P1
+    P1 -. "epsilon branch" .-> Guess
+    Guess --> P2
+    P2 -- "read 0 with top 0, or read 1 with top 1" --> P2
+    P2 --> PAcc --> PAccept(("accepting branch"))
+  end
 ```
+
+The PDA diagram separates finite control, the one-way input head, and the stack interface so the transition labels show exactly what is read, pushed, or popped. The `0^n1^n` DPDA has a visible phase switch at the first `1`, while the palindrome NPDA uses an epsilon branch to guess an unmarked midpoint before comparing symbols against the stack.
 
 | Model | Memory | Language family |
 |---|---|---|

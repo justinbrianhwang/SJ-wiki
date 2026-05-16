@@ -9,10 +9,6 @@ Basic RNNs carry hidden states through time, but they struggle to preserve usefu
 
 This page is a bridge between vanilla recurrence and attention-based models. Gating explains how neural networks can decide what to remember, what to forget, and what to expose. Encoder-decoder training introduces teacher forcing, padding masks, sequence loss, and decoding. Beam search then shows that prediction is not just a forward pass; it is a search problem over possible output sequences.
 
-![A recurrent neural network diagram shows a compact recurrent cell and the same computation unfolded over time.](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Recurrent_neural_network_unfold.svg/500px-Recurrent_neural_network_unfold.svg.png)
-
-*Figure: Recurrent neural network shown compactly and unfolded through time. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Recurrent_neural_network_unfold.svg), fdeloche, CC BY-SA 4.0.*
-
 ## Definitions
 
 A **GRU** modifies the RNN hidden-state update using gates. With input $X_t$ and previous hidden state $H_{t-1}$, the reset gate $R_t$ and update gate $Z_t$ are
@@ -91,18 +87,46 @@ Loss masking is part of the model objective. Padding lets variable-length sequen
 ## Visual
 
 ```mermaid
-sequenceDiagram
-  participant Src as Source tokens
-  participant Enc as Encoder RNN
-  participant State as Context state
-  participant Dec as Decoder RNN
-  participant Tgt as Target tokens
-  Src->>Enc: x1, x2, ..., xn
-  Enc->>State: final hidden states
-  State->>Dec: initialize decoder
-  Tgt->>Dec: <bos>, y1, y2 during training
-  Dec->>Tgt: predict y1, y2, ..., <eos>
+flowchart TB
+  subgraph LSTM["LSTM cell internals at time t"]
+    direction TB
+    X["#quot;Input x_t: [N, d_x"]"] --> Cat["#quot;Concatenate [h_{t-1}, x_t"]"]
+    Hprev["#quot;Previous hidden h_{t-1}: [N, d_h"]"] --> Cat
+    Cprev["#quot;Previous cell C_{t-1}: [N, d_h"]"] -. "linear memory path" .-> ForgetMul(("Elementwise multiply"))
+
+    Cat --> F["#quot;Forget gate f_t = sigmoid(W_f [h_{t-1}, x_t"] + b_f)"]
+    Cat --> I["#quot;Input gate i_t = sigmoid(W_i [h_{t-1}, x_t"] + b_i)"]
+    Cat --> G["#quot;Candidate g_t = tanh(W_g [h_{t-1}, x_t"] + b_g)"]
+    Cat --> O["#quot;Output gate o_t = sigmoid(W_o [h_{t-1}, x_t"] + b_o)"]
+
+    F --> ForgetMul
+    Cprev --> ForgetMul
+    I --> InMul(("Elementwise multiply"))
+    G --> InMul
+    ForgetMul --> Cadd(("Add cell contributions"))
+    InMul --> Cadd
+    Cadd --> Ct["Cell C_t = f_t*C_{t-1} + i_t*g_t"]
+    Ct --> TanhC["tanh(C_t)"]
+    O --> OutMul(("Elementwise multiply"))
+    TanhC --> OutMul
+    OutMul --> Ht["Hidden h_t = o_t*tanh(C_t)"]
+  end
+
+  subgraph Seq2Seq["Encoder-decoder sequence-to-sequence pipeline"]
+    direction LR
+    Src["#quot;Source tokens: [x_1 ... x_n"]"] --> SrcEmb["Source embedding + mask"]
+    SrcEmb --> Enc["Encoder RNN/LSTM unrolled over source"]
+    Enc --> Context["Final encoder state(s): h_n and C_n"]
+    Context --> DecInit["Initialize decoder state"]
+    Bos["BOS token then previous target tokens"] --> TgtEmb["Target embedding"]
+    TgtEmb --> Dec["Decoder RNN/LSTM unrolled over target"]
+    DecInit --> Dec
+    Dec --> Proj["Linear vocabulary projection"]
+    Proj --> Pred(("Predicted y_1 ... EOS"))
+  end
 ```
+
+The LSTM cell diagram shows all four gate computations from the concatenated `[h_{t-1}, x_t]` input and the additive memory update `C_t = f_t*C_{t-1} + i_t*g_t`. The dotted path highlights the cell state's nearly direct route through time, while the output gate controls what part of `tanh(C_t)` becomes the exposed hidden state. The seq2seq subgraph then shows how encoder final states initialize the decoder, with teacher-forced target tokens feeding the decoder during training.
 
 | Model | Extra state or gates | Strength | Limitation |
 |---|---|---|---|

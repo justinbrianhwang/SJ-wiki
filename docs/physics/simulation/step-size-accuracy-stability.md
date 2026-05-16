@@ -80,17 +80,23 @@ For Simulink models, step-size selection must account for block behavior. Discon
 ## Visual
 
 ```mermaid
-flowchart TD
-  A[Select output quantities of interest] --> B[Estimate fastest time scale or event spacing]
-  B --> C[Choose initial solver and step/tolerances]
-  C --> D[Run simulation]
-  D --> E{"Any warnings, missed events, or instability?"}
-  E -->|yes| F["Reduce step, change solver, or fix model"]
-  E -->|no| G[Run convergence check h and h/2]
-  G --> H{"Output change acceptable?"}
-  H -->|no| F
-  H -->|yes| I[Use result with documented settings]
+flowchart TB
+  QoI["Quantities of interest<br/>outputs, event times, peaks, steady values"] --> TimeScale["Estimate fastest time scale<br/>modes, forcing, discontinuities, event spacing"]
+  TimeScale --> Solver["Choose solver family<br/>explicit, implicit, fixed-step, variable-step"]
+  Solver --> Settings["Set h or tolerances<br/>RelTol, AbsTol, max step, event detection"]
+  Settings --> Run["Run baseline simulation"]
+  Run --> Warnings{"warnings, missed events, stiffness, or instability?"}
+  Warnings -- "yes" --> Remedy["change solver, reduce step, scale states, or fix model"]
+  Warnings -- "no" --> Refine["run convergence study<br/>h, h/2, h/4 or tighter tolerances"]
+  Refine --> Compare{"QoI changes below tolerance?"}
+  Compare -- "no" --> Remedy
+  Compare -- "yes" --> Stability["stability audit<br/>test equation limits, oscillations, damping, event timing"]
+  Stability --> Doc["document solver, step/tolerances, diagnostics, and residual checks"]
+  Remedy -. "rerun" .-> Settings
+  Doc --> Accepted(("credible numerical run"))
 ```
+
+The step-size diagram expands solver choice into a repeatable verification loop. It starts from quantities of interest and time scales, then routes through solver family, tolerance settings, baseline run, warning checks, convergence refinement, and stability audit. The dotted feedback arrow shows that numerical problems should change the solver configuration or model representation before the run is accepted.
 
 | Issue | Symptom in plot | Likely cause | Remedy |
 |---|---|---|---|

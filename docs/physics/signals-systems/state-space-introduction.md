@@ -149,15 +149,26 @@ Dimensions are a useful sanity check. If the state has length $m$, then $A$ is $
 
 ```mermaid
 flowchart LR
-  U[Input x] --> Bmat[B matrix]
-  Bmat --> S[State q]
-  S --> Amat[A dynamics]
-  Amat --> S
-  S --> Cmat[C matrix]
-  Cmat --> Y[Output y]
-  U --> Dmat[D feedthrough]
-  Dmat --> Y
+  U["input u(t)<br/>shape m x 1"] --> B["input matrix B<br/>n x m"]
+  B --> Sum(("sum"))
+  X["state x(t)<br/>shape n x 1"] --> A["dynamics matrix A<br/>n x n"]
+  A --> Sum
+  Sum --> Xdot["state derivative<br/>x_dot = A x + B u"]
+  Xdot --> Int["integrator bank<br/>one integrator per state"]
+  Int --> X
+  X --> C["output matrix C<br/>p x n"]
+  C --> Ysum(("sum"))
+  U --> D["feedthrough matrix D<br/>p x m"]
+  D --> Ysum
+  Ysum --> Y["output y(t)<br/>shape p x 1"]
+
+  X -. "internal memory" .-> Modes["modes from eigenvalues of A"]
+  U -. "can inputs move every mode?" .-> Ctrl["controllability test"]
+  Y -. "can outputs reveal every mode?" .-> Obs["observability test"]
+  Modes --> TF["transfer function<br/>G(s)=C(sI-A)^-1B+D"]
 ```
+
+The state-space diagram labels the dimensions and signal flow in the standard continuous-time realization. Inputs pass through $B$, states feed back through $A$, an integrator bank stores internal memory, and outputs combine $Cx$ with direct feedthrough $Du$. The dotted diagnostic arrows show why state space contains information that a transfer function can hide: modal structure, controllability, and observability.
 
 | Representation | Main object | Best for | Typical equation |
 |---|---|---|---|

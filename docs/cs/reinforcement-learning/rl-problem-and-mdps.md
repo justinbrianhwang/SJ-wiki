@@ -112,16 +112,47 @@ This result is powerful because it reduces the control problem to estimating val
 
 ```mermaid
 flowchart LR
-  S[State S_t] --> P["Policy pi(a | s)"]
-  P --> A[Action A_t]
-  A --> E["Environment dynamics p(s', r | s, a)"]
-  E --> R["Reward R_{t+1}"]
-  E --> N["Next state S_{t+1}"]
-  R --> G[Return G_t]
-  N --> S
-  G --> V["Value estimates V_pi, Q_pi"]
-  V --> P
+  subgraph Agent["Agent at time t"]
+    direction TB
+    Obs["State S_t or observation encoded as state features"]
+    Policy["Policy pi(a | s)"]
+    Values["Value estimates V_pi(s), Q_pi(s,a), or model"]
+    Improve["Policy improvement or exploration rule"]
+    Obs --> Policy
+    Values --> Improve
+    Improve --> Policy
+  end
+
+  subgraph Env["Environment / finite MDP"]
+    direction TB
+    Dyn["Transition kernel p(s', r | s, a)"]
+    Reward["Reward signal R_(t+1)"]
+    Next["Next state S_(t+1)"]
+    Terminal{"Terminal state?"}
+    Dyn --> Reward
+    Dyn --> Next
+    Next --> Terminal
+  end
+
+  Policy --> Action["Sample action A_t from pi(. | S_t)"]
+  Action --> Dyn
+  Reward --> Return["Return G_t = R_(t+1) + gamma G_(t+1)"]
+  Return --> Values
+  Next --> Obs
+  Terminal -- "episodic reset" --> Start["Start-state distribution"]
+  Start --> Obs
+
+  subgraph Bellman["Bellman backup used by later algorithms"]
+    direction TB
+    B1["#quot;Expectation backup: sum_a pi(a|#quot;s) sum_s',r p(s',r#quot;|s,a)[r + gamma V(s')"]"]
+    B2["#quot;Optimality backup: max_a sum_s',r p(s',r|s,a)[r + gamma V(s')"]"]
+  end
+
+  Env -. "model-based methods use p("s',r|s,a")" .-> Bellman
+  Bellman -. "bootstrapping target" .-> Values
 ```
+
+This MDP diagram makes the agent-environment contract explicit at time `t`: state enters the policy, an action enters the transition kernel, and the environment returns reward plus next state. The value/model block feeds policy improvement, while the return edge shows why immediate reward and future consequences are both part of the objective. The Bellman subgraph labels the expectation and optimality backups that later become TD, dynamic-programming, and control targets.
 
 | Concept | Symbol | Role in the MDP | Common confusion |
 |---|---:|---|---|

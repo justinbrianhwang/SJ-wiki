@@ -70,17 +70,26 @@ In static rigid-body analysis without friction and deformation, mechanical advan
 
 ```mermaid
 flowchart TD
-  A[Assembly problem] --> B{"Are members two-force?"}
-  B -->|mostly yes| C[Truss idealization]
-  B -->|no| D[Frame or machine]
-  C --> E{"Need all member forces?"}
-  E -->|yes| F[Method of joints]
-  E -->|selected members| G[Method of sections]
-  D --> H[Separate members or subassemblies]
-  F --> I[Joint particle equilibrium]
-  G --> J[Rigid-body equilibrium of cut part]
-  H --> J
+  Assembly["Assembly problem<br/>loads, supports, pins, members"] --> Idealize{"Are members ideal two-force members?"}
+  Idealize -- "yes, pin-jointed and loaded at joints" --> Truss["Truss idealization<br/>members carry axial tension/compression only"]
+  Idealize -- "no" --> Frame["Frame or machine<br/>members may carry shear, moment, and pin reactions"]
+
+  Truss --> Need{"Need all member forces or selected forces?"}
+  Need -- "all" --> Joints["Method of joints<br/>isolate one joint at a time"]
+  Need -- "selected" --> Sections["Method of sections<br/>cut through up to three unknown members"]
+  Joints --> JointEq["particle equilibrium at each joint<br/>sum Fx=0, sum Fy=0"]
+  Sections --> CutFBD["rigid-body FBD of cut part<br/>use moments to eliminate unknowns"]
+
+  Frame --> Separate["separate members or subassemblies<br/>show pin action-reaction pairs on different bodies"]
+  Separate --> MemberEq["rigid-body equilibrium per member<br/>forces and moments"]
+  JointEq --> Interpret["interpret sign<br/>tension vs compression"]
+  CutFBD --> Interpret
+  MemberEq --> Interpret
+  Interpret --> Check["check zero-force members, determinacy, and support reactions"]
+  Check --> Result(("member-force solution"))
 ```
+
+This assembly diagram routes a structure by its modeling assumption before choosing a method. True trusses use joint particle equilibrium or section cuts, while frames and machines require separate rigid-body diagrams for members or subassemblies. The sign and zero-force checks are included because the same solved number has different physical meaning as tension, compression, shear, or pin reaction.
 
 | Assembly type | Main free body | Member force type | Best first method |
 |---|---|---|---|

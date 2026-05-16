@@ -9,10 +9,6 @@ D2L's modern CNN chapters show how image models evolved from LeNet into deeper, 
 
 These models are more than a historical sequence. They introduce reusable design ideas: blocks, bottlenecks, normalization, residual connections, concatenation, global average pooling, and computational tradeoffs between width, depth, and resolution. Modern vision models still rely on these ideas even when attention or hybrid architectures are added.
 
-![A convolutional neural network diagram shows convolution and pooling layers feeding into dense classification layers.](https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Convolutional_Neural_Network.png/500px-Convolutional_Neural_Network.png)
-
-*Figure: Convolutional neural network architecture. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Convolutional_Neural_Network.png), Irisbox, CC BY 4.0.*
-
 ## Definitions
 
 An **architecture block** is a repeated module with a recognizable input-output pattern. VGG blocks repeat $3 \times 3$ convolutions and pooling. Inception blocks run several branches in parallel. Residual blocks add an input to a learned transformation.
@@ -74,17 +70,135 @@ Architecture comparison should control for training recipe. AlexNet, VGG, GoogLe
 ## Visual
 
 ```mermaid
-flowchart TD
-  X[Input feature map] --> C1[Conv BN ReLU]
-  C1 --> C2[Conv BN]
-  X --> S{"Same shape?"}
-  S -->|yes| I[Identity shortcut]
-  S -->|no| P[1 x 1 projection]
-  I --> Add[Add]
-  P --> Add
-  C2 --> Add
-  Add --> R[ReLU]
+flowchart TB
+  X["#quot;Input: [N, 3, 224, 224"]"] --> C1["#quot;Conv 11 x 11, 96, stride 4 -> [N, 96, 55, 55"]"]
+  C1 --> R1["ReLU"]
+  R1 --> P1["#quot;MaxPool 3 x 3, stride 2 -> [N, 96, 27, 27"]"]
+  P1 --> C2["#quot;Conv 5 x 5, 256, pad 2 -> [N, 256, 27, 27"]"]
+  C2 --> R2["ReLU"]
+  R2 --> P2["#quot;MaxPool 3 x 3, stride 2 -> [N, 256, 13, 13"]"]
+  P2 --> C3["#quot;Conv 3 x 3, 384, pad 1 -> [N, 384, 13, 13"]"]
+  C3 --> R3["ReLU"]
+  R3 --> C4["#quot;Conv 3 x 3, 384, pad 1 -> [N, 384, 13, 13"]"]
+  C4 --> R4["ReLU"]
+  R4 --> C5["#quot;Conv 3 x 3, 256, pad 1 -> [N, 256, 13, 13"]"]
+  C5 --> R5["ReLU"]
+  R5 --> P5["#quot;MaxPool 3 x 3, stride 2 -> [N, 256, 6, 6"]"]
+  P5 --> Flat["#quot;Flatten -> [N, 9216"]"]
+  Flat --> FC6["FC 4096 + ReLU + Dropout"]
+  FC6 --> FC7["FC 4096 + ReLU + Dropout"]
+  FC7 --> FC8["FC 1000 logits"]
+  FC8 --> Out(("ImageNet class distribution"))
 ```
+
+AlexNet starts with a large stride-4 convolution that rapidly reduces the 224 x 224 image, then uses three 3 x 3 convolutions before the classifier. The diagram includes the historical channel counts, pooling transitions, and the large fully connected head where dropout was applied. It makes the compute-heavy flattening point explicit: `[N, 256, 6, 6]` becomes `[N, 9216]`.
+
+```mermaid
+flowchart TB
+  X["#quot;Input: [N, 3, 224, 224"]"] --> B1["#quot;Block 1: 2 conv 3 x 3, 64 -> [N, 64, 224, 224"]"]
+  B1 --> P1["#quot;MaxPool 2 x 2, stride 2 -> [N, 64, 112, 112"]"]
+  P1 --> B2["#quot;Block 2: 2 conv 3 x 3, 128 -> [N, 128, 112, 112"]"]
+  B2 --> P2["#quot;MaxPool -> [N, 128, 56, 56"]"]
+  P2 --> B3["#quot;Block 3: 3 conv 3 x 3, 256 for VGG-16; 4 conv for VGG-19 -> [N, 256, 56, 56"]"]
+  B3 --> P3["#quot;MaxPool -> [N, 256, 28, 28"]"]
+  P3 --> B4["#quot;Block 4: 3 conv 3 x 3, 512 for VGG-16; 4 conv for VGG-19 -> [N, 512, 28, 28"]"]
+  B4 --> P4["#quot;MaxPool -> [N, 512, 14, 14"]"]
+  P4 --> B5["#quot;Block 5: 3 conv 3 x 3, 512 for VGG-16; 4 conv for VGG-19 -> [N, 512, 14, 14"]"]
+  B5 --> P5["#quot;MaxPool -> [N, 512, 7, 7"]"]
+  P5 --> Flat["#quot;Flatten -> [N, 25088"]"]
+  Flat --> FC1["FC 4096 + ReLU + Dropout"]
+  FC1 --> FC2["FC 4096 + ReLU + Dropout"]
+  FC2 --> Head["FC 1000 logits"]
+  Head --> Out(("Class distribution"))
+```
+
+VGG is intentionally regular: each stage keeps the same spatial size inside the repeated 3 x 3 convolutions, then halves resolution with max pooling. The diagram distinguishes VGG-16 and VGG-19 by the number of convolutions in the later blocks while preserving the same 224 -> 112 -> 56 -> 28 -> 14 -> 7 spatial path. It also shows why the original classifier head is parameter-heavy after flattening 512 x 7 x 7 features.
+
+```mermaid
+flowchart TB
+  X["#quot;Input feature map: [N, 192, H, W"]"] --> B1R["#quot;Branch 1 reduce: Conv 1 x 1, 64 -> [N, 64, H, W"]"]
+  B1R --> B1["Branch 1 output: 1 x 1 features"]
+  X --> B3R["#quot;Branch 2 reduce: Conv 1 x 1, 96 -> [N, 96, H, W"]"]
+  B3R --> B3["#quot;Conv 3 x 3, 128, pad 1 -> [N, 128, H, W"]"]
+  X --> B5R["#quot;Branch 3 reduce: Conv 1 x 1, 16 -> [N, 16, H, W"]"]
+  B5R --> B5["#quot;Conv 5 x 5, 32, pad 2 -> [N, 32, H, W"]"]
+  X --> BP["#quot;Branch 4: MaxPool 3 x 3, stride 1, pad 1 -> [N, 192, H, W"]"]
+  BP --> BPR["#quot;Conv 1 x 1, 32 -> [N, 32, H, W"]"]
+  B1 --> Cat["#quot;Concatenate channels -> [N, 256, H, W"]"]
+  B3 --> Cat
+  B5 --> Cat
+  BPR --> Cat
+```
+
+The Inception module runs multiple receptive-field choices in parallel while preserving the same height and width in every branch. The 1 x 1 reductions before 3 x 3 and 5 x 5 convolutions are the bottlenecks that keep the expensive branches tractable. Concatenation is along channels, so the example branch widths combine into 256 output channels.
+
+```mermaid
+flowchart TB
+  X["#quot;Block input x: [N, C, H, W"]"] --> R1["#quot;1 x 1 conv, C_mid, stride s -> [N, C_mid, H/s, W/s"]"]
+  R1 --> BN1["BatchNorm + ReLU"]
+  BN1 --> R2["#quot;3 x 3 conv, C_mid, pad 1 -> [N, C_mid, H/s, W/s"]"]
+  R2 --> BN2["BatchNorm + ReLU"]
+  BN2 --> R3["#quot;1 x 1 conv, 4*C_mid -> [N, 4*C_mid, H/s, W/s"]"]
+  R3 --> BN3["BatchNorm"]
+  X --> Match{"Shape matches [N, 4*C_mid, H/s, W/s]?"}
+  Match -->|"yes"| Id["Identity shortcut"]
+  Match -->|"no"| Proj["1 x 1 projection, stride s, 4*C_mid"]
+  Id --> Add(("Add"))
+  Proj --> Add
+  BN3 --> Add
+  Add --> Act["ReLU"]
+  Act --> Y["#quot;Block output: [N, 4*C_mid, H/s, W/s"]"]
+```
+
+This bottleneck block shows ResNet's expansion factor of 4: the residual branch compresses with 1 x 1, processes with 3 x 3, then expands back to `4*C_mid`. The shortcut is identity only when channel and spatial shapes already match; otherwise a 1 x 1 projection aligns both the channel count and stride. The addition node is the explicit residual merge.
+
+```mermaid
+flowchart TB
+  In["#quot;Input image: [N, 3, 224, 224"]"] --> Stem["#quot;Stem: Conv 7 x 7, 64, stride 2 -> [N, 64, 112, 112"]"]
+  Stem --> Pool["#quot;MaxPool 3 x 3, stride 2 -> [N, 64, 56, 56"]"]
+  Pool --> S1["#quot;conv2_x: 3 bottlenecks [1 x 1,64; 3 x 3,64; 1 x 1,256"] -> ["N, 256, 56, 56"]"]
+  S1 --> S2["#quot;conv3_x: 4 bottlenecks [1 x 1,128; 3 x 3,128; 1 x 1,512"], first stride 2 -> ["N, 512, 28, 28"]"]
+  S2 --> S3["#quot;conv4_x: 6 bottlenecks [1 x 1,256; 3 x 3,256; 1 x 1,1024"], first stride 2 -> ["N, 1024, 14, 14"]"]
+  S3 --> S4["#quot;conv5_x: 3 bottlenecks [1 x 1,512; 3 x 3,512; 1 x 1,2048"], first stride 2 -> ["N, 2048, 7, 7"]"]
+  S4 --> GAP["#quot;Global average pool over 7 x 7 -> [N, 2048"]"]
+  GAP --> FC["FC 1000 logits"]
+  FC --> Out(("Class distribution"))
+  Pool -. "stage shortcut projections when shape changes" .-> S1
+  S1 -. "projection shortcut at first conv3_x block" .-> S2
+  S2 -. "projection shortcut at first conv4_x block" .-> S3
+  S3 -. "projection shortcut at first conv5_x block" .-> S4
+```
+
+The ResNet-50 stage diagram expands the architecture into its stem, four residual stages, and global-average-pooling head. It uses the standard ImageNet shapes: 56 x 56 for `conv2_x`, then 28 x 28, 14 x 14, and 7 x 7 as stages downsample. Dotted arrows mark where projection shortcuts are required because the first block of a stage changes resolution or channel count.
+
+```mermaid
+flowchart TB
+  X0["#quot;Dense block input x0: [N, C0, H, W"]"] --> L1["#quot;Layer 1: BN-ReLU-Conv 3 x 3, growth k -> x1 [N, k, H, W"]"]
+  X0 --> Cat1["#quot;Concat [x0, x1"] -> ["N, C0+k, H, W"]"]
+  L1 --> Cat1
+  Cat1 --> L2["#quot;Layer 2: BN-ReLU-Conv 3 x 3, growth k -> x2 [N, k, H, W"]"]
+  Cat1 --> Cat2["#quot;Concat [x0, x1, x2"] -> ["N, C0+2k, H, W"]"]
+  L2 --> Cat2
+  Cat2 --> L3["#quot;Layer 3: BN-ReLU-Conv 3 x 3, growth k -> x3 [N, k, H, W"]"]
+  Cat2 --> Cat3["#quot;Concat [x0, x1, x2, x3"] -> ["N, C0+3k, H, W"]"]
+  L3 --> Cat3
+  Cat3 --> Trans["#quot;Transition: 1 x 1 conv compression theta + avg pool 2 x 2 -> [N, floor(theta*(C0+3k)), H/2, W/2"]"]
+```
+
+DenseNet differs from ResNet by concatenating features instead of adding them. Every new layer contributes `k` growth-rate channels, so the dense block output channel count grows from `C0` to `C0+3k` in this three-layer example. The transition layer then compresses channels and downsamples spatial resolution to control memory.
+
+```mermaid
+flowchart TB
+  X["#quot;Input feature map: [N, C_in, H, W"]"] --> DW["#quot;Depthwise conv k x k, groups C_in -> [N, C_in, H, W"]"]
+  DW --> DWBN["BatchNorm + ReLU6"]
+  DWBN --> PW["#quot;Pointwise conv 1 x 1, C_out -> [N, C_out, H, W"]"]
+  PW --> PWBN["BatchNorm + ReLU6"]
+  PWBN --> Y["Output feature map"]
+  X -. "spatial filtering per channel" .-> DW
+  DWBN -. "channel mixing happens only in 1 x 1 conv" .-> PW
+```
+
+MobileNet's depthwise-separable block splits spatial filtering from channel mixing. The depthwise convolution applies one spatial kernel per input channel, and the 1 x 1 pointwise convolution then mixes channels to produce `C_out`. This is the main architectural reason MobileNet blocks use far fewer parameters and multiply-adds than a dense k x k convolution.
 
 | Family | Main design idea | Benefit | Cost or caution |
 |---|---|---|---|

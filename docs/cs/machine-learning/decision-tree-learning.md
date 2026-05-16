@@ -9,10 +9,6 @@ Decision tree learning is one of the most practical algorithms in Mitchell's boo
 
 The chapter also introduces overfitting in a concrete way. A tree can keep growing until it matches every training example, but a perfectly fitted tree may generalize poorly. The tension among expressive trees, noisy data, small samples, and pruning remains central in modern tree methods such as random forests and gradient boosting, even though those methods go beyond Mitchell's 1997 scope.
 
-![An overfitting diagram shows a classifier boundary that follows training points too closely.](https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Overfitting.svg/500px-Overfitting.svg.png)
-
-*Figure: Overfitting in a classifier decision boundary. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Overfitting.svg), Chabacano, CC BY-SA 4.0.*
-
 ## Definitions
 
 A decision tree represents a function by internal decision nodes and leaf predictions. Each internal node tests an attribute. Each branch corresponds to an attribute value or threshold outcome. Each leaf gives the predicted class.
@@ -77,17 +73,38 @@ Decision trees are appropriate when:
 
 ```mermaid
 flowchart TD
-    Root{Outlook}
-    Root -->|Sunny| H{Humidity}
-    Root -->|Overcast| Yes1["Play = Yes"]
-    Root -->|Rain| W{Wind}
-    H -->|High| No1["Play = No"]
-    H -->|Normal| Yes2["Play = Yes"]
-    W -->|Strong| No2["Play = No"]
-    W -->|Weak| Yes3["Play = Yes"]
+    S["Training subset S at current node"] --> Pure{"All examples same class?"}
+    Pure -- "yes" --> LeafPure(("Leaf: majority or pure class"))
+    Pure -- "no" --> Attrs{"Unused attributes or valid thresholds remain?"}
+    Attrs -- "no" --> LeafMaj(("Leaf: majority class in S"))
+    Attrs -- "yes" --> Ent["Compute Entropy(S)"]
+    Ent --> Gains["For each candidate test A, compute Gain(S,A)"]
+    Gains --> Choose["Choose test with highest information gain"]
+    Choose --> Split["Partition S into child subsets S_v"]
+    Split --> Child1["Recurse on branch value/threshold v_1"]
+    Split --> Child2["Recurse on branch value/threshold v_2"]
+    Split --> ChildK["Recurse on branch value/threshold v_k"]
+    Child1 --> S
+    Child2 --> S
+    ChildK --> S
+
+    subgraph Learned["Example learned tree"]
+      direction TB
+      Root{"Outlook"}
+      Root -- "Sunny" --> H{"Humidity"}
+      Root -- "Overcast" --> Yes1(("Play = Yes"))
+      Root -- "Rain" --> W{"Wind"}
+      H -- "High" --> No1(("Play = No"))
+      H -- "Normal" --> Yes2(("Play = Yes"))
+      W -- "Strong" --> No2(("Play = No"))
+      W -- "Weak" --> Yes3(("Play = Yes"))
+    end
+
+    Split --> Prune["Post-pruning: replace subtree if validation error does not increase"]
+    Prune -. "simplifies learned tree" .-> Learned
 ```
 
-This is the classic PlayTennis-style tree. It encodes a disjunction of paths: overcast days are positive immediately, while sunny and rainy days require different secondary tests.
+This decision-tree diagram shows both the ID3 growth procedure and the resulting tree structure. The builder computes entropy, evaluates every candidate test by information gain, partitions the training subset, and recurses until purity, exhaustion, or a stopping rule creates a leaf. The pruning edge shows how a subtree can be replaced by a leaf when validation error does not increase, while the example tree makes the final root-to-leaf decision paths concrete.
 
 ## Worked example 1: Compute entropy and information gain
 

@@ -117,16 +117,55 @@ This size limit is another practical reason hybrid encryption is the default pat
 ## Visual
 
 ```mermaid
-flowchart LR
-  M[Message m] --> P[OAEP randomized encoding]
-  R[Random seed r] --> P
-  P --> X[Encoded integer x]
-  X --> E["c = x^e mod N"]
-  E --> C[Ciphertext c]
-  C --> D["x = c^d mod N"]
-  D --> U[OAEP decode and checks]
-  U --> M2[Message or reject]
+flowchart TB
+  M["Message M"]
+  L["Optional label L"]
+  Seed["Random seed: hLen bytes"]
+  LHash["lHash = Hash(L)"]
+  DB["Data block DB = lHash || PS || 0x01 || M"]
+
+  subgraph Encode["OAEP Feistel-like encoding"]
+    direction TB
+    G["MGF1(seed) -> dbMask"]
+    MaskDB(("xor"))
+    MaskedDB["maskedDB = DB xor dbMask"]
+    H["MGF1(maskedDB) -> seedMask"]
+    MaskSeed(("xor"))
+    MaskedSeed["maskedSeed = seed xor seedMask"]
+    EM["Encoded message EM = 0x00 || maskedSeed || maskedDB"]
+    Seed --> G --> MaskDB --> MaskedDB --> H --> MaskSeed --> MaskedSeed --> EM
+    DB --> MaskDB
+    Seed --> MaskSeed
+  end
+
+  subgraph RSA["RSA trapdoor permutation"]
+    direction TB
+    Int["Convert EM to integer x in the RSA modulus range"]
+    Enc["Encrypt: c = x^e mod N"]
+    Dec["Decrypt: x = c^d mod N"]
+    EM2["Parse EM = 0x00 || maskedSeed || maskedDB"]
+    Int --> Enc --> C["Ciphertext c"] --> Dec --> EM2
+  end
+
+  subgraph Decode["OAEP decoding and constant-time checks"]
+    direction TB
+    UnmaskSeed["seed = maskedSeed xor MGF1(maskedDB)"]
+    UnmaskDB["DB = maskedDB xor MGF1(seed)"]
+    Check["Check leading 0x00, lHash, PS zeros, 0x01 separator"]
+    Result{"All checks pass?"}
+    Plain["Return M"]
+    Reject["Reject without oracle detail"]
+    UnmaskSeed --> UnmaskDB --> Check --> Result
+    Result -->|"Yes"| Plain
+    Result -->|"No"| Reject
+  end
+
+  L --> LHash --> DB
+  M --> DB
+  EM2 --> UnmaskSeed
 ```
+
+This diagram shows OAEP as a two-mask encoding wrapped by the RSA permutation. The seed masks the data block, the masked data block masks the seed, and decoding must verify the label hash, separator, padding zeros, and leading byte before releasing either the message or a generic rejection.
 
 | RSA variant | Randomized? | CPA secure? | Main issue |
 |---|---:|---:|---|

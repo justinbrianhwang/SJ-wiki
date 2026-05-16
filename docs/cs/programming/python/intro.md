@@ -50,18 +50,51 @@ The extracted table of contents gives this chapter map:
 ## Visual
 
 ```mermaid
-flowchart TD
-  A[Install and run Python] --> B[Use REPL and scripts]
-  B --> C["Learn syntax, variables, and types"]
-  C --> D[Control flow and containers]
-  D --> E[Functions]
-  E --> F[Modules and packages]
-  E --> G[Classes]
-  F --> H[Files and exceptions]
-  G --> H
-  H --> I[Debugging and testing]
-  I --> J[Standard library and scientific stack]
+flowchart TB
+  Source["Source input: script.py, module import, or REPL cell"] --> Lexer["Tokenizer and parser"]
+  Lexer --> AST["Abstract syntax tree"]
+  AST --> Compiler["Compiler: symbol table, scopes, constants, bytecode"]
+  Compiler --> CodeObj["Code object: bytecode, constants, names, varnames"]
+  CodeObj --> Pyc["Optional __pycache__ .pyc for imported modules"]
+
+  subgraph Runtime["CPython bytecode execution architecture"]
+    direction TB
+    Frame["Frame: globals, locals, value stack, block stack, instruction pointer"]
+    Dispatch{Eval loop dispatches next opcode}
+    Load["LOAD_CONST / LOAD_FAST: push values onto stack"]
+    Op["BINARY_OP / COMPARE_OP: pop operands, push result"]
+    Call["CALL: enter Python frame or C-extension function"]
+    Branch["POP_JUMP / FOR_ITER: update instruction pointer"]
+    Return["RETURN_VALUE: pop result and leave frame"]
+    Except["Exception path: unwind block stack, search handlers"]
+    Frame --> Dispatch
+    Dispatch -- "load opcode" --> Load --> Dispatch
+    Dispatch -- "operator opcode" --> Op --> Dispatch
+    Dispatch -- "call opcode" --> Call --> Frame
+    Dispatch -- "branch opcode" --> Branch --> Dispatch
+    Dispatch -- "return opcode" --> Return
+    Dispatch -- "raise or error" --> Except --> Dispatch
+  end
+
+  CodeObj --> Frame
+  Return --> Result(("program output or returned value"))
+
+  subgraph Environment["Project environment and imports"]
+    direction TB
+    Venv["Virtual environment selects interpreter and site-packages"]
+    SysPath["sys.path search order"]
+    Importer["Import machinery: find spec, load module, execute top-level code once"]
+    ModuleDict["Module object with namespace dictionary"]
+    Packages["Installed packages: standard library, wheels, local project code"]
+    Venv --> SysPath --> Importer --> ModuleDict
+    Packages --> Importer
+  end
+
+  Source -. "import statement" .-> Importer
+  ModuleDict -. "module globals used by frames" .-> Frame
 ```
+
+This diagram shows Python as an execution pipeline rather than only a learning path: source text becomes an AST, then a code object, then bytecode interpreted by CPython frames and the eval loop. The environment branch explains why virtual environments and imports affect runtime behavior: imported modules execute into module dictionaries that later frames use as globals.
 
 | Wiki page | Primary source connection | Expansion added here |
 |---|---|---|

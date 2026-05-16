@@ -9,10 +9,6 @@ Hashing (해싱) tries to make dictionary operations close to constant time by c
 
 The cost is that collisions are unavoidable: two distinct keys can map to the same table slot. A hashing implementation is therefore mostly a collision-management design. The source textbook's hashing chapter covers hash tables, hash functions, overflow handling, theoretical evaluation, dynamic hashing, and Bloom filters. This page focuses on the core curriculum pieces: open addressing and chaining.
 
-![A hash table diagram shows keys mapped to table slots with chained buckets for collisions.](https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Dsa_hash_table.svg/500px-Dsa_hash_table.svg.png)
-
-*Figure: Hash table using separate chaining for collisions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dsa_hash_table.svg), Amit6, public domain.*
-
 ## Definitions
 
 A **hash table** stores records in an array of size $m$. A **hash function** maps a key $k$ to an integer slot:
@@ -75,23 +71,47 @@ Hash-table equality also has two stages: first compute a slot or bucket from the
 
 ```mermaid
 flowchart TD
-  A[Key] --> B[hash function]
-  B --> C{"slot empty?"}
-  C -->|yes| D[store key]
-  C -->|no| E[collision strategy]
-  E --> F[chaining bucket]
-  E --> G[open-address probe]
+  Key["Key k"] --> Hash["Hash function h(k) -> home index in 0..m-1"]
+  Hash --> Strategy{"Collision strategy"}
+
+  subgraph Chain["Separate chaining table"]
+    direction TB
+    Slots["Array slots 0..m-1 store bucket heads"]
+    S0["slot 0 -> 10 -> 25"]
+    S1["slot 1 -> 11"]
+    S2["slot 2 -> 7 -> 32"]
+    S3["slot 3 -> empty"]
+    S4["slot 4 -> 19"]
+    Slots --> S0
+    Slots --> S1
+    Slots --> S2
+    Slots --> S3
+    Slots --> S4
+    SearchC["Search: compute slot, then compare actual keys along chain"]
+  end
+
+  subgraph Open["Open addressing with linear probing"]
+    direction TB
+    Home["Try home slot h(k)"]
+    Occupied{"Slot occupied by different key?"}
+    Probe["Probe next slot: (h(k)+i) mod m"]
+    Tomb["Tombstone: deleted marker keeps probe chain intact"]
+    Insert["Insert into first empty or reusable tombstone slot"]
+    Home --> Occupied
+    Occupied -- "yes" --> Probe
+    Probe --> Occupied
+    Occupied -- "no" --> Insert
+    Tomb --> Probe
+  end
+
+  Strategy -- "buckets outside table slots" --> Chain
+  Strategy -- "records stay inside array" --> Open
+  Hash --> Resize{"Load factor above threshold?"}
+  Resize -- "yes" --> Rehash["Allocate larger table and reinsert every live key because h(k) depends on m"]
+  Resize -- "no" --> Strategy
 ```
 
-Separate chaining example for $h(k) = k \bmod 5$:
-
-```text
-slot 0: 10 -> 25
-slot 1: 11
-slot 2: 7 -> 32
-slot 3: empty
-slot 4: 19
-```
+This hash-table diagram shows both collision-resolution architectures. Separate chaining stores bucket heads in the table and follows linked records while comparing real keys; open addressing keeps every live record in the table array and relies on probe sequences plus tombstones after deletion. The load-factor branch makes resizing explicit, including the need to rehash keys when table size changes.
 
 ## Worked example 1: linear probing insertion
 

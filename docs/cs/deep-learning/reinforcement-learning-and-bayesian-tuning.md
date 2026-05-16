@@ -86,16 +86,48 @@ Bayesian optimization depends on an acquisition function, such as expected impro
 ## Visual
 
 ```mermaid
-flowchart LR
-  S[State s_t] --> P[Policy pi]
-  P --> A[Action a_t]
-  A --> E[Environment]
-  E --> R[Reward r_t]
-  E --> S2[Next state s_t+1]
-  R --> L[Update value or policy]
-  S2 --> L
-  L --> P
+flowchart TB
+  subgraph ActorCritic["Actor-critic interaction loop"]
+    direction LR
+    S["State s_t"] --> Actor["Actor policy pi_theta(a | s)"]
+    Actor --> A["Sample or choose action a_t"]
+    A --> Env["Environment transition"]
+    Env --> R["Reward r_{t+1}"]
+    Env --> S2["Next state s_{t+1}"]
+    S --> Critic["Critic V_phi(s_t) or Q_phi(s_t,a_t)"]
+    S2 --> Critic2["Critic target bootstrap V_phi(s_{t+1})"]
+    R --> TD["TD error delta = r + gamma*V(s_next) - V(s)"]
+    Critic --> TD
+    Critic2 --> TD
+    TD --> UpdateCritic["Update critic parameters phi"]
+    TD --> UpdateActor["Policy-gradient update for actor theta"]
+    UpdateActor -. "improved policy collects new data" .-> Actor
+  end
+
+  subgraph DQN["DQN with target network and replay"]
+    direction TB
+    Transition["Store transition (s,a,r,s_next,done)"] --> Replay["Replay buffer minibatch"]
+    Replay --> Online["Online Q network Q_theta(s,a)"]
+    Replay --> Target["Target network Q_theta_minus(s_next, a')"]
+    Target --> Bellman["Target y = r + gamma*max_a' Q_theta_minus(s_next,a')"]
+    Online --> Loss["Squared TD loss (Q_theta(s,a)-y)^2"]
+    Bellman --> Loss
+    Loss --> OnlineStep["Gradient step updates theta"]
+    OnlineStep -. "periodically copy theta to theta_minus" .-> Target
+  end
+
+  subgraph BO["Bayesian optimization with GP surrogate"]
+    direction TB
+    Trials["Observed trials: hyperparameters x_i and validation scores y_i"] --> GP["Fit Gaussian-process surrogate mean mu(x), uncertainty sigma(x)"]
+    GP --> Acq["Acquisition function, e.g. EI or UCB"]
+    Acq --> Next["Select next hyperparameter x_next"]
+    Next --> Train["Train/evaluate model at budget"]
+    Train --> Trials
+    GP --> Best(("Best validated configuration"))
+  end
 ```
+
+The actor-critic loop shows the policy, environment transition, critic bootstrap, and TD-error signal that updates both networks. The DQN subgraph makes the stabilizing machinery explicit: replay samples decorrelate data and the target network supplies a delayed Bellman target. The Bayesian-optimization subgraph mirrors the exploration-exploitation problem at the experiment level, using GP uncertainty and an acquisition function to choose the next trial.
 
 | Topic | Core object | Deep learning connection | Main caution |
 |---|---|---|---|

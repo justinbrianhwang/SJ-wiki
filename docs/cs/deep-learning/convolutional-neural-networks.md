@@ -9,10 +9,6 @@ Convolutional neural networks exploit the structure of images. A fully connected
 
 The core insight is parameter sharing. A small kernel slides across an image and applies the same weights at every location. This makes the model efficient, encourages it to detect the same pattern anywhere in the image, and builds feature maps that preserve spatial layout. Padding, stride, channels, pooling, and stacked convolutional layers then turn this simple operation into a complete architecture such as LeNet.
 
-![A convolutional neural network diagram shows convolution and pooling layers feeding into dense classification layers.](https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Convolutional_Neural_Network.png/500px-Convolutional_Neural_Network.png)
-
-*Figure: Convolutional neural network architecture. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Convolutional_Neural_Network.png), Irisbox, CC BY 4.0.*
-
 ## Definitions
 
 For an input image $X$ and kernel $K$, the two-dimensional **cross-correlation** output is
@@ -67,17 +63,34 @@ LeNet is historically small, but its pattern remains recognizable. Convolutional
 ## Visual
 
 ```mermaid
-flowchart LR
-  I[Image batch N x C x H x W] --> C1[Conv 5 x 5]
-  C1 --> A1[Sigmoid or ReLU]
-  A1 --> P1[Pooling]
-  P1 --> C2[Conv 5 x 5]
-  C2 --> A2[Activation]
-  A2 --> P2[Pooling]
-  P2 --> F[Flatten]
-  F --> L1[Fully connected]
-  L1 --> L2[Classifier logits]
+flowchart TB
+  subgraph Generic["Generic CNN feature block"]
+    direction TB
+    GI["#quot;Feature map: [N, C_in, H, W"]"] --> GC["#quot;Conv k x k, stride s, padding p -> [N, C_out, H_out, W_out"]"]
+    GC --> GBN["BatchNorm2d C_out"]
+    GBN --> GR["ReLU"]
+    GR --> GP["#quot;Optional pool 2 x 2, stride 2 -> [N, C_out, H_out/2, W_out/2"]"]
+  end
+
+  subgraph LeNet["LeNet-5 style classifier for 28 x 28 grayscale digits"]
+    direction TB
+    X["#quot;Input image batch: [N, 1, 28, 28"]"] --> C1["#quot;C1: Conv 5 x 5, 6 channels, pad 2 -> [N, 6, 28, 28"]"]
+    C1 --> A1["Sigmoid or modern ReLU"]
+    A1 --> S2["#quot;S2: AvgPool 2 x 2, stride 2 -> [N, 6, 14, 14"]"]
+    S2 --> C3["#quot;C3: Conv 5 x 5, 16 channels, valid -> [N, 16, 10, 10"]"]
+    C3 --> A3["Sigmoid or modern ReLU"]
+    A3 --> S4["#quot;S4: AvgPool 2 x 2, stride 2 -> [N, 16, 5, 5"]"]
+    S4 --> Flat["#quot;Flatten -> [N, 400"]"]
+    Flat --> F5["FC: 400 -> 120"]
+    F5 --> A5["Activation"]
+    A5 --> F6["FC: 120 -> 84"]
+    F6 --> A6["Activation"]
+    A6 --> Out["FC classifier: 84 -> 10 logits"]
+    Out --> Prob(("Class probabilities after softmax"))
+  end
 ```
+
+The generic block shows the modern Conv-BN-ReLU-Pool pattern with the spatial-size controls called out on the convolution and pooling layers. The LeNet diagram then expands the classic conv-pool-conv-pool-fc-fc-fc contract, including the standard channel counts and key tensor shapes from `[N, 1, 28, 28]` to `[N, 400]` before classification. The final node separates logits from optional softmax probabilities, matching how training code usually consumes classifier outputs.
 
 | Operation | Learned parameters | Main effect | Shape control |
 |---|---:|---|---|

@@ -84,16 +84,24 @@ Those checks are cheap and usually worth keeping.
 
 ```mermaid
 flowchart TD
-  A[Define parameters with units] --> B[Compute or set initial conditions]
-  B --> C["Define input function u(t)"]
-  C --> D["Write derivative function dx=f(#quot;t,x,p#quot;)"]
-  D --> E[Choose solver and tolerances]
-  E --> F[Run simulation]
-  F --> G[Plot states and outputs]
-  G --> H["Check equilibrium, units, and convergence"]
-  H -->|needs revision| D
-  H -->|accepted| I[Save figures and data]
+  Setup["Script setup<br/>clear assumptions, units, random seed if needed"] --> Params["define parameters with units<br/>p.mass_kg, p.R_K_per_W, etc."]
+  Params --> IC["compute or set initial conditions<br/>state vector and names"]
+  IC --> Input["define input function u(t)<br/>steps, measured data, scheduled commands"]
+  Input --> RHS["derivative function<br/>dxdt = f(t,x,p,u)"]
+  RHS --> Assertions["assertions and guards<br/>positive parameters, sorted time, valid state ranges"]
+  Assertions --> Solver["choose solver and tolerances<br/>ode45, ode15s, fixed-step loop"]
+  Solver --> Run["run simulation<br/>capture solver stats and warnings"]
+  Run --> Post["postprocess derived quantities<br/>outputs, residuals, energy, rates"]
+  Post --> Plot["plot states, outputs, inputs, and diagnostics"]
+  Plot --> Check["check equilibrium, units, convergence, and limiting cases"]
+  Check --> Decision{"accepted?"}
+  Decision -- "fix equations or inputs" --> RHS
+  Decision -- "fix solver/settings" --> Solver
+  Decision -- "yes" --> Save["save data, figures, parameters, and script version"]
+  Save --> Artifact(("reproducible simulation run"))
 ```
+
+This scripting diagram treats a MATLAB file as a reproducible experiment driver. Parameters, initial conditions, input timing, derivative function, assertions, solver settings, postprocessing, plotting, and saved artifacts are all separate blocks. The two feedback paths distinguish equation/input errors from solver-configuration errors.
 
 ## Worked example 1: Script a first-order thermal model
 

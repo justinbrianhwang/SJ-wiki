@@ -146,17 +146,30 @@ Biochemical redox chains use the same principles with different notation. Electr
 ## Visual
 
 ```mermaid
-sequenceDiagram
-  participant An as Anode: oxidation
-  participant Wire as External circuit
-  participant Cat as Cathode: reduction
-  participant Salt as Salt bridge
-  An->>Wire: electrons leave anode
-  Wire->>Cat: electrons enter cathode
-  Salt-->>An: anions balance charge
-  Salt-->>Cat: cations balance charge
-  Note over An,Cat: Delta_r G = -nu F E
+flowchart LR
+  Chem["Redox reaction<br/>separate into oxidation and reduction half-reactions"] --> Potentials["Electrode potentials<br/>standard values plus activity corrections"]
+  Potentials --> Nernst["Nernst equation<br/>E = E_standard - (RT/nu F) ln Q"]
+  Nernst --> Cell["Cell voltage<br/>Ecell = Ecathode - Eanode"]
+  Cell --> Thermo["Thermodynamic link<br/>Delta_r G = -nu F E"]
+
+  subgraph CellArch["Electrochemical cell architecture"]
+    direction TB
+    Anode["anode<br/>oxidation, electron source"] --> Wire["external circuit<br/>electrons do electrical work"]
+    Wire --> Cathode["cathode<br/>reduction, electron sink"]
+    Salt["ion conductor<br/>salt bridge, membrane, or electrolyte"] --> Charge["maintains electroneutrality<br/>cations/anions migrate"]
+    Charge -. "balances half-cells" .-> Anode
+    Charge -. "balances half-cells" .-> Cathode
+  end
+
+  Cell --> Anode
+  Thermo --> Work(("maximum non-expansion work"))
+  Nernst --> Types{"cell use"}
+  Types -- "concentration cell" --> Conc["voltage from activity gradient"]
+  Types -- "electrolysis" --> Electrolysis["external voltage drives nonspontaneous direction"]
+  Types -- "corrosion or battery" --> Surface["distributed local anodes/cathodes or finite reactants"]
 ```
+
+This physical-electrochemistry diagram links cell architecture to thermodynamics. The half-cell subgraph shows electron flow through the external circuit and ion migration through the electrolyte, while the Nernst and free-energy nodes show how activities and reaction quotient determine voltage. The cell-use branch distinguishes concentration cells, electrolysis, corrosion, and batteries as different uses of the same electrochemical contract.
 
 | Quantity | Formula | Interpretation |
 |---|---:|---|

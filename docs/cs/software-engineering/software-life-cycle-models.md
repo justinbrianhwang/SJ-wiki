@@ -57,16 +57,51 @@ The spiral model is most useful when risk dominates the project. It asks the tea
 ## Visual
 
 ```mermaid
-flowchart LR
-  A[Feasibility] --> B[Requirements]
-  B --> C[Project planning]
-  C --> D[Design]
-  D --> E[Implementation]
-  E --> F[Testing]
-  F --> G[Delivery]
-  G --> H[Maintenance]
-  H -. change requests .-> B
+flowchart TB
+  subgraph Waterfall["Waterfall lifecycle"]
+    direction LR
+    W1["Feasibility"] --> W2["Requirements"] --> W3["Project planning"] --> W4["Architecture and detailed design"] --> W5["Implementation"] --> W6["System testing"] --> W7["Delivery"] --> W8["Maintenance"]
+    W8 -. "change request" .-> W2
+  end
+
+  subgraph VModel["V-model lifecycle"]
+    direction LR
+    VReq["User requirements"] --> VSys["System requirements"] --> VArch["Architecture design"] --> VDetail["Detailed design"] --> VCode["Code"]
+    VCode --> VUnit["Unit tests"]
+    VUnit --> VInt["Integration tests"]
+    VInt --> VSysTest["System tests"]
+    VSysTest --> VAccept["Acceptance tests"]
+    VReq -. "validated by" .-> VAccept
+    VSys -. "verified by" .-> VSysTest
+    VArch -. "verified by" .-> VInt
+    VDetail -. "verified by" .-> VUnit
+  end
+
+  subgraph Spiral["Spiral lifecycle"]
+    direction TB
+    SObj["Set objectives and alternatives"]
+    SRisk["Identify and reduce risks"]
+    SDev["Develop and verify next increment"]
+    SPlan["Plan next cycle"]
+    SObj --> SRisk --> SDev --> SPlan --> SObj
+  end
+
+  subgraph Agile["Agile / incremental lifecycle"]
+    direction LR
+    Backlog["Product backlog"] --> SprintPlan["Sprint planning"]
+    SprintPlan --> Build["Design, code, test small increment"]
+    Build --> Review["Review, demo, retrospective"]
+    Review --> Release["Potentially shippable increment"]
+    Review -. "reprioritize" .-> Backlog
+  end
+
+  W8 --> Compare["Choose model based on requirement stability, risk, release slicing, and feedback needs"]
+  VAccept --> Compare
+  SPlan --> Compare
+  Release --> Compare
 ```
+
+This diagram places waterfall, V-model, spiral, and agile lifecycles side by side instead of reducing them to a single phase chain. The dotted arrows show the main feedback contracts: maintenance changes return to requirements, V-model tests verify matching development artifacts, spiral cycles revisit risk, and agile reviews reprioritize the backlog.
 
 | Model | Basic shape | Best fit | Main trade-off |
 |---|---|---|---|

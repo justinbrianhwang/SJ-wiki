@@ -9,10 +9,6 @@ Fourier series represent periodic functions as sums of sines and cosines. The en
 
 The same idea solves boundary-value PDEs. If the boundary conditions match sine or cosine modes, the initial shape can be expanded in that basis and each mode evolves independently. Fourier series therefore connect approximation, signal analysis, heat flow, wave motion, and Sturm-Liouville theory.
 
-![Several partial sums of a Fourier series approximate a square wave.](https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Fourier_Series_Square_Wave.svg/500px-Fourier_Series_Square_Wave.svg.png)
-
-*Figure: Fourier-series approximations to a square wave. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fourier_Series_Square_Wave.svg), Guy vandegrift, CC0 1.0.*
-
 ## Definitions
 
 For a $2\pi$-periodic function,
@@ -115,16 +111,29 @@ This says that mean-square size in physical space equals size in coefficient spa
 ## Visual
 
 ```mermaid
-flowchart TD
-  A[Function on interval] --> B{"Periodic full-range or half-range?"}
-  B -->|full range| C[Compute a_n and b_n]
-  B -->|half-range sine| D[Odd extension]
-  B -->|half-range cosine| E[Even extension]
-  C --> F[Fourier series]
-  D --> F
-  E --> F
-  F --> G["Approximation, spectra, PDE modes"]
+flowchart TB
+  Input["Input function f(x)<br/>interval, period, boundary conditions"] --> Choice{"Choose expansion contract"}
+  Choice -- "full-range periodic" --> Full["Use period 2L<br/>keep sine and cosine modes"]
+  Choice -- "half-range sine" --> Odd["Odd extension<br/>sine modes satisfy zero endpoint values"]
+  Choice -- "half-range cosine" --> Even["Even extension<br/>cosine modes satisfy zero derivative endpoints"]
+
+  Full --> Coeff["Coefficient analysis<br/>a0, an, bn by orthogonality integrals"]
+  Odd --> Bn["Sine coefficients<br/>bn from integral on (0,L)"]
+  Even --> An["Cosine coefficients<br/>a0 and an from integral on (0,L)"]
+  Bn --> Synthesis
+  An --> Synthesis
+  Coeff --> Synthesis["Synthesis series<br/>a0/2 + sum an cos(n pi x/L) + bn sin(n pi x/L)"]
+
+  Synthesis --> Partial["Partial sums S_N<br/>truncate to finite modes"]
+  Partial --> Spectrum["Coefficient spectrum<br/>DC, harmonic amplitudes, phase"]
+  Partial --> PDE["PDE modal solver<br/>each mode evolves independently"]
+  Partial --> Convergence{"Pointwise behavior"}
+  Convergence -- "smooth point" --> Value["converges to f(x)"]
+  Convergence -- "jump" --> Midpoint["converges to average of left and right limits"]
+  Convergence -- "near jump" --> Gibbs["Gibbs overshoot and slow coefficient decay"]
 ```
+
+The Fourier-series architecture starts by choosing the periodic contract: full range, odd half-range, or even half-range. The coefficient sublayers use orthogonality to analyze the input, while the synthesis layer reconstructs partial sums and exposes spectra or PDE modes. The convergence branch shows why the same pipeline produces accurate smooth regions but Gibbs behavior near jumps.
 
 | Function feature | Coefficient effect | Practical meaning |
 |---|---|---|

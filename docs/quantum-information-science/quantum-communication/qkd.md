@@ -155,27 +155,51 @@ The error-correction language also needs care. In link-level QKD, information re
 
 ```mermaid
 flowchart TD
-  Source["State source"]
-  Channel["Quantum channel as noisy operation"]
-  Measure["Measurement and raw outcomes"]
-  Sift["Sifting"]
-  Test["Parameter estimation"]
-  Proof["Security proof"]
-  Rec["Information reconciliation"]
-  PA["Privacy amplification"]
-  Key["Composable final key"]
-  Abort["Abort"]
+  subgraph E91["E91 entanglement-based QKD"]
+    direction LR
+    ESource["Entangled-pair source<br/>|Phi+> or noisy rho_AB"] --> EA["Alice receives qubit A<br/>choose basis a in {Z, X, tilted}"]
+    ESource --> EB["Bob receives qubit B<br/>choose basis b in {Z, X, tilted}"]
+    EA --> EMeas["Alice outcomes<br/>A_i in {-1,+1}"]
+    EB --> EMeas
+    EMeas --> ETest["Correlation tests<br/>QBER + Bell/CHSH parameter"]
+    ETest --> ERaw["Raw key from matched bases<br/>security from entanglement correlations"]
+  end
 
-  Source --> Channel
-  Channel --> Measure
-  Measure --> Sift
-  Sift --> Test
-  Test -->|parameters acceptable| Proof
-  Test -->|too noisy| Abort
-  Proof --> Rec
-  Rec --> PA
-  PA --> Key
+  subgraph MDI["MDI-QKD with untrusted measurement node"]
+    direction LR
+    MA["Alice decoy-state source<br/>phase-randomized pulses, intensity mu_A"] --> MChanA["Quantum channel A -> Charlie<br/>loss eta_A"]
+    MB["Bob decoy-state source<br/>phase-randomized pulses, intensity mu_B"] --> MChanB["Quantum channel B -> Charlie<br/>loss eta_B"]
+    MChanA --> MC["Untrusted Bell-state measurement<br/>linear optics + two-detector clicks"]
+    MChanB --> MC
+    MC --> MAnn["Charlie announces successful BSM pattern<br/>no detector trust required"]
+    MAnn --> MRaw["Alice/Bob sift by basis, bit-flip rule, decoy estimates"]
+  end
+
+  subgraph TF["Twin-field QKD setup"]
+    direction LR
+    TA["Alice phase-encoded weak coherent state<br/>phase phi_A, intensity mu"] --> TMid["Middle interference station<br/>single-click detection"]
+    TB["Bob phase-encoded weak coherent state<br/>phase phi_B, intensity mu"] --> TMid
+    TMid --> TAnn["Announce detector click and time slot"]
+    TAnn --> TPost["Phase post-selection and decoy analysis<br/>single-photon interference across long distance"]
+    TPost --> TRaw["Raw key bits from relative phase classes"]
+  end
+
+  subgraph ClassicalPost["Shared classical post-processing"]
+    direction TB
+    Raw["raw correlated strings<br/>plus public transcript"] --> Test["parameter estimation<br/>QBER, yields, phase-error bounds"]
+    Test --> Decision{"parameters inside proof bound?"}
+    Decision -->|"yes"| Rec["information reconciliation<br/>leak_EC subtracted"]
+    Rec --> PA["privacy amplification<br/>universal hash to length ell"]
+    PA --> Key["composable final key<br/>epsilon-secure bits"]
+    Decision -->|"no"| Abort["abort<br/>discard raw data"]
+  end
+
+  ERaw --> Raw
+  MRaw --> Raw
+  TRaw --> Raw
 ```
+
+The diagram distinguishes three QKD architectures that have different trust boundaries. E91 relies on measured entanglement correlations, MDI-QKD moves detector trust to an untrusted Bell-measurement station, and twin-field QKD uses single-photon interference at a middle station to improve distance scaling. All three feed the same classical post-processing path where parameter estimates decide between abort and reconciliation plus privacy amplification.
 
 | Quantity | Formula | What it controls in QKD |
 |---|---|---|

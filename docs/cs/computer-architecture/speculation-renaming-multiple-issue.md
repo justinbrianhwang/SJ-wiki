@@ -54,18 +54,41 @@ The limits of ILP are not only hardware limits. Programs contain pointer chains,
 ## Visual
 
 ```mermaid
-flowchart LR
-    A[Fetch with prediction] --> B[Decode]
-    B --> C[Rename]
-    C --> D[Issue queue]
-    C --> E[ROB allocate]
-    D --> F[Execute]
-    F --> G[Write result]
-    G --> H{"Oldest and safe?"}
-    H -->|yes| I[Commit architectural state]
-    H -->|no| E
-    A -. wrong path .-> J[Squash and recover map]
+flowchart TB
+    Fetch["Wide fetch: up to W instructions/cycle using predictor and BTB"] --> Decode["Decode into micro-ops"]
+    Decode --> Rename["Rename: architectural regs -> physical regs"]
+    Rename --> Free["Free-list allocates new physical destinations"]
+    Rename --> ROB["ROB allocate in program order: PC, dest, exception, ready bit"]
+    Rename --> IQ["Issue queues: source tags, ready bits, op type"]
+    Rename --> LSQ["Load/store queue: address, data, ordering checks"]
+
+    IQ --> Select{"Wakeup/select chooses ready ops up to issue width"}
+    Select --> ALU["ALU / branch units"]
+    Select --> FPU["FP/vector units"]
+    LSQ --> LSU["Load/store unit and caches"]
+    ALU --> PRF["Physical register file writeback"]
+    FPU --> PRF
+    LSU --> PRF
+    PRF --> Wake["Broadcast completion tags to issue queues"]
+    Wake --> IQ
+    PRF --> ROBReady["Mark ROB entries ready"]
+    ROBReady --> Commit{"Oldest ROB entries ready, no exception, branch verified?"}
+    Commit -- "yes, up to retire width" --> Arch["Commit: update architectural map; release old physical regs"]
+    Commit -- "no" --> Hold["ROB head stalls younger commit"]
+    Hold --> Commit
+
+    ALU --> Branch{"Branch correct?"}
+    Branch -- "yes" --> Commit
+    Branch -- "no" --> Recover["Squash younger ROB/IQ/LSQ entries; restore rename checkpoint; redirect fetch"]
+    Recover --> Fetch
+
+    LSU --> MemCheck{"Memory-order violation?"}
+    MemCheck -- "yes" --> Replay["Replay load and dependent younger ops"]
+    Replay --> IQ
+    MemCheck -- "no" --> ROBReady
 ```
+
+This speculative superscalar diagram labels the structures that let a wide core run ahead while still committing in order. Rename allocates physical registers and ROB entries, issue queues wake and select ready operations, the load/store queue enforces memory ordering, and completion tags update the physical register file and ROB readiness. The branch and memory-replay paths show how speculation is repaired without exposing wrong-path or prematurely executed state to the ISA.
 
 | Technique | Main benefit | Required support | Main cost |
 |---|---|---|---|

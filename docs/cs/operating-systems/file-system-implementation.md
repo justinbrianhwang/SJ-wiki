@@ -62,19 +62,56 @@ Simple consistency checkers exist because these relationships can be verified af
 
 ```mermaid
 flowchart TD
-  Path["/home/ada/a.txt"] --> Dir[Directory entry]
-  Dir --> Inode[Inode / FCB]
-  Inode --> D1[Direct block pointer]
-  Inode --> D2[Direct block pointer]
-  Inode --> Ind[Indirect block pointer]
-  D1 --> B10[Data block 10]
-  D2 --> B11[Data block 11]
-  Ind --> IDX[Index block]
-  IDX --> B80[Data block 80]
-  IDX --> B81[Data block 81]
+  Path["Path lookup: /home/ada/report.txt"] --> Dcache{"Directory-entry cache hit?"}
+  Dcache -- "miss" --> DirBlock["Directory data block: name -> inode number"]
+  Dcache -- "hit" --> InoNum["Inode number"]
+  DirBlock --> InoNum
+  InoNum --> Icache{"Inode cache hit?"}
+  Icache -- "miss" --> InodeDisk["Read inode table block"]
+  Icache -- "hit" --> Inode["In-memory inode / FCB"]
+  InodeDisk --> Inode
+
+  subgraph InodeLayout["UNIX-style inode block map"]
+    direction TB
+    Meta["Metadata: owner, mode, size, times, link count"]
+    D0["Direct pointer 0 -> data block"]
+    D1["Direct pointer 1 -> data block"]
+    D11["Direct pointer 11 -> data block"]
+    SInd["Single indirect pointer"]
+    DInd["Double indirect pointer"]
+    TInd["Triple indirect pointer"]
+  end
+
+  Inode --> Meta
+  Inode --> D0
+  Inode --> D1
+  Inode --> D11
+  Inode --> SInd
+  Inode --> DInd
+  Inode --> TInd
+
+  D0 --> B0["File bytes: block 0"]
+  D1 --> B1["File bytes: block 1"]
+  D11 --> B11["File bytes: block 11"]
+  SInd --> SIBlock["Index block: 1024 block pointers if 4 KiB blocks and 4-byte pointers"]
+  SIBlock --> B12["File bytes: block 12"]
+  SIBlock --> B1035["File bytes: block 1035"]
+  DInd --> DIBlock["Outer index block -> many single-indirect blocks"]
+  DIBlock --> SIBlock2["Second-level index block"]
+  SIBlock2 --> Huge["Large-file data blocks"]
+  TInd --> TIBlock["Third-level index tree for very large files"]
+
+  subgraph Allocation["Supporting metadata"]
+    direction LR
+    FreeMap["Free-space bitmap: one bit per block"]
+    Journal["Journal or log: ordered metadata updates"]
+    PageCache["Page cache: dirty and clean file pages"]
+  end
+
+  Inode -. "allocation and recovery invariants" .-> Allocation
 ```
 
-The directory does not normally contain the whole file. It maps a name to metadata; the metadata points to data blocks directly or indirectly.
+This inode diagram separates name lookup, inode lookup, and block mapping. Small files are reached through direct pointers, while larger files progress through single, double, and triple indirection; the example notes the common 4 KiB/4-byte pointer fanout for a single-indirect block. The dotted dependency to the free-space bitmap, journal, and page cache shows why allocation, crash recovery, and caching must preserve the same inode-to-block invariants.
 
 ## Worked example 1: bitmap free-space size
 

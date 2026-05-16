@@ -9,10 +9,6 @@ Processors are much faster than main memory, so modern computers rely on a hiera
 
 The central cache question is quantitative: how much does a design reduce execution time, not just miss rate? A larger block may reduce compulsory misses but increase miss penalty. Higher associativity may reduce conflict misses but lengthen hit time. A bigger cache may reduce capacity misses while increasing power and access latency. Average memory access time, AMAT, is the first-order model that keeps these trade-offs visible.
 
-![A cache hierarchy diagram shows progressively larger memory levels between CPU cores and main memory.](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Multi-level_Cache_Hierarchy.svg/500px-Multi-level_Cache_Hierarchy.svg.png)
-
-*Figure: Multi-level cache hierarchy between processors and memory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Multi-level_Cache_Hierarchy.svg), Ferry24.Milan, CC BY-SA 3.0.*
-
 ## Definitions
 
 A cache block, or line, is the unit transferred between adjacent hierarchy levels. If a processor requests an address and the corresponding block is present in the cache, the access is a hit. Otherwise it is a miss, and a lower level must supply the block.
@@ -82,15 +78,39 @@ Inclusive, exclusive, and non-inclusive multilevel caches also change behavior. 
 
 ## Visual
 
-```text
-32-bit address with 64-byte blocks and 256 sets
+```mermaid
+flowchart TB
+  Addr["32-bit byte address"] --> Split["Split fields: tag bits, set index bits, block offset bits"]
+  Split --> Tag["Tag = upper bits; identifies memory block"]
+  Split --> Index["Index = selects one cache set"]
+  Split --> Offset["Offset = selects byte/word within 64-byte line"]
 
-  31                         14 13          6 5        0
- +-----------------------------+-------------+----------+
- |             Tag             |    Index    |  Offset  |
- +-----------------------------+-------------+----------+
-                 18 bits            8 bits      6 bits
+  Index --> Set["Selected set: 4 ways in a set-associative cache"]
+  Tag --> Cmp0{"Way 0 tag match and valid?"}
+  Tag --> Cmp1{"Way 1 tag match and valid?"}
+  Tag --> Cmp2{"Way 2 tag match and valid?"}
+  Tag --> Cmp3{"Way 3 tag match and valid?"}
+  Set --> Line0["Way 0: valid, dirty, tag, 64-byte data line"]
+  Set --> Line1["Way 1: valid, dirty, tag, 64-byte data line"]
+  Set --> Line2["Way 2: valid, dirty, tag, 64-byte data line"]
+  Set --> Line3["Way 3: valid, dirty, tag, 64-byte data line"]
+  Line0 --> Cmp0
+  Line1 --> Cmp1
+  Line2 --> Cmp2
+  Line3 --> Cmp3
+  Cmp0 --> Mux["Way select mux"]
+  Cmp1 --> Mux
+  Cmp2 --> Mux
+  Cmp3 --> Mux
+  Offset --> Mux
+  Mux --> Hit{"Any way hit?"}
+  Hit -- "yes" --> Data(("Return requested word"))
+  Hit -- "no" --> Miss["Miss: choose victim by replacement state; fetch block from lower level"]
+  Miss --> Fill["Fill selected way; set valid and tag; update dirty on writes"]
+  Fill --> Set
 ```
+
+This cache-organization diagram expands the address fields into the actual tag-compare and way-select datapath. The index chooses one set, all ways in that set compare their tags in parallel, and the offset selects the requested bytes from the winning cache line. The miss path labels replacement, lower-level fill, valid/tag update, and dirty-state handling, which are the structures behind AMAT terms.
 
 | Organization | Placement | Hit lookup | Main advantage | Main drawback |
 |---|---|---|---|---|

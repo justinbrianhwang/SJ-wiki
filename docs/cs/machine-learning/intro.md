@@ -11,10 +11,6 @@ Mitchell's treatment sits historically before today's large neural networks, GPU
 
 Use this section as a classic machine-learning map. For modern extensions, cross-reference the deeper SJ Wiki sections on [deep learning](/cs/deep-learning/), [reinforcement learning](/cs/reinforcement-learning/), [data mining](/cs/data-mining/), [probability](/math/probability/), and [statistics](/math/statistics/).
 
-![A perceptron diagram shows weighted inputs combined and passed through an activation function to produce an output.](https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Perceptron.svg/500px-Perceptron.svg.png)
-
-*Figure: Perceptron unit with weighted inputs and activation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Perceptron.svg), Mat the w, CC BY-SA 3.0.*
-
 1. [Learning Problems and System Design](/cs/machine-learning/learning-problems-and-system-design)
 2. [Concept Learning and Version Spaces](/cs/machine-learning/concept-learning-and-version-spaces)
 3. [Decision Tree Learning](/cs/machine-learning/decision-tree-learning)

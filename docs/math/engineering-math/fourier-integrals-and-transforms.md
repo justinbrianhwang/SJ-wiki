@@ -134,14 +134,29 @@ Dimensional units help catch convention mistakes. If $x$ is measured in meters, 
 
 ```mermaid
 flowchart LR
-  A["Signal f(x)"] --> B[Fourier transform]
-  B --> C["Spectrum fhat(omega)"]
-  C --> D["Multiply by filter H(omega)"]
-  D --> E[Inverse transform]
-  E --> F[Filtered signal]
-  A --> G["Shift, scale, differentiate"]
-  G --> C
+  Signal["Signal f(x)<br/>aperiodic, integrable or generalized"] --> Analysis["Analysis integral<br/>fhat(omega) = integral f(x)e^(-i omega x) dx"]
+  Analysis --> Spectrum["Spectrum fhat(omega)<br/>amplitude, phase, bandwidth, units"]
+
+  subgraph Ops["Frequency-domain operations"]
+    direction TB
+    Shift["shift in x<br/>multiply by phase"] --> SpecEdit["edited spectrum"]
+    Diff["differentiate in x<br/>multiply by i omega"] --> SpecEdit
+    Conv["convolution in x<br/>multiply transforms"] --> SpecEdit
+    Filter["LTI filter or PDE multiplier<br/>H(omega), e^(-k omega^2 t), etc."] --> SpecEdit
+  end
+
+  Spectrum --> Shift
+  Spectrum --> Diff
+  Spectrum --> Conv
+  Spectrum --> Filter
+  SpecEdit --> Inverse["Synthesis integral<br/>inverse Fourier transform"]
+  Inverse --> Output["Output signal<br/>filtered, differentiated, or evolved"]
+  Output --> Verify{"Check transform convention"}
+  Verify -- "constants, units, support ok" --> Result(("Usable result"))
+  Verify -- "mismatch" --> Analysis
 ```
+
+This transform diagram makes the analysis/synthesis contract explicit: an aperiodic signal becomes a continuous spectrum, operations are performed as algebraic multipliers or phase factors, and the inverse integral reconstructs the result. The operations subgraph covers the common architecture behind filtering, convolution, differentiation, and PDE evolution. The verification branch is necessary because Fourier conventions and units change the constants even when the structural pipeline is the same.
 
 | Time or space operation | Frequency effect |
 |---|---|

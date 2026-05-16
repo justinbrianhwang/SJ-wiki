@@ -61,14 +61,49 @@ For applied NLP, error analysis should include actual text examples. Aggregate a
 ## Visual
 
 ```mermaid
-flowchart LR
-  T[Raw text] --> Tok[Tokenization]
-  Tok --> V[Vocabulary ids]
-  V --> Emb[Embeddings]
-  Emb --> Enc["Encoder: mean CNN RNN or Transformer"]
-  Enc --> Head[Task head]
-  Head --> Out[Sentiment NLI or sequence output]
+flowchart TB
+  Raw["Raw corpus or task text"] --> Tok["Tokenize: word, character, or subword units"]
+  Tok --> IDs["Vocabulary ids + padding mask"]
+
+  subgraph Static["Static embedding pretraining"]
+    direction TB
+    IDs --> W2V["word2vec skip-gram: center id -> embedding v_c"]
+    W2V --> Dot["Dot with context embeddings u_o and negatives u_k"]
+    Dot --> NSLoss["Negative-sampling binary loss"]
+    NSLoss --> StaticEmb["#quot;Static word vector table E: [|V|, d"]"]
+  end
+
+  subgraph ELMo["ELMo-style contextual features"]
+    direction TB
+    IDs --> CharCNN["Character CNN or token embedding"]
+    CharCNN --> FwdLM["Forward LM LSTM"]
+    CharCNN --> BwdLM["Backward LM LSTM"]
+    FwdLM --> ELMoCat["Layer-weighted concat of forward/backward states"]
+    BwdLM --> ELMoCat
+    ELMoCat --> ELMoFeat["#quot;Contextual token features [N, T, d_ctx"]"]
+  end
+
+  subgraph BERTFlow["BERT-style contextual encoder"]
+    direction TB
+    IDs --> BEmb["Token + segment + position embeddings"]
+    BEmb --> BEnc["Bidirectional Transformer encoder"]
+    BEnc --> MLM["Pretraining head: masked token logits"]
+    BEnc --> CLS["#quot;[CLS"] sequence representation"]
+  end
+
+  subgraph Adapt["Using pretrained representations"]
+    direction TB
+    StaticEmb --> FT["Fine-tuning path: add task head and update selected parameters"]
+    ELMoFeat --> FT
+    CLS --> FT
+    CLS --> Prompt["Prompting path: format task as text and read model output"]
+    FT --> Head["Task head: sentiment, NLI, tagging, or seq2seq"]
+    Prompt --> Head
+    Head --> Out(("Task predictions"))
+  end
 ```
+
+The diagram separates static embedding training, ELMo-style bidirectional recurrent features, and BERT-style bidirectional transformer pretraining. The adaptation subgraph shows the two main downstream patterns: fine-tuning with a task head versus prompting by formatting the task as text. Shape labels distinguish vocabulary tables, contextual token sequences, and sequence-level `[CLS]` representations.
 
 | Representation | Contextual? | Handles rare words | Typical use |
 |---|---|---|---|

@@ -164,13 +164,26 @@ The impulse response is sometimes more informative than the original equation. A
 ## Visual
 
 ```mermaid
-flowchart LR
-  A[Input x] --> B[Impulse decomposition]
-  B --> C[Each impulse produces shifted h]
-  C --> D[Scale by input value]
-  D --> E[Add all shifted responses]
-  E --> F["Output y=x*h"]
+flowchart TB
+  System["LTI system T<br/>linear + time invariant + initial rest"] --> Probe["#quot;Impulse probe<br/>h(t)=T{delta(t)} or h[n"]=T{delta[n]}"]
+  Input["Input signal x<br/>continuous or discrete"] --> Decomp["#quot;Impulse decomposition<br/>x(t)=integral x(tau) delta(t-tau)d tau<br/>x[n"]=sum x[k] delta[n-k]"]
+  Probe --> Shift["Time invariance<br/>shifted impulse gives shifted h"]
+  Decomp --> Scale["Linearity<br/>scale each shifted response by input value"]
+  Shift --> Scale
+  Scale --> Sum["Superposition<br/>integral or sum of shifted responses"]
+  Sum --> Conv["#quot;Convolution output<br/>y(t)=integral x(tau)h(t-tau)d tau<br/>y[n"]=sum x[k]h[n-k]"]
+
+  subgraph Properties["Impulse-response diagnostics"]
+    direction TB
+    Conv --> Causal["causal iff h is zero before time 0"]
+    Conv --> Stable["BIBO stable iff h is absolutely integrable or summable"]
+    Conv --> Support["support adds<br/>input support plus impulse-response support"]
+  end
+
+  Conv --> Output(("output y"))
 ```
+
+The convolution diagram shows why the impulse response completely specifies an LTI system. The input is decomposed into shifted impulses, time invariance supplies shifted copies of $h$, and linearity scales and sums them into the convolution integral or sum. The diagnostics branch attaches causality, BIBO stability, and support transitions directly to the impulse-response architecture.
 
 | LTI fact | Continuous time | Discrete time |
 |---|---|---|

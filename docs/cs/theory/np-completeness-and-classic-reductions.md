@@ -51,14 +51,43 @@ Optimization versions should be separated from decision versions. NP-completenes
 ## Visual
 
 ```mermaid
-graph LR
-  SAT --> 3SAT
-  3SAT --> CLIQUE
-  3SAT --> HAMPATH
-  3SAT --> SUBSETSUM
-  CLIQUE --> VERTEXCOVER[VERTEX-COVER]
-  VERTEXCOVER --> SETCOVER[SET-COVER]
+flowchart TB
+  subgraph CookLevin["Cook-Levin root: NP verifier encoded as SAT"]
+    direction TB
+    X["Instance x with size n"] --> Cert["Certificate y with length poly(n)"]
+    Cert --> Verifier["Polynomial-time verifier M(x,y), running T = n^k steps"]
+    Verifier --> Tableau["Computation tableau: rows time 0..T, columns tape cells 0..T"]
+    Tableau --> Vars["Boolean variables: Cell(t,i,s), Head(t,i), State(t,q)"]
+    Vars --> Clauses["CNF clauses: start row, exactly-one contents, legal local windows, accepting row"]
+    Clauses --> SAT["SAT formula phi(M,x)"]
+  end
+
+  SAT --> ThreeSAT["3SAT: split long clauses with auxiliary variables"]
+
+  subgraph Clique["3SAT to CLIQUE gadget"]
+    direction TB
+    C1["Clause C1: one vertex per literal occurrence"]
+    C2["Clause C2: one vertex per literal occurrence"]
+    C3["Clause C3: one vertex per literal occurrence"]
+    Edges["Edges only between different clauses and non-contradictory literals"]
+    K["Target k = number of clauses"]
+    C1 --> Edges
+    C2 --> Edges
+    C3 --> Edges
+    Edges --> K
+    K --> CliqueOut(("k-clique chooses one consistent true literal per clause"))
+  end
+
+  ThreeSAT --> Clique
+  ThreeSAT --> HAMPATH["HAMPATH gadgets: force assignment choices through graph paths"]
+  ThreeSAT --> SUBSETSUM["SUBSETSUM digits: encode variables and clauses without carries"]
+  CliqueOut --> VertexCover["VERTEX-COVER via complement of a clique"]
+  VertexCover --> SetCover["SET-COVER via element-and-subset incidence"]
+
+  Solver["Hypothetical polynomial solver for any target problem"] -. "composed after reduction" .-> SourceSolved(("polynomial solver for the source NP-complete problem"))
 ```
+
+The diagram starts at Cook-Levin, where a polynomial verifier becomes a tableau and then a SAT formula whose clauses enforce local computation consistency. The lower gadgets show how 3SAT instances are reshaped into CLIQUE, HAMPATH, SUBSETSUM, and later covering problems while preserving yes/no answers and polynomial size; the dotted solver arrow is the reason the reduction direction matters.
 
 | Problem | Certificate | Verification |
 |---|---|---|

@@ -9,10 +9,6 @@ An operating system is the control layer that makes bare hardware usable. It hid
 
 This page sits at the entrance to the rest of operating systems. Processes, memory, files, I/O, protection, and security are not separate inventions; they are services exposed through interfaces and implemented inside a kernel structure. Understanding that split between interface and implementation makes later topics easier: a file descriptor, page table, interrupt handler, and scheduler queue are all parts of the same larger design problem.
 
-![A process state diagram shows transitions among new, ready, running, waiting, and terminated states.](https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Process_state.svg/500px-Process_state.svg.png)
-
-*Figure: Five-state process model used in operating systems. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Process_state.svg), MrDrBob, CC BY-SA 3.0.*
-
 ## Definitions
 
 An **operating system** is the software that manages hardware resources and provides services for programs. The textbook uses the common practical definition of the **kernel** as the program running at all times on the computer. System programs, libraries, command interpreters, graphical shells, daemons, and application programs may ship with an OS distribution, but they are not necessarily part of the kernel.
@@ -52,22 +48,47 @@ Booting follows a layered handoff. Firmware runs first, initializes enough hardw
 
 ```mermaid
 flowchart TB
-  User[User or application] --> API["Library API: POSIX, Java, Win32"]
-  API --> Trap[System-call trap]
-  Trap --> Kernel[Kernel dispatcher]
-  Kernel --> Proc[Process management]
-  Kernel --> Mem[Memory management]
-  Kernel --> FS[File systems]
-  Kernel --> IO[I/O subsystem]
-  Kernel --> Protect[Protection and security]
-  Proc --> HW[Hardware]
-  Mem --> HW
-  FS --> HW
-  IO --> HW
-  Protect --> HW
+  User["User process in user mode"] --> Lib["Library wrapper: POSIX, Win32, Java native call"]
+  Lib --> ABI["Place syscall number and args in ABI-defined registers"]
+  ABI --> Trap["Trap/syscall instruction switches to kernel mode"]
+  Trap --> Entry["Kernel entry stub: save user PC, flags, and registers"]
+  Entry --> Dispatch["System-call table dispatch"]
+  Dispatch --> Validate["Validate fd, pointer ranges, lengths, credentials"]
+
+  subgraph KernelServices["Kernel service modules"]
+    direction TB
+    Proc["Process manager: PCB, signals, wait, fork/exec"]
+    VFS["VFS and file system: fd table, inode, page cache"]
+    VM["Virtual memory: VMA lookup, page tables, copyin/copyout"]
+    Block["Block layer: BIO, scheduler, request queue"]
+    Driver["Device driver: registers, DMA mapping, interrupts"]
+    Net["Network stack: socket buffers, routing, NIC queues"]
+  end
+
+  Validate --> Proc
+  Validate --> VFS
+  Validate --> VM
+  VFS --> VM
+  VFS --> Block
+  Block --> Driver
+  Net --> Driver
+  Driver --> HW["Hardware controllers and interrupt lines"]
+  HW --> IRQ["Interrupt handler or completion queue"]
+  IRQ --> Wake["Wake sleeping task and set return value"]
+  Wake --> Return["Restore registers and return to user mode"]
+  Return --> User
+
+  subgraph Boot["Boot path"]
+    direction LR
+    Firmware["Firmware"] --> Loader["Boot loader"]
+    Loader --> KernelImage["Kernel image"]
+    KernelImage --> Init["First user-space process"]
+  end
+
+  Boot -. "creates initial kernel state before syscalls run" .-> KernelServices
 ```
 
-The diagram separates the interface path from the implementation modules. Applications mostly see the API and system-call contract; the kernel internally coordinates hardware, memory, files, devices, and protection.
+This system-call diagram follows one controlled crossing from user mode into kernel mode and back. It labels the ABI setup, trap entry, saved CPU state, dispatch table, validation checks, service modules, interrupt completion, and final register restore. The boot subgraph shows how firmware and the loader create the initial kernel context before ordinary system calls can use these structures.
 
 ## Worked example 1: tracing a file read
 

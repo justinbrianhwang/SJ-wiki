@@ -9,10 +9,6 @@ The vanilla LSTM cell with input / forget / output gates is the most commonly ta
 
 For the baseline LSTM definition (cell state $C_t$, gates $i_t$, $f_t$, $o_t$, additive memory path), see [Gated RNNs and Sequence-to-Sequence](/cs/deep-learning/gated-rnns-seq2seq).
 
-![An LSTM cell diagram shows gates controlling information flow through cell state and hidden state paths.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Long_Short-Term_Memory.svg/500px-Long_Short-Term_Memory.svg.png)
-
-*Figure: Long short-term memory cell architecture. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Long_Short-Term_Memory.svg), fdeloche, CC BY-SA 4.0.*
-
 ## Quick reference
 
 | Variant | Year | Modification | When to use |
@@ -41,6 +37,29 @@ $$
 
 The diagonal weight vector $V_g$ (one per gate $g$) is elementwise on the cell state. Peephole connections improved LSTM accuracy on timing tasks where the model needs to **count** intervals — e.g., the original test was learning to produce spikes at precise times after a trigger.
 
+```mermaid
+flowchart TB
+  Xp["x_t"] --> CatP["Gate inputs also include h_{t-1}"]
+  Hp["h_{t-1}"] --> CatP
+  Cp["C_{t-1}"] -. "peephole V_f * C_{t-1}" .-> Fp["f_t = sigmoid(W_f x_t + U_f h_{t-1} + V_f*C_{t-1} + b_f)"]
+  Cp -. "peephole V_i * C_{t-1}" .-> Ip["i_t = sigmoid(W_i x_t + U_i h_{t-1} + V_i*C_{t-1} + b_i)"]
+  CatP --> Gp["g_t = tanh(W_g x_t + U_g h_{t-1} + b_g)"]
+  Fp --> CmulP(("f_t*C_{t-1}"))
+  Cp --> CmulP
+  Ip --> ImulP(("i_t*g_t"))
+  Gp --> ImulP
+  CmulP --> CaddP(("Add"))
+  ImulP --> CaddP
+  CaddP --> CtP["C_t"]
+  CtP -. "peephole V_o * C_t" .-> Op["o_t = sigmoid(W_o x_t + U_o h_{t-1} + V_o*C_t + b_o)"]
+  CtP --> TanhP["tanh(C_t)"]
+  Op --> HmulP("(#quot;o_t*tanh(C_t")"))
+  TanhP --> HmulP
+  HmulP --> HtP["h_t"]
+```
+
+The peephole diagram adds explicit dotted connections from the cell state into the gates. The forget and input gates inspect `C_{t-1}`, while the output gate can inspect the newly computed `C_t`. The main additive memory path remains the LSTM cell update; peepholes only add timing-sensitive gate inputs.
+
 **Practical relevance today**: small. The empirical study by [Greff et al. (2017)](https://arxiv.org/abs/1503.04069) tested eight variants on speech, handwriting, and music tasks and found peephole connections offered no statistically significant improvement on those problems. Most modern frameworks omit them by default.
 
 ## Coupled input-forget gate (CIFG)
@@ -67,14 +86,35 @@ $$
 
 Cannot be used in causal language modeling (the backward pass would leak future tokens) — it's an encoder-only tool. PyTorch: `nn.LSTM(..., bidirectional=True)`.
 
+```mermaid
+flowchart TB
+  Seq["Input sequence x_1 ... x_T"] --> Fwd["Forward LSTM: h_1^f to h_T^f"]
+  Seq --> Bwd["Backward LSTM: h_T^b to h_1^b"]
+  Fwd --> Concat["#quot;Per-token concat [h_t^f; h_t^b"] -> ["N, T, 2*d_h"]"]
+  Bwd --> Concat
+  Concat --> TokenHead["Token head for tagging, or pooling for sequence head"]
+  TokenHead --> Out(("Offline encoder output"))
+```
+
+The BiLSTM diagram shows two independent recurrent passes over the same completed sequence. Their hidden states are concatenated at each token, doubling the representation width from `d_h` to `2*d_h`. This is an encoder architecture because the backward pass requires future tokens to be available.
+
 ## Stacked / Deep LSTM
 
 The standard recipe for adding capacity to an RNN is to stack layers: the hidden state output of layer $\ell$ becomes the input of layer $\ell+1$.
 
 ```mermaid
-flowchart LR
-  X[Input] --> L1[LSTM layer 1] --> L2[LSTM layer 2] --> L3[LSTM layer 3] --> Y[Output]
+flowchart TB
+  Xs["#quot;Input embeddings: [N, T, d_x"]"] --> L1["#quot;LSTM layer 1 over time -> [N, T, d_h"]"]
+  L1 --> Drop1["Dropout between recurrent layers"]
+  Drop1 --> L2["#quot;LSTM layer 2 over time -> [N, T, d_h"]"]
+  L2 --> Drop2["Dropout between recurrent layers"]
+  Drop2 --> L3["#quot;LSTM layer 3 over time -> [N, T, d_h"]"]
+  L3 --> Ys["Output sequence or final state"]
+  L1 -. "optional residual if dimensions match" .-> L2
+  L2 -. "optional residual if dimensions match" .-> L3
 ```
+
+The stacked LSTM diagram separates recurrence over time inside each layer from recurrence over depth between layers. Each layer returns a full hidden sequence that becomes the next layer's input, with dropout commonly applied only between layers. Dotted residual shortcuts are optional and require matching hidden dimensions or a projection.
 
 Empirically, 2-4 layers helps; beyond that gradients become hard to train without skip connections (see Residual LSTM below). All major encoder-decoder MT systems before transformers used 4-8 layer BiLSTM encoders.
 
@@ -87,6 +127,19 @@ h_t' = W_r h_t, \qquad h_t' \in \mathbb{R}^{r}, \quad r \ll n
 $$
 
 The projected $h_t'$ is what the next time step (and the next layer) sees, while the larger $h_t$ stays internal. This decouples representational capacity ($n$) from inter-time-step bandwidth ($r$), letting models be wider without quadratic blowup. Standard in production speech models for years before transformers took over.
+
+```mermaid
+flowchart TB
+  Xr["x_t"] --> GatesR["Large internal LSTM gates use projected h'_{t-1} plus x_t"]
+  HprojPrev["#quot;Projected recurrent state h'_{t-1}: [N, r"]"] --> GatesR
+  GatesR --> CellR["#quot;Internal cell update C_t and hidden h_t: [N, n"]"]
+  CellR --> Project["#quot;Projection W_r h_t -> h'_t: [N, r"], with r much smaller than n"]
+  Project --> NextR["Next time step and next layer receive h'_t"]
+  CellR --> LocalR["Large internal memory stays width n"]
+  Project -. "recurrent bandwidth is r" .-> GatesR
+```
+
+The LSTMP diagram keeps the internal memory size `n` separate from the recurrent/output size `r`. Gates and the cell update can use a large hidden representation, but the projected `h'_t` is what later time steps and layers consume. This reduces recurrent matrix cost while preserving a wider internal cell.
 
 ## ConvLSTM
 
@@ -143,19 +196,21 @@ Empirically xLSTM matches or beats some modern linear-time sequence models on se
 ## Choosing a variant in practice
 
 ```mermaid
-flowchart TD
-  A[Need recurrent model] --> B{"Bidirectional info OK?"}
-  B -- yes --> C[BiLSTM]
-  B -- no --> D{"Spatial structure?"}
-  D -- yes --> E[ConvLSTM or 3D CNN]
-  D -- no --> F{"Very deep?"}
-  F -- yes --> G[Residual / Highway LSTM]
-  F -- no --> H{"Huge hidden state?"}
-  H -- yes --> I[Projection LSTM]
-  H -- no --> J{"Parameter budget tight?"}
-  J -- yes --> K[CIFG LSTM or GRU]
-  J -- no --> L[Vanilla LSTM]
+flowchart TB
+  A["Need recurrent sequence model"] --> B{"Can each output use future tokens?"}
+  B -->|"yes, offline encoder"| C["BiLSTM: forward and backward LSTM, concat hidden states"]
+  B -->|"no, causal/streaming"| D{"Does the state need spatial H x W structure?"}
+  D -->|"yes"| E["ConvLSTM: replace gate matmuls with convolutions"]
+  D -->|"no"| F{"Need many recurrent layers?"}
+  F -->|"yes"| G["Stacked LSTM with residual/highway skips between layers"]
+  F -->|"no"| H{"Is internal hidden width too expensive?"}
+  H -->|"yes"| I["LSTMP: large internal h_t, projected recurrent h'_t"]
+  H -->|"no"| J{"Need fewer gate parameters?"}
+  J -->|"yes"| K["CIFG LSTM or GRU"]
+  J -->|"no"| L["Vanilla LSTM"]
 ```
+
+This decision diagram is a routing view rather than a cell schematic. It makes the architectural constraints explicit: bidirectionality requires full-sequence access, ConvLSTM preserves spatial tensors inside gates, stacked and residual variants address depth, and LSTMP addresses large recurrent-state cost. The leaf labels identify which hidden or cell-state contract changes compared with a vanilla LSTM.
 
 Or — and this is the honest 2025 recommendation — **consider whether you should be using an LSTM at all**. For most sequence problems the practical choice is a Transformer (see [Attention and Transformers](/cs/deep-learning/attention-transformers)) or a modern linear-time alternative (see [Efficient Sequence Modeling](/cs/deep-learning/efficient-sequence-modeling)). LSTMs remain useful for:
 

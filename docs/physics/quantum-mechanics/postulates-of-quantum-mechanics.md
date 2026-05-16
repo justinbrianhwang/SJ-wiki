@@ -135,17 +135,30 @@ Thus the postulates are not independent slogans. Hilbert space gives superpositi
 ## Visual
 
 ```mermaid
-flowchart TD
-  A[Preparation procedure] --> B[State vector or density operator]
-  B --> C[Choose observable A]
-  C --> D[Expand in eigenbasis of A]
-  D --> E[Born probabilities]
-  E --> F{"Outcome selected?"}
-  F -->|yes| G[Project onto eigenspace]
-  F -->|no| H[Keep full statistical prediction]
-  G --> I[Unitary evolution after measurement]
-  H --> I
+flowchart TB
+  Prep["Preparation<br/>repeatable lab procedure or ensemble filter"] --> State{"State representation"}
+  State -- "pure" --> Ket["ray psi<br/>global phase irrelevant"]
+  State -- "mixed" --> Rho["density operator rho<br/>positive, trace 1"]
+  Ket --> Hilbert["Hilbert space contract<br/>inner products give amplitudes"]
+  Rho --> Hilbert
+
+  Hilbert --> Obs["Observable A<br/>self-adjoint operator"]
+  Obs --> Spectral["Spectral decomposition<br/>A = sum a P_a or integral over projectors"]
+  Spectral --> Prob["Born probabilities<br/>P(a)=psi-dagger P_a psi or Tr(rho P_a)"]
+  Prob --> Mean["Expectation and uncertainty<br/>mean of A, Delta A, commutator bounds"]
+  Prob --> Outcome{"Condition on an outcome?"}
+
+  Outcome -- "yes" --> Select["Ideal projective update<br/>normalize projected state"]
+  Outcome -- "no" --> Nonselect["Nonselective measurement<br/>rho to sum over P_a rho P_a"]
+  Select --> Evolve["Closed-system dynamics<br/>i hbar d psi/dt = H psi"]
+  Nonselect --> Evolve
+  Mean --> Evolve
+  Evolve --> Unitary["Unitary propagator<br/>U(t,t0), probability conserved"]
+  Unitary --> Next["Next measurement context"]
+  Next -. "new observable" .-> Obs
 ```
+
+This postulates diagram spells out every operational block: preparation, state representation, observable, spectral projectors, Born probabilities, state update, and unitary dynamics. Pure and mixed states share the same measurement architecture once probabilities are written with projectors or traces. The feedback arrow shows sequential measurement structure, where the output state of one measurement becomes the input state for the next observable.
 
 | Postulate | Mathematical form | Sakurai emphasis | Ballentine emphasis |
 |---|---|---|---|

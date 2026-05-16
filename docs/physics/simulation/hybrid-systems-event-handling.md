@@ -82,13 +82,35 @@ Hybrid systems should be tested with cases that exercise every mode. A thermosta
 ## Visual
 
 ```mermaid
-stateDiagram-v2
-  [*] --> HeaterOff
-  HeaterOff --> HeaterOn: T <= 19
-  HeaterOn --> HeaterOff: T >= 21
-  HeaterOff: dT/dt = (Tamb - T)/(RC)
-  HeaterOn: dT/dt = (Tamb - T)/(RC) + Q/C
+flowchart TB
+  Start["Hybrid model<br/>continuous state x and discrete mode q"] --> Mode{"current mode q"}
+
+  subgraph Off["Mode: HeaterOff"]
+    direction TB
+    OffODE["continuous dynamics<br/>dT/dt = (Tamb - T)/(R C)"] --> OffGuard{"guard T at most 19 C?"}
+    OffGuard -- "no" --> OffFlow["continue integrating HeaterOff"]
+  end
+
+  subgraph On["Mode: HeaterOn"]
+    direction TB
+    OnODE["continuous dynamics<br/>dT/dt = (Tamb - T)/(R C) + Q/C"] --> OnGuard{"guard T at least 21 C?"}
+    OnGuard -- "no" --> OnFlow["continue integrating HeaterOn"]
+  end
+
+  Mode -- "q = off" --> OffODE
+  Mode -- "q = on" --> OnODE
+  OffGuard -- "yes" --> EventOn["event located by zero crossing<br/>q+ = on"]
+  OnGuard -- "yes" --> EventOff["event located by zero crossing<br/>q+ = off"]
+  EventOn --> Reset["reset map<br/>state continuity or jump specified"]
+  EventOff --> Reset
+  Reset --> Log["log event time, old mode, new mode, reset count"]
+  Log --> Mode
+  OffFlow --> Solver["solver step accepted"]
+  OnFlow --> Solver
+  Solver --> Mode
 ```
+
+This hybrid-system diagram shows both continuous dynamics and discrete event semantics. Each mode owns its own differential equation and guard condition; when a guard is crossed, the event is located, a reset or mode update is applied, and the event is logged before integration resumes. The thermostat hysteresis thresholds make the routing explicit and prevent hidden switching logic.
 
 | Hybrid issue | Why it matters | Modeling response |
 |---|---|---|

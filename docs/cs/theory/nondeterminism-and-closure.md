@@ -49,14 +49,44 @@ Nondeterministic closure constructions are often intentionally permissive. In a 
 ## Visual
 
 ```mermaid
-stateDiagram-v2
-  [*] --> s
-  s --> s: 0,1
-  s --> a: epsilon
-  a --> b: 0
-  b --> c: 1
-  c --> [*]
+flowchart TB
+  Input["Input stream over Sigma = {0,1}"] --> Active0["Active-state set before symbol: epsilon-closure({s})"]
+
+  subgraph NFA["NFA for strings containing substring 01"]
+    direction TB
+    S["s: scanning arbitrary prefix"]
+    A["a: guessed a 0 as start of 01"]
+    F["f: substring 01 has been found"]
+    S -- "read 0 / continue prefix" --> S
+    S -- "read 1 / continue prefix" --> S
+    S -- "read 0 / branch to start match" --> A
+    A -- "read 1 / complete match" --> F
+    F -- "read 0 or 1 / consume suffix" --> F
+  end
+
+  Active0 --> Move0["For next symbol a, collect every delta(q,a) from active states"]
+  Move0 --> Close1["Apply epsilon-closure again after the move"]
+  Close1 --> Active1["New active-state set after this prefix"]
+  Active1 --> Intersect{"Active set intersects F?"}
+  Intersect -- "input exhausted and yes" --> Accept(("accept"))
+  Intersect -- "input exhausted and no" --> Reject(("reject"))
+  Intersect -- "more input" --> Move0
+
+  subgraph Subset["Subset construction to an equivalent DFA"]
+    direction TB
+    D0["DFA state {s}: no partial match active"]
+    D1["DFA state {s,a}: after reading a possible starting 0"]
+    D2["DFA state {s,a,f}: accepting; f is active"]
+    D0 -- "read 0" --> D1
+    D0 -- "read 1" --> D0
+    D1 -- "read 0" --> D1
+    D1 -- "read 1" --> D2
+    D2 -- "read 0" --> D1
+    D2 -- "read 1" --> D2
+  end
 ```
+
+The NFA branch from `s` to `a` shows how nondeterminism guesses that a particular `0` begins the target substring while other branches keep scanning. The active-state pipeline below it is the deterministic simulation invariant: each input symbol maps one set of possible NFA states to the next, and the subset DFA makes those sets explicit as ordinary states.
 
 | Construction | NFA idea | Why it is useful |
 |---|---|---|

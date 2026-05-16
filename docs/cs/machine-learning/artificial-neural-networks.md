@@ -9,10 +9,6 @@ Mitchell's neural-network chapter predates the modern deep learning era, but man
 
 The chapter connects neural networks to the earlier checkers learner. Both use parameterized functions and error gradients. A perceptron is a linear threshold hypothesis; a multilayer network composes many differentiable units to represent nonlinear decision surfaces.
 
-![A perceptron diagram shows weighted inputs combined and passed through an activation function to produce an output.](https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Perceptron.svg/500px-Perceptron.svg.png)
-
-*Figure: Perceptron unit with weighted inputs and activation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Perceptron.svg), Mat the w, CC BY-SA 3.0.*
-
 ## Definitions
 
 A perceptron computes a weighted sum and passes it through a threshold:
@@ -115,20 +111,40 @@ This search view prevents a common misconception: adding hidden units is not aut
 ## Visual
 
 ```mermaid
-flowchart LR
-    X1[x1] --> H1((h1))
-    X1 --> H2((h2))
-    X2[x2] --> H1
-    X2 --> H2
-    B1[bias] --> H1
-    B1 --> H2
-    H1 --> O((output))
-    H2 --> O
-    B2[bias] --> O
-    O --> Y[prediction]
+flowchart TB
+    subgraph Forward["Forward pass"]
+      direction LR
+      X["Input vector x: d features"] --> Aff1["Hidden preactivation z_h = W_h x + b_h"]
+      Aff1 --> Act1["Hidden activation h = sigmoid(z_h)"]
+      Act1 --> Aff2["Output preactivation z_o = W_o h + b_o"]
+      Aff2 --> Act2["Output activation o = sigmoid(z_o)"]
+      Act2 --> Loss["Loss E = 1/2 sum_k (t_k - o_k)^2"]
+    end
+
+    subgraph Backward["Backward pass"]
+      direction RL
+      DeltaO["Output delta: o_k(1-o_k)(t_k-o_k)"] --> GradO["Gradient for W_o: delta_o * h"]
+      DeltaH["#quot;Hidden delta: h_j(1-h_j) sum_k W_o[j,k"] delta_k"] --> GradH["Gradient for W_h: delta_h * x"]
+      GradO --> UpdateO["Update W_o and b_o with learning rate eta and momentum"]
+      GradH --> UpdateH["Update W_h and b_h with learning rate eta and momentum"]
+    end
+
+    Loss --> DeltaO
+    DeltaO --> DeltaH
+    UpdateO -. "changes next forward pass" .-> Aff2
+    UpdateH -. "changes next forward pass" .-> Aff1
+
+    subgraph Capacity["Generalization controls"]
+      direction LR
+      Hidden["Number of hidden units"]
+      Stop["Validation early stopping"]
+      Decay["Weight decay or regularization"]
+    end
+
+    Capacity -. "biases search and controls overfitting" .-> Loss
 ```
 
-The forward pass computes activations from left to right. Backpropagation computes error derivatives from right to left.
+This neural-network diagram exposes the computation graph used by backpropagation. The forward pass labels affine transforms, sigmoid activations, output, and squared-error loss; the backward pass labels output deltas, hidden deltas, gradients, and parameter updates. The dotted update edges show why each training step changes the next forward pass, and the capacity controls connect hidden-unit count, early stopping, and regularization to generalization.
 
 ## Worked example 1: Design a perceptron for AND
 

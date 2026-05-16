@@ -9,10 +9,6 @@ Quantum computing studies information processing in systems whose states are vec
 
 The foundational pages in this section now use Michael A. Nielsen and Isaac L. Chuang's *Quantum Computation and Quantum Information* as the primary textbook reference, synthesized with the wiki's earlier draft material. The current split is practical: [hardware](/quantum-information-science/quantum-computing/hardware) asks how qubits are physically made; [algorithms](/quantum-information-science/quantum-computing/algorithms) asks where coherent quantum evolution changes complexity; [quantum error correction](/quantum-information-science/quantum-computing/error-correction) asks how fragile states can be protected; and [quantum machine learning](/quantum-information-science/quantum-computing/quantum-ml) asks which learning or optimization workflows may benefit from quantum subroutines without overstating speculative claims.
 
-![Bloch sphere diagram showing a qubit state as a vector on the unit sphere](https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Bloch_Sphere.svg/500px-Bloch_Sphere.svg.png)
-
-*Figure: Bloch sphere representation of a single qubit state. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bloch_Sphere.svg), Glosser.ca, CC BY-SA 3.0.*
-
 ## Primary Source
 
 Nielsen and Chuang is the canonical source for this area's notation and core results: Dirac notation and density operators, quantum circuits, QFT and phase estimation, Shor and Grover, physical implementation criteria, quantum operations, distance measures, stabilizer codes, fault tolerance, entropy, and quantum information theory. QML is marked as modern supplementary material because it is not treated directly as a standalone field in N&C; it borrows the book's notation for states, channels, measurements, and information measures.
@@ -95,20 +91,43 @@ Finally, scalable quantum computing appears to require error correction. Physica
 ## Visual
 
 ```mermaid
-graph LR
-  H["Hardware platforms"] <--> A["Algorithms"]
-  A <--> E["Error correction"]
-  E <--> H
-  H <--> M["Quantum ML"]
-  A <--> M
-  E <--> M
-  H --> C["Control, calibration, readout"]
-  A --> L["Linear algebra and complexity"]
-  E --> S["Stabilizers and codes"]
-  M --> O["Optimization and learning theory"]
+flowchart TB
+  subgraph Physical["Physical qubit layer"]
+    direction LR
+    TQ["Transmon qubit<br/>anharmonic oscillator states |#quot;0>, #quot;|1>"] --> TC["Microwave control<br/>1-qubit rotations"]
+    TQ --> TR["Readout resonator<br/>dispersive measurement"]
+    IQ["Trapped-ion qubit<br/>hyperfine or optical levels"] --> IC["Laser control<br/>1-qubit gates + motional bus"]
+    IQ --> IR["Fluorescence readout<br/>state-dependent photons"]
+    PQ["Photonic qubit<br/>dual-rail, time-bin, or polarization"] --> PC["Linear optics<br/>beamsplitters + phase shifters"]
+    PQ --> PR["Single-photon detectors<br/>click-pattern readout"]
+  end
+
+  subgraph Circuit["Circuit-model execution"]
+    direction TB
+    In["#quot;Classical input or state-prep spec<br/>bits [m"], qubits [n]"] --> Prep["Initialize registers<br/>|#quot;0>^n, #quot;|+>^n, |#quot;psi>, or encoded #quot;|psi_L>"]
+    Prep --> Gate1["Gate layer U_1<br/>native 1q gates + entangling gates"]
+    Gate1 --> GateL["Gate layer U_l<br/>compiled pulses with timing constraints"]
+    GateL --> Meas["#quot;Measure selected qubits<br/>bit string [n"] or observable samples"]
+  end
+
+  subgraph Logical["Logical and algorithm layer"]
+    direction TB
+    Enc["#quot;Encode logical qubits<br/>[n physical"] -> ["k logical, distance d"]"] --> Syn["Repeated syndrome extraction<br/>ancillas, stabilizers, decoder"]
+    Syn --> Frame["Pauli-frame update<br/>classical correction record"]
+    Frame --> Alg["Algorithmic primitive<br/>QFT, phase estimation, Grover, VQE/QAOA"]
+    Alg --> Out["Classical post-processing<br/>factors, phase estimate, samples, expectation"]
+  end
+
+  TC -->|"calibrated pulse schedule"| Prep
+  IC -->|"native gate set + connectivity"| Prep
+  PC -->|"optical mode transformation"| Prep
+  GateL -->|"physical noise channel E_l"| Syn
+  Syn -. "fault-tolerant feedback" .-> Gate1
+  Meas -->|"raw shots [S x n]"| Out
+  Alg -. "logical gate requirements" .-> Enc
 ```
 
-The diagram is bidirectional because progress is coupled. Algorithms determine the required logical gates; error correction turns logical requirements into physical overhead; hardware determines which native gates, connectivity, and noise models are realistic; and QML often lives at the boundary where hardware constraints and classical optimization meet.
+The diagram reads bottom-up from concrete devices into the abstract circuit model and then into logical algorithms. It labels the I/O contract at each boundary: physical platforms supply calibrated native gates and readout, circuits transform $n$-qubit registers into shot data, and error correction maps many physical qubits into fewer logical qubits with a Pauli-frame feedback path. The dotted feedback arrows show why architecture choices are coupled rather than a one-way pipeline.
 
 ## Worked example 1: Classifying a quantum-computing claim
 

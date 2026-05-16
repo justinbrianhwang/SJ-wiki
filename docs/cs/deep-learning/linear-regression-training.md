@@ -92,16 +92,21 @@ Residual plots are another diagnostic. If residuals are centered around zero wit
 ## Visual
 
 ```mermaid
-flowchart TD
-  A[Initialize w and b] --> B[Sample minibatch]
-  B --> C["Forward: y_hat = Xw + b"]
-  C --> D[Compute squared loss]
-  D --> E["Backward: gradients"]
-  E --> F[SGD parameter update]
-  F --> G{"More epochs?"}
-  G -->|yes| B
-  G -->|no| H[Evaluate training and validation loss]
+flowchart TB
+  Init["#quot;Initialize w: [d, 1"] and b: [1]"] --> Loader["#quot;DataLoader yields minibatch X_B: [B, d"], y_B: ["B, 1"]"]
+  Loader --> Forward["#quot;Forward: y_hat = X_B w + b -> [B, 1"]"]
+  Forward --> Residual["Residual r_B = y_hat - y_B"]
+  Residual --> Loss["Squared loss L_B = mean(0.5 * r_B^2)"]
+  Loss --> Backward["Backward: grad_w = X_B^T r_B / B, grad_b = mean(r_B)"]
+  Backward --> Zero["optimizer.zero_grad before next backward"]
+  Backward --> Step["SGD step: w and b move opposite gradients"]
+  Step --> Epoch{"More minibatches or epochs?"}
+  Epoch -->|"yes"| Loader
+  Epoch -->|"no"| Eval["Evaluation: disable grad, run full train/validation loaders"]
+  Eval --> Metrics(("Loss curves and learned parameter check"))
 ```
+
+The training-loop diagram keeps the tensor shapes visible through prediction, residual, scalar loss, and gradients. It also separates the required optimizer bookkeeping: gradients are cleared before the next backward pass and parameters are updated after the current gradients are computed. The evaluation branch uses the same forward contract but not the backward/update path.
 
 | Component | From-scratch version | PyTorch concise version |
 |---|---|---|

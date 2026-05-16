@@ -9,10 +9,6 @@ Depth estimation asks how far scene points are from the vehicle. Lidar gives dir
 
 This page covers stereo geometry, monocular depth, self-supervised depth learning, and depth completion. It connects the raw sensor discussion in [sensors](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu) to [perception](/cs/autonomous-driving/perception-object-detection-and-segmentation), [sensor fusion](/cs/autonomous-driving/sensor-fusion), and [motion planning](/cs/autonomous-driving/motion-planning), where depth uncertainty becomes a safety-critical input.
 
-![A binocular vision diagram shows the overlapping field where stereoscopic depth perception is possible.](https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Binocular_vision_Stereopsis.svg/500px-Binocular_vision_Stereopsis.svg.png)
-
-*Figure: Binocular overlap region for stereoscopic vision. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Binocular_vision_Stereopsis.svg), T.vanschaik, CC0.*
-
 ## Definitions
 
 **Depth** is distance along a camera's optical axis, often denoted $Z$. **Range** is Euclidean distance from the sensor origin to a point. They are equal only for points on the optical axis.

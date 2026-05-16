@@ -50,16 +50,33 @@ Finally, keep symbolic and particulate representations side by side. A balanced 
 ## Visual
 
 ```mermaid
-flowchart LR
-  A[Initial mixture] --> B[Compute Q]
-  B --> C{Compare Q to K}
-  C -->|"Q < K"| D[Shift toward products]
-  C -->|"Q = K"| E[At equilibrium]
-  C -->|"Q > K"| F[Shift toward reactants]
-  D --> G[ICE table]
-  F --> G
-  G --> H[Equilibrium concentrations]
+flowchart TB
+  Rxn["Balanced reaction<br/>aA + bB reversible cC + dD"] --> Expr["Write equilibrium expression<br/>K = activities(products)^coeff / activities(reactants)^coeff"]
+  Expr --> Initial["Initial row<br/>known molarity, pressure, or moles"]
+  Initial --> Qcalc["Compute reaction quotient Q<br/>same expression as K using current values"]
+  Qcalc --> Compare{"Compare Q with K"}
+
+  Compare -- "Q less than K" --> Forward["System shifts forward<br/>products increase"]
+  Compare -- "Q greater than K" --> Reverse["System shifts reverse<br/>reactants increase"]
+  Compare -- "Q = K" --> AtEq["Already at equilibrium"]
+
+  Forward --> ChangeF["Change row<br/>-a x, -b x, +c x, +d x"]
+  Reverse --> ChangeR["Change row<br/>+a x, +b x, -c x, -d x"]
+  ChangeF --> Equil["Equilibrium row<br/>initial plus stoichiometric change"]
+  ChangeR --> Equil
+  Equil --> Solve["Substitute into K<br/>solve polynomial or approximation"]
+  Solve --> Check{"Chemically valid?"}
+  Check -- "all concentrations nonnegative" --> Approx{"Approximation used?"}
+  Check -- "negative or impossible" --> Revise["Choose other root or redo direction"]
+  Approx -- "yes" --> Percent["Percent-change check<br/>usually less than 5 percent"]
+  Approx -- "no" --> Result["Report equilibrium composition"]
+  Percent -- "passes" --> Result
+  Percent -- "fails" --> SolveFull["Solve without approximation"]
+  SolveFull --> Result
+  AtEq --> Result
 ```
+
+The equilibrium diagram expands the ICE-table protocol into its inputs, routing decision, stoichiometric change row, algebraic solve, and validity checks. The branches make the direction of shift depend on $Q$ versus $K$, while the change-row nodes show how coefficients set the shape of the calculation. The final checks are part of the architecture because equilibrium concentrations must be nonnegative and any approximation must be justified.
 
 | Stress | Typical shift | Note |
 |---|---|---|

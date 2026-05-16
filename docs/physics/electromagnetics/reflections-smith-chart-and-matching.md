@@ -9,10 +9,6 @@ Reflections occur whenever a traveling wave reaches a discontinuity whose impeda
 
 Impedance matching is the practical response: choose a network or line section so the source sees the intended impedance and the load receives the intended power. Ulaby treats reflection coefficients, standing-wave ratio, special line lengths, the Smith chart, lumped matching, and single-stub matching. This page organizes those ideas in formula form while keeping the physical picture visible.
 
-![A Smith chart diagram shows constant-resistance and constant-reactance circles.](https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Smith_chart.svg/400px-Smith_chart.svg.png)
-
-*Figure: Smith chart used for transmission-line impedance matching. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Smith_chart.svg), Cannabic, CC BY-SA 4.0.*
-
 ## Definitions
 
 For a lossless line terminated by load $Z_L$, the voltage reflection coefficient at the load is
@@ -112,15 +108,29 @@ For passive loads on a lossless line, all physically valid reflection coefficien
 ## Visual
 
 ```mermaid
-flowchart LR
-  A[Incident wave] --> B{Load ZL}
-  B -->|"ZL = Z0"| C[No reflection]
-  B -->|ZL differs from Z0| D[Reflected wave Gamma]
-  D --> E[Standing waves]
-  E --> F[SWR and voltage maxima]
-  D --> G[Input impedance transformation]
-  G --> H[Matching network or stub]
+flowchart TB
+  Line["Lossless line with characteristic impedance Z0"] --> Load["Load impedance Z_L"]
+  Load --> Gamma["reflection coefficient<br/>Gamma_L = (Z_L - Z0)/(Z_L + Z0)"]
+  Gamma --> MatchQ{"Gamma_L = 0?"}
+  MatchQ -- "yes" --> Matched["matched load<br/>all incident power delivered"]
+  MatchQ -- "no" --> Standing["standing waves<br/>SWR = (1+|Gamma|)/(1-|Gamma|)"]
+  Standing --> InputZ["input impedance transformation<br/>move reference plane by length l"]
+  InputZ --> Smith["Smith-chart workflow<br/>normalize z=Z/Z0, rotate by electrical length, convert z/y"]
+
+  subgraph Matching["Matching-network choices"]
+    direction TB
+    Lumped["lumped L network<br/>series/shunt reactance at low frequency"] --> Check["check bandwidth, Q, losses, component parasitics"]
+    Quarter["quarter-wave transformer<br/>Z_t = sqrt(Z0 R_L) at design frequency"] --> Check
+    Stub["single-stub match<br/>move to g=1 then cancel susceptance"] --> Check
+  end
+
+  Smith --> Lumped
+  Smith --> Quarter
+  Smith --> Stub
+  Check --> Result(("reduced reflection at design band"))
 ```
+
+This matching diagram shows the full impedance-matching pipeline from load impedance to reflection coefficient, standing waves, reference-plane transformation, Smith-chart operations, and physical matching networks. The subgraph separates lumped, quarter-wave, and stub methods and routes all of them through bandwidth and parasitic checks. The diagram makes the shortcut goal explicit: a successful match is a reduced $\Gamma$ over the intended band, not just a single algebraic point.
 
 | Load | $\Gamma_L$ | $\vert \Gamma_L\vert $ | SWR | Power behavior |
 |---|---:|---:|---:|---|

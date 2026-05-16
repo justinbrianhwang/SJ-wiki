@@ -79,25 +79,42 @@ Quantum communication has three different scopes that should not be confused. Fi
 
 ```mermaid
 flowchart TD
-  QIS["Quantum information science"]
-  QCom["Quantum communication"]
-  BB84["BB84 prepare-and-measure"]
-  QKD["QKD protocol families"]
-  QNet["Quantum communication networks"]
-  QInternet["Quantum internet"]
-  Sec["Quantum security and PQC"]
-  Crypto["Classical cryptography"]
-  QM["Quantum mechanics"]
+  subgraph PM["Prepare-and-measure QKD link"]
+    direction LR
+    APrep["Alice state preparation<br/>bit a_i, basis b_i in {Z,X}"] --> QChan["Quantum channel<br/>loss eta, noise E, possible Eve interaction"]
+    QChan --> BMeas["Bob random-basis measurement<br/>basis b'_i, outcome y_i"]
+    BMeas --> Sift["Basis sifting<br/>keep b_i = b'_i detections"]
+    Sift --> QBER["Parameter estimation<br/>QBER and decoy statistics"]
+    QBER --> KeyLink["Link key block<br/>reconciliation + privacy amplification"]
+  end
 
-  QIS --> QCom
-  QCom --> BB84
-  BB84 --> QKD
-  QKD --> QNet
-  QNet --> QInternet
-  QKD --> Sec
-  QKD --> Crypto
-  QM --> QCom
+  subgraph EntNet["Entanglement-distribution path"]
+    direction LR
+    Source["Bell-pair source or heralded link<br/>rho_AB"] --> MemA["Memory at node A<br/>store qubit A"]
+    Source --> MemB["Memory at node B<br/>store qubit B"]
+    MemA --> Swap["Optional entanglement swapping<br/>Bell-state measurement at repeater"]
+    MemB --> Swap
+    Swap --> Pair["End-to-end pair<br/>fidelity F, generation time T"]
+    Pair --> Consume["Application consumes resource<br/>teleportation, E91 QKD, sensing, distributed gates"]
+  end
+
+  subgraph Classical["Authenticated classical control plane"]
+    direction TB
+    Auth["Authentication<br/>pre-shared key or PQ signature/KEM support"] --> Announce["Basis, herald, and timing announcements"]
+    Announce --> EC["Information reconciliation<br/>leakage accounted"]
+    EC --> PA["Privacy amplification<br/>compress Eve's information"]
+    PA --> KMS["Key-management service<br/>buffers, policy, rekey API"]
+  end
+
+  PM -->|"secret bits [L]"| KMS
+  EntNet -->|"Bell pairs or measurement outcomes"| Announce
+  Auth -. "protects transcript integrity" .-> PM
+  Auth -. "protects herald and routing messages" .-> EntNet
+  KMS --> Apps["Applications<br/>MACsec, VPN, TLS keys, teleportation control"]
+  Consume --> Apps
 ```
+
+The diagram separates the two main communication architectures: prepare-and-measure QKD creates hop keys from transmitted states, while entanglement distribution creates Bell-pair resources for teleportation, E91-style QKD, and networked quantum operations. The shape labels identify where qubits become classical records, where QBER or fidelity is estimated, and where reconciliation and privacy amplification enter. Dotted arrows emphasize that authenticated classical communication is part of the protocol, not an optional management channel.
 
 | Concept | Main resource | Classical channel needed? | Typical output | Main caveat |
 |---|---:|---:|---|---|

@@ -127,15 +127,45 @@ This plot is often the fastest diagnostic.
 
 ```mermaid
 flowchart LR
-  R["Reference"] --> SUM["Control law"]
-  XH["Estimated state"] --> SUM
-  SUM --> U["Input u"]
-  U --> P["Plant"]
-  P --> Y["Output y"]
-  U --> OBS["Observer"]
-  Y --> OBS
-  OBS --> XH
+  R["Reference r"] --> Pref["Prefilter / reference gain Nbar"]
+  Pref --> SumU(("Σ"))
+  XHat["Estimated state x_hat"] --> K["State feedback gain K"]
+  K --> NegK["-K x_hat"]
+  NegK --> SumU
+  SumU --> U["Control input u = Nbar r - K x_hat"]
+
+  subgraph Plant["Plant"]
+    direction TB
+    Xdot["x_dot = A x + B u"]
+    Yeq["y = C x + D u"]
+    Xdot --> Yeq
+  end
+
+  subgraph Observer["Luenberger observer"]
+    direction TB
+    Model["Model prediction: A x_hat + B u"]
+    Yhat["Predicted output y_hat = C x_hat + D u"]
+    Innov(("Σ"))
+    GainL["Observer injection L(y - y_hat)"]
+    XhatDot["x_hat_dot = A x_hat + B u + L(y - y_hat)"]
+    Model --> XhatDot
+    Yhat --> Innov
+    Innov --> GainL --> XhatDot
+    XhatDot --> XHat
+  end
+
+  U --> Xdot
+  U --> Model
+  U --> Yhat
+  Yeq --> Y["Measured output y"]
+  Y --> Innov
+  Y --> Output(("Controlled output"))
+  XHat -. "controller uses estimate, not true state" .-> K
+  Xdot -. "controller poles: eig(A - B K)" .-> Sep["Separation principle"]
+  XhatDot -. "observer poles: eig(A - L C)" .-> Sep
 ```
+
+This diagram shows the separation-principle architecture: the controller places the poles of `A - B K` using the estimated state, while the observer drives estimation error through the innovation `y - y_hat` and poles of `A - L C`. The plant, observer model, reference prefilter, and feedback path are separate blocks so the I/O contract is clear even when not all states are measured.
 
 | Concept | Matrix test | Design implication |
 |---|---|---|

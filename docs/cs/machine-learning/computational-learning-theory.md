@@ -9,10 +9,6 @@ Computational learning theory asks what can be learned in principle, how much da
 
 This material remains foundational because it gives formal language for generalization. Modern models are often too large for the simplest finite-hypothesis bounds to be tight, but the discipline of stating a distribution, an error tolerance, a confidence level, and a hypothesis class is still essential.
 
-![A support vector machine diagram shows candidate separating hyperplanes and the maximum-margin separator.](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Svm_separating_hyperplanes_%28SVG%29.svg/500px-Svm_separating_hyperplanes_%28SVG%29.svg.png)
-
-*Figure: Maximum-margin separating hyperplane for an SVM. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Svm_separating_hyperplanes_%28SVG%29.svg), ZackWeinberg based on Cyc, CC BY-SA 3.0.*
-
 ## Definitions
 
 A concept class $C$ is a set of target concepts. A hypothesis space $H$ is the set of hypotheses available to the learner. In many analyses $C \subseteq H$, but agnostic settings allow the target to fall outside $H$.
@@ -83,16 +79,35 @@ This perspective also keeps negative results useful. Showing that a broad class 
 ## Visual
 
 ```mermaid
-flowchart TD
-    A[Choose epsilon and delta] --> B[Fix hypothesis space H]
-    B --> C[Draw m independent examples]
-    C --> D[Run learner]
-    D --> E{"Consistent hypothesis found?"}
-    E -->|realizable PAC setting| F[Bound true error by epsilon with probability 1-delta]
-    E -->|agnostic setting| G[Compare to best hypothesis in H]
+flowchart TB
+  Setup["Learning specification: distribution D, concept class C, hypothesis space H"] --> Params["Choose accuracy epsilon and confidence delta"]
+  Params --> SampleBound["Finite-H bound: m >= (ln |H| + ln(1/delta)) / epsilon"]
+  Params --> VCBound["VC-style capacity bound uses VC(H) instead of |H|"]
+  SampleBound --> Sample["Draw m independent examples from D"]
+  VCBound --> Sample
+  Sample --> Learner{Learner setting}
+
+  Learner -- "realizable and consistent" --> Consistent["Find h in H with zero training error"]
+  Consistent --> PAC["With probability at least 1-delta, true error_D(h) <= epsilon"]
+
+  Learner -- "agnostic" --> Empirical["Minimize validation or empirical risk"]
+  Empirical --> Excess["Guarantee error close to best achievable in H"]
+
+  subgraph Mistake["Online mistake-bound model"]
+    direction TB
+    Experts["Version space or weighted experts"]
+    Predict["Predict by majority vote or weighted vote"]
+    Observe["Observe true label"]
+    Update["Eliminate wrong hypotheses or down-weight mistaken experts"]
+    Bound["Mistakes bounded by log2 |H| for Halving"]
+    Experts --> Predict --> Observe --> Update --> Experts
+    Update --> Bound
+  end
+
+  Learner --> Mistake
 ```
 
-The theory is conditional: the guarantee follows only after the problem setting and assumptions are fixed.
+The PAC side of the diagram labels the statistical contract: once `D`, `H`, `epsilon`, and `delta` are fixed, a sufficient sample size supports a high-probability true-error guarantee. The online branch shows a different architecture where examples arrive sequentially and the learner updates a version space or expert weights after each mistake.
 
 ## Worked example 1: Finite hypothesis sample bound
 

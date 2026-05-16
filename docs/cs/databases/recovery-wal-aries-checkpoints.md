@@ -56,14 +56,39 @@ Log records must cover index changes as well as table changes. If a transaction 
 
 ```mermaid
 flowchart TD
-  A["Crash"] --> B["Analysis: active txns and dirty pages"]
-  B --> C["Redo: repeat history"]
-  C --> D["Undo: roll back loser transactions"]
-  D --> E["Database consistent after restart"]
-  F["WAL"] --> C
-  F --> D
-  G["Checkpoint"] --> B
+  Txn["Transaction updates page P"] --> LogRec["Append update log record: LSN, txn id, page id, prevLSN, redo, undo"]
+  LogRec --> PageLSN["Set in-memory pageLSN(P) = LSN"]
+  PageLSN --> WALRule{"Before flushing dirty page, is log durable through pageLSN?"}
+  WALRule -- "no" --> ForceLog["Force log to stable storage through pageLSN"]
+  ForceLog --> FlushPage["Flush dirty data page"]
+  WALRule -- "yes" --> FlushPage
+  Txn --> Commit["Commit request"]
+  Commit --> CommitLog["Append commit log record"]
+  CommitLog --> CommitForce["Force commit record to stable log"]
+  CommitForce --> Ack(("Report commit durable"))
+
+  subgraph Checkpoint["Fuzzy checkpoint contents"]
+    direction TB
+    ATT["Active transaction table: txn id -> lastLSN, status"]
+    DPT["Dirty page table: page id -> recLSN"]
+    BeginEnd["Begin-checkpoint and end-checkpoint records"]
+  end
+
+  ForceLog --> Checkpoint
+  CommitForce --> Checkpoint
+  Crash["Crash and restart"] --> Analysis["Analysis: rebuild ATT and DPT from last checkpoint"]
+  Checkpoint -. "restart starts near checkpoint" .-> Analysis
+  Analysis --> Redo["Redo: repeat history from smallest recLSN in DPT"]
+  Redo --> RedoCheck{"pageLSN on disk >= log LSN?"}
+  RedoCheck -- "yes, skip" --> NextRedo["Next redo record"]
+  RedoCheck -- "no, reapply redo info" --> Apply["Apply update and set pageLSN"]
+  Apply --> NextRedo
+  NextRedo --> Undo["Undo loser transactions by following prevLSN chains"]
+  Undo --> CLR["Write compensation log record for each undo"]
+  CLR --> Done(("Consistent database after restart"))
 ```
+
+This ARIES diagram shows both normal execution and restart recovery. WAL forces the log before dirty pages and before commit acknowledgment, while fuzzy checkpoints record the active transaction table and dirty page table without stopping the world. After a crash, analysis rebuilds those tables, redo repeats history with `pageLSN` idempotence checks, and undo follows transaction log chains while writing compensation log records.
 
 | Policy | Meaning | Recovery need |
 | --- | --- | --- |

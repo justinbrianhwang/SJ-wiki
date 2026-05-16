@@ -77,15 +77,56 @@ Because recommendations influence future interactions, evaluation is partly caus
 ## Visual
 
 ```mermaid
-flowchart LR
-  U[User id] --> UE[User embedding]
-  I[Item id] --> IE[Item embedding]
-  UE --> Dot[Dot product or neural scorer]
-  IE --> Dot
-  C[Context features] --> Dot
-  Dot --> Score[Preference score]
-  Score --> Rank[Rank candidate items]
+flowchart TB
+  subgraph MF["Matrix factorization score"]
+    direction LR
+    U["User id u"] --> UE["#quot;User embedding p_u: [k"]"]
+    I["Item id i"] --> IE["#quot;Item embedding q_i: [k"]"]
+    UE --> Dot["Dot product p_u^T q_i"]
+    IE --> Dot
+    U --> UB["User bias b_u"]
+    I --> IB["Item bias b_i"]
+    Dot --> Sum["Score = p_u^T q_i + b_u + b_i + global mean"]
+    UB --> Sum
+    IB --> Sum
+  end
+
+  subgraph NeuMF["Neural collaborative filtering, NeuMF"]
+    direction TB
+    U2["User id"] --> GMFU["GMF user embedding"]
+    I2["Item id"] --> GMFI["GMF item embedding"]
+    GMFU --> Had["Elementwise product"]
+    GMFI --> Had
+    U2 --> MLPUser["MLP user embedding"]
+    I2 --> MLPItem["MLP item embedding"]
+    MLPUser --> Cat["Concatenate user/item embeddings"]
+    MLPItem --> Cat
+    Cat --> MLP["Dense layers + ReLU"]
+    Had --> Join["Concatenate GMF and MLP features"]
+    MLP --> Join
+    Join --> NeuScore["Prediction head -> click/rating score"]
+  end
+
+  subgraph TwoTower["Two-tower retrieval"]
+    direction LR
+    UserFeat["User features + recent history"] --> UserTower["#quot;User tower -> query vector [d"]"]
+    ItemFeat["Item metadata/content/id"] --> ItemTower["#quot;Item tower -> item vector [d"]"]
+    UserTower --> ANN["Approx nearest-neighbor search by dot product"]
+    ItemTower --> ANN
+    ANN --> Cand["Top-K candidate items"]
+  end
+
+  subgraph Serve["Candidate generation plus ranking"]
+    direction TB
+    Request["Serving request for user/context"] --> Retrieve["Candidate generators: MF, two-tower, rules, freshness"]
+    Retrieve --> Merge["Merge, dedupe, filter unavailable items"]
+    Merge --> Ranker["Ranking model with user, item, context, cross features"]
+    Ranker --> Calib["Calibration, business rules, diversity constraints"]
+    Calib --> List(("Final ranked recommendation list"))
+  end
 ```
+
+The recommender diagram separates scoring architectures from serving architecture. Matrix factorization uses a dot product plus biases, NeuMF combines a generalized matrix-factorization path with an MLP path, and the two-tower design supports fast approximate retrieval by embedding users and items separately. The final serving subgraph shows why production recommenders usually retrieve a candidate set first and then apply a richer ranker.
 
 | Method | Main representation | Strength | Caution |
 |---|---|---|---|

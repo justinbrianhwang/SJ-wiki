@@ -93,13 +93,20 @@ Model drift weakens the claim.
 
 ```mermaid
 sequenceDiagram
-  participant P as Prover knows witness w
+  participant P as Prover with witness x
   participant V as Verifier
-  P->>V: commitment a
-  V->>P: random challenge e
+  Note over P,V: Public statement: y = g^x in group G of order q
+  P->>P: sample r in Z_q and compute commitment R = g^r
+  P->>V: commitment R
+  V->>V: sample random challenge e in Z_q
+  V->>P: challenge e
+  P->>P: response z = r + e*x mod q
   P->>V: response z
-  V->>V: check relation on x,a,e,z
+  V->>V: verify g^z == R * y^e
+  Note over P,V: Fiat-Shamir replaces e with H("statement, R, context") for signatures
 ```
+
+This sequence is the Schnorr Sigma protocol in its three moves: commitment, random challenge, and response. The verifier checks the labeled algebraic relation without learning the witness, while the note marks where Fiat-Shamir turns the interaction into a noninteractive signature-style proof.
 
 | Property | Informal test | Failure mode |
 |---|---|---|

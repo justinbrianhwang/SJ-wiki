@@ -9,10 +9,6 @@ Virtual memory lets a process execute even when not all of its pages are in phys
 
 The benefit has a cost: a missing page causes a page fault, and servicing a page fault may require disk or SSD I/O, page-table changes, and replacement of another page. The central questions are therefore when to bring pages in, which page to evict, how many frames each process should receive, and how to detect when the system is spending more time paging than executing.
 
-![A virtual memory diagram shows mappings between application addresses, physical memory, and secondary storage.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Virtual_memory.svg/500px-Virtual_memory.svg.png)
-
-*Figure: Virtual memory relating address spaces, RAM, and disk. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Virtual_memory.svg), Ehamberg, CC BY-SA 3.0.*
-
 ## Definitions
 
 **Virtual memory** is the technique of executing processes whose complete address spaces are not resident in physical memory. The logical address space may be much larger than RAM.
@@ -59,23 +55,44 @@ Replacement policy also interacts with dirty pages. Evicting a clean page is che
 
 ```mermaid
 flowchart TD
-  Ref[CPU references virtual address] --> Valid{"Page resident?"}
-  Valid -->|yes| Access[Translate and access memory]
-  Valid -->|no| Fault[Page fault trap]
-  Fault --> Legal{"Address legal?"}
-  Legal -->|no| Kill[Signal or terminate process]
-  Legal -->|yes| Free{"Free frame available?"}
-  Free -->|yes| Read[Read page from backing store]
-  Free -->|no| Victim[Select victim page]
-  Victim --> Dirty{"Victim dirty?"}
-  Dirty -->|yes| Write[Write victim to backing store]
-  Dirty -->|no| Read
-  Write --> Read
-  Read --> Update[Update page table and TLB]
-  Update --> Restart[Restart instruction]
+  Access["CPU access: virtual address VPN p, offset d"] --> TLB{"TLB entry valid and resident?"}
+  TLB -- "hit" --> RAM["Access DRAM frame f at offset d"]
+  TLB -- "miss" --> PTE["Read process page-table entry for VPN p"]
+  PTE --> Present{"Present bit set?"}
+  Present -- "yes" --> Refill["Refill TLB with VPN p -> PFN f"]
+  Refill --> RAM
+
+  Present -- "no" --> Fault["Page-fault trap to kernel"]
+  Fault --> Legal{"Address legal and permitted?"}
+  Legal -- "no" --> Signal["Raise SIGSEGV or terminate process"]
+  Legal -- "yes" --> Free{"Free physical frame available?"}
+
+  Free -- "yes" --> Frame["Allocate free frame"]
+  Free -- "no" --> Select["Select victim by clock/LRU approximation"]
+  Select --> Dirty{"Victim dirty?"}
+  Dirty -- "yes" --> Writeback["Write victim page to swap or mapped file"]
+  Dirty -- "no" --> Reuse["Reuse clean victim frame"]
+  Writeback --> Reuse
+  Reuse --> Frame
+
+  Frame --> Fetch["Read missing page from executable, mapped file, zero-fill, or swap"]
+  Fetch --> Update["Update PTE: present, PFN, protection, referenced, dirty=0"]
+  Update --> Shootdown["Invalidate stale TLB entry or perform TLB shootdown"]
+  Shootdown --> Retry["Restart faulting instruction"]
+  Retry --> TLB
+
+  subgraph Backing["Backing stores"]
+    direction LR
+    Exec["Executable file pages"]
+    Map["Memory-mapped files"]
+    Swap["Swap area for anonymous pages"]
+    Zero["Zero-fill-on-demand page"]
+  end
+
+  Fetch -. "source depends on VMA metadata" .-> Backing
 ```
 
-This flow explains why page faults are expensive: the fault path may include replacement, disk writes, disk reads, and instruction restart.
+This page-fault diagram expands the slow path behind demand paging. A TLB miss can still be cheap if the page-table entry is present, but a nonresident page transfers control to the kernel, may evict a dirty victim, reads from the appropriate backing store, updates the PTE, and restarts the original instruction. The labeled backing-store branch explains why executable pages, mapped files, anonymous zero pages, and swapped pages all use the same fault machinery but different data sources.
 
 | Algorithm | Uses future? | Easy to implement? | Typical role |
 |---|---:|---:|---|

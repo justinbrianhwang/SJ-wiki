@@ -127,18 +127,44 @@ Policy gradient methods also make constraints on actions easier to encode. If th
 ## Visual
 
 ```mermaid
-flowchart LR
-  State[S_t] --> Actor["Actor pi(a|s,theta)"]
-  Actor --> Action[A_t]
-  Action --> Env[Environment]
-  Env --> Reward[R_t+1 and S_t+1]
-  Reward --> Critic[Critic V_hat or Q_hat]
-  Critic --> Advantage[Return or TD advantage]
-  Advantage --> ActorUpdate[Policy gradient update]
+flowchart TB
+  State["State S_t"] --> Actor["Actor network or table: policy pi(a | s, theta)"]
+  Actor --> Dist["Action distribution: softmax logits or Gaussian parameters"]
+  Dist --> Sample["Sample action A_t"]
+  Sample --> Env["Environment transition"]
+  Env --> Reward["Observe R_(t+1), S_(t+1), terminal flag"]
+
+  subgraph Critic["Critic / baseline"]
+    direction TB
+    Vt["Estimate V_hat(S_t,w)"]
+    Vnext["Estimate V_hat(S_(t+1),w)"]
+    TD["TD error delta = R + gamma V_hat(S') - V_hat(S)"]
+    Vt --> TD
+    Vnext --> TD
+  end
+
+  Reward --> Critic
+  State --> Vt
+  Reward --> Vnext
+  TD --> Advantage["Advantage estimate: delta_t or G_t - b(S_t)"]
+  Dist --> Score["Score function gradient: grad_theta log pi(A_t | S_t, theta)"]
+  Advantage --> ActorGrad["Policy gradient sample: advantage * score gradient"]
+  Score --> ActorGrad
+  ActorGrad --> ActorUpdate["Actor update: theta <- theta + alpha_theta * gradient"]
+  TD --> CriticUpdate["Critic update: w <- w + alpha_w * delta * grad_w V_hat"]
   ActorUpdate --> Actor
-  Reward --> CriticUpdate[Value update]
   CriticUpdate --> Critic
+
+  subgraph REINFORCE["Monte Carlo REINFORCE branch"]
+    direction LR
+    Episode["Complete episode trajectory"] --> Return["Return G_t"]
+    Return --> Baseline["Subtract baseline b(S_t) without changing expected gradient"]
+  end
+
+  Baseline -. "alternative advantage signal" .-> Advantage
 ```
+
+This policy-gradient diagram exposes the actor, action distribution, sampled action, critic, advantage estimate, score-function gradient, and separate actor/critic parameter updates. Actor-critic uses the TD error as a low-variance advantage estimate, while the REINFORCE branch shows the Monte Carlo return-with-baseline alternative. The score-gradient path makes the central computation visible: increase the log probability of actions whose advantage is positive and decrease it when advantage is negative.
 
 | Method | Policy update signal | Needs value function? | Bias/variance pattern |
 |---|---|---|---|

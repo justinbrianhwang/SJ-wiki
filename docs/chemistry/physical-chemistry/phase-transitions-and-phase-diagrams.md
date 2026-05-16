@@ -9,10 +9,6 @@ Phase diagrams compress a large amount of thermodynamic information into a visua
 
 Atkins develops both pure-substance phase diagrams and mixture phase diagrams because the same chemical-potential idea controls vaporization, fusion, sublimation, azeotropes, eutectics, liquid crystals, and materials purification. A phase boundary is not just a line on a graph; it is the set of conditions where chemical potentials are equal across phases.
 
-![A phase diagram of water shows solid, liquid, vapor, triple point, and critical point regions on pressure-temperature axes.](https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Phase_diagram_of_water.svg/500px-Phase_diagram_of_water.svg.png)
-
-*Figure: Pressure-temperature phase diagram of water. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Phase_diagram_of_water.svg), Cmglee, CC BY-SA 3.0.*
-
 ## Definitions
 
 A **phase** is a form of matter uniform in chemical composition and physical state. A **component** is the minimum number of independent species needed to describe the composition of all phases. A **constituent** is an actual chemical species present.
@@ -133,18 +129,33 @@ Liquid crystals broaden the meaning of phase. A mesophase can have orientational
 ## Visual
 
 ```mermaid
-graph TD
-  A[Pure substance] --> B["one phase: F=2"]
-  A --> C["two phases: F=1"]
-  A --> D["triple point: F=0"]
-  C --> E[Clapeyron slope]
-  E --> F["vaporization: Clausius-Clapeyron"]
-  G[Binary mixture at fixed p] --> H["one phase: F=2"]
-  G --> I["two phases: F=1"]
-  G --> J["three phases: F=0"]
-  I --> K[tie lines and lever rule]
-  J --> L[eutectics or three-phase equilibria]
+flowchart TB
+  Start["Thermodynamic state<br/>choose component count C, phases P, variables T and p"] --> Rule["Gibbs phase rule<br/>F = C - P + 2"]
+
+  subgraph Pure["Pure substance p-T map"]
+    direction TB
+    Pure1["Single phase region<br/>solid, liquid, or vapor; P = 1, F = 2"] --> Boundary["Two-phase boundary<br/>mu_alpha = mu_beta; P = 2, F = 1"]
+    Boundary --> Triple["Triple point<br/>solid + liquid + vapor; P = 3, F = 0"]
+    Boundary --> Critical["Critical point<br/>liquid-vapor distinction ends"]
+    Boundary --> Slope["Clapeyron slope<br/>dp/dT = Delta S / Delta V"]
+    Slope --> CC["Clausius-Clapeyron approximation<br/>ln p vs 1/T for vaporization"]
+  end
+
+  subgraph Binary["Binary mixture at fixed pressure"]
+    direction TB
+    Bin1["One-phase field<br/>liquid or solid solution; F = 2"] --> Bin2["Two-phase region<br/>tie line fixes phase compositions; F = 1"]
+    Bin2 --> Lever["Lever rule<br/>phase amounts from overall composition"]
+    Bin2 --> Eutectic["Three-phase invariant<br/>solid A + solid B + liquid; F = 0"]
+    Bin1 --> Azeo["Liquid-vapor extremum<br/>azeotrope when x_liquid = x_vapor"]
+  end
+
+  Rule --> Pure1
+  Rule --> Bin1
+  Slope -. "uses dmu = Vm dp - Sm dT" .-> Boundary
+  Lever -. "mass balance constraint" .-> Bin2
 ```
+
+This diagram replaces a fixed phase-picture with the underlying thermodynamic architecture. The pure-substance subgraph shows regions, coexistence boundaries, the triple point, critical point, and the Clapeyron-to-Clausius-Clapeyron derivation path; the binary-mixture subgraph shows tie lines, lever rule, eutectics, and azeotropes. The labeled freedoms show how the shape of a phase diagram follows from $F=C-P+2$ and chemical-potential equality rather than from memorized curves.
 
 | Feature | Pure substance | Binary mixture |
 |---|---|---|

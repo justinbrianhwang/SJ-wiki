@@ -61,14 +61,28 @@ Model initialization deserves the same care as wiring. Integrator initial condit
 
 ```mermaid
 flowchart LR
-  U[Input source] --> SUM[Sum forces or flows]
-  X[State feedback] --> FB[Physical feedback gains]
-  FB --> SUM
-  SUM --> GAIN[Capacitance or inertia inverse]
-  GAIN --> INT[Integrator]
-  INT --> X
-  X --> SCOPE[Scope and logging]
+  Input["Sources<br/>steps, signals, workspace data"] --> Sum["Sum block<br/>signed force, flow, or rate balance"]
+  State["state feedback<br/>integrator outputs with units"] --> Gains["physical gains<br/>stiffness, resistance, geometry"]
+  Gains --> Sum
+  Sum --> Inv["inverse storage parameter<br/>1/m, 1/C, 1/L, etc."]
+  Inv --> Deriv["state derivative signal<br/>acceleration, temperature rate, current rate"]
+  Deriv --> Int["Integrator block<br/>initial condition and continuous state"]
+  Int --> State
+  State --> Output["output map or sensors<br/>selected states, algebraic outputs"]
+  Output --> Log["logging and scopes<br/>named signals, units, run metadata"]
+
+  subgraph ModelMgmt["Model-management blocks"]
+    direction TB
+    Subsystem["subsystems<br/>physical or algorithmic boundary"] --> Mask["mask parameters<br/>reusable structure"]
+    Solver["solver settings<br/>fixed/variable step, zero-crossing, tolerances"] --> Log
+    Assert["assertions and diagnostics<br/>units, limits, residuals"] --> Log
+  end
+
+  State -. "organized into" .-> Subsystem
+  Input -. "experiment setup" .-> Solver
 ```
+
+The Simulink diagram shows an integrator-centered realization rather than a generic block chain. Inputs and feedback form a signed balance, gains convert the balance into a derivative, integrators store the states, and outputs are logged with metadata. The management subgraph adds the blocks that make a diagram maintainable: subsystems, masks, solver settings, assertions, and diagnostics.
 
 | Simulink block | Mathematical role | Typical mistake |
 |---|---|---|

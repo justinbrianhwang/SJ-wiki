@@ -130,16 +130,31 @@ Repeated poles create polynomial factors multiplying exponentials in time. For e
 
 ## Visual
 
-```text
-s-plane ROC examples
+```mermaid
+flowchart TB
+  Signal["Time signal x(t)<br/>right-sided, left-sided, or two-sided"] --> Transform["Laplace transform<br/>X(s)=integral x(t)e^(-st)dt"]
+  Transform --> Poles["Algebraic expression<br/>poles and zeros in the s-plane"]
+  Transform --> ROC{"Region of convergence"}
 
-left-sided:          two-sided:             right-sided:
+  subgraph Shapes["ROC shapes"]
+    direction TB
+    Right["right-sided signal<br/>ROC right of rightmost pole"] --> Causal["causal rational LTI candidate"]
+    Left["left-sided signal<br/>ROC left of leftmost pole"] --> Anti["anti-causal candidate"]
+    Strip["two-sided signal<br/>ROC vertical strip between poles"] --> Noncausal["noncausal candidate"]
+  end
 
-<==== ROC | pole     pole |==== ROC ====| pole     pole | ROC ====>
-          a               a             b               a
-
-The ROC is a vertical half-plane or strip and never includes poles.
+  ROC -- "Re(s) greater than pole boundary" --> Right
+  ROC -- "Re(s) less than pole boundary" --> Left
+  ROC -- "between pole boundaries" --> Strip
+  Poles --> Exclude["ROC never includes poles"]
+  Causal --> Stable{"j omega axis inside ROC?"}
+  Anti --> Stable
+  Noncausal --> Stable
+  Stable -- "yes" --> Fourier["Fourier transform exists<br/>frequency response from X(j omega)"]
+  Stable -- "no" --> NoFT["no ordinary Fourier transform"]
 ```
+
+This Laplace diagram replaces the static ROC sketch with the transform pipeline: a signal produces an algebraic $X(s)$ plus an ROC, and both are needed to identify the time signal. The ROC subgraph shows the three standard shapes for right-sided, left-sided, and two-sided signals. The stability branch makes the key shape transition explicit: the Fourier transform exists only when the $j\omega$ axis lies in the ROC.
 
 | Signal type | Pole pattern | ROC shape | Causality clue |
 |---|---|---|---|

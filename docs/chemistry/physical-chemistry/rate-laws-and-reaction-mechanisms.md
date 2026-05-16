@@ -144,17 +144,38 @@ Kinetic isotope effects provide mechanistic clues because isotopic substitution 
 ## Visual
 
 ```mermaid
-flowchart LR
-  A[Experimental concentration vs time] --> B[Determine rate law]
-  B --> C[Fit k and orders]
-  C --> D[Propose mechanism]
-  D --> E{"Intermediates?"}
-  E -->|yes| F[steady-state approximation]
-  E -->|fast reversible step| G[pre-equilibrium approximation]
-  F --> H[derived rate law]
-  G --> H
-  H --> I[compare with experiment]
+flowchart TB
+  Data["#quot;Measured concentration profile<br/>[A"](t), [B](t), product signal"] --> RateLaw["#quot;Empirical differential law<br/>rate = k[A"]^m[B]^n"]
+  RateLaw --> Mechanism["Candidate elementary mechanism<br/>steps sum to overall reaction"]
+
+  subgraph SSA["Steady-state approximation path"]
+    direction TB
+    Step1["Write elementary step rates<br/>formation and consumption terms"] --> Inter["Choose reactive intermediate I<br/>low concentration after induction"]
+    Inter --> Balance["#quot;Set d[I"]/dt approximately 0<br/>formation rate = consumption rate"]
+    Balance --> SolveI["#quot;Solve algebraically for [I"]<br/>in terms of stable reactants"]
+    SolveI --> Substitute["Substitute into product rate<br/>remove unobserved intermediate"]
+  end
+
+  subgraph PreEq["Pre-equilibrium path"]
+    direction TB
+    Fast["Fast reversible step<br/>A + B reversible I"] --> Keq["#quot;Use K = [I"]/([A][B])"]
+    Keq --> Slow["#quot;Slow product-forming step<br/>rate = k_slow[I"]"]
+    Slow --> Substitute2["#quot;Substitute [I"] from equilibrium"]
+  end
+
+  Mechanism --> Choice{"Which mechanistic assumption fits rate constants?"}
+  Choice -- "intermediate remains small" --> SSA
+  Choice -- "fast reversible step before slow step" --> PreEq
+  Substitute --> Derived["Derived observable rate law"]
+  Substitute2 --> Derived
+  Derived --> Tests{"Matches all constraints?"}
+  Tests -- "rate law, stoichiometry, units" --> Plausible["Mechanism survives current tests"]
+  Tests -- "mismatch" --> Reject["Revise steps or assumptions"]
+  Reject -. "new mechanism" .-> Mechanism
+  Plausible --> Extra["Seek independent evidence<br/>isotope effects, intermediates, catalysis, products"]
 ```
+
+The mechanism diagram separates empirical rate-law fitting from two derivation architectures: steady-state and pre-equilibrium. Each subgraph shows the algebraic handoff that removes an unobserved intermediate from the final observable rate law. The feedback loop is explicit because agreement with the measured law is necessary but not enough; mechanisms still need independent chemical evidence.
 
 ## Worked example 1: First-order rate constant from half-life
 

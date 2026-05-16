@@ -73,17 +73,23 @@ Equilibrium is also a useful modeling test. If a proposed support arrangement pr
 
 ```mermaid
 flowchart TD
-  A[Choose the particle or joint] --> B[Draw complete FBD]
-  B --> C[Assign axes and unknown directions]
-  C --> D[Resolve every force into components]
-  D --> E["Write sum Fx = 0, sum Fy = 0, and sum Fz = 0 if needed"]
-  E --> F[Solve linear equations]
-  F --> G{"Any negative unknowns?"}
-  G -->|yes| H[Force acts opposite assumed direction]
-  G -->|no| I[Directions match assumptions]
-  H --> J["Check magnitude, units, and physical sense"]
-  I --> J
+  Body["Choose particle or joint<br/>single point mass or pin"] --> FBD["Free-body diagram<br/>include only external forces"]
+  FBD --> Forces["Enumerate force models<br/>weight, cable tension, normal contact, applied load"]
+  Forces --> Axes["Choose axes<br/>2D x-y or 3D coordinate basis"]
+  Axes --> Components["Resolve every force<br/>direction cosines or unit vectors"]
+  Components --> Equations["Equilibrium equations<br/>sum Fx=0, sum Fy=0, sum Fz=0 if 3D"]
+  Equations --> Count{"unknown count no larger than independent equations?"}
+  Count -- "yes" --> Solve["solve linear system for force magnitudes"]
+  Count -- "no" --> Extra["need more bodies, constraints, or model assumptions"]
+  Solve --> Signs{"any negative tension or reaction?"}
+  Signs -- "yes" --> Interpret["force acts opposite assumed arrow<br/>or contact/cable model may be invalid"]
+  Signs -- "no" --> OK["assumed directions are consistent"]
+  Interpret --> Check["check units, magnitudes, support capability, and geometry"]
+  OK --> Check
+  Check --> Result(("equilibrium force solution"))
 ```
+
+This free-body workflow shows every block needed for particle equilibrium: body isolation, force inventory, axes, component resolution, equation count, solve, and physical sign checks. The negative-force branch is explicit because a cable cannot push and a unilateral contact cannot pull. The diagram also shows where underdetermined models require additional bodies or constraints rather than algebraic guessing.
 
 | Model | Scalar equations | Typical unknowns | Warning sign |
 |---|---:|---|---|

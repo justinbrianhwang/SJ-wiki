@@ -9,10 +9,6 @@ Sampling connects continuous-time signals to discrete-time sequences. A sampler 
 
 The sampling theorem says exact reconstruction is possible for bandlimited signals when the sampling rate is high enough. If the sampling rate is too low, shifted copies of the spectrum overlap. That overlap is aliasing, and it is not merely a plotting artifact: different continuous-time frequencies produce the same discrete-time samples.
 
-![An aliasing graph shows two sine waves sharing the same sampled points.](https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/AliasingSines.svg/600px-AliasingSines.svg.png)
-
-*Figure: Aliasing when different continuous sinusoids agree at sampled instants. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:AliasingSines.svg), Moxfyre, CC BY-SA 3.0.*
-
 ## Definitions
 
 Uniform sampling of a continuous-time signal $x_c(t)$ with sampling period $T$ produces the sequence
@@ -153,19 +149,32 @@ The sample values alone do not contain the sampling rate. The same numerical seq
 
 ## Visual
 
-```text
-No aliasing: spectral copies do not overlap
+```mermaid
+flowchart TB
+  Analog["Continuous-time signal x_c(t)<br/>bandlimit omega_M if ideal"] --> AntiAlias["Anti-alias filter<br/>remove content above omega_s/2"]
+  AntiAlias --> Sampler["#quot;Uniform sampler<br/>x[n"] = x_c(nT), omega_s = 2pi/T"]
+  Sampler --> Sequence["#quot;Discrete-time sequence x[n"]<br/>DT frequency Omega = omega T"]
 
-       copy          baseband          copy
---------/\-------------/\-------------/\--------> omega
-      -ws             0              ws
+  subgraph Spectrum["Sampling spectrum architecture"]
+    direction TB
+    CTSpec["original spectrum X_c(j omega)"] --> Replicas["impulse-train sampling creates replicas<br/>copies spaced by omega_s"]
+    Replicas --> Alias{"copies overlap?"}
+    Alias -- "no, omega_s greater than 2 omega_M" --> Safe["samples preserve bandlimited information"]
+    Alias -- "yes" --> Fold["aliasing<br/>different CT frequencies map to same DT frequency"]
+  end
 
-Aliasing: copies overlap
-
-          overlap overlap
------------/\/\---/\/\---/\/\----------> omega
-          -ws     0      ws
+  AntiAlias --> CTSpec
+  Sequence --> Recon{"Reconstruction requested?"}
+  Safe --> Recon
+  Fold --> Loss["lost information cannot be recovered by ideal interpolation"]
+  Recon -- "yes" --> IdealLP["ideal lowpass interpolation<br/>sinc reconstruction for bandlimited signal"]
+  Recon -- "practical" --> Practical["hold, interpolation, or reconstruction filter<br/>adds distortion or delay"]
+  IdealLP --> Output("(#quot;reconstructed x_c(t")"))
+  Practical --> Output
+  Loss --> Output
 ```
+
+The sampling diagram shows the full continuous-to-discrete-to-continuous contract. An anti-alias filter and sampler create spectral replicas spaced by $\omega_s$; if those replicas overlap, the aliasing branch records irreversible information loss. The reconstruction branch distinguishes ideal sinc/lowpass recovery from practical holds and filters that trade accuracy for realizability.
 
 | Quantity | Meaning | Formula |
 |---|---|---|

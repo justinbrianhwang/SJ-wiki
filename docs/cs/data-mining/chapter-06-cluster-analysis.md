@@ -9,10 +9,6 @@ Cluster analysis groups unlabeled data objects so that objects in the same group
 
 This page focuses on the main families from the basic clustering chapter. The next page covers advanced settings such as categorical data, scalability, high-dimensional clustering, semi-supervised clustering, visual supervision, and ensembles.
 
-![A DBSCAN diagram shows core points, border points, and noise under a density-based clustering rule.](https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/DBSCAN-Illustration.svg/500px-DBSCAN-Illustration.svg.png)
-
-*Figure: DBSCAN core, border, and noise points. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:DBSCAN-Illustration.svg), Chire, CC BY-SA 3.0.*
-
 ## Definitions
 
 A **clustering** partitions or organizes objects $X_1,\dots,X_n$ into groups $C_1,\dots,C_k$. Some algorithms create a hard partition where each object belongs to one cluster; others create soft memberships or hierarchical structures.
@@ -69,20 +65,29 @@ Setting the derivative to zero yields $\mu=(1/\vert C\vert )\sum_{X_i\in C}X_i$.
 
 ```mermaid
 flowchart TD
-  A[Unlabeled data] --> B{Cluster assumption}
-  B -->|prototype around center| C["k-means, k-medians, k-medoids"]
-  B -->|nested grouping| D[Hierarchical clustering]
-  B -->|mixture density| E[Gaussian mixture and EM]
-  B -->|dense regions| F[DBSCAN and DENCLUE]
-  B -->|cell summaries| G[Grid-based methods]
-  B -->|graph connectivity| H[Graph clustering]
-  C --> I[Validate]
-  D --> I
-  E --> I
-  F --> I
-  G --> I
-  H --> I
+  X["Input matrix X: n points x d features"] --> Scale["Preprocess: scale numeric features; choose distance"]
+  Scale --> Init{"Initialize k centroids"}
+  Init -- "random or k-means++" --> Mu0["Centroids mu_1..mu_k, each in R^d"]
+  Mu0 --> Assign["Assignment step: c_i = argmin_r ||x_i - mu_r||^2"]
+  Assign --> Buckets["Cluster buckets C_1..C_k"]
+  Buckets --> Update["Update step: mu_r = mean of points in C_r"]
+  Update --> Objective["Compute SSE = sum_r sum_{x_i in C_r} ||x_i - mu_r||^2"]
+  Objective --> Stop{"Assignments unchanged or SSE decrease < tolerance?"}
+  Stop -- "no" --> Assign
+  Stop -- "yes" --> Output(("Final clusters, centroids, SSE"))
+
+  subgraph OneIter["One iteration for points 0,2,8,10 with k=2"]
+    direction LR
+    P0["Points: 0, 2, 8, 10"] --> C0["Initial mu_1=0, mu_2=10"]
+    C0 --> A1["Assignments: {0,2} and {8,10}"]
+    A1 --> U1["Updated mu_1=1, mu_2=9"]
+  end
+
+  Assign -. "nearest-centroid boundary changes" .-> OneIter
+  Update -. "centroids move to within-cluster means" .-> OneIter
 ```
+
+This k-means diagram shows the full alternating optimization loop instead of only naming clustering families. The input shape, centroid dimensions, assignment formula, centroid update rule, SSE objective, and convergence test are all labeled, so the reader can see why each iteration cannot increase the squared-error objective. The side example traces the one-dimensional worked example from initial centroids through assignments to updated centroids.
 
 | Algorithm | Cluster shape | Parameters | Strength | Weakness |
 |---|---|---|---|---|

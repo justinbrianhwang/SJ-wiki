@@ -74,19 +74,47 @@ For study purposes, the most useful habit is to separate four layers: the contin
 ## Visual
 
 ```mermaid
-graph LR
-  A[Initial guesses] --> B{"Derivative available?"}
-  B -->|yes| C[Newton step]
-  B -->|no| D[Secant step]
-  C --> E{"Step acceptable?"}
-  D --> E
-  E -->|yes| F[Update iterate]
-  E -->|no| G[Fallback bracket or damp step]
-  F --> H{"Converged?"}
-  G --> H
-  H -->|no| B
-  H -->|yes| I[Report root and residual]
+flowchart TB
+  Start["Input<br/>f, initial guess or two guesses, tolerance"] --> Deriv{"Derivative or polynomial structure available?"}
+
+  subgraph Newton["Newton branch"]
+    direction TB
+    EvalN["evaluate f(p_n) and f'(p_n)"] --> GuardN{"f'(p_n) safely nonzero?"}
+    GuardN -- "yes" --> StepN["Newton step<br/>p_next = p_n - f/f'"]
+    GuardN -- "no" --> Safeguard["damp, bracket, or switch method"]
+  end
+
+  subgraph Secant["Secant branch"]
+    direction TB
+    EvalS["evaluate f(p_n), f(p_{n-1})"] --> GuardS{"secant denominator nonzero?"}
+    GuardS -- "yes" --> StepS["secant step<br/>line through last two points"]
+    GuardS -- "no" --> Safeguard
+  end
+
+  subgraph Poly["Polynomial branch"]
+    direction TB
+    Coeff["polynomial coefficients"] --> Horner["Horner evaluation<br/>P(p) and optionally P'(p)"]
+    Horner --> Deflate{"root accepted for deflation?"}
+    Deflate -- "yes" --> Synthetic["synthetic division<br/>reduce degree"]
+    Deflate -- "no" --> StepN
+  end
+
+  Deriv -- "yes" --> EvalN
+  Deriv -- "no" --> EvalS
+  Deriv -- "polynomial" --> Coeff
+  StepN --> Accept{"step acceptable?<br/>inside domain, residual decreased, bracket kept if required"}
+  StepS --> Accept
+  Safeguard --> Accept
+  Accept -- "yes" --> Update["update iterate and history"]
+  Accept -- "no" --> Safeguard
+  Update --> Stop{"converged?<br/>residual and step small"}
+  Stop -- "no" --> Deriv
+  Stop -- "yes" --> Report["report root, residual, iterations, multiplicity warning"]
+  Synthetic -. "next root" .-> Coeff
+  Report --> Root(("root estimate"))
 ```
+
+The root-finding diagram exposes the shared loop around Newton, secant, and polynomial-specific work. Each branch shows the data needed per iteration, the guard against zero denominators or derivatives, and the accept-or-safeguard decision before updating. The polynomial subgraph adds Horner evaluation and optional deflation, making clear where numerical error can enter repeated-root workflows.
 
 | Method | Data per step | Local order | Strength | Failure mode |
 |---|---|---:|---|---|

@@ -97,18 +97,29 @@ Initial conditions are the other reason state-space form remains important. A tr
 ## Visual
 
 ```mermaid
-flowchart LR
-  A["State model A,B,C,D"] --> B[Eigenvalues of A]
-  A --> C["Transfer function G(s)"]
-  B --> D[Modes and stability]
-  C --> E[Poles and zeros]
-  C --> F[Step and impulse response]
-  C --> G["Frequency response G(jw)"]
-  D --> H[Expected time plot]
-  E --> H
-  F --> H
-  G --> I[Expected sinusoidal gain and phase]
+flowchart TB
+  Model["Linear model<br/>state space A,B,C,D or transfer function G(s)"] --> StatePath{"state-space available?"}
+  StatePath -- "yes" --> Eig["eigenvalues of A<br/>internal modes and stability"]
+  StatePath -- "yes" --> IC["initial-condition response<br/>exp(A t)x0"]
+  StatePath -- "yes" --> TF["G(s)=C(sI-A)^-1B+D<br/>zero-state input-output map"]
+  StatePath -- "transfer function only" --> TF
+
+  TF --> Poles["poles and zeros<br/>dominant modes, cancellations, DC gain"]
+  TF --> Time["time responses<br/>impulse, step, forced sinusoid"]
+  TF --> Freq["frequency response<br/>G(jw) magnitude and phase"]
+  Eig --> Stability["stability and damping interpretation"]
+  IC --> Natural["natural response from stored energy"]
+  Poles --> Expected["expected simulation signatures<br/>settling, overshoot, resonance, final value"]
+  Time --> Expected
+  Freq --> Sinusoid["steady sinusoidal gain and phase check"]
+  Stability --> Expected
+  Natural --> Expected
+  Expected --> Verify["compare MATLAB/Simulink run with analytical response"]
+  Sinusoid --> Verify
+  Verify --> Result(("verified linear subsystem"))
 ```
+
+This linear-systems diagram separates internal modal analysis from transfer-function input-output analysis. State-space matrices expose eigenvalues and initial-condition response, while $G(s)$ exposes poles, zeros, step/impulse behavior, and frequency response. The verification node is the practical architecture: linear analytical results are regression tests for the simulation implementation.
 
 | Pole location | Time-domain behavior | Simulation clue |
 |---|---|---|

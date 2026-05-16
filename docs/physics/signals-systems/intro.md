@@ -98,17 +98,37 @@ Finally, always track units. Continuous-time frequency $\omega$ is in radians pe
 ## Visual
 
 ```mermaid
-graph LR
-  A[Signals] --> B[System properties]
-  B --> C[LTI systems]
-  C --> D[Convolution]
-  D --> E[Fourier series]
-  D --> F[Fourier transforms]
-  F --> G[Sampling and modulation]
-  C --> H[Laplace and z transforms]
-  H --> I[Stability and frequency response]
-  I --> J[State-space models]
+flowchart TB
+  Input["Problem input<br/>signal expression, graph, system equation, or data"] --> Classify{"Classify signal and system"}
+  Classify -- "signal only" --> SignalRep["Signal representation<br/>CT/DT, periodic/aperiodic, energy/power"]
+  Classify -- "system" --> Tests["Property tests<br/>linearity, time invariance, causality, memory, stability"]
+  Tests --> LTI{"LTI confirmed?"}
+  LTI -- "yes" --> Impulse["Impulse response h<br/>complete input-output contract"]
+  LTI -- "no" --> NonLTI["use direct operator, state update, or nonlinear model"]
+
+  subgraph TimeDomain["Time-domain architecture"]
+    direction TB
+    Impulse --> Conv["convolution<br/>CT integral or DT sum"]
+    Conv --> Interconnect["cascade, parallel, feedback<br/>combine impulse responses or transforms"]
+  end
+
+  subgraph TransformDomain["Transform-domain architecture"]
+    direction TB
+    SignalRep --> Choose{"Choose representation"}
+    Choose -- "periodic" --> FS["Fourier series<br/>harmonic line spectrum"]
+    Choose -- "aperiodic CT" --> CTFT["CTFT or Laplace<br/>continuous spectrum or ROC"]
+    Choose -- "aperiodic DT" --> DTFT["DTFT or z-transform<br/>periodic spectrum or ROC"]
+    Impulse --> H["system function or frequency response<br/>H(jw), H(e^jO), H(s), H(z)"]
+    FS --> H
+    CTFT --> H
+    DTFT --> H
+  end
+
+  H --> Apps["Applications<br/>filtering, sampling, modulation, state-space realization"]
+  Apps --> Check["check units, frequency convention, ROC, and stability"]
 ```
+
+This overview diagram separates the signals-and-systems workflow into classification, property testing, LTI reduction, time-domain convolution, transform-domain representation, and application layers. The impulse response is shown as the key I/O contract for LTI systems, while Fourier, Laplace, DTFT, and $z$ tools are routed by signal type and ROC needs. The final check node captures the common failure points: units, frequency convention, sidedness, and stability.
 
 ## Worked example 1: choosing the right representation
 

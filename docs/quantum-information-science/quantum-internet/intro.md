@@ -86,20 +86,49 @@ Sending half of a Bell pair through such a channel produces a shared state whose
 ## Visual
 
 ```mermaid
-flowchart LR
-  App["Application request"] --> Req["Entanglement request"]
-  Req --> Link["Elementary link generation"]
-  Link --> Mem["Store successful links"]
-  Mem --> Swap["Entanglement swapping"]
-  Swap --> Purify["Optional purification"]
-  Purify --> Pair["End-to-end Bell pair"]
-  Pair --> Tele["Teleportation or measurement"]
-  Tele --> AppOut["Application output"]
-  Class["Classical messages"] --> Link
-  Class --> Swap
-  Class --> Purify
-  Class --> Tele
+flowchart TB
+  subgraph Resource["Entanglement resource pipeline"]
+    direction LR
+    Req["Application request<br/>remote qubit channel, Bell pair, GHZ, or key"] --> LinkGen["Elementary link generation<br/>photon transmission, heralding, success prob p_link"]
+    LinkGen --> Herald{"heralded success?"}
+    Herald -->|"no"| Retry["retry or reroute<br/>loss eta(L) dominates"]
+    Retry --> LinkGen
+    Herald -->|"yes"| Mem["Store endpoint qubits<br/>memory time T_mem, fidelity F_link"]
+    Mem --> Swap["Entanglement swapping<br/>Bell-state measurement at repeater"]
+    Swap --> Distill{"fidelity high enough?"}
+    Distill -->|"no"| Purify["Distillation<br/>consume multiple noisy pairs"]
+    Purify --> Distill
+    Distill -->|"yes"| Pair["End-to-end resource<br/>Bell pair or multipartite entanglement"]
+  end
+
+  subgraph Consumers["Network applications"]
+    direction TB
+    Pair --> Tele["Teleportation<br/>1 Bell pair + 2 classical bits -> 1 qubit channel"]
+    Pair --> E91["Entanglement-based QKD<br/>measure correlations -> secret key"]
+    Pair --> Gate["Distributed quantum gate<br/>nonlocal operation via entanglement"]
+    Pair --> Sense["Clock/sensing correlation<br/>shared phase reference or GHZ-like resource"]
+    Tele --> Out["Application output<br/>delivered state, key, estimate, or gate result"]
+    E91 --> Out
+    Gate --> Out
+    Sense --> Out
+  end
+
+  subgraph Control["Classical control plane"]
+    direction TB
+    Auth["Authenticated classical channel"] --> Timing["time sync and herald collection"]
+    Timing --> Route["routing and memory scheduling"]
+    Route --> Feed["Pauli-frame and feed-forward messages"]
+    Feed --> Accounting["resource accounting<br/>rate, fidelity, failure probability"]
+  end
+
+  Timing -. "heralds" .-> Herald
+  Route -. "selects path and memories" .-> LinkGen
+  Feed -. "corrections after BSMs" .-> Swap
+  Feed -. "2-bit correction data" .-> Tele
+  Accounting -. "service contract" .-> Req
 ```
+
+The diagram presents a quantum internet as an entanglement allocation machine rather than a packet-copying network. It labels the key state transitions: lossy elementary link attempts become stored pairs, swapping extends distance, distillation trades rate for fidelity, and applications consume the resulting Bell or multipartite resource. The dotted arrows show the classical control messages that make heralding, routing, memory scheduling, and Pauli-frame updates work.
 
 | Classical internet habit | Quantum-internet replacement |
 |---|---|

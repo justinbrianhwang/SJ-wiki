@@ -62,15 +62,36 @@ A final verification step is to reconstruct from the computed coefficients and c
 ## Visual
 
 ```mermaid
-graph TD
-  A[Sampled data x_j] --> B[DFT]
-  B --> C[Frequency coefficients X_k]
-  C --> D{"Need speed?"}
-  D -->|small n| E["Direct O(n^2)"]
-  D -->|large n| F["FFT O(n log n)"]
-  F --> G["Filter, analyze, or reconstruct"]
-  E --> G
+flowchart TB
+  Input["Approximation target<br/>function values, samples, or series data"] --> Form{"Choose representation"}
+
+  subgraph Rational["Rational approximation"]
+    direction TB
+    Pade["match series coefficients<br/>P_m(x)/Q_n(x)"] --> Denom["check denominator zeros and poles"]
+    Denom --> RatOut["captures poles or sharp transitions"]
+  end
+
+  subgraph Trig["Trigonometric and DFT path"]
+    direction TB
+    Samples["sampled data x_j, j=0..N-1"] --> Periodic["assume one periodic window"]
+    Periodic --> NeedSpeed{"Need speed?"}
+    NeedSpeed -- "small N" --> Direct["direct DFT<br/>O(N^2)"]
+    NeedSpeed -- "large N, factorizable N" --> FFT["FFT divide-and-conquer<br/>O(N log N)"]
+    Direct --> Coeff["frequency coefficients X_k"]
+    FFT --> Coeff
+    Coeff --> Edit["analyze, filter, multiply, or truncate modes"]
+    Edit --> IDFT["inverse DFT or reconstruction"]
+  end
+
+  Form -- "quotient of polynomials" --> Pade
+  Form -- "periodic sampled data" --> Samples
+  RatOut --> CheckR["check poles, residual, and domain"]
+  IDFT --> CheckT["check aliasing, leakage, and endpoint jumps"]
+  CheckR --> Result(("approximation or spectrum"))
+  CheckT --> Result
 ```
+
+This diagram shows rational approximation and FFT-based trigonometric approximation as different architectures. The rational path fits a quotient and must inspect denominator behavior, while the DFT path assumes a periodic sample window and chooses between direct $O(N^2)$ work and FFT $O(N\log N)$ structure. The final checks expose the usual failure modes: poles for rational forms, and aliasing or leakage for sampled periodic data.
 
 | Approximation | Basis or form | Strength | Risk |
 |---|---|---|---|

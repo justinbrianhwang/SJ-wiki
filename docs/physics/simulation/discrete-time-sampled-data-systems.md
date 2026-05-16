@@ -104,16 +104,30 @@ For final-value checks, compare discrete equilibria directly rather than assumin
 ## Visual
 
 ```mermaid
-sequenceDiagram
-  participant Plant as Continuous plant
-  participant ADC as Sampler
-  participant Ctrl as Digital controller
-  participant DAC as Zero-order hold
-  Plant->>ADC: y(t)
-  ADC->>Ctrl: y[k] every T seconds
-  Ctrl->>DAC: u[k]
-  DAC->>Plant: held u(t)
+flowchart LR
+  Ref["#quot;reference or command r[k"]<br/>sample period T"] --> Ctrl["digital controller<br/>difference equation and memory"]
+  PlantY["continuous plant output y(t)"] --> Sensor["sensor and anti-alias filter"]
+  Sensor --> Sampler["#quot;sampler / ADC<br/>y[k"] = y(kT)"]
+  Sampler --> Ctrl
+  Ctrl --> Compute["#quot;compute u[k"]<br/>uses stored delays and current sample"]
+  Compute --> Hold["#quot;zero-order hold / DAC<br/>u(t)=u[k"] during one sample interval"]
+  Hold --> Plant["continuous plant<br/>x_dot = f(t,x,u)"]
+  Plant --> PlantY
+
+  subgraph Discretize["Continuous-to-discrete model conversion"]
+    direction TB
+    CT["continuous LTI model<br/>x_dot = A x + B u"] --> Exact["exact ZOH conversion<br/>A_d = exp(A T)"]
+    CT --> Euler["approximate conversion<br/>forward/backward Euler, bilinear, matched pole-zero"]
+    Exact --> DT["#quot;discrete model<br/>x[k+1"]=A_d x[k]+B_d u[k]"]
+    Euler --> DT
+  end
+
+  Plant -. "linear analysis path" .-> CT
+  DT --> Check["check sample rate, aliasing, delay, and discrete stability"]
+  Check --> Result(("sampled-data simulation"))
 ```
+
+This sampled-data architecture shows every timing boundary: sensor filtering, sampling, controller memory, zero-order hold, and continuous plant response. The conversion subgraph separates exact zero-order-hold discretization from approximate methods such as Euler or bilinear transforms. The loop makes the I/O contract explicit: the controller only sees $y[k]$, while the plant receives a held continuous input between ticks.
 
 | Concept | Continuous time | Discrete time |
 |---|---|---|

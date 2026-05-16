@@ -9,10 +9,6 @@ Sequence modeling handles data where order matters: text, time series, speech, c
 
 RNNs are no longer the default architecture for large-scale language modeling, but they remain conceptually important. They introduce hidden states, truncated backpropagation through time, gradient clipping, teacher-forced sequence training, and the difference between training with known histories and generating one token at a time. These ideas reappear in encoder-decoder models, attention, transformers, and reinforcement learning.
 
-![A recurrent neural network diagram shows a compact recurrent cell and the same computation unfolded over time.](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Recurrent_neural_network_unfold.svg/500px-Recurrent_neural_network_unfold.svg.png)
-
-*Figure: Recurrent neural network shown compactly and unfolded through time. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Recurrent_neural_network_unfold.svg), fdeloche, CC BY-SA 4.0.*
-
 ## Definitions
 
 A **sequence** is an ordered list $(x_1,\ldots,x_T)$. In language modeling, $x_t$ may be a token. In time-series forecasting, it may be a real-valued observation.
@@ -87,20 +83,42 @@ This is why sequence experiments should document batching, hidden-state reset ru
 ## Visual
 
 ```mermaid
-flowchart LR
-  X1[x1] --> R1[RNN cell]
-  H0[h0] --> R1
-  R1 --> H1[h1]
-  R1 --> O1[p x2]
-  X2[x2] --> R2[RNN cell]
-  H1 --> R2
-  R2 --> H2[h2]
-  R2 --> O2[p x3]
-  X3[x3] --> R3[RNN cell]
-  H2 --> R3
-  R3 --> H3[h3]
-  R3 --> O3[p x4]
+flowchart TB
+  subgraph Cell["Vanilla RNN cell at time t"]
+    direction TB
+    Xt["#quot;Input x_t: [N, d_x"]"] --> XW["Input affine: x_t W_xh"]
+    Hprev["#quot;Previous hidden h_{t-1}: [N, d_h"]"] --> HW["Recurrent affine: h_{t-1} W_hh"]
+    XW --> Sum(("Add + b_h"))
+    HW --> Sum
+    Sum --> Phi["Nonlinearity phi, e.g. tanh or ReLU"]
+    Phi --> Ht["#quot;Hidden h_t: [N, d_h"]"]
+    Ht --> Readout["Output affine: h_t W_hq + b_q"]
+    Readout --> Ot["#quot;Logits o_t: [N, vocab"]"]
+    Ot --> Pt(("p next token from prefix through t"))
+  end
+
+  subgraph Unrolled["Same cell unrolled through time with shared weights"]
+    direction LR
+    H0["h_0"] --> R1["RNN cell t=1"]
+    X1["x_1"] --> R1
+    R1 --> H1["h_1"]
+    R1 --> O1["logits for x_2"]
+    H1 --> R2["RNN cell t=2"]
+    X2["x_2"] --> R2
+    R2 --> H2["h_2"]
+    R2 --> O2["logits for x_3"]
+    H2 --> R3["RNN cell t=3"]
+    X3["x_3"] --> R3
+    R3 --> H3["h_3"]
+    R3 --> O3["logits for x_4"]
+  end
+
+  Ht -. "state passed forward" .-> H1
+  R1 -. "shared W_xh, W_hh, W_hq" .-> R2
+  R2 -. "shared W_xh, W_hh, W_hq" .-> R3
 ```
+
+The first subgraph opens the vanilla RNN cell: input and previous hidden state are projected separately, added with bias, passed through a nonlinearity, and read out as next-token logits. The unrolled subgraph shows the same parameterized cell reused at each time step, with the hidden state carrying `[N, d_h]` information forward. Dotted arrows emphasize weight sharing across time rather than separate layers.
 
 | Concept | Meaning in sequence models | Practical decision |
 |---|---|---|

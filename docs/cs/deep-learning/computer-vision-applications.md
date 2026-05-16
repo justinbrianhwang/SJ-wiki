@@ -9,10 +9,6 @@ D2L's computer vision application chapters show how CNN ideas become task system
 
 The main shift is from global image prediction to spatial prediction. Object detection predicts boxes and classes. Segmentation predicts a class for each pixel. Style transfer optimizes an image itself to match content and style statistics. Fine-tuning adapts pretrained features to a new dataset. In each case, the model must preserve or recover spatial information that a plain classifier might discard.
 
-![A convolutional neural network diagram shows convolution and pooling layers feeding into dense classification layers.](https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Convolutional_Neural_Network.png/500px-Convolutional_Neural_Network.png)
-
-*Figure: Convolutional neural network architecture. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Convolutional_Neural_Network.png), Irisbox, CC BY 4.0.*
-
 ## Definitions
 
 **Image augmentation** applies label-preserving transformations such as random flips, crops, color jitter, and normalization. It increases effective data diversity and encodes invariances.
@@ -71,13 +67,93 @@ For every vision application, preprocessing at inference must match preprocessin
 ## Visual
 
 ```mermaid
-flowchart LR
-  I[Input image] --> B[CNN backbone]
-  B --> C1[Classification head]
-  B --> D1["Detection head: anchors classes offsets"]
-  B --> S1["Segmentation head: upsample per-pixel logits"]
-  B --> F1[Feature losses for style transfer]
+flowchart TB
+  In["#quot;Input image: [N, 3, 572, 572"]"] --> E1["#quot;Encoder level 1: two Conv 3 x 3, 64 -> [N, 64, 568, 568"]"]
+  E1 --> P1["#quot;MaxPool 2 x 2 -> [N, 64, 284, 284"]"]
+  P1 --> E2["#quot;Encoder level 2: two Conv 3 x 3, 128 -> [N, 128, 280, 280"]"]
+  E2 --> P2["#quot;MaxPool 2 x 2 -> [N, 128, 140, 140"]"]
+  P2 --> E3["#quot;Encoder level 3: two Conv 3 x 3, 256 -> [N, 256, 136, 136"]"]
+  E3 --> P3["#quot;MaxPool 2 x 2 -> [N, 256, 68, 68"]"]
+  P3 --> E4["#quot;Encoder level 4: two Conv 3 x 3, 512 -> [N, 512, 64, 64"]"]
+  E4 --> P4["#quot;MaxPool 2 x 2 -> [N, 512, 32, 32"]"]
+  P4 --> Bottleneck["#quot;Bottleneck: two Conv 3 x 3, 1024 -> [N, 1024, 28, 28"]"]
+  Bottleneck --> U4["#quot;UpConv 2 x 2, 512 -> [N, 512, 56, 56"]"]
+  E4 -. "crop and concatenate skip" .-> Cat4["#quot;Concat skip -> [N, 1024, 56, 56"]"]
+  U4 --> Cat4
+  Cat4 --> D4["#quot;Decoder level 4: two Conv 3 x 3, 512 -> [N, 512, 52, 52"]"]
+  D4 --> U3["#quot;UpConv 2 x 2, 256 -> [N, 256, 104, 104"]"]
+  E3 -. "crop and concatenate skip" .-> Cat3["#quot;Concat skip -> [N, 512, 104, 104"]"]
+  U3 --> Cat3
+  Cat3 --> D3["#quot;Decoder level 3: two Conv 3 x 3, 256 -> [N, 256, 100, 100"]"]
+  D3 --> U2["#quot;UpConv 2 x 2, 128 -> [N, 128, 200, 200"]"]
+  E2 -. "crop and concatenate skip" .-> Cat2["#quot;Concat skip -> [N, 256, 200, 200"]"]
+  U2 --> Cat2
+  Cat2 --> D2["#quot;Decoder level 2: two Conv 3 x 3, 128 -> [N, 128, 196, 196"]"]
+  D2 --> U1["#quot;UpConv 2 x 2, 64 -> [N, 64, 392, 392"]"]
+  E1 -. "crop and concatenate skip" .-> Cat1["#quot;Concat skip -> [N, 128, 392, 392"]"]
+  U1 --> Cat1
+  Cat1 --> D1["#quot;Decoder level 1: two Conv 3 x 3, 64 -> [N, 64, 388, 388"]"]
+  D1 --> Head["#quot;1 x 1 conv to K classes -> [N, K, 388, 388"]"]
+  Head --> Mask(("Per-pixel class map"))
 ```
+
+The U-Net diagram shows the hourglass explicitly: the contracting path doubles channels while pooling reduces resolution, and the expanding path upsamples while concatenating same-level encoder features. Dotted skip connections carry high-resolution detail into each decoder level, which is why U-Net is effective for boundary-sensitive segmentation. The labels use the original valid-convolution shape progression from 572 x 572 input to 388 x 388 logits.
+
+```mermaid
+flowchart TB
+  Img["Input image"] --> Proposals["External region proposals, e.g. selective search"]
+  Proposals --> Crop["Crop/warp each region"]
+  Crop --> RCNNBackbone["R-CNN: CNN per region"]
+  RCNNBackbone --> RCNNHead["SVM classifier + box regressor"]
+
+  Img --> SharedCNN["Fast R-CNN: one shared CNN feature map"]
+  Proposals --> ROI["RoI pooling on shared feature map"]
+  SharedCNN --> ROI
+  ROI --> FastHead["FC head -> class logits + box deltas"]
+
+  Img --> FasterBackbone["Faster R-CNN backbone feature map"]
+  FasterBackbone --> RPN["Region Proposal Network: anchors -> objectness + box deltas"]
+  RPN --> FasterROI["RoI pooling or RoIAlign"]
+  FasterBackbone --> FasterROI
+  FasterROI --> FasterHead["Detection head -> class logits + refined boxes"]
+  FasterHead --> NMS(("Final boxes after NMS"))
+```
+
+The R-CNN family diagram contrasts where proposals and feature extraction happen. Original R-CNN runs a CNN for every proposed crop, Fast R-CNN shares a single backbone feature map and pools per proposal, and Faster R-CNN learns proposals with an RPN. The shared-backbone path is the key architecture transition from slow external pipelines to trainable detectors.
+
+```mermaid
+flowchart TB
+  Img["#quot;Input image: [N, 3, S, S"]"] --> Backbone["CNN backbone + neck feature pyramid"]
+  Backbone --> Grid["#quot;Dense grid features, e.g. [N, A*(5+K), H, W"]"]
+  Grid --> BoxHead["Per cell/anchor: box center, width, height"]
+  Grid --> ObjHead["Objectness score"]
+  Grid --> ClassHead["Class logits"]
+  BoxHead --> Decode["Decode boxes relative to grid and anchors"]
+  ObjHead --> Score["Class confidence = objectness * class probability"]
+  ClassHead --> Score
+  Decode --> Filter["Confidence threshold + NMS"]
+  Score --> Filter
+  Filter --> Out(("Single-shot detections"))
+```
+
+YOLO-style detectors predict boxes and classes in one dense pass instead of classifying proposal crops. The diagram shows the detection tensor split into box geometry, objectness, and class logits before decoding and NMS. The single-shot contract trades proposal-stage flexibility for a simpler low-latency pipeline.
+
+```mermaid
+flowchart TB
+  Img["Input image"] --> Backbone["Backbone + FPN feature pyramid"]
+  Backbone --> RPN["RPN proposes candidate boxes"]
+  RPN --> Align["RoIAlign preserves subpixel alignment"]
+  Backbone --> Align
+  Align --> BoxHead["Box branch: FC layers -> class logits + box deltas"]
+  Align --> MaskHead["Mask branch: Conv stack -> per-class mask logits"]
+  BoxHead --> Boxes["Refined boxes after NMS"]
+  MaskHead --> Masks["K binary masks per RoI, e.g. 28 x 28"]
+  Boxes --> Select["Select mask for predicted class and paste into image"]
+  Masks --> Select
+  Select --> Out("[#quot;Instances: box, class, score, mask#quot;]")
+```
+
+Mask R-CNN extends Faster R-CNN with a parallel mask branch after RoIAlign. The box branch predicts classes and refined boxes, while the mask branch keeps spatial structure inside each RoI to produce per-instance masks. RoIAlign is labeled because mask quality depends on preserving feature-to-pixel alignment.
 
 | Task | Input | Output | Main loss or metric |
 |---|---|---|---|

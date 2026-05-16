@@ -9,10 +9,6 @@ Nonlinear systems are the rule rather than the exception in realistic simulation
 
 Linearization builds a local linear approximation around an equilibrium or trajectory. It does not make the original system linear; it gives a model that predicts small deviations near the chosen point. This is especially useful for controller design, small-signal frequency response, and quick stability checks before running large nonlinear simulations.
 
-![A Van der Pol phase-space diagram shows stable limit cycles for several parameter values.](https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/VanderPol-lc.svg/400px-VanderPol-lc.svg.png)
-
-*Figure: Stable limit-cycle behavior in the Van der Pol oscillator. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:VanderPol-lc.svg), Widdma, CC BY-SA 3.0.*
-
 ## Definitions
 
 A nonlinear state model has the form
@@ -111,17 +107,22 @@ Linearization can also be performed numerically when symbolic derivatives are in
 
 ```mermaid
 flowchart TD
-  A["Nonlinear model xdot=f(#quot;x,u#quot;)"] --> B[Find operating point]
-  B --> C{"Equilibrium?"}
-  C -->|yes| D[Use deviation variables]
-  C -->|no| E[Linearize along trajectory or keep affine term]
-  D --> F["Compute Jacobians A,B,C,D"]
-  E --> F
-  F --> G[Analyze local modes and response]
-  G --> H[Compare with nonlinear simulation]
-  H -->|small deviations agree| I[Use linear model locally]
-  H -->|large deviations differ| J[Use nonlinear model]
+  Nonlinear["Nonlinear model<br/>x_dot=f(x,u), y=g(x,u)"] --> Operating["Choose operating point or trajectory<br/>x_bar, u_bar, y_bar"]
+  Operating --> Equil{"equilibrium?"}
+  Equil -- "yes" --> Deviations["define deviation variables<br/>delta x = x - x_bar, delta u = u - u_bar"]
+  Equil -- "no" --> Affine["linearize along trajectory<br/>time-varying A(t), B(t), or affine term"]
+  Deviations --> Jacobian["compute Jacobians<br/>A=df/dx, B=df/du, C=dg/dx, D=dg/du"]
+  Affine --> Jacobian
+  Jacobian --> Linear["local linear model<br/>delta x_dot = A delta x + B delta u"]
+  Linear --> Modes["local modes and gains<br/>eigenvalues, transfer functions, small-signal response"]
+  Modes --> Compare["side-by-side simulation<br/>nonlinear model vs linear model"]
+  Compare --> Range{"agreement over perturbation range?"}
+  Range -- "small deviations agree" --> UseLocal["use linear model locally<br/>store operating point with matrices"]
+  Range -- "large deviations differ" --> UseNL["use nonlinear model or schedule linearizations"]
+  UseNL -. "new operating point" .-> Operating
 ```
+
+The nonlinear-linearization diagram makes the operating point part of the model artifact. It shows the route from nonlinear equations to deviation variables, Jacobians, local linear dynamics, modal analysis, and a side-by-side nonlinear comparison. The feedback arrow marks operating-range testing: disagreement for large perturbations usually means the linear model is being used outside its local contract.
 
 | Nonlinearity | Mathematical feature | Simulation effect | Linearization warning |
 |---|---|---|---|

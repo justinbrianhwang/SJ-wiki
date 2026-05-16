@@ -95,20 +95,53 @@ Separate compilation also affects build dependencies. If a public header changes
 
 ```mermaid
 flowchart TD
-  A[main.c] --> P1[Preprocessor]
-  B[stack.c] --> P2[Preprocessor]
-  C[getch.c] --> P3[Preprocessor]
-  H[calc.h] --> P1
-  H --> P2
-  H --> P3
-  P1 --> O1[main.o]
-  P2 --> O2[stack.o]
-  P3 --> O3[getch.o]
-  O1 --> L[Linker]
-  O2 --> L
-  O3 --> L
-  L --> E[Executable]
+  subgraph TU1["Translation unit main.c"]
+    direction TB
+    MainC["main.c source"]
+    Inc1["#include calc.h and system headers"]
+    PP1["Preprocessor: macro expansion, conditional inclusion, include guards"]
+    C1["Compiler: parse/type-check optimized C translation unit"]
+    Asm1["Assembler: machine code plus relocation records"]
+    Obj1["main.o: text, data, symbols, relocations"]
+    MainC --> Inc1
+    Inc1 --> PP1
+    PP1 --> C1
+    C1 --> Asm1
+    Asm1 --> Obj1
+  end
+
+  subgraph TU2["Translation unit stack.c"]
+    direction TB
+    StackC["stack.c source"] --> Inc2["#include calc.h"]
+    Inc2 --> PP2["Preprocessor"]
+    PP2 --> C2["Compiler"]
+    C2 --> Asm2["Assembler"]
+    Asm2 --> Obj2["stack.o"]
+  end
+
+  subgraph TU3["Translation unit getch.c"]
+    direction TB
+    GetchC["getch.c source"] --> Inc3["#include calc.h"]
+    Inc3 --> PP3["Preprocessor"]
+    PP3 --> C3["Compiler"]
+    C3 --> Asm3["Assembler"]
+    Asm3 --> Obj3["getch.o"]
+  end
+
+  Header["calc.h: declarations, macros, extern variables, include guard"] --> Inc1
+  Header --> Inc2
+  Header --> Inc3
+  Obj1 --> Link["Linker resolves external symbols and applies relocations"]
+  Obj2 --> Link
+  Obj3 --> Link
+  Lib["Runtime and standard libraries"] --> Link
+  Link --> Exe(("Executable image"))
+
+  Header -. "changing public interface rebuilds every including translation unit" .-> TU1
+  Header -. "one definition rule for external objects is checked at link time" .-> Link
 ```
+
+This C build diagram expands separate compilation into preprocessing, compiling, assembling, object files, symbol resolution, relocation, libraries, and the final executable. The shared header feeds each translation unit with declarations and macros, but each `.c` file is still compiled independently after preprocessing. The dotted edges call out the two architectural contracts that matter most in C projects: public header changes trigger recompilation, and external definitions must resolve exactly at link time.
 
 | Tool | Operates on | Knows C types? | Typical failure |
 |---|---|---|---|

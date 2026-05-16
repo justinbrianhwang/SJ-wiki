@@ -73,16 +73,44 @@ For study purposes, the most useful habit is to separate four layers: the contin
 ## Visual
 
 ```mermaid
-graph TD
-  A[Initial x0] --> B[Compute residual r0]
-  B --> C[Set search direction p0]
-  C --> D[Choose alpha by line minimization]
-  D --> E[Update x and residual]
-  E --> F{"Residual small?"}
-  F -->|yes| G[Return x]
-  F -->|no| H[Compute beta and new conjugate direction]
-  H --> D
+flowchart TB
+  Input["SPD linear system<br/>A x = b, optional preconditioner M"] --> Init["choose x0<br/>r0 = b - A x0"]
+  Init --> Prec{"preconditioned?"}
+  Prec -- "no" --> P0["p0 = r0"]
+  Prec -- "yes" --> Z0["solve M z0 = r0<br/>p0 = z0"]
+
+  subgraph CG["Conjugate-gradient loop"]
+    direction TB
+    Matvec["compute A p_k"] --> Alpha["alpha_k = (r_k^T z_k) / (p_k^T A p_k)"]
+    Alpha --> UpdateX["x_{k+1} = x_k + alpha_k p_k"]
+    UpdateX --> UpdateR["r_{k+1} = r_k - alpha_k A p_k"]
+    UpdateR --> Stop{"residual norm below tolerance?"}
+    Stop -- "no" --> PreStep["solve M z_{k+1} = r_{k+1}<br/>or z = r without preconditioner"]
+    PreStep --> Beta["beta_k = (r_{k+1}^T z_{k+1}) / (r_k^T z_k)"]
+    Beta --> NewP["p_{k+1} = z_{k+1} + beta_k p_k<br/>A-conjugate direction"]
+    NewP --> Matvec
+  end
+
+  P0 --> Matvec
+  Z0 --> Matvec
+  Stop -- "yes" --> CGOut["return x with residual and iteration count"]
+
+  subgraph Refine["Iterative refinement after a direct solve"]
+    direction TB
+    Approx["computed solution x_hat"] --> Rcomp["compute high-precision residual<br/>r = b - A x_hat"]
+    Rcomp --> Corr["solve A delta = r<br/>reuse factorization if available"]
+    Corr --> Add["x_hat := x_hat + delta"]
+    Add --> Rsmall{"residual improved enough?"}
+    Rsmall -- "no" --> Rcomp
+    Rsmall -- "yes" --> RefOut["refined solution"]
+  end
+
+  Input -. "alternative direct-solve workflow" .-> Approx
+  CGOut --> Done(("iterative solution"))
+  RefOut --> Done
 ```
+
+The CG loop shows the full state carried between iterations: residuals, optional preconditioned residuals, search directions, matrix-vector products, step lengths, and conjugacy updates. The separate refinement subgraph covers the direct-solve correction workflow, where a high-quality residual drives a correction equation. Both paths end with explicit residual reporting because convergence is a numerical claim, not just a loop exit.
 
 | Method | Matrix class | Main cost | Strength | Limitation |
 |---|---|---|---|---|

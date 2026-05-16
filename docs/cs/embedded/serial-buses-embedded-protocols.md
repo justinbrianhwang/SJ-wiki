@@ -9,10 +9,6 @@ The source includes a buses and protocols chapter covering serial communication 
 
 The common theme is that a bus is more than a wire. It defines electrical levels, direction rules, timing, addressing, framing, acknowledgements, and error checks. Software must follow the protocol's order exactly, while hardware must satisfy voltage, termination, pull-up, and distance requirements.
 
-![An SPI bus diagram shows one master selecting among three slave devices with separate chip-select lines.](https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/SPI_three_slaves.svg/500px-SPI_three_slaves.svg.png)
-
-*Figure: SPI bus with one master and three slave devices. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:SPI_three_slaves.svg), Cburnett, CC BY-SA 3.0.*
-
 ## Definitions
 
 **Serial communication** transmits data one bit at a time over one or a small number of signal lines. It contrasts with parallel transfer, where multiple bits move simultaneously.
@@ -56,21 +52,58 @@ The ninth key result is that acknowledgements mean different things at different
 ## Visual
 
 ```mermaid
-sequenceDiagram
-  participant M as I2C master
-  participant S as I2C slave
-  M->>S: START
-  M->>S: 7-bit address + write bit
-  S-->>M: ACK
-  M->>S: register address
-  S-->>M: ACK
-  M->>S: repeated START
-  M->>S: 7-bit address + read bit
-  S-->>M: ACK
-  S->>M: data byte
-  M-->>S: NACK
-  M->>S: STOP
+flowchart TB
+  MCU["Microcontroller serial peripheral or bit-banged GPIO"] --> Choice{"Protocol and electrical layer"}
+
+  subgraph UART["UART / RS-232 / RS-485 framing"]
+    direction LR
+    Idle["Idle line"] --> Start["Start bit"]
+    Start --> Data["5-9 data bits, least significant bit first"]
+    Data --> Parity["Optional parity"]
+    Parity --> Stop["One or more stop bits"]
+    Stop --> Gap["Inter-frame gap or protocol delimiter"]
+  end
+
+  subgraph I2C["I2C transaction"]
+    direction LR
+    Pullups["Open-drain SDA/SCL with pull-ups"] --> StartI["START: SDA falls while SCL high"]
+    StartI --> Addr["7-bit address + R/W bit"]
+    Addr --> Ack1["ACK bit driven low by receiver"]
+    Ack1 --> Reg["Register address or command byte"]
+    Reg --> Rep["Repeated START for read"]
+    Rep --> DataI["Data byte, sampled while SCL high"]
+    DataI --> NackStop["NACK then STOP"]
+  end
+
+  subgraph SPI["SPI full-duplex transfer"]
+    direction LR
+    CS["Assert one chip-select line"] --> Clock["SCLK edges define sample/shift timing"]
+    Clock --> MOSI["MOSI shifts master-to-slave bitstream"]
+    Clock --> MISO["MISO shifts slave-to-master bitstream"]
+    MOSI --> DoneSPI["Deassert chip select after frame"]
+    MISO --> DoneSPI
+  end
+
+  subgraph Modbus["Modbus RTU over RS-485"]
+    direction LR
+    Silent["Silent interval"] --> Slave["Slave address"]
+    Slave --> Function["Function code"]
+    Function --> Payload["Data bytes"]
+    Payload --> CRC["CRC-16"]
+    CRC --> Turnaround["Driver direction turnaround"]
+  end
+
+  Choice -- "async byte stream" --> UART
+  Choice -- "two-wire shared bus" --> I2C
+  Choice -- "synchronous chip-select bus" --> SPI
+  Choice -- "industrial multidrop frames" --> Modbus
+  UART --> Driver["Level shifter or differential transceiver as needed"]
+  I2C --> Pull["Pull-up sizing and bus capacitance limit rise time"]
+  SPI --> Fanout["One chip select per slave or decoder"]
+  Modbus --> Term["RS-485 termination, bias, and bus arbitration"]
 ```
+
+This serial-bus diagram compares the actual frame and wiring contracts for UART/RS-style links, I2C, SPI, and Modbus RTU. Each subgraph labels the ordering of start/address/data/acknowledgement or chip-select/clock/data events, so the bus is not reduced to a generic byte arrow. The hardware side notes make the electrical assumptions visible: level shifting, open-drain pull-ups, chip-select fanout, differential termination, and driver turnaround.
 
 | Bus or standard | Signaling | Topology | Software concern | Hardware concern |
 |---|---|---|---|---|

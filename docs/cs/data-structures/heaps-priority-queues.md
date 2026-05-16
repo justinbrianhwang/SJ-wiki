@@ -9,10 +9,6 @@ A priority queue (우선순위 큐) stores items so that the most important item
 
 The source textbook introduces heaps in the tree chapter and later revisits advanced priority queues. The basic binary heap is the essential core. It combines two ideas: a complete binary-tree shape, which packs neatly into an array, and a heap-order property, which keeps the highest-priority key at the root.
 
-![A binary heap diagram shows a complete binary tree whose parent keys satisfy the heap order property.](https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Binary_heap.svg/500px-Binary_heap.svg.png)
-
-*Figure: Binary heap represented as a complete tree. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Binary_heap.svg), Wojciech Mula, CC BY-SA 3.0.*
-
 ## Definitions
 
 A **priority queue ADT** supports:
@@ -75,21 +71,41 @@ Careful index arithmetic is part of the heap invariant, not a cosmetic implement
 ## Visual
 
 ```mermaid
-graph TD
-  A("(90")) --> B("(70"))
-  A --> C("(60"))
-  B --> D("(40"))
-  B --> E("(50"))
-  C --> F("(20"))
-  C --> G("(10"))
+flowchart TB
+  subgraph Tree["Max-heap as complete binary tree"]
+    direction TB
+    N0["index 0: 90"] --> N1["index 1: 70"]
+    N0 --> N2["index 2: 60"]
+    N1 --> N3["index 3: 40"]
+    N1 --> N4["index 4: 50"]
+    N2 --> N5["index 5: 20"]
+    N2 --> N6["index 6: 10"]
+  end
+
+  subgraph Array["Array representation"]
+    direction LR
+    A0["0:90"] --> A1["1:70"]
+    A1 --> A2["2:60"]
+    A2 --> A3["3:40"]
+    A3 --> A4["4:50"]
+    A4 --> A5["5:20"]
+    A5 --> A6["6:10"]
+  end
+
+  Formula["For zero-based index i: left=2i+1, right=2i+2, parent=floor((i-1)/2)"] --> Tree
+  Tree -. "same storage order, level by level" .-> Array
+
+  Insert["Insert: append new key at next array slot"] --> SiftUp{"Parent key smaller?"}
+  SiftUp -- "yes" --> SwapUp["Swap with parent; continue upward"]
+  SwapUp --> SiftUp
+  SiftUp -- "no" --> HeapOK(("Heap order restored"))
+  Delete["Delete max: move last key to root"] --> SiftDown{"Child key larger?"}
+  SiftDown -- "yes" --> SwapDown["Swap with larger child; continue downward"]
+  SwapDown --> SiftDown
+  SiftDown -- "no" --> HeapOK
 ```
 
-Array representation of the same max heap:
-
-```text
-index: 0   1   2   3   4   5   6
-key:  90  70  60  40  50  20  10
-```
+This heap diagram ties the complete-tree invariant to the level-order array representation. Each tree node is labeled with its array index, and the formula node gives the exact parent/child index arithmetic used by heap operations. The insert and delete-max repair paths show why only one root-to-leaf or leaf-to-root path needs to be adjusted, giving logarithmic update cost.
 
 ## Worked example 1: inserting into a max heap
 

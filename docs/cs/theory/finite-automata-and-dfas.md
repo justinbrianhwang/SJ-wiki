@@ -49,14 +49,41 @@ DFAs also provide a first example of finite abstraction. A long prefix may conta
 ## Visual
 
 ```mermaid
-stateDiagram-v2
-  [*] --> even
-  even --> even: 0
-  even --> odd: 1
-  odd --> odd: 0
-  odd --> even: 1
-  even --> [*]
+flowchart TB
+  Input["Input tape w = 1 0 1 1 0"] --> Head["Read-only head: consumes exactly one symbol per step"]
+  Head --> State["Current state is the only memory"]
+
+  subgraph Contract["DFA contract M = (Q, Sigma, delta, q0, F)"]
+    direction TB
+    Q["Q = {E, O}: stored parity of 1s seen so far"]
+    Sigma["Sigma = {0, 1}: every state has one transition per symbol"]
+    Q0["q0 = E: empty prefix has even parity"]
+    F["F = {E}: accept after the whole input is consumed"]
+  end
+
+  State --> E["E: even number of 1s in consumed prefix"]
+  E -- "read 0 / stay E" --> E
+  E -- "read 1 / toggle" --> O["O: odd number of 1s in consumed prefix"]
+  O -- "read 0 / stay O" --> O
+  O -- "read 1 / toggle" --> E
+
+  E --> EndEven{"Input exhausted?"}
+  O --> EndOdd{"Input exhausted?"}
+  EndEven -- "yes and state in F" --> Accept(("accept"))
+  EndOdd -- "yes and state not in F" --> Reject(("reject"))
+  EndEven -- "no" --> Head
+  EndOdd -- "no" --> Head
+
+  subgraph Product["Closure construction: product DFA"]
+    direction TB
+    AState["DFA A state qA after prefix x"] --> Pair["Product state (qA, qB)"]
+    BState["DFA B state qB after prefix x"] --> Pair
+    Pair -- "on symbol a" --> PairNext["Next pair = (deltaA(qA,a), deltaB(qB,a))"]
+    PairNext --> Rule["Acceptance rule chooses union, intersection, or difference"]
+  end
 ```
+
+This diagram treats a DFA as an execution architecture: the input head advances one symbol at a time while the finite state stores the complete summary of the consumed prefix. The parity example exposes both `0` and `1` transitions from each state, the accept/reject decision after input exhaustion, and the product construction used to combine two DFAs without adding any extra memory model.
 
 | Language pattern | DFA memory idea | Number of states often needed |
 |---|---|---|

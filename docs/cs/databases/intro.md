@@ -9,10 +9,6 @@ Database systems are the software layer that lets people store, query, update, p
 
 These notes follow the structure and emphasis of Silberschatz, Korth, and Sudarshan's *Database System Concepts*, 7th edition, using the local source PDF's extracted table of contents as the roadmap. The pages are written as study notes rather than a replacement for the book: they compress the core definitions, algorithms, trade-offs, and worked examples needed to connect SQL practice with database internals.
 
-![A B-tree diagram shows multiple keys stored in each internal node and leaves at the same depth.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/B-tree.svg/500px-B-tree.svg.png)
-
-*Figure: B-tree node structure used in balanced search indexes. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:B-tree.svg), CyHawk, CC BY-SA 3.0.*
-
 ## Definitions
 
 A **database** is an organized collection of related data representing some part of the real world or an enterprise. A **database-management system (DBMS)** is the software system that defines, stores, queries, updates, protects, and administers that data. A **database system** is the DBMS plus the data, applications, users, and operating environment around it.
@@ -56,18 +52,43 @@ Several themes recur across the whole subject:
 
 ```mermaid
 flowchart TD
-  A["Requirements and enterprise rules"] --> B["Conceptual design: E-R model"]
-  B --> C["Logical design: relational schema"]
-  C --> D["SQL queries and updates"]
-  C --> E["Constraints and normalization"]
-  D --> F["Query optimizer"]
-  F --> G["Physical plan"]
-  G --> H["Storage, indexes, buffer manager"]
-  D --> I["Transactions and isolation"]
-  I --> J["Recovery and logging"]
-  H --> K["Distributed and analytical systems"]
-  J --> K
+  Client["Application or SQL client"] --> Parser["Parser, binder, and authorization checks"]
+  Parser --> Logical["Logical plan: relational algebra tree"]
+  Logical --> Rewrite["Rewrite rules: predicate pushdown, view expansion, decorrelation"]
+  Rewrite --> Optimizer["Cost-based optimizer"]
+
+  subgraph Catalog["Catalog and statistics"]
+    direction TB
+    Schema["Schemas, constraints, views"]
+    Stats["Tuple counts, histograms, distinct values, index metadata"]
+    Privs["Users, roles, grants"]
+  end
+
+  Catalog -. "metadata and estimates" .-> Parser
+  Catalog -. "cost and legality inputs" .-> Optimizer
+  Optimizer --> Physical["Physical plan: scans, joins, sort/hash/group operators"]
+  Physical --> Executor["Execution engine: iterator, vectorized, or compiled"]
+
+  subgraph Storage["Storage and transaction services"]
+    direction TB
+    Buffer["Buffer manager and page cache"]
+    Indexes["Indexes: B+ tree, hash, bitmap"]
+    Heap["Table/heap files and record layout"]
+    Txn["Transaction manager: locks or MVCC snapshots"]
+    Log["WAL and recovery manager"]
+  end
+
+  Executor --> Buffer
+  Executor --> Txn
+  Buffer --> Indexes
+  Buffer --> Heap
+  Txn --> Log
+  Log --> Disk["Stable storage and replicas"]
+  Buffer --> Disk
+  Executor --> Result(("Result rows or commit/abort"))
 ```
+
+This DBMS architecture diagram follows a query from SQL text to a physical plan and then into storage, transaction, and recovery services. The catalog supplies schema checks, privileges, and optimizer statistics; the executor then drives buffer pages, indexes, heap files, locks or MVCC snapshots, and WAL. The output node covers both read queries and update transactions because the same engine must produce results while preserving isolation and durability.
 
 | If you are trying to understand... | Start with | Then read |
 | --- | --- | --- |

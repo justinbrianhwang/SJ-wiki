@@ -9,10 +9,6 @@ Feedforward neural networks extend linear models by learning hidden representati
 
 For NLP, the critical shift is from hand-built sparse features to learned dense features. A word can be mapped through an embedding lookup, combined with nearby words or pooled over a document, transformed by hidden layers, and finally converted to a probability distribution with softmax. This architecture is the ancestor of RNNs, encoder-decoders, and transformers.
 
-![A recurrent neural network diagram shows a compact recurrent cell and the same computation unfolded over time.](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Recurrent_neural_network_unfold.svg/500px-Recurrent_neural_network_unfold.svg.png)
-
-*Figure: Recurrent neural network shown compactly and unfolded through time. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Recurrent_neural_network_unfold.svg), fdeloche, CC BY-SA 4.0.*
-
 ## Definitions
 
 A **feedforward neural network** maps an input vector $x$ to an output through layers with no cycles. A one-hidden-layer network is

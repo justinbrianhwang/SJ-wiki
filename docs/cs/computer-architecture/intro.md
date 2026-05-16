@@ -9,10 +9,6 @@ Computer architecture studies the contract between software and hardware, and th
 
 These notes follow the scope of *Computer Architecture: A Quantitative Approach*, 5th edition: quantitative design, memory hierarchy, instruction-level parallelism, data-level parallelism, thread-level parallelism, warehouse-scale computing, and supporting appendix topics such as instruction sets, pipelining, virtual memory, and storage. They are written as original study notes, with formulas, diagrams, worked examples, and small runnable models.
 
-![A von Neumann architecture diagram shows a CPU connected to memory through shared data and control paths.](https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Von_Neumann_Architecture.svg/500px-Von_Neumann_Architecture.svg.png)
-
-*Figure: Von Neumann computer architecture. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Von_Neumann_Architecture.svg), Kapooht, CC BY-SA 3.0.*
-
 ## Definitions
 
 Computer architecture includes three related layers:
@@ -79,19 +75,32 @@ The final result is that local peak numbers are rarely enough. Peak FLOP/s, peak
 
 ```mermaid
 flowchart TD
-    A[Quantitative design] --> B[ISA contract]
-    A --> C[Processor organization]
-    A --> D[Memory hierarchy]
-    C --> E[Pipelining and ILP]
-    E --> F["Prediction, scheduling, speculation"]
-    D --> G["Caches, TLBs, virtual memory"]
-    G --> H[Coherence and consistency]
-    A --> I[Parallel systems]
-    I --> J["SIMD, GPU, multicore, WSC"]
-    A --> K[Storage and dependability]
-    J --> L[Accelerators and domain-specific design]
-    K --> L
+    Workload["Workload and metrics: time, energy, cost, availability"] --> ISA["ISA contract: instructions, registers, memory model, exceptions"]
+    ISA --> FrontEnd["Front end: fetch, branch prediction, decode"]
+    FrontEnd --> Rename["Rename and dispatch: map table, free list, ROB allocation"]
+    Rename --> Issue["Issue queues / reservation stations"]
+    Issue --> FUs["Functional units: ALU, branch, load/store, FP/vector"]
+    FUs --> Commit["In-order commit: precise architectural state"]
+    Commit --> ISA
+
+    FUs --> L1["L1 I-cache and D-cache"]
+    L1 --> TLB["TLBs and page-table walker"]
+    L1 --> L2["Private or shared L2 cache"]
+    L2 --> LLC["Last-level cache and coherence directory"]
+    LLC --> DRAM["Memory controllers and DRAM channels"]
+    DRAM --> Storage["Persistent storage: SSD, disk, RAID"]
+
+    LLC --> Interconnect["On-chip network / bus / ring / mesh"]
+    Interconnect --> Core2["Other cores with private caches"]
+    Core2 -. "coherence messages and memory ordering" .-> LLC
+
+    FUs --> SIMD["SIMD/vector lanes and GPU/SIMT accelerators"]
+    DRAM -. "bandwidth and data movement limits" .-> SIMD
+    Workload -. "Amdahl fraction and bottleneck measurement" .-> FrontEnd
+    Workload -. "locality and working set" .-> L1
 ```
+
+This architecture overview shows the path from workload goals through ISA, front end, out-of-order core structures, caches, translation, coherence, memory, storage, and accelerators. The feedback edge from commit to the ISA highlights the key contract: speculative internal work must retire as precise architectural state. The dotted edges call out the quantitative constraints that dominate real designs, especially Amdahl fractions, locality, coherence traffic, and data movement.
 
 | Design question | Typical metric | Related pages |
 |---|---|---|

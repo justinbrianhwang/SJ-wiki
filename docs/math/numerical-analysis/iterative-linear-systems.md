@@ -87,18 +87,33 @@ For study purposes, the most useful habit is to separate four layers: the contin
 | Weighted Jacobi | no | yes | weight | common smoother |
 
 ```mermaid
-graph TD
-  A[Choose x0] --> B[Compute residual]
-  B --> C{"Converged?"}
-  C -->|yes| D[Return x]
-  C -->|no| E{Iteration type}
-  E --> F[Jacobi old values]
-  E --> G[Gauss-Seidel newest values]
-  E --> H[SOR relaxed update]
-  F --> B
-  G --> B
-  H --> B
+flowchart TB
+  Input["Linear system<br/>A x = b"] --> Split["Choose splitting<br/>A = D - L - U"]
+  Split --> Init["initial guess x^(0)<br/>tolerance, norm, max iterations"]
+  Init --> Resid["compute residual<br/>r^(k) = b - A x^(k)"]
+  Resid --> Stop{"converged?<br/>residual small and iteration count safe"}
+  Stop -- "yes" --> Return["return x^(k) with residual report"]
+  Stop -- "no" --> Method{"iteration formula"}
+
+  subgraph Updates["Stationary updates"]
+    direction TB
+    Jacobi["Jacobi<br/>use only old values"] --> Xnew["candidate x^(k+1)"]
+    GS["Gauss-Seidel<br/>use newest lower-index values"] --> Xnew
+    SOR["SOR<br/>relax GS step with omega"] --> Xnew
+    WJ["weighted Jacobi<br/>blend old and Jacobi update"] --> Xnew
+  end
+
+  Method -- "parallel-friendly" --> Jacobi
+  Method -- "sequential sweep" --> GS
+  Method -- "tuned relaxation" --> SOR
+  Method -- "smoother" --> WJ
+  Xnew --> Diverge{"residual decreasing?"}
+  Diverge -- "yes" --> Resid
+  Diverge -- "no" --> Diagnose["diagnose spectral radius, scaling, or omega"]
+  Diagnose -. "change method or preconditioner" .-> Split
 ```
+
+This iterative-solver diagram keeps the residual test outside the update formula, which is the safest way to compare Jacobi, Gauss-Seidel, SOR, and weighted Jacobi. The stationary-update subgraph shows exactly which values each method uses to build $x^{(k+1)}$. The divergence branch makes the convergence hypothesis visible instead of hiding it behind a fixed iteration count.
 
 ## Worked example 1: Jacobi iteration
 

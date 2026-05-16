@@ -4,35 +4,63 @@ slug: /quantum-information-science
 sidebar_position: 0
 ---
 
-<div align="center">
-  <img src="/assets/quantum-computing.png" alt="Quantum Information Science" width="180" />
-</div>
-
 # Quantum Information Science
 
 The discipline that studies how information is encoded, stored, transformed, transmitted, sensed, and protected using quantum-mechanical degrees of freedom. SJ Wiki organizes the field into five sister areas:
 
 ```mermaid
 flowchart TD
-  QIS["Quantum Information Science"]
-  QIS --> QC[Quantum Computing]
-  QIS --> QCom[Quantum Communication]
-  QIS --> QI[Quantum Internet]
-  QIS --> QS[Quantum Sensing]
-  QIS --> QSec[Quantum Security]
-  QC --> HW[Hardware]
-  QC --> ALG[Algorithms]
-  QC --> EC[Error Correction]
-  QC --> QML[Quantum ML]
-  QCom --> BB84[BB84]
-  QCom --> QKD[QKD]
-  QCom --> QNet[Quantum Network]
-  QI --> ENT[Entanglement]
-  QI --> TEL[Teleportation]
-  QI --> REP[Quantum Repeater]
-  QSec --> PQC[PQC]
-  QSec --> QSC["Quantum-safe Crypto"]
+  QIS["Quantum Information Science<br/>encode, transform, transmit, sense, protect quantum states"]
+
+  subgraph QC["Quantum Computing"]
+    direction TB
+    HW["hardware platforms<br/>transmons, ions, photons"] --> CIR["#quot;circuit model<br/>registers [n qubits"], gates, measurements"]
+    CIR --> ALG["algorithms<br/>QFT, phase estimation, Grover, Shor, HHL"]
+    CIR --> EC["error correction<br/>stabilizers, syndrome extraction, logical qubits"]
+    ALG --> QML["quantum ML<br/>VQE, QAOA, kernels, optimizer loops"]
+    EC -. "fault-tolerant logical gates" .-> ALG
+  end
+
+  subgraph QCom["Quantum Communication"]
+    direction TB
+    BB84["BB84 prepare-and-measure<br/>bits + bases -> sifted key"] --> QKD["QKD families<br/>E91, MDI-QKD, TF-QKD"]
+    QKD --> QNet["communication networks<br/>trusted nodes, key buffers, control plane"]
+  end
+
+  subgraph QI["Quantum Internet"]
+    direction TB
+    ENT["entanglement resources<br/>Bell pairs, GHZ states, fidelity F"] --> TEL["teleportation<br/>Bell measurement + 2 classical bits"]
+    ENT --> REP["quantum repeaters<br/>heralding, memories, swapping, distillation"]
+    REP --> TEL
+  end
+
+  subgraph QS["Quantum Sensing"]
+    direction TB
+    RAM["Ramsey sequence<br/>pi/2 - free evolution - pi/2"] --> EST["estimator<br/>phase, field, frequency, uncertainty"]
+    NV["NV magnetometry<br/>green pump, microwave control, fluorescence"] --> EST
+    CLK["atomic clocks<br/>oscillator, atoms, error signal, servo"] --> EST
+  end
+
+  subgraph QSec["Quantum Security"]
+    direction TB
+    Threat["quantum threat model<br/>Shor for public key, Grover for search"] --> PQC["PQC primitives<br/>ML-KEM, ML-DSA, SLH-DSA, FN-DSA"]
+    Threat --> QSafe["quantum-safe migration<br/>hybrid TLS, inventory, crypto agility"]
+    QKDsec["QKD links<br/>specialized physical key distribution"] --> QSafe
+  end
+
+  QIS --> QC
+  QIS --> QCom
+  QIS --> QI
+  QIS --> QS
+  QIS --> QSec
+  QCom -. "secret keys and authenticated classical channels" .-> QSec
+  QI -. "entanglement transport primitives" .-> QCom
+  QC -. "algorithms create cryptographic risk" .-> QSec
+  EC -. "needed for scalable repeaters and computers" .-> QI
+  QS -. "shared control/readout techniques" .-> HW
 ```
+
+The map is an architecture overview of the QIS section rather than a directory tree. Each domain shows its internal building blocks and the labeled dotted arrows show the cross-domain contracts: computing supplies the algorithms that create security risk, communication supplies keys and authenticated channels, the quantum internet transports entanglement, and error correction supports scalable computing and repeaters. The diagram also makes the I/O style visible, from qubit registers and Bell pairs to sifted keys, estimator outputs, and migration targets.
 
 ## Areas
 

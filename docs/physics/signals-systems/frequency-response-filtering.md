@@ -9,10 +9,6 @@ Frequency response describes how an LTI system changes sinusoidal or complex exp
 
 This page connects Fourier transforms, Laplace transforms, and $z$-transforms. In continuous time, the frequency response is $H(j\omega)$. In discrete time, it is $H(e^{j\Omega})$. In both cases, it is obtained from the impulse response of an LTI system and used through multiplication in the frequency domain.
 
-![A Butterworth-filter Bode plot shows magnitude and phase versus logarithmic frequency.](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Butterworth_filter_bode_plot.svg/600px-Butterworth_filter_bode_plot.svg.png)
-
-*Figure: Bode plot for a Butterworth low-pass filter. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Butterworth_filter_bode_plot.svg), Alejo2083, CC BY-SA 3.0.*
-
 ## Definitions
 
 For a continuous-time LTI system with impulse response $h(t)$, the frequency response is
@@ -160,16 +156,43 @@ Ideal filters are useful reference models, but realizable filters trade sharpnes
 | Bandstop / notch | low and high bands | middle band | remove around $\omega_0$ |
 | Allpass | all magnitudes | none by magnitude | changes phase only |
 
-```text
-Magnitude sketches
+```mermaid
+flowchart TB
+  Spec["Filter specification<br/>passband, transition band, stopband, ripple, phase"] --> Type{"Desired magnitude behavior"}
+  Type -- "lowpass" --> LP["pass low frequencies<br/>reject high frequencies"]
+  Type -- "highpass" --> HP["reject DC and low frequencies<br/>pass high frequencies"]
+  Type -- "bandpass" --> BP["pass a middle band<br/>reject low and high"]
+  Type -- "notch or bandstop" --> Notch["reject a narrow band<br/>pass outside"]
 
-lowpass:        highpass:       bandpass:       notch:
+  subgraph LTI["LTI frequency-response contract"]
+    direction TB
+    Impulse["impulse response h"] --> Transform["transform to H(jw) or H(e^jOmega)"]
+    Transform --> Mag["magnitude response<br/>gain by frequency"]
+    Transform --> Phase["phase response<br/>delay and waveform distortion"]
+  end
 
-  ____             ____            ____        ___    ___
- |    |           |    |          |    |      |   |  |   |
-_|    |___     ___|    |      ____|    |__    |   |__|   |__
-      w             w             w              w
+  subgraph Realization["Realizable filter choices"]
+    direction TB
+    FIR["FIR design<br/>finite impulse response, possible linear phase"] --> Delay["more taps means sharper transition and more delay"]
+    IIR["IIR design<br/>poles and zeros, lower order possible"] --> Stability["poles must satisfy stability ROC condition"]
+    Analog["analog prototype<br/>RC, Butterworth, Chebyshev, etc."] --> TransformD["optional discretization<br/>bilinear or impulse-invariant"]
+  end
+
+  LP --> Impulse
+  HP --> Impulse
+  BP --> Impulse
+  Notch --> Impulse
+  Mag --> RealCheck["check passband and stopband against spec"]
+  Phase --> RealCheck
+  RealCheck --> FIR
+  RealCheck --> IIR
+  RealCheck --> Analog
+  Delay --> Output(("filtered signal"))
+  Stability --> Output
+  TransformD --> Output
 ```
+
+This filtering diagram connects ideal frequency goals to realizable LTI systems. The central contract is the impulse-response-to-frequency-response path, where magnitude controls pass/stop behavior and phase controls delay or waveform distortion. The realization subgraph shows why FIR, IIR, and analog-prototype filters make different tradeoffs in transition width, delay, order, and stability.
 
 ## Worked example 1: RC lowpass frequency response
 

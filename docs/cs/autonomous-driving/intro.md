@@ -9,10 +9,6 @@ Autonomous driving is a system-of-systems problem: sensors measure the world, pe
 
 This foundational section gives SJ Wiki a stable base for later paper and textbook deep-dives. The emphasis is practical and architectural: what each layer does, what math it relies on, what can go wrong, and how the layers connect. The pages use standard public terminology such as SAE J3016 automation levels, ODD, ISO 26262, SOTIF, sensor fusion, BEV representations, motion forecasting, model predictive control, and scenario-based validation.
 
-![A driving automation levels table summarizes SAE levels from no automation to full automation.](https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Levels_of_Driving_Automation.png/500px-Levels_of_Driving_Automation.png)
-
-*Figure: Levels of driving automation for road vehicles. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Levels_of_Driving_Automation.png), Bryant Walker Smith, CC BY 3.0.*
-
 ## Definitions
 
 An **autonomous vehicle**, in this section, is a road vehicle with software and hardware that can perform some or all of the dynamic driving task under specified conditions. The phrase is informal; precise responsibility depends on the SAE automation level and the operational design domain.
@@ -96,25 +92,88 @@ The page set produced here is:
 ## Visual
 
 ```mermaid
-flowchart TD
-  A["Cameras, LiDAR, radar, IMU, GNSS"] --> B["Synchronization and calibration"]
-  B --> C["Perception: objects, lanes, free space"]
-  C --> D["Fusion: tracks, BEV, occupancy"]
-  B --> E["Localization and HD map matching"]
-  D --> F["Prediction: multimodal agent futures"]
-  E --> F
-  F --> G["Behavior planning: yield, merge, stop"]
-  G --> H["Motion planning: feasible trajectory"]
-  H --> I["Control: steering, throttle, brake"]
-  I --> J["Vehicle and road world"]
-  J --> A
-  K["ODD, safety case, simulation, regulation"] --> B
-  K --> C
-  K --> F
-  K --> G
-  K --> H
-  K --> I
+flowchart TB
+  subgraph Sense["Sensor acquisition and time base"]
+    direction TB
+    Cam["#quot;Camera frames: [N_cam, H, W, 3"]"]
+    Lidar["#quot;LiDAR packets: [points, x, y, z, intensity, t"]"]
+    Radar["#quot;Radar targets: [range, azimuth, elevation, Doppler, RCS"]"]
+    Inertial["#quot;IMU + wheel odometry + GNSS: [a, omega, wheel ticks, lat/lon"]"]
+    Sync["Clock sync, timestamp alignment, health checks"]
+    Calib["Intrinsic + extrinsic calibration: T_sensor_to_vehicle"]
+    Cam --> Sync
+    Lidar --> Sync
+    Radar --> Sync
+    Inertial --> Sync
+    Sync --> Calib
+  end
+
+  subgraph Perception["Perception and scene representation"]
+    direction TB
+    ImageNet["Image backbone + 2D heads: boxes, masks, lanes, lights"]
+    PointNet["Point-cloud / BEV backbone: 3D boxes, occupancy, freespace"]
+    RadarEnc["Radar encoder: velocity cues, long-range tracks"]
+    BEV["#quot;Shared BEV tensor: [C, X, Y"] with uncertainty"]
+    Track["Multi-object tracking: object list + covariance"]
+    Calib -->|"rectified images"| ImageNet
+    Calib -->|"registered point cloud"| PointNet
+    Calib -->|"ego-compensated radar detections"| RadarEnc
+    ImageNet -->|"semantic features"| BEV
+    PointNet -->|"geometry features"| BEV
+    RadarEnc -->|"Doppler features"| BEV
+    BEV --> Track
+  end
+
+  subgraph Localization["Localization and map context"]
+    direction TB
+    DR["Dead reckoning propagation: x_t, P_t"]
+    MapMatch["HD/SD map matching: lanes, crosswalks, speed rules"]
+    Pose["Ego pose: SE(2)/SE(3) + covariance"]
+    Calib -->|"IMU, wheel, GNSS, landmarks"| DR
+    DR --> Pose
+    Map["Map tiles + route graph"] --> MapMatch
+    Pose --> MapMatch
+  end
+
+  subgraph Reasoning["Prediction, planning, and control"]
+    direction TB
+    Pred["Motion forecasting: K multimodal trajectories per agent"]
+    Behavior["Behavior planner: yield, stop, merge, lane change"]
+    Motion["#quot;Motion planner: collision-free trajectory [x, y, yaw, v, a"]"]
+    Control["Tracking controller: steering, throttle, brake"]
+    Act["Actuators: EPS, brake, powertrain"]
+    Track -->|"object list + histories"| Pred
+    MapMatch -->|"lane graph + route context"| Pred
+    Pred -->|"future-trajectory set + probabilities"| Behavior
+    Behavior -->|"maneuver + constraints"| Motion
+    MapMatch -->|"drivable corridor"| Motion
+    Motion -->|"time-indexed trajectory"| Control
+    Pose -->|"current ego state"| Control
+    Control -->|"motion command"| Act
+  end
+
+  subgraph Assurance["Runtime assurance and lifecycle feedback"]
+    direction TB
+    ODD["ODD monitor: road, weather, speed, sensor health"]
+    Safety["Safety supervisor: RSS/rule checks, fallback, MRM"]
+    Sim["Simulation + scenario mining + field logs"]
+    Case["Safety case and release evidence"]
+    ODD --> Safety
+    Safety -. "override or degrade" .-> Motion
+    Safety -. "override or stop" .-> Control
+    Act -->|"vehicle motion changes world"| World(("Road world"))
+    World -->|"new photons, returns, inertial motion"| Cam
+    World --> Lidar
+    World --> Radar
+    World --> Inertial
+    Track -->|"events and failures"| Sim
+    Motion -->|"planned vs actual"| Sim
+    Sim --> Case
+    Case --> ODD
+  end
 ```
+
+This diagram shows the modular AV stack as a typed data pipeline: raw sensor streams become calibrated features, BEV tensors, object tracks, pose estimates, multimodal forecasts, planned trajectories, and finally actuator commands. The dotted supervisor paths show that ODD and safety logic are not a postprocessing report; they can constrain planning, override control, or force fallback while logged scenarios feed the safety case.
 
 ## Worked example 1: Classifying an AV feature claim
 

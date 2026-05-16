@@ -49,19 +49,51 @@ Snapshot choice also affects user experience. A long report under transaction-le
 ## Visual
 
 ```mermaid
-sequenceDiagram
-  participant T1
-  participant DB
-  participant T2
-  T1->>DB: begin, snapshot S0
-  T2->>DB: begin, snapshot S0
-  T1->>DB: read A=on, B=on
-  T2->>DB: read A=on, B=on
-  T1->>DB: write A=off
-  T2->>DB: write B=off
-  T1->>DB: commit succeeds
-  T2->>DB: commit succeeds under SI
+flowchart TB
+  T1["T1 begins at timestamp 20; snapshot sees commits <= 20"] --> ReadA["Read row A"]
+  T2["T2 begins at timestamp 25; snapshot sees commits <= 25"] --> UpdateA["Write new version of row A"]
+
+  subgraph VersionChain["Row A version chain, newest first"]
+    direction LR
+    V3["Version v3: value 450; xmin=T2; xmax=null; commit=30"] --> V2["Version v2: value 500; xmin=T0; xmax=T2; commit=10"]
+    V2 --> V1["Older version v1"]
+  end
+
+  ReadA --> Visible{"Which version is visible to T1 snapshot 20?"}
+  Visible -- "v3 commit 30 is too new" --> Skip["Skip v3"]
+  Skip --> UseV2["Use v2: committed at 10 and not deleted as of 20"]
+  UpdateA --> V3
+
+  subgraph SIConflict["Snapshot-isolation commit checks"]
+    direction TB
+    W1["T3 writes row B"]
+    W2["T4 writes row B concurrently"]
+    SameRow{"Same-row write-write conflict?"}
+    Abort["Abort one writer: first-committer-wins"]
+    W1 --> SameRow
+    W2 --> SameRow
+    SameRow -- "yes" --> Abort
+  end
+
+  subgraph WriteSkew["Write skew under SI"]
+    direction TB
+    S0["Snapshot: Alice=on, Bob=on"]
+    TxA["T5 sets Alice=off after reading Bob=on"]
+    TxB["T6 sets Bob=off after reading Alice=on"]
+    NoWW{"Same row written?"}
+    Bad["Both may commit; invariant at least one doctor on call is false"]
+    S0 --> TxA
+    S0 --> TxB
+    TxA --> NoWW
+    TxB --> NoWW
+    NoWW -- "no" --> Bad
+  end
+
+  Visible -. "visibility uses xmin/xmax, commit status, and snapshot" .-> VersionChain
+  SIConflict -. "prevents direct lost update" .-> WriteSkew
 ```
+
+This MVCC diagram shows the physical version chain a reader walks and the timestamp rule that chooses the visible row version. The same page also labels the snapshot-isolation write-write conflict check, which aborts concurrent writers of the same row. The write-skew subgraph explains why that check is still weaker than serializability: two transactions can write different rows after reading the same snapshot and jointly violate a constraint.
 
 | Isolation style | Reader blocks writer? | Writer blocks reader? | Main anomaly risk |
 | --- | --- | --- | --- |

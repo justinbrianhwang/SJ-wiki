@@ -9,10 +9,6 @@ Electrochemistry connects electron transfer to electrical work. In a galvanic ce
 
 In the Ebbing and Gammon sequence this topic sits near balancing redox in acidic and basic solution, voltaic cells, cell notation, cell potential, standard electrode potentials, equilibrium constants from cell potentials, Nernst equation, commercial cells, electrolytic cells, and electrolysis stoichiometry. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
-![A galvanic cell diagram shows two half-cells connected by a salt bridge and an external electron path.](https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Galvanic_Cell.svg/400px-Galvanic_Cell.svg.png)
-
-*Figure: Galvanic cell with separated oxidation and reduction half-cells. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Galvanic_Cell.svg), Gringer, CC BY-SA 3.0.*
-
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.
@@ -54,16 +50,39 @@ Finally, keep symbolic and particulate representations side by side. A balanced 
 ## Visual
 
 ```mermaid
-sequenceDiagram
-  participant Anode as Anode: oxidation
-  participant Wire as External wire
-  participant Cathode as Cathode: reduction
-  participant Bridge as Salt bridge
-  Anode->>Wire: electrons leave
-  Wire->>Cathode: electrons arrive
-  Bridge-->>Anode: anions maintain charge
-  Bridge-->>Cathode: cations maintain charge
+flowchart LR
+  Ox["Oxidation half-reaction<br/>Zn(s) to Zn2+(aq) + 2 e-"] --> Anode["Anode electrode<br/>negative in galvanic cell"]
+  Anode -- "e- flow through wire" --> Load["External circuit<br/>voltmeter or load"]
+  Load -- "e- arrive" --> Cathode["Cathode electrode<br/>positive in galvanic cell"]
+  Cathode --> Red["Reduction half-reaction<br/>Cu2+(aq) + 2 e- to Cu(s)"]
+
+  subgraph LeftCell["Anode half-cell"]
+    direction TB
+    AnSol["Zn2+(aq), 1 M standard state"] --> Anode
+    Anode --> AnBuild["cation concentration rises"]
+  end
+
+  subgraph Bridge["Salt bridge or porous barrier"]
+    direction TB
+    Kplus["cations migrate toward cathode"] --> ChargeBal["charge neutrality maintained"]
+    Anion["anions migrate toward anode"] --> ChargeBal
+  end
+
+  subgraph RightCell["Cathode half-cell"]
+    direction TB
+    CatSol["Cu2+(aq), 1 M standard state"] --> Cathode
+    Cathode --> CatDrop["cation concentration falls"]
+  end
+
+  Anion -. "balances Zn2+ buildup" .-> AnBuild
+  Kplus -. "replaces consumed Cu2+" .-> CatDrop
+  Ox --> Cell["Cell reaction<br/>Zn(s) + Cu2+(aq) to Zn2+(aq) + Cu(s)"]
+  Red --> Cell
+  Cell --> Pot["Ecell = Ecathode - Eanode<br/>standard: 0.34 - (-0.76) = 1.10 V"]
+  Pot --> Work(("Electrical work"))
 ```
+
+This galvanic-cell architecture separates the oxidation and reduction half-reactions into an anode half-cell, cathode half-cell, external electron path, and ionic salt bridge. The dotted salt-bridge arrows show charge-balancing ion migration, while the solid external path shows electron flow from anode to cathode. The labeled standard potentials make the I/O contract explicit: half-cell chemistry produces a positive cell potential and usable electrical work.
 
 | Cell type | Sign of $\Delta G$ | Sign of $E_{cell}$ | Energy role |
 |---|---:|---:|---|

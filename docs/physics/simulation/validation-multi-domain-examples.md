@@ -68,16 +68,21 @@ A final validation check is prediction under changed conditions. After calibrati
 
 ```mermaid
 flowchart TD
-  A[Define decision and quantity of interest] --> B[Derive model and assumptions]
-  B --> C[Implement MATLAB and/or Simulink model]
-  C --> D[Verify numerics and code]
-  D --> E[Calibrate uncertain parameters]
-  E --> F[Validate against independent data]
-  F --> G{"Credible for decision?"}
-  G -->|no| H["Revise assumptions, parameters, or model structure"]
-  H --> B
-  G -->|yes| I[Use model and document limitations]
+  Decision["Define decision and quantity of interest<br/>what will the model be used to decide?"] --> Assumptions["derive model and assumptions<br/>domain boundary, parameters, equations"]
+  Assumptions --> Implement["implement MATLAB and/or Simulink model<br/>scripts, diagrams, logging"]
+  Implement --> Verify["verify numerics and code<br/>unit tests, residuals, solver refinement, analytical anchors"]
+  Verify --> Calibrate["calibrate uncertain parameters<br/>use training data and record fit method"]
+  Calibrate --> Validate["validate against independent data<br/>changed inputs, operating points, or experiments"]
+  Validate --> Residuals["analyze residual structure<br/>bias, delay, missing dynamics, noise model"]
+  Residuals --> Uncertainty["quantify uncertainty and limits<br/>parameter ranges, sensitivity, domain validity"]
+  Uncertainty --> Gate{"credible for the decision?"}
+  Gate -- "no" --> Revise["revise assumptions, parameters, data, or model structure"]
+  Revise --> Assumptions
+  Gate -- "yes" --> Report["use model with documented limitations<br/>decision scope, data set, solver settings"]
+  Report --> Outcome(("validated simulation evidence"))
 ```
+
+This validation diagram distinguishes verification, calibration, validation, residual analysis, and uncertainty reporting. The pipeline moves from a decision-specific model to independent-data testing, then gates use of the model on whether the evidence is credible for that decision. The revision loop is broad because validation failures can come from assumptions, parameters, data quality, implementation, or model structure.
 
 | Domain | Storage state | Flow/effort analogy | Common response |
 |---|---|---|---|

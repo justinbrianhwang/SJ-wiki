@@ -66,16 +66,39 @@ For study purposes, the most useful habit is to separate four layers: the contin
 ## Visual
 
 ```mermaid
-graph TD
-  A[Attempt step with h] --> B[Compute high and low order RK estimates]
-  B --> C[Estimate local error]
-  C --> D{"error <= tolerance?"}
-  D -->|yes| E[Accept step]
-  E --> F[Choose next h]
-  D -->|no| G[Reject and reduce h]
-  G --> A
-  F --> A
+flowchart TB
+  IVP["ODE problem<br/>y' = f(t,y), tolerances, final time"] --> Start["current accepted state<br/>(t_n, w_n), step h"]
+
+  subgraph Embedded["Embedded Runge-Kutta controller"]
+    direction TB
+    Stages["compute staged slopes<br/>k1, k2, ..., ks"] --> HighLow["two estimates from same stages<br/>high-order w_H and low-order w_L"]
+    HighLow --> Error["local error estimate<br/>err = norm(w_H - w_L)"]
+    Error --> Accept{"error within tolerance?"}
+    Accept -- "yes" --> Commit["accept w_{n+1} = w_H<br/>advance time"]
+    Accept -- "no" --> Reject["reject step<br/>do not advance state"]
+    Reject --> Shrink["reduce h with safety factor"]
+    Commit --> Grow["choose next h<br/>scale by (tol/err)^(1/(p+1))"]
+  end
+
+  subgraph Multi["Multistep predictor-corrector"]
+    direction TB
+    History["history values<br/>w_n, w_{n-1}, ... and f_n, f_{n-1}, ..."] --> Predict["Adams-Bashforth predictor<br/>explicit next value"]
+    Predict --> Correct["Adams-Moulton corrector<br/>implicit or fixed-point correction"]
+    Correct --> MultiErr["estimate error from predictor-corrector difference"]
+    MultiErr --> MultiAccept{"accept step?"}
+  end
+
+  Start --> Stages
+  Start --> History
+  Shrink --> Start
+  Grow --> Next{"finished interval?"}
+  MultiAccept -- "no" --> Shrink
+  MultiAccept -- "yes" --> Grow
+  Next -- "no" --> Start
+  Next -- "yes" --> Sol(("adaptive trajectory"))
 ```
+
+The adaptive-step diagram shows both embedded Runge-Kutta and multistep predictor-corrector architectures. Embedded RK reuses the same staged slopes to produce high- and low-order estimates, while multistep methods reuse accepted history and compare predictor-corrector behavior. The accept/reject and step-size controller nodes make clear that rejected steps never advance the state.
 
 | Family | Memory | Error control | Cost pattern | Typical use |
 |---|---:|---|---|---|

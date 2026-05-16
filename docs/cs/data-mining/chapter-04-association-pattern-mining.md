@@ -65,16 +65,32 @@ A value above 1 suggests positive association; below 1 suggests negative associa
 
 ```mermaid
 flowchart TD
-  A[Transactions] --> B[Count frequent 1-itemsets]
-  B --> C[Generate candidates of size k]
-  C --> D[Prune candidates with infrequent subsets]
-  D --> E[Scan database and count support]
-  E --> F{"Any frequent k-itemsets?"}
-  F -->|yes| C
-  F -->|no| G[Frequent itemsets]
-  G --> H[Generate rules]
-  H --> I[Filter by confidence and interest]
+  D["Transaction database D: baskets as item sets"] --> C1["Scan D and count singleton supports"]
+  C1 --> L1["L_1: frequent 1-itemsets where support >= sigma"]
+  L1 --> Join["Self-join L_(k-1) to form C_k candidates"]
+  Join --> Prune["Apriori prune: drop candidate if any (k-1)-subset is not in L_(k-1)"]
+  Prune --> Count["Scan D: increment support for candidates contained in each transaction"]
+  Count --> Lk["L_k: candidates with support >= sigma"]
+  Lk --> More{"L_k nonempty?"}
+  More -- "yes, k = k + 1" --> Join
+  More -- "no" --> Freq["All frequent itemsets = union of L_1..L_(k-1)"]
+  Freq --> Rules["For each frequent itemset Z, enumerate nonempty X subset Z"]
+  Rules --> Conf["Rule X -> Z-X; confidence = support(Z) / support(X)"]
+  Conf --> Interesting{"Confidence, lift, or other interest passes threshold?"}
+  Interesting -- "yes" --> Output(("Accepted association rules"))
+  Interesting -- "no" --> Drop["Discard weak or uninteresting rule"]
+
+  subgraph Example["Level-wise candidate example"]
+    direction LR
+    E1["L_1: bread, milk, diaper, beer"] --> E2["C_2: bread milk; bread diaper; milk diaper; diaper beer"]
+    E2 --> E3["L_2 after support count"]
+    E3 --> E4["C_3 generated only from frequent pairs"]
+  end
+
+  Prune -. "downward closure removes supersets of infrequent subsets" .-> Example
 ```
+
+This Apriori diagram shows candidate generation, subset pruning, support counting, level-wise termination, and rule generation as separate stages. The labels identify the sets `C_k` and `L_k`, the minimum support threshold, and the confidence calculation for rules after frequent itemsets are known. The example branch illustrates downward closure: a candidate of size 3 can only survive if all of its size-2 subsets were frequent.
 
 | Measure | Formula | Interpretation | Limitation |
 |---|---|---|---|

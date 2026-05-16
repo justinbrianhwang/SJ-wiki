@@ -9,10 +9,6 @@ Machine translation maps text from a source language to a target language. Juraf
 
 MT is a compact view of NLP as a whole. It needs tokenization, language modeling, sequence modeling, search, semantics, evaluation, and awareness of social context. A translation must be adequate, preserving meaning, and fluent, sounding natural in the target language. Those goals are easy to state and hard to optimize directly.
 
-![A recurrent neural network diagram shows a compact recurrent cell and the same computation unfolded over time.](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Recurrent_neural_network_unfold.svg/500px-Recurrent_neural_network_unfold.svg.png)
-
-*Figure: Recurrent neural network shown compactly and unfolded through time. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Recurrent_neural_network_unfold.svg), fdeloche, CC BY-SA 4.0.*
-
 ## Definitions
 
 Given a source sentence $x$ and target sentence $y$, machine translation seeks
@@ -70,17 +66,50 @@ Human post-editing data is especially informative because it shows what a profes
 ## Visual
 
 ```mermaid
-flowchart LR
-  A[Source sentence] --> B[Source subword tokens]
-  B --> C[Transformer encoder]
-  C --> D[Encoder states]
-  E[Previous target tokens] --> F[Masked decoder self-attention]
-  F --> G[Cross-attention to encoder states]
-  D --> G
-  G --> H[Softmax over target vocabulary]
-  H --> I[Beam search]
-  I --> J[Target translation]
+flowchart TB
+  Source["Source sentence x"] --> SrcTok["Source subword tokens: x_1..x_m"]
+  SrcTok --> SrcEmb["Source embeddings plus positional encodings"]
+
+  subgraph Encoder["Transformer encoder stack"]
+    direction TB
+    EncSA["Multi-head self-attention over all source tokens"]
+    EncAN1["Add and LayerNorm"]
+    EncFFN["Position-wise feed-forward network"]
+    EncAN2["Add and LayerNorm"]
+    EncSA --> EncAN1
+    EncAN1 --> EncFFN
+    EncFFN --> EncAN2
+  end
+
+  SrcEmb --> EncSA
+  EncAN2 --> Memory["Encoder memory: source keys and values"]
+
+  Prev["Shifted target prefix y_<t during teacher forcing or beam search"] --> TgtEmb["Target embeddings plus positional encodings"]
+
+  subgraph Decoder["Transformer decoder layer"]
+    direction TB
+    Masked["Masked multi-head self-attention over target prefix"]
+    DAN1["Add and LayerNorm"]
+    Cross["Cross-attention: Q from decoder, K/V from encoder memory"]
+    DAN2["Add and LayerNorm"]
+    DFFN["Position-wise feed-forward network"]
+    DAN3["Add and LayerNorm"]
+    Masked --> DAN1
+    DAN1 --> Cross
+    Cross --> DAN2
+    DAN2 --> DFFN
+    DFFN --> DAN3
+  end
+
+  TgtEmb --> Masked
+  Memory -. "K, V source states" .-> Cross
+  DAN3 --> Linear["Linear projection to target vocabulary"]
+  Linear --> Softmax["Softmax P(y_t | y_<t, x)"]
+  Softmax --> Beam["Beam search: keep top k partial translations by normalized log score"]
+  Beam --> Output(("Target translation y"))
 ```
+
+This MT architecture diagram shows the full encoder-decoder Transformer path used by modern neural translation. Source tokens become encoder memory through self-attention and FFN sublayers; the decoder uses masked self-attention for the target prefix and cross-attention with `Q` from the decoder and `K,V` from the encoder. The final linear/softmax and beam-search block make the autoregressive output contract explicit.
 
 | MT era | Main representation | Search problem | Strength | Weakness |
 |---|---|---|---|---|

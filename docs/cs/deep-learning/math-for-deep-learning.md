@@ -99,17 +99,24 @@ The link between likelihood and loss is a recurring modeling choice. Squared err
 ## Visual
 
 ```mermaid
-flowchart LR
-  X[Input tensor X] --> F[Forward computation]
-  P[Parameters theta] --> F
-  F --> YH[Predictions y_hat]
-  Y[Targets y] --> L[Scalar loss]
-  YH --> L
-  L --> B[Backward pass]
-  B --> G[Gradients dL/dtheta]
-  G --> O[Optimizer update]
-  O --> P
+flowchart TB
+  X["#quot;Input batch X: [N, d"]"] --> Matmul["Linear algebra: XW + b"]
+  Theta["Parameters theta: W, b, layer weights"] --> Matmul
+  Matmul --> Nonlin["Differentiable operations: activations, norms, attention, convolutions"]
+  Nonlin --> Pred["Predictions y_hat"]
+  Y["Targets y"] --> Loss["Scalar loss L(y_hat, y)"]
+  Pred --> Loss
+  Loss --> Seed["Reverse-mode seed: dL/dL = 1"]
+  Seed --> VJP["Vector-Jacobian products through recorded graph"]
+  VJP --> Saved["Use saved forward tensors where needed"]
+  Saved --> GradTheta["Parameter gradients dL/dtheta"]
+  Saved --> GradX["Optional input gradients dL/dX"]
+  GradTheta --> Step["Optimizer applies negative-gradient update"]
+  Step --> Theta
+  Loss -. "probability view: negative log-likelihood or empirical risk" .-> Step
 ```
+
+This computation graph connects the math objects to the training mechanics. The forward pass is a chain of tensor operations that ends in a scalar loss, and reverse-mode autodiff sends vector-Jacobian products backward through the exact recorded operations. The optimizer consumes `dL/dtheta`; input gradients are optional and only needed for analysis or methods such as adversarial examples.
 
 | Mathematical tool | Deep learning role | Typical failure when misunderstood |
 |---|---|---|

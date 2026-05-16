@@ -69,16 +69,22 @@ This makes TLS a useful capstone topic. Every earlier primitive appears with ope
 sequenceDiagram
   participant C as Client
   participant S as Server
-  C->>S: ClientHello + key_share
-  S->>C: ServerHello + key_share
-  S->>C: EncryptedExtensions
-  S->>C: Certificate
-  S->>C: CertificateVerify
-  S->>C: Finished
-  C->>S: Finished
-  C->>S: AEAD-protected application records
-  S->>C: AEAD-protected application records
+  C->>S: ClientHello: versions, cipher suites, random, key_share, extensions
+  S->>C: ServerHello: selected suite, random, key_share
+  Note over C,S: Both compute ECDHE shared secret and derive handshake traffic keys with HKDF
+  S->>C: EncryptedExtensions under server handshake key
+  S->>C: Certificate chain
+  S->>C: CertificateVerify: signature over transcript hash
+  S->>C: Finished: MAC over transcript with server finished key
+  Note over C: Verify certificate, signature, transcript, and Finished MAC
+  C->>S: Finished: MAC over transcript with client finished key
+  Note over C,S: Derive application traffic secrets and update record nonces
+  C->>S: AEAD application record: seq, nonce, ciphertext, tag
+  S->>C: AEAD application record: seq, nonce, ciphertext, tag
+  Note over C,S: KeyUpdate can derive fresh traffic keys without a new handshake
 ```
+
+This sequence expands the TLS 1.3 handshake into its authenticated key-exchange and record-protection layers. The ServerHello key share establishes handshake encryption, CertificateVerify and Finished bind authentication to the transcript, and application records use separate AEAD traffic keys and nonces derived from the HKDF schedule.
 
 | TLS component | Cryptographic role | Related primitive |
 |---|---|---|

@@ -168,16 +168,40 @@ Bell pairs per input pair. This rate is meaningful only when the uncertainty is 
 
 ```mermaid
 flowchart TB
-  Source["Noisy pair source"] --> Raw["Raw shared states"]
-  Raw --> Check["Estimate fidelity"]
-  Check -->|high enough| Use["Use directly"]
-  Check -->|moderate| Distill["DEJMPS or hashing"]
-  Distill --> Better["Fewer better Bell pairs"]
-  Better --> Teleport["Teleportation"]
-  Better --> Swap["Entanglement swapping"]
-  Better --> QKD["Entanglement-based QKD"]
-  Check -->|too noisy| Discard["Discard or regenerate"]
+  subgraph Bell["Bell-pair generation circuit"]
+    direction LR
+    BQ0["#quot;q0<br/>|#quot;0>#quot;"] --> BH["#quot;Hadamard H<br/>(#quot;|0>+|1>)/sqrt(2)#quot;"]
+    BQ1["q1<br/>|0>"] --> BCX["CNOT<br/>control q0, target q1"]
+    BH --> BCX
+    BCX --> BOut["Bell pair<br/>|#quot;Phi+> = (#quot;|00>+|11>)/sqrt(2)"]
+  end
+
+  subgraph GHZ["GHZ-state generation circuit"]
+    direction LR
+    GQ0["q0<br/>|0>"] --> GH["Hadamard H on q0"]
+    GQ1["q1<br/>|0>"] --> GCX1["CNOT<br/>q0 -> q1"]
+    GH --> GCX1
+    GCX1 --> GCX2["CNOT<br/>q0 -> q2"]
+    GQ2["q2<br/>|0>"] --> GCX2
+    GCX2 --> GOut["GHZ state<br/>(|#quot;000>+#quot;|111>)/sqrt(2)"]
+  end
+
+  subgraph NetworkUse["Noisy-resource handling"]
+    direction LR
+    Source["physical source or repeater link<br/>rho_AB, fidelity F"] --> Noise["channel and memory noise<br/>loss, dephasing, depolarization"]
+    Noise --> Check{"resource quality?"}
+    Check -->|"F high"| Use["use directly<br/>teleportation, swapping, E91 QKD"]
+    Check -->|"F moderate"| Distill["distillation block<br/>bilateral CNOTs, measurements, compare parities"]
+    Distill --> Better["fewer higher-fidelity Bell pairs"]
+    Better --> Use
+    Check -->|"F too low"| Discard["discard or regenerate"]
+  end
+
+  BOut --> Source
+  GOut --> Use
 ```
+
+The diagram makes the entanglement resources concrete before showing how a network handles noise. The Bell circuit uses a Hadamard followed by a CNOT, and the GHZ circuit adds fanout CNOTs from the first qubit to create multipartite correlation. The resource-handling branch labels the fidelity decision point and shows distillation as an explicit block that consumes multiple noisy pairs to produce fewer better ones.
 
 | Resource | State form | Network use | Caveat |
 |---|---|---|---|

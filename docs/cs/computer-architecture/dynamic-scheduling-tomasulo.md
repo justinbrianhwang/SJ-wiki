@@ -62,15 +62,40 @@ Tomasulo's algorithm is often taught with a common data bus, but real processors
 
 ```mermaid
 flowchart TD
-    A[Instruction queue] --> B[Issue and rename]
-    B --> C[Reservation stations]
-    C --> D{"Operands ready?"}
-    D -->|no| C
-    D -->|yes| E[Functional unit]
-    E --> F[Broadcast tag and value]
-    F --> C
-    F --> G[Register result status]
+    Fetch["Instruction queue in program order"] --> Issue{"Issue if reservation station and destination tag available"}
+    Issue --> RegStatus["Register result status: architectural reg -> producer tag"]
+    Issue --> RSAdd["Add/sub reservation stations: op, Vj/Vk or Qj/Qk, dest tag"]
+    Issue --> RSMul["Mul/div reservation stations: op, Vj/Vk or Qj/Qk, dest tag"]
+    Issue --> LSQ["Load/store queue: address, data tag/value, ordering state"]
+
+    RegStatus -. "renames destination and supplies source tags" .-> RSAdd
+    RegStatus -. "renames destination and supplies source tags" .-> RSMul
+    RegStatus -. "renames destination and supplies source tags" .-> LSQ
+
+    RSAdd --> ReadyAdd{"Both operands ready and add unit free?"}
+    RSMul --> ReadyMul{"Both operands ready and mul unit free?"}
+    LSQ --> ReadyMem{"Address known and memory ordering safe?"}
+    ReadyAdd -- "yes" --> AddFU["FP add/sub unit"]
+    ReadyMul -- "yes" --> MulFU["FP mul/div unit"]
+    ReadyMem -- "yes" --> MemFU["Load/store unit and D-cache"]
+    ReadyAdd -- "no" --> RSAdd
+    ReadyMul -- "no" --> RSMul
+    ReadyMem -- "no" --> LSQ
+
+    AddFU --> CDB["Common data bus: broadcast tag plus value"]
+    MulFU --> CDB
+    MemFU --> CDB
+    CDB --> Wake["Wakeup: matching Qj/Qk tags capture value into Vj/Vk"]
+    Wake --> RSAdd
+    Wake --> RSMul
+    Wake --> LSQ
+    CDB --> WriteReg{"Tag still names current architectural destination?"}
+    WriteReg -- "yes" --> RegFile["Architectural register file receives value"]
+    WriteReg -- "no, newer writer exists" --> Drop["Ignore stale name-dependence result"]
+    RegFile --> Fetch
 ```
+
+This Tomasulo diagram exposes the renamed dataflow behind out-of-order execution. Issue allocates reservation stations, records producer tags in the register-status table, and lets each station wait on values or tags until its operands and functional unit are ready. The common data bus wakes consumers by tag, while the destination-tag check prevents older writes from overwriting newer architectural mappings.
 
 | Structure | Holds | Purpose |
 |---|---|---|

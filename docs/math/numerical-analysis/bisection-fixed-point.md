@@ -78,16 +78,40 @@ For study purposes, the most useful habit is to separate four layers: the contin
 ## Visual
 
 ```mermaid
-graph TD
-  A["Choose bracket a,b with f(a)f(b)<0"] --> B[Compute midpoint p]
-  B --> C{"Stopping test passed?"}
-  C -->|yes| D[Return midpoint and interval bound]
-  C -->|no| E{"Sign change in a,p?"}
-  E -->|yes| F["Set b = p"]
-  E -->|no| G["Set a = p"]
-  F --> B
-  G --> B
+flowchart TB
+  Start["Problem data<br/>continuous f, tolerance, max iterations"] --> Route{"Guaranteed bracket available?"}
+
+  subgraph Bisect["Bisection loop"]
+    direction TB
+    Bracket["#quot;Initialize [a,b"]<br/>f(a)f(b) negative"] --> Mid["p = (a+b)/2<br/>evaluate f(p)"]
+    Mid --> StopB{"stop? |#quot;f(p)#quot;| small or half-width within tol"}
+    StopB -- "yes" --> ReturnB["return p with interval error bound"]
+    StopB -- "no" --> Side{"sign change on [a,p]?"}
+    Side -- "yes" --> Left["set b = p"]
+    Side -- "no" --> Right["set a = p"]
+    Left --> Mid
+    Right --> Mid
+  end
+
+  subgraph Fixed["Fixed-point loop"]
+    direction TB
+    Map["Choose rearrangement<br/>x = g(x)"] --> Contract{"contraction evidence?<br/>|#quot;g'(x)#quot;| at most k, with k less than 1"}
+    Contract -- "yes" --> Iterate["x_next = g(x_current)"]
+    Contract -- "no" --> Warn["no global guarantee<br/>use damping or bracket safeguard"]
+    Warn --> Iterate
+    Iterate --> StopF{"stop? step and residual small"}
+    StopF -- "yes" --> ReturnF["return fixed point estimate"]
+    StopF -- "no" --> Iterate
+  end
+
+  Route -- "yes" --> Bracket
+  Route -- "no" --> Map
+  ReturnB --> Check["verify residual, interval, and iteration count"]
+  ReturnF --> Check
+  Check --> Root(("root or fixed point"))
 ```
+
+This algorithm diagram shows the two related iteration architectures side by side. Bisection keeps an explicit sign-changing interval and returns an error bound, while fixed-point iteration depends on the contraction behavior of the chosen map $g$. The final diagnostic node is shared because both methods need a residual or interval-based check before the numerical answer is trusted.
 
 | Method | Required input | Guarantee | Typical rate | Main weakness |
 |---|---|---|---|---|

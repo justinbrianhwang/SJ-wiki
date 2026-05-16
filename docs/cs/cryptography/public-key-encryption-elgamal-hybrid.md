@@ -9,10 +9,6 @@ Public-key encryption lets anyone encrypt to a receiver using a public key, whil
 
 Katz and Lindell present public-key encryption through CPA and CCA experiments, hybrid encryption, KEM/DEM, ElGamal, DDH-based encapsulation, and RSA-based schemes. Smart's public-key and hybrid-encryption chapters complement this with concrete RSA, ElGamal, Rabin, Paillier, and KEM/DEM explanations. The synthesis is that public-key encryption is mostly a key-establishment tool inside larger protocols.
 
-![A Diffie-Hellman key exchange diagram shows two parties deriving a shared secret from public values.](https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Diffie-Hellman_Key_Exchange.svg/500px-Diffie-Hellman_Key_Exchange.svg.png)
-
-*Figure: Diffie-Hellman key exchange idea. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Diffie-Hellman_Key_Exchange.svg), A.J. Vinck and Flugaal, public domain.*
-
 ## Definitions
 
 A **public-key encryption scheme** has:
@@ -110,17 +106,51 @@ The recipient set is often security-relevant metadata.
 ## Visual
 
 ```mermaid
-flowchart LR
-  PK[Receiver public key] --> KEM[KEM Encaps]
-  KEM --> CK[Encapsulation]
-  KEM --> K[Session key K]
-  M[Message] --> DEM[AEAD DEM]
-  AD[Associated data] --> DEM
-  K --> DEM
-  DEM --> CD[Data ciphertext]
-  CK --> OUT["(Hybrid ciphertext)"]
-  CD --> OUT
+flowchart TB
+  subgraph ElGamal["ElGamal public-key encryption core"]
+    direction TB
+    Params["Group G, generator g, order q"]
+    Secret["Receiver secret x"]
+    Public["Receiver public key h = g^x"]
+    Random["Fresh encryption randomness r"]
+    C1["c1 = g^r"]
+    Mask["shared mask h^r"]
+    C2["c2 = mask * m"]
+    DecMask["receiver computes c1^x = g^(rx)"]
+    Recover["m = c2 / c1^x"]
+    Params --> Public
+    Secret --> Public
+    Public --> Mask
+    Random --> C1
+    Random --> Mask --> C2
+    C1 --> DecMask
+    Secret --> DecMask --> Recover
+    C2 --> Recover
+  end
+
+  subgraph Hybrid["KEM/DEM hybrid encryption"]
+    direction TB
+    PK["Receiver public key"]
+    Encaps["KEM encapsulate: produce encapsulation C_K and shared secret Z"]
+    KDF["KDF(Z, recipient id, algorithm suite, associated data) -> AEAD key K"]
+    Message["Message bytes M"]
+    AD["Associated data: headers, recipient set, context"]
+    AEAD["DEM: AEAD encrypt M with K, nonce, AD"]
+    DataC["Data ciphertext C_data + tag"]
+    Bundle["Hybrid ciphertext: C_K, nonce, C_data, tag, AD binding"]
+    PK --> Encaps --> KDF --> AEAD
+    Message --> AEAD
+    AD --> KDF
+    AD --> AEAD
+    AEAD --> DataC --> Bundle
+    Encaps --> Bundle
+  end
+
+  Recover --> Lesson["Lesson: randomized public-key layer should protect a key, not a whole file"]
+  Lesson --> Encaps
 ```
+
+This diagram separates textbook ElGamal from the practical hybrid pattern. ElGamal exposes the algebraic mask `h^r`, while KEM/DEM uses public-key encryption only to derive an AEAD key and binds recipient/context metadata into the KDF and associated data.
 
 | Scheme pattern | Strength | Main limitation |
 |---|---|---|

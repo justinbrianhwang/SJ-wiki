@@ -188,17 +188,52 @@ This attack family illustrates why physical evaluation must report distance, ang
 ## Visual
 
 ```mermaid
-flowchart LR
-  A[Physical perturbation p] --> B[Placement or fabrication]
-  B --> C["World variables: pose, light, distance"]
-  C --> D[Sensor pipeline]
-  D --> E[Preprocessing]
-  E --> F[Model f]
-  F --> G[Prediction or action]
-  C --> H[EOT samples transformations]
-  H --> I[Optimize p across samples]
-  I --> A
+flowchart TB
+  Patch["#quot;Trainable patch texture p: [H_p, W_p, 3"]"]
+  Image["Clean image / scene render x"]
+  Mask["Patch mask and placement parameters: location, scale, rotation"]
+
+  subgraph Transform["Expectation over transformation samples"]
+    direction TB
+    Pose["Sample viewpoint, distance, object pose"]
+    Light["Sample lighting, blur, exposure, weather"]
+    Print["Print/camera model: color gamut, resolution, sensor noise"]
+    Occlusion["Optional occlusion and physical deformation"]
+    Pose --> Compose["Compose transformed patch onto scene"]
+    Light --> Compose
+    Print --> Compose
+    Occlusion --> Compose
+  end
+
+  subgraph ModelPipe["Physical sensor and model pipeline"]
+    direction TB
+    Sensor["Camera/sensor capture or differentiable renderer"]
+    Pre["Preprocessing: resize, crop, normalization, detector proposals"]
+    Model["Victim model f: classifier, detector, tracker, or policy"]
+    TargetLoss["Loss: targeted class, missed detection, wrong action, or margin"]
+    Sensor --> Pre --> Model --> TargetLoss
+  end
+
+  subgraph Optimize["Patch optimization loop"]
+    direction TB
+    Grad["Backprop gradient through transform and model to patch"]
+    Update["Optimizer step on p: sign/Adam/PGD"]
+    Project["Project constraints: printable colors, area, alpha, norm"]
+    Stop{"Converged over EOT batch?"}
+    Grad --> Update --> Project --> Stop
+    Stop -->|"No"| Patch
+    Stop -->|"Yes"| FinalPatch["Physical patch design for print/test"]
+  end
+
+  Patch --> Compose
+  Image --> Compose
+  Mask --> Compose
+  Compose -->|"patched scene sample"| Sensor
+  TargetLoss --> Grad
+  FinalPatch --> Field["Field evaluation: distance, angle, lighting, failed trials"]
 ```
+
+This diagram makes the physical patch attack loop explicit: a trainable patch is placed into many transformed scenes, passed through the real or differentiable sensor/model pipeline, and updated from the expected loss. The projection step enforces physical constraints such as printable color and patch area, while the final field-evaluation block records the real-world conditions that digital success alone cannot prove.
 
 | Attack type | Perturbation budget | Transformation concern | Example domain |
 |---|---|---|---|

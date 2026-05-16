@@ -99,23 +99,48 @@ As a scale check, a 500 kB sifted block accumulated in about six minutes corresp
 
 ```mermaid
 flowchart TB
-  App["Application layer: keys, teleportation, sensing, distributed compute"]
-  Trans["Transport layer: sessions, retries, service quality"]
-  Net["Network layer: routing, path selection, swapping schedule"]
-  Link["Link layer: hop key blocks or elementary Bell pairs"]
-  Phys["Physical layer: photons, memories, detectors, timing"]
-  Classical["Classical control plane: auth, heralds, reconciliation, routing"]
+  subgraph Trusted["Trusted-node QKD topology"]
+    direction LR
+    UserA["User A<br/>encryptor or KMS client"] --> KA["Key manager A<br/>application key buffer"]
+    KA --> LinkAB["QKD link A-T1<br/>quantum channel + authenticated classical channel"]
+    LinkAB --> T1["Trusted node T1<br/>stores hop keys in secure boundary"]
+    T1 --> LinkBC["QKD link T1-T2<br/>independent hop key blocks"]
+    LinkBC --> T2["Trusted node T2<br/>key relay and policy enforcement"]
+    T2 --> LinkCD["QKD link T2-B<br/>fresh hop key material"]
+    LinkCD --> KB["Key manager B<br/>application key buffer"]
+    KB --> UserB["User B<br/>encryptor or KMS client"]
+    T1 -. "trusted relay unwrap/rewrap or one-time-pad combine" .-> T2
+  end
 
-  App --> Trans
-  Trans --> Net
-  Net --> Link
-  Link --> Phys
-  Classical -. coordinates .-> App
-  Classical -. coordinates .-> Trans
-  Classical -. coordinates .-> Net
-  Classical -. coordinates .-> Link
-  Classical -. coordinates .-> Phys
+  subgraph Stack["Quantum-network layered stack"]
+    direction TB
+    App["Application layer<br/>MACsec keys, teleportation requests, sensing, distributed compute"] --> Trans["Transport layer<br/>sessions, retries, fidelity/key-rate SLA"]
+    Trans --> Net["Network layer<br/>path selection, trusted relay route, swapping schedule"]
+    Net --> Link["Link layer<br/>sifted key blocks or elementary Bell pairs"]
+    Link --> Phys["Physical layer<br/>photons, memories, detectors, clocks, wavelength control"]
+  end
+
+  subgraph Control["Classical control and management plane"]
+    direction TB
+    Auth["Authentication<br/>PQC/classical credentials protect transcripts"] --> Herald["Heralds and timing<br/>detection events, basis announcements"]
+    Herald --> Sched["Scheduler<br/>switch epochs, memory allocation, wavelength assignment"]
+    Sched --> Telemetry["Telemetry<br/>QBER, loss, key-buffer depth, fidelity"]
+    Telemetry --> Policy["Policy engine<br/>admission control, reroute, abort thresholds"]
+  end
+
+  LinkAB --> Phys
+  LinkBC --> Phys
+  LinkCD --> Phys
+  KA --> App
+  KB --> App
+  Policy -. "coordinates" .-> App
+  Policy -. "coordinates" .-> Trans
+  Policy -. "coordinates" .-> Net
+  Policy -. "coordinates" .-> Link
+  Policy -. "coordinates" .-> Phys
 ```
+
+The topology block shows a trusted-node network as a chain of independently secured QKD links with key managers and trusted relay points, not as a single end-to-end quantum channel. The layered stack labels the service contract at each layer, from physical photons and detectors up to application key delivery or entanglement requests. The dotted management-plane arrows show how authentication, heralds, scheduling, telemetry, and policy coordinate every layer.
 
 | Architecture | Intermediate node learns final key? | Needs quantum memory? | Main use today | Main limitation |
 |---|---:|---:|---|---|

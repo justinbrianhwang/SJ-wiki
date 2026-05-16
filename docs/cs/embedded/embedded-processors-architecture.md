@@ -9,10 +9,6 @@ Embedded processors are chosen under constraints that are different from desktop
 
 Lee and Seshia emphasize the distinction between an instruction set architecture and a processor realization. The ISA defines what instructions mean. A chip implements that ISA with pipelines, caches, buses, memories, peripherals, and parallel hardware. Two chips may run the same machine code but have very different timing, which is central in cyber-physical systems.
 
-![An Intel 8051 architecture diagram shows central microcontroller blocks and buses.](https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Intel_8051_arch.svg/500px-Intel_8051_arch.svg.png)
-
-*Figure: Intel 8051 microcontroller architecture. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_8051_arch.svg), Appaloosa, CC BY-SA 3.0.*
-
 ## Definitions
 
 An **instruction set architecture** (ISA) defines the instructions, registers, data sizes, and programmer-visible behavior of a processor family. A **processor realization** is a particular chip or core implementing an ISA.
@@ -68,17 +64,67 @@ Debug visibility is another practical architectural factor. Trace units, cycle c
 ## Visual
 
 ```mermaid
-flowchart LR
-  App[Application need] --> MC{Processor family}
-  MC --> MCU["Microcontroller: low power, peripherals"]
-  MC --> DSP["DSP: MAC, circular buffers"]
-  MC --> GPU["GPU: data parallel graphics/numerics"]
-  MC --> HMC[Heterogeneous multicore]
-  MCU --> Timing[Timing and energy analysis]
-  DSP --> Timing
-  GPU --> Timing
-  HMC --> Timing
+flowchart TB
+  Req["Embedded application requirements: control period, latency, energy, cost, I/O"] --> Choice{"Processor realization"}
+
+  subgraph MCU["Microcontroller"]
+    direction TB
+    MCUCore["Simple CPU core"]
+    Flash["On-chip Flash/ROM"]
+    SRAM["On-chip SRAM"]
+    GPIO["GPIO, timers, ADC/PWM, UART/SPI/I2C"]
+    IRQ["Interrupt controller and watchdog"]
+    MCUCore --> Flash
+    MCUCore --> SRAM
+    MCUCore --> GPIO
+    GPIO --> IRQ
+  end
+
+  subgraph DSP["DSP processor"]
+    direction TB
+    MAC["Single-cycle multiply-accumulate"]
+    Circ["Circular-buffer addressing"]
+    Harvard["Separate program/data paths"]
+    Sat["Saturating fixed-point arithmetic"]
+    MAC --> Circ
+    Circ --> Harvard
+    Harvard --> Sat
+  end
+
+  subgraph OoO["High-performance embedded CPU"]
+    direction TB
+    Pipe["Deep pipeline and branch predictor"]
+    Cache["Caches and TLBs"]
+    OoOQ["Issue queues, ROB, speculation"]
+    Pipe --> Cache
+    Pipe --> OoOQ
+  end
+
+  subgraph Hetero["Heterogeneous SoC"]
+    direction TB
+    RTCore["Real-time core"]
+    AppCore["Application core"]
+    DMA["DMA and interconnect"]
+    Accel["GPU/DSP/AI accelerator"]
+    Shared["Shared memory, cache, and bus arbitration"]
+    RTCore --> Shared
+    AppCore --> Shared
+    Accel --> DMA
+    DMA --> Shared
+  end
+
+  Choice --> MCU
+  Choice --> DSP
+  Choice --> OoO
+  Choice --> Hetero
+  MCU --> Analyze["Timing, energy, memory, toolchain, and assurance analysis"]
+  DSP --> Analyze
+  OoO --> Analyze
+  Hetero --> Analyze
+  Analyze --> Result(("Selected architecture and software partition"))
 ```
+
+This embedded-processor architecture diagram compares the actual blocks behind common processor choices. The microcontroller branch emphasizes on-chip memory and peripherals, the DSP branch shows MAC/circular-buffer/fixed-point support, the high-performance CPU branch exposes timing variability from pipelines and caches, and the heterogeneous SoC branch labels shared-memory interference. The final analysis node makes processor choice a system-level decision tied to timing, energy, tools, and assurance rather than peak throughput alone.
 
 | Architecture feature | Helps with | Timing consequence |
 |---|---|---|

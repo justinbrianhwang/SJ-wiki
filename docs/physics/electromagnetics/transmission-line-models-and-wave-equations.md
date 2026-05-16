@@ -111,16 +111,23 @@ A line can be electrically long even in ordinary digital hardware. The fastest s
 
 ```mermaid
 flowchart LR
-  A[Distributed segment dz] --> B["Series R'dz and L'dz"]
-  A --> C["Shunt G'dz and C'dz"]
-  B --> D[Telegrapher equations]
-  C --> D
-  D --> E[Wave equations]
-  E --> F["gamma, beta, alpha"]
-  E --> G[Characteristic impedance Z0]
-  F --> H[Delay and wavelength]
-  G --> I[Matching and reflections]
+  Segment["Infinitesimal line segment dz<br/>two-conductor distributed model"] --> Series["series branch<br/>R' dz loss + L' dz magnetic storage"]
+  Segment --> Shunt["shunt branch<br/>G' dz leakage + C' dz electric storage"]
+  Series --> KVL["KVL over dz<br/>partial v / partial z = -(R' + jw L') i"]
+  Shunt --> KCL["KCL over dz<br/>partial i / partial z = -(G' + jw C') v"]
+  KVL --> Tele["Telegrapher equations"]
+  KCL --> Tele
+  Tele --> Wave["wave equations<br/>second derivatives in z"]
+  Wave --> Gamma["propagation constant<br/>gamma = alpha + j beta"]
+  Wave --> Z0["characteristic impedance<br/>Z0 = sqrt((R'+jwL')/(G'+jwC'))"]
+  Gamma --> Delay["phase velocity, delay, wavelength<br/>u_p = omega / beta"]
+  Gamma --> Atten["attenuation and dispersion<br/>lossy line behavior"]
+  Z0 --> Match["matching condition<br/>Z_L = Z0 gives no reflection"]
+  Delay --> Result(("distributed-line model"))
+  Match --> Result
 ```
+
+The transmission-line diagram starts from the per-unit-length equivalent circuit and derives the telegrapher equations through KVL and KCL. The wave-equation layer then exposes the propagation constant, attenuation, phase, characteristic impedance, delay, wavelength, and matching condition. The labeled branches make the energy-storage roles of $L'$ and $C'$ and the loss roles of $R'$ and $G'$ explicit.
 
 | Case | $\gamma$ | $Z_0$ | Main behavior |
 |---|---|---|---|

@@ -65,14 +65,36 @@ For study purposes, the most useful habit is to separate four layers: the contin
 | Gauss-Kronrod | nested paired nodes | difference of paired rules | practical adaptive driver | tabulated rules needed |
 
 ```mermaid
-graph TD
-  A["Start interval a,b"] --> B[Compute coarse Simpson]
-  B --> C[Compute two half Simpson values]
-  C --> D{"Estimated error small?"}
-  D -->|yes| E[Accept corrected estimate]
-  D -->|no| F[Split interval]
-  F --> A
+flowchart TB
+  Integral["Target integral<br/>I = integral_a^b f(x) dx"] --> Panel["#quot;Start panel [a,b"]<br/>tolerance budget"]
+  Panel --> Rule{"Choose paired rule"}
+
+  subgraph Simpson["Adaptive Simpson"]
+    direction TB
+    S1["#quot;coarse Simpson on [a,b"]"] --> S2["two half-panel Simpson estimates"]
+    S2 --> SErr["error estimate from difference<br/>scaled by 1/15"]
+  end
+
+  subgraph Gauss["Gauss-Kronrod style"]
+    direction TB
+    G1["evaluate nested nodes<br/>Gauss nodes subset of Kronrod nodes"] --> G2["compute low-order and high-order estimates"]
+    G2 --> GErr["error estimate from paired-rule difference"]
+  end
+
+  Rule -- "simple recursive rule" --> S1
+  Rule -- "higher efficiency smooth integrand" --> G1
+  SErr --> Test{"panel error within local tolerance?"}
+  GErr --> Test
+  Test -- "yes" --> Accept["accept panel contribution<br/>add corrected estimate"]
+  Test -- "no" --> Split["split panel at midpoint<br/>halve or redistribute tolerance"]
+  Split --> Panel
+  Accept --> Queue{"unprocessed panels remain?"}
+  Queue -- "yes" --> Panel
+  Queue -- "no" --> Report["sum accepted panels<br/>report error estimate and depth"]
+  Report --> Result(("integral estimate"))
 ```
+
+This quadrature diagram shows adaptive integration as a queue of panels with paired estimates and local error tests. Simpson and Gauss-Kronrod style rules differ in node placement and efficiency, but both route through the same accept-or-split controller. The output includes not only the integral estimate but also the accumulated error and recursion depth diagnostics.
 
 ## Worked example 1: three-point Gauss rule for $x^4$
 

@@ -61,17 +61,43 @@ Parallel execution adds another layer. A scan can be split across workers, a has
 
 ```mermaid
 flowchart TD
-  SQL["SQL query"] --> P["parse and validate"]
-  P --> L["logical algebra tree"]
-  L --> O["optimizer chooses physical plan"]
-  O --> A["access paths"]
-  O --> J["join algorithms"]
-  O --> G["grouping/sorting strategy"]
-  A --> E["execution engine"]
-  J --> E
-  G --> E
-  E --> R["result rows"]
+  SQL["SQL query: student join takes join course"] --> Parse["Parse, bind names, check types and privileges"]
+  Parse --> Logical["Logical plan: project(select(join(student, takes, course)))"]
+  Logical --> Rewrite["Rewrite: push selections; drop unused columns"]
+
+  subgraph Physical["Chosen physical plan"]
+    direction TB
+    Project["Project: ID, name, title"]
+    HJ2["Hash join on course_id"]
+    HJ1["Hash join on ID"]
+    BuildT["Build hash table from filtered takes: key ID; payload course_id"]
+    ProbeS["Probe with index scan on student: dept_name = CS"]
+    BuildC["Build hash table from course: key course_id; payload title"]
+    Project --> HJ2
+    HJ2 --> HJ1
+    HJ2 --> BuildC
+    HJ1 --> ProbeS
+    HJ1 --> BuildT
+  end
+
+  subgraph Alternatives["Join algorithm alternatives considered"]
+    direction TB
+    NL["Nested-loop join: outer rows x inner scan"]
+    INL["Index nested-loop: outer row -> inner B+ tree lookup"]
+    SMJ["Sort-merge join: sort both inputs by join key, then merge"]
+    PHJ["Partitioned hash join: partition, build, probe when build spills"]
+  end
+
+  Rewrite --> Cost{"Cost model chooses access paths and joins"}
+  Cost -. "table pages, row counts, histograms, index height, memory" .-> Catalog["Catalog statistics"]
+  Cost --> Physical
+  Cost -. "rejected alternatives" .-> Alternatives
+  Physical --> Exec["Execution engine pulls batches/tuples through operators"]
+  Exec --> Buffer["Buffer manager reads table and index pages"]
+  Buffer --> Result(("Result rows"))
 ```
+
+This query-processing diagram distinguishes the logical relational expression from the executable physical plan. The chosen plan labels concrete operator choices, including two hash joins, build/probe roles, index scanning, and projected payloads, while the side branch lists nested-loop, index nested-loop, sort-merge, and partitioned hash alternatives. The dotted catalog edge shows that plan selection depends on statistics, memory, and index metadata rather than only SQL syntax.
 
 | Join algorithm | Equality only? | Uses indexes? | Memory sensitivity | Output order |
 | --- | --- | --- | --- | --- |

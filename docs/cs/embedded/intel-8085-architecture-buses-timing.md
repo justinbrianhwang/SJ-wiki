@@ -9,10 +9,6 @@ The 8085 is the book's central microprocessor example. It is a good teaching CPU
 
 The architecture page sits between the simple microprocessor model and the instruction-set pages. It names the blocks that execute instructions, but it also explains why extra hardware is needed around the chip: the lower address bus is multiplexed with the data bus, memory and I/O chips need selection signals, and slow devices may require wait states.
 
-![A photograph shows an Intel C8085AH microprocessor chip package.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Intel_C8085AH.jpg/500px-Intel_C8085AH.jpg)
-
-*Figure: Intel C8085AH microprocessor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_C8085AH.jpg), Thomas Nguyen, CC BY-SA 4.0.*
-
 ## Definitions
 
 The **8085** is an 8-bit microprocessor with a 16-bit address bus. It can address 64 KiB of memory and has a separate I/O address space of 256 ports when I/O-mapped instructions are used.
@@ -52,17 +48,53 @@ The fifth key result is that resets and interrupts are control-flow events with 
 ## Visual
 
 ```mermaid
-sequenceDiagram
-  participant CPU as 8085 CPU
-  participant Latch as Address Latch
-  participant Mem as Memory or I/O
-  CPU->>Latch: AD7-AD0 = A7-A0, ALE = 1
-  Latch-->>Mem: Latched low address
-  CPU->>Mem: A15-A8 and control status valid
-  CPU->>Mem: RD or WR asserted
-  Mem-->>CPU: Data byte on AD7-AD0 for read
-  CPU->>Mem: RD or WR deasserted
+flowchart TB
+  subgraph Core["8085 internal architecture"]
+    direction TB
+    A["Accumulator A and temporary register"]
+    Flags["Flags: S, Z, AC, P, CY"]
+    Regs["Register pairs: BC, DE, HL"]
+    PC["Program counter: 16-bit"]
+    SP["Stack pointer: 16-bit"]
+    IR["Instruction register and decoder"]
+    ALU["8-bit ALU"]
+    Timing["Timing and control unit"]
+    A --> ALU
+    Regs --> ALU
+    ALU --> A
+    ALU --> Flags
+    PC --> IR
+    IR --> Timing
+  end
+
+  subgraph Bus["External bus interface"]
+    direction TB
+    AHigh["A15-A8: high address byte"]
+    AD["AD7-AD0: low address during T1, data during T2/T3"]
+    ALE["ALE: latch-enable pulse"]
+    Ctrl["RD, WR, IO/M, S1, S0, READY"]
+  end
+
+  Timing --> Bus
+  Bus --> Latch["74LS373-style latch captures A7-A0 when ALE=1"]
+  Latch --> LowAddr["Stable low address A7-A0"]
+  AHigh --> Decoder["Address decoder and chip-select logic"]
+  LowAddr --> Decoder
+  Ctrl --> Decoder
+  Decoder --> Memory["Memory or I/O device"]
+  Memory <--> AD
+
+  subgraph ReadCycle["Memory read machine cycle timing"]
+    direction LR
+    T1["T1: A15-A8 valid; AD7-AD0=A7-A0; ALE high"] --> T2["T2: ALE low; AD bus turns around; RD asserted"]
+    T2 --> Tw["Optional wait states while READY=0"]
+    Tw --> T3["T3: selected device drives data; CPU samples; RD deasserts"]
+  end
+
+  Ctrl -. "READY can stretch cycle" .-> ReadCycle
 ```
+
+This 8085 diagram combines the CPU core, external bus pins, demultiplexing latch, decoder, and read-cycle timing. It labels the accumulator, flags, register pairs, PC, SP, ALU, instruction decoder, and timing unit, then shows how `AD7`-`AD0` switch roles from low address to data. The timing subgraph explains why `ALE`, `RD`, `IO/M`, and `READY` are architectural facts for board design rather than incidental pin names.
 
 | 8085 signal or group | Main purpose | Common mistake |
 |---|---|---|
@@ -148,4 +180,3 @@ Check: The instruction contains three bytes, but it requires four bus read opera
 - [8085 instruction set and addressing](/cs/embedded/8085-instruction-set-addressing)
 - [8085 I/O, memory, and DMA interfacing](/cs/embedded/8085-io-memory-dma-interfacing)
 - [8255 programmable peripheral interface](/cs/embedded/8255-programmable-peripheral-interface)
-

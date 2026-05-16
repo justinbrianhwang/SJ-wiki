@@ -9,10 +9,6 @@ Input and output are where sequential software meets a concurrent physical world
 
 Lee and Seshia use I/O to expose a central CPS tension. Software is written as ordered statements, but the environment is not ordered by the program. Polling, interrupts, GPIO, PWM, serial interfaces, buses, memory-mapped registers, and device drivers are all mechanisms for reconciling that mismatch.
 
-![An I2C bus diagram shows one master connected to several slave devices over shared SDA and SCL lines.](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/I2C.svg/500px-I2C.svg.png)
-
-*Figure: I2C bus with one master and several slave devices. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:I2C.svg), Cburnett, CC BY-SA 3.0.*
-
 ## Definitions
 
 **General-purpose input/output** (GPIO) pins can be configured by software as digital inputs or outputs. They expose logical values as voltage levels, subject to electrical limits.
@@ -78,18 +74,39 @@ I/O documentation should therefore include reset behavior and startup sequencing
 ## Visual
 
 ```mermaid
-sequenceDiagram
-  participant HW as Timer hardware
-  participant CPU as CPU main code
-  participant ISR as ISR
-  CPU->>CPU: execute main instructions
-  HW-->>CPU: interrupt request
-  CPU->>CPU: save PC/status, branch vector
-  CPU->>ISR: run handler
-  ISR->>ISR: update shared state
-  ISR-->>CPU: return from interrupt
-  CPU->>CPU: resume main code
+flowchart TB
+  Sensor["External sensor, switch, timer, UART, ADC, or bus device"] --> FrontEnd["Electrical front end: pull-up/down, level shift, filter, driver"]
+  FrontEnd --> Regs["Peripheral registers: DATA, STATUS, CONTROL"]
+  Regs --> Access{"Software access method"}
+  Access -- "polling" --> Poll["Main loop reads STATUS until ready or timeout"]
+  Access -- "interrupt" --> IRQ["Interrupt request line to controller"]
+  Access -- "DMA" --> DMA["DMA engine owns buffer descriptors and memory bus"]
+  Access -- "PWM/output" --> PWM["Timer compare toggles output with duty cycle"]
+
+  IRQ --> IntCtl["Interrupt controller prioritizes and vectors"]
+  IntCtl --> ISR["ISR: save context, read/clear device flag, move data, signal main code"]
+  Poll --> Shared["Shared buffer or state variable"]
+  ISR --> Shared
+  DMA --> Shared
+  Shared --> Main["Main control task consumes samples or produces commands"]
+  Main --> Regs
+  PWM --> Actuator["Actuator or power stage"]
+
+  subgraph Concurrency["Correctness boundaries"]
+    direction TB
+    Volatile["Volatile register access prevents stale compiler caching"]
+    Atomic["Atomic sections protect shared indices and flags"]
+    Barrier["Memory barriers order DMA descriptors and device registers"]
+    Timeout["Timeout/error path handles missing or malformed events"]
+  end
+
+  Regs -. "memory-mapped I/O must use documented semantics" .-> Volatile
+  Shared -. "main and ISR/DMA share ownership" .-> Atomic
+  DMA -. "device and CPU observe memory in order" .-> Barrier
+  Poll -. "avoid infinite busy wait" .-> Timeout
 ```
+
+This I/O interfacing diagram shows the complete path from an external electrical event to peripheral registers, polling, interrupts, DMA, shared buffers, main control code, and actuator output. It labels the concurrency boundaries that make embedded I/O difficult: volatile register access, atomic shared-state updates, memory barriers for DMA, and timeout/error handling. The diagram also distinguishes software-visible events from electrical front-end requirements such as pull-ups, filtering, level shifting, and drivers.
 
 | I/O method | Good for | Weakness | Typical protection |
 |---|---|---|---|

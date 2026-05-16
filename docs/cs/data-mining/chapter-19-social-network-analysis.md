@@ -64,16 +64,41 @@ A **social network** is a graph $G=(V,E)$ where nodes represent social actors an
 ## Visual
 
 ```mermaid
-graph TD
-  A("(A")) --- B("(B"))
-  A --- C("(C"))
-  B --- C
-  C --- D("(D"))
-  D --- E("(E"))
-  D --- F("(F"))
-  E --- F
-  B -. possible link .- D
+flowchart TB
+  subgraph Graph["Directed social/web graph"]
+    direction LR
+    A(("A")) --> B(("B"))
+    A --> C(("C"))
+    B --> C
+    C --> A
+    C --> D(("D"))
+    D --> E(("E"))
+    E --> D
+    F(("F")) --> D
+  end
+
+  Graph --> Init["Initialize PageRank vector r_0(v) = 1 / |V|"]
+  Init --> Distribute["For each node u, distribute r_t(u) / outdegree(u) along outgoing edges"]
+  Distribute --> Damping["Apply damping: r_(t+1)(v) = (1-alpha)/|V| + alpha * incoming_sum(v)"]
+  Damping --> Dangling["Redistribute dangling-node mass if outdegree is zero"]
+  Dangling --> Normalize["Normalize rank vector and compute L1 change"]
+  Normalize --> Converged{"Change < tolerance?"}
+  Converged -- "no" --> Distribute
+  Converged -- "yes" --> Rank(("Stable centrality scores"))
+
+  subgraph LinkPred["Link-prediction features"]
+    direction TB
+    CN["Common neighbors"]
+    Jaccard["Jaccard overlap"]
+    AA["Adamic-Adar weighting"]
+    PA["Preferential attachment"]
+  end
+
+  Graph -. "neighborhood structure" .-> LinkPred
+  LinkPred --> Candidate["Candidate edge score, e.g. B-D"]
 ```
+
+This social-network diagram gives the PageRank power-iteration data flow over a directed graph and keeps link prediction as a separate feature pipeline. PageRank repeatedly distributes rank along outgoing edges, applies damping, handles dangling mass, normalizes, and checks convergence. The dotted link-prediction branch shows that common-neighbor style scores use local neighborhood structure, while PageRank is a global iterative centrality computation.
 
 | Task | Input | Output | Common signal |
 |---|---|---|---|

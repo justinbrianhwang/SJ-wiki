@@ -75,17 +75,30 @@ For study purposes, the most useful habit is to separate four layers: the contin
 ## Visual
 
 ```mermaid
-graph TD
-  A[Current vector x] --> B[Evaluate F and Jacobian J]
-  B --> C["Solve J s = -F"]
-  C --> D{"Full step acceptable?"}
-  D -->|yes| E["x <- x + s"]
-  D -->|no| F[Damp or trust-region step]
-  F --> E
-  E --> G{"Residual small?"}
-  G -->|no| B
-  G -->|yes| H[Return root estimate]
+flowchart TB
+  Input["Nonlinear system<br/>F(x) = 0, x in R^n"] --> Init["initial guess x_k<br/>scaling, tolerance, max iterations"]
+  Init --> Eval["evaluate F(x_k)<br/>residual norm and component scales"]
+  Eval --> Jacobian{"Jacobian strategy"}
+  Jacobian -- "analytic or automatic" --> JExact["assemble J(x_k)"]
+  Jacobian -- "finite difference" --> JFD["approximate columns by perturbations"]
+  Jacobian -- "quasi-Newton" --> JBroyden["update approximate Jacobian"]
+  JExact --> Linear["solve Newton system<br/>J s = -F"]
+  JFD --> Linear
+  JBroyden --> Linear
+  Linear --> Global{"globalization needed?"}
+  Global -- "full step ok" --> Full["trial x = x_k + s"]
+  Global -- "line search" --> LS["try alpha s<br/>require residual decrease"]
+  Global -- "trust region" --> TR["limit step norm<br/>solve constrained model"]
+  LS --> Trial["accepted trial point"]
+  TR --> Trial
+  Full --> Trial
+  Trial --> Stop{"stop? residual and step small"}
+  Stop -- "no" --> Eval
+  Stop -- "yes" --> Report["report root, residual, step norm, iterations"]
+  Report --> Root(("root estimate"))
 ```
+
+The nonlinear-systems diagram exposes Newton's method as a sequence of residual evaluation, Jacobian construction, linear solve, globalization, and stopping tests. The Jacobian branch distinguishes exact, finite-difference, and quasi-Newton approximations, while the globalization branch shows why full Newton steps are sometimes damped or constrained. The output includes diagnostics because a small step alone does not prove that $F(x)=0$ has been solved.
 
 | Method | Derivative information | Local speed | Global safeguard | Main cost |
 |---|---|---|---|---|

@@ -64,18 +64,47 @@ Fine-tuning also changes the representation. The pretrained model is not merely 
 ## Visual
 
 ```mermaid
-flowchart TD
-  T[Token ids] --> E[Token embeddings]
-  S[Segment ids] --> SE[Segment embeddings]
-  P[Positions] --> PE[Position embeddings]
-  E --> Sum[Sum embeddings]
-  SE --> Sum
-  PE --> Sum
-  Sum --> Enc[Transformer encoder stack]
-  Enc --> CLS[CLS representation]
-  CLS --> Head[Task head]
-  Head --> Out[Class logits or scores]
+flowchart TB
+  subgraph BERT["BERT encoder-only pretraining and fine-tuning"]
+    direction TB
+    BTok["#quot;Input tokens: [CLS"] sentence A [SEP] sentence B [SEP]"]
+    BTok --> BEmb["#quot;Token + segment + position embeddings -> [N, T, d_model"]"]
+    BEmb --> BMask["Bidirectional self-attention mask, padding only"]
+    BMask --> BEnc["Transformer encoder stack, e.g. 12 or 24 layers"]
+    BEnc --> BCLS["#quot;[CLS"] representation -> ["N, d_model"]"]
+    BEnc --> BMasked["Hidden states at masked token positions"]
+    BCLS --> NSP["#quot;NSP or sentence-pair classification head -> [N, 2"]"]
+    BMasked --> MLM["MLM head: dense + activation + layer norm + tied vocab projection"]
+    MLM --> MLMOut("[#quot;Masked-token logits [M, |V|]#quot;]")
+    NSP --> NSPOut(("Sentence/task logits"))
+  end
+
+  subgraph GPT["GPT decoder-only language model"]
+    direction TB
+    GTok["#quot;Prompt tokens: [x_1 ... x_T"]"] --> GEmb["#quot;Token + position embeddings -> [N, T, d_model"]"]
+    GEmb --> GMask["Causal mask: token t attends only to positions through t"]
+    GMask --> GDec["Transformer decoder blocks: masked self-attn + MLP"]
+    GDec --> GHead["Tied linear vocab head"]
+    GHead --> GOut("[#quot;Next-token logits [N, T, |V|]#quot;]")
+    GOut -. "autoregressive sampling feeds token T+1 back as input" .-> GTok
+  end
+
+  subgraph T5["T5 text-to-text encoder-decoder"]
+    direction TB
+    Task["Text prefix + source tokens, e.g. summarize: ..."] --> TEncEmb["Encoder token + relative position bias"]
+    TEncEmb --> TEnc["Encoder stack with bidirectional self-attention"]
+    TEnc --> Memory["#quot;Encoder memory keys/values: [N, S, d_model"]"]
+    Target["Decoder input: shifted target tokens"] --> TDecEmb["Decoder embeddings"]
+    TDecEmb --> TSelf["Masked decoder self-attention"]
+    TSelf --> TCross["Cross-attention reads encoder memory"]
+    Memory --> TCross
+    TCross --> TMLP["Decoder MLP and final norm"]
+    TMLP --> THead["Vocabulary projection"]
+    THead --> TOut(("Generated text tokens"))
+  end
 ```
+
+BERT, GPT, and T5 differ mainly in attention direction and output contract. BERT uses bidirectional encoder layers and splits into MLM plus sequence-level heads, GPT uses a causal decoder-only stack whose next-token predictions feed generation, and T5 uses an encoder memory that the causal decoder reads through cross-attention. The diagram labels the token formatting, masks, and head shapes that determine which tasks each family naturally supports.
 
 | Transformer family | Attention direction | Pretraining objective | Best matched tasks |
 |---|---|---|---|

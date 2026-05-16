@@ -52,21 +52,45 @@ Consistency models are programmer-visible, so they must be documented by the ISA
 ## Visual
 
 ```mermaid
-stateDiagram-v2
-    [*] --> I
-    I: Invalid
-    S: Shared
-    E: Exclusive
-    M: Modified
-    I --> E: read miss, no sharers
-    I --> S: read miss, sharers exist
-    E --> M: processor write
-    S --> M: write miss / invalidate others
-    M --> S: other core reads, supply data
-    E --> S: other core reads
-    S --> I: other core writes
-    M --> I: other core gets ownership
+flowchart TB
+  Core0["Core 0 load/store pipeline"] --> L10["Core 0 private cache line for block X"]
+  Core1["Core 1 load/store pipeline"] --> L11["Core 1 private cache line for block X"]
+  L10 --> Bus{"Snoop bus or directory request"}
+  L11 --> Bus
+  Bus --> Dir["Directory/sharer state for block X"]
+  Dir --> Mem["Memory copy of block X"]
+
+  subgraph MESI["Per-cache-line MESI state machine"]
+    direction LR
+    I["I: invalid"] -- "PrRd / BusRd; no sharers" --> E["E: exclusive clean"]
+    I -- "PrRd / BusRd; sharers exist" --> S["S: shared clean"]
+    E -- "PrWr silent upgrade" --> M["M: modified dirty owner"]
+    S -- "PrWr / BusUpgr invalidates sharers" --> M
+    M -- "BusRd: supply data, downgrade" --> S
+    E -- "BusRd by another core" --> S
+    S -- "BusUpgr or BusRdX by another core" --> I
+    M -- "BusRdX by another core: write back or transfer owner" --> I
+  end
+
+  Core0 -- "PrRd/PrWr events" --> MESI
+  Bus -- "BusRd, BusUpgr, BusRdX snoops" --> MESI
+  MESI -. "state stored with tag and data array" .-> L10
+  MESI -. "same protocol independently per cache" .-> L11
+
+  subgraph Consistency["Consistency layer above coherence"]
+    direction TB
+    StoreBuf["Store buffers and speculative loads"]
+    Fence["Fence/acquire/release operations"]
+    Order["Program-visible ordering guarantee"]
+    StoreBuf --> Fence
+    Fence --> Order
+  end
+
+  Core0 -. "locks and fences impose ordering across addresses" .-> Consistency
+  Core1 -. "coherence only serializes one address" .-> Consistency
 ```
+
+This coherence diagram distinguishes the per-line MESI protocol from the broader consistency rules. The cache-line state machine labels processor events, snoop messages, ownership transfers, invalidations, and dirty writeback/transfer behavior for one block. The consistency subgraph shows why fences and acquire/release operations are still required: coherence serializes writes to one address, but ordering across different addresses is a separate contract.
 
 | Concept | Scope | Example question | Mechanism |
 |---|---|---|---|

@@ -9,10 +9,6 @@ Simulation of dynamic systems studies how mathematical models evolve over time w
 
 These notes are written as working study pages. They emphasize model derivation, state-space form, numerical integration, MATLAB scripts, Simulink implementation, time-response interpretation, and verification. The goal is not to replace a textbook or software manual, but to give a coherent path from physical assumptions to a simulation result that can be checked, explained, and improved.
 
-![A Lorenz-attractor plot shows a butterfly-shaped trajectory in phase space.](https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Lorenz_system_r28_s10_b2-6666.png/500px-Lorenz_system_r28_s10_b2-6666.png)
-
-*Figure: Lorenz attractor as a canonical nonlinear dynamic-system trajectory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Lorenz_system_r28_s10_b2-6666.png), Wikimol, public domain.*
-
 ## Definitions
 
 A dynamic system is a system whose current behavior depends on stored information from the past. The stored information is represented by state variables. For a continuous-time system,
@@ -86,18 +82,27 @@ The result of a simulation should be checked against at least one anchor: an equ
 
 ```mermaid
 flowchart TD
-  A[Modeling assumptions] --> B[Continuous or discrete equations]
-  B --> C[State-space form]
-  C --> D{Implementation path}
-  D -->|Script| E[MATLAB ODE function]
-  D -->|Diagram| F[Simulink integrator/block model]
-  E --> G[Solver and step/tolerance choices]
-  F --> G
-  G --> H["Time response, frequency response, and logs"]
-  H --> I[Verification and validation]
-  I -->|revise| A
-  I -->|credible| J["Use for design, prediction, or explanation"]
+  Question["Simulation question<br/>prediction, design, explanation, or validation"] --> Boundary["System boundary and assumptions<br/>inputs, outputs, neglected effects"]
+  Boundary --> States["Choose states<br/>stored energy, mass, memory, or mode variables"]
+  States --> Laws["Conservation and constitutive laws<br/>force, flow, heat, charge, reaction, etc."]
+  Laws --> Equations["Model equations<br/>x_dot = f(t,x,u,p), y = g(t,x,u,p)"]
+  Equations --> Checks["Pre-simulation checks<br/>units, signs, equilibria, limiting cases"]
+  Checks --> Implement{"Implementation path"}
+
+  Implement -- "script" --> Script["MATLAB derivative function<br/>parameters, initial state, input function"]
+  Implement -- "diagram" --> Simulink["Simulink block model<br/>sums, gains, integrators, subsystems"]
+  Script --> Solver["Solver configuration<br/>method, step size, tolerances, events"]
+  Simulink --> Solver
+  Solver --> Run["Run simulation<br/>states, outputs, diagnostics, logs"]
+  Run --> Verify["Numerical verification<br/>step refinement, residuals, conservation, analytical anchor"]
+  Verify --> Validate["Physical validation<br/>independent data or credible domain behavior"]
+  Validate --> Decision{"credible for intended decision?"}
+  Decision -- "revise model" --> Boundary
+  Decision -- "revise implementation" --> Implement
+  Decision -- "yes" --> Use(("documented simulation result"))
 ```
+
+This overview diagram shows the full simulation architecture from question framing to documented result. The model path exposes boundaries, states, laws, equations, and pre-run checks before MATLAB or Simulink implementation; the numerical path exposes solver settings, logs, verification, and validation. The two feedback arrows distinguish revising the physics model from revising the implementation.
 
 | Page order | Page | Main deliverable |
 |---:|---|---|

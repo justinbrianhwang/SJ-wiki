@@ -56,18 +56,30 @@ Parameter management also affects reproducibility. Initialization should be expl
 ## Visual
 
 ```mermaid
-flowchart TD
-  M[nn.Module] --> P[Registered parameters]
-  M --> B[Registered buffers]
-  M --> S[Submodules]
-  S --> P2[Child parameters]
-  P --> O[Optimizer]
-  P2 --> O
-  P --> SD[state_dict save/load]
-  B --> SD
-  M --> D[to device]
-  D --> GPU[CPU or CUDA tensors]
+flowchart TB
+  Module["nn.Module object"] --> Init["__init__: assign submodules, Parameters, and buffers"]
+  Init --> RegP["Registered parameters: weights and biases"]
+  Init --> RegB["Registered buffers: BatchNorm running stats, masks, constants"]
+  Init --> Children["Child modules: Sequential, ModuleList, custom blocks"]
+  Children --> ChildP["Recursive child parameters"]
+  Module --> Forward["forward(x): use registered objects to compute outputs"]
+  X["Input batch on device"] --> Forward
+  Forward --> Loss["Scalar loss"]
+  Loss --> Backward["loss.backward() populates .grad on registered parameters"]
+  RegP --> Optim["Optimizer parameter groups"]
+  ChildP --> Optim
+  Backward --> Optim
+  Optim --> Step["optimizer.step() mutates parameters"]
+  RegP --> State["state_dict: parameters + buffers by hierarchical key"]
+  RegB --> State
+  State --> SaveLoad["Save/load checkpoint into matching architecture code"]
+  Module --> Mode{"Mode and device"}
+  Mode -->|"model.train()"| Train["Dropout active, BatchNorm batch stats"]
+  Mode -->|"model.eval()"| Eval["Dropout disabled, BatchNorm running stats"]
+  Mode -->|"model.to(device)"| Device["Parameters and buffers move together"]
 ```
+
+The PyTorch builder diagram expands what `nn.Module` owns and how those objects participate in training. Parameters and child-module parameters flow into optimizer groups and receive gradients only if they are registered, while buffers travel through `state_dict` and device moves without being optimized. The mode branch separates `train()` and `eval()` behavior from gradient recording.
 
 | PyTorch feature | Correct use | Common bug |
 |---|---|---|

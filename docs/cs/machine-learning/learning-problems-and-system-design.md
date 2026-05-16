@@ -9,10 +9,6 @@ Mitchell's first chapter frames machine learning as the engineering problem of m
 
 The chapter's checkers example is also a compact design pattern for the whole book. A learner does not directly receive the perfect strategy. It receives experience, converts experience into training examples, searches a hypothesis space, and updates a performance system. The same pattern reappears in decision trees, neural networks, Bayesian classifiers, instance-based methods, explanation-based learning, and reinforcement learning.
 
-![An overfitting diagram shows a classifier boundary that follows training points too closely.](https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Overfitting.svg/500px-Overfitting.svg.png)
-
-*Figure: Overfitting in a classifier decision boundary. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Overfitting.svg), Chabacano, CC BY-SA 4.0.*
-
 ## Definitions
 
 A computer program learns from experience $E$ with respect to a class of tasks $T$ and performance measure $P$ if its performance at tasks in $T$, as measured by $P$, improves with experience $E$.
@@ -88,16 +84,47 @@ The representation choice also controls what can be learned. A linear checkers e
 ## Visual
 
 ```mermaid
-flowchart LR
-    E[Experiment generator] -->|practice problem| P[Performance system]
-    H[Current hypothesis] --> P
-    P -->|solution trace| C[Critic]
-    C -->|training examples| G[Generalizer]
-    G -->|revised hypothesis| H
-    H --> E
+flowchart TB
+  Task["Task T and performance measure P"] --> Problem["Practice or deployment problem"]
+  Hyp["Current hypothesis h or value estimate V-hat(b)"] --> Perf["Performance system: chooses actions using h"]
+  Problem --> Perf
+  Perf --> Trace["Behavior trace: states, actions, rewards, outcomes"]
+
+  subgraph CriticBlock["Critic: converts experience into supervised targets"]
+    direction TB
+    TraceIn["Trace from performance system"]
+    Feedback["External result or delayed reward"]
+    Bootstrap["Bootstrapped target: V_train(b) <- V-hat(successor(b))"]
+    Examples["Training examples: (features x(b), target V_train(b))"]
+    TraceIn --> Bootstrap
+    Feedback --> Bootstrap
+    Bootstrap --> Examples
+  end
+
+  subgraph GeneralizerBlock["Generalizer: searches the hypothesis space"]
+    direction TB
+    Features["#quot;Feature vector x(b) = [x1..x6"]"]
+    Prediction["Linear model V-hat(b) = w0 + sum_i w_i x_i(b)"]
+    Error["Prediction error = V_train(b) - V-hat(b)"]
+    LMS["LMS update: w_i <- w_i + eta * error * x_i(b)"]
+    Features --> Prediction --> Error --> LMS
+  end
+
+  subgraph ExperimentBlock["Experiment generator: controls future data"]
+    direction TB
+    Explore["Choose opponent, starting board, or active query"]
+    Distribution["Changes the distribution of future experience E"]
+    Explore --> Distribution
+  end
+
+  Trace --> TraceIn
+  Examples --> Features
+  LMS --> Hyp
+  Hyp --> Explore
+  Distribution --> Problem
 ```
 
-The diagram is deliberately circular. Learning is not a single pass from data to model; the current hypothesis influences future experience, especially in active learning, game learning, robotics, and reinforcement learning.
+This learning-system diagram expands Mitchell's four modules into their data contracts: a performance trace becomes bootstrapped training examples, the generalizer turns features and errors into weight updates, and the revised hypothesis feeds the next behavior. The feedback loop is deliberate because the current hypothesis influences future experience in self-play, active learning, robotics, and reinforcement learning.
 
 ## Worked example 1: Specify a well-posed learning problem
 

@@ -128,15 +128,31 @@ For screws and wedges, friction can either help hold a load or make motion ineff
 
 ```mermaid
 flowchart TD
-  A[Friction problem] --> B{"Contact slipping?"}
-  B -->|no or unknown| C["Static friction: solve required F"]
-  C --> D{"Is |F| <= mu_s N?"}
-  D -->|yes| E[Sticking equilibrium valid]
-  D -->|no| F["Sticking impossible; use impending or kinetic model"]
-  B -->|sliding| G["Kinetic friction F = mu_k N"]
-  B -->|belt wrap| H[Capstan equation]
-  B -->|screw thread| I[Friction angle and lead angle]
+  Problem["Friction/contact problem<br/>block, belt, wedge, screw, or contact pair"] --> Contact["Identify contact geometry<br/>normal direction and possible slip direction"]
+  Contact --> State{"Contact state?"}
+  State -- "sticking or unknown" --> Static["static model<br/>solve required friction F from equilibrium"]
+  Static --> Limit{"|F| within mu_s N and N nonnegative?"}
+  Limit -- "yes" --> Stick["sticking equilibrium valid"]
+  Limit -- "no" --> Impending["sticking impossible<br/>use impending slip direction"]
+  State -- "sliding" --> Kinetic["kinetic model<br/>F = mu_k N opposite relative motion"]
+
+  subgraph Special["Machine-element friction models"]
+    direction TB
+    Belt["belt wrap<br/>dT = mu T dtheta"] --> Capstan["capstan equation<br/>T2/T1 = exp(mu beta)"]
+    Screw["square-thread screw<br/>lead angle lambda, friction angle phi"] --> Torque["raising/lowering torque<br/>self-locking if phi greater than lambda"]
+  end
+
+  State -- "belt" --> Belt
+  State -- "screw" --> Screw
+  Stick --> Check["check force directions, units, contact compression, and energy sense"]
+  Impending --> Check
+  Kinetic --> Check
+  Capstan --> Check
+  Torque --> Check
+  Check --> Result(("friction-model result"))
 ```
+
+The friction diagram starts with contact geometry and explicitly routes by contact state. Static friction is solved first and then compared with $\mu_sN$, while kinetic and impending-slip models require a known slip direction. The belt and screw subgraph shows the specialized architectures where distributed wrap or lead/friction angles replace the simple point-contact inequality.
 
 | Model | Governing relation | Equality means | Main caution |
 |---|---|---|---|

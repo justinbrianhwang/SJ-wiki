@@ -9,10 +9,6 @@ Feynman diagrams are not cartoons added after a calculation. They are a compact 
 
 The physical value of the diagrammatic language is that it separates universal structure from algebra. Once the propagators and vertices are known, scattering amplitudes can be organized by the number of vertices or loops. Zee's early discussion of diagrams is meant to make this organization feel natural: forces arise because fields propagate between interaction events, and perturbation theory enumerates those events.
 
-![A Feynman diagram shows electron-positron annihilation followed by quark production and gluon radiation.](https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Feynman_Diagram_Gluon_Radiation.svg/500px-Feynman_Diagram_Gluon_Radiation.svg.png)
-
-*Figure: Feynman diagram for gluon radiation after electron-positron annihilation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Feynman_Diagram_Gluon_Radiation.svg), Joel Holdsworth, public domain.*
-
 ## Definitions
 
 For a theory split into free and interacting parts,
@@ -92,16 +88,41 @@ The most useful habit is to read every diagram twice: once as a mathematical rec
 ## Visual
 
 ```mermaid
-flowchart LR
-  A[Lagrangian] --> B[Free quadratic part]
-  A --> C[Interaction terms]
-  B --> D[Propagators]
-  C --> E[Vertices]
-  D --> F[Diagrams]
-  E --> F
-  F --> G[Momentum integrals]
-  G --> H[Amplitude]
+flowchart TB
+  Theory["QFT model<br/>fields, symmetries, Lagrangian"] --> Split["Split action or Lagrangian<br/>free quadratic part + interactions"]
+
+  subgraph Rules["Feynman-rule lookup"]
+    direction TB
+    Free["quadratic kernel"] --> Prop["propagators<br/>internal line factor, pole prescription"]
+    Inter["interaction monomials<br/>couplings and field content"] --> Vert["vertices<br/>coupling factor and momentum conservation"]
+    External["external states<br/>on-shell momenta, spin or polarization"] --> Legs["external legs<br/>wavefunctions or LSZ factors"]
+  end
+
+  Split --> Free
+  Split --> Inter
+  Theory --> External
+  Prop --> Enumerate["enumerate diagrams<br/>fixed external legs and order in coupling"]
+  Vert --> Enumerate
+  Legs --> Enumerate
+
+  subgraph Integral["Diagram-to-integrand assembly"]
+    direction TB
+    Assign["assign momentum to each line"] --> Delta["apply vertex delta functions<br/>conserve momentum"]
+    Delta --> Loops["choose independent loop momenta<br/>one integral per loop"]
+    Loops --> Numerator["multiply vertex, propagator, and numerator factors"]
+    Numerator --> Sym["divide by symmetry factor if needed"]
+  end
+
+  Enumerate --> Assign
+  Sym --> Reg{"loop integral divergent?"}
+  Reg -- "no" --> Amp["amplitude or correlator"]
+  Reg -- "yes" --> Regularize["regularize<br/>cutoff, dimensional, lattice, etc."]
+  Regularize --> Counter["add counterterms and renormalization conditions"]
+  Counter --> Amp
+  Amp --> Obs["observable prediction<br/>cross section, decay rate, correlation function"]
 ```
+
+This perturbation-theory diagram turns a Lagrangian into a calculation pipeline. The rule-lookup subgraph separates propagators, vertices, and external legs, while the integrand subgraph shows momentum assignment, delta functions, loop integration, numerator factors, and symmetry factors. The divergence branch makes regularization and counterterms part of the architecture whenever loop integrals are ultraviolet sensitive.
 
 ASCII sketch of common scalar diagrams:
 

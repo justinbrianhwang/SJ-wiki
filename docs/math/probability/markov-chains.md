@@ -9,10 +9,6 @@ A Markov chain is a model for random movement among states where the next state 
 
 This page introduces finite discrete-time Markov chains. The central objects are states, transition probabilities, transition matrices, multi-step probabilities, and stationary distributions. The emphasis is on computation and interpretation rather than advanced convergence theory.
 
-![A three-state Markov chain diagram shows directed transitions with probabilities between states.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Simple_markov_chain.svg/500px-Simple_markov_chain.svg.png)
-
-*Figure: Simple three-state Markov chain. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Simple_markov_chain.svg), Chrislb, CC BY-SA 3.0.*
-
 ## Definitions
 
 A **discrete-time stochastic process** is a sequence of random variables
@@ -131,13 +127,37 @@ For finite chains, drawing the directed graph of possible transitions is often t
 ## Visual
 
 ```mermaid
-stateDiagram-v2
-  [*] --> Sunny
-  Sunny --> Sunny: 0.7
-  Sunny --> Rainy: 0.3
-  Rainy --> Sunny: 0.4
-  Rainy --> Rainy: 0.6
+flowchart LR
+  subgraph Chain["Finite Markov chain example"]
+    direction LR
+    S(("Sunny")) -- "0.7" --> S
+    S -- "0.3" --> R(("Rainy"))
+    R -- "0.4" --> S
+    R -- "0.6" --> R
+  end
+
+  subgraph Matrix["Transition-matrix contract"]
+    direction TB
+    P["#quot;P = [[0.7, 0.3"], ["0.4, 0.6"]]<br/>rows: current state; columns: next state"] --> RowCheck["row sums = 1<br/>entries nonnegative"]
+    RowCheck --> Step["one-step update<br/>pi_next = pi_current P"]
+    Step --> Multi["n-step update<br/>pi_n = pi_0 P^n"]
+  end
+
+  subgraph LongRun["Long-run analysis"]
+    direction TB
+    Class["classify communication<br/>irreducible, closed, absorbing"]
+    Class --> Period["check period<br/>aperiodic if return gcd = 1"]
+    Period --> Stationary["solve stationary equations<br/>pi = pi P, sum pi_i = 1"]
+    Stationary --> Limit{"ergodic finite chain?"}
+    Limit -- "yes" --> Converge["pi_n converges to stationary distribution"]
+    Limit -- "no" --> Special["depends on start, class, or oscillation"]
+  end
+
+  S -. "state order defines rows" .-> P
+  Multi --> Class
 ```
+
+The Markov-chain diagram separates the state graph from the matrix contract that drives computation. Directed transition arrows give the one-step probabilities, while the matrix subgraph shows row normalization, distribution updates, and powers of $P$. The long-run branch makes convergence depend on communication classes and periodicity, not just on solving $\pi=\pi P$.
 
 | Concept | Formula | Meaning |
 |---|---|---|

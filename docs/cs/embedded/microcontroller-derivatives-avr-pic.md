@@ -55,24 +55,52 @@ The eighth key result is that compiler support does not erase architectural diff
 | Low power | Idle and power-down | Stop-clock and supervision in some parts | Sleep modes | Sleep and watchdog wake/reset |
 
 ```mermaid
-graph TD
-  Core[Embedded design question] --> Mem[Memory organization]
-  Core --> IO[I/O and peripherals]
-  Core --> Int[Interrupt model]
-  Core --> Power[Power and watchdog]
-  Mem --> MCS[MCS-51 derivative]
-  Mem --> AVR[AVR AT90S2313]
-  Mem --> PIC[PIC16CXX]
-  IO --> MCS
-  IO --> AVR
-  IO --> PIC
-  Int --> MCS
-  Int --> AVR
-  Int --> PIC
-  Power --> MCS
-  Power --> AVR
-  Power --> PIC
+flowchart TB
+  Design["Embedded design question"] --> Compare{"Choose exact device family and part number"}
+
+  subgraph MCS["MCS-51 / 89C51-style derivative"]
+    direction TB
+    MCore["Accumulator-centered 8051 core"]
+    MSFR["SFR map: ports, timers, UART, IE/IP"]
+    MMem["Internal RAM plus code memory; optional external memory"]
+    MEnh["Derivative features: Flash/OTP, dual DPTR, PCA, watchdog"]
+    MCore --> MSFR
+    MCore --> MMem
+    MSFR --> MEnh
+  end
+
+  subgraph AVR["AVR AT90S2313-style organization"]
+    direction TB
+    ARegs["Register file with many working registers"]
+    AIO["I/O register space for peripherals"]
+    AFlash["Harvard program memory and SRAM/EEPROM"]
+    AInt["Interrupt vectors, timers, watchdog, UART"]
+    ARegs --> AIO
+    ARegs --> AFlash
+    AIO --> AInt
+  end
+
+  subgraph PIC["PIC16CXX-style organization"]
+    direction TB
+    W["W working register"]
+    File["Banked file registers and SFRs"]
+    Prog["Program memory words, Harvard-style"]
+    PPeriph["Timers, watchdog, ports, ADC on selected parts"]
+    W --> File
+    W --> Prog
+    File --> PPeriph
+  end
+
+  Compare --> MCS
+  Compare --> AVR
+  Compare --> PIC
+  MCS --> Checklist["Checklist: memory map, register model, interrupt vectors, timers, low-power modes, programming toolchain"]
+  AVR --> Checklist
+  PIC --> Checklist
+  Checklist --> Datasheet(("Read the exact data sheet before wiring or coding"))
 ```
+
+This derivative-comparison diagram shows that 8051 derivatives, AVR devices, and PIC16 devices answer the same architectural questions with different register models and memory maps. The MCS-51 branch labels SFR-centered extensions, the AVR branch labels its larger working-register file and I/O register space, and the PIC branch labels the W register plus banked file-register model. The final checklist explains why concepts transfer across families but low-level code and wiring must follow the exact part data sheet.
 
 ## Worked example 1: Choosing between idle and power-down thinking
 

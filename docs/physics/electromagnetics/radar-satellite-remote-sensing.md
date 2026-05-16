@@ -102,17 +102,35 @@ System calculations should also respect regulatory and operational constraints. 
 ## Visual
 
 ```mermaid
-flowchart TD
-  A[Transmit power Pt] --> B[Transmit antenna gain Gt]
-  B --> C[Free-space spreading]
-  C --> D{System type}
-  D -->|satellite link| E[Receive antenna gain Gr]
-  E --> F[Received communication power]
-  D -->|radar| G[Target radar cross section sigma]
-  G --> H[Return spreading]
-  H --> I[Echo power]
-  I --> J["Range, Doppler, detection"]
+flowchart TB
+  Tx["transmitter<br/>power P_t, waveform, bandwidth"] --> TxAnt["transmit antenna<br/>gain G_t, pointing, polarization"]
+  TxAnt --> Path1["outbound propagation<br/>free-space loss, atmosphere, rain, pointing loss"]
+  Path1 --> System{"system architecture"}
+
+  subgraph Sat["Satellite communication link"]
+    direction TB
+    Uplink["uplink to satellite receiver"] --> Transponder["transponder<br/>filter, frequency translate, amplify"]
+    Transponder --> Downlink["downlink to ground receiver"]
+    Downlink --> RxAnt["receive antenna gain G_r"]
+    RxAnt --> LinkBudget["received carrier power, noise, C/N, margin"]
+  end
+
+  subgraph Radar["Monostatic radar"]
+    direction TB
+    Target["target interaction<br/>radar cross section sigma"] --> Return["return propagation<br/>second free-space spreading"]
+    Return --> Echo["echo power at receiver<br/>range dependence R^-4"]
+    Echo --> Processing["receiver processing<br/>matched filter, Doppler FFT, threshold"]
+    Processing --> Detect["range, velocity, detection probability"]
+  end
+
+  System -- "communication" --> Uplink
+  System -- "radar" --> Target
+  LinkBudget --> Margin["engineering margins<br/>implementation, polarization, weather, regulation"]
+  Detect --> Margin
+  Margin --> Result(("link or sensing performance"))
 ```
+
+This system diagram shows why satellite links and radar share transmit and propagation blocks but diverge after the outbound path. The satellite branch adds a transponder, downlink, receive gain, and carrier-to-noise margin; the radar branch adds target cross section, return spreading, matched processing, Doppler, and detection. The final margin node records nonideal losses and regulatory constraints that decide whether the ideal electromagnetic calculation is usable.
 
 | System quantity | Satellite link | Radar |
 |---|---|---|

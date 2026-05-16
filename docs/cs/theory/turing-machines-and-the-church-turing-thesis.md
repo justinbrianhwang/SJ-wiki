@@ -53,22 +53,46 @@ Turing machines are therefore both a model and a measuring stick. They let us pr
 ## Visual
 
 ```mermaid
-stateDiagram-v2
-  [*] --> scan
-  scan --> scan: read 0 write 0 move R
-  scan --> scan: read 1 write 1 move R
-  scan --> accept: read blank write blank move R
-  accept --> [*]
+flowchart TB
+  subgraph Tape["Two-way unbounded tape with finite nonblank region"]
+    direction LR
+    B0["blank"]
+    C1["1"]
+    C2["0"]
+    C3["1"]
+    C4["1"]
+    B1["blank"]
+    B0 --> C1 --> C2 --> C3 --> C4 --> B1
+  end
+
+  C1 --> Head["Head position: reads one cell, writes one cell, then moves L or R"]
+  Head --> Read{Read current symbol}
+  Read --> Delta["Transition delta(q, symbol) = (q next, symbol to write, direction)"]
+  Delta --> Write["Overwrite current cell"]
+  Write --> Move["Move head left or right"]
+  Move --> NextState["Update finite-control state"]
+  NextState --> Read
+
+  subgraph Inc["Example machine: binary increment by one"]
+    direction TB
+    QScan["q_scan: move right to the first blank after the number"]
+    QCarry["q_carry: propagate carry leftward"]
+    QAccept["q_accept: halt with incremented tape"]
+    QReject["q_reject: halt reject for non-binary input"]
+    QScan -- "read 0 or 1 / write same, move R" --> QScan
+    QScan -- "read blank / write blank, move L" --> QCarry
+    QCarry -- "read 1 / write 0, move L" --> QCarry
+    QCarry -- "read 0 / write 1, move R" --> QAccept
+    QCarry -- "read blank / write 1, move R" --> QAccept
+    QScan -- "read other symbol" --> QReject
+  end
+
+  NextState --> QScan
+  QAccept --> Accept(("accept"))
+  QReject --> Reject(("reject"))
 ```
 
-```text
-Input tape snapshot:
-
-... _ _ 1 0 1 1 _ _ ...
-          ^
-        head
-state = scan
-```
+The tape cells, head, and transition function show the Turing-machine I/O contract at one step of execution: only the current cell and finite-control state determine the write, move, and next state. The binary-increment subgraph expands a high-level algorithm into local scan and carry states, including the shape transition from input such as `1011` to output `1100` on the same tape.
 
 ## Worked example 1: A Turing machine for binary increment
 

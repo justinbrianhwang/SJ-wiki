@@ -72,18 +72,30 @@ For study purposes, the most useful habit is to separate four layers: the contin
 | Reuse for many points | basis can be reused | recurrence repeated per point | barycentric form is better |
 | Numerical risk | large basis products | triangular recurrence | node choice still dominates |
 
-```text
-Interpolation through four nodes can bend sharply near endpoints.
+```mermaid
+flowchart TB
+  Data["Interpolation data<br/>nodes x_i and values y_i"] --> Need{"Need polynomial form or one value?"}
 
-   y
-   |        o
-   |      /   \
-   |  o--/-----\--o
-   |   \/       \
-   |    o        \
-   +---------------- x
-      x0 x1 x2 x3
+  subgraph Lagrange["Lagrange form"]
+    direction TB
+    Basis["build basis polynomials L_i(x)<br/>L_i(x_j)=delta_ij"] --> Sum["P(x)=sum y_i L_i(x)"]
+    Sum --> EvalMany["evaluate or reuse polynomial at many x values"]
+  end
+
+  subgraph Neville["Neville evaluation"]
+    direction TB
+    Target["choose target x"] --> Table["#quot;triangular recurrence<br/>P[i,j"](x) from neighboring entries"]
+    Table --> EvalOne["#quot;output P[0,n"](x)<br/>one target value"]
+  end
+
+  Need -- "symbolic or reusable" --> Basis
+  Need -- "single target x" --> Target
+  EvalMany --> Check["check node interpolation and endpoint oscillation"]
+  EvalOne --> Check
+  Check --> Result(("interpolated value or polynomial"))
 ```
+
+This interpolation diagram shows the two computational contracts separately. Lagrange builds reusable basis polynomials that exactly select node values, while Neville builds a triangular table aimed at one target value. The shared check calls out the main structural risk: high-degree interpolation can oscillate strongly near endpoints even when it matches every node.
 
 ## Worked example 1: quadratic Lagrange interpolation
 

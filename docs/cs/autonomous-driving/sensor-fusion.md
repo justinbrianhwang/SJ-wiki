@@ -9,10 +9,6 @@ Sensor fusion combines measurements from cameras, lidar, radar, IMU, GNSS, maps,
 
 This page sits between [sensors](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu), [perception](/cs/autonomous-driving/perception-object-detection-and-segmentation), [localization](/cs/autonomous-driving/localization-and-hd-maps), and [prediction](/cs/autonomous-driving/prediction-and-motion-forecasting). It introduces early, mid, and late fusion; bird's-eye-view representations; occupancy networks; and calibration. The practical lesson is that fusion is a systems problem as much as a model-design problem.
 
-![A LiDAR point cloud image shows a street intersection reconstructed as colored three-dimensional points.](https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Ouster_OS1-64_lidar_point_cloud_of_intersection_of_Folsom_and_Dore_St%2C_San_Francisco.png/500px-Ouster_OS1-64_lidar_point_cloud_of_intersection_of_Folsom_and_Dore_St%2C_San_Francisco.png)
-
-*Figure: LiDAR point cloud of an urban intersection. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Ouster_OS1-64_lidar_point_cloud_of_intersection_of_Folsom_and_Dore_St,_San_Francisco.png), Dllu, CC BY 4.0.*
-
 ## Definitions
 
 **Early fusion** combines raw or lightly processed sensor data before high-level perception. Examples include projecting lidar points into camera images, painting point clouds with image features, or concatenating radar and lidar features in a common voxel grid.
@@ -75,20 +71,79 @@ The best fusion design is often observable in logs. Engineers should be able to 
 ## Visual
 
 ```mermaid
-flowchart TD
-  A["Camera images"] --> B["Image backbone"]
-  C["LiDAR points"] --> D["Voxel or pillar backbone"]
-  E["Radar detections"] --> F["Radar feature encoder"]
-  G["Map vectors"] --> H["Lane and topology encoder"]
-  B --> I["Shared BEV fusion"]
-  D --> I
-  F --> I
-  H --> I
-  I --> J["Objects"]
-  I --> K["Occupancy"]
-  I --> L["Lanes and drivable area"]
-  I --> M["Motion features for prediction"]
+flowchart TB
+  subgraph Inputs["Synchronized calibrated inputs"]
+    direction TB
+    Cam["#quot;Images: [B, N_cam, 3, H, W"]"]
+    Lidar["#quot;LiDAR points: [B, N_pts, x, y, z, intensity"]"]
+    Radar["#quot;Radar detections: [B, N_radar, range, azimuth, Doppler"]"]
+    Map["Map vectors: lanes, crosswalks, topology"]
+    Pose["Ego pose and sensor transforms: T_sensor_to_ego"]
+  end
+
+  subgraph Early["Early fusion path"]
+    direction TB
+    ProjectPts["Project lidar/radar into camera and BEV frames"]
+    Decorate["Decorate points/pixels with depth, velocity, semantics"]
+    EarlyBackbone["Single fused backbone over enriched tensor"]
+    Cam --> ProjectPts
+    Lidar --> ProjectPts
+    Radar --> ProjectPts
+    Pose --> ProjectPts
+    ProjectPts --> Decorate --> EarlyBackbone
+  end
+
+  subgraph Mid["Mid-level BEV fusion path"]
+    direction TB
+    ImgFeat["Image backbone + FPN features"]
+    Depth["#quot;Depth distribution per pixel: [D, H/stride, W/stride"]"]
+    Lift["#quot;Lift-splat to BEV: [C_img, X, Y"]"]
+    Voxel["#quot;Voxel/pillar encoder: [C_lidar, X, Y"]"]
+    RadarFeat["#quot;Radar BEV encoder: [C_radar, X, Y"]"]
+    MapFeat["#quot;Vector map encoder: polyline attention -> [C_map, X, Y"]"]
+    CrossAttn["BEVFormer-style spatial cross-attention: BEV queries attend image features"]
+    Fuse["Concat/add/gated fusion + temporal BEV memory"]
+    Cam --> ImgFeat --> Depth --> Lift
+    ImgFeat --> CrossAttn
+    Pose --> CrossAttn
+    Lidar --> Voxel
+    Radar --> RadarFeat
+    Map --> MapFeat
+    Lift --> Fuse
+    CrossAttn --> Fuse
+    Voxel --> Fuse
+    RadarFeat --> Fuse
+    MapFeat --> Fuse
+  end
+
+  subgraph Late["Late fusion path"]
+    direction TB
+    CamDet["Camera detections: 2D/3D boxes + scores"]
+    LidarDet["LiDAR detections: 3D boxes + scores"]
+    RadarTrack["Radar tracks: position + radial velocity"]
+    Assoc["Association: gating by IoU, Mahalanobis distance, time"]
+    TrackFilter["Track filter: EKF/UKF/JPDA/MHT"]
+    Cam --> CamDet
+    Lidar --> LidarDet
+    Radar --> RadarTrack
+    CamDet --> Assoc
+    LidarDet --> Assoc
+    RadarTrack --> Assoc
+    Assoc --> TrackFilter
+  end
+
+  EarlyBackbone --> Heads["Task heads"]
+  Fuse --> Heads
+  TrackFilter --> Heads
+  Heads --> Objects["#quot;Objects and tracks: [class, box, velocity, covariance"]"]
+  Heads --> Occupancy["#quot;Occupancy / freespace grid: [X, Y, p_occ"]"]
+  Heads --> Lanes["Lanes, drivable area, traffic controls"]
+  Objects --> Final(("Prediction and planning interface"))
+  Occupancy --> Final
+  Lanes --> Final
 ```
+
+This diagram shows early, mid-level, and late fusion as distinct architectural choices rather than synonyms. The mid-level BEV path makes the main shape transition explicit: camera, lidar, radar, and map features are transformed into aligned BEV tensors, with spatial cross-attention and temporal memory providing the shared representation used by detection, occupancy, and lane heads.
 
 ## Worked example 1: Projecting a lidar point into a camera
 

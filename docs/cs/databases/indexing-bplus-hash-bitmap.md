@@ -9,10 +9,6 @@ An index is an auxiliary access structure that helps the DBMS find records witho
 
 Indexing belongs after storage because an index is itself stored in pages. B+ trees, hash indexes, and bitmap indexes support different query patterns. There is no universally best index. The right choice depends on equality versus range predicates, key cardinality, clustering, update frequency, and whether the workload is transactional or analytical.
 
-![A B-tree diagram shows multiple keys stored in each internal node and leaves at the same depth.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/B-tree.svg/500px-B-tree.svg.png)
-
-*Figure: B-tree node structure used in balanced search indexes. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:B-tree.svg), CyHawk, CC BY-SA 3.0.*
-
 ## Definitions
 
 A **search key** is the attribute or attribute set used to look up records in an index. It does not need to be a candidate key. For example, an index on `student(dept_name)` has a search key that may match many students.
@@ -55,19 +51,53 @@ Unique indexes deserve separate mention because they often enforce constraints a
 
 ```mermaid
 flowchart TD
-  R["#quot;Root: 30 |#quot; 60#quot;"] --> A["#quot;Internal: 10 #quot;| 20#quot;"]
-  R --> B["Internal: 40 | 50"]
-  R --> C["Internal: 70 | 80"]
-  A --> L1["Leaf: 1, 5, 9"]
-  A --> L2["Leaf: 12, 18"]
-  A --> L3["Leaf: 22, 27"]
-  B --> L4["Leaf: 31, 35"]
-  B --> L5["Leaf: 44, 49"]
-  B --> L6["Leaf: 53, 58"]
-  C --> L7["Leaf: 62, 69"]
-  C --> L8["Leaf: 73, 79"]
-  C --> L9["Leaf: 82, 90"]
+  Query["Predicate: dept_name = CS and tot_cred >= 90"] --> Choose{"Optimizer chooses access path"}
+
+  subgraph BPTree["B+ tree on (dept_name, tot_cred)"]
+    direction TB
+    Root["Root page: separators CS|Math|Physics; child page ids"]
+    I1["Internal page: CS, keys 30|60|90; 4 child pointers"]
+    I2["Internal page: Math, keys 30|60|90; 4 child pointers"]
+    L1["Leaf page: CS, 0..29; key/RID entries; next pointer"]
+    L2["Leaf page: CS, 30..59; key/RID entries; next pointer"]
+    L3["Leaf page: CS, 60..89; key/RID entries; next pointer"]
+    L4["Leaf page: CS, 90..120; key/RID entries; next pointer"]
+    Root --> I1
+    Root --> I2
+    I1 --> L1
+    I1 --> L2
+    I1 --> L3
+    I1 --> L4
+    L1 -. "leaf sibling" .-> L2
+    L2 -. "leaf sibling" .-> L3
+    L3 -. "leaf sibling" .-> L4
+  end
+
+  subgraph HashIdx["Hash index on ID"]
+    direction TB
+    HKey["hash(ID) mod bucket_count"] --> Bucket["Bucket page: key/RID slots"]
+    Bucket --> Overflow["Overflow page chain if bucket full"]
+  end
+
+  subgraph BitmapIdx["Bitmap indexes for analytics"]
+    direction TB
+    B1["dept_name = CS bitmap: 1 1 0 1 0 0 1 0"]
+    B2["year = 4 bitmap: 0 1 1 1 0 1 0 0"]
+    Band["Bitwise AND"]
+    Rows["Matching row positions: 2 and 4 in 1-based row numbering"]
+    B1 --> Band
+    B2 --> Band
+    Band --> Rows
+  end
+
+  Choose -- "range and order" --> BPTree
+  Choose -- "equality only" --> HashIdx
+  Choose -- "low-cardinality predicates" --> BitmapIdx
+  L4 --> RID["Record IDs or clustered data rows"]
+  RID --> Table["Base table pages if non-covering index"]
 ```
+
+This indexing diagram separates the physical layouts used by B+ tree, hash, and bitmap indexes. The B+ tree path labels root, internal, and linked leaf pages, so equality and range scans can descend once and then follow sibling pointers; the hash path shows why equality lookup is direct but unordered. The bitmap branch shows predicate composition as bitwise data flow, and the final RID/table edge makes the covering versus non-covering index cost visible.
 
 | Index type | Best for | Poor for | Update cost |
 | --- | --- | --- | --- |

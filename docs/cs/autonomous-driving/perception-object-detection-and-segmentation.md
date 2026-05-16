@@ -9,10 +9,6 @@ Perception turns raw sensor data into scene understanding: vehicles, pedestrians
 
 This page introduces the core perception tasks and metrics that later pages on [sensor fusion](/cs/autonomous-driving/sensor-fusion), [prediction](/cs/autonomous-driving/prediction-and-motion-forecasting), [planning](/cs/autonomous-driving/motion-planning), and [adversarial attacks](/cs/autonomous-driving/adversarial-and-physical-attacks-on-av) build on. The main engineering theme is that perception outputs are not just labels; they are uncertain, delayed, partially observed state estimates used by downstream planners.
 
-![A convolutional neural network diagram shows convolution and pooling layers feeding into dense classification layers.](https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Convolutional_Neural_Network.png/500px-Convolutional_Neural_Network.png)
-
-*Figure: Convolutional neural network architecture. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Convolutional_Neural_Network.png), Irisbox, CC BY 4.0.*
-
 ## Definitions
 
 **Object detection** localizes and classifies objects. In 2D detection, the output is usually an image bounding box and class label. In 3D detection, the output is a metric box with position, size, heading, class, and confidence in a vehicle, lidar, camera, or global coordinate frame.
@@ -142,19 +138,64 @@ Perception outputs also need lifecycle management. A detection becomes a track, 
 ## Visual
 
 ```mermaid
-flowchart LR
-  A["Camera images"] --> B["2D detection"]
-  A --> C["Segmentation"]
-  D["LiDAR points"] --> E["3D detection"]
-  F["Radar targets"] --> G["Velocity cues"]
-  B --> H["Tracking and fusion"]
-  C --> H
-  E --> H
-  G --> H
-  H --> I["Objects, lanes, free space, uncertainty"]
-  I --> J["Prediction"]
-  I --> K["Planning"]
+flowchart TB
+  Img["#quot;Camera frames: [B, 3, H, W"]"] --> ImgBackbone["Image backbone: Conv/BN/ReLU or ViT patches"]
+  ImgBackbone --> FPN["#quot;FPN neck: multi-scale features [P3..P7"]"]
+  FPN --> TwoDHead["2D heads: class logits, boxes, masks, lanes, lights"]
+
+  Points["#quot;LiDAR points: [N, x, y, z, intensity, t"]"] --> Voxelize["Voxelization / pillarization: fixed grid in ego frame"]
+  Voxelize --> VFE["Voxel/Pillar feature encoder: PointNet-style MLP + pooling"]
+  VFE --> Scatter["#quot;Scatter to BEV pseudo-image: [C, X, Y"]"]
+  Scatter --> BEVBackbone["2D BEV backbone: Conv-BN-ReLU blocks + FPN"]
+
+  subgraph PointPillars["PointPillars-style branch"]
+    direction TB
+    PPHead["Anchor/center detection head"]
+    PPCls["Classification heatmap"]
+    PPBox["Box regression: x, y, z, l, w, h, yaw"]
+    PPVel["Optional velocity / direction head"]
+    BEVBackbone --> PPHead
+    PPHead --> PPCls
+    PPHead --> PPBox
+    PPHead --> PPVel
+  end
+
+  subgraph CenterPoint["CenterPoint-style temporal branch"]
+    direction TB
+    CenterHeat["Center heatmap in BEV"]
+    CenterReg["Offset, height, size, yaw, velocity"]
+    NMS["Peak selection + circle/rotated NMS"]
+    Track["Temporal association: Kalman/filter or learned tracking"]
+    BEVBackbone --> CenterHeat
+    BEVBackbone --> CenterReg
+    CenterHeat --> NMS
+    CenterReg --> NMS
+    NMS --> Track
+  end
+
+  subgraph VoxelNet["VoxelNet / sparse-3D branch"]
+    direction TB
+    Sparse3D["Sparse 3D convolution backbone"]
+    HeightCollapse["Height compression to BEV"]
+    SparseHead["3D detection head"]
+    VFE --> Sparse3D --> HeightCollapse --> SparseHead
+  end
+
+  Radar["#quot;Radar targets: [range, azimuth, Doppler"]"] --> RadarEnc["Radar feature encoder: Doppler + confidence"]
+  TwoDHead --> Assoc["Cross-sensor association and tracking"]
+  PPCls --> Decode["Decode boxes + scores"]
+  PPBox --> Decode
+  PPVel --> Decode
+  Track --> Assoc
+  SparseHead --> Assoc
+  RadarEnc --> Assoc
+  Decode --> Assoc
+  Assoc --> Scene["Scene output: tracked objects, lanes, freespace, occupancy, uncertainty"]
+  Scene --> Pred["Prediction input: object histories + map context"]
+  Scene --> Plan["Planning input: collision geometry + semantic constraints"]
 ```
+
+This diagram expands perception into the standard camera, PointPillars/CenterPoint, VoxelNet, and radar branches. The key shape transition is from unordered lidar points to voxels/pillars and then to a BEV tensor, while the downstream association block turns raw detections into tracked objects and uncertainty for prediction and planning.
 
 ## Worked example 1: Computing IoU for two boxes
 

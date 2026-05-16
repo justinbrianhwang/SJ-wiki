@@ -89,15 +89,47 @@ Finally, adversarial training is not a drop-in patch after a model is finished. 
 ## Visual
 
 ```mermaid
-flowchart TD
-  A["Mini-batch x,y"] --> B[Inner attack against current model]
-  B --> C[Adversarial examples x_adv]
-  C --> D[Compute robust loss]
-  D --> E[Backprop through model parameters]
-  E --> F[Optimizer step on theta]
-  F --> G[Next mini-batch]
-  F --> B
+flowchart TB
+  Batch["Mini-batch (x, y) and current parameters theta"]
+
+  subgraph Inner["Inner maximization: PGD adversary"]
+    direction TB
+    Init["Initialize delta_0 inside threat set"]
+    Forward["Forward f_theta(x + delta_t)"]
+    InputGrad["Input gradient grad_delta L(f_theta(x + delta_t), y)"]
+    AttackStep["Ascent step on delta"]
+    Project["Project delta to epsilon-ball and clip x + delta"]
+    Done{"T attack steps complete?"}
+    Adv["Adversarial batch x_adv = x + delta_T"]
+    Init --> Forward --> InputGrad --> AttackStep --> Project --> Done
+    Done -->|"No"| Forward
+    Done -->|"Yes"| Adv
+  end
+
+  subgraph Outer["Outer minimization: parameter update"]
+    direction TB
+    RobustLoss["PGD-AT loss: CE(f_theta(x_adv), y)"]
+    TradesClean["TRADES clean term: CE(f_theta(x), y)"]
+    TradesKL["TRADES robust term: beta * KL(f_theta(x) || f_theta(x_adv))"]
+    Combine["Choose objective: PGD-AT or TRADES weighted loss"]
+    ParamGrad["Backprop gradient with respect to theta"]
+    SGD["SGD/Adam step on theta"]
+    Eval["Validation: clean accuracy, robust accuracy, catastrophic overfitting checks"]
+    RobustLoss --> Combine
+    TradesClean --> Combine
+    TradesKL --> Combine
+    Combine --> ParamGrad --> SGD --> Eval
+  end
+
+  Batch --> Init
+  Batch --> TradesClean
+  Adv --> RobustLoss
+  Adv --> TradesKL
+  Eval --> Next(("Next mini-batch / next epoch"))
+  SGD -. "updated theta for next inner attack" .-> Forward
 ```
+
+This diagram shows adversarial training as a min-max loop with a PGD inner maximization and an SGD/Adam outer minimization. The TRADES branch makes the dual objective explicit: clean cross-entropy is balanced against a KL robustness term computed between clean and adversarial predictions.
 
 | Method | Inner attack | Extra cost | Main benefit | Main risk |
 |---|---|---|---|---|

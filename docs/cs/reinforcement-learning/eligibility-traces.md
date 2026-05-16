@@ -72,15 +72,35 @@ True online TD($\lambda$) is important because ordinary accumulating-trace TD ca
 ## Visual
 
 ```mermaid
-flowchart LR
-  Visit[Visit state or state-action] --> Trace[Increase eligibility trace]
-  Trace --> Decay[Decay by gamma lambda each step]
-  Reward[New reward and next value] --> Delta[TD error delta]
-  Delta --> Update[Update all eligible entries]
-  Decay --> Update
-  Update --> Values[Values or weights]
-  Values --> Delta
+flowchart TB
+  Step["At time t, visit state or state-action feature x_t"] --> Decay["Decay all traces: z <- gamma * lambda * z"]
+  Decay --> Accum["Accumulate current trace: z <- z + grad v_hat(S_t,w)"]
+  Accum --> TDTarget["Compute TD target: R_(t+1) + gamma v_hat(S_(t+1),w)"]
+  TDTarget --> Delta["TD error delta_t = target - v_hat(S_t,w)"]
+  Delta --> Update["Update all weights: w <- w + alpha * delta_t * z"]
+  Update --> Next["Proceed to next transition"]
+  Next --> Step
+
+  subgraph Forward["Forward view"]
+    direction LR
+    G1["1-step return"] --> Mix["lambda-return: weighted mixture of n-step returns"]
+    G2["2-step return"] --> Mix
+    Gn["n-step returns"] --> Mix
+    Mix --> Target["Conceptual target G_t^lambda"]
+  end
+
+  subgraph Control["Control variants"]
+    direction TB
+    SarsaL["SARSA(lambda): traces over state-action pairs"]
+    Replace["Replacing traces: active trace set to 1"]
+    Watkins["Watkins Q(lambda): cut traces after nongreedy action"]
+  end
+
+  Forward -. "backward trace implements online credit assignment" .-> Accum
+  Update -. "same mechanism with variant trace rules" .-> Control
 ```
+
+This eligibility-trace diagram shows the online backward view in parameter order: decay traces, accumulate the current state's feature gradient, compute the TD error, and update every eligible weight. The forward-view subgraph names the lambda-return as a weighted mixture of n-step returns, while the control-variant subgraph distinguishes SARSA(lambda), replacing traces, and Watkins's trace cutting. The key shape transition is from one visited state-action to a trace vector `z` that distributes the current TD error over recent history.
 
 | $\lambda$ value | Target behavior | Credit assignment | Typical effect |
 |---:|---|---|---|

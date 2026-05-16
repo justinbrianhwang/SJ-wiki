@@ -9,10 +9,6 @@ Numerical integration converts a continuous-time state equation into a sequence 
 
 Klee and Allen introduce elementary methods before moving to Runge-Kutta, adaptive, multistep, stiff, and real-time-compatible techniques. The practical idea is simple: an integrator is a rule for using slope information. The engineering difficulty is choosing a rule and step size that produce an answer accurate enough, stable enough, and fast enough for the intended use.
 
-![A Runge-Kutta diagram shows intermediate slope estimates used to advance one step.](https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Runge-Kutta_slopes.svg/500px-Runge-Kutta_slopes.svg.png)
-
-*Figure: Intermediate slopes used by the classical fourth-order Runge-Kutta method. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Runge-Kutta_slopes.svg), HilberTraum, CC BY-SA 4.0.*
-
 ## Definitions
 
 For an initial value problem
@@ -94,21 +90,54 @@ The time-response plot is part of the numerical diagnosis. A jagged curve, alter
 ## Visual
 
 ```mermaid
-flowchart LR
-  A[x_k at t_k] --> B[Evaluate slopes]
-  B --> C{Method}
-  C -->|Euler| D[Use initial slope]
-  C -->|Trapezoidal| E[Average endpoint slopes]
-  C -->|RK4| F[Weighted staged slopes]
-  C -->|Adaptive RK| G[Compare high and low order estimates]
-  D --> H["x_{k+1}"]
-  E --> H
-  F --> H
-  G --> I{"Error acceptable?"}
-  I -->|yes| H
-  I -->|no| J[Reduce step and retry]
-  J --> B
+flowchart TB
+  IVP["State equation<br/>x_dot = f(t,x,u,p), current x_k at t_k"] --> Step["Choose trial step h<br/>fixed or adaptive"]
+  Step --> Method{"Integration method"}
+
+  subgraph Euler["Explicit Euler"]
+    direction TB
+    E1["evaluate slope f(t_k,x_k)"] --> E2["advance x_{k+1}=x_k+h f_k"]
+  end
+
+  subgraph RK4["Classical RK4"]
+    direction TB
+    K1["k1 at start"] --> K2["k2 at midpoint using k1"]
+    K2 --> K3["k3 at midpoint using k2"]
+    K3 --> K4["k4 at endpoint using k3"]
+    K4 --> RKMix["weighted slope<br/>(k1+2k2+2k3+k4)/6"]
+    RKMix --> RKOut["advance one step"]
+  end
+
+  subgraph Adaptive["Adaptive embedded RK"]
+    direction TB
+    Stages["shared staged slopes"] --> Pair["high-order and low-order estimates"]
+    Pair --> Err["local error estimate"]
+    Err --> Accept{"error within tolerance?"}
+    Accept -- "yes" --> AOut["accept high-order state"]
+    Accept -- "no" --> Shrink["reduce h and retry same state"]
+  end
+
+  subgraph Implicit["Implicit/stiff method"]
+    direction TB
+    Predict["predict next state"] --> Nonlinear["solve implicit equation<br/>Newton or linear solve"]
+    Nonlinear --> IOut["accepted stiff step"]
+  end
+
+  Method -- "cheap first order" --> E1
+  Method -- "fixed high order" --> K1
+  Method -- "variable step" --> Stages
+  Method -- "stiff or robust" --> Predict
+  E2 --> Diagnostics
+  RKOut --> Diagnostics
+  AOut --> Diagnostics
+  IOut --> Diagnostics["diagnostics<br/>stability, local/global error, event timing"]
+  Shrink --> Step
+  Diagnostics --> Next{"more steps?"}
+  Next -- "yes" --> Step
+  Next -- "no" --> Traj(("computed trajectory"))
 ```
+
+This integration diagram expands one simulation step into explicit, RK4, adaptive, and implicit solver architectures. RK4 shows all staged slopes; adaptive RK shows the embedded error estimate and reject/retry logic; implicit methods show the nonlinear solve needed for stiffness. The diagnostics node connects numerical stability, error, and event timing to the accepted trajectory.
 
 | Method | Type | Function evaluations | Typical global order | Practical use |
 |---|---:|---:|---:|---|

@@ -71,25 +71,66 @@ This is why probability estimates must be tied back to assumptions. A Naive Baye
 ## Visual
 
 ```mermaid
-flowchart TD
-    C["Class: PlayTennis"] --> Outlook
-    C --> Humidity
-    C --> Wind
-    C --> Temperature
-```
+flowchart TB
+  subgraph NB["Naive Bayes classifier"]
+    direction TB
+    C["Class variable C"]
+    X1["Feature X_1"]
+    X2["Feature X_2"]
+    Xd["Feature X_d"]
+    Prior["Estimate P(C)"]
+    Cond["Estimate P(X_i | C) with smoothing"]
+    Score["Score class c: log P(c) + sum_i log P(x_i | c)"]
+    Pred(("Predicted class argmax_c score"))
+    C --> X1
+    C --> X2
+    C --> Xd
+    Prior --> Score
+    Cond --> Score
+    X1 --> Score
+    X2 --> Score
+    Xd --> Score
+    Score --> Pred
+  end
 
-This is the Naive Bayes graph: all observed attributes depend on the class, and no direct dependencies among attributes are modeled.
-
-```mermaid
-flowchart TD
+  subgraph BN["Bayesian belief network"]
+    direction TB
+    Season["Season"]
+    Disease["Disease"]
+    Allergy["Allergy"]
+    Fever["Fever"]
+    Cough["Cough"]
+    CPT["CPT at each node: P(node | parents)"]
+    Joint["Joint factorization: product_i P(Y_i | Parents(Y_i))"]
+    Season --> Disease
+    Season --> Allergy
     Disease --> Fever
     Disease --> Cough
     Allergy --> Cough
-    Season --> Allergy
-    Season --> Disease
+    CPT --> Joint
+  end
+
+  subgraph EM["Expectation-maximization for latent-variable model"]
+    direction TB
+    Data["Observed data X; hidden assignments Z unknown"]
+    Params["Current parameters theta_t"]
+    EStep["E-step: compute responsibilities P(Z | X, theta_t)"]
+    MStep["M-step: update theta_(t+1) to maximize expected complete log likelihood"]
+    Lik{"Likelihood improvement below tolerance?"}
+    Final(("Local maximum parameters"))
+    Data --> EStep
+    Params --> EStep
+    EStep --> MStep
+    MStep --> Lik
+    Lik -- "no" --> Params
+    Lik -- "yes" --> Final
+  end
+
+  NB -. "special DAG: class is sole parent of features" .-> BN
+  BN -. "hidden nodes require inference or EM-style learning" .-> EM
 ```
 
-This Bayesian network is richer: cough has two possible causes, and season influences both allergy and disease.
+This probabilistic-model diagram combines the three structures on the page. Naive Bayes labels the class-to-feature conditional independence assumption and the log-posterior scoring path; the Bayesian-network subgraph shows a richer DAG with CPTs and joint factorization. The EM subgraph shows the hidden-variable learning loop, where responsibilities from the E-step become fractional complete data for the M-step until likelihood stops improving.
 
 ## Worked example 1: Naive Bayes classification with smoothing
 

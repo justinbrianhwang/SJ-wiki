@@ -9,10 +9,6 @@ Classification changes the target from a real number to a discrete class. D2L in
 
 The chapter also introduces a more careful view of generalization. Good training accuracy is not the goal; good performance on future data from the intended environment is the goal. Classification makes this distinction visible because accuracy, cross-entropy, class imbalance, distribution shift, and repeated test-set use can all tell different stories about the same model.
 
-![An overfitting diagram shows a classifier boundary that follows training points too closely.](https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Overfitting.svg/500px-Overfitting.svg.png)
-
-*Figure: Overfitting in a classifier decision boundary. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Overfitting.svg), Chabacano, CC BY-SA 4.0.*
-
 ## Definitions
 
 For $K$ classes, a classifier produces **logits** $o \in \mathbb{R}^K$. Logits are unconstrained scores, not probabilities. The **softmax** function maps logits to probabilities:
@@ -88,14 +84,33 @@ Softmax temperature changes confidence without changing logit order when applied
 ## Visual
 
 ```mermaid
-flowchart LR
-  X[Input x] --> A[Affine layer W^T x + b]
-  A --> O[Logits]
-  O --> S[Softmax probabilities]
-  S --> C[Cross-entropy with true class]
-  O --> M[argmax prediction]
-  M --> Acc[Accuracy metric]
+flowchart TB
+  X["#quot;Input batch X: [N, d"]"] --> Affine["#quot;Affine classifier: logits O = XW + b -> [N, K"]"]
+  Affine --> Stable["Stable log-softmax: subtract row max before exponentials"]
+  Stable --> Prob["#quot;Probabilities p_hat: [N, K"], rows sum to 1"]
+  Y["#quot;True class ids y: [N"]"] --> Gather["Gather log probability of true class"]
+  Prob --> Gather
+  Gather --> CE["Cross-entropy loss = mean(-log p_hat_y)"]
+  Affine --> Argmax["argmax over logits"]
+  Argmax --> Acc["Accuracy, top-k, per-class metrics"]
+  CE --> Grad["Gradient wrt logits: p_hat - one_hot(y)"]
+  Grad --> Update["Backprop to W and b"]
+
+  subgraph Generalization["Generalization control"]
+    direction TB
+    Train["Training split fits W and b"]
+    Val["Validation split selects hyperparameters"]
+    Test["Test split used once for final estimate"]
+    Shift["Deployment shift checks: covariate, label, concept"]
+  end
+
+  Update --> Train
+  Train --> Val
+  Val --> Test
+  Test --> Shift
 ```
+
+The softmax diagram distinguishes logits, probabilities, cross-entropy, and argmax metrics. The loss path uses the true-class log probability and produces the compact `p_hat - one_hot(y)` gradient, while the metric path reads decisions from logits. The generalization subgraph shows where validation, test, and distribution-shift checks belong in the classifier workflow.
 
 | Evaluation idea | Measures | Strength | Weakness |
 |---|---|---|---|

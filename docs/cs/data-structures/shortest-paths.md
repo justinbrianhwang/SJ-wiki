@@ -62,25 +62,34 @@ Negative weights require special care. A single negative edge can invalidate Dij
 ## Visual
 
 ```mermaid
-graph LR
-  A("(A")) -->|2| B("(B"))
-  A -->|5| C("(C"))
-  B -->|1| C
-  B -->|2| D("(D"))
-  C -->|3| D
-  D -->|1| E("(E"))
-  C -->|5| E
+flowchart TB
+  subgraph Graph["Weighted directed graph"]
+    direction LR
+    A(("A")) -- "2" --> B(("B"))
+    A -- "5" --> C(("C"))
+    B -- "1" --> C
+    B -- "2" --> D(("D"))
+    C -- "3" --> D
+    D -- "1" --> E(("E"))
+    C -- "5" --> E
+  end
+
+  Init["#quot;Initialize d[A"]=0; all other d[v]=infinity; parent[v]=null"] --> PQ["Priority queue keyed by tentative distance"]
+  Graph --> PQ
+  PQ --> Extract["#quot;Extract unsettled vertex u with smallest d[u"]"]
+  Extract --> Finalize["#quot;Finalize u; d[u"] is now shortest because weights are nonnegative"]
+  Finalize --> Edges["For each outgoing edge u -> v with weight w"]
+  Edges --> Relax{"d[u] + w < d[v]?"}
+  Relax -- "yes" --> Update["#quot;Set d[v"]=d[u]+w; parent[v]=u; decrease-key or push duplicate"]
+  Relax -- "no" --> Keep["#quot;Keep current d[v"] and parent[v]"]
+  Update --> PQ
+  Keep --> More{"Unsettled vertices remain?"}
+  PQ --> More
+  More -- "yes" --> Extract
+  More -- "no" --> Paths(("Distances and predecessor tree from source A"))
 ```
 
-Relaxation flow:
-
-```mermaid
-flowchart LR
-  U[known d[u]] --> E[edge u to v with weight w]
-  E --> C{"d[u] + w < d[v]?"}
-  C -->|yes| R[update d[v] and parent[v]]
-  C -->|no| N[keep current distance]
-```
+This Dijkstra diagram combines the weighted graph, priority queue, finalization invariant, and relaxation operation. The extract-min step is what makes a vertex settled, while each outgoing edge may update a tentative distance and predecessor. The update label includes the two common heap strategies: true decrease-key or inserting a duplicate entry and ignoring stale removals later.
 
 ## Worked example 1: Dijkstra from A
 
