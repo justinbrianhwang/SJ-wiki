@@ -211,17 +211,48 @@ Vaswani et al. [1] introduced the Transformer in the setting of neural machine t
 The original model is an encoder-decoder architecture. The encoder has $N=6$ identical layers. Each encoder layer contains multi-head self-attention followed by a position-wise feed-forward network, with residual connections and layer normalization around both sublayers. The decoder also has $N=6$ layers, but each decoder layer has three sublayers: masked decoder self-attention, encoder-decoder cross-attention, and the same position-wise feed-forward network. In the base model, $d_{\mathrm{model}}=512$, $d_{\mathrm{ff}}=2048$, and there are $h=8$ attention heads with $d_k=d_v=64$. The big model uses a wider configuration, but the same conceptual stack.
 
 ```mermaid
-flowchart LR
-  Src[Source tokens] --> SE[Source embeddings plus sinusoidal PE]
-  SE --> Enc["Encoder stack N=6"]
-  Enc --> Memory[Encoder memory keys and values]
-  Tgt[Shifted target tokens] --> TE[Target embeddings plus sinusoidal PE]
-  TE --> MSA[Masked decoder self-attention]
-  MSA --> CA[Encoder-decoder cross-attention]
-  Memory --> CA
-  CA --> FFN[Decoder feed-forward]
-  FFN --> Softmax[Linear projection and softmax]
+flowchart TB
+  Src["Source tokens"] --> SrcEmb["Source embedding"]
+  SrcEmb --> SrcAdd["+ sinusoidal positional encoding"]
+
+  subgraph Encoder["Encoder stack (N = 6 layers)"]
+    direction TB
+    EncIn[" "] --> E_SA["Multi-head self-attention"]
+    E_SA --> E_AN1["Add and LayerNorm (residual)"]
+    E_AN1 --> E_FFN["Position-wise feed-forward (FFN)"]
+    E_FFN --> E_AN2["Add and LayerNorm (residual)"]
+    E_AN2 --> EncOut[" "]
+  end
+
+  SrcAdd --> EncIn
+  EncOut -. "K, V (encoder memory)" .-> D_CA
+
+  Tgt["Target tokens (shifted right)"] --> TgtEmb["Target embedding"]
+  TgtEmb --> TgtAdd["+ sinusoidal positional encoding"]
+
+  subgraph Decoder["Decoder stack (N = 6 layers)"]
+    direction TB
+    DecIn[" "] --> D_MSA["Masked multi-head self-attention"]
+    D_MSA --> D_AN1["Add and LayerNorm (residual)"]
+    D_AN1 --> D_CA["Encoder–decoder cross-attention (Q from decoder, K and V from encoder)"]
+    D_CA --> D_AN2["Add and LayerNorm (residual)"]
+    D_AN2 --> D_FFN["Position-wise feed-forward (FFN)"]
+    D_FFN --> D_AN3["Add and LayerNorm (residual)"]
+    D_AN3 --> DecOut[" "]
+  end
+
+  TgtAdd --> DecIn
+  DecOut --> Linear["Linear projection to vocab dim"]
+  Linear --> Softmax["Softmax"]
+  Softmax --> Probs["Output token probabilities"]
 ```
+
+The block diagram above shows the canonical encoder–decoder Transformer of Vaswani et al. [1]:
+
+- **Encoder layer** (left) has two sublayers — multi-head self-attention and a position-wise feed-forward network — each wrapped in a residual connection followed by layer normalization. Stacked $N$ times.
+- **Decoder layer** (right) adds a third sublayer: masked multi-head self-attention prevents target tokens from attending to future positions, encoder–decoder cross-attention lets each target position read the full encoded source through $Q = X_{\mathrm{dec}} W^Q$ and $K, V$ from the encoder output, and a position-wise FFN finishes the layer. Stacked $N$ times.
+- **Output** projects decoder states to the target vocabulary with a linear layer, then softmax produces the next-token distribution.
+- **Embeddings** map discrete tokens to vectors of dimension $d_{\mathrm{model}}$; sinusoidal positional encodings are added so the model can use order despite having no recurrence or convolution.
 
 The paper uses three attention variants. **Encoder self-attention** uses source positions as queries, keys, and values, so every source token can see every other source token, aside from padding masks. **Decoder masked self-attention** uses target positions as queries, keys, and values, but masks future target positions so autoregressive training cannot leak the answer. **Encoder-decoder attention** uses decoder states as queries and encoder outputs as keys and values, allowing each target position to attend over the full source sentence.
 
