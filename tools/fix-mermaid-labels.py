@@ -29,7 +29,7 @@ import sys
 import pathlib
 
 
-HAZARDOUS = re.compile(r"[\(\)=\?:'<>&,;|]")
+HAZARDOUS = re.compile(r"[\(\)=\?:'<>&,;|\"]")
 
 
 # Mermaid bracket variants in order: longer/specific first.
@@ -47,16 +47,21 @@ NODE_BRACKETS = [
 
 
 def quote_label(label: str) -> str:
-    # already a quoted label like "..." (possibly with whitespace)
     s = label.strip()
-    if (s.startswith('"') and s.endswith('"')) or (
-        s.startswith('&quot;') and s.endswith('&quot;')
-    ):
+    # If already wrapped in "...", strip the outer wrap so we can re-validate
+    # the inner content. (Codex sometimes emits `"y' = f("x,y")"` which is
+    # broken because the inner `"`s need to be escaped to #quot;.)
+    if len(s) >= 2 and s.startswith('"') and s.endswith('"'):
+        inner = s[1:-1]
+        wrapped_already = True
+    else:
+        inner = label
+        wrapped_already = False
+    # Safe? No hazardous chars and no stray " inside.
+    if not HAZARDOUS.search(inner):
         return label
-    if not HAZARDOUS.search(label):
-        return label
-    # escape internal double quotes
-    escaped = label.replace('"', '#quot;')
+    # Escape any remaining literal " to #quot; (Mermaid HTML entity)
+    escaped = inner.replace('"', "#quot;")
     return f'"{escaped}"'
 
 

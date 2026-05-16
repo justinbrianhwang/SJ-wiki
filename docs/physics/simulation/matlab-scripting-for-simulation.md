@@ -86,7 +86,7 @@ Those checks are cheap and usually worth keeping.
 flowchart TD
   A[Define parameters with units] --> B[Compute or set initial conditions]
   B --> C["Define input function u(t)"]
-  C --> D["Write derivative function dx=f("t,x,p")"]
+  C --> D["Write derivative function dx=f("#quot;t,x,p#quot;")"]
   D --> E[Choose solver and tolerances]
   E --> F[Run simulation]
   F --> G[Plot states and outputs]
