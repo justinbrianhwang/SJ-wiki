@@ -10,10 +10,9 @@ sidebar_position: 0
 
 # Chemistry
 
-Notes on chemistry concepts.
+Notes on chemistry — from general chemistry foundations to physical-chemistry rigor.
 
 ## Topics
 
-- **[General Chemistry](/chemistry/general/intro)** — atoms, bonds, reactions, thermodynamics, kinetics
-
-*Detailed content is being generated from* **Ebbing & Gammon — *General Chemistry* (9th ed)**.
+- **[General Chemistry](/chemistry/general/intro)** — atoms, bonds, reactions, thermodynamics, kinetics, electrochemistry (Ebbing & Gammon)
+- **[Physical Chemistry](/chemistry/physical-chemistry/intro)** — thermodynamics, statistical mechanics, quantum chemistry, spectroscopy, kinetics (Atkins)

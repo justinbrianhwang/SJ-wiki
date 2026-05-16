@@ -18,7 +18,8 @@ Notes on mathematical concepts — from calculus to graph theory.
 - **[Linear Algebra](/math/linear-algebra/intro)** — vectors, matrices, eigenvalues
 - **[Engineering Mathematics](/math/engineering-math/intro)** — ODEs, PDEs, transforms, complex analysis
 - **[Statistics](/math/statistics/intro)** — distributions, hypothesis testing, regression
-- **[Probability & Random Variables](/math/probability/intro)** — sample spaces, distributions, limit theorems
+- **[Probability](/math/probability/intro)** — Lane-derived introduction; sample spaces, distributions
+- **[Probability and Random Variables](/math/probability-and-random-variables/intro)** — rigorous theory from MIT 18.440 (Sheffield)
 - **[Discrete Mathematics](/math/discrete/intro)** — logic, combinatorics, graphs, recurrences
 - **[Numerical Analysis](/math/numerical-analysis/intro)** — interpolation, integration, ODE solvers, stability
 - **[Graph Theory](/math/graph-theory/intro)** — connectivity, trees, planarity, coloring
