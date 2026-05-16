@@ -210,3 +210,29 @@ print(choose_crosswalk_behavior(scene))
 - [Signals and systems](/physics/signals-systems/)
 - Further reading: SAE J3016, Thrun et al. *Probabilistic Robotics*, Pomerleau's ALVINN, NVIDIA PilotNet, Mobileye RSS, CARLA, Waymo Open Dataset, Argoverse, nuScenes, ISO 26262, and ISO 21448.
 
+## System and paper deep-dives
+
+The following pages extend the foundational stack pages with system-level and paper-level deep dives from the autonomous-driving PDF collection:
+
+1. [PointPillars](/cs/autonomous-driving/pointpillars) - fast LiDAR pillar encoding for 3D object detection.
+2. [CenterPoint](/cs/autonomous-driving/centerpoint) - center-based 3D detection and tracking.
+3. [LaneGCN](/cs/autonomous-driving/lanegcn) - lane-graph representation learning for motion forecasting.
+4. [VectorNet](/cs/autonomous-driving/vectornet) - vectorized HD maps and agent dynamics for behavior prediction.
+5. [HiVT](/cs/autonomous-driving/hivt) - hierarchical vector transformers for multi-agent motion prediction.
+6. [PnPNet](/cs/autonomous-driving/pnpnet) - end-to-end perception and prediction with tracking in the loop.
+7. [ChauffeurNet](/cs/autonomous-driving/chauffeurnet) - mid-level imitation learning with perturbation-based recovery.
+8. [Learning by Cheating](/cs/autonomous-driving/learning-by-cheating) - privileged-teacher distillation for vision-based driving.
+9. [Dynamic Conditional Imitation Learning](/cs/autonomous-driving/dynamic-conditional-imitation-learning) - CIL with LiDAR fusion, occupancy grids, and route replanning.
+10. [TransFuser](/cs/autonomous-driving/transfuser) - transformer-based camera-LiDAR fusion for end-to-end driving.
+11. [InterFuser](/cs/autonomous-driving/interfuser) - interpretable sensor-fusion transformer with safety constraints.
+12. [UniAD](/cs/autonomous-driving/uniad) - planning-oriented unified perception, prediction, and planning.
+13. [VAD](/cs/autonomous-driving/vad) - vectorized end-to-end autonomous driving with explicit planning constraints.
+14. [DriveVLM](/cs/autonomous-driving/drivevlm) - VLM scene reasoning and hierarchical planning.
+15. [AutoVLA](/cs/autonomous-driving/autovla) - VLA action-token driving with adaptive reasoning.
+16. [VLA for Driving Survey](/cs/autonomous-driving/vla-for-driving-survey) - taxonomy of vision-language-action models for driving.
+17. [MLLM for Driving Survey](/cs/autonomous-driving/mllm-for-driving-survey) - multimodal large language models for driving, maps, and transportation.
+18. [World Models for Driving](/cs/autonomous-driving/world-models-for-driving) - DriveDreamer, GAIA-1, and generative driving futures.
+19. [Diffusion Planning for Driving](/cs/autonomous-driving/diffusion-planning-for-driving) - Hydra-MDP, DiffVLA, and stack-integrated diffusion planning.
+20. [LimSim++](/cs/autonomous-driving/limsim) - closed-loop evaluation for multimodal LLM driving agents.
+21. [DARPA Urban Challenge](/cs/autonomous-driving/darpa-urban-challenge) - classical robotic design lessons from the 2007 urban autonomy competition.
+22. [MV3D Sonar](/cs/autonomous-driving/mv3d-sonar) - domain-specific 3D reconstruction from forward-looking sonar for underwater autonomy.

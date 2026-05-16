@@ -1,0 +1,8 @@
+{
+  "label": "Quantum Communication",
+  "position": 2,
+  "link": {
+    "type": "doc",
+    "id": "quantum-information-science/quantum-communication/intro"
+  }
+}

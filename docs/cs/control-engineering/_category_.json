@@ -1,0 +1,8 @@
+{
+  "label": "Control Engineering",
+  "position": 9,
+  "link": {
+    "type": "doc",
+    "id": "cs/control-engineering/intro"
+  }
+}

@@ -105,6 +105,12 @@ const config: Config = {
           label: 'Chemistry',
         },
         {
+          type: 'docSidebar',
+          sidebarId: 'qisSidebar',
+          position: 'left',
+          label: 'Quantum Info',
+        },
+        {
           href: 'https://www.sjhwang.com',
           label: 'sjhwang.com',
           position: 'right',
@@ -121,6 +127,7 @@ const config: Config = {
             {label: 'Computer Science', to: '/cs'},
             {label: 'Physics', to: '/physics'},
             {label: 'Chemistry', to: '/chemistry'},
+            {label: 'Quantum Information Science', to: '/quantum-information-science'},
           ],
         },
         {

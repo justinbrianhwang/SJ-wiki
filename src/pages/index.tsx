@@ -62,6 +62,13 @@ const sections: Section[] = [
       'General chemistry — atoms, bonds, reactions, thermodynamics, kinetics, and basic organic chemistry.',
     to: '/chemistry',
   },
+  {
+    image: 'assets/quantum-computing.png',
+    title: 'Quantum Information Science',
+    description:
+      'Quantum computing, communication, internet, sensing, and security — qubits, QKD, teleportation, quantum repeaters, PQC.',
+    to: '/quantum-information-science',
+  },
 ];
 
 function HomepageSections() {

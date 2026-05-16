@@ -1,6 +1,6 @@
 {
   "label": "Cryptography",
-  "position": 15,
+  "position": 16,
   "link": {
     "type": "doc",
     "id": "cs/cryptography/intro"
