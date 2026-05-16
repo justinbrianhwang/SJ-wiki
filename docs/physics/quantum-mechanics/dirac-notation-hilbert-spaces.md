@@ -137,9 +137,9 @@ This result connects Sakurai's generator-first derivation with Schiff's traditio
 
 ```mermaid
 graph LR
-  K[Abstract ket |psi>] --> S[Spin basis coefficients]
-  K --> X[Position wave function psi(x)]
-  K --> P[Momentum amplitude phi(p)]
+  K["Abstract ket |psi>"] --> S[Spin basis coefficients]
+  K --> X["Position wave function psi(x)"]
+  K --> P["Momentum amplitude phi(p)"]
   S --> M[Matrix operators]
   X --> D[Differential operators]
   P --> F[Fourier transformed operators]

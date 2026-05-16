@@ -49,10 +49,10 @@ flowchart LR
   Leader([Team leader])
   Source[Source code]
   Plan[Test plan]
-  Test((Unit testing))
+  Test("(Unit testing"))
   Results[Test results]
-  Review((Test review))
-  Decision{OK?}
+  Review("(Test review"))
+  Decision{"OK?"}
   Approval[Approval]
   Rework[Rework request]
 

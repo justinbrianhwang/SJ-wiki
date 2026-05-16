@@ -114,12 +114,12 @@ leading to Bloch-like states with phase under discrete translation. Sakurai uses
 ```mermaid
 flowchart TD
   A[Physical invariance] --> B[Unitary or antiunitary operator]
-  B --> C{Continuous?}
+  B --> C{"Continuous?"}
   C -->|yes| D[Hermitian generator G]
   D --> E[Commutator with H]
   E --> F[Conservation law]
   C -->|no| G[Discrete quantum number]
-  G --> H[Parity, exchange, time reversal]
+  G --> H["Parity, exchange, time reversal"]
 ```
 
 | Symmetry | Operator | Generator or label | Conservation/result |

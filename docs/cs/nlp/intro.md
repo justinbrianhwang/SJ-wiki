@@ -62,14 +62,14 @@ flowchart TD
   A --> C[Acoustic features for speech]
   B --> D[Count and linear models]
   D --> E[Embeddings and neural networks]
-  E --> F[RNNs, LSTMs, transformers]
+  E --> F["RNNs, LSTMs, transformers"]
   F --> G[Pretrained language models]
   B --> H[Structured prediction]
-  H --> I[HMMs, CRFs, CKY, dependency parsing]
+  H --> I["HMMs, CRFs, CKY, dependency parsing"]
   G --> J[Applications]
   I --> J
   C --> J
-  J --> K[MT, IE, dialogue, ASR, TTS, coreference, SRL]
+  J --> K["MT, IE, dialogue, ASR, TTS, coreference, SRL"]
 ```
 
 | Theme | Classical expression | Neural expression | Why it recurs |

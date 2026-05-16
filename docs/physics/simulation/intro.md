@@ -89,10 +89,10 @@ flowchart TD
   D -->|Diagram| F[Simulink integrator/block model]
   E --> G[Solver and step/tolerance choices]
   F --> G
-  G --> H[Time response, frequency response, and logs]
+  G --> H["Time response, frequency response, and logs"]
   H --> I[Verification and validation]
   I -->|revise| A
-  I -->|credible| J[Use for design, prediction, or explanation]
+  I -->|credible| J["Use for design, prediction, or explanation"]
 ```
 
 | Page order | Page | Main deliverable |

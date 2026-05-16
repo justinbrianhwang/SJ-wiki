@@ -48,7 +48,7 @@ Booting follows a layered handoff. Firmware runs first, initializes enough hardw
 
 ```mermaid
 flowchart TB
-  User[User or application] --> API[Library API: POSIX, Java, Win32]
+  User[User or application] --> API["Library API: POSIX, Java, Win32"]
   API --> Trap[System-call trap]
   Trap --> Kernel[Kernel dispatcher]
   Kernel --> Proc[Process management]

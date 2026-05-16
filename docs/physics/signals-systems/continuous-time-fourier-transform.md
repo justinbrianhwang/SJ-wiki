@@ -152,15 +152,15 @@ Duality is another useful guide. Narrow signals in time tend to have broad spect
 
 ```mermaid
 flowchart LR
-  A[x(t)] --> B[CTFT]
-  B --> C[X(j omega)]
-  D[h(t)] --> E[CTFT]
-  E --> F[H(j omega)]
+  A["x(t)"] --> B[CTFT]
+  B --> C["X(j omega)"]
+  D["h(t)"] --> E[CTFT]
+  E --> F["H(j omega)"]
   C --> G[Multiply spectra]
   F --> G
-  G --> H[Y(j omega)]
+  G --> H["Y(j omega)"]
   H --> I[Inverse CTFT]
-  I --> J[y(t)=x*h]
+  I --> J["y(t)=x*h"]
 ```
 
 ## Worked example 1: transform of a decaying exponential

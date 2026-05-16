@@ -65,13 +65,13 @@ The call stack used by C function calls is also a stack, but it is managed by th
 
 ```mermaid
 flowchart TD
-  A[Read next token] --> B{operand?}
+  A[Read next token] --> B{"operand?"}
   B -->|yes| C[push operand value]
-  B -->|no, operator| D[pop right operand]
+  B -->|"no, operator"| D[pop right operand]
   D --> E[pop left operand]
   E --> F[apply operator]
   F --> G[push result]
-  C --> H{more tokens?}
+  C --> H{"more tokens?"}
   G --> H
   H -->|yes| A
   H -->|no| I[result is only stack item]

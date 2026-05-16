@@ -72,7 +72,7 @@ Hash-table equality also has two stages: first compute a slot or bucket from the
 ```mermaid
 flowchart TD
   A[Key] --> B[hash function]
-  B --> C{slot empty?}
+  B --> C{"slot empty?"}
   C -->|yes| D[store key]
   C -->|no| E[collision strategy]
   E --> F[chaining bucket]

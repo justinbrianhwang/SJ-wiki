@@ -167,8 +167,8 @@ A final useful check is reversibility of differentiation. If you integrate accel
 
 ```mermaid
 flowchart LR
-  A[Motion description] --> B{Best coordinate system?}
-  B -->|straight line| C[Rectilinear x, v, a]
+  A[Motion description] --> B{"Best coordinate system?"}
+  B -->|straight line| C["Rectilinear x, v, a"]
   B -->|known path and speed| D[Normal-tangential]
   B -->|radial distance and angle| E[Polar]
   B -->|radial plus height| F[Cylindrical]

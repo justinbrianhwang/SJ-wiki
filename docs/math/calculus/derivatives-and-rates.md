@@ -123,10 +123,10 @@ Derivative notation should be chosen to match the setting. Prime notation is com
 graph LR
   A[Two points on graph] --> B[Secant slope]
   B --> C[Shrink horizontal gap h]
-  C --> D{Limit exists?}
-  D -->|yes| E[Tangent slope f'(a)]
-  D -->|no| F[Corner, cusp, vertical tangent, jump, or oscillation]
-  E --> G[Rate, velocity, marginal change, linear approximation]
+  C --> D{"Limit exists?"}
+  D -->|yes| E["Tangent slope f'(a)"]
+  D -->|no| F["Corner, cusp, vertical tangent, jump, or oscillation"]
+  E --> G["Rate, velocity, marginal change, linear approximation"]
 ```
 
 | Object | Formula | Interpretation |

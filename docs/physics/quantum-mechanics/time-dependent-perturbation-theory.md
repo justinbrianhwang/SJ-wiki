@@ -105,8 +105,8 @@ The golden rule rests on three approximations: weak coupling, long observation t
 
 ```mermaid
 flowchart TD
-  A[Initial eigenstate |i>] --> B[Turn on V(t)]
-  B --> C[Interaction-picture phase exp(i omega_fi t)]
+  A["Initial eigenstate |i>"] --> B["Turn on V(t)"]
+  B --> C["Interaction-picture phase exp(i omega_fi t)"]
   C --> D[Integrate transition amplitude]
   D --> E{Final states}
   E -->|discrete| F[Oscillatory transition probability]

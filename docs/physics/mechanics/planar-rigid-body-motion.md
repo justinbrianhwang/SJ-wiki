@@ -116,11 +116,11 @@ using the parallel-axis theorem, because $v_G=\omega r_{G/O}$.
 flowchart TD
   A[Planar rigid body] --> B[Kinematics]
   A --> C[Kinetics]
-  B --> D[vB = vA + omega x r]
-  B --> E[aB = aA + alpha x r - omega^2 r]
-  C --> F[sum F = m aG]
-  C --> G[sum MG = IG alpha]
-  D --> H[Constraints: rolling, pins, slots]
+  B --> D["vB = vA + omega x r"]
+  B --> E["aB = aA + alpha x r - omega^2 r"]
+  C --> F["sum F = m aG"]
+  C --> G["sum MG = IG alpha"]
+  D --> H["Constraints: rolling, pins, slots"]
   E --> H
   F --> H
   G --> H

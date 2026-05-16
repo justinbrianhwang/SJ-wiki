@@ -69,7 +69,7 @@ A recursive algorithm terminates when each recursive call decreases a well-found
 flowchart LR
   A[Base case] --> B[Inductive hypothesis]
   B --> C[Prove next case]
-  C --> D[Statement holds for all n >= n0]
+  C --> D["Statement holds for all n >= n0"]
 ```
 
 | Method | Hypothesis allowed | Best for | Typical proof obligation |

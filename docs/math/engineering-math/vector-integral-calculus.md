@@ -96,9 +96,9 @@ flowchart TD
   A[Local derivatives] --> B[Green theorem]
   A --> C[Stokes theorem]
   A --> D[Divergence theorem]
-  B --> E[Boundary circulation = area curl]
-  C --> F[Boundary circulation = surface curl flux]
-  D --> G[Closed surface flux = volume divergence]
+  B --> E["Boundary circulation = area curl"]
+  C --> F["Boundary circulation = surface curl flux"]
+  D --> G["Closed surface flux = volume divergence"]
   H[Orientation] --> B
   H --> C
   H --> D

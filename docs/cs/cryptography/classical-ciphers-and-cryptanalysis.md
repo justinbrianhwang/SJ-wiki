@@ -68,7 +68,7 @@ flowchart LR
   D --> E
   E --> F[Propose key]
   F --> G[Decrypt trial text]
-  G --> H{Readable?}
+  G --> H{"Readable?"}
   H -->|yes| I[Recover message]
   H -->|no| E
 ```

@@ -71,7 +71,7 @@ flowchart TD
   B -->|movement paths| E[Trajectory mining]
   C --> F[Spatial clustering or outliers]
   D --> F
-  E --> G[Patterns, clusters, anomalies, labels]
+  E --> G["Patterns, clusters, anomalies, labels"]
   F --> H[Validate with spatial awareness]
   G --> H
 ```

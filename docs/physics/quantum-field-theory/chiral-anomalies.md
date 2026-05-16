@@ -102,11 +102,11 @@ In practical model building, anomaly checks are mandatory. A proposed chiral gau
 flowchart TD
   A[Classical chiral symmetry] --> B[Quantize fermions]
   B --> C[Need regulator]
-  C --> D{Which Ward identity preserved?}
+  C --> D{"Which Ward identity preserved?"}
   D -->|preserve gauge current| E[Axial current anomalous]
   D -->|break gauge current| F[Inconsistent gauge theory]
   E --> G[Triangle diagram]
-  E --> H[Topology: F F-dual]
+  E --> H["Topology: F F-dual"]
   E --> I[Physical pion decay]
 ```
 

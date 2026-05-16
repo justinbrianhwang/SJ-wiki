@@ -150,10 +150,10 @@ In applied problems, constraints often encode limited resources. A maximum volum
 
 ```mermaid
 graph TD
-  A[Optimization problem] --> B{Constraint?}
-  B -->|no| C[Solve grad f = 0]
+  A[Optimization problem] --> B{"Constraint?"}
+  B -->|no| C["Solve grad f = 0"]
   C --> D[Second derivative test]
-  B -->|yes| E[Solve grad f = lambda grad g plus constraint]
+  B -->|yes| E["Solve grad f = lambda grad g plus constraint"]
   E --> F[Check boundary/corners if region has them]
   D --> G[Classify candidates]
   F --> H[Compare objective values]

@@ -56,9 +56,9 @@ flowchart TD
   C --> D[Let molar solubility be s]
   D --> E[Substitute equilibrium concentrations]
   E --> F[Solve and check]
-  F --> G{Qsp compared with Ksp?}
-  G -->|Qsp > Ksp| H[Precipitation]
-  G -->|Qsp <= Ksp| I[No precipitation]
+  F --> G{"Qsp compared with Ksp?"}
+  G -->|"Qsp > Ksp"| H[Precipitation]
+  G -->|"Qsp <= Ksp"| I[No precipitation]
 ```
 
 | Equilibrium | What reduces free metal ion? | Solubility effect |

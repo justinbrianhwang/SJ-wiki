@@ -98,12 +98,12 @@ Initial conditions are the other reason state-space form remains important. A tr
 
 ```mermaid
 flowchart LR
-  A[State model A,B,C,D] --> B[Eigenvalues of A]
-  A --> C[Transfer function G(s)]
+  A["State model A,B,C,D"] --> B[Eigenvalues of A]
+  A --> C["Transfer function G(s)"]
   B --> D[Modes and stability]
   C --> E[Poles and zeros]
   C --> F[Step and impulse response]
-  C --> G[Frequency response G(jw)]
+  C --> G["Frequency response G(jw)"]
   D --> H[Expected time plot]
   E --> H
   F --> H

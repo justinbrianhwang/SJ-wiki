@@ -121,9 +121,9 @@ flowchart LR
   M[Message m] --> P[OAEP randomized encoding]
   R[Random seed r] --> P
   P --> X[Encoded integer x]
-  X --> E[c = x^e mod N]
+  X --> E["c = x^e mod N"]
   E --> C[Ciphertext c]
-  C --> D[x = c^d mod N]
+  C --> D["x = c^d mod N"]
   D --> U[OAEP decode and checks]
   U --> M2[Message or reject]
 ```

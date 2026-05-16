@@ -51,7 +51,7 @@ This page extends basic outlier analysis. The main message is that an anomaly ma
 
 ```mermaid
 flowchart TD
-  A[Candidate anomaly] --> B{Why hard?}
+  A[Candidate anomaly] --> B{"Why hard?"}
   B -->|symbolic values| C[Categorical rarity and pattern deviation]
   B -->|many dimensions| D[Subspace or angle-based scoring]
   B -->|detector instability| E[Outlier ensemble]

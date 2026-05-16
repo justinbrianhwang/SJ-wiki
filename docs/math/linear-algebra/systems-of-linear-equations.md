@@ -69,7 +69,7 @@ The number of solutions can be read from pivots. If a consistent system has a pi
 
 ```mermaid
 flowchart TD
-  A["Start with augmented matrix [A | b]"] --> B["Row reduce"]
+  A["#quot;Start with augmented matrix [A | b"]"] --> B["Row reduce"]
   B --> C{"Contradictory row 0 = c?"}
   C -->|yes| D["Inconsistent: no solution"]
   C -->|no| E{"Pivot in every variable column?"}

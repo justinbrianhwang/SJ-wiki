@@ -59,9 +59,9 @@ graph LR
   ROM -->|data bus| CPU
   RAM <-->|data bus| CPU
   IO <-->|data bus| CPU
-  CPU -->|RD, WR, status| ROM
-  CPU -->|RD, WR, status| RAM
-  CPU -->|RD, WR, status| IO
+  CPU -->|"RD, WR, status"| ROM
+  CPU -->|"RD, WR, status"| RAM
+  CPU -->|"RD, WR, status"| IO
 ```
 
 | Concept | 8085-style microprocessor system | 8051-style microcontroller system |

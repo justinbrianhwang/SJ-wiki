@@ -63,11 +63,11 @@ graph TD
   U3 --> U4[8085 I/O and memory interface]
   U4 --> M1[8051 architecture]
   M1 --> M2[8051 programming]
-  M2 --> M3[Timers, serial, interrupts]
+  M2 --> M3["Timers, serial, interrupts"]
   M3 --> P1[8255 and external devices]
   P1 --> P2[Serial buses and protocols]
   P2 --> P3[EEPROM and DS1307]
-  P3 --> D1[89C51, AVR, PIC derivatives]
+  P3 --> D1["89C51, AVR, PIC derivatives"]
 ```
 
 | Study layer | Main question | Representative source topics |

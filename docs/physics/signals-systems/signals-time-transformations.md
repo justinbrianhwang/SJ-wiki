@@ -181,9 +181,9 @@ for every integer $k$, so discrete-time frequency is periodic with period $2\pi$
 
 ```mermaid
 flowchart TD
-  A[Given y(t)=x(a t+b)] --> B[List landmarks of x at tau0]
-  B --> C[Solve tau0=a t+b]
-  C --> D[Place each landmark at t=(tau0-b)/a]
+  A["Given y(t)=x(a t+b)"] --> B[List landmarks of x at tau0]
+  B --> C["Solve tau0=a t+b"]
+  C --> D["Place each landmark at t=(tau0-b)/a"]
   D --> E[Copy amplitudes from x]
   E --> F[Connect intervals with correct reversal and scaling]
 ```

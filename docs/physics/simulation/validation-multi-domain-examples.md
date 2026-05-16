@@ -73,8 +73,8 @@ flowchart TD
   C --> D[Verify numerics and code]
   D --> E[Calibrate uncertain parameters]
   E --> F[Validate against independent data]
-  F --> G{Credible for decision?}
-  G -->|no| H[Revise assumptions, parameters, or model structure]
+  F --> G{"Credible for decision?"}
+  G -->|no| H["Revise assumptions, parameters, or model structure"]
   H --> B
   G -->|yes| I[Use model and document limitations]
 ```

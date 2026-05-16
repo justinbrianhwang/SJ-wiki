@@ -106,12 +106,12 @@ Systems also make scaling important. Variables may have different units and magn
 
 ```mermaid
 flowchart TD
-  A[System x' = f(x)] --> B[Find equilibria]
+  A["System x' = f(x)"] --> B[Find equilibria]
   B --> C[Compute Jacobian]
   C --> D[Eigenvalues]
   D --> E{Real parts}
   E -->|all negative| F[Local sink]
-  E -->|some positive, some negative| G[Saddle]
+  E -->|"some positive, some negative"| G[Saddle]
   E -->|all positive| H[Source]
   E -->|zero real part| I[Linearization inconclusive or center]
   B --> J[Draw nullclines and trajectories]

@@ -81,12 +81,12 @@ step 3: lo=5 hi=5 mid=5 A[mid]=23  -> found
 
 ```mermaid
 flowchart TD
-  A[lo <= hi?] -->|no| F[not found]
+  A["lo <= hi?"] -->|no| F[not found]
   A -->|yes| B[compute mid]
-  B --> C{A[mid] == target?}
+  B --> C{"A[mid] == target?"}
   C -->|yes| D[return mid]
-  C -->|A[mid] < target| E[lo = mid + 1]
-  C -->|A[mid] > target| G[hi = mid - 1]
+  C -->|"A[mid] < target"| E["lo = mid + 1"]
+  C -->|"A[mid] > target"| G["hi = mid - 1"]
   E --> A
   G --> A
 ```

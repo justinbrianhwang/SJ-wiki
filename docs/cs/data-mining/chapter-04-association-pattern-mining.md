@@ -69,7 +69,7 @@ flowchart TD
   B --> C[Generate candidates of size k]
   C --> D[Prune candidates with infrequent subsets]
   D --> E[Scan database and count support]
-  E --> F{Any frequent k-itemsets?}
+  E --> F{"Any frequent k-itemsets?"}
   F -->|yes| C
   F -->|no| G[Frequent itemsets]
   G --> H[Generate rules]

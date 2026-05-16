@@ -183,8 +183,8 @@ graph LR
   B --> C[Definite integral]
   C --> D[Net change]
   E[Antiderivative F] --> D
-  D --> F[F(b)-F(a)]
-  C --> G[Area, displacement, mass, average value]
+  D --> F["F(b)-F(a)"]
+  C --> G["Area, displacement, mass, average value"]
 ```
 
 | Concept | Expression | Meaning |

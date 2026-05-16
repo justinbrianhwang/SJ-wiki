@@ -127,7 +127,7 @@ flowchart LR
   B --> C[Rescale coordinates and fields]
   C --> D[New effective action]
   D --> E[Couplings move]
-  E --> F{Fixed point?}
+  E --> F{"Fixed point?"}
   F -->|yes| G[Scale invariance]
   F -->|no| B
 ```

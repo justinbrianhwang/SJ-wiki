@@ -85,7 +85,7 @@ Resonances occur when a phase shift passes rapidly through $\pi/2$. They signal 
 flowchart LR
   A[Incident beam] --> B[Localized target potential]
   B --> C[Outgoing spherical wave]
-  C --> D[Amplitude f(theta)]
+  C --> D["Amplitude f(theta)"]
   D --> E[Differential cross section]
   D --> F[Partial-wave phase shifts]
   F --> G[Resonance or low-energy limit]

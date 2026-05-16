@@ -76,7 +76,7 @@ flowchart TD
   A[Raw time series] --> B[Clean missing and irregular times]
   B --> C[Normalize or detrend]
   C --> D{Task}
-  D -->|compare| E[Euclidean, correlation, DTW]
+  D -->|compare| E["Euclidean, correlation, DTW"]
   D -->|predict| F[Forecasting model]
   D -->|repeated shapes| G[Motif discovery]
   D -->|group| H[Time-series clustering]

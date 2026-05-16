@@ -107,11 +107,11 @@ Linearization can also be performed numerically when symbolic derivatives are in
 
 ```mermaid
 flowchart TD
-  A[Nonlinear model xdot=f(x,u)] --> B[Find operating point]
-  B --> C{Equilibrium?}
+  A["Nonlinear model xdot=f("x,u")"] --> B[Find operating point]
+  B --> C{"Equilibrium?"}
   C -->|yes| D[Use deviation variables]
   C -->|no| E[Linearize along trajectory or keep affine term]
-  D --> F[Compute Jacobians A,B,C,D]
+  D --> F["Compute Jacobians A,B,C,D"]
   E --> F
   F --> G[Analyze local modes and response]
   G --> H[Compare with nonlinear simulation]

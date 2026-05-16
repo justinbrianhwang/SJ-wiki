@@ -66,7 +66,7 @@ Setting the derivative to zero yields $\mu=(1/\vert C\vert )\sum_{X_i\in C}X_i$.
 ```mermaid
 flowchart TD
   A[Unlabeled data] --> B{Cluster assumption}
-  B -->|prototype around center| C[k-means, k-medians, k-medoids]
+  B -->|prototype around center| C["k-means, k-medians, k-medoids"]
   B -->|nested grouping| D[Hierarchical clustering]
   B -->|mixture density| E[Gaussian mixture and EM]
   B -->|dense regions| F[DBSCAN and DENCLUE]

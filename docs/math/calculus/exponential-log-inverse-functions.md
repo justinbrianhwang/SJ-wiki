@@ -195,10 +195,10 @@ This matters in modeling, estimation, and asymptotic comparison.
 ```mermaid
 graph LR
   A[One-to-one f] --> B[Inverse f^-1]
-  B --> C[Reflect graph across y=x]
-  A --> D[Slope f'(a)]
-  D --> E[Inverse slope 1/f'(a)]
-  E --> F[(f^-1)' at f(a)]
+  B --> C["Reflect graph across y=x"]
+  A --> D["Slope f'(a)"]
+  D --> E["Inverse slope 1/f'(a)"]
+  E --> F["(f^-1)' at f(a)"]
 ```
 
 ## Worked example 1: differentiate exponential and logarithmic expressions

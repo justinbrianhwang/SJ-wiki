@@ -75,10 +75,10 @@ A useful BVP check is to compare the boundary residual with the interior residua
 ```mermaid
 graph TD
   A[BVP with conditions at a and b] --> B{Choose method}
-  B --> C[Shooting: guess missing initial slope]
+  B --> C["Shooting: guess missing initial slope"]
   C --> D[Solve IVP]
   D --> E[Adjust slope from endpoint residual]
-  B --> F[Finite differences: build grid]
+  B --> F["Finite differences: build grid"]
   F --> G[Replace derivatives by algebraic equations]
   G --> H[Solve linear or nonlinear system]
 ```

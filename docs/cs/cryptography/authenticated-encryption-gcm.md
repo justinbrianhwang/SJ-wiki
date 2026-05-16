@@ -73,7 +73,7 @@ flowchart LR
   E --> C[Ciphertext c]
   C --> T
   T --> G[Tag t]
-  C --> OUT[(c,t)]
+  C --> OUT["("#quot;c,t#quot;")"]
   G --> OUT
 ```
 

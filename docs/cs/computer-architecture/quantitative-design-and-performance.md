@@ -100,10 +100,10 @@ Finally, measurements should be reproducible. A benchmark report should describe
 flowchart TD
     A[Architecture idea] --> B[Choose workload]
     B --> C[Measure baseline time]
-    C --> D[Decompose time: IC, CPI, clock, stalls]
+    C --> D["Decompose time: IC, CPI, clock, stalls"]
     D --> E[Estimate affected fraction]
     E --> F[Apply Amdahl or CPI model]
-    F --> G{Whole-system win?}
+    F --> G{"Whole-system win?"}
     G -->|yes| H[Keep and refine]
     G -->|no| I[Reject or narrow scope]
 ```

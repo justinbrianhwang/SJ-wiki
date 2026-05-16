@@ -69,7 +69,7 @@ Error analysis should distinguish head errors from label errors. A parser may at
 
 ```mermaid
 graph TD
-  ROOT((ROOT)) -->|root| saw
+  ROOT("(ROOT")) -->|root| saw
   saw -->|nsubj| I
   saw -->|obj| dog
   dog -->|det| the

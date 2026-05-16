@@ -85,12 +85,12 @@ Those checks are cheap and usually worth keeping.
 ```mermaid
 flowchart TD
   A[Define parameters with units] --> B[Compute or set initial conditions]
-  B --> C[Define input function u(t)]
-  C --> D[Write derivative function dx=f(t,x,p)]
+  B --> C["Define input function u(t)"]
+  C --> D["Write derivative function dx=f("t,x,p")"]
   D --> E[Choose solver and tolerances]
   E --> F[Run simulation]
   F --> G[Plot states and outputs]
-  G --> H[Check equilibrium, units, and convergence]
+  G --> H["Check equilibrium, units, and convergence"]
   H -->|needs revision| D
   H -->|accepted| I[Save figures and data]
 ```

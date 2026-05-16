@@ -51,11 +51,11 @@ Finally, keep symbolic and particulate representations side by side. A balanced 
 
 ```mermaid
 flowchart TD
-  A[Acid-base mixture] --> B{Strong acid/base present?}
+  A[Acid-base mixture] --> B{"Strong acid/base present?"}
   B -->|yes| C[Do stoichiometry first]
   B -->|no| D[Identify weak equilibrium]
   C --> D
-  D --> E{Buffer pair present?}
+  D --> E{"Buffer pair present?"}
   E -->|yes| F[Use Henderson-Hasselbalch if valid]
   E -->|no| G[Use ICE table]
   F --> H[Check approximation]

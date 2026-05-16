@@ -75,8 +75,8 @@ This follows by comparing prime exponents: the gcd takes minimum exponents, the 
 
 ```mermaid
 flowchart TD
-  A[Start with a and b] --> B{Is b zero?}
-  B -->|yes| C[gcd is abs(a)]
+  A[Start with a and b] --> B{"Is b zero?"}
+  B -->|yes| C["gcd is abs(a)"]
   B -->|no| D[Replace a by b]
   D --> E[Replace b by a mod b]
   E --> B

@@ -111,7 +111,7 @@ graph TD
   B -->|best value| C[Build objective function]
   C --> D[Find derivative and critical numbers]
   D --> E[Check candidates and endpoints]
-  B -->|solve f(x)=0| F[Choose initial guess]
+  B -->|"solve f(x)=0"| F[Choose initial guess]
   F --> G[Newton update using tangent line]
   G --> H[Stop when change is small]
   B -->|recover original function| I[Find antiderivative]

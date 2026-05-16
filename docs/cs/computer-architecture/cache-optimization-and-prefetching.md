@@ -60,11 +60,11 @@ Energy can reverse a purely performance-based conclusion. A prefetcher that impr
 
 ```mermaid
 flowchart TD
-    A[Memory stall problem] --> B{Dominant term?}
+    A[Memory stall problem] --> B{"Dominant term?"}
     B -->|Hit time| C[Small L1 or way prediction]
-    B -->|Miss rate| D[Associativity, size, blocking]
-    B -->|Miss penalty| E[Multilevel cache, critical word first]
-    B -->|Bandwidth| F[Banks, pipeline, nonblocking cache]
+    B -->|Miss rate| D["Associativity, size, blocking"]
+    B -->|Miss penalty| E["Multilevel cache, critical word first"]
+    B -->|Bandwidth| F["Banks, pipeline, nonblocking cache"]
     B -->|Latency overlap| G[Hardware or compiler prefetch]
 ```
 

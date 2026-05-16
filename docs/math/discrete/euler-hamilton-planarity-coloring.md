@@ -58,9 +58,9 @@ Every planar graph is $4$-colorable, by the four color theorem. Many elementary 
 
 ```mermaid
 graph LR
-  A((a)) --- B((b))
-  B --- C((c))
-  C --- D((d))
+  A("(a")) --- B("(b"))
+  B --- C("(c"))
+  C --- D("(d"))
   D --- A
   A --- C
 ```

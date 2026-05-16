@@ -99,7 +99,7 @@ sequenceDiagram
   participant V as Verifier
   S->>S: sigma = Sign_sk(m)
   S->>V: m, sigma, pk
-  V->>V: Vrfy_pk(m, sigma)
+  V->>V: Vrfy_pk("m, sigma")
   V-->>S: accept or reject
 ```
 

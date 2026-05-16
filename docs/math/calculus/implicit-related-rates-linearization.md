@@ -126,7 +126,7 @@ They also force the final number back into the original situation.
 graph TD
   A[Problem statement] --> B[Identify changing quantities]
   B --> C[Write equation relating variables]
-  C --> D[Differentiation variable?]
+  C --> D["Differentiation variable?"]
   D -->|with respect to x| E[Implicit differentiation]
   D -->|with respect to t| F[Related rates]
   E --> G[Solve for dy/dx]

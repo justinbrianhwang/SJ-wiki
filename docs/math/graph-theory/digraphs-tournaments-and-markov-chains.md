@@ -65,10 +65,10 @@ A stationary distribution satisfies $\pi=\pi P$.
 
 ```mermaid
 graph LR
-  A((A)) --> B((B))
-  B --> C((C))
+  A("(A")) --> B("(B"))
+  B --> C("(C"))
   C --> A
-  A --> D((D))
+  A --> D("(D"))
   D --> B
   C --> D
 ```

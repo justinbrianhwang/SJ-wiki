@@ -152,10 +152,10 @@ int main() {
 flowchart TD
   A[Start main] --> B[Declare and initialize variables]
   B --> C[Read input]
-  C --> D{Valid input?}
+  C --> D{"Valid input?"}
   D -->|no| E[Report error]
   D -->|yes| F[Compute expression]
-  F --> G{Need repetition?}
+  F --> G{"Need repetition?"}
   G -->|yes| H[Loop body updates state]
   H --> G
   G -->|no| I[Output result]

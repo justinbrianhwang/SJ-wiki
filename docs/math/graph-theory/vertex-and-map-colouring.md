@@ -75,12 +75,12 @@ This bound is useful when large cliques are absent but colour classes are still 
 
 ```mermaid
 graph LR
-  A((A:red)) --- B((B:blue))
-  B --- C((C:green))
-  C --- D((D:red))
+  A("(#quot;A:red#quot;")) --- B("(#quot;B:blue#quot;"))
+  B --- C("(#quot;C:green#quot;"))
+  C --- D("(#quot;D:red#quot;"))
   D --- A
   A --- C
-  B --- E((E:red))
+  B --- E("(#quot;E:red#quot;"))
   C --- E
 ```
 

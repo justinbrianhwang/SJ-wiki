@@ -72,12 +72,12 @@ Careful index arithmetic is part of the heap invariant, not a cosmetic implement
 
 ```mermaid
 graph TD
-  A((90)) --> B((70))
-  A --> C((60))
-  B --> D((40))
-  B --> E((50))
-  C --> F((20))
-  C --> G((10))
+  A("(90")) --> B("(70"))
+  A --> C("(60"))
+  B --> D("(40"))
+  B --> E("(50"))
+  C --> F("(20"))
+  C --> G("(10"))
 ```
 
 Array representation of the same max heap:

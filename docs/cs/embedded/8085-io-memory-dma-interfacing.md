@@ -49,11 +49,11 @@ flowchart LR
   Decoder --> ROMCS[ROM chip select]
   Decoder --> RAMCS[RAM chip select]
   Decoder --> IOCS[I/O chip select]
-  CPU -->|RD, WR, IO/M| Control[Control gating]
+  CPU -->|"RD, WR, IO/M"| Control[Control gating]
   Control --> ROM[ROM]
   Control --> RAM[RAM]
   Control --> IO[I/O ports]
-  IO --> Device[Keyboard, display, ADC, DAC]
+  IO --> Device["Keyboard, display, ADC, DAC"]
 ```
 
 | Transfer method | CPU involvement | Typical hardware | Best use | Main risk |

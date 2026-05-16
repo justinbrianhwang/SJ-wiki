@@ -60,12 +60,12 @@ The triangle has two faces: the inside face and the outside face. Its dual has t
 ```mermaid
 graph LR
   subgraph G[Plane graph G]
-    A((A)) --- B((B))
-    B --- C((C))
+    A("(A")) --- B("(B"))
+    B --- C("(C"))
     C --- A
   end
   subgraph D[Dual G*]
-    I((inside face)) === O((outside face))
+    I("(inside face")) === O("(outside face"))
     I === O
     I === O
   end

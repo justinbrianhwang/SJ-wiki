@@ -114,7 +114,7 @@ flowchart LR
   AD[Associated data] --> DEM
   K --> DEM
   DEM --> CD[Data ciphertext]
-  CK --> OUT[(Hybrid ciphertext)]
+  CK --> OUT["(Hybrid ciphertext)"]
   CD --> OUT
 ```
 

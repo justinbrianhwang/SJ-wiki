@@ -77,11 +77,11 @@ For nearly sorted arrays, insertion sort is often used as a finishing pass insid
 
 ```mermaid
 flowchart TD
-  A[Need to sort records] --> B{Keys are fixed-width digits?}
+  A[Need to sort records] --> B{"Keys are fixed-width digits?"}
   B -->|yes| C[Consider radix sort]
-  B -->|no| D{Need stable output?}
+  B -->|no| D{"Need stable output?"}
   D -->|yes| E[Merge sort or insertion sort for small n]
-  D -->|no| F{Need worst-case guarantee and in-place?}
+  D -->|no| F{"Need worst-case guarantee and in-place?"}
   F -->|yes| G[Heap sort]
   F -->|no| H[Quicksort with good pivot strategy]
 ```

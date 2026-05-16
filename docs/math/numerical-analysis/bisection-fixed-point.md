@@ -79,12 +79,12 @@ For study purposes, the most useful habit is to separate four layers: the contin
 
 ```mermaid
 graph TD
-  A[Choose bracket a,b with f(a)f(b)<0] --> B[Compute midpoint p]
-  B --> C{Stopping test passed?}
+  A["Choose bracket a,b with f(a)f(b)<0"] --> B[Compute midpoint p]
+  B --> C{"Stopping test passed?"}
   C -->|yes| D[Return midpoint and interval bound]
-  C -->|no| E{Sign change in a,p?}
-  E -->|yes| F[Set b = p]
-  E -->|no| G[Set a = p]
+  C -->|no| E{"Sign change in a,p?"}
+  E -->|yes| F["Set b = p"]
+  E -->|no| G["Set a = p"]
   F --> B
   G --> B
 ```

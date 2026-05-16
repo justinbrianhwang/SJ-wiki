@@ -137,14 +137,14 @@ is a function of $y$ alone. These tests are useful, but they should be applied a
 
 ```mermaid
 flowchart TD
-  A[First-order ODE] --> B{Can write y' = g(x)h(y)?}
+  A[First-order ODE] --> B{"Can write y' = g(x)h(y)?"}
   B -->|yes| C[Separate variables]
-  B -->|no| D{Linear: y' + p(x)y = r(x)?}
+  B -->|no| D{"Linear: y' + p(x)y = r(x)?"}
   D -->|yes| E[Use integrating factor]
-  D -->|no| F{Exact: M_y = N_x?}
-  F -->|yes| G[Find potential u(x,y)]
-  F -->|no| H{Bernoulli form?}
-  H -->|yes| I[Substitute v = y^(1-a)]
+  D -->|no| F{"Exact: M_y = N_x?"}
+  F -->|yes| G["Find potential u("x,y")"]
+  F -->|no| H{"Bernoulli form?"}
+  H -->|yes| I["Substitute v = y^(1-a)"]
   H -->|no| J[Use qualitative or numerical method]
 ```
 

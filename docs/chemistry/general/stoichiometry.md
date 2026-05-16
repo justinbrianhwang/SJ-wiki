@@ -54,7 +54,7 @@ flowchart LR
   A[grams of A] -->|divide by molar mass| B[moles of A]
   B -->|balanced equation mole ratio| C[moles of B]
   C -->|multiply by molar mass| D[grams of B]
-  B --> E{multiple reactants?}
+  B --> E{"multiple reactants?"}
   E -->|yes| F[compare possible product]
   F --> G[limiting reactant]
   E -->|no| D

@@ -104,11 +104,11 @@ as $\binom{n+r-1}{r}$. Think of $r$ stars and $n-1$ bars; the bars separate star
 
 ```mermaid
 flowchart TD
-  A[Selection problem] --> B{Does order matter?}
-  B -->|yes| C{Can items repeat?}
+  A[Selection problem] --> B{"Does order matter?"}
+  B -->|yes| C{"Can items repeat?"}
   C -->|yes| D[n^r]
-  C -->|no| E[P(n,r)]
-  B -->|no| F{Can items repeat?}
+  C -->|no| E["P("n,r")"]
+  B -->|no| F{"Can items repeat?"}
   F -->|yes| G[stars and bars]
   F -->|no| H[binomial coefficient]
 ```

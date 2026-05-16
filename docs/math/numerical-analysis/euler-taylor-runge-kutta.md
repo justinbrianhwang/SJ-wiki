@@ -73,7 +73,7 @@ For study purposes, the most useful habit is to separate four layers: the contin
 ```mermaid
 graph LR
   A[State w_i at t_i] --> B[Sample slope k1]
-  B --> C[Sample midpoint slopes k2,k3]
+  B --> C["Sample midpoint slopes k2,k3"]
   C --> D[Sample endpoint slope k4]
   D --> E[Weighted average slope]
   E --> F[State w_i+1]

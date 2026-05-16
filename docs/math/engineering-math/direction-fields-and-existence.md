@@ -78,13 +78,13 @@ When using a direction field as a diagnostic, check three features. First, the i
 
 ```mermaid
 flowchart LR
-  A[y' = f(x,y)] --> B[Draw slopes f(x,y)]
+  A["y' = f("x,y")"] --> B["Draw slopes f("x,y")"]
   B --> C[Trace solution through initial point]
-  A --> D{f and f_y continuous?}
+  A --> D{"f and f_y continuous?"}
   D -->|yes| E[Local unique solution]
-  D -->|f continuous only| F[Existence may hold, uniqueness may fail]
+  D -->|f continuous only| F["Existence may hold, uniqueness may fail"]
   D -->|f discontinuous| G[Existence theorem does not apply]
-  C --> H[Check equilibria, crossing, blow-up]
+  C --> H["Check equilibria, crossing, blow-up"]
 ```
 
 | Situation | What to inspect | Qualitative consequence |

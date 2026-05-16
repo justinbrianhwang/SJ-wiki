@@ -92,12 +92,12 @@ The particular solution is not unique. If $y_p$ is one particular solution and $
 flowchart TD
   A[Nonhomogeneous linear ODE] --> B[Solve associated homogeneous equation]
   B --> C[Find y_h]
-  A --> D{Forcing has simple table form?}
+  A --> D{"Forcing has simple table form?"}
   D -->|yes| E[Undetermined coefficients]
   D -->|no| F[Variation of parameters]
   E --> G[Find one y_p]
   F --> G
-  C --> H[y = y_h + y_p]
+  C --> H["y = y_h + y_p"]
   G --> H
   H --> I[Apply initial or boundary data]
 ```

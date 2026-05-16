@@ -62,8 +62,8 @@ Postmortems close the loop. A postmortem that merely assigns blame is harmful. A
 ```mermaid
 flowchart TD
   A[Plan work and roles] --> B[Execute tasks]
-  B --> C[Track effort, defects, and earned value]
-  C --> D{Variance or quality problem?}
+  B --> C["Track effort, defects, and earned value"]
+  C --> D{"Variance or quality problem?"}
   D -->|no| E[Continue current plan]
   D -->|yes| F[Analyze cause]
   F --> G[Correct plan or process]

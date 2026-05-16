@@ -99,9 +99,9 @@ flowchart TD
   B --> C[Discretize or iterate]
   C --> D[Compute approximation]
   D --> E[Estimate error and residual]
-  E --> F{Accept?}
+  E --> F{"Accept?"}
   F -->|yes| G[Report result with tolerance]
-  F -->|no| H[Refine step, grid, method, or model]
+  F -->|no| H["Refine step, grid, method, or model"]
   H --> C
 ```
 

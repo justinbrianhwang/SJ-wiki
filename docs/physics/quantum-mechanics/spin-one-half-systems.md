@@ -125,8 +125,8 @@ flowchart LR
   A[Unpolarized beam] --> B[SG z analyzer]
   B --> C[Keep +z beam]
   C --> D[SG x analyzer]
-  D --> E[+x: probability 1/2]
-  D --> F[-x: probability 1/2]
+  D --> E["+x: probability 1/2"]
+  D --> F["-x: probability 1/2"]
   E --> G[SG z analyzer]
   F --> G
   G --> H[+z and -z both possible]

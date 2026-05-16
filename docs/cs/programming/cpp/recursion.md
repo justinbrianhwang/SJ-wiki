@@ -97,10 +97,10 @@ flowchart TD
   C --> D[2 * factorial 1]
   D --> E[1 * factorial 0]
   E --> F[1]
-  F --> G[1 * 1 = 1]
-  G --> H[2 * 1 = 2]
-  H --> I[3 * 2 = 6]
-  I --> J[4 * 6 = 24]
+  F --> G["1 * 1 = 1"]
+  G --> H["2 * 1 = 2"]
+  H --> I["3 * 2 = 6"]
+  I --> J["4 * 6 = 24"]
 ```
 
 | Problem shape | Recursive pattern | Base case |

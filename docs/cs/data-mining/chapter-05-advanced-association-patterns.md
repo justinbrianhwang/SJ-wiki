@@ -43,7 +43,7 @@ A **monotone constraint** has the property that if an itemset satisfies it, ever
 
 ```mermaid
 flowchart TD
-  A[All frequent patterns] --> B{Output too large?}
+  A[All frequent patterns] --> B{"Output too large?"}
   B -->|yes| C[Maximal patterns]
   B -->|yes| D[Closed patterns]
   B -->|yes| E[Approximate patterns]

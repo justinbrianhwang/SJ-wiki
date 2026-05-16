@@ -207,12 +207,12 @@ For conics, focus and directrix definitions are not just historical. They explai
 ```mermaid
 graph LR
   A[Curve description] --> B{Coordinate form}
-  B -->|x=f(t), y=g(t)| C[Parametric slope and arc length]
-  B -->|r=f(theta)| D[Polar area and tangent]
+  B -->|"x=f(t), y=g(t)"| C[Parametric slope and arc length]
+  B -->|"r=f(theta)"| D[Polar area and tangent]
   B -->|quadratic equation| E[Conic classification]
   C --> F[Motion interpretation]
   D --> G[Sector accumulation]
-  E --> H[Focus, directrix, eccentricity]
+  E --> H["Focus, directrix, eccentricity"]
 ```
 
 ## Worked example 1: tangent and concavity for a parametric curve

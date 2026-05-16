@@ -115,7 +115,7 @@ flowchart TD
   D --> F[Four-gluon vertex]
   E --> G[Asymptotic freedom]
   F --> G
-  G --> H[QCD: weak UV, strong IR]
+  G --> H["QCD: weak UV, strong IR"]
 ```
 
 | Feature | QED | Yang-Mills / QCD |

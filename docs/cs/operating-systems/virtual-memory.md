@@ -55,15 +55,15 @@ Replacement policy also interacts with dirty pages. Evicting a clean page is che
 
 ```mermaid
 flowchart TD
-  Ref[CPU references virtual address] --> Valid{Page resident?}
+  Ref[CPU references virtual address] --> Valid{"Page resident?"}
   Valid -->|yes| Access[Translate and access memory]
   Valid -->|no| Fault[Page fault trap]
-  Fault --> Legal{Address legal?}
+  Fault --> Legal{"Address legal?"}
   Legal -->|no| Kill[Signal or terminate process]
-  Legal -->|yes| Free{Free frame available?}
+  Legal -->|yes| Free{"Free frame available?"}
   Free -->|yes| Read[Read page from backing store]
   Free -->|no| Victim[Select victim page]
-  Victim --> Dirty{Victim dirty?}
+  Victim --> Dirty{"Victim dirty?"}
   Dirty -->|yes| Write[Write victim to backing store]
   Dirty -->|no| Read
   Write --> Read

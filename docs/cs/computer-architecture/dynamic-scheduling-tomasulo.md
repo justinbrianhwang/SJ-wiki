@@ -64,7 +64,7 @@ Tomasulo's algorithm is often taught with a common data bus, but real processors
 flowchart TD
     A[Instruction queue] --> B[Issue and rename]
     B --> C[Reservation stations]
-    C --> D{Operands ready?}
+    C --> D{"Operands ready?"}
     D -->|no| C
     D -->|yes| E[Functional unit]
     E --> F[Broadcast tag and value]

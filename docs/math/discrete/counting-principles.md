@@ -63,13 +63,13 @@ The division rule explains why unordered choices often involve factorials. If an
 
 ```mermaid
 flowchart TD
-  A[Counting problem] --> B{Alternatives?}
+  A[Counting problem] --> B{"Alternatives?"}
   B -->|disjoint cases| C[Use sum rule]
   B -->|sequential choices| D[Use product rule]
-  A --> E{Overcounted?}
+  A --> E{"Overcounted?"}
   E -->|same object counted d times| F[Use division rule]
   E -->|overlapping sets| G[Use inclusion-exclusion]
-  A --> H{At least one / avoid condition?}
+  A --> H{"At least one / avoid condition?"}
   H --> I[Count complement]
 ```
 

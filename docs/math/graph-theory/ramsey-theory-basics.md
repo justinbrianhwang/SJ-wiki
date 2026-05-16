@@ -63,10 +63,10 @@ One extremal colouring of $K_5$ uses a red $5$-cycle and blue complementary diag
 
 ```mermaid
 graph LR
-  A((A)) ---|red| B((B))
-  B ---|red| C((C))
-  C ---|red| D((D))
-  D ---|red| E((E))
+  A("(A")) ---|red| B("(B"))
+  B ---|red| C("(C"))
+  C ---|red| D("(D"))
+  D ---|red| E("(E"))
   E ---|red| A
   A ---|blue| C
   A ---|blue| D

@@ -90,7 +90,7 @@ The generated chapter list is:
 
 ```mermaid
 flowchart TD
-  A[Why fields?] --> B[Path integral]
+  A["Why fields?"] --> B[Path integral]
   B --> C[Feynman diagrams]
   C --> D[Scalar examples]
   D --> E[Spinors and QED]

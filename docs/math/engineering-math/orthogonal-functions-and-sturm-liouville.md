@@ -127,7 +127,7 @@ The boundary conditions are part of the operator. The same differential expressi
 
 ```mermaid
 flowchart TD
-  A[Boundary-value differential operator] --> B{Self-adjoint with weight w?}
+  A[Boundary-value differential operator] --> B{"Self-adjoint with weight w?"}
   B -->|yes| C[Real eigenvalues]
   C --> D[Orthogonal eigenfunctions]
   D --> E[Expand data by projection]

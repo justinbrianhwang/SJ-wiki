@@ -68,7 +68,7 @@ flowchart TD
   G -->|similarity| H[Cosine search]
   G -->|clustering| I[Spherical k-means or NMF]
   G -->|topics| J[LSI or LDA]
-  G -->|classification| K[Naive Bayes, SVM, logistic]
+  G -->|classification| K["Naive Bayes, SVM, logistic"]
   G -->|novelty| L[Nearest previous document score]
 ```
 

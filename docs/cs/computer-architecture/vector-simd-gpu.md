@@ -63,12 +63,12 @@ Data transfers also shape heterogeneous systems. A kernel that runs $50\times$ f
 
 ```mermaid
 flowchart LR
-    A[Scalar loop] --> B{Regular independent iterations?}
+    A[Scalar loop] --> B{"Regular independent iterations?"}
     B -->|yes| C[SIMD or vectorize]
-    C --> D{Enough parallel work?}
+    C --> D{"Enough parallel work?"}
     D -->|small/latency sensitive| E[CPU SIMD]
     D -->|large throughput job| F[GPU]
-    B -->|no| G[Scalar, task parallel, or algorithm change]
+    B -->|no| G["Scalar, task parallel, or algorithm change"]
 ```
 
 | Style | Control | Best memory pattern | Strength | Weakness |

@@ -76,7 +76,7 @@ flowchart LR
   D --> E[Defect log]
   E --> F[Producer rework]
   F --> G[Moderator follow-up]
-  G --> H{Exit criteria met?}
+  G --> H{"Exit criteria met?"}
   H -->|yes| I[Inspection complete]
   H -->|no| C
 ```

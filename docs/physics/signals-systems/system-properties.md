@@ -141,13 +141,13 @@ For systems described by formulas, it is helpful to classify the location of inp
 
 ```mermaid
 flowchart TD
-  A[Given system T] --> B{Uses future input?}
+  A[Given system T] --> B{"Uses future input?"}
   B -->|yes| C[Noncausal]
   B -->|no| D[Causal candidate]
-  D --> E{Superposition holds?}
+  D --> E{"Superposition holds?"}
   E -->|no| F[Nonlinear]
   E -->|yes| G[Linear]
-  G --> H{Shift test holds?}
+  G --> H{"Shift test holds?"}
   H -->|yes| I[LTI candidate]
   H -->|no| J[Linear time-varying]
 ```

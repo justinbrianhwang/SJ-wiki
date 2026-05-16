@@ -50,10 +50,10 @@ These theorems explain why unit-capacity flow can prove Menger-type path-packing
 
 ```mermaid
 graph LR
-  s((s)) -->|3| a((a))
-  s -->|2| b((b))
+  s("(s")) -->|3| a("(a"))
+  s -->|2| b("(b"))
   a -->|1| b
-  a -->|2| t((t))
+  a -->|2| t("(t"))
   b -->|3| t
 ```
 

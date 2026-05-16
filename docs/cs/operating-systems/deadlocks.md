@@ -56,9 +56,9 @@ Deadlock proofs and fixes both become clearer when the exact resource graph is d
 
 ```mermaid
 flowchart LR
-  P1((P1)) -->|requests| R2[R2]
+  P1("(P1")) -->|requests| R2[R2]
   R1[R1] -->|assigned| P1
-  P2((P2)) -->|requests| R1
+  P2("(P2")) -->|requests| R1
   R2[R2] -->|assigned| P2
 ```
 

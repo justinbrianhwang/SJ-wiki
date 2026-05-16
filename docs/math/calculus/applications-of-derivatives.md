@@ -90,11 +90,11 @@ When using L'Hopital's Rule, other algebra may be preferable. Factoring, rationa
 ```mermaid
 graph TD
   A[Start with f] --> B[Find domain and intercepts]
-  B --> C[Compute f']
+  B --> C["Compute f'"]
   C --> D[Critical numbers]
-  D --> E[Sign chart for f']
+  D --> E["Sign chart for f'"]
   E --> F[Increasing/decreasing and local extrema]
-  F --> G[Compute f'']
+  F --> G["Compute f''"]
   G --> H[Concavity and inflection candidates]
   H --> I[Asymptotes and final sketch]
 ```

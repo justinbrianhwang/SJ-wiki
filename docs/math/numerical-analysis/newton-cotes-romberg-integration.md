@@ -80,7 +80,7 @@ For study purposes, the most useful habit is to separate four layers: the contin
 
 ```mermaid
 graph TD
-  A[Composite trapezoid T(h)] --> B[Refine to T(h/2)]
+  A["Composite trapezoid T(h)"] --> B["Refine to T(h/2)"]
   B --> C[Cancel h squared error]
   C --> D[Refine again]
   D --> E[Cancel h fourth error]

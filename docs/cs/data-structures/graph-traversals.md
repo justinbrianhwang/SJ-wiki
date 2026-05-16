@@ -69,12 +69,12 @@ flowchart TD
   Q -->|BFS| B[enqueue s]
   B --> C[dequeue next frontier vertex]
   C --> D[enqueue each unvisited neighbor]
-  D --> E{frontier empty?}
+  D --> E{"frontier empty?"}
   E -->|no| C
   Q -->|DFS| F[push or recurse on s]
   F --> G[choose unvisited neighbor]
   G --> H[go deeper]
-  H --> I{dead end?}
+  H --> I{"dead end?"}
   I -->|yes| J[backtrack]
 ```
 

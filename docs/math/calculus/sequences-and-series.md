@@ -166,11 +166,11 @@ That viewpoint links sequence limits directly to series convergence.
 
 ```mermaid
 graph TD
-  A[Series sum a_n] --> B{Does a_n -> 0?}
+  A[Series sum a_n] --> B{"Does a_n -> 0?"}
   B -->|no| C[Diverges by nth-term test]
-  B -->|yes| D{Recognizable form?}
-  D -->|geometric| E[Use |r| < 1]
-  D -->|p-series| F[Use p > 1]
+  B -->|yes| D{"Recognizable form?"}
+  D -->|geometric| E["Use |r| < 1"]
+  D -->|p-series| F["Use p > 1"]
   D -->|positive terms| G[Comparison or integral test]
   D -->|factorials/powers| H[Ratio or root test]
   D -->|alternating signs| I[Alternating series test]

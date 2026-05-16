@@ -65,12 +65,12 @@ A **social network** is a graph $G=(V,E)$ where nodes represent social actors an
 
 ```mermaid
 graph TD
-  A((A)) --- B((B))
-  A --- C((C))
+  A("(A")) --- B("(B"))
+  A --- C("(C"))
   B --- C
-  C --- D((D))
-  D --- E((E))
-  D --- F((F))
+  C --- D("(D"))
+  D --- E("(E"))
+  D --- F("(F"))
   E --- F
   B -. possible link .- D
 ```

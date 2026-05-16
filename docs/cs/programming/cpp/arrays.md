@@ -109,12 +109,12 @@ value: |  4 |  8 | 15 | ?? | ?? | ?? |
 
 ```mermaid
 flowchart TD
-  A[Start selection sort pass k] --> B[Assume minIndex = k]
+  A[Start selection sort pass k] --> B["Assume minIndex = k"]
   B --> C[Scan indexes k+1 to used-1]
-  C --> D{a[i] < a[minIndex]?}
-  D -->|yes| E[Set minIndex = i]
+  C --> D{"a[i] < a[minIndex]?"}
+  D -->|yes| E["Set minIndex = i"]
   D -->|no| F[Keep minIndex]
-  E --> G{More indexes?}
+  E --> G{"More indexes?"}
   F --> G
   G -->|yes| C
   G -->|no| H[Swap a[k] and a[minIndex]]

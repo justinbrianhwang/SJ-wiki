@@ -152,15 +152,15 @@ Numerical integration is also a legitimate technique when an exact antiderivativ
 
 ```mermaid
 graph TD
-  A[Integral] --> B{Composite with derivative?}
+  A[Integral] --> B{"Composite with derivative?"}
   B -->|yes| C[Substitution]
-  B -->|no| D{Product?}
+  B -->|no| D{"Product?"}
   D -->|yes| E[Integration by parts]
-  D -->|no| F{Rational?}
+  D -->|no| F{"Rational?"}
   F -->|yes| G[Divide then partial fractions]
-  F -->|no| H{Infinite or unbounded?}
+  F -->|no| H{"Infinite or unbounded?"}
   H -->|yes| I[Improper integral limit]
-  H -->|no| J[Try identities, tables, or numerical methods]
+  H -->|no| J["Try identities, tables, or numerical methods"]
 ```
 
 ## Worked example 1: integration by parts

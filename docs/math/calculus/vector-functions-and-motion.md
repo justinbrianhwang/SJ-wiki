@@ -235,9 +235,9 @@ Speed controls arc length but not position alone. Two particles can pass through
 
 ```mermaid
 graph LR
-  A[Position r(t)] -->|differentiate| B[Velocity v(t)]
-  B -->|magnitude| C[Speed |v|]
-  B -->|differentiate| D[Acceleration a(t)]
+  A["Position r(t)"] -->|differentiate| B["Velocity v(t)"]
+  B -->|magnitude| C["Speed |v|"]
+  B -->|differentiate| D["Acceleration a(t)"]
   B -->|normalize| E[Unit tangent T]
   D --> F[Tangential component changes speed]
   D --> G[Normal component changes direction]

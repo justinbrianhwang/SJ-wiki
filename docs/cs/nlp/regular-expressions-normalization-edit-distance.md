@@ -56,7 +56,7 @@ flowchart LR
   B --> C[Regex cleanup and rule matches]
   C --> D[Tokenization]
   D --> E[Sentence segmentation]
-  E --> F[Lemmas, stems, or subwords]
+  E --> F["Lemmas, stems, or subwords"]
   F --> G[Model input]
   D --> H[Edit-distance comparison]
   H --> I[Spelling correction or WER]

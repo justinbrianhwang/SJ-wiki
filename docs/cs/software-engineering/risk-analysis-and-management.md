@@ -67,12 +67,12 @@ flowchart TD
   B --> C[Estimate probability]
   C --> D[Estimate impact]
   D --> E[Compute exposure]
-  E --> F{Exposure acceptable?}
+  E --> F{"Exposure acceptable?"}
   F -->|yes| G[Monitor trigger]
   F -->|no| H[Mitigate probability or impact]
   H --> I[Define contingency plan]
   I --> G
-  G --> J{Trigger occurs?}
+  G --> J{"Trigger occurs?"}
   J -->|no| C
   J -->|yes| K[Execute contingency]
 ```

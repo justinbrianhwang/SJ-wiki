@@ -157,14 +157,14 @@ Units are a strong guardrail. Stiffness $k$ has units N/m, damping $c$ has units
 flowchart TD
   A[SDOF model] --> B[Choose coordinate from equilibrium]
   B --> C[Draw FBD]
-  C --> D[m xddot + c xdot + k x = F(t)]
-  D --> E{Forcing?}
+  C --> D["m xddot + c xdot + k x = F(t)"]
+  D --> E{"Forcing?"}
   E -->|none| F[Free vibration]
   E -->|harmonic| G[Steady-state amplitude and phase]
   F --> H{Damping ratio}
-  H -->|zeta = 0| I[Undamped sinusoid]
-  H -->|0 < zeta < 1| J[Decaying oscillation]
-  H -->|zeta >= 1| K[Nonoscillatory return]
+  H -->|"zeta = 0"| I[Undamped sinusoid]
+  H -->|"0 < zeta < 1"| J[Decaying oscillation]
+  H -->|"zeta >= 1"| K[Nonoscillatory return]
 ```
 
 | Case | Condition | Motion type | Key formula |

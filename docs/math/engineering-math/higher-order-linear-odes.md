@@ -103,12 +103,12 @@ In design problems, coefficients may depend on parameters. The characteristic ro
 
 ```mermaid
 flowchart TD
-  A[nth-order linear ODE] --> B{Constant coefficients?}
-  B -->|yes| C[Characteristic polynomial P(lambda)]
+  A[nth-order linear ODE] --> B{"Constant coefficients?"}
+  B -->|yes| C["Characteristic polynomial P(lambda)"]
   C --> D[Find roots and multiplicities]
   D --> E[Build n homogeneous modes]
   B -->|no| F[Use known special methods or convert to system]
-  E --> G{Nonhomogeneous?}
+  E --> G{"Nonhomogeneous?"}
   G -->|yes| H[Find particular solution]
   G -->|no| I[Apply n conditions]
   H --> I

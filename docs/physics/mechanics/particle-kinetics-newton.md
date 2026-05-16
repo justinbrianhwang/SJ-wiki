@@ -117,7 +117,7 @@ flowchart TD
   B --> C[Choose coordinates matching motion]
   C --> D[Write acceleration components]
   D --> E[Resolve forces in same directions]
-  E --> F[Apply sum F = m a]
+  E --> F["Apply sum F = m a"]
   F --> G[Add constraints if connected]
   G --> H[Solve and check signs/units]
 ```

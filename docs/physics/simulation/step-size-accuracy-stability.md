@@ -84,10 +84,10 @@ flowchart TD
   A[Select output quantities of interest] --> B[Estimate fastest time scale or event spacing]
   B --> C[Choose initial solver and step/tolerances]
   C --> D[Run simulation]
-  D --> E{Any warnings, missed events, or instability?}
-  E -->|yes| F[Reduce step, change solver, or fix model]
+  D --> E{"Any warnings, missed events, or instability?"}
+  E -->|yes| F["Reduce step, change solver, or fix model"]
   E -->|no| G[Run convergence check h and h/2]
-  G --> H{Output change acceptable?}
+  G --> H{"Output change acceptable?"}
   H -->|no| F
   H -->|yes| I[Use result with documented settings]
 ```

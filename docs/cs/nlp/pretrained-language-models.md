@@ -73,8 +73,8 @@ This distinction also helps evaluation. A closed-book benchmark tests parameteri
 ```mermaid
 flowchart TD
   A[Large unlabeled corpus] --> B{Pretraining objective}
-  B --> C[Causal LM: predict next token]
-  B --> D[Masked LM: recover masked tokens]
+  B --> C["Causal LM: predict next token"]
+  B --> D["Masked LM: recover masked tokens"]
   C --> E[GPT-style decoder]
   D --> F[BERT-style encoder]
   E --> G[Prompting and generation]

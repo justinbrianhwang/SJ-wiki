@@ -128,12 +128,12 @@ For screws and wedges, friction can either help hold a load or make motion ineff
 
 ```mermaid
 flowchart TD
-  A[Friction problem] --> B{Contact slipping?}
-  B -->|no or unknown| C[Static friction: solve required F]
-  C --> D{Is |F| <= mu_s N?}
+  A[Friction problem] --> B{"Contact slipping?"}
+  B -->|no or unknown| C["Static friction: solve required F"]
+  C --> D{"Is |F| <= mu_s N?"}
   D -->|yes| E[Sticking equilibrium valid]
-  D -->|no| F[Sticking impossible; use impending or kinetic model]
-  B -->|sliding| G[Kinetic friction F = mu_k N]
+  D -->|no| F["Sticking impossible; use impending or kinetic model"]
+  B -->|sliding| G["Kinetic friction F = mu_k N"]
   B -->|belt wrap| H[Capstan equation]
   B -->|screw thread| I[Friction angle and lead angle]
 ```

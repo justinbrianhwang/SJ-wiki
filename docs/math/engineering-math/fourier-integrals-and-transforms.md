@@ -134,12 +134,12 @@ Dimensional units help catch convention mistakes. If $x$ is measured in meters, 
 
 ```mermaid
 flowchart LR
-  A[Signal f(x)] --> B[Fourier transform]
-  B --> C[Spectrum fhat(omega)]
-  C --> D[Multiply by filter H(omega)]
+  A["Signal f(x)"] --> B[Fourier transform]
+  B --> C["Spectrum fhat(omega)"]
+  C --> D["Multiply by filter H(omega)"]
   D --> E[Inverse transform]
   E --> F[Filtered signal]
-  A --> G[Shift, scale, differentiate]
+  A --> G["Shift, scale, differentiate"]
   G --> C
 ```
 

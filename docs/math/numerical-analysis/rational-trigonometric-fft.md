@@ -65,10 +65,10 @@ A final verification step is to reconstruct from the computed coefficients and c
 graph TD
   A[Sampled data x_j] --> B[DFT]
   B --> C[Frequency coefficients X_k]
-  C --> D{Need speed?}
-  D -->|small n| E[Direct O(n^2)]
-  D -->|large n| F[FFT O(n log n)]
-  F --> G[Filter, analyze, or reconstruct]
+  C --> D{"Need speed?"}
+  D -->|small n| E["Direct O(n^2)"]
+  D -->|large n| F["FFT O(n log n)"]
+  F --> G["Filter, analyze, or reconstruct"]
   E --> G
 ```
 

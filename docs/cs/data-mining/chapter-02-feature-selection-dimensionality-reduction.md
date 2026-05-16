@@ -61,7 +61,7 @@ minimizes $\|X-Y\|_F$ over all matrices $Y$ with rank at most $k$. This is why S
 
 ```mermaid
 flowchart LR
-  A[High-dimensional data] --> B{Need original feature meanings?}
+  A[High-dimensional data] --> B{"Need original feature meanings?"}
   B -->|yes| C[Feature subset selection]
   B -->|no| D{Data representation}
   D -->|numeric matrix| E[PCA or SVD]

@@ -78,7 +78,7 @@ graph TD
   B --> C[Set search direction p0]
   C --> D[Choose alpha by line minimization]
   D --> E[Update x and residual]
-  E --> F{Residual small?}
+  E --> F{"Residual small?"}
   F -->|yes| G[Return x]
   F -->|no| H[Compute beta and new conjugate direction]
   H --> D

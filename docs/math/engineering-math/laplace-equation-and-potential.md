@@ -86,8 +86,8 @@ flowchart TD
   C --> D[Maximum principle]
   C --> E[Mean-value property]
   C --> F[Boundary determines interior]
-  A --> G[Field F = -grad u]
-  G --> H[Source-free flux when div F = 0]
+  A --> G["Field F = -grad u"]
+  G --> H["Source-free flux when div F = 0"]
 ```
 
 | Boundary condition | Specifies | Uniqueness behavior |

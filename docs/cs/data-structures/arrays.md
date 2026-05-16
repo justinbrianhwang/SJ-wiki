@@ -81,7 +81,7 @@ value:  10   20   99   30   40   50
 
 ```mermaid
 flowchart LR
-  A[Request insert at index i] --> B{size < capacity?}
+  A[Request insert at index i] --> B{"size < capacity?"}
   B -->|no| C[allocate larger array]
   C --> D[copy old elements]
   B -->|yes| E[shift suffix right]

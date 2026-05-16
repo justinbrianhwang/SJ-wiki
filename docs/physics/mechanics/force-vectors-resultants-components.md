@@ -131,14 +131,14 @@ Later pages use the pair $(\mathbf{R},\mathbf{M}_O)$ to represent equivalent for
 
 ```mermaid
 flowchart LR
-  A[Physical force description] --> B{Known by angle or by two points?}
+  A[Physical force description] --> B{"Known by angle or by two points?"}
   B -->|magnitude and angle| C[Resolve with sine and cosine]
   B -->|magnitude and line AB| D[Build unit vector uAB]
   C --> E[Signed Cartesian components]
   D --> E
   E --> F[Add components]
   F --> G[Resultant vector R]
-  G --> H[Check magnitude, quadrant, and units]
+  G --> H["Check magnitude, quadrant, and units"]
 ```
 
 | Task | Reliable expression | Check |

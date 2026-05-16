@@ -99,9 +99,9 @@ In large systems, algorithmic cost matters. Dense Gaussian elimination for an $n
 
 ```mermaid
 flowchart TD
-  A[Linear system A x = b] --> B[Row reduce or factor]
-  B --> C{Pivot in every column?}
-  C -->|yes, square| D[Unique solution]
+  A["Linear system A x = b"] --> B[Row reduce or factor]
+  B --> C{"Pivot in every column?"}
+  C -->|"yes, square"| D[Unique solution]
   C -->|no pivot but consistent| E[Infinitely many solutions]
   C -->|inconsistent row| F[No exact solution]
   A --> G[Check conditioning]

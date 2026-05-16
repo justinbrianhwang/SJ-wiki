@@ -106,7 +106,7 @@ flowchart LR
     E[m2] --> X2 --> F[AES] --> G[c2]
   end
   subgraph CTR
-    N[nonce,counter] --> H[AES] --> S[pad]
+    N["nonce,counter"] --> H[AES] --> S[pad]
     P[m] --> X[XOR]
     S --> X --> Q[c]
   end

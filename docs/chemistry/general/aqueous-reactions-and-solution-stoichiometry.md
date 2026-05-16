@@ -51,10 +51,10 @@ Finally, keep symbolic and particulate representations side by side. A balanced 
 
 ```mermaid
 flowchart TD
-  A[Mix aqueous solutions] --> B{Strong soluble electrolyte?}
+  A[Mix aqueous solutions] --> B{"Strong soluble electrolyte?"}
   B -->|yes| C[Write separated ions]
   B -->|no| D[Keep molecular form]
-  C --> E{Insoluble solid, water, gas, or redox change?}
+  C --> E{"Insoluble solid, water, gas, or redox change?"}
   E -->|yes| F[Write net ionic equation]
   E -->|no| G[No net reaction]
   F --> H[Use molarity and coefficients]

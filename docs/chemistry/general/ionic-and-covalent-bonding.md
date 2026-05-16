@@ -55,7 +55,7 @@ flowchart TD
   B --> C[Connect atoms with single bonds]
   C --> D[Complete outer octets]
   D --> E[Place remaining electrons on central atom]
-  E --> F{Central atom octet?}
+  E --> F{"Central atom octet?"}
   F -->|no| G[Make multiple bonds if allowed]
   F -->|yes| H[Compute formal charges]
   G --> H

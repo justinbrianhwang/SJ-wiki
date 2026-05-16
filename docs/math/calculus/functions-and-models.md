@@ -117,7 +117,7 @@ graph LR
   B --> C[Choose function family]
   C --> D[Set domain and parameters]
   D --> E[Analyze graph]
-  E --> F[Use limits, derivatives, or integrals]
+  E --> F["Use limits, derivatives, or integrals"]
   F --> G[Interpret in original units]
 ```
 

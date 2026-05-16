@@ -53,9 +53,9 @@ Finally, keep symbolic and particulate representations side by side. A balanced 
 flowchart LR
   A[Initial mixture] --> B[Compute Q]
   B --> C{Compare Q to K}
-  C -->|Q < K| D[Shift toward products]
-  C -->|Q = K| E[At equilibrium]
-  C -->|Q > K| F[Shift toward reactants]
+  C -->|"Q < K"| D[Shift toward products]
+  C -->|"Q = K"| E[At equilibrium]
+  C -->|"Q > K"| F[Shift toward reactants]
   D --> G[ICE table]
   F --> G
   G --> H[Equilibrium concentrations]

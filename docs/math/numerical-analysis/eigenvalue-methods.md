@@ -97,7 +97,7 @@ Eigenvalue computations should also report normalization and phase conventions f
 
 ```mermaid
 graph TD
-  A[Matrix A] --> B{Need one eigenvalue or many?}
+  A[Matrix A] --> B{"Need one eigenvalue or many?"}
   B -->|dominant one| C[Power method]
   B -->|near a shift| D[Inverse iteration]
   B -->|many or all| E[Reduction to Hessenberg or tridiagonal]

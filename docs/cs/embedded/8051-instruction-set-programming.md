@@ -61,11 +61,11 @@ The tenth key result is that external lookup tables and internal variables shoul
 
 ```mermaid
 flowchart TD
-  Start[Need to move data] --> Q{Target memory space?}
+  Start[Need to move data] --> Q{"Target memory space?"}
   Q -->|Internal RAM or SFR| MOV[MOV]
   Q -->|External data memory| MOVX[MOVX]
   Q -->|Program/code table| MOVC[MOVC]
-  Q -->|Single bit| BIT[SETB, CLR, CPL, JB, JNB]
+  Q -->|Single bit| BIT["SETB, CLR, CPL, JB, JNB"]
   MOV --> Done[Correct bus and address behavior]
   MOVX --> Done
   MOVC --> Done

@@ -75,14 +75,14 @@ For study purposes, the most useful habit is to separate four layers: the contin
 
 ```mermaid
 graph LR
-  A[Initial guesses] --> B{Derivative available?}
+  A[Initial guesses] --> B{"Derivative available?"}
   B -->|yes| C[Newton step]
   B -->|no| D[Secant step]
-  C --> E{Step acceptable?}
+  C --> E{"Step acceptable?"}
   D --> E
   E -->|yes| F[Update iterate]
   E -->|no| G[Fallback bracket or damp step]
-  F --> H{Converged?}
+  F --> H{"Converged?"}
   G --> H
   H -->|no| B
   H -->|yes| I[Report root and residual]

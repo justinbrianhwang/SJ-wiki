@@ -118,12 +118,12 @@ For checking a solution, direct substitution is the final authority, but three q
 
 ```mermaid
 flowchart TD
-  A[ay'' + by' + cy = 0] --> B[Try y = exp(lambda x)]
-  B --> C[a lambda^2 + b lambda + c = 0]
+  A["ay'' + by' + cy = 0"] --> B["Try y = exp(lambda x)"]
+  B --> C["a lambda^2 + b lambda + c = 0"]
   C --> D{Root type}
-  D -->|distinct real| E[c1 exp(lambda1 x) + c2 exp(lambda2 x)]
-  D -->|repeated real| F[(c1 + c2 x) exp(lambda x)]
-  D -->|complex alpha +/- i beta| G[exp(alpha x)(c1 cos beta x + c2 sin beta x)]
+  D -->|distinct real| E["c1 exp(lambda1 x) + c2 exp(lambda2 x)"]
+  D -->|repeated real| F["(c1 + c2 x) exp(lambda x)"]
+  D -->|complex alpha +/- i beta| G["exp(alpha x)(c1 cos beta x + c2 sin beta x)"]
 ```
 
 ## Worked example 1: Distinct real roots with initial data

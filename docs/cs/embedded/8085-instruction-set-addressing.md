@@ -71,7 +71,7 @@ The eighth key result is that signed interpretation is a software convention on 
 
 ```mermaid
 graph TD
-  A[Need an operand] --> B{Where is it?}
+  A[Need an operand] --> B{"Where is it?"}
   B -->|In instruction byte| C[Immediate addressing]
   B -->|In CPU register| D[Register addressing]
   B -->|At named memory address| E[Direct addressing]

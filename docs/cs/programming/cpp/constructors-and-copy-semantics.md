@@ -94,7 +94,7 @@ Static members belong to the class as a whole rather than to one object. They ar
 flowchart TD
   A[Object creation] --> B[Constructor initializes members]
   B --> C[Object used through public functions]
-  C --> D{Copy needed?}
+  C --> D{"Copy needed?"}
   D -->|new object| E[Copy constructor]
   D -->|existing object| F[Assignment operator]
   C --> G[Object lifetime ends]

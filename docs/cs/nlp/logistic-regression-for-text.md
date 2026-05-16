@@ -85,7 +85,7 @@ In error analysis, separate feature errors from decision errors. If a document i
 ```mermaid
 flowchart LR
   A[Document] --> B[Feature vector x]
-  B --> C[Linear score z = Wx + b]
+  B --> C["Linear score z = Wx + b"]
   C --> D[Sigmoid or softmax]
   D --> E[Class probabilities]
   E --> F[Cross-entropy loss]

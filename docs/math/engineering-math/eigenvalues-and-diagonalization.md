@@ -110,13 +110,13 @@ Repeated eigenvalues require a calm check. A repeated root of the characteristic
 
 ```mermaid
 flowchart TD
-  A[Square matrix A] --> B[Compute det(A - lambda I)]
+  A[Square matrix A] --> B["Compute det(A - lambda I)"]
   B --> C[Find eigenvalues]
   C --> D[Find nullspaces of A - lambda I]
-  D --> E{n independent eigenvectors?}
-  E -->|yes| F[A = P D P^-1]
-  E -->|no| G[Not diagonalizable; use generalized methods]
-  F --> H[Powers, exponentials, modal coordinates]
+  D --> E{"n independent eigenvectors?"}
+  E -->|yes| F["A = P D P^-1"]
+  E -->|no| G["Not diagonalizable; use generalized methods"]
+  F --> H["Powers, exponentials, modal coordinates"]
 ```
 
 | Matrix type | Eigenvalue behavior | Diagonalization result |

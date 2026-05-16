@@ -97,8 +97,8 @@ That is the conceptual bridge between WKB, classical mechanics, and Feynman's fo
 
 ```mermaid
 flowchart LR
-  A[Initial point xa, ta] --> B[All possible paths]
-  B --> C[Each path contributes exp(iS/hbar)]
+  A["Initial point xa, ta"] --> B[All possible paths]
+  B --> C["Each path contributes exp(iS/hbar)"]
   C --> D[Add amplitudes]
   D --> E[Propagator K]
   E --> F[Final wave function]

@@ -124,7 +124,7 @@ Approximate symmetry breaking is also common. If a symmetry is nearly exact but 
 flowchart TD
   A[Symmetric Lagrangian] --> B[Degenerate vacuum manifold]
   B --> C[Choose one vacuum]
-  C --> D{Symmetry global or gauged?}
+  C --> D{"Symmetry global or gauged?"}
   D -->|global| E[Massless Goldstone mode]
   D -->|gauged| F[Would-be Goldstone absorbed]
   F --> G[Massive gauge boson]

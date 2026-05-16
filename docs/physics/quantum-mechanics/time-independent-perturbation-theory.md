@@ -109,7 +109,7 @@ with spin and fine-structure refinements depending on coupling regime. Sakurai's
 
 ```mermaid
 flowchart TD
-  A[Choose solvable H0] --> B{Level degenerate?}
+  A[Choose solvable H0] --> B{"Level degenerate?"}
   B -->|no| C[Use expectation value for first order]
   C --> D[Sum over other states for second order]
   B -->|yes| E[Build V matrix in degenerate subspace]

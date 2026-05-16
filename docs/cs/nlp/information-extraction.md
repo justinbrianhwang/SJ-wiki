@@ -75,7 +75,7 @@ flowchart TD
   B --> C[NER and entity linking]
   C --> D[Candidate pairs or event triggers]
   D --> E[Relation/event classifier]
-  E --> F[Negation, modality, time]
+  E --> F["Negation, modality, time"]
   F --> G[Coreference and aggregation]
   G --> H[Knowledge base or templates]
 ```

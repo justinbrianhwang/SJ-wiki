@@ -114,8 +114,8 @@ Neutrino mass is another motivation for larger structures. If a right-handed neu
 
 ```mermaid
 flowchart TD
-  A[SU(2)_L x U(1)_Y] --> B[Higgs doublet gets vev]
-  B --> C[Unbroken U(1)_em]
+  A["SU(2)_L x U(1)_Y"] --> B[Higgs doublet gets vev]
+  B --> C["Unbroken U(1)_em"]
   B --> D[W plus and W minus massive]
   B --> E[Z massive]
   C --> F[Photon massless]

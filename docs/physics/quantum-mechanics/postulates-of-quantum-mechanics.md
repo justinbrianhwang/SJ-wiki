@@ -140,7 +140,7 @@ flowchart TD
   B --> C[Choose observable A]
   C --> D[Expand in eigenbasis of A]
   D --> E[Born probabilities]
-  E --> F{Outcome selected?}
+  E --> F{"Outcome selected?"}
   F -->|yes| G[Project onto eigenspace]
   F -->|no| H[Keep full statistical prediction]
   G --> I[Unitary evolution after measurement]

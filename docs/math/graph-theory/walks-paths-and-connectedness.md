@@ -53,12 +53,12 @@ The edge $CD$ is a bridge because it is the only route from the left triangle to
 
 ```mermaid
 graph LR
-  A((A)) --- B((B))
-  B --- C((C))
+  A("(A")) --- B("(B"))
+  B --- C("(C"))
   C --- A
-  C === D((D))
-  D --- E((E))
-  E --- F((F))
+  C === D("(D"))
+  D --- E("(E"))
+  E --- F("(F"))
   F --- D
 ```
 

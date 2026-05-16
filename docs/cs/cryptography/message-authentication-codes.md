@@ -88,7 +88,7 @@ sequenceDiagram
   S->>S: t = Mac_k(m)
   S->>R: m, t
   A-->>R: maybe modify m or t
-  R->>R: accept iff Vrfy_k(m,t)=1
+  R->>R: accept iff Vrfy_k("m,t")=1
 ```
 
 | Construction | Message length | Main assumption | Main warning |

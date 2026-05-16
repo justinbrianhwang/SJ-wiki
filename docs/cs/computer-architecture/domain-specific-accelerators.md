@@ -62,12 +62,12 @@ Accelerator evaluation should include utilization. A unit advertised at high pea
 
 ```mermaid
 flowchart TD
-    A[Workload profile] --> B{Hot stable kernel?}
+    A[Workload profile] --> B{"Hot stable kernel?"}
     B -->|no| C[Use CPU or general parallelism]
-    B -->|yes| D{Regular data parallelism?}
-    D -->|yes| E[SIMD, GPU, or tensor accelerator]
+    B -->|yes| D{"Regular data parallelism?"}
+    D -->|yes| E["SIMD, GPU, or tensor accelerator"]
     D -->|no| F[Pipeline or fixed-function accelerator]
-    E --> G{Data movement affordable?}
+    E --> G{"Data movement affordable?"}
     F --> G
     G -->|yes| H[Accelerator is plausible]
     G -->|no| I[Optimize locality or reject]

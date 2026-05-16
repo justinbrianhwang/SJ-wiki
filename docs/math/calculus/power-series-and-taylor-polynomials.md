@@ -156,7 +156,7 @@ This prevents local approximations from being mistaken for global identities lat
 ```mermaid
 graph LR
   A[Function f] --> B[Derivatives at a]
-  B --> C[Taylor coefficients f^(n)(a)/n!]
+  B --> C["Taylor coefficients f^(n)(a)/n!"]
   C --> D[Taylor polynomial T_N]
   C --> E[Taylor series]
   E --> F[Find radius and interval of convergence]

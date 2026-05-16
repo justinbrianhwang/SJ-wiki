@@ -114,7 +114,7 @@ flowchart TD
   C --> D[Classify poles or singularities]
   D --> E[Compute residues]
   E --> F[Sum residues]
-  F --> G[Integral = 2 pi i times sum]
+  F --> G["Integral = 2 pi i times sum"]
   A --> H[Check orientation and hypotheses]
 ```
 

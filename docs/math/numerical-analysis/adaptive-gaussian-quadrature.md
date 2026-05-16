@@ -66,9 +66,9 @@ For study purposes, the most useful habit is to separate four layers: the contin
 
 ```mermaid
 graph TD
-  A[Start interval a,b] --> B[Compute coarse Simpson]
+  A["Start interval a,b"] --> B[Compute coarse Simpson]
   B --> C[Compute two half Simpson values]
-  C --> D{Estimated error small?}
+  C --> D{"Estimated error small?"}
   D -->|yes| E[Accept corrected estimate]
   D -->|no| F[Split interval]
   F --> A

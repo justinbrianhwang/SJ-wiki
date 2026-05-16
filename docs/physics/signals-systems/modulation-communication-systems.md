@@ -155,7 +155,7 @@ In baseband-equivalent analysis, engineers often use complex envelopes to avoid 
 
 ```mermaid
 flowchart LR
-  A[Message m(t)] --> B[Multiply by carrier]
+  A["Message m(t)"] --> B[Multiply by carrier]
   C[cos omega_c t] --> B
   B --> D[Shifted sidebands]
   D --> E[Channel]

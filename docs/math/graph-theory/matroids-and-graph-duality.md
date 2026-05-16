@@ -77,10 +77,10 @@ The triangle with a pendant edge has cycle matroid circuits and cut structure th
 
 ```mermaid
 graph LR
-  A((A)) --- B((B))
-  B --- C((C))
+  A("(A")) --- B("(B"))
+  B --- C("(C"))
   C --- A
-  C --- D((D))
+  C --- D("(D"))
 ```
 
 | Edge set | In graph | In $M(G)$ |

@@ -61,7 +61,7 @@ flowchart LR
     C --> E[ROB allocate]
     D --> F[Execute]
     F --> G[Write result]
-    G --> H{Oldest and safe?}
+    G --> H{"Oldest and safe?"}
     H -->|yes| I[Commit architectural state]
     H -->|no| E
     A -. wrong path .-> J[Squash and recover map]

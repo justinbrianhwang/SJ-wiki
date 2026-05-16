@@ -69,7 +69,7 @@ For study purposes, the most useful habit is to separate four layers: the contin
 graph TD
   A[Attempt step with h] --> B[Compute high and low order RK estimates]
   B --> C[Estimate local error]
-  C --> D{error <= tolerance?}
+  C --> D{"error <= tolerance?"}
   D -->|yes| E[Accept step]
   E --> F[Choose next h]
   D -->|no| G[Reject and reduce h]

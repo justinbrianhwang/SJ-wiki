@@ -132,12 +132,12 @@ Energy methods can also expose impossible assumptions. If an equation predicts n
 ```mermaid
 flowchart LR
   A[Known positions 1 and 2] --> B[Draw FBD and identify doing-work forces]
-  B --> C{Conservative?}
+  B --> C{"Conservative?"}
   C -->|yes| D[Use potential energy V]
   C -->|no| E[Compute explicit work U_nc]
-  D --> F[T1 + V1 + U_nc = T2 + V2]
+  D --> F["T1 + V1 + U_nc = T2 + V2"]
   E --> F
-  F --> G[Solve for speed, distance, compression, or work]
+  F --> G["Solve for speed, distance, compression, or work"]
 ```
 
 | Quantity | Formula | Sign or use |

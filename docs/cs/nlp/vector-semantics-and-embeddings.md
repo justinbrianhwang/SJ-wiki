@@ -89,7 +89,7 @@ flowchart TD
   D --> E[Sparse TF-IDF or PPMI]
   D --> F[Dense word2vec or GloVe]
   D --> G[Contextual transformer states]
-  E --> H[Similarity, retrieval, features]
+  E --> H["Similarity, retrieval, features"]
   F --> H
   G --> H
 ```

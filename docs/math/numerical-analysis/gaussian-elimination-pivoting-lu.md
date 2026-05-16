@@ -81,14 +81,14 @@ For study purposes, the most useful habit is to separate four layers: the contin
 
 ```mermaid
 graph TD
-  A[Matrix A and right side b] --> B{Need row swap?}
+  A[Matrix A and right side b] --> B{"Need row swap?"}
   B -->|yes| C[Apply permutation P]
   B -->|no| D[Use current pivot]
   C --> D
   D --> E[Eliminate below pivot]
-  E --> F{More columns?}
+  E --> F{"More columns?"}
   F -->|yes| B
-  F -->|no| G[Triangular solves Ly=Pb and Ux=y]
+  F -->|no| G["Triangular solves Ly=Pb and Ux=y"]
 ```
 
 | Strategy | Factorization | Main benefit | Main risk |

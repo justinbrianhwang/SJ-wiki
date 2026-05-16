@@ -52,8 +52,8 @@ A **cluster ensemble** combines multiple clusterings into a consensus clustering
 ```mermaid
 flowchart LR
   A[Advanced clustering problem] --> B{Data challenge}
-  B -->|categorical| C[k-modes, entropy, medoids]
-  B -->|massive| D[sampling, summaries, scalable passes]
+  B -->|categorical| C["k-modes, entropy, medoids"]
+  B -->|massive| D["sampling, summaries, scalable passes"]
   B -->|high dimensional| E[subspace or projected clustering]
   B -->|partial labels| F[semi-supervised constraints]
   B -->|unstable solutions| G[cluster ensembles]

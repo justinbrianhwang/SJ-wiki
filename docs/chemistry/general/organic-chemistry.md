@@ -60,12 +60,12 @@ Finally, keep symbolic and particulate representations side by side. A balanced 
 
 ```mermaid
 graph TD
-  A[Carbon skeleton] --> B{Multiple bond?}
+  A[Carbon skeleton] --> B{"Multiple bond?"}
   B -->|none| C[alkane or cycloalkane]
-  B -->|C=C| D[alkene]
+  B -->|"C=C"| D[alkene]
   B -->|C#C| E[alkyne]
-  A --> F{Functional group?}
-  F --> G[alcohol, amine, carbonyl, acid, etc.]
+  A --> F{"Functional group?"}
+  F --> G["alcohol, amine, carbonyl, acid, etc."]
 ```
 
 ## Worked example 1: Formula and isomers of pentane

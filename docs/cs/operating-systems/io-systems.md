@@ -67,7 +67,7 @@ sequenceDiagram
   participant Ctrl as Controller/DMA
   participant Dev as Device
 
-  App->>Kernel: read(fd, buf, n)
+  App->>Kernel: read("fd, buf, n")
   Kernel->>Driver: build device request
   Driver->>Ctrl: program registers and DMA
   Ctrl->>Dev: perform device operation

@@ -74,9 +74,9 @@ When a recurrence contains parameters, special parameter values may cause the se
 
 ```mermaid
 flowchart TD
-  A[Choose center x0] --> B{Ordinary point?}
-  B -->|yes| C[Assume power series sum a_n (x-x0)^n]
-  B -->|regular singular| D[Assume Frobenius series (x-x0)^r sum a_n (x-x0)^n]
+  A[Choose center x0] --> B{"Ordinary point?"}
+  B -->|yes| C["Assume power series sum a_n (x-x0)^n"]
+  B -->|regular singular| D["Assume Frobenius series (x-x0)^r sum a_n (x-x0)^n"]
   B -->|irregular singular| E[Use asymptotic or special methods]
   C --> F[Differentiate and align powers]
   D --> F

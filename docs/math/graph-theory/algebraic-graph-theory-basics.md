@@ -79,10 +79,10 @@ counts all closed walks of length $k$. For example, in a simple graph, each tria
 
 ```mermaid
 graph LR
-  A((1)) --- B((2))
-  B --- C((3))
+  A("(1")) --- B("(2"))
+  B --- C("(3"))
   C --- A
-  C --- D((4))
+  C --- D("(4"))
 ```
 
 For this graph, with vertex order $(1,2,3,4)$,

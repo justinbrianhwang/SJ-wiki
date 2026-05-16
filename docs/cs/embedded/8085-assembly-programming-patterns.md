@@ -57,7 +57,7 @@ The ninth key result is that debugging assembly is easiest when memory locations
 
 ```mermaid
 flowchart TD
-  Start[Initialize pointer and count] --> Test{Count done?}
+  Start[Initialize pointer and count] --> Test{"Count done?"}
   Test -->|yes| Finish[Store result and return]
   Test -->|no| Body[Process current byte]
   Body --> Update[Advance pointer and decrement count]

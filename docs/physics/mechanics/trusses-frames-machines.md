@@ -70,10 +70,10 @@ In static rigid-body analysis without friction and deformation, mechanical advan
 
 ```mermaid
 flowchart TD
-  A[Assembly problem] --> B{Are members two-force?}
+  A[Assembly problem] --> B{"Are members two-force?"}
   B -->|mostly yes| C[Truss idealization]
   B -->|no| D[Frame or machine]
-  C --> E{Need all member forces?}
+  C --> E{"Need all member forces?"}
   E -->|yes| F[Method of joints]
   E -->|selected members| G[Method of sections]
   D --> H[Separate members or subassemblies]

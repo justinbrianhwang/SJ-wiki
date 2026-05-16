@@ -117,7 +117,7 @@ q -----^
 flowchart TD
   A[Allocate with new or new[]] --> B[Store returned pointer]
   B --> C[Use only while object is alive]
-  C --> D{Single object or array?}
+  C --> D{"Single object or array?"}
   D -->|single| E[delete pointer]
   D -->|array| F[delete[] pointer]
   E --> G[Set pointer to nullptr if reused]

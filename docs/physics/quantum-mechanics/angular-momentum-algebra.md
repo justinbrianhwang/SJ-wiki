@@ -134,7 +134,7 @@ Sakurai's algebraic treatment explains why $\ell$ and $m$ have their allowed val
 
 ```mermaid
 graph TD
-  A["|j,j>"] -->|J-| B["|j,j-1>"]
+  A["#quot;|#quot;j,j>#quot;"] -->"|J-| B["|j,j-1>"]
   B -->|J-| C["..."]
   C -->|J-| D["|j,-j+1>"]
   D -->|J-| E["|j,-j>"]

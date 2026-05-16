@@ -116,10 +116,10 @@ gives a constant force with the same impulse over the same time interval. Real i
 ```mermaid
 flowchart LR
   A[Choose system and time interval] --> B[Identify external impulses]
-  B --> C{Net external impulse negligible in direction?}
+  B --> C{"Net external impulse negligible in direction?"}
   C -->|yes| D[Conserve momentum in that direction]
-  C -->|no| E[Use p1 + J = p2]
-  D --> F{Impact?}
+  C -->|no| E["Use p1 + J = p2"]
+  D --> F{"Impact?"}
   E --> F
   F -->|yes| G[Add restitution or sticking condition]
   F -->|no| H[Solve impulse or final velocity]

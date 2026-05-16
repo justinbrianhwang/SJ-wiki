@@ -112,14 +112,14 @@ This says that mean-square size in physical space equals size in coefficient spa
 
 ```mermaid
 flowchart TD
-  A[Function on interval] --> B{Periodic full-range or half-range?}
+  A[Function on interval] --> B{"Periodic full-range or half-range?"}
   B -->|full range| C[Compute a_n and b_n]
   B -->|half-range sine| D[Odd extension]
   B -->|half-range cosine| E[Even extension]
   C --> F[Fourier series]
   D --> F
   E --> F
-  F --> G[Approximation, spectra, PDE modes]
+  F --> G["Approximation, spectra, PDE modes"]
 ```
 
 | Function feature | Coefficient effect | Practical meaning |

@@ -63,12 +63,12 @@ Negative weights require special care. A single negative edge can invalidate Dij
 
 ```mermaid
 graph LR
-  A((A)) -->|2| B((B))
-  A -->|5| C((C))
+  A("(A")) -->|2| B("(B"))
+  A -->|5| C("(C"))
   B -->|1| C
-  B -->|2| D((D))
+  B -->|2| D("(D"))
   C -->|3| D
-  D -->|1| E((E))
+  D -->|1| E("(E"))
   C -->|5| E
 ```
 
@@ -77,7 +77,7 @@ Relaxation flow:
 ```mermaid
 flowchart LR
   U[known d[u]] --> E[edge u to v with weight w]
-  E --> C{d[u] + w < d[v]?}
+  E --> C{"d[u] + w < d[v]?"}
   C -->|yes| R[update d[v] and parent[v]]
   C -->|no| N[keep current distance]
 ```

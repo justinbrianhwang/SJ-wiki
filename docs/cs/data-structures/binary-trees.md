@@ -72,12 +72,12 @@ Tree algorithms are often easiest to verify by induction. The base case is the e
 
 ```mermaid
 graph TD
-  A((A)) --> B((B))
-  A --> C((C))
-  B --> D((D))
-  B --> E((E))
-  C --> F((F))
-  C --> G((G))
+  A("(A")) --> B("(B"))
+  A --> C("(C"))
+  B --> D("(D"))
+  B --> E("(E"))
+  C --> F("(F"))
+  C --> G("(G"))
 ```
 
 For this tree:

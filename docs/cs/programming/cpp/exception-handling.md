@@ -84,11 +84,11 @@ A useful correctness rule is this: after any exception, every object that was fu
 ```mermaid
 flowchart TD
   A[Call function] --> B[Enter try block]
-  B --> C{Error detected?}
+  B --> C{"Error detected?"}
   C -->|no| D[Continue normally]
   C -->|yes| E[throw exception object]
   E --> F[Unwind stack]
-  F --> G{Matching catch?}
+  F --> G{"Matching catch?"}
   G -->|yes| H[Run handler]
   G -->|no| I[Continue unwinding]
   H --> J[Program resumes after catch]

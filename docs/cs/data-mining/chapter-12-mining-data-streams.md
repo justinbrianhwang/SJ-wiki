@@ -67,7 +67,7 @@ flowchart LR
   E --> H
   F --> H
   G --> H
-  H --> I[Alerts, models, dashboards]
+  H --> I["Alerts, models, dashboards"]
 ```
 
 | Setting | Data access | Typical tool | Suitable task |

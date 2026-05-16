@@ -63,12 +63,12 @@ A **frequent subgraph** is a substructure appearing in many graphs or many place
 
 ```mermaid
 graph LR
-  A((A)) --- B((B))
-  B --- C((C))
+  A("(A")) --- B("(B"))
+  B --- C("(C"))
   C --- A
-  C --- D((D))
-  D --- E((E))
-  E --- F((F))
+  C --- D("(D"))
+  D --- E("(E"))
+  E --- F("(F"))
   F --- D
 ```
 

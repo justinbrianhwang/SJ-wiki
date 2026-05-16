@@ -56,7 +56,7 @@ Proof by cases requires two checks: the cases cover all possibilities, and the c
 graph TD
   A[Statement to prove] --> B{Main form}
   B -->|P implies Q| C[Try direct proof]
-  C --> D[If Q is easier to negate, use contraposition]
+  C --> D["If Q is easier to negate, use contraposition"]
   B -->|not S is impossible| E[Try contradiction]
   B -->|for all x| F[Choose arbitrary x]
   B -->|there exists x| G[Build a witness]

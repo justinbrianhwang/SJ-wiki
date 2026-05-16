@@ -76,7 +76,7 @@ flowchart TD
   F --> I
   G --> I
   H --> I
-  I --> J[Text, time series, graphs, web, streams, privacy]
+  I --> J["Text, time series, graphs, web, streams, privacy"]
   J -. feedback .-> B
 ```
 

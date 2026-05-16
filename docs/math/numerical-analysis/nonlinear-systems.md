@@ -77,12 +77,12 @@ For study purposes, the most useful habit is to separate four layers: the contin
 ```mermaid
 graph TD
   A[Current vector x] --> B[Evaluate F and Jacobian J]
-  B --> C[Solve J s = -F]
-  C --> D{Full step acceptable?}
-  D -->|yes| E[x <- x + s]
+  B --> C["Solve J s = -F"]
+  C --> D{"Full step acceptable?"}
+  D -->|yes| E["x <- x + s"]
   D -->|no| F[Damp or trust-region step]
   F --> E
-  E --> G{Residual small?}
+  E --> G{"Residual small?"}
   G -->|no| B
   G -->|yes| H[Return root estimate]
 ```

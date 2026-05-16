@@ -83,8 +83,8 @@ The central invariant for a well-formed singly linked list is: starting at `head
 ```mermaid
 flowchart LR
   A[Create new node] --> B[Store value]
-  B --> C[newNode->next = head]
-  C --> D[head = newNode]
+  B --> C["newNode->next = head"]
+  C --> D["head = newNode"]
   D --> E[List has one more first node]
 ```
 

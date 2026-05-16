@@ -76,12 +76,12 @@ flowchart TD
   A[Choose the particle or joint] --> B[Draw complete FBD]
   B --> C[Assign axes and unknown directions]
   C --> D[Resolve every force into components]
-  D --> E[Write sum Fx = 0, sum Fy = 0, and sum Fz = 0 if needed]
+  D --> E["Write sum Fx = 0, sum Fy = 0, and sum Fz = 0 if needed"]
   E --> F[Solve linear equations]
-  F --> G{Any negative unknowns?}
+  F --> G{"Any negative unknowns?"}
   G -->|yes| H[Force acts opposite assumed direction]
   G -->|no| I[Directions match assumptions]
-  H --> J[Check magnitude, units, and physical sense]
+  H --> J["Check magnitude, units, and physical sense"]
   I --> J
 ```
 

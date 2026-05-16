@@ -81,7 +81,7 @@ flowchart LR
   Cache --> Block[Block I/O layer]
   Block --> Sched[Disk scheduler]
   Sched --> Ctrl[Storage controller]
-  Ctrl --> Disk[(HDD / SSD / RAID)]
+  Ctrl --> Disk["(HDD / SSD / RAID)"]
 ```
 
 The file system is not the final stop. Requests pass through caching, block mapping, scheduling, and controller queues before reaching storage.

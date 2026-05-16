@@ -100,7 +100,7 @@ flowchart LR
   D --> H[x_{k+1}]
   E --> H
   F --> H
-  G --> I{Error acceptable?}
+  G --> I{"Error acceptable?"}
   I -->|yes| H
   I -->|no| J[Reduce step and retry]
   J --> B

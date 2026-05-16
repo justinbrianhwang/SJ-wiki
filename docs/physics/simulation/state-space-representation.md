@@ -89,13 +89,13 @@ State scaling also matters. If one state is a voltage near $10^{-3}$ and another
 
 ```mermaid
 flowchart LR
-  U[Input u(t)] --> S1[State derivative f or Ax+Bu]
+  U["Input u(t)"] --> S1[State derivative f or Ax+Bu]
   S1 --> INT[Integrator bank]
-  INT --> X[State x(t)]
+  INT --> X["State x(t)"]
   X --> S1
   X --> OUT[Output map g or Cx+Du]
   U --> OUT
-  OUT --> Y[Output y(t)]
+  OUT --> Y["Output y(t)"]
 ```
 
 | Form | Main use | Strength | Limitation |

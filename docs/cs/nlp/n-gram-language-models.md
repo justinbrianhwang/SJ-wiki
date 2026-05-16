@@ -89,8 +89,8 @@ Historically, n-grams were also important because they separated the language mo
 
 ```mermaid
 flowchart TD
-  A[Training corpus] --> B[Count unigrams, bigrams, trigrams]
-  B --> C{Is history count reliable?}
+  A[Training corpus] --> B["Count unigrams, bigrams, trigrams"]
+  B --> C{"Is history count reliable?"}
   C -->|yes| D[Use discounted higher-order probability]
   C -->|no| E[Back off or interpolate]
   D --> F[Reserve probability mass]

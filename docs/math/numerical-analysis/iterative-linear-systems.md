@@ -89,7 +89,7 @@ For study purposes, the most useful habit is to separate four layers: the contin
 ```mermaid
 graph TD
   A[Choose x0] --> B[Compute residual]
-  B --> C{Converged?}
+  B --> C{"Converged?"}
   C -->|yes| D[Return x]
   C -->|no| E{Iteration type}
   E --> F[Jacobi old values]

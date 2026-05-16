@@ -69,7 +69,7 @@ The hardware translation path is therefore a performance feature and a protectio
 
 ```mermaid
 flowchart LR
-  LA["Logical address\npage p + offset d"] --> TLB{TLB hit?}
+  LA["Logical address\npage p + offset d"] --> TLB{"TLB hit?"}
   TLB -->|yes| Frame[Frame number f]
   TLB -->|no| PT[Page table lookup]
   PT --> Frame

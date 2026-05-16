@@ -186,7 +186,7 @@ Bounds should be checked by projecting the region. In a double integral, the out
 
 ```mermaid
 graph TD
-  A[Region or solid] --> B{Symmetry?}
+  A[Region or solid] --> B{"Symmetry?"}
   B -->|rectangular/box| C[Cartesian]
   B -->|circular in xy-plane| D[Polar or cylindrical]
   B -->|spherical/radial| E[Spherical]

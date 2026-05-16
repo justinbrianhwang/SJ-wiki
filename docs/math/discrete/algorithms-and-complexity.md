@@ -70,7 +70,7 @@ flowchart TD
   C --> D[Prove correctness]
   D --> E[Count primitive operations]
   E --> F[Express asymptotic bound]
-  F --> G{Acceptable for input size?}
+  F --> G{"Acceptable for input size?"}
   G -->|yes| H[Implement or specify]
   G -->|no| I[Seek better structure]
   I --> B

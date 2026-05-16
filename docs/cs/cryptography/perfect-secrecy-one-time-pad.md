@@ -118,7 +118,7 @@ That precision is the enduring value of the definition.
 flowchart LR
   M[Message m] --> X[XOR]
   K[Uniform one-time key k] --> X
-  X --> C[Ciphertext c = m xor k]
+  X --> C["Ciphertext c = m xor k"]
   C --> Y[XOR]
   K --> Y
   Y --> R[Recovered m]

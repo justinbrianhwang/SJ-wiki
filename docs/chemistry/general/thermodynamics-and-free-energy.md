@@ -58,7 +58,7 @@ Finally, keep symbolic and particulate representations side by side. A balanced 
 
 ```mermaid
 flowchart LR
-  A[Delta H] --> C[Delta G = Delta H - T Delta S]
+  A[Delta H] --> C["Delta G = Delta H - T Delta S"]
   B[Delta S] --> C
   C --> D{Delta G}
   D -->|negative| E[Forward spontaneous]

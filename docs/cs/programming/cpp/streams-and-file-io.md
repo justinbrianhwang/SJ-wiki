@@ -119,8 +119,8 @@ Random access file operations use positions, such as `seekg`, `tellg`, `seekp`, 
 ```mermaid
 flowchart LR
   F[External file] -->|open ifstream| IN[input stream object]
-  IN -->|operator>> or get| P[Program variables]
-  P -->|operator<< or put| OUT[output stream object]
+  IN -->|"operator>> or get"| P[Program variables]
+  P -->|"operator<< or put"| OUT[output stream object]
   OUT -->|open ofstream| G[External file]
 ```
 

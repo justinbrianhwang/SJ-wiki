@@ -141,7 +141,7 @@ The matrix $(sI-A)^{-1}$ exposes the same eigenvalue poles that appear in the ma
 ```mermaid
 flowchart LR
   A[Time-domain IVP] --> B[Apply Laplace transform]
-  B --> C[Algebraic equation in Y(s)]
+  B --> C["Algebraic equation in Y(s)"]
   C --> D[Partial fractions and shifts]
   D --> E[Inverse transform]
   E --> F[Time-domain solution]

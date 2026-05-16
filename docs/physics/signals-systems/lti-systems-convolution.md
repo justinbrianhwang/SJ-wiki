@@ -169,7 +169,7 @@ flowchart LR
   B --> C[Each impulse produces shifted h]
   C --> D[Scale by input value]
   D --> E[Add all shifted responses]
-  E --> F[Output y=x*h]
+  E --> F["Output y=x*h"]
 ```
 
 | LTI fact | Continuous time | Discrete time |

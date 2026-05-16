@@ -78,7 +78,7 @@ Factoring out $n!$ yields the formula above.
 ```mermaid
 flowchart TD
   A[Objects] --> B[Assign each object to a box]
-  B --> C{More objects than capacity?}
+  B --> C{"More objects than capacity?"}
   C -->|yes| D[Some box is crowded]
   C -->|no| E[Pigeonhole conclusion not forced]
 ```
