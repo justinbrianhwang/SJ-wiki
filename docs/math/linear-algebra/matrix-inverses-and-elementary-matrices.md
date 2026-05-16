@@ -101,7 +101,7 @@ flowchart TD
   A --> D["A x = b has a unique solution for every b"]
   A --> E["Columns of A form a basis"]
   A --> F["det(A) is nonzero"]
-  B --> G["#quot;#quot;#quot;[A |#quot;#quot; I#quot;#quot;"] row reduces to ["#quot;#quot;I #quot;#quot;| A inverse#quot;#quot;"]"]
+  B --> G["#quot;[A |#quot; I#quot;"] row reduces to ["#quot;I #quot;| A inverse#quot;"]"]
 ```
 
 | Row operation | Elementary matrix action | Inverse operation |

@@ -51,7 +51,7 @@ Unique indexes deserve separate mention because they often enforce constraints a
 
 ```mermaid
 flowchart TD
-  R["#quot;#quot;#quot;Root: 30 |#quot;#quot;#quot; 60#quot;#quot;#quot;"] --> A["#quot;#quot;#quot;Internal: 10 #quot;#quot;#quot;| 20#quot;#quot;#quot;"]
+  R["#quot;Root: 30 |#quot; 60#quot;"] --> A["#quot;Internal: 10 #quot;| 20#quot;"]
   R --> B["Internal: 40 | 50"]
   R --> C["Internal: 70 | 80"]
   A --> L1["Leaf: 1, 5, 9"]

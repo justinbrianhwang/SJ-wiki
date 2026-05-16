@@ -142,7 +142,7 @@ flowchart TD
   B -->|no| D{"Linear: y' + p(x)y = r(x)?"}
   D -->|yes| E[Use integrating factor]
   D -->|no| F{"Exact: M_y = N_x?"}
-  F -->|yes| G["Find potential u("#quot;#quot;x,y#quot;#quot;")"]
+  F -->|yes| G["Find potential u(#quot;x,y#quot;)"]
   F -->|no| H{"Bernoulli form?"}
   H -->|yes| I["Substitute v = y^(1-a)"]
   H -->|no| J[Use qualitative or numerical method]

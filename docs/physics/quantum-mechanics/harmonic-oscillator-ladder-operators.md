@@ -133,7 +133,7 @@ This is why coherent states are the oscillator states closest to classical sinus
 
 ```mermaid
 graph TD
-  N0["#quot;#quot;#quot;|#quot;#quot;#quot;0>, E0 = hbar omega / 2#quot;#quot;#quot;"] -->#quot;#quot;"|a dagger|"#quot; N1["#quot;#quot;#quot;#quot;|1>, E1 = 3 hbar omega / 2#quot;#quot;"]
+  N0["#quot;|#quot;0>, E0 = hbar omega / 2#quot;"] -->#quot;|a dagger|#quot; N1["#quot;|1>, E1 = 3 hbar omega / 2#quot;"]
   N1 -->|a dagger| N2["|2>, E2 = 5 hbar omega / 2"]
   N2 -->|a dagger| N3["|3>, E3 = 7 hbar omega / 2"]
   N3 -->|a| N2

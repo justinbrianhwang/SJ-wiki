@@ -1,28 +1,32 @@
 """Quote node labels inside ```mermaid``` fenced blocks.
 
 Codex agents occasionally emit Mermaid node labels with characters that the
-Mermaid parser treats specially: ``'``, ``=``, ``(``, ``)``, ``?``, ``:``,
-``<``, ``>``, ``&``, ``,`` and ``"``. These cause client-side render errors
-even though the markdown builds fine.
+Mermaid parser treats specially. Mermaid accepts any character inside a label
+when the label is wrapped in double quotes and internal ``"`` is replaced by
+the HTML entity ``#quot;``, so this script normalizes labels to that form.
 
-Mermaid accepts any character inside a label when the label is wrapped in
-double quotes, so we wrap any *unquoted* label that contains one of those
-characters. Already-quoted labels are left as-is.
+Bracket shapes handled (in matching priority — longest/most-specific first):
 
-Supported node shapes:
-- ``A[text]``        rectangle
-- ``A(text)``        rounded rectangle
-- ``A((text))``      circle
-- ``A{text}``        diamond
-- ``A{{text}}``      hexagon
-- ``A[/text/]``      parallelogram
-- ``A[\\text\\]``    parallelogram (alt)
-- ``A[(text)]``      cylinder
-- ``A[[text]]``      subroutine
+- ``A[(text)]``  cylinder
+- ``A[[text]]``  subroutine
+- ``A((text))``  circle
+- ``A{{text}}``  hexagon
+- ``A[/text/]``  parallelogram
+- ``A[\\text\\]``  parallelogram (alt)
+- ``A[text]``    rectangle
+- ``A(text)``    rounded
+- ``A{text}``    diamond
 
-We do not try to be exhaustive — just the common shapes.
+Edge labels (``A -->|label| B``) are handled separately.
 
-Edge labels (``A -->|label| B``) get the same treatment.
+The original implementation ran each bracket shape as its own regex pass,
+which caused content inside ``[label]`` to be re-processed by the later
+``(label)`` pass — accumulating layers of escaping. This version does a
+single left-to-right scan with an alternation pattern so each bracketed
+region is consumed exactly once.
+
+A recovery step collapses ``"#quot;`` / ``#quot;"`` / ``#quot;#quot;``
+chains created by the older buggy script.
 """
 import re
 import sys
@@ -31,79 +35,90 @@ import pathlib
 
 HAZARDOUS = re.compile(r"[\(\)=\?:'<>&,;|\"]")
 
-
-# Mermaid bracket variants in order: longer/specific first.
+# (open, close) pairs in priority order — longest opening literal first.
 NODE_BRACKETS = [
-    ("[(", ")]"),    # cylinder
-    ("[[", "]]"),    # subroutine
-    ("((", "))"),    # circle
-    ("{{", "}}"),    # hexagon
-    ("[/", "/]"),    # parallelogram
-    ("[\\", "\\]"),  # parallelogram alt
-    ("[", "]"),      # rectangle
-    ("(", ")"),      # rounded
-    ("{", "}"),      # diamond
+    ("[(", ")]"),
+    ("[[", "]]"),
+    ("((", "))"),
+    ("{{", "}}"),
+    ("[/", "/]"),
+    ("[\\", "\\]"),
+    ("[", "]"),
+    ("(", ")"),
+    ("{", "}"),
 ]
 
 
 def quote_label(label: str) -> str:
     s = label.strip()
-    # If already wrapped in "...", strip the outer wrap so we can re-validate
-    # the inner content. (Codex sometimes emits `"y' = f("x,y")"` which is
-    # broken because the inner `"`s need to be escaped to #quot;.)
+    # If already wrapped in "...", strip and revalidate.
     if len(s) >= 2 and s.startswith('"') and s.endswith('"'):
         inner = s[1:-1]
-        wrapped_already = True
     else:
         inner = label
-        wrapped_already = False
-    # Safe? No hazardous chars and no stray " inside.
     if not HAZARDOUS.search(inner):
         return label
-    # Escape any remaining literal " to #quot; (Mermaid HTML entity)
     escaped = inner.replace('"', "#quot;")
     return f'"{escaped}"'
 
 
+# Build a single alternation regex that matches any node-shape bracket pair.
+# Each alternative uses its own named group so we can identify which fired.
+def _build_node_regex() -> "re.Pattern[str]":
+    parts = []
+    for i, (open_b, close_b) in enumerate(NODE_BRACKETS):
+        # The lazy body excludes the closing bracket's first character to
+        # keep the match bounded but tolerant of unrelated chars inside.
+        open_esc = re.escape(open_b)
+        close_esc = re.escape(close_b)
+        body = rf"[^{re.escape(close_b[0])}\n]+?"
+        parts.append(rf"(?P<o{i}>{open_esc})(?P<b{i}>{body})(?P<c{i}>{close_esc})")
+    return re.compile("|".join(parts))
+
+
+NODE_REGEX = _build_node_regex()
+
+
 def fix_mermaid_block(block_body: str) -> str:
-    """Walk lines and rewrite node labels."""
     lines = block_body.split("\n")
     out = []
     for line in lines:
-        new_line = line
-        # First, edge labels: --|...| or ===|...| or ---|...|
-        # Pattern: any of -->|, --o|, --x|, ==>|, ---|, etc., followed by content, then |
-        def edge_label_sub(m):
-            prefix, label, suffix = m.group(1), m.group(2), m.group(3)
-            return prefix + quote_label(label) + suffix
-        new_line = re.sub(
-            r"(\|)([^|\n]+)(\|)",
-            edge_label_sub,
-            new_line,
-        )
-        # Node-shape labels. Try each bracket pair (longest first to avoid
-        # rectangles eating into cylinders, subroutines, etc.).
-        for open_b, close_b in NODE_BRACKETS:
-            open_esc = re.escape(open_b)
-            close_esc = re.escape(close_b)
-            pat = re.compile(
-                rf"({open_esc})([^{re.escape(close_b[0])}\n]+?)({close_esc})"
-            )
-            new_line = pat.sub(
-                lambda m: m.group(1) + quote_label(m.group(2)) + m.group(3),
-                new_line,
-            )
-        out.append(new_line)
+        # 1) Edge labels --|...|, ==>|...|, etc. — single pass.
+        def edge_sub(m: "re.Match[str]") -> str:
+            return f"{m.group(1)}{quote_label(m.group(2))}{m.group(3)}"
+        line = re.sub(r"(\|)([^|\n]+)(\|)", edge_sub, line)
+
+        # 2) Recovery: collapse compound `#quot;` chains and stray quotes
+        # introduced by an earlier buggy version of this script.
+        while '"#quot;' in line or '#quot;"' in line or '#quot;#quot;' in line:
+            line = line.replace('"#quot;', '#quot;')
+            line = line.replace('#quot;"', '#quot;')
+            line = line.replace('#quot;#quot;', '#quot;')
+
+        # 3) Node-shape labels — single left-to-right pass via alternation.
+        def node_sub(m: "re.Match[str]") -> str:
+            for i in range(len(NODE_BRACKETS)):
+                o = m.group(f"o{i}")
+                if o is not None:
+                    b = m.group(f"b{i}")
+                    c = m.group(f"c{i}")
+                    return f"{o}{quote_label(b)}{c}"
+            return m.group(0)
+
+        line = NODE_REGEX.sub(node_sub, line)
+        out.append(line)
     return "\n".join(out)
 
 
 def fix(path: pathlib.Path) -> bool:
     text = path.read_text(encoding="utf-8")
     pattern = re.compile(r"```mermaid\n(.*?)\n```", re.DOTALL)
-    def block_sub(m):
+
+    def block_sub(m: "re.Match[str]") -> str:
         body = m.group(1)
         new_body = fix_mermaid_block(body)
         return f"```mermaid\n{new_body}\n```"
+
     new = pattern.sub(block_sub, text)
     if new != text:
         path.write_text(new, encoding="utf-8")
