@@ -1,0 +1,8 @@
+{
+  "label": "Autonomous Driving",
+  "position": 17,
+  "link": {
+    "type": "doc",
+    "id": "cs/autonomous-driving/intro"
+  }
+}
