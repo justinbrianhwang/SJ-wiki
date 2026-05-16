@@ -52,7 +52,7 @@ A **cluster ensemble** combines multiple clusterings into a consensus clustering
 ```mermaid
 flowchart TB
   X["Point x_i in feature space"] --> Region["epsilon-neighborhood N_eps(x_i)"]
-  Region --> Count{"|#quot;N_eps(x_i)#quot;| >= MinPts?"}
+  Region --> Count{"|N_eps(x_i)| >= MinPts?"}
   Count -- "yes" --> Core["Core point: can expand a cluster"]
   Count -- "no, within eps of a core" --> Border["Border point: assigned but does not expand"]
   Count -- "no, not density-reachable" --> Noise["Noise/outlier"]
@@ -61,7 +61,7 @@ flowchart TB
   Seed --> Pop["Pop unvisited neighbor y"]
   Pop --> Visit{"Has y been visited?"}
   Visit -- "no" --> Query["Range query N_eps(y)"]
-  Query --> IsCore{"|#quot;N_eps(y)#quot;| >= MinPts?"}
+  Query --> IsCore{"|N_eps(y)| >= MinPts?"}
   IsCore -- "yes" --> Merge["Add y's neighbors to seed queue"]
   IsCore -- "no" --> Assign["Assign y as border if reachable"]
   Merge --> Pop

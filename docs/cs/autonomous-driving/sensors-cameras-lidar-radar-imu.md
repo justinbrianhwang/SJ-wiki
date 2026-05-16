@@ -76,27 +76,27 @@ Sensor failure modes must be treated as first-class design inputs. Cameras can s
 flowchart TB
   subgraph Camera["Camera processing chain"]
     direction TB
-    CamRaw["#quot;Raw frames: [H, W, RGB/RCCB, t"]"]
+    CamRaw["Raw frames: #lsqb;H, W, RGB/RCCB, t"]"]
     CamISP["ISP + HDR merge + rectification"]
     CamCal["Intrinsic/extrinsic calibration: K, distortion, T_cam_vehicle"]
-    CamFeat["#quot;Image CNN/ViT features: [C, H/stride, W/stride"]"]
+    CamFeat["Image CNN/ViT features: #lsqb;C, H/stride, W/stride"]"]
     CamOut["Outputs: 2D boxes, masks, lanes, lights, bearings"]
     CamRaw --> CamISP --> CamCal --> CamFeat --> CamOut
   end
 
   subgraph Lidar["LiDAR processing chain"]
     direction TB
-    LidarRaw["#quot;Packets/range image: [beam, azimuth, range, intensity, t"]"]
+    LidarRaw["Packets/range image: #lsqb;beam, azimuth, range, intensity, t"]"]
     LidarMotion["Motion compensation with IMU/odometry"]
-    LidarCloud["#quot;Point cloud: [N, x, y, z, intensity"]"]
-    LidarVoxel["#quot;Voxel/pillarization: [C, X, Y, Z"] or ["C, X, Y"]"]
+    LidarCloud["Point cloud: #lsqb;N, x, y, z, intensity"]"]
+    LidarVoxel["Voxel/pillarization: #lsqb;C, X, Y, Z"] or ["C, X, Y"]"]
     LidarOut["Outputs: 3D boxes, occupancy, freespace, landmarks"]
     LidarRaw --> LidarMotion --> LidarCloud --> LidarVoxel --> LidarOut
   end
 
   subgraph Radar["Radar processing chain"]
     direction TB
-    RadarRaw["#quot;FMCW ADC samples: [chirp, antenna, sample"]"]
+    RadarRaw["FMCW ADC samples: #lsqb;chirp, antenna, sample"]"]
     FFT["Range FFT -> Doppler FFT -> angle estimation"]
     RadarCFAR["CFAR detection + clustering"]
     RadarTrack["Track filtering: range, bearing, radial velocity"]
@@ -106,7 +106,7 @@ flowchart TB
 
   subgraph Inertial["IMU, GNSS, odometry chain"]
     direction TB
-    IMURaw["#quot;IMU: [a_x, a_y, a_z, gyro_x, gyro_y, gyro_z"] at high rate"]
+    IMURaw["IMU: #lsqb;a_x, a_y, a_z, gyro_x, gyro_y, gyro_z"] at high rate"]
     Wheel["Wheel ticks + steering angle"]
     GNSS["GNSS/RTK: position, time, covariance"]
     Prop["Dead-reckoning propagation: x_t, P_t"]

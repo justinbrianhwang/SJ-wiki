@@ -66,21 +66,21 @@ LeNet is historically small, but its pattern remains recognizable. Convolutional
 flowchart TB
   subgraph Generic["Generic CNN feature block"]
     direction TB
-    GI["#quot;Feature map: [N, C_in, H, W"]"] --> GC["#quot;Conv k x k, stride s, padding p -> [N, C_out, H_out, W_out"]"]
+    GI["Feature map: #lsqb;N, C_in, H, W"]"] --> GC["Conv k x k, stride s, padding p -> #lsqb;N, C_out, H_out, W_out"]"]
     GC --> GBN["BatchNorm2d C_out"]
     GBN --> GR["ReLU"]
-    GR --> GP["#quot;Optional pool 2 x 2, stride 2 -> [N, C_out, H_out/2, W_out/2"]"]
+    GR --> GP["Optional pool 2 x 2, stride 2 -> #lsqb;N, C_out, H_out/2, W_out/2"]"]
   end
 
   subgraph LeNet["LeNet-5 style classifier for 28 x 28 grayscale digits"]
     direction TB
-    X["#quot;Input image batch: [N, 1, 28, 28"]"] --> C1["#quot;C1: Conv 5 x 5, 6 channels, pad 2 -> [N, 6, 28, 28"]"]
+    X["Input image batch: #lsqb;N, 1, 28, 28"]"] --> C1["C1: Conv 5 x 5, 6 channels, pad 2 -> #lsqb;N, 6, 28, 28"]"]
     C1 --> A1["Sigmoid or modern ReLU"]
-    A1 --> S2["#quot;S2: AvgPool 2 x 2, stride 2 -> [N, 6, 14, 14"]"]
-    S2 --> C3["#quot;C3: Conv 5 x 5, 16 channels, valid -> [N, 16, 10, 10"]"]
+    A1 --> S2["S2: AvgPool 2 x 2, stride 2 -> #lsqb;N, 6, 14, 14"]"]
+    S2 --> C3["C3: Conv 5 x 5, 16 channels, valid -> #lsqb;N, 16, 10, 10"]"]
     C3 --> A3["Sigmoid or modern ReLU"]
-    A3 --> S4["#quot;S4: AvgPool 2 x 2, stride 2 -> [N, 16, 5, 5"]"]
-    S4 --> Flat["#quot;Flatten -> [N, 400"]"]
+    A3 --> S4["S4: AvgPool 2 x 2, stride 2 -> #lsqb;N, 16, 5, 5"]"]
+    S4 --> Flat["Flatten -> #lsqb;N, 400"]"]
     Flat --> F5["FC: 400 -> 120"]
     F5 --> A5["Activation"]
     A5 --> F6["FC: 120 -> 84"]

@@ -120,7 +120,7 @@ Thus the coupled basis diagonalizes spin-orbit interactions. This is why atomic 
 
 ```mermaid
 graph TD
-  A["Uncoupled basis |#quot;j1,m1>#quot;|j2,m2>"] --> B["Group by M = m1 + m2"]
+  A["Uncoupled basis |j1,m1>|j2,m2>"] --> B["Group by M = m1 + m2"]
   B --> C["Highest weight state J = j1 + j2"]
   C --> D["Lower with J-"]
   D --> E["Orthogonalize remaining states"]

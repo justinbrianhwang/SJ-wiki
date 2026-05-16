@@ -83,8 +83,8 @@ flowchart TB
 
   subgraph Bisect["Bisection loop"]
     direction TB
-    Bracket["#quot;Initialize [a,b"]<br/>f(a)f(b) negative"] --> Mid["p = (a+b)/2<br/>evaluate f(p)"]
-    Mid --> StopB{"stop? |#quot;f(p)#quot;| small or half-width within tol"}
+    Bracket["Initialize #lsqb;a,b"]<br/>f(a)f(b) negative"] --> Mid["p = (a+b)/2<br/>evaluate f(p)"]
+    Mid --> StopB{"stop? |f(p)| small or half-width within tol"}
     StopB -- "yes" --> ReturnB["return p with interval error bound"]
     StopB -- "no" --> Side{"sign change on [a,p]?"}
     Side -- "yes" --> Left["set b = p"]
@@ -95,7 +95,7 @@ flowchart TB
 
   subgraph Fixed["Fixed-point loop"]
     direction TB
-    Map["Choose rearrangement<br/>x = g(x)"] --> Contract{"contraction evidence?<br/>|#quot;g'(x)#quot;| at most k, with k less than 1"}
+    Map["Choose rearrangement<br/>x = g(x)"] --> Contract{"contraction evidence?<br/>|g'(x)| at most k, with k less than 1"}
     Contract -- "yes" --> Iterate["x_next = g(x_current)"]
     Contract -- "no" --> Warn["no global guarantee<br/>use damping or bracket safeguard"]
     Warn --> Iterate

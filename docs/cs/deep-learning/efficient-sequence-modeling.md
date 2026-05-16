@@ -29,7 +29,7 @@ The problem is not only asymptotic notation. Doubling the context length quadrup
 
 ```mermaid
 flowchart TB
-  X["#quot;Input sequence x: [N, T, d_model"]"] --> Norm["RMSNorm"]
+  X["Input sequence x: #lsqb;N, T, d_model"]"] --> Norm["RMSNorm"]
   Norm --> Expand["Input projection expands channels -> x_stream and gate z"]
   Expand --> DW["Short depthwise conv 1D, causal, kernel k"]
   DW --> Act["SiLU activation"]
@@ -40,7 +40,7 @@ flowchart TB
   Expand --> Gate["Gate z with SiLU"]
   Gate --> Mul(("Elementwise gate"))
   Read --> Mul
-  Mul --> OutProj["#quot;Output projection -> [N, T, d_model"]"]
+  Mul --> OutProj["Output projection -> #lsqb;N, T, d_model"]"]
   OutProj --> Residual(("Residual add to block input"))
   X -. "skip connection" .-> Residual
   Scan -. "implemented by associative parallel scan, not a Python time loop" .-> OutProj
@@ -50,7 +50,7 @@ The Mamba block starts with normalized token states, expands channels, applies a
 
 ```mermaid
 flowchart TB
-  X["#quot;Input tokens x_t: [N, T, d"]"] --> MixPrev["Token shift mixes x_t with x_{t-1} per channel"]
+  X["Input tokens x_t: #lsqb;N, T, d"]"] --> MixPrev["Token shift mixes x_t with x_{t-1} per channel"]
   MixPrev --> R["Receptance r_t = W_r mix_r(x_t, x_{t-1})"]
   MixPrev --> K["Key k_t = W_k mix_k(x_t, x_{t-1})"]
   MixPrev --> V["Value v_t = W_v mix_v(x_t, x_{t-1})"]
@@ -73,14 +73,14 @@ RWKV combines an attention-like decayed key-value recurrence with a separate cha
 
 ```mermaid
 flowchart TB
-  X["#quot;Input sequence: [N, T, d"]"] --> Proj["Linear projection into value stream v and gate streams x_1 ... x_N"]
+  X["Input sequence: #lsqb;N, T, d"]"] --> Proj["Linear projection into value stream v and gate streams x_1 ... x_N"]
   Proj --> FilterNet["Implicit filter MLP over positions -> long filters h_1 ... h_N"]
   FilterNet --> FFT["Causal FFT convolution with padding, O(T log T)"]
   Proj --> Gate1["Data-controlled diagonal gates D_{x_i}"]
   Gate1 --> Order1["Hyena order 1: gate value stream"]
   FFT --> Order1
   Order1 --> Order2["Repeat gate + long convolution for higher order"]
-  Order2 --> Out["#quot;Output projection -> [N, T, d"]"]
+  Order2 --> Out["Output projection -> #lsqb;N, T, d"]"]
   X -. "residual around operator" .-> Add(("Residual add"))
   Out --> Add
   FFT -. "padding enforces causal, aperiodic convolution" .-> Order2
@@ -90,7 +90,7 @@ Hyena replaces pairwise attention with a hierarchy of long implicit convolutions
 
 ```mermaid
 flowchart TB
-  X["#quot;Input tokens: [N, T, d"]"] --> Norm1["RMSNorm"]
+  X["Input tokens: #lsqb;N, T, d"]"] --> Norm1["RMSNorm"]
   Norm1 --> RGLRU["RG-LRU: gated diagonal recurrence with input gate and recurrence gate"]
   RGLRU --> AddR(("Residual add"))
   X -. "residual" .-> AddR
@@ -111,7 +111,7 @@ Griffin mixes fixed-state recurrence with bounded local attention. The RG-LRU br
 
 ```mermaid
 flowchart TB
-  In["#quot;Decoder input tokens: [N, T, d"]"] --> Block1["Jamba block 1: 8 layers"]
+  In["Decoder input tokens: #lsqb;N, T, d"]"] --> Block1["Jamba block 1: 8 layers"]
   Block1 --> Block2["Jamba block 2: 8 layers"]
   Block2 --> Block3["Jamba block 3: 8 layers"]
   Block3 --> Block4["Jamba block 4: 8 layers"]

@@ -103,7 +103,7 @@ flowchart TB
 
   subgraph GeneralizerBlock["Generalizer: searches the hypothesis space"]
     direction TB
-    Features["#quot;Feature vector x(b) = [x1..x6"]"]
+    Features["Feature vector x(b) = #lsqb;x1..x6"]"]
     Prediction["Linear model V-hat(b) = w0 + sum_i w_i x_i(b)"]
     Error["Prediction error = V_train(b) - V-hat(b)"]
     LMS["LMS update: w_i <- w_i + eta * error * x_i(b)"]

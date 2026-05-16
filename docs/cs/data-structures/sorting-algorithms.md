@@ -77,15 +77,15 @@ For nearly sorted arrays, insertion sort is often used as a finishing pass insid
 
 ```mermaid
 flowchart TD
-  Input["#quot;Input array A[0..n-1"]"] --> Choice{"Algorithm structure"}
+  Input["Input array A#lsqb;0..n-1"]"] --> Choice{"Algorithm structure"}
 
   subgraph Merge["Merge sort recursion"]
     direction TB
-    M0["#quot;Split A[lo..hi"] at mid"]
+    M0["Split A#lsqb;lo..hi"] at mid"]
     M1["Recursively sort left half"]
     M2["Recursively sort right half"]
     M3["Merge two sorted runs into auxiliary array"]
-    M4["#quot;Copy merged run back to A[lo..hi"]"]
+    M4["Copy merged run back to A#lsqb;lo..hi"]"]
     M0 --> M1
     M0 --> M2
     M1 --> M3

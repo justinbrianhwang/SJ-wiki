@@ -91,7 +91,7 @@ flowchart TB
   subgraph Auth["GHASH authentication path"]
     direction TB
     H["Hash subkey H = E_K(0^128)"]
-    Blocks["GHASH input: A blocks || C blocks ||#quot; len(A) #quot;|| len(C)"]
+    Blocks["GHASH input: A blocks || C blocks || len(A) || len(C)"]
     Mul["Polynomial multiplication in GF(2^128)"]
     S["Authentication accumulator S"]
     Mask["Tag mask E_K(J0)"]

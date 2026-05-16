@@ -86,7 +86,7 @@ flowchart TB
 
   subgraph Transition["Arc-standard transition parser state"]
     direction TB
-    State0["#quot;Stack = [ROOT"], Buffer = ["I, saw, the, brown, dog"], Arcs = {}"]
+    State0["Stack = #lsqb;ROOT"], Buffer = ["I, saw, the, brown, dog"], Arcs = {}"]
     Shift1["SHIFT I, SHIFT saw"]
     LeftArc["LEFT-ARC(nsubj): add saw -> I and pop I"]
     ShiftRest["SHIFT the, SHIFT brown, SHIFT dog"]

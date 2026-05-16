@@ -154,7 +154,7 @@ Linear approximation is local. If $(x,y)$ moves too far from $(a,b)$, curvature 
 
 ```mermaid
 graph LR
-  A["f(#quot;x,y#quot;)"] --> B[Partial derivatives f_x and f_y]
+  A["f(x,y)"] --> B[Partial derivatives f_x and f_y]
   B --> C[Gradient vector]
   C --> D[Directional derivative dot product]
   C --> E[Steepest increase]

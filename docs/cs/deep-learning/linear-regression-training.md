@@ -93,8 +93,8 @@ Residual plots are another diagnostic. If residuals are centered around zero wit
 
 ```mermaid
 flowchart TB
-  Init["#quot;Initialize w: [d, 1"] and b: [1]"] --> Loader["#quot;DataLoader yields minibatch X_B: [B, d"], y_B: ["B, 1"]"]
-  Loader --> Forward["#quot;Forward: y_hat = X_B w + b -> [B, 1"]"]
+  Init["Initialize w: #lsqb;d, 1#rsqb; and b: #lsqb;1#rsqb;"] --> Loader["DataLoader yields minibatch X_B: #lsqb;B, d#rsqb;, y_B: #lsqb;B, 1#rsqb;"]
+  Loader --> Forward["Forward: y_hat = X_B w + b -> #lsqb;B, 1#rsqb;"]
   Forward --> Residual["Residual r_B = y_hat - y_B"]
   Residual --> Loss["Squared loss L_B = mean(0.5 * r_B^2)"]
   Loss --> Backward["Backward: grad_w = X_B^T r_B / B, grad_b = mean(r_B)"]

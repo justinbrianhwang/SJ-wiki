@@ -152,8 +152,8 @@ The sample values alone do not contain the sampling rate. The same numerical seq
 ```mermaid
 flowchart TB
   Analog["Continuous-time signal x_c(t)<br/>bandlimit omega_M if ideal"] --> AntiAlias["Anti-alias filter<br/>remove content above omega_s/2"]
-  AntiAlias --> Sampler["#quot;Uniform sampler<br/>x[n"] = x_c(nT), omega_s = 2pi/T"]
-  Sampler --> Sequence["#quot;Discrete-time sequence x[n"]<br/>DT frequency Omega = omega T"]
+  AntiAlias --> Sampler["Uniform sampler<br/>x#lsqb;n"] = x_c(nT), omega_s = 2pi/T"]
+  Sampler --> Sequence["Discrete-time sequence x#lsqb;n"]<br/>DT frequency Omega = omega T"]
 
   subgraph Spectrum["Sampling spectrum architecture"]
     direction TB
@@ -169,7 +169,7 @@ flowchart TB
   Fold --> Loss["lost information cannot be recovered by ideal interpolation"]
   Recon -- "yes" --> IdealLP["ideal lowpass interpolation<br/>sinc reconstruction for bandlimited signal"]
   Recon -- "practical" --> Practical["hold, interpolation, or reconstruction filter<br/>adds distortion or delay"]
-  IdealLP --> Output("(#quot;reconstructed x_c(t")"))
+  IdealLP --> Output("(reconstructed x_c(t")"))
   Practical --> Output
   Loss --> Output
 ```

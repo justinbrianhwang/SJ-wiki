@@ -76,9 +76,9 @@ Conditional GANs extend the same game by giving class labels or other conditions
 
 ```mermaid
 flowchart TB
-  Real["#quot;Real batch x ~ p_data: [N, C, H, W"]"] --> DReal["Discriminator D(x) -> real logits"]
-  Z["#quot;Latent noise z ~ p_z: [N, d_z"]"] --> G["Generator G(z)"]
-  G --> Fake["#quot;Generated batch x_fake: [N, C, H, W"]"]
+  Real["Real batch x ~ p_data: #lsqb;N, C, H, W"] --> DReal["Discriminator D(x) -> real logits"]
+  Z["Latent noise z ~ p_z: #lsqb;N, d_z"] --> G["Generator G(z)"]
+  G --> Fake["Generated batch x_fake: #lsqb;N, C, H, W"]
   Fake --> Detach["Detach fake batch for discriminator step"]
   Detach --> DFake["Discriminator D(x_fake.detach()) -> fake logits"]
   DReal --> DLoss["D loss: BCE(real, 1) + BCE(fake, 0)"]
@@ -100,29 +100,29 @@ The adversarial loop makes the detach boundary explicit: discriminator training 
 flowchart TB
   subgraph DCGANG["DCGAN generator for 64 x 64 RGB"]
     direction TB
-    Z["#quot;z: [N, 100, 1, 1"]"] --> T1["#quot;ConvTranspose 4 x 4, 1024, stride 1 -> [N, 1024, 4, 4"]"]
+    Z["z: #lsqb;N, 100, 1, 1"] --> T1["ConvTranspose 4 x 4, 1024, stride 1 -> #lsqb;N, 1024, 4, 4"]
     T1 --> B1["BatchNorm + ReLU"]
-    B1 --> T2["#quot;ConvTranspose 4 x 4, 512, stride 2, pad 1 -> [N, 512, 8, 8"]"]
+    B1 --> T2["ConvTranspose 4 x 4, 512, stride 2, pad 1 -> #lsqb;N, 512, 8, 8"]
     T2 --> B2["BatchNorm + ReLU"]
-    B2 --> T3["#quot;ConvTranspose 4 x 4, 256, stride 2, pad 1 -> [N, 256, 16, 16"]"]
+    B2 --> T3["ConvTranspose 4 x 4, 256, stride 2, pad 1 -> #lsqb;N, 256, 16, 16"]
     T3 --> B3["BatchNorm + ReLU"]
-    B3 --> T4["#quot;ConvTranspose 4 x 4, 128, stride 2, pad 1 -> [N, 128, 32, 32"]"]
+    B3 --> T4["ConvTranspose 4 x 4, 128, stride 2, pad 1 -> #lsqb;N, 128, 32, 32"]
     T4 --> B4["BatchNorm + ReLU"]
-    B4 --> T5["#quot;ConvTranspose 4 x 4, 3, stride 2, pad 1 -> [N, 3, 64, 64"]"]
+    B4 --> T5["ConvTranspose 4 x 4, 3, stride 2, pad 1 -> #lsqb;N, 3, 64, 64"]
     T5 --> Tanh["Tanh image output"]
   end
 
   subgraph DCGAND["DCGAN discriminator"]
     direction TB
-    Img["#quot;Image: [N, 3, 64, 64"]"] --> C1["#quot;Conv 4 x 4, 128, stride 2, pad 1 -> [N, 128, 32, 32"]"]
+    Img["Image: #lsqb;N, 3, 64, 64"] --> C1["Conv 4 x 4, 128, stride 2, pad 1 -> #lsqb;N, 128, 32, 32"]
     C1 --> L1["LeakyReLU 0.2"]
-    L1 --> C2["#quot;Conv 4 x 4, 256, stride 2, pad 1 -> [N, 256, 16, 16"]"]
+    L1 --> C2["Conv 4 x 4, 256, stride 2, pad 1 -> #lsqb;N, 256, 16, 16"]
     C2 --> D2["BatchNorm + LeakyReLU"]
-    D2 --> C3["#quot;Conv 4 x 4, 512, stride 2, pad 1 -> [N, 512, 8, 8"]"]
+    D2 --> C3["Conv 4 x 4, 512, stride 2, pad 1 -> #lsqb;N, 512, 8, 8"]
     C3 --> D3["BatchNorm + LeakyReLU"]
-    D3 --> C4["#quot;Conv 4 x 4, 1024, stride 2, pad 1 -> [N, 1024, 4, 4"]"]
+    D3 --> C4["Conv 4 x 4, 1024, stride 2, pad 1 -> #lsqb;N, 1024, 4, 4"]
     C4 --> D4["BatchNorm + LeakyReLU"]
-    D4 --> C5["#quot;Conv 4 x 4, 1, stride 1 -> [N, 1, 1, 1"]"]
+    D4 --> C5["Conv 4 x 4, 1, stride 1 -> #lsqb;N, 1, 1, 1"]
     C5 --> Logit(("Real/fake logit"))
   end
 ```

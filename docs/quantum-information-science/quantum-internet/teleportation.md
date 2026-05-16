@@ -176,12 +176,12 @@ flowchart LR
     B0["Alice entangled qubit B<br/>|0>"] --> BH["H"]
     B1["Bob qubit C<br/>|0>"] --> BCX["CNOT<br/>B -> C"]
     BH --> BCX
-    BCX --> Pair["shared |#quot;Phi+>_BC<br/>(#quot;|00>+|11>)/sqrt(2)"]
+    BCX --> Pair["shared |Phi+>_BC<br/>(|00>+|11>)/sqrt(2)"]
   end
 
   subgraph Alice["Alice Bell measurement"]
     direction LR
-    Psi["input qubit A<br/>|#quot;psi> = alpha#quot;|0> + beta|1>"] --> ACX["CNOT<br/>A -> B"]
+    Psi["input qubit A<br/>|psi> = alpha|0> + beta|1>"] --> ACX["CNOT<br/>A -> B"]
     Pair --> Bwire["Alice half B"]
     Bwire --> ACX
     ACX --> AH["H on A"]

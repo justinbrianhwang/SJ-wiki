@@ -85,7 +85,7 @@ flowchart TB
 
   subgraph Search["A* / Hybrid A* search expansion"]
     direction TB
-    Discretize["#quot;State lattice or grid: [x, y, yaw, v"]"]
+    Discretize["State lattice or grid: #lsqb;x, y, yaw, v"]"]
     Open["Open set priority queue: f(n) = g(n) + h(n)"]
     Pop{"Pop lowest f(n)"}
     Primitive["Expand neighbors / motion primitives"]

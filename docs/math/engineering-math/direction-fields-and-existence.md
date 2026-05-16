@@ -78,7 +78,7 @@ When using a direction field as a diagnostic, check three features. First, the i
 
 ```mermaid
 flowchart LR
-  A["y' = f(#quot;x,y#quot;)"] --> B["Draw slopes f(#quot;x,y#quot;)"]
+  A["y' = f(x,y)"] --> B["Draw slopes f(x,y)"]
   B --> C[Trace solution through initial point]
   A --> D{"f and f_y continuous?"}
   D -->|yes| E[Local unique solution]

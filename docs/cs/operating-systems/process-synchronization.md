@@ -63,7 +63,7 @@ flowchart TB
     P0["Produce item outside critical section"]
     P1["wait(empty): reserve an empty slot"]
     P2["wait(mutex): enter monitor/critical section"]
-    P3["#quot;buffer[in"] = item; in = (in + 1) mod N; count++"]
+    P3["buffer#lsqb;in"] = item; in = (in + 1) mod N; count++"]
     P4["signal(mutex): leave critical section"]
     P5["signal(full): publish one filled slot"]
   end
@@ -80,7 +80,7 @@ flowchart TB
     direction TB
     C1["wait(full): reserve a filled slot"]
     C2["wait(mutex): enter monitor/critical section"]
-    C3["#quot;item = buffer[out"]; out = (out + 1) mod N; count--"]
+    C3["item = buffer#lsqb;out"]; out = (out + 1) mod N; count--"]
     C4["signal(mutex): leave critical section"]
     C5["signal(empty): publish one free slot"]
     C6["Consume item outside critical section"]

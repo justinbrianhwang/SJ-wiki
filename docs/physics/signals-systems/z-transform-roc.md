@@ -145,7 +145,7 @@ As with the Laplace transform, repeated poles produce polynomial factors in the 
 
 ```mermaid
 flowchart TB
-  Seq["#quot;Discrete-time sequence x[n"]<br/>right-sided, left-sided, two-sided, or finite"] --> ZT["#quot;z-transform<br/>X(z)=sum x[n"] z^(-n)"]
+  Seq["Discrete-time sequence x#lsqb;n"]<br/>right-sided, left-sided, two-sided, or finite"] --> ZT["z-transform<br/>X(z)=sum x#lsqb;n"] z^(-n)"]
   ZT --> Poles["Pole-zero expression<br/>radii and angles in z-plane"]
   ZT --> ROC{"Region of convergence"}
 

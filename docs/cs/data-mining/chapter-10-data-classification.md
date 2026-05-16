@@ -73,7 +73,7 @@ $$
 
 ```mermaid
 flowchart TB
-  Data["#quot;Training table X: [N x d"] with labels y: [N]"] --> Split["Train/validation/test split before fitting preprocessing"]
+  Data["Training table X: #lsqb;N x d"] with labels y: [N]"] --> Split["Train/validation/test split before fitting preprocessing"]
   Split --> Prep["Fit preprocessing on train only: imputation, scaling, encoding, feature selection"]
   Prep --> Family{Choose model family and supervision objective}
 
@@ -137,7 +137,7 @@ flowchart TB
   NN --> Eval
   KNN --> Eval
   Eval --> Test["Final untouched test estimate"]
-  Test --> Deployed("(#quot;classifier f(x") with documented preprocessing contract"))
+  Test --> Deployed("(classifier f(x") with documented preprocessing contract"))
 ```
 
 The classification diagram makes preprocessing, model-family internals, and validation part of one deployable system instead of treating the classifier as a black box. The SVM branch includes the decision boundary, the two margin hyperplanes, support vectors, soft-margin violations, and the kernel option; the other branches expose their own sufficient statistics, split criteria, parameters, or stored examples.

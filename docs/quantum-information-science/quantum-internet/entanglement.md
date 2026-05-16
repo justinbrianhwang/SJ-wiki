@@ -170,10 +170,10 @@ Bell pairs per input pair. This rate is meaningful only when the uncertainty is 
 flowchart TB
   subgraph Bell["Bell-pair generation circuit"]
     direction LR
-    BQ0["#quot;q0<br/>|#quot;0>#quot;"] --> BH["#quot;Hadamard H<br/>(#quot;|0>+|1>)/sqrt(2)#quot;"]
+    BQ0["q0<br/>|0>"] --> BH["Hadamard H<br/>(|0>+|1>)/sqrt(2)"]
     BQ1["q1<br/>|0>"] --> BCX["CNOT<br/>control q0, target q1"]
     BH --> BCX
-    BCX --> BOut["Bell pair<br/>|#quot;Phi+> = (#quot;|00>+|11>)/sqrt(2)"]
+    BCX --> BOut["Bell pair<br/>|Phi+> = (|00>+|11>)/sqrt(2)"]
   end
 
   subgraph GHZ["GHZ-state generation circuit"]
@@ -183,7 +183,7 @@ flowchart TB
     GH --> GCX1
     GCX1 --> GCX2["CNOT<br/>q0 -> q2"]
     GQ2["q2<br/>|0>"] --> GCX2
-    GCX2 --> GOut["GHZ state<br/>(|#quot;000>+#quot;|111>)/sqrt(2)"]
+    GCX2 --> GOut["GHZ state<br/>(|000>+|111>)/sqrt(2)"]
   end
 
   subgraph NetworkUse["Noisy-resource handling"]

@@ -105,12 +105,12 @@ For final-value checks, compare discrete equilibria directly rather than assumin
 
 ```mermaid
 flowchart LR
-  Ref["#quot;reference or command r[k"]<br/>sample period T"] --> Ctrl["digital controller<br/>difference equation and memory"]
+  Ref["reference or command r#lsqb;k"]<br/>sample period T"] --> Ctrl["digital controller<br/>difference equation and memory"]
   PlantY["continuous plant output y(t)"] --> Sensor["sensor and anti-alias filter"]
-  Sensor --> Sampler["#quot;sampler / ADC<br/>y[k"] = y(kT)"]
+  Sensor --> Sampler["sampler / ADC<br/>y#lsqb;k"] = y(kT)"]
   Sampler --> Ctrl
-  Ctrl --> Compute["#quot;compute u[k"]<br/>uses stored delays and current sample"]
-  Compute --> Hold["#quot;zero-order hold / DAC<br/>u(t)=u[k"] during one sample interval"]
+  Ctrl --> Compute["compute u#lsqb;k"]<br/>uses stored delays and current sample"]
+  Compute --> Hold["zero-order hold / DAC<br/>u(t)=u#lsqb;k"] during one sample interval"]
   Hold --> Plant["continuous plant<br/>x_dot = f(t,x,u)"]
   Plant --> PlantY
 
@@ -118,7 +118,7 @@ flowchart LR
     direction TB
     CT["continuous LTI model<br/>x_dot = A x + B u"] --> Exact["exact ZOH conversion<br/>A_d = exp(A T)"]
     CT --> Euler["approximate conversion<br/>forward/backward Euler, bilinear, matched pole-zero"]
-    Exact --> DT["#quot;discrete model<br/>x[k+1"]=A_d x[k]+B_d u[k]"]
+    Exact --> DT["discrete model<br/>x#lsqb;k+1"]=A_d x[k]+B_d u[k]"]
     Euler --> DT
   end
 

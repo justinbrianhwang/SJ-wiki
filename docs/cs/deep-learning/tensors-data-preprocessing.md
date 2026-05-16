@@ -67,9 +67,9 @@ flowchart TB
   Raw["Raw files, tables, images, or text"] --> Parse["Parse records and labels"]
   Parse --> Split["Split train / validation / test before fitting statistics"]
   Split --> TrainStats["Fit train-only artifacts: means, stds, vocab, category map, label map"]
-  TrainStats --> Num["#quot;Numeric path: impute -> standardize -> float tensor [N, d_num"]"]
-  TrainStats --> Cat["#quot;Categorical path: one-hot or embedding ids -> [N, d_cat"]"]
-  TrainStats --> Seq["#quot;Sequence/image path: pad, crop, normalize -> [N, T"] or ["N, C, H, W"]"]
+  TrainStats --> Num["Numeric path: impute -> standardize -> float tensor #lsqb;N, d_num"]"]
+  TrainStats --> Cat["Categorical path: one-hot or embedding ids -> #lsqb;N, d_cat"]"]
+  TrainStats --> Seq["Sequence/image path: pad, crop, normalize -> #lsqb;N, T"] or ["N, C, H, W"]"]
   Num --> Join["Assemble feature tensors and targets"]
   Cat --> Join
   Seq --> Join

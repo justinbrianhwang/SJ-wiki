@@ -121,7 +121,7 @@ Avoid overloading operators whose built-in evaluation rules are too special. Sav
 flowchart LR
   A[Expression a + b] --> B{"operator+ member?"}
   B -->|yes| C["a.operator+(b)"]
-  B -->|no| D["operator+(#quot;a, b#quot;)"]
+  B -->|no| D["operator+(a, b)"]
   D --> E{"friend?"}
   E -->|yes| F[Can read private members]
   E -->|no| G[Use public accessors]

@@ -354,13 +354,13 @@ The practical lesson is that "a good logical memory" is not the same statement a
 flowchart TB
   subgraph BitFlip["3-qubit bit-flip code"]
     direction LR
-    BFIn["input qubit<br/>|#quot;psi> = alpha#quot;|0> + beta|1>"] --> BFC1["CNOT<br/>q0 -> q1"]
+    BFIn["input qubit<br/>|psi> = alpha|0> + beta|1>"] --> BFC1["CNOT<br/>q0 -> q1"]
     BFC1 --> BFC2["CNOT<br/>q0 -> q2"]
-    BFC2 --> BFEnc["encoded block<br/>alpha|#quot;000> + beta#quot;|111>"]
+    BFC2 --> BFEnc["encoded block<br/>alpha|000> + beta|111>"]
     BFEnc --> BFNoise["single-X error channel<br/>I, X1, X2, or X3"]
     BFNoise --> BFS1["measure stabilizer<br/>Z1 Z2 -> syndrome bit s12"]
     BFNoise --> BFS2["measure stabilizer<br/>Z2 Z3 -> syndrome bit s23"]
-    BFS1 --> BFSyn["#quot;syndrome pair<br/>[s12, s23"]"]
+    BFS1 --> BFSyn["syndrome pair<br/>#lsqb;s12, s23"]"]
     BFS2 --> BFSyn
     BFSyn --> BFDec{"decoder table<br/>which bit flipped?"}
     BFDec -->|"["+,+"]"| BFI["do nothing"]
@@ -375,9 +375,9 @@ flowchart TB
 
   subgraph Shor9["9-qubit Shor code"]
     direction LR
-    SHIn["input qubit<br/>alpha|#quot;0> + beta#quot;|1>"] --> SHPhase["phase-flip repetition<br/>alpha|#quot;+++> + beta#quot;|--->"]
+    SHIn["input qubit<br/>alpha|0> + beta|1>"] --> SHPhase["phase-flip repetition<br/>alpha|+++> + beta|--->"]
     SHPhase --> SHBit["bit-flip repetition inside each block<br/>3 blocks x 3 qubits"]
-    SHBit --> SHCode["codewords<br/>alpha(|#quot;000>+#quot;|111>)^3 + beta(|#quot;000>-#quot;|111>)^3"]
+    SHBit --> SHCode["codewords<br/>alpha(|000>+|111>)^3 + beta(|000>-|111>)^3"]
     SHCode --> SHZ["within-block Z checks<br/>Z1Z2, Z2Z3, Z4Z5, Z5Z6, Z7Z8, Z8Z9"]
     SHCode --> SHX["between-block X checks<br/>X1...X6 and X4...X9"]
     SHZ --> SHSyn["bit-flip and phase-flip syndromes"]
@@ -387,7 +387,7 @@ flowchart TB
 
   subgraph Steane7["7-qubit Steane CSS code"]
     direction LR
-    STIn["logical input<br/>|psi_L>"] --> STEnc["#quot;Hamming-code CSS encoder<br/>[[7,1,3"]]"]
+    STIn["logical input<br/>|psi_L>"] --> STEnc["Hamming-code CSS encoder<br/>#lsqb;#lsqb;7,1,3"]]"]
     STEnc --> STData["7 data qubits<br/>distance 3, one logical qubit"]
     STData --> STX["X stabilizers<br/>X1X3X5X7, X2X3X6X7, X4X5X6X7"]
     STData --> STZ["Z stabilizers<br/>Z1Z3Z5Z7, Z2Z3Z6Z7, Z4Z5Z6Z7"]

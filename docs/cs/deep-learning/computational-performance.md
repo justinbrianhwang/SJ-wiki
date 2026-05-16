@@ -65,7 +65,7 @@ The simplest reliable performance habit is to change one variable at a time. Bat
 flowchart TB
   subgraph DataParallel["Data parallel training"]
     direction LR
-    DBatch["#quot;Global batch [N, ..."]"] --> Shard["Split batch into shards"]
+    DBatch["Global batch #lsqb;N, ..."]"] --> Shard["Split batch into shards"]
     Shard --> GPU0["GPU0 full model, shard 0"]
     Shard --> GPU1["GPU1 full model, shard 1"]
     GPU0 --> G0["Gradients dtheta_0"]
@@ -77,7 +77,7 @@ flowchart TB
 
   subgraph ModelParallel["Layer/model parallelism"]
     direction LR
-    MIn["#quot;Activation [N, d"]"] --> L0["Device 0: early layers"]
+    MIn["Activation #lsqb;N, d"]"] --> L0["Device 0: early layers"]
     L0 --> Send01["Transfer activations"]
     Send01 --> L1["Device 1: later layers"]
     L1 --> MOut["Loss and backward reverse the transfers"]
@@ -95,12 +95,12 @@ flowchart TB
 
   subgraph TensorParallel["Tensor parallel layer"]
     direction LR
-    X["#quot;Input activation [N, d_in"]"] --> SplitW["Split weight matrix by columns or rows"]
+    X["Input activation #lsqb;N, d_in"]"] --> SplitW["Split weight matrix by columns or rows"]
     SplitW --> T0["GPU0 partial matmul"]
     SplitW --> T1["GPU1 partial matmul"]
     T0 --> Gather["All-gather or reduce-scatter partial outputs"]
     T1 --> Gather
-    Gather --> TY["#quot;Layer output [N, d_out"]"]
+    Gather --> TY["Layer output #lsqb;N, d_out"]"]
   end
 ```
 

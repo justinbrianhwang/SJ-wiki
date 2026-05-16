@@ -234,10 +234,10 @@ The important warning is that the Heisenberg limit is a scaling law for an ideal
 flowchart TB
   subgraph Ramsey["Ramsey interferometry sequence"]
     direction LR
-    R0["#quot;two-level probe<br/>|#quot;0>#quot;"] --> Rpi1["#quot;pi/2 pulse<br/>(#quot;|0>+|1>)/sqrt(2)#quot;"]
+    R0["two-level probe<br/>|0>"] --> Rpi1["pi/2 pulse<br/>(|0>+|1>)/sqrt(2)"]
     Rpi1 --> Rfree["free evolution time T<br/>phase phi = delta omega T + signal"]
     Rfree --> Rpi2["second pi/2 pulse<br/>map phase to population"]
-    Rpi2 --> Rmeas["#quot;measure P0, P1<br/>shots [S"]"]
+    Rpi2 --> Rmeas["measure P0, P1<br/>shots #lsqb;S"]"]
     Rmeas --> Rest["phase/frequency estimator<br/>Delta phi -> Delta omega"]
   end
 
@@ -247,7 +247,7 @@ flowchart TB
     MW["microwave control<br/>pi/2, pi, dynamical-decoupling pulses"] --> Center
     Field["magnetic field B(t)<br/>Zeeman shift"] --> Center
     Center --> Red["red fluorescence<br/>spin-dependent brightness"]
-    Red --> Counter["#quot;photon counter / camera<br/>counts [S"]"]
+    Red --> Counter["photon counter / camera<br/>counts #lsqb;S"]"]
     Counter --> ODMR["ODMR fit<br/>resonance shift -> B estimate"]
   end
 

@@ -195,14 +195,14 @@ flowchart TD
     TCtrl["Room-temperature control rack<br/>AWG, DAC, microwave sources"] --> TXY["XY microwave drive<br/>X/Y rotations"]
     TCtrl --> TZ["Flux or coupler bias<br/>frequency and ZZ tuning"]
     TJ["Josephson junction<br/>nonlinear inductance E_J"] --- TCap["Shunt capacitor<br/>charging energy E_C"]
-    TJ --- TQ["Transmon qubit<br/>|#quot;0>, #quot;|1>, leakage |2>"]
+    TJ --- TQ["Transmon qubit<br/>|0>, |1>, leakage |2>"]
     TCap --- TQ
     TXY --> TQ
     TZ --> TQ
     TQ --> TG["Entangling operation<br/>cross-resonance, iSWAP, CZ, or tunable coupler"]
     TQ --> TRes["Readout resonator<br/>state-dependent frequency shift"]
     TRes --> TPurcell["Purcell/filter chain<br/>protect qubit from readout loss"]
-    TPurcell --> TADC["#quot;Amplifier + ADC<br/>I/Q samples -> bit [0 or 1"]"]
+    TPurcell --> TADC["Amplifier + ADC<br/>I/Q samples -> bit #lsqb;0 or 1"]"]
   end
 
   subgraph IonTrap["Trapped-ion processor"]
@@ -214,12 +214,12 @@ flowchart TD
     Raman["Raman or quadrupole beams<br/>1q gates and MS entangling gates"] --> Chain
     Chain --> Motion["Motional bus<br/>collective modes mediate 2q gates"]
     Motion --> IEnt["Mølmer-Sørensen gate<br/>XX(theta) on selected ions"]
-    Chain --> IDet["#quot;State-dependent fluorescence<br/>PMT/CCD camera -> bits [N"]"]
+    Chain --> IDet["State-dependent fluorescence<br/>PMT/CCD camera -> bits #lsqb;N"]"]
   end
 
   subgraph Photonic["Linear-optical photonic block"]
     direction TB
-    Src["Single-photon or weak-coherent sources<br/>time-bin, polarization, or dual-rail"] --> Enc["Mode encoding<br/>logical |#quot;0>, #quot;|1> across optical modes"]
+    Src["Single-photon or weak-coherent sources<br/>time-bin, polarization, or dual-rail"] --> Enc["Mode encoding<br/>logical |0>, |1> across optical modes"]
     Enc --> Mesh["Interferometer mesh<br/>beamsplitters + phase shifters"]
     Mesh --> NL["Optional nonlinear or measurement-induced gate<br/>KLM-style ancillas"]
     NL --> FF["Fast feed-forward switch<br/>condition on detector clicks"]
@@ -228,9 +228,9 @@ flowchart TD
 
   subgraph Stack["Hardware-to-algorithm stack"]
     direction TB
-    Spec["#quot;Circuit specification<br/>logical qubits [k"], depth [D], measurements"] --> Compile["Compiler and scheduler<br/>map gates to native operations"]
+    Spec["Circuit specification<br/>logical qubits #lsqb;k"], depth [D], measurements"] --> Compile["Compiler and scheduler<br/>map gates to native operations"]
     Compile --> Cal["Calibration loop<br/>Rabi, Ramsey, crosstalk, readout assignment"]
-    Cal --> Run["#quot;Execution batch<br/>shots [S"] with timing and reset"]
+    Cal --> Run["Execution batch<br/>shots #lsqb;S"] with timing and reset"]
     Run --> Noise["Noise model<br/>T1/T2, leakage, loss, SPAM, crosstalk"]
     Noise --> QEC["QEC cycle<br/>syndrome measurement + decoder + Pauli frame"]
     QEC --> Result["Algorithm result<br/>samples, expectation values, logical outcomes"]

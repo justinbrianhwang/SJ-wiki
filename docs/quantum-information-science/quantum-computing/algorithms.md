@@ -160,9 +160,9 @@ which gives $O(\sqrt{N/M})$ oracle calls. N&C also emphasize two limits: quantum
 flowchart TB
   subgraph DJ["Deutsch-Jozsa circuit"]
     direction LR
-    DJx0["#quot;x register<br/>|#quot;0>^n#quot;"] --> DJHn["#quot;H on n query qubits<br/>2^(-n/2) sum_x #quot;|x>#quot;"]
-    DJy0["#quot;ancilla<br/>|#quot;1>#quot;"] --> DJHy["#quot;H on ancilla<br/>#quot;|1> -> |->#quot;"]
-    DJHn --> DJUf["Oracle U_f<br/>|#quot;x>#quot;|y> -> |#quot;x>#quot;|y xor f(x)>"]
+    DJx0["x register<br/>|0>^n"] --> DJHn["H on n query qubits<br/>2^(-n/2) sum_x |x>"]
+    DJy0["ancilla<br/>|1>"] --> DJHy["H on ancilla<br/>|1> -> |->"]
+    DJHn --> DJUf["Oracle U_f<br/>|x>|y> -> |x>|y xor f(x)>"]
     DJHy --> DJUf
     DJUf --> DJHn2["H on x register<br/>interference of (-1)^f(x)"]
     DJUf --> DJAncOut["ancilla unchanged<br/>|->"]
@@ -172,7 +172,7 @@ flowchart TB
   subgraph BV["Bernstein-Vazirani circuit"]
     direction LR
     BVx0["x register<br/>|0>^n"] --> BVHn["H on n query qubits<br/>uniform superposition"]
-    BVy0["#quot;ancilla<br/>|#quot;1>#quot;"] --> BVHy["#quot;H on ancilla<br/>#quot;|->#quot;"]
+    BVy0["ancilla<br/>|1>"] --> BVHy["H on ancilla<br/>|->"]
     BVHn --> BVUf["Oracle U_f for f(x)=a dot x xor b<br/>phase (-1)^(a dot x xor b)"]
     BVHy --> BVUf
     BVUf --> BVHn2["H on x register<br/>phase pattern -> bit string a"]
@@ -181,7 +181,7 @@ flowchart TB
 
   subgraph Grover["Grover amplitude-amplification iterate"]
     direction LR
-    GR0["#quot;search register<br/>|#quot;0>^n, N=2^n#quot;"] --> GRH["#quot;H^n<br/>uniform state #quot;|s>#quot;"]
+    GR0["search register<br/>|0>^n, N=2^n"] --> GRH["H^n<br/>uniform state |s>"]
     GRH --> GRO["Oracle O_f<br/>marked states get phase -1"]
     GRO --> GRD1["H^n"]
     GRD1 --> GRD2["X^n"]
@@ -206,7 +206,7 @@ flowchart TB
   subgraph QPE["Quantum phase estimation"]
     direction LR
     PEphase["phase register<br/>|0>^t"] --> PEH["H^t<br/>superposition over powers"]
-    PEeig["target register<br/>eigenstate |#quot;u>, U#quot;|u>=e^(2 pi i phi)|u>"] --> PECtrl["controlled-U^(2^k) ladder<br/>k=0 ... t-1"]
+    PEeig["target register<br/>eigenstate |u>, U|u>=e^(2 pi i phi)|u>"] --> PECtrl["controlled-U^(2^k) ladder<br/>k=0 ... t-1"]
     PEH --> PECtrl
     PECtrl --> PEiqft["inverse QFT on phase register"]
     PECtrl --> PEtarget["target remains |u><br/>up to measurement branch"]
@@ -217,9 +217,9 @@ flowchart TB
     direction LR
     SHN["classical input<br/>odd composite N, random a"] --> SHG{"gcd(a,N)>1?"}
     SHG -->|"yes"| SHFactor0["nontrivial factor found"]
-    SHG -->|"no"| SHReg["two registers<br/>|#quot;0>^t #quot;|1>"]
-    SHReg --> SHH["H on exponent register<br/>sum_x |#quot;x>#quot;|1>"]
-    SHH --> SHMod["modular exponentiation<br/>|#quot;x>#quot;|1> -> |#quot;x>#quot;|a^x mod N>"]
+    SHG -->|"no"| SHReg["two registers<br/>|0>^t |1>"]
+    SHReg --> SHH["H on exponent register<br/>sum_x |x>|1>"]
+    SHH --> SHMod["modular exponentiation<br/>|x>|1> -> |x>|a^x mod N>"]
     SHMod --> SHQFT["inverse QFT on exponent register"]
     SHQFT --> SHMeas["measure c<br/>approx c/2^t ~= s/r"]
     SHMeas --> SHCF["continued fractions<br/>recover candidate order r"]
@@ -231,9 +231,9 @@ flowchart TB
 
   subgraph HHL["HHL linear-system subroutine"]
     direction LR
-    HHLb["input state<br/>|#quot;b> = sum_j beta_j #quot;|u_j>"] --> HHLpe["phase estimation<br/>controlled exp(iAt)"]
+    HHLb["input state<br/>|b> = sum_j beta_j |u_j>"] --> HHLpe["phase estimation<br/>controlled exp(iAt)"]
     HHLpe --> HHLlam["eigenvalue register<br/>|lambda_j>"]
-    HHLanc["#quot;ancilla<br/>|#quot;0>#quot;"] --> HHLrot["#quot;controlled rotation<br/>#quot;|0> -> sqrt(1-C^2/lambda_j^2)|#quot;0> + C/lambda_j #quot;|1>#quot;"]
+    HHLanc["ancilla<br/>|0>"] --> HHLrot["controlled rotation<br/>|0> -> sqrt(1-C^2/lambda_j^2)|0> + C/lambda_j |1>"]
     HHLlam --> HHLrot
     HHLrot --> HHLun["inverse phase estimation<br/>uncompute lambda register"]
     HHLun --> HHLpost["postselect or amplitude amplify<br/>ancilla = 1"]

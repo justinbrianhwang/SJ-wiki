@@ -94,7 +94,7 @@ Finally, scalable quantum computing appears to require error correction. Physica
 flowchart TB
   subgraph Physical["Physical qubit layer"]
     direction LR
-    TQ["Transmon qubit<br/>anharmonic oscillator states |#quot;0>, #quot;|1>"] --> TC["Microwave control<br/>1-qubit rotations"]
+    TQ["Transmon qubit<br/>anharmonic oscillator states |0>, |1>"] --> TC["Microwave control<br/>1-qubit rotations"]
     TQ --> TR["Readout resonator<br/>dispersive measurement"]
     IQ["Trapped-ion qubit<br/>hyperfine or optical levels"] --> IC["Laser control<br/>1-qubit gates + motional bus"]
     IQ --> IR["Fluorescence readout<br/>state-dependent photons"]
@@ -104,15 +104,15 @@ flowchart TB
 
   subgraph Circuit["Circuit-model execution"]
     direction TB
-    In["#quot;Classical input or state-prep spec<br/>bits [m"], qubits [n]"] --> Prep["Initialize registers<br/>|#quot;0>^n, #quot;|+>^n, |#quot;psi>, or encoded #quot;|psi_L>"]
+    In["Classical input or state-prep spec<br/>bits #lsqb;m"], qubits [n]"] --> Prep["Initialize registers<br/>|0>^n, |+>^n, |psi>, or encoded |psi_L>"]
     Prep --> Gate1["Gate layer U_1<br/>native 1q gates + entangling gates"]
     Gate1 --> GateL["Gate layer U_l<br/>compiled pulses with timing constraints"]
-    GateL --> Meas["#quot;Measure selected qubits<br/>bit string [n"] or observable samples"]
+    GateL --> Meas["Measure selected qubits<br/>bit string #lsqb;n"] or observable samples"]
   end
 
   subgraph Logical["Logical and algorithm layer"]
     direction TB
-    Enc["#quot;Encode logical qubits<br/>[n physical"] -> ["k logical, distance d"]"] --> Syn["Repeated syndrome extraction<br/>ancillas, stabilizers, decoder"]
+    Enc["Encode logical qubits<br/>#lsqb;n physical"] -> ["k logical, distance d"]"] --> Syn["Repeated syndrome extraction<br/>ancillas, stabilizers, decoder"]
     Syn --> Frame["Pauli-frame update<br/>classical correction record"]
     Frame --> Alg["Algorithmic primitive<br/>QFT, phase estimation, Grover, VQE/QAOA"]
     Alg --> Out["Classical post-processing<br/>factors, phase estimate, samples, expectation"]
