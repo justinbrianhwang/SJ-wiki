@@ -5,217 +5,286 @@ sidebar_position: 2
 
 # Hardware
 
-Quantum hardware is the engineering layer that turns abstract qubits, gates, and measurements into controlled physical systems. The same circuit drawn in [algorithms](/quantum-information-science/quantum-computing/algorithms) looks very different in a dilution refrigerator, an ion trap, an optical table, a tweezer array, or a proposed topological device, so hardware comparisons must track coherence, gate mechanisms, connectivity, measurement, fabrication, and how naturally each platform supports [error correction](/quantum-information-science/quantum-computing/error-correction).
+Quantum hardware is the engineering layer that turns abstract qubits, gates, and measurements into controlled physical systems. The same circuit drawn in [algorithms](/quantum-information-science/quantum-computing/algorithms) looks very different in an ion trap, optical cavity, nuclear magnetic resonance experiment, superconducting chip, neutral-atom array, or photonic network, so hardware comparisons must track coherence, controllability, initialization, readout, connectivity, and compatibility with [error correction](/quantum-information-science/quantum-computing/error-correction).
+
+*This page synthesizes the wiki's earlier hardware draft with Chapter 7 of Nielsen and Chuang. N&C's central organizing idea is implementation requirements: represent quantum information robustly, perform controlled unitary transformations, prepare fiducial input states, and measure outputs. Modern superconducting, neutral-atom, and topological notes are supplementary context beyond the book's original platform emphasis.*
 
 ## Definitions
 
-A **physical qubit** is a two-level subsystem chosen inside a real device. It may be the two lowest levels of a superconducting circuit, two hyperfine states of an ion, polarization or path modes of a photon, two atomic clock states in a neutral atom, or a nonlocal parity state in a topological proposal. The physical qubit is never perfectly isolated; it couples to controls, measurement apparatus, neighboring qubits, and the environment.
+A **physical qubit** is a two-level subsystem chosen inside a real device. It may be two hyperfine states of a trapped ion, two polarization or spatial modes of a photon, two nuclear spin states in a molecule, two levels of a superconducting circuit, two clock states of a neutral atom, or a protected parity degree of freedom in a topological proposal. The computational basis is written with explicit basis labels, such as $\vert 0\rangle, \vert 1\rangle$, but the laboratory system may have many extra levels that cause leakage.
 
-The essential hardware metrics are:
+Nielsen and Chuang phrase the minimum implementation problem in four requirements:
+
+| Requirement | Hardware meaning | Typical failure mode |
+|---|---|---|
+| Represent quantum information | Choose a finite, addressable Hilbert-space subspace | Leakage, uncontrolled degeneracy, excessive environmental coupling |
+| Perform unitary transformations | Control Hamiltonians well enough to realize a universal gate set | Calibration error, crosstalk, slow gates, unwanted entanglement with controls |
+| Prepare fiducial initial states | Repeatedly initialize states such as $\vert 0\rangle^{\otimes n}$ with high fidelity | Thermal population, imperfect cooling, residual entropy |
+| Measure output results | Couple selected qubits to a classical record | Low signal-to-noise ratio, measurement back-action, slow reset |
+
+The book's discussion predates many present devices, but its abstraction still works. A candidate platform is not judged by qubit count alone; it is judged by whether the entire prepare-control-measure loop can be made reliable enough for logical computation.
+
+Important hardware metrics include:
 
 | Metric | Meaning | Why it matters |
 |---|---|---|
-| $T_1$ | Energy relaxation time | Limits how long an excited state survives |
-| $T_2$ | Dephasing time | Limits phase coherence in superpositions |
-| Single-qubit fidelity | Accuracy of local rotations | Affects all circuits and calibration loops |
-| Two-qubit fidelity | Accuracy of entangling gates | Usually the bottleneck for algorithms and QEC |
-| Connectivity | Which qubits can interact directly | Determines routing overhead |
-| Measurement fidelity | Accuracy of readout | Critical for mid-circuit syndrome extraction |
-| Reset speed | Time to prepare a fresh state | Important for repeated QEC cycles |
-| Crosstalk | Unwanted influence among controls | Becomes harder at scale |
+| $T_1$ | Energy relaxation time | Limits survival of excited-state population |
+| $T_2$ | Dephasing time | Limits coherence of relative phases |
+| $t_{\mathrm{op}}$ | Time for an elementary operation | Sets how many gates fit inside a coherence window |
+| $F_1, F_2$ | Single- and two-qubit gate fidelities | Two-qubit gates usually dominate algorithmic error |
+| Connectivity | Which qubits interact directly | Determines routing overhead and QEC layout |
+| Readout fidelity | Probability of correct measurement record | Crucial for repeated syndrome extraction |
+| Reset latency | Time to prepare a fresh state | Matters for ancilla-heavy error correction |
+| Crosstalk and leakage | Unwanted response outside the intended gate | Creates correlated and non-Pauli noise |
 
-**Superconducting transmons** are nonlinear microwave oscillators made from Josephson junctions and capacitors. A Josephson junction contributes an energy $E_J$ and the capacitor contributes a charging energy $E_C$. The transmon regime $E_J/E_C \gg 1$ reduces sensitivity to charge noise at the cost of weaker anharmonicity. Gates are driven by microwave pulses, and readout usually uses resonators dispersively coupled to qubits. Related superconducting designs include fluxonium, which uses a large inductance to improve protection against some noise channels, and tunable coupler designs such as gmon-style architectures.
+**Optical photons** can encode qubits in dual-rail states, where $\vert 0_L\rangle=\vert 01\rangle$ and $\vert 1_L\rangle=\vert 10\rangle$ across two optical modes, or in polarization, time-bin, path, or frequency modes. Photons are natural flying qubits for [quantum communication](/quantum-information-science/quantum-communication/), but deterministic photon-photon gates are hard because ordinary optical nonlinearities are weak at the single-photon level.
 
-**Trapped ions** store qubits in internal electronic or hyperfine states of charged atoms confined by electromagnetic fields. Paul traps use radio-frequency fields to confine ions, and shared motional modes mediate entangling gates. The Molmer-Sorensen gate is a standard entangling operation that couples spin states through collective motion.
+**Cavity QED** couples atoms to quantized cavity modes. In the ideal strong-coupling picture, an atom and a single field mode exchange excitations through a Jaynes-Cummings interaction. The cavity can mediate interactions between photons or between atoms, but loss through cavity mirrors and spontaneous emission must be controlled.
 
-**Photonic quantum computing** encodes qubits in photons, such as polarization, time bins, frequency bins, or spatial modes. Photons travel well and are natural for [quantum communication](/quantum-information-science/quantum-communication/), but photon-photon interactions are weak. The KLM scheme showed that linear optics, single-photon sources, measurements, and feed-forward can in principle implement universal quantum computation probabilistically. Measurement-based photonic computation builds large entangled cluster states and computes by adaptive measurements.
+**Trapped ions** store qubits in internal electronic or hyperfine states of charged atoms confined by electromagnetic fields. Laser pulses drive single-qubit rotations and couple internal states to shared motional modes. The shared phonon modes provide an entangling bus, making ion traps one of N&C's clearest examples of controllable microscopic quantum logic.
 
-**Neutral atoms** use optically trapped atoms in tweezer arrays or optical lattices. Rydberg excitation creates strong, controllable interactions: an atom excited to a Rydberg state shifts nearby atoms so that simultaneous excitation can be blocked. This Rydberg blockade enables entangling gates and analog Hamiltonian simulation on flexible geometries.
+**Nuclear magnetic resonance** uses nuclear spins in molecules as qubits and radio-frequency pulses for control. NMR was historically important because it demonstrated small quantum algorithms with excellent coherent control, but it uses large room-temperature ensembles and effective-pure-state preparation, so signal scaling is a serious obstacle to large-scale computation.
 
-**Topological proposals** encode information nonlocally, often using Majorana zero modes in engineered superconducting systems. The appeal is hardware-level protection from some local noise processes. The status should be stated conservatively: topological qubits remain an active research program, and unambiguous, scalable Majorana-based quantum computing has not become an established production platform.
+**Superconducting circuits** are the dominant modern solid-state gate-model platform. Transmons are nonlinear microwave oscillators made from Josephson junctions and capacitors. The transmon regime reduces charge-noise sensitivity, while resonators and tunable couplers supply readout and entangling gates. This is a modern successor to the superconducting charge and flux proposals N&C discuss in their "other implementation schemes" section.
+
+**Neutral atoms** use optically trapped atoms in tweezer arrays or lattices. Rydberg excitation creates strong controllable interactions through blockade, giving flexible geometries for simulation and gate-model experiments. N&C mention optical-lattice proposals; modern tweezer arrays are a later development.
+
+**Topological proposals** encode information nonlocally, often using anyons or Majorana zero modes. The appeal is hardware-level protection from some local noise processes. The conservative status is that topological quantum computing remains an active research program rather than an established scalable production platform.
 
 ## Key results
 
-The hardware abstraction starts with a two-level Hamiltonian. A driven qubit is often modeled in a rotating frame by
+The first N&C hardware figure of merit is the approximate number of coherent operations available before decoherence:
 
 $$
-H(t) = \frac{\hbar}{2}\left(\Delta(t) Z + \Omega_x(t) X + \Omega_y(t) Y\right),
+n_{\mathrm{op}} \approx \frac{\tau_Q}{t_{\mathrm{op}}},
 $$
 
-where $\Delta$ is detuning and $\Omega_x,\Omega_y$ are control amplitudes. A pulse implements
+where $\tau_Q$ is a characteristic coherence time and $t_{\mathrm{op}}$ is an elementary operation time. This ratio is not a full error model, but it captures the core engineering tension: strong coupling gives fast gates, while isolation gives long coherence, and a platform must balance both.
+
+A controlled qubit is often modeled by a Hamiltonian in a rotating frame,
 
 $$
-U = \mathcal{T}\exp\left(-\frac{i}{\hbar}\int_0^\tau H(t)\,dt\right),
+H(t)=\frac{\hbar}{2}\left(\Delta(t)Z+\Omega_x(t)X+\Omega_y(t)Y\right),
 $$
 
-with $\mathcal{T}$ indicating time ordering. The ideal gate is the target unitary; the real gate includes calibration error, leakage, decoherence, and crosstalk.
-
-The transmon Hamiltonian is commonly approximated as
+so a pulse of duration $\tau$ ideally implements
 
 $$
-H = 4E_C(n-n_g)^2 - E_J\cos\phi.
+U=\mathcal{T}\exp\left(-\frac{i}{\hbar}\int_0^\tau H(t)\,dt\right).
 $$
 
-When $E_J/E_C$ is large, the transition frequency becomes less sensitive to charge offset $n_g$. The price is that the oscillator becomes more harmonic, so pulses must avoid leakage into $\vert 2\rangle$ and higher states.
-
-For trapped ions, entanglement comes from spin-motion coupling. An ideal two-qubit Molmer-Sorensen gate can be written as
+Real gates deviate from this unitary description because the qubit is open to controls and environment. In the notation of [quantum error correction](/quantum-information-science/quantum-computing/error-correction), the implemented process is more accurately a quantum channel
 
 $$
-U_{\mathrm{MS}}(\theta)
-= \exp\left(-i\frac{\theta}{2} X_i X_j\right),
+\mathcal{E}(\rho)=\sum_k E_k\rho E_k^\dagger,
 $$
 
-up to single-qubit rotations and convention choices. In practice the motional mode spectrum, laser phase stability, heating, and spectator ions matter.
+where leakage, relaxation, dephasing, measurement back-action, and classical control errors are folded into the operation elements $E_k$.
 
-For neutral atoms, Rydberg blockade is captured by a simple energy-scale condition. If the interaction shift $V$ is much larger than the Rabi frequency $\Omega$, double excitation is suppressed:
+For optical photons, passive linear optics implements mode transformations such as beamsplitters and phase shifters. In a two-mode basis, a beamsplitter acts like a small unitary rotation of creation operators. Single-photon states are easy to transport and measure compared with many matter qubits, but two-qubit gates require either strong nonlinearities, measurement-induced gates with ancillas and feed-forward, or cluster-state methods. This explains why photonics is excellent for networking while gate-model photonic computing is resource-sensitive.
 
-$$
-V \gg \hbar \Omega.
-$$
-
-The blockade radius is the distance inside which that condition holds. Arrays can be rearranged into useful graph geometries, making the platform attractive for simulation and some combinatorial optimization experiments.
-
-For photonics, the key result is that linear optics alone does not provide deterministic two-photon entangling gates. KLM avoids this by using ancilla photons, measurement, and feed-forward to make nondeterministic gates that can be boosted through encoding and teleportation. Measurement-based photonic computing shifts the burden from direct gates to preparing large cluster states and measuring adaptively.
-
-For scalable systems, a hardware platform must support repeated cycles:
+For cavity QED, a simplified resonant Jaynes-Cummings interaction has the form
 
 $$
-\text{prepare} \rightarrow \text{entangle} \rightarrow \text{measure syndrome} \rightarrow \text{classical decode} \rightarrow \text{correct or track}.
+H_{\mathrm{JC}}=\hbar g(a^\dagger\sigma_-+a\sigma_+),
 $$
 
-That loop links hardware directly to [surface codes](/quantum-information-science/quantum-computing/error-correction): fast mid-circuit measurement, reset, low crosstalk, and high two-qubit fidelity often matter more than isolated headline coherence times.
+where $a,a^\dagger$ act on the cavity mode and $\sigma_\pm$ act on the atom. Useful operation requires coherent coupling $g$ to dominate decay rates such as cavity loss $\kappa$ and atomic spontaneous emission $\gamma$. In that regime the atom and field can exchange quantum information before it leaks into the environment.
+
+For ion traps, entanglement arises by coupling spin states to collective vibrational modes. A simplified modern entangling gate is often written as
+
+$$
+U_{\mathrm{MS}}(\theta)=\exp\left(-i\frac{\theta}{2}X_iX_j\right),
+$$
+
+up to single-qubit rotations and convention choices. N&C present the older Cirac-Zoller style logic in terms of sideband transitions and phonon-mediated gates; the enduring idea is the same: internal states are good memories, and shared motion supplies a controllable interaction.
+
+For NMR, the thermal state at temperature $T$ is a density operator close to maximally mixed:
+
+$$
+\rho \approx \frac{I}{2^n}+\epsilon\Delta\rho,
+\qquad
+\epsilon \approx \frac{hf}{2k_BT}
+$$
+
+for a spin transition of frequency $f$ with $\epsilon\ll 1$. The useful signal is carried by the small deviation term $\Delta\rho$, not by a pure ensemble of identical $\vert 0\rangle^{\otimes n}$ systems. This is why NMR was a powerful control testbed but not a clean route to scalable fault-tolerant quantum computing.
+
+Finally, hardware must be evaluated through the QEC cycle:
+
+$$
+\text{prepare} \rightarrow \text{entangle} \rightarrow \text{measure syndrome} \rightarrow \text{decode} \rightarrow \text{update Pauli frame}.
+$$
+
+A device with beautiful isolated qubits but slow, noisy, or destructive measurement may be poor for fault tolerance. Conversely, a platform with modest coherence can still be competitive if its gates and measurements are fast, parallel, and repeatable.
 
 ## Visual
 
 ```mermaid
-graph TD
-  P["Physical platform"] --> Q["Qubit encoding"]
-  Q --> C["Control fields"]
-  C --> G["Native gates"]
-  G --> R["Readout and reset"]
-  R --> N["Noise model"]
-  N --> F["Fault-tolerant architecture"]
-  F --> A["Algorithm resources"]
-  A --> F
+flowchart TD
+  P["Physical platform"] --> R["Represent qubit subspace"]
+  R --> I["Initialize fiducial state"]
+  I --> U["Control universal gates"]
+  U --> M["Measure selected qubits"]
+  M --> N["Infer noise channel"]
+  N --> Q["Run QEC cycle"]
+  Q --> A["Support algorithms"]
+  Q --> N
 ```
 
-| Platform | Typical coherence profile | Gate fidelity profile | Connectivity | Scaling outlook |
-|---|---|---|---|---|
-| Superconducting transmons | Shorter coherence than ions or atoms, but fast gates | Very strong single-qubit gates; two-qubit gates are mature but calibration-heavy | Usually local on chip, tunable couplers improve layout | Strong fabrication ecosystem; cryogenic wiring, crosstalk, yield, and QEC overhead are central |
-| Trapped ions | Long coherence for internal states | High-fidelity gates demonstrated; gates are slower than superconducting gates | Effective all-to-all within a chain, harder across large modules | Modular photonic interconnects and trap engineering are key scaling routes |
-| Photonics | Excellent transmission coherence, weak storage without memories | Linear optics is precise; entangling gates are measurement-driven and probabilistic unless encoded | Natural flying-qubit connectivity | Attractive for networking; source quality, loss, detectors, cluster generation, and feed-forward dominate |
-| Neutral atoms | Long-lived internal states; Rydberg states are more fragile | Rapid progress; Rydberg gates and analog operations depend on control uniformity | Flexible geometry in tweezer arrays, often local by blockade radius | Large arrays are promising; loading, rearrangement, loss, and gate uniformity matter |
-| Topological proposals | Intended nonlocal protection | Goal is protected operations; experimental maturity is lower | Depends on braiding or measurement-only architecture | Potentially powerful if realized; status remains research-stage |
+| Platform | N&C emphasis | Strength | Main scaling pressure |
+|---|---|---|---|
+| Optical photons | Dual-rail photons, beamsplitters, nonlinear optical media | Excellent transmission and room-temperature propagation | Loss, source quality, detector efficiency, feed-forward, weak deterministic interactions |
+| Cavity QED | Strong atom-photon coupling | Mediated interactions between flying and stationary qubits | Cavity loss, spontaneous emission, mode matching |
+| Trapped ions | Internal states plus motional bus | Long coherence and high-fidelity control | Gate speed, motional heating, large-chain crowding, modular interconnects |
+| NMR | Ensemble nuclear-spin control | Historically important pulse control and small algorithms | Exponential signal loss in effective-pure-state schemes |
+| Superconducting circuits | Mentioned as charge/flux proposals; modern transmons extend this line | Fast gates, lithographic scaling, strong control stack | Cryogenic wiring, crosstalk, leakage, calibration drift |
+| Neutral atoms | Optical-lattice proposals; modern tweezers are supplementary | Large flexible arrays and Rydberg interactions | Atom loss, loading, uniformity, mid-circuit measurement |
+| Topological proposals | Mostly beyond N&C's main treatment | Possible passive protection from local noise | Experimental maturity and controllable logical gates |
 
-## Worked example 1: Estimating a decoherence-limited error
+## Worked example 1: Operation budget from coherence and gate time
 
-**Problem.** A superconducting two-qubit gate takes $\tau = 200$ ns. A simple model assumes energy relaxation time $T_1 = 100$ microseconds and estimates the relaxation contribution to error as $p \approx \tau/T_1$ for $\tau \ll T_1$. What is the estimated relaxation error per gate?
-
-**Method.**
-
-1. Convert both times to seconds:
-
-$$
-\tau = 200 \text{ ns} = 200 \times 10^{-9}\text{ s} = 2.0 \times 10^{-7}\text{ s},
-$$
-
-$$
-T_1 = 100 \text{ microseconds} = 100 \times 10^{-6}\text{ s} = 1.0 \times 10^{-4}\text{ s}.
-$$
-
-2. Use the small-time approximation:
-
-$$
-p \approx \frac{\tau}{T_1}
-= \frac{2.0 \times 10^{-7}}{1.0 \times 10^{-4}}
-= 2.0 \times 10^{-3}.
-$$
-
-3. Convert to a percentage:
-
-$$
-2.0 \times 10^{-3} = 0.2\%.
-$$
-
-**Answer.** The rough relaxation-limited contribution is $0.2\%$, or a fidelity ceiling near $99.8\%$ from this single mechanism. The checked interpretation is important: real gate error may be higher or lower depending on dephasing, leakage, pulse shaping, crosstalk, and error cancellation, so this is not a full fidelity estimate.
-
-## Worked example 2: Checking a Rydberg blockade condition
-
-**Problem.** A neutral-atom gate uses Rabi frequency $\Omega/2\pi = 2$ MHz. The interaction shift between two atoms at the chosen spacing is $V/h = 60$ MHz. Check whether the blockade condition $V \gg \hbar\Omega$ is plausibly satisfied by comparing frequencies.
+**Problem.** Compare two simplified platforms. Platform A has coherence time $\tau_Q=1$ s and two-qubit gate time $t_{\mathrm{op}}=100$ microseconds. Platform B has $\tau_Q=100$ microseconds and $t_{\mathrm{op}}=200$ ns. Estimate $n_{\mathrm{op}}=\tau_Q/t_{\mathrm{op}}$ for each.
 
 **Method.**
 
-1. Express both quantities as frequencies. Since $V = h(60\text{ MHz})$ and $\hbar\Omega = h(\Omega/2\pi)$, the comparison is
+1. Convert Platform A's gate time:
 
 $$
-60\text{ MHz} \quad \text{versus} \quad 2\text{ MHz}.
+100\ \mu\mathrm{s}=100\times 10^{-6}\ \mathrm{s}=10^{-4}\ \mathrm{s}.
 $$
 
-2. Compute the ratio:
+2. Compute Platform A's operation budget:
 
 $$
-\frac{V/h}{\Omega/2\pi}
-= \frac{60}{2}
-= 30.
+n_{\mathrm{op},A}=\frac{1}{10^{-4}}=10^4.
 $$
 
-3. Interpret the ratio. A factor of $30$ is much larger than $1$, so simultaneous double excitation is strongly off-resonant in this simplified check.
+3. Convert Platform B's values:
 
-**Answer.** The blockade condition is plausibly satisfied, with an interaction shift about $30$ times the drive scale. The answer is checked only at the order-of-magnitude level; a real gate also depends on finite lifetime of the Rydberg state, Doppler effects, laser noise, atomic motion, and pulse shape.
+$$
+\tau_Q=100\times 10^{-6}\ \mathrm{s}=10^{-4}\ \mathrm{s},
+\qquad
+t_{\mathrm{op}}=200\times 10^{-9}\ \mathrm{s}=2\times 10^{-7}\ \mathrm{s}.
+$$
+
+4. Compute Platform B's operation budget:
+
+$$
+n_{\mathrm{op},B}=\frac{10^{-4}}{2\times 10^{-7}}=5\times 10^2.
+$$
+
+**Answer.** Platform A permits roughly $10{,}000$ elementary gate times per coherence time, while Platform B permits roughly $500$. The checked interpretation is limited: a real error budget also includes gate calibration, measurement, leakage, idle noise, and correlated errors, so this ratio is a first screening metric, not a threshold estimate.
+
+## Worked example 2: Thermal polarization in an NMR-style qubit
+
+**Problem.** A nuclear spin transition has frequency $f=500$ MHz at room temperature $T=300$ K. Use the high-temperature estimate
+
+$$
+\epsilon \approx \frac{hf}{2k_BT}
+$$
+
+to estimate the population polarization.
+
+**Method.**
+
+1. Use constants
+
+$$
+h=6.626\times 10^{-34}\ \mathrm{J\,s},
+\qquad
+k_B=1.381\times 10^{-23}\ \mathrm{J/K}.
+$$
+
+2. Convert frequency:
+
+$$
+f=500\ \mathrm{MHz}=5.00\times 10^8\ \mathrm{s}^{-1}.
+$$
+
+3. Compute the numerator:
+
+$$
+hf=(6.626\times 10^{-34})(5.00\times 10^8)
+=3.313\times 10^{-25}\ \mathrm{J}.
+$$
+
+4. Compute the denominator:
+
+$$
+2k_BT=2(1.381\times 10^{-23})(300)
+=8.286\times 10^{-21}\ \mathrm{J}.
+$$
+
+5. Divide:
+
+$$
+\epsilon \approx \frac{3.313\times 10^{-25}}{8.286\times 10^{-21}}
+\approx 4.0\times 10^{-5}.
+$$
+
+**Answer.** The polarization is about $4\times 10^{-5}$. This explains the NMR ensemble issue: the density operator is extremely close to maximally mixed, so many molecules are needed to obtain a macroscopic signal, and effective-pure-state signal shrinks as the number of qubits grows.
 
 ## Code
 
-The following snippet compares platforms by a simple weighted score. It is intentionally transparent: changing the weights changes the conclusion, which is exactly the point of hardware tradeoff analysis.
+The following Python snippet computes the two N&C-style screening quantities used above: coherent operation budget and NMR thermal polarization.
 
 ```python
-platforms = {
-    "superconducting": {"gate_speed": 5, "connectivity": 3, "fabrication": 5, "memory": 2},
-    "trapped_ions": {"gate_speed": 2, "connectivity": 5, "fabrication": 3, "memory": 5},
-    "photonics": {"gate_speed": 4, "connectivity": 5, "fabrication": 3, "memory": 1},
-    "neutral_atoms": {"gate_speed": 3, "connectivity": 4, "fabrication": 4, "memory": 4},
-    "topological": {"gate_speed": 1, "connectivity": 2, "fabrication": 1, "memory": 4},
-}
+from dataclasses import dataclass
 
-weights = {
-    "gate_speed": 0.25,
-    "connectivity": 0.25,
-    "fabrication": 0.25,
-    "memory": 0.25,
-}
+H = 6.62607015e-34
+KB = 1.380649e-23
 
-scores = {}
-for name, metrics in platforms.items():
-    scores[name] = sum(weights[k] * metrics[k] for k in weights)
+@dataclass
+class Platform:
+    name: str
+    coherence_s: float
+    gate_s: float
 
-for name, score in sorted(scores.items(), key=lambda item: item[1], reverse=True):
-    print(f"{name:16s} {score:.2f}")
+def operation_budget(platform):
+    return platform.coherence_s / platform.gate_s
+
+def nmr_polarization(frequency_hz, temperature_k):
+    return H * frequency_hz / (2 * KB * temperature_k)
+
+platforms = [
+    Platform("ion-like memory", coherence_s=1.0, gate_s=100e-6),
+    Platform("fast solid-state gate", coherence_s=100e-6, gate_s=200e-9),
+    Platform("photonic feed-forward step", coherence_s=1e-3, gate_s=10e-9),
+]
+
+for platform in platforms:
+    print(f"{platform.name:24s} n_op={operation_budget(platform):.1f}")
+
+epsilon = nmr_polarization(frequency_hz=500e6, temperature_k=300)
+print(f"NMR polarization at 500 MHz and 300 K: {epsilon:.2e}")
 ```
 
 ## Common pitfalls
 
-- Comparing platforms by qubit count alone. A large array with weak gates may be less useful than a smaller array with excellent control.
-- Treating coherence time as independent of gate speed. A short-lived qubit with very fast gates may still perform many operations per coherence window.
-- Ignoring connectivity. Limited connectivity creates swap overhead, which increases circuit depth and error.
-- Assuming a native entangling gate is the same as a logical gate. Logical operations require encoding, syndrome extraction, decoding, and fault-tolerant scheduling.
-- Overstating topological hardware maturity. Majorana-based approaches are important research directions, but claims should distinguish evidence for modes from scalable protected computation.
-- Forgetting measurement and reset. Many algorithms measure only at the end, but error correction needs fast, repeated, high-fidelity mid-circuit measurement.
-- Treating analog simulators and gate-model processors as interchangeable. They answer different kinds of questions and have different validation burdens.
+- Comparing platforms by physical qubit count alone. Coherence, gate quality, measurement, reset, connectivity, and crosstalk determine computational value.
+- Treating $T_1$ or $T_2$ as a complete error model. Gate errors can be dominated by control imperfections, leakage, and correlated noise.
+- Forgetting initialization. N&C emphasize that a device must prepare a fiducial input state, not merely preserve arbitrary states for a while.
+- Ignoring measurement. Fault-tolerant machines need repeated, selective, high-fidelity syndrome measurements, not just final readout.
+- Assuming photons are always easy because they travel well. Photonic qubits are excellent carriers, but deterministic two-qubit gates and loss management are difficult.
+- Treating NMR demonstrations as scalable fault-tolerant blueprints. They were important control demonstrations, but ensemble signal scaling is the bottleneck.
+- Reading N&C's platform list as current market ranking. The book's criteria remain central, but the leading experimental platforms have evolved since the original edition.
+- Treating topological protection as already solved hardware engineering. Protected encodings and protected gates are distinct experimental challenges.
 
 ## Connections
 
-- [Quantum algorithms](/quantum-information-science/quantum-computing/algorithms) translates hardware constraints into depth, gate set, connectivity, and oracle costs.
-- [Quantum error correction](/quantum-information-science/quantum-computing/error-correction) explains why physical error rates and measurement cycles dominate scaling.
-- [Quantum machine learning](/quantum-information-science/quantum-computing/quantum-ml) often targets NISQ devices, so hardware noise and circuit depth are central.
+- [Quantum algorithms](/quantum-information-science/quantum-computing/algorithms) translates hardware constraints into depth, gate set, connectivity, and oracle cost.
+- [Quantum error correction](/quantum-information-science/quantum-computing/error-correction) explains why physical noise channels, stabilizer measurement, and fresh ancillas dominate scaling.
+- [Quantum machine learning](/quantum-information-science/quantum-computing/quantum-ml) is strongly constrained by NISQ noise, shot budgets, and trainability.
 - [Quantum communication](/quantum-information-science/quantum-communication/) is especially close to photonic hardware and quantum memories.
-- [Quantum internet](/quantum-information-science/quantum-internet/) connects trapped-ion, neutral-atom, solid-state, and photonic modules through entanglement distribution.
-- [Linear algebra](/math/linear-algebra/) supplies the unitary and tensor-product language used to model gates.
-- [Quantum mechanics](/physics/quantum-mechanics/) supplies Hamiltonians, measurement theory, perturbation ideas, and angular momentum tools.
+- [Quantum internet](/quantum-information-science/quantum-internet/) connects stationary qubits, flying photons, entanglement distribution, and repeaters.
+- [Linear algebra](/math/linear-algebra/) supplies the unitary, spectral, and tensor-product language used to model gates.
+- [Quantum mechanics](/physics/quantum-mechanics/) supplies Hamiltonians, measurement theory, perturbation ideas, spin, and oscillator physics.
 
 ## Further reading
 
-- Michel H. Devoret and Robert J. Schoelkopf, reviews on superconducting circuits and circuit QED.
-- John Clarke and Frank K. Wilhelm, review articles on superconducting quantum bits.
+- Michael A. Nielsen and Isaac L. Chuang, *Quantum Computation and Quantum Information*, Chapter 7.
+- David DiVincenzo, articles on criteria for physical implementation of quantum computation.
 - Rainer Blatt and David Wineland, reviews on trapped-ion quantum information.
+- H. Jeff Kimble and collaborators, cavity-QED and quantum-network experiments.
 - Emanuel Knill, Raymond Laflamme, and Gerald Milburn, linear-optics quantum computation.
-- Mikhail D. Lukin and collaborators, work on Rydberg blockade and neutral-atom arrays.
-- Chetan Nayak, Steven Simon, Ady Stern, Michael Freedman, and Sankar Das Sarma, review on non-Abelian anyons and topological quantum computation.
+- Michel Devoret, Robert Schoelkopf, and collaborators, reviews on superconducting circuits and circuit QED.

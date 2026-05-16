@@ -7,7 +7,11 @@ sidebar_position: 1
 
 Quantum computing studies information processing in systems whose states are vectors in complex Hilbert space and whose allowed operations are physical quantum evolutions, measurements, and controlled noise processes. This area sits between [quantum mechanics](/physics/quantum-mechanics/), [linear algebra](/math/linear-algebra/), [cryptography](/cs/cryptography/), and computer architecture: the central question is not whether quantum theory is strange, but which computational tasks become different when superposition, interference, entanglement, and measurement are engineered deliberately.
 
-The pages in this section are written as a clean foundation for later combine-mode additions from textbooks and papers. The current split is practical: [hardware](/quantum-information-science/quantum-computing/hardware) asks how qubits are physically made; [algorithms](/quantum-information-science/quantum-computing/algorithms) asks where coherent quantum evolution changes complexity; [quantum error correction](/quantum-information-science/quantum-computing/error-correction) asks how fragile states can be protected; and [quantum machine learning](/quantum-information-science/quantum-computing/quantum-ml) asks which learning or optimization workflows may benefit from quantum subroutines without overstating speculative claims.
+The foundational pages in this section now use Michael A. Nielsen and Isaac L. Chuang's *Quantum Computation and Quantum Information* as the primary textbook reference, synthesized with the wiki's earlier draft material. The current split is practical: [hardware](/quantum-information-science/quantum-computing/hardware) asks how qubits are physically made; [algorithms](/quantum-information-science/quantum-computing/algorithms) asks where coherent quantum evolution changes complexity; [quantum error correction](/quantum-information-science/quantum-computing/error-correction) asks how fragile states can be protected; and [quantum machine learning](/quantum-information-science/quantum-computing/quantum-ml) asks which learning or optimization workflows may benefit from quantum subroutines without overstating speculative claims.
+
+## Primary Source
+
+Nielsen and Chuang is the canonical source for this area's notation and core results: Dirac notation and density operators, quantum circuits, QFT and phase estimation, Shor and Grover, physical implementation criteria, quantum operations, distance measures, stabilizer codes, fault tolerance, entropy, and quantum information theory. QML is marked as modern supplementary material because it is not treated directly as a standalone field in N&C; it borrows the book's notation for states, channels, measurements, and information measures.
 
 ## Definitions
 
@@ -218,3 +222,12 @@ for i, topic in enumerate(order, start=1):
 - Eleanor Rieffel and Wolfgang Polak, *Quantum Computing: A Gentle Introduction*.
 - Phillip Kaye, Raymond Laflamme, and Michele Mosca, *An Introduction to Quantum Computing*.
 - Scott Aaronson, *Quantum Computing Since Democritus*.
+
+## Deep-dive papers
+
+- [Willow surface code below threshold](/quantum-information-science/quantum-computing/willow-surface-code-below-threshold) covers Google's Willow distance-7 surface-code memory, below-threshold scaling, break-even lifetime, leakage removal, and real-time distance-5 decoding.
+- [Concatenated bosonic cat qubits](/quantum-information-science/quantum-computing/concatenated-bosonic-cat-qubits) explains a hardware-efficient bosonic memory that suppresses cat bit flips in hardware and corrects phase flips with a distance-5 repetition code.
+- [GKP qudit error correction](/quantum-information-science/quantum-computing/gkp-qudit-error-correction) covers beyond-break-even logical qutrit and ququart memories encoded as finite-energy GKP grid states in a superconducting cavity.
+- [Quantum decoder circuit](/quantum-information-science/quantum-computing/quantum-decoder-circuit) summarizes a learned variational quantum circuit for mapping syndrome data to logical sectors, motivated by real-time decoding latency.
+- [Failure mechanisms of error-corrected gates](/quantum-information-science/quantum-computing/failure-mechanisms-of-ec-gates) uses heavy-hex memory and stability experiments to separate logical-memory decay from measurement-driven logical-gate failures.
+- [Silicon spin logical qubits](/quantum-information-science/quantum-computing/silicon-spin-logical-qubits) covers a phosphorus-donor silicon implementation of the $[[4,2,2]]$ detection code with universal logical operations and a logical VQE demonstration.

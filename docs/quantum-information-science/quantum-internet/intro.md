@@ -9,6 +9,8 @@ The quantum internet is a network architecture whose main service is not ordinar
 
 This area sits between [quantum communication](/quantum-information-science/quantum-communication/intro), [quantum computing](/quantum-information-science/quantum-computing/intro), and the quantum mechanics of [density operators and entanglement](/physics/quantum-mechanics/density-operator-entanglement-decoherence). Quantum key distribution can work with relatively simple prepare-and-measure links. A full quantum internet needs stronger primitives: heralded entanglement, quantum memories, entanglement swapping, purification, and eventually fault-tolerant network nodes. In that setting, teleportation becomes the routing primitive: the payload state never travels as a copied packet, but is reconstructed at the destination after an entanglement-assisted Bell measurement and two classical bits.
 
+Nielsen and Chuang's *Quantum Computation and Quantum Information* is the primary reference for the foundational layer of this section. It does not present a modern quantum-internet stack, but it supplies the formal primitives that the stack spends: teleportation from Section 1.3.7, the postulates and reduced density operators from Chapter 2, quantum operations and Kraus maps from Chapter 8, entropy from Chapter 11, and entanglement distillation plus channel-capacity ideas from Chapter 12. The pages in this folder synthesize that canonical treatment with quantum-network terminology rather than creating a separate set of Nielsen-Chuang notes.
+
 ## Definitions
 
 A **quantum node** is a device that can prepare, store, manipulate, and measure one or more qubits. Early nodes may be single-qubit devices; advanced nodes may contain many logical qubits protected by [quantum error correction](/quantum-information-science/quantum-computing/error-correction).
@@ -72,6 +74,14 @@ $$
 where $\alpha$ is attenuation in dB per kilometer. Direct transmission success therefore falls exponentially in distance. A [quantum repeater](/quantum-information-science/quantum-internet/quantum-repeater) divides distance into elementary links, stores successful links, swaps entanglement across them, and optionally distills higher-fidelity pairs from multiple noisy pairs.
 
 A useful abstraction is that a quantum internet does not merely connect devices; it allocates entanglement. Applications consume that resource in different ways. QKD consumes measured entanglement to create correlated secret bits. Teleportation consumes one Bell pair and two classical bits to move one qubit. Distributed computing consumes many high-fidelity pairs to implement nonlocal gates, share logical qubits, or coordinate remote processors. Clock synchronization and sensing may consume multipartite entanglement or repeated pair generation to beat classical precision limits under suitable assumptions.
+
+The fourth organizing result is that noisy links are quantum channels, not just lossy pipes. In Nielsen and Chuang's operator-sum language, a link acts as
+
+$$
+\mathcal{E}(\rho)=\sum_k E_k\rho E_k^\dagger.
+$$
+
+Sending half of a Bell pair through such a channel produces a shared state whose quality determines whether a pair can be used directly, distilled, or discarded. This is the conceptual connection between Chapter 8 quantum operations, Chapter 12 distillable entanglement, and the practical [quantum repeater](/quantum-information-science/quantum-internet/quantum-repeater) pipeline.
 
 ## Visual
 
@@ -221,3 +231,7 @@ print("fidelity  =", abs(np.vdot(psi, corrected)) ** 2)
 - [BB84 Protocol](/quantum-information-science/quantum-communication/bb84)
 - [Quantum Error Correction](/quantum-information-science/quantum-computing/error-correction)
 - [Density Operator, Entanglement, and Decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence)
+
+## Deep-dive papers
+
+- [Entanglement Swapping with Time-Bin Telecom Qubits (Davis et al., 2025)](/quantum-information-science/quantum-internet/entanglement-swapping-time-bin-telecom) explains a deployable 1536.4 nm time-bin entanglement-swapping system with SNSPD heralding, characteristic-function modeling, and source-independent QKD implications.

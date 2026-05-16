@@ -5,90 +5,222 @@ sidebar_position: 3
 
 # Quantum Key Distribution
 
-Quantum key distribution is a family of protocols for producing shared secret keys between distant parties using quantum signals plus authenticated classical communication. It is best understood as a key-establishment layer, not as a replacement for all cryptography. A QKD system still needs authentication, key management, endpoint security, traffic engineering, and ordinary encryption or one-time-pad use after the key has been produced.
+Quantum key distribution is a protocol family for generating shared secret key material from quantum signals and authenticated public discussion. It is not a direct replacement for encryption, signatures, endpoint security, or network operations. Its job is narrower: Alice and Bob either abort or output a shared random key whose secrecy is certified by observed quantum-channel statistics and a stated device model.
 
-The field has two parallel stories. The conceptual story starts with BB84 and E91: nonorthogonal states or entanglement make undetected eavesdropping statistically impossible under the protocol assumptions. The engineering story starts when ideal single photons and ideal detectors are replaced by weak lasers, lossy fiber, imperfect timing, finite sample sizes, and hardware side channels. Most modern QKD variants can be read as responses to one of those engineering pressures.
+This page combines the existing SJ Wiki overview with Nielsen and Chuang's Chapter 12 treatment. Nielsen and Chuang emphasize three linked ideas: nonorthogonal states cannot be distinguished without disturbance, Holevo's theorem bounds accessible classical information from quantum states, and BB84 security can be proved by reducing an entanglement-distillation protocol based on CSS codes to ordinary prepare-and-measure BB84. The modern engineering variants below extend that foundation to weak coherent sources, side channels, finite-key security, and network deployment.
 
 ## Definitions
 
-**QKD protocol** means the full process that produces a final key or aborts: quantum transmission, public sifting, parameter estimation, reconciliation, verification, privacy amplification, and authentication of the transcript.
+**QKD protocol** means the full key-generation procedure: quantum transmission, public sifting, parameter estimation, information reconciliation, verification, privacy amplification, and transcript authentication.
 
-**Security model** is the set of assumptions under which the final key is claimed secure. A model may assume trusted and characterized source devices, trusted and characterized detectors, an untrusted measurement node, or almost untrusted devices certified by Bell inequality violation.
+**Authenticated classical channel** is mandatory. Alice and Bob may discuss bases, check bits, syndromes, hash choices, and abort decisions publicly, but Eve must not be able to forge or rewrite those messages undetected. Without authentication, Eve can run two separate QKD sessions and impersonate each endpoint.
 
-**Composable security** means the generated key is close to an ideal uniformly random key in a way that remains meaningful when the key is used inside a larger cryptographic system. Informally, if the failure probability is $\epsilon$, then the real system behaves like the ideal system except with probability at most $\epsilon$.
+**Accessible information** is the maximum classical mutual information obtainable by measuring a quantum ensemble. If Alice chooses $X=x$ with probability $p_x$ and sends $\rho_x$, Bob or Eve chooses a POVM and receives a classical outcome $Y$. The accessible information is the maximum of $I(X:Y)$ over all measurements.
 
-**Collective, coherent, and general attacks** describe Eve's allowed operations. In a collective attack, Eve interacts with each signal similarly but may store quantum side information for a later joint measurement. In a coherent attack, Eve can attack many signals jointly. Modern proof statements should say which attack class is covered and under what finite-key assumptions.
+**Holevo information** for the ensemble $\{p_x,\rho_x\}$ is
 
-**Secret-key rate** is the final secret bits per transmitted pulse, per detected signal, or per second, depending on context. Always check the unit. In theoretical loss-scaling discussions, rate is often compared as a function of channel transmittance $\eta$.
+$$
+\chi(X:Q)=S(\rho)-\sum_x p_xS(\rho_x),
+\qquad
+\rho=\sum_x p_x\rho_x.
+$$
 
-**Repeaterless bound** refers to fundamental limits on point-to-point secret-key generation over a lossy channel without quantum repeaters. For pure-loss channels, the key rate of direct transmission scales roughly linearly in $\eta$ at high loss.
+Holevo's theorem gives the upper bound
 
-**Trusted-node QKD network** links adjacent nodes with QKD and forwards end-to-end keys through nodes that must be trusted not to leak the hop keys. This can be operationally useful but is not the same as end-to-end quantum security.
+$$
+I(X:Y)\le \chi(X:Q)
+$$
+
+for every measurement outcome $Y$. Nielsen and Chuang use this as the quantitative expression of the "hidden" nature of quantum information: nonorthogonal quantum states can carry a classical label, but a measurement need not reveal the full label.
+
+**Security criterion** in the N&C presentation says, informally, that for chosen security parameters, a QKD protocol either aborts or succeeds with high probability and leaves Eve with exponentially small mutual information about an essentially random final key. Modern composable security usually states this with a trace-distance parameter $\epsilon$, but the operational demand is the same: the real key should be substitutable for an ideal secret key in later cryptographic use.
+
+**Information reconciliation** is classical error correction between Alice's and Bob's correlated strings. It leaks public information and must be charged against the final key length.
+
+**Privacy amplification** is public randomized compression, usually implemented with a universal hash family, that maps the reconciled string to a shorter key about which Eve has negligible information.
+
+**Bit errors and phase errors** are the two error types separated by CSS-code analyses. In prepare-and-measure BB84, bit errors are directly sampled by comparing check bits. Phase errors are not directly observed in the same run, but the proof relates them to measurements in the conjugate basis.
+
+**Collective attack** means Eve interacts with signals individually but may store quantum side information and measure it jointly later. **Coherent attack** means Eve may attack many signals jointly. Security claims must state which attack model and finite-key reduction are being used.
 
 ## Key results
 
-**BB84** is the baseline prepare-and-measure protocol. Its security intuition is measurement disturbance in mutually unbiased bases. Practical BB84 usually needs decoy states because weak coherent pulses sometimes contain multiple photons.
+The foundational proposition is information gain implies disturbance. If Eve could distinguish two nonorthogonal states without disturbing them, she could learn the encoded information while leaving Alice and Bob's statistics unchanged. Nielsen and Chuang prove the contrapositive by modeling Eve's operation as a unitary interaction with an ancilla. If the operation leaves both nonorthogonal input states unchanged, preservation of inner products forces the corresponding ancilla states to be identical, so Eve has gained no distinguishing information.
 
-**B92** uses only two nonorthogonal states. It is conceptually elegant because nonorthogonality alone is enough to prevent perfect discrimination, but its sifting and loss behavior are less favorable than BB84 in many settings.
-
-**Six-state QKD** uses three mutually unbiased qubit bases, often associated with the eigenstates of $X$, $Y$, and $Z$. It samples more error information than BB84 and can tolerate or estimate certain attacks differently, but it consumes more basis choices and can be more demanding experimentally.
-
-**E91** is entanglement-based. An entangled source distributes pairs to Alice and Bob; correlations and Bell-test statistics certify the resource. Entanglement-based protocols make the connection between QKD and [entanglement distribution](/quantum-information-science/quantum-internet/entanglement) explicit.
-
-**Decoy-state BB84** addresses photon-number-splitting attacks against weak coherent sources. Alice varies intensity among signal and decoy levels, then Alice and Bob use detection rates and error rates at different intensities to bound the single-photon contribution. This is one of the most important bridges from ideal BB84 to practical fiber and free-space systems.
-
-**MDI-QKD**, measurement-device-independent QKD, removes detector side channels from the trust boundary. Alice and Bob each prepare states and send them to an untrusted middle station, often called Charlie, which attempts a Bell-state measurement. The measurement device may be adversarial; the proof relies on the observed statistics and on assumptions about Alice's and Bob's prepared states. The tradeoff is lower rate and more demanding interference requirements than simple point-to-point BB84.
-
-**TF-QKD**, twin-field QKD, uses single-photon interference at an untrusted middle station. Its headline theoretical feature is key-rate scaling like $\sqrt{\eta}$ in favorable regimes, rather than the direct-transmission $\eta$ scaling. That does not mean every TF-QKD implementation beats every ordinary QKD system; phase stabilization, finite-key effects, detector noise, and proof variant matter.
-
-**DI-QKD**, device-independent QKD, aims to certify security from Bell inequality violation with minimal trust in internal device behavior. It is the strongest conceptual answer to side channels, but it is experimentally severe: high detection efficiency, low noise, space-like or carefully modeled separation assumptions, and large finite-key data requirements are hard.
-
-Security has a standard shape. Alice and Bob estimate observable parameters, especially bit error and sometimes phase error or Bell violation. A proof lower-bounds the conditional min-entropy of Alice's raw key given Eve's information. Reconciliation leaks some information, and privacy amplification extracts a shorter key. A simplified finite-key expression looks like
+Holevo's theorem gives the information-theoretic ceiling behind this intuition. For Bob's received ensemble $\{p_k,\rho_k^B\}$,
 
 $$
-\ell \le H_{\min}^{\epsilon}(X^n\mid E) - \mathrm{leak}_{\mathrm{EC}} - \mathrm{security\ margins},
+I_{\text{Bob:Alice}}\le
+\chi_B
+=S(\rho^B)-\sum_kp_kS(\rho_k^B),
 $$
 
-where $\ell$ is the final key length. This formula is schematic, but it captures the accounting principle: final key equals certified uncertainty minus public leakage and margins.
+and for Eve's ensemble $\{p_k,\rho_k^E\}$,
+
+$$
+I_{\text{Eve:Alice}}\le
+\chi_E
+=S(\rho^E)-\sum_kp_kS(\rho_k^E).
+$$
+
+When Alice and Bob have an advantage over Eve, reconciliation and privacy amplification can convert correlated data into a secret key. A classical one-way expression with the right shape is the Csiszar-Korner bound
+
+$$
+r\ge I(A:B)-I(A:E).
+$$
+
+In a quantum proof, $I(A:E)$ is replaced or bounded by an appropriate quantum side-information quantity, often passing through Holevo information, entropic uncertainty, or smooth min-entropy. A modern finite-key expression is commonly written schematically as
+
+$$
+\ell \le H_{\min}^{\epsilon}(X^n\mid E)
+-\mathrm{leak}_{\mathrm{EC}}
+-\mathrm{security\ margins},
+$$
+
+where $\ell$ is the final key length. This formula expresses the same accounting principle as the N&C discussion: certified uncertainty for Eve minus public leakage and proof margins.
+
+For ideal asymptotic BB84 with one-way postprocessing and symmetric bit and phase error rate $Q$, the familiar secret fraction is
+
+$$
+r\approx 1-2h_2(Q),
+$$
+
+where
+
+$$
+h_2(Q)=-Q\log_2Q-(1-Q)\log_2(1-Q).
+$$
+
+The first entropy term corresponds to information reconciliation for bit errors; the second corresponds to privacy amplification against phase-error information. This is the clean textbook expression, not a deployed rate formula.
+
+Nielsen and Chuang's secure-BB84 proof proceeds by reduction. First, an EPR-based protocol is manifestly secure if Alice and Bob can distill high-fidelity Bell pairs. Second, random sampling bounds the number of errors. Third, CSS codes correct bit and phase errors. Fourth, the CSS protocol is simplified: Bob can measure immediately, $C_1$ becomes an ordinary classical reconciliation code, and the coset $v_k+C_2$ becomes the privacy-amplified key. The final protocol is BB84 up to cosmetic differences.
+
+The major QKD protocol families can be read as variations on which quantum states are sent, what parameters are estimated, and what device assumptions are trusted.
+
+| Protocol family | Quantum resource | Security emphasis | Main advantage | Main limitation |
+|---|---|---|---|---|
+| [BB84](/quantum-information-science/quantum-communication/bb84) | Four states in two mutually unbiased bases | Nonorthogonality, sampling, CSS reduction | Canonical and simple | Source and detector assumptions matter |
+| B92 | Two nonorthogonal states | Impossibility of perfect state discrimination | Minimal state alphabet | Lower conclusive rate and loss sensitivity |
+| Six-state | Eigenstates of $X$, $Y$, and $Z$ | More complete qubit error sampling | Better symmetry for some analyses | More basis settings |
+| E91 | Entangled pairs | Bell correlations and entanglement | Connects QKD to entanglement tests | Requires high-quality entanglement distribution |
+| Decoy-state BB84 | Weak coherent pulses with varied intensity | Bounds single-photon contribution | Practical laser-source security | Requires statistical intensity analysis |
+| MDI-QKD | Two sources and untrusted Bell measurement | Removes detector side channels | Measurement device can be untrusted | Lower rate and demanding interference |
+| TF-QKD | Phase-coherent fields at middle station | High-loss scaling improvements | Can scale like $\sqrt{\eta}$ in favorable regimes | Phase stabilization and finite-key complexity |
+| DI-QKD | Bell violation | Minimal internal device trust | Strongest conceptual side-channel resistance | Extremely demanding efficiency and statistics |
+
+Nielsen and Chuang's Chapter 8 noise model is also relevant. Real QKD channels are quantum operations: loss, depolarization, phase damping, detector dark counts, and source imperfections change the ensemble reaching Bob and Eve. The proof must connect observed classical statistics back to a bounded family of quantum states or channels. That bridge is where ideal textbook protocols become engineering security analyses.
 
 ## Visual
 
-| Protocol family | Quantum resource | Security model | Main advantage | Main limitation | Typical loss scaling idea |
-|---|---|---|---|---|---|
-| BB84 | Four nonorthogonal states in two bases | Trusted source and detector model | Simple, foundational, widely implemented | Detector and source side channels | Direct, roughly $O(\eta)$ |
-| B92 | Two nonorthogonal states | Trusted devices | Minimal state alphabet | Lower conclusive rate, sensitive to loss | Direct, roughly $O(\eta)$ |
-| Six-state | Three mutually unbiased bases | Trusted devices | More complete qubit error sampling | More basis settings | Direct, roughly $O(\eta)$ |
-| E91 | Entangled pairs | Source may be untrusted in some variants; measurement assumptions vary | Bell-correlation view of secrecy | Entanglement distribution quality | Direct unless repeaters are used |
-| Decoy BB84 | Weak coherent pulses with intensity variation | Trusted source characterization and detectors | Defends against PNS attacks | Requires intensity control and statistics | Direct, roughly $O(\eta)$ |
-| MDI-QKD | Two prepared states plus untrusted Bell measurement | Detectors untrusted; sources characterized | Removes detector side channels | Lower rate, two-photon interference | Often effectively direct-loss limited |
-| TF-QKD | Phase-coherent fields interfering at middle node | Measurement node untrusted; proof variant matters | Can improve high-loss scaling | Difficult phase stabilization and finite-key analysis | Can scale like $O(\sqrt{\eta})$ |
-| DI-QKD | Bell violation | Minimal device trust, strong assumptions on test conditions | Best conceptual side-channel resistance | Very demanding experimentally | Not summarized by simple practical scaling |
-
 ```mermaid
-flowchart LR
-  Ideal["Ideal protocol idea"]
-  Devices["Real devices"]
-  Side["Side-channel risk"]
+flowchart TD
+  Source["State source"]
+  Channel["Quantum channel as noisy operation"]
+  Measure["Measurement and raw outcomes"]
+  Sift["Sifting"]
+  Test["Parameter estimation"]
   Proof["Security proof"]
+  Rec["Information reconciliation"]
+  PA["Privacy amplification"]
   Key["Composable final key"]
   Abort["Abort"]
 
-  Ideal --> Devices
-  Devices --> Side
-  Side -->|model and countermeasure| Proof
-  Proof -->|positive entropy after leakage| Key
-  Proof -->|too much error or uncertainty| Abort
+  Source --> Channel
+  Channel --> Measure
+  Measure --> Sift
+  Sift --> Test
+  Test -->|parameters acceptable| Proof
+  Test -->|too noisy| Abort
+  Proof --> Rec
+  Rec --> PA
+  PA --> Key
 ```
 
-## Worked example 1: Estimate an asymptotic BB84 secret fraction
+| Quantity | Formula | What it controls in QKD |
+|---|---|---|
+| Shannon mutual information | $I(A:B)=H(A)-H(A\mid B)$ | Alice-Bob correlation after the quantum stage |
+| Holevo information | $\chi=S(\rho)-\sum_xp_xS(\rho_x)$ | Upper bound on accessible information from a quantum ensemble |
+| Binary entropy | $h_2(Q)=-Q\log_2Q-(1-Q)\log_2(1-Q)$ | Error-correction and phase-error penalties |
+| Reconciliation leakage | $\mathrm{leak}_{\mathrm{EC}}$ | Public information revealed to align strings |
+| Final key length | $\ell \le H_{\min}^{\epsilon}(X^n\mid E)-\mathrm{leak}_{\mathrm{EC}}-\cdots$ | How many secret bits remain after proof margins |
 
-**Problem.** In a simplified asymptotic BB84 model, suppose the observed QBER is $Q=3\%$ and reconciliation leaks $f h_2(Q)$ bits per raw bit with efficiency factor $f=1.15$. Approximate the final secret fraction as
+## Worked example 1: Holevo bound for two nonorthogonal states
+
+**Problem.** Alice chooses one of two pure qubit states with equal probability:
 
 $$
-r = 1 - h_2(Q) - f h_2(Q).
+\lvert \psi_0\rangle=\lvert 0\rangle,
+\qquad
+\lvert \psi_1\rangle=\cos\theta\lvert 0\rangle+\sin\theta\lvert 1\rangle.
 $$
 
-Compute $r$ and interpret it.
+Let $\theta=\pi/3$, so the overlap is $\langle\psi_0\mid\psi_1\rangle=\cos\theta=1/2$. Compute the Holevo upper bound on Bob's accessible information about Alice's bit.
+
+**Method.**
+
+1. Because both signal states are pure,
+
+$$
+S(\lvert\psi_0\rangle\langle\psi_0\rvert)=
+S(\lvert\psi_1\rangle\langle\psi_1\rvert)=0.
+$$
+
+2. The average density operator is
+
+$$
+\rho=\frac{1}{2}\lvert\psi_0\rangle\langle\psi_0\rvert
++\frac{1}{2}\lvert\psi_1\rangle\langle\psi_1\rvert.
+$$
+
+3. For two equally likely pure states with real overlap $c=\vert \langle\psi_0\mid\psi_1\rangle\vert $, the eigenvalues of $\rho$ are
+
+$$
+\lambda_{\pm}=\frac{1\pm c}{2}.
+$$
+
+4. Substitute $c=1/2$:
+
+$$
+\lambda_+=\frac{1+1/2}{2}=0.75,
+\qquad
+\lambda_-=\frac{1-1/2}{2}=0.25.
+$$
+
+5. Since the signal entropies are zero, the Holevo quantity is
+
+$$
+\chi=S(\rho)=h_2(0.75).
+$$
+
+6. Compute
+
+$$
+h_2(0.75)=-0.75\log_2(0.75)-0.25\log_2(0.25).
+$$
+
+Using $\log_2(0.75)\approx -0.4150$ and $\log_2(0.25)=-2$,
+
+$$
+h_2(0.75)\approx 0.3113+0.5000=0.8113.
+$$
+
+**Checked answer.** Bob's accessible information is at most about $0.811$ bits. It is less than one bit because the two states are nonorthogonal. If $\theta=\pi/2$, the states are orthogonal, $c=0$, the eigenvalues are $1/2,1/2$, and the Holevo bound becomes one bit.
+
+## Worked example 2: Key-length accounting after reconciliation
+
+**Problem.** A simplified asymptotic BB84 postprocessing block has $n=1{,}000{,}000$ sifted unrevealed bits and observed QBER $Q=3\%$. Use the phase-error estimate $e_{\mathrm{ph}}=Q$, reconciliation leakage
+
+$$
+\mathrm{leak}_{\mathrm{EC}}=1.15\,n\,h_2(Q),
+$$
+
+and a fixed proof margin of $10{,}000$ bits. Estimate
+
+$$
+\ell=n\bigl(1-h_2(e_{\mathrm{ph}})\bigr)
+-\mathrm{leak}_{\mathrm{EC}}
+-10{,}000.
+$$
 
 **Method.**
 
@@ -98,7 +230,7 @@ $$
 h_2(0.03)=-0.03\log_2(0.03)-0.97\log_2(0.97).
 $$
 
-2. Approximate the two terms:
+2. Approximate the logarithms:
 
 $$
 \log_2(0.03)\approx -5.0589,
@@ -109,121 +241,97 @@ $$
 3. Substitute:
 
 $$
-h_2(0.03)\approx -0.03(-5.0589)-0.97(-0.0439).
+h_2(0.03)\approx -0.03(-5.0589)-0.97(-0.0439)
 $$
 
 $$
-h_2(0.03)\approx 0.1518+0.0426=0.1944.
+\approx 0.1518+0.0426=0.1944.
 $$
 
-4. Compute the reconciliation leakage term:
+4. Compute the phase-uncertainty term:
 
 $$
-f h_2(Q)=1.15(0.1944)=0.2236.
+n(1-h_2(Q))=1{,}000{,}000(1-0.1944)=805{,}600.
 $$
 
-5. Compute the secret fraction:
+5. Compute reconciliation leakage:
 
 $$
-r=1-0.1944-0.2236=0.5820.
+\mathrm{leak}_{\mathrm{EC}}
+=1.15(1{,}000{,}000)(0.1944)
+=223{,}560.
 $$
 
-**Checked answer.** The simplified model gives about $0.58$ final secret bits per reconciled raw bit. The result is plausible because low QBER leaves a positive margin. A production finite-key calculation would subtract additional confidence and verification terms and would use protocol-specific phase-error estimates.
-
-## Worked example 2: Compare direct and twin-field loss scaling
-
-**Problem.** A fiber link has attenuation $\alpha=0.2$ dB/km and total Alice-to-Bob distance $L=300$ km. Compute the channel transmittance
+6. Subtract leakage and the fixed margin:
 
 $$
-\eta = 10^{-\alpha L/10}.
+\ell=805{,}600-223{,}560-10{,}000=572{,}040.
 $$
 
-Compare the rough scaling factors $\eta$ for direct QKD and $\sqrt{\eta}$ for a TF-QKD-style scaling discussion. Do not include implementation constants.
-
-**Method.**
-
-1. Compute total loss in dB:
-
-$$
-\alpha L = 0.2 \cdot 300 = 60 \text{ dB}.
-$$
-
-2. Convert dB loss to transmittance:
-
-$$
-\eta = 10^{-60/10}=10^{-6}.
-$$
-
-3. Direct point-to-point high-loss scaling is proportional to $\eta$:
-
-$$
-R_{\text{direct}}\propto 10^{-6}.
-$$
-
-4. Twin-field-style scaling is proportional to the square root:
-
-$$
-R_{\text{TF}}\propto \sqrt{10^{-6}}=10^{-3}.
-$$
-
-5. Compare the scaling factors:
-
-$$
-\frac{10^{-3}}{10^{-6}} = 10^3.
-$$
-
-**Checked answer.** The scaling-only comparison favors the square-root behavior by a factor of $1000$ at 300 km and 0.2 dB/km. This is not a guaranteed deployed-rate advantage: detector dark counts, phase reference distribution, finite-key block size, duty cycle, and proof constants can dominate.
+**Checked answer.** The simplified block yields about $572{,}040$ final secret bits. The result is lower than $n(1-2h_2(Q))=611{,}200$ because the reconciliation efficiency factor is larger than one and because we subtracted an explicit margin. A real finite-key calculation would derive the phase-error bound and margin from confidence parameters rather than inserting them by hand.
 
 ## Code
 
 ```python
 import math
+import numpy as np
+
+def entropy_from_eigenvalues(values):
+    total = 0.0
+    for value in values:
+        if value > 1e-12:
+            total -= float(value) * math.log2(float(value))
+    return total
 
 def binary_entropy(q):
-    if q == 0.0 or q == 1.0:
+    if q <= 0.0 or q >= 1.0:
         return 0.0
-    return -q * math.log2(q) - (1 - q) * math.log2(1 - q)
+    return -q * math.log2(q) - (1.0 - q) * math.log2(1.0 - q)
 
-def bb84_secret_fraction(qber, reconciliation_efficiency=1.15):
-    return max(0.0, 1 - binary_entropy(qber) - reconciliation_efficiency * binary_entropy(qber))
+def holevo_two_pure_states(theta):
+    ket0 = np.array([[1.0], [0.0]])
+    ket1 = np.array([[math.cos(theta)], [math.sin(theta)]])
+    rho0 = ket0 @ ket0.T
+    rho1 = ket1 @ ket1.T
+    rho = 0.5 * rho0 + 0.5 * rho1
+    eigenvalues = np.linalg.eigvalsh(rho)
+    return entropy_from_eigenvalues(eigenvalues), eigenvalues
 
-def fiber_eta(distance_km, loss_db_per_km=0.2):
-    return 10 ** (-(loss_db_per_km * distance_km) / 10)
+def bb84_key_length(n, qber, reconciliation_efficiency=1.15, margin=10_000):
+    h = binary_entropy(qber)
+    leak_ec = reconciliation_efficiency * n * h
+    length = n * (1.0 - h) - leak_ec - margin
+    return max(0, int(length)), leak_ec
 
-distances = [50, 100, 200, 300, 400]
-qbers = [0.01, 0.03, 0.08]
+chi, eigs = holevo_two_pure_states(math.pi / 3)
+print(f"Holevo chi={chi:.4f} bits, eigenvalues={eigs}")
 
-print("Simplified BB84 secret fractions")
-for q in qbers:
-    print(f"QBER={q:.2%}: r={bb84_secret_fraction(q):.3f}")
-
-print("\nLoss scaling comparison")
-for d in distances:
-    eta = fiber_eta(d)
-    print(
-        f"{d:3d} km  eta={eta:.3e}  direct~{eta:.3e}  twin_field~{math.sqrt(eta):.3e}"
-    )
+for qber in [0.01, 0.03, 0.08, 0.11]:
+    length, leak = bb84_key_length(1_000_000, qber)
+    print(f"QBER={qber:.1%} leak={leak:,.0f} final_length={length:,}")
 ```
 
-This code computes only high-level estimates. It is useful for checking how quickly fiber loss overwhelms direct links and why high-loss protocols, satellites, trusted nodes, or repeaters enter the discussion.
+This NumPy sketch computes the Holevo quantity for two pure qubit states and a simplified BB84 key length. It deliberately avoids pretending to be a full QKD stack: it has no random sampling bound, no detector model, no decoy-state estimation, and no composable security proof object.
 
 ## Common pitfalls
 
-- Comparing key rates without units. Bits per pulse, bits per second, secure bits after finite-key analysis, and raw detections are different quantities.
-- Treating every QKD security statement as device independent. Most practical systems assume characterized sources, detectors, timing behavior, and optical isolation.
-- Ignoring photon-number-splitting attacks. Weak coherent sources have multi-photon pulses, and decoy states are the usual countermeasure.
-- Assuming detector blinding, time-shift attacks, or Trojan-horse probes are theoretical trivia. They are exactly the kinds of implementation gaps that motivated MDI-QKD and careful device certification.
-- Forgetting authentication and endpoint security. QKD does not stop malware, stolen keys after generation, compromised random-number generators, or unauthenticated classical transcripts.
-- Calling a trusted-node network an end-to-end quantum internet. The China backbone and satellite-integrated demonstrations, the Tokyo QKD network, SECOQC, DARPA, and related field tests are important, but trusted nodes remain trust assumptions.
-- Over-reading TF-QKD. Square-root scaling is a major theoretical and experimental direction, not a blanket claim that every TF-QKD system is operationally superior.
-- Treating DI-QKD as a near-term drop-in replacement. It is powerful in principle but demanding in loss, efficiency, noise, and finite statistics.
+- Treating QKD as message encryption. QKD generates shared random keys; messages are still protected by one-time pads, authenticated encryption, or other classical mechanisms.
+- Forgetting the authenticated channel. Public discussion is safe only against listening, not against undetected rewriting.
+- Assuming every QKD claim is device independent. Most practical protocols trust some source, detector, timing, isolation, and random-number-generator assumptions.
+- Equating Holevo information with the final key rate. Holevo bounds accessible information for an ensemble; a security proof must still connect observed data to Eve's possible quantum state and subtract public leakage.
+- Comparing protocols without units. Secret bits per pulse, per detected signal, per second, and per finite block are different quantities.
+- Ignoring weak coherent pulse statistics. Multi-photon emissions enable photon-number-splitting attacks unless decoy-state analysis or another countermeasure is used.
+- Over-reading asymptotic thresholds. The often cited BB84 threshold near 11% comes from an ideal proof setting; practical finite-key and device assumptions can be stricter.
+- Calling a trusted-node network end-to-end quantum-secure. Trusted relays can be useful, but relay compromise is a trust assumption.
+- Treating TF-QKD or DI-QKD as drop-in upgrades. Their theoretical advantages come with demanding phase, loss, efficiency, and finite-statistics requirements.
 
 ## Connections
 
-- [BB84 Protocol](/quantum-information-science/quantum-communication/bb84) for the foundational prepare-and-measure protocol and decoy-state motivation.
-- [Quantum Communication](/quantum-information-science/quantum-communication/intro) for the no-cloning, basis, and QBER intuition.
+- [BB84 Protocol](/quantum-information-science/quantum-communication/bb84) for the detailed prepare-and-measure protocol and Nielsen-Chuang CSS-code security reduction.
+- [Quantum Communication](/quantum-information-science/quantum-communication/intro) for the no-cloning, wrong-basis, and QBER intuition.
 - [Quantum Network](/quantum-information-science/quantum-communication/quantum-network) for trusted-node networks and stack-level integration.
-- [Quantum Internet](/quantum-information-science/quantum-internet/intro), [Entanglement](/quantum-information-science/quantum-internet/entanglement), and [Quantum Repeater](/quantum-information-science/quantum-internet/quantum-repeater) for approaches beyond direct QKD links.
-- [Post-Quantum Cryptography](/quantum-information-science/quantum-security/pqc) and [Quantum-Safe Cryptography](/quantum-information-science/quantum-security/quantum-safe-crypto) for the classical cryptographic alternative to QKD deployment.
+- [Quantum Internet](/quantum-information-science/quantum-internet/intro), [Entanglement](/quantum-information-science/quantum-internet/entanglement), and [Quantum Repeater](/quantum-information-science/quantum-internet/quantum-repeater) for entanglement distribution beyond direct QKD links.
+- [Quantum Error Correction](/quantum-information-science/quantum-computing/error-correction) for CSS codes, bit/phase error separation, and the link between QKD security and coding.
 - [Classical Cryptography](/cs/cryptography/intro), [Computational Security Definitions](/cs/cryptography/computational-security-definitions), and [Message Authentication Codes](/cs/cryptography/message-authentication-codes) for protocol-security language and authentication.
-- [Probability Basics](/math/statistics/probability-basics) and [Entropy and Coding](/math/probability-and-random-variables/entropy-and-coding) for the statistics and entropy formulas used in parameter estimation.
+- [Post-Quantum Cryptography](/quantum-information-science/quantum-security/pqc) and [Quantum-Safe Cryptography](/quantum-information-science/quantum-security/quantum-safe-crypto) for the classical alternative to deploying QKD.
+- Primary textbook reference: Nielsen and Chuang, *Quantum Computation and Quantum Information*, Chapters 8 and 12, especially quantum operations, Holevo's theorem, privacy amplification, and the BB84 security proof.

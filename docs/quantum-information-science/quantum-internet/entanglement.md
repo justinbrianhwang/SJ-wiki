@@ -9,6 +9,8 @@ Entanglement is the native currency of a quantum internet. A classical network t
 
 This page focuses on entanglement as a **network resource** rather than only as a paradox of quantum mechanics. The key questions are operational: how many high-quality pairs can a link deliver, how quickly can noisy pairs be distilled, how does multipartite entanglement differ from many pairwise links, and what can be done using only local operations and classical communication?
 
+Nielsen and Chuang are the primary reference for the mathematical layer used here. Chapter 2 gives the postulates, reduced density operators, Schmidt decomposition, and purifications; Chapter 11 gives von Neumann entropy; Chapter 12 treats entanglement as an interconvertible physical resource. Modern quantum-internet papers often add hardware, routing, and scheduling language, but the invariant quantities underneath are the same: spectra of reduced states, LOCC convertibility, channel noise, and fidelity to Bell states.
+
 ## Definitions
 
 For two qubits, use the computational basis ordered as
@@ -50,6 +52,14 @@ $$
 
 where $\lambda_k\gt 0$, $\sum_k \lambda_k^2=1$, and the local Schmidt vectors are orthonormal. The Schmidt rank $r$ is 1 exactly for product states. For two qubits, $r=2$ indicates pure-state entanglement.
 
+The proof is the singular value decomposition in Dirac notation. If
+
+$$
+\lvert\psi\rangle=\sum_{ij} a_{ij}\lvert i\rangle_A\lvert j\rangle_B,
+$$
+
+then the coefficient matrix $A=(a_{ij})$ has an SVD $A=UDV^\dagger$. The nonzero diagonal entries of $D$ are the Schmidt coefficients, and the columns of $U$ and complex conjugates of the columns of $V$ define the two local Schmidt bases. This is why local unitary basis changes cannot alter the Schmidt coefficients: they only multiply $A$ on the left or right by unitary matrices.
+
 The reduced state of subsystem $A$ is
 
 $$
@@ -67,6 +77,14 @@ Using $\log_2$ gives entropy in ebits. In the Schmidt basis, the eigenvalues of 
 $$
 S(\rho_A)=-\sum_k \lambda_k^2\log_2(\lambda_k^2).
 $$
+
+A **purification** of a mixed state $\rho_A=\sum_i p_i\lvert i\rangle\langle i\rvert$ is a pure state on a larger system $AR$ such as
+
+$$
+\lvert\psi\rangle_{AR}=\sum_i \sqrt{p_i}\lvert i\rangle_A\lvert i\rangle_R
+$$
+
+with $\mathrm{Tr}_R(\lvert\psi\rangle\langle\psi\rvert)=\rho_A$. Purification is a bookkeeping device in Nielsen and Chuang's treatment: a noisy or mixed local state can be viewed as part of a larger pure entangled state. For networks this is more than notation, because an environment, an eavesdropper, or a lost photon mode can be treated as the purifying system.
 
 Important multipartite states include the three-qubit GHZ state
 
@@ -100,7 +118,13 @@ $$
 
 are equally entangled; they simply use different local bases.
 
+The Schmidt spectrum also gives a clean separability test for pure states. A pure bipartite state is separable if and only if exactly one Schmidt coefficient is nonzero. Equivalently, $\rho_A$ and $\rho_B$ are pure. If more than one coefficient is nonzero, each local reduced state is mixed even though the joint state is pure. This is the Nielsen-Chuang lesson behind the Bell pair: complete knowledge of the joint state can coexist with maximal local uncertainty.
+
+For deterministic pure-state LOCC transformations, the sharper statement is Nielsen's majorization criterion. Let $\lambda(\psi)$ be the vector of squared Schmidt coefficients of $\lvert\psi\rangle$, sorted in nonincreasing order. Then $\lvert\psi\rangle$ can be converted to $\lvert\phi\rangle$ by LOCC exactly when $\lambda(\psi)$ is majorized by $\lambda(\phi)$. Intuitively, LOCC can concentrate or discard entanglement, but it cannot make the Schmidt spectrum more uniform than the resource permits.
+
 For pure states, many entanglement tasks have clean asymptotic rates. If Alice and Bob share many copies of $\lvert\psi\rangle_{AB}$, they can distill about $nS(\rho_A)$ Bell pairs from $n$ copies by LOCC in the large-$n$ limit. Conversely, they can prepare about $n$ copies of $\lvert\psi\rangle$ from $nS(\rho_A)$ Bell pairs. Thus pure-state entanglement entropy is both the distillable entanglement and the entanglement cost.
+
+The proof idea is typical subspaces. For $n$ copies, most Schmidt strings have probability close to $2^{-nS(\rho_A)}$ and live in a typical subspace of size about $2^{nS(\rho_A)}$. Entanglement dilution uses $nS(\rho_A)$ Bell pairs to teleport the part of a typical state Bob should hold. Entanglement distillation runs the logic in reverse: Alice and Bob project onto the typical Schmidt structure and convert the nearly uniform Schmidt support into Bell pairs. The finite-$n$ protocol has errors and overheads; the rate statement is asymptotic.
 
 Mixed states are harder. The **distillable entanglement** $E_D$ is the asymptotic rate at which high-fidelity Bell pairs can be extracted from noisy shared states using LOCC. The **entanglement cost** $E_C$ is the asymptotic Bell-pair rate needed to create the state using LOCC. In general,
 
@@ -109,6 +133,8 @@ E_D(\rho)\le E_C(\rho),
 $$
 
 and there are bound entangled states for which entanglement is present but no Bell pairs can be distilled by LOCC.
+
+Nielsen and Chuang emphasize the communication meaning of $E_D$. If Alice sends half of many Bell pairs through a noisy quantum channel, Alice and Bob share many copies of the channel's output state. Any distillation protocol for that state becomes an entanglement-assisted error-correction method: distill good pairs first, then use [teleportation](/quantum-information-science/quantum-internet/teleportation) to transmit unknown qubits. This is one conceptual bridge from static entanglement theory to repeater chains.
 
 LOCC cannot create entanglement from scratch. This is why entanglement is a resource: if separated parties start with a separable state, any LOCC protocol leaves them with a separable state on average. Classical messages can coordinate choices and postselection, but they cannot replace a quantum channel or shared entanglement.
 
@@ -119,6 +145,8 @@ C^2_{A\mid BC}\ge C^2_{AB}+C^2_{AC}.
 $$
 
 If $A$ is maximally entangled with $B$, it cannot also be maximally entangled with $C$. Network protocols rely on this. A Bell pair used for teleportation cannot remain available for another independent teleportation, and security protocols use monogamy to limit how much an eavesdropper can be entangled with honest parties' systems.
+
+Von Neumann entropy supplies several consistency checks. It is nonnegative, equals zero exactly for pure states, is at most $\log_2 d$ on a $d$-dimensional system, and reaches that maximum only for the completely mixed state $I/d$. If $AB$ is pure then $S(\rho_A)=S(\rho_B)$. Unlike classical entropy, conditional quantum entropy $S(B\vert A)=S(AB)-S(A)$ may be negative; for an entangled pure state it equals $-S(A)$. Negative conditional entropy is one way the resource character of entanglement shows up in information theory.
 
 Distillation converts several imperfect entangled pairs into fewer better ones. In recurrence-style protocols such as DEJMPS, Alice and Bob operate on two shared noisy pairs at a time. They apply coordinated local rotations, perform bilateral CNOT operations, measure one pair, compare classical outcomes, and keep the other pair only when the outcomes pass a parity test. The kept pair has higher fidelity when the input fidelity is above the protocol threshold, but the protocol is probabilistic and consumes pairs.
 

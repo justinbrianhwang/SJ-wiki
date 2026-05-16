@@ -29,6 +29,24 @@ $$
 
 where $L$ is distance in kilometers, $\alpha$ is attenuation in dB/km, and $\eta$ is transmissivity. Around telecom wavelengths, a common idealized value is $\alpha\approx0.2$ dB/km for good fiber, before connector, coupling, detector, and protocol losses.
 
+Nielsen and Chuang do not develop repeater architectures in depth, but Chapter 8 gives the channel language used to model each elementary link. A deterministic noisy quantum channel is a completely positive trace-preserving map
+
+$$
+\mathcal{E}(\rho)=\sum_k E_k\rho E_k^\dagger,\qquad \sum_k E_k^\dagger E_k=I.
+$$
+
+This is the **operator-sum** or **Kraus** representation. The operators $E_k$ can be derived from a unitary interaction with an environment followed by tracing out that environment. In a repeater, loss, dephasing, imperfect memories, detector dark counts, and local gate errors are all modeled by composing such maps, sometimes with non-trace-preserving branches when a heralded event is conditioned on success.
+
+The **Choi-Jamiolkowski state** of a channel is the state obtained by applying the channel to half of a maximally entangled pair:
+
+$$
+J(\mathcal{E})=(I\otimes\mathcal{E})(\lvert\Phi_d\rangle\langle\Phi_d\rvert),
+\qquad
+\lvert\Phi_d\rangle=\frac{1}{\sqrt{d}}\sum_{i=0}^{d-1}\lvert i\rangle\lvert i\rangle.
+$$
+
+This channel-state view is especially natural for repeaters. An elementary entanglement-generation attempt can be analyzed as preparing a Bell pair and letting one half pass through the physical link. The resulting shared state is the channel's Choi state up to normalization and convention. Nielsen and Chuang emphasize the operator-sum and process-tomography descriptions; the Choi form is the compact modern notation for the same background idea.
+
 ## Key results
 
 The direct-transmission problem is exponential. If a source emits photons at a clock rate $f$, a very simple upper estimate for the raw arrival rate is
@@ -48,6 +66,12 @@ $$
 $$
 
 where a Bell measurement on $B,C$ announces which Pauli frame $\sigma_k$ applies to the remote pair $A,D$. The Pauli correction can be applied physically or tracked in software until the pair is consumed by [teleportation](/quantum-information-science/quantum-internet/teleportation).
+
+The channel-state viewpoint turns this into an error-accounting rule. If an elementary link is represented by a Bell-diagonal Choi state, then swapping combines Bell error labels, local memories add additional Kraus noise while a link waits, and purification is an LOCC map on several copies of those shared states. This is why a repeater performance model normally tracks both rate and state quality; a high heralding rate with a poor Choi state may be less useful than a slower link that distills efficiently.
+
+Nielsen and Chuang Chapter 12 connects entanglement distillation with quantum communication. If Alice sends halves of Bell pairs through a noisy channel and then Alice and Bob distill the resulting shared mixed states, the distilled Bell pairs can teleport unknown qubits reliably. Thus distillation can function as an error-correction method for a communication channel, with the achievable rate controlled by the distillable entanglement of the channel-generated state. Repeaters add spatial segmentation and memories to that information-theoretic idea.
+
+Capacity formulas are benchmarks, not repeater designs. The Holevo-Schumacher-Westmoreland expression bounds the classical information rate achievable over a noisy quantum channel with product-state encodings, while quantum capacity is governed by coherent-information regularization in the general theory. For a physical repeater chain, those capacities sit above a more detailed stack: photon survival, heralding probability, memory lifetime, local gate fidelity, purification yield, scheduling policy, and final application fidelity.
 
 The BDCZ scheme, named for Briegel, Duer, Cirac, and Zoller, is the canonical first-generation repeater idea. Its structure is:
 
@@ -98,6 +122,7 @@ flowchart LR
 | Error-corrected repeater | Encoded logical qubits | Suppresses accumulated errors at scale | Large qubit and gate overhead |
 | All-photonic repeater | Photonic graph states and feedforward | Reduces reliance on long-lived matter memory | Huge photonic-source and loss-tolerant encoding overhead |
 | Trusted-node chain | Classical measurement and regeneration | Deployable for QKD in limited settings | Nodes must be trusted; no end-to-end entanglement |
+| Channel-state analysis | Kraus maps and Choi states | Separates physical link noise from protocol logic | Requires accurate tomography or calibrated noise model |
 
 ## Worked example 1: Why elementary links help with loss
 
@@ -191,6 +216,17 @@ def swapped_werner_fidelity(F):
     p = np.array([F, (1 - F) / 3, (1 - F) / 3, (1 - F) / 3])
     return float(np.sum(p * p))
 
+def choi_from_kraus(kraus_ops):
+    """Return normalized qubit Choi state for a channel."""
+    phi = np.array([1, 0, 0, 1], dtype=complex) / np.sqrt(2)
+    rho = np.outer(phi, phi.conj())
+    out = np.zeros((4, 4), dtype=complex)
+    I = np.eye(2, dtype=complex)
+    for E in kraus_ops:
+        K = np.kron(I, E)
+        out += K @ rho @ K.conj().T
+    return out
+
 total_length = 200
 segment_length = 20
 
@@ -205,6 +241,13 @@ F = 0.90
 for level in range(4):
     print(f"after {level} swap levels: F = {F:.4f}")
     F = swapped_werner_fidelity(F)
+
+gamma = 0.10
+E0 = np.array([[1, 0], [0, np.sqrt(1 - gamma)]], dtype=complex)
+E1 = np.array([[0, np.sqrt(gamma)], [0, 0]], dtype=complex)
+J = choi_from_kraus([E0, E1])
+bell = np.array([1, 0, 0, 1], dtype=complex) / np.sqrt(2)
+print("amplitude-damping Choi fidelity:", np.real(bell.conj() @ J @ bell))
 ```
 
 ## Common pitfalls
@@ -214,6 +257,7 @@ for level in range(4):
 - Quoting square-root scaling without the overheads. Segmenting a link improves elementary success probabilities, but rates still depend on waiting time, detector loss, memory decay, swapping probability, and purification cost.
 - Ignoring memory lifetime. If a stored pair decoheres before neighboring links succeed, the apparent link-generation advantage disappears.
 - Treating entanglement swapping as fidelity-neutral. Even perfect swapping combines preexisting link errors; imperfect gates and measurements add more.
+- Modeling every link by a single scalar loss probability. Repeaters also need phase noise, memory decay, detector imperfections, and the full shared-state error structure, often represented by Kraus maps or Choi states.
 - Assuming all-photonic repeaters remove all hard hardware requirements. They reduce matter-memory dependence but require large photonic graph states, low loss, fast feedforward, and efficient sources.
 - Extrapolating small laboratory demonstrations to deployed long-haul service. Current demonstrations validate building blocks; engineering a reliable repeater chain is a larger systems problem.
 

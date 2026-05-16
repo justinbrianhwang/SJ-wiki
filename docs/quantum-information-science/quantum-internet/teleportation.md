@@ -9,6 +9,8 @@ Quantum teleportation is the primitive that lets a quantum network move an unkno
 
 The standard protocol was introduced by Bennett, Brassard, Crepeau, Jozsa, Peres, and Wootters in 1993. It is not science-fiction matter transport and it is not faster-than-light signaling. It is a precise circuit identity: a Bell-basis measurement plus two classical correction bits implements the identity channel from Alice's input qubit to Bob's output qubit, provided Alice and Bob initially share a high-quality entangled pair.
 
+Nielsen and Chuang Section 1.3.7 is the primary reference for the circuit derivation used on this page. Their emphasis is useful for networking: teleportation converts resources. One pre-shared EPR pair plus two classical bits can substitute for one use of an ideal qubit channel, while the original input is consumed by measurement.
+
 ## Definitions
 
 Let Alice hold an unknown input qubit $A$,
@@ -77,6 +79,38 @@ $$
 
 where the qubit order is $A,B,C$.
 
+Nielsen and Chuang's circuit implements the Bell measurement by a CNOT from $A$ to $B$, a Hadamard on $A$, and computational-basis measurements of $A$ and $B$. After the CNOT,
+
+$$
+\begin{aligned}
+\lvert\psi_1\rangle
+&=\frac{1}{\sqrt{2}}\left[
+\alpha\lvert0\rangle_A(\lvert00\rangle+\lvert11\rangle)_{BC}
+\beta\lvert1\rangle_A(\lvert10\rangle+\lvert01\rangle)_{BC}
+\right]\\
+&=\frac{1}{\sqrt{2}}\left(
+\alpha\lvert000\rangle+\alpha\lvert011\rangle
+\beta\lvert110\rangle+\beta\lvert101\rangle
+\right).
+\end{aligned}
+$$
+
+After the Hadamard on $A$,
+
+$$
+\begin{aligned}
+\lvert\psi_2\rangle
+=\frac{1}{2}\big(&
+\lvert00\rangle_{AB}(\alpha\lvert0\rangle+\beta\lvert1\rangle)_C\\
+&+\lvert01\rangle_{AB}(\beta\lvert0\rangle+\alpha\lvert1\rangle)_C\\
+&+\lvert10\rangle_{AB}(\alpha\lvert0\rangle-\beta\lvert1\rangle)_C\\
+&+\lvert11\rangle_{AB}(-\beta\lvert0\rangle+\alpha\lvert1\rangle)_C
+\big).
+\end{aligned}
+$$
+
+The four computational outcomes of Alice's two measured qubits therefore correspond to Bob's four possible pre-correction states. Each branch has probability $1/4$, because the squared norm of each Bob-side vector is $\vert \alpha\vert ^2+\vert \beta\vert ^2=1$ and each branch has amplitude factor $1/2$.
+
 Rewrite this state in the Bell basis of $A,B$:
 
 $$
@@ -102,6 +136,21 @@ Alice's Bell measurement on $(A,B)$ randomly returns one of the four Bell outcom
 
 After Bob's correction, the output is $\lvert\psi\rangle$ up to an irrelevant global phase. Alice's original input has been measured as part of the Bell measurement. This is exactly what makes the protocol consistent with no-cloning: the unknown state is relocated, not duplicated.
 
+Before the two classical bits arrive, Bob has no usable information about $\alpha$ and $\beta$. Averaging over Alice's four equally likely outcomes gives
+
+$$
+\rho_B
+=\frac{1}{4}\left(
+\lvert\psi\rangle\langle\psi\rvert
++X\lvert\psi\rangle\langle\psi\rvert X
++Z\lvert\psi\rangle\langle\psi\rvert Z
++XZ\lvert\psi\rangle\langle\psi\rvert ZX
+\right)
+=\frac{I}{2}.
+$$
+
+The reduced state is independent of the teleported qubit. This is the density-operator proof, developed in Nielsen and Chuang Section 2.4.3, that teleportation cannot be used as a faster-than-light communication channel.
+
 Teleportation also gives a clean operational meaning to entanglement. A Bell pair by itself cannot send a message. Two classical bits by themselves cannot specify an arbitrary unknown qubit. Together, a Bell pair and two bits implement the identity quantum channel from Alice to Bob. In network terms, the Bell pair is a pre-distributed nonlocal resource, and the classical bits are the control information that selects the correction.
 
 In a routed network, the correction is often handled as a **Pauli frame** rather than as an immediate physical gate. Bob's controller records that the logical output has an $X$, $Z$, or $XZ$ frame update, and later measurements or gates are interpreted relative to that frame. This is common in fault-tolerant circuits because it avoids unnecessary physical operations. It also makes teleportation naturally compatible with entanglement swapping: intermediate Bell measurements create Pauli-frame information that can be propagated classically until the final consumer of the entangled pair needs a definite interpretation.
@@ -113,6 +162,8 @@ F_{\mathrm{avg}}=\frac{2F_e+1}{3}.
 $$
 
 This formula is a useful engineering rule of thumb: improving the entangled link improves the application-level teleportation fidelity. It also shows why distillation matters. A raw pair with low Bell fidelity may be inadequate for teleportation, while a distilled pair can cross the threshold needed by an application.
+
+The usual classical benchmark is $F_{\mathrm{avg}}\le 2/3$ for an unknown uniformly distributed qubit when the parties have no shared entanglement and use only measure-and-prepare communication. Under the isotropic model above, exceeding that benchmark is equivalent to $F_e\gt 1/2$. More generally, the relevant resource quality is the fully entangled fraction of the shared state, and different noise models may require process fidelity or diamond-norm error rather than only Bell fidelity.
 
 Experimental teleportation has been demonstrated in many physical settings. Early photonic demonstrations appeared in 1997, including the Innsbruck experiment and a related Rome experiment. Satellite-scale work by Jian-Wei Pan's group demonstrated ground-to-satellite teleportation of independent single-photon qubits over distances up to about 1400 km using the Micius satellite. These experiments should be read conservatively: they validate essential primitives under specific assumptions and loss budgets, not yet a general-purpose global quantum internet.
 
@@ -288,6 +339,34 @@ for outcome in ["Phi+", "Phi-", "Psi+", "Psi-"]:
 Fe = 0.88
 Favg = (2 * Fe + 1) / 3
 print("average teleportation fidelity:", Favg)
+```
+
+A Qiskit-style circuit sketch for the same protocol is:
+
+```python
+from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
+
+q = QuantumRegister(3, "q")      # q[0]=input, q[1]=Alice EPR half, q[2]=Bob
+c = ClassicalRegister(2, "m")    # Alice's two classical bits
+qc = QuantumCircuit(q, c)
+
+# Prepare the shared Bell pair between Alice's q[1] and Bob's q[2].
+qc.h(q[1])
+qc.cx(q[1], q[2])
+
+# Bell measurement on Alice's two qubits.
+qc.cx(q[0], q[1])
+qc.h(q[0])
+qc.measure(q[0], c[0])
+qc.measure(q[1], c[1])
+
+# Bob's Pauli correction, written in the Nielsen-Chuang convention.
+with qc.if_test((c[1], 1)):
+    qc.x(q[2])
+with qc.if_test((c[0], 1)):
+    qc.z(q[2])
+
+print(qc)
 ```
 
 ## Common pitfalls

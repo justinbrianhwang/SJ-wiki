@@ -5,298 +5,357 @@ sidebar_position: 3
 
 # Algorithms
 
-Quantum algorithms are not faster because they try all answers and then read them out. They are faster when a circuit creates phases whose interference reveals a hidden algebraic, geometric, or probabilistic structure with fewer queries or lower asymptotic cost than known classical methods. This page covers the foundational algorithms that define the field: Deutsch-Jozsa, Bernstein-Vazirani, Simon's algorithm, Shor's factoring algorithm, Grover search and amplitude amplification, quantum phase estimation, quantum walks, and HHL for linear systems.
+Quantum algorithms are not faster because they "try all answers" and then reveal the right one. They are faster when a circuit arranges amplitudes so that measurement samples information about hidden structure: a period, an eigenphase, a marked subspace, or a useful expectation value. This page gives the foundational circuit-model algorithms and uses Nielsen and Chuang's notation for oracles, quantum Fourier transforms, phase estimation, Shor's order-finding reduction, and Grover search.
+
+*This page synthesizes the wiki's earlier algorithm overview with Chapters 1, 5, and 6 of Nielsen and Chuang. The N&C emphasis is that QFT and search are the two canonical algorithmic engines: QFT exposes algebraic periodicity, while Grover's iterate performs an optimal two-dimensional amplitude rotation.*
 
 ## Definitions
 
-A **quantum algorithm** is a family of circuits, usually uniform in the input size, followed by classical post-processing. The basic circuit operations are unitary gates and measurements; the cost model may count gates, oracle queries, circuit depth, qubits, or fault-tolerant logical resources.
+A **quantum algorithm** is a uniform family of circuits followed by classical post-processing. Inputs may be classical bit strings, quantum states, or oracle access to a function. Costs may count gates, circuit depth, qubits, oracle calls, precision, or fault-tolerant logical resources. A speedup claim is meaningful only after the input model and output model are fixed.
 
-A **query algorithm** accesses a function $f$ through an oracle. A common bit oracle is
-
-$$
-U_f |x\rangle |y\rangle = |x\rangle |y \oplus f(x)\rangle.
-$$
-
-With the second register prepared as $\vert -\rangle = (\vert 0\rangle - \vert 1\rangle)/\sqrt{2}$, phase kickback gives
+A common bit oracle for $f:\{0,1\}^n\to\{0,1\}$ is
 
 $$
-U_f |x\rangle |-\rangle = (-1)^{f(x)} |x\rangle |-\rangle.
+U_f|x\rangle|y\rangle=|x\rangle|y\oplus f(x)\rangle.
 $$
 
-That phase form is central to Deutsch-Jozsa, Bernstein-Vazirani, Simon's algorithm, and Grover search.
-
-The **quantum Fourier transform** over $N=2^n$ basis states is
+If the second register is prepared as
 
 $$
-QFT_N |x\rangle
-= \frac{1}{\sqrt{N}}\sum_{k=0}^{N-1} e^{2\pi i xk/N}|k\rangle.
+|-\rangle=\frac{|0\rangle-|1\rangle}{\sqrt{2}},
 $$
 
-It is the key transform in phase estimation and Shor's period finding.
-
-**Amplitude amplification** starts with a state
+then phase kickback gives
 
 $$
-|\psi\rangle = \sqrt{a}|\psi_{\mathrm{good}}\rangle
-+ \sqrt{1-a}|\psi_{\mathrm{bad}}\rangle,
+U_f|x\rangle|-\rangle=(-1)^{f(x)}|x\rangle|-\rangle.
 $$
 
-and repeatedly rotates amplitude toward the good subspace using a phase oracle and a reflection about the initial state.
+This phase-oracle form underlies Deutsch-Jozsa, Bernstein-Vazirani, Simon's algorithm, and Grover search.
 
-**Hamiltonian simulation** approximates $e^{-iHt}$ for a Hermitian matrix $H$. Phase estimation, quantum walks, and HHL all rely on controlled unitary evolution or a closely related block-encoding.
+The **quantum Fourier transform** over $N=2^n$ basis states is the unitary
+
+$$
+QFT_N|j\rangle=\frac{1}{\sqrt{N}}\sum_{k=0}^{N-1}e^{2\pi i jk/N}|k\rangle.
+$$
+
+N&C stress that this is a Fourier transform of amplitudes, not a direct replacement for the classical fast Fourier transform on explicitly stored data. The efficient circuit comes from writing $j=j_1j_2\cdots j_n$ in binary and using the product representation
+
+$$
+QFT_{2^n}|j_1\cdots j_n\rangle=
+\frac{(|0\rangle+e^{2\pi i0.j_n}|1\rangle)\cdots(|0\rangle+e^{2\pi i0.j_1\cdots j_n}|1\rangle)}
+{2^{n/2}},
+$$
+
+up to the final reversal of qubit order.
+
+**Phase estimation** estimates $\phi$ when
+
+$$
+U|u\rangle=e^{2\pi i\phi}|u\rangle.
+$$
+
+It uses a phase register, controlled powers $U^{2^j}$, the inverse QFT, and computational-basis measurement. If the input is a superposition of eigenvectors, measurement samples one eigenphase with probability equal to the squared overlap with its eigenvector.
+
+For a positive integer $a\lt N$ with $\gcd(a,N)=1$, the **order** of $a$ modulo $N$ is the least $r\gt 0$ such that
+
+$$
+a^r\equiv 1 \pmod N.
+$$
+
+Shor's algorithm reduces factoring to finding this order.
+
+**Amplitude amplification** starts with
+
+$$
+|\psi\rangle=\sqrt{a}\,|\psi_{\mathrm{good}}\rangle+\sqrt{1-a}\,|\psi_{\mathrm{bad}}\rangle
+$$
+
+and uses a phase oracle plus a reflection about $\vert \psi\rangle$ to rotate amplitude toward the good subspace.
 
 ## Key results
 
-Deutsch-Jozsa separates deterministic classical and exact quantum query complexity for a promise problem. Given $f:\{0,1\}^n \to \{0,1\}$ promised to be constant or balanced, the circuit prepares a uniform superposition, applies phase kickback, then applies Hadamards:
+Deutsch-Jozsa gives an exact oracle separation for a promise problem. Given $f:\{0,1\}^n\to\{0,1\}$ promised constant or balanced, the amplitude of $\vert 0^n\rangle$ after the final Hadamards is
 
 $$
-H^{\otimes n} U_f H^{\otimes n}|0^n\rangle |-\rangle.
+\frac{1}{2^n}\sum_x(-1)^{f(x)}.
 $$
 
-The amplitude of $\vert 0^n\rangle$ in the input register is
+It is $\pm 1$ for constant functions and $0$ for balanced functions. N&C introduce this early because it demonstrates phase kickback and interference before the more substantial algorithms.
+
+Phase estimation is the core QFT subroutine. With $t$ phase qubits, Hadamards prepare $2^{-t/2}\sum_{j=0}^{2^t-1}\vert j\rangle$. Controlled powers transform this into
 
 $$
-\frac{1}{2^n}\sum_x (-1)^{f(x)}.
+\frac{1}{2^{t/2}}\sum_{j=0}^{2^t-1}e^{2\pi i j\phi}|j\rangle|u\rangle.
 $$
 
-It equals $\pm 1$ for constant functions and $0$ for balanced functions.
+The inverse QFT maps the phase pattern to a computational-basis estimate. If $\phi$ has an exact $t$-bit binary expansion, the estimate is exact. Otherwise, extra phase bits raise the success probability of obtaining a close approximation.
 
-Bernstein-Vazirani finds a hidden string $s \in \{0,1\}^n$ with one query when
+Shor's factoring algorithm proceeds as follows.
 
-$$
-f_s(x) = s \cdot x \pmod 2.
-$$
-
-The phase oracle maps the uniform state to
+1. Choose a random $a$ with $1\lt a\lt N$. If $\gcd(a,N)\gt 1$, a factor has already been found.
+2. Define the modular multiplication unitary
 
 $$
-\frac{1}{\sqrt{2^n}}\sum_x (-1)^{s\cdot x}|x\rangle,
+U_a|y\rangle=|ay\bmod N\rangle
 $$
 
-and a final Hadamard transform returns $\vert s\rangle$.
-
-Simon's algorithm finds a hidden xor mask $s$ for a two-to-one function satisfying
-
-$$
-f(x) = f(y) \quad \text{iff} \quad y = x \oplus s.
-$$
-
-After querying and measuring the output register, the input register is proportional to $\vert x\rangle + \vert x\oplus s\rangle$. Applying Hadamards and measuring gives a random $y$ such that
+on the subspace $0\le y\lt N$, with a reversible convention on unused basis states.
+3. Use phase estimation on $U_a$. The eigenstates associated with the cyclic orbit of $1$ are
 
 $$
-y \cdot s = 0 \pmod 2.
+|u_s\rangle=\frac{1}{\sqrt{r}}\sum_{k=0}^{r-1}e^{-2\pi i sk/r}|a^k\bmod N\rangle,
 $$
 
-Repeating gives linear equations over $\mathbb{F}_2$ that determine $s$.
-
-Shor's factoring algorithm reduces factoring an odd composite $N$ to period finding. Choose $a$ coprime to $N$ and define
-
-$$
-f(x) = a^x \bmod N.
-$$
-
-If the period $r$ is even and $a^{r/2} \not\equiv -1 \pmod N$, then
+with eigenvalue $e^{2\pi i s/r}$. Preparing $\vert 1\rangle$ gives a uniform superposition of these eigenstates, so phase estimation samples an approximation to $s/r$.
+4. Use continued fractions to recover a candidate denominator $r$ from the measured rational approximation.
+5. Check whether $a^r\equiv 1\pmod N$. If not, repeat or refine.
+6. If $r$ is even and $a^{r/2}\not\equiv -1\pmod N$, compute
 
 $$
-\gcd(a^{r/2}-1,N)
-\quad \text{and} \quad
-\gcd(a^{r/2}+1,N)
+\gcd(a^{r/2}-1,N),
+\qquad
+\gcd(a^{r/2}+1,N).
 $$
 
-give nontrivial factors with good probability. The quantum part uses modular exponentiation and QFT-based phase estimation to estimate $k/r$.
+These are nontrivial factors. The success probability is constant after accounting for random $a$, useful Fourier samples, and the coprimality of $s$ and $r$, so repetition boosts success.
 
-Grover search finds a marked item among $N$ possibilities using $O(\sqrt{N})$ oracle queries. Let $\sin^2\theta = M/N$ where $M$ is the number of marked items. Each Grover iterate rotates by $2\theta$ in the span of good and bad states:
-
-$$
-G = (2|\psi\rangle\langle\psi| - I)O_f.
-$$
-
-After about $\pi/(4\theta)$ iterations, measuring returns a marked item with high probability.
-
-Quantum phase estimation estimates an eigenphase. If
+Grover search solves an unstructured marked-item problem with a quadratic query improvement. Let $N$ be the number of items and $M$ the number of marked items. Define
 
 $$
-U|u\rangle = e^{2\pi i \phi}|u\rangle,
+|g\rangle=\frac{1}{\sqrt{M}}\sum_{f(x)=1}|x\rangle,
+\qquad
+|b\rangle=\frac{1}{\sqrt{N-M}}\sum_{f(x)=0}|x\rangle.
 $$
 
-then controlled powers $U^{2^j}$ and inverse QFT estimate $\phi$ to $m$ bits using an $m$-qubit phase register.
-
-Quantum walks generalize random walks by unitary evolution. Discrete-time walks use a coin and shift operator, while continuous-time walks evolve as
+The initial uniform state is
 
 $$
-|\psi(t)\rangle = e^{-i\gamma A t}|\psi(0)\rangle
+|\psi\rangle=\sqrt{\frac{M}{N}}|g\rangle+\sqrt{\frac{N-M}{N}}|b\rangle.
 $$
 
-for graph adjacency matrix $A$. They support search, element distinctness, and graph traversal speedups in specific settings.
+Set $\sin\theta=\sqrt{M/N}$. The Grover iterate
 
-HHL solves linear systems in a restricted output model. For a sparse, well-conditioned Hermitian matrix $A$ and state $\vert b\rangle$, the goal is to prepare a state proportional to $A^{-1}\vert b\rangle$. Phase estimation on $e^{iAt}$ extracts eigenvalues $\lambda_j$, a controlled rotation applies a factor proportional to $1/\lambda_j$, and uncomputation leaves amplitudes scaled by the inverse eigenvalues. The caveats are essential: data loading, condition number, sparsity, precision, and output readout determine whether an application gains anything.
+$$
+G=(2|\psi\rangle\langle\psi|-I)O_f
+$$
 
-These algorithms also illustrate three recurring design patterns. First, many speedups are really **Fourier sampling** arguments: a hidden subgroup, period, or character is transformed into a measurable computational-basis label. Second, many search speedups are **two-dimensional rotation** arguments: the circuit preserves the span of good and bad components and rotates inside it. Third, many linear-algebra speedups are **state-output** arguments: the quantum computer prepares a state whose amplitudes encode an answer, but extracting all entries would require too many measurements. Keeping those patterns separate prevents a common overgeneralization: Shor, Grover, and HHL are not three interchangeable examples of the same kind of advantage.
+is the product of two reflections and rotates the state by $2\theta$ in the plane spanned by $\vert g\rangle$ and $\vert b\rangle$. After $k$ iterations, the success probability is
+
+$$
+\sin^2((2k+1)\theta).
+$$
+
+A near-optimal choice is
+
+$$
+k\approx \left\lfloor \frac{\pi}{4\theta}-\frac{1}{2}\right\rceil,
+$$
+
+which gives $O(\sqrt{N/M})$ oracle calls. N&C also emphasize two limits: quantum counting combines Grover with phase estimation to estimate $M$, and Grover search is optimal in the black-box model, so unstructured search cannot be improved to logarithmic query complexity.
 
 ## Visual
 
 ```mermaid
 flowchart TD
-  S["Problem has oracle or algebraic structure"] --> Q{"Which structure dominates?"}
-  Q -->|hidden linear bit string| BV["Bernstein-Vazirani"]
-  Q -->|constant versus balanced promise| DJ["Deutsch-Jozsa"]
-  Q -->|hidden xor period| SI["Simon's algorithm"]
-  Q -->|multiplicative period| SH["Shor period finding"]
-  Q -->|marked item oracle| GR["Grover and amplitude amplification"]
-  Q -->|unitary eigenphase| PE["Phase estimation"]
-  Q -->|graph dynamics| QW["Quantum walks"]
-  Q -->|linear system state output| HH["HHL"]
+  P["Problem instance"] --> S{"Useful structure?"}
+  S -->|constant vs balanced promise| DJ["Deutsch-Jozsa"]
+  S -->|linear Boolean phase| BV["Bernstein-Vazirani"]
+  S -->|hidden xor period| SI["Simon's algorithm"]
+  S -->|multiplicative period| SH["Shor order finding"]
+  S -->|unitary eigenphase| PE["Phase estimation"]
+  S -->|marked subspace only| GR["Grover search"]
+  SH --> QFT["QFT and inverse QFT"]
+  PE --> QFT
+  GR --> AA["Amplitude amplification"]
 ```
 
-| Algorithm | Core unitary idea | Speedup type | Main caveat |
-|---|---|---|---|
-| Deutsch-Jozsa | Global phase sum after Hadamards | Exact oracle separation | Promise problem, not broad application |
-| Bernstein-Vazirani | Phase kickback of linear Boolean function | Query reduction | Hidden linear structure is special |
-| Simon | Samples equations orthogonal to hidden xor mask | Exponential oracle separation | Requires promise and oracle access |
-| Shor | Modular exponentiation plus QFT period finding | Exponential over best known classical factoring algorithms | Needs fault-tolerant depth and many logical gates |
-| Grover | Reflections rotate amplitude toward marked states | Quadratic | Oracle construction can dominate |
-| Phase estimation | Controlled powers plus inverse QFT | Foundational subroutine | Requires eigenstate preparation or overlap |
-| Quantum walks | Unitary graph propagation | Problem-specific | Speedup depends on graph and hitting structure |
-| HHL | Phase estimation plus eigenvalue inversion | Potential exponential in output-state model | Data loading and readout limitations are severe |
+| Algorithmic pattern | N&C representative | Quantum operation | Classical post-processing | Main caveat |
+|---|---|---|---|---|
+| Phase kickback | Deutsch-Jozsa, Bernstein-Vazirani | Convert function values into phases | Interpret final bit string | Promise or hidden linearity is special |
+| Fourier sampling | Phase estimation, Shor | Inverse QFT turns phases into estimates | Continued fractions, gcd checks | Needs coherent controlled powers |
+| Order finding | Shor | Modular exponentiation plus phase estimation | Recover $r$, then factors | Fault-tolerant depth dominates practical factoring |
+| Amplitude amplification | Grover | Product of two reflections | Verify sampled solution | Oracle construction can dominate |
+| Quantum counting | Grover plus phase estimation | Estimate eigenphase of Grover iterate | Convert angle to $M$ | Still needs oracle access |
+| State-output linear algebra | HHL-style later algorithms | Prepare amplitude-encoded answer state | Estimate observables | Data loading and readout can erase speedup |
 
-## Worked example 1: Bernstein-Vazirani for a three-bit string
+## Worked example 1: Shor post-processing for factoring 15
 
-**Problem.** Suppose $f_s(x)=s\cdot x \pmod 2$ with hidden string $s=101$. Show that one quantum query recovers $s$.
+**Problem.** Factor $N=15$ using the order-finding branch of Shor's algorithm with $a=2$. Show the order and the classical gcd step.
 
 **Method.**
 
-1. Start the input register in $\vert 000\rangle$ and apply Hadamards:
+1. Check that $a$ is usable:
 
 $$
-H^{\otimes 3}|000\rangle
-= \frac{1}{\sqrt{8}}\sum_{x\in\{0,1\}^3}|x\rangle.
+\gcd(2,15)=1.
 $$
 
-2. Use the phase oracle:
+So no factor is found immediately, and order finding is needed.
+
+2. Compute powers of $2$ modulo $15$:
 
 $$
-|x\rangle \mapsto (-1)^{s\cdot x}|x\rangle.
+2^1\equiv 2\pmod{15},
 $$
 
-For $s=101$, the exponent is $x_1 \oplus x_3$ if bits are ordered left to right. The state becomes
-
 $$
-\frac{1}{\sqrt{8}}\sum_x (-1)^{x_1\oplus x_3}|x\rangle.
+2^2=4\equiv 4\pmod{15},
 $$
 
-3. Use the identity
-
 $$
-H^{\otimes n}\left(\frac{1}{\sqrt{2^n}}\sum_x (-1)^{s\cdot x}|x\rangle\right)=|s\rangle.
+2^3=8\equiv 8\pmod{15},
 $$
 
-For $n=3$, the final state is $\vert 101\rangle$.
+$$
+2^4=16\equiv 1\pmod{15}.
+$$
 
-4. Measure in the computational basis.
+No earlier positive exponent gives $1$, so the order is
 
-**Answer.** The measurement returns $101$ with probability $1$. The check is that the final Hadamards undo the character of the Boolean group $\mathbb{F}_2^3$ and convert the phase label into a basis label.
+$$
+r=4.
+$$
 
-## Worked example 2: Grover iteration count for one marked item
+3. Check the factoring conditions. The order is even. Also
 
-**Problem.** A database has $N=64$ items and exactly one marked item. Estimate how many Grover iterations should be used.
+$$
+2^{r/2}=2^2=4\not\equiv -1\pmod{15},
+$$
+
+because $-1\equiv 14\pmod{15}$.
+
+4. Compute the gcds:
+
+$$
+\gcd(2^{r/2}-1,15)=\gcd(3,15)=3,
+$$
+
+$$
+\gcd(2^{r/2}+1,15)=\gcd(5,15)=5.
+$$
+
+5. Connect this to the quantum measurement. If a phase register of size $q=256$ measured $64$, the rational estimate is
+
+$$
+\frac{64}{256}=\frac{1}{4}.
+$$
+
+Continued fractions recover denominator $4$, matching the order. A measurement of $192$ would give $192/256=3/4$, also revealing denominator $4$.
+
+**Answer.** The order of $2$ modulo $15$ is $4$, and the classical post-processing returns factors $3$ and $5$. The checked point is that the quantum subroutine is not "factoring directly"; it estimates a phase whose denominator is the period needed by the number-theoretic reduction.
+
+## Worked example 2: Grover iteration count and success check
+
+**Problem.** A search space has $N=64$ items and $M=1$ marked item. Estimate the number of Grover iterations and check the success probability formula.
 
 **Method.**
 
-1. With one marked item, $M=1$ and
+1. Compute the initial good amplitude:
 
 $$
-\sin^2\theta = \frac{M}{N} = \frac{1}{64}.
+\sin\theta=\sqrt{\frac{M}{N}}=\sqrt{\frac{1}{64}}=\frac{1}{8}.
 $$
 
-2. Therefore
+2. Find the angle:
 
 $$
-\sin\theta = \frac{1}{8},
-\qquad
-\theta = \arcsin(1/8).
+\theta=\arcsin(1/8)\approx 0.1253.
 $$
 
-For small angles this is about $0.125$ radians; using the arcsine gives about $0.1253$ radians.
-
-3. The near-optimal iteration count is
+3. Use the near-optimal iteration estimate:
 
 $$
-k \approx \left\lfloor \frac{\pi}{4\theta} \right\rfloor
-= \left\lfloor \frac{3.1416}{4(0.1253)} \right\rfloor
-= \lfloor 6.27 \rfloor
-= 6.
+k\approx \frac{\pi}{4\theta}-\frac{1}{2}
+=\frac{3.1416}{4(0.1253)}-\frac{1}{2}
+\approx 5.77.
 $$
 
-4. Check the success angle after $k$ iterations. The success probability is
+So choose $k=6$ iterations.
+
+4. Check the success probability:
 
 $$
-\sin^2((2k+1)\theta)
-= \sin^2(13 \times 0.1253)
-= \sin^2(1.6289).
+P_{\mathrm{success}}=\sin^2((2k+1)\theta)
+=\sin^2(13\times 0.1253).
 $$
 
-Since $1.6289$ is close to $\pi/2$, the probability is close to $1$.
+5. Multiply the angle:
 
-**Answer.** Use about $6$ Grover iterations. More iterations are not always better; after the amplitude rotates past the marked subspace, the success probability decreases.
+$$
+13\times 0.1253=1.6289.
+$$
+
+This is close to $\pi/2\approx 1.5708$, so the sine squared is close to $1$.
+
+**Answer.** Use about $6$ Grover iterations. The state has rotated very near the marked subspace, so measurement returns the marked item with high probability. The check also shows why over-iteration is a mistake: after passing the marked subspace, further rotations decrease success probability.
 
 ## Code
 
-This small state-vector simulation implements Grover search for $N=8$ with one marked item. It uses only NumPy and explicit matrices so the reflections are visible.
+This snippet implements the classical post-processing part of Shor's algorithm for small examples. It assumes the quantum phase-estimation stage has supplied a candidate rational approximation.
 
 ```python
-import numpy as np
+from fractions import Fraction
+from math import gcd
 
-def grover_search(num_qubits, marked):
-    n = 2 ** num_qubits
-    state = np.ones(n, dtype=complex) / np.sqrt(n)
+def recover_order_from_phase(measured, q, n):
+    """Recover a candidate order r from measured/q using continued fractions."""
+    frac = Fraction(measured, q).limit_denominator(n)
+    return frac.denominator
 
-    oracle = np.eye(n, dtype=complex)
-    oracle[marked, marked] = -1
+def shor_postprocess(n, a, measured, q):
+    g = gcd(a, n)
+    if g > 1:
+        return g, n // g
 
-    psi = np.ones((n, 1), dtype=complex) / np.sqrt(n)
-    diffusion = 2 * (psi @ psi.conj().T) - np.eye(n)
+    r = recover_order_from_phase(measured, q, n)
+    if pow(a, r, n) != 1:
+        return None
+    if r % 2 != 0:
+        return None
 
-    iterations = round(np.pi / 4 * np.sqrt(n))
-    for _ in range(iterations):
-        state = diffusion @ (oracle @ state)
+    half = pow(a, r // 2, n)
+    if half == n - 1:
+        return None
 
-    probabilities = np.abs(state) ** 2
-    return probabilities
+    p = gcd(half - 1, n)
+    q_factor = gcd(half + 1, n)
+    if 1 < p < n and 1 < q_factor < n:
+        return tuple(sorted((p, q_factor)))
+    return None
 
-probs = grover_search(num_qubits=3, marked=5)
-for index, probability in enumerate(probs):
-    print(f"{index:03b}: {probability:.3f}")
+print(shor_postprocess(n=15, a=2, measured=64, q=256))
+print(shor_postprocess(n=15, a=2, measured=192, q=256))
 ```
 
 ## Common pitfalls
 
-- Saying "quantum parallelism" without explaining interference. Superposition alone does not give readable answers.
-- Ignoring oracle construction. Query complexity can hide the real cost of building $U_f$.
-- Treating Shor as a NISQ algorithm. Useful large-number factoring requires fault-tolerant resources.
-- Treating HHL as a drop-in replacement for classical linear solvers. It prepares a quantum state, not a printed vector.
-- Forgetting input and output models. State preparation and measurement can erase theoretical speedups.
-- Over-iterating Grover search. The state rotates through the good subspace and then away from it.
-- Assuming phase estimation works without eigenstate overlap. If the input has little overlap with the target eigenstate, success probability is small.
-- Calling every variational circuit an algorithmic speedup. Many variational methods are heuristics; see [quantum machine learning](/quantum-information-science/quantum-computing/quantum-ml).
-- Forgetting precision dependence. A polylogarithmic dimension dependence can still be offset by condition number, inverse success probability, or high accuracy requirements.
-- Ignoring classical post-processing. Simon's algorithm needs linear algebra over $\mathbb{F}_2$, and Shor's algorithm needs continued fractions and gcd computations after measurement.
+- Saying "quantum parallelism" without explaining interference. Superposition alone does not make all branch results readable.
+- Treating QFT as a faster classical FFT. It transforms amplitudes of a quantum state; extracting all transformed amplitudes would require many measurements.
+- Hiding modular exponentiation in Shor's algorithm. It is the large reversible arithmetic block and dominates resource estimates.
+- Forgetting continued fractions and gcd checks. The quantum measurement gives a rational approximation, not factors by itself.
+- Assuming every choice of $a$ works in Shor. Random choices can fail if the order is odd or $a^{r/2}\equiv -1\pmod N$.
+- Over-iterating Grover search. The good amplitude rotates up and then back down.
+- Ignoring oracle construction. Query complexity can hide a real circuit whose cost is comparable to the classical verifier.
+- Concluding that Grover solves NP-complete problems efficiently. It gives a quadratic speedup for unstructured search, and N&C discuss optimality bounds against better black-box scaling.
+- Claiming NISQ devices can run useful Shor factoring at cryptographic sizes. Shor requires deep, fault-tolerant modular arithmetic.
+- Forgetting input and output models in later algorithms such as HHL. Preparing $\vert b\rangle$ and reading useful observables are part of the algorithm.
 
 ## Connections
 
-- [Quantum hardware](/quantum-information-science/quantum-computing/hardware) determines native gates, depth limits, and whether circuits can be run before decoherence.
+- [Quantum hardware](/quantum-information-science/quantum-computing/hardware) determines whether controlled powers, modular arithmetic, or Grover oracles can be run before noise dominates.
 - [Quantum error correction](/quantum-information-science/quantum-computing/error-correction) is required for deep algorithms such as Shor and high-precision phase estimation.
-- [Quantum machine learning](/quantum-information-science/quantum-computing/quantum-ml) uses amplitude estimation, kernels, parametrized circuits, and QAOA-adjacent methods.
-- [Cryptography](/cs/cryptography/) connects to Shor's algorithm through RSA and discrete-log systems.
-- [Linear algebra](/math/linear-algebra/) is the language of unitary matrices, eigenspaces, singular values, and condition numbers.
-- [Machine learning](/cs/machine-learning/) and [deep learning](/cs/deep-learning/) are needed to judge QML baselines honestly.
-- [Quantum security](/quantum-information-science/quantum-security/) covers quantum-safe cryptography and protocol implications.
+- [Quantum machine learning](/quantum-information-science/quantum-computing/quantum-ml) borrows amplitude estimation, phase estimation, kernels, and variational circuits, but often changes the input-output model.
+- [Cryptography](/cs/cryptography/) connects directly to factoring, discrete logarithms, and post-quantum security.
+- [Linear algebra](/math/linear-algebra/) supplies eigenvectors, unitaries, tensor products, projections, and Fourier transforms.
+- [Quantum mechanics](/physics/quantum-mechanics/) supplies measurement, unitary evolution, phase, and interference.
+- [Quantum communication](/quantum-information-science/quantum-communication/) uses many of the same primitive circuits, including teleportation and phase-sensitive measurements.
 
 ## Further reading
 
+- Michael A. Nielsen and Isaac L. Chuang, *Quantum Computation and Quantum Information*, Chapters 1, 5, and 6.
 - Peter Shor, polynomial-time algorithms for prime factorization and discrete logarithms.
 - Lov Grover, a fast quantum mechanical algorithm for database search.
 - Daniel Simon, on the power of quantum computation.
 - Ethan Bernstein and Umesh Vazirani, quantum complexity theory.
-- Dorit Aharonov, Andris Ambainis, Julia Kempe, and others on quantum walks.
 - Aram Harrow, Avinatan Hassidim, and Seth Lloyd, quantum algorithm for linear systems.
-- Michael A. Nielsen and Isaac L. Chuang, *Quantum Computation and Quantum Information*.

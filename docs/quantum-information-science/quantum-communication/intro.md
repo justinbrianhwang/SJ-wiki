@@ -9,6 +9,8 @@ Quantum communication studies how quantum states, classical authenticated discus
 
 The neighboring areas matter. [Quantum computing](/quantum-information-science/quantum-computing/intro) supplies the qubit, measurement, and no-cloning language. [Quantum security](/quantum-information-science/quantum-security/intro) covers the post-quantum-cryptography path, where algorithms are changed so that classical networks remain safe against quantum computers. [Quantum internet](/quantum-information-science/quantum-internet/intro) pushes beyond key distribution toward entanglement distribution, teleportation, repeaters, and networked quantum processors.
 
+Primary textbook reference for this section: Nielsen and Chuang, *Quantum Computation and Quantum Information*, especially Chapter 12 for quantum information theory, Holevo's theorem, privacy amplification, and BB84 security, and Chapter 8 for quantum noise and channel modeling. The pages in this folder synthesize that textbook foundation with existing practical QKD and network material rather than duplicating separate textbook-specific pages.
+
 ## Definitions
 
 **Quantum communication** is any communication protocol in which at least one transmitted system must be modeled as a quantum state. The payload may be a single photon polarization, a time-bin qubit, a phase-encoded weak optical pulse, an entangled pair shared between nodes, or a more complex encoded state.
@@ -221,3 +223,9 @@ This deliberately omits loss, dark counts, finite-key confidence intervals, and 
 - [Quantum-Safe Cryptography](/quantum-information-science/quantum-security/quantum-safe-crypto) and [Post-Quantum Cryptography](/quantum-information-science/quantum-security/pqc) for the classical migration path.
 - [Classical Cryptography](/cs/cryptography/intro) for symmetric encryption, authentication, public-key assumptions, and protocol design baselines.
 - [Postulates of Quantum Mechanics](/physics/quantum-mechanics/postulates-of-quantum-mechanics), [Measurement and Interpretation](/physics/quantum-mechanics/measurement-interpretation), and [Dirac Notation and Hilbert Spaces](/physics/quantum-mechanics/dirac-notation-hilbert-spaces) for the physics used by the security intuition.
+- Nielsen and Chuang, *Quantum Computation and Quantum Information*, Chapters 8 and 12, for the canonical textbook treatment of quantum channels, accessible information, Holevo bounds, and BB84 security.
+
+## Deep-dive papers
+
+- [Efficient-BB84 Metropolitan Network (2025)](/quantum-information-science/quantum-communication/efficient-bb84-metropolitan-network): VenQCI deployment study of efficient-BB84, optical link switching, MACsec integration, and two-month metropolitan QKD operation.
+- [QKD Security Proofs, Attacks, and Network Integration (2025)](/quantum-information-science/quantum-communication/qkd-security-proofs-and-attacks-review): merged review of QKD protocol families, proof models, PNS and Trojan-horse attacks, jamming, QECC context, and classical-network deployment caveats.
