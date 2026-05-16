@@ -5,7 +5,7 @@ sidebar_position: 0
 ---
 
 <div align="center">
-  <img src="/SJ-wiki/assets/math.png" alt="Mathematics" width="180" />
+  <img src="/assets/math.png" alt="Mathematics" width="180" />
 </div>
 
 # Mathematics

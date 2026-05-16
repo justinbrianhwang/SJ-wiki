@@ -14,8 +14,8 @@ const config: Config = {
     v4: true,
   },
 
-  url: 'https://justinbrianhwang.github.io',
-  baseUrl: '/SJ-wiki/',
+  url: 'https://sjhwangwiki.com',
+  baseUrl: '/',
 
   organizationName: 'justinbrianhwang',
   projectName: 'SJ-wiki',

@@ -5,7 +5,7 @@ sidebar_position: 0
 ---
 
 <div align="center">
-  <img src="/SJ-wiki/assets/cs.png" alt="Computer Science" width="180" />
+  <img src="/assets/cs.png" alt="Computer Science" width="180" />
 </div>
 
 # Computer Science

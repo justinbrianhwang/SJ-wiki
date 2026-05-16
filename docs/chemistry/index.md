@@ -5,7 +5,7 @@ sidebar_position: 0
 ---
 
 <div align="center">
-  <img src="/SJ-wiki/assets/chemistry.png" alt="Chemistry" width="180" />
+  <img src="/assets/chemistry.png" alt="Chemistry" width="180" />
 </div>
 
 # Chemistry

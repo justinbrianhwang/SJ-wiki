@@ -5,7 +5,7 @@ sidebar_position: 0
 ---
 
 <div align="center">
-  <img src="/SJ-wiki/assets/physics.png" alt="Physics" width="180" />
+  <img src="/assets/physics.png" alt="Physics" width="180" />
 </div>
 
 # Physics
