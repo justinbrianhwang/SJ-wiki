@@ -9,10 +9,6 @@ Quantum theory explains why atoms have discrete spectra and why electrons occupy
 
 In the Ebbing and Gammon sequence this topic sits near light waves, photons, Bohr theory, quantum mechanics, quantum numbers, and atomic orbitals. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
-![A diagram shows electron shells and orbital filling capacities for atomic orbitals.](https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Electron_orbitals.svg/600px-Electron_orbitals.svg.png)
-
-*Figure: Electron orbitals and shell filling capacities. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Electron_orbitals.svg), Patricia.fidi, public domain.*
-
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.

@@ -84,8 +84,8 @@ flowchart TB
 
   subgraph Neville["Neville evaluation"]
     direction TB
-    Target["choose target x"] --> Table["triangular recurrence<br/>P(i,j"](x) from neighboring entries"]
-    Table --> EvalOne["output P(0,n"](x)<br/>one target value"]
+    Target["choose target x"] --> Table["triangular recurrence<br/>P(i,j)(x) from neighboring entries"]
+    Table --> EvalOne["output P(0,n)(x)<br/>one target value"]
   end
 
   Need -- "symbolic or reusable" --> Basis

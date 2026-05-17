@@ -9,10 +9,6 @@ Angular momentum is where quantum mechanics turns symmetry into spectra. Rotatio
 
 Sakurai presents angular momentum as the representation theory of rotations, with spin and orbital angular momentum treated under the same algebra. Ballentine gives a rigorous operator and rotation treatment, including finite rotations and tensor operators. The Gottfried-named notes develop the algebra after spin-1/2 and symmetries. Schiff's older coordinate style emphasizes orbital angular momentum, spherical harmonics, and central-potential wave functions.
 
-![A spherical-harmonics rendering shows colored lobes for the first bands of angular functions.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Spherical_Harmonics.png/600px-Spherical_Harmonics.png)
-
-*Figure: Real spherical harmonics as angular-momentum basis functions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Spherical_Harmonics.png), Inigo.quilez, CC BY-SA 3.0.*
-
 ## Definitions
 
 An angular momentum operator $\mathbf J=(J_x,J_y,J_z)$ satisfies

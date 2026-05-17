@@ -57,12 +57,12 @@ The output should also be checked structurally. A set of edges with low total we
 
 ```mermaid
 graph LR
-  A("(A")) ---|4| B("(B"))
-  A ---|2| C("(C"))
+  A((A)) ---|4| B((B))
+  A ---|2| C((C))
   B ---|1| C
-  B ---|5| D("(D"))
+  B ---|5| D((D))
   C ---|8| D
-  C ---|10| E("(E"))
+  C ---|10| E((E))
   D ---|2| E
 ```
 

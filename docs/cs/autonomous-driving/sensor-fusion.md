@@ -74,9 +74,9 @@ The best fusion design is often observable in logs. Engineers should be able to 
 flowchart TB
   subgraph Inputs["Synchronized calibrated inputs"]
     direction TB
-    Cam["Images: (B, N_cam, 3, H, W"]"]
-    Lidar["LiDAR points: (B, N_pts, x, y, z, intensity"]"]
-    Radar["Radar detections: (B, N_radar, range, azimuth, Doppler"]"]
+    Cam["Images: (B, N_cam, 3, H, W)"]
+    Lidar["LiDAR points: (B, N_pts, x, y, z, intensity)"]
+    Radar["Radar detections: (B, N_radar, range, azimuth, Doppler)"]
     Map["Map vectors: lanes, crosswalks, topology"]
     Pose["Ego pose and sensor transforms: T_sensor_to_ego"]
   end
@@ -96,11 +96,11 @@ flowchart TB
   subgraph Mid["Mid-level BEV fusion path"]
     direction TB
     ImgFeat["Image backbone + FPN features"]
-    Depth["Depth distribution per pixel: (D, H/stride, W/stride"]"]
-    Lift["Lift-splat to BEV: (C_img, X, Y"]"]
-    Voxel["Voxel/pillar encoder: (C_lidar, X, Y"]"]
-    RadarFeat["Radar BEV encoder: (C_radar, X, Y"]"]
-    MapFeat["Vector map encoder: polyline attention -> (C_map, X, Y"]"]
+    Depth["Depth distribution per pixel: (D, H/stride, W/stride)"]
+    Lift["Lift-splat to BEV: (C_img, X, Y)"]
+    Voxel["Voxel/pillar encoder: (C_lidar, X, Y)"]
+    RadarFeat["Radar BEV encoder: (C_radar, X, Y)"]
+    MapFeat["Vector map encoder: polyline attention -> (C_map, X, Y)"]
     CrossAttn["BEVFormer-style spatial cross-attention: BEV queries attend image features"]
     Fuse["Concat/add/gated fusion + temporal BEV memory"]
     Cam --> ImgFeat --> Depth --> Lift
@@ -135,8 +135,8 @@ flowchart TB
   EarlyBackbone --> Heads["Task heads"]
   Fuse --> Heads
   TrackFilter --> Heads
-  Heads --> Objects["Objects and tracks: (class, box, velocity, covariance"]"]
-  Heads --> Occupancy["Occupancy / freespace grid: (X, Y, p_occ"]"]
+  Heads --> Objects["Objects and tracks: (class, box, velocity, covariance)"]
+  Heads --> Occupancy["Occupancy / freespace grid: (X, Y, p_occ)"]
   Heads --> Lanes["Lanes, drivable area, traffic controls"]
   Objects --> Final(("Prediction and planning interface"))
   Occupancy --> Final

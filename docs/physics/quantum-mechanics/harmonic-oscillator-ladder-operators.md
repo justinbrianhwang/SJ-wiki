@@ -9,10 +9,6 @@ The harmonic oscillator is the exactly solvable model that reappears everywhere:
 
 Sakurai solves the oscillator with ladder operators after developing time evolution and the Heisenberg picture. Ballentine gives both algebraic and coordinate-representation treatments. The Gottfried-named notes include coherent states and uncertainty discussion. Schiff's classic treatment is the differential-equation counterpart, often emphasizing Hermite polynomials and wave functions.
 
-![A quantum-harmonic-oscillator plot shows the first six wavefunctions.](https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Oscillator_wavefunctions.svg/600px-Oscillator_wavefunctions.svg.png)
-
-*Figure: First six wavefunctions of the quantum harmonic oscillator. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Oscillator_wavefunctions.svg), AkanoToE, public domain.*
-
 ## Definitions
 
 The one-dimensional oscillator Hamiltonian is

@@ -61,10 +61,10 @@ For weighted graphs, adjacency-list nodes normally store both `to` and `weight`.
 
 ```mermaid
 graph LR
-  A("(0")) --- B("(1"))
-  A --- C("(2"))
+  A((0)) --- B((1))
+  A --- C((2))
   B --- C
-  B --- D("(3"))
+  B --- D((3))
   C --- D
 ```
 

@@ -62,7 +62,7 @@ sequenceDiagram
   participant Main
   participant Worker1
   participant Worker2
-  participant Counter as Arc<Mutex<i32>>
+  participant Counter as "Arc<Mutex<i32>>"
   Main->>Worker1: spawn(move clone)
   Main->>Worker2: spawn(move clone)
   Worker1->>Counter: lock()

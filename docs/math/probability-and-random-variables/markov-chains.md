@@ -118,7 +118,7 @@ flowchart LR
 
   subgraph Evolution["Distribution evolution"]
     direction TB
-    Mu0["initial distribution<br/>mu_0 = (P(R), P(S)"]"] --> Pmat["transition matrix<br/>P = ((0.5, 0.5"], ["0.2, 0.8"]]"]
+    Mu0["initial distribution<br/>mu_0 = (P(R), P(S))"] --> Pmat["transition matrix<br/>P = ((0.5, 0.5), (0.2, 0.8))"]
     Pmat --> Mu1["one step<br/>mu_1 = mu_0 P"]
     Mu1 --> Mun["n steps<br/>mu_n = mu_0 P^n"]
     Mun --> Flow["stationary flow balance<br/>pi_R P_RS = pi_S P_SR"]
@@ -126,7 +126,7 @@ flowchart LR
 
   subgraph Absorb["Absorbing-chain template"]
     direction TB
-    Canon["reorder states<br/>transient first, absorbing last"] --> Block["block matrix<br/>P = ((Q, R"], ["0, I"]]"]
+    Canon["reorder states<br/>transient first, absorbing last"] --> Block["block matrix<br/>P = ((Q, R), (0, I))"]
     Block --> Fundamental["fundamental matrix<br/>N = (I - Q)^-1"]
     Fundamental --> Outputs["absorption probabilities and expected hitting times"]
   end

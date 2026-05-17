@@ -93,7 +93,7 @@ Model drift weakens the claim.
 
 ```mermaid
 sequenceDiagram
-  participant P as Prover with witness x
+  participant P as "Prover with witness x"
   participant V as Verifier
   Note over P,V: Public statement: y = g^x in group G of order q
   P->>P: sample r in Z_q and compute commitment R = g^r

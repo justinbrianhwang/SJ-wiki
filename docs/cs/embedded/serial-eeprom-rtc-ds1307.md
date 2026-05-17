@@ -53,7 +53,7 @@ The tenth key result is that nonvolatile data needs a format, not just an addres
 
 ```mermaid
 sequenceDiagram
-  participant MCU as 8051 I2C master
+  participant MCU as "8051 I2C master"
   participant RTC as DS1307
   MCU->>RTC: START, address 68H write
   RTC-->>MCU: ACK

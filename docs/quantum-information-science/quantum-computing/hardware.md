@@ -202,7 +202,7 @@ flowchart TD
     TQ --> TG["Entangling operation<br/>cross-resonance, iSWAP, CZ, or tunable coupler"]
     TQ --> TRes["Readout resonator<br/>state-dependent frequency shift"]
     TRes --> TPurcell["Purcell/filter chain<br/>protect qubit from readout loss"]
-    TPurcell --> TADC["Amplifier + ADC<br/>I/Q samples -> bit (0 or 1"]"]
+    TPurcell --> TADC["Amplifier + ADC<br/>I/Q samples -> bit (0 or 1)"]
   end
 
   subgraph IonTrap["Trapped-ion processor"]
@@ -214,7 +214,7 @@ flowchart TD
     Raman["Raman or quadrupole beams<br/>1q gates and MS entangling gates"] --> Chain
     Chain --> Motion["Motional bus<br/>collective modes mediate 2q gates"]
     Motion --> IEnt["Mølmer-Sørensen gate<br/>XX(theta) on selected ions"]
-    Chain --> IDet["State-dependent fluorescence<br/>PMT/CCD camera -> bits (N"]"]
+    Chain --> IDet["State-dependent fluorescence<br/>PMT/CCD camera -> bits (N)"]
   end
 
   subgraph Photonic["Linear-optical photonic block"]
@@ -228,9 +228,9 @@ flowchart TD
 
   subgraph Stack["Hardware-to-algorithm stack"]
     direction TB
-    Spec["Circuit specification<br/>logical qubits (k"], depth [D], measurements"] --> Compile["Compiler and scheduler<br/>map gates to native operations"]
+    Spec["Circuit specification<br/>logical qubits (k), depth (D), measurements"] --> Compile["Compiler and scheduler<br/>map gates to native operations"]
     Compile --> Cal["Calibration loop<br/>Rabi, Ramsey, crosstalk, readout assignment"]
-    Cal --> Run["Execution batch<br/>shots (S"] with timing and reset"]
+    Cal --> Run["Execution batch<br/>shots (S) with timing and reset"]
     Run --> Noise["Noise model<br/>T1/T2, leakage, loss, SPAM, crosstalk"]
     Noise --> QEC["QEC cycle<br/>syndrome measurement + decoder + Pauli frame"]
     QEC --> Result["Algorithm result<br/>samples, expectation values, logical outcomes"]

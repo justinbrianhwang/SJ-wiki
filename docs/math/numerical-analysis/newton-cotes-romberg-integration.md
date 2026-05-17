@@ -80,7 +80,7 @@ For study purposes, the most useful habit is to separate four layers: the contin
 
 ```mermaid
 flowchart TB
-  Integral["Integral on (a,b"]<br/>choose panel count and tolerance"] --> Base{"Newton-Cotes rule"}
+  Integral["Integral on (a,b)<br/>choose panel count and tolerance"] --> Base{"Newton-Cotes rule"}
   Base -- "trapezoid" --> Trap["composite trapezoid T(h)<br/>endpoint-weighted panels"]
   Base -- "Simpson" --> Simp["composite Simpson<br/>pairs of panels, even subinterval count"]
   Base -- "midpoint" --> Mid["composite midpoint<br/>open panel centers"]

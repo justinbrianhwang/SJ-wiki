@@ -62,9 +62,9 @@ That compromise is normal.
 ```mermaid
 sequenceDiagram
   participant App as Application
-  participant Kernel as Kernel I/O subsystem
-  participant Driver as Device driver
-  participant Ctrl as Controller/DMA
+  participant Kernel as "Kernel I/O subsystem"
+  participant Driver as "Device driver"
+  participant Ctrl as "Controller/DMA"
   participant Dev as Device
 
   App->>Kernel: read("fd, buf, n")

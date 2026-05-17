@@ -124,7 +124,7 @@ flowchart TB
     subgraph Backward["Backward pass"]
       direction RL
       DeltaO["Output delta: o_k(1-o_k)(t_k-o_k)"] --> GradO["Gradient for W_o: delta_o * h"]
-      DeltaH["Hidden delta: h_j(1-h_j) sum_k W_o(j,k"] delta_k"] --> GradH["Gradient for W_h: delta_h * x"]
+      DeltaH["Hidden delta: h_j(1-h_j) sum_k W_o(j,k) delta_k"] --> GradH["Gradient for W_h: delta_h * x"]
       GradO --> UpdateO["Update W_o and b_o with learning rate eta and momentum"]
       GradH --> UpdateH["Update W_h and b_h with learning rate eta and momentum"]
     end

@@ -135,10 +135,10 @@ Keep it versioned.
 
 ```mermaid
 sequenceDiagram
-  participant ADC as A/D sampler
-  participant CPU as Digital compensator
-  participant DAC as D/A and hold
-  participant Plant as Continuous plant
+  participant ADC as "A/D sampler"
+  participant CPU as "Digital compensator"
+  participant DAC as "D/A and hold"
+  participant Plant as "Continuous plant"
   ADC->>CPU: e[n]
   CPU->>CPU: update difference equation
   CPU->>DAC: u[n]

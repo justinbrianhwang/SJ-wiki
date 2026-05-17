@@ -85,8 +85,8 @@ The triangle needs three edge colours because every pair of edges is adjacent.
 
 ```mermaid
 graph LR
-  A("(A")) ---|red| B("(B"))
-  B ---|blue| C("(C"))
+  A(("A")) ---|red| B(("B"))
+  B ---|blue| C(("C"))
   C ---|green| A
 ```
 

@@ -14,7 +14,7 @@ flowchart TD
 
   subgraph QC["Quantum Computing"]
     direction TB
-    HW["hardware platforms<br/>transmons, ions, photons"] --> CIR["circuit model<br/>registers (n qubits"], gates, measurements"]
+    HW["hardware platforms<br/>transmons, ions, photons"] --> CIR["circuit model<br/>registers (n qubits), gates, measurements"]
     CIR --> ALG["algorithms<br/>QFT, phase estimation, Grover, Shor, HHL"]
     CIR --> EC["error correction<br/>stabilizers, syndrome extraction, logical qubits"]
     ALG --> QML["quantum ML<br/>VQE, QAOA, kernels, optimizer loops"]

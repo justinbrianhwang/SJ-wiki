@@ -87,11 +87,11 @@ The wheel $W_5$ is planar. Its center connects to all four vertices of an outer 
 
 ```mermaid
 graph TD
-  A("(A")) --- B("(B"))
-  B --- C("(C"))
-  C --- D("(D"))
+  A(("A")) --- B(("B"))
+  B --- C(("C"))
+  C --- D(("D"))
   D --- A
-  O("(O")) --- A
+  O(("O")) --- A
   O --- B
   O --- C
   O --- D

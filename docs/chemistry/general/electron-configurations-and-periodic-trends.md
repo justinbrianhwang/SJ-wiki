@@ -9,10 +9,6 @@ Electron configurations translate quantum numbers into the periodic table. They 
 
 In the Ebbing and Gammon sequence this topic sits near electron spin, Pauli exclusion, building-up principle, periodic table, orbital diagrams, Hund's rule, and periodic properties. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
-![A periodic table displays element names, atomic masses, electron configurations, ionization energies, and electronegativities.](https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Periodic_table_large.svg/600px-Periodic_table_large.svg.png)
-
-*Figure: Periodic table with electron configurations and trend-related data. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Periodic_table_large.svg), 2012rc, CC BY 3.0.*
-
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.

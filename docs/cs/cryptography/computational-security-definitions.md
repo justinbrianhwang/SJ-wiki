@@ -78,7 +78,7 @@ Negligible probabilities are closed under polynomial sums, which is why the defi
 
 ```mermaid
 sequenceDiagram
-  participant A as Adversary A
+  participant A as "Adversary A"
   participant C as Challenger
   C->>C: sample key k and hidden bit b
   A->>C: send m0, m1 with equal length

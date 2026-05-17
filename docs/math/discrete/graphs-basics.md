@@ -69,10 +69,10 @@ Graph isomorphism asks whether two graphs are structurally identical after renam
 
 ```mermaid
 graph LR
-  A("(a")) --- B("(b"))
-  A --- C("(c"))
+  A(("a")) --- B(("b"))
+  A --- C(("c"))
   B --- C
-  C --- D("(d"))
+  C --- D(("d"))
 ```
 
 | Representation | Space for $n$ vertices, $m$ edges | Fast operation | Weakness |

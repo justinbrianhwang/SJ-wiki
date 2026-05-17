@@ -66,12 +66,12 @@ For study purposes, the most useful habit is to separate four layers: the contin
 
 ```mermaid
 flowchart TB
-  Integral["Target integral<br/>I = integral_a^b f(x) dx"] --> Panel["Start panel (a,b"]<br/>tolerance budget"]
+  Integral["Target integral<br/>I = integral_a^b f(x) dx"] --> Panel["Start panel (a,b)<br/>tolerance budget"]
   Panel --> Rule{"Choose paired rule"}
 
   subgraph Simpson["Adaptive Simpson"]
     direction TB
-    S1["coarse Simpson on (a,b"]"] --> S2["two half-panel Simpson estimates"]
+    S1["coarse Simpson on (a,b)"] --> S2["two half-panel Simpson estimates"]
     S2 --> SErr["error estimate from difference<br/>scaled by 1/15"]
   end
 

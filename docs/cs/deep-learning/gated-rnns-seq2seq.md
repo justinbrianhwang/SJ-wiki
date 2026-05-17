@@ -90,14 +90,14 @@ Loss masking is part of the model objective. Padding lets variable-length sequen
 flowchart TB
   subgraph LSTM["LSTM cell internals at time t"]
     direction TB
-    X["Input x_t: (N, d_x"]"] --> Cat["Concatenate (h_{t-1}, x_t"]"]
-    Hprev["Previous hidden h_{t-1}: (N, d_h"]"] --> Cat
-    Cprev["Previous cell C_{t-1}: (N, d_h"]"] -. "linear memory path" .-> ForgetMul(("Elementwise multiply"))
+    X["Input x_t: (N, d_x)"] --> Cat["Concatenate (h_{t-1}, x_t)"]
+    Hprev["Previous hidden h_{t-1}: (N, d_h)"] --> Cat
+    Cprev["Previous cell C_{t-1}: (N, d_h)"] -. "linear memory path" .-> ForgetMul(("Elementwise multiply"))
 
-    Cat --> F["Forget gate f_t = sigmoid(W_f (h_{t-1}, x_t"] + b_f)"]
-    Cat --> I["Input gate i_t = sigmoid(W_i (h_{t-1}, x_t"] + b_i)"]
-    Cat --> G["Candidate g_t = tanh(W_g (h_{t-1}, x_t"] + b_g)"]
-    Cat --> O["Output gate o_t = sigmoid(W_o (h_{t-1}, x_t"] + b_o)"]
+    Cat --> F["Forget gate f_t = sigmoid(W_f (h_{t-1}, x_t) + b_f)"]
+    Cat --> I["Input gate i_t = sigmoid(W_i (h_{t-1}, x_t) + b_i)"]
+    Cat --> G["Candidate g_t = tanh(W_g (h_{t-1}, x_t) + b_g)"]
+    Cat --> O["Output gate o_t = sigmoid(W_o (h_{t-1}, x_t) + b_o)"]
 
     F --> ForgetMul
     Cprev --> ForgetMul
@@ -114,7 +114,7 @@ flowchart TB
 
   subgraph Seq2Seq["Encoder-decoder sequence-to-sequence pipeline"]
     direction LR
-    Src["Source tokens: (x_1 ... x_n"]"] --> SrcEmb["Source embedding + mask"]
+    Src["Source tokens: (x_1 ... x_n)"] --> SrcEmb["Source embedding + mask"]
     SrcEmb --> Enc["Encoder RNN/LSTM unrolled over source"]
     Enc --> Context["Final encoder state(s): h_n and C_n"]
     Context --> DecInit["Initialize decoder state"]

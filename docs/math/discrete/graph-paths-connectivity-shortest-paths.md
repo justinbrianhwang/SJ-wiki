@@ -37,12 +37,12 @@ The adjacency matrix $A$ of a graph also counts walks: the $(i,j)$ entry of $A^k
 
 ```mermaid
 graph LR
-  A("(a")) ---|2| B("(b"))
-  A ---|5| C("(c"))
+  A(("a")) ---|2| B(("b"))
+  A ---|5| C(("c"))
   B ---|1| C
-  B ---|4| D("(d"))
+  B ---|4| D(("d"))
   C ---|1| D
-  D ---|3| E("(e"))
+  D ---|3| E(("e"))
 ```
 
 | Algorithm | Graph type | Main output | Typical time with adjacency lists |

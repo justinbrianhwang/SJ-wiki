@@ -85,10 +85,10 @@ Softmax temperature changes confidence without changing logit order when applied
 
 ```mermaid
 flowchart TB
-  X["Input batch X: (N, d"]"] --> Affine["Affine classifier: logits O = XW + b -> (N, K"]"]
+  X["Input batch X: (N, d)"] --> Affine["Affine classifier: logits O = XW + b -> (N, K)"]
   Affine --> Stable["Stable log-softmax: subtract row max before exponentials"]
-  Stable --> Prob["Probabilities p_hat: (N, K"], rows sum to 1"]
-  Y["True class ids y: (N"]"] --> Gather["Gather log probability of true class"]
+  Stable --> Prob["Probabilities p_hat: (N, K), rows sum to 1"]
+  Y["True class ids y: (N)"] --> Gather["Gather log probability of true class"]
   Prob --> Gather
   Gather --> CE["Cross-entropy loss = mean(-log p_hat_y)"]
   Affine --> Argmax["argmax over logits"]

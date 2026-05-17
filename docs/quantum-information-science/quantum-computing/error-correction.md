@@ -360,13 +360,13 @@ flowchart TB
     BFEnc --> BFNoise["single-X error channel<br/>I, X1, X2, or X3"]
     BFNoise --> BFS1["measure stabilizer<br/>Z1 Z2 -> syndrome bit s12"]
     BFNoise --> BFS2["measure stabilizer<br/>Z2 Z3 -> syndrome bit s23"]
-    BFS1 --> BFSyn["syndrome pair<br/>(s12, s23"]"]
+    BFS1 --> BFSyn["syndrome pair<br/>(s12, s23)"]
     BFS2 --> BFSyn
     BFSyn --> BFDec{"decoder table<br/>which bit flipped?"}
-    BFDec -->|"["+,+"]"| BFI["do nothing"]
-    BFDec -->|"["-,+"]"| BFX1["apply X1"]
-    BFDec -->|"["-,-"]"| BFX2["apply X2"]
-    BFDec -->|"["+,-"]"| BFX3["apply X3"]
+    BFDec -->|"(+,+)"| BFI["do nothing"]
+    BFDec -->|"(-,+)"| BFX1["apply X1"]
+    BFDec -->|"(-,-)"| BFX2["apply X2"]
+    BFDec -->|"(+,-)"| BFX3["apply X3"]
     BFI --> BFOut["logical state restored<br/>up to correctable error"]
     BFX1 --> BFOut
     BFX2 --> BFOut
@@ -387,7 +387,7 @@ flowchart TB
 
   subgraph Steane7["7-qubit Steane CSS code"]
     direction LR
-    STIn["logical input<br/>|psi_L>"] --> STEnc["Hamming-code CSS encoder<br/>((7,1,3"]]"]
+    STIn["logical input<br/>|psi_L>"] --> STEnc["Hamming-code CSS encoder<br/>parameters (7,1,3)"]
     STEnc --> STData["7 data qubits<br/>distance 3, one logical qubit"]
     STData --> STX["X stabilizers<br/>X1X3X5X7, X2X3X6X7, X4X5X6X7"]
     STData --> STZ["Z stabilizers<br/>Z1Z3Z5Z7, Z2Z3Z6Z7, Z4Z5Z6Z7"]

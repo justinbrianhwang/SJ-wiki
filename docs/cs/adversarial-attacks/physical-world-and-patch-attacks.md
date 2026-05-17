@@ -197,7 +197,7 @@ This attack family illustrates why physical evaluation must report distance, ang
 
 ```mermaid
 flowchart TB
-  Patch["Trainable patch texture p: (H_p, W_p, 3"]"]
+  Patch["Trainable patch texture p: (H_p, W_p, 3)"]
   Image["Clean image / scene render x"]
   Mask["Patch mask and placement parameters: location, scale, rotation"]
 

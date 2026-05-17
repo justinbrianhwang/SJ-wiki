@@ -11,7 +11,7 @@ The later pages cover the main deep learning families: multilayer perceptrons, c
 
 ```mermaid
 flowchart TB
-  Data["Data as tensors: tabular (N,d"], images ["N,C,H,W"], tokens ["N,T"]"] --> Model["Differentiable model: linear layers, MLPs, CNNs, RNNs, attention"]
+  Data["Data as tensors: tabular (N,d), images (N,C,H,W), tokens (N,T)"] --> Model["Differentiable model: linear layers, MLPs, CNNs, RNNs, attention"]
   Model --> Pred["Predictions: scalar, class logits, token logits, boxes, masks, scores"]
   Target["Targets or self-supervised labels"] --> Loss["Scalar objective"]
   Pred --> Loss

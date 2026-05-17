@@ -45,11 +45,11 @@ The left four vertices form a square, and the diagonal connection through $E$ ch
 
 ```mermaid
 graph LR
-  A("(A")) --- B("(B"))
-  B --- C("(C"))
-  C --- D("(D"))
+  A(("A")) --- B(("B"))
+  B --- C(("C"))
+  C --- D(("D"))
   D --- A
-  D --- E("(E"))
+  D --- E(("E"))
   E --- A
 ```
 

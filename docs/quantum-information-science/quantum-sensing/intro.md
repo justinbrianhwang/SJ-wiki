@@ -237,7 +237,7 @@ flowchart TB
     R0["two-level probe<br/>|0>"] --> Rpi1["pi/2 pulse<br/>(|0>+|1>)/sqrt(2)"]
     Rpi1 --> Rfree["free evolution time T<br/>phase phi = delta omega T + signal"]
     Rfree --> Rpi2["second pi/2 pulse<br/>map phase to population"]
-    Rpi2 --> Rmeas["measure P0, P1<br/>shots (S"]"]
+    Rpi2 --> Rmeas["measure P0, P1<br/>shots (S)"]
     Rmeas --> Rest["phase/frequency estimator<br/>Delta phi -> Delta omega"]
   end
 
@@ -247,7 +247,7 @@ flowchart TB
     MW["microwave control<br/>pi/2, pi, dynamical-decoupling pulses"] --> Center
     Field["magnetic field B(t)<br/>Zeeman shift"] --> Center
     Center --> Red["red fluorescence<br/>spin-dependent brightness"]
-    Red --> Counter["photon counter / camera<br/>counts (S"]"]
+    Red --> Counter["photon counter / camera<br/>counts (S)"]
     Counter --> ODMR["ODMR fit<br/>resonance shift -> B estimate"]
   end
 

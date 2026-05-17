@@ -9,10 +9,6 @@ AC Circuits and Electromagnetic Waves covers sinusoidal circuits, reactance, res
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
-![A plane electromagnetic wave diagram shows perpendicular electric and magnetic fields.](https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Plane_electromagnetic_wave.svg/600px-Plane_electromagnetic_wave.svg.png)
-
-*Figure: Plane electromagnetic wave with transverse electric and magnetic fields. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Plane_electromagnetic_wave.svg), Chetvorno, CC0 1.0.*
-
 ## Definitions
 
 - **Scope:** sinusoidal circuits, reactance, resonance, Maxwell wave ideas, and the electromagnetic spectrum.

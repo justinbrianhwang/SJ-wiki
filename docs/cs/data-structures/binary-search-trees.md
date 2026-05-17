@@ -66,12 +66,12 @@ Deletion is the operation that most often breaks student implementations. A good
 
 ```mermaid
 graph TD
-  A("(50")) --> B("(30"))
-  A --> C("(70"))
-  B --> D("(20"))
-  B --> E("(40"))
-  C --> F("(60"))
-  C --> G("(80"))
+  A((50)) --> B((30))
+  A --> C((70))
+  B --> D((20))
+  B --> E((40))
+  C --> F((60))
+  C --> G((80))
 ```
 
 The invariant says each local subtree also forms a valid search tree:

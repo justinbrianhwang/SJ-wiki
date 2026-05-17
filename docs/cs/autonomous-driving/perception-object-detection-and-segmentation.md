@@ -139,13 +139,13 @@ Perception outputs also need lifecycle management. A detection becomes a track, 
 
 ```mermaid
 flowchart TB
-  Img["Camera frames: (B, 3, H, W"]"] --> ImgBackbone["Image backbone: Conv/BN/ReLU or ViT patches"]
-  ImgBackbone --> FPN["FPN neck: multi-scale features (P3..P7"]"]
+  Img["Camera frames: (B, 3, H, W)"] --> ImgBackbone["Image backbone: Conv/BN/ReLU or ViT patches"]
+  ImgBackbone --> FPN["FPN neck: multi-scale features (P3..P7)"]
   FPN --> TwoDHead["2D heads: class logits, boxes, masks, lanes, lights"]
 
-  Points["LiDAR points: (N, x, y, z, intensity, t"]"] --> Voxelize["Voxelization / pillarization: fixed grid in ego frame"]
+  Points["LiDAR points: (N, x, y, z, intensity, t)"] --> Voxelize["Voxelization / pillarization: fixed grid in ego frame"]
   Voxelize --> VFE["Voxel/Pillar feature encoder: PointNet-style MLP + pooling"]
-  VFE --> Scatter["Scatter to BEV pseudo-image: (C, X, Y"]"]
+  VFE --> Scatter["Scatter to BEV pseudo-image: (C, X, Y)"]
   Scatter --> BEVBackbone["2D BEV backbone: Conv-BN-ReLU blocks + FPN"]
 
   subgraph PointPillars["PointPillars-style branch"]
@@ -181,7 +181,7 @@ flowchart TB
     VFE --> Sparse3D --> HeightCollapse --> SparseHead
   end
 
-  Radar["Radar targets: (range, azimuth, Doppler"]"] --> RadarEnc["Radar feature encoder: Doppler + confidence"]
+  Radar["Radar targets: (range, azimuth, Doppler)"] --> RadarEnc["Radar feature encoder: Doppler + confidence"]
   TwoDHead --> Assoc["Cross-sensor association and tracking"]
   PPCls --> Decode["Decode boxes + scores"]
   PPBox --> Decode
@@ -198,10 +198,6 @@ flowchart TB
 ![PointPillars architecture — the figure shows LiDAR points encoded into pillars, scattered into a pseudo-image, and processed by a 2D backbone and detection head.](https://ar5iv.labs.arxiv.org/html/1812.05784/assets/x2.png)
 
 *Figure: PointPillars converts sparse point clouds into pillar features before 2D convolutional detection. From [Lang et al., 2019](https://arxiv.org/abs/1812.05784) — embedded under educational fair use with attribution.*
-
-![CenterPoint detection and tracking output — the figure shows center-based 3D detections and tracked objects in a driving scene.](https://github.com/tianweiy/CenterPoint/raw/refs/heads/master/docs/imgs/nusc_teaser.png?raw=true)
-
-*Figure: CenterPoint represents objects by BEV centers and uses those centers for 3D detection and tracking. From [Yin et al., 2021](https://arxiv.org/abs/2006.11275), via the authors' [CenterPoint repository](https://github.com/tianweiy/CenterPoint) — embedded under educational fair use with attribution.*
 
 This diagram expands perception into the standard camera, PointPillars/CenterPoint, VoxelNet, and radar branches. The key shape transition is from unordered lidar points to voxels/pillars and then to a BEV tensor, while the downstream association block turns raw detections into tracked objects and uncertainty for prediction and planning.
 

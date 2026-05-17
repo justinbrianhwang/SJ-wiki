@@ -81,8 +81,8 @@ For study purposes, the most useful habit is to separate four layers: the contin
 
 ```mermaid
 flowchart TB
-  Nodes["Ordered nodes<br/>x0, x1, ..., xn"] --> Values["first column<br/>f(x_i"] = y_i"]
-  Values --> Diff1["first divided differences<br/>f(x_i,x_{i+1}"]"]
+  Nodes["Ordered nodes<br/>x0, x1, ..., xn"] --> Values["first column<br/>f(x_i) = y_i"]
+  Values --> Diff1["first divided differences<br/>f(x_i,x_{i+1})"]
   Diff1 --> Diff2["higher columns<br/>recursive quotient differences"]
   Diff2 --> Coeff["top row gives Newton coefficients<br/>c0, c1, ..., cn"]
   Coeff --> Eval["nested evaluation<br/>P(x)=c0+(x-x0)(c1+(x-x1)(...))"]

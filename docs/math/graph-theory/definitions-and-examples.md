@@ -74,10 +74,10 @@ The same abstract graph can be drawn in different ways. The diagram below record
 
 ```mermaid
 graph LR
-  P("(P")) --- Q("(Q"))
-  Q --- R("(R"))
-  R --- S("(S"))
-  S --- T("(T"))
+  P(("P")) --- Q(("Q"))
+  Q --- R(("R"))
+  R --- S(("S"))
+  S --- T(("T"))
   T --- P
   Q --- S
 ```

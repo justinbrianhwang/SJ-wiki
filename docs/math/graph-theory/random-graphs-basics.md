@@ -91,10 +91,10 @@ up to constants depending on automorphisms. This heuristic predicts the scale at
 
 ```mermaid
 graph LR
-  A("(1")) --- B("(2"))
-  A --- D("(4"))
-  B --- C("(3"))
-  C --- E("(5"))
+  A(("1")) --- B(("2"))
+  A --- D(("4"))
+  B --- C(("3"))
+  C --- E(("5"))
   D --- E
   B --- E
 ```

@@ -56,9 +56,9 @@ The server is small enough to inspect completely, which makes it better for lear
 ```mermaid
 sequenceDiagram
   participant Client
-  participant Main as Main listener
-  participant Pool as ThreadPool sender
-  participant Worker as Worker thread
+  participant Main as "Main listener"
+  participant Pool as "ThreadPool sender"
+  participant Worker as "Worker thread"
   Client->>Main: TCP connection
   Main->>Pool: execute("move || handle_connection(stream"))
   Pool->>Worker: send Job over channel

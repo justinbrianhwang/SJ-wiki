@@ -52,8 +52,8 @@ Clock assumptions must be explicit. Some distributed systems use loosely synchro
 ```mermaid
 sequenceDiagram
   participant C as Coordinator
-  participant P1 as Participant 1
-  participant P2 as Participant 2
+  participant P1 as "Participant 1"
+  participant P2 as "Participant 2"
   C->>P1: prepare?
   C->>P2: prepare?
   P1-->>C: vote yes

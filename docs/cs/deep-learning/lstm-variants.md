@@ -53,7 +53,7 @@ flowchart TB
   CaddP --> CtP["C_t"]
   CtP -. "peephole V_o * C_t" .-> Op["o_t = sigmoid(W_o x_t + U_o h_{t-1} + V_o*C_t + b_o)"]
   CtP --> TanhP["tanh(C_t)"]
-  Op --> HmulP("(o_t*tanh(C_t")"))
+  Op --> HmulP["o_t*tanh(C_t)"]
   TanhP --> HmulP
   HmulP --> HtP["h_t"]
 ```
@@ -90,7 +90,7 @@ Cannot be used in causal language modeling (the backward pass would leak future 
 flowchart TB
   Seq["Input sequence x_1 ... x_T"] --> Fwd["Forward LSTM: h_1^f to h_T^f"]
   Seq --> Bwd["Backward LSTM: h_T^b to h_1^b"]
-  Fwd --> Concat["Per-token concat (h_t^f; h_t^b"] -> ["N, T, 2*d_h"]"]
+  Fwd --> Concat["Per-token concat (h_t^f; h_t^b) -> (N, T, 2*d_h)"]
   Bwd --> Concat
   Concat --> TokenHead["Token head for tagging, or pooling for sequence head"]
   TokenHead --> Out(("Offline encoder output"))
@@ -104,11 +104,11 @@ The standard recipe for adding capacity to an RNN is to stack layers: the hidden
 
 ```mermaid
 flowchart TB
-  Xs["Input embeddings: (N, T, d_x"]"] --> L1["LSTM layer 1 over time -> (N, T, d_h"]"]
+  Xs["Input embeddings: (N, T, d_x)"] --> L1["LSTM layer 1 over time -> (N, T, d_h)"]
   L1 --> Drop1["Dropout between recurrent layers"]
-  Drop1 --> L2["LSTM layer 2 over time -> (N, T, d_h"]"]
+  Drop1 --> L2["LSTM layer 2 over time -> (N, T, d_h)"]
   L2 --> Drop2["Dropout between recurrent layers"]
-  Drop2 --> L3["LSTM layer 3 over time -> (N, T, d_h"]"]
+  Drop2 --> L3["LSTM layer 3 over time -> (N, T, d_h)"]
   L3 --> Ys["Output sequence or final state"]
   L1 -. "optional residual if dimensions match" .-> L2
   L2 -. "optional residual if dimensions match" .-> L3
@@ -131,9 +131,9 @@ The projected $h_t'$ is what the next time step (and the next layer) sees, while
 ```mermaid
 flowchart TB
   Xr["x_t"] --> GatesR["Large internal LSTM gates use projected h'_{t-1} plus x_t"]
-  HprojPrev["Projected recurrent state h'_{t-1}: (N, r"]"] --> GatesR
-  GatesR --> CellR["Internal cell update C_t and hidden h_t: (N, n"]"]
-  CellR --> Project["Projection W_r h_t -> h'_t: (N, r"], with r much smaller than n"]
+  HprojPrev["Projected recurrent state h'_{t-1}: (N, r)"] --> GatesR
+  GatesR --> CellR["Internal cell update C_t and hidden h_t: (N, n)"]
+  CellR --> Project["Projection W_r h_t -> h'_t: (N, r), with r much smaller than n"]
   Project --> NextR["Next time step and next layer receive h'_t"]
   CellR --> LocalR["Large internal memory stays width n"]
   Project -. "recurrent bandwidth is r" .-> GatesR

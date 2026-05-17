@@ -66,12 +66,12 @@ This generalizes the tree formula $m=n-1$, which is the special case $c=1$. The 
 
 ```mermaid
 graph TD
-  R("(root")) --- A("(A"))
-  R --- B("(B"))
-  A --- C("(C"))
-  A --- D("(D"))
-  B --- E("(E"))
-  E --- F("(F"))
+  R(("root")) --- A(("A"))
+  R --- B(("B"))
+  A --- C(("C"))
+  A --- D(("D"))
+  B --- E(("E"))
+  E --- F(("F"))
 ```
 
 | View | Meaning | Typical use |

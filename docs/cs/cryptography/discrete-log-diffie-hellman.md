@@ -93,7 +93,7 @@ That keeps deployments reviewable.
 ```mermaid
 sequenceDiagram
   participant A as Alice
-  participant E as Eavesdropper / active attacker
+  participant E as "Eavesdropper / active attacker"
   participant B as Bob
   Note over A,B: Public parameters: group G of order q, generator g
   A->>A: sample ephemeral a in Z_q

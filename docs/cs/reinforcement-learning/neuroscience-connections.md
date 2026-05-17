@@ -61,12 +61,12 @@ This careful stance keeps the connection useful. RL offers equations precise eno
 sequenceDiagram
   participant Cue
   participant Critic
-  participant Dopamine as Prediction error signal
-  participant Actor
+  participant Dopamine as "Prediction error signal"
+  participant Act as "Actor"
   participant Outcome
   Cue->>Critic: state changes, predicted value rises
   Critic->>Dopamine: positive TD error if cue was unexpected
-  Dopamine->>Actor: reinforce recent action or cue response
+  Dopamine->>Act: reinforce recent action or cue response
   Outcome->>Critic: reward arrives
   Critic->>Dopamine: small error if reward was predicted
 ```

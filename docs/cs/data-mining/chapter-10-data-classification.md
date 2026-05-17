@@ -73,7 +73,7 @@ $$
 
 ```mermaid
 flowchart TB
-  Data["Training table X: (N x d"] with labels y: [N]"] --> Split["Train/validation/test split before fitting preprocessing"]
+  Data["Training table X: (N x d) with labels y: (N)"] --> Split["Train/validation/test split before fitting preprocessing"]
   Split --> Prep["Fit preprocessing on train only: imputation, scaling, encoding, feature selection"]
   Prep --> Family{Choose model family and supervision objective}
 
@@ -137,7 +137,7 @@ flowchart TB
   NN --> Eval
   KNN --> Eval
   Eval --> Test["Final untouched test estimate"]
-  Test --> Deployed("(classifier f(x") with documented preprocessing contract"))
+  Test --> Deployed["classifier f(x) with documented preprocessing contract"]
 ```
 
 ![Simple decision tree — the figure shows a binary decision tree that separates four shapes by answering two yes-or-no questions.](https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Simple_decision_tree.svg/960px-Simple_decision_tree.svg.png)

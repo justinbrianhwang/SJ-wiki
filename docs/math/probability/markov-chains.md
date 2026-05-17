@@ -138,7 +138,7 @@ flowchart LR
 
   subgraph Matrix["Transition-matrix contract"]
     direction TB
-    P["P = ((0.7, 0.3"], ["0.4, 0.6"]]<br/>rows: current state; columns: next state"] --> RowCheck["row sums = 1<br/>entries nonnegative"]
+    P["P = ((0.7, 0.3), (0.4, 0.6))<br/>rows: current state; columns: next state"] --> RowCheck["row sums = 1<br/>entries nonnegative"]
     RowCheck --> Step["one-step update<br/>pi_next = pi_current P"]
     Step --> Multi["n-step update<br/>pi_n = pi_0 P^n"]
   end

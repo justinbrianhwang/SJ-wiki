@@ -104,15 +104,15 @@ flowchart TB
 
   subgraph Circuit["Circuit-model execution"]
     direction TB
-    In["Classical input or state-prep spec<br/>bits (m"], qubits [n]"] --> Prep["Initialize registers<br/>|0>^n, |+>^n, |psi>, or encoded |psi_L>"]
+    In["Classical input or state-prep spec<br/>bits (m), qubits (n)"] --> Prep["Initialize registers<br/>|0>^n, |+>^n, |psi>, or encoded |psi_L>"]
     Prep --> Gate1["Gate layer U_1<br/>native 1q gates + entangling gates"]
     Gate1 --> GateL["Gate layer U_l<br/>compiled pulses with timing constraints"]
-    GateL --> Meas["Measure selected qubits<br/>bit string (n"] or observable samples"]
+    GateL --> Meas["Measure selected qubits<br/>bit string (n) or observable samples"]
   end
 
   subgraph Logical["Logical and algorithm layer"]
     direction TB
-    Enc["Encode logical qubits<br/>(n physical"] -> ["k logical, distance d"]"] --> Syn["Repeated syndrome extraction<br/>ancillas, stabilizers, decoder"]
+    Enc["Encode logical qubits<br/>(n physical) -> (k logical, distance d)"] --> Syn["Repeated syndrome extraction<br/>ancillas, stabilizers, decoder"]
     Syn --> Frame["Pauli-frame update<br/>classical correction record"]
     Frame --> Alg["Algorithmic primitive<br/>QFT, phase estimation, Grover, VQE/QAOA"]
     Alg --> Out["Classical post-processing<br/>factors, phase estimate, samples, expectation"]

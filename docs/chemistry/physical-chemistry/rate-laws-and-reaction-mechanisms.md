@@ -145,22 +145,22 @@ Kinetic isotope effects provide mechanistic clues because isotopic substitution 
 
 ```mermaid
 flowchart TB
-  Data["Measured concentration profile<br/>(A"](t), [B](t), product signal"] --> RateLaw["Empirical differential law<br/>rate = k(A"]^m[B]^n"]
+  Data["Measured concentration profile<br/>[A](t), [B](t), product signal"] --> RateLaw["Empirical differential law<br/>rate = k[A]^m[B]^n"]
   RateLaw --> Mechanism["Candidate elementary mechanism<br/>steps sum to overall reaction"]
 
   subgraph SSA["Steady-state approximation path"]
     direction TB
     Step1["Write elementary step rates<br/>formation and consumption terms"] --> Inter["Choose reactive intermediate I<br/>low concentration after induction"]
-    Inter --> Balance["Set d(I"]/dt approximately 0<br/>formation rate = consumption rate"]
-    Balance --> SolveI["Solve algebraically for (I"]<br/>in terms of stable reactants"]
+    Inter --> Balance["Set d[I]/dt approximately 0<br/>formation rate = consumption rate"]
+    Balance --> SolveI["Solve algebraically for [I]<br/>in terms of stable reactants"]
     SolveI --> Substitute["Substitute into product rate<br/>remove unobserved intermediate"]
   end
 
   subgraph PreEq["Pre-equilibrium path"]
     direction TB
-    Fast["Fast reversible step<br/>A + B reversible I"] --> Keq["Use K = (I"]/([A][B])"]
-    Keq --> Slow["Slow product-forming step<br/>rate = k_slow(I"]"]
-    Slow --> Substitute2["Substitute (I"] from equilibrium"]
+    Fast["Fast reversible step<br/>A + B reversible I"] --> Keq["Use K = [I]/([A][B])"]
+    Keq --> Slow["Slow product-forming step<br/>rate = k_slow[I]"]
+    Slow --> Substitute2["Substitute [I] from equilibrium"]
   end
 
   Mechanism --> Choice{"Which mechanistic assumption fits rate constants?"}

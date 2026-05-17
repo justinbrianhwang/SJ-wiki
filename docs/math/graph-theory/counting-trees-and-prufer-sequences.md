@@ -74,11 +74,11 @@ Here is a labelled tree whose Pruefer code is computed in the first worked examp
 
 ```mermaid
 graph TD
-  1("(1")) --- 4("(4"))
-  2("(2")) --- 4
-  3("(3")) --- 4
-  4 --- 5("(5"))
-  5 --- 6("(6"))
+  1(("1")) --- 4(("4"))
+  2(("2")) --- 4
+  3(("3")) --- 4
+  4 --- 5(("5"))
+  5 --- 6(("6"))
 ```
 
 | Step | Smallest leaf removed | Neighbor recorded | Remaining code prefix |
