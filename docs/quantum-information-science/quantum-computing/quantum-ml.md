@@ -167,14 +167,14 @@ flowchart TB
 
   subgraph Kernel["Quantum kernel circuit"]
     direction LR
-    Kx["Classical example x_i<br/>features #lsqb;d"]"] --> KMap1["Feature map<br/>U_phi(x_i)|0>^n"]
-    Ky["Classical example x_j<br/>features #lsqb;d"]"] --> KMap2["Inverse feature map<br/>U_phi(x_j)^dagger"]
+    Kx["Classical example x_i<br/>features (d"]"] --> KMap1["Feature map<br/>U_phi(x_i)|0>^n"]
+    Ky["Classical example x_j<br/>features (d"]"] --> KMap2["Inverse feature map<br/>U_phi(x_j)^dagger"]
     KMap1 --> KMap2
     KMap2 --> KZero["All-zero measurement<br/>Pr(0^n) = overlap squared"]
     KZero --> KMat["Kernel matrix K_ij<br/>input to SVM or ridge model"]
   end
 
-  Data["Training data<br/>X #lsqb;N x d"], labels y [N]"] --> VA
+  Data["Training data<br/>X (N x d"], labels y [N]"] --> VA
   Data --> QInit
   Data --> Kx
   Data --> Ky

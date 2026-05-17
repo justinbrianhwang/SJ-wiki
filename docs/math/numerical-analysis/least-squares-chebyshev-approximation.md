@@ -101,7 +101,7 @@ flowchart TB
 
   subgraph Cheb["Chebyshev/minimax architecture"]
     direction TB
-    Map["map interval to #lsqb;-1,1"]"] --> Basis["use Chebyshev basis T_n(x)<br/>stable recurrence"]
+    Map["map interval to (-1,1"]"] --> Basis["use Chebyshev basis T_n(x)<br/>stable recurrence"]
     Basis --> Equi["minimax target<br/>alternating peak errors of equal magnitude"]
     Equi --> Uniform["control ||error||_infinity"]
   end

@@ -70,7 +70,7 @@ flowchart TB
     IDs --> W2V["word2vec skip-gram: center id -> embedding v_c"]
     W2V --> Dot["Dot with context embeddings u_o and negatives u_k"]
     Dot --> NSLoss["Negative-sampling binary loss"]
-    NSLoss --> StaticEmb["Static word vector table E: #lsqb;|V|, d"]"]
+    NSLoss --> StaticEmb["Static word vector table E: (|V|, d"]"]
   end
 
   subgraph ELMo["ELMo-style contextual features"]
@@ -80,7 +80,7 @@ flowchart TB
     CharCNN --> BwdLM["Backward LM LSTM"]
     FwdLM --> ELMoCat["Layer-weighted concat of forward/backward states"]
     BwdLM --> ELMoCat
-    ELMoCat --> ELMoFeat["Contextual token features #lsqb;N, T, d_ctx"]"]
+    ELMoCat --> ELMoFeat["Contextual token features (N, T, d_ctx"]"]
   end
 
   subgraph BERTFlow["BERT-style contextual encoder"]
@@ -88,7 +88,7 @@ flowchart TB
     IDs --> BEmb["Token + segment + position embeddings"]
     BEmb --> BEnc["Bidirectional Transformer encoder"]
     BEnc --> MLM["Pretraining head: masked token logits"]
-    BEnc --> CLS["#lsqb;CLS"] sequence representation"]
+    BEnc --> CLS["(CLS"] sequence representation"]
   end
 
   subgraph Adapt["Using pretrained representations"]

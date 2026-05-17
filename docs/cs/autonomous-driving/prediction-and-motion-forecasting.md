@@ -150,7 +150,7 @@ Forecast freshness is another interface requirement: a good old prediction may b
 
 ```mermaid
 flowchart TB
-  Agents["Tracked agents: #lsqb;A, T_hist, x, y, vx, vy, yaw, class"]"]
+  Agents["Tracked agents: (A, T_hist, x, y, vx, vy, yaw, class"]"]
   Map["Map polylines: lanes, boundaries, crosswalks, signals"]
   Ego["Ego state and candidate ego plans"]
 
@@ -158,10 +158,10 @@ flowchart TB
     direction TB
     Vec["Polyline vectorization: agent segments + lane segments"]
     SegMLP["Per-vector MLP: start/end pose, type, traffic state"]
-    PolyPool["Subgraph max-pool per polyline: #lsqb;P, C"]"]
+    PolyPool["Subgraph max-pool per polyline: (P, C"]"]
     GlobalGraph["Global interaction graph: self-attention / GNN over polylines"]
     GoalDecode["Goal/mode decoder: K endpoint hypotheses"]
-    TrajDecode["Trajectory decoder: #lsqb;A, K, T_f, x, y"] + probabilities"]
+    TrajDecode["Trajectory decoder: (A, K, T_f, x, y"] + probabilities"]
     Vec --> SegMLP --> PolyPool --> GlobalGraph --> GoalDecode --> TrajDecode
   end
 

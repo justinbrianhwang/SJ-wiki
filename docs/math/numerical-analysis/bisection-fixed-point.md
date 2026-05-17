@@ -83,7 +83,7 @@ flowchart TB
 
   subgraph Bisect["Bisection loop"]
     direction TB
-    Bracket["Initialize #lsqb;a,b"]<br/>f(a)f(b) negative"] --> Mid["p = (a+b)/2<br/>evaluate f(p)"]
+    Bracket["Initialize (a,b"]<br/>f(a)f(b) negative"] --> Mid["p = (a+b)/2<br/>evaluate f(p)"]
     Mid --> StopB{"stop? |f(p)| small or half-width within tol"}
     StopB -- "yes" --> ReturnB["return p with interval error bound"]
     StopB -- "no" --> Side{"sign change on [a,p]?"}

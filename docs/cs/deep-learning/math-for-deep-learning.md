@@ -100,7 +100,7 @@ The link between likelihood and loss is a recurring modeling choice. Squared err
 
 ```mermaid
 flowchart TB
-  X["Input batch X: #lsqb;N, d"]"] --> Matmul["Linear algebra: XW + b"]
+  X["Input batch X: (N, d"]"] --> Matmul["Linear algebra: XW + b"]
   Theta["Parameters theta: W, b, layer weights"] --> Matmul
   Matmul --> Nonlin["Differentiable operations: activations, norms, attention, convolutions"]
   Nonlin --> Pred["Predictions y_hat"]

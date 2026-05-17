@@ -60,7 +60,7 @@ flowchart TD
   end
 
   Runtime --> Areas
-  Areas --> Main["Invoke public static void main(String#lsqb;"] args)"]
+  Areas --> Main["Invoke public static void main(String("] args)"]
   Main --> Interpreter["Interpreter executes bytecode initially"]
   Interpreter --> Hot{"Hot method or loop?"}
   Hot -- "yes" --> JIT["JIT compiler emits optimized native code"]

@@ -68,32 +68,32 @@ For every vision application, preprocessing at inference must match preprocessin
 
 ```mermaid
 flowchart TB
-  In["Input image: #lsqb;N, 3, 572, 572"]"] --> E1["Encoder level 1: two Conv 3 x 3, 64 -> #lsqb;N, 64, 568, 568"]"]
-  E1 --> P1["MaxPool 2 x 2 -> #lsqb;N, 64, 284, 284"]"]
-  P1 --> E2["Encoder level 2: two Conv 3 x 3, 128 -> #lsqb;N, 128, 280, 280"]"]
-  E2 --> P2["MaxPool 2 x 2 -> #lsqb;N, 128, 140, 140"]"]
-  P2 --> E3["Encoder level 3: two Conv 3 x 3, 256 -> #lsqb;N, 256, 136, 136"]"]
-  E3 --> P3["MaxPool 2 x 2 -> #lsqb;N, 256, 68, 68"]"]
-  P3 --> E4["Encoder level 4: two Conv 3 x 3, 512 -> #lsqb;N, 512, 64, 64"]"]
-  E4 --> P4["MaxPool 2 x 2 -> #lsqb;N, 512, 32, 32"]"]
-  P4 --> Bottleneck["Bottleneck: two Conv 3 x 3, 1024 -> #lsqb;N, 1024, 28, 28"]"]
-  Bottleneck --> U4["UpConv 2 x 2, 512 -> #lsqb;N, 512, 56, 56"]"]
-  E4 -. "crop and concatenate skip" .-> Cat4["Concat skip -> #lsqb;N, 1024, 56, 56"]"]
+  In["Input image: (N, 3, 572, 572"]"] --> E1["Encoder level 1: two Conv 3 x 3, 64 -> (N, 64, 568, 568"]"]
+  E1 --> P1["MaxPool 2 x 2 -> (N, 64, 284, 284"]"]
+  P1 --> E2["Encoder level 2: two Conv 3 x 3, 128 -> (N, 128, 280, 280"]"]
+  E2 --> P2["MaxPool 2 x 2 -> (N, 128, 140, 140"]"]
+  P2 --> E3["Encoder level 3: two Conv 3 x 3, 256 -> (N, 256, 136, 136"]"]
+  E3 --> P3["MaxPool 2 x 2 -> (N, 256, 68, 68"]"]
+  P3 --> E4["Encoder level 4: two Conv 3 x 3, 512 -> (N, 512, 64, 64"]"]
+  E4 --> P4["MaxPool 2 x 2 -> (N, 512, 32, 32"]"]
+  P4 --> Bottleneck["Bottleneck: two Conv 3 x 3, 1024 -> (N, 1024, 28, 28"]"]
+  Bottleneck --> U4["UpConv 2 x 2, 512 -> (N, 512, 56, 56"]"]
+  E4 -. "crop and concatenate skip" .-> Cat4["Concat skip -> (N, 1024, 56, 56"]"]
   U4 --> Cat4
-  Cat4 --> D4["Decoder level 4: two Conv 3 x 3, 512 -> #lsqb;N, 512, 52, 52"]"]
-  D4 --> U3["UpConv 2 x 2, 256 -> #lsqb;N, 256, 104, 104"]"]
-  E3 -. "crop and concatenate skip" .-> Cat3["Concat skip -> #lsqb;N, 512, 104, 104"]"]
+  Cat4 --> D4["Decoder level 4: two Conv 3 x 3, 512 -> (N, 512, 52, 52"]"]
+  D4 --> U3["UpConv 2 x 2, 256 -> (N, 256, 104, 104"]"]
+  E3 -. "crop and concatenate skip" .-> Cat3["Concat skip -> (N, 512, 104, 104"]"]
   U3 --> Cat3
-  Cat3 --> D3["Decoder level 3: two Conv 3 x 3, 256 -> #lsqb;N, 256, 100, 100"]"]
-  D3 --> U2["UpConv 2 x 2, 128 -> #lsqb;N, 128, 200, 200"]"]
-  E2 -. "crop and concatenate skip" .-> Cat2["Concat skip -> #lsqb;N, 256, 200, 200"]"]
+  Cat3 --> D3["Decoder level 3: two Conv 3 x 3, 256 -> (N, 256, 100, 100"]"]
+  D3 --> U2["UpConv 2 x 2, 128 -> (N, 128, 200, 200"]"]
+  E2 -. "crop and concatenate skip" .-> Cat2["Concat skip -> (N, 256, 200, 200"]"]
   U2 --> Cat2
-  Cat2 --> D2["Decoder level 2: two Conv 3 x 3, 128 -> #lsqb;N, 128, 196, 196"]"]
-  D2 --> U1["UpConv 2 x 2, 64 -> #lsqb;N, 64, 392, 392"]"]
-  E1 -. "crop and concatenate skip" .-> Cat1["Concat skip -> #lsqb;N, 128, 392, 392"]"]
+  Cat2 --> D2["Decoder level 2: two Conv 3 x 3, 128 -> (N, 128, 196, 196"]"]
+  D2 --> U1["UpConv 2 x 2, 64 -> (N, 64, 392, 392"]"]
+  E1 -. "crop and concatenate skip" .-> Cat1["Concat skip -> (N, 128, 392, 392"]"]
   U1 --> Cat1
-  Cat1 --> D1["Decoder level 1: two Conv 3 x 3, 64 -> #lsqb;N, 64, 388, 388"]"]
-  D1 --> Head["1 x 1 conv to K classes -> #lsqb;N, K, 388, 388"]"]
+  Cat1 --> D1["Decoder level 1: two Conv 3 x 3, 64 -> (N, 64, 388, 388"]"]
+  D1 --> Head["1 x 1 conv to K classes -> (N, K, 388, 388"]"]
   Head --> Mask(("Per-pixel class map"))
 ```
 
@@ -127,8 +127,8 @@ The R-CNN family diagram contrasts where proposals and feature extraction happen
 
 ```mermaid
 flowchart TB
-  Img["Input image: #lsqb;N, 3, S, S"]"] --> Backbone["CNN backbone + neck feature pyramid"]
-  Backbone --> Grid["Dense grid features, e.g. #lsqb;N, A*(5+K), H, W"]"]
+  Img["Input image: (N, 3, S, S"]"] --> Backbone["CNN backbone + neck feature pyramid"]
+  Backbone --> Grid["Dense grid features, e.g. (N, A*(5+K), H, W"]"]
   Grid --> BoxHead["Per cell/anchor: box center, width, height"]
   Grid --> ObjHead["Objectness score"]
   Grid --> ClassHead["Class logits"]
@@ -158,7 +158,7 @@ flowchart TB
   MaskHead --> Masks["K binary masks per RoI, e.g. 28 x 28"]
   Boxes --> Select["Select mask for predicted class and paste into image"]
   Masks --> Select
-  Select --> Out("#lsqb;Instances: box, class, score, mask#rsqb;")
+  Select --> Out("(Instances: box, class, score, mask)")
 ```
 
 Mask R-CNN extends Faster R-CNN with a parallel mask branch after RoIAlign. The box branch predicts classes and refined boxes, while the mask branch keeps spatial structure inside each RoI to produce per-instance masks. RoIAlign is labeled because mask quality depends on preserving feature-to-pixel alignment.

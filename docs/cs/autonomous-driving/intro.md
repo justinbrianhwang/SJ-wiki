@@ -95,10 +95,10 @@ The page set produced here is:
 flowchart TB
   subgraph Sense["Sensor acquisition and time base"]
     direction TB
-    Cam["Camera frames: #lsqb;N_cam, H, W, 3"]"]
-    Lidar["LiDAR packets: #lsqb;points, x, y, z, intensity, t"]"]
-    Radar["Radar targets: #lsqb;range, azimuth, elevation, Doppler, RCS"]"]
-    Inertial["IMU + wheel odometry + GNSS: #lsqb;a, omega, wheel ticks, lat/lon"]"]
+    Cam["Camera frames: (N_cam, H, W, 3"]"]
+    Lidar["LiDAR packets: (points, x, y, z, intensity, t"]"]
+    Radar["Radar targets: (range, azimuth, elevation, Doppler, RCS"]"]
+    Inertial["IMU + wheel odometry + GNSS: (a, omega, wheel ticks, lat/lon"]"]
     Sync["Clock sync, timestamp alignment, health checks"]
     Calib["Intrinsic + extrinsic calibration: T_sensor_to_vehicle"]
     Cam --> Sync
@@ -113,7 +113,7 @@ flowchart TB
     ImageNet["Image backbone + 2D heads: boxes, masks, lanes, lights"]
     PointNet["Point-cloud / BEV backbone: 3D boxes, occupancy, freespace"]
     RadarEnc["Radar encoder: velocity cues, long-range tracks"]
-    BEV["Shared BEV tensor: #lsqb;C, X, Y"] with uncertainty"]
+    BEV["Shared BEV tensor: (C, X, Y"] with uncertainty"]
     Track["Multi-object tracking: object list + covariance"]
     Calib -->|"rectified images"| ImageNet
     Calib -->|"registered point cloud"| PointNet
@@ -139,7 +139,7 @@ flowchart TB
     direction TB
     Pred["Motion forecasting: K multimodal trajectories per agent"]
     Behavior["Behavior planner: yield, stop, merge, lane change"]
-    Motion["Motion planner: collision-free trajectory #lsqb;x, y, yaw, v, a"]"]
+    Motion["Motion planner: collision-free trajectory (x, y, yaw, v, a"]"]
     Control["Tracking controller: steering, throttle, brake"]
     Act["Actuators: EPS, brake, powertrain"]
     Track -->|"object list + histories"| Pred

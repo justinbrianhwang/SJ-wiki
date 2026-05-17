@@ -152,8 +152,8 @@ The sample values alone do not contain the sampling rate. The same numerical seq
 ```mermaid
 flowchart TB
   Analog["Continuous-time signal x_c(t)<br/>bandlimit omega_M if ideal"] --> AntiAlias["Anti-alias filter<br/>remove content above omega_s/2"]
-  AntiAlias --> Sampler["Uniform sampler<br/>x#lsqb;n"] = x_c(nT), omega_s = 2pi/T"]
-  Sampler --> Sequence["Discrete-time sequence x#lsqb;n"]<br/>DT frequency Omega = omega T"]
+  AntiAlias --> Sampler["Uniform sampler<br/>x(n"] = x_c(nT), omega_s = 2pi/T"]
+  Sampler --> Sequence["Discrete-time sequence x(n"]<br/>DT frequency Omega = omega T"]
 
   subgraph Spectrum["Sampling spectrum architecture"]
     direction TB

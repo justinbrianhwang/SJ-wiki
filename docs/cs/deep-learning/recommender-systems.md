@@ -80,8 +80,8 @@ Because recommendations influence future interactions, evaluation is partly caus
 flowchart TB
   subgraph MF["Matrix factorization score"]
     direction LR
-    U["User id u"] --> UE["User embedding p_u: #lsqb;k"]"]
-    I["Item id i"] --> IE["Item embedding q_i: #lsqb;k"]"]
+    U["User id u"] --> UE["User embedding p_u: (k"]"]
+    I["Item id i"] --> IE["Item embedding q_i: (k"]"]
     UE --> Dot["Dot product p_u^T q_i"]
     IE --> Dot
     U --> UB["User bias b_u"]
@@ -109,8 +109,8 @@ flowchart TB
 
   subgraph TwoTower["Two-tower retrieval"]
     direction LR
-    UserFeat["User features + recent history"] --> UserTower["User tower -> query vector #lsqb;d"]"]
-    ItemFeat["Item metadata/content/id"] --> ItemTower["Item tower -> item vector #lsqb;d"]"]
+    UserFeat["User features + recent history"] --> UserTower["User tower -> query vector (d"]"]
+    ItemFeat["Item metadata/content/id"] --> ItemTower["Item tower -> item vector (d"]"]
     UserTower --> ANN["Approx nearest-neighbor search by dot product"]
     ItemTower --> ANN
     ANN --> Cand["Top-K candidate items"]

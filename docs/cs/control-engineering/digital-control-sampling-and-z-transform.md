@@ -118,10 +118,10 @@ Then test it.
 
 ```mermaid
 flowchart LR
-  R["Continuous reference r(t)"] --> SamplerR["Sampler: r#lsqb;n"] = r(nT)"]
+  R["Continuous reference r(t)"] --> SamplerR["Sampler: r(n"] = r(nT)"]
   SamplerR --> Sum(("Σ"))
-  Yfb["Digital feedback y#lsqb;n"]"] -->|"negative input"| Sum
-  Sum --> E["Error sequence e#lsqb;n"]"]
+  Yfb["Digital feedback y(n"]"] -->|"negative input"| Sum
+  Sum --> E["Error sequence e(n"]"]
   E --> Delay["Computation / scheduling delay: z^-d"]
   Delay --> Dz["Digital controller D(z): difference equation"]
   Dz --> QuantU["DAC/PWM quantization"]

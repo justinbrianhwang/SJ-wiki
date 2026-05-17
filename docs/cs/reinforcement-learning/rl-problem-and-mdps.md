@@ -144,8 +144,8 @@ flowchart LR
 
   subgraph Bellman["Bellman backup used by later algorithms"]
     direction TB
-    B1["Expectation backup: sum_a pi(a|s) sum_s',r p(s',r|s,a)#lsqb;r + gamma V(s')"]"]
-    B2["Optimality backup: max_a sum_s',r p(s',r|s,a)#lsqb;r + gamma V(s')"]"]
+    B1["Expectation backup: sum_a pi(a|s) sum_s',r p(s',r|s,a)(r + gamma V(s')"]"]
+    B2["Optimality backup: max_a sum_s',r p(s',r|s,a)(r + gamma V(s')"]"]
   end
 
   Env -. "model-based methods use p("s',r|s,a")" .-> Bellman

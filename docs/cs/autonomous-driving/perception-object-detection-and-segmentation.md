@@ -139,13 +139,13 @@ Perception outputs also need lifecycle management. A detection becomes a track, 
 
 ```mermaid
 flowchart TB
-  Img["Camera frames: #lsqb;B, 3, H, W"]"] --> ImgBackbone["Image backbone: Conv/BN/ReLU or ViT patches"]
-  ImgBackbone --> FPN["FPN neck: multi-scale features #lsqb;P3..P7"]"]
+  Img["Camera frames: (B, 3, H, W"]"] --> ImgBackbone["Image backbone: Conv/BN/ReLU or ViT patches"]
+  ImgBackbone --> FPN["FPN neck: multi-scale features (P3..P7"]"]
   FPN --> TwoDHead["2D heads: class logits, boxes, masks, lanes, lights"]
 
-  Points["LiDAR points: #lsqb;N, x, y, z, intensity, t"]"] --> Voxelize["Voxelization / pillarization: fixed grid in ego frame"]
+  Points["LiDAR points: (N, x, y, z, intensity, t"]"] --> Voxelize["Voxelization / pillarization: fixed grid in ego frame"]
   Voxelize --> VFE["Voxel/Pillar feature encoder: PointNet-style MLP + pooling"]
-  VFE --> Scatter["Scatter to BEV pseudo-image: #lsqb;C, X, Y"]"]
+  VFE --> Scatter["Scatter to BEV pseudo-image: (C, X, Y"]"]
   Scatter --> BEVBackbone["2D BEV backbone: Conv-BN-ReLU blocks + FPN"]
 
   subgraph PointPillars["PointPillars-style branch"]
@@ -181,7 +181,7 @@ flowchart TB
     VFE --> Sparse3D --> HeightCollapse --> SparseHead
   end
 
-  Radar["Radar targets: #lsqb;range, azimuth, Doppler"]"] --> RadarEnc["Radar feature encoder: Doppler + confidence"]
+  Radar["Radar targets: (range, azimuth, Doppler"]"] --> RadarEnc["Radar feature encoder: Doppler + confidence"]
   TwoDHead --> Assoc["Cross-sensor association and tracking"]
   PPCls --> Decode["Decode boxes + scores"]
   PPBox --> Decode

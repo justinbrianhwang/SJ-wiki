@@ -67,25 +67,25 @@ Fine-tuning also changes the representation. The pretrained model is not merely 
 flowchart TB
   subgraph BERT["BERT encoder-only pretraining and fine-tuning"]
     direction TB
-    BTok["Input tokens: #lsqb;CLS"] sentence A [SEP] sentence B [SEP]"]
-    BTok --> BEmb["Token + segment + position embeddings -> #lsqb;N, T, d_model"]"]
+    BTok["Input tokens: (CLS"] sentence A [SEP] sentence B [SEP]"]
+    BTok --> BEmb["Token + segment + position embeddings -> (N, T, d_model"]"]
     BEmb --> BMask["Bidirectional self-attention mask, padding only"]
     BMask --> BEnc["Transformer encoder stack, e.g. 12 or 24 layers"]
-    BEnc --> BCLS["#lsqb;CLS"] representation -> ["N, d_model"]"]
+    BEnc --> BCLS["(CLS"] representation -> ["N, d_model"]"]
     BEnc --> BMasked["Hidden states at masked token positions"]
-    BCLS --> NSP["NSP or sentence-pair classification head -> #lsqb;N, 2"]"]
+    BCLS --> NSP["NSP or sentence-pair classification head -> (N, 2"]"]
     BMasked --> MLM["MLM head: dense + activation + layer norm + tied vocab projection"]
-    MLM --> MLMOut("#lsqb;Masked-token logits #lsqb;M, |V|#rsqb;#rsqb;")
+    MLM --> MLMOut("(Masked-token logits (M, |V|))")
     NSP --> NSPOut(("Sentence/task logits"))
   end
 
   subgraph GPT["GPT decoder-only language model"]
     direction TB
-    GTok["Prompt tokens: #lsqb;x_1 ... x_T"]"] --> GEmb["Token + position embeddings -> #lsqb;N, T, d_model"]"]
+    GTok["Prompt tokens: (x_1 ... x_T"]"] --> GEmb["Token + position embeddings -> (N, T, d_model"]"]
     GEmb --> GMask["Causal mask: token t attends only to positions through t"]
     GMask --> GDec["Transformer decoder blocks: masked self-attn + MLP"]
     GDec --> GHead["Tied linear vocab head"]
-    GHead --> GOut("#lsqb;Next-token logits #lsqb;N, T, |V|#rsqb;#rsqb;")
+    GHead --> GOut("(Next-token logits (N, T, |V|))")
     GOut -. "autoregressive sampling feeds token T+1 back as input" .-> GTok
   end
 
@@ -93,7 +93,7 @@ flowchart TB
     direction TB
     Task["Text prefix + source tokens, e.g. summarize: ..."] --> TEncEmb["Encoder token + relative position bias"]
     TEncEmb --> TEnc["Encoder stack with bidirectional self-attention"]
-    TEnc --> Memory["Encoder memory keys/values: #lsqb;N, S, d_model"]"]
+    TEnc --> Memory["Encoder memory keys/values: (N, S, d_model"]"]
     Target["Decoder input: shifted target tokens"] --> TDecEmb["Decoder embeddings"]
     TDecEmb --> TSelf["Masked decoder self-attention"]
     TSelf --> TCross["Cross-attention reads encoder memory"]

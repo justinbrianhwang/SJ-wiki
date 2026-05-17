@@ -86,7 +86,7 @@ flowchart TB
   Periodic --> Equations
   Equations["assemble continuity equations<br/>value, first derivative, second derivative"] --> Tri["tridiagonal or cyclic system<br/>unknown second derivatives or slopes"]
   Tri --> Solve["Thomas algorithm or cyclic solve"]
-  Solve --> Segments["local cubic pieces<br/>S_i(x) on #lsqb;x_i, x_{i+1}"]"]
+  Solve --> Segments["local cubic pieces<br/>S_i(x) on (x_i, x_{i+1}"]"]
   Segments --> Eval["evaluate only the containing segment"]
 
   subgraph Parametric["Parametric curve option"]

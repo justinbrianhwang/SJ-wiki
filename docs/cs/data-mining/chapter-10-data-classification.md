@@ -73,7 +73,7 @@ $$
 
 ```mermaid
 flowchart TB
-  Data["Training table X: #lsqb;N x d"] with labels y: [N]"] --> Split["Train/validation/test split before fitting preprocessing"]
+  Data["Training table X: (N x d"] with labels y: [N]"] --> Split["Train/validation/test split before fitting preprocessing"]
   Split --> Prep["Fit preprocessing on train only: imputation, scaling, encoding, feature selection"]
   Prep --> Family{Choose model family and supervision objective}
 

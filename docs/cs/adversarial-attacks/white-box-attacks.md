@@ -348,7 +348,7 @@ flowchart TB
     Grad["Compute gradient: grad_x L(f_theta(x_adv^t), y)"]
     Step["Gradient step: x_adv^t + alpha * sign(grad) or normalized grad"]
     Project["Project to threat set: Pi_{B_p(x, epsilon)}"]
-    Clip["Clip to valid input range #lsqb;0, 1#rsqb; or normalized bounds"]
+    Clip["Clip to valid input range (0, 1) or normalized bounds"]
     Check{"More PGD steps or restarts?"}
     Select["Select highest-loss successful adversarial example"]
     Init --> Grad --> Step --> Project --> Clip --> Check

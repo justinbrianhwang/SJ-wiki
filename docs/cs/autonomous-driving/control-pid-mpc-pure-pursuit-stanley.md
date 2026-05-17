@@ -98,8 +98,8 @@ Control handoff also matters. When a planner replans, cancels a lane change, or 
 
 ```mermaid
 flowchart TB
-  Ref["Planned trajectory: #lsqb;t, x_ref, y_ref, yaw_ref, v_ref, kappa_ref"]"]
-  State["Estimated vehicle state: #lsqb;x, y, yaw, v, a, yaw_rate"]"]
+  Ref["Planned trajectory: (t, x_ref, y_ref, yaw_ref, v_ref, kappa_ref"]"]
+  State["Estimated vehicle state: (x, y, yaw, v, a, yaw_rate"]"]
 
   subgraph Error["Reference comparison"]
     direction TB
@@ -143,7 +143,7 @@ flowchart TB
     Constraints["Constraints: tire friction, steering, accel, rate limits"]
     Objective["Objective: tracking error + control effort + comfort"]
     Solver["Real-time solver + warm start"]
-    FirstU["First control u_0 = #lsqb;delta, accel"]"]
+    FirstU["First control u_0 = (delta, accel"]"]
     Model --> Horizon --> Constraints --> Objective --> Solver --> FirstU
   end
 

@@ -165,13 +165,13 @@ The impulse response is sometimes more informative than the original equation. A
 
 ```mermaid
 flowchart TB
-  System["LTI system T<br/>linear + time invariant + initial rest"] --> Probe["Impulse probe<br/>h(t)=T{delta(t)} or h#lsqb;n"]=T{delta[n]}"]
-  Input["Input signal x<br/>continuous or discrete"] --> Decomp["Impulse decomposition<br/>x(t)=integral x(tau) delta(t-tau)d tau<br/>x#lsqb;n"]=sum x[k] delta[n-k]"]
+  System["LTI system T<br/>linear + time invariant + initial rest"] --> Probe["Impulse probe<br/>h(t)=T{delta(t)} or h(n"]=T{delta[n]}"]
+  Input["Input signal x<br/>continuous or discrete"] --> Decomp["Impulse decomposition<br/>x(t)=integral x(tau) delta(t-tau)d tau<br/>x(n"]=sum x[k] delta[n-k]"]
   Probe --> Shift["Time invariance<br/>shifted impulse gives shifted h"]
   Decomp --> Scale["Linearity<br/>scale each shifted response by input value"]
   Shift --> Scale
   Scale --> Sum["Superposition<br/>integral or sum of shifted responses"]
-  Sum --> Conv["Convolution output<br/>y(t)=integral x(tau)h(t-tau)d tau<br/>y#lsqb;n"]=sum x[k]h[n-k]"]
+  Sum --> Conv["Convolution output<br/>y(t)=integral x(tau)h(t-tau)d tau<br/>y(n"]=sum x[k]h[n-k]"]
 
   subgraph Properties["Impulse-response diagnostics"]
     direction TB

@@ -86,14 +86,14 @@ This is why sequence experiments should document batching, hidden-state reset ru
 flowchart TB
   subgraph Cell["Vanilla RNN cell at time t"]
     direction TB
-    Xt["Input x_t: #lsqb;N, d_x"]"] --> XW["Input affine: x_t W_xh"]
-    Hprev["Previous hidden h_{t-1}: #lsqb;N, d_h"]"] --> HW["Recurrent affine: h_{t-1} W_hh"]
+    Xt["Input x_t: (N, d_x"]"] --> XW["Input affine: x_t W_xh"]
+    Hprev["Previous hidden h_{t-1}: (N, d_h"]"] --> HW["Recurrent affine: h_{t-1} W_hh"]
     XW --> Sum(("Add + b_h"))
     HW --> Sum
     Sum --> Phi["Nonlinearity phi, e.g. tanh or ReLU"]
-    Phi --> Ht["Hidden h_t: #lsqb;N, d_h"]"]
+    Phi --> Ht["Hidden h_t: (N, d_h"]"]
     Ht --> Readout["Output affine: h_t W_hq + b_q"]
-    Readout --> Ot["Logits o_t: #lsqb;N, vocab"]"]
+    Readout --> Ot["Logits o_t: (N, vocab"]"]
     Ot --> Pt(("p next token from prefix through t"))
   end
 

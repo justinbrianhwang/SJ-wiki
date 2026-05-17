@@ -105,7 +105,7 @@ flowchart TB
     direction TB
     Box["Input interval: lower_0 = x - epsilon, upper_0 = x + epsilon"]
     Linear1["Affine/conv layer: bound W x + b with sign-split weights"]
-    ReLU1["ReLU interval: #lsqb;max(0, lower), max(0, upper)"]"]
+    ReLU1["ReLU interval: (max(0, lower), max(0, upper)"]"]
     Linear2["Next affine layer bounds"]
     Logits["Logit intervals: lower_j, upper_j"]
     Margin["Worst-case margin: lower_y - max_{j != y} upper_j"]

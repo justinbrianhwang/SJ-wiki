@@ -94,9 +94,9 @@ When the distance notion is wrong, storing more examples can simply make the lea
 
 ```mermaid
 flowchart TB
-  Train["Training examples X: #lsqb;N x d"], labels or targets y"] --> Scale["Fit scaling and metric parameters on training data"]
+  Train["Training examples X: (N x d"], labels or targets y"] --> Scale["Fit scaling and metric parameters on training data"]
   Scale --> Store["Store examples in memory or nearest-neighbor index"]
-  Query["Query point x_q: #lsqb;d"]"] --> QScale["Apply the same scaling and feature mapping"]
+  Query["Query point x_q: (d"]"] --> QScale["Apply the same scaling and feature mapping"]
   QScale --> Dist["Compute distances d(x_q, x_i)"]
   Store --> Dist
   Dist --> Rank["Rank examples by distance"]

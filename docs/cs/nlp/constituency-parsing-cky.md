@@ -72,12 +72,12 @@ flowchart TB
 
   subgraph Chart["CKY triangular chart cells"]
     direction TB
-    C01["#lsqb;0,1"]: V via V -> book"]
-    C12["#lsqb;1,2"]: Det via Det -> the"]
-    C23["#lsqb;2,3"]: N via N -> flight"]
-    C02["#lsqb;0,2"]: empty after split k=1"]
-    C13["#lsqb;1,3"]: NP via NP -> Det N, split k=2"]
-    C03["#lsqb;0,3"]: S via S -> V NP, split k=1"]
+    C01["(0,1"]: V via V -> book"]
+    C12["(1,2"]: Det via Det -> the"]
+    C23["(2,3"]: N via N -> flight"]
+    C02["(0,2"]: empty after split k=1"]
+    C13["(1,3"]: NP via NP -> Det N, split k=2"]
+    C03["(0,3"]: S via S -> V NP, split k=1"]
     C12 --> C13
     C23 --> C13
     C01 --> C03
@@ -92,12 +92,12 @@ flowchart TB
 
   subgraph Recurrence["Dynamic-programming recurrence"]
     direction TB
-    Span["Target span #lsqb;i,j"]"]
+    Span["Target span (i,j"]"]
     Split{"Choose split k with i < k < j"}
-    Left["Left cell #lsqb;i,k"] contains B"]
-    Right["Right cell #lsqb;k,j"] contains C"]
+    Left["Left cell (i,k"] contains B"]
+    Right["Right cell (k,j"] contains C"]
     Rule["Grammar rule A -> B C"]
-    Add["Add A to #lsqb;i,j"] and store backpointer ("A -> B C, k")"]
+    Add["Add A to (i,j"] and store backpointer ("A -> B C, k")"]
     Span --> Split
     Split --> Left
     Split --> Right
