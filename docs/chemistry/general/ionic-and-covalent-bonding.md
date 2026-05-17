@@ -9,9 +9,13 @@ Chemical bonding explains why atoms form stable substances and why those substan
 
 In the Ebbing and Gammon sequence this topic sits near ionic bonds, electron configurations of ions, ionic radii, covalent bonds, electronegativity, Lewis formulas, resonance, octet exceptions, formal charge, bond length, and bond energy. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
-![A crystal-structure diagram shows sodium and chloride ions arranged in the cubic lattice of sodium chloride.](https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Sodium_chloride_crystal.png/500px-Sodium_chloride_crystal.png)
+![A crystal-structure diagram shows sodium and chloride ions arranged in the cubic lattice of sodium chloride.](https://commons.wikimedia.org/wiki/Special:FilePath/Sodium_chloride_crystal.png)
 
 *Figure: Sodium chloride crystal structure illustrating an ionic lattice. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sodium_chloride_crystal.png), H Padleckas, public domain.*
+
+![A rotating model shows the tetrahedral network of the diamond cubic crystal structure.](https://commons.wikimedia.org/wiki/Special:FilePath/Diamond_cubic_animation.gif)
+
+*Figure: Diamond cubic lattice showing covalent network bonding in a solid. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Diamond_cubic_animation.gif), MarinaVladivostok, CC0.*
 
 ## Definitions
 

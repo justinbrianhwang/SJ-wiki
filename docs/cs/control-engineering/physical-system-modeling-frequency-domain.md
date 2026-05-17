@@ -7,6 +7,10 @@ sidebar_position: 4
 
 After introducing transfer functions, Nise spends substantial effort deriving them from real components: electrical networks, translational and rotational mechanical systems, gears, and electromechanical motors. The goal is not to memorize isolated formulas. It is to recognize a modeling pattern: identify energy-storage and dissipative elements, write physical laws, transform to the $s$-domain, and solve for the chosen input-output ratio.
 
+![A Bode plot shows gain and phase changing with frequency.](https://commons.wikimedia.org/wiki/Special:FilePath/Bodeplot.png)
+
+*Figure: Bode plots connect frequency-response calculations to a standard engineering visualization. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bodeplot.png), Stw and Vukg, public domain.*
+
 This page collects the modeling rules most often needed before response and design. The same physical device can produce different transfer functions depending on the selected input and output. A motor can be modeled from armature voltage to angular speed, armature voltage to position, or torque command to load displacement. Always state the variables before writing equations.
 
 ## Definitions

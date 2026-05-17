@@ -7,6 +7,10 @@ sidebar_position: 16
 
 Appendix B of K&R summarizes the ANSI C standard library: headers, types, macros, and functions that a conforming hosted implementation supplies. The library is not the core language, but it is the practical environment in which most C programs live. K&R focuses on the facilities a working programmer reaches for: I/O, character classification, strings, math, utilities, diagnostics, variable arguments, non-local jumps, signals, time, and implementation limits.
 
+![A C language logo marks the systems-programming pages built around C examples.](https://commons.wikimedia.org/wiki/Special:FilePath/C_Programming_Language.svg)
+
+*Figure: C remains the reference language for low-level memory, pointers, and Unix interfaces. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:C_Programming_Language.svg), ElodinKaldwin, public domain text logo.*
+
 This page is a selected reference rather than a replacement for a standard manual. It follows K&R's scope while emphasizing safe usage patterns, common return values, and how the headers relate to earlier chapters.
 
 ## Definitions

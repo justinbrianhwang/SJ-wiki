@@ -9,6 +9,10 @@ One-dimensional potentials are where the abstract postulates become wave mechani
 
 Sakurai presents wave mechanics after Dirac notation and dynamics, treating wave functions as representations of kets. Ballentine uses coordinate and momentum representations early, with careful attention to probability flux and boundary conditions. The Gottfried-named notes start with wave functions and then build the formalism. Schiff's classic approach is closest to the traditional sequence: solve differential equations, then interpret the spectra.
 
+![A particle-in-a-box diagram shows standing-wave probability structure between hard walls.](https://commons.wikimedia.org/wiki/Special:FilePath/Particle_in_a_box.svg)
+
+*Figure: The infinite square well is the simplest visual example of confinement producing discrete energy levels. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Particle_in_a_box.svg), Pieter Kuiper, public domain.*
+
 ## Definitions
 
 For a particle of mass $m$ in one dimension,

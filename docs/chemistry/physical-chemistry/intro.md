@@ -9,6 +9,22 @@ These notes follow Peter Atkins and Julio de Paula, **Atkins' Physical Chemistry
 
 The set is organized as a compact but detailed physical chemistry course: equilibrium thermodynamics first, then statistical thermodynamics, quantum structure, spectroscopy, molecular motion, kinetics, surfaces, catalysis, macromolecules, and solids. Each detail page includes formal definitions, key formulas, a visual anchor, two worked examples, runnable code, common pitfalls, and links to related SJ Wiki areas.
 
+![A Maxwell-Boltzmann distribution plot compares molecular speeds for several noble gases.](https://commons.wikimedia.org/wiki/Special:FilePath/MaxwellBoltzmann-en.svg)
+
+*Figure: Molecular speed distributions as a physical picture behind gas laws and statistical thermodynamics. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:MaxwellBoltzmann-en.svg), Pdbailey, Cryptic C62, and Lilyu, public domain.*
+
+![A phase diagram of water maps solid, liquid, vapor, triple-point, and critical-point regions.](https://commons.wikimedia.org/wiki/Special:FilePath/Phase_diagram_of_water.svg)
+
+*Figure: Phase diagram showing how thermodynamics organizes states of matter. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Phase_diagram_of_water.svg), Cmglee, CC BY-SA 3.0.*
+
+![Hydrogen orbital density plots show bright probability regions for several quantum states.](https://commons.wikimedia.org/wiki/Special:FilePath/Hydrogen_Density_Plots.png)
+
+*Figure: Hydrogen electron probability densities as the quantum foundation for atomic and molecular structure. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hydrogen_Density_Plots.png), PoorLeno, public domain.*
+
+![A tall Bruker NMR spectrometer stands in a museum gallery.](https://commons.wikimedia.org/wiki/Special:FilePath/NMR_spectrometer.jpg)
+
+*Figure: NMR spectrometer as physical chemistry instrumentation for spin energy levels and molecular structure. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:NMR_spectrometer.jpg), Tiia Monto, CC BY-SA 3.0.*
+
 1. [Properties of Gases](/chemistry/physical-chemistry/properties-of-gases)
 2. [First Law and Thermochemistry](/chemistry/physical-chemistry/first-law-and-thermochemistry)
 3. [Second Law and Entropy](/chemistry/physical-chemistry/second-law-and-entropy)

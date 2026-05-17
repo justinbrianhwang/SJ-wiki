@@ -7,6 +7,10 @@ sidebar_position: 6
 
 Classes are where Java programs define new kinds of objects. A class can hold state in fields, expose behavior through methods, control object creation through constructors, and hide representation details with access modifiers. The source book's early examples use small classes not because Java objects are small, but because the design rules are easiest to see when the state and operations are concrete.
 
+![The Sun Microsystems logo gives Java pages historical context for the language and platform.](https://commons.wikimedia.org/wiki/Special:FilePath/Sun_Microsystems_logo.svg)
+
+*Figure: Java's early development at Sun shaped its portability, virtual-machine model, and library ecosystem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sun_Microsystems_logo.svg), Sun Microsystems and Afrank99, public domain text logo.*
+
 Encapsulation is the central discipline. A class should protect its invariants by deciding which fields are private, which operations are public, and which representation details are hidden from clients. If outside code can write directly into an object's internal fields, the object cannot reliably enforce its own contract. This is why the book quickly moves from visible fields to methods that mediate access.
 
 ## Definitions

@@ -9,6 +9,10 @@ Post-quantum cryptography, or PQC, is classical cryptography designed to resist 
 
 The subject is not one algorithm. It is a portfolio of mathematical families with different key sizes, signature sizes, implementation risks, proof styles, and operational roles. Lattice-based schemes are the main general-purpose winners so far, hash-based signatures provide a conservative signature fallback with large signatures, code-based encryption has a long history but large public keys, and multivariate and isogeny-based schemes provide cautionary examples because major candidates were broken during public review.
 
+![A lattice-reduction diagram shows two different bases for the same lattice points, including a shorter reduced basis.](https://commons.wikimedia.org/wiki/Special:FilePath/Lattice-reduction.svg)
+
+*Figure: Lattice-based PQC hides secrets in high-dimensional noisy linear structure; this two-dimensional lattice-reduction picture is only the visible toy version. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Lattice-reduction.svg), Catslash, public domain.*
+
 ## Definitions
 
 A **post-quantum algorithm** is an algorithm intended to remain secure against known classical and quantum attacks. It runs on ordinary hardware. The "quantum" in the name describes the attacker model, not the implementation platform.

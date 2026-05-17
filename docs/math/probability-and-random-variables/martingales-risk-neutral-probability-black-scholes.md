@@ -7,6 +7,10 @@ sidebar_position: 18
 
 The final MIT 18.440 lectures connect probability to fair games and mathematical finance. A martingale is a stochastic process whose conditional expected future value equals its current value. This captures the mathematical version of a fair game: if the price process is a martingale, no strategy based only on past and present information should create positive expected gain by timing the market.
 
+![Pierre-Simon de Laplace is shown in a historical engraved portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Pierre-Simon_de_Laplace.jpg)
+
+*Figure: Pierre-Simon de Laplace is a key figure in probability, transforms, and potential theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pierre-Simon_de_Laplace.jpg), Louis Delaistre after Armand-Charles Guilleminot, public domain.*
+
 Risk-neutral probability then turns market prices into a probability measure for pricing future payoffs. Black-Scholes uses a lognormal risk-neutral model for a future stock price to compute option prices as discounted expectations. The formulas use earlier course tools: expectations, conditional expectation, normal and lognormal distributions, martingales, and no-arbitrage reasoning.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 18
 
 Spatial data mining studies objects with location, geometry, distance, neighborhood, and regional context. Aggarwal's spatial chapter covers mining with contextual spatial attributes and trajectory mining. Spatial data sits between multidimensional mining and graph/time-series mining: a point has numeric coordinates, but its meaning often depends on nearby objects, regions, paths, and movement through space.
 
+![An Iris dataset scatterplot compares flower measurements colored by species.](https://commons.wikimedia.org/wiki/Special:FilePath/Iris_dataset_scatterplot.svg)
+
+*Figure: The Iris scatterplot makes feature spaces and class separation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Iris_dataset_scatterplot.svg), Nicoguaro, CC BY 4.0.*
+
 This page covers spatial context, spatial autocorrelation, spatial clustering, spatial outlier detection, trajectory pattern mining, trajectory clustering, trajectory outlier detection, and trajectory classification.
 
 ## Definitions

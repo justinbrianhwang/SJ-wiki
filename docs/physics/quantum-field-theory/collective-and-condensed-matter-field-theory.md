@@ -9,6 +9,10 @@ Quantum field theory is not only a theory of elementary particles. It is also th
 
 In condensed matter, the vacuum is replaced by a material ground state, Lorentz symmetry may be absent, and the speed of light is rarely the relevant velocity. Yet the same ideas recur: path integrals, symmetry breaking, Goldstone modes, vortices, solitons, effective actions, Chern-Simons terms, and renormalization group flow. The payoff is that field theory explains universality: many microscopic systems share the same long-distance behavior.
 
+![A Mexican-hat potential surface has a central peak surrounded by a circular valley.](https://commons.wikimedia.org/wiki/Special:FilePath/Mexican_hat_potential_polar.svg)
+
+*Figure: The Mexican-hat potential visualizes spontaneous symmetry breaking as a choice among degenerate minima. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mexican_hat_potential_polar.svg), Rupert Millard, public domain.*
+
 ## Definitions
 
 A nonrelativistic bosonic field $\psi(t,\mathbf{x})$ can be described by

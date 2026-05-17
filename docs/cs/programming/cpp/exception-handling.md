@@ -7,6 +7,10 @@ sidebar_position: 17
 
 Exception handling gives C++ a structured way to report and respond to unusual errors without forcing every function to return a special error code. Savitch presents exceptions after classes and dynamic memory because exceptions interact with control flow, object lifetime, and resource cleanup.
 
+![The ISO C++ logo marks pages on classes, templates, containers, and modern C++ idioms.](https://commons.wikimedia.org/wiki/Special:FilePath/ISO_C%2B%2B_Logo.svg)
+
+*Figure: C++ extends systems programming with abstraction, generic code, and deterministic resource management. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ISO_C%2B%2B_Logo.svg), Jeremy Kratz, public domain text logo.*
+
 The central pattern is `try`, `throw`, and `catch`. Code that may detect an exceptional condition throws an exception object. Code that knows how to recover catches it. Functions in between do not need to pass the error manually, but they must still be written so local objects clean themselves up correctly during stack unwinding.
 
 ## Definitions

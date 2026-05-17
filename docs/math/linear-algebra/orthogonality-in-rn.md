@@ -7,6 +7,10 @@ sidebar_position: 8
 
 Orthogonality turns vector algebra into geometry. Length, angle, distance, projection, and perpendicularity can all be expressed with the dot product. This is why systems, approximation, and decompositions become geometric: the best answer is often the one whose error is perpendicular to the space of allowable answers.
 
+![Two vectors add tip to tail to form a resultant vector.](https://commons.wikimedia.org/wiki/Special:FilePath/Vectoraddition.svg)
+
+*Figure: Vector addition is the geometric base case for linear combinations and span. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Vectoraddition.svg), Svjo, CC0 1.0.*
+
 The dot product is the bridge between coordinates and measurement. Without it, vectors can be added and scaled; with it, one can ask how long a vector is, whether two directions are perpendicular, and how much of one vector lies in another direction. Projection is the key operation that later becomes least squares and QR factorization.
 
 ## Definitions

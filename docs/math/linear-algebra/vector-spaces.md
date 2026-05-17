@@ -7,6 +7,10 @@ sidebar_position: 9
 
 The abstraction from $\mathbb{R}^n$ to vector spaces is not a change of subject. It is a way to recognize the same algebraic behavior in polynomials, functions, matrices, sequences, and solution sets. Once the vector space axioms hold, ideas such as span, independence, basis, dimension, and linear transformation work in the same way.
 
+![David Hilbert is shown wearing a hat in a historical photograph.](https://commons.wikimedia.org/wiki/Special:FilePath/Hilbert.jpg)
+
+*Figure: David Hilbert's work frames modern foundations, geometry, and infinite-dimensional thinking. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hilbert.jpg), Unknown author, public domain.*
+
 This abstraction is useful because many objects that do not look like arrows still add and scale like arrows. Polynomials can be added and multiplied by constants. Continuous functions can be added and scaled. Matrices of the same size can be added and scaled. Linear algebra keeps the operations and lets the objects vary.
 
 ## Definitions

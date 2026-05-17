@@ -7,6 +7,10 @@ sidebar_position: 20
 
 Multiple integrals extend accumulation to regions in the plane and solids in space. A double integral adds contributions over area. A triple integral adds contributions over volume. The same slice-and-sum idea from single-variable integration remains, but the geometry of the region becomes more important.
 
+![Arrows rotate around the origin in a two-dimensional vector field.](https://commons.wikimedia.org/wiki/Special:FilePath/Vector_field.svg)
+
+*Figure: A planar vector field shows how direction and magnitude vary from point to point. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Vector_field.svg), Fibonacci, public domain.*
+
 These integrals compute volume, mass, charge, probability, average value, and moments. They also prepare for vector calculus, where flux and circulation compare integrals over regions, surfaces, and boundaries.
 
 ## Definitions

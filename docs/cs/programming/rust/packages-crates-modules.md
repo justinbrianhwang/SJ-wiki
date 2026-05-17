@@ -7,6 +7,10 @@ sidebar_position: 8
 
 As Rust projects grow, the problem changes from "can this file compile?" to "where should this item live, who can use it, and how do names resolve?" The book's module-system chapter answers those questions with packages, crates, modules, paths, visibility, and `use`. These concepts are Rust's way to separate public API from private implementation while keeping compilation units explicit.
 
+![The Rust logo marks pages on ownership, borrowing, traits, and safe systems programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Rust_programming_language_black_logo.svg)
+
+*Figure: Rust connects systems control with compile-time memory-safety guarantees. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Rust_programming_language_black_logo.svg), Rust Foundation, CC BY 4.0.*
+
 This page follows the custom-type pages because modules are often where structs, enums, functions, and traits become part of a library boundary. It also prepares for [Cargo workflows](/cs/programming/rust/cargo-crates-io-workflow), where packages are published, versioned, and consumed by other crates.
 
 ## Definitions

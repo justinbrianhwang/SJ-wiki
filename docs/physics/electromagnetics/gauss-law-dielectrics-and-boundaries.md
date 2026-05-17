@@ -9,6 +9,10 @@ Gauss's law is the electrostatic statement that electric flux begins and ends on
 
 Dielectrics add material response. Bound charges inside a polarized material reduce or reshape the electric field, so it is convenient to distinguish $\vec E$, $\vec D$, and polarization $\vec P$. Boundary conditions then tell us how normal and tangential field components change across interfaces. These rules are the foundation of capacitors, insulation design, dielectric wave propagation, and conductor shielding.
 
+![Four electric dipole configurations are drawn with dense field-line patterns.](https://commons.wikimedia.org/wiki/Special:FilePath/VFPt_dipoles_electric.svg)
+
+*Figure: Dipole field lines make superposition, potential gradients, and boundary intuition visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:VFPt_dipoles_electric.svg), Geek3, CC BY-SA 4.0.*
+
 ## Definitions
 
 Gauss's law in integral form is

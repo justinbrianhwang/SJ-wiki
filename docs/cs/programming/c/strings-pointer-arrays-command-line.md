@@ -7,6 +7,10 @@ sidebar_position: 8
 
 K&R's pointer chapter moves from single pointers to arrays of pointers, strings, sorting lines, multi-dimensional arrays, and command-line arguments. This is where the language becomes idiomatic UNIX C: a program reads lines into storage, keeps pointers to those lines, sorts or filters by rearranging pointers, and uses `argv` to select behavior.
 
+![A C language logo marks the systems-programming pages built around C examples.](https://commons.wikimedia.org/wiki/Special:FilePath/C_Programming_Language.svg)
+
+*Figure: C remains the reference language for low-level memory, pointers, and Unix interfaces. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:C_Programming_Language.svg), ElodinKaldwin, public domain text logo.*
+
 The central lesson is representation. A two-dimensional character array stores fixed-width rows. An array of `char *` stores pointers to strings that may have different lengths. Both can be indexed with two subscripts in some cases, but their storage and flexibility differ dramatically.
 
 ## Definitions

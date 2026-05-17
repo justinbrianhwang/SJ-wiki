@@ -9,6 +9,14 @@ Electromagnetics is a field theory, so most quantities have direction as well as
 
 The practical reason to learn multiple coordinate systems is symmetry. A line charge is natural in cylindrical coordinates, a point charge is natural in spherical coordinates, and a rectangular waveguide is natural in Cartesian coordinates. Choosing coordinates that match the geometry usually turns a hard integral into a short calculation. This page supports the vector calculus page and connects directly to [vector differential calculus](/math/engineering-math/vector-differential-calculus).
 
+![A cylindrical coordinate system marks radius, azimuth, and height around a vertical axis.](https://commons.wikimedia.org/wiki/Special:FilePath/Cylindrical_coordinate_system.svg)
+
+*Figure: Cylindrical coordinates fit wires, coaxial cables, waveguides, and rotational symmetry. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cylindrical_coordinate_system.svg), Svjo, CC BY-SA 3.0.*
+
+![A spherical coordinate system marks radial distance, polar angle, and azimuth angle on a sphere.](https://commons.wikimedia.org/wiki/Special:FilePath/Spherical_coordinate_system.svg)
+
+*Figure: Spherical coordinates fit radiation, central forces, and three-dimensional angular structure. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Spherical_coordinate_system.svg), SharkD, CC BY-SA 4.0.*
+
 ## Definitions
 
 A vector $\vec A$ has magnitude $\vert \vec A\vert $ and direction. In Cartesian coordinates,

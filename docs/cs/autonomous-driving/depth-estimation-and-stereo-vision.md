@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Depth estimation asks how far scene points are from the vehicle. Lidar gives direct sparse range, but camera-based systems must infer depth from geometry, motion, stereo disparity, learned priors, or fusion. This is central to autonomous driving because planning needs metric distances: whether a pedestrian is 6 m or 60 m away changes braking, lane changes, and risk assessment.
 
+![A PointPillars diagram converts LiDAR points into pillars, a pseudo-image, and a detection head.](https://ar5iv.labs.arxiv.org/html/1812.05784/assets/x2.png)
+
+*Figure: PointPillars shows how sparse LiDAR becomes convolution-friendly perception input. Image: [ar5iv](https://arxiv.org/abs/1812.05784), Lang et al., educational use with attribution.*
+
 This page covers stereo geometry, monocular depth, self-supervised depth learning, and depth completion. It connects the raw sensor discussion in [sensors](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu) to [perception](/cs/autonomous-driving/perception-object-detection-and-segmentation), [sensor fusion](/cs/autonomous-driving/sensor-fusion), and [motion planning](/cs/autonomous-driving/motion-planning), where depth uncertainty becomes a safety-critical input.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 12
 
 Data classification learns a model from labeled examples and uses it to assign labels to new objects. Aggarwal's classification chapter covers feature selection, decision trees, rule-based classifiers, probabilistic classifiers such as naive Bayes, support vector machines, neural networks, instance-based learning, and evaluation. Classification is supervised: unlike clustering, it is judged by how well it predicts known labels or future outcomes.
 
+![An Iris dataset scatterplot compares flower measurements colored by species.](https://commons.wikimedia.org/wiki/Special:FilePath/Iris_dataset_scatterplot.svg)
+
+*Figure: The Iris scatterplot makes feature spaces and class separation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Iris_dataset_scatterplot.svg), Nicoguaro, CC BY 4.0.*
+
 This page covers the core classification toolkit. The advanced page covers multiclass learning, rare classes, scalability, regression, semi-supervised learning, active learning, and ensembles.
 
 ## Definitions
@@ -140,7 +144,7 @@ flowchart TB
   Test --> Deployed["classifier f(x) with documented preprocessing contract"]
 ```
 
-![Simple decision tree — the figure shows a binary decision tree that separates four shapes by answering two yes-or-no questions.](https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Simple_decision_tree.svg/960px-Simple_decision_tree.svg.png)
+![Simple decision tree — the figure shows a binary decision tree that separates four shapes by answering two yes-or-no questions.](https://commons.wikimedia.org/wiki/Special:FilePath/Simple_decision_tree.svg)
 
 *Figure: A decision tree routes an example through successive feature tests until it reaches a class leaf. From [Eviatar Bach, 2013](https://commons.wikimedia.org/wiki/File:Simple_decision_tree.svg) — CC0 1.0.*
 

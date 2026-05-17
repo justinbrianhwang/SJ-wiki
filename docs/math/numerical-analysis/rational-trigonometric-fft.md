@@ -7,6 +7,10 @@ sidebar_position: 20
 
 Polynomial approximation is not the only useful approximation model. Rational functions can represent poles, saturation, and sharp transitions with lower degree than polynomials. Trigonometric approximations represent periodic behavior, and the fast Fourier transform makes them computationally practical for large data sets.
 
+![Joseph Fourier is shown in a historical portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Joseph_Fourier.jpg)
+
+*Figure: Joseph Fourier's work on heat flow led to Fourier series and transforms. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Joseph_Fourier.jpg), Jules Boilly, public domain.*
+
 This page connects approximation theory with algorithms. A rational approximant changes the function class; a trigonometric approximant changes the basis; the FFT changes the cost of computing coefficients. All three are used in scientific computing, signal processing, spectral methods, and data analysis.
 
 ## Definitions

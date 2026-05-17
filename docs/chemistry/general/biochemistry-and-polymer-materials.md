@@ -9,6 +9,10 @@ Polymer and biological chemistry apply bonding, structure, and intermolecular fo
 
 In the Ebbing and Gammon sequence this topic sits near synthetic polymers, electrically conducting polymers, proteins, nucleic acids, and introductory biological macromolecules. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
+![A DNA double helix model shows two spiraling strands joined by base pairs.](https://commons.wikimedia.org/wiki/Special:FilePath/DNA_double_helix_vertikal.PNG)
+
+*Figure: DNA double helix as a biological polymer whose function depends on molecular structure. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:DNA_double_helix_vertikal.PNG), Jerome Walker and Dennis Myts, public domain.*
+
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.

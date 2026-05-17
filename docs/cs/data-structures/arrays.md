@@ -7,6 +7,10 @@ sidebar_position: 2
 
 Arrays are the first concrete data structure in many C-based data-structures courses because they expose both the mathematical idea of indexed data and the machine-level idea of contiguous memory. In the source textbook's early chapters, arrays (배열) sit immediately after the discussion of algorithms, abstract data types, pointers, and dynamic allocation. That placement matters: an array is not only a list of values, but also a contract between the programmer, the compiler, and memory.
 
+![A square Kufic algorithms mark introduces the study of designed procedures.](https://commons.wikimedia.org/wiki/Special:FilePath/Algorithms.svg)
+
+*Figure: The algorithms mark gives the abstract algorithms pages a concrete visual anchor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Algorithms.svg), Jeff Erickson, CC BY 4.0.*
+
 In C, arrays are fast because address computation is simple. If the base address and element size are known, the address of any element can be found in constant time. The tradeoff is rigidity: fixed-size arrays cannot grow by themselves, insertion may require many shifts, and deleting an element from the middle does not automatically close the gap unless the programmer writes that logic. Dynamic arrays soften the fixed-size limitation by allocating a larger block and copying elements, but the same contiguous-storage model remains underneath.
 
 ## Definitions

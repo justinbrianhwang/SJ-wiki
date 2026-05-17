@@ -9,6 +9,10 @@ Nuclear chemistry studies changes in atomic nuclei rather than changes in electr
 
 In the Ebbing and Gammon sequence this topic sits near radioactivity, nuclear bombardment reactions, radiation detection and biological effects, radioactive decay rates, isotope applications, mass-energy calculations, fission, and fusion. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
+![A nuclear fission diagram shows a neutron splitting uranium into smaller nuclei and additional neutrons.](https://commons.wikimedia.org/wiki/Special:FilePath/Nuclear_fission.svg)
+
+*Figure: Nuclear fission as a change in nuclei rather than electron arrangements. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Nuclear_fission.svg), Fastfission, public domain.*
+
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.

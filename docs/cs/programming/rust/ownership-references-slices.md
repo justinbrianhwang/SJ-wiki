@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Ownership is Rust's central idea. It is the reason Rust can give memory-safety guarantees without a garbage collector and without asking programmers to manually free ordinary values. Instead of tracking live objects at runtime, Rust checks a set of ownership, borrowing, and lifetime rules at compile time. At first this can feel stricter than other languages, but the rules are designed to prevent use-after-free, double-free, iterator invalidation, and data races.
 
+![The Rust logo marks pages on ownership, borrowing, traits, and safe systems programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Rust_programming_language_black_logo.svg)
+
+*Figure: Rust connects systems control with compile-time memory-safety guarantees. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Rust_programming_language_black_logo.svg), Rust Foundation, CC BY 4.0.*
+
 This page sits at the center of the Rust notes. Almost every later topic uses ownership: collections own their elements, functions may take or borrow values, smart pointers extend ownership patterns, and concurrency depends on the same aliasing rules. The book introduces ownership through `String`, references, and slices because they reveal the difference between stack-only values and heap-backed data.
 
 ## Definitions

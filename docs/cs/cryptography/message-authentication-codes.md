@@ -7,6 +7,10 @@ sidebar_position: 7
 
 Encryption hides content; it does not prove that a message came from the right sender or arrived unchanged. Message authentication codes solve the integrity side of symmetric cryptography. A MAC lets parties sharing a secret key attach a tag to a message so that an attacker who can see and even request tags cannot create a valid tag for a new message.
 
+![A public-key encryption diagram separates public encryption from private decryption.](https://commons.wikimedia.org/wiki/Special:FilePath/Public_key_encryption.svg)
+
+*Figure: Asymmetric encryption turns key distribution into a public and private key pair. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Public_key_encryption.svg), Davidgothberg, public domain.*
+
 Katz and Lindell present MACs through formal unforgeability experiments and then develop PRF-based MACs, CBC-MAC, HMAC, and authenticated encryption. Smart's hash-and-MAC discussion is more applied and helps explain why real systems often authenticate protocol records, file chunks, or handshake transcripts. The shared point is that integrity needs its own primitive and its own definition.
 
 ## Definitions

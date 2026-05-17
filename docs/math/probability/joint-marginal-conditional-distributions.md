@@ -7,6 +7,10 @@ sidebar_position: 9
 
 Most probability models involve more than one random variable. A student's study time and exam score, two components in a system, or the two coordinates of a random point are not separate stories; their relationship is often the point of the model. Joint distributions describe variables together. Marginal distributions describe one variable after ignoring the others. Conditional distributions describe one variable after another has been observed.
 
+![Tree diagrams organize conditional probabilities for Bayes' theorem.](https://commons.wikimedia.org/wiki/Special:FilePath/Bayes_theorem_tree_diagrams.svg)
+
+*Figure: Probability trees make the conditioning structure in Bayes' theorem explicit. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bayes_theorem_tree_diagrams.svg), Gnathan87, CC0 1.0.*
+
 This page generalizes conditional probability from events to random variables. It prepares for covariance, independence, transformations, and Markov chains, all of which depend on understanding what information is contained in a joint distribution.
 
 ## Definitions

@@ -11,6 +11,10 @@ This page focuses on entanglement as a **network resource** rather than only as 
 
 Nielsen and Chuang are the primary reference for the mathematical layer used here. Chapter 2 gives the postulates, reduced density operators, Schmidt decomposition, and purifications; Chapter 11 gives von Neumann entropy; Chapter 12 treats entanglement as an interconvertible physical resource. Modern quantum-internet papers often add hardware, routing, and scheduling language, but the invariant quantities underneath are the same: spectra of reduced states, LOCC convertibility, channel noise, and fidelity to Bell states.
 
+![An optical-table experiment illustrates entangled photon generation through spontaneous parametric down-conversion.](https://commons.wikimedia.org/wiki/Special:FilePath/Quantum_Entanglement_Experiment_via_Spontaneous_Parametric_Down-Conversion_%28SPDC%29.jpg)
+
+*Figure: Network entanglement starts as a physical resource from sources, optics, detectors, and timing logic before it becomes a Bell-pair symbol in a protocol. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quantum_Entanglement_Experiment_via_Spontaneous_Parametric_Down-Conversion_%28SPDC%29.jpg), Farbodk, CC BY-SA 4.0.*
+
 ## Definitions
 
 For two qubits, use the computational basis ordered as

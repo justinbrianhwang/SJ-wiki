@@ -7,6 +7,10 @@ sidebar_position: 14
 
 Nyquist analysis is the frequency-domain stability test that complements Routh-Hurwitz and root locus. Instead of forming a Routh table or drawing pole paths, it studies how the open-loop transfer function maps a contour around the right half-plane. Nise uses Nyquist to connect encirclements of the critical point $-1+j0$ with closed-loop stability, then defines gain and phase margins as practical robustness measures.
 
+![A Bode plot shows gain and phase changing with frequency.](https://commons.wikimedia.org/wiki/Special:FilePath/Bodeplot.png)
+
+*Figure: Bode plots connect frequency-response calculations to a standard engineering visualization. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bodeplot.png), Stw and Vukg, public domain.*
+
 The power of Nyquist is that it reasons from open-loop frequency response while accounting for open-loop unstable poles. Bode plots are easier to read for routine design, but Nyquist gives the underlying stability logic and handles cases where open-loop right-half-plane poles matter.
 
 ## Definitions

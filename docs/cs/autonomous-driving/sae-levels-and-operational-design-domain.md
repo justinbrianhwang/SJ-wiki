@@ -7,6 +7,10 @@ sidebar_position: 2
 
 The SAE J3016 levels are the common vocabulary for describing how much of the driving task is automated, but the levels are often misread as a ladder of product quality. They are really a responsibility map: who performs the dynamic driving task, who monitors the driving environment, and who must respond when the automation reaches its limits. Operational design domain, usually shortened to ODD, is the other half of the vocabulary because a system is never simply "self-driving" in the abstract; it is automated under stated roads, speeds, weather, geography, lighting, traffic rules, and vehicle states.
 
+![A Waymo self-driving car drives on a public road with roof-mounted sensors.](https://commons.wikimedia.org/wiki/Special:FilePath/Waymo_self-driving_car_front_view.gk.jpg)
+
+*Figure: A real autonomous vehicle grounds the driving stack in a physical platform. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Waymo_self-driving_car_front_view.gk.jpg), Grendelkhan, CC BY-SA 4.0.*
+
 This page gives the foundational taxonomy used throughout the autonomous-driving section. Later pages on [sensors](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu), [prediction](/cs/autonomous-driving/prediction-and-motion-forecasting), [planning](/cs/autonomous-driving/motion-planning), [control](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley), and [safety](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing) assume this distinction between capability, domain, fallback responsibility, and legal permission.
 
 ## Definitions

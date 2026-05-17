@@ -9,6 +9,10 @@ Electronic spectroscopy probes changes in electronic state, laser chemistry expl
 
 Atkins treats these topics as connected by transition energies, selection rules, populations, and relaxation. Whether the transition is UV-visible absorption, fluorescence, NMR, or EPR, the same physical questions recur: what are the energy levels, what couples them to radiation, and what happens after excitation?
 
+![A tall Bruker NMR spectrometer stands in a museum gallery.](https://commons.wikimedia.org/wiki/Special:FilePath/NMR_spectrometer.jpg)
+
+*Figure: NMR spectrometer as magnetic-resonance apparatus for spin-dependent structure. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:NMR_spectrometer.jpg), Tiia Monto, CC BY-SA 3.0.*
+
 ## Definitions
 
 For electronic absorption,

@@ -9,6 +9,10 @@ Chemical kinetics studies how fast reactions occur and what molecular sequence p
 
 Atkins builds kinetics from empirical rate laws, integrated forms, elementary reactions, and mechanism approximations. The most important practical skill is separating the experimentally observed rate law from the proposed molecular mechanism that explains it.
 
+![A reaction coordinate diagram marks the activation energy between reactants and products.](https://commons.wikimedia.org/wiki/Special:FilePath/Activation_Energy.svg)
+
+*Figure: Activation energy barrier connecting mechanism hypotheses to measured rates. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Activation_Energy.svg), Risibot based on Brazosport College, CC BY-SA 4.0.*
+
 ## Definitions
 
 For a reaction

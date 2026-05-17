@@ -7,9 +7,13 @@ sidebar_position: 19
 
 Equivalence relations formalize sameness for a chosen purpose. Partial orders formalize comparison when not every pair must be comparable. Both are special kinds of relations, and both organize sets into useful structure.
 
+![Two overlapping circles show a highlighted Venn diagram region.](https://commons.wikimedia.org/wiki/Special:FilePath/Venn0001.svg)
+
+*Figure: A Venn diagram connects set operations with the same logical connectives used in proofs. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Venn0001.svg), Watchduck, public domain.*
+
 The contrast is useful. Equivalence relations collapse a set into blocks of objects considered the same, such as integers with the same remainder modulo $m$. Partial orders arrange objects by precedence or containment, such as tasks ordered by prerequisites or sets ordered by inclusion.
 
-![A Hasse diagram orders all subsets of a three-element set by inclusion.](https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Hasse_diagram_of_powerset_of_3.svg/500px-Hasse_diagram_of_powerset_of_3.svg.png)
+![A Hasse diagram orders all subsets of a three-element set by inclusion.](https://commons.wikimedia.org/wiki/Special:FilePath/Hasse_diagram_of_powerset_of_3.svg)
 
 *Figure: Hasse diagram for the power set of a three-element set. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hasse_diagram_of_powerset_of_3.svg), KSmrq, CC BY-SA 3.0.*
 

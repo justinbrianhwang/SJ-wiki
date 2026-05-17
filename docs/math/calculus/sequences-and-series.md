@@ -7,6 +7,10 @@ sidebar_position: 13
 
 Sequences and series apply the limit concept to infinite lists and infinite sums. A sequence asks whether the terms $a_n$ settle toward a value. A series asks whether the accumulated partial sums $a_1+a_2+\cdots+a_n$ settle toward a finite total. These are related questions, but they are not the same question.
 
+![A Sierpinski triangle repeats triangular holes at smaller and smaller scales.](https://commons.wikimedia.org/wiki/Special:FilePath/Big_Sierpinski_triangle.svg)
+
+*Figure: The Sierpinski triangle connects recursion, self-similarity, and geometric counting. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Big_Sierpinski_triangle.svg), Medvedev, public domain.*
+
 Infinite series are essential for approximating functions, solving differential equations, estimating errors, and understanding power series. The work is mostly diagnostic: identify the structure of the terms, choose an appropriate convergence test, and state exactly what the test proves.
 
 ## Definitions

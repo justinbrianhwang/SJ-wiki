@@ -7,6 +7,10 @@ sidebar_position: 1
 
 These notes cover C through the scope of Kernighan and Ritchie's *The C Programming Language*, second edition: the tutorial core, the expression and type system, control flow, functions, pointers, structures, input/output, the UNIX interface, the ANSI standard library, and the gap between K&R-era style and modern C practice.
 
+![A C language logo marks the systems-programming pages built around C examples.](https://commons.wikimedia.org/wiki/Special:FilePath/C_Programming_Language.svg)
+
+*Figure: C remains the reference language for low-level memory, pointers, and Unix interfaces. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:C_Programming_Language.svg), ElodinKaldwin, public domain text logo.*
+
 C is a small language with unusually direct access to representation. Arrays are contiguous storage, strings are null-terminated character arrays, pointers are typed addresses, and much of the standard library is built out of explicit buffers, status returns, and caller-managed storage. That directness is why K&R can move quickly from "hello, world" to sorting lines, parsing declarations, building hash tables, walking directories, and sketching an allocator.
 
 The pages emphasize K&R idioms: pointer-based traversal, compact stream filters, explicit prototypes, small functions, file-scope `static` state, careful use of macros, and precise notes on undefined or implementation-defined behavior. The examples are written in modern prototype style while preserving the book's model of how C programs are shaped.

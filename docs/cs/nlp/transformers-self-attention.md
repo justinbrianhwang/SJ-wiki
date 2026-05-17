@@ -7,6 +7,10 @@ sidebar_position: 9
 
 Transformers replace recurrence with attention over token representations. Jurafsky and Martin present self-attention, multihead attention, transformer blocks, positional embeddings, causal language modeling, generation, and harms. Eisenstein's 2018 text predates the full LLM era but includes the formal ingredients that transformers build on: embeddings, neural language models, attention-based neural machine translation, and non-recurrent sequence transduction.
 
+![A skip-gram word embedding diagram predicts surrounding context words from a center word.](https://commons.wikimedia.org/wiki/Special:FilePath/Word_embeddings_Skip-gram.svg)
+
+*Figure: Skip-gram training ties word meaning to surrounding context. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Word_embeddings_Skip-gram.svg), Jeran Renz, CC BY-SA 4.0.*
+
 The key idea is that each token representation is updated by looking at other tokens. In causal language models, a token may attend only to previous tokens. In bidirectional encoders, it may attend to the whole input. This attention pattern, stacked with feedforward layers and residual connections, is the main architecture behind modern pretrained language models.
 
 ## Definitions

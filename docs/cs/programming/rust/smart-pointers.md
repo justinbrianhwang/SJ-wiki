@@ -7,6 +7,10 @@ sidebar_position: 16
 
 Smart pointers are data structures that act like pointers but also carry extra behavior or metadata. The book introduces them after ownership, traits, and collections because they combine all three. `Box<T>` puts data on the heap. `Rc<T>` enables multiple ownership in single-threaded code. `RefCell<T>` moves borrow-rule checking from compile time to runtime for specific interior-mutability patterns. `Weak<T>` breaks reference cycles.
 
+![The Rust logo marks pages on ownership, borrowing, traits, and safe systems programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Rust_programming_language_black_logo.svg)
+
+*Figure: Rust connects systems control with compile-time memory-safety guarantees. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Rust_programming_language_black_logo.svg), Rust Foundation, CC BY 4.0.*
+
 This page builds on [ownership](/cs/programming/rust/ownership-references-slices) and [generics, traits, and lifetimes](/cs/programming/rust/generics-traits-lifetimes). It also prepares for [concurrency](/cs/programming/rust/concurrency-and-shared-state), where `Arc<T>` and `Mutex<T>` play related roles in multi-threaded programs.
 
 ## Definitions

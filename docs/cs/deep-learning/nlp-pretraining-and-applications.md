@@ -7,6 +7,10 @@ sidebar_position: 17
 
 D2L's NLP application chapters connect representation learning to downstream language tasks. Before transformers became dominant, word embeddings such as word2vec and GloVe showed that useful semantic structure could be learned from unlabeled text. Modern systems extend that idea with contextual encoders and task-specific fine-tuning for sentiment analysis, natural language inference, and sequence-to-sequence prediction.
 
+![An ELIZA terminal conversation shows an early chatbot responding to typed user input.](https://commons.wikimedia.org/wiki/Special:FilePath/ELIZA_conversation.png)
+
+*Figure: ELIZA provides historical context for dialogue systems and chatbot evaluation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ELIZA_conversation.png), Unknown author, public domain text.*
+
 The common thread is that text must be represented numerically while preserving enough linguistic structure to support the task. A bag of words can work for simple sentiment problems, but it loses order and context. Static embeddings represent each word type with one vector. Contextual models represent each token occurrence based on surrounding tokens. Applications differ in output structure, but they all depend on tokenization, vocabulary handling, batching, masking, and loss design.
 
 ## Definitions

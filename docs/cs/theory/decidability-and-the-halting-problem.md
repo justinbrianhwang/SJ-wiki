@@ -7,6 +7,10 @@ sidebar_position: 12
 
 Decidability marks the boundary between algorithmic problems that can always be solved and those that cannot. Turing machines are powerful enough to express ordinary computation, but that power makes it possible to encode machines as inputs to other machines. Once programs can reason about programs, self-reference and diagonalization produce unavoidable limits.
 
+![A portrait of Alan Turing as a teenager gives computability theory historical context.](https://commons.wikimedia.org/wiki/Special:FilePath/Alan_Turing_Aged_16.jpg)
+
+*Figure: Alan Turing's work on computation and undecidability frames the theory section. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Alan_Turing_Aged_16.jpg), Unknown photographer, public domain.*
+
 The halting problem is the canonical undecidable problem. It asks whether a given machine eventually halts on a given input. The proof that no decider exists is short, but its consequences are broad: no fully automatic tool can decide every semantic property of programs, and many natural language-theory questions are undecidable.
 
 ## Definitions

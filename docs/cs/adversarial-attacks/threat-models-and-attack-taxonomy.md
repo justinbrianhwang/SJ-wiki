@@ -7,6 +7,10 @@ sidebar_position: 2
 
 Adversarial machine learning is only meaningful once the attacker's powers are stated. A defense that is strong against a transfer attack may fail under white-box gradients; a detector that works for digital $\ell_\infty$ image noise may be irrelevant for a printed sticker or a prompt-injection attack. Threat modeling is the discipline that turns "the model is robust" into a claim with assumptions, budgets, goals, and evaluation rules.
 
+![A visually similar adversarial panda image is classified as a gibbon by an ImageNet model.](https://ar5iv.labs.arxiv.org/html/1412.6572/assets/gibbon_993.png)
+
+*Figure: The FGSM panda example shows that imperceptible perturbations can change model decisions. Image: [ar5iv](https://arxiv.org/abs/1412.6572), Goodfellow, Shlens, and Szegedy, educational use with attribution.*
+
 This page gives the vocabulary used throughout the adversarial-attacks section. It connects the security-style view of attacker goal, knowledge, capability, and strategy with the optimization view used in [mathematical formulation](/cs/adversarial-attacks/mathematical-formulation), [white-box attacks](/cs/adversarial-attacks/white-box-attacks), and [evaluation and benchmarks](/cs/adversarial-attacks/evaluation-and-benchmarks).
 
 ## Definitions

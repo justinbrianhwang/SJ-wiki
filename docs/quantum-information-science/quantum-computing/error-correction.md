@@ -9,6 +9,10 @@ Quantum error correction is the mechanism that makes large quantum computations 
 
 *This page synthesizes the wiki's earlier QEC draft with Chapters 8 and 10 of Nielsen and Chuang. The N&C treatment is canonical for the operator-sum model of noise, the Knill-Laflamme error-correction conditions, Pauli error discretization, stabilizer codes, normalizers, encoded operations, and the threshold theorem.*
 
+![A three-qubit bit-flip error-correction circuit encodes one qubit, passes through a noisy channel, and decodes to correct one bit flip.](https://commons.wikimedia.org/wiki/Special:FilePath/Quantum_error_correction_of_bit_flip_using_three_qubits.svg)
+
+*Figure: The three-qubit repetition code is the simplest place to see the QEC pattern: encode, expose to noise, measure syndrome information, and recover. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quantum_error_correction_of_bit_flip_using_three_qubits.svg), Bender2k14, CC BY-SA 3.0.*
+
 ## Definitions
 
 A **quantum operation** or **channel** maps density operators to density operators. In N&C notation, a trace-preserving channel has an operator-sum representation

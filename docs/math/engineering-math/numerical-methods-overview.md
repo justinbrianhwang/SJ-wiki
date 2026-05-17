@@ -7,6 +7,10 @@ sidebar_position: 23
 
 Numerical methods approximate mathematical problems when exact formulas are unavailable, inconvenient, or too expensive. In engineering mathematics they solve nonlinear equations, linear systems, eigenvalue problems, ODEs, PDEs, interpolation, integration, and least-squares problems. The goal is not just to get a number, but to know how reliable that number is.
 
+![Four Runge-Kutta slope samples are drawn along one ODE step.](https://commons.wikimedia.org/wiki/Special:FilePath/Runge-Kutta_slopes.svg)
+
+*Figure: Runge-Kutta methods combine several slope estimates to advance an ODE solution more accurately. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Runge-Kutta_slopes.svg), HilberTraum, CC BY-SA 4.0.*
+
 Every numerical method has assumptions, cost, and error behavior. A method that is excellent for a smooth nonstiff ODE may fail for a stiff system. A direct linear solver may be ideal for a dense moderate system but impractical for a huge sparse system. Numerical thinking is the discipline of matching the method to the problem.
 
 ## Definitions

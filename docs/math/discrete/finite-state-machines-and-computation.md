@@ -7,6 +7,10 @@ sidebar_position: 25
 
 Rosen's final topic connects discrete structures to models of computation. Grammars generate languages. Finite-state machines recognize simple languages with limited memory. Turing machines model general effective computation and support the distinction between tractable, intractable, and unsolvable problems.
 
+![A finite-state machine diagram shows states and transitions for a simple process.](https://commons.wikimedia.org/wiki/Special:FilePath/Finite_state_machine_example_with_comments.svg)
+
+*Figure: A finite-state machine represents computation as transitions among discrete states. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Finite_state_machine_example_with_comments.svg), Macguy314, reworked by Perhelion, public domain.*
+
 The theme is memory. A finite-state machine has only finitely many states, so it can remember bounded information such as parity or a fixed suffix. A pushdown automaton adds a stack and recognizes many nested structures. A Turing machine adds unbounded tape and becomes a model for general algorithms.
 
 ## Definitions

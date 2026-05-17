@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Classification changes the target from a real number to a discrete class. D2L introduces softmax regression as the linear neural network for this setting: it is still a single affine transformation, but its outputs are interpreted as class probabilities. This makes it the natural baseline for image classification, text classification, and any problem where the model must choose among mutually exclusive labels.
 
+![A grid of MNIST handwritten digits shows the small grayscale examples used in many ML tutorials.](https://commons.wikimedia.org/wiki/Special:FilePath/MNIST_dataset_example.png)
+
+*Figure: MNIST gives classification, vision, and neural-network pages a familiar benchmark image. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:MNIST_dataset_example.png), Suvanjanprasai, CC BY-SA 4.0.*
+
 The chapter also introduces a more careful view of generalization. Good training accuracy is not the goal; good performance on future data from the intended environment is the goal. Classification makes this distinction visible because accuracy, cross-entropy, class imbalance, distribution shift, and repeated test-set use can all tell different stories about the same model.
 
 ## Definitions

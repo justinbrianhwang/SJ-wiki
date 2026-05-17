@@ -7,6 +7,10 @@ sidebar_position: 1
 
 These notes are based on **Python Programming** by **Hans-Petter Halvorsen**. The extracted front matter identifies the book as *Python Programming*, Hans-Petter Halvorsen, 2019, with copyright text dated August 12, 2020 and ISBN `978-82-691106-4-7`. The book is an introductory programming text: it starts with why Python is useful, moves through installation and first scripts, then covers variables, packages, plotting, control flow, functions, classes, modules, file handling, error handling, debugging, environments, editors, and a short mathematics/scientific-computing section.
 
+![The Python logo marks pages on scripting, testing, packaging, and scientific programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Python-logo-notext.svg)
+
+*Figure: Python provides the practical environment for many CS, ML, and data examples. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Python-logo-notext.svg), Python Software Foundation, GPL-compatible free license; trademark terms apply.*
+
 The wiki pages in this section follow the book's practical order but expand the treatment for a modern Python study path. Where the textbook introduces a beginner concept, these notes keep that foundation and add idioms students need when moving into larger scripts: virtual environments, context managers, comprehensions, decorators, dataclasses, iterators, `pathlib`, testing, and the scientific stack. The source book is the anchor; the wiki organization is designed to make the material easier to revisit topic by topic.
 
 ## Definitions

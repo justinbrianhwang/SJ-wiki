@@ -7,6 +7,10 @@ sidebar_position: 7
 
 Python's built-in containers are one of the main reasons the language feels productive. Lists, tuples, sets, and dictionaries cover most everyday data modeling needs without importing anything. Halvorsen's early chapters use arrays in the beginner sense and then loop over data. In idiomatic Python, the usual built-in sequence for a growable ordered collection is a list; specialized numeric arrays are introduced later through NumPy.
 
+![The Python logo marks pages on scripting, testing, packaging, and scientific programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Python-logo-notext.svg)
+
+*Figure: Python provides the practical environment for many CS, ML, and data examples. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Python-logo-notext.svg), Python Software Foundation, GPL-compatible free license; trademark terms apply.*
+
 Choosing the right container is a design decision. If order and mutation matter, use a list. If fixed position and unpacking matter, use a tuple. If uniqueness and membership tests matter, use a set. If lookup by key matters, use a dictionary. Most beginner code becomes simpler when data is put into the container that matches the operation being performed.
 
 ## Definitions

@@ -9,9 +9,13 @@ Rotational and vibrational spectroscopy read molecular motion directly. Microwav
 
 Atkins treats spectroscopy as quantum mechanics made observable: photons are absorbed or scattered when their energy matches allowed molecular energy differences and when transition moments satisfy selection rules.
 
-![An energy-level diagram compares Rayleigh scattering, Stokes Raman scattering, anti-Stokes Raman scattering, and infrared absorption.](https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Raman_energy_levels.svg/500px-Raman_energy_levels.svg.png)
+![An energy-level diagram compares Rayleigh scattering, Stokes Raman scattering, anti-Stokes Raman scattering, and infrared absorption.](https://commons.wikimedia.org/wiki/Special:FilePath/Raman_energy_levels.svg)
 
 *Figure: Molecular energy-level diagram for Raman scattering and infrared absorption. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Raman_energy_levels.svg), Moxfyre based on work by Pavlina2.0, CC BY-SA 3.0.*
+
+![A laboratory Raman spectrometer sits on an optical bench for material and molecular analysis.](https://commons.wikimedia.org/wiki/Special:FilePath/Raman-Spektrometer.jpg)
+
+*Figure: Raman spectrometer as real instrumentation behind scattering spectra. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Raman-Spektrometer.jpg), IOM Leipzig, CC BY 4.0.*
 
 ## Definitions
 

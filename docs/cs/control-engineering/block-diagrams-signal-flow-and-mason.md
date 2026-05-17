@@ -7,6 +7,10 @@ sidebar_position: 7
 
 Real control systems are built from interconnected subsystems. Nise's reduction chapter shows how to collapse block diagrams and signal-flow graphs into equivalent transfer functions, so that the response and stability tools from earlier chapters can be applied. This is where modeling becomes system analysis: motors, sensors, amplifiers, loads, and feedback paths become one closed-loop expression.
 
+![A feedback control block diagram shows compensators wrapped around a plant.](https://commons.wikimedia.org/wiki/Special:FilePath/Control_System.svg)
+
+*Figure: The standard feedback loop keeps control pages tied to the plant-controller interface. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Control_System.svg), Inductiveload, public domain.*
+
 The methods here are algebraic, but they are also organizational. A clean block diagram exposes where disturbances enter, where sensor dynamics sit, and which signals are internal. Signal-flow graphs provide a compact alternative when many loops interact. Mason's gain formula is especially useful when block-diagram reduction becomes visually messy.
 
 ## Definitions

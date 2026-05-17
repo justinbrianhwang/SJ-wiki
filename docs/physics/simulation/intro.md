@@ -9,6 +9,18 @@ Simulation of dynamic systems studies how mathematical models evolve over time w
 
 These notes are written as working study pages. They emphasize model derivation, state-space form, numerical integration, MATLAB scripts, Simulink implementation, time-response interpretation, and verification. The goal is not to replace a textbook or software manual, but to give a coherent path from physical assumptions to a simulation result that can be checked, explained, and improved.
 
+![A Lorenz attractor coils through phase space in two butterfly-like lobes.](https://commons.wikimedia.org/wiki/Special:FilePath/Lorenz_attractor_yb.svg)
+
+*Figure: The Lorenz attractor is the standard visual scene for sensitive dependence and nonlinear simulation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Lorenz_attractor_yb.svg), Wikimol and Dschwen, CC BY-SA 3.0/GFDL.*
+
+![A state-space block diagram routes input through system matrices to state and output variables.](https://commons.wikimedia.org/wiki/Special:FilePath/Typical_State_Space_model.svg)
+
+*Figure: State-space diagrams show how stored state, input, and output maps fit into one dynamic-system representation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Typical_State_Space_model.svg), Cburnett and BiMiT, CC0 1.0.*
+
+![An inverted pendulum is mounted on a cart with its angle and cart position labeled.](https://commons.wikimedia.org/wiki/Special:FilePath/Cart-pendulum.svg)
+
+*Figure: The cart-pendulum setup is a classic benchmark for unstable dynamics, feedback, and hybrid simulation tests. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cart-pendulum.svg), Krishnavedala, CC0 1.0.*
+
 ## Definitions
 
 A dynamic system is a system whose current behavior depends on stored information from the past. The stored information is represented by state variables. For a continuous-time system,

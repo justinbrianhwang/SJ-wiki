@@ -7,6 +7,18 @@ sidebar_position: 1
 
 These notes organize Burden and Faires, *Numerical Analysis*, 9th edition, into a practical wiki path for computation, analysis, and implementation. The emphasis is the central theme of the text: numerical algorithms are useful only when their approximation error, floating-point behavior, convergence, and stability are understood together.
 
+![The bisection method repeatedly narrows an interval around a root.](https://commons.wikimedia.org/wiki/Special:FilePath/Bisection_method.svg)
+
+*Figure: Bisection is a robust root-finding method built from the intermediate value theorem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bisection_method.svg), Tokuchan after Dake, CC BY-SA 3.0.*
+
+![Newton iteration follows tangent lines toward a root of a curve.](https://commons.wikimedia.org/wiki/Special:FilePath/Newton_iteration.svg)
+
+*Figure: Newton iteration uses local linearization to turn calculus into a fast root-finding algorithm. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Newton_iteration.svg), Oleg Alexandrov and Pbroks13, public domain.*
+
+![Four Runge-Kutta slope samples are drawn along one ODE step.](https://commons.wikimedia.org/wiki/Special:FilePath/Runge-Kutta_slopes.svg)
+
+*Figure: Runge-Kutta methods combine several slope estimates to advance an ODE solution more accurately. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Runge-Kutta_slopes.svg), HilberTraum, CC BY-SA 4.0.*
+
 The sequence starts with calculus-based error estimates and machine arithmetic, then moves through nonlinear equations, interpolation, differentiation, integration, ordinary differential equations, numerical linear algebra, approximation theory, eigenvalue problems, nonlinear systems, boundary-value problems, and finite-difference methods for partial differential equations. Each topic page follows the same study pattern: intuition, algorithm, convergence or stability analysis, a worked example, and executable Python/NumPy/SciPy-style code.
 
 Use the pages in order for a first pass; later, jump directly to the method family needed for a computation.

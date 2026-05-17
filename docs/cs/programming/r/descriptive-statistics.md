@@ -7,6 +7,10 @@ sidebar_position: 13
 
 Descriptive statistics summarize what is in a sample before moving to formal inference. The book's statistics section begins with elementary summaries because they are the bridge between raw vectors and statistical reasoning. A mean, median, standard deviation, table, or quantile does not prove a hypothesis, but it reveals scale, center, spread, skew, outliers, and group differences that should shape the rest of the analysis.
 
+![The R logo marks pages on statistical computing, graphics, and data analysis.](https://commons.wikimedia.org/wiki/Special:FilePath/R_logo.svg)
+
+*Figure: R connects programming examples to statistical modeling and visualization workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:R_logo.svg), The R Foundation, CC BY-SA 4.0.*
+
 In R, descriptive statistics are mostly vector operations plus grouping. You compute a summary for one vector, then repeat it across columns, groups, or subsets. The same ideas support plots, confidence intervals, hypothesis tests, and models. If a summary is wrong because of missing values, bad classes, or accidental subsetting, later inference will also be wrong.
 
 ## Definitions

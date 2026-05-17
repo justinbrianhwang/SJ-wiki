@@ -9,6 +9,10 @@ Linear system analysis gives simulation a set of benchmarks. When a model is lin
 
 In a simulation workflow, linear analysis is useful in two directions. First, a known transfer function or state model can be simulated and checked against analytical results. Second, a nonlinear model can be linearized around an operating point so its local modes and frequency response can be understood. This page connects the simulation notes to the broader signals-and-systems material.
 
+![A state-space block diagram routes input through system matrices to state and output variables.](https://commons.wikimedia.org/wiki/Special:FilePath/Typical_State_Space_model.svg)
+
+*Figure: State-space diagrams show how stored state, input, and output maps fit into one dynamic-system representation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Typical_State_Space_model.svg), Cburnett and BiMiT, CC0 1.0.*
+
 ## Definitions
 
 A continuous-time LTI state-space model is

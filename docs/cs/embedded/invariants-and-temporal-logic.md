@@ -7,6 +7,10 @@ sidebar_position: 62
 
 Embedded-system requirements are often temporal. It is not enough to say "the reset state is reachable" or "the light can be red." We need statements such as "the pedestrian signal is never green while cars have green," "every request eventually receives a response," or "after reset is asserted, the controller enters the reset state on the next tick and stays there until reset is deasserted."
 
+![An Arduino Uno board shows a familiar microcontroller development board with headers and USB.](https://commons.wikimedia.org/wiki/Special:FilePath/Arduino_Uno_-_R3.jpg)
+
+*Figure: Arduino boards make microcontroller I/O and prototyping tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Arduino_Uno_-_R3.jpg), SparkFun Electronics, CC BY 2.0.*
+
 Temporal logic is a precise notation for such requirements. Lee and Seshia introduce invariants first, then linear temporal logic (LTL), because invariants are the most common and simplest time-spanning properties. Formal specifications matter because English requirements leave timing ambiguities that are unacceptable in safety-critical CPS design.
 
 ## Definitions

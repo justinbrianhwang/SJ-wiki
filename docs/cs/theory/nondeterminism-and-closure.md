@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Nondeterminism lets a finite automaton branch into several possible futures. An NFA accepts if at least one branch accepts. This sounds more powerful than a DFA because the machine can guess where a pattern begins, which alternative to take, or how many symbols to consume before a final check. For finite automata, however, nondeterminism adds convenience but not expressive power.
 
+![A square Kufic algorithms mark introduces the study of designed procedures.](https://commons.wikimedia.org/wiki/Special:FilePath/Algorithms.svg)
+
+*Figure: The algorithms mark gives the abstract algorithms pages a concrete visual anchor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Algorithms.svg), Jeff Erickson, CC BY 4.0.*
+
 The equivalence between NFAs and DFAs is one of the first major robustness results in the course. It shows that a computational feature can make descriptions shorter and constructions easier without changing the class of languages recognized. The same lesson returns later for nondeterministic Turing machines in decidability, although complexity theory treats nondeterminism much more carefully.
 
 ## Definitions

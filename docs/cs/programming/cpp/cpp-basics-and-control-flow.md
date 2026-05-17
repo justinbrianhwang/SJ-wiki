@@ -7,6 +7,10 @@ sidebar_position: 2
 
 C++ begins with a small set of precise rules: every program has a `main`, every variable has a type, expressions are evaluated according to precedence, and execution normally moves from one statement to the next. Control-flow statements are the first tools that let a program stop being a straight-line calculator and start making decisions. Savitch treats these early topics as the grammar of the language: identifiers, declarations, assignment, console I/O, Boolean expressions, branches, loops, and the first contact with file input.
 
+![The ISO C++ logo marks pages on classes, templates, containers, and modern C++ idioms.](https://commons.wikimedia.org/wiki/Special:FilePath/ISO_C%2B%2B_Logo.svg)
+
+*Figure: C++ extends systems programming with abstraction, generic code, and deterministic resource management. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ISO_C%2B%2B_Logo.svg), Jeremy Kratz, public domain text logo.*
+
 These notes connect Chapter 1 and Chapter 2 into a single foundation. The main idea is that a C++ program is a sequence of state changes. Declarations create named storage, assignments update that storage, input statements fill it from outside the program, output statements reveal it, and control-flow statements choose which updates happen and how often.
 
 ## Definitions

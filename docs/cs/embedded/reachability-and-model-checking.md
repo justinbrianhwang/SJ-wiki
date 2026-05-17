@@ -7,6 +7,10 @@ sidebar_position: 64
 
 Model checking is algorithmic formal verification. Given a finite-state model and a formal property, it attempts to answer whether the model satisfies the property. In embedded systems, this is useful for checking mode logic, protocols, mutual exclusion, controller supervision, and abstractions of software or hardware.
 
+![An Arduino Uno board shows a familiar microcontroller development board with headers and USB.](https://commons.wikimedia.org/wiki/Special:FilePath/Arduino_Uno_-_R3.jpg)
+
+*Figure: Arduino boards make microcontroller I/O and prototyping tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Arduino_Uno_-_R3.jpg), SparkFun Electronics, CC BY 2.0.*
+
 Lee and Seshia build model checking around reachability. If a bad state is unreachable, then a safety invariant holds. If an accepting cycle corresponding to the negation of a liveness property is reachable, then the model has a counterexample. The power of the method is exhaustive exploration; the challenge is state explosion.
 
 ## Definitions

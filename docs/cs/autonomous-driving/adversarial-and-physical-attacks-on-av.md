@@ -7,6 +7,10 @@ sidebar_position: 16
 
 Autonomous vehicles are cyber-physical systems, so attacks can target neural perception, sensor physics, localization, maps, communication, compute, and human interaction. A sticker on a sign, a projected pattern, a spoofed GNSS signal, lidar interference, radar jamming, a malicious V2X message, or a tampered map update can all become safety-relevant. The defense is not one adversarial-training trick; it is layered robustness, detection, redundancy, secure engineering, and conservative fallback.
 
+![An RP2 pipeline optimizes a masked perturbation for a stop sign across viewing conditions.](https://ar5iv.labs.arxiv.org/html/1707.08945/assets/figs/pip4.png)
+
+*Figure: RP2 connects adversarial optimization to physical-world traffic-sign attacks. Image: [ar5iv](https://arxiv.org/abs/1707.08945), Eykholt et al., educational use with attribution.*
+
 This page gives a foundational overview of adversarial patches on signs, lidar spoofing, projector attacks, sensor jamming, GNSS spoofing, V2X attacks, and defense considerations. It cross-links to the broader [adversarial attacks](/cs/adversarial-attacks/) section and to AV-specific pages on [sensors](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu), [fusion](/cs/autonomous-driving/sensor-fusion), [V2X](/cs/autonomous-driving/v2x-and-connected-vehicles), and [safety](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing).
 
 ## Definitions

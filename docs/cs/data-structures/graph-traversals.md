@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Graph traversal is the process of systematically visiting vertices reachable from a starting point. The two fundamental traversals are depth-first search (DFS, 깊이 우선 탐색) and breadth-first search (BFS, 너비 우선 탐색). They differ mainly in the frontier discipline: DFS uses stack behavior and goes deep before backtracking; BFS uses queue behavior and explores in layers.
 
+![A Dijkstra animation highlights tentative distances as the shortest path grows through a graph.](https://commons.wikimedia.org/wiki/Special:FilePath/Dijkstra_Animation.gif)
+
+*Figure: Dijkstra's algorithm is a concrete example of graph search becoming a path. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dijkstra_Animation.gif), Ibmua, public domain.*
+
 In the source textbook, traversal appears after graph representation because traversal is representation-sensitive. With adjacency lists, scanning all vertices and edges costs $O(V + E)$. With an adjacency matrix, finding neighbors of each vertex costs $O(V)$, giving $O(V^2)$ traversal time even for sparse graphs.
 
 ## Definitions

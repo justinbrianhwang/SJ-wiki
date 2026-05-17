@@ -7,6 +7,10 @@ sidebar_position: 4
 
 Computational security is the bridge from perfect secrecy to practical cryptography. Instead of demanding that a ciphertext leak exactly zero information to an unlimited adversary, we demand that every efficient adversary has only negligible advantage in a formal experiment. This is the language used throughout modern private-key encryption, public-key encryption, MACs, signatures, and zero-knowledge.
 
+![A public-key encryption diagram separates public encryption from private decryption.](https://commons.wikimedia.org/wiki/Special:FilePath/Public_key_encryption.svg)
+
+*Figure: Asymmetric encryption turns key distribution into a public and private key pair. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Public_key_encryption.svg), Davidgothberg, public domain.*
+
 Katz and Lindell make this shift central: modern cryptography needs definitions, assumptions, and reductions. Smart presents the same reductionist spirit later in the text through semantic security, indistinguishability, random oracles, and hybrid encryption. The shared message is that "secure" is not an adjective; it is a quantified statement about adversaries, resources, and success probabilities.
 
 ## Definitions

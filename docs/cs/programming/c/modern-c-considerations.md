@@ -7,6 +7,10 @@ sidebar_position: 17
 
 K&R second edition teaches ANSI C as it existed around the C89/C90 standard, and it deliberately preserves older idioms so readers can understand existing C and UNIX code. Modern C compilers still recognize much of this style, but the surrounding expectations have changed: prototypes are mandatory in practice, `main` should have a declared return type, unsafe library functions are avoided, warnings are treated seriously, and later standards added features that improve clarity and diagnostics.
 
+![A C language logo marks the systems-programming pages built around C examples.](https://commons.wikimedia.org/wiki/Special:FilePath/C_Programming_Language.svg)
+
+*Figure: C remains the reference language for low-level memory, pointers, and Unix interfaces. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:C_Programming_Language.svg), ElodinKaldwin, public domain text logo.*
+
 The goal is not to rewrite K&R out of history. The goal is to read K&R fluently while writing C that survives modern compilers, larger codebases, security reviews, and different platforms. The original idioms remain valuable when they express data flow clearly; they need adjustment when they rely on old defaults, unchecked buffers, or implementation-specific behavior.
 
 ## Definitions

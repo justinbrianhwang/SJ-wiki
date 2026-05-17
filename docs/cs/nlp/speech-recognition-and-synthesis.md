@@ -7,6 +7,10 @@ sidebar_position: 19
 
 Speech processing connects language to sound. Jurafsky and Martin include automatic speech recognition, log Mel features, encoder-decoder ASR, CTC, word error rate, text-to-speech, text normalization, spectrogram prediction, and vocoding. Eisenstein treats speech as a neighboring field to NLP and notes the role of language models in recognition and spoken dialogue. The combined view is that speech systems are language systems plus acoustic modeling and signal representations.
 
+![An ELIZA terminal conversation shows an early chatbot responding to typed user input.](https://commons.wikimedia.org/wiki/Special:FilePath/ELIZA_conversation.png)
+
+*Figure: ELIZA provides historical context for dialogue systems and chatbot evaluation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ELIZA_conversation.png), Unknown author, public domain text.*
+
 ASR maps audio to text. TTS maps text to audio. Both tasks involve sequence transduction, uncertainty, and evaluation problems. Speech also forces preprocessing questions to become concrete: numbers, abbreviations, punctuation, disfluencies, speaker variation, dialect, and code switching can change both recognition and synthesis.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 14
 
 Sorting rearranges records into order by key. It is one of the best ways to compare algorithmic design techniques because many algorithms solve the same problem with different tradeoffs: selection sort is simple, insertion sort adapts to nearly sorted input, quicksort partitions, merge sort divides and combines, heap sort uses a priority structure, and radix sort escapes comparison sorting by processing digits.
 
+![A quicksort animation shows bars being partitioned around pivots until the list is sorted.](https://commons.wikimedia.org/wiki/Special:FilePath/Quicksort.gif)
+
+*Figure: Quicksort turns a partitioning rule into a visible divide-and-conquer process. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quicksort.gif), Simpsons contributor, CC BY-SA 3.0.*
+
 The source textbook has a full sorting chapter after graphs. It covers internal sorting methods such as insertion, quick, merge, heap, and radix sort, and also discusses external sorting. This page focuses on the standard in-memory algorithms from a C data-structures course, while keeping the connection to arrays, heaps, and searching visible.
 
 ## Definitions

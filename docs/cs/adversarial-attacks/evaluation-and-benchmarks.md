@@ -7,6 +7,10 @@ sidebar_position: 10
 
 Adversarial robustness evaluation is unusually easy to get wrong. A model can look robust because the attack is weak, the threat model is underspecified, the preprocessing scale is inconsistent, gradients are masked, the query budget is too low, or the benchmark excludes failed examples. Good evaluation is therefore a core technical topic, not an administrative afterthought.
 
+![A visually similar adversarial panda image is classified as a gibbon by an ImageNet model.](https://ar5iv.labs.arxiv.org/html/1412.6572/assets/gibbon_993.png)
+
+*Figure: The FGSM panda example shows that imperceptible perturbations can change model decisions. Image: [ar5iv](https://arxiv.org/abs/1412.6572), Goodfellow, Shlens, and Szegedy, educational use with attribution.*
+
 This page gives a practical checklist for evaluating adversarial defenses. It covers robust accuracy, adaptive attacks, AutoAttack, RobustBench-style reporting, certified metrics, and common methodological errors. The goal is not to crown one benchmark as final, but to make robustness claims reproducible and threat-model-specific.
 
 ## Definitions

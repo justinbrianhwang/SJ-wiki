@@ -7,6 +7,10 @@ sidebar_position: 12
 
 Initial-value problems ask for a function whose derivative is prescribed by an equation and whose starting value is known. Numerical ODE methods turn that continuous problem into a sequence of time steps. Euler's method is the simplest step, Taylor methods use analytic derivative information, and Runge-Kutta methods imitate Taylor accuracy using only evaluations of the right-hand side.
 
+![Four Runge-Kutta slope samples are drawn along one ODE step.](https://commons.wikimedia.org/wiki/Special:FilePath/Runge-Kutta_slopes.svg)
+
+*Figure: Runge-Kutta methods combine several slope estimates to advance an ODE solution more accurately. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Runge-Kutta_slopes.svg), HilberTraum, CC BY-SA 4.0.*
+
 These methods are the foundation for later adaptive, multistep, stiff, and system solvers. The main questions are always the same: how much local error is made in one step, how does that error accumulate globally, and how many right-hand-side evaluations are worth spending per step?
 
 ## Definitions

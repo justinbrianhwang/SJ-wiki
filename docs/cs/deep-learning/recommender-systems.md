@@ -7,6 +7,10 @@ sidebar_position: 19
 
 D2L's recommender-system material introduces a major applied setting where deep learning meets sparse user-item interaction data. The goal is to predict what a user may like, click, buy, watch, or rate. Unlike standard supervised learning tables, recommender data is mostly missing, feedback can be explicit or implicit, and the absence of an interaction does not always mean negative preference.
 
+![An artificial neural network diagram shows input, hidden, and output layers connected by weights.](https://commons.wikimedia.org/wiki/Special:FilePath/Artificial_neural_network.svg)
+
+*Figure: Layered neural networks make differentiable function approximation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Artificial_neural_network.svg), Cburnett, CC BY-SA 3.0/GFDL.*
+
 The chapter surveys collaborative filtering, matrix factorization, autoencoders, factorization machines, neural collaborative filtering, and sequence-aware recommendation. These methods differ in architecture, but they share a central representation idea: learn user and item features from observed behavior, then score candidate items for each user.
 
 ## Definitions

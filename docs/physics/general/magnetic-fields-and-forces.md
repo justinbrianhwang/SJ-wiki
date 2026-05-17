@@ -9,6 +9,10 @@ Magnetic Fields and Forces covers magnetic force on moving charges and currents,
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
+![Iron filings reveal the magnetic field pattern between attracting bar magnets.](https://commons.wikimedia.org/wiki/Special:FilePath/Magnetic_field_of_bar_magnets_attracting.png)
+
+*Figure: Iron filings provide a physical picture of magnetic field direction and field-line density. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Magnetic_field_of_bar_magnets_attracting.png), Alexander Wilmer Duff, public domain in the United States.*
+
 ## Definitions
 
 - **Scope:** magnetic force on moving charges and currents, circular motion, and magnetic torque.

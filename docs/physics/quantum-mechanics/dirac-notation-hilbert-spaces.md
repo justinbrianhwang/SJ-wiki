@@ -9,6 +9,10 @@ Dirac notation is not just shorthand. It separates the state itself from any par
 
 Sakurai introduces bras, kets, and operators before wave mechanics, making Hilbert space the native language. Ballentine begins with a more explicit mathematical account of vector spaces, self-adjointness, probability, and rigged Hilbert spaces. The Gottfried-named notes move between wave functions and Dirac notation, which is useful for seeing how the abstract and coordinate pictures translate. Schiff's older style corresponds mostly to choosing the position representation early.
 
+![A Bloch sphere locates a two-level quantum state by polar and azimuthal angles.](https://commons.wikimedia.org/wiki/Special:FilePath/Bloch_sphere.svg)
+
+*Figure: The Bloch sphere turns a two-component complex state into a geometric object that can be rotated and measured. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bloch_sphere.svg), Smite-Meister, CC BY-SA 3.0.*
+
 ## Definitions
 
 A **ket** $\vert \psi\rangle$ is a vector in a complex Hilbert space. A **bra** $\langle \psi\vert $ is its dual vector. The inner product $\langle \phi\vert \psi\rangle$ is linear in the ket argument and conjugate-linear in the bra argument under the physics convention.

@@ -7,6 +7,10 @@ sidebar_position: 4
 
 Counting is the arithmetic behind finite probability. When outcomes are equally likely, probability reduces to a ratio: favorable outcomes divided by possible outcomes. The difficulty is rarely the division; it is deciding what should be counted, whether order matters, and whether repetition is allowed.
 
+![Pascal's triangle fills in row by row with binomial coefficients.](https://commons.wikimedia.org/wiki/Special:FilePath/PascalTriangleAnimated2.gif)
+
+*Figure: Pascal's triangle organizes binomial coefficients, combinations, and recurrence patterns. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PascalTriangleAnimated2.gif), Hersfold, public domain.*
+
 This page keeps counting brief because discrete mathematics usually treats it in greater depth. The goal here is to make probability calculations reliable enough for binomial, hypergeometric, multinomial, and card-style examples. For a fuller discrete treatment, use the cross-link at the end.
 
 ## Definitions

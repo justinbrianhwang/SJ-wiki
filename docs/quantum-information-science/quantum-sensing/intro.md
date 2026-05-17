@@ -9,6 +9,18 @@ Quantum sensing treats measurement as a controlled parameter-estimation problem.
 
 The subject sits between [quantum mechanics](/physics/quantum-mechanics/), statistical estimation, and experimental device physics. Quantum effects matter because probes can be prepared in superposition, entangled across many particles, spin-squeezed to redistribute uncertainty, or read out with photon-counting and phase-sensitive measurements. These features can improve sensitivity, bandwidth, spatial resolution, or calibration stability, but they do not remove ordinary constraints such as loss, technical noise, decoherence, finite duty cycle, and imperfect readout.
 
+![A fluorescence microscope image shows a bright irradiated spot in diamond containing many nitrogen-vacancy centers.](https://commons.wikimedia.org/wiki/Special:FilePath/Irradiated_spot_of_diamond_with_high_concentration_of_nitrogen-vacancy_centers.jpg)
+
+*Figure: NV-center sensing becomes a laboratory instrument when diamond defects, optical pumping, fluorescence collection, and microwave control are combined. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Irradiated_spot_of_diamond_with_high_concentration_of_nitrogen-vacancy_centers.jpg), Hughes et al., CC BY 4.0.*
+
+![A historic NIST cesium beam frequency standard shows the apparatus behind early atomic-clock metrology.](https://commons.wikimedia.org/wiki/Special:FilePath/Atomic_Clock045.jpg)
+
+*Figure: Atomic clocks are quantum sensors whose output is a disciplined frequency or time scale rather than an image or a single event count. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Atomic_Clock045.jpg), National Institute of Standards and Technology, public domain.*
+
+![The LIGO Hanford interferometer has two long perpendicular arms used for precision laser interferometry.](https://commons.wikimedia.org/wiki/Special:FilePath/LIGO_at_Hanford%2C_Washington_%28LIGO_Pic_16-CC%29.jpg)
+
+*Figure: LIGO makes quantum sensing visible at facility scale: displacement readout, laser power, mirror motion, seismic isolation, and quantum noise all enter the measurement budget. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:LIGO_at_Hanford%2C_Washington_%28LIGO_Pic_16-CC%29.jpg), LIGO Laboratory, CC BY 4.0.*
+
 ## Definitions
 
 **Quantum metrology** is the use of quantum systems and quantum measurement theory to estimate parameters as precisely as possible. In its simplest mathematical form, an unknown scalar parameter $\theta$ is encoded into a probe state:

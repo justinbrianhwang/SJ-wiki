@@ -7,6 +7,10 @@ sidebar_position: 8
 
 Cluster analysis groups unlabeled data objects so that objects in the same group are more similar to each other than to objects in other groups. Aggarwal presents clustering as a core unsupervised building block, with representative-based methods such as k-means, hierarchical methods, probabilistic model-based clustering, density and grid methods, graph-based algorithms, non-negative matrix factorization, and validation criteria.
 
+![A DBSCAN diagram marks core, border, and noise points under a density threshold.](https://commons.wikimedia.org/wiki/Special:FilePath/DBSCAN-Illustration.svg)
+
+*Figure: DBSCAN explains clustering as density reachability rather than a fixed number of clusters. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:DBSCAN-Illustration.svg), Chire, CC BY-SA 3.0.*
+
 This page focuses on the main families from the basic clustering chapter. The next page covers advanced settings such as categorical data, scalability, high-dimensional clustering, semi-supervised clustering, visual supervision, and ensembles.
 
 ## Definitions
@@ -87,7 +91,7 @@ flowchart TD
   Update -. "centroids move to within-cluster means" .-> OneIter
 ```
 
-![K-means convergence animation — the figure shows centroids and Voronoi boundaries changing over iterations until the clustering stabilizes.](https://upload.wikimedia.org/wikipedia/commons/e/ea/K-means_convergence.gif)
+![K-means convergence animation — the figure shows centroids and Voronoi boundaries changing over iterations until the clustering stabilizes.](https://commons.wikimedia.org/wiki/Special:FilePath/K-means_convergence.gif)
 
 *Figure: K-means alternates assignment and centroid-update steps until the cluster boundaries stop changing. From [Chire, 2017](https://commons.wikimedia.org/wiki/File:K-means_convergence.gif) — CC BY-SA 4.0.*
 

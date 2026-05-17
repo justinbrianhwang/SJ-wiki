@@ -9,6 +9,10 @@ Quantum dynamics describes how probability amplitudes change between preparation
 
 Sakurai develops the time-evolution operator first, then compares pictures and applies the result to spin precession, Ehrenfest's theorem, and transition amplitudes. Ballentine puts dynamics inside a broader symmetry and transformation framework. The Gottfried-named notes emphasize propagators and density operators soon after the picture change. Schiff's wave-mechanics tradition corresponds most directly to Schrodinger's differential equation in coordinate representation.
 
+![A Bloch sphere locates a two-level quantum state by polar and azimuthal angles.](https://commons.wikimedia.org/wiki/Special:FilePath/Bloch_sphere.svg)
+
+*Figure: The Bloch sphere turns a two-component complex state into a geometric object that can be rotated and measured. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bloch_sphere.svg), Smite-Meister, CC BY-SA 3.0.*
+
 ## Definitions
 
 The **time-evolution operator** satisfies

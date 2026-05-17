@@ -7,6 +7,10 @@ sidebar_position: 7
 
 Risk analysis asks what could go wrong, how likely it is, what it would cost, and what the team should do before it happens. Gustafson's risk chapter covers risk identification, estimation, exposure, decision trees, mitigation, and risk management plans. The chapter is short but important because it connects uncertainty to explicit management action.
 
+![A Kanban board screenshot shows work items organized by workflow state.](https://commons.wikimedia.org/wiki/Special:FilePath/Openproject_kanban.PNG)
+
+*Figure: Kanban boards turn process state into a visible project-management surface. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Openproject_kanban.PNG), OpenProject contributors, CC0.*
+
 Risk management belongs near the start of a project, but it does not end there. New risks appear as requirements change, suppliers slip, prototypes reveal limitations, or defects cluster in critical modules. A useful risk process turns vague concern into named risks with probabilities, impacts, triggers, owners, mitigation strategies, and contingency plans.
 
 ## Definitions

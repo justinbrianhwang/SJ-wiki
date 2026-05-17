@@ -9,6 +9,10 @@ The discrete-time Fourier transform represents an aperiodic sequence as a contin
 
 The DTFT is the natural frequency-domain tool for digital filters and difference equations when signals are not necessarily periodic. It turns convolution of sequences into multiplication of spectra and makes the frequency response of a discrete-time LTI system visible.
 
+![Two sine waves pass through the same sampled points, illustrating aliasing.](https://commons.wikimedia.org/wiki/Special:FilePath/AliasingSines.svg)
+
+*Figure: Aliasing shows why sampling rate is a physical constraint, not just a numerical detail. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:AliasingSines.svg), Moxfyre, CC BY-SA 3.0/GFDL.*
+
 ## Definitions
 
 The DTFT of a sequence $x[n]$ is

@@ -7,6 +7,10 @@ sidebar_position: 15
 
 Formal notations use mathematically defined syntax or semantics to state software behavior precisely. Gustafson's final chapter introduces formal specifications, preconditions, postconditions, invariants, and the Object Constraint Language (OCL). The chapter's motivation is direct: natural language is ambiguous, while mathematical notions such as sets and sequences have precise meanings.
 
+![The Git logo marks distributed version control as a core software-engineering tool.](https://commons.wikimedia.org/wiki/Special:FilePath/Git-logo.svg)
+
+*Figure: Git is a practical substrate for collaboration, branching, review, and release workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Git-logo.svg), Jason Long, CC BY 3.0.*
+
 Formal methods can reduce errors by making requirements and design constraints explicit. Their cost is difficulty: formal specifications require skill, careful modeling, and agreement about how software concepts map to mathematical concepts. OCL is presented as a practical formal notation connected to UML object models. It uses class context, navigation through associations, collection operations, invariants, and pre/postconditions.
 
 ## Definitions

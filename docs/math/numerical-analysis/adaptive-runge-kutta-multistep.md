@@ -7,6 +7,10 @@ sidebar_position: 13
 
 Fixed-step one-step methods are easy to explain, but real initial-value problems rarely need the same step size everywhere. Adaptive Runge-Kutta methods estimate the local error during a step and change $h$ automatically. Multistep methods use several previous solution values to reduce the cost per step after enough history has been built.
 
+![Four Runge-Kutta slope samples are drawn along one ODE step.](https://commons.wikimedia.org/wiki/Special:FilePath/Runge-Kutta_slopes.svg)
+
+*Figure: Runge-Kutta methods combine several slope estimates to advance an ODE solution more accurately. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Runge-Kutta_slopes.svg), HilberTraum, CC BY-SA 4.0.*
+
 These two ideas answer different efficiency questions. Adaptive methods ask where effort should be spent. Multistep methods ask how to reuse information already computed. Many production ODE solvers combine both ideas with error control, order selection, and stiffness detection.
 
 ## Definitions

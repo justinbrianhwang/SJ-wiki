@@ -7,6 +7,10 @@ sidebar_position: 14
 
 Permutations and combinations count selections from a finite set. The key distinction is order. If the order of selected objects matters, use permutations or ordered arrangements. If order does not matter, use combinations.
 
+![Pascal's triangle fills in row by row with binomial coefficients.](https://commons.wikimedia.org/wiki/Special:FilePath/PascalTriangleAnimated2.gif)
+
+*Figure: Pascal's triangle organizes binomial coefficients, combinations, and recurrence patterns. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PascalTriangleAnimated2.gif), Hersfold, public domain.*
+
 These formulas are special cases of the product and division rules. The safest approach is to describe the object being counted in words before choosing a formula: ordered or unordered, with or without repetition, all objects or only some objects, distinct objects or repeated types.
 
 ## Definitions

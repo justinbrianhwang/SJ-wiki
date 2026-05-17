@@ -7,6 +7,10 @@ sidebar_position: 2
 
 An operating system is the control layer that makes bare hardware usable. It hides awkward device details, allocates shared resources, gives programs a stable execution environment, and prevents one program from casually damaging another. Silberschatz, Galvin, and Gagne frame the OS from two complementary views: to users and applications it is a convenient service provider, while to the hardware it is a resource allocator and control program.
 
+![A Linux kernel map organizes subsystems such as memory, filesystems, networking, and drivers.](https://commons.wikimedia.org/wiki/Special:FilePath/Linux_kernel_map.png)
+
+*Figure: The Linux kernel map shows how OS services become interacting subsystems. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Linux_kernel_map.png), Conan at English Wikipedia, CC BY 3.0.*
+
 This page sits at the entrance to the rest of operating systems. Processes, memory, files, I/O, protection, and security are not separate inventions; they are services exposed through interfaces and implemented inside a kernel structure. Understanding that split between interface and implementation makes later topics easier: a file descriptor, page table, interrupt handler, and scheduler queue are all parts of the same larger design problem.
 
 ## Definitions

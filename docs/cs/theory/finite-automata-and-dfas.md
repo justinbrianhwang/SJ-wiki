@@ -7,6 +7,10 @@ sidebar_position: 4
 
 A deterministic finite automaton is the simplest serious model of computation in the course. It reads an input string from left to right, keeps only one state from a finite set, and decides acceptance after the last symbol. Because it has no stack, tape, or unbounded counter, a DFA can remember only bounded information: parity, a fixed suffix, a residue modulo $k$, whether a required substring has appeared, or which stage of a fixed pattern it is in.
 
+![A square Kufic algorithms mark introduces the study of designed procedures.](https://commons.wikimedia.org/wiki/Special:FilePath/Algorithms.svg)
+
+*Figure: The algorithms mark gives the abstract algorithms pages a concrete visual anchor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Algorithms.svg), Jeff Erickson, CC BY 4.0.*
+
 This restriction is exactly what makes finite automata useful. They model lexical scanners, simple controllers, network protocol states, hardware circuits with finite memory, and pattern matching for regular languages. The point of learning DFAs is not that they are powerful; it is that their limits are clean enough to prove, and their constructions prepare the habits used for richer models.
 
 ## Definitions

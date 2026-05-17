@@ -7,6 +7,10 @@ sidebar_position: 14
 
 Orthogonal bases are computationally valuable because coordinates become dot products and projections separate cleanly. The Gram-Schmidt process converts an independent set into an orthogonal or orthonormal set with the same span. In matrix form, this becomes QR decomposition, one of the central tools for least squares and numerical linear algebra.
 
+![Two vectors add tip to tail to form a resultant vector.](https://commons.wikimedia.org/wiki/Special:FilePath/Vectoraddition.svg)
+
+*Figure: Vector addition is the geometric base case for linear combinations and span. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Vectoraddition.svg), Svjo, CC0 1.0.*
+
 The main idea is to remove from each new vector the parts already explained by previous directions. What remains is perpendicular to the earlier directions. Repeating this produces a basis with the same span but much cleaner geometry.
 
 ## Definitions

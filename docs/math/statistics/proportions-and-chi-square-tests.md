@@ -9,7 +9,7 @@ Many statistical questions involve counts rather than measurements: how many res
 
 The main distinction is between one categorical variable and two categorical variables. With one variable, we may estimate or test a population proportion, or test whether several category probabilities match a claimed distribution. With two variables, we ask whether the variables are independent or associated in a population. The calculations use counts, but the interpretation must return to proportions, context, and design.
 
-![Several chi-square density curves are plotted for different degrees of freedom.](https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Chi-square_distributionPDF.svg/500px-Chi-square_distributionPDF.svg.png)
+![Several chi-square density curves are plotted for different degrees of freedom.](https://commons.wikimedia.org/wiki/Special:FilePath/Chi-square_distributionPDF.svg)
 
 *Figure: Chi-square density curves for different degrees of freedom. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Chi-square_distributionPDF.svg), Jona, CC BY-SA 4.0.*
 

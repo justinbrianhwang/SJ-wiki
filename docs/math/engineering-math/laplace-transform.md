@@ -7,6 +7,10 @@ sidebar_position: 10
 
 The Laplace transform converts a time-domain function into a function of the complex variable $s$. For linear initial value problems, it turns differentiation into algebra and carries initial conditions into the transformed equation automatically. That is why it is a standard tool for circuits, mechanical vibrations, control systems, discontinuous inputs, and impulses.
 
+![Pierre-Simon de Laplace is shown in a historical engraved portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Pierre-Simon_de_Laplace.jpg)
+
+*Figure: Pierre-Simon de Laplace is a key figure in probability, transforms, and potential theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pierre-Simon_de_Laplace.jpg), Louis Delaistre after Armand-Charles Guilleminot, public domain.*
+
 The transform is also a way of changing perspective. Time-domain convolution becomes multiplication, exponential decay becomes a shift in the $s$-plane, and stability becomes a question about poles. The method is most effective when the system is linear and causal, meaning the behavior begins at $t=0$ and depends only on present and past input.
 
 ## Definitions

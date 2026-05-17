@@ -7,6 +7,10 @@ sidebar_position: 10
 
 A basis is a coordinate system for a vector space. It is small enough to avoid redundancy and large enough to reach every vector. Rank and nullity measure how a matrix distributes dimensions between outputs it can produce and inputs it sends to zero.
 
+![Carl Friedrich Gauss is shown in a formal painted portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Carl_Friedrich_Gauss.jpg)
+
+*Figure: Carl Friedrich Gauss is central to number theory, linear algebra, statistics, and numerical methods. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Carl_Friedrich_Gauss.jpg), Gottlieb Biermann after Christian Albrecht Jensen, public domain.*
+
 These ideas connect computation with structure. Row reduction finds pivots, pivots identify independent columns, independent columns form bases for column spaces, and free variables describe null spaces. Dimension turns these observations into exact counts rather than vague descriptions.
 
 ## Definitions

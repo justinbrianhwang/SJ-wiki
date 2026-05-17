@@ -7,6 +7,10 @@ sidebar_position: 13
 
 Policy gradient methods optimize a parameterized policy directly. Instead of learning action values and then choosing greedily, the agent adjusts policy parameters in a direction that increases expected return. Sutton and Barto present this as a major alternative to value-based control, especially useful for stochastic policies, continuous action spaces, and settings where smooth changes in behavior are desirable.
 
+![A cart-pole animation shows a controller trying to balance an inverted pole on a moving cart.](https://commons.wikimedia.org/wiki/Special:FilePath/Cartpole.gif)
+
+*Figure: Cart-pole is a standard control and reinforcement-learning benchmark. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cartpole.gif), Condordellanebbia, CC BY-SA 4.0.*
+
 The basic REINFORCE algorithm uses complete returns to estimate the gradient. Baselines reduce variance without changing the expected gradient. Actor-critic methods combine policy gradients with learned value functions, using the critic's TD error as a lower-variance learning signal for the actor. These methods connect the gradient bandit idea from Chapter 2 to full sequential decision making.
 
 ## Definitions

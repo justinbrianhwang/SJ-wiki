@@ -9,6 +9,10 @@ Thermochemistry studies heat flow during chemical and physical change. It connec
 
 In the Ebbing and Gammon sequence this topic sits near energy units, heat of reaction, enthalpy, thermochemical equations, stoichiometry with heat, calorimetry, Hess's law, standard enthalpies of formation, and fuels. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
+![A schematic calorimeter shows an insulated vessel, thermometer, and stirrer used to measure heat transfer.](https://commons.wikimedia.org/wiki/Special:FilePath/Calorimeter.svg)
+
+*Figure: Calorimeter apparatus used to connect temperature change to heat flow. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Calorimeter.svg), Li-on, public domain.*
+
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.

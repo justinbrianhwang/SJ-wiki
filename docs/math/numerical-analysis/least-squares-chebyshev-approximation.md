@@ -7,6 +7,10 @@ sidebar_position: 19
 
 Approximation is different from interpolation. Interpolation insists on matching data exactly at nodes, while approximation looks for a simpler function that is close in a chosen sense. Least squares minimizes the sum of squared residuals. Chebyshev, or minimax, approximation minimizes the maximum error.
 
+![A straight regression line is fitted through scattered data points.](https://commons.wikimedia.org/wiki/Special:FilePath/Linear_regression.svg)
+
+*Figure: Least squares turns geometric projection into a practical model-fitting method. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Linear_regression.svg), Sewaqu, public domain.*
+
 The choice of norm changes the meaning of best. Least squares is natural for noisy data with many small independent errors. Chebyshev approximation is natural when the worst-case deviation matters, as in uniform polynomial approximation and filter design.
 
 ## Definitions

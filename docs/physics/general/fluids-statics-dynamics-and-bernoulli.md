@@ -9,6 +9,10 @@ Fluids: Statics, Dynamics, and Bernoulli covers pressure, buoyancy, continuity, 
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
+![A flow tube diagram marks pressure, height, and speed at two cross sections.](https://commons.wikimedia.org/wiki/Special:FilePath/BernoullisLawDerivationDiagram.svg)
+
+*Figure: Bernoulli's equation becomes easier to interpret when the flow tube shows pressure work, height, and velocity together. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:BernoullisLawDerivationDiagram.svg), MannyMax, redrawn by Slashme and Pbrks, CC BY-SA 3.0/GFDL.*
+
 ## Definitions
 
 - **Scope:** pressure, buoyancy, continuity, and Bernoulli's equation for ideal flow.

@@ -7,6 +7,10 @@ sidebar_position: 14
 
 Menger's theorem and max-flow min-cut are two versions of the same principle: the maximum number of independent ways to move through a network equals the minimum size of a bottleneck that blocks all movement. This is one of the clearest places where graph theory turns a routing question into a structural equality.
 
+![A flow network shows final edge flows after the Ford-Fulkerson algorithm.](https://commons.wikimedia.org/wiki/Special:FilePath/Ford-Fulkerson_example_final.svg)
+
+*Figure: A Ford-Fulkerson flow network visualizes capacities, augmenting paths, and maximum flow. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Ford-Fulkerson_example_final.svg), Cburnett, CC BY-SA 3.0.*
+
 Network flows add capacities to directed edges. Instead of asking only whether a path exists, we ask how much material can be sent from a source to a sink while respecting capacity constraints. The algorithmic picture is built from augmenting paths, residual networks, and cuts.
 
 ## Definitions

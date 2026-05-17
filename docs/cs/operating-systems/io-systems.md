@@ -7,6 +7,10 @@ sidebar_position: 13
 
 I/O systems are where operating systems confront hardware diversity directly. A keyboard, network interface, timer, SSD, GPU, and printer all behave differently, yet applications expect a small set of coherent operations: read, write, wait, control, map, and close. The kernel I/O subsystem turns many device-specific protocols into stable abstractions while preserving performance and protection.
 
+![A Linux kernel map organizes subsystems such as memory, filesystems, networking, and drivers.](https://commons.wikimedia.org/wiki/Special:FilePath/Linux_kernel_map.png)
+
+*Figure: The Linux kernel map shows how OS services become interacting subsystems. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Linux_kernel_map.png), Conan at English Wikipedia, CC BY 3.0.*
+
 The textbook's I/O chapter brings together hardware, application interfaces, kernel services, request transformation, STREAMS, and performance. The central design problem is bridging the gap between device-controller reality and programmer-facing uniformity. That bridge includes interrupts, polling, DMA, buffering, caching, spooling, device drivers, and error handling.
 
 ## Definitions

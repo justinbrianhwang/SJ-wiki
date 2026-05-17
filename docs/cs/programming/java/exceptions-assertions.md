@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Exceptions separate ordinary control flow from unexpected failure. A method can throw an exception when it cannot complete its contract, and callers either handle that exception or allow it to propagate. The source book treats exception design as a clarity tool: code should not be buried under error checks, but exceptions should not be abused for expected situations such as normal end-of-input.
 
+![The Sun Microsystems logo gives Java pages historical context for the language and platform.](https://commons.wikimedia.org/wiki/Special:FilePath/Sun_Microsystems_logo.svg)
+
+*Figure: Java's early development at Sun shaped its portability, virtual-machine model, and library ecosystem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sun_Microsystems_logo.svg), Sun Microsystems and Afrank99, public domain text logo.*
+
 Assertions serve a different purpose. An assertion checks a condition that should be true if the program logic is correct, such as an invariant, precondition, or postcondition. Assertions can be enabled or disabled, so they are a debugging and validation aid rather than a substitute for required argument checks in public APIs.
 
 ## Definitions

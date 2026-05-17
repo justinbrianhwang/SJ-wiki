@@ -7,6 +7,10 @@ sidebar_position: 6
 
 The 8085 becomes useful only when it is connected to memory and real-world devices. The source chapter on I/O and memory interfacing follows the programming chapters because the same instructions now have electrical meaning: `LDA` reads a selected memory chip, `STA` writes one byte to a decoded address, `IN` samples a port, and `OUT` drives a port. The programmer's model and the hardware map must agree.
 
+![An Intel 4004 package shows one of the first commercial microprocessors.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_4004.jpg)
+
+*Figure: The Intel 4004 marks the transition from board-level logic to microprocessors. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_4004.jpg), LucaDetomi at Italian Wikipedia, CC BY-SA 3.0/GFDL.*
+
 This page ties together programmed I/O, interrupt-driven I/O, direct memory access, I/O-mapped addressing, memory-mapped addressing, and memory decoding. These ideas are not unique to the 8085, but the 8085 exposes them cleanly through `IO/M`, `RD`, `WR`, `IN`, `OUT`, `HOLD`, and `HLDA`.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 6
 
 Trees are the connected graphs with no wasted edges. They carry information from one vertex to another along unique routes, which makes them central to search algorithms, hierarchical data, electrical networks, phylogenies, and proofs by induction. In Wilson's development, trees appear after paths and cycles because they are exactly the graphs in which cycles have been eliminated without losing connectedness.
 
+![A rooted binary tree shows nodes connected by parent-child edges.](https://commons.wikimedia.org/wiki/Special:FilePath/Binary_tree.svg)
+
+*Figure: A binary tree is a basic model for hierarchy, recursion, and branching decisions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Binary_tree.svg), Derrick Coetzee, public domain.*
+
 Spanning trees connect tree theory back to arbitrary connected graphs. A connected graph may have many cycles, but deleting cycle edges carefully leaves a minimal connected backbone. That backbone is often the object an algorithm actually needs.
 
 ## Definitions

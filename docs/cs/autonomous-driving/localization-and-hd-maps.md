@@ -7,6 +7,10 @@ sidebar_position: 7
 
 Localization estimates where the ego vehicle is, how fast it is moving, and how uncertain that estimate is. HD maps encode lane geometry, traffic-control elements, road boundaries, crosswalks, speed limits, and topology at a level of precision useful for automated driving. Together, localization and maps let a vehicle reason about where it is in the road network, not only where it is on Earth.
 
+![A Waymo self-driving car drives on a public road with roof-mounted sensors.](https://commons.wikimedia.org/wiki/Special:FilePath/Waymo_self-driving_car_front_view.gk.jpg)
+
+*Figure: A real autonomous vehicle grounds the driving stack in a physical platform. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Waymo_self-driving_car_front_view.gk.jpg), Grendelkhan, CC BY-SA 4.0.*
+
 This page covers GNSS plus IMU dead reckoning, visual-inertial odometry, lidar-inertial odometry, GraphSLAM, map matching, vector maps, lanelet maps, and map-light alternatives. It connects [sensors](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu) and [sensor fusion](/cs/autonomous-driving/sensor-fusion) to [behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning), because a planner cannot choose the correct lane, yield line, or turn if the vehicle's pose and map context are ambiguous.
 
 ## Definitions

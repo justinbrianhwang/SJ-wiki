@@ -7,6 +7,10 @@ sidebar_position: 6
 
 Time response connects the algebraic model to what an engineer sees on an oscilloscope, plot, or test rig. Nise's Chapter 4 studies how poles and zeros produce first-order and second-order responses, then defines transient specifications such as time constant, peak time, percent overshoot, rise time, and settling time.
 
+![A feedback control block diagram shows compensators wrapped around a plant.](https://commons.wikimedia.org/wiki/Special:FilePath/Control_System.svg)
+
+*Figure: The standard feedback loop keeps control pages tied to the plant-controller interface. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Control_System.svg), Inductiveload, public domain.*
+
 The most important habit is to read the response from pole locations. A real pole gives exponential decay. A complex conjugate pair gives oscillation under an exponential envelope. Poles near the imaginary axis decay slowly; poles far to the left decay quickly. Zeros do not determine stability by themselves, but they can strongly change shape, overshoot, and apparent speed.
 
 ## Definitions

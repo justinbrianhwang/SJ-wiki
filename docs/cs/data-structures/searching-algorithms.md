@@ -7,6 +7,10 @@ sidebar_position: 15
 
 Searching asks whether a target key is present and, if so, where. The simplest method is linear search: inspect elements one by one. The most famous improvement is binary search: if the array is sorted, compare with the middle element and discard half of the remaining candidates. These two algorithms capture a recurring data-structures lesson: extra organization can buy faster operations, but only if the program maintains the required invariant.
 
+![A square Kufic algorithms mark introduces the study of designed procedures.](https://commons.wikimedia.org/wiki/Special:FilePath/Algorithms.svg)
+
+*Figure: The algorithms mark gives the abstract algorithms pages a concrete visual anchor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Algorithms.svg), Jeff Erickson, CC BY 4.0.*
+
 The source textbook treats search throughout several chapters: arrays support linear and binary search, binary search trees organize keys dynamically, hashing aims for expected constant-time dictionary access, and advanced search trees control height. This page focuses on the basic array algorithms because they provide the clearest baseline for later structures.
 
 ## Definitions

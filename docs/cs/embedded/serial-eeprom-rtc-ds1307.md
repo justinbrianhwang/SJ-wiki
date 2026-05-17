@@ -7,6 +7,10 @@ sidebar_position: 13
 
 The source chapter on EEPROM and the DS1307 real-time clock is a practical continuation of the serial-bus chapter. Instead of discussing I2C in the abstract, it shows the kind of small serial devices commonly attached to a microcontroller: nonvolatile memory chips such as 93C46/56/66 and 24C16/32/64, and an RTC that keeps calendar time while the main system is off.
 
+![An Arduino Uno board shows a familiar microcontroller development board with headers and USB.](https://commons.wikimedia.org/wiki/Special:FilePath/Arduino_Uno_-_R3.jpg)
+
+*Figure: Arduino boards make microcontroller I/O and prototyping tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Arduino_Uno_-_R3.jpg), SparkFun Electronics, CC BY 2.0.*
+
 These devices are small, but they teach important embedded habits: read the device address format, respect write-cycle time, distinguish RAM variables from nonvolatile storage, use BCD correctly, and handle multi-byte register updates in a safe order. A system that logs data, stores settings, or keeps time needs these habits.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 3
 
 Java source code is a stream of lexical elements before it is a program. Keywords, identifiers, literals, operators, separators, and comments are recognized first; only then can declarations and expressions be parsed. That lexical layer matters because small spelling differences can change meaning completely: a keyword cannot be used as a variable name, a string literal is not an identifier, and a comment is ignored by the compiler.
 
+![The Sun Microsystems logo gives Java pages historical context for the language and platform.](https://commons.wikimedia.org/wiki/Special:FilePath/Sun_Microsystems_logo.svg)
+
+*Figure: Java's early development at Sun shaped its portability, virtual-machine model, and library ecosystem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sun_Microsystems_logo.svg), Sun Microsystems and Afrank99, public domain text logo.*
+
 Variables connect names to values. For primitive types the value is the primitive data itself; for reference types the value is a reference to an object or array. The source book returns to this distinction repeatedly because it affects assignment, parameter passing, object mutation, arrays, equality checks, and garbage collection.
 
 ## Definitions

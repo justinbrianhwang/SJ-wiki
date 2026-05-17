@@ -7,6 +7,10 @@ sidebar_position: 6
 
 Process synchronization is the part of operating systems where concurrency becomes precise. Processes and threads often cooperate by sharing memory, files, buffers, counters, or kernel objects. If two execution contexts access the same mutable state without coordination, the final result may depend on timing rather than logic. That timing dependence is a race condition, and it is one of the most persistent sources of operating-system bugs.
 
+![A Linux kernel map organizes subsystems such as memory, filesystems, networking, and drivers.](https://commons.wikimedia.org/wiki/Special:FilePath/Linux_kernel_map.png)
+
+*Figure: The Linux kernel map shows how OS services become interacting subsystems. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Linux_kernel_map.png), Conan at English Wikipedia, CC BY 3.0.*
+
 The textbook develops synchronization from the critical-section problem through hardware support, mutex locks, semaphores, monitors, classic synchronization problems, and deadlocks. The common theme is controlled access: the OS and programs need ways to express "only one at a time," "wait until a condition is true," and "wake the right waiters without losing events."
 
 ## Definitions

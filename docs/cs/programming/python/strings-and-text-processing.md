@@ -7,6 +7,10 @@ sidebar_position: 6
 
 Strings appear early in Python because the first program usually prints text. The textbook introduces strings with quotes, indexing, slicing, `len()`, case conversion, replacement, splitting, and input. Those operations are enough to build many useful scripts: clean a line of data, parse a simple record, format a report, or ask a user for information.
 
+![The Python logo marks pages on scripting, testing, packaging, and scientific programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Python-logo-notext.svg)
+
+*Figure: Python provides the practical environment for many CS, ML, and data examples. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Python-logo-notext.svg), Python Software Foundation, GPL-compatible free license; trademark terms apply.*
+
 Python strings are more than arrays of characters. They are immutable Unicode text objects with a rich method library. Once you understand immutability, indexing, slicing, formatting, and the difference between text and bytes, string processing becomes predictable. The goal is not to memorize every method; it is to recognize the small set of transformations that show up repeatedly.
 
 ## Definitions

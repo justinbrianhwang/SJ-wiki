@@ -7,6 +7,10 @@ sidebar_position: 2
 
 Python is easiest to learn when the feedback loop is short: type a small expression, run it, inspect the result, and then save the parts worth keeping in a script. Hans-Petter Halvorsen's *Python Programming* begins with this practical route. It introduces Python as an interpreted, cross-platform language, then shows several ways to run it: the IDLE shell that comes with the basic installer, a system console, a script file, Spyder through Anaconda, and other editors such as Visual Studio Code.
 
+![The Python logo marks pages on scripting, testing, packaging, and scientific programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Python-logo-notext.svg)
+
+*Figure: Python provides the practical environment for many CS, ML, and data examples. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Python-logo-notext.svg), Python Software Foundation, GPL-compatible free license; trademark terms apply.*
+
 This page turns that first-contact material into a repeatable working model. The main idea is that "Python" is not just one executable. A useful Python setup has an interpreter, a place to edit code, a way to run scripts, and a package/environment strategy. Beginners can start with the official installer and IDLE. Larger projects usually need a virtual environment, a command-line workflow, and an editor that can lint, debug, and run tests.
 
 ## Definitions

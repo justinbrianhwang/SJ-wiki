@@ -7,6 +7,10 @@ sidebar_position: 1
 
 These notes are based on *The Java Programming Language, Fourth Edition* by Ken Arnold, James Gosling, and David Holmes. The book is a Java 5 era source: it explains the core language, the virtual machine model, object orientation, interfaces, nested classes, enums, generics, exceptions, assertions, strings, threads, annotations, reflection, garbage collection, packages, documentation comments, I/O, collections, utility classes, system programming, internationalization, and a survey of standard packages.
 
+![The Sun Microsystems logo gives Java pages historical context for the language and platform.](https://commons.wikimedia.org/wiki/Special:FilePath/Sun_Microsystems_logo.svg)
+
+*Figure: Java's early development at Sun shaped its portability, virtual-machine model, and library ecosystem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sun_Microsystems_logo.svg), Sun Microsystems and Afrank99, public domain text logo.*
+
 The source is historically important because it teaches Java from the language designers' point of view. It treats Java features as contracts between source code, compiler, virtual machine, standard library, and programmer. Later Java features such as lambda expressions, the `java.util.stream` Stream API, `CompletableFuture`, Java Platform Module System modules, Maven, and Gradle are outside this source. Where those topics are natural neighbors, the pages mark them as later boundaries rather than inventing coverage not present in the book.
 
 ## Definitions

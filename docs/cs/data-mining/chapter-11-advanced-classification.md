@@ -7,6 +7,14 @@ sidebar_position: 13
 
 Advanced classification covers supervised learning cases that go beyond a balanced, moderate-size, fully labeled two-class table. Aggarwal's advanced classification chapter includes multiclass learning, rare class learning, scalable classification, regression with numeric targets, semi-supervised learning, active learning, and ensemble methods. These topics matter because real data sets rarely arrive with abundant clean labels and equal class frequencies.
 
+![A simple decision tree routes shapes through binary feature tests to a class leaf.](https://commons.wikimedia.org/wiki/Special:FilePath/Simple_decision_tree.svg)
+
+*Figure: Decision trees classify by asking a sequence of feature questions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Simple_decision_tree.svg), Eviatar Bach, CC0.*
+
+![An Iris dataset scatterplot compares flower measurements colored by species.](https://commons.wikimedia.org/wiki/Special:FilePath/Iris_dataset_scatterplot.svg)
+
+*Figure: The Iris scatterplot makes feature spaces and class separation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Iris_dataset_scatterplot.svg), Nicoguaro, CC BY 4.0.*
+
 This page extends the core classifiers. The unifying question is how to adapt a predictive model when labels are many, rare, expensive, partially missing, numeric, streaming, or noisy.
 
 ## Definitions

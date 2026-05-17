@@ -7,6 +7,10 @@ sidebar_position: 65
 
 Quantitative analysis asks whether a measurable property stays within required bounds. In embedded systems, those properties include execution time, memory use, energy, power, reaction time, physical position, temperature, and network delay. Timing is the representative case because a correct control value can be unsafe if it is produced too late.
 
+![An Arduino Uno board shows a familiar microcontroller development board with headers and USB.](https://commons.wikimedia.org/wiki/Special:FilePath/Arduino_Uno_-_R3.jpg)
+
+*Figure: Arduino boards make microcontroller I/O and prototyping tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Arduino_Uno_-_R3.jpg), SparkFun Electronics, CC BY 2.0.*
+
 Lee and Seshia focus on execution-time analysis, especially worst-case execution time (WCET). The key theme is that WCET is a property of both the program and the platform. Loops, branches, function calls, infeasible paths, caches, pipelines, interrupts, and memory hierarchy all affect the result.
 
 ## Definitions

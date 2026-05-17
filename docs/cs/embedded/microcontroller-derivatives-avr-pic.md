@@ -7,6 +7,10 @@ sidebar_position: 14
 
 The later source chapters broaden the subject beyond the original 8051. They discuss conceptual derivatives of microcontrollers, an 89C51-family derivative such as the 89C51RD, AVR microcontrollers with the AT90S2313 as the example, and PIC microcontrollers in the PIC16CXX family. The point is not that these devices are identical; it is that the same embedded questions repeat with different answers: where is program memory, where are registers, how are interrupts controlled, what timers exist, and how is nonvolatile memory handled?
 
+![An Arduino Uno board shows a familiar microcontroller development board with headers and USB.](https://commons.wikimedia.org/wiki/Special:FilePath/Arduino_Uno_-_R3.jpg)
+
+*Figure: Arduino boards make microcontroller I/O and prototyping tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Arduino_Uno_-_R3.jpg), SparkFun Electronics, CC BY 2.0.*
+
 This page is a comparative map. It keeps the 8051 as the reference point, then highlights derivative features, AVR organization, and PIC organization. The goal is to help a reader transfer the mental model from earlier pages without assuming that instruction sets, register files, memory maps, or interrupt rules are interchangeable.
 
 ## Definitions

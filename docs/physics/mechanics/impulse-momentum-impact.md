@@ -9,6 +9,10 @@ Impulse-momentum methods focus on force effects over time rather than over dista
 
 Energy and momentum are complementary, not interchangeable. Momentum balance can survive inelastic impact where mechanical energy is lost. Energy methods can find speeds when work and distance are known. In many collision problems, momentum gives the immediate post-impact velocity relation, while energy or a coefficient of restitution supplies the missing information.
 
+![A projectile follows a parabolic trajectory with launch angle, range, and maximum height marked.](https://commons.wikimedia.org/wiki/Special:FilePath/Projectile_motion.svg)
+
+*Figure: Projectile motion is the standard visual model for decomposing one motion into horizontal and vertical components. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Projectile_motion.svg), Maxmath12, CC0 1.0.*
+
 ## Definitions
 
 The **linear momentum** of a particle is

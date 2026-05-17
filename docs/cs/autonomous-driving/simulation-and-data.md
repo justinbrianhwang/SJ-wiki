@@ -7,6 +7,10 @@ sidebar_position: 13
 
 Autonomous driving depends on data twice: first to train and evaluate perception, prediction, planning, and control, and second to build a safety case that the system behaves acceptably across its operational design domain. Real-world driving logs are indispensable, but they are expensive, imbalanced, and risky for rare events. Simulation fills the gap by replaying logs, generating scenarios, testing closed-loop behavior, and creating synthetic sensor data.
 
+![A Waymo self-driving car drives on a public road with roof-mounted sensors.](https://commons.wikimedia.org/wiki/Special:FilePath/Waymo_self-driving_car_front_view.gk.jpg)
+
+*Figure: A real autonomous vehicle grounds the driving stack in a physical platform. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Waymo_self-driving_car_front_view.gk.jpg), Grendelkhan, CC BY-SA 4.0.*
+
 This page introduces CARLA, NVIDIA DRIVE Sim, AirSim, LGSVL or SVL, scenario generation, synthetic data, sim-to-real transfer, log replay, and data mining. It connects every stack layer from [sensors](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu) through [safety](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing), because no AV module can be evaluated seriously without a strategy for data coverage and closed-loop testing.
 
 ## Definitions

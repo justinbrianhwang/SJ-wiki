@@ -7,6 +7,10 @@ sidebar_position: 12
 
 Applications of integrals all follow the same organizing idea: slice a quantity into small pieces, approximate each piece, and add the pieces by integration. Area, volume, work, mass, average value, arc length, and accumulated change differ in geometry and units, but the integral structure is the same.
 
+![Rectangles under a curve approximate area in a Riemann sum.](https://commons.wikimedia.org/wiki/Special:FilePath/Riemannsumme.svg)
+
+*Figure: Riemann sums turn accumulated area into the limiting process behind definite integrals. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Riemannsumme.svg), Emes2k, public domain.*
+
 The hardest part is often not the integration itself. It is choosing the slice, writing the representative small quantity, identifying correct bounds, and checking units. Once the setup is correct, the definite integral carries out the accumulation.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 12
 
 Recursion is a way to solve a problem by reducing it to smaller versions of the same problem. A recursive function calls itself directly or indirectly. Savitch presents recursion as a design technique, not a magic trick: identify a base case that needs no recursive call, identify a recursive case that moves closer to the base case, and trust the smaller call to do the smaller job.
 
+![The ISO C++ logo marks pages on classes, templates, containers, and modern C++ idioms.](https://commons.wikimedia.org/wiki/Special:FilePath/ISO_C%2B%2B_Logo.svg)
+
+*Figure: C++ extends systems programming with abstraction, generic code, and deterministic resource management. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ISO_C%2B%2B_Logo.svg), Jeremy Kratz, public domain text logo.*
+
 Recursion is especially natural for numbers written digit by digit, divide-and-conquer search, tree traversal, expression parsing, and backtracking. It is not always faster than iteration, but it can make the structure of a solution match the structure of the problem.
 
 ## Definitions

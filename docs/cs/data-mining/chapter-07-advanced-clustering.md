@@ -7,6 +7,10 @@ sidebar_position: 9
 
 Advanced clustering deals with cases where the clean numeric, moderate-size, low-dimensional assumptions fail. Aggarwal discusses categorical data, scalable algorithms, high-dimensional and projected clustering, semi-supervised clustering, human or visual supervision, and cluster ensembles. The common theme is that the basic idea of grouping similar objects survives, but the representation, objective, and search strategy must change.
 
+![A k-means animation shows centroids and cluster boundaries moving until assignments stabilize.](https://commons.wikimedia.org/wiki/Special:FilePath/K-means_convergence.gif)
+
+*Figure: K-means alternates assignments and centroid updates until the partition stops changing. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:K-means_convergence.gif), Chire, CC BY-SA 4.0.*
+
 This page extends the core clustering methods. It is especially important in data mining because real data often contain categorical attributes, millions of records, sparse text features, local subspace structure, partial labels, or multiple incompatible clusterings.
 
 ## Definitions
@@ -82,7 +86,7 @@ flowchart TB
   Cluster -. "summaries or constraints can replace raw expansion in advanced settings" .-> Scalable
 ```
 
-![DBSCAN core, border, and noise points — the figure shows core points around A, density-reachable border points B and C, and noise point N.](https://upload.wikimedia.org/wikipedia/commons/a/af/DBSCAN-Illustration.svg)
+![DBSCAN core, border, and noise points — the figure shows core points around A, density-reachable border points B and C, and noise point N.](https://commons.wikimedia.org/wiki/Special:FilePath/DBSCAN-Illustration.svg)
 
 *Figure: DBSCAN classifies points as core, border, or noise according to epsilon-neighborhood density and reachability. From [Chire, 2011](https://commons.wikimedia.org/wiki/File:DBSCAN-Illustration.svg) — CC BY-SA 3.0.*
 

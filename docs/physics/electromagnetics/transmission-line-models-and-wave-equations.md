@@ -9,6 +9,10 @@ Transmission lines are the bridge from circuit theory to field theory. When a wi
 
 The transmission-line model keeps the circuit variables $v(z,t)$ and $i(z,t)$, but lets them depend on position. Its distributed parameters $R'$, $L'$, $G'$, and $C'$ summarize the fields around the conductors per unit length. This page develops the telegrapher equations, wave propagation, characteristic impedance, and the lossless-line formulas used later for standing waves and matching.
 
+![A coaxial cable cutaway shows conductor, dielectric, shield, and jacket layers.](https://commons.wikimedia.org/wiki/Special:FilePath/Coaxial_cable_cutaway.svg)
+
+*Figure: A coaxial line makes distributed inductance, capacitance, impedance, and guided waves tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Coaxial_cable_cutaway.svg), Tkgd2007, CC BY 3.0.*
+
 ## Definitions
 
 A uniform transmission line is modeled by per-unit-length parameters:

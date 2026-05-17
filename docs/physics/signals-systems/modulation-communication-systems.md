@@ -9,6 +9,10 @@ Modulation moves signal content from one frequency range to another. In communic
 
 The simplest modulation models are built from sinusoids and Fourier transform properties. Amplitude modulation shifts spectra by multiplying a message by a carrier. Frequency modulation changes the instantaneous phase derivative. Sampling can also be viewed as modulation by an impulse train, which produces repeated spectral copies.
 
+![The electromagnetic spectrum is arranged by wavelength, frequency, and representative sources.](https://commons.wikimedia.org/wiki/Special:FilePath/EM_Spectrum_Properties_edit.svg)
+
+*Figure: The electromagnetic spectrum ties circuit-scale oscillations, radio links, optics, and thermal radiation into one continuum. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:EM_Spectrum_Properties_edit.svg), Inductiveload, public domain.*
+
 ## Definitions
 
 Let $m(t)$ be a message signal. Complex modulation by $e^{j\omega_c t}$ produces

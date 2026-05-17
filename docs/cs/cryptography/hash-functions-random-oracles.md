@@ -7,6 +7,10 @@ sidebar_position: 9
 
 Cryptographic hash functions compress arbitrary-length input into fixed-length digests while trying to preserve adversarial unpredictability properties. They are used for integrity checks, commitment schemes, password hashing, key derivation, signatures, Merkle trees, and MAC constructions such as HMAC. But a hash is not "just a checksum." It needs security properties defined against attackers.
 
+![A public-key encryption diagram separates public encryption from private decryption.](https://commons.wikimedia.org/wiki/Special:FilePath/Public_key_encryption.svg)
+
+*Figure: Asymmetric encryption turns key distribution into a public and private key pair. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Public_key_encryption.svg), Davidgothberg, public domain.*
+
 Katz and Lindell separate collision resistance, weaker hash notions, Merkle-Damgard domain extension, birthday attacks, HMAC, applications, and the random-oracle model. Smart gives a more applied presentation of hash design, the MD4 family, SHA-style constructions, and MAC use. Together they show both sides: hash functions are concrete algorithms such as SHA-2 and SHA-3, and they are also idealized objects in proofs.
 
 ## Definitions

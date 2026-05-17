@@ -7,6 +7,10 @@ sidebar_position: 4
 
 Matrices organize linear information. A matrix can be a table of data, a coefficient array for a system, or the rule for a linear transformation. Matrix algebra is designed so that these interpretations agree: matrix-vector multiplication applies a linear rule, and matrix-matrix multiplication composes such rules.
 
+![A matrix multiplication diagram highlights row and column products.](https://commons.wikimedia.org/wiki/Special:FilePath/Matrix_multiplication_diagram.svg)
+
+*Figure: A matrix multiplication diagram makes the row-column structure of linear algebra visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Matrix_multiplication_diagram.svg), Bilou, CC BY-SA 3.0.*
+
 The main surprise is that matrix arithmetic resembles ordinary arithmetic only partly. Addition behaves as expected, but multiplication is order-sensitive and dimension-sensitive. This is not a defect. It records the fact that applying one linear process after another depends on which process happens first and whether the output size of the first matches the input size of the second.
 
 ## Definitions

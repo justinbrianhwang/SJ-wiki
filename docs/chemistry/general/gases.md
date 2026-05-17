@@ -9,6 +9,10 @@ Gases are the simplest state of matter to model quantitatively because molecules
 
 In the Ebbing and Gammon sequence this topic sits near gas pressure, empirical gas laws, ideal gas law, gas stoichiometry, Dalton's law, kinetic theory, diffusion, effusion, and real gases. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
+![A Maxwell-Boltzmann distribution plot compares molecular speed distributions for several noble gases.](https://commons.wikimedia.org/wiki/Special:FilePath/MaxwellBoltzmann-en.svg)
+
+*Figure: Molecular speed distributions connecting temperature, mass, and gas behavior. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:MaxwellBoltzmann-en.svg), Pdbailey, Cryptic C62, and Lilyu, public domain.*
+
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.

@@ -9,6 +9,10 @@ A system maps an input signal to an output signal. It can represent an electrica
 
 The most important later theory, linear time-invariant analysis, is built from two of these properties. Linearity gives superposition. Time invariance says the system behaves the same way regardless of the absolute time origin. Together they imply that the response to any signal can be assembled from shifted impulse responses, producing convolution.
 
+![A state-space block diagram routes input through system matrices to state and output variables.](https://commons.wikimedia.org/wiki/Special:FilePath/Typical_State_Space_model.svg)
+
+*Figure: State-space diagrams show how stored state, input, and output maps fit into one dynamic-system representation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Typical_State_Space_model.svg), Cburnett and BiMiT, CC0 1.0.*
+
 ## Definitions
 
 A continuous-time system $T$ maps an input $x(t)$ to an output

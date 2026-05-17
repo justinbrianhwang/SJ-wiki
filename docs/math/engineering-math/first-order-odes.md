@@ -7,6 +7,10 @@ sidebar_position: 2
 
 A first-order ordinary differential equation relates an unknown function to its first derivative. In engineering models the derivative is usually a rate: current changing in a circuit, temperature relaxing toward the surroundings, concentration changing in a mixing tank, or velocity responding to drag. The mathematical work is only one part of the task. A useful solution also records the modeling assumptions, the interval where the solution is valid, the initial condition, and the physical meaning of constants.
 
+![Euler method advances along short tangent-line steps.](https://commons.wikimedia.org/wiki/Special:FilePath/Euler_method.svg)
+
+*Figure: Euler method approximates an ODE solution by repeatedly stepping in the current slope direction. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Euler_method.svg), Oleg Alexandrov, public domain.*
+
 This page sits between qualitative ideas such as slope fields and later linear-system methods. The main theme is recognition: identify whether the equation is separable, linear, exact, Bernoulli, homogeneous in $y/x$, or best handled numerically. Many errors in first-order ODEs come from forcing an equation into a favorite method instead of checking its actual structure.
 
 ## Definitions

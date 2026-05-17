@@ -9,6 +9,10 @@ Organic chemistry is the chemistry of carbon compounds, especially those with C-
 
 In the Ebbing and Gammon sequence this topic sits near bonding of carbon, alkanes, cycloalkanes, alkenes, alkynes, aromatic hydrocarbons, hydrocarbon naming, and oxygen- and nitrogen-containing derivatives. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
+![A ball-and-stick model shows benzene as a planar aromatic ring.](https://commons.wikimedia.org/wiki/Special:FilePath/Benzene-aromatic-3D-balls.png)
+
+*Figure: Benzene as a compact example of carbon bonding, delocalization, and aromatic structure. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Benzene-aromatic-3D-balls.png), Benjah-bmm27, public domain.*
+
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.

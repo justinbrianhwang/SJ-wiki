@@ -7,6 +7,10 @@ sidebar_position: 15
 
 A thread is a sequence of execution within a program. Most simple programs run one step at a time, but Java supports multiple threads that may execute concurrently and interact through shared objects. The source book introduces threads with a concrete race: two operations on shared state can interleave unless the program uses synchronization to define a safe order.
 
+![The Sun Microsystems logo gives Java pages historical context for the language and platform.](https://commons.wikimedia.org/wiki/Special:FilePath/Sun_Microsystems_logo.svg)
+
+*Figure: Java's early development at Sun shaped its portability, virtual-machine model, and library ecosystem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sun_Microsystems_logo.svg), Sun Microsystems and Afrank99, public domain text logo.*
+
 Threading is difficult because correctness depends on more than individual statements. Visibility, atomicity, ordering, locks, waiting, notification, deadlock, and termination all matter. The Java memory model gives meaning to synchronization and `volatile`, while the object monitor mechanism provides `synchronized`, `wait`, `notify`, and `notifyAll`.
 
 ## Definitions

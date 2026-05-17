@@ -7,6 +7,10 @@ sidebar_position: 8
 
 Authenticated encryption combines confidentiality and integrity in one interface. It encrypts the message and authenticates both the ciphertext and optional associated data such as headers, sequence numbers, protocol versions, or content types. This is the primitive most applications should want, because bare encryption is malleable and separate encryption/MAC composition is easy to get wrong.
 
+![A public-key encryption diagram separates public encryption from private decryption.](https://commons.wikimedia.org/wiki/Special:FilePath/Public_key_encryption.svg)
+
+*Figure: Asymmetric encryption turns key distribution into a public and private key pair. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Public_key_encryption.svg), Davidgothberg, public domain.*
+
 Katz and Lindell emphasize generic composition, especially encrypt-then-MAC, and explain how authenticated encryption yields stronger guarantees such as resistance to chosen-ciphertext attacks. Smart's hybrid-encryption and symmetric-security chapters reinforce the same engineering picture: protect the payload with a data encapsulation mechanism that already includes confidentiality and authenticity. GCM is a widely deployed example built from CTR encryption plus polynomial authentication.
 
 ## Definitions

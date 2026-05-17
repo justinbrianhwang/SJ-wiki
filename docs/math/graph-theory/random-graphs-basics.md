@@ -7,6 +7,10 @@ sidebar_position: 18
 
 Random graphs study what a graph typically looks like when edges are chosen by chance. Instead of analyzing one fixed graph, we analyze a probability distribution over many graphs. This shift makes it possible to prove existence results, estimate thresholds for properties, and model large networks whose exact structure is not known in advance.
 
+![Paul Erdos stands at a student seminar in Budapest in 1992.](https://commons.wikimedia.org/wiki/Special:FilePath/Erdos_budapest_fall_1992.jpg)
+
+*Figure: Paul Erdos at a student seminar reflects the collaborative culture behind modern combinatorics and random graph theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Erdos_budapest_fall_1992.jpg), Kmhkmh, CC BY 3.0.*
+
 The basic model is the Erdos-Renyi graph $G(n,p)$: start with $n$ labelled vertices and include each possible edge independently with probability $p$. As $p$ increases from $0$ to $1$, the graph evolves from isolated vertices to a dense graph, and properties such as containing a triangle, being connected, or having a giant component appear around predictable thresholds.
 
 ## Definitions

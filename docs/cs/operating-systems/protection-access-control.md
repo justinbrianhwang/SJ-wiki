@@ -7,6 +7,10 @@ sidebar_position: 14
 
 Protection is the internal control problem: once users, processes, files, memory, and devices exist, who may do what to which resource? It is narrower than security but foundational for it. A system cannot defend against external attack if it cannot reliably enforce internal access rules among its own subjects and objects.
 
+![The Linux mascot marks the operating-system pages that use Linux as a recurring case study.](https://commons.wikimedia.org/wiki/Special:FilePath/Tux.svg)
+
+*Figure: Linux provides the concrete kernel case study for many OS abstractions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tux.svg), Larry Ewing, Simon Budig, and Garrett LeSage, CC0/attribution permission.*
+
 The textbook distinguishes protection from security. Protection provides mechanisms for specifying and enforcing access to resources. Security includes broader threats such as authentication failure, malware, network attacks, and cryptography. This page focuses on domains, access matrices, access-control lists, capability lists, revocation, and language-based protection.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 1
 
 Notes on C++ — types, classes, templates, the STL, and idioms for resource management. Based on Walter Savitch's *Absolute C++*.
 
+![The ISO C++ logo marks pages on classes, templates, containers, and modern C++ idioms.](https://commons.wikimedia.org/wiki/Special:FilePath/ISO_C%2B%2B_Logo.svg)
+
+*Figure: C++ extends systems programming with abstraction, generic code, and deterministic resource management. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ISO_C%2B%2B_Logo.svg), Jeremy Kratz, public domain text logo.*
+
 ## Pages
 
 1. [C++ basics and control flow](/cs/programming/cpp/cpp-basics-and-control-flow)

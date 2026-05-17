@@ -7,6 +7,10 @@ sidebar_position: 17
 
 Linear models are the modeling core of *The Book of R*. The regression chapters move from simple linear regression to multiple regression, categorical predictors, interactions, transformations, model selection, diagnostics, leverage, Cook's distance, and collinearity. The same formula interface also leads naturally to generalized linear models, where the response distribution and link function change but the modeling workflow remains familiar.
 
+![The R logo marks pages on statistical computing, graphics, and data analysis.](https://commons.wikimedia.org/wiki/Special:FilePath/R_logo.svg)
+
+*Figure: R connects programming examples to statistical modeling and visualization workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:R_logo.svg), The R Foundation, CC BY-SA 4.0.*
+
 The key idea is that a model is an explicit approximation. In simple linear regression, R estimates an intercept and slope so a line summarizes the average relationship between a numeric predictor and numeric response. In multiple regression, each coefficient is interpreted while holding other predictors fixed. Diagnostics then ask whether the approximation is adequate for the intended use.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 12
 
 Text handling in Java centers on immutable `String` objects, mutable builders, regular expressions, formatted output, and token scanning. The source book places strings before many utility classes because text appears everywhere: command-line arguments, diagnostic messages, file contents, formatted reports, parsed input, resource bundles, and object descriptions.
 
+![The Sun Microsystems logo gives Java pages historical context for the language and platform.](https://commons.wikimedia.org/wiki/Special:FilePath/Sun_Microsystems_logo.svg)
+
+*Figure: Java's early development at Sun shaped its portability, virtual-machine model, and library ecosystem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sun_Microsystems_logo.svg), Sun Microsystems and Afrank99, public domain text logo.*
+
 The most important design distinction is immutability versus mutation. A `String` value does not change after creation. A `StringBuilder` changes as text is appended, inserted, or replaced, then produces a `String` when needed. Regular expressions and scanners add pattern-based matching and parsing, while `Formatter` provides controlled conversion of values to text.
 
 ## Definitions

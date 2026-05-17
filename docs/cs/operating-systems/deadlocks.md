@@ -7,6 +7,10 @@ sidebar_position: 7
 
 Deadlock is the failure mode where a set of processes can never make progress because each is waiting for an event that only another member of the set can cause. It is not simply a slow system, a busy lock, or a priority problem. In a deadlock, the wait relationship forms a closed trap: every participant is stuck, and ordinary scheduling cannot free them.
 
+![A Linux kernel map organizes subsystems such as memory, filesystems, networking, and drivers.](https://commons.wikimedia.org/wiki/Special:FilePath/Linux_kernel_map.png)
+
+*Figure: The Linux kernel map shows how OS services become interacting subsystems. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Linux_kernel_map.png), Conan at English Wikipedia, CC BY 3.0.*
+
 Silberschatz, Galvin, and Gagne place the detailed deadlock discussion inside the synchronization chapter in the Essentials edition, while the broader dinosaur-book family often treats it as a full chapter. The topic deserves its own wiki page because the same ideas appear in mutexes, semaphores, memory allocation, file locks, device allocation, database transactions, and distributed systems.
 
 ## Definitions

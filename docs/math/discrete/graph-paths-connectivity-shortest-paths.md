@@ -7,6 +7,10 @@ sidebar_position: 21
 
 Paths are how local edges become global structure. Connectivity asks whether vertices can reach one another. Shortest-path algorithms add weights and optimize travel, cost, latency, or risk across a network.
 
+![Dijkstra's algorithm animation updates tentative distances across a weighted graph.](https://commons.wikimedia.org/wiki/Special:FilePath/Dijkstra_Animation.gif)
+
+*Figure: Dijkstra's algorithm is the standard visual example for shortest paths in weighted graphs. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dijkstra_Animation.gif), Ibmua, public domain.*
+
 These ideas are the algorithmic core of graph theory. A graph representation tells us who is adjacent; traversal algorithms turn that local information into reachability, components, spanning trees, and distances. Weighted graphs then require more careful algorithms because the fewest edges need not give the lowest total cost.
 
 ## Definitions

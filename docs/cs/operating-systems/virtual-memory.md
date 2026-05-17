@@ -7,6 +7,10 @@ sidebar_position: 9
 
 Virtual memory lets a process execute even when not all of its pages are in physical memory. This is one of the most important abstractions in modern operating systems because it separates a program's logical address space from the size and placement of RAM. Programs can be larger than physical memory, processes can share pages, process creation can be faster, and the OS can keep more runnable work resident.
 
+![A Linux kernel map organizes subsystems such as memory, filesystems, networking, and drivers.](https://commons.wikimedia.org/wiki/Special:FilePath/Linux_kernel_map.png)
+
+*Figure: The Linux kernel map shows how OS services become interacting subsystems. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Linux_kernel_map.png), Conan at English Wikipedia, CC BY 3.0.*
+
 The benefit has a cost: a missing page causes a page fault, and servicing a page fault may require disk or SSD I/O, page-table changes, and replacement of another page. The central questions are therefore when to bring pages in, which page to evict, how many frames each process should receive, and how to detect when the system is spending more time paging than executing.
 
 ## Definitions

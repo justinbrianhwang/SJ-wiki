@@ -7,6 +7,10 @@ sidebar_position: 13
 
 Analytical learning uses prior knowledge and deduction to generalize from examples. Mitchell contrasts it with purely inductive learning: an inductive learner generalizes from many observed cases, while an analytical learner can generalize from one example if it has a domain theory that explains why the example satisfies the target concept. Explanation-based learning is the main method in the chapter.
 
+![An Iris dataset scatterplot compares flower measurements colored by species.](https://commons.wikimedia.org/wiki/Special:FilePath/Iris_dataset_scatterplot.svg)
+
+*Figure: The Iris scatterplot makes feature spaces and class separation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Iris_dataset_scatterplot.svg), Nicoguaro, CC BY 4.0.*
+
 The historical setting matters. Before massive datasets became common, a central question was how to use hand-built domain theories to reduce data requirements. Analytical learning is strongest when the theory is correct and operationally useful; it is weakest when the theory is wrong, incomplete, or too expensive to apply.
 
 ## Definitions

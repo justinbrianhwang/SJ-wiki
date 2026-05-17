@@ -7,6 +7,10 @@ sidebar_position: 9
 
 Duality turns faces into vertices and cycles into cuts. For plane graphs this is a concrete geometric construction: put a new vertex in each face and draw a new edge crossing each original edge. The result often explains why statements about cycles have twin statements about cutsets.
 
+![A Klein bottle loops through itself as a non-orientable surface.](https://commons.wikimedia.org/wiki/Special:FilePath/Klein_bottle.svg)
+
+*Figure: A Klein bottle is a classic non-orientable surface used in topology and graph embeddings. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Klein_bottle.svg), Tttrung, CC BY-SA 3.0.*
+
 Graphs on surfaces and infinite graphs extend the planar story. On a torus or a surface with handles, Euler's formula changes by the Euler characteristic. In infinite graphs, even basic statements about paths need local finiteness or countability assumptions. Wilson's planarity chapter uses these extensions to show which planar ideas survive, which need modification, and which fail.
 
 ## Definitions

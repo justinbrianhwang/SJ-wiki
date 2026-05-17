@@ -7,6 +7,10 @@ sidebar_position: 3
 
 Adversarial examples are usually introduced as surprising inputs, but the technical core is an optimization problem. Given a trained model and a valid set of input changes, the attacker searches for a nearby point that maximizes loss, changes the predicted label, or induces a target behavior. Defenses then try to train or certify models whose predictions are stable throughout that valid set.
 
+![A visually similar adversarial panda image is classified as a gibbon by an ImageNet model.](https://ar5iv.labs.arxiv.org/html/1412.6572/assets/gibbon_993.png)
+
+*Figure: The FGSM panda example shows that imperceptible perturbations can change model decisions. Image: [ar5iv](https://arxiv.org/abs/1412.6572), Goodfellow, Shlens, and Szegedy, educational use with attribution.*
+
 This page builds the notation used by [white-box attacks](/cs/adversarial-attacks/white-box-attacks), [adversarial training](/cs/adversarial-attacks/adversarial-training), and [certified defenses](/cs/adversarial-attacks/certified-defenses-and-randomized-smoothing). The same formulas are simple enough to write down and hard enough to solve exactly: the inner maximization is nonconvex for neural networks, and the choice of constraint set determines what "nearby" means.
 
 ## Definitions

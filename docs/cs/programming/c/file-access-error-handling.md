@@ -7,6 +7,10 @@ sidebar_position: 13
 
 K&R's I/O chapter moves from standard input and output to named files, error reporting, line input, string operations, character classification, command execution, and storage management. This is the portable interface layer above operating-system calls. Programs that use `fopen`, `fclose`, `getc`, `putc`, `fprintf`, and `fgets` can often move across systems without changing their core logic.
 
+![A C language logo marks the systems-programming pages built around C examples.](https://commons.wikimedia.org/wiki/Special:FilePath/C_Programming_Language.svg)
+
+*Figure: C remains the reference language for low-level memory, pointers, and Unix interfaces. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:C_Programming_Language.svg), ElodinKaldwin, public domain text logo.*
+
 The central design idea is that a file is accessed through a stream, represented by `FILE *`. The stream buffers data, records status, and presents text or binary input in a standard form. Error handling is explicit: check return values, report failures on `stderr`, and return a useful status from `main`.
 
 ## Definitions

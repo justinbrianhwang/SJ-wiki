@@ -7,6 +7,10 @@ sidebar_position: 14
 
 K&R ends the main text by going below the standard I/O library to the UNIX system interface. This chapter is deliberately system-specific: it explains file descriptors, `read`, `write`, `open`, `close`, `lseek`, directory traversal, and the low-level basis for a storage allocator. The point is not that every C program should use these calls, but that C is close enough to the operating system to express them directly.
 
+![A C language logo marks the systems-programming pages built around C examples.](https://commons.wikimedia.org/wiki/Special:FilePath/C_Programming_Language.svg)
+
+*Figure: C remains the reference language for low-level memory, pointers, and Unix interfaces. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:C_Programming_Language.svg), ElodinKaldwin, public domain text logo.*
+
 The contrast with `<stdio.h>` is the main idea. Standard I/O deals in buffered `FILE *` streams and portable text conventions. UNIX low-level I/O deals in integer file descriptors and byte counts. The stream library is often implemented on top of these lower-level calls.
 
 ## Definitions

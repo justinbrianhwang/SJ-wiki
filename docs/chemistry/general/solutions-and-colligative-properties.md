@@ -9,6 +9,14 @@ Solutions are homogeneous mixtures whose behavior depends on both chemical ident
 
 In the Ebbing and Gammon sequence this topic sits near types of solutions, solution process, temperature and pressure effects on solubility, concentration units, vapor pressure lowering, boiling-point elevation, freezing-point depression, osmosis, ionic solutions, and colloids. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
+![A diagram shows red blood cells changing volume in hypotonic, isotonic, and hypertonic solutions.](https://commons.wikimedia.org/wiki/Special:FilePath/Osmotic_pressure_on_blood_cells_diagram.svg)
+
+*Figure: Osmotic pressure as a colligative effect driven by dissolved particle concentration. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Osmotic_pressure_on_blood_cells_diagram.svg), LadyofHats, public domain.*
+
+![A fractional distillation apparatus diagram shows a heated flask, column, condenser, and receiving flask.](https://commons.wikimedia.org/wiki/Special:FilePath/Fractional_distillation_lab_apparatus.svg)
+
+*Figure: Fractional distillation as a practical separation method for liquid mixtures. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fractional_distillation_lab_apparatus.svg), Theresa Knott and John Kershaw, CC BY-SA 3.0/GFDL.*
+
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.

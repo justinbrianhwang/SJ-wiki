@@ -7,6 +7,10 @@ sidebar_position: 19
 
 The later source chapters widen from individual language constructs to the organization and environment of Java programs. Packages create namespaces and access boundaries. Documentation comments describe contracts for tools and readers. Utility classes provide formatting, random numbers, timers, UUIDs, math, scanning, and observable patterns. System classes expose standard streams, properties, environment interactions, process creation, shutdown behavior, and security checks.
 
+![The Sun Microsystems logo gives Java pages historical context for the language and platform.](https://commons.wikimedia.org/wiki/Special:FilePath/Sun_Microsystems_logo.svg)
+
+*Figure: Java's early development at Sun shaped its portability, virtual-machine model, and library ecosystem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sun_Microsystems_logo.svg), Sun Microsystems and Afrank99, public domain text logo.*
+
 Internationalization and localization show why text, dates, numbers, currency, resources, and calendars should not be hard-coded as if every user shared one language and region. The source also surveys standard packages and discusses application evolution across language, library, and virtual-machine versions. Modern build tools such as Maven and Gradle, and Java 9 modules, are outside this 2005 source and are noted only as later ecosystem boundaries.
 
 ## Definitions

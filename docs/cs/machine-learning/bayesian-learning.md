@@ -7,6 +7,10 @@ sidebar_position: 7
 
 Bayesian learning is both an algorithmic family and an analytical lens. Mitchell uses it to describe classifiers that explicitly compute probabilities, but also to explain why some non-Bayesian procedures can be interpreted as optimizing a probabilistic objective. This chapter links prior beliefs, observed data, likelihood, posterior probability, maximum a posteriori hypotheses, maximum likelihood hypotheses, and minimum description length.
 
+![An Iris dataset scatterplot compares flower measurements colored by species.](https://commons.wikimedia.org/wiki/Special:FilePath/Iris_dataset_scatterplot.svg)
+
+*Figure: The Iris scatterplot makes feature spaces and class separation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Iris_dataset_scatterplot.svg), Nicoguaro, CC BY 4.0.*
+
 Historically, this treatment is important because it places machine learning inside probability theory rather than only symbolic search or numerical optimization. Modern probabilistic modeling, Bayesian networks, topic models, Gaussian mixtures, and calibrated classifiers all build on the same foundations, even when implemented with newer algorithms.
 
 ## Definitions

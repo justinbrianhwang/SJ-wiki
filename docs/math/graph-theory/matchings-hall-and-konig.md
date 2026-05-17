@@ -7,6 +7,10 @@ sidebar_position: 13
 
 Matchings formalize pairing without conflicts. A matching can assign students to projects, workers to jobs, tasks to machines, or vertices in one part of a bipartite graph to compatible vertices in the other part. The central obstruction is local competition: too many vertices may demand too few possible partners.
 
+![The complete bipartite graph K three three connects two groups of three vertices.](https://commons.wikimedia.org/wiki/Special:FilePath/Complete_bipartite_graph_K3%2C3.svg)
+
+*Figure: The graph K3,3 is a classical nonplanar bipartite graph. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Complete_bipartite_graph_K3%2C3.svg), David Benbennick, public domain.*
+
 Hall's theorem gives an exact condition for perfect matching on one side of a bipartite graph. Konig's theorem then links matchings to vertex covers, showing that in bipartite graphs the largest set of disjoint edges has the same size as the smallest set of vertices touching all edges.
 
 ## Definitions

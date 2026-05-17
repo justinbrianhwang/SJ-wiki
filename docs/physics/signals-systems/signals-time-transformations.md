@@ -9,6 +9,10 @@ A signal is a function that carries information through variation. In this cours
 
 Time transformations are the first language for describing how signals move, stretch, flip, or line up with other signals. They also prepare the ground for convolution, sampling, Fourier analysis, and modulation. When a problem asks for $x(2-t)$ or $x[3n+1]$, it is asking how the input graph or sequence is re-indexed before values are read.
 
+![A Tektronix oscilloscope sits on a bench with its display and controls visible.](https://commons.wikimedia.org/wiki/Special:FilePath/Tektronix_2235_100Mhz_Oscilloscope.png)
+
+*Figure: An oscilloscope grounds signal language in measured voltage traces, triggering, bandwidth, and time scales. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tektronix_2235_100Mhz_Oscilloscope.png), Dennis van Zuijlekom, CC BY-SA 2.0.*
+
 ## Definitions
 
 A continuous-time signal is a mapping

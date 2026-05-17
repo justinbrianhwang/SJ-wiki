@@ -7,6 +7,10 @@ sidebar_position: 8
 
 The 8051 programming chapter follows the hardware chapter because the instruction set reflects the chip's memory organization. Unlike the 8085, the 8051 has explicit support for bit operations, separate program and data spaces, special function registers, register banks, and external memory access. A correct 8051 program is therefore not just a sequence of mnemonics; it is a sequence of accesses to the correct memory space.
 
+![An Intel 8051 architecture diagram shows timers, serial I/O, memory, and ports around the CPU core.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_8051_arch.svg)
+
+*Figure: The 8051 diagram connects assembly details to the microcontroller's peripheral blocks. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_8051_arch.svg), Appaloosa, CC BY-SA 3.0.*
+
 The programmer's goal is to choose the shortest clear instruction that matches the target: internal RAM, SFR, program-memory table, external RAM, single bit, or port pin. When that choice is right, 8051 assembly is compact and expressive.
 
 ## Definitions

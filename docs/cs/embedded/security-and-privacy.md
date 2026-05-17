@@ -7,6 +7,10 @@ sidebar_position: 66
 
 Security and privacy are central design concerns for networked embedded and cyber-physical systems. Unlike ordinary correctness requirements, they assume an adversarial environment. A failure may not come from a random bug or overloaded CPU; it may come from an attacker who chooses inputs, observes timing, tampers with sensors, injects messages, or reverse engineers the device.
 
+![An Arduino Uno board shows a familiar microcontroller development board with headers and USB.](https://commons.wikimedia.org/wiki/Special:FilePath/Arduino_Uno_-_R3.jpg)
+
+*Figure: Arduino boards make microcontroller I/O and prototyping tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Arduino_Uno_-_R3.jpg), SparkFun Electronics, CC BY 2.0.*
+
 Lee and Seshia introduce the foundations: threat models, cryptographic primitives, protocol security, software security, information flow, sensor/actuator security, and side channels. The key engineering discipline is to state what attacker capabilities are assumed and what properties must hold under that model.
 
 ## Definitions

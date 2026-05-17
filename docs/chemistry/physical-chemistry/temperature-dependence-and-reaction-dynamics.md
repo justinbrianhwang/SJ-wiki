@@ -9,6 +9,10 @@ Temperature dependence links empirical kinetics to molecular energy, barriers, a
 
 Atkins develops Arrhenius behavior, transition-state theory, collision theory, RRK/RRKM ideas for unimolecular reactions, photochemical dynamics, and electron transfer. The unifying concept is that rate constants reflect both how often systems attempt reaction and how likely those attempts are to cross the required barrier.
 
+![A Maxwell-Boltzmann distribution plot compares molecular speed distributions for several noble gases.](https://commons.wikimedia.org/wiki/Special:FilePath/MaxwellBoltzmann-en.svg)
+
+*Figure: Thermal molecular speed distributions as context for temperature-dependent reaction rates. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:MaxwellBoltzmann-en.svg), Pdbailey, Cryptic C62, and Lilyu, public domain.*
+
 ## Definitions
 
 The Arrhenius equation is

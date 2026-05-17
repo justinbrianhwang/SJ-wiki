@@ -7,6 +7,10 @@ sidebar_position: 15
 
 Matroids abstract the idea of independence. In linear algebra, independence means no vector is a linear combination of the others. In graph theory, independence often means no cycle has been formed. Matroids capture the shared exchange behavior behind these situations, allowing graph arguments about trees, cycles, and cuts to be expressed in a more general language.
 
+![The Petersen graph is drawn with an outer pentagon and inner star.](https://commons.wikimedia.org/wiki/Special:FilePath/Petersen_graph.svg)
+
+*Figure: The Petersen graph is a standard counterexample and test case throughout graph theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Petersen_graph.svg), David Benbennick, public domain.*
+
 Graph duality becomes especially clean through matroids. The cycle structure of a planar graph is dual to the cut structure of its plane dual, and matroid duality turns this into an exact algebraic statement. Wilson's final chapter uses matroids to unify ideas that appeared earlier as separate graph theorems.
 
 ## Definitions

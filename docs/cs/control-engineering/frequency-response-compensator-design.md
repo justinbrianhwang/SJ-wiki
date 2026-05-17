@@ -7,6 +7,10 @@ sidebar_position: 15
 
 Frequency-response design uses Bode and Nyquist information to shape loop gain, bandwidth, and stability margins. Nise's design chapter parallels root-locus compensation, but the viewpoint changes: instead of placing dominant poles directly in the $s$-plane, the designer adjusts magnitude and phase near crossover while preserving low-frequency accuracy and high-frequency noise attenuation.
 
+![A Bode plot shows gain and phase changing with frequency.](https://commons.wikimedia.org/wiki/Special:FilePath/Bodeplot.png)
+
+*Figure: Bode plots connect frequency-response calculations to a standard engineering visualization. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bodeplot.png), Stw and Vukg, public domain.*
+
 This method is especially practical when plant frequency response is measured experimentally. Even if a precise transfer function is uncertain, gain crossover, phase lag, resonant peaks, and delay effects can be observed. Lead compensation adds phase near crossover; lag compensation raises low-frequency gain while trying not to damage phase margin; lag-lead combines both.
 
 ## Definitions

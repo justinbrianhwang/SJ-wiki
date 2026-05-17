@@ -7,6 +7,10 @@ sidebar_position: 21
 
 Social network analysis studies graphs whose nodes are people, accounts, organizations, or social entities and whose edges represent relationships or interactions. Aggarwal's social network chapter covers preliminaries and properties, community detection, collective classification, link prediction, and social influence analysis. The topic is graph mining with stronger behavioral assumptions: social ties often imply homophily, influence, triadic closure, and community structure.
 
+![An Iris dataset scatterplot compares flower measurements colored by species.](https://commons.wikimedia.org/wiki/Special:FilePath/Iris_dataset_scatterplot.svg)
+
+*Figure: The Iris scatterplot makes feature spaces and class separation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Iris_dataset_scatterplot.svg), Nicoguaro, CC BY 4.0.*
+
 This page covers network properties, centrality, community detection, collective classification, link prediction, and influence. It connects directly to graph mining, web mining, classification, clustering, and privacy.
 
 ## Definitions

@@ -9,6 +9,10 @@ Mathematical modeling is the translation step between a physical story and a sim
 
 The point of the model is not to reproduce every detail of the real system. A useful simulation model keeps the mechanisms that matter for the question being asked and omits details whose effects are small, unknown, or outside the intended operating range. Klee and Allen's text emphasizes this modeling-to-simulation path: begin with physical laws, turn them into equations, and then replace the continuous equation by a discrete-time numerical procedure that MATLAB or Simulink can execute.
 
+![A spring-mass harmonic oscillator shows displacement, spring force, and equilibrium position.](https://commons.wikimedia.org/wiki/Special:FilePath/Harmonic_oscillator.svg)
+
+*Figure: The mass-spring oscillator is the canonical apparatus behind resonance, normal modes, and linearization. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Harmonic_oscillator.svg), LucasVB, public domain.*
+
 ## Definitions
 
 A continuous-time dynamical system has variables that are functions of real-valued time $t$. A scalar first-order model has the form

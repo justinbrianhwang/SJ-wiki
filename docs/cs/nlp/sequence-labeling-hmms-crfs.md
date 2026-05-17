@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Sequence labeling assigns one label to each token in a sequence. Jurafsky and Martin introduce the topic through part-of-speech tagging and named entity recognition, using HMMs as the classic generative model and CRFs as the discriminative feature-rich model. Eisenstein gives the formal structure prediction view: the output space is exponentially large, but local score decompositions make Viterbi inference efficient.
 
+![A parse tree expands a formal grammar from the start symbol down to terminal tokens.](https://commons.wikimedia.org/wiki/Special:FilePath/Parse-tree.svg)
+
+*Figure: Parse trees make grammar derivations visible as rooted syntax structures. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Parse-tree.svg), Martin Thoma, CC BY 3.0.*
+
 This topic matters because many NLP annotations are token-aligned: POS tags, named entity BIO tags, chunk labels, morphological tags, dialogue acts, and some semantic roles. The key idea is to score whole tag sequences rather than independent token decisions, so the model can prefer globally coherent outputs.
 
 ## Definitions

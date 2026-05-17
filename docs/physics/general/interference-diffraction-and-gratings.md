@@ -9,6 +9,10 @@ Interference, Diffraction, and Gratings covers wave optics, phase, Young's exper
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
+![A double-slit setup sends waves through two openings to form an interference pattern on a screen.](https://commons.wikimedia.org/wiki/Special:FilePath/Double-slit.svg)
+
+*Figure: The double-slit experiment is the canonical setting where path difference becomes an observable fringe pattern. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Double-slit.svg), NekoJaNekoJa and Johannes Kalliauer, CC BY-SA 4.0.*
+
 ## Definitions
 
 - **Scope:** wave optics, phase, Young's experiment, single-slit diffraction, and gratings.

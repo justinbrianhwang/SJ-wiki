@@ -7,6 +7,10 @@ sidebar_position: 20
 
 Web mining studies documents, links, queries, user behavior, and recommender interactions on the web. Aggarwal's web chapter covers crawling and resource discovery, search engine indexing and query processing, ranking algorithms, recommender systems, and web usage mining. Web data combines text, graphs, streams, sequences, and large-scale systems, so it acts as a practical synthesis of many earlier chapters.
 
+![A skip-gram word embedding diagram predicts surrounding context words from a center word.](https://commons.wikimedia.org/wiki/Special:FilePath/Word_embeddings_Skip-gram.svg)
+
+*Figure: Skip-gram training ties word meaning to surrounding context. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Word_embeddings_Skip-gram.svg), Jeran Renz, CC BY-SA 4.0.*
+
 This page focuses on crawling, inverted indexes, link analysis, PageRank-style ranking, collaborative filtering, content-based recommendation, and web usage patterns.
 
 ## Definitions

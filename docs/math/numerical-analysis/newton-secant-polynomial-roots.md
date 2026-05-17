@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Newton's method and the secant method are local root-finding algorithms. They are often much faster than bisection once a good starting point is available, because they use slope information, either explicitly or implicitly. Polynomial root algorithms add another layer: the function has algebraic structure, so evaluation, derivative computation, and deflation can be organized efficiently.
 
+![Newton iteration follows tangent lines toward a root of a curve.](https://commons.wikimedia.org/wiki/Special:FilePath/Newton_iteration.svg)
+
+*Figure: Newton iteration uses local linearization to turn calculus into a fast root-finding algorithm. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Newton_iteration.svg), Oleg Alexandrov and Pbroks13, public domain.*
+
 These methods should be read as part of a toolkit rather than as replacements for bracketing. In production solvers, Newton or secant steps are frequently guarded by interval tests, step-size limits, or fallback bisection. The mathematical rate is important, but so is the behavior when the derivative is small, the starting value is poor, or roots are multiple.
 
 ## Definitions

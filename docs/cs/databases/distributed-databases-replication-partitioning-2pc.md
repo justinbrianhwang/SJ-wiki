@@ -7,6 +7,10 @@ sidebar_position: 17
 
 A distributed database stores data across multiple machines, sites, or regions while trying to present a coherent data-management service. Distribution is used for scale, availability, locality, fault tolerance, and organizational autonomy. It also introduces new failure modes: messages can be delayed, nodes can crash independently, and network partitions can separate machines that are all still running.
 
+![A pgAdmin screenshot shows a real database administration interface with schema objects.](https://commons.wikimedia.org/wiki/Special:FilePath/PgAdminScreenshot.png)
+
+*Figure: A database system is experienced through schemas, queries, connections, and administration tools. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PgAdminScreenshot.png), Boshomi, CC BY-SA 3.0.*
+
 The central design choices are partitioning, replication, distributed query processing, and distributed transaction management. Partitioning divides data so work can be spread out. Replication copies data so reads can be local and failures can be survived. Commit protocols coordinate atomic decisions across sites. Consistency models define what users can safely assume when operations touch more than one copy or partition.
 
 ## Definitions

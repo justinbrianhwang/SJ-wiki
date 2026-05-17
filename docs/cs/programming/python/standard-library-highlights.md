@@ -7,6 +7,10 @@ sidebar_position: 14
 
 Python is often described as having "batteries included." Halvorsen's textbook introduces the standard library through modules such as `math` and through the general idea that Python ships with reusable modules for common tasks. That point deserves emphasis: before installing a package or writing a custom parser, check whether the standard library already solves the problem.
 
+![The Python logo marks pages on scripting, testing, packaging, and scientific programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Python-logo-notext.svg)
+
+*Figure: Python provides the practical environment for many CS, ML, and data examples. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Python-logo-notext.svg), Python Software Foundation, GPL-compatible free license; trademark terms apply.*
+
 This page focuses on a practical subset: `pathlib` for paths, `collections` for better containers, `datetime` for dates and times, `json` for structured data, and `re` for regular expressions. These modules cover a large fraction of everyday scripting. They also model a broader principle: use specialized library types instead of ad hoc string manipulation or fragile conventions.
 
 ## Definitions

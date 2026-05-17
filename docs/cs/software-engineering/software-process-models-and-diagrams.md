@@ -7,6 +7,10 @@ sidebar_position: 3
 
 The second chapter of Gustafson's book moves from life cycle phases to modeling notations. A software project is full of processes, data movement, objects, messages, states, and control paths. No single diagram shows all of that cleanly. The chapter therefore surveys several diagram types and gives construction rules for each: software process models, data flow diagrams, Petri nets, object models, use cases, scenarios, sequence diagrams, hierarchy diagrams, control flow graphs, state diagrams, and lattice models.
 
+![A Kanban board screenshot shows work items organized by workflow state.](https://commons.wikimedia.org/wiki/Special:FilePath/Openproject_kanban.PNG)
+
+*Figure: Kanban boards turn process state into a visible project-management surface. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Openproject_kanban.PNG), OpenProject contributors, CC0.*
+
 The unifying idea is disciplined abstraction. A diagram is not useful because it is pretty; it is useful because it leaves out the right details while preserving the relationships needed for a decision. A process model can train new team members, a data flow diagram can expose missing inputs and outputs, an object model can clarify associations and multiplicities, a state diagram can prevent impossible transitions, and a lattice can model ordered security or dependency relationships.
 
 ## Definitions

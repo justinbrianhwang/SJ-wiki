@@ -9,6 +9,10 @@ Electron configurations translate quantum numbers into the periodic table. They 
 
 In the Ebbing and Gammon sequence this topic sits near electron spin, Pauli exclusion, building-up principle, periodic table, orbital diagrams, Hund's rule, and periodic properties. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
+![A chart shows the shapes and filling order of electron orbitals.](https://commons.wikimedia.org/wiki/Special:FilePath/Electron_orbitals.svg)
+
+*Figure: Electron orbitals as the structural basis for configurations and periodic trends. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Electron_orbitals.svg), Patricia.fidi, public domain.*
+
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.

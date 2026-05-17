@@ -9,6 +9,10 @@ Loop diagrams integrate over virtual momenta of all sizes. At high momentum the 
 
 Zee's renormalization chapters present the subject as a lesson in ignorance. A cutoff represents the fact that the theory is not trusted at arbitrarily short distance. Counterterms are not a cover-up; they are the most general local terms required by the symmetries to keep long-distance predictions finite when short-distance details are hidden.
 
+![A Feynman diagram shows two electrons scattering by exchanging a photon.](https://commons.wikimedia.org/wiki/Special:FilePath/Electron-scattering.svg)
+
+*Figure: A Feynman diagram turns perturbation theory into a compact bookkeeping picture for particles, propagators, and vertices. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Electron-scattering.svg), KCVelaga, CC BY-SA 4.0.*
+
 ## Definitions
 
 A **regulator** modifies divergent expressions so that intermediate quantities are finite. Examples include a momentum cutoff $\Lambda$, dimensional regularization with $d=4-\epsilon$, and Pauli-Villars fields.

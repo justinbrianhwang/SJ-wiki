@@ -7,6 +7,10 @@ sidebar_position: 15
 
 Templates let C++ describe a pattern for code instead of one fixed function or one fixed class. Savitch introduces them as a way to avoid rewriting the same algorithm for `int`, `double`, `char`, or a user-defined class when the logic is identical and only the type changes.
 
+![The ISO C++ logo marks pages on classes, templates, containers, and modern C++ idioms.](https://commons.wikimedia.org/wiki/Special:FilePath/ISO_C%2B%2B_Logo.svg)
+
+*Figure: C++ extends systems programming with abstraction, generic code, and deterministic resource management. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ISO_C%2B%2B_Logo.svg), Jeremy Kratz, public domain text logo.*
+
 The important idea is that a template is checked and instantiated by the compiler. It is not a run-time container of unknown values. A function template such as `swapValues` or `maximum` becomes an actual function for each set of types used by the program, provided those types support the operations used inside the template body.
 
 ## Definitions

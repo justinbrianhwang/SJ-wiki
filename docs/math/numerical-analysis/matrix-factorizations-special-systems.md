@@ -7,6 +7,10 @@ sidebar_position: 16
 
 General Gaussian elimination is a powerful default, but many matrices have structure that should not be ignored. Symmetric positive definite matrices, tridiagonal matrices, banded matrices, and orthogonal factorizations all allow algorithms that are faster, more stable, or more memory efficient than treating the matrix as dense and unstructured.
 
+![A matrix multiplication diagram highlights row and column products.](https://commons.wikimedia.org/wiki/Special:FilePath/Matrix_multiplication_diagram.svg)
+
+*Figure: A matrix multiplication diagram makes the row-column structure of linear algebra visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Matrix_multiplication_diagram.svg), Bilou, CC BY-SA 3.0.*
+
 The main numerical lesson is to let the matrix structure choose the solver. A direct method that respects symmetry or bandwidth can reduce both arithmetic and roundoff. This page focuses on Cholesky factorization for symmetric positive definite systems and the Thomas algorithm for tridiagonal systems, with QR noted as the stable workhorse for least squares.
 
 ## Definitions

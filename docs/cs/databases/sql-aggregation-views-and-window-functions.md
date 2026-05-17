@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Aggregation turns many rows into summary rows. Views name useful query expressions so that users and applications can work at a higher level of abstraction. Window functions compute values across related rows while still preserving the individual rows. Together, these features move SQL beyond row filtering into reporting, analytics, and reusable logical design.
 
+![A MySQL console screenshot shows a command-line database session with query output.](https://commons.wikimedia.org/wiki/Special:FilePath/Mysql-screenshot.PNG)
+
+*Figure: SQL pages connect abstract relational operations to the database console used in practice. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mysql-screenshot.PNG), Wikimedia Commons contributors, public domain text.*
+
 These features are also where many SQL mistakes become subtle. The difference between `WHERE` and `HAVING`, between grouped rows and original rows, and between aggregate functions and window functions matters. A database system may execute these queries with sorting, hashing, temporary storage, or indexes, but the logical model should be clear before performance tuning begins.
 
 ## Definitions

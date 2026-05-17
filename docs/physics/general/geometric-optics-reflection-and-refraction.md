@@ -9,6 +9,10 @@ Geometric Optics: Reflection and Refraction covers ray optics, reflection, refra
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
+![A light ray refracts across an interface with incident and refracted angles labeled.](https://commons.wikimedia.org/wiki/Special:FilePath/Snells_law.svg)
+
+*Figure: Snell's law turns an everyday refraction scene into a boundary-condition calculation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Snells_law.svg), Cristan and Sawims, public domain.*
+
 ## Definitions
 
 - **Scope:** ray optics, reflection, refraction, total internal reflection, mirrors, and thin lenses.

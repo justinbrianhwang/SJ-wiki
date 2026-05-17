@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Advanced outlier analysis studies cases where ordinary numeric, full-dimensional, single-model anomaly detection is inadequate. Aggarwal's advanced chapter focuses on categorical data, high-dimensional outlier detection, ensembles, and applications. These settings are common in data mining: fraud records mix category codes, text vectors have thousands of sparse dimensions, and operational systems often need robust rankings rather than one brittle detector.
 
+![A DBSCAN diagram marks core, border, and noise points under a density threshold.](https://commons.wikimedia.org/wiki/Special:FilePath/DBSCAN-Illustration.svg)
+
+*Figure: DBSCAN explains clustering as density reachability rather than a fixed number of clusters. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:DBSCAN-Illustration.svg), Chire, CC BY-SA 3.0.*
+
 This page extends basic outlier analysis. The main message is that an anomaly may be hidden in a subspace, in an unusual categorical combination, or in disagreement among several detectors.
 
 ## Definitions

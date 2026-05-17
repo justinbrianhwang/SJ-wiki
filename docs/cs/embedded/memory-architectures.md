@@ -7,6 +7,10 @@ sidebar_position: 58
 
 Memory architecture is often the difference between an embedded system that merely runs and one that meets its timing, energy, persistence, and reliability requirements. Embedded systems mix volatile and non-volatile technologies, small fast memories and larger slow memories, memory-mapped devices, stacks, heaps, caches, scratchpads, and sometimes memory-protection hardware.
 
+![An Arduino Uno board shows a familiar microcontroller development board with headers and USB.](https://commons.wikimedia.org/wiki/Special:FilePath/Arduino_Uno_-_R3.jpg)
+
+*Figure: Arduino boards make microcontroller I/O and prototyping tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Arduino_Uno_-_R3.jpg), SparkFun Electronics, CC BY 2.0.*
+
 Lee and Seshia treat memory as part of the cyber-physical platform because it affects not only capacity but timing. A cache miss, DRAM refresh, flash write, page fault, stack overflow, or garbage-collection pause can change whether a task meets a real-time deadline.
 
 ## Definitions

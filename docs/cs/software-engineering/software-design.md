@@ -7,6 +7,10 @@ sidebar_position: 10
 
 Software design converts the "what" of requirements into the "how" of a buildable system. Gustafson's design chapter covers the movement from user-oriented requirements to development specifications, design phases, interfaces, refinement, modularity, abstraction, cohesion, coupling, program slices, glue tokens, and requirements traceability. The chapter treats design as creative work, but not unstructured work: good design is evaluated by whether it is implementable, understandable, cohesive, loosely coupled, and traceable to requirements.
 
+![The Git logo marks distributed version control as a core software-engineering tool.](https://commons.wikimedia.org/wiki/Special:FilePath/Git-logo.svg)
+
+*Figure: Git is a practical substrate for collaboration, branching, review, and release workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Git-logo.svg), Jason Long, CC BY 3.0.*
+
 The chapter also makes a subtle distinction between phenomena in the environment and phenomena visible to the implementation. A user may care about a physical book, a pop can, or a person at a door. The software may only see a barcode, an image pattern, or a sensor event. Design begins from a specification that connects the world and the machine using terms visible enough to both sides.
 
 ## Definitions

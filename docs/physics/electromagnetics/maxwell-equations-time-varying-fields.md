@@ -9,6 +9,10 @@ Time-varying electromagnetics is where electric and magnetic fields stop being s
 
 The static laws remain visible as limiting cases. Electrostatics keeps $\nabla\times\vec E=0$ because $\partial\vec B/\partial t=0$. Magnetostatics keeps $\nabla\times\vec H=\vec J$ because displacement current is absent or negligible. In the full theory, Faraday's law and the Ampere-Maxwell law join Gauss's laws to form a complete field description.
 
+![The electromagnetic spectrum is arranged by wavelength, frequency, and representative sources.](https://commons.wikimedia.org/wiki/Special:FilePath/EM_Spectrum_Properties_edit.svg)
+
+*Figure: The electromagnetic spectrum ties circuit-scale oscillations, radio links, optics, and thermal radiation into one continuum. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:EM_Spectrum_Properties_edit.svg), Inductiveload, public domain.*
+
 ## Definitions
 
 Maxwell's equations in differential form are

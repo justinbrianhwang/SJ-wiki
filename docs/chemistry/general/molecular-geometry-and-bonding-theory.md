@@ -9,9 +9,13 @@ A Lewis structure tells which atoms are connected, but molecular geometry tells 
 
 In the Ebbing and Gammon sequence this topic sits near VSEPR, dipole moments, valence bond theory, hybridization, multiple bonding, molecular orbital theory, and delocalized bonding. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
-![A VSEPR chart shows common molecular geometries organized by steric number and lone-pair count.](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/VSEPR_geometries.PNG/500px-VSEPR_geometries.PNG)
+![A VSEPR chart shows common molecular geometries organized by steric number and lone-pair count.](https://commons.wikimedia.org/wiki/Special:FilePath/VSEPR_geometries.PNG)
 
 *Figure: VSEPR molecular geometries by electron domains and lone pairs. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:VSEPR_geometries.PNG), Dr. Richard Loomis and Dr. Regina Frey, public domain.*
+
+![A ball-and-stick model shows methane with four equivalent bonds pointing toward the corners of a tetrahedron.](https://commons.wikimedia.org/wiki/Special:FilePath/Methane-3D-balls.png)
+
+*Figure: Methane as a tetrahedral molecular geometry example. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Methane-3D-balls.png), Benjah-bmm27, public domain.*
 
 ## Definitions
 

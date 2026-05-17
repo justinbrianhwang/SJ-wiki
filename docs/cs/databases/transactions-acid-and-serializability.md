@@ -7,6 +7,10 @@ sidebar_position: 13
 
 A transaction is a unit of database work that must behave as if it either happened completely or did not happen at all. Transactions let applications compose reads and writes into meaningful operations: transfer money, enroll in a course, reserve a seat, or post an order. Without transactions, failures and concurrent users can leave the database in states that no application rule accepts.
 
+![A pgAdmin screenshot shows a real database administration interface with schema objects.](https://commons.wikimedia.org/wiki/Special:FilePath/PgAdminScreenshot.png)
+
+*Figure: A database system is experienced through schemas, queries, connections, and administration tools. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PgAdminScreenshot.png), Boshomi, CC BY-SA 3.0.*
+
 Transaction theory separates correctness from implementation. ACID names the properties users expect. Serializability gives a formal correctness criterion for interleavings of concurrent transactions. Later topics, such as locking, timestamp ordering, MVCC, and recovery, are implementation techniques for approximating or enforcing these properties efficiently.
 
 ## Definitions

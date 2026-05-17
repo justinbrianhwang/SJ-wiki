@@ -7,6 +7,10 @@ sidebar_position: 22
 
 A nonlinear system asks for a vector $x$ such that $F(x)=0$. Unlike scalar root finding, there is no simple sign-change bracket that guarantees a nearby solution in several dimensions. The geometry involves curves, surfaces, Jacobians, and local linear models.
 
+![The Lorenz attractor forms two looping wings in phase space.](https://commons.wikimedia.org/wiki/Special:FilePath/Lorenz_attractor_yb.svg)
+
+*Figure: The Lorenz attractor visualizes sensitive dependence on initial conditions in nonlinear systems. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Lorenz_attractor_yb.svg), Wikimol and Dschwen, CC BY-SA 3.0.*
+
 Newton's method for systems generalizes the tangent-line idea: linearize all equations at the current point, solve a linear system for a correction, and update the vector. The method can be extremely fast near a regular solution, but globalization, scaling, and linear solve accuracy are central in practice.
 
 ## Definitions

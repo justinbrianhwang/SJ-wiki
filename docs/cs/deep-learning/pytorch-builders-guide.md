@@ -7,6 +7,10 @@ sidebar_position: 7
 
 D2L's builders' guide turns neural networks from formulas into maintainable software. Early examples can fit in a few lines, but real projects need named modules, reusable layers, controlled initialization, explicit parameter access, model serialization, and device management. PyTorch's `nn.Module` abstraction is the central tool for this.
 
+![An artificial neural network diagram shows input, hidden, and output layers connected by weights.](https://commons.wikimedia.org/wiki/Special:FilePath/Artificial_neural_network.svg)
+
+*Figure: Layered neural networks make differentiable function approximation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Artificial_neural_network.svg), Cburnett, CC BY-SA 3.0/GFDL.*
+
 The builder mindset is simple: the forward pass should describe computation, while the module object should own parameters and submodules. When parameters are registered correctly, PyTorch can move them to a GPU, save them in a `state_dict`, include them in an optimizer, and collect their gradients. Most painful PyTorch bugs come from breaking one of these registration or device assumptions.
 
 ## Definitions

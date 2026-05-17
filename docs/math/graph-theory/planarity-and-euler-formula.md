@@ -9,11 +9,11 @@ Planarity asks whether a graph can be drawn in the plane without edge crossings.
 
 Euler's formula is the main counting tool for plane graphs. It connects vertices, edges, and faces, and it gives quick proofs that certain dense graphs cannot be planar. Wilson's treatment uses this formula as the bridge from intuitive drawings to structural obstructions such as $K_5$ and $K_{3,3}$.
 
-![The complete graph K five connects every pair among five vertices.](https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Complete_graph_K5.svg/500px-Complete_graph_K5.svg.png)
+![The complete graph K five connects every pair among five vertices.](https://commons.wikimedia.org/wiki/Special:FilePath/Complete_graph_K5.svg)
 
 *Figure: The complete graph $K_5$, one of the classical minimal nonplanar graphs. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Complete_graph_K5.svg), David Benbennick, public domain.*
 
-![The complete bipartite graph K three three connects each of three vertices to each of three opposite vertices.](https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Complete_bipartite_graph_K3%2C3.svg/500px-Complete_bipartite_graph_K3%2C3.svg.png)
+![The complete bipartite graph K three three connects each of three vertices to each of three opposite vertices.](https://commons.wikimedia.org/wiki/Special:FilePath/Complete_bipartite_graph_K3%2C3.svg)
 
 *Figure: The complete bipartite graph $K_{3,3}$, the other classical minimal nonplanar graph. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Complete_bipartite_graph_K3%2C3.svg), David Benbennick, public domain.*
 

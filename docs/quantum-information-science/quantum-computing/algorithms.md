@@ -9,6 +9,10 @@ Quantum algorithms are not faster because they "try all answers" and then reveal
 
 *This page synthesizes the wiki's earlier algorithm overview with Chapters 1, 5, and 6 of Nielsen and Chuang. The N&C emphasis is that QFT and search are the two canonical algorithmic engines: QFT exposes algebraic periodicity, while Grover's iterate performs an optimal two-dimensional amplitude rotation.*
 
+![A Shor algorithm circuit diagram shows the order-finding structure behind quantum factoring.](https://commons.wikimedia.org/wiki/Special:FilePath/Shor%27s_algorithm.svg)
+
+*Figure: Shor's algorithm is the canonical example where a quantum subroutine changes the security assumptions behind RSA-style public-key cryptography. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Shor%27s_algorithm.svg), Bender2k14, CC BY-SA 4.0.*
+
 ## Definitions
 
 A **quantum algorithm** is a uniform family of circuits followed by classical post-processing. Inputs may be classical bit strings, quantum states, or oracle access to a function. Costs may count gates, circuit depth, qubits, oracle calls, precision, or fault-tolerant logical resources. A speedup claim is meaningful only after the input model and output model are fixed.
@@ -250,9 +254,9 @@ flowchart TB
   HHLobs --> Linear["state-output linear algebra<br/>read observables only"]
 ```
 
-![Grover circuit — the figure shows Hadamards, oracle queries, the diffuser, repeated iterations, and measurement for amplitude amplification.](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Grover%27s_algorithm_circuit.svg/960px-Grover%27s_algorithm_circuit.svg.png)
+![Grover circuit - the figure shows Hadamards, oracle queries, the diffuser, repeated iterations, and measurement for amplitude amplification.](https://commons.wikimedia.org/wiki/Special:FilePath/Grover%27s_algorithm_circuit.svg)
 
-*Figure: Grover's algorithm alternates an oracle phase flip with diffusion before measuring the search register. From [Fawly, 2021](https://commons.wikimedia.org/wiki/File:Grover%27s_algorithm_circuit.svg) — CC BY-SA 4.0.*
+*Figure: Grover's algorithm alternates an oracle phase flip with diffusion before measuring the search register. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Grover%27s_algorithm_circuit.svg), Fawly, CC BY-SA 4.0.*
 
 This diagram replaces the old taxonomy with circuit-level views of the core algorithms. The kickback circuits show the query register, ancilla preparation, oracle action, final Hadamards, and measurement contract; QFT and QPE expose the controlled-phase and controlled-power ladders used by Shor. Grover's loop shows the oracle and diffusion sub-operations explicitly, while HHL shows the phase-estimation, controlled-rotation, uncomputation, and postselection structure that makes its output a quantum state rather than a full classical vector.
 

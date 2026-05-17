@@ -7,6 +7,18 @@ sidebar_position: 1
 
 These notes follow Aston Zhang, Zachary C. Lipton, Mu Li, and Alexander J. Smola's *Dive into Deep Learning* and emphasize the book's central style: concepts, mathematics, and runnable code together. The path starts with tensors, data preparation, linear algebra, calculus, probability, and automatic differentiation, then builds complete training loops for regression and classification before moving to modern architectures.
 
+![An artificial neural network diagram shows input, hidden, and output layers connected by weights.](https://commons.wikimedia.org/wiki/Special:FilePath/Artificial_neural_network.svg)
+
+*Figure: Layered neural networks make differentiable function approximation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Artificial_neural_network.svg), Cburnett, CC BY-SA 3.0/GFDL.*
+
+![A grid of MNIST handwritten digits shows the small grayscale examples used in many ML tutorials.](https://commons.wikimedia.org/wiki/Special:FilePath/MNIST_dataset_example.png)
+
+*Figure: MNIST gives classification, vision, and neural-network pages a familiar benchmark image. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:MNIST_dataset_example.png), Suvanjanprasai, CC BY-SA 4.0.*
+
+![A simplified neural network diagram shows units connected from input to output.](https://commons.wikimedia.org/wiki/Special:FilePath/Neural_network.svg)
+
+*Figure: A compact network diagram gives deep-learning pages a quick visual model of learned weights. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Neural_network.svg), Dake and Mysid, CC BY 1.0.*
+
 The later pages cover the main deep learning families: multilayer perceptrons, convolutional networks, recurrent networks, attention, transformers, NLP applications, computer vision systems, recommender systems, GANs, reinforcement learning, Gaussian processes, and hyperparameter optimization. Code examples use PyTorch for portability. For classical context, compare these notes with [machine learning](/cs/machine-learning/); for prerequisites, see [linear algebra](/math/linear-algebra/) and [probability](/math/probability-and-random-variables/).
 
 ```mermaid

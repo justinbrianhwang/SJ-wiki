@@ -7,6 +7,10 @@ sidebar_position: 7
 
 Adversarial training is the most important empirical defense for norm-bounded image robustness. Instead of training only on clean examples, it trains on adversarial examples generated against the current model. The idea is simple: if the model will face worst-case perturbations at test time, include worst-case perturbations in the training objective.
 
+![A visually similar adversarial panda image is classified as a gibbon by an ImageNet model.](https://ar5iv.labs.arxiv.org/html/1412.6572/assets/gibbon_993.png)
+
+*Figure: The FGSM panda example shows that imperceptible perturbations can change model decisions. Image: [ar5iv](https://arxiv.org/abs/1412.6572), Goodfellow, Shlens, and Szegedy, educational use with attribution.*
+
 The cost is also central. Strong adversarial training is much more expensive than ordinary empirical risk minimization, can reduce clean accuracy, and can overfit robust accuracy late in training. This page gives the min-max objective, common variants such as PGD adversarial training and TRADES, and the implementation choices that determine whether the result is meaningful.
 
 ## Definitions

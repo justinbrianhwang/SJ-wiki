@@ -9,6 +9,14 @@ Spin-1/2 is the smallest nontrivial quantum laboratory. Its Hilbert space is two
 
 Sakurai's treatment is operational and experimental: beams split, recombine, and reveal the logic of spin states. Ballentine returns to spin for measurement and state preparation, emphasizing what is inferred from repeated preparations. The Gottfried-named notes use spin-1/2 as a clean illustration of the postulates and density matrices. Schiff's older notation usually reaches spin after wave mechanics, so the contrast is mainly pedagogical.
 
+![A Bloch sphere locates a two-level quantum state by polar and azimuthal angles.](https://commons.wikimedia.org/wiki/Special:FilePath/Bloch_sphere.svg)
+
+*Figure: The Bloch sphere turns a two-component complex state into a geometric object that can be rotated and measured. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bloch_sphere.svg), Smite-Meister, CC BY-SA 3.0.*
+
+![A Stern-Gerlach apparatus splits a beam into discrete spin outcomes.](https://commons.wikimedia.org/wiki/Special:FilePath/Stern-Gerlach_experiment.svg)
+
+*Figure: The Stern-Gerlach experiment is the physical scene behind spin quantization and quantum measurement. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Stern-Gerlach_experiment.svg), Tatoute, CC BY-SA 4.0.*
+
 ## Definitions
 
 The standard $S_z$ basis is

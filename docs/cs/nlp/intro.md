@@ -7,6 +7,18 @@ sidebar_position: 1
 
 Natural language processing studies computational methods for analyzing, representing, transforming, and generating human language. This section combines two complementary sources: Jurafsky and Martin's *Speech and Language Processing* is used as the primary structure because it gives the broadest modern coverage, including transformers, pretrained language models, dialogue, and speech. Eisenstein's *Natural Language Processing* is used as a secondary source for formal machine-learning depth, especially probabilistic models, structured prediction, parsing, semantics, and the connections among learning, search, and linguistic structure.
 
+![An ELIZA terminal conversation shows an early chatbot responding to typed user input.](https://commons.wikimedia.org/wiki/Special:FilePath/ELIZA_conversation.png)
+
+*Figure: ELIZA provides historical context for dialogue systems and chatbot evaluation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ELIZA_conversation.png), Unknown author, public domain text.*
+
+![A parse tree expands a formal grammar from the start symbol down to terminal tokens.](https://commons.wikimedia.org/wiki/Special:FilePath/Parse-tree.svg)
+
+*Figure: Parse trees make grammar derivations visible as rooted syntax structures. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Parse-tree.svg), Martin Thoma, CC BY 3.0.*
+
+![A skip-gram word embedding diagram predicts surrounding context words from a center word.](https://commons.wikimedia.org/wiki/Special:FilePath/Word_embeddings_Skip-gram.svg)
+
+*Figure: Skip-gram training ties word meaning to surrounding context. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Word_embeddings_Skip-gram.svg), Jeran Renz, CC BY-SA 4.0.*
+
 The notes are organized as a single merged course rather than as per-book summaries. When the books overlap, the pages usually follow Jurafsky and Martin for terminology and topic order, then add Eisenstein's notation or modeling perspective where it sharpens the math. When a topic is covered mainly by one book, the page says so implicitly through its emphasis: speech and modern prompting come mostly from Jurafsky and Martin, while weighted grammars, CRFs, and structured search draw heavily from Eisenstein.
 
 ## Definitions

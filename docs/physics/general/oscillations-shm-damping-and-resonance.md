@@ -9,6 +9,10 @@ Oscillations: SHM, Damping, and Resonance covers simple harmonic motion, energy 
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
+![A spring-mass harmonic oscillator shows displacement, spring force, and equilibrium position.](https://commons.wikimedia.org/wiki/Special:FilePath/Harmonic_oscillator.svg)
+
+*Figure: The mass-spring oscillator is the canonical apparatus behind resonance, normal modes, and linearization. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Harmonic_oscillator.svg), LucasVB, public domain.*
+
 ## Definitions
 
 - **Scope:** simple harmonic motion, energy exchange, damping, driving, and resonance.

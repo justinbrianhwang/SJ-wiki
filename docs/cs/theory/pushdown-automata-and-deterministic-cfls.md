@@ -7,6 +7,10 @@ sidebar_position: 8
 
 A pushdown automaton is a finite automaton equipped with a stack. The stack gives it unbounded last-in-first-out memory, which is exactly the right shape for nested and balanced structure. While a DFA can remember only bounded summaries, a PDA can push markers while reading one part of the input and pop them while reading a corresponding later part.
 
+![A parse tree expands a formal grammar from the start symbol down to terminal tokens.](https://commons.wikimedia.org/wiki/Special:FilePath/Parse-tree.svg)
+
+*Figure: Parse trees make grammar derivations visible as rooted syntax structures. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Parse-tree.svg), Martin Thoma, CC BY 3.0.*
+
 Pushdown automata are the machine counterpart of context-free grammars. CFGs generate strings by recursive expansion; PDAs recognize strings by using a stack to manage unfinished obligations. The equivalence between CFGs and PDAs is one of the central bridges of automata theory. Deterministic PDAs form a smaller class with important parsing applications.
 
 ## Definitions

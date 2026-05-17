@@ -7,6 +7,10 @@ sidebar_position: 16
 
 Orthogonal functions generalize perpendicular vectors to function spaces. Instead of a dot product of finite vectors, we use an integral inner product. This turns functions into modes that can be projected, expanded, and compared by energy. Fourier series are the most familiar example, but Legendre polynomials and Bessel functions fit the same pattern.
 
+![Adrien-Marie Legendre is shown in a historical portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Legendre.jpg)
+
+*Figure: Adrien-Marie Legendre's name appears in orthogonal polynomials and special functions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Legendre.jpg), Julien-Leopold Boilly, public domain.*
+
 Sturm-Liouville theory explains why these mode families appear in boundary-value problems. A differential operator with suitable boundary conditions has real eigenvalues and orthogonal eigenfunctions. This is the structural reason separation of variables works for many heat, wave, and potential problems.
 
 ## Definitions

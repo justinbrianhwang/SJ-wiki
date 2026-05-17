@@ -7,6 +7,10 @@ sidebar_position: 4
 
 Threads refine the process model. A process owns an address space and resources; a thread is a path of execution inside that process. A single-threaded process has one program counter, one register set, and one stack. A multithreaded process has several of these execution contexts sharing the same code, data, heap, and open files. That sharing is exactly why threads are useful and exactly why they can be dangerous.
 
+![A Linux kernel map organizes subsystems such as memory, filesystems, networking, and drivers.](https://commons.wikimedia.org/wiki/Special:FilePath/Linux_kernel_map.png)
+
+*Figure: The Linux kernel map shows how OS services become interacting subsystems. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Linux_kernel_map.png), Conan at English Wikipedia, CC BY 3.0.*
+
 The textbook places threads after processes because the motivation is clearer once the cost of process creation, context switching, and IPC is visible. Threads make servers more responsive, allow one activity to block while another continues, exploit multiple cores, and express parallel structure within an application. They also introduce races, deadlocks, visibility bugs, and scheduling interactions that show up throughout synchronization and CPU scheduling.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 13
 
 Dependency parsing represents syntax as directed relations between words. Jurafsky and Martin present dependency relations, transition-based parsing, graph-based parsing, and evaluation. Eisenstein gives a formal structure prediction account: dependency parses are directed graphs over words, graph-based parsers search for high-scoring trees, and transition-based parsers build trees with actions.
 
+![A parse tree expands a formal grammar from the start symbol down to terminal tokens.](https://commons.wikimedia.org/wiki/Special:FilePath/Parse-tree.svg)
+
+*Figure: Parse trees make grammar derivations visible as rooted syntax structures. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Parse-tree.svg), Martin Thoma, CC BY 3.0.*
+
 Dependency syntax is often more compact than constituency syntax and is widely used across languages through Universal Dependencies. It directly identifies who depends on whom: subjects attach to predicates, objects attach to verbs, modifiers attach to heads, and function words receive language-specific analyses. These arcs are useful for information extraction, semantic role labeling, relation extraction, and downstream interpretation.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 18
 
 Partial derivatives extend the derivative to functions of several variables by changing one input at a time. The gradient collects those first partial derivatives into a vector. Together they describe slopes, tangent planes, directional derivatives, level curves, and local linear approximation for surfaces.
 
+![Arrows rotate around the origin in a two-dimensional vector field.](https://commons.wikimedia.org/wiki/Special:FilePath/Vector_field.svg)
+
+*Figure: A planar vector field shows how direction and magnitude vary from point to point. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Vector_field.svg), Fibonacci, public domain.*
+
 The main conceptual shift is that a multivariable function can change in many directions from the same point. A single derivative number is no longer enough. The gradient gives the direction of steepest increase and organizes all directional rates into one vector formula.
 
 ## Definitions

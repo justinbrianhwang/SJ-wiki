@@ -7,6 +7,10 @@ sidebar_position: 4
 
 Decision tree learning is one of the most practical algorithms in Mitchell's book. It learns a discrete-valued target function by recursively splitting the instance space according to attribute tests. The result is readable, fast at prediction time, and naturally handles interactions among attributes. ID3, the main algorithm in the chapter, is historically important because it made information-theoretic attribute selection a standard idea.
 
+![A simple decision tree routes shapes through binary feature tests to a class leaf.](https://commons.wikimedia.org/wiki/Special:FilePath/Simple_decision_tree.svg)
+
+*Figure: Decision trees classify by asking a sequence of feature questions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Simple_decision_tree.svg), Eviatar Bach, CC0.*
+
 The chapter also introduces overfitting in a concrete way. A tree can keep growing until it matches every training example, but a perfectly fitted tree may generalize poorly. The tension among expressive trees, noisy data, small samples, and pruning remains central in modern tree methods such as random forests and gradient boosting, even though those methods go beyond Mitchell's 1997 scope.
 
 ## Definitions

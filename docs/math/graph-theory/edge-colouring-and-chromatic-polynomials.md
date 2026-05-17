@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Edge colouring assigns colours to edges so that adjacent edges receive different colours. It is the natural model for scheduling pairwise interactions: games sharing a team, jobs sharing a machine, or communication links sharing a port cannot happen in the same time slot. Unlike vertex colouring, edge colouring is controlled closely by the maximum degree, but the exact answer still contains subtle structure.
 
+![A planar map is colored so adjacent regions have different colors.](https://commons.wikimedia.org/wiki/Special:FilePath/Fourcolorsmap.svg)
+
+*Figure: A four-colour map example connects graph colouring to planar regions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fourcolorsmap.svg), Germo, public domain.*
+
 Chromatic polynomials count proper vertex colourings as a function of the number of available colours. They refine the yes/no question "is this graph $k$-colourable?" into "how many $k$-colourings does it have?" This gives a bridge from graph theory to algebra and combinatorics.
 
 ## Definitions

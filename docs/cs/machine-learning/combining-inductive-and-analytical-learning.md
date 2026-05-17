@@ -7,6 +7,10 @@ sidebar_position: 14
 
 Mitchell's chapter on combining inductive and analytical learning addresses a realistic middle ground: prior knowledge is helpful but imperfect. Pure induction can require many examples. Pure analytical learning can fail when the domain theory is incomplete or wrong. Combined methods try to exploit prior knowledge while still allowing data to correct it.
 
+![An Iris dataset scatterplot compares flower measurements colored by species.](https://commons.wikimedia.org/wiki/Special:FilePath/Iris_dataset_scatterplot.svg)
+
+*Figure: The Iris scatterplot makes feature spaces and class separation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Iris_dataset_scatterplot.svg), Nicoguaro, CC BY 4.0.*
+
 The chapter presents several strategies: initialize the hypothesis with prior knowledge, alter the search objective using prior knowledge, and augment search with prior-knowledge-derived features or candidate rules. The examples include KBANN, TANGENTPROP, EBNN, and FOCL. These systems are historically specific, but the design pattern is modern: use prior knowledge as a bias, initialization, regularizer, feature generator, or constraint.
 
 ## Definitions

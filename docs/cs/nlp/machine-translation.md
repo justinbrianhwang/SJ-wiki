@@ -7,6 +7,10 @@ sidebar_position: 14
 
 Machine translation maps text from a source language to a target language. Jurafsky and Martin emphasize modern encoder-decoder transformer translation, typological divergences, beam search, low-resource settings, and evaluation with chrF and BLEU. Eisenstein gives a complementary historical and formal view: translation as an optimization problem, statistical machine translation with latent alignments, phrase-based and syntax-based ideas, and neural machine translation with attention.
 
+![An ELIZA terminal conversation shows an early chatbot responding to typed user input.](https://commons.wikimedia.org/wiki/Special:FilePath/ELIZA_conversation.png)
+
+*Figure: ELIZA provides historical context for dialogue systems and chatbot evaluation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ELIZA_conversation.png), Unknown author, public domain text.*
+
 MT is a compact view of NLP as a whole. It needs tokenization, language modeling, sequence modeling, search, semantics, evaluation, and awareness of social context. A translation must be adequate, preserving meaning, and fluent, sounding natural in the target language. Those goals are easy to state and hard to optimize directly.
 
 ## Definitions

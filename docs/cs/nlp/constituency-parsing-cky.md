@@ -7,6 +7,10 @@ sidebar_position: 12
 
 Constituency parsing analyzes a sentence as nested phrases. Jurafsky and Martin introduce context-free grammars, treebanks, Chomsky normal form, ambiguity, CKY dynamic programming, span-based neural parsing, and parser evaluation. Eisenstein gives a complementary formal treatment of context-free languages, weighted context-free grammars, probabilistic CFGs, semiring parsing, grammar refinement, and links to transition-based parsing.
 
+![A parse tree expands a formal grammar from the start symbol down to terminal tokens.](https://commons.wikimedia.org/wiki/Special:FilePath/Parse-tree.svg)
+
+*Figure: Parse trees make grammar derivations visible as rooted syntax structures. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Parse-tree.svg), Martin Thoma, CC BY 3.0.*
+
 The main idea is that natural language has hierarchical structure. A noun phrase can contain a determiner and nominal; a verb phrase can contain a verb and noun phrase; larger phrases can be built recursively. CKY shows how to search the enormous space of possible trees efficiently when the grammar is in a suitable binary form.
 
 ## Definitions

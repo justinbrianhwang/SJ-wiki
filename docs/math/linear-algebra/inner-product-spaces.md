@@ -7,6 +7,10 @@ sidebar_position: 13
 
 An inner product space is a vector space with a generalized dot product. Once an inner product is specified, abstract vectors can have length, angle, distance, projection, and orthogonality. This lets the geometry of $\mathbb{R}^n$ apply to polynomials, functions, matrices, and other vector spaces.
 
+![David Hilbert is shown wearing a hat in a historical photograph.](https://commons.wikimedia.org/wiki/Special:FilePath/Hilbert.jpg)
+
+*Figure: David Hilbert's work frames modern foundations, geometry, and infinite-dimensional thinking. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hilbert.jpg), Unknown author, public domain.*
+
 The important shift is that geometry is not tied to columns of numbers. A polynomial can be orthogonal to another polynomial, a function can have a norm, and a matrix can have a length. The inner product is the extra structure that tells us how to measure these objects.
 
 ## Definitions

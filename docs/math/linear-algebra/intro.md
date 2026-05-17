@@ -7,6 +7,18 @@ sidebar_position: 1
 
 These notes follow the core path of Anton and Kaul's *Elementary Linear Algebra*: start with systems of equations, turn their row operations into matrix algebra, reinterpret matrices as transformations, then move from concrete vectors in $\mathbb{R}^n$ to abstract vector spaces and inner product geometry. The later pages focus on structure: eigenvalues, diagonalization, orthogonality, least squares, numerical methods, and singular value decomposition.
 
+![A matrix multiplication diagram highlights row and column products.](https://commons.wikimedia.org/wiki/Special:FilePath/Matrix_multiplication_diagram.svg)
+
+*Figure: A matrix multiplication diagram makes the row-column structure of linear algebra visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Matrix_multiplication_diagram.svg), Bilou, CC BY-SA 3.0.*
+
+![Two vectors add tip to tail to form a resultant vector.](https://commons.wikimedia.org/wiki/Special:FilePath/Vectoraddition.svg)
+
+*Figure: Vector addition is the geometric base case for linear combinations and span. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Vectoraddition.svg), Svjo, CC0 1.0.*
+
+![Carl Friedrich Gauss is shown in a formal painted portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Carl_Friedrich_Gauss.jpg)
+
+*Figure: Carl Friedrich Gauss is central to number theory, linear algebra, statistics, and numerical methods. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Carl_Friedrich_Gauss.jpg), Gottlieb Biermann after Christian Albrecht Jensen, public domain.*
+
 The emphasis is computational and conceptual. Row reduction is treated both as a hand algorithm and as the engine behind rank, independence, bases, inverses, determinants, and solvability. Matrix factorizations such as QR, LU, and SVD are included because they explain how the same ideas are used in numerical work and data applications.
 
 ## Pages

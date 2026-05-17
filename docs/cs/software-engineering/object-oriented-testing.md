@@ -7,6 +7,10 @@ sidebar_position: 14
 
 Object-oriented testing keeps the usual goals of software testing but adds criteria that fit object interaction. Gustafson's chapter covers method-message testing and function pair coverage. The key observation is that OO complexity often lives in messages among methods and objects rather than in long procedural control structures. A method can have simple internal statements while still triggering a complicated chain of calls.
 
+![Two programmers work together at one computer in a pair-programming setup.](https://commons.wikimedia.org/wiki/Special:FilePath/Pair_Programming.jpg)
+
+*Figure: Pair programming makes collaboration and review practices concrete. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pair_Programming.jpg), Calqui, CC BY-SA 3.0.*
+
 The chapter does not replace functional, statement, branch, or data-flow testing. It adds OO-specific coverage ideas. Functional testing still checks specified behavior. Statement coverage remains a minimal expectation. Method-message testing ensures that method calls are actually exercised. Function pair coverage then checks adjacent method-call sequences, often using a state machine or regular expression to define legal behavior.
 
 ## Definitions

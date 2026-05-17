@@ -7,6 +7,10 @@ sidebar_position: 10
 
 Outlier analysis finds objects that deviate strongly from the expected behavior of the data. Aggarwal treats it as a core data mining problem, parallel to clustering, classification, and association mining. The same unusual object can be a data error, a fraud signal, a rare medical case, a sensor fault, or an emerging event, so outlier analysis is tightly tied to the domain and the cost of false alarms.
 
+![A DBSCAN diagram marks core, border, and noise points under a density threshold.](https://commons.wikimedia.org/wiki/Special:FilePath/DBSCAN-Illustration.svg)
+
+*Figure: DBSCAN explains clustering as density reachability rather than a fixed number of clusters. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:DBSCAN-Illustration.svg), Chire, CC BY-SA 3.0.*
+
 This page covers the main outlier families: extreme value analysis, probabilistic models, clustering-based detection, distance-based detection, density-based methods, information-theoretic models, and validity. The advanced outlier page covers categorical, high-dimensional, and ensemble settings.
 
 ## Definitions

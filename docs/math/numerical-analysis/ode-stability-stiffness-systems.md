@@ -7,6 +7,10 @@ sidebar_position: 14
 
 Accuracy is not the only issue for differential equation solvers. A method can have a small truncation error formula and still fail because the step size lies outside its stability region. This becomes especially important for stiff equations, where fast-decaying modes force tiny explicit steps even when the visible solution changes slowly.
 
+![Euler method advances along short tangent-line steps.](https://commons.wikimedia.org/wiki/Special:FilePath/Euler_method.svg)
+
+*Figure: Euler method approximates an ODE solution by repeatedly stepping in the current slope direction. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Euler_method.svg), Oleg Alexandrov, public domain.*
+
 Systems of ODEs make this behavior more transparent. The eigenvalues of the Jacobian describe local modes. Large negative eigenvalues may decay rapidly in the exact solution, but an explicit method can turn those harmless decays into numerical oscillations unless the step size is restricted.
 
 ## Definitions

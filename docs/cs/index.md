@@ -12,6 +12,22 @@ sidebar_position: 0
 
 Notes on computer science concepts, organized from foundational theory to systems, machine learning, and applied subjects.
 
+![An ENIAC installation shows early computer architecture as cabinets, switches, and wiring.](https://commons.wikimedia.org/wiki/Special:FilePath/ENIAC_Penn1.jpg)
+
+*Figure: ENIAC gives architecture pages a physical reference point before modern chips. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ENIAC_Penn1.jpg), Paul W. Shaffer and TexasDex, CC BY-SA 3.0/GFDL.*
+
+![An artificial neural network diagram shows input, hidden, and output layers connected by weights.](https://commons.wikimedia.org/wiki/Special:FilePath/Artificial_neural_network.svg)
+
+*Figure: Layered neural networks make differentiable function approximation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Artificial_neural_network.svg), Cburnett, CC BY-SA 3.0/GFDL.*
+
+![A Waymo self-driving car drives on a public road with roof-mounted sensors.](https://commons.wikimedia.org/wiki/Special:FilePath/Waymo_self-driving_car_front_view.gk.jpg)
+
+*Figure: A real autonomous vehicle grounds the driving stack in a physical platform. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Waymo_self-driving_car_front_view.gk.jpg), Grendelkhan, CC BY-SA 4.0.*
+
+![The Git logo marks distributed version control as a core software-engineering tool.](https://commons.wikimedia.org/wiki/Special:FilePath/Git-logo.svg)
+
+*Figure: Git is a practical substrate for collaboration, branching, review, and release workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Git-logo.svg), Jason Long, CC BY 3.0.*
+
 ## Topics
 
 ### Foundations

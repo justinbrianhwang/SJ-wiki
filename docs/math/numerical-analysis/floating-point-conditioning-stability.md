@@ -7,6 +7,10 @@ sidebar_position: 3
 
 Floating-point arithmetic is the working language of most numerical algorithms. It represents a real number by a sign, a finite significand, and an exponent, so almost every real result is rounded before it is stored. The resulting errors are usually tiny one operation at a time, but a poor formula can amplify them until the final answer is meaningless.
 
+![A matrix multiplication diagram highlights row and column products.](https://commons.wikimedia.org/wiki/Special:FilePath/Matrix_multiplication_diagram.svg)
+
+*Figure: A matrix multiplication diagram makes the row-column structure of linear algebra visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Matrix_multiplication_diagram.svg), Bilou, CC BY-SA 3.0.*
+
 Conditioning and stability give two different diagnoses. Conditioning belongs to the mathematical problem: does a small perturbation in the data cause a small or large perturbation in the answer? Stability belongs to the algorithm: does the chosen computational path behave like the exact solution of a nearby problem, or does it create avoidable error?
 
 ## Definitions

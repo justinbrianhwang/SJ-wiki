@@ -7,6 +7,10 @@ sidebar_position: 2
 
 A first Java program is small, but it already shows the major design of the language. A class contains a `main` method, the method executes statements, objects receive method invocations, and the standard library provides objects such as `System.out`. The quick tour in the source book deliberately moves fast because it wants the reader to see the whole shape before studying each rule.
 
+![The Sun Microsystems logo gives Java pages historical context for the language and platform.](https://commons.wikimedia.org/wiki/Special:FilePath/Sun_Microsystems_logo.svg)
+
+*Figure: Java's early development at Sun shaped its portability, virtual-machine model, and library ecosystem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sun_Microsystems_logo.svg), Sun Microsystems and Afrank99, public domain text logo.*
+
 The platform matters as much as the syntax. Java source is compiled to bytecode, bytecode is loaded and verified by a virtual machine, and the runtime system connects the running program to services such as standard streams, security checks, class loading, and garbage collection. That architecture is why Java can talk about portability, safety checks, and a large standard API as one platform rather than as a thin language over an operating system.
 
 ## Definitions

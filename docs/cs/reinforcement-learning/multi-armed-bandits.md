@@ -7,6 +7,10 @@ sidebar_position: 3
 
 The multi-armed bandit problem is the simplest reinforcement learning setting in Sutton and Barto's development. There is no state transition structure and no delayed reward. On each step the agent chooses one of $k$ actions and receives a reward drawn from that action's distribution. The difficulty is not planning through time, but balancing exploitation of the action that currently looks best against exploration of actions that might be better.
 
+![A cart-pole animation shows a controller trying to balance an inverted pole on a moving cart.](https://commons.wikimedia.org/wiki/Special:FilePath/Cartpole.gif)
+
+*Figure: Cart-pole is a standard control and reinforcement-learning benchmark. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cartpole.gif), Condordellanebbia, CC BY-SA 4.0.*
+
 Bandits are important because they isolate a core statistical tension that appears everywhere else in reinforcement learning. A value estimate can only improve for actions tried often enough, but choosing apparently suboptimal actions has an opportunity cost. Action-value methods, $\epsilon$-greedy exploration, optimistic initial values, upper-confidence bounds, and gradient bandits are all different answers to that tension.
 
 ## Definitions

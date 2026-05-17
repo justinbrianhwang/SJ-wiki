@@ -9,6 +9,10 @@ The renormalization group is the idea that physics changes its description when 
 
 In Zee's scope, the RG appears in both high-energy and condensed-matter contexts. In particle physics it explains running charges and asymptotic freedom; in critical phenomena it explains universality and scaling. The same mathematics says that many microscopic systems can share one long-distance theory because irrelevant details flow away.
 
+![A Lorenz attractor coils through phase space in two butterfly-like lobes.](https://commons.wikimedia.org/wiki/Special:FilePath/Lorenz_attractor_yb.svg)
+
+*Figure: The Lorenz attractor is the standard visual scene for sensitive dependence and nonlinear simulation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Lorenz_attractor_yb.svg), Wikimol and Dschwen, CC BY-SA 3.0/GFDL.*
+
 ## Definitions
 
 Let $g_i(\mu)$ be couplings defined at renormalization scale $\mu$. The beta function is

@@ -7,6 +7,10 @@ sidebar_position: 4
 
 Arrays collect many values of the same type under one name. They are useful when a program needs indexed repetition: scores for a class, production totals for plants, characters in a word, or rows and columns in a table. Savitch uses arrays to introduce memory layout, array parameters, partially filled arrays, searching, sorting, and multidimensional data.
 
+![The ISO C++ logo marks pages on classes, templates, containers, and modern C++ idioms.](https://commons.wikimedia.org/wiki/Special:FilePath/ISO_C%2B%2B_Logo.svg)
+
+*Figure: C++ extends systems programming with abstraction, generic code, and deterministic resource management. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ISO_C%2B%2B_Logo.svg), Jeremy Kratz, public domain text logo.*
+
 The key insight is that an array gives constant-time access by index, but C++ does not automatically remember or enforce every boundary in ordinary built-in arrays. The programmer must carry the size, distinguish capacity from the number of used elements, and avoid reading or writing outside the declared range.
 
 ## Definitions

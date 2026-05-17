@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Genetic algorithms search a hypothesis space by maintaining a population of candidate hypotheses and applying selection, crossover, and mutation. Mitchell presents them as learning methods inspired by biological evolution, with hypotheses encoded as strings and fitness measuring performance. In the 1997 context, genetic algorithms were a prominent alternative to gradient descent, greedy symbolic search, and probabilistic inference.
 
+![A square Kufic algorithms mark introduces the study of designed procedures.](https://commons.wikimedia.org/wiki/Special:FilePath/Algorithms.svg)
+
+*Figure: The algorithms mark gives the abstract algorithms pages a concrete visual anchor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Algorithms.svg), Jeff Erickson, CC BY 4.0.*
+
 The chapter is brief relative to decision trees or Bayesian learning, but it contributes an important perspective: learning can be viewed as randomized population search. This is useful when hypotheses are hard to differentiate, search spaces are rugged, or candidate solutions have natural compositional encodings.
 
 ## Definitions

@@ -9,6 +9,10 @@ Quantum theory supplies the molecular energy levels used by statistical thermody
 
 Atkins develops quantum mechanics as the structure language of physical chemistry: orbitals, bonding, spectra, and molecular symmetry all depend on wavefunctions and operators. The foundational postulates are mathematical, but their chemical meaning is concrete: they determine allowed energies and transition intensities.
 
+![A double-slit diagram shows coherent waves producing interference at a detection screen.](https://commons.wikimedia.org/wiki/Special:FilePath/Double_slit.svg)
+
+*Figure: Double-slit interference as context for wave behavior in quantum mechanics. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Double_slit.svg), Epzcaw, CC BY-SA 3.0.*
+
 ## Definitions
 
 Planck's relation connects photon energy and frequency:

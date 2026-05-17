@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Differentiation rules turn the derivative from a limit that must be recomputed every time into a practical calculus tool. The rules are shortcuts, but they are not arbitrary tricks. Each one follows from the limit definition and the algebra of functions.
 
+![Gottfried Wilhelm Leibniz is shown in a historical portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Gottfried_Wilhelm_von_Leibniz.jpg)
+
+*Figure: Gottfried Wilhelm Leibniz's notation shaped differential and integral calculus. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Gottfried_Wilhelm_von_Leibniz.jpg), Bernhard Christoph Francke, public domain.*
+
 The main task is to recognize structure. A complicated expression may be a sum, product, quotient, or composition of simpler functions. Once that structure is clear, the derivative is found by applying the appropriate rule in the correct order, while keeping domain restrictions and units in mind.
 
 ## Definitions

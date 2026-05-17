@@ -7,6 +7,10 @@ sidebar_position: 6
 
 Structs and enums are Rust's main tools for making domain-specific types. A struct names a group of related fields. An enum defines a value that can be one of several variants. Together they let a program model data more honestly than loose tuples or strings. Rust then combines these types with methods, associated functions, traits, and pattern matching.
 
+![The Rust logo marks pages on ownership, borrowing, traits, and safe systems programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Rust_programming_language_black_logo.svg)
+
+*Figure: Rust connects systems control with compile-time memory-safety guarantees. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Rust_programming_language_black_logo.svg), Rust Foundation, CC BY 4.0.*
+
 This page covers the book's material on structs and the beginning of enum-based design. It prepares for the separate page on [pattern matching](/cs/programming/rust/pattern-matching), where enums become especially powerful. It also connects to [ownership](/cs/programming/rust/ownership-references-slices), because choosing owned fields such as `String` versus borrowed fields such as `&str` affects lifetimes.
 
 ## Definitions

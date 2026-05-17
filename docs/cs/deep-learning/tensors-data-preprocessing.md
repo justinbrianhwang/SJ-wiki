@@ -7,6 +7,10 @@ sidebar_position: 2
 
 Deep learning starts with two practical skills: representing data as tensors and making raw data numerically usable. D2L begins here because every later model, from linear regression to transformers, is ultimately a composition of tensor operations. A network can look mysterious at the architectural level, but at runtime it mostly consumes batches of arrays, applies broadcasted arithmetic, multiplies matrices, and moves intermediate results through differentiable operators.
 
+![A grid of MNIST handwritten digits shows the small grayscale examples used in many ML tutorials.](https://commons.wikimedia.org/wiki/Special:FilePath/MNIST_dataset_example.png)
+
+*Figure: MNIST gives classification, vision, and neural-network pages a familiar benchmark image. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:MNIST_dataset_example.png), Suvanjanprasai, CC BY-SA 4.0.*
+
 Data preprocessing matters just as much as the model definition. Missing values, mixed numeric and categorical columns, inconsistent scales, and accidental train-test leakage can dominate the result before optimization even begins. A disciplined tensor pipeline keeps shapes explicit, keeps statistical estimates tied to the training split, and makes each minibatch look like what the model expects.
 
 ## Definitions

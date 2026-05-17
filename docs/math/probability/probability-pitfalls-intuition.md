@@ -7,6 +7,10 @@ sidebar_position: 15
 
 Probability is precise, but human intuition about uncertainty is often biased. We overreact to vivid evidence, neglect base rates, confuse one conditional probability with its reverse, and expect small samples to look more regular than they should. Good probability habits are not just formula habits; they are modeling habits.
 
+![The Monty Hall problem is shown with three doors and one open door.](https://commons.wikimedia.org/wiki/Special:FilePath/Monty_open_door.svg)
+
+*Figure: The Monty Hall problem is a compact example of conditional probability and base-rate intuition. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Monty_open_door.svg), Cepheus, public domain.*
+
 This page collects several recurring traps. The goal is not to memorize puzzle answers but to learn the diagnostic questions: What is the sample space? What is being conditioned on? What information did the selection process reveal? Are we confusing a probability of evidence with a probability of guilt, disease, or truth?
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 6
 
 Sensor fusion combines measurements from cameras, lidar, radar, IMU, GNSS, maps, and vehicle odometry into a more useful estimate than any sensor can provide alone. The goal is not merely to average sensors. Fusion must respect coordinate frames, timestamps, uncertainty, occlusion, failure modes, and semantic meaning. A lidar point, a radar target, a camera detection, and a map lane boundary are different kinds of evidence.
 
+![A PointPillars diagram converts LiDAR points into pillars, a pseudo-image, and a detection head.](https://ar5iv.labs.arxiv.org/html/1812.05784/assets/x2.png)
+
+*Figure: PointPillars shows how sparse LiDAR becomes convolution-friendly perception input. Image: [ar5iv](https://arxiv.org/abs/1812.05784), Lang et al., educational use with attribution.*
+
 This page sits between [sensors](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu), [perception](/cs/autonomous-driving/perception-object-detection-and-segmentation), [localization](/cs/autonomous-driving/localization-and-hd-maps), and [prediction](/cs/autonomous-driving/prediction-and-motion-forecasting). It introduces early, mid, and late fusion; bird's-eye-view representations; occupancy networks; and calibration. The practical lesson is that fusion is a systems problem as much as a model-design problem.
 
 ## Definitions

@@ -9,6 +9,10 @@ Electrochemistry turns chemical potential differences into electrical work. When
 
 Atkins places equilibrium electrochemistry with chemical equilibrium because the cell potential is a direct measurement of reaction Gibbs energy. The Nernst equation, standard potentials, electrolyte activity, Debye-Huckel theory, fuel cells, corrosion, and biological redox chemistry all follow from this connection.
 
+![A galvanic cell diagram shows two half-cells connected by a salt bridge and external circuit.](https://commons.wikimedia.org/wiki/Special:FilePath/Galvanic_Cell.svg)
+
+*Figure: Galvanic cell linking cell potential to reaction Gibbs energy. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Galvanic_Cell.svg), Gringer, CC BY-SA 3.0/GFDL.*
+
 ## Definitions
 
 An **electrode** is a phase boundary where electronic and ionic charge transfer can be coupled. A **half-reaction** is an oxidation or reduction written for one electrode. A **galvanic cell** produces electrical work from a spontaneous reaction. An **electrolytic cell** uses electrical work to drive a nonspontaneous reaction.

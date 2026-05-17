@@ -7,6 +7,10 @@ sidebar_position: 7
 
 Exponential, logarithmic, and inverse functions are where calculus moves beyond polynomial behavior. Exponentials model quantities whose rate of change is proportional to the current amount. Logarithms undo exponential growth and convert multiplication into addition. Inverse functions reverse input-output roles, so their derivatives explain how rates change when a relationship is solved in the opposite direction.
 
+![Leonhard Euler is shown in an eighteenth-century portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Leonhard_Euler.jpg)
+
+*Figure: Leonhard Euler's notation and results appear across analysis, graph theory, and number theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Leonhard_Euler.jpg), Jakob Emanuel Handmann, public domain.*
+
 These functions appear in growth and decay, compound interest, radioactive half-life, pH, sound intensity, population models, and change of scale. They also support many integration techniques and differential equations later in calculus.
 
 ## Definitions

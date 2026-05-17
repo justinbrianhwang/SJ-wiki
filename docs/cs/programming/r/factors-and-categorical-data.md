@@ -7,6 +7,10 @@ sidebar_position: 7
 
 R has a special representation for categorical variables: factors. A factor stores observed category labels together with a fixed set of possible levels. This is more than a display convenience. Statistical models need to know which variables are categorical so they can create indicator columns, choose reference groups, and report coefficients in terms of category differences.
 
+![The R logo marks pages on statistical computing, graphics, and data analysis.](https://commons.wikimedia.org/wiki/Special:FilePath/R_logo.svg)
+
+*Figure: R connects programming examples to statistical modeling and visualization workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:R_logo.svg), The R Foundation, CC BY-SA 4.0.*
+
 The book discusses factors as part of non-numeric values because categories sit between text and numbers. The labels are human-readable strings, but internally R stores integer codes with a `levels` attribute. That internal coding is useful, but it also creates classic mistakes when people treat factor codes as the original data. Good factor work means controlling levels deliberately and converting carefully.
 
 ## Definitions

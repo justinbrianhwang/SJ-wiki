@@ -7,6 +7,10 @@ sidebar_position: 13
 
 Public-key encryption lets anyone encrypt to a receiver using a public key, while only the receiver can decrypt using a private key. It solves the distribution problem that limits purely symmetric systems, but public-key operations are usually slower and message-size limited. Practical systems therefore use public-key encryption to protect a short symmetric key, then use authenticated symmetric encryption for the data.
 
+![A public-key diagram shows Alice encrypting a message that only Bob can decrypt.](https://commons.wikimedia.org/wiki/Special:FilePath/Public_key_encryption_alice_to_bob.svg)
+
+*Figure: Public-key encryption makes the Alice-to-Bob security goal explicit. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Public_key_encryption_alice_to_bob.svg), Winstonlee, CC0.*
+
 Katz and Lindell present public-key encryption through CPA and CCA experiments, hybrid encryption, KEM/DEM, ElGamal, DDH-based encapsulation, and RSA-based schemes. Smart's public-key and hybrid-encryption chapters complement this with concrete RSA, ElGamal, Rabin, Paillier, and KEM/DEM explanations. The synthesis is that public-key encryption is mostly a key-establishment tool inside larger protocols.
 
 ## Definitions

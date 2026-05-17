@@ -9,6 +9,10 @@ Capacitance is the ability of a conductor arrangement to store charge for a give
 
 The image method is a different but related tool. Conducting planes and spheres impose equipotential boundary conditions that can sometimes be satisfied by replacing the conductor with fictitious image charges. The field in the physical region is then computed with ordinary Coulomb methods. This page brings together capacitance, electrostatic energy, dielectric breakdown, and image-charge reasoning.
 
+![A parallel-plate capacitor diagram marks plate area, separation, and dielectric region.](https://commons.wikimedia.org/wiki/Special:FilePath/Parallel_plate_capacitor.svg)
+
+*Figure: The parallel-plate capacitor is the basic field-storage apparatus behind electrostatic energy and lumped capacitance. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Parallel_plate_capacitor.svg), Inductiveload, public domain.*
+
 ## Definitions
 
 Capacitance is

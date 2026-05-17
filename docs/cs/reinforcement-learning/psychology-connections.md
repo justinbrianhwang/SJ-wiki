@@ -7,6 +7,10 @@ sidebar_position: 14
 
 Sutton and Barto connect reinforcement learning to psychology because many RL ideas were shaped by animal learning, conditioning, and theories of delayed reinforcement. The connection is not just metaphorical. Prediction errors, temporal credit assignment, habitual control, and model-based behavior all have psychological counterparts. RL provides formal tools for asking what a learner could infer from reward and stimulus sequences.
 
+![A cart-pole animation shows a controller trying to balance an inverted pole on a moving cart.](https://commons.wikimedia.org/wiki/Special:FilePath/Cartpole.gif)
+
+*Figure: Cart-pole is a standard control and reinforcement-learning benchmark. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cartpole.gif), Condordellanebbia, CC BY-SA 4.0.*
+
 The psychology chapter focuses on classical conditioning, instrumental conditioning, delayed reinforcement, cognitive maps, and the distinction between habitual and goal-directed behavior. These topics broaden the meaning of reinforcement learning: it is not only an engineering framework for agents, but also a mathematical language for learning from consequences.
 
 ## Definitions

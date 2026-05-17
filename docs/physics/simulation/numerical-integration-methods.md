@@ -9,6 +9,14 @@ Numerical integration converts a continuous-time state equation into a sequence 
 
 Klee and Allen introduce elementary methods before moving to Runge-Kutta, adaptive, multistep, stiff, and real-time-compatible techniques. The practical idea is simple: an integrator is a rule for using slope information. The engineering difficulty is choosing a rule and step size that produce an answer accurate enough, stable enough, and fast enough for the intended use.
 
+![Euler's method advances along tangent-line steps compared with the exact curve.](https://commons.wikimedia.org/wiki/Special:FilePath/Euler_method.svg)
+
+*Figure: Euler stepping makes local truncation error visible as the gap between a tangent advance and the true trajectory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Euler_method.svg), Oleg Alexandrov, public domain.*
+
+![Several one-step numerical methods are compared against an exact solution curve.](https://commons.wikimedia.org/wiki/Special:FilePath/Runge-kutta.svg)
+
+*Figure: Runge-Kutta comparisons show how staged slopes improve simulated trajectories over simple Euler steps. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Runge-kutta.svg), T.gauster, CC BY-SA 3.0.*
+
 ## Definitions
 
 For an initial value problem

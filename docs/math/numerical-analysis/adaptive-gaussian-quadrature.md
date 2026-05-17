@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Composite quadrature spends evaluation points uniformly. That is reasonable when the integrand is equally easy everywhere, but wasteful when most of the interval is smooth and only a small region is difficult. Adaptive quadrature refines the interval only where an error indicator says refinement is needed.
 
+![A parabola is fitted over an interval to illustrate Simpson rule.](https://commons.wikimedia.org/wiki/Special:FilePath/Simpsons_rule.svg)
+
+*Figure: Simpson rule improves numerical integration by approximating the integrand with a quadratic arc. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Simpsons_rule.svg), Wdvorak, CC BY-SA 3.0.*
+
 Gaussian quadrature takes a different approach. Instead of equally spacing the nodes, it chooses both nodes and weights to maximize polynomial exactness. For smooth integrands, a small number of Gaussian nodes can outperform much denser Newton-Cotes rules. The price is that the nodes are less intuitive and basic Gauss rules are not naturally nested.
 
 ## Definitions

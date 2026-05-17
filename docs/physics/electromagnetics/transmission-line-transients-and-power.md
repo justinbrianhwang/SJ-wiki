@@ -9,6 +9,10 @@ Sinusoidal analysis shows steady standing waves, but real interconnects also car
 
 Power is the complementary viewpoint. Voltage and current waves carry energy down the line, and reflected waves carry undelivered energy back. The same impedance mismatch that creates standing waves in phasor analysis creates bounce diagrams in transient analysis. This page ties those pictures together.
 
+![A coaxial cable cutaway shows conductor, dielectric, shield, and jacket layers.](https://commons.wikimedia.org/wiki/Special:FilePath/Coaxial_cable_cutaway.svg)
+
+*Figure: A coaxial line makes distributed inductance, capacitance, impedance, and guided waves tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Coaxial_cable_cutaway.svg), Tkgd2007, CC BY 3.0.*
+
 ## Definitions
 
 For a lossless line with forward and backward traveling time-domain waves,

@@ -7,6 +7,10 @@ sidebar_position: 2
 
 Statistics is the discipline of learning from data. In the Lane text, the first chapter stresses two complementary meanings of the word: statistics can be numerical summaries, and statistics can also be the set of methods used to collect, display, analyze, interpret, and make decisions from data. A student who only learns formulas can compute impressive numbers and still miss the point if the data were poorly sampled, the variables were badly defined, or the conclusion goes beyond what the study design permits.
 
+![Anscombe's quartet shows four scatterplots with similar summary statistics.](https://commons.wikimedia.org/wiki/Special:FilePath/AnscombeQuartet.svg)
+
+*Figure: Anscombe's quartet shows why visualization matters even when numerical summaries agree. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:AnscombeQuartet.svg), Gabry, CC BY-SA 3.0.*
+
 Statistical literacy begins before calculation. It asks what the cases are, what variable was measured on each case, whether the data describe a whole population or only a sample, and whether the study was designed for description, inference, prediction, or causal explanation. These distinctions support every later topic in this statistics section, from [graphing distributions](/math/statistics/graphing-distributions) through [hypothesis testing](/math/statistics/hypothesis-testing-logic).
 
 ## Definitions

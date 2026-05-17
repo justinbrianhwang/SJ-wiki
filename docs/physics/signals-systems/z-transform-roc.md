@@ -9,6 +9,10 @@ The $z$-transform is the discrete-time counterpart of the Laplace transform. It 
 
 As with the Laplace transform, the region of convergence is part of the answer. The same rational expression can describe a right-sided sequence, a left-sided sequence, or a two-sided sequence depending on the ROC. In digital signal processing, many system questions reduce to locating poles relative to the unit circle.
 
+![Two sine waves pass through the same sampled points, illustrating aliasing.](https://commons.wikimedia.org/wiki/Special:FilePath/AliasingSines.svg)
+
+*Figure: Aliasing shows why sampling rate is a physical constraint, not just a numerical detail. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:AliasingSines.svg), Moxfyre, CC BY-SA 3.0/GFDL.*
+
 ## Definitions
 
 The bilateral $z$-transform of a sequence $x[n]$ is

@@ -9,6 +9,10 @@ Composite quantum systems carry angular momentum in pieces: orbital plus spin, e
 
 Sakurai treats angular-momentum addition through tensor products, coupled bases, and Clebsch-Gordan coefficients. Ballentine connects the same decomposition to irreducible representations and tensor operators. The Gottfried-named notes derive common low-dimensional coefficients explicitly. Schiff's central-potential and atomic notation uses the resulting quantum numbers heavily, especially in spectroscopic language.
 
+![A Stern-Gerlach apparatus splits a beam into discrete spin outcomes.](https://commons.wikimedia.org/wiki/Special:FilePath/Stern-Gerlach_experiment.svg)
+
+*Figure: The Stern-Gerlach experiment is the physical scene behind spin quantization and quantum measurement. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Stern-Gerlach_experiment.svg), Tatoute, CC BY-SA 4.0.*
+
 ## Definitions
 
 For two angular momenta $\mathbf J_1$ and $\mathbf J_2$ acting on different Hilbert spaces,

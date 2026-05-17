@@ -7,6 +7,10 @@ sidebar_position: 19
 
 STL algorithms are generic functions that operate on ranges. They are separate from containers, so the same algorithm can search a `vector`, traverse a `list`, or copy from one container to another as long as the iterators provide the required operations. This is the bridge between Savitch's template material and real library programming.
 
+![The ISO C++ logo marks pages on classes, templates, containers, and modern C++ idioms.](https://commons.wikimedia.org/wiki/Special:FilePath/ISO_C%2B%2B_Logo.svg)
+
+*Figure: C++ extends systems programming with abstraction, generic code, and deterministic resource management. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ISO_C%2B%2B_Logo.svg), Jeremy Kratz, public domain text logo.*
+
 Iterators make generic algorithms possible. Instead of hard-coding array indexes or node pointers, an algorithm receives a beginning iterator and an ending iterator. The ending iterator is one past the last element, which gives C++ a consistent half-open range notation: `[begin, end)`.
 
 ## Definitions

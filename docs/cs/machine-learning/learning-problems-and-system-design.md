@@ -7,6 +7,10 @@ sidebar_position: 2
 
 Mitchell's first chapter frames machine learning as the engineering problem of making a program improve through experience. That sounds broad, but the value of the definition is that it forces every learning claim to name the task being improved, the evidence used for improvement, and the measurement that decides whether improvement actually occurred. This is a pre-deep-learning formulation: it is less concerned with giant model families and more concerned with the precise relation among task, representation, training signal, and search.
 
+![An Iris dataset scatterplot compares flower measurements colored by species.](https://commons.wikimedia.org/wiki/Special:FilePath/Iris_dataset_scatterplot.svg)
+
+*Figure: The Iris scatterplot makes feature spaces and class separation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Iris_dataset_scatterplot.svg), Nicoguaro, CC BY 4.0.*
+
 The chapter's checkers example is also a compact design pattern for the whole book. A learner does not directly receive the perfect strategy. It receives experience, converts experience into training examples, searches a hypothesis space, and updates a performance system. The same pattern reappears in decision trees, neural networks, Bayesian classifiers, instance-based methods, explanation-based learning, and reinforcement learning.
 
 ## Definitions

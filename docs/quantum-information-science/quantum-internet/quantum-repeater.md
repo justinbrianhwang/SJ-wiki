@@ -9,6 +9,14 @@ A quantum repeater is a network device or protocol stack that extends entangleme
 
 The repeater problem is the central engineering bridge between [entanglement as a network resource](/quantum-information-science/quantum-internet/entanglement) and a useful [quantum internet](/quantum-information-science/quantum-internet/intro). Without repeaters, long-distance quantum communication is dominated by exponential channel loss. With repeaters, idealized scaling can become polynomial in distance, but only if memories, photon interfaces, local gates, heralding, and classical control are good enough.
 
+![A quantum buffer diagram shows entangled optical images and a rubidium vapor cell used to delay one of the optical fields.](https://commons.wikimedia.org/wiki/Special:FilePath/Quantum_buffer_%285940501733%29.jpg)
+
+*Figure: Quantum repeaters require memory-like behavior: successful elementary links must wait while other probabilistic links and heralding messages arrive. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quantum_buffer_%285940501733%29.jpg), National Institute of Standards and Technology / A. Marino, public domain.*
+
+![An optical-table SPDC experiment shows hardware used to create entangled photon pairs.](https://commons.wikimedia.org/wiki/Special:FilePath/Quantum_Entanglement_Experiment_via_Spontaneous_Parametric_Down-Conversion_%28SPDC%29.jpg)
+
+*Figure: Entangled-photon sources are one physical route to the elementary links that repeater protocols try to store, swap, and purify. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quantum_Entanglement_Experiment_via_Spontaneous_Parametric_Down-Conversion_%28SPDC%29.jpg), Farbodk, CC BY-SA 4.0.*
+
 ## Definitions
 
 An **elementary link** is a short quantum connection between neighboring nodes. A link attempt may send one or more photons through fiber or free space. A successful attempt is usually **heralded**, meaning detectors and classical messages announce that entanglement has been created.

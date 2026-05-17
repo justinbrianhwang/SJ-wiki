@@ -7,6 +7,10 @@ sidebar_position: 19
 
 Graph mining studies data whose structure is expressed through nodes and edges. Aggarwal's graph chapter covers graph matching and distance computation, transformation-based graph distances, frequent substructure mining, graph clustering, and graph classification. Graphs appear in chemistry, social networks, web links, communication networks, biological interactions, fraud rings, and knowledge bases.
 
+![An Iris dataset scatterplot compares flower measurements colored by species.](https://commons.wikimedia.org/wiki/Special:FilePath/Iris_dataset_scatterplot.svg)
+
+*Figure: The Iris scatterplot makes feature spaces and class separation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Iris_dataset_scatterplot.svg), Nicoguaro, CC BY 4.0.*
+
 This page covers core graph mining ideas for both single large graphs and collections of many graphs. The main challenge is that topology matters: two objects may have identical attributes but different neighborhoods, and two graphs may be similar even when their node labels do not align exactly.
 
 ## Definitions

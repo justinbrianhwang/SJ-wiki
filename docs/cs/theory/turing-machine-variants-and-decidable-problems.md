@@ -7,6 +7,10 @@ sidebar_position: 11
 
 The basic Turing machine model is deliberately minimal, so it is natural to ask whether more convenient versions compute more languages. Multitape machines, nondeterministic machines, enumerators, and high-level algorithms all look stronger or more natural. For decidability, these variants are equivalent to the basic model.
 
+![A portrait of Alan Turing as a teenager gives computability theory historical context.](https://commons.wikimedia.org/wiki/Special:FilePath/Alan_Turing_Aged_16.jpg)
+
+*Figure: Alan Turing's work on computation and undecidability frames the theory section. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Alan_Turing_Aged_16.jpg), Unknown photographer, public domain.*
+
 This equivalence matters because it lets us write algorithms at a sensible level without changing what is computable. When proving decidability of automata and grammar questions, we can describe graph searches, table-filling algorithms, and simulations. A formal single-tape Turing machine could implement them, but requiring low-level tape details every time would hide the idea.
 
 ## Definitions

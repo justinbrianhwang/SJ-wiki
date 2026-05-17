@@ -7,6 +7,10 @@ sidebar_position: 15
 
 The neuroscience connection in Sutton and Barto centers on reward prediction error, dopamine, and actor-critic organization in the brain. The point is not that the brain literally runs a textbook algorithm line by line. Rather, temporal-difference learning provides a compact computational hypothesis: certain neural signals resemble the error between received reward plus predicted future reward and previous prediction.
 
+![A cart-pole animation shows a controller trying to balance an inverted pole on a moving cart.](https://commons.wikimedia.org/wiki/Special:FilePath/Cartpole.gif)
+
+*Figure: Cart-pole is a standard control and reinforcement-learning benchmark. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cartpole.gif), Condordellanebbia, CC BY-SA 4.0.*
+
 The chapter discusses dopamine neurons, basal ganglia circuits, neural actor-critic ideas, and broader questions such as model-based methods, addiction, and collective reinforcement learning. For a wiki treatment, the most important lesson is how an RL equation can organize evidence about learning signals and action selection.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 10
 
 Rust separates errors into two broad categories: unrecoverable errors, handled with `panic!`, and recoverable errors, represented by `Result<T, E>`. This distinction is central to Rust's reliability story. If a bug violates a program invariant, panicking may be appropriate. If failure is expected as part of the environment, such as a missing file or invalid input, the type system should make callers handle it.
 
+![The Rust logo marks pages on ownership, borrowing, traits, and safe systems programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Rust_programming_language_black_logo.svg)
+
+*Figure: Rust connects systems control with compile-time memory-safety guarantees. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Rust_programming_language_black_logo.svg), Rust Foundation, CC BY 4.0.*
+
 This page builds on [pattern matching](/cs/programming/rust/pattern-matching) because `Result` is an enum, and on [collections](/cs/programming/rust/common-collections) because indexing can panic while safe access returns `Option`. It also prepares for project pages such as [closures and iterators](/cs/programming/rust/closures-and-iterators), where command-line programs often return `Result` from `main`.
 
 ## Definitions

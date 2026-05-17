@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Project planning turns a desired software product into an organized body of work. Gustafson's planning chapter covers work breakdown structures, PERT networks, critical paths, slack time, lines-of-code estimation, LOC-based cost estimation, COCOMO, function point analysis, productivity, and evaluation of estimates. The chapter's central lesson is that planning is not a single number. A credible plan connects tasks, dependencies, sizes, costs, uncertainty, and reviewable assumptions.
 
+![A Kanban board screenshot shows work items organized by workflow state.](https://commons.wikimedia.org/wiki/Special:FilePath/Openproject_kanban.PNG)
+
+*Figure: Kanban boards turn process state into a visible project-management surface. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Openproject_kanban.PNG), OpenProject contributors, CC0.*
+
 Planning is where software engineering becomes quantitative. The team decomposes work into tasks, estimates size and effort, finds dependency constraints, identifies the path that controls completion time, and checks whether the estimate is plausible. The resulting plan is still uncertain, but it is no longer a guess without structure.
 
 ## Definitions

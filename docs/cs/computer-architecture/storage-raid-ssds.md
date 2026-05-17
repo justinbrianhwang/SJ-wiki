@@ -7,6 +7,10 @@ sidebar_position: 16
 
 Storage systems sit below memory hierarchy but strongly affect whole-system performance and dependability. Databases, file servers, virtual machines, WSCs, and scientific workflows often wait on persistent storage. H&P's storage appendix treats I/O performance and reliability quantitatively, especially through RAID and queueing ideas.
 
+![An ENIAC installation shows early computer architecture as cabinets, switches, and wiring.](https://commons.wikimedia.org/wiki/Special:FilePath/ENIAC_Penn1.jpg)
+
+*Figure: ENIAC gives architecture pages a physical reference point before modern chips. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ENIAC_Penn1.jpg), Paul W. Shaffer and TexasDex, CC BY-SA 3.0/GFDL.*
+
 Architecturally, storage is different from cache and DRAM because persistence, failure recovery, and service time variation matter. A disk access includes mechanical seek and rotation. An SSD avoids mechanical delay but has erase-before-write behavior, limited write endurance, internal parallelism, and controller-managed flash translation. RAID combines multiple devices to improve performance, capacity, and dependability.
 
 ## Definitions

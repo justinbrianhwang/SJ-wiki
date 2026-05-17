@@ -7,6 +7,10 @@ sidebar_position: 3
 
 SQL is the standard practical language for relational databases. It is both a data-definition language, because it declares schemas and constraints, and a data-manipulation language, because it inserts, changes, deletes, and queries data. The important shift from relational algebra is that SQL is declarative: a query says what result is wanted, not which physical algorithm should produce it.
 
+![A MySQL console screenshot shows a command-line database session with query output.](https://commons.wikimedia.org/wiki/Special:FilePath/Mysql-screenshot.PNG)
+
+*Figure: SQL pages connect abstract relational operations to the database console used in practice. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mysql-screenshot.PNG), Wikimedia Commons contributors, public domain text.*
+
 Basic SQL is enough to express many useful questions: create tables, declare primary and foreign keys, filter rows, project columns, sort results, and update stored facts. The deeper topics of joins, grouping, views, recursion, and transactions build on these same ideas. A good SQL query is not only syntactically valid; it also states its assumptions about keys, missing values, and duplicate rows clearly.
 
 ## Definitions

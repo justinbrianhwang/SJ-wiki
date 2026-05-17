@@ -9,6 +9,10 @@ The path integral replaces the question "which path did the particle take?" with
 
 Zee emphasizes the path integral early because it gives a compact route from quantum mechanics to field theory. Instead of beginning with commutators and Hilbert-space operators, one starts with the classical action and integrates over configurations weighted by $e^{iS}$. Correlation functions, propagators, Feynman rules, and semiclassical approximations all come from the same generating functional.
 
+![A Feynman diagram shows two electrons scattering by exchanging a photon.](https://commons.wikimedia.org/wiki/Special:FilePath/Electron-scattering.svg)
+
+*Figure: A Feynman diagram turns perturbation theory into a compact bookkeeping picture for particles, propagators, and vertices. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Electron-scattering.svg), KCVelaga, CC BY-SA 4.0.*
+
 ## Definitions
 
 For a single quantum-mechanical coordinate $q(t)$, the transition amplitude is formally

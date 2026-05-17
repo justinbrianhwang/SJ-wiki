@@ -7,6 +7,10 @@ sidebar_position: 15
 
 The pigeonhole principle proves that collisions are unavoidable. Inclusion-exclusion counts unions by correcting overcounting. Together they handle problems where direct counting is messy because objects overlap or constraints force repetition.
 
+![Two overlapping circles show a highlighted Venn diagram region.](https://commons.wikimedia.org/wiki/Special:FilePath/Venn0001.svg)
+
+*Figure: A Venn diagram connects set operations with the same logical connectives used in proofs. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Venn0001.svg), Watchduck, public domain.*
+
 Both tools require careful modeling. For pigeonhole arguments, the hard part is choosing boxes so that sharing a box gives the desired conclusion. For inclusion-exclusion, the hard part is identifying which objects were counted more than once and correcting in the right alternating pattern.
 
 ## Definitions

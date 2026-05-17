@@ -7,6 +7,10 @@ sidebar_position: 19
 
 R's object-oriented systems are easy to miss at first because many examples look like ordinary function calls. You call `summary(fit)`, `plot(fit)`, or `print(test)`, and R chooses behavior based on the object's class. The book's discussion of classes, attributes, fitted model objects, and plotting methods points toward this larger idea: R objects carry metadata, and generic functions use that metadata to decide what to do.
 
+![The R logo marks pages on statistical computing, graphics, and data analysis.](https://commons.wikimedia.org/wiki/Special:FilePath/R_logo.svg)
+
+*Figure: R connects programming examples to statistical modeling and visualization workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:R_logo.svg), The R Foundation, CC BY-SA 4.0.*
+
 Base R has several object systems. The most common for everyday analysis is S3, a lightweight convention built around class attributes and generic functions. S4 is more formal, with declared classes, slots, and method signatures. A brief understanding is enough to explain why `summary()` works on vectors, data frames, hypothesis tests, and linear models while returning different structures for each.
 
 ## Definitions

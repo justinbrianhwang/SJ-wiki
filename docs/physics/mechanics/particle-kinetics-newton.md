@@ -9,6 +9,10 @@ Kinetics connects motion to the forces that cause it. For a particle, Newton's s
 
 This page continues directly from particle equilibrium. Static equilibrium is the special case $\mathbf{a}=\mathbf{0}$. In dynamics, nonzero acceleration allows a nonzero resultant force, but the free-body diagram rules do not change. You still isolate the particle, draw real external forces, and write component equations.
 
+![William Blake's portrait of Isaac Newton shows geometry as a physical way of thinking.](https://commons.wikimedia.org/wiki/Special:FilePath/Newton-WilliamBlake.jpg)
+
+*Figure: Blake's Newton gives the mechanics section a historical anchor for forces, geometry, and idealization. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Newton-WilliamBlake.jpg), William Blake, public domain.*
+
 ## Definitions
 
 For a particle of constant mass $m$, Newton's second law is

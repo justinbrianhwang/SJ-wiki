@@ -7,6 +7,10 @@ sidebar_position: 16
 
 The main thread chapter teaches the core monitor model: `Thread`, `Runnable`, `synchronized`, `wait`, and notification. The source also surveys the newer Java 5 concurrency utilities in `java.util.concurrent`. These utilities do not replace the need to understand synchronization, but they package common patterns into tested abstractions such as concurrent collections, executors, futures, locks, conditions, and synchronizers.
 
+![The Sun Microsystems logo gives Java pages historical context for the language and platform.](https://commons.wikimedia.org/wiki/Special:FilePath/Sun_Microsystems_logo.svg)
+
+*Figure: Java's early development at Sun shaped its portability, virtual-machine model, and library ecosystem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sun_Microsystems_logo.svg), Sun Microsystems and Afrank99, public domain text logo.*
+
 This page stays within the source-era boundary. It covers `Executor`, `ExecutorService`, `Callable`, `Future`, concurrent collections, locks, and conditions as Java 5 concepts. It does not teach `CompletableFuture`, which is a later Java 8 feature and therefore outside the textbook.
 
 ## Definitions

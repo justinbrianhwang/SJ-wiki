@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Once random variables are defined jointly, the next natural question is what happens when we combine them. Sums of independent random variables produce convolutions. Maxima, minima, and sorted samples produce order statistics. These constructions explain why gamma distributions arise from exponential waiting times, why sums of uniforms have triangular and then smoother densities, and why sorted uniform samples lead to beta distributions.
 
+![A Galton box diagram shows balls falling through pegs into bins.](https://commons.wikimedia.org/wiki/Special:FilePath/Galton_Box.svg)
+
+*Figure: A Galton box turns repeated random left-right choices into an approximate bell-shaped distribution. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Galton_Box.svg), Marcin Floryan, CC BY-SA 3.0.*
+
 MIT 18.440 uses these topics to connect earlier distribution families with joint densities and conditional reasoning. A key theme is that formulas often become simple when one first draws the right region in the plane or cube: the density of $X+Y$ integrates over the line $x+y=a$, while order statistics integrate over the ways sample points can be arranged.
 
 ## Definitions

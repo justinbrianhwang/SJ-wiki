@@ -7,6 +7,10 @@ sidebar_position: 3
 
 A stack (스택) is a restricted linear structure where insertion and deletion happen at one end, called the top. This restriction is the point: by removing choices, the stack gives strong behavior. The last item pushed is the first item popped, so a stack naturally represents nested work: function calls, parentheses, undo histories, backtracking, depth-first traversal, and expression evaluation.
 
+![A square Kufic algorithms mark introduces the study of designed procedures.](https://commons.wikimedia.org/wiki/Special:FilePath/Algorithms.svg)
+
+*Figure: The algorithms mark gives the abstract algorithms pages a concrete visual anchor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Algorithms.svg), Jeff Erickson, CC BY 4.0.*
+
 In a C data-structures course, stacks are usually introduced after arrays because the simplest stack is just an array plus an integer top index. The same ADT can also be implemented with linked nodes, which removes the fixed-capacity problem but adds allocation overhead. The source textbook places stacks next to queues and then applies stacks to maze search and arithmetic expressions. Expression evaluation is a particularly good example because the stack does not merely store data; it enforces the order in which operations become ready.
 
 ## Definitions

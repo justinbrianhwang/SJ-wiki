@@ -9,6 +9,10 @@ Angular momentum is where quantum mechanics turns symmetry into spectra. Rotatio
 
 Sakurai presents angular momentum as the representation theory of rotations, with spin and orbital angular momentum treated under the same algebra. Ballentine gives a rigorous operator and rotation treatment, including finite rotations and tensor operators. The Gottfried-named notes develop the algebra after spin-1/2 and symmetries. Schiff's older coordinate style emphasizes orbital angular momentum, spherical harmonics, and central-potential wave functions.
 
+![Hydrogen orbital density plots show bright probability regions for several quantum numbers.](https://commons.wikimedia.org/wiki/Special:FilePath/Hydrogen_Density_Plots.png)
+
+*Figure: Hydrogen density plots make angular momentum, nodes, and probability density visible in real atomic structure. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hydrogen_Density_Plots.png), PoorLeno, public domain.*
+
 ## Definitions
 
 An angular momentum operator $\mathbf J=(J_x,J_y,J_z)$ satisfies

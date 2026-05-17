@@ -7,6 +7,10 @@ sidebar_position: 14
 
 Data-level parallelism appears when the same operation can be applied to many data elements. It is common in linear algebra, graphics, signal processing, image processing, machine learning, compression, and scientific simulation. Instead of finding independent scalar instructions one by one, data-parallel hardware exposes many lanes and asks software to feed them regular streams of work.
 
+![An opened Intel 4004 processor exposes the silicon die inside its package.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_4004_open.jpg)
+
+*Figure: Opening the package links instruction-set discussions to the physical die. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_4004_open.jpg), Science Museum Group, CC BY 4.0.*
+
 H&P's data-level parallelism chapter compares vector architectures, SIMD instruction extensions, and GPUs. They differ in programming model and implementation style, but they share a core idea: amortize instruction control over multiple data operations. This can deliver high throughput and good energy efficiency when work is regular, but it performs poorly when control flow diverges or memory access is irregular.
 
 ## Definitions

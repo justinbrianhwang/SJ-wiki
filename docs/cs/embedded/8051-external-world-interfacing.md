@@ -7,6 +7,10 @@ sidebar_position: 11
 
 The source chapter titled "Interfacing to External World" collects the practical circuits that make an 8051 system interact with users and physical signals: external RAM and ROM, I/O expansion with 8255, keyboards, LED displays, LCD modules, DACs, ADCs, stepper motors, and typical MCS-51 based systems. This is where register-level programming meets electrical timing and signal conditioning.
 
+![An Intel 8051 architecture diagram shows timers, serial I/O, memory, and ports around the CPU core.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_8051_arch.svg)
+
+*Figure: The 8051 diagram connects assembly details to the microcontroller's peripheral blocks. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_8051_arch.svg), Appaloosa, CC BY-SA 3.0.*
+
 An 8051 pin can set a logic level, but most real devices need more: debouncing, current drivers, address decoding, handshaking, conversion time, scaling, or protection. The right software pattern depends on the device's interface. A keyboard is scanned, a display is refreshed, an ADC is started and polled, a DAC is fed with a sample code, and a stepper motor receives a sequence of coil patterns.
 
 ## Definitions

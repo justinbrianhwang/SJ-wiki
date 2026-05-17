@@ -7,6 +7,10 @@ sidebar_position: 2
 
 The relational model is the mathematical core of most database systems. It describes data as named relations, where each relation is a set of tuples over named attributes, and it describes queries as operations that transform relations into other relations. The model matters because it separates the logical view of data from the physical details of files, indexes, caches, and disks. A user asks for a result in terms of relations and predicates; the database system chooses how to compute it.
 
+![An entity-relationship table diagram shows linked tables for relational modeling.](https://commons.wikimedia.org/wiki/Special:FilePath/CPT-Databases-ExampleLinkTables.svg)
+
+*Figure: Link tables make many-to-many relationships concrete in a relational schema. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:CPT-Databases-ExampleLinkTables.svg), Pluke, CC0.*
+
 Relational algebra is the procedural query language that gives this model its basic operators. It is not usually the language people type into production systems, but it is the language behind query rewriting, equivalence rules, join ordering, and many optimizer proofs. SQL adds bags, nulls, grouping, ordering, and many conveniences, but the first mental model for SQL should still be relation in, relation out.
 
 ## Definitions

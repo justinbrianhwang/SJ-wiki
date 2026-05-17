@@ -7,6 +7,10 @@ sidebar_position: 10
 
 Many probability questions involve several random variables defined on the same sample space. A joint distribution records how they behave together, not merely how each behaves separately. This distinction matters: the marginal laws of $X$ and $Y$ do not determine whether they are independent, positively related, negatively related, or constrained by an equation such as $Y=X^2$.
 
+![Tree diagrams organize conditional probabilities for Bayes' theorem.](https://commons.wikimedia.org/wiki/Special:FilePath/Bayes_theorem_tree_diagrams.svg)
+
+*Figure: Probability trees make the conditioning structure in Bayes' theorem explicit. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bayes_theorem_tree_diagrams.svg), Gnathan87, CC0 1.0.*
+
 MIT 18.440 introduces joint mass functions, joint densities, marginal distributions, independent random variables, and distributions of functions of random variables. These ideas are the technical foundation for convolutions, conditional densities, covariance, order statistics, and the transform methods used later in the course.
 
 ## Definitions

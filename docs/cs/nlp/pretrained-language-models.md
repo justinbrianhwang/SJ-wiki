@@ -7,6 +7,10 @@ sidebar_position: 10
 
 Pretrained language models learn general-purpose representations from large unlabeled corpora and are then adapted to tasks. Jurafsky and Martin separate causal transformer LLMs, bidirectional masked language models, fine-tuning, prompting, in-context learning, and instruction tuning. Eisenstein's text predates BERT and GPT-style deployment, but its chapters on language modeling, embeddings, neural networks, and structured prediction explain the underlying probabilistic and optimization ideas.
 
+![A skip-gram word embedding diagram predicts surrounding context words from a center word.](https://commons.wikimedia.org/wiki/Special:FilePath/Word_embeddings_Skip-gram.svg)
+
+*Figure: Skip-gram training ties word meaning to surrounding context. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Word_embeddings_Skip-gram.svg), Jeran Renz, CC BY-SA 4.0.*
+
 The practical shift is from training a separate model from scratch for each NLP task to reusing a large model that already encodes syntax, lexical meaning, world associations, and many task formats. Adaptation may happen by adding a classifier head and updating weights, by prompting without weight updates, or by instruction tuning and preference optimization.
 
 ## Definitions

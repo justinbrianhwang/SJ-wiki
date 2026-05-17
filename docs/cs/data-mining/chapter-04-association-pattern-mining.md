@@ -7,6 +7,10 @@ sidebar_position: 6
 
 Association pattern mining finds combinations of items, events, or attribute values that occur together more often than a user-defined threshold or more interestingly than chance. Aggarwal treats this as one of the four major data mining building blocks because it converts large transaction collections into interpretable co-occurrence structure. The classic setting is market basket analysis, but the same ideas apply to web paths, text terms, categorical profiles, biological markers, and many discretized data sets.
 
+![A hash list diagram links data blocks to hashes that can verify later blocks.](https://commons.wikimedia.org/wiki/Special:FilePath/Hash_list.svg)
+
+*Figure: Hash lists connect hashing to integrity checking and authenticated data structures. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hash_list.svg), David Gothberg and DataWraith, public domain.*
+
 This page covers the basic frequent itemset model, association rules, Apriori, pattern growth, and interest measures. The advanced chapter adds closed and maximal patterns, querying, constraints, and downstream uses.
 
 ## Definitions

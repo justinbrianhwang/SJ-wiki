@@ -7,6 +7,10 @@ sidebar_position: 3
 
 Gaussian elimination is the disciplined version of substitution. Instead of solving equations one by one in an ad hoc way, it uses elementary row operations to expose pivots, free variables, contradictions, and back-substitution. The same procedure underlies rank, inverse computation, determinant evaluation, LU factorization, and many numerical solvers.
 
+![Gaussian elimination turns a linear system into triangular form.](https://commons.wikimedia.org/wiki/Special:FilePath/File_Gaussian_elimination.svg)
+
+*Figure: Gaussian elimination uses row operations to expose pivots, rank, and solvability. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:File_Gaussian_elimination.svg), Akira tanzivana, CC BY-SA 4.0.*
+
 The method matters because it separates the conceptual question from the bookkeeping. Conceptually, we want an equivalent system whose solution set is easier to read. Operationally, we choose pivot positions, clear entries below those pivots, and then solve from the bottom upward. That simple pattern becomes one of the most reusable algorithms in mathematics and scientific computing.
 
 ## Definitions

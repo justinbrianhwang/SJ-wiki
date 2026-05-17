@@ -7,6 +7,10 @@ sidebar_position: 15
 
 Vehicle-to-everything communication, or V2X, lets vehicles exchange information with other vehicles, infrastructure, pedestrians, networks, and cloud services. It can extend perception beyond line of sight, coordinate traffic signals, warn about hazards, and improve efficiency. But V2X is not a substitute for onboard autonomy because messages can be delayed, absent, spoofed, jammed, misconfigured, or unavailable across fleets and regions.
 
+![A Waymo self-driving car drives on a public road with roof-mounted sensors.](https://commons.wikimedia.org/wiki/Special:FilePath/Waymo_self-driving_car_front_view.gk.jpg)
+
+*Figure: A real autonomous vehicle grounds the driving stack in a physical platform. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Waymo_self-driving_car_front_view.gk.jpg), Grendelkhan, CC BY-SA 4.0.*
+
 This page introduces DSRC, C-V2X, V2V, V2I, V2P, V2N, cooperative perception, security, privacy, latency budgets, and deployment constraints. It connects [sensor fusion](/cs/autonomous-driving/sensor-fusion), [prediction](/cs/autonomous-driving/prediction-and-motion-forecasting), [safety](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing), and [adversarial attacks](/cs/autonomous-driving/adversarial-and-physical-attacks-on-av).
 
 ## Definitions

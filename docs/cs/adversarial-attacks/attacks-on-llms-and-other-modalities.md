@@ -7,6 +7,10 @@ sidebar_position: 12
 
 Adversarial ML began with image classifiers in much of the modern deep-learning literature, but the same security questions appear in text, speech, reinforcement learning, recommender systems, multimodal models, and LLM applications. The perturbation set changes: a text edit is discrete and semantic, an audio perturbation passes through acoustics, an RL perturbation can change a trajectory, and an LLM prompt injection may be an instruction placed in retrieved content or tool output.
 
+![An ELIZA terminal conversation shows an early chatbot responding to typed user input.](https://commons.wikimedia.org/wiki/Special:FilePath/ELIZA_conversation.png)
+
+*Figure: ELIZA provides historical context for dialogue systems and chatbot evaluation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ELIZA_conversation.png), Unknown author, public domain text.*
+
 This page gives the vocabulary needed to connect image adversarial examples to other modalities without pretending that every domain fits an $\ell_p$ ball. Representative papers such as HotFlip, TextFooler, BERT-Attack, audio attacks, and RF universal perturbations are folded into the topical modality sections below.
 
 ## Definitions

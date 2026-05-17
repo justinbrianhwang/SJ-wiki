@@ -9,6 +9,10 @@ Solubility equilibria describe slightly soluble ionic solids in contact with the
 
 In the Ebbing and Gammon sequence this topic sits near solubility product, common-ion effect, precipitation calculations, pH effects on solubility, complex-ion formation, complex ions and solubility, and qualitative analysis. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
+![A sample of silver chloride appears as a pale insoluble solid.](https://commons.wikimedia.org/wiki/Special:FilePath/Silver_chloride.jpg)
+
+*Figure: Silver chloride as a classic slightly soluble precipitate for solubility-product calculations. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Silver_chloride.jpg), Vano3333, CC BY-SA 4.0.*
+
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.

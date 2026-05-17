@@ -7,6 +7,10 @@ sidebar_position: 60
 
 Multitasking is the mid-level machinery that lets multiple imperative computations appear to run at the same time. It sits between hardware mechanisms such as interrupts and multicore processors, and higher-level models such as synchronous-reactive or dataflow models. In embedded systems, multitasking is attractive because devices must handle many activities at once: sampling, control, communication, display updates, logging, and fault handling.
 
+![An Arduino Uno board shows a familiar microcontroller development board with headers and USB.](https://commons.wikimedia.org/wiki/Special:FilePath/Arduino_Uno_-_R3.jpg)
+
+*Figure: Arduino boards make microcontroller I/O and prototyping tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Arduino_Uno_-_R3.jpg), SparkFun Electronics, CC BY 2.0.*
+
 The difficulty is that threads expose concurrency through shared memory and interleavings of sequential code. Lee and Seshia treat threads as powerful but hazardous. Race conditions, deadlock, memory-consistency surprises, and missed timing properties can lurk for years because the bad interleaving may be rare.
 
 ## Definitions

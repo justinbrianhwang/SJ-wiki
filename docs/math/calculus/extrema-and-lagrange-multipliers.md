@@ -7,6 +7,10 @@ sidebar_position: 19
 
 Multivariable extrema extend optimization to surfaces and constraints. Without constraints, critical points occur where the gradient is zero or undefined. With constraints, the gradient of the objective must align with the gradient of the constraint at an interior constrained optimum.
 
+![A matrix transforms two vectors into new positions in the plane.](https://commons.wikimedia.org/wiki/Special:FilePath/Matrix_multiplication.svg)
+
+*Figure: Matrix multiplication can be read geometrically as a transformation of vectors. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Matrix_multiplication.svg), Jakob.scholbach and Pbroks13, CC BY-SA 3.0.*
+
 The geometry is more important than the algebra. At an unconstrained local maximum or minimum, every first-order direction has zero change. On a constraint curve or surface, only directions tangent to the constraint are allowed, so the objective gradient must be perpendicular to those tangent directions.
 
 ## Definitions

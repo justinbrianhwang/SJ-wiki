@@ -9,6 +9,22 @@ General chemistry is the bridge between observable materials and particle-level 
 
 In the Ebbing and Gammon sequence this topic sits near measurement, atomic theory, bonding, reactions, equilibrium, thermodynamics, and descriptive chemistry. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
+![A color-coded periodic table organizes elements by atomic number, symbol, and broad chemical class.](https://commons.wikimedia.org/wiki/Special:FilePath/Periodic_Table_Of_Elements.svg)
+
+*Figure: Modern periodic table connecting atomic identity to chemical families. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Periodic_Table_Of_Elements.svg), Dmarcus100, CC BY-SA 4.0.*
+
+![An early Mendeleev periodic table shows elements arranged by recurring chemical properties.](https://commons.wikimedia.org/wiki/Special:FilePath/Mendeleev_Table_5th_II.jpg)
+
+*Figure: Mendeleev's periodic table from the 1891 English edition of Principles of Chemistry. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mendeleev_Table_5th_II.jpg), Dmitrii Mendeleev, public domain.*
+
+![Four Bunsen burner flames show how air flow changes flame color and shape.](https://commons.wikimedia.org/wiki/Special:FilePath/Bunsen_burner_flame_types.jpg)
+
+*Figure: Bunsen burner flame types used in introductory laboratory work. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bunsen_burner_flame_types.jpg), Arthur Jan Fijalkowski, CC BY-SA 3.0/GFDL.*
+
+![A studio portrait shows Marie Curie around 1920.](https://commons.wikimedia.org/wiki/Special:FilePath/Marie_Curie_c1920.jpg)
+
+*Figure: Marie Curie, whose work on radioactivity connects chemistry, physics, and measurement. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Marie_Curie_c1920.jpg), Henri Manuel, public domain.*
+
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.

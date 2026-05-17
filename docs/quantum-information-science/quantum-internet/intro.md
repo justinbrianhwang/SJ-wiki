@@ -11,6 +11,14 @@ This area sits between [quantum communication](/quantum-information-science/quan
 
 Nielsen and Chuang's *Quantum Computation and Quantum Information* is the primary reference for the foundational layer of this section. It does not present a modern quantum-internet stack, but it supplies the formal primitives that the stack spends: teleportation from Section 1.3.7, the postulates and reduced density operators from Chapter 2, quantum operations and Kraus maps from Chapter 8, entropy from Chapter 11, and entanglement distillation plus channel-capacity ideas from Chapter 12. The pages in this folder synthesize that canonical treatment with quantum-network terminology rather than creating a separate set of Nielsen-Chuang notes.
 
+![A quantum buffer diagram shows entangled optical images passing through rubidium vapor cells.](https://commons.wikimedia.org/wiki/Special:FilePath/Quantum_buffer_%285940501733%29.jpg)
+
+*Figure: Networked quantum systems need timing, buffering, memory interfaces, and heralding hardware, not just abstract Bell-pair symbols. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quantum_buffer_%285940501733%29.jpg), National Institute of Standards and Technology / A. Marino, public domain.*
+
+![A quantum teleportation circuit shows Alice's Bell measurement and Bob's classically controlled Pauli corrections.](https://commons.wikimedia.org/wiki/Special:FilePath/Quantum_teleportation_circuit_pauli_gates.svg)
+
+*Figure: Teleportation is the routing primitive that converts pre-shared entanglement plus two classical bits into a one-qubit channel. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quantum_teleportation_circuit_pauli_gates.svg), Buecherdiebin, CC BY-SA 4.0.*
+
 ## Definitions
 
 A **quantum node** is a device that can prepare, store, manipulate, and measure one or more qubits. Early nodes may be single-qubit devices; advanced nodes may contain many logical qubits protected by [quantum error correction](/quantum-information-science/quantum-computing/error-correction).

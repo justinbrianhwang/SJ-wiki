@@ -7,6 +7,10 @@ sidebar_position: 16
 
 Vectors describe magnitude and direction. In space, they provide the language for lines, planes, distances, projections, angles, areas, and volumes. Calculus in several variables depends on this geometry because gradients, vector fields, tangent planes, and surface integrals all use vector operations.
 
+![Two vectors add tip to tail to form a resultant vector.](https://commons.wikimedia.org/wiki/Special:FilePath/Vectoraddition.svg)
+
+*Figure: Vector addition is the geometric base case for linear combinations and span. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Vectoraddition.svg), Svjo, CC0 1.0.*
+
 The main shift from two-dimensional coordinate geometry is that equations are often not unique. A line in space needs a point and a direction vector. A plane needs a point and a normal vector. Vector notation keeps those relationships organized.
 
 ## Definitions

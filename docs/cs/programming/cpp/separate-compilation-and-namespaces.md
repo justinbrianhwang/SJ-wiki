@@ -7,6 +7,10 @@ sidebar_position: 10
 
 Small examples fit in one file, but real C++ programs are built from components. Separate compilation divides a program into interface files, implementation files, and application files so that classes can be reused and changes can be compiled in smaller pieces. Namespaces solve a different organization problem: they let code from different libraries use the same short names without colliding.
 
+![The ISO C++ logo marks pages on classes, templates, containers, and modern C++ idioms.](https://commons.wikimedia.org/wiki/Special:FilePath/ISO_C%2B%2B_Logo.svg)
+
+*Figure: C++ extends systems programming with abstraction, generic code, and deterministic resource management. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ISO_C%2B%2B_Logo.svg), Jeremy Kratz, public domain text logo.*
+
 Savitch frames separate compilation as a practical extension of encapsulation. A class interface says what users may do. A class implementation says how the work is done. Those two ideas should be separate in the programmer's mind, and C++ lets them be separated into header and source files.
 
 ## Definitions

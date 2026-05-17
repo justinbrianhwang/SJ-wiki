@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Root-locus design asks whether the existing closed-loop pole paths can meet specifications. If simple gain adjustment is enough, the design is economical. If the root locus misses the desired region or creates an unacceptable steady-state error trade-off, the controller must add dynamics. Nise's design chapter develops cascade compensation for improving steady-state error, transient response, or both.
 
+![A feedback control block diagram shows compensators wrapped around a plant.](https://commons.wikimedia.org/wiki/Special:FilePath/Control_System.svg)
+
+*Figure: The standard feedback loop keeps control pages tied to the plant-controller interface. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Control_System.svg), Inductiveload, public domain.*
+
 The engineering pattern is consistent: translate specifications into desired dominant pole locations and error constants, inspect the uncompensated root locus, then add poles and zeros to reshape the locus and low-frequency gain. The compensator is not a mathematical decoration. It represents hardware or software that must be physically realized and must not demand impossible actuator behavior.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 15
 
 K&R approaches storage allocation twice. First, Chapter 5 presents a tiny stack-like allocator over a fixed character array to explain pointer arithmetic. Later, Chapter 8 presents a more realistic free-list allocator resembling `malloc` and `free`. Together they show the same lesson at two scales: dynamic storage is just memory plus metadata, but getting alignment, lifetime, and ownership right is difficult.
 
+![A C language logo marks the systems-programming pages built around C examples.](https://commons.wikimedia.org/wiki/Special:FilePath/C_Programming_Language.svg)
+
+*Figure: C remains the reference language for low-level memory, pointers, and Unix interfaces. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:C_Programming_Language.svg), ElodinKaldwin, public domain text logo.*
+
 This topic connects pointers, arrays, structures, unions, typedefs, and the UNIX system interface. It is also where undefined behavior becomes especially concrete. Writing one byte past an allocated block can corrupt allocator metadata. Freeing the same block twice can damage the free list. Returning an incorrectly aligned pointer can make otherwise valid object access fail.
 
 ## Definitions

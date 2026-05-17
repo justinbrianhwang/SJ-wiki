@@ -7,6 +7,10 @@ sidebar_position: 19
 
 Database systems rarely stand alone. Applications connect to them through drivers, connection pools, web frameworks, APIs, background jobs, and reporting tools. The database may enforce constraints and transactions, but application architecture determines how queries are issued, how failures are retried, how credentials are protected, and how user input reaches SQL.
 
+![A pgAdmin screenshot shows a real database administration interface with schema objects.](https://commons.wikimedia.org/wiki/Special:FilePath/PgAdminScreenshot.png)
+
+*Figure: A database system is experienced through schemas, queries, connections, and administration tools. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PgAdminScreenshot.png), Boshomi, CC BY-SA 3.0.*
+
 Security is not a separate final step. It begins with schema design, least-privilege accounts, parameterized queries, authorization checks, and careful transaction boundaries. A database-backed application that is functionally correct under friendly inputs can still fail badly if it concatenates SQL strings, leaks data through overbroad queries, or grants write privileges where read privileges would suffice.
 
 ## Definitions

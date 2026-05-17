@@ -7,6 +7,10 @@ sidebar_position: 6
 
 Vectors and matrices require one atomic type. Lists remove that restriction: a list can hold a numeric vector, a character string, a matrix, a fitted model, and another list at the same time. Data frames build on lists by requiring each component to behave like a column of the same length. That combination makes data frames the central object for statistical work in R.
 
+![The R logo marks pages on statistical computing, graphics, and data analysis.](https://commons.wikimedia.org/wiki/Special:FilePath/R_logo.svg)
+
+*Figure: R connects programming examples to statistical modeling and visualization workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:R_logo.svg), The R Foundation, CC BY-SA 4.0.*
+
 The book introduces lists before data frames because data frames are easier to understand once you know that each column is a list component. A data frame looks rectangular, but internally it is a named list of equal-length vectors. This explains both its flexibility and its indexing rules: `df[rows, columns]` treats it like a table, while `df$column` or `df[["column"]]` extracts a column component.
 
 ## Definitions

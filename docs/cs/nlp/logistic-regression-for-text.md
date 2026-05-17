@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Logistic regression is the standard discriminative baseline for supervised text classification. Jurafsky and Martin present it after Naive Bayes to show how a model can directly estimate $P(y\mid x)$, learn weights by gradient descent, and generalize to multiple classes through softmax. Eisenstein emphasizes the same model as a log-linear classifier, relating it to regularization, convex optimization, and the older maximum entropy name used in NLP.
 
+![An ELIZA terminal conversation shows an early chatbot responding to typed user input.](https://commons.wikimedia.org/wiki/Special:FilePath/ELIZA_conversation.png)
+
+*Figure: ELIZA provides historical context for dialogue systems and chatbot evaluation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ELIZA_conversation.png), Unknown author, public domain text.*
+
 For NLP, logistic regression is important because it sits between count-based classifiers and neural networks. It uses arbitrary features, produces calibrated-ish probabilities when trained carefully, handles correlated features better than Naive Bayes, and provides the softmax and cross-entropy machinery that reappears in neural language models, transformers, sequence labeling, and parsing.
 
 ## Definitions

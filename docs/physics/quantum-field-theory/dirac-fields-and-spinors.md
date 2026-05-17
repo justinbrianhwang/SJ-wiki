@@ -9,6 +9,10 @@ Scalar fields describe spin-zero quanta, but much of matter is fermionic. Electr
 
 The spinor part of QFT is often where notation first becomes dense. The central physical idea is simpler than the notation suggests. A Dirac field is an operator-valued field whose excitations include particles and antiparticles, and the minus signs required by Fermi statistics are implemented by anticommutators or Grassmann variables. Zee's sequence from the Dirac equation to fermion diagrams is meant to make this algebra feel like a necessity rather than a trick.
 
+![A basic Feynman diagram shows an electron and positron annihilating.](https://commons.wikimedia.org/wiki/Special:FilePath/Basic_Feynman_diagram_-_electron_and_positron_annihilate.svg)
+
+*Figure: Electron-positron annihilation is a compact physical scene for interaction vertices and crossing ideas. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Basic_Feynman_diagram_-_electron_and_positron_annihilate.svg), Romainbehar, CC0 1.0.*
+
 ## Definitions
 
 The Dirac Lagrangian is

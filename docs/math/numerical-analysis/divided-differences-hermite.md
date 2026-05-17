@@ -7,6 +7,10 @@ sidebar_position: 7
 
 Divided differences reorganize polynomial interpolation so that new data can be added without rebuilding the entire polynomial. Instead of writing the interpolant in the Lagrange basis, the Newton form writes it as a nested polynomial whose coefficients are computed from a triangular table. This is especially convenient for hand computation, incremental data, and error analysis.
 
+![Colored basis curves combine to form one interpolating polynomial.](https://commons.wikimedia.org/wiki/Special:FilePath/Lagrange_polynomial.svg)
+
+*Figure: Lagrange interpolation builds a polynomial that passes exactly through prescribed data points. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Lagrange_polynomial.svg), Wikimedia Commons contributor, CC BY-SA 3.0.*
+
 Hermite interpolation extends the same idea to derivative data. A Hermite polynomial can match both function values and derivative values at selected nodes, so it captures local slope as well as height. This makes it a natural bridge from ordinary interpolation to cubic splines, finite elements, and high-order initial-value methods.
 
 ## Definitions

@@ -8,6 +8,22 @@ sidebar_position: 0
 
 The discipline that studies how information is encoded, stored, transformed, transmitted, sensed, and protected using quantum-mechanical degrees of freedom. SJ Wiki organizes the field into five sister areas:
 
+![An IBM Quantum System One sits inside a glass enclosure as a practical example of superconducting quantum computing hardware.](https://commons.wikimedia.org/wiki/Special:FilePath/IBM_Q_system_%28Fraunhofer_2%29.jpg)
+
+*Figure: Superconducting quantum-computing hardware packages qubits, cryogenics, microwave control, and readout into one engineered system. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:IBM_Q_system_%28Fraunhofer_2%29.jpg), IBM Research, CC BY 2.0.*
+
+![A single-mode optical fiber carries visible light through a cable, illustrating the physical channel used by many quantum communication links.](https://commons.wikimedia.org/wiki/Special:FilePath/Fiber_Optical_Cable.jpg)
+
+*Figure: Fiber links make quantum communication concrete: photons are the carriers, and loss in the channel is a central system constraint. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fiber_Optical_Cable.jpg), Bquast, CC0 1.0.*
+
+![A NIST drawing shows the nitrogen-vacancy defect embedded in a diamond lattice.](https://commons.wikimedia.org/wiki/Special:FilePath/Nitrogen-vacancy_center.png)
+
+*Figure: NV centers in diamond are solid-state quantum systems used as local magnetic-field and materials sensors. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Nitrogen-vacancy_center.png), National Institute of Standards and Technology, public domain.*
+
+![The LIGO Hanford interferometer stretches across a desert site with two long perpendicular arms.](https://commons.wikimedia.org/wiki/Special:FilePath/LIGO_at_Hanford%2C_Washington_%28LIGO_Pic_16-CC%29.jpg)
+
+*Figure: Gravitational-wave detectors such as LIGO are large-scale precision interferometers where quantum noise and squeezed light matter operationally. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:LIGO_at_Hanford%2C_Washington_%28LIGO_Pic_16-CC%29.jpg), LIGO Laboratory, CC BY 4.0.*
+
 ```mermaid
 flowchart TD
   QIS["Quantum Information Science<br/>encode, transform, transmit, sense, protect quantum states"]

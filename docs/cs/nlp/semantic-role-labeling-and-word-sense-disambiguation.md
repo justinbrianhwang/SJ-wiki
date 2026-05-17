@@ -7,6 +7,10 @@ sidebar_position: 15
 
 Semantic role labeling and word-sense disambiguation move from surface form toward meaning. Jurafsky and Martin cover semantic roles, PropBank-style arguments, thematic role problems, selectional restrictions, and semantic role labeling algorithms. Eisenstein adds predicate-argument semantics, VerbNet, PropBank, FrameNet, SRL as classification and constrained optimization, neural SRL, AMR, and a classification view of word-sense disambiguation.
 
+![A skip-gram word embedding diagram predicts surrounding context words from a center word.](https://commons.wikimedia.org/wiki/Special:FilePath/Word_embeddings_Skip-gram.svg)
+
+*Figure: Skip-gram training ties word meaning to surrounding context. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Word_embeddings_Skip-gram.svg), Jeran Renz, CC BY-SA 4.0.*
+
 Both tasks ask a contextual question. For SRL: who did what to whom, where, when, and how? For WSD: which meaning of a word is intended here? They are distinct tasks, but they share a dependence on syntax, lexical semantics, context, and inventories of labels.
 
 ## Definitions

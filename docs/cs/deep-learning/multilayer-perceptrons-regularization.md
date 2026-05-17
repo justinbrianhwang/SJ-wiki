@@ -7,6 +7,10 @@ sidebar_position: 6
 
 Multilayer perceptrons extend linear models by composing affine transformations with nonlinear activation functions. This is the first point in D2L where the model can represent genuinely nonlinear relationships without manually designing nonlinear features. A linear model can only carve input space with hyperplanes; an MLP can bend those boundaries by learning hidden representations.
 
+![An artificial neural network diagram shows input, hidden, and output layers connected by weights.](https://commons.wikimedia.org/wiki/Special:FilePath/Artificial_neural_network.svg)
+
+*Figure: Layered neural networks make differentiable function approximation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Artificial_neural_network.svg), Cburnett, CC BY-SA 3.0/GFDL.*
+
 The same flexibility creates new training issues. Deep networks can overfit, gradients can vanish or explode, initialization can make learning slow, and regularizers can change both optimization and generalization. D2L treats these as practical engineering concerns rather than isolated theory: activation choice, initialization, dropout, weight decay, and early stopping all shape the behavior of the same training loop.
 
 ## Definitions

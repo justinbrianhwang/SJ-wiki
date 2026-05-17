@@ -7,6 +7,10 @@ sidebar_position: 18
 
 Once a system is represented in the $z$-domain, many classical design ideas reappear with new geometry. Nise shows block-diagram reduction, stability, steady-state error, root locus, gain design, cascade compensation via the $s$-plane, and digital compensator implementation. The central translation is simple: the unit circle replaces the imaginary axis as the stability boundary.
 
+![A compact PID controller block shows proportional, integral, and derivative action.](https://commons.wikimedia.org/wiki/Special:FilePath/PID_Controller.png)
+
+*Figure: PID control turns error history into a practical actuator command. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PID_Controller.png), Hew, public domain.*
+
 Digital design has two common routes. One route discretizes an already designed analog compensator, often with the Tustin transformation. Another route designs directly in the $z$-plane using root locus and transient-response grids. In either case, the final controller must be converted into a difference equation that can run on a processor.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 9
 
 Collections store multiple values on the heap. The book focuses on three standard library collections because they appear constantly in real Rust programs: `Vec<T>`, `String`, and `HashMap<K, V>`. A vector is a growable sequence. A string is a growable UTF-8 text buffer. A hash map associates keys with values. Each collection interacts with ownership, borrowing, and error handling in visible ways.
 
+![The Rust logo marks pages on ownership, borrowing, traits, and safe systems programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Rust_programming_language_black_logo.svg)
+
+*Figure: Rust connects systems control with compile-time memory-safety guarantees. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Rust_programming_language_black_logo.svg), Rust Foundation, CC BY 4.0.*
+
 This page follows [ownership](/cs/programming/rust/ownership-references-slices) because collections own their contents and may reallocate as they grow. It also prepares for [iterators](/cs/programming/rust/closures-and-iterators), because collections are often processed through iterator adapters rather than manual indexing.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 24
 
 Boolean algebra is the algebra of two values, $0$ and $1$. It is equivalent in structure to propositional logic and to set algebra, and it is the mathematical foundation for digital circuit design. Boolean expressions describe Boolean functions; gates implement those expressions physically.
 
+![A Karnaugh map groups Boolean values in a square grid.](https://commons.wikimedia.org/wiki/Special:FilePath/Karnaugh.svg)
+
+*Figure: A Karnaugh map visualizes Boolean simplification for logic circuits. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Karnaugh.svg), Mobius, public domain.*
+
 The value of Boolean algebra is that symbolic laws can simplify hardware. Equivalent expressions compute the same function, but one may use fewer gates, fewer inputs, or a more convenient universal gate type. This makes the topic a meeting point for logic, algebra, and computer engineering.
 
 ## Definitions

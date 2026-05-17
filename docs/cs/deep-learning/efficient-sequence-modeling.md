@@ -7,6 +7,10 @@ sidebar_position: 12.5
 
 Full self-attention is the reference token mixer for modern sequence models, but its cost grows quadratically with sequence length. That is acceptable for many sentences and short documents. It becomes a bottleneck for long documents, code repositories, audio, genomics, video, high-resolution image patches, and any decoder that must keep a large key-value cache during generation.
 
+![An ELIZA terminal conversation shows an early chatbot responding to typed user input.](https://commons.wikimedia.org/wiki/Special:FilePath/ELIZA_conversation.png)
+
+*Figure: ELIZA provides historical context for dialogue systems and chatbot evaluation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ELIZA_conversation.png), Unknown author, public domain text.*
+
 Efficient sequence modeling asks which parts of attention are essential. The answer is not a single architecture. Some methods replace attention with long convolutions, some use linearized attention or recurrent key-value summaries, some use state-space recurrences, and production models often hybridize these ideas with a small amount of attention. The design space is a tradeoff among quality, exact retrieval, training parallelism, inference memory, hardware kernels, and how much history must be remembered exactly.
 
 ## The quadratic attention bottleneck

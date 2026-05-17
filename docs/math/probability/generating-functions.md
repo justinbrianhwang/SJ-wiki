@@ -7,6 +7,10 @@ sidebar_position: 12
 
 Generating functions encode a distribution inside an expectation involving powers or exponentials. They are compact tools for finding moments, proving sums of independent random variables, and proving limit theorems. Moment generating functions are often easiest when they exist near zero. Characteristic functions always exist and are the more general theoretical tool.
 
+![Pierre-Simon de Laplace is shown in a historical engraved portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Pierre-Simon_de_Laplace.jpg)
+
+*Figure: Pierre-Simon de Laplace is a key figure in probability, transforms, and potential theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pierre-Simon_de_Laplace.jpg), Louis Delaistre after Armand-Charles Guilleminot, public domain.*
+
 This page is intentionally brief relative to a full probability-theory course, but it includes the core definitions and computations students need before seeing generating functions in proofs of the central limit theorem or in distribution derivations.
 
 ## Definitions

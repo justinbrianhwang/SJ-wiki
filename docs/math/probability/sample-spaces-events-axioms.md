@@ -7,6 +7,10 @@ sidebar_position: 2
 
 Probability begins by separating two ideas that everyday language often mixes together: the outcomes that could happen and the numerical rules used to describe how likely those outcomes are. A sample space lists the possible outcomes of an experiment, while events are the subsets of outcomes we ask questions about. Once those objects are clear, probability is not a collection of gambling tricks; it is a measure on events.
 
+![Two overlapping circles show a highlighted Venn diagram region.](https://commons.wikimedia.org/wiki/Special:FilePath/Venn0001.svg)
+
+*Figure: A Venn diagram connects set operations with the same logical connectives used in proofs. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Venn0001.svg), Watchduck, public domain.*
+
 This page gives the formal starting point for the rest of probability theory. Lane et al.'s statistics text introduces probability through equally likely outcomes, relative frequencies, simple compound events, and base rates. A probability-theory course keeps those examples but places them inside Kolmogorov's axioms, which work equally well for finite dice rolls, countably infinite waiting times, and continuous measurements such as lifetimes.
 
 ## Definitions

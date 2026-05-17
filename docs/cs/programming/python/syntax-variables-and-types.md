@@ -7,6 +7,10 @@ sidebar_position: 3
 
 Python syntax is designed to make structure visible. Instead of braces around blocks, Python uses indentation; instead of type declarations for ordinary variables, it uses dynamic typing; instead of a mandatory program wrapper, a file can begin with useful statements immediately. Halvorsen's textbook introduces these ideas through small programs: assign a number, print it, combine values in a formula, inspect a variable's type, and gradually build longer scripts.
 
+![The Python logo marks pages on scripting, testing, packaging, and scientific programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Python-logo-notext.svg)
+
+*Figure: Python provides the practical environment for many CS, ML, and data examples. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Python-logo-notext.svg), Python Software Foundation, GPL-compatible free license; trademark terms apply.*
+
 The practical lesson is that Python code is close to executable pseudocode, but it is still precise. Whitespace matters. Names are case-sensitive. Values have types even when variables do not have declared types. A beginner who understands those rules can read most simple Python programs and can diagnose many first errors without guessing.
 
 ## Definitions

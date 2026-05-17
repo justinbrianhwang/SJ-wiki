@@ -7,6 +7,10 @@ sidebar_position: 7
 
 Context-free grammars describe recursive syntax. They are stronger than finite automata because a nonterminal can expand into smaller instances of the same pattern, which naturally represents nesting and balanced structure. This is why CFGs appear in programming-language syntax, arithmetic expressions, markup languages, and parse trees.
 
+![A parse tree expands a formal grammar from the start symbol down to terminal tokens.](https://commons.wikimedia.org/wiki/Special:FilePath/Parse-tree.svg)
+
+*Figure: Parse trees make grammar derivations visible as rooted syntax structures. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Parse-tree.svg), Martin Thoma, CC BY 3.0.*
+
 The grammar viewpoint is generative: a language is the set of terminal strings that can be derived from a start variable. The same language may have many grammars, and a grammar may admit several parse trees for one string. Normal forms such as Chomsky normal form make grammars easier to analyze and connect them to algorithms and pushdown automata.
 
 ## Definitions

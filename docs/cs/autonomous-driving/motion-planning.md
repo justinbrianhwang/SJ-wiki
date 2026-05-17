@@ -7,6 +7,10 @@ sidebar_position: 9
 
 Motion planning converts goals and scene understanding into a physically executable trajectory. It must respect obstacles, lanes, traffic rules, comfort, vehicle dynamics, actuator limits, uncertainty, and the future motion of other agents. In an autonomous-driving stack, planning is where perception errors and prediction uncertainty become concrete choices: brake, continue, yield, change lanes, creep, pull over, or reroute.
 
+![A Waymo self-driving car drives on a public road with roof-mounted sensors.](https://commons.wikimedia.org/wiki/Special:FilePath/Waymo_self-driving_car_front_view.gk.jpg)
+
+*Figure: A real autonomous vehicle grounds the driving stack in a physical platform. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Waymo_self-driving_car_front_view.gk.jpg), Grendelkhan, CC BY-SA 4.0.*
+
 This page covers search-based planning, sampling-based planning, optimization-based planning, model predictive control, iLQR, trajectory optimization, and lattice planners. It links [prediction](/cs/autonomous-driving/prediction-and-motion-forecasting), [behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning), and [control](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley), because planning sits between high-level intent and low-level actuation.
 
 ## Definitions

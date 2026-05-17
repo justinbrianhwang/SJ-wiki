@@ -9,6 +9,10 @@ Planar rigid-body motion combines translation of a body with rotation about an a
 
 The central benefit of the rigid-body model is that distances between points remain fixed. Once the motion of one point and the angular motion are known, the velocity and acceleration of every other point can be related by vector equations. Once the acceleration of the mass center and angular acceleration are known, planar force and moment balance determine or check the required forces.
 
+![An inverted pendulum is mounted on a cart with its angle and cart position labeled.](https://commons.wikimedia.org/wiki/Special:FilePath/Cart-pendulum.svg)
+
+*Figure: The cart-pendulum setup is a classic benchmark for unstable dynamics, feedback, and hybrid simulation tests. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cart-pendulum.svg), Krishnavedala, CC0 1.0.*
+
 ## Definitions
 
 A rigid body in planar motion has angular velocity

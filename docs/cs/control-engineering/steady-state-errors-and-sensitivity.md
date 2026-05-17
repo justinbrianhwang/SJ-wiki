@@ -7,6 +7,10 @@ sidebar_position: 9
 
 Steady-state error measures the accuracy left after transients have died out. In Nise's sequence it follows stability because final error is meaningful only for stable closed-loop systems. A design that tracks accurately while unstable is not a design; it is an invalid calculation.
 
+![An inverted pendulum on a cart shows the unstable plant used in many control examples.](https://commons.wikimedia.org/wiki/Special:FilePath/Cart-pendulum.svg)
+
+*Figure: The cart-pendulum is a concrete plant for modeling, stabilization, and control design. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cart-pendulum.svg), Krishnavedala, CC0.*
+
 The chapter's main message is that low-frequency loop structure determines tracking accuracy. System type, static error constants, disturbance location, nonunity feedback, and parameter sensitivity all describe what remains after the fast behavior is gone. These ideas explain why integral action is so valuable and why gain alone often creates trade-offs with transient response.
 
 ## Definitions

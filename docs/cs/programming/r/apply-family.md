@@ -7,6 +7,10 @@ sidebar_position: 11
 
 R's apply family is a set of tools for repeated work without writing explicit loops every time. The book first introduces implicit looping through `apply`, then later uses functions and lists in ways that make `lapply`, `sapply`, `vapply`, and `mapply` natural. These functions do not make loops disappear; they package common loop patterns into expressions that say what is being applied and to what.
 
+![The R logo marks pages on statistical computing, graphics, and data analysis.](https://commons.wikimedia.org/wiki/Special:FilePath/R_logo.svg)
+
+*Figure: R connects programming examples to statistical modeling and visualization workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:R_logo.svg), The R Foundation, CC BY-SA 4.0.*
+
 The apply family is most useful when each iteration is independent and produces a predictable result. It is less useful when iterations depend heavily on previous iterations, in which case a clear `for` or `while` loop may be better. The goal is readable, reliable iteration, not avoiding the word `for` at all costs.
 
 ## Definitions

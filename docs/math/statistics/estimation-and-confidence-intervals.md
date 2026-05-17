@@ -7,6 +7,10 @@ sidebar_position: 10
 
 Estimation is the statistical task of using sample data to learn about an unknown population parameter. A point estimate gives one best single number, while a confidence interval gives a range of plausible parameter values produced by a method with a known long-run success rate. The Lane text separates estimation from hypothesis testing because estimation asks "how large is the effect or parameter?" rather than only "is it inconsistent with a null value?"
 
+![A central limit theorem simulation shows sample means becoming bell shaped.](https://commons.wikimedia.org/wiki/Special:FilePath/Central_Limit_Theorem.png)
+
+*Figure: A central limit theorem simulation shows why sample means often become approximately normal. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Central_Limit_Theorem.png), Daniel Resende, CC BY-SA 4.0.*
+
 Confidence intervals are easy to compute mechanically and easy to misinterpret. A 95% confidence interval is not a statement that the fixed parameter has a 95% probability of being in this one computed interval under the usual frequentist interpretation. It means that the procedure, used repeatedly in the same way, would capture the true parameter in about 95% of repetitions. The observed interval is then reported as the set of parameter values reasonably compatible with the data and model.
 
 ## Definitions

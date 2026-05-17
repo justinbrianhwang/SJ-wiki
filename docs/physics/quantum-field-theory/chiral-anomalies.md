@@ -9,6 +9,10 @@ An anomaly occurs when a symmetry of the classical action cannot be preserved by
 
 Zee's anomaly chapter fits naturally after gauge theory and symmetry breaking. It shows that symmetries must survive quantization, not merely the classical equations. Global anomalies can explain physical processes such as neutral pion decay. Gauge anomalies are more severe: if a gauge redundancy is anomalous, the theory is inconsistent unless the fermion content cancels the anomaly.
 
+![A Feynman diagram shows two electrons scattering by exchanging a photon.](https://commons.wikimedia.org/wiki/Special:FilePath/Electron-scattering.svg)
+
+*Figure: A Feynman diagram turns perturbation theory into a compact bookkeeping picture for particles, propagators, and vertices. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Electron-scattering.svg), KCVelaga, CC BY-SA 4.0.*
+
 ## Definitions
 
 For a massless Dirac fermion, define vector and axial currents

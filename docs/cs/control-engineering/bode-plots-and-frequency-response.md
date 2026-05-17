@@ -7,6 +7,10 @@ sidebar_position: 13
 
 Frequency response studies the steady-state output of a stable linear system driven by sinusoidal inputs. Nise introduces Bode plots as a practical way to approximate and interpret magnitude and phase over many decades of frequency. The same transfer function used for time response is evaluated on the imaginary axis, $s=j\omega$.
 
+![A Bode plot shows gain and phase changing with frequency.](https://commons.wikimedia.org/wiki/Special:FilePath/Bodeplot.png)
+
+*Figure: Bode plots connect frequency-response calculations to a standard engineering visualization. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bodeplot.png), Stw and Vukg, public domain.*
+
 The value of frequency response is design visibility. Low-frequency gain relates to steady-state tracking. Crossover frequency relates to speed and bandwidth. Phase lag near crossover relates to overshoot and stability margin. Bode plots show these trade-offs in a form engineers can sketch, measure, and tune.
 
 ## Definitions

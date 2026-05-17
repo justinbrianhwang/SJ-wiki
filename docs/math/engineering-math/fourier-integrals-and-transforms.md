@@ -7,6 +7,10 @@ sidebar_position: 17
 
 Fourier transforms extend Fourier series from periodic functions to signals on the whole real line. Instead of discrete harmonic frequencies $n\pi/L$, a nonperiodic signal is decomposed into a continuum of frequencies. This is the mathematical foundation of spectra, filtering, diffraction, signal processing, and many PDE solution formulas.
 
+![Joseph Fourier is shown in a historical portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Joseph_Fourier.jpg)
+
+*Figure: Joseph Fourier's work on heat flow led to Fourier series and transforms. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Joseph_Fourier.jpg), Jules Boilly, public domain.*
+
 The transform trades localization in time or space for frequency information. Smoothness, decay, shifts, modulation, and convolution all have clean frequency-domain interpretations. Compared with the Laplace transform, the Fourier transform is usually two-sided and emphasizes steady spectral content rather than initial-value algebra.
 
 ## Definitions

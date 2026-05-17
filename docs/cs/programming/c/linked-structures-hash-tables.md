@@ -7,6 +7,10 @@ sidebar_position: 11
 
 After introducing structures, K&R immediately applies them to dynamic data structures: binary trees for word counting and linked lists for hash-table buckets. These examples matter because they combine several earlier ideas at once: pointers to structures, recursion, dynamic allocation, string copying, arrays of pointers, and careful ownership of memory.
 
+![A C language logo marks the systems-programming pages built around C examples.](https://commons.wikimedia.org/wiki/Special:FilePath/C_Programming_Language.svg)
+
+*Figure: C remains the reference language for low-level memory, pointers, and Unix interfaces. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:C_Programming_Language.svg), ElodinKaldwin, public domain text logo.*
+
 The examples are small versions of real compiler and text-processing machinery. A tree stores sorted words with counts. A hash table stores names and replacement text for something like a macro processor. Both show why structures are more than grouped variables: a structure can point to another structure of the same type, creating a graph of objects.
 
 ## Definitions

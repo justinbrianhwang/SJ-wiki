@@ -7,6 +7,10 @@ sidebar_position: 12
 
 Rust's type system prevents many bugs, but it does not prove that program logic matches the user's intent. Automated tests fill that gap. The book presents tests as ordinary Rust functions annotated with attributes and run by Cargo's test harness. Tests can check success values, expected panics, error returns, private helper functions, and public crate behavior from integration tests.
 
+![The Rust logo marks pages on ownership, borrowing, traits, and safe systems programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Rust_programming_language_black_logo.svg)
+
+*Figure: Rust connects systems control with compile-time memory-safety guarantees. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Rust_programming_language_black_logo.svg), Rust Foundation, CC BY 4.0.*
+
 This page follows [error handling](/cs/programming/rust/error-handling) because tests often use panics, assertions, and `Result`. It also supports every later project page: once a Rust program grows past examples, `cargo test` becomes part of the normal edit loop alongside `cargo check`.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 13
 
 Object-oriented metrics measure properties of class-based software that traditional control-flow metrics do not capture well. Gustafson's chapter explains why McCabe and Halstead-style metrics are not enough for OO systems: methods are often small, while complexity appears in inheritance, coupling, dynamic dispatch, and relationships among classes. The chapter presents the Chidamber and Kemerer metrics suite and the MOOD metrics.
 
+![Two programmers work together at one computer in a pair-programming setup.](https://commons.wikimedia.org/wiki/Special:FilePath/Pair_Programming.jpg)
+
+*Figure: Pair programming makes collaboration and review practices concrete. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pair_Programming.jpg), Calqui, CC BY-SA 3.0.*
+
 The subject remains partly research-oriented in the source. The chapter does not claim final consensus; it presents metrics that were influential and useful for reasoning about OO designs. The key engineering lesson is to measure the structural properties that actually create maintenance and testing risk: too many methods, deep inheritance, excessive children, high coupling, large response sets, low cohesion, weak encapsulation, and uncontrolled polymorphism.
 
 ## Definitions

@@ -11,6 +11,10 @@ The standard protocol was introduced by Bennett, Brassard, Crepeau, Jozsa, Peres
 
 Nielsen and Chuang Section 1.3.7 is the primary reference for the circuit derivation used on this page. Their emphasis is useful for networking: teleportation converts resources. One pre-shared EPR pair plus two classical bits can substitute for one use of an ideal qubit channel, while the original input is consumed by measurement.
 
+![An optical entanglement experiment uses spontaneous parametric down-conversion to create correlated photon pairs.](https://commons.wikimedia.org/wiki/Special:FilePath/Quantum_Entanglement_Experiment_via_Spontaneous_Parametric_Down-Conversion_%28SPDC%29.jpg)
+
+*Figure: Teleportation consumes a pre-shared entangled pair, which in photonic demonstrations often begins with an optical entanglement source rather than a circuit diagram. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quantum_Entanglement_Experiment_via_Spontaneous_Parametric_Down-Conversion_%28SPDC%29.jpg), Farbodk, CC BY-SA 4.0.*
+
 ## Definitions
 
 Let Alice hold an unknown input qubit $A$,
@@ -201,9 +205,9 @@ flowchart LR
   MB -. "classical bit c1" .-> XCorr
 ```
 
-![Quantum teleportation circuit with Pauli corrections — the figure shows Alice's Bell measurement, two classical bits, and Bob's conditional X and Z corrections.](https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Quantum_teleportation_circuit_pauli_gates.svg/1280px-Quantum_teleportation_circuit_pauli_gates.svg.png)
+![Quantum teleportation circuit with Pauli corrections - the figure shows Alice's Bell measurement, two classical bits, and Bob's conditional X and Z corrections.](https://commons.wikimedia.org/wiki/Special:FilePath/Quantum_teleportation_circuit_pauli_gates.svg)
 
-*Figure: The teleportation circuit implements a Bell-basis measurement followed by classically controlled Pauli corrections. From [Buecherdiebin, 2024](https://commons.wikimedia.org/wiki/File:Quantum_teleportation_circuit_pauli_gates.svg) — CC BY-SA 4.0.*
+*Figure: The teleportation circuit implements a Bell-basis measurement followed by classically controlled Pauli corrections. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quantum_teleportation_circuit_pauli_gates.svg), Buecherdiebin, CC BY-SA 4.0.*
 
 The circuit shows all three resources in the teleportation identity: Alice's unknown input, the pre-shared Bell pair, and the two classical correction bits. Alice performs a CNOT and Hadamard before measuring both local qubits, which destroys the original input while producing $c_0$ and $c_1$. Bob's dotted classical controls select the $X$ and $Z$ Pauli corrections that reconstruct the input state on his qubit.
 

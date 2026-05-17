@@ -7,6 +7,18 @@ sidebar_position: 1
 
 Computer architecture studies the contract between software and hardware, and the organization that makes that contract fast, efficient, dependable, and affordable. In the quantitative tradition of Hennessy and Patterson, architectural ideas are evaluated by execution time, throughput, energy, cost, and reliability rather than by elegance alone. A cache, branch predictor, pipeline, vector unit, or multicore interconnect is useful only when it improves the measured behavior of real workloads under real constraints.
 
+![An ENIAC installation shows early computer architecture as cabinets, switches, and wiring.](https://commons.wikimedia.org/wiki/Special:FilePath/ENIAC_Penn1.jpg)
+
+*Figure: ENIAC gives architecture pages a physical reference point before modern chips. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ENIAC_Penn1.jpg), Paul W. Shaffer and TexasDex, CC BY-SA 3.0/GFDL.*
+
+![An opened Intel 4004 processor exposes the silicon die inside its package.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_4004_open.jpg)
+
+*Figure: Opening the package links instruction-set discussions to the physical die. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_4004_open.jpg), Science Museum Group, CC BY 4.0.*
+
+![An Intel 4004 package shows one of the first commercial microprocessors.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_4004.jpg)
+
+*Figure: The Intel 4004 marks the transition from board-level logic to microprocessors. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_4004.jpg), LucaDetomi at Italian Wikipedia, CC BY-SA 3.0/GFDL.*
+
 These notes follow the scope of *Computer Architecture: A Quantitative Approach*, 5th edition: quantitative design, memory hierarchy, instruction-level parallelism, data-level parallelism, thread-level parallelism, warehouse-scale computing, and supporting appendix topics such as instruction sets, pipelining, virtual memory, and storage. They are written as original study notes, with formulas, diagrams, worked examples, and small runnable models.
 
 ## Definitions

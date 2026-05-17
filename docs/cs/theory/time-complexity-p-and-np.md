@@ -7,6 +7,10 @@ sidebar_position: 14
 
 Computability asks whether a problem can be solved at all. Complexity asks whether it can be solved within a reasonable resource bound. Time complexity measures how the number of computation steps grows with input length. This shifts attention from possible to feasible, and from isolated algorithms to classes of problems.
 
+![A square Kufic algorithms mark introduces the study of designed procedures.](https://commons.wikimedia.org/wiki/Special:FilePath/Algorithms.svg)
+
+*Figure: The algorithms mark gives the abstract algorithms pages a concrete visual anchor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Algorithms.svg), Jeff Erickson, CC BY 4.0.*
+
 The classes P and NP are the center of introductory complexity theory. P contains decision problems solvable in polynomial time. NP contains decision problems whose yes-instances have polynomial-size certificates verifiable in polynomial time, equivalently decidable by nondeterministic polynomial-time Turing machines. The unresolved question $P$ versus $NP$ asks whether efficient verification always implies efficient solution.
 
 ## Definitions

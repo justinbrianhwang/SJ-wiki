@@ -7,6 +7,10 @@ sidebar_position: 3
 
 Functions are the first major abstraction tool in C++. They let a program give a name to a computation, isolate local state, document preconditions and postconditions, and reuse one tested operation in many places. Savitch presents functions in two stages: first the mechanics of predefined and programmer-defined functions, then the parameter-passing rules that determine whether a function receives a copy of a value or direct access to the caller's variable.
 
+![The ISO C++ logo marks pages on classes, templates, containers, and modern C++ idioms.](https://commons.wikimedia.org/wiki/Special:FilePath/ISO_C%2B%2B_Logo.svg)
+
+*Figure: C++ extends systems programming with abstraction, generic code, and deterministic resource management. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ISO_C%2B%2B_Logo.svg), Jeremy Kratz, public domain text logo.*
+
 The central discipline is to think about what a function promises, not only what lines of code it contains. A good function has a narrow purpose, a clear parameter list, and a return mode that matches the job. It either computes and returns a value, performs an action through side effects, or carefully combines both when that combination is justified.
 
 ## Definitions

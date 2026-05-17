@@ -9,6 +9,10 @@ Vibration is dynamics focused on motion near equilibrium. A single-degree-of-fre
 
 This page ties together Newton's second law, work-energy ideas, and linearization. The same mass-spring-damper model appears in machinery, vehicle suspensions, building response, instruments, isolation mounts, and control systems. Even when real systems have many degrees of freedom, the single-degree model gives the vocabulary: natural frequency, damping ratio, resonance, phase, and transmissibility.
 
+![A spring-mass harmonic oscillator shows displacement, spring force, and equilibrium position.](https://commons.wikimedia.org/wiki/Special:FilePath/Harmonic_oscillator.svg)
+
+*Figure: The mass-spring oscillator is the canonical apparatus behind resonance, normal modes, and linearization. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Harmonic_oscillator.svg), LucasVB, public domain.*
+
 ## Definitions
 
 A **single-degree-of-freedom** system is one whose configuration can be described by one coordinate $x(t)$ after constraints are applied. The standard linear mass-spring-damper equation is

@@ -7,6 +7,10 @@ sidebar_position: 8
 
 BCNF and 3NF handle redundancy explained by functional dependencies. Some schemas still contain redundancy even when no functional dependency is responsible. Multivalued dependencies capture a different pattern: two or more independent many-valued facts about the same key are stored in one relation. Fourth normal form removes that redundancy.
 
+![An entity-relationship table diagram shows linked tables for relational modeling.](https://commons.wikimedia.org/wiki/Special:FilePath/CPT-Databases-ExampleLinkTables.svg)
+
+*Figure: Link tables make many-to-many relationships concrete in a relational schema. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:CPT-Databases-ExampleLinkTables.svg), Pluke, CC0.*
+
 Decomposition is the practical operation behind normalization. It replaces one relation by two or more relations that store the same information with fewer anomalies. The quality of a decomposition is judged by lossless join, dependency preservation, and the normal form reached. These goals can pull in different directions, which is why design is an engineering activity rather than a purely mechanical exercise.
 
 ## Definitions

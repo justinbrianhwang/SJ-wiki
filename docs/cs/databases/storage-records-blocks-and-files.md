@@ -7,6 +7,10 @@ sidebar_position: 9
 
 The relational model hides physical storage, but database systems live on real hardware. Records must be laid out in pages or blocks, pages must be read into memory, and files must be organized so that common access patterns are not painfully expensive. Storage design explains why a query can be fast or slow before indexes and optimizers even enter the discussion.
 
+![A PostgreSQL B-tree diagram shows index pages connected by parent and leaf links.](https://commons.wikimedia.org/wiki/Special:FilePath/PostgreSQL_B-tree.svg)
+
+*Figure: PostgreSQL B-tree pages show how logical indexes map to storage structures. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PostgreSQL_B-tree.svg), Kelti, CC BY-SA 4.0.*
+
 This topic connects the logical world of relations to the implementation world of disks, flash storage, memory, and buffer managers. A database administrator can declare a table and write SQL without specifying exact record offsets, but a DBMS still chooses layouts and file organizations. Understanding those choices makes indexing, query processing, recovery, and transaction performance easier to reason about.
 
 ## Definitions

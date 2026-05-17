@@ -7,6 +7,10 @@ sidebar_position: 15
 
 Fourier series represent periodic functions as sums of sines and cosines. The engineering interpretation is modal decomposition: a complicated periodic signal, force, temperature distribution, or vibration shape is built from pure harmonic components. Each coefficient measures how much of one frequency is present.
 
+![Joseph Fourier is shown in a historical portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Joseph_Fourier.jpg)
+
+*Figure: Joseph Fourier's work on heat flow led to Fourier series and transforms. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Joseph_Fourier.jpg), Jules Boilly, public domain.*
+
 The same idea solves boundary-value PDEs. If the boundary conditions match sine or cosine modes, the initial shape can be expanded in that basis and each mode evolves independently. Fourier series therefore connect approximation, signal analysis, heat flow, wave motion, and Sturm-Liouville theory.
 
 ## Definitions

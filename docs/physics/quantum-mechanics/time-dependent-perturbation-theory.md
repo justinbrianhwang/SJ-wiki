@@ -9,6 +9,10 @@ Time-dependent perturbation theory predicts transitions. Instead of asking how a
 
 Sakurai derives the formalism in the interaction picture and uses constant and harmonic perturbations to reach the golden rule. Ballentine treats time-dependent phenomena alongside decay, beats, and adiabatic behavior. The Gottfried-named notes follow a similar interaction-picture route. Schiff's older treatment often emphasizes explicit integrals of transition amplitudes in wave mechanics.
 
+![A Stern-Gerlach apparatus splits a beam into discrete spin outcomes.](https://commons.wikimedia.org/wiki/Special:FilePath/Stern-Gerlach_experiment.svg)
+
+*Figure: The Stern-Gerlach experiment is the physical scene behind spin quantization and quantum measurement. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Stern-Gerlach_experiment.svg), Tatoute, CC BY-SA 4.0.*
+
 ## Definitions
 
 Split the Hamiltonian as

@@ -9,6 +9,10 @@ Gravitation and Kepler's Laws covers Newtonian gravitation, orbital motion, grav
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
+![William Blake's portrait of Isaac Newton shows geometry as a physical way of thinking.](https://commons.wikimedia.org/wiki/Special:FilePath/Newton-WilliamBlake.jpg)
+
+*Figure: Blake's Newton gives the mechanics section a historical anchor for forces, geometry, and idealization. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Newton-WilliamBlake.jpg), William Blake, public domain.*
+
 ## Definitions
 
 - **Scope:** Newtonian gravitation, orbital motion, gravitational potential energy, and Kepler's laws.

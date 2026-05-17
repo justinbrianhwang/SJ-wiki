@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Streams give C++ a uniform model for input and output. Keyboard input, screen output, file input, file output, and string parsing all use objects that move characters into or out of a program. Savitch emphasizes that once a stream is opened, file I/O looks much like the `cin` and `cout` operations used in early console programs.
 
+![The ISO C++ logo marks pages on classes, templates, containers, and modern C++ idioms.](https://commons.wikimedia.org/wiki/Special:FilePath/ISO_C%2B%2B_Logo.svg)
+
+*Figure: C++ extends systems programming with abstraction, generic code, and deterministic resource management. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ISO_C%2B%2B_Logo.svg), Jeremy Kratz, public domain text logo.*
+
 The important design habit is to treat I/O as a stateful process that can fail. Opening a file can fail. Reading can fail. A loop can accidentally process stale data after an unsuccessful extraction. Good file programs check stream state and structure loops around successful reads.
 
 ## Definitions

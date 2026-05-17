@@ -7,6 +7,10 @@ sidebar_position: 10
 
 When two random variables are studied together, we often want to know whether they move together, move oppositely, or have no systematic linear relationship. Covariance measures joint variation in original units; correlation standardizes it to a number between $-1$ and $1$. Independence is stronger: it means the full distribution of one variable is unchanged by knowing the other.
 
+![Scatterplots show several patterns and Pearson correlation coefficients.](https://commons.wikimedia.org/wiki/Special:FilePath/Correlation_examples2.svg)
+
+*Figure: Correlation examples show how association strength and visual pattern are related but not identical. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Correlation_examples2.svg), DenisBoigelot and Imagecreator, public domain.*
+
 This distinction matters throughout statistics. A zero correlation can be useful, but it does not by itself mean that variables are unrelated. Many nonlinear relationships have zero covariance. Conversely, independence implies zero covariance when variances exist, but the reverse implication usually fails.
 
 ## Definitions

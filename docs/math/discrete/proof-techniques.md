@@ -7,6 +7,10 @@ sidebar_position: 4
 
 A proof is a finite chain of justified steps from hypotheses to a conclusion. The main challenge is not remembering a ritual but matching the form of the statement to a method that exposes why it is true. Conditional statements invite direct proof or contraposition. Negated statements invite contradiction. Universal statements require arbitrary elements. Existential statements require witnesses or a carefully justified nonconstructive argument.
 
+![Leonhard Euler is shown in an eighteenth-century portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Leonhard_Euler.jpg)
+
+*Figure: Leonhard Euler's notation and results appear across analysis, graph theory, and number theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Leonhard_Euler.jpg), Jakob Emanuel Handmann, public domain.*
+
 Discrete mathematics uses proof techniques constantly because many objects are finite, symbolic, and rule based. Algorithms need correctness proofs, counting formulas need double-counting or bijective proofs, graph statements need structural arguments, and number theory statements need divisibility reasoning. A good proof makes the dependencies visible enough that another reader can check every step.
 
 ## Definitions

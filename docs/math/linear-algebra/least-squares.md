@@ -9,7 +9,7 @@ Least squares solves inconsistent systems by changing the goal. If $A\mathbf{x}=
 
 This is one of the most important applied ideas in linear algebra. Data rarely fit a model perfectly. Least squares gives a principled way to choose the model parameters whose predictions have the smallest Euclidean error. It is the algebraic foundation of linear regression, curve fitting, signal approximation, and many inverse problems.
 
-![A scatterplot has a straight regression line fitted through the points.](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Linear_regression.svg/500px-Linear_regression.svg.png)
+![A scatterplot has a straight regression line fitted through the points.](https://commons.wikimedia.org/wiki/Special:FilePath/Linear_regression.svg)
 
 *Figure: Least-squares line fitted to scattered data. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Linear_regression.svg), Sewaqu, public domain.*
 

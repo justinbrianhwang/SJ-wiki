@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Pipelining overlaps the execution of multiple instructions by dividing processor work into stages. It is the architectural version of an assembly line: one instruction is fetched while another is decoded, another uses the ALU, another accesses memory, and another writes its result. The benefit is throughput, not the latency of one isolated instruction.
 
+![An opened Intel 4004 processor exposes the silicon die inside its package.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_4004_open.jpg)
+
+*Figure: Opening the package links instruction-set discussions to the physical die. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_4004_open.jpg), Science Museum Group, CC BY 4.0.*
+
 The classic five-stage RISC pipeline is simple enough to reason about but rich enough to expose the central problems of processor implementation. Structural hazards occur when two instructions need the same hardware resource. Data hazards occur when an instruction needs a value that an earlier instruction has not yet produced. Control hazards occur when the next instruction address depends on a branch or jump that has not yet been resolved.
 
 ## Definitions

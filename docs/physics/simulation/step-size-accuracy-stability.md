@@ -9,6 +9,14 @@ Step size is the most visible simulation setting, but it controls several differ
 
 The central lesson is that a simulation result is a numerical experiment, not a direct view of the differential equation. A physically stable model can become unstable after discretization. A plotted curve can look smooth while missing peak values or event times. The modeler needs a step-size selection process that checks local error, global behavior, solver stability, and the time scales present in the system.
 
+![Euler's method advances along tangent-line steps compared with the exact curve.](https://commons.wikimedia.org/wiki/Special:FilePath/Euler_method.svg)
+
+*Figure: Euler stepping makes local truncation error visible as the gap between a tangent advance and the true trajectory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Euler_method.svg), Oleg Alexandrov, public domain.*
+
+![Several one-step numerical methods are compared against an exact solution curve.](https://commons.wikimedia.org/wiki/Special:FilePath/Runge-kutta.svg)
+
+*Figure: Runge-Kutta comparisons show how staged slopes improve simulated trajectories over simple Euler steps. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Runge-kutta.svg), T.gauster, CC BY-SA 3.0.*
+
 ## Definitions
 
 For a fixed-step simulation, the time grid is

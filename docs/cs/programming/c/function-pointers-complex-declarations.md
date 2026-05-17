@@ -7,6 +7,10 @@ sidebar_position: 9
 
 K&R's pointer chapter ends with two topics that define advanced C style: pointers to functions and complicated declarations. Function pointers let algorithms accept behavior as an argument, as in a sort routine that can compare strings lexicographically or numerically. Complex declarations arise because C declaration syntax mirrors expression syntax; this is elegant for simple cases and difficult for nested arrays, pointers, and functions.
 
+![A C language logo marks the systems-programming pages built around C examples.](https://commons.wikimedia.org/wiki/Special:FilePath/C_Programming_Language.svg)
+
+*Figure: C remains the reference language for low-level memory, pointers, and Unix interfaces. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:C_Programming_Language.svg), ElodinKaldwin, public domain text logo.*
+
 The practical goal is not to write unreadable declarations. It is to understand the ones that appear in libraries, callbacks, signal handlers, sorting routines, and system interfaces. K&R's advice is still sound: build complex types in small steps, often with `typedef`, and verify declarations by reading from the identifier outward.
 
 ## Definitions

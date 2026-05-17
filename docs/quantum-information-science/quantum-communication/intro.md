@@ -11,6 +11,14 @@ The neighboring areas matter. [Quantum computing](/quantum-information-science/q
 
 Primary textbook reference for this section: Nielsen and Chuang, *Quantum Computation and Quantum Information*, especially Chapter 12 for quantum information theory, Holevo's theorem, privacy amplification, and BB84 security, and Chapter 8 for quantum noise and channel modeling. The pages in this folder synthesize that textbook foundation with existing practical QKD and network material rather than duplicating separate textbook-specific pages.
 
+![A glowing single-mode optical fiber illustrates the lossy physical channel that carries photons in many QKD systems.](https://commons.wikimedia.org/wiki/Special:FilePath/Fiber_Optical_Cable.jpg)
+
+*Figure: Optical fiber is the everyday hardware behind many terrestrial quantum links, but quantum states cannot be copied and optically amplified like classical signals. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fiber_Optical_Cable.jpg), Bquast, CC0 1.0.*
+
+![A BB84 network diagram shows Alice sending polarized light across an insecure quantum channel to Bob while Eve listens.](https://commons.wikimedia.org/wiki/Special:FilePath/BB84-network_setup.svg)
+
+*Figure: BB84 turns the Alice-Bob-Eve setting into a physical experiment with a source, quantum channel, receiver, and eavesdropping model. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:BB84-network_setup.svg), Andy Spencer, CC BY-SA 3.0.*
+
 ## Definitions
 
 **Quantum communication** is any communication protocol in which at least one transmitted system must be modeled as a quantum state. The payload may be a single photon polarization, a time-bin qubit, a phase-encoded weak optical pulse, an entangled pair shared between nodes, or a more complex encoded state.

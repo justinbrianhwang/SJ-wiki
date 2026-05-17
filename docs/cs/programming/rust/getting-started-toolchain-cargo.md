@@ -7,6 +7,10 @@ sidebar_position: 2
 
 Rust starts with an unusually strong toolchain story. The language is compiled, statically typed, and strict about memory safety, but the first workflow the book teaches is deliberately small: install Rust, compile `main.rs`, then let Cargo manage the project layout. That progression matters because Rust programs quickly depend on more than a single source file. The compiler `rustc` is still the foundation, but day-to-day Rust work usually happens through `cargo`.
 
+![The Rust logo marks pages on ownership, borrowing, traits, and safe systems programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Rust_programming_language_black_logo.svg)
+
+*Figure: Rust connects systems control with compile-time memory-safety guarantees. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Rust_programming_language_black_logo.svg), Rust Foundation, CC BY 4.0.*
+
 This page sits before the language chapters. Its purpose is to connect the tools with the mental model: source code becomes a crate, Cargo builds the crate, and the compiler checks the program before any executable is produced. Later pages on [modules and crates](/cs/programming/rust/packages-crates-modules), [Cargo workflows](/cs/programming/rust/cargo-crates-io-workflow), and [testing](/cs/programming/rust/automated-tests) build on this same structure.
 
 ## Definitions

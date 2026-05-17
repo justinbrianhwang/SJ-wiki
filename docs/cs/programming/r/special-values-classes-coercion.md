@@ -7,6 +7,10 @@ sidebar_position: 8
 
 Real data rarely arrives as neat numeric vectors with no surprises. R has several special values for missingness, undefined calculations, infinite results, and absent objects. It also has type and class systems that determine how functions interpret values. The book places these ideas after vectors, factors, lists, and data frames because they explain many of R's most confusing beginner errors.
 
+![The R logo marks pages on statistical computing, graphics, and data analysis.](https://commons.wikimedia.org/wiki/Special:FilePath/R_logo.svg)
+
+*Figure: R connects programming examples to statistical modeling and visualization workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:R_logo.svg), The R Foundation, CC BY-SA 4.0.*
+
 The practical message is simple: inspect objects before analyzing them. `NA`, `NaN`, `Inf`, `NULL`, character-to-numeric coercion, factor coding, date classes, and data frame column classes all change what a function can do. A statistical answer is only as reliable as the object structure that produced it.
 
 ## Definitions

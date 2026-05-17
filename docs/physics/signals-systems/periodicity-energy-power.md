@@ -9,6 +9,10 @@ Signals can be classified by how they repeat and by how much accumulated magnitu
 
 The words energy and power are mathematical analogies unless the signal is literally voltage, current, displacement, or another physical quantity in a specified system. In signals and systems, they measure size. Energy accumulates $\vert x\vert ^2$ over all time or samples. Average power measures the long-term average of $\vert x\vert ^2$ over a growing symmetric observation window.
 
+![An animation decomposes a square wave into sinusoidal components and a frequency-domain spectrum.](https://commons.wikimedia.org/wiki/Special:FilePath/Fourier_transform_time_and_frequency_domains.gif)
+
+*Figure: Fourier analysis becomes concrete when a time waveform and its spectral lines are shown side by side. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fourier_transform_time_and_frequency_domains.gif), Lucas Vieira, public domain.*
+
 ## Definitions
 
 A continuous-time signal $x(t)$ is periodic if there exists a positive number $T$ such that

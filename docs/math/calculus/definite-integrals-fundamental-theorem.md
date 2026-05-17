@@ -9,7 +9,7 @@ The definite integral measures accumulated change. It begins as a limit of sums,
 
 This topic is the hinge between differential and integral calculus. Derivatives measure local change; definite integrals add local contributions over an interval. The Fundamental Theorem says these operations are inverse in a precise sense, provided the hypotheses are satisfied.
 
-![Rectangles under a curve approximate the area of a region in a Riemann sum.](https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Riemannsumme.svg/500px-Riemannsumme.svg.png)
+![Rectangles under a curve approximate the area of a region in a Riemann sum.](https://commons.wikimedia.org/wiki/Special:FilePath/Riemannsumme.svg)
 
 *Figure: Riemann-sum approximation of area under a curve. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Riemannsumme.svg), Emes2k, public domain.*
 

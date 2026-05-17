@@ -7,6 +7,10 @@ sidebar_position: 13
 
 Counting turns structure into numbers. Before using formulas, identify whether choices are independent, mutually exclusive, ordered, unordered, repeatable, or constrained. Most errors in elementary combinatorics come from counting the same object more than once or failing to count all cases.
 
+![Pascal's triangle fills in row by row with binomial coefficients.](https://commons.wikimedia.org/wiki/Special:FilePath/PascalTriangleAnimated2.gif)
+
+*Figure: Pascal's triangle organizes binomial coefficients, combinations, and recurrence patterns. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PascalTriangleAnimated2.gif), Hersfold, public domain.*
+
 The goal is not to memorize a formula for every situation. It is to describe the objects being counted so precisely that the correct rule becomes visible. Sum, product, subtraction, division, pigeonhole, and inclusion-exclusion are the core tools behind permutations, combinations, probability, graph enumeration, and recurrence modeling.
 
 ## Definitions

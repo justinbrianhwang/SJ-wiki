@@ -7,6 +7,10 @@ sidebar_position: 3
 
 R's basic unit of computation is the vector. Even a single number such as `7` is treated as a vector of length one. This explains why early R code feels different from calculator-style programming: most arithmetic, comparison, mathematical, and summary functions naturally act on many values at once. The book introduces this style immediately after setup because it is the foundation for later matrices, data frames, statistics, and plots.
 
+![The R logo marks pages on statistical computing, graphics, and data analysis.](https://commons.wikimedia.org/wiki/Special:FilePath/R_logo.svg)
+
+*Figure: R connects programming examples to statistical modeling and visualization workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:R_logo.svg), The R Foundation, CC BY-SA 4.0.*
+
 A beginner can write loops in R, but idiomatic R first asks whether the operation is vectorized. If you want to add 10 to every score, you write `scores + 10`, not a loop over positions. If you want to test which cars have more than 25 miles per gallon, you write `mtcars$mpg > 25`. The result is another vector, often a logical vector used for filtering or summaries.
 
 ## Definitions

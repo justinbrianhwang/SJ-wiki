@@ -9,9 +9,13 @@ Symmetry is often most powerful when the equations have it but the state does no
 
 This cluster of ideas is central to both particle physics and condensed matter. The pion is understood as an approximate Goldstone boson of chiral symmetry breaking. Superconductivity and the electroweak theory both use the Higgs mechanism. Zee treats these topics as one conceptual family: a vacuum is not passive; its structure determines the particle spectrum.
 
-![A Mexican-hat potential plot shows a circular valley around an unstable symmetric maximum.](https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Mexican_hat_potential_polar.svg/500px-Mexican_hat_potential_polar.svg.png)
+![A Mexican-hat potential plot shows a circular valley around an unstable symmetric maximum.](https://commons.wikimedia.org/wiki/Special:FilePath/Mexican_hat_potential_polar.svg)
 
 *Figure: Mexican-hat potential used to visualize spontaneous symmetry breaking. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mexican_hat_potential_polar.svg), Rupert Millard, public domain.*
+
+![The Standard Model chart groups quarks, leptons, gauge bosons, and the Higgs boson.](https://commons.wikimedia.org/wiki/Special:FilePath/Standard_Model_of_Elementary_Particles.svg)
+
+*Figure: The Standard Model chart gives QFT pages a concrete particle-spectrum map. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Standard_Model_of_Elementary_Particles.svg), Cush and MissMJ, public domain/CC BY 3.0.*
 
 ## Definitions
 

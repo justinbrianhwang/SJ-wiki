@@ -7,6 +7,10 @@ sidebar_position: 10
 
 Root locus is a graphical method for seeing how closed-loop poles move as a parameter, usually gain, changes. Nise emphasizes it because it connects stability, transient response, and design intuition in one $s$-plane picture. Instead of repeatedly solving the closed-loop characteristic equation for many gains, the designer sketches the paths that poles must follow.
 
+![A feedback control block diagram shows compensators wrapped around a plant.](https://commons.wikimedia.org/wiki/Special:FilePath/Control_System.svg)
+
+*Figure: The standard feedback loop keeps control pages tied to the plant-controller interface. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Control_System.svg), Inductiveload, public domain.*
+
 The method is built around the characteristic equation $1+KG(s)H(s)=0$. Points on the root locus are candidate closed-loop pole locations. Once a point is chosen, the gain required to place a pole there is found from the magnitude condition. This makes root locus a design tool, not only an analysis tool.
 
 ## Definitions

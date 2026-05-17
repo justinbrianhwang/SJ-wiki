@@ -7,6 +7,10 @@ sidebar_position: 18
 
 Generative adversarial networks are D2L's introduction to adversarial generative modeling. A generator learns to produce samples, while a discriminator learns to distinguish generated samples from real data. The two networks define a game: the discriminator improves its ability to detect fakes, and the generator improves its ability to fool the discriminator.
 
+![An artificial neural network diagram shows input, hidden, and output layers connected by weights.](https://commons.wikimedia.org/wiki/Special:FilePath/Artificial_neural_network.svg)
+
+*Figure: Layered neural networks make differentiable function approximation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Artificial_neural_network.svg), Cburnett, CC BY-SA 3.0/GFDL.*
+
 GANs are important because they separate sample generation from explicit likelihood calculation. They can produce sharp images, and DCGANs show how convolutional design principles apply to generation. They are also notoriously delicate: loss curves can be hard to interpret, training can collapse to few modes, and the balance between generator and discriminator matters.
 
 ## Definitions

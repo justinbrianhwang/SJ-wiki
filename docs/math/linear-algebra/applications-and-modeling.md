@@ -7,6 +7,10 @@ sidebar_position: 20
 
 Linear algebra is a modeling language. A model becomes linear when unknown quantities combine by addition and scalar multiplication: flows through networks, currents in circuits, chemical reaction coefficients, input-output economics, Markov transitions, polynomial interpolation, curve fitting, and data compression.
 
+![A straight regression line is fitted through scattered data points.](https://commons.wikimedia.org/wiki/Special:FilePath/Linear_regression.svg)
+
+*Figure: Least squares turns geometric projection into a practical model-fitting method. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Linear_regression.svg), Sewaqu, public domain.*
+
 The common pattern is to translate a real constraint into an equation, collect unknowns in a vector, and let a matrix encode how those unknowns contribute. Once the model is written as $A\mathbf{x}=\mathbf{b}$, $\mathbf{x}_{k+1}=A\mathbf{x}_k$, or an optimization problem such as least squares, the theory of the previous pages becomes usable.
 
 ## Definitions

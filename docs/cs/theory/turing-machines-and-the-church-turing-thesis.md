@@ -7,6 +7,10 @@ sidebar_position: 10
 
 Turing machines are the course's full-strength model of algorithmic computation. A Turing machine has finite control like a DFA, but it also has a tape that can be read, written, and revisited. This tape supplies unbounded working memory, allowing the machine to simulate algorithms, manipulate encodings, and perform computations that finite automata and pushdown automata cannot express.
 
+![A portrait of Alan Turing as a teenager gives computability theory historical context.](https://commons.wikimedia.org/wiki/Special:FilePath/Alan_Turing_Aged_16.jpg)
+
+*Figure: Alan Turing's work on computation and undecidability frames the theory section. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Alan_Turing_Aged_16.jpg), Unknown photographer, public domain.*
+
 The model is intentionally austere. It does not resemble a modern processor in speed or convenience, but it captures the fundamental idea of a step-by-step effective procedure. The Church-Turing thesis is the philosophical and mathematical claim that this simple model captures exactly the intuitive notion of algorithmic computability.
 
 ## Definitions

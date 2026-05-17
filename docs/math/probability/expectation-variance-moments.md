@@ -7,6 +7,10 @@ sidebar_position: 8
 
 Expectation summarizes the long-run center of a random variable; variance summarizes its spread; moments summarize increasingly detailed features of its distribution. These quantities are not substitutes for the full distribution, but they are often the most useful first summaries. They also power limit theorems, regression, risk calculations, and error estimates.
 
+![A Galton box diagram shows balls falling through pegs into bins.](https://commons.wikimedia.org/wiki/Special:FilePath/Galton_Box.svg)
+
+*Figure: A Galton box turns repeated random left-right choices into an approximate bell-shaped distribution. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Galton_Box.svg), Marcin Floryan, CC BY-SA 3.0.*
+
 The key idea is weighted averaging. In a discrete distribution, values are weighted by probability masses. In a continuous distribution, values are weighted by density and integrated. The same logic also applies to functions of random variables through the law of the unconscious statistician.
 
 ## Definitions

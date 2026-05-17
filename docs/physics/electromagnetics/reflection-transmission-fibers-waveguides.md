@@ -9,6 +9,10 @@ When a plane wave meets a material boundary, Maxwell boundary conditions determi
 
 Guided waves add geometry. Optical fibers guide light by total internal reflection or modal confinement. Metallic waveguides guide microwave fields with conducting boundaries and support discrete TE and TM modes. Cavities are closed waveguides that store energy at resonant frequencies. These topics show how fields, materials, and boundaries become engineered structures.
 
+![A light ray refracts across an interface with incident and refracted angles labeled.](https://commons.wikimedia.org/wiki/Special:FilePath/Snells_law.svg)
+
+*Figure: Snell's law turns an everyday refraction scene into a boundary-condition calculation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Snells_law.svg), Cristan and Sawims, public domain.*
+
 ## Definitions
 
 For normal incidence from medium 1 to medium 2, the electric-field reflection and transmission coefficients are

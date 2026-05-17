@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Weighted graphs attach numerical costs, lengths, capacities, or rewards to edges. This changes the basic question from "is there a route?" to "which route is best?" The same graph can model a road network with travel times, a communication network with latencies, a pipeline with construction costs, or a dependency graph with penalties.
 
+![Dijkstra's algorithm animation updates tentative distances across a weighted graph.](https://commons.wikimedia.org/wiki/Special:FilePath/Dijkstra_Animation.gif)
+
+*Figure: Dijkstra's algorithm is the standard visual example for shortest paths in weighted graphs. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dijkstra_Animation.gif), Ibmua, public domain.*
+
 Two families of problems dominate the introductory theory. **Shortest path** algorithms minimize the total weight of a route between vertices. **Minimum spanning tree** algorithms connect all vertices with minimum total edge weight. Both are greedy in important cases, but the reason the greedy choice is valid is different in each setting.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 15
 
 The strong law of large numbers upgrades the weak law from high-probability convergence to almost-sure convergence. Instead of saying that the probability of a large error goes to zero, it says that with probability one the sample averages eventually settle to the mean along the actual infinite sequence of trials. This is a stronger and more pathwise statement.
 
+![A central limit theorem simulation shows sample means becoming bell shaped.](https://commons.wikimedia.org/wiki/Special:FilePath/Central_Limit_Theorem.png)
+
+*Figure: A central limit theorem simulation shows why sample means often become approximately normal. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Central_Limit_Theorem.png), Daniel Resende, CC BY-SA 4.0.*
+
 Jensen's inequality is a different kind of result: it compares the average value of a convex function to the function of an average. MIT 18.440 places Jensen after the strong law and uses economic examples to show why convexity and concavity matter. A risk with the same expected value can be preferable or worse depending on the shape of the utility or payoff function.
 
 ## Definitions

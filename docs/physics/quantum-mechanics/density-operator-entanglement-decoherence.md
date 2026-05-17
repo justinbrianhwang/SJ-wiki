@@ -9,6 +9,10 @@ The density operator is the language of incomplete information, subsystems, stat
 
 Sakurai introduces density operators in the angular-momentum chapter through pure versus mixed ensembles and later uses spin correlations and Bell inequalities. Ballentine gives extensive attention to pure and general states, measurement, and ensemble interpretation. The Gottfried-named notes develop density matrices for spin-1/2 and mixed beams. Schiff's older treatment is less centered on density operators, reflecting the historical emphasis on wave functions.
 
+![A Bloch sphere locates a two-level quantum state by polar and azimuthal angles.](https://commons.wikimedia.org/wiki/Special:FilePath/Bloch_sphere.svg)
+
+*Figure: The Bloch sphere turns a two-component complex state into a geometric object that can be rotated and measured. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bloch_sphere.svg), Smite-Meister, CC BY-SA 3.0.*
+
 ## Definitions
 
 A density operator $\rho$ is a positive semidefinite, trace-one operator:

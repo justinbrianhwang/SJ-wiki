@@ -7,6 +7,10 @@ sidebar_position: 6
 
 Temporal-difference learning combines two ideas that earlier appeared separately: sampling from Monte Carlo methods and bootstrapping from dynamic programming. A TD method learns from actual experience, but it does not wait for the final return. It updates a value estimate toward a target that includes the observed reward plus the current estimate of the next state's value.
 
+![A cart-pole animation shows a controller trying to balance an inverted pole on a moving cart.](https://commons.wikimedia.org/wiki/Special:FilePath/Cartpole.gif)
+
+*Figure: Cart-pole is a standard control and reinforcement-learning benchmark. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cartpole.gif), Condordellanebbia, CC BY-SA 4.0.*
+
 This makes TD learning central in Sutton and Barto's account. TD(0), SARSA, Q-learning, Expected SARSA, and Double Q-learning are compact algorithms that explain much of tabular RL practice. They also introduce themes that continue through approximation: bootstrapping bias, online learning, off-policy control, and maximization bias.
 
 ## Definitions

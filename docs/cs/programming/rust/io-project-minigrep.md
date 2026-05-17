@@ -7,6 +7,10 @@ sidebar_position: 14
 
 The book's `minigrep` project turns earlier concepts into a small command-line application. It reads command-line arguments, opens a file, searches for a query, prints matching lines, and gradually improves error handling and organization. The point is not to replace `grep`; the point is to practice separating parsing, configuration, I/O, business logic, tests, and user-facing errors.
 
+![The Rust logo marks pages on ownership, borrowing, traits, and safe systems programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Rust_programming_language_black_logo.svg)
+
+*Figure: Rust connects systems control with compile-time memory-safety guarantees. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Rust_programming_language_black_logo.svg), Rust Foundation, CC BY 4.0.*
+
 This page connects [error handling](/cs/programming/rust/error-handling), [ownership](/cs/programming/rust/ownership-references-slices), [closures and iterators](/cs/programming/rust/closures-and-iterators), and [automated tests](/cs/programming/rust/automated-tests). The project is also the first strong reason to split code between `src/main.rs` and `src/lib.rs`.
 
 ## Definitions

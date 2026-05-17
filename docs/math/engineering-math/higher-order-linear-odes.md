@@ -7,6 +7,10 @@ sidebar_position: 6
 
 Higher-order linear ODEs generalize the second-order models used for vibration and circuits. They arise directly in beam theory and indirectly when systems are reduced to a single scalar equation. The order tells how many independent pieces of initial data are required and how many independent homogeneous modes must be found.
 
+![An inverted pendulum is balanced above a movable base.](https://commons.wikimedia.org/wiki/Special:FilePath/2-D_inverted_pendulum.svg)
+
+*Figure: The inverted pendulum is a compact physical model for stability, linearization, and control. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:2-D_inverted_pendulum.svg), Arne Nordmann, CC BY-SA 3.0.*
+
 The algebra is familiar: linearity gives superposition, constant coefficients lead to a characteristic polynomial, repeated roots produce powers of $x$, and nonhomogeneous terms require a particular solution. The main new issue is bookkeeping. A third-order or fourth-order equation has more roots, more constants, and more possible combinations of real, complex, and repeated factors.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 18
 
 Annotations attach structured metadata to program elements. Reflection lets a running program inspect classes, methods, fields, constructors, annotations, generic signatures, arrays, packages, and sometimes create objects or invoke methods dynamically. Together, they let tools and frameworks reason about Java programs using standardized metadata rather than ad hoc naming conventions.
 
+![The Sun Microsystems logo gives Java pages historical context for the language and platform.](https://commons.wikimedia.org/wiki/Special:FilePath/Sun_Microsystems_logo.svg)
+
+*Figure: Java's early development at Sun shaped its portability, virtual-machine model, and library ecosystem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sun_Microsystems_logo.svg), Sun Microsystems and Afrank99, public domain text logo.*
+
 The source book presents these features carefully because they cross boundaries. Ordinary Java code is statically checked and direct. Reflective code asks questions at runtime and may bypass normal compile-time visibility checks under controlled circumstances. Annotations can be retained only in source, in class files, or at runtime, so their usefulness depends on retention and target choices.
 
 ## Definitions

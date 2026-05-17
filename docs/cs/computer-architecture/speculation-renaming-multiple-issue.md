@@ -7,6 +7,10 @@ sidebar_position: 8
 
 High-performance processors combine several ideas: they fetch and decode multiple instructions per cycle, rename architectural registers onto a larger pool of physical registers, issue ready operations out of order, speculate past unresolved branches, and commit results in program order. The goal is to expose instruction-level parallelism while preserving the precise architectural behavior expected by software.
 
+![An opened Intel 4004 processor exposes the silicon die inside its package.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_4004_open.jpg)
+
+*Figure: Opening the package links instruction-set discussions to the physical die. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_4004_open.jpg), Science Museum Group, CC BY 4.0.*
+
 This machinery is expensive. It consumes power, area, design effort, and verification effort. H&P emphasizes that ILP techniques eventually hit diminishing returns because branch prediction, memory dependence uncertainty, finite windows, and true data dependencies limit how many useful instructions can be kept in flight.
 
 ## Definitions

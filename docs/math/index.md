@@ -12,6 +12,18 @@ sidebar_position: 0
 
 Notes on mathematical concepts — from calculus to graph theory.
 
+![Leonhard Euler is shown in an eighteenth-century portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Leonhard_Euler.jpg)
+
+*Figure: Leonhard Euler's notation and results appear across analysis, graph theory, and number theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Leonhard_Euler.jpg), Jakob Emanuel Handmann, public domain.*
+
+![Carl Friedrich Gauss is shown in a formal painted portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Carl_Friedrich_Gauss.jpg)
+
+*Figure: Carl Friedrich Gauss is central to number theory, linear algebra, statistics, and numerical methods. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Carl_Friedrich_Gauss.jpg), Gottlieb Biermann after Christian Albrecht Jensen, public domain.*
+
+![The Mandelbrot set forms a black fractal boundary in the complex plane.](https://commons.wikimedia.org/wiki/Special:FilePath/Mandelbrot_set.png)
+
+*Figure: The Mandelbrot set turns iteration of a simple complex quadratic map into intricate geometry. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mandelbrot_set.png), Einottaja, attribution required.*
+
 ## Topics
 
 - **[Calculus](/math/calculus/intro)** — limits, derivatives, integrals, series

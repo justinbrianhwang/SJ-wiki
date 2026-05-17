@@ -7,6 +7,10 @@ sidebar_position: 6
 
 The determinant compresses important information about a square matrix into one scalar. It detects invertibility, gives signed area or volume scaling, changes predictably under row operations, and produces formulas such as Cramer's rule. Determinants are not the preferred way to solve large systems, but they are conceptually central.
 
+![A matrix transforms two vectors into new positions in the plane.](https://commons.wikimedia.org/wiki/Special:FilePath/Matrix_multiplication.svg)
+
+*Figure: Matrix multiplication can be read geometrically as a transformation of vectors. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Matrix_multiplication.svg), Jakob.scholbach and Pbroks13, CC BY-SA 3.0.*
+
 A useful way to read $\det(A)$ is as a signed scaling factor. In $\mathbb{R}^2$, the absolute value of the determinant is the area-scaling factor of the linear transformation $\mathbf{x}\mapsto A\mathbf{x}$. In $\mathbb{R}^3$, it is the volume-scaling factor. The sign records whether orientation is preserved or reversed.
 
 ## Definitions

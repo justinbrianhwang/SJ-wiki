@@ -9,6 +9,10 @@ States of matter connect molecular attractions to macroscopic properties. Gases 
 
 In the Ebbing and Gammon sequence this topic sits near gases, liquids, solids, phase transitions, phase diagrams, surface tension, viscosity, intermolecular forces, crystalline solids, unit cells, and x-ray diffraction. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
+![A phase diagram of water maps solid, liquid, vapor, triple-point, and critical-point regions.](https://commons.wikimedia.org/wiki/Special:FilePath/Phase_diagram_of_water.svg)
+
+*Figure: Water phase diagram connecting pressure and temperature to state of matter. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Phase_diagram_of_water.svg), Cmglee, CC BY-SA 3.0.*
+
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.

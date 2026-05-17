@@ -7,6 +7,10 @@ sidebar_position: 14
 
 A Markov chain is a model for random movement among states where the next state depends on the current state, not on the full past. This is a simple assumption, but it leads to a rich theory for queues, genetics, board games, web ranking, weather models, text generation, inventory systems, and random walks.
 
+![A finite-state machine diagram shows states and transitions for a simple process.](https://commons.wikimedia.org/wiki/Special:FilePath/Finite_state_machine_example_with_comments.svg)
+
+*Figure: A finite-state machine represents computation as transitions among discrete states. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Finite_state_machine_example_with_comments.svg), Macguy314, reworked by Perhelion, public domain.*
+
 This page introduces finite discrete-time Markov chains. The central objects are states, transition probabilities, transition matrices, multi-step probabilities, and stationary distributions. The emphasis is on computation and interpretation rather than advanced convergence theory.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Nonhomogeneous linear ODEs describe systems driven by an outside input. The homogeneous part gives the natural response, while the forcing term creates a particular response. In engineering language, the solution is usually separated into transient behavior, which depends on initial conditions and often decays, and steady or forced behavior, which follows the input.
 
+![An inverted pendulum is balanced above a movable base.](https://commons.wikimedia.org/wiki/Special:FilePath/2-D_inverted_pendulum.svg)
+
+*Figure: The inverted pendulum is a compact physical model for stability, linearization, and control. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:2-D_inverted_pendulum.svg), Arne Nordmann, CC BY-SA 3.0.*
+
 This topic extends the constant-coefficient second-order equations by adding terms such as loads, voltages, periodic forcing, impulses, and prescribed environmental changes. The central task is to find one particular solution without losing the homogeneous family. Once that is done, initial or boundary conditions determine the constants.
 
 ## Definitions

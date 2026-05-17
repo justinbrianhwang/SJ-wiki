@@ -7,6 +7,10 @@ sidebar_position: 4
 
 A queue (큐) is the linear structure for waiting order. New elements enter at the rear, old elements leave from the front, and the element that has waited longest is served first. This FIFO rule makes queues central to scheduling, buffering, breadth-first search, simulations, interrupt handling, and producer-consumer systems.
 
+![A square Kufic algorithms mark introduces the study of designed procedures.](https://commons.wikimedia.org/wiki/Special:FilePath/Algorithms.svg)
+
+*Figure: The algorithms mark gives the abstract algorithms pages a concrete visual anchor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Algorithms.svg), Jeff Erickson, CC BY 4.0.*
+
 The basic queue is easy to describe but surprisingly easy to implement poorly in C. If an array queue always removes by shifting every remaining element left, each dequeue costs $O(n)$. If it uses a `front` index and never reuses earlier cells, the array appears full even when many cells have been dequeued. The circular queue solves both problems by treating the array as a ring. The deque, or double-ended queue, generalizes the idea by allowing insertion and deletion at both ends.
 
 ## Definitions

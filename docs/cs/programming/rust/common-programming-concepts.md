@@ -7,6 +7,10 @@ sidebar_position: 4
 
 Rust has familiar programming building blocks: variables, types, functions, branches, and loops. The difference is that Rust gives those ideas stricter compile-time meaning. Variables are immutable by default. Integer and floating-point types have explicit sizes. Functions and branches are expressions when they produce values. Loops can return values. These choices make code less ambiguous and give the compiler more information to check.
 
+![The Rust logo marks pages on ownership, borrowing, traits, and safe systems programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Rust_programming_language_black_logo.svg)
+
+*Figure: Rust connects systems control with compile-time memory-safety guarantees. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Rust_programming_language_black_logo.svg), Rust Foundation, CC BY 4.0.*
+
 This page corresponds to the book's chapter on common programming concepts. It prepares the ground for [ownership](/cs/programming/rust/ownership-references-slices), where mutability and scope become memory-safety rules, and for [pattern matching](/cs/programming/rust/pattern-matching), where control flow becomes more expressive than a chain of `if` statements.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 16
 
 Recovery is the part of a DBMS that makes atomicity and durability believable after crashes. Transactions update pages in memory, pages are written to disk at inconvenient times, and failures can interrupt execution between any two machine instructions. The recovery system records enough history to redo committed work and undo uncommitted work after restart.
 
+![A pgAdmin screenshot shows a real database administration interface with schema objects.](https://commons.wikimedia.org/wiki/Special:FilePath/PgAdminScreenshot.png)
+
+*Figure: A database system is experienced through schemas, queries, connections, and administration tools. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PgAdminScreenshot.png), Boshomi, CC BY-SA 3.0.*
+
 Write-ahead logging and ARIES are central ideas in recovery. The log is an append-only record of changes and transaction events. Write-ahead logging says the log record describing a change must reach stable storage before the changed data page reaches stable storage. ARIES organizes restart into analysis, redo, and undo phases, allowing flexible buffer management and efficient recovery.
 
 ## Definitions

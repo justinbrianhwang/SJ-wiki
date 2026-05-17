@@ -7,6 +7,10 @@ sidebar_position: 10
 
 Behavior planning chooses what kind of maneuver the vehicle should perform before motion planning computes the exact trajectory. It answers questions like: should the ego vehicle yield, proceed, change lanes, creep forward, stop for a pedestrian, pull over, or wait for a clearer gap? This layer gives structure to driving decisions that are too semantic for pure trajectory optimization but too concrete for route planning.
 
+![A Waymo self-driving car drives on a public road with roof-mounted sensors.](https://commons.wikimedia.org/wiki/Special:FilePath/Waymo_self-driving_car_front_view.gk.jpg)
+
+*Figure: A real autonomous vehicle grounds the driving stack in a physical platform. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Waymo_self-driving_car_front_view.gk.jpg), Grendelkhan, CC BY-SA 4.0.*
+
 This page covers finite-state machines, behavior trees, POMDPs, rule-based and learned planners, and hybrid approaches. It connects the responsibility and ODD concepts from [SAE levels](/cs/autonomous-driving/sae-levels-and-operational-design-domain) to the algorithmic layers in [prediction](/cs/autonomous-driving/prediction-and-motion-forecasting), [motion planning](/cs/autonomous-driving/motion-planning), [control](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley), and [safety](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing).
 
 ## Definitions

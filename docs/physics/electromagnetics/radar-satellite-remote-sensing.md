@@ -9,6 +9,10 @@ Applied electromagnetics becomes system engineering in satellite communication a
 
 Ulaby's final chapter uses these systems as selected highlights rather than a complete communications or radar course. The goal of this page is the same: connect electromagnetic wave propagation, antennas, and power density to practical remote sensing and communication calculations.
 
+![A large C-band radar dish stands at Kennedy Space Center.](https://commons.wikimedia.org/wiki/Special:FilePath/C-band_Radar-dish_Antenna.jpg)
+
+*Figure: A radar dish gives remote sensing a physical aperture, beamwidth, and link-budget context. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:C-band_Radar-dish_Antenna.jpg), NASA, public domain.*
+
 ## Definitions
 
 Free-space path loss is the inverse of the Friis spreading factor:

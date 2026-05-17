@@ -7,6 +7,10 @@ sidebar_position: 3
 
 Computation theory is proof-heavy because the main claims are not about one machine run but about all strings, all machines, or all algorithms. A construction must work for every input in a language. A pumping argument must defeat every possible decomposition. An undecidability proof must rule out every algorithm, including algorithms nobody has written down.
 
+![A square Kufic algorithms mark introduces the study of designed procedures.](https://commons.wikimedia.org/wiki/Special:FilePath/Algorithms.svg)
+
+*Figure: The algorithms mark gives the abstract algorithms pages a concrete visual anchor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Algorithms.svg), Jeff Erickson, CC BY 4.0.*
+
 The proof techniques are standard but used in distinctive ways. Construction builds a machine, grammar, expression, or reduction. Contradiction assumes an impossible decider or recognizer and derives a contradiction. Induction proves statements about string length, expression structure, derivation length, or computation steps. Diagonalization and countability show that some languages or behaviors cannot be listed by finite descriptions.
 
 ## Definitions

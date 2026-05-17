@@ -7,6 +7,10 @@ sidebar_position: 7
 
 n-step methods sit between one-step temporal-difference learning and full Monte Carlo learning. Instead of updating from one reward plus one bootstrapped estimate, or waiting for a complete episode return, an n-step method looks ahead for $n$ rewards and then bootstraps. This gives a continuum of targets: $n=1$ is ordinary TD, while $n$ reaching the episode end gives a Monte Carlo target.
 
+![A cart-pole animation shows a controller trying to balance an inverted pole on a moving cart.](https://commons.wikimedia.org/wiki/Special:FilePath/Cartpole.gif)
+
+*Figure: Cart-pole is a standard control and reinforcement-learning benchmark. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cartpole.gif), Condordellanebbia, CC BY-SA 4.0.*
+
 Sutton and Barto use n-step bootstrapping to show that algorithms are not isolated tricks. Prediction, SARSA, off-policy learning, tree-backup methods, and later eligibility traces can all be understood as different ways to combine sampled rewards, bootstrapped estimates, and policy probabilities across multiple time steps.
 
 ## Definitions

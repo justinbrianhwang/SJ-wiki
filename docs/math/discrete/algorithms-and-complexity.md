@@ -7,6 +7,10 @@ sidebar_position: 8
 
 An algorithm is a finite, precise procedure for solving a class of problems. Discrete mathematics studies algorithms at two levels: correctness and cost. Correctness asks whether the algorithm always returns the intended answer. Complexity asks how resource use grows as the input size grows.
 
+![Dijkstra's algorithm animation updates tentative distances across a weighted graph.](https://commons.wikimedia.org/wiki/Special:FilePath/Dijkstra_Animation.gif)
+
+*Figure: Dijkstra's algorithm is the standard visual example for shortest paths in weighted graphs. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dijkstra_Animation.gif), Ibmua, public domain.*
+
 The subject is not just about writing code. It is about describing a procedure independently of a programming language, proving that the procedure terminates with the right result, and estimating the amount of work needed for large inputs. This is why algorithms connect proof techniques, functions, sums, recurrence relations, number theory, graphs, and computation theory.
 
 ## Definitions

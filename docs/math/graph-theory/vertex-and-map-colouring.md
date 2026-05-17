@@ -9,7 +9,7 @@ Vertex colouring asks how few labels, or colours, are needed so that adjacent ve
 
 Map colouring is graph colouring in disguise. A plane map can be converted to a dual graph whose vertices are regions and whose edges record shared borders. Colouring the map is then equivalent to vertex-colouring that dual graph. This connection explains why planar graph theory and colouring theory are historically intertwined.
 
-![A small planar map is colored with four colors so adjacent regions differ.](https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Fourcolorsmap.svg/500px-Fourcolorsmap.svg.png)
+![A small planar map is colored with four colors so adjacent regions differ.](https://commons.wikimedia.org/wiki/Special:FilePath/Fourcolorsmap.svg)
 
 *Figure: Four-colour map example. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fourcolorsmap.svg), Germo, public domain.*
 

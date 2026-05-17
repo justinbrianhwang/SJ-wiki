@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Many useful random variables are built from other random variables. If $X$ is a measurement, then $X^2$, $\log X$, $aX+b$, $\max(X_1,\ldots,X_n)$, and $X+Y$ are all transformations. Probability theory gives systematic ways to derive the distribution of the transformed variable rather than guessing from simulation.
 
+![A Galton box diagram shows balls falling through pegs into bins.](https://commons.wikimedia.org/wiki/Special:FilePath/Galton_Box.svg)
+
+*Figure: A Galton box turns repeated random left-right choices into an approximate bell-shaped distribution. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Galton_Box.svg), Marcin Floryan, CC BY-SA 3.0.*
+
 Transformations are also the engine behind standardization, change of variables in continuous distributions, sums of independent variables, and many sampling distributions. The main tools are the CDF method, one-to-one density transformations, Jacobians, and convolution.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 2
 
 Control systems engineering studies how to make a dynamic system behave in a desired way despite uncertainty, disturbances, and imperfect components. Nise's opening chapter frames the subject as a design loop: translate requirements into a physical system, draw the functional block diagram, derive a mathematical model, reduce interconnected subsystems, then analyze and redesign until transient response, steady-state error, and stability meet specifications.
 
+![An inverted pendulum on a cart shows the unstable plant used in many control examples.](https://commons.wikimedia.org/wiki/Special:FilePath/Cart-pendulum.svg)
+
+*Figure: The cart-pendulum is a concrete plant for modeling, stabilization, and control design. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cart-pendulum.svg), Krishnavedala, CC0.*
+
 The central idea is feedback. In an open-loop system the command passes forward to the plant without measuring the result. In a closed-loop system the output is sensed and compared with the reference, producing an error signal that drives correction. The price of feedback is extra hardware, modeling effort, and possible instability; the benefit is accuracy, disturbance rejection, and tunable dynamics. This page sets the vocabulary used by the modeling, response, stability, and design pages that follow.
 
 ## Definitions

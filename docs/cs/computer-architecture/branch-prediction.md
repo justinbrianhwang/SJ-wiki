@@ -7,6 +7,10 @@ sidebar_position: 6
 
 Branches are small instructions with large architectural consequences. A pipelined processor wants to fetch the next instruction every cycle, but a conditional branch may not reveal the correct next program counter until several stages later. Without prediction, the front end either stalls or fetches from a conservative path. With prediction, it guesses and keeps the pipeline busy, then repairs the machine state if the guess was wrong.
 
+![An opened Intel 4004 processor exposes the silicon die inside its package.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_4004_open.jpg)
+
+*Figure: Opening the package links instruction-set discussions to the physical die. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_4004_open.jpg), Science Museum Group, CC BY 4.0.*
+
 Branch prediction is one of the clearest examples of quantitative design. The hardware is useful only because real programs have patterns: loops are usually taken until the final iteration, error paths are rarely taken, and branches often correlate with recent control flow. The value of a predictor depends on branch frequency, prediction accuracy, and misprediction penalty.
 
 ## Definitions

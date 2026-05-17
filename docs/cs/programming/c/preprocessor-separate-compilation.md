@@ -7,6 +7,10 @@ sidebar_position: 6
 
 K&R treats the preprocessor as part of practical C programming, even though it runs before the compiler proper. It is how C programs include shared declarations, define symbolic constants, write small macro abstractions, and compile different code for different environments. Used carefully, it keeps multi-file programs consistent. Used carelessly, it bypasses the type system and creates bugs that are hard to see in the source text.
 
+![A C language logo marks the systems-programming pages built around C examples.](https://commons.wikimedia.org/wiki/Special:FilePath/C_Programming_Language.svg)
+
+*Figure: C remains the reference language for low-level memory, pointers, and Unix interfaces. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:C_Programming_Language.svg), ElodinKaldwin, public domain text logo.*
+
 Separate compilation is the other half of the same story. Real C programs are not one long file. They are sets of source files connected by headers, external definitions, and linker-visible names. The discipline is simple but strict: headers declare shared interfaces, source files define storage and behavior, and file-private details are hidden with `static`.
 
 ## Definitions

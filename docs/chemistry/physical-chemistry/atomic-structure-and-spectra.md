@@ -9,6 +9,10 @@ Atomic structure is the first major chemical application of the Schrodinger equa
 
 Atkins uses atomic spectra to connect quantum numbers with measured transitions. Spectral lines are not arbitrary fingerprints; they are energy differences constrained by selection rules.
 
+![A hydrogen spectrum diagram shows discrete spectral series on a wavelength scale.](https://commons.wikimedia.org/wiki/Special:FilePath/Hydrogen_spectrum.svg)
+
+*Figure: Hydrogen spectral series connecting atomic energy levels to observed light. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hydrogen_spectrum.svg), OrangeDog, CC BY-SA 3.0.*
+
 ## Definitions
 
 A hydrogenic atom is a one-electron species with nuclear charge $+Ze$, such as $\mathrm{H}$, $\mathrm{He^+}$, or $\mathrm{Li^{2+}}$. Its energy levels are

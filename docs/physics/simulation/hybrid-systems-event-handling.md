@@ -9,6 +9,10 @@ Hybrid systems combine continuous dynamics with discrete changes. A bouncing bal
 
 Hybrid simulation is harder than purely continuous simulation because the solver must locate events accurately and restart the model with changed equations or states. A time step that skips over a threshold can produce wrong event times, wrong energy loss, or even a different sequence of modes. The modeler needs to identify events explicitly and decide which variables are continuous, which jump, and which logic states remember past decisions.
 
+![An inverted pendulum is mounted on a cart with its angle and cart position labeled.](https://commons.wikimedia.org/wiki/Special:FilePath/Cart-pendulum.svg)
+
+*Figure: The cart-pendulum setup is a classic benchmark for unstable dynamics, feedback, and hybrid simulation tests. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cart-pendulum.svg), Krishnavedala, CC0 1.0.*
+
 ## Definitions
 
 A hybrid system has a continuous state $x$, a discrete mode $q$, and dynamics that depend on the mode:

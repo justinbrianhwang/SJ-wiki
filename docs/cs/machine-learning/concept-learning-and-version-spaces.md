@@ -7,6 +7,10 @@ sidebar_position: 3
 
 Concept learning is Mitchell's cleanest introduction to machine learning as search. The learner sees labeled examples and tries to infer a boolean-valued concept, such as whether a day is suitable for enjoying a sport. The chapter is intentionally symbolic: hypotheses are logical descriptions, examples are attribute vectors, and learning is movement through a partially ordered hypothesis space.
 
+![A simple decision tree routes shapes through binary feature tests to a class leaf.](https://commons.wikimedia.org/wiki/Special:FilePath/Simple_decision_tree.svg)
+
+*Figure: Decision trees classify by asking a sequence of feature questions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Simple_decision_tree.svg), Eviatar Bach, CC0.*
+
 This treatment feels different from modern large-scale statistical learning, but it remains useful because it exposes assumptions that are often hidden. Every learner has a bias. Every hypothesis language excludes some possible target concepts. Every generalization from observed examples to unseen examples requires an assumption beyond the data itself.
 
 ## Definitions

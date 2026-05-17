@@ -7,6 +7,10 @@ sidebar_position: 7
 
 Construction and method invocation are the everyday mechanics of object-oriented Java. A constructor gives a new object its initial state. A method gives clients a named operation. The keyword `this` names the current receiver, making it possible to distinguish fields from parameters and to delegate among constructors or methods.
 
+![The Sun Microsystems logo gives Java pages historical context for the language and platform.](https://commons.wikimedia.org/wiki/Special:FilePath/Sun_Microsystems_logo.svg)
+
+*Figure: Java's early development at Sun shaped its portability, virtual-machine model, and library ecosystem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sun_Microsystems_logo.svg), Sun Microsystems and Afrank99, public domain text logo.*
+
 Overloading lets several methods or constructors share a name when their parameter lists differ. This can make APIs natural, but it also means the compiler must choose a most specific applicable method. The source book treats this choice as a precise language rule, not as a matter of intuition. Good overloaded APIs make the intended choice obvious to both compiler and reader.
 
 ## Definitions

@@ -9,6 +9,10 @@ Simulink represents dynamic systems as executable block diagrams. Instead of wri
 
 A block diagram is still a mathematical model. Every connection should correspond to a variable with units, every Integrator block should correspond to a state, and every feedback path should represent a real dependency or algorithmic relation. The diagram is most valuable when it clarifies structure rather than hiding equations behind unlabeled blocks.
 
+![A state-space block diagram routes input through system matrices to state and output variables.](https://commons.wikimedia.org/wiki/Special:FilePath/Typical_State_Space_model.svg)
+
+*Figure: State-space diagrams show how stored state, input, and output maps fit into one dynamic-system representation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Typical_State_Space_model.svg), Cburnett and BiMiT, CC0 1.0.*
+
 ## Definitions
 
 An Integrator block implements

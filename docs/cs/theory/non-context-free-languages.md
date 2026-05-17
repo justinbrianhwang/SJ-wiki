@@ -7,6 +7,10 @@ sidebar_position: 9
 
 Context-free languages handle one main unbounded dependency very well. They can match parentheses, count zeros against ones, and parse recursively nested expressions. They do not handle arbitrary coordination among several independent counts or cross-serial dependencies. The pumping lemma for context-free languages is the first standard tool for proving those limitations.
 
+![A parse tree expands a formal grammar from the start symbol down to terminal tokens.](https://commons.wikimedia.org/wiki/Special:FilePath/Parse-tree.svg)
+
+*Figure: Parse trees make grammar derivations visible as rooted syntax structures. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Parse-tree.svg), Martin Thoma, CC BY 3.0.*
+
 The CFL pumping lemma is subtler than the regular pumping lemma because parse trees branch. A long generated string must contain a repeated variable along some root-to-leaf path in a parse tree, and pumping repeats the material generated between those two occurrences. The result is a split into five pieces rather than three.
 
 ## Definitions

@@ -9,6 +9,14 @@ Measurement is the entry point into chemistry because chemical explanations must
 
 In the Ebbing and Gammon sequence this topic sits near the scientific method, matter classification, significant figures, SI units, derived units, and dimensional analysis. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
+![Four Bunsen burner flames show how controlled air flow changes the flame used for heating samples.](https://commons.wikimedia.org/wiki/Special:FilePath/Bunsen_burner_flame_types.jpg)
+
+*Figure: Bunsen burner flame types as a laboratory context for controlled observation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bunsen_burner_flame_types.jpg), Arthur Jan Fijalkowski, CC BY-SA 3.0/GFDL.*
+
+![A schematic mass spectrometer shows ionization, acceleration, magnetic deflection, and detection.](https://commons.wikimedia.org/wiki/Special:FilePath/Mass_Spectrometer_Schematic.svg)
+
+*Figure: Mass spectrometer schematic connecting measurement to atomic and molecular mass. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mass_Spectrometer_Schematic.svg), Devon Fyson and USGS, public domain.*
+
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.

@@ -7,6 +7,10 @@ sidebar_position: 2
 
 Software engineering begins by making work visible. A software life cycle is the ordered set of activities, deliverables, checkpoints, and decisions that move an idea from feasibility to a maintained product. Gustafson's first chapter treats the life cycle as a management structure as much as a technical structure: phases help teams know what work is expected, what artifacts should exist, and when progress can be judged by an observable milestone.
 
+![A Kanban board screenshot shows work items organized by workflow state.](https://commons.wikimedia.org/wiki/Special:FilePath/Openproject_kanban.PNG)
+
+*Figure: Kanban boards turn process state into a visible project-management surface. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Openproject_kanban.PNG), OpenProject contributors, CC0.*
+
 The chapter is intentionally practical. It names common development activities such as requirements, design, implementation, testing, delivery, and maintenance; it also names the documents that make those activities inspectable. Life cycle models then arrange the same kinds of work in different patterns. The waterfall model emphasizes a mostly sequential flow, prototyping uses a throwaway system to clarify ideas, incremental development delivers useful subsets, and the spiral model repeatedly revisits planning, risk, engineering, construction, and customer evaluation.
 
 ## Definitions

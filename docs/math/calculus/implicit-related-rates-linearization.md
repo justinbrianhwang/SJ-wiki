@@ -7,6 +7,10 @@ sidebar_position: 6
 
 Implicit differentiation handles curves described by equations that do not solve neatly for $y$ as a function of $x$. Instead of rewriting the equation first, we differentiate both sides and remember that $y$ depends on $x$. The chain rule then produces factors of $dy/dx$.
 
+![A tangent line touches a curve at a point to show instantaneous slope.](https://commons.wikimedia.org/wiki/Special:FilePath/Derivative_with_tangent.svg)
+
+*Figure: A tangent line gives the local geometric meaning of a derivative. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Derivative_with_tangent.svg), Olivier Cleynen, CC0 1.0.*
+
 The same idea drives related rates and linearization. In related rates, several quantities change with time and are tied together by an equation. In linearization, a differentiable curve is replaced near a point by its tangent line. Both topics ask for careful attention to variables, units, and the moment at which the information is evaluated.
 
 ## Definitions

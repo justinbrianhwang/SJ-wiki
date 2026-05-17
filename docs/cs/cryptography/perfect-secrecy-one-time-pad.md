@@ -7,6 +7,10 @@ sidebar_position: 3
 
 Perfect secrecy is the cleanest possible confidentiality definition: after seeing the ciphertext, the adversary learns nothing about which message was sent. This is stronger than "hard to break" and stronger than "no known attack." It is an information-theoretic statement, so it does not depend on the attacker's running time or computing power.
 
+![A public-key encryption diagram separates public encryption from private decryption.](https://commons.wikimedia.org/wiki/Special:FilePath/Public_key_encryption.svg)
+
+*Figure: Asymmetric encryption turns key distribution into a public and private key pair. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Public_key_encryption.svg), Davidgothberg, public domain.*
+
 The one-time pad is the central construction. Katz and Lindell present it as the canonical perfectly secret encryption scheme and use Shannon's theorem to explain its cost: the secret key must be at least as long as the message. Smart adds information-theoretic language such as entropy, equivocation, and unicity distance, which helps connect perfect secrecy to statistical leakage in classical systems.
 
 ## Definitions

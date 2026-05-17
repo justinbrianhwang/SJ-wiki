@@ -7,6 +7,10 @@ sidebar_position: 10
 
 Numerical integration, or quadrature, replaces an integral by a weighted sum of function values. Newton-Cotes formulas choose equally spaced nodes and integrate an interpolating polynomial through those nodes. The trapezoidal rule, midpoint rule, and Simpson's rule are the most common members of this family.
 
+![A parabola is fitted over an interval to illustrate Simpson rule.](https://commons.wikimedia.org/wiki/Special:FilePath/Simpsons_rule.svg)
+
+*Figure: Simpson rule improves numerical integration by approximating the integrand with a quadratic arc. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Simpsons_rule.svg), Wdvorak, CC BY-SA 3.0.*
+
 Romberg integration accelerates the composite trapezoidal rule by applying Richardson extrapolation to its even-power error expansion. It is a good example of a general numerical pattern: start with a simple approximation at several mesh sizes, then combine the approximations to cancel leading error terms.
 
 ## Definitions

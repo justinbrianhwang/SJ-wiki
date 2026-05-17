@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Generics, traits, and lifetimes let Rust express reusable code without giving up static checking. Generics remove duplication across types. Traits describe shared behavior. Lifetimes describe how long references are valid relative to one another. Together they explain how Rust libraries can feel high-level while still compiling to concrete, efficient code.
 
+![The Rust logo marks pages on ownership, borrowing, traits, and safe systems programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Rust_programming_language_black_logo.svg)
+
+*Figure: Rust connects systems control with compile-time memory-safety guarantees. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Rust_programming_language_black_logo.svg), Rust Foundation, CC BY 4.0.*
+
 This page is one of the densest in the Rust book. It depends on [ownership and references](/cs/programming/rust/ownership-references-slices), because lifetimes are about borrowed data, and on [structs and enums](/cs/programming/rust/structs-methods-enums), because generic parameters often appear on custom types. It prepares for [smart pointers](/cs/programming/rust/smart-pointers), [closures and iterators](/cs/programming/rust/closures-and-iterators), and [advanced features](/cs/programming/rust/object-oriented-and-advanced-features).
 
 ## Definitions

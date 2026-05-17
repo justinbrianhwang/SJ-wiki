@@ -7,6 +7,10 @@ sidebar_position: 5
 
 A random variable converts outcomes into numbers. Instead of listing every detailed outcome in the sample space, we often care about a numerical summary: the number of heads, the waiting time until a machine fails, the maximum of several measurements, or whether a test result is positive. Distributions describe how probability is assigned to those numerical values.
 
+![A Galton box diagram shows balls falling through pegs into bins.](https://commons.wikimedia.org/wiki/Special:FilePath/Galton_Box.svg)
+
+*Figure: A Galton box turns repeated random left-right choices into an approximate bell-shaped distribution. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Galton_Box.svg), Marcin Floryan, CC BY-SA 3.0.*
+
 This page is the bridge between event-based probability and the distribution-centered language used in statistics, simulation, and modeling. Lane et al. use probability distributions for binomial, Poisson, normal, and sampling-distribution examples. Here we build the general vocabulary: random variables, probability mass functions, probability density functions, and cumulative distribution functions.
 
 ## Definitions

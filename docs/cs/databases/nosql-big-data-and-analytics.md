@@ -7,6 +7,10 @@ sidebar_position: 18
 
 NoSQL and big-data systems grew from workloads where a single relational server was not the best fit: massive event logs, web-scale key-value access, flexible semi-structured documents, large graph traversals, streaming data, and analytical scans over petabytes. These systems do not replace relational databases as a category; they broaden the design space for data management.
 
+![A MySQL console screenshot shows a command-line database session with query output.](https://commons.wikimedia.org/wiki/Special:FilePath/Mysql-screenshot.PNG)
+
+*Figure: SQL pages connect abstract relational operations to the database console used in practice. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mysql-screenshot.PNG), Wikimedia Commons contributors, public domain text.*
+
 The key question is not whether a system is "SQL" or "NoSQL." The key question is what data model, consistency contract, access pattern, scale target, and operational cost match the workload. Many modern systems mix ideas: relational databases store JSON, document stores add SQL-like languages, warehouses use columnar storage, and stream processors maintain stateful views.
 
 ## Definitions

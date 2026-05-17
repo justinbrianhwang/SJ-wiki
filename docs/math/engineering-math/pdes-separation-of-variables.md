@@ -7,6 +7,10 @@ sidebar_position: 18
 
 Separation of variables solves certain linear PDEs by looking for product solutions. A function of several variables is written as a product of one-variable factors, such as $u(x,t)=X(x)T(t)$. Substitution separates the PDE into ordinary differential equations, and boundary conditions turn the spatial ODE into an eigenvalue problem.
 
+![Joseph Fourier is shown in a historical portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Joseph_Fourier.jpg)
+
+*Figure: Joseph Fourier's work on heat flow led to Fourier series and transforms. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Joseph_Fourier.jpg), Jules Boilly, public domain.*
+
 The method is most useful for linear homogeneous boundary conditions on simple domains. It explains why Fourier series, Legendre polynomials, and Bessel functions appear in heat, wave, and potential problems. The core idea is modal evolution: solve the spatial shapes once, then determine how each shape changes in time or another variable.
 
 ## Definitions

@@ -9,6 +9,10 @@ Fourier series represent periodic signals as weighted sums of harmonically relat
 
 Continuous-time and discrete-time Fourier series share the same conceptual structure, but their details differ. Continuous-time periodic signals generally require infinitely many harmonics. Discrete-time periodic sequences have only finitely many distinct harmonics over one period because discrete-time frequency repeats every $2\pi$.
 
+![An animation decomposes a square wave into sinusoidal components and a frequency-domain spectrum.](https://commons.wikimedia.org/wiki/Special:FilePath/Fourier_transform_time_and_frequency_domains.gif)
+
+*Figure: Fourier analysis becomes concrete when a time waveform and its spectral lines are shown side by side. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fourier_transform_time_and_frequency_domains.gif), Lucas Vieira, public domain.*
+
 ## Definitions
 
 For a continuous-time periodic signal with fundamental period $T_0$ and fundamental angular frequency

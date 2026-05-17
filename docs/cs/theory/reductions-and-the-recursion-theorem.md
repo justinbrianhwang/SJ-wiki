@@ -7,6 +7,10 @@ sidebar_position: 13
 
 Reductions are the main transport mechanism for impossibility results. Instead of proving every undecidable problem from scratch by diagonalization, we transform known hard instances into new instances. If a solver for the new problem would give a solver for the old problem, then the new problem cannot be decidable.
 
+![A square Kufic algorithms mark introduces the study of designed procedures.](https://commons.wikimedia.org/wiki/Special:FilePath/Algorithms.svg)
+
+*Figure: The algorithms mark gives the abstract algorithms pages a concrete visual anchor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Algorithms.svg), Jeff Erickson, CC BY 4.0.*
+
 The recursion theorem deepens the same theme of self-reference. It says, roughly, that a Turing machine can obtain and use its own description. This formalizes self-reproducing and self-aware constructions without relying on informal paradoxes. Together, reductions and self-reference explain why many semantic program questions are beyond total algorithmic decision.
 
 ## Definitions

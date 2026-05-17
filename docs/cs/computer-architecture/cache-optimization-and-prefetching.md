@@ -7,6 +7,10 @@ sidebar_position: 10
 
 Basic cache design chooses size, block size, associativity, and write policy. Advanced cache design asks how to reduce hit time, miss rate, miss penalty, bandwidth bottlenecks, and energy at the same time. These goals often conflict. A large cache may reduce misses but slow hits. A prefetcher may hide latency but waste bandwidth and power. A nonblocking cache may improve out-of-order execution but require more tracking state.
 
+![An opened Intel 4004 processor exposes the silicon die inside its package.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_4004_open.jpg)
+
+*Figure: Opening the package links instruction-set discussions to the physical die. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_4004_open.jpg), Science Museum Group, CC BY 4.0.*
+
 H&P organizes cache optimizations around measurable causes of memory stalls. The right question is not "does this reduce misses?" but "which term in execution time does this improve, and what does it damage?" That framing is especially important once multicore processors create shared-cache contention and bandwidth pressure.
 
 ## Definitions

@@ -9,6 +9,10 @@ The electroweak theory combines weak interactions and electromagnetism into a ga
 
 Grand unification asks whether the gauge groups and matter representations of the Standard Model are fragments of a larger simple group such as $SU(5)$ or $SO(10)$. Zee's grand-unification chapters connect group theory, running couplings, proton decay, and the idea that apparently different charges may be different components of one deeper gauge structure.
 
+![The Standard Model chart groups quarks, leptons, gauge bosons, and the Higgs boson.](https://commons.wikimedia.org/wiki/Special:FilePath/Standard_Model_of_Elementary_Particles.svg)
+
+*Figure: The Standard Model chart gives QFT pages a concrete particle-spectrum map. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Standard_Model_of_Elementary_Particles.svg), Cush and MissMJ, public domain/CC BY 3.0.*
+
 ## Definitions
 
 The electroweak gauge group is

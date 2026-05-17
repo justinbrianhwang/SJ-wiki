@@ -7,6 +7,10 @@ sidebar_position: 9
 
 Timers, serial communication, and interrupts are where the 8051 becomes a practical embedded controller instead of only a small CPU with ports. The source has separate chapters on counter/timer programming, serial communication, and interrupt programming because these features interact but must be learned carefully: timers produce delays and baud rates, the serial port signals transmit and receive completion, and interrupts let the system respond without polling every flag continuously.
 
+![An Intel 8051 architecture diagram shows timers, serial I/O, memory, and ports around the CPU core.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_8051_arch.svg)
+
+*Figure: The 8051 diagram connects assembly details to the microcontroller's peripheral blocks. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_8051_arch.svg), Appaloosa, CC BY-SA 3.0.*
+
 The central habit is to configure the correct SFR bits, clear or test the correct flags, and understand which hardware event sets each flag. Once that is in place, an 8051 program can blink LEDs, count external pulses, generate a baud clock, receive characters, and service external events predictably.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 9
 
 Numerical differentiation estimates derivatives from function values. It looks simple because the formulas resemble the limit definitions from calculus, but it is one of the most error-sensitive tasks in numerical analysis. Difference quotients subtract nearby values, and that subtraction can amplify both measurement noise and floating-point roundoff.
 
+![A tangent line touches a curve at a point to show instantaneous slope.](https://commons.wikimedia.org/wiki/Special:FilePath/Derivative_with_tangent.svg)
+
+*Figure: A tangent line gives the local geometric meaning of a derivative. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Derivative_with_tangent.svg), Olivier Cleynen, CC0 1.0.*
+
 Richardson extrapolation improves a difference formula by combining approximations computed with different step sizes. When the leading error term is known, the combination cancels that term and raises the order. The idea appears again in Romberg integration, deferred correction, and step-size control for differential equations.
 
 ## Definitions

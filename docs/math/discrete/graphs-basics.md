@@ -9,7 +9,7 @@ Graphs model pairwise connections. Vertices represent objects and edges represen
 
 The first skill is translation: decide what the vertices are, decide what the edges mean, and decide whether direction, weights, loops, or multiple edges matter. Once the graph is chosen, degree counts, adjacency representations, isomorphism checks, and special graph families provide a vocabulary for reasoning about structure.
 
-![Five vertices are connected pairwise to form the complete graph K five.](https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Complete_graph_K5.svg/500px-Complete_graph_K5.svg.png)
+![Five vertices are connected pairwise to form the complete graph K five.](https://commons.wikimedia.org/wiki/Special:FilePath/Complete_graph_K5.svg)
 
 *Figure: The complete graph $K_5$. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Complete_graph_K5.svg), David Benbennick, public domain.*
 

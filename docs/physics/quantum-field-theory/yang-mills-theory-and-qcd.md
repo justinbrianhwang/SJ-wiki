@@ -9,6 +9,10 @@ Yang-Mills theory generalizes electromagnetism from an abelian $U(1)$ gauge grou
 
 Zee's treatment uses nonabelian gauge theory as a bridge between elegant geometry and measurable particle physics. The same field strength that looks like curvature in a mathematical connection becomes the source of three-gluon and four-gluon vertices. Quantizing the theory requires gauge fixing and ghosts, and the resulting theory underlies QCD, the electroweak theory, and grand unification.
 
+![The Standard Model chart groups quarks, leptons, gauge bosons, and the Higgs boson.](https://commons.wikimedia.org/wiki/Special:FilePath/Standard_Model_of_Elementary_Particles.svg)
+
+*Figure: The Standard Model chart gives QFT pages a concrete particle-spectrum map. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Standard_Model_of_Elementary_Particles.svg), Cush and MissMJ, public domain/CC BY 3.0.*
+
 ## Definitions
 
 Let $T^a$ be generators of a Lie algebra:

@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Induction proves infinitely many statements by showing how each case follows from earlier cases. Recursion defines objects or algorithms by reducing them to smaller objects or inputs. The two ideas fit together: recursive definitions give objects step by step, and induction proves facts about every step.
 
+![A Sierpinski triangle repeats triangular holes at smaller and smaller scales.](https://commons.wikimedia.org/wiki/Special:FilePath/Big_Sierpinski_triangle.svg)
+
+*Figure: The Sierpinski triangle connects recursion, self-similarity, and geometric counting. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Big_Sierpinski_triangle.svg), Medvedev, public domain.*
+
 The connection is practical. A recursive algorithm is trustworthy only when it has a base case, makes progress toward that base case, and combines smaller answers correctly. An induction proof has exactly the same shape: verify the base case, assume smaller or previous cases, and prove the next case.
 
 ## Definitions

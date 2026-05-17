@@ -7,6 +7,10 @@ sidebar_position: 9
 
 Processors are much faster than main memory, so modern computers rely on a hierarchy of storage technologies. Small memories close to the processor are fast and expensive per byte. Larger memories farther away are slower and cheaper per byte. Caches exploit locality so that most accesses hit in a fast level while the full address space remains backed by larger memory.
 
+![An opened Intel 4004 processor exposes the silicon die inside its package.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_4004_open.jpg)
+
+*Figure: Opening the package links instruction-set discussions to the physical die. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_4004_open.jpg), Science Museum Group, CC BY 4.0.*
+
 The central cache question is quantitative: how much does a design reduce execution time, not just miss rate? A larger block may reduce compulsory misses but increase miss penalty. Higher associativity may reduce conflict misses but lengthen hit time. A bigger cache may reduce capacity misses while increasing power and access latency. Average memory access time, AMAT, is the first-order model that keeps these trade-offs visible.
 
 ## Definitions

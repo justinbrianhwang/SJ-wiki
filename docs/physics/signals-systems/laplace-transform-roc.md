@@ -9,6 +9,10 @@ The Laplace transform generalizes the continuous-time Fourier transform by using
 
 For systems, the Laplace transform exposes poles, zeros, stability, causality, and transient behavior. The region of convergence is not optional. The algebraic expression $X(s)$ alone may correspond to different time-domain signals depending on where the transform converges.
 
+![A diagram compares a signal representation in time with its frequency-domain counterpart.](https://commons.wikimedia.org/wiki/Special:FilePath/Time_and_frequency_domains.svg)
+
+*Figure: Time and frequency views highlight why transforms are alternate coordinates for the same signal behavior. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Time_and_frequency_domains.svg), Juanlu001, CC0 1.0.*
+
 ## Definitions
 
 The bilateral Laplace transform of $x(t)$ is

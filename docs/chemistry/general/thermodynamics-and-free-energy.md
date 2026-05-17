@@ -9,6 +9,10 @@ Thermodynamics explains the direction and limits of chemical change. Thermochemi
 
 In the Ebbing and Gammon sequence this topic sits near first law, enthalpy, spontaneous processes, entropy, standard entropies, third law, Gibbs free energy, spontaneity, free energy interpretation, free energy and equilibrium constants, and temperature effects. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
+![A Gibbs energy curve shows a reaction mixture relaxing toward an equilibrium composition.](https://commons.wikimedia.org/wiki/Special:FilePath/Gibbs-Energie-Veranschaulichung.svg)
+
+*Figure: Gibbs energy as the thermodynamic criterion for direction and equilibrium. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Gibbs-Energie-Veranschaulichung.svg), Johannes Schneider, CC BY-SA 4.0.*
+
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.

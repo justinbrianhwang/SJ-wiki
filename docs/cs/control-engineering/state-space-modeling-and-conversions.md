@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Transfer functions describe the input-output behavior of linear systems, but they hide internal variables. State-space modeling exposes those variables directly. Nise introduces state space as the time-domain representation built from first-order differential equations, useful for simulation, multi-output systems, controllability, observability, and modern controller design.
 
+![An inverted pendulum on a cart shows the unstable plant used in many control examples.](https://commons.wikimedia.org/wiki/Special:FilePath/Cart-pendulum.svg)
+
+*Figure: The cart-pendulum is a concrete plant for modeling, stabilization, and control design. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cart-pendulum.svg), Krishnavedala, CC0.*
+
 The shift is conceptual. Instead of asking only for $C(s)/R(s)$, we choose a vector of state variables whose present values, together with the input, determine the future motion. The state model can then be converted to and from transfer-function form, but many design questions are easier to state using the matrices $A$, $B$, $C$, and $D$.
 
 ## Definitions

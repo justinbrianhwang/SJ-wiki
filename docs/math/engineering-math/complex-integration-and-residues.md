@@ -7,6 +7,10 @@ sidebar_position: 22
 
 Complex integration is powerful because analyticity controls whole contour integrals. Cauchy's theorem, Cauchy's integral formula, Laurent series, and the residue theorem turn many difficult integrals into local calculations around singularities. The global path matters, but the answer is often determined by a few coefficients.
 
+![Augustin-Louis Cauchy is shown in a nineteenth-century portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Augustin_Louis_Cauchy.jpg)
+
+*Figure: Augustin-Louis Cauchy is a central figure in rigorous limits, continuity, and complex analysis. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Augustin_Louis_Cauchy.jpg), Charles H. Reutlinger, public domain.*
+
 Residues are central in engineering mathematics because they evaluate real integrals, invert transforms, and identify modal contributions from poles. The same pole locations that control Laplace transform solutions also control contour-integral contributions in the complex plane.
 
 ## Definitions

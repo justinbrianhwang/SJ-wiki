@@ -7,6 +7,10 @@ sidebar_position: 2
 
 Numerical analysis begins with a simple tension: calculus and linear algebra describe exact objects, while a computer stores finitely many numbers and performs finitely many operations. The purpose of error analysis is not to make this tension disappear. It is to make the size, direction, and consequences of the error visible enough that an algorithm can be trusted for the intended problem.
 
+![Carl Friedrich Gauss is shown in a formal painted portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Carl_Friedrich_Gauss.jpg)
+
+*Figure: Carl Friedrich Gauss is central to number theory, linear algebra, statistics, and numerical methods. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Carl_Friedrich_Gauss.jpg), Gottlieb Biermann after Christian Albrecht Jensen, public domain.*
+
 This page sits before root finding, interpolation, quadrature, differential equations, and matrix algorithms because every later method uses the same vocabulary. We compare exact and approximate quantities, track how local truncation errors become global errors, and distinguish mathematical convergence from practical reliability.
 
 ## Definitions

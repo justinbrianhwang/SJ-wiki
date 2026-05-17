@@ -7,6 +7,10 @@ sidebar_position: 5
 
 CPU scheduling is the policy problem at the heart of multiprogramming: when several processes or kernel-level threads are ready, which one gets the CPU next? The answer shapes responsiveness, throughput, fairness, deadline behavior, and user perception. The scheduler cannot make a slow CPU fast, but it can avoid wasting the CPU while processes wait for I/O and can prevent one activity from monopolizing the machine.
 
+![A Linux kernel map organizes subsystems such as memory, filesystems, networking, and drivers.](https://commons.wikimedia.org/wiki/Special:FilePath/Linux_kernel_map.png)
+
+*Figure: The Linux kernel map shows how OS services become interacting subsystems. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Linux_kernel_map.png), Conan at English Wikipedia, CC BY 3.0.*
+
 The textbook presents scheduling after synchronization in this edition, but conceptually it builds on processes and threads. The scheduler chooses among ready execution contexts; the dispatcher performs the context switch; timers and blocking operations create opportunities to reconsider the choice. Different environments want different outcomes, so a batch server, desktop, mobile phone, and real-time controller should not all use the same simple rule.
 
 ## Definitions

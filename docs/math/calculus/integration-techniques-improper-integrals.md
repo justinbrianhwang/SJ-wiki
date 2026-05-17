@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Integration techniques are pattern-recognition tools for finding antiderivatives and evaluating definite integrals. Substitution reverses the chain rule. Integration by parts reverses the product rule. Partial fractions break rational functions into simpler pieces. Improper integrals extend definite integrals to infinite intervals and unbounded integrands through limits.
 
+![Rectangles under a curve approximate area in a Riemann sum.](https://commons.wikimedia.org/wiki/Special:FilePath/Riemannsumme.svg)
+
+*Figure: Riemann sums turn accumulated area into the limiting process behind definite integrals. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Riemannsumme.svg), Emes2k, public domain.*
+
 No single technique solves every integral. The work is to identify structure, transform the integral without changing its value, and check whether the result is an antiderivative, a convergent improper integral, or a divergent expression.
 
 ## Definitions

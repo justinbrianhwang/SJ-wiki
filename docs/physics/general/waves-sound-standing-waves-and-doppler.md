@@ -9,6 +9,10 @@ Waves, Sound, Standing Waves, and Doppler Effect covers mechanical waves, sound,
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
+![Wavefronts bunch ahead of a moving source and spread behind it.](https://commons.wikimedia.org/wiki/Special:FilePath/Doppler_effect_diagrammatic.svg)
+
+*Figure: The Doppler pattern connects wave geometry with frequency shifts in sound, light, and sensing systems. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Doppler_effect_diagrammatic.svg), Tkarcher and Tatoute, CC BY-SA 3.0/GFDL.*
+
 ## Definitions
 
 - **Scope:** mechanical waves, sound, standing-wave modes, and Doppler shifts.

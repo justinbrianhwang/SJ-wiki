@@ -7,6 +7,10 @@ sidebar_position: 9
 
 Gradient masking is the classic failure mode of adversarial defenses. A defense appears robust because common gradient attacks fail, but the model has not actually become robust inside the threat set. The gradients are missing, misleading, noisy, shattered, saturated, or hidden behind nondifferentiable operations. Once the attack is adapted, robustness collapses.
 
+![A visually similar adversarial panda image is classified as a gibbon by an ImageNet model.](https://ar5iv.labs.arxiv.org/html/1412.6572/assets/gibbon_993.png)
+
+*Figure: The FGSM panda example shows that imperceptible perturbations can change model decisions. Image: [ar5iv](https://arxiv.org/abs/1412.6572), Goodfellow, Shlens, and Szegedy, educational use with attribution.*
+
 This page explains why broken defenses can look strong, how to recognize the symptoms, and how adaptive attacks such as BPDA and EOT change the evaluation. It is the bridge between attack algorithms and benchmark discipline: every robustness claim should be checked for gradient masking before it is trusted.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 16
 
 Space complexity measures working memory rather than time. A computation may run for many steps while using only a small amount of storage, and nondeterministic choices can sometimes be simulated with surprisingly little extra space. Space classes are central for graph reachability, quantified Boolean formulas, games, and memory-limited computation.
 
+![A square Kufic algorithms mark introduces the study of designed procedures.](https://commons.wikimedia.org/wiki/Special:FilePath/Algorithms.svg)
+
+*Figure: The algorithms mark gives the abstract algorithms pages a concrete visual anchor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Algorithms.svg), Jeff Erickson, CC BY 4.0.*
+
 The main classes in the introductory theory sequence are PSPACE, NPSPACE, L, and NL. Savitch's theorem relates deterministic and nondeterministic space by showing that nondeterministic space can be simulated deterministically with only a quadratic space blowup. This is one of the most striking contrasts with time complexity, where no analogous proof is known for P and NP.
 
 ## Definitions

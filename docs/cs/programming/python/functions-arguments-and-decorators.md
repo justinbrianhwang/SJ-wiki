@@ -7,6 +7,10 @@ sidebar_position: 8
 
 Functions are the first major abstraction in Python. They turn a sequence of statements into a named operation with inputs, outputs, and a local workspace. Halvorsen's textbook introduces functions after control flow, including functions with multiple return values. That placement is natural: once code can branch and loop, it quickly becomes worth packaging repeated logic into reusable pieces.
 
+![The Python logo marks pages on scripting, testing, packaging, and scientific programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Python-logo-notext.svg)
+
+*Figure: Python provides the practical environment for many CS, ML, and data examples. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Python-logo-notext.svg), Python Software Foundation, GPL-compatible free license; trademark terms apply.*
+
 Modern Python functions go further than simple `def name(x): return y`. They support positional arguments, keyword arguments, defaults, variable-length argument lists, closures, lambdas, decorators, annotations, and multiple return values through tuples. These features should serve readability. A good function makes one idea easy to call and easy to test; a clever signature that hides behavior is usually worse than a few explicit lines.
 
 ## Definitions

@@ -9,6 +9,14 @@ AC Circuits and Electromagnetic Waves covers sinusoidal circuits, reactance, res
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
+![A Tektronix oscilloscope sits on a bench with its display and controls visible.](https://commons.wikimedia.org/wiki/Special:FilePath/Tektronix_2235_100Mhz_Oscilloscope.png)
+
+*Figure: An oscilloscope grounds signal language in measured voltage traces, triggering, bandwidth, and time scales. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tektronix_2235_100Mhz_Oscilloscope.png), Dennis van Zuijlekom, CC BY-SA 2.0.*
+
+![The electromagnetic spectrum is arranged by wavelength, frequency, and representative sources.](https://commons.wikimedia.org/wiki/Special:FilePath/EM_Spectrum_Properties_edit.svg)
+
+*Figure: The electromagnetic spectrum ties circuit-scale oscillations, radio links, optics, and thermal radiation into one continuum. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:EM_Spectrum_Properties_edit.svg), Inductiveload, public domain.*
+
 ## Definitions
 
 - **Scope:** sinusoidal circuits, reactance, resonance, Maxwell wave ideas, and the electromagnetic spectrum.

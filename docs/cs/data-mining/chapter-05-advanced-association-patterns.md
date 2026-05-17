@@ -7,6 +7,10 @@ sidebar_position: 7
 
 Basic association mining can produce too many itemsets and rules. Aggarwal's advanced association chapter addresses this output-management problem with summarization, querying, constraints, and applications. Instead of treating every frequent itemset as equally useful, the analyst can mine closed patterns, maximal patterns, approximate patterns, constrained patterns, or preprocessed structures that answer many pattern queries efficiently.
 
+![A hash list diagram links data blocks to hashes that can verify later blocks.](https://commons.wikimedia.org/wiki/Special:FilePath/Hash_list.svg)
+
+*Figure: Hash lists connect hashing to integrity checking and authenticated data structures. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hash_list.svg), David Gothberg and DataWraith, public domain.*
+
 This page builds directly on Apriori and FP-growth. The central issue is no longer only "can we find all frequent itemsets?" It is "which representation of the pattern space is compact, queryable, and useful for the downstream task?"
 
 ## Definitions

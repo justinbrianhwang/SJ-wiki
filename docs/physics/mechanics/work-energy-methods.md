@@ -9,6 +9,10 @@ Work-energy methods replace a time-by-time force analysis with a balance between
 
 The method does not eliminate modeling. You still need a free-body diagram to identify forces and a kinematic description to write displacements or speeds. The advantage is that constraint forces that do no work, such as ideal normal reactions or pin reactions at fixed points, can often be ignored in the energy equation.
 
+![A simple pendulum diagram shows a mass suspended from a pivot with its angular displacement marked.](https://commons.wikimedia.org/wiki/Special:FilePath/Simple_pendulum.svg)
+
+*Figure: A pendulum makes the links among gravity, constraint forces, energy exchange, and small-oscillation models concrete. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Simple_pendulum.svg), Chris-martin, after Unc.hbar, public domain.*
+
 ## Definitions
 
 The **work** done by a force $\mathbf{F}$ over a displacement path from position $1$ to position $2$ is

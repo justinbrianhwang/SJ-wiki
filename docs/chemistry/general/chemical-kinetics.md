@@ -9,6 +9,10 @@ Chemical kinetics studies how fast reactions occur and what molecular events con
 
 In the Ebbing and Gammon sequence this topic sits near reaction rates, experimental rate laws, integrated rate laws, temperature effects, collision theory, transition-state theory, Arrhenius equation, mechanisms, elementary reactions, rate-determining steps, and catalysis. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
+![A reaction coordinate diagram marks the activation energy between reactants and products.](https://commons.wikimedia.org/wiki/Special:FilePath/Activation_Energy.svg)
+
+*Figure: Activation energy barrier that controls reaction rates. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Activation_Energy.svg), Risibot based on Brazosport College, CC BY-SA 4.0.*
+
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.

@@ -7,6 +7,10 @@ sidebar_position: 4
 
 Naive Bayes is the classic first probabilistic classifier for text. Jurafsky and Martin introduce it through sentiment analysis, where words in a review provide strong evidence for positive or negative orientation. Eisenstein treats it as a linear text classifier with a clear generative story, showing why smoothing and feature choices matter.
 
+![An ELIZA terminal conversation shows an early chatbot responding to typed user input.](https://commons.wikimedia.org/wiki/Special:FilePath/ELIZA_conversation.png)
+
+*Figure: ELIZA provides historical context for dialogue systems and chatbot evaluation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ELIZA_conversation.png), Unknown author, public domain text.*
+
 The model is simple enough to compute by hand, yet strong enough to remain a useful baseline. It teaches the bag-of-words representation, priors, likelihoods, log-space scoring, smoothing, evaluation with precision and recall, and the distinction between generative and discriminative classifiers.
 
 ## Definitions

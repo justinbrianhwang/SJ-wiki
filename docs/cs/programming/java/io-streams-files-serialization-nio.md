@@ -7,6 +7,10 @@ sidebar_position: 13
 
 The source book's I/O chapter uses the word stream in the classic Java sense: a sequence of bytes or characters flowing from a source to a destination. This is not the later Java 8 `java.util.stream` API for functional-style collection processing. Source-era I/O streams are about files, memory buffers, filters, readers, writers, object serialization, and checked `IOException`.
 
+![The Sun Microsystems logo gives Java pages historical context for the language and platform.](https://commons.wikimedia.org/wiki/Special:FilePath/Sun_Microsystems_logo.svg)
+
+*Figure: Java's early development at Sun shaped its portability, virtual-machine model, and library ecosystem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sun_Microsystems_logo.svg), Sun Microsystems and Afrank99, public domain text logo.*
+
 I/O is a library topic where language features become practical. You need classes, inheritance, wrapping, interfaces, exceptions, `finally` cleanup, arrays, strings, and sometimes synchronization. The stream classes are designed for composition: a file stream supplies bytes, a buffering stream improves efficiency, a reader decodes bytes into characters, and a data or object stream interprets structured values.
 
 ## Definitions

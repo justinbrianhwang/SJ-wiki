@@ -9,6 +9,10 @@ Discrete-time models update at separated time instants rather than evolving over
 
 Continuous simulation and discrete-time modeling meet in several places. Numerical integration itself creates a difference equation. Digital controllers sample sensor data and hold actuator commands. Simulink models often combine continuous plant blocks with discrete controllers. Understanding the difference between solver step size, sample time, and output logging interval prevents many simulation errors.
 
+![Two sine waves pass through the same sampled points, illustrating aliasing.](https://commons.wikimedia.org/wiki/Special:FilePath/AliasingSines.svg)
+
+*Figure: Aliasing shows why sampling rate is a physical constraint, not just a numerical detail. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:AliasingSines.svg), Moxfyre, CC BY-SA 3.0/GFDL.*
+
 ## Definitions
 
 A discrete-time state model is

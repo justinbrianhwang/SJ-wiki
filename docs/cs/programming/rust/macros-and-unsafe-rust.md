@@ -7,6 +7,10 @@ sidebar_position: 19
 
 Macros and unsafe Rust are advanced tools for cases where ordinary functions and safe abstractions are not enough. Macros write code that writes code, reducing repetition or creating syntax-like APIs. Unsafe Rust permits a small set of operations the compiler cannot fully verify, such as dereferencing raw pointers or calling unsafe functions. The book presents both topics carefully: they are powerful, but they should be isolated behind safe, well-tested interfaces whenever possible.
 
+![The Rust logo marks pages on ownership, borrowing, traits, and safe systems programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Rust_programming_language_black_logo.svg)
+
+*Figure: Rust connects systems control with compile-time memory-safety guarantees. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Rust_programming_language_black_logo.svg), Rust Foundation, CC BY 4.0.*
+
 This page builds on [advanced traits and object-oriented features](/cs/programming/rust/object-oriented-and-advanced-features), [ownership](/cs/programming/rust/ownership-references-slices), and [concurrency](/cs/programming/rust/concurrency-and-shared-state). Unsafe code is not a way to turn off all Rust checks; it opens specific extra capabilities while the rest of the language remains checked.
 
 ## Definitions

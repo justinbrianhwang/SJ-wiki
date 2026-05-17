@@ -7,6 +7,10 @@ sidebar_position: 6
 
 Pointers expose the address-based side of C++. They make it possible to create objects whose lifetime is controlled explicitly, build dynamic arrays, share objects without copying them, and implement linked data structures. Savitch introduces pointers after arrays because array parameters already behave like addresses; pointers make that mechanism explicit.
 
+![The ISO C++ logo marks pages on classes, templates, containers, and modern C++ idioms.](https://commons.wikimedia.org/wiki/Special:FilePath/ISO_C%2B%2B_Logo.svg)
+
+*Figure: C++ extends systems programming with abstraction, generic code, and deterministic resource management. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ISO_C%2B%2B_Logo.svg), Jeremy Kratz, public domain text logo.*
+
 The power of pointers is balanced by responsibility. A pointer can point to a valid object, point to nothing, point to an object that has already been destroyed, or be uninitialized. Correct pointer programs maintain ownership and lifetime invariants as carefully as numeric programs maintain arithmetic invariants.
 
 ## Definitions

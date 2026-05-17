@@ -9,6 +9,10 @@ Friction turns statics from pure equality into a problem with inequalities and i
 
 This page collects the engineering friction models most often used in statics: dry Coulomb friction, belt friction, and square-thread screw friction. These models are idealizations, but they are practical when the surfaces are dry, the contact state is known or can be tested, and the goal is a first-order force estimate rather than detailed tribology.
 
+![A pulley diagram compares several rope-and-sheave arrangements.](https://commons.wikimedia.org/wiki/Special:FilePath/Pulleys.svg)
+
+*Figure: Pulley systems make constraints, tension, and mechanical advantage visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pulleys.svg), Tomia, CC BY 2.5/CC BY-SA 3.0/GFDL.*
+
 ## Definitions
 
 For dry contact, the normal reaction $N$ acts perpendicular to the contact surface. The friction force $F$ acts tangent to the surface and opposes relative motion or impending relative motion.

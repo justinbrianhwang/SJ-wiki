@@ -9,6 +9,14 @@ Simulation is useful only when the model is credible for its intended question. 
 
 Dynamic-system simulation is powerful because the same mathematical structures appear in mechanical, electrical, thermal, chemical, and biological domains. Storage elements create states; resistive elements create dissipation; sources drive the system; nonlinearities and constraints shape the response. A validation mindset uses these analogies while still respecting the units, data, and mechanisms of each domain.
 
+![An inverted pendulum is mounted on a cart with its angle and cart position labeled.](https://commons.wikimedia.org/wiki/Special:FilePath/Cart-pendulum.svg)
+
+*Figure: The cart-pendulum setup is a classic benchmark for unstable dynamics, feedback, and hybrid simulation tests. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cart-pendulum.svg), Krishnavedala, CC0 1.0.*
+
+![A Lorenz attractor coils through phase space in two butterfly-like lobes.](https://commons.wikimedia.org/wiki/Special:FilePath/Lorenz_attractor_yb.svg)
+
+*Figure: The Lorenz attractor is the standard visual scene for sensitive dependence and nonlinear simulation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Lorenz_attractor_yb.svg), Wikimol and Dschwen, CC BY-SA 3.0/GFDL.*
+
 ## Definitions
 
 Verification is the process of checking that the model implementation correctly solves the specified mathematical model. Examples include code reviews, unit tests, solver convergence studies, comparison with analytical solutions, and consistency between MATLAB and Simulink implementations.

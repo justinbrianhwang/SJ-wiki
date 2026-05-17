@@ -7,6 +7,10 @@ sidebar_position: 7
 
 Pointers are the central C idea after functions. A pointer is a value that locates an object, and C lets programs copy, compare, increment, subtract, and dereference such values under precise conditions. K&R emphasizes that pointers can make programs smaller and clearer when they follow array and object boundaries, but they can also make errors immediate and severe.
 
+![A C language logo marks the systems-programming pages built around C examples.](https://commons.wikimedia.org/wiki/Special:FilePath/C_Programming_Language.svg)
+
+*Figure: C remains the reference language for low-level memory, pointers, and Unix interfaces. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:C_Programming_Language.svg), ElodinKaldwin, public domain text logo.*
+
 Arrays and pointers are taught together because C connects them tightly. An array expression usually converts to a pointer to its first element. Pointer arithmetic moves by elements, not bytes. Function parameters declared as arrays are really pointer parameters. These rules explain much of the compact style that C inherited from early UNIX programming.
 
 ## Definitions

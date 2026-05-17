@@ -7,6 +7,10 @@ sidebar_position: 9
 
 Computational learning theory asks what can be learned in principle, how much data is sufficient, and how computation constrains learning. Mitchell's treatment centers on PAC learning, sample complexity, VC dimension, and mistake bounds. The chapter is less about building a classifier for a given dataset and more about proving guarantees under explicit assumptions.
 
+![A square Kufic algorithms mark introduces the study of designed procedures.](https://commons.wikimedia.org/wiki/Special:FilePath/Algorithms.svg)
+
+*Figure: The algorithms mark gives the abstract algorithms pages a concrete visual anchor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Algorithms.svg), Jeff Erickson, CC BY 4.0.*
+
 This material remains foundational because it gives formal language for generalization. Modern models are often too large for the simplest finite-hypothesis bounds to be tight, but the discipline of stating a distribution, an error tolerance, a confidence level, and a hypothesis class is still essential.
 
 ## Definitions

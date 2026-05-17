@@ -7,6 +7,10 @@ sidebar_position: 18
 
 Rust does not copy class-based object-oriented programming directly, but it supports several object-oriented goals: encapsulation, polymorphism, and state-dependent behavior. The book uses this comparison to show where Rust's design differs from inheritance-heavy languages. Later, the advanced-features chapter deepens the same theme with associated types, operator overloading, fully qualified syntax, supertraits, newtype wrappers, type aliases, and function pointers.
 
+![The Rust logo marks pages on ownership, borrowing, traits, and safe systems programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Rust_programming_language_black_logo.svg)
+
+*Figure: Rust connects systems control with compile-time memory-safety guarantees. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Rust_programming_language_black_logo.svg), Rust Foundation, CC BY 4.0.*
+
 This page combines the object-oriented chapter with the advanced trait and type material most closely related to it. It builds on [traits and lifetimes](/cs/programming/rust/generics-traits-lifetimes), [modules and privacy](/cs/programming/rust/packages-crates-modules), and [smart pointers](/cs/programming/rust/smart-pointers). It prepares for [macros and unsafe Rust](/cs/programming/rust/macros-and-unsafe-rust), where the language allows even more explicit control.
 
 ## Definitions

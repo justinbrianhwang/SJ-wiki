@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Control flow is how a program decides what to do next. Halvorsen's textbook introduces `if ... else`, arrays or list-like data, `for` loops, nested loops, and `while` loops as the first major step beyond straight-line scripts. These constructs make programs respond to data instead of merely executing a fixed sequence of assignments and prints.
 
+![The Python logo marks pages on scripting, testing, packaging, and scientific programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Python-logo-notext.svg)
+
+*Figure: Python provides the practical environment for many CS, ML, and data examples. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Python-logo-notext.svg), Python Software Foundation, GPL-compatible free license; trademark terms apply.*
+
 Python's control flow is deliberately small. Conditions choose branches. Loops repeat work. `break` exits a loop. `continue` skips to the next iteration. Comprehensions build collections from existing iterables. Once these pieces are clear, many programs become combinations of filtering, transforming, accumulating, and stopping at the right time.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 17
 
 Domain-specific accelerators trade generality for efficiency. Instead of spending area and energy on branch prediction, wide out-of-order scheduling, and complex speculation, an accelerator builds hardware around a narrower computation pattern: matrix multiply, video encoding, cryptography, packet processing, signal processing, compression, or graphics. H&P 5e predates public TPU systems, but its treatment of SIMD, GPUs, embedded processors, and quantitative energy limits explains why later tensor and AI accelerators became attractive.
 
+![An opened Intel 4004 processor exposes the silicon die inside its package.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_4004_open.jpg)
+
+*Figure: Opening the package links instruction-set discussions to the physical die. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_4004_open.jpg), Science Museum Group, CC BY 4.0.*
+
 The key architectural question is not whether special hardware can be faster. It usually can. The question is whether the speedup, energy reduction, and cost justify the loss of flexibility, programming effort, data-movement overhead, and integration complexity.
 
 ## Definitions

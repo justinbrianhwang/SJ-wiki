@@ -7,6 +7,10 @@ sidebar_position: 14
 
 Base R graphics are immediate, scriptable, and deeply connected to ordinary R objects. The book introduces plotting early with `plot`, graphical parameters, points, lines, text, colors, and axis controls, then returns later to advanced customization. Base graphics are not arranged around a grammar in the same way as `ggplot2`; instead, you open a device, draw a plot, and add layers procedurally.
 
+![The R logo marks pages on statistical computing, graphics, and data analysis.](https://commons.wikimedia.org/wiki/Special:FilePath/R_logo.svg)
+
+*Figure: R connects programming examples to statistical modeling and visualization workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:R_logo.svg), The R Foundation, CC BY-SA 4.0.*
+
 That procedural style is useful for statistical exploration. A scatterplot can be drawn with one command, then a fitted line, legend, labels, and reference marks can be added step by step. Understanding base graphics also helps when reading older R code, using modeling functions that provide base diagnostic plots, or exporting quick figures without additional packages.
 
 ## Definitions

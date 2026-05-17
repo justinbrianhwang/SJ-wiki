@@ -9,6 +9,10 @@ Particle equilibrium is the statics model for a body whose size and rotational e
 
 The topic is simple in principle and unforgiving in practice. The equation $\sum\mathbf{F}=\mathbf{0}$ is short, but the success of the solution depends on a complete free-body diagram, correct force directions, and enough independent scalar equations. A particle in 2D supplies two scalar equations; a particle in 3D supplies three.
 
+![A pulley diagram compares several rope-and-sheave arrangements.](https://commons.wikimedia.org/wiki/Special:FilePath/Pulleys.svg)
+
+*Figure: Pulley systems make constraints, tension, and mechanical advantage visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pulleys.svg), Tomia, CC BY 2.5/CC BY-SA 3.0/GFDL.*
+
 ## Definitions
 
 A **particle** is an idealized body with position but no size or orientation. In statics, it has no acceleration, so linear momentum is constant and the force balance reduces to

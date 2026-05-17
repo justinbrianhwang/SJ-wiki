@@ -9,6 +9,10 @@ Reflections occur whenever a traveling wave reaches a discontinuity whose impeda
 
 Impedance matching is the practical response: choose a network or line section so the source sees the intended impedance and the load receives the intended power. Ulaby treats reflection coefficients, standing-wave ratio, special line lengths, the Smith chart, lumped matching, and single-stub matching. This page organizes those ideas in formula form while keeping the physical picture visible.
 
+![A Smith chart fills the circle with resistance and reactance coordinate curves.](https://commons.wikimedia.org/wiki/Special:FilePath/Smith_chart.svg)
+
+*Figure: The Smith chart turns reflection coefficients and impedance matching into a navigable geometric construction. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Smith_chart.svg), Cannabic, CC BY-SA 4.0.*
+
 ## Definitions
 
 For a lossless line terminated by load $Z_L$, the voltage reflection coefficient at the load is

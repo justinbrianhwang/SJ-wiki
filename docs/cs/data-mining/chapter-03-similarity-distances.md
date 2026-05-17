@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Similarity and distance functions define what it means for two data objects to be close. They are the hidden geometry behind nearest-neighbor search, clustering, outlier detection, information retrieval, graph mining, sequence matching, and many supervised learning methods. Aggarwal's treatment emphasizes that the right measure depends on the data type and on the analytical task, not on a universal formula.
 
+![A DBSCAN diagram marks core, border, and noise points under a density threshold.](https://commons.wikimedia.org/wiki/Special:FilePath/DBSCAN-Illustration.svg)
+
+*Figure: DBSCAN explains clustering as density reachability rather than a fixed number of clusters. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:DBSCAN-Illustration.svg), Chire, CC BY-SA 3.0.*
+
 This page bridges data preparation and algorithms. A feature matrix is not enough; an algorithm also needs a comparison rule. Numeric vectors often use $L_p$ distances, text often uses cosine similarity, sets often use Jaccard similarity, strings use edit distance, time series may use dynamic time warping, and graphs use topology-aware measures.
 
 ## Definitions

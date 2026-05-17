@@ -7,6 +7,10 @@ sidebar_position: 2
 
 Propositional logic is the grammar of precise yes-or-no statements. A proposition is not a vague claim, a command, or an expression with an unassigned variable; it is a declarative sentence with a definite truth value. Once propositions are named by variables such as $p$, $q$, and $r$, larger statements can be built with logical connectives. This lets mathematical arguments be checked by form rather than by the accidental wording of English.
 
+![Two overlapping circles show a highlighted Venn diagram region.](https://commons.wikimedia.org/wiki/Special:FilePath/Venn0001.svg)
+
+*Figure: A Venn diagram connects set operations with the same logical connectives used in proofs. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Venn0001.svg), Watchduck, public domain.*
+
 This topic sits at the entrance to proof, set theory, circuit design, program specification, and Boolean search. Its power is that complicated statements can be reduced to small truth tables and algebraic laws. Its limitation is also important: propositional logic treats each simple sentence as atomic, so it cannot express "for every integer" or "there exists a vertex" until predicates and quantifiers are introduced.
 
 ## Definitions

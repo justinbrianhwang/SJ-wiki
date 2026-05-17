@@ -7,6 +7,18 @@ sidebar_position: 1
 
 These notes synthesize the standard undergraduate sequence in Norman S. Nise's *Control Systems Engineering*, 7th ed. The section begins with feedback configurations and the design process, then develops transfer-function and state-space models for electrical, mechanical, electromechanical, and sampled-data systems. The central analysis themes are transient response, steady-state error, and stability; the design themes are root locus, Bode/Nyquist frequency response, classical compensation, state feedback, observers, and digital implementation.
 
+![An inverted pendulum on a cart shows the unstable plant used in many control examples.](https://commons.wikimedia.org/wiki/Special:FilePath/Cart-pendulum.svg)
+
+*Figure: The cart-pendulum is a concrete plant for modeling, stabilization, and control design. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cart-pendulum.svg), Krishnavedala, CC0.*
+
+![A historical centrifugal governor drawing shows rotating flyballs regulating engine speed.](https://commons.wikimedia.org/wiki/Special:FilePath/Centrifugal_governor.png)
+
+*Figure: The centrifugal governor is an early mechanical feedback-control apparatus. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Centrifugal_governor.png), R. Routledge, public domain.*
+
+![A feedback control block diagram shows compensators wrapped around a plant.](https://commons.wikimedia.org/wiki/Special:FilePath/Control_System.svg)
+
+*Figure: The standard feedback loop keeps control pages tied to the plant-controller interface. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Control_System.svg), Inductiveload, public domain.*
+
 The emphasis is practical: every model should state its assumptions, every controller should be checked for stability and error performance, and every elegant pole-zero calculation should survive simulation and implementation constraints. Nise's treatment is primarily linear and time-invariant, so the nonlinear page is included as a short bridge showing where saturation, dead zone, phase-plane thinking, describing functions, and Lyapunov ideas enter after the linear course.
 
 The pages are written to be read in order, but they also work as references for specific tasks. If you are deriving a plant model, start with transfer functions, physical modeling, and state space. If you are checking a proposed design, use time response, Routh-Hurwitz, steady-state error, and margins. If you are implementing a controller, read the compensator, digital-control, and embedded connections carefully because sampling, saturation, and actuator limits often decide whether the textbook design survives contact with hardware.

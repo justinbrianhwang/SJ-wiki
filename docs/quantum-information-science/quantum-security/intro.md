@@ -9,6 +9,14 @@ Quantum security studies what happens to cryptographic systems when adversaries 
 
 This area sits between [classical cryptography](/cs/cryptography/), [quantum algorithms](/quantum-information-science/quantum-computing/algorithms), and [quantum communication](/quantum-information-science/quantum-communication/qkd). The two main response paths are independent. Post-quantum cryptography, or PQC, replaces vulnerable public-key algorithms with classical algorithms believed to resist quantum attacks. Quantum key distribution, or QKD, uses quantum hardware and physical measurement effects to distribute keys over specialized communication links. PQC is the default path for internet-scale migration; QKD is a specialized hardware approach with different assumptions and deployment constraints.
 
+![A public-key cryptography diagram shows a random seed creating separate public and private keys.](https://commons.wikimedia.org/wiki/Special:FilePath/Public_key_making.svg)
+
+*Figure: Quantum security is operationally focused on public-key mechanisms, because Shor's algorithm changes the assumptions behind RSA, Diffie-Hellman, and elliptic-curve systems. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Public_key_making.svg), Davidgothberg, public domain.*
+
+![A lattice-reduction diagram shows a skew basis and a shorter reduced basis over the same point lattice.](https://commons.wikimedia.org/wiki/Special:FilePath/Lattice-reduction.svg)
+
+*Figure: Lattice geometry is one of the main mathematical settings for post-quantum cryptography, especially KEMs and signatures derived from LWE and SIS variants. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Lattice-reduction.svg), Catslash, public domain.*
+
 ## Definitions
 
 A **cryptographically relevant quantum computer** is a quantum computer large enough, reliable enough, and error-corrected enough to break cryptographic parameter sizes used in real systems. Small noisy quantum devices are not enough. The phrase matters because the migration decision is driven by risk over the lifetime of protected data, not by demonstrations of small quantum circuits.

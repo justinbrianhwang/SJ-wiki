@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Vectors are one-dimensional. Matrices and arrays extend the same atomic-vector storage into two or more dimensions. This matters in R because many mathematical and statistical procedures are naturally rectangular: a data table, a design matrix for regression, an image grid, a covariance matrix, or a simulated result with dimensions for replicate, variable, and parameter.
 
+![The R logo marks pages on statistical computing, graphics, and data analysis.](https://commons.wikimedia.org/wiki/Special:FilePath/R_logo.svg)
+
+*Figure: R connects programming examples to statistical modeling and visualization workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:R_logo.svg), The R Foundation, CC BY-SA 4.0.*
+
 The book's matrix chapter connects everyday R syntax with linear algebra. A matrix still contains one atomic type, but it has a `dim` attribute that tells R how to arrange the values into rows and columns. Arrays generalize that idea to three or more dimensions. The key mental model is that R stores the values in a vector and layers dimension metadata on top.
 
 ## Definitions

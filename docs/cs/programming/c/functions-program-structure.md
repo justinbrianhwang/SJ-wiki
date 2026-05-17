@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Functions are the main unit of decomposition in C. K&R uses functions not only to avoid repetition, but to make data flow explicit: pass values in, return a result, and keep private details inside the function or source file. Chapter 4 develops this into a model for multi-file programs with prototypes, external variables, scope rules, headers, static storage, initialization, recursion, and preprocessor support.
 
+![A C language logo marks the systems-programming pages built around C examples.](https://commons.wikimedia.org/wiki/Special:FilePath/C_Programming_Language.svg)
+
+*Figure: C remains the reference language for low-level memory, pointers, and Unix interfaces. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:C_Programming_Language.svg), ElodinKaldwin, public domain text logo.*
+
 This is also where ANSI C differs visibly from earlier C. Function prototypes let the compiler check argument counts and types. Old-style function definitions remain historically important, but K&R's second edition strongly prefers prototypes because they catch mistakes at compile time.
 
 ## Definitions

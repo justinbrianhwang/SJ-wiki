@@ -7,6 +7,10 @@ sidebar_position: 6
 
 Trees (트리) organize data hierarchically rather than linearly. A binary tree is the most common starting point because each node has at most two children, usually called left and right. That small branching factor is enough to model expression structure, decision processes, hierarchical indexes, priority queues, and search trees.
 
+![A binary tree diagram shows a rooted hierarchy with left and right child links.](https://commons.wikimedia.org/wiki/Special:FilePath/Binary_tree.svg)
+
+*Figure: Binary trees make recursive structure and pointer relationships visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Binary_tree.svg), Derrick Coetzee, public domain.*
+
 In the source textbook's tree chapter, binary trees appear before heaps and binary search trees because both are specialized binary-tree shapes. A heap uses a nearly complete binary tree with an order rule between parents and children. A binary search tree uses an ordering rule between the left subtree, root, and right subtree. Before those special cases make sense, the basic language of root, child, height, level, representation, and traversal must be clear.
 
 ## Definitions

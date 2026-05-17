@@ -9,7 +9,7 @@ Linear regression models the mean of a quantitative response as a linear functio
 
 A regression line is not merely a line drawn through a scatterplot by eye. It is the line that minimizes the sum of squared residuals. That least-squares criterion gives precise formulas, but the model must still be checked. Outliers, curvature, nonconstant variance, dependence, and extrapolation can make a technically correct line misleading.
 
-![A scatterplot has a red least-squares regression line fitted through the data.](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Linear_regression.svg/500px-Linear_regression.svg.png)
+![A scatterplot has a red least-squares regression line fitted through the data.](https://commons.wikimedia.org/wiki/Special:FilePath/Linear_regression.svg)
 
 *Figure: Linear regression line fitted to random data points. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Linear_regression.svg), Sewaqu, public domain.*
 

@@ -7,6 +7,10 @@ sidebar_position: 3
 
 The end of easy clock-rate scaling changed computer architecture. Earlier designs could often spend extra transistors to make one processor faster. Modern designs must ask a harder question: does this structure deliver enough useful work per joule, per dollar, and per failure risk? Power limits shape mobile systems because batteries and heat are scarce; they shape servers because cooling and electricity dominate operating costs; they shape chips because leakage and hot spots can make transistors unusable even when there is enough silicon area.
 
+![An ENIAC installation shows early computer architecture as cabinets, switches, and wiring.](https://commons.wikimedia.org/wiki/Special:FilePath/ENIAC_Penn1.jpg)
+
+*Figure: ENIAC gives architecture pages a physical reference point before modern chips. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ENIAC_Penn1.jpg), Paul W. Shaffer and TexasDex, CC BY-SA 3.0/GFDL.*
+
 Dependability belongs in the same quantitative conversation. A machine that is fast but unavailable during repair is not fast for the service it supports. H&P uses reliability, availability, cost, and energy as first-class design constraints because modern systems are built from many parts, and the chance that something is broken grows as the system scales.
 
 ## Definitions

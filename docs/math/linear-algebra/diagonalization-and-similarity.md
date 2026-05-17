@@ -7,6 +7,10 @@ sidebar_position: 12
 
 Diagonalization changes coordinates so that a linear transformation becomes simple. A diagonal matrix acts independently on coordinate axes; a diagonalizable matrix acts independently along eigenvector directions. Similarity formalizes the idea that two matrices can describe the same linear transformation in different bases.
 
+![An eigenvector keeps its direction while a matrix scales it.](https://commons.wikimedia.org/wiki/Special:FilePath/Eigenvalue_equation.svg)
+
+*Figure: The eigenvalue equation captures directions preserved by a linear transformation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Eigenvalue_equation.svg), Lyudmil Antonov, CC BY-SA 4.0.*
+
 This is where eigenvectors become computationally powerful. If a matrix can be written as $A=PDP^{-1}$, then powers, recurrences, and many qualitative questions reduce to the diagonal entries of $D$. The matrix $P$ changes from eigenvector coordinates to standard coordinates, while $P^{-1}$ changes back.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 2
 
 Classical ciphers are the right place to begin cryptography because their designs are simple enough to compute by hand, but their failures already show the central lessons of the modern subject. A shift cipher, substitution cipher, and Vigenere cipher all hide a message by transforming letters according to a secret key. They fail because their transformations preserve too much structure: letter frequencies, repeated patterns, word boundaries, or predictable relations between plaintext and ciphertext.
 
+![An Enigma cipher machine shows historical cryptography as electromechanical hardware.](https://commons.wikimedia.org/wiki/Special:FilePath/Enigma-Machine.jpg)
+
+*Figure: Enigma provides historical context for classical ciphers and cryptanalysis. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Enigma-Machine.jpg), United States Central Intelligence Agency, public domain.*
+
 Katz and Lindell use these examples to motivate the modern move from clever-looking secrecy to definitions, assumptions, and proofs. Smart's treatment is more historical and computational: it gives more hand examples of shift, substitution, Vigenere, Enigma-like thinking, and the attacker's view. Read together, the sources make one point clear: a cipher is not secure because its rule looks complicated. It is secure only relative to a precise attack model.
 
 ## Definitions

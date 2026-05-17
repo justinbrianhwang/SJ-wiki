@@ -7,6 +7,10 @@ sidebar_position: 19
 
 The heat equation and wave equation are the two standard time-dependent PDEs in introductory engineering mathematics. The heat equation models diffusion: temperature, concentration, or probability density smooths out over time. The wave equation models propagation: disturbances travel, reflect, and oscillate.
 
+![Joseph Fourier is shown in a historical portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Joseph_Fourier.jpg)
+
+*Figure: Joseph Fourier's work on heat flow led to Fourier series and transforms. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Joseph_Fourier.jpg), Jules Boilly, public domain.*
+
 Both equations can be solved by separation of variables on simple bounded domains, but their time behavior is fundamentally different. Heat modes decay exponentially, while wave modes oscillate. This difference is visible in energy, smoothing, stability, and how initial data affect later behavior.
 
 ## Definitions

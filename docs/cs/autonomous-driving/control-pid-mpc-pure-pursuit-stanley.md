@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Control turns a planned trajectory into steering, throttle, and braking commands. It is where elegant trajectories meet tire friction, actuator delay, sensor noise, slopes, load transfer, and imperfect vehicle models. In autonomous driving, longitudinal control manages speed and headway, while lateral control manages path tracking. A good controller is stable, smooth, robust, and honest about the limits of the plan it is asked to follow.
 
+![An inverted pendulum on a cart shows the unstable plant used in many control examples.](https://commons.wikimedia.org/wiki/Special:FilePath/Cart-pendulum.svg)
+
+*Figure: The cart-pendulum is a concrete plant for modeling, stabilization, and control design. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cart-pendulum.svg), Krishnavedala, CC0.*
+
 This page introduces PID, pure pursuit, Stanley control, model predictive control, and the kinematic and dynamic bicycle models. It connects [motion planning](/cs/autonomous-driving/motion-planning) to [embedded implementation](/cs/embedded/) and [engineering math](/math/engineering-math/), because control is both mathematical and deeply physical.
 
 ## Definitions

@@ -9,6 +9,10 @@ Equilibrium and Elasticity covers static equilibrium, torque balance, stress, st
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
+![A beam bends under transverse loading in a simple mechanics schematic.](https://commons.wikimedia.org/wiki/Special:FilePath/Beam_bending.svg)
+
+*Figure: Beam bending connects support reactions, internal shear, bending moment, and section stiffness. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Beam_bending.svg), Krishnavedala, CC0 1.0.*
+
 ## Definitions
 
 - **Scope:** static equilibrium, torque balance, stress, strain, and elastic moduli.

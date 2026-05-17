@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Linked lists (연결 리스트) replace the array's contiguous storage with nodes connected by pointers. This single change alters the tradeoffs: insertion and deletion near a known node can be constant time, but random access by index is no longer constant because the list must be traversed link by link. In C, linked lists also force careful handling of allocation, pointer updates, and ownership.
 
+![A square Kufic algorithms mark introduces the study of designed procedures.](https://commons.wikimedia.org/wiki/Special:FilePath/Algorithms.svg)
+
+*Figure: The algorithms mark gives the abstract algorithms pages a concrete visual anchor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Algorithms.svg), Jeff Erickson, CC BY 4.0.*
+
 The source textbook introduces lists after stacks and queues, then uses them to implement linked stacks, linked queues, polynomial lists, sparse matrices, circular lists, and doubly linked lists. That order is natural. Once a node can point to another node, the same idea can represent many structures: a chain, a ring, a two-way sequence, a sparse row, or an adjacency list in a graph.
 
 ## Definitions

@@ -9,6 +9,10 @@ Quantum machine learning studies whether quantum circuits can improve learning, 
 
 *Nielsen and Chuang do not cover QML as a separate topic. This page keeps the wiki's modern QML treatment and uses N&C-style notation from Chapters 2, 8, 11, and 12: density operators $\rho$, channels $\mathcal{E}$, POVMs, trace distance, fidelity, von Neumann entropy, and quantum information-processing resource accounting.*
 
+![A grid of handwritten MNIST digits shows the kind of small benchmark data often used to illustrate learning pipelines.](https://commons.wikimedia.org/wiki/Special:FilePath/MNIST_dataset_example.png)
+
+*Figure: MNIST is a classical benchmark, but it makes the QML input problem concrete: data must be encoded into quantum states before a quantum model can act on it. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:MNIST_dataset_example.png), Suvanjanprasai, CC BY-SA 4.0.*
+
 ## Definitions
 
 A **parametrized quantum circuit** is a unitary family $U(x,\theta)$ depending on input data $x$ and trainable parameters $\theta$. A common supervised model prepares

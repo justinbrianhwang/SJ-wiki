@@ -9,6 +9,10 @@ Gravity enters QFT in two complementary ways. First, ordinary quantum fields can
 
 Zee's later chapters connect gravity, cosmology, supersymmetry, string theory glimpses, gravitational waves, and modern scattering ideas. The common theme is that field theory remains useful even when it points beyond itself. It supplies the language for low-energy gravitational interactions, vacuum energy puzzles, and relationships between gauge theory and gravity amplitudes.
 
+![Albert Einstein is shown in a formal 1947 portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Albert_Einstein_Head.jpg)
+
+*Figure: Einstein is a natural historical anchor for relativity and the modern limits of classical mechanics. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Albert_Einstein_Head.jpg), Orren Jack Turner, public domain.*
+
 ## Definitions
 
 The Einstein-Hilbert action is

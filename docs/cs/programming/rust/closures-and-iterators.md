@@ -7,6 +7,10 @@ sidebar_position: 13
 
 Closures and iterators bring functional-programming style into Rust without abandoning ownership and static dispatch. A closure is an anonymous function-like value that can capture its environment. An iterator is a value that produces a sequence of items through repeated calls to `next`. Together they support expressive data processing pipelines that compile to efficient loops.
 
+![The Rust logo marks pages on ownership, borrowing, traits, and safe systems programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Rust_programming_language_black_logo.svg)
+
+*Figure: Rust connects systems control with compile-time memory-safety guarantees. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Rust_programming_language_black_logo.svg), Rust Foundation, CC BY 4.0.*
+
 This page follows [generics, traits, and lifetimes](/cs/programming/rust/generics-traits-lifetimes) because closures are represented by traits and iterators are built around the `Iterator` trait. It also supports the command-line project style used in the Rust book's `minigrep` chapter, where iterators process arguments, lines, and search results.
 
 ## Definitions

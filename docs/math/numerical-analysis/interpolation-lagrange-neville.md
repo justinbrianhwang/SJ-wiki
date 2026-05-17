@@ -7,6 +7,10 @@ sidebar_position: 6
 
 Polynomial interpolation constructs a polynomial that passes through prescribed data points. Lagrange interpolation gives the polynomial explicitly as a weighted sum of basis polynomials, while Neville's method evaluates the same interpolating polynomial at a chosen point without first expanding all coefficients. The two views are algebraically equivalent but computationally different.
 
+![Colored basis curves combine to form one interpolating polynomial.](https://commons.wikimedia.org/wiki/Special:FilePath/Lagrange_polynomial.svg)
+
+*Figure: Lagrange interpolation builds a polynomial that passes exactly through prescribed data points. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Lagrange_polynomial.svg), Wikimedia Commons contributor, CC BY-SA 3.0.*
+
 Interpolation is the local model behind numerical differentiation, Newton-Cotes integration, finite elements, and many approximation schemes. It is powerful because a polynomial is easy to evaluate, differentiate, and integrate. It is dangerous when high degree or badly spaced nodes produce oscillation that is not present in the underlying function.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 8
 
 Planning and learning meet when an agent uses both real experience and a model. A model may be given, learned, deterministic, stochastic, exact, or approximate. Sutton and Barto's Dyna architecture makes the relationship concrete: real interaction updates values and the model, then simulated experience from the model performs additional value updates.
 
+![An agent-environment loop shows actions, observations, and rewards cycling through interaction.](https://commons.wikimedia.org/wiki/Special:FilePath/Agent-environment-diagram-rl.svg)
+
+*Figure: The agent-environment interface is the basic situation that defines reinforcement learning. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Agent-environment-diagram-rl.svg), Martin Thoma, CC0.*
+
 This chapter expands the view of reinforcement learning beyond pure trial and error. Dynamic programming is planning from a complete model. TD learning is learning from real experience. Dyna, prioritized sweeping, trajectory sampling, real-time dynamic programming, heuristic search, rollout, and Monte Carlo tree search occupy the space between them. The central question is how to spend limited computation to improve decisions.
 
 ## Definitions

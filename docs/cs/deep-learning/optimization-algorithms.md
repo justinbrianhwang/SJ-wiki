@@ -7,6 +7,10 @@ sidebar_position: 14
 
 Training a neural network is an optimization problem, but D2L is careful to separate optimization from generalization. Optimization asks how to reduce the training objective. Generalization asks whether the learned model works on new data. Deep learning needs both, and the optimizer often determines whether a reasonable architecture trains at all.
 
+![An artificial neural network diagram shows input, hidden, and output layers connected by weights.](https://commons.wikimedia.org/wiki/Special:FilePath/Artificial_neural_network.svg)
+
+*Figure: Layered neural networks make differentiable function approximation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Artificial_neural_network.svg), Cburnett, CC BY-SA 3.0/GFDL.*
+
 The D2L optimization chapters move from gradient descent and convexity to stochastic gradients, minibatches, momentum, adaptive learning rates, and schedules. These methods are not just implementation variants. Each one makes a different tradeoff among gradient noise, curvature, memory, compute, and hyperparameter sensitivity. Understanding the update equations makes debugging training curves much easier.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 2
 
 R is both a programming language and an interactive statistical environment. The first chapters of *The Book of R* treat R as a place to work: you type an expression, R evaluates it, prints a result, and keeps any assigned objects in memory for later use. That immediate feedback loop is the reason R is friendly for statistics. You can compute a number, inspect a vector, draw a plot, change the code, and rerun the same command without compiling a whole program.
 
+![The R logo marks pages on statistical computing, graphics, and data analysis.](https://commons.wikimedia.org/wiki/Special:FilePath/R_logo.svg)
+
+*Figure: R connects programming examples to statistical modeling and visualization workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:R_logo.svg), The R Foundation, CC BY-SA 4.0.*
+
 The practical goal at the beginning is not to memorize every command. It is to build a repeatable workflow: use the console for exploration, save durable work in scripts, ask help pages for exact argument names, and install packages only when base R does not already provide the tool you need. RStudio, described in the book's appendix, wraps that workflow with editor, console, environment, files, plots, and help panes, but the same ideas apply in any R editor.
 
 ## Definitions

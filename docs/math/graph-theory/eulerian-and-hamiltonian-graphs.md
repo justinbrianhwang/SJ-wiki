@@ -7,6 +7,10 @@ sidebar_position: 4
 
 Eulerian and Hamiltonian problems both ask for tours through a graph, but they count different things. Eulerian questions ask whether one can use every edge exactly once. Hamiltonian questions ask whether one can visit every vertex exactly once. The distinction is essential: Eulerian graphs have a clean degree characterization, while Hamiltonian graphs resist such a simple test.
 
+![A historical map of Konigsberg highlights the river and bridges.](https://commons.wikimedia.org/wiki/Special:FilePath/Konigsberg_Bridge.png)
+
+*Figure: The bridges of Konigsberg motivate graph traversal, Eulerian walks, and network abstraction. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Konigsberg_Bridge.png), Merian-Erben, public domain.*
+
 Historically, Eulerian graph theory begins with the Konigsberg bridges problem, where the impossibility of an edge-using tour follows from vertex degrees. Hamiltonian graph theory is closer to the travelling salesperson problem: it is easy to state, rich in sufficient conditions, and computationally difficult in general.
 
 ## Definitions

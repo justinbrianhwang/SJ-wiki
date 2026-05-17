@@ -7,6 +7,10 @@ sidebar_position: 15
 
 Text mining transforms unstructured language into analyzable representations for similarity search, clustering, topic modeling, classification, novelty detection, and other data mining tasks. Aggarwal's text chapter covers document preparation, text similarity, specialized clustering, topic modeling, classification, and first-story detection. The central representation is usually the sparse term-document matrix, but the best weighting and reduction choices depend on the task.
 
+![A skip-gram word embedding diagram predicts surrounding context words from a center word.](https://commons.wikimedia.org/wiki/Special:FilePath/Word_embeddings_Skip-gram.svg)
+
+*Figure: Skip-gram training ties word meaning to surrounding context. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Word_embeddings_Skip-gram.svg), Jeran Renz, CC BY-SA 4.0.*
+
 This page focuses on classic data-mining text methods: tokenization, TF-IDF, cosine similarity, latent semantic indexing, topic models, text clustering, text classification, and novelty detection.
 
 ## Definitions

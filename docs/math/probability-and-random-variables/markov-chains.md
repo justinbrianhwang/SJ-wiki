@@ -7,6 +7,10 @@ sidebar_position: 16
 
 A Markov chain is a random process whose next state depends on the present state but not on the earlier history. This "memoryless given the present" property is discrete-time cousin of the exponential waiting-time idea. Instead of one random variable, a Markov chain is a sequence $X_0,X_1,X_2,\ldots$ moving through a state space.
 
+![A finite-state machine diagram shows states and transitions for a simple process.](https://commons.wikimedia.org/wiki/Special:FilePath/Finite_state_machine_example_with_comments.svg)
+
+*Figure: A finite-state machine represents computation as transitions among discrete states. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Finite_state_machine_example_with_comments.svg), Macguy314, reworked by Perhelion, public domain.*
+
 MIT 18.440 introduces finite-state Markov chains through examples such as weather models, then discusses ergodicity and stationarity. The main long-run question is whether the chain forgets its starting state and settles into stable state frequencies. Transition matrices make the calculations concrete.
 
 ## Definitions

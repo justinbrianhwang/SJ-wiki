@@ -7,6 +7,10 @@ sidebar_position: 9
 
 Interfaces define contracts independent of a single class hierarchy. A class can extend only one class, but it can implement multiple interfaces, which makes interfaces Java's main tool for expressing roles such as comparable, iterable, runnable, cloneable, or serializable. The source book predates lambda syntax, so single-method interfaces are shown through named or anonymous classes rather than lambda expressions.
 
+![The Sun Microsystems logo gives Java pages historical context for the language and platform.](https://commons.wikimedia.org/wiki/Special:FilePath/Sun_Microsystems_logo.svg)
+
+*Figure: Java's early development at Sun shaped its portability, virtual-machine model, and library ecosystem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sun_Microsystems_logo.svg), Sun Microsystems and Afrank99, public domain text logo.*
+
 Nested classes and enums add structure. A nested type can keep helper code close to the class that uses it, while an enum defines a fixed set of named instances with type safety. These features reduce loose conventions: instead of passing arbitrary integers for a mode, use an enum; instead of exposing a helper class globally, nest it where its relationship is clear.
 
 ## Definitions

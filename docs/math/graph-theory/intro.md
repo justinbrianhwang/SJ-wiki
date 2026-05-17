@@ -7,6 +7,18 @@ sidebar_position: 1
 
 These notes follow Robin J. Wilson's *Introduction to Graph Theory*, fourth edition, using the local PDF source with 180 pages. Wilson's core route is definitions, connectedness, paths and cycles, trees, planarity, colouring, digraphs, matching, network flows, and matroids. Each page is organized around intuition, precise definitions, theorem statements with proofs or proof sketches, worked examples, and small Python implementations where useful.
 
+![A historical map of Konigsberg highlights the river and bridges.](https://commons.wikimedia.org/wiki/Special:FilePath/Konigsberg_Bridge.png)
+
+*Figure: The bridges of Konigsberg motivate graph traversal, Eulerian walks, and network abstraction. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Konigsberg_Bridge.png), Merian-Erben, public domain.*
+
+![The Petersen graph is drawn with an outer pentagon and inner star.](https://commons.wikimedia.org/wiki/Special:FilePath/Petersen_graph.svg)
+
+*Figure: The Petersen graph is a standard counterexample and test case throughout graph theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Petersen_graph.svg), David Benbennick, public domain.*
+
+![Paul Erdos stands at a student seminar in Budapest in 1992.](https://commons.wikimedia.org/wiki/Special:FilePath/Erdos_budapest_fall_1992.jpg)
+
+*Figure: Paul Erdos at a student seminar reflects the collaborative culture behind modern combinatorics and random graph theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Erdos_budapest_fall_1992.jpg), Kmhkmh, CC BY 3.0.*
+
 The Ramsey page expands Wilson's six-person party puzzle into the basic language of Ramsey numbers. The algebraic/spectral and Erdos-Renyi pages are included because they were requested, but they are supplementary rather than standalone Wilson chapters.
 
 1. [Definitions and Examples](definitions-and-examples)

@@ -9,6 +9,14 @@ Stoichiometry turns a balanced chemical equation into a quantitative statement a
 
 In the Ebbing and Gammon sequence this topic sits near chemical formulas, mole concept, balanced equations, limiting reagents, theoretical yield, and percent yield. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
+![A visible chemical reaction produces color and gas as reactants combine in laboratory glassware.](https://commons.wikimedia.org/wiki/Special:FilePath/Chemical_reaction.jpg)
+
+*Figure: Laboratory reaction illustrating why balanced equations must be connected to observable amounts. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Chemical_reaction.jpg), Daria55, CC BY 4.0.*
+
+![A portrait shows Antoine-Laurent Lavoisier, associated with conservation of mass in chemical reactions.](https://commons.wikimedia.org/wiki/Special:FilePath/Lavoisier.jpg)
+
+*Figure: Antoine-Laurent Lavoisier, historical context for conservation-based chemical accounting. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Lavoisier.jpg), Jacques-Louis David, public domain.*
+
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.

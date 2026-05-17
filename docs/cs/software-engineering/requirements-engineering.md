@@ -7,6 +7,10 @@ sidebar_position: 9
 
 Requirements engineering defines what the system must do and what constraints it must satisfy before design and implementation commit to a solution. Gustafson's requirements chapter focuses on requirements models and specification artifacts: object models, data flow models, behavioral models, data dictionaries, system diagrams, and the IEEE structure for a software requirements specification. The chapter emphasizes diagrams as communication tools between users and developers.
 
+![A Kanban board screenshot shows work items organized by workflow state.](https://commons.wikimedia.org/wiki/Special:FilePath/Openproject_kanban.PNG)
+
+*Figure: Kanban boards turn process state into a visible project-management surface. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Openproject_kanban.PNG), OpenProject contributors, CC0.*
+
 Requirements sit at the boundary between the environment and the machine. Users describe real-world work, goals, exceptions, and constraints. Developers need a specification detailed enough to design and test against. The requirements process translates domain language into precise, reviewable descriptions without prematurely hiding user-visible behavior inside implementation decisions.
 
 ## Definitions

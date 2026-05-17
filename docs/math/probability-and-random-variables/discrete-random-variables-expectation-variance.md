@@ -7,6 +7,10 @@ sidebar_position: 5
 
 A random variable turns outcomes into numbers. This change of viewpoint is one of the main transitions in probability: instead of asking only which event occurred, we ask for numerical summaries such as the number of heads, the number of fixed points in a shuffled hat problem, or the total payoff from a gamble. Once outcomes have numerical values, expectation and variance become the central quantities.
 
+![A Galton box diagram shows balls falling through pegs into bins.](https://commons.wikimedia.org/wiki/Special:FilePath/Galton_Box.svg)
+
+*Figure: A Galton box turns repeated random left-right choices into an approximate bell-shaped distribution. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Galton_Box.svg), Marcin Floryan, CC BY-SA 3.0.*
+
 The MIT lectures introduce random variables as functions on the sample space, then define probability mass functions, cumulative distribution functions, expectation, variance, and the decomposition trick of writing complicated variables as sums of simple indicator variables. Linearity of expectation is the most important early result: it does not require independence and is often the simplest way to compute an expected count.
 
 ## Definitions

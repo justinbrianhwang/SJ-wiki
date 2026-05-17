@@ -7,6 +7,10 @@ sidebar_position: 2
 
 Probability begins with counting because many first models have finitely many equally likely outcomes. If every outcome in a sample space is equally likely, then probabilities reduce to ratios: favorable outcomes divided by total outcomes. The hard part is usually not the division; it is counting the numerator and denominator without double-counting, under-counting, or accidentally treating identical objects as distinct.
 
+![Pascal's triangle fills in row by row with binomial coefficients.](https://commons.wikimedia.org/wiki/Special:FilePath/PascalTriangleAnimated2.gif)
+
+*Figure: Pascal's triangle organizes binomial coefficients, combinations, and recurrence patterns. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PascalTriangleAnimated2.gif), Hersfold, public domain.*
+
 The first MIT 18.440 lectures use permutations, combinations, Pascal's triangle, multinomial coefficients, and partition-style problems as the basic language for finite probability. These methods remain useful even after the course moves to random variables, because binomial, multinomial, hypergeometric, geometric, and many occupancy models are all organized by the same counting principles.
 
 ## Definitions

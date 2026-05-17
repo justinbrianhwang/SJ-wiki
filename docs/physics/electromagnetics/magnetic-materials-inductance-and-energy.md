@@ -9,6 +9,10 @@ Magnetic materials determine how strongly a current produces magnetic flux and h
 
 Inductance is the circuit-level measure of magnetic flux linkage per current. Like capacitance, it is fundamentally geometric and material. A current creates $\vec H$, the medium produces $\vec B$, flux links conductors, and energy is stored in the magnetic field. This page covers magnetic materials, boundary conditions, self and mutual inductance, and magnetic energy.
 
+![Iron filings reveal the magnetic field pattern between attracting bar magnets.](https://commons.wikimedia.org/wiki/Special:FilePath/Magnetic_field_of_bar_magnets_attracting.png)
+
+*Figure: Iron filings provide a physical picture of magnetic field direction and field-line density. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Magnetic_field_of_bar_magnets_attracting.png), Alexander Wilmer Duff, public domain in the United States.*
+
 ## Definitions
 
 Magnetization $\vec M$ is magnetic dipole moment per unit volume. The macroscopic fields satisfy

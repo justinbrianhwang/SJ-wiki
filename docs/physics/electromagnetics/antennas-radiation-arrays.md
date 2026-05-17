@@ -9,6 +9,10 @@ Antennas convert guided electromagnetic energy into radiated waves and convert i
 
 Ulaby's antenna chapter develops the Hertzian dipole, half-wave dipole, radiation characteristics, Friis transmission, large apertures, and arrays. These topics are a practical culmination of Maxwell's equations, plane waves, power density, and boundary/guiding ideas from earlier pages.
 
+![A Yagi-Uda antenna diagram labels reflector, driven element, director, and wavelength-scaled spacing.](https://commons.wikimedia.org/wiki/Special:FilePath/Yagi-Uda_diagram.svg)
+
+*Figure: The Yagi-Uda antenna is a compact real-world example of phased current elements producing directional radiation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Yagi-Uda_diagram.svg), Ktims, CC BY-SA 3.0/GFDL.*
+
 ## Definitions
 
 The radiation pattern describes angular variation of radiated field or power. For a far-zone field, power density often has the form

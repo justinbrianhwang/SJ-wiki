@@ -7,6 +7,10 @@ sidebar_position: 3
 
 A limit describes the value a function approaches, not necessarily the value it actually attains. This distinction lets calculus handle holes, jumps, asymptotes, oscillations, and functions whose formulas change from one region to another. Continuity is the special case where approaching and evaluating agree.
 
+![Augustin-Louis Cauchy is shown in a nineteenth-century portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Augustin_Louis_Cauchy.jpg)
+
+*Figure: Augustin-Louis Cauchy is a central figure in rigorous limits, continuity, and complex analysis. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Augustin_Louis_Cauchy.jpg), Charles H. Reutlinger, public domain.*
+
 Limits sit between algebra and the derivative. The derivative is defined as a limit of slopes, and the definite integral is defined as a limit of sums. A weak understanding of limits usually becomes a weak understanding of every later topic, so the goal is not just to compute limits but to recognize what kind of behavior the graph has near the point.
 
 ## Definitions

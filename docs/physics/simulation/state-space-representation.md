@@ -9,6 +9,10 @@ State-space representation is the working language of simulation because it expr
 
 This representation also separates model structure from implementation. MATLAB functions such as `ode45`, `ss`, `lsim`, and `step` operate naturally on state equations, and Simulink's Integrator and State-Space blocks are built around the same idea. Transfer functions are useful for linear input-output analysis, but state-space models keep the internal variables visible, which is essential when validating simulations against measured states or checking physical constraints.
 
+![A state-space block diagram routes input through system matrices to state and output variables.](https://commons.wikimedia.org/wiki/Special:FilePath/Typical_State_Space_model.svg)
+
+*Figure: State-space diagrams show how stored state, input, and output maps fit into one dynamic-system representation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Typical_State_Space_model.svg), Cburnett and BiMiT, CC0 1.0.*
+
 ## Definitions
 
 A continuous-time nonlinear state-space model is

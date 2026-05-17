@@ -7,6 +7,10 @@ sidebar_position: 16
 
 Statistical significance asks whether data are surprising under a null model. It does not say whether an effect is large, important, stable, or useful. Effect sizes, meta-analytic thinking, nonparametric methods, and resampling all push analysis beyond a single p-value. The Lane text includes power, effect size, and distribution-free tests near the end because they refine how statistical evidence should be judged.
 
+![Anscombe's quartet shows four scatterplots with similar summary statistics.](https://commons.wikimedia.org/wiki/Special:FilePath/AnscombeQuartet.svg)
+
+*Figure: Anscombe's quartet shows why visualization matters even when numerical summaries agree. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:AnscombeQuartet.svg), Gabry, CC BY-SA 3.0.*
+
 These tools answer different but related questions. Effect sizes put results on interpretable scales. Meta-analysis combines evidence across studies. Nonparametric tests reduce reliance on normality or interval-scale assumptions. Bootstrap intervals estimate uncertainty by resampling the observed data. Permutation tests build a null distribution by rearranging labels according to the null hypothesis. Together, they encourage a more complete view of evidence.
 
 ## Definitions

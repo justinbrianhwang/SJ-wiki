@@ -9,7 +9,7 @@ Eigenvectors reveal directions that a matrix does not turn. Along those directio
 
 The definition is simple, but its consequences are broad. Instead of asking how a matrix acts on every vector at once, eigenanalysis looks for special directions where the action is one-dimensional. If enough such directions exist, the matrix can be understood by studying independent scalar multiplications.
 
-![An eigenvector is shown preserving its direction while being scaled by a matrix.](https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Eigenvalue_equation.svg/500px-Eigenvalue_equation.svg.png)
+![An eigenvector is shown preserving its direction while being scaled by a matrix.](https://commons.wikimedia.org/wiki/Special:FilePath/Eigenvalue_equation.svg)
 
 *Figure: Eigenvalue equation as scaling along a preserved direction. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Eigenvalue_equation.svg), Lyudmil Antonov, CC BY-SA 4.0.*
 

@@ -7,6 +7,10 @@ sidebar_position: 8
 
 Cubic splines replace one high-degree interpolating polynomial by many low-degree pieces joined smoothly. This gives the local flexibility of piecewise approximation while preserving enough smoothness for plotting, differentiation, and physical modeling. The result is usually more stable and visually reasonable than forcing a single polynomial through many points.
 
+![Colored basis curves combine to form one interpolating polynomial.](https://commons.wikimedia.org/wiki/Special:FilePath/Lagrange_polynomial.svg)
+
+*Figure: Lagrange interpolation builds a polynomial that passes exactly through prescribed data points. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Lagrange_polynomial.svg), Wikimedia Commons contributor, CC BY-SA 3.0.*
+
 Parametric curves use the same idea when the data describe a path rather than a single-valued function. Instead of writing $y=f(x)$, a curve is represented by $x=x(t)$ and $y=y(t)$. This is essential for loops, vertical tangents, closed curves, and computer graphics paths.
 
 ## Definitions

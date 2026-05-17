@@ -7,6 +7,10 @@ sidebar_position: 2
 
 A microprocessor is a programmable digital processing unit: it fetches instructions from memory, interprets them, performs arithmetic or logic, and controls data movement through buses. The source text begins with this foundation before moving into the 8085, because every later topic - timing, interrupts, memory interfacing, I/O ports, and microcontrollers - is easier when the processor is seen as a small set of cooperating blocks rather than as a black box.
 
+![An Intel 4004 package shows one of the first commercial microprocessors.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_4004.jpg)
+
+*Figure: The Intel 4004 marks the transition from board-level logic to microprocessors. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_4004.jpg), LucaDetomi at Italian Wikipedia, CC BY-SA 3.0/GFDL.*
+
 A microcomputer is the useful system built around the microprocessor. It includes memory, input/output circuits, clocks, reset circuitry, bus drivers, and the program that coordinates them. The important distinction is that a microprocessor such as the 8085 is mainly a CPU chip, while a microcontroller such as the 8051 also places RAM, ROM, timers, ports, and serial hardware on the same chip. The whole subject is about learning where each function lives and how software makes the hardware move in the required order.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 17
 
 Foundation models for driving use large multimodal models, vision-language models, language agents, or vision-language-action policies to reason about traffic scenes and sometimes produce driving actions. They are not a replacement for the rest of the AV stack. Their useful role is to add semantic reasoning, instruction following, explanation, data annotation, and high-level decision support while staying grounded by calibrated perception, maps, planning constraints, and safety monitors.
 
+![A UniAD architecture diagram connects perception, prediction, mapping, occupancy, and planning around an ego trajectory.](https://ar5iv.labs.arxiv.org/html/2212.10156/assets/x1.png)
+
+*Figure: UniAD illustrates planning-oriented autonomous-driving architecture. Image: [ar5iv](https://arxiv.org/abs/2212.10156), Hu et al., educational use with attribution.*
+
 This page covers multimodal large language models for driving, vision-language-action models, action interfaces, hybrid VLM-plus-planner designs, and closed-loop evaluation for language agents. It complements [end-to-end driving](/cs/autonomous-driving/end-to-end-driving), [decision making](/cs/autonomous-driving/decision-making-and-behavior-planning), [motion planning](/cs/autonomous-driving/motion-planning), [simulation and data](/cs/autonomous-driving/simulation-and-data), and [safety](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing).
 
 ## Definitions

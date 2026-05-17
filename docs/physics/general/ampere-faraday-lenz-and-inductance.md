@@ -9,6 +9,10 @@ Ampere, Faraday, Lenz, and Inductance covers magnetic fields from currents, magn
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
+![A coil surrounds a solenoid in an induction diagram.](https://commons.wikimedia.org/wiki/Special:FilePath/Coil_and_solenoid.svg)
+
+*Figure: A solenoid makes magnetic flux, induced emf, and stored magnetic energy physically concrete. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Coil_and_solenoid.svg), Guy vandegrift, public domain.*
+
 ## Definitions
 
 - **Scope:** magnetic fields from currents, magnetic flux, induction, Lenz's law, and inductors.

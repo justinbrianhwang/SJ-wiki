@@ -9,6 +9,10 @@ Temperature, Heat, and Kinetic Theory covers temperature, heat transfer, phase c
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
+![Maxwell-Boltzmann speed distributions show how molecular speeds spread with temperature and gas species.](https://commons.wikimedia.org/wiki/Special:FilePath/MaxwellBoltzmann-en.svg)
+
+*Figure: The speed distribution connects microscopic molecular motion with temperature and thermal averages. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:MaxwellBoltzmann-en.svg), Pdbailey, with later SVG conversion by Lilyu, public domain.*
+
 ## Definitions
 
 - **Scope:** temperature, heat transfer, phase change, ideal gases, and molecular kinetic energy.

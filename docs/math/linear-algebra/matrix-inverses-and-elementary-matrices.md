@@ -7,6 +7,10 @@ sidebar_position: 5
 
 An inverse matrix undoes a linear process. Elementary matrices make this idea concrete: every row operation is the same as multiplying by a simple invertible matrix. This connects row reduction, solving systems, and algebraic invertibility into one framework.
 
+![A matrix multiplication diagram highlights row and column products.](https://commons.wikimedia.org/wiki/Special:FilePath/Matrix_multiplication_diagram.svg)
+
+*Figure: A matrix multiplication diagram makes the row-column structure of linear algebra visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Matrix_multiplication_diagram.svg), Bilou, CC BY-SA 3.0.*
+
 The main point is not merely that some square matrices have formulas for inverses. The deeper point is that invertibility is an equivalence of many ideas: no information is lost, the system $A\mathbf{x}=\mathbf{b}$ has exactly one solution for every $\mathbf{b}$, the columns form a basis, the determinant is nonzero, and row reduction reaches the identity. Elementary matrices are the bridge between the algorithm and these structural statements.
 
 ## Definitions

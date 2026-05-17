@@ -7,6 +7,10 @@ sidebar_position: 9
 
 Number theory studies integers and their divisibility structure. In discrete mathematics it supplies proof examples, efficient algorithms, and the arithmetic foundation for cryptography. The central objects are divisibility, primes, greatest common divisors, and integer representations.
 
+![Carl Friedrich Gauss is shown in a formal painted portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Carl_Friedrich_Gauss.jpg)
+
+*Figure: Carl Friedrich Gauss is central to number theory, linear algebra, statistics, and numerical methods. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Carl_Friedrich_Gauss.jpg), Gottlieb Biermann after Christian Albrecht Jensen, public domain.*
+
 The topic is both ancient and computational. Divisibility statements train proof writing; Euclid's algorithm is one of the oldest efficient algorithms; prime factorization leads directly to modern public-key cryptography. The habit to build here is to move between equations, divisibility notation, and algorithms without losing track of hypotheses such as "nonzero" or "positive."
 
 ## Definitions

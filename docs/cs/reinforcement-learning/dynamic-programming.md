@@ -7,6 +7,10 @@ sidebar_position: 4
 
 Dynamic programming solves finite MDPs when a complete model is available. In Sutton and Barto's structure, DP is less a practical universal method than a conceptual reference point. It shows what exact Bellman backups look like, why policy evaluation and policy improvement fit together, and how generalized policy iteration underlies many later model-free algorithms.
 
+![A cart-pole animation shows a controller trying to balance an inverted pole on a moving cart.](https://commons.wikimedia.org/wiki/Special:FilePath/Cartpole.gif)
+
+*Figure: Cart-pole is a standard control and reinforcement-learning benchmark. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cartpole.gif), Condordellanebbia, CC BY-SA 4.0.*
+
 The main assumption is strong: the agent knows $p(s',r \mid s,a)$ for every relevant state and action. With that model, the agent can update value estimates by sweeping over states instead of waiting for sampled experience. Monte Carlo and temporal-difference methods later replace these full expected backups with sample backups.
 
 ## Definitions

@@ -9,6 +9,10 @@ Symmetry is the shortest route from physical invariance to conserved quantities 
 
 Sakurai devotes a chapter to symmetries, conservation laws, degeneracies, parity, lattice translations, and time reversal. Ballentine treats symmetries of spacetime and the Galilei group early, making generators central. The Gottfried-named notes connect symmetries to rotations, angular momentum, and identical particles. Schiff's classic applications appear throughout central potentials, parity, and selection rules.
 
+![Hydrogen orbital density plots show bright probability regions for several quantum numbers.](https://commons.wikimedia.org/wiki/Special:FilePath/Hydrogen_Density_Plots.png)
+
+*Figure: Hydrogen density plots make angular momentum, nodes, and probability density visible in real atomic structure. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hydrogen_Density_Plots.png), PoorLeno, public domain.*
+
 ## Definitions
 
 A transformation is a symmetry if it preserves physical transition probabilities:

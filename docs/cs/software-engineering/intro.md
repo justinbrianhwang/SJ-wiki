@@ -7,6 +7,18 @@ sidebar_position: 1
 
 These notes summarize and expand the scope of **Schaum's Outline of Theory and Problems of Software Engineering** by David A. Gustafson. The source is a practice-oriented software engineering text: it is not only a survey of terms, but a collection of techniques, diagrams, calculations, review rules, and worked problems for students learning how software projects are specified, designed, measured, tested, and controlled.
 
+![Two programmers work together at one computer in a pair-programming setup.](https://commons.wikimedia.org/wiki/Special:FilePath/Pair_Programming.jpg)
+
+*Figure: Pair programming makes collaboration and review practices concrete. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pair_Programming.jpg), Calqui, CC BY-SA 3.0.*
+
+![A Kanban board screenshot shows work items organized by workflow state.](https://commons.wikimedia.org/wiki/Special:FilePath/Openproject_kanban.PNG)
+
+*Figure: Kanban boards turn process state into a visible project-management surface. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Openproject_kanban.PNG), OpenProject contributors, CC0.*
+
+![The Git logo marks distributed version control as a core software-engineering tool.](https://commons.wikimedia.org/wiki/Special:FilePath/Git-logo.svg)
+
+*Figure: Git is a practical substrate for collaboration, branching, review, and release workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Git-logo.svg), Jason Long, CC BY 3.0.*
+
 The book's structure is broad but compact. It starts with life cycle models, then moves through process modeling, project management, planning, metrics, risk, quality assurance, requirements, design, testing, object-oriented development, object-oriented metrics, object-oriented testing, and formal notation with OCL. The pages in this section mirror that sequence so the notes can be read as a course path or used independently as reference pages.
 
 ## Definitions

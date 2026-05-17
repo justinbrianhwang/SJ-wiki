@@ -7,6 +7,10 @@ sidebar_position: 13
 
 D2L moves from the Transformer architecture to large-scale pretraining because modern deep learning often starts from a pretrained model rather than from random initialization. Pretraining uses broad self-supervised tasks to learn reusable representations, then adapts those representations to downstream tasks. This shift is central to current NLP and increasingly important in vision and multimodal systems.
 
+![An ELIZA terminal conversation shows an early chatbot responding to typed user input.](https://commons.wikimedia.org/wiki/Special:FilePath/ELIZA_conversation.png)
+
+*Figure: ELIZA provides historical context for dialogue systems and chatbot evaluation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ELIZA_conversation.png), Unknown author, public domain text.*
+
 The chapter distinguishes encoder-only, encoder-decoder, and decoder-only Transformer families. BERT represents the encoder-only path: it builds bidirectional contextual representations through masked language modeling. Sequence-to-sequence models use encoder-decoder pretraining for tasks such as translation and summarization. Decoder-only models train autoregressively and generate text one token at a time.
 
 ## Definitions

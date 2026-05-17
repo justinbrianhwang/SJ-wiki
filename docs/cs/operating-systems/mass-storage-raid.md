@@ -7,6 +7,10 @@ sidebar_position: 12
 
 Mass storage is where file systems meet physical devices. The OS cannot treat disks, SSDs, and storage arrays as abstract infinite boxes; their physical behavior shapes performance and reliability. Traditional hard disks have seek time and rotational latency. SSDs have no mechanical head but have erase blocks, write amplification, and finite write endurance. RAID arrays combine devices to improve capacity, performance, reliability, or some mixture of these.
 
+![A Linux kernel map organizes subsystems such as memory, filesystems, networking, and drivers.](https://commons.wikimedia.org/wiki/Special:FilePath/Linux_kernel_map.png)
+
+*Figure: The Linux kernel map shows how OS services become interacting subsystems. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Linux_kernel_map.png), Conan at English Wikipedia, CC BY 3.0.*
+
 This page follows the textbook's mass-storage chapter: disk structure, attachment, scheduling, disk management, swap-space management, RAID, and stable storage. The goal is not to memorize every device detail, but to understand why operating systems schedule I/O, manage bad blocks, reserve swap space, and use redundancy.
 
 ## Definitions

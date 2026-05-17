@@ -7,6 +7,10 @@ sidebar_position: 5
 
 C++ has two major string traditions. The older C-style representation stores text in an array of `char` terminated by the null character `'\0'`. The modern standard-library representation uses the class `std::string`, which manages storage and exposes string operations through member functions and overloaded operators. Savitch covers both because C-strings still appear in string literals, command-line arguments, old libraries, and low-level character processing.
 
+![The ISO C++ logo marks pages on classes, templates, containers, and modern C++ idioms.](https://commons.wikimedia.org/wiki/Special:FilePath/ISO_C%2B%2B_Logo.svg)
+
+*Figure: C++ extends systems programming with abstraction, generic code, and deterministic resource management. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ISO_C%2B%2B_Logo.svg), Jeremy Kratz, public domain text logo.*
+
 The practical rule is simple: use `std::string` for ordinary application code, but understand C-strings well enough to read, interoperate with, and safely maintain code that uses them.
 
 ## Definitions

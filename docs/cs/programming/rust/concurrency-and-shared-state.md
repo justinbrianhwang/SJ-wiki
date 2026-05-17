@@ -7,6 +7,10 @@ sidebar_position: 17
 
 Rust's concurrency chapter shows how ownership and types prevent many classic threaded-programming mistakes. The language does not remove the hard parts of concurrency, but it makes data sharing explicit. Threads can take ownership of captured values. Channels transfer messages between threads. Mutexes protect shared state. Marker traits such as `Send` and `Sync` determine which types may safely cross or be shared across thread boundaries.
 
+![The Rust logo marks pages on ownership, borrowing, traits, and safe systems programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Rust_programming_language_black_logo.svg)
+
+*Figure: Rust connects systems control with compile-time memory-safety guarantees. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Rust_programming_language_black_logo.svg), Rust Foundation, CC BY 4.0.*
+
 This page builds directly on [ownership](/cs/programming/rust/ownership-references-slices), [closures](/cs/programming/rust/closures-and-iterators), and [smart pointers](/cs/programming/rust/smart-pointers). The final [multithreaded web server](/cs/programming/rust/multithreaded-web-server) project uses these ideas to build a small thread pool.
 
 ## Definitions

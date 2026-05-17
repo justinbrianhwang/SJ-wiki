@@ -7,6 +7,10 @@ sidebar_position: 54
 
 Real embedded systems are too large to model as one flat state machine. A useful model is assembled from smaller machines: one for a traffic light, one for a pedestrian button, one for a door latch, one for an interrupt controller, and so on. Composition gives rules for how these machines react together and how their ports or variables communicate.
 
+![An Arduino Uno board shows a familiar microcontroller development board with headers and USB.](https://commons.wikimedia.org/wiki/Special:FilePath/Arduino_Uno_-_R3.jpg)
+
+*Figure: Arduino boards make microcontroller I/O and prototyping tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Arduino_Uno_-_R3.jpg), SparkFun Electronics, CC BY 2.0.*
+
 Lee and Seshia emphasize that the hard part is not the drawing style. The hard part is semantics. Two diagrams that look almost identical can mean different things depending on whether reactions are synchronous, asynchronous, interleaved, scheduled, cascaded, or hierarchical. Those choices affect determinism, missed events, deadlock possibilities, and whether a composed model can be analyzed modularly.
 
 ## Definitions

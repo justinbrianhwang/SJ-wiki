@@ -9,6 +9,10 @@ Simple quantum models are not just textbook exercises. The particle in a box, ha
 
 Atkins uses these models to show how boundary conditions and potentials shape energy levels. Each model has a characteristic spacing pattern, and those spacing patterns explain observed spectra and thermal behavior.
 
+![Hydrogen orbital density plots show bright probability regions for several quantum states.](https://commons.wikimedia.org/wiki/Special:FilePath/Hydrogen_Density_Plots.png)
+
+*Figure: Quantized probability densities as concrete outcomes of simple quantum models. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hydrogen_Density_Plots.png), PoorLeno, public domain.*
+
 ## Definitions
 
 For a particle in a one-dimensional box of length $L$ with infinite walls, the allowed wavefunctions are

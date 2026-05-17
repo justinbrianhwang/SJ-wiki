@@ -7,6 +7,10 @@ sidebar_position: 16
 
 D2L's computer vision application chapters show how CNN ideas become task systems. Image classification is the simplest case: one image, one label. Practical vision also includes augmentation, fine-tuning, object detection, anchor boxes, region-based CNNs, semantic segmentation, transposed convolution, and neural style transfer. These topics reuse convolutional backbones but change the output structure and loss.
 
+![A grid of MNIST handwritten digits shows the small grayscale examples used in many ML tutorials.](https://commons.wikimedia.org/wiki/Special:FilePath/MNIST_dataset_example.png)
+
+*Figure: MNIST gives classification, vision, and neural-network pages a familiar benchmark image. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:MNIST_dataset_example.png), Suvanjanprasai, CC BY-SA 4.0.*
+
 The main shift is from global image prediction to spatial prediction. Object detection predicts boxes and classes. Segmentation predicts a class for each pixel. Style transfer optimizes an image itself to match content and style statistics. Fine-tuning adapts pretrained features to a new dataset. In each case, the model must preserve or recover spatial information that a plain classifier might discard.
 
 ## Definitions

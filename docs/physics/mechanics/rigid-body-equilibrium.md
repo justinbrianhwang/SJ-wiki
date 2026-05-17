@@ -9,6 +9,10 @@ A rigid body can translate and rotate, so force balance alone is not enough. A b
 
 This page is the center of statics. Once you can isolate a body, replace supports by reactions, compute moments, and choose useful equilibrium equations, trusses, beams, friction, frames, and machines become variations on the same theme. The algebra can be short, but the modeling choices must be explicit.
 
+![A beam bends under transverse loading in a simple mechanics schematic.](https://commons.wikimedia.org/wiki/Special:FilePath/Beam_bending.svg)
+
+*Figure: Beam bending connects support reactions, internal shear, bending moment, and section stiffness. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Beam_bending.svg), Krishnavedala, CC0 1.0.*
+
 ## Definitions
 
 A **rigid body** is an ideal body whose distances between material points do not change. It can have many forces applied at different points. In static equilibrium,

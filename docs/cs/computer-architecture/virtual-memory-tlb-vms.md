@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Virtual memory lets each process run as if it owns a large private address space. The operating system and hardware translate virtual addresses into physical addresses, enforce protection, and move pages between memory and storage when necessary. This abstraction is essential for multiprogramming, process isolation, demand paging, and modern operating systems.
 
+![An opened Intel 4004 processor exposes the silicon die inside its package.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_4004_open.jpg)
+
+*Figure: Opening the package links instruction-set discussions to the physical die. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_4004_open.jpg), Science Museum Group, CC BY 4.0.*
+
 Translation must be fast because it is needed for almost every instruction fetch and data access. The translation lookaside buffer, TLB, is a cache of recent virtual-to-physical page translations. Virtual machines extend the same protection idea: a virtual machine monitor multiplexes physical hardware among guest operating systems while preserving isolation.
 
 ## Definitions

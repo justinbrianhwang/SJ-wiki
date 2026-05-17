@@ -7,6 +7,10 @@ sidebar_position: 12
 
 Learning sets of rules returns to symbolic representations, but with more practical machinery than the early concept-learning chapter. Mitchell covers sequential covering, rule evaluation, FOIL, first-order Horn clauses, and inductive logic programming. The goal is to learn readable if-then rules, sometimes with variables and relations rather than fixed attribute vectors.
 
+![A simple decision tree routes shapes through binary feature tests to a class leaf.](https://commons.wikimedia.org/wiki/Special:FilePath/Simple_decision_tree.svg)
+
+*Figure: Decision trees classify by asking a sequence of feature questions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Simple_decision_tree.svg), Eviatar Bach, CC0.*
+
 This chapter is historically important because it shows machine learning interacting with logic programming. Rules can express relational structure that ordinary feature-vector methods hide. A rule learner can describe family relations, list structure, chemical relations, or database facts when examples are naturally relational.
 
 ## Definitions

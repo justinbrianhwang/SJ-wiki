@@ -7,6 +7,10 @@ sidebar_position: 3
 
 The guessing game is the book's first project chapter. Its value is not the game itself; it is the way one small program introduces many Rust habits before the formal chapters explain them. The project uses input, mutable variables, references, external crates, `Result`, `match`, loops, shadowing, and numeric parsing. It also shows a realistic pattern: write a simple version, compile it, read the compiler's feedback, then refine behavior.
 
+![The Rust logo marks pages on ownership, borrowing, traits, and safe systems programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Rust_programming_language_black_logo.svg)
+
+*Figure: Rust connects systems control with compile-time memory-safety guarantees. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Rust_programming_language_black_logo.svg), Rust Foundation, CC BY 4.0.*
+
 This page is a bridge between [getting started](/cs/programming/rust/getting-started-toolchain-cargo) and [common programming concepts](/cs/programming/rust/common-programming-concepts). Do not worry if some terms feel early. The point is to see them in motion, then return to them with more precision in the later pages on [ownership](/cs/programming/rust/ownership-references-slices), [pattern matching](/cs/programming/rust/pattern-matching), and [error handling](/cs/programming/rust/error-handling).
 
 ## Definitions

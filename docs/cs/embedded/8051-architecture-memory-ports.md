@@ -7,6 +7,10 @@ sidebar_position: 7
 
 The book turns from the 8085 microprocessor to the 8051 microcontroller because the design problem changes. With the 8085, a system designer must add memory, ports, and peripheral chips around the CPU. With the 8051, many of those resources already exist inside the chip: internal RAM, program memory in many variants, four 8-bit ports, timers, a serial port, interrupt control, and special function registers.
 
+![An Intel 8051 architecture diagram shows timers, serial I/O, memory, and ports around the CPU core.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_8051_arch.svg)
+
+*Figure: The 8051 diagram connects assembly details to the microcontroller's peripheral blocks. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_8051_arch.svg), Appaloosa, CC BY-SA 3.0.*
+
 The 8051 is still small enough to understand at the register level. It is also different enough from the 8085 to teach microcontroller thinking: software configures hardware by writing SFRs, port pins may serve alternate functions, internal data memory has multiple regions, and bit-addressable storage makes single-bit control efficient.
 
 ## Definitions

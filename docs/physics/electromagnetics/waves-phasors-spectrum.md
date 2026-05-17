@@ -9,6 +9,10 @@ Applied electromagnetics begins with a simple observation: fields carry influenc
 
 Phasors are the language that makes sinusoidal steady state manageable. Instead of carrying $\cos(\omega t+\phi)$ through every equation, we encode amplitude and phase in a complex number, solve algebraic equations in the frequency domain, and take the real part at the end. This page reviews the wave and phasor tools that support transmission lines, plane waves, antennas, and many frequency-domain views in [signals and systems](/physics/signals-systems/).
 
+![The electromagnetic spectrum is arranged by wavelength, frequency, and representative sources.](https://commons.wikimedia.org/wiki/Special:FilePath/EM_Spectrum_Properties_edit.svg)
+
+*Figure: The electromagnetic spectrum ties circuit-scale oscillations, radio links, optics, and thermal radiation into one continuum. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:EM_Spectrum_Properties_edit.svg), Inductiveload, public domain.*
+
 ## Definitions
 
 A one-dimensional traveling wave moving in the $+z$ direction can be written as

@@ -7,6 +7,10 @@ sidebar_position: 15
 
 Concurrency is about handling multiple tasks whose lifetimes overlap. The textbook is introductory and does not center concurrency, but Python programmers eventually meet it when programs wait on files, networks, user interfaces, subprocesses, sensors, or many independent calculations. The core question is not "how do I make code parallel?" It is "what is the program waiting for, and what model matches that waiting?"
 
+![The Python logo marks pages on scripting, testing, packaging, and scientific programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Python-logo-notext.svg)
+
+*Figure: Python provides the practical environment for many CS, ML, and data examples. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Python-logo-notext.svg), Python Software Foundation, GPL-compatible free license; trademark terms apply.*
+
 Python offers several concurrency tools. Threads are useful for overlapping I/O-bound work. Processes are useful for CPU-bound work because they avoid the limitations of the global interpreter lock in standard CPython. `asyncio` is useful for large numbers of cooperative I/O tasks when the libraries involved support async APIs. Each tool has costs, so start with clear sequential code and introduce concurrency only when measurement or design need justifies it.
 
 ## Definitions

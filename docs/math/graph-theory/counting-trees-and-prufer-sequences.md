@@ -7,6 +7,10 @@ sidebar_position: 7
 
 Tree counting asks how many different tree shapes or labelled trees are possible. The labelled problem has a remarkably clean answer: there are $n^{n-2}$ labelled trees on vertex set $\{1,\dots,n\}$. The usual proof uses Pruefer sequences, which convert a labelled tree into a sequence of labels and back again.
 
+![A rooted binary tree shows nodes connected by parent-child edges.](https://commons.wikimedia.org/wiki/Special:FilePath/Binary_tree.svg)
+
+*Figure: A binary tree is a basic model for hierarchy, recursion, and branching decisions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Binary_tree.svg), Derrick Coetzee, public domain.*
+
 This is one of the best examples of a bijective proof in graph theory. Rather than deriving Cayley's formula by algebra alone, we build a reversible encoding. The encoding also reveals how degrees are distributed in a labelled tree, because the number of times a label appears in the Pruefer code is directly tied to the degree of that vertex.
 
 ## Definitions

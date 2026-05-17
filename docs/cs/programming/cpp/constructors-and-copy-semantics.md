@@ -7,6 +7,10 @@ sidebar_position: 9
 
 Constructors make class objects usable from the moment they are created. Destructors release resources when objects die. Copy constructors and assignment operators define what it means to duplicate an object. Savitch introduces these tools gradually: constructors first for initialization, then `const`, static members, vectors, destructors, copy constructors, and overloaded assignment when classes own dynamic memory.
 
+![The ISO C++ logo marks pages on classes, templates, containers, and modern C++ idioms.](https://commons.wikimedia.org/wiki/Special:FilePath/ISO_C%2B%2B_Logo.svg)
+
+*Figure: C++ extends systems programming with abstraction, generic code, and deterministic resource management. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ISO_C%2B%2B_Logo.svg), Jeremy Kratz, public domain text logo.*
+
 The guiding principle is resource ownership. If a class only stores simple values, the compiler-generated copy behavior is often fine. If a class owns memory, a file handle, or another resource, memberwise copying is usually not enough. The class must decide whether copying means deep copy, shared ownership, disabled copy, or move-style transfer in modern C++.
 
 ## Definitions

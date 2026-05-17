@@ -9,6 +9,10 @@ Many general chemistry reactions occur in water, where soluble ionic compounds s
 
 In the Ebbing and Gammon sequence this topic sits near ionic theory of solutions, solubility rules, precipitation, acid-base reactions, redox reactions, molarity, dilution, gravimetric analysis, and volumetric analysis. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
+![A precipitation reaction forms a cloudy solid in solution.](https://commons.wikimedia.org/wiki/Special:FilePath/Reazione_di_precipitazione.jpg)
+
+*Figure: A precipitation reaction in water, where ions form an insoluble product. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Reazione_di_precipitazione.jpg), Nicolodestefani97, public domain.*
+
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.

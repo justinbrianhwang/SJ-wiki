@@ -9,6 +9,18 @@ Quantum mechanics is the framework for physical systems whose states are probabi
 
 This section synthesizes four requested sources into one wiki sequence. Sakurai's *Modern Quantum Mechanics* supplies the primary structure: Stern-Gerlach motivation, Dirac notation, dynamics, angular momentum, symmetries, approximation methods, scattering, and identical particles. Ballentine supplies mathematical care, ensemble interpretation, density-operator emphasis, and scattering depth. The file named for Gottfried in the local source set extracts as graduate lecture notes that cite Gottfried/Yan and is used where it cleanly reinforces postulates, spin, dynamics, angular momentum, symmetries, and perturbation theory. Schiff is included as the classic wave-mechanics contrast where the topic naturally matches the older coordinate-representation style; this local copy is scanned/image-only through `pdftotext`, so no precise extracted page quotations are used from it.
 
+![A Stern-Gerlach apparatus splits a beam into discrete spin outcomes.](https://commons.wikimedia.org/wiki/Special:FilePath/Stern-Gerlach_experiment.svg)
+
+*Figure: The Stern-Gerlach experiment is the physical scene behind spin quantization and quantum measurement. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Stern-Gerlach_experiment.svg), Tatoute, CC BY-SA 4.0.*
+
+![A Bloch sphere locates a two-level quantum state by polar and azimuthal angles.](https://commons.wikimedia.org/wiki/Special:FilePath/Bloch_sphere.svg)
+
+*Figure: The Bloch sphere turns a two-component complex state into a geometric object that can be rotated and measured. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bloch_sphere.svg), Smite-Meister, CC BY-SA 3.0.*
+
+![Hydrogen orbital density plots show bright probability regions for several quantum numbers.](https://commons.wikimedia.org/wiki/Special:FilePath/Hydrogen_Density_Plots.png)
+
+*Figure: Hydrogen density plots make angular momentum, nodes, and probability density visible in real atomic structure. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hydrogen_Density_Plots.png), PoorLeno, public domain.*
+
 ## Definitions
 
 A **state** is represented by a ray in Hilbert space for a pure preparation, or by a density operator for a general preparation. A **ket** $\vert \psi\rangle$ is the abstract state vector; a **wave function** $\psi(x)=\langle x\vert \psi\rangle$ is one representation of that vector. A **bra** $\langle\psi\vert $ is the corresponding dual object.

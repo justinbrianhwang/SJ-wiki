@@ -7,6 +7,10 @@ sidebar_position: 12
 
 The source includes a buses and protocols chapter covering serial communication classes, RS-232C, RS-423A, RS-422A, RS-485, I2C, Modbus, and IEEE-488. These topics widen the view from one microcontroller board to communication between devices. A microcontroller may send bytes through a UART, share an I2C bus with memory and clock chips, or exchange Modbus frames with an industrial controller.
 
+![An Arduino Uno board shows a familiar microcontroller development board with headers and USB.](https://commons.wikimedia.org/wiki/Special:FilePath/Arduino_Uno_-_R3.jpg)
+
+*Figure: Arduino boards make microcontroller I/O and prototyping tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Arduino_Uno_-_R3.jpg), SparkFun Electronics, CC BY 2.0.*
+
 The common theme is that a bus is more than a wire. It defines electrical levels, direction rules, timing, addressing, framing, acknowledgements, and error checks. Software must follow the protocol's order exactly, while hardware must satisfy voltage, termination, pull-up, and distance requirements.
 
 ## Definitions

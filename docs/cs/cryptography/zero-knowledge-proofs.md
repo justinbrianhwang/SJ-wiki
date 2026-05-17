@@ -7,6 +7,10 @@ sidebar_position: 16
 
 Zero-knowledge proofs let a prover convince a verifier that a statement is true without revealing why it is true. This sounds paradoxical until you separate knowledge from verification: the verifier should become convinced of truth, but anything it sees should be simulatable without the secret witness. That simulation idea is the heart of zero knowledge.
 
+![A public-key diagram shows Alice encrypting a message that only Bob can decrypt.](https://commons.wikimedia.org/wiki/Special:FilePath/Public_key_encryption_alice_to_bob.svg)
+
+*Figure: Public-key encryption makes the Alice-to-Bob security goal explicit. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Public_key_encryption_alice_to_bob.svg), Winstonlee, CC0.*
+
 The supplied Katz and Lindell edition is focused mainly on encryption, MACs, hashes, number theory, public-key encryption, and signatures. Smart's later chapters include zero-knowledge, graph isomorphism, Sigma protocols, and voting applications, so this page leans more heavily on Smart while keeping the same proof-aware style used in modern cryptography. Zero knowledge connects naturally to identification, signatures through Fiat-Shamir, commitments, and secure multiparty computation.
 
 ## Definitions

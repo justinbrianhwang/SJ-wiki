@@ -7,6 +7,10 @@ sidebar_position: 20
 
 Laplace's equation describes equilibrium fields with no internal sources. It appears in steady heat conduction, electrostatic potential, gravitational potential, incompressible irrotational flow, and membrane equilibrium. The equation is simple to write but extremely rich because its solutions, called harmonic functions, obey strong geometric restrictions.
 
+![Pierre-Simon de Laplace is shown in a historical engraved portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Pierre-Simon_de_Laplace.jpg)
+
+*Figure: Pierre-Simon de Laplace is a key figure in probability, transforms, and potential theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pierre-Simon_de_Laplace.jpg), Louis Delaistre after Armand-Charles Guilleminot, public domain.*
+
 Potential theory connects scalar potentials with vector fields. A field such as electric field or velocity can be derived from a potential, and Laplace's equation expresses source-free behavior. In two dimensions, harmonic functions are also tied to analytic complex functions through the Cauchy-Riemann equations.
 
 ## Definitions

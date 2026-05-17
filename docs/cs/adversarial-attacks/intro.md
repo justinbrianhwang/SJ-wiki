@@ -7,6 +7,14 @@ sidebar_position: 1
 
 Adversarial machine learning studies how learned systems fail when inputs, training data, feedback, or surrounding context are chosen by an adversary rather than sampled passively from the test distribution. In the modern deep-learning setting, the canonical example is an adversarial image $x' = x+\delta$ that looks nearly unchanged to a human but causes a classifier to predict the wrong label. The same discipline now reaches text, speech, reinforcement learning, retrieval systems, tool-using LLM agents, and physical-world perception.
 
+![A visually similar adversarial panda image is classified as a gibbon by an ImageNet model.](https://ar5iv.labs.arxiv.org/html/1412.6572/assets/gibbon_993.png)
+
+*Figure: The FGSM panda example shows that imperceptible perturbations can change model decisions. Image: [ar5iv](https://arxiv.org/abs/1412.6572), Goodfellow, Shlens, and Szegedy, educational use with attribution.*
+
+![A physical adversarial patch on a tabletop changes a banana scene into a toaster prediction.](https://ar5iv.labs.arxiv.org/html/1712.09665/assets/banana_attack_diagram.png)
+
+*Figure: Physical patches show that adversarial examples can survive outside the pixel-only setting. Image: [ar5iv](https://arxiv.org/abs/1712.09665), Brown et al., educational use with attribution.*
+
 This section is the foundational layer for SJ Wiki. It organizes adversarial ML as topical chapters with papers cited inline: vocabulary, threat models, mathematical formulations, attack families, defenses, and evaluation rules. The central habit is security-style precision: every robustness claim must state the attacker's goal, knowledge, capability, and budget.
 
 ## Definitions

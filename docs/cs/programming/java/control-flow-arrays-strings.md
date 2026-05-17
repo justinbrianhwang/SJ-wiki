@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Control flow determines which statements run, how often they run, and when a method returns. Java's constructs are familiar to C-family programmers: blocks, `if`, `switch`, `while`, `do`, `for`, labels, `break`, `continue`, and `return`. The source book emphasizes that these constructs are simple but precise. The right loop shape makes code easier to verify; the wrong one hides the condition that ends the computation.
 
+![The Sun Microsystems logo gives Java pages historical context for the language and platform.](https://commons.wikimedia.org/wiki/Special:FilePath/Sun_Microsystems_logo.svg)
+
+*Figure: Java's early development at Sun shaped its portability, virtual-machine model, and library ecosystem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sun_Microsystems_logo.svg), Sun Microsystems and Afrank99, public domain text logo.*
+
 Arrays and strings are the first compound data structures many Java programs use. An array is an object with a fixed length and indexed components. A `String` is an object representing a sequence of characters, and string operations create or use objects rather than changing a primitive value. Together, loops, arrays, and strings form the base of searching, counting, formatting, parsing, and many examples in later chapters.
 
 ## Definitions

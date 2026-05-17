@@ -9,6 +9,10 @@ Molecular partition functions factor the motion and internal structure of a mole
 
 For many gases, the separability approximation is accurate enough that one can write the molecular partition function as a product. Each factor has a distinct temperature dependence, which explains heat capacities, entropies, and equilibrium constants.
 
+![A hydrogen spectrum diagram shows discrete spectral series on a wavelength scale.](https://commons.wikimedia.org/wiki/Special:FilePath/Hydrogen_spectrum.svg)
+
+*Figure: Discrete spectral lines as observable evidence of molecular and atomic energy-level spacing. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hydrogen_spectrum.svg), OrangeDog, CC BY-SA 3.0.*
+
 ## Definitions
 
 When molecular energy is approximately separable,

@@ -7,6 +7,18 @@ sidebar_position: 1
 
 Data mining is the study of collecting, preparing, modeling, and interpreting data so that large raw data sets yield useful structure. In Charu C. Aggarwal's organization, the subject is built around a practical pipeline and a small number of reusable analytical building blocks: association pattern mining, clustering, outlier detection, and classification. The same building blocks are then adapted to text, time series, discrete sequences, spatial data, graphs, web data, social networks, streams, and privacy-sensitive settings.
 
+![An Iris dataset scatterplot compares flower measurements colored by species.](https://commons.wikimedia.org/wiki/Special:FilePath/Iris_dataset_scatterplot.svg)
+
+*Figure: The Iris scatterplot makes feature spaces and class separation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Iris_dataset_scatterplot.svg), Nicoguaro, CC BY 4.0.*
+
+![A k-means animation shows centroids and cluster boundaries moving until assignments stabilize.](https://commons.wikimedia.org/wiki/Special:FilePath/K-means_convergence.gif)
+
+*Figure: K-means alternates assignments and centroid updates until the partition stops changing. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:K-means_convergence.gif), Chire, CC BY-SA 4.0.*
+
+![A DBSCAN diagram marks core, border, and noise points under a density threshold.](https://commons.wikimedia.org/wiki/Special:FilePath/DBSCAN-Illustration.svg)
+
+*Figure: DBSCAN explains clustering as density reachability rather than a fixed number of clusters. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:DBSCAN-Illustration.svg), Chire, CC BY-SA 3.0.*
+
 These notes are detailed study pages for Aggarwal's *Data Mining: The Textbook*. They emphasize definitions, algorithmic ideas, worked numerical examples, pseudocode, and Python snippets. The goal is not to replace the book's full treatment, but to give a structured wiki path through the concepts that recur across chapters.
 
 ## Definitions

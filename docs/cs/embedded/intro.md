@@ -7,6 +7,18 @@ sidebar_position: 1
 
 These notes follow the scanned textbook *Microprocessors & Microcontroller Systems* by D.A. Godse and A.P. Godse. The PDF is image-based in this workspace, so the usable source signals are its metadata and visually inspected table of contents. That contents shows a course centered on the 8085 microprocessor and the MCS-51/8051 microcontroller, then extended through 8255 interfacing, external devices, serial buses, serial EEPROM/DS1307, 89C51 derivatives, AVR AT90S2313, and PIC16CXX.
 
+![An Arduino Uno board shows a familiar microcontroller development board with headers and USB.](https://commons.wikimedia.org/wiki/Special:FilePath/Arduino_Uno_-_R3.jpg)
+
+*Figure: Arduino boards make microcontroller I/O and prototyping tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Arduino_Uno_-_R3.jpg), SparkFun Electronics, CC BY 2.0.*
+
+![An Intel P8051 chip photo shows the microcontroller as an actual integrated circuit package.](https://commons.wikimedia.org/wiki/Special:FilePath/KL_Intel_P8051.jpg)
+
+*Figure: The 8051 pages discuss an architecture that existed as widely used embedded chips. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:KL_Intel_P8051.jpg), Konrad Lischka, CC BY-SA 3.0/GFDL.*
+
+![An Intel 8051 architecture diagram shows timers, serial I/O, memory, and ports around the CPU core.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_8051_arch.svg)
+
+*Figure: The 8051 diagram connects assembly details to the microcontroller's peripheral blocks. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_8051_arch.svg), Appaloosa, CC BY-SA 3.0.*
+
 The subject is about building a working digital system from a processor, memory, I/O circuits, and software. The 8085 chapters teach external bus thinking: address decoding, machine cycles, memory maps, I/O-mapped ports, DMA, and assembly programs. The 8051 chapters shift to microcontroller thinking: on-chip RAM, SFRs, ports, timers, serial communication, interrupts, and device interfacing. The later chapters show that once the vocabulary is clear, new controller families can be compared by memory organization, peripheral set, interrupt model, power modes, and programming style.
 
 ## Definitions

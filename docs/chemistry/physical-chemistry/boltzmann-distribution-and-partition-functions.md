@@ -9,6 +9,10 @@ Statistical thermodynamics explains macroscopic thermodynamic properties from mo
 
 Atkins introduces the Boltzmann distribution and the molecular partition function as the central tools. Once the partition function is known, thermodynamic functions such as internal energy, entropy, Helmholtz energy, and equilibrium constants can be derived systematically.
 
+![A Maxwell-Boltzmann distribution plot compares molecular speeds for several noble gases.](https://commons.wikimedia.org/wiki/Special:FilePath/MaxwellBoltzmann-en.svg)
+
+*Figure: Maxwell-Boltzmann distribution as a physical population model for thermal molecular states. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:MaxwellBoltzmann-en.svg), Pdbailey, Cryptic C62, and Lilyu, public domain.*
+
 ## Definitions
 
 A **configuration** specifies how particles are distributed among available molecular states. If level $i$ has energy $\epsilon_i$ and degeneracy $g_i$, the relative population at thermal equilibrium is given by the Boltzmann distribution:

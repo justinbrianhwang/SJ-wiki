@@ -7,6 +7,10 @@ sidebar_position: 8
 
 Stability is the nonnegotiable requirement in feedback design. A controller that improves speed or accuracy is useless if the natural response grows without bound. Nise treats stability first through pole locations, then through the Routh-Hurwitz criterion, which determines how many roots of a polynomial lie in the right half-plane without explicitly solving for the roots.
 
+![A feedback control block diagram shows compensators wrapped around a plant.](https://commons.wikimedia.org/wiki/Special:FilePath/Control_System.svg)
+
+*Figure: The standard feedback loop keeps control pages tied to the plant-controller interface. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Control_System.svg), Inductiveload, public domain.*
+
 The criterion is practical because closed-loop characteristic equations quickly become high order. For a feedback system, the denominator may include controller, plant, sensor, and load dynamics. Routh-Hurwitz lets the designer test stability and find allowable gain ranges by arithmetic on polynomial coefficients.
 
 ## Definitions

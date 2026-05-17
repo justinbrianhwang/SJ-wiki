@@ -9,6 +9,10 @@ Gauge invariance is a redundancy with physical force. In electromagnetism the ve
 
 QED is the cleanest gauge theory because its group is abelian, $U(1)$. The electron field carries charge, the photon field mediates the interaction, and the local phase symmetry determines the covariant derivative. Zee's discussion uses QED to show how a symmetry can be both a computational constraint and a physical explanation for why a force has the structure it has.
 
+![A Feynman diagram shows two electrons scattering by exchanging a photon.](https://commons.wikimedia.org/wiki/Special:FilePath/Electron-scattering.svg)
+
+*Figure: A Feynman diagram turns perturbation theory into a compact bookkeeping picture for particles, propagators, and vertices. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Electron-scattering.svg), KCVelaga, CC BY-SA 4.0.*
+
 ## Definitions
 
 The QED Lagrangian is

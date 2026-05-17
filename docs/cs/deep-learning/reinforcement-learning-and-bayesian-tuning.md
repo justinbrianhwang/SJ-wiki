@@ -7,6 +7,10 @@ sidebar_position: 20
 
 D2L closes by touching topics that connect deep learning to decision making and automated model selection. Reinforcement learning studies agents that act in environments and learn from rewards. Gaussian processes provide a Bayesian way to model unknown functions. Hyperparameter optimization uses search algorithms, often including Bayesian optimization and multi-fidelity methods, to tune choices such as learning rate, model width, and regularization.
 
+![A cart-pole animation shows a controller trying to balance an inverted pole on a moving cart.](https://commons.wikimedia.org/wiki/Special:FilePath/Cartpole.gif)
+
+*Figure: Cart-pole is a standard control and reinforcement-learning benchmark. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cartpole.gif), Condordellanebbia, CC BY-SA 4.0.*
+
 These topics are broad enough for dedicated courses, so this page keeps the focus on D2L's role: introduce the objects and workflows that deep learning practitioners encounter. RL connects naturally to Sutton and Barto's framework of Markov decision processes. Gaussian processes connect probability, kernels, and uncertainty. Hyperparameter optimization connects experimental design to the reality that many deep learning outcomes depend on nontrained configuration choices.
 
 ## Definitions

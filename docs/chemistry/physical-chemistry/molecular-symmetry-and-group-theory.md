@@ -9,6 +9,10 @@ Molecular symmetry organizes structure, bonding, and spectroscopy. Rather than t
 
 Atkins introduces point groups, symmetry operations, character tables, and symmetry labels as practical tools. The core payoff is selection: symmetry decides whether an orbital overlap, matrix element, or vibrational transition can be nonzero.
 
+![A ball-and-stick methane model shows four equivalent C-H bonds arranged tetrahedrally.](https://commons.wikimedia.org/wiki/Special:FilePath/Methane-3D-balls.png)
+
+*Figure: Methane as a high-symmetry molecule with tetrahedral geometry. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Methane-3D-balls.png), Benjah-bmm27, public domain.*
+
 ## Definitions
 
 A **symmetry operation** moves a molecule into an indistinguishable orientation. A **symmetry element** is the geometrical object associated with the operation.

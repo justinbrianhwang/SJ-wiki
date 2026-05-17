@@ -7,6 +7,10 @@ sidebar_position: 6
 
 Probability supplies the language for uncertainty in statistical inference. A sample result is rarely interpreted as a fixed fact about a population; instead, it is interpreted against a probability model for what could have happened under repeated sampling or repeated trials. The Lane text introduces probability before sampling distributions because confidence intervals, p-values, power, and regression inference all depend on probability statements.
 
+![The Monty Hall problem is shown with three doors and one open door.](https://commons.wikimedia.org/wiki/Special:FilePath/Monty_open_door.svg)
+
+*Figure: The Monty Hall problem is a compact example of conditional probability and base-rate intuition. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Monty_open_door.svg), Cepheus, public domain.*
+
 The practical goal is not to memorize gambling examples. It is to learn how events combine, how conditional information changes probabilities, and how independence differs from mutual exclusivity. These ideas appear whenever a researcher asks whether a medical test is reliable, whether two traits are associated, whether a result is surprising under a null hypothesis, or whether base rates change the interpretation of evidence.
 
 ## Definitions

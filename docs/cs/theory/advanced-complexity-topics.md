@@ -7,6 +7,10 @@ sidebar_position: 17
 
 After P, NP, and PSPACE, complexity theory branches into a landscape of sharper questions. Hierarchy theorems ask whether giving machines more time or space genuinely increases power. Oracles show that some proof techniques cannot resolve P versus NP by relativizing arguments alone. Randomized complexity studies algorithms that use coin flips. Interactive proofs and PCPs reveal surprising connections among verification, games, probability, and approximation.
 
+![A square Kufic algorithms mark introduces the study of designed procedures.](https://commons.wikimedia.org/wiki/Special:FilePath/Algorithms.svg)
+
+*Figure: The algorithms mark gives the abstract algorithms pages a concrete visual anchor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Algorithms.svg), Jeff Erickson, CC BY 4.0.*
+
 These topics are usually introduced as brief overviews in a first theory course, but they matter because they show that complexity is not a single ladder. Resources interact: time, space, randomness, alternation, parallelism, communication, and approximation each produce different ways to classify computational difficulty.
 
 ## Definitions

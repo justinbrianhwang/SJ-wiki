@@ -7,6 +7,10 @@ sidebar_position: 14
 
 Concurrency control lets many transactions run at the same time while preserving a correctness contract. Without it, two users can overwrite each other's updates, read data that later disappears, or make decisions from inconsistent snapshots. The DBMS must balance safety and throughput: blocking too much wastes resources, while allowing too much interleaving creates anomalies.
 
+![A pgAdmin screenshot shows a real database administration interface with schema objects.](https://commons.wikimedia.org/wiki/Special:FilePath/PgAdminScreenshot.png)
+
+*Figure: A database system is experienced through schemas, queries, connections, and administration tools. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PgAdminScreenshot.png), Boshomi, CC BY-SA 3.0.*
+
 Locking and timestamp protocols are classic approaches. Locking controls access to data items by making transactions wait for incompatible operations. Timestamp ordering assigns transactions a serialization order and rejects operations that violate that order. Both approaches are easier to understand after serializability, because their purpose is to produce schedules that behave like a safe serial order.
 
 ## Definitions

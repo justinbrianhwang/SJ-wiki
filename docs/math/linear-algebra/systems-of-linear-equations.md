@@ -7,6 +7,10 @@ sidebar_position: 2
 
 A linear system is the first place where linear algebra becomes visible: several flat constraints must be satisfied at once. In two variables the constraints are lines; in three variables they are planes; in $n$ variables they are hyperplanes. The algebraic question "which tuples solve all equations?" is the geometric question "where do these hyperplanes meet?"
 
+![Gaussian elimination turns a linear system into triangular form.](https://commons.wikimedia.org/wiki/Special:FilePath/File_Gaussian_elimination.svg)
+
+*Figure: Gaussian elimination uses row operations to expose pivots, rank, and solvability. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:File_Gaussian_elimination.svg), Akira tanzivana, CC BY-SA 4.0.*
+
 Systems also introduce the central habit of the subject: replace a question about many equations by an equivalent question about a matrix. Once the coefficients are stored in an augmented matrix, row operations reveal whether the constraints intersect in no point, one point, or an entire affine family of points. The same language later becomes rank, column space, null space, inverse matrices, least squares, and numerical factorization.
 
 ## Definitions

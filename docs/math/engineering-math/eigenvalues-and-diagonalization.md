@@ -7,6 +7,10 @@ sidebar_position: 12
 
 Eigenvalues identify directions that a linear transformation stretches without turning. If $A\mathbf{v}=\lambda\mathbf{v}$, the vector $\mathbf{v}$ keeps its direction and the scalar $\lambda$ gives the stretch factor. This idea organizes vibration modes, stability of ODE systems, Markov chains, principal axes, and many numerical algorithms.
 
+![An eigenvector keeps its direction while a matrix scales it.](https://commons.wikimedia.org/wiki/Special:FilePath/Eigenvalue_equation.svg)
+
+*Figure: The eigenvalue equation captures directions preserved by a linear transformation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Eigenvalue_equation.svg), Lyudmil Antonov, CC BY-SA 4.0.*
+
 Diagonalization is powerful because it replaces a coupled linear map with independent scalar actions along eigenvector directions. When a matrix can be diagonalized, powers, exponentials, and recurrence formulas become much easier. When it cannot, generalized eigenvectors and Jordan or Schur forms explain what replaces the ideal picture.
 
 ## Definitions

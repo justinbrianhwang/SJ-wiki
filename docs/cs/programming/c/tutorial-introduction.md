@@ -7,6 +7,10 @@ sidebar_position: 2
 
 K&R begins C by writing complete programs immediately. That is the right way to meet the language: C has few surface features, but every feature is close to the machine, the compiler, and the run-time environment. A tiny program already uses a translation unit, a function named `main`, a standard header, a library call, character constants, integer arithmetic, and a return status to the host environment.
 
+![A C language logo marks the systems-programming pages built around C examples.](https://commons.wikimedia.org/wiki/Special:FilePath/C_Programming_Language.svg)
+
+*Figure: C remains the reference language for low-level memory, pointers, and Unix interfaces. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:C_Programming_Language.svg), ElodinKaldwin, public domain text logo.*
+
 The tutorial chapter is not meant to teach every rule. It gives a working core: output with `printf`, variables and arithmetic, `while` and `for`, symbolic constants, character input with `getchar`, arrays, functions, call by value, character arrays, and the first warning about external variables. Later chapters tighten the rules, but this chapter supplies the idioms that make C recognizable.
 
 ## Definitions

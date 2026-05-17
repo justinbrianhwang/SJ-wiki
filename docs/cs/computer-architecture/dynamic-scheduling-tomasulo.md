@@ -7,6 +7,10 @@ sidebar_position: 7
 
 Dynamic scheduling lets hardware find instruction-level parallelism that the compiler could not fully expose. In a simple in-order pipeline, one stalled instruction can block younger independent instructions. An out-of-order core decodes instructions in program order, tracks dependencies, and allows ready instructions to execute when their operands and functional units are available.
 
+![An opened Intel 4004 processor exposes the silicon die inside its package.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_4004_open.jpg)
+
+*Figure: Opening the package links instruction-set discussions to the physical die. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_4004_open.jpg), Science Museum Group, CC BY 4.0.*
+
 Tomasulo's algorithm is the classic model for this idea. It was developed for floating-point execution, but its concepts reappear throughout modern processors: reservation stations, tags instead of architectural register names, broadcast results, and dependency-driven wakeup. The algorithm attacks RAW hazards by waiting for values and attacks WAR/WAW name hazards by renaming registers to producer tags.
 
 ## Definitions

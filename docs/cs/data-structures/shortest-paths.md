@@ -7,6 +7,10 @@ sidebar_position: 13
 
 Shortest-path algorithms find minimum-cost routes through weighted graphs. They are related to traversal, but weights change the problem. BFS is enough when every edge has equal cost; once edges have different nonnegative weights, Dijkstra's algorithm is the standard single-source method. For all-pairs shortest paths, Floyd-Warshall uses dynamic programming over an adjacency matrix.
 
+![A Dijkstra animation highlights tentative distances as the shortest path grows through a graph.](https://commons.wikimedia.org/wiki/Special:FilePath/Dijkstra_Animation.gif)
+
+*Figure: Dijkstra's algorithm is a concrete example of graph search becoming a path. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dijkstra_Animation.gif), Ibmua, public domain.*
+
 The source textbook's graph chapter treats shortest paths after spanning trees. That contrast is important. A minimum spanning tree minimizes the total weight of a connecting tree, while shortest paths minimize route cost between specified vertices. The MST of a road network does not necessarily contain the shortest route between two cities.
 
 ## Definitions

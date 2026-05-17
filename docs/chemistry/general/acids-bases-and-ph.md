@@ -9,6 +9,10 @@ Acid-base chemistry classifies reactions by proton transfer, hydroxide productio
 
 In the Ebbing and Gammon sequence this topic sits near Arrhenius acids and bases, Bronsted-Lowry acids and bases, Lewis acids and bases, acid strength, molecular structure, water autoionization, strong acids and bases, and pH. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
+![A roll of universal indicator paper shows color bands used to estimate acidity and basicity.](https://commons.wikimedia.org/wiki/Special:FilePath/Universal_indicator_paper.jpg)
+
+*Figure: Universal indicator paper as a laboratory bridge from hydronium concentration to observed color. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Universal_indicator_paper.jpg), Bordercolliez, CC0.*
+
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.

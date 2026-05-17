@@ -7,6 +7,10 @@ sidebar_position: 6
 
 Database design starts before tables. The entity-relationship model gives designers a way to talk about the world being modeled: the objects that exist, the facts known about them, and the relationships among them. It is deliberately conceptual. A good E-R model avoids premature storage details but is precise enough to become a relational schema with keys and constraints.
 
+![An entity-relationship table diagram shows linked tables for relational modeling.](https://commons.wikimedia.org/wiki/Special:FilePath/CPT-Databases-ExampleLinkTables.svg)
+
+*Figure: Link tables make many-to-many relationships concrete in a relational schema. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:CPT-Databases-ExampleLinkTables.svg), Pluke, CC0.*
+
 E-R modeling sits between requirements analysis and relational design. It helps expose ambiguity: Is an instructor an entity or just an attribute of a course section? Can a section have more than one instructor? Can a department exist without instructors? The mapping from E-R diagrams to relations then turns those answers into tables, primary keys, foreign keys, and sometimes separate relationship tables.
 
 ## Definitions

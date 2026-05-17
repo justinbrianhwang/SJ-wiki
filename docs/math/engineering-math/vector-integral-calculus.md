@@ -7,6 +7,10 @@ sidebar_position: 14
 
 Vector integral calculus turns local vector-field information into global statements over curves, surfaces, and volumes. Line integrals measure accumulated work or circulation, surface integrals measure flux, and the major integral theorems connect these integrals to gradient, divergence, and curl.
 
+![Arrows rotate around the origin in a two-dimensional vector field.](https://commons.wikimedia.org/wiki/Special:FilePath/Vector_field.svg)
+
+*Figure: A planar vector field shows how direction and magnitude vary from point to point. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Vector_field.svg), Fibonacci, public domain.*
+
 The subject is the global partner of vector differential calculus. Green's theorem, Stokes' theorem, and the divergence theorem are not isolated formulas; they are different forms of the same idea: a total boundary effect equals the accumulation of a local derivative inside.
 
 ## Definitions

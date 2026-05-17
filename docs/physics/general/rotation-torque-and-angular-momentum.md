@@ -9,6 +9,10 @@ Rotation, Torque, and Angular Momentum covers rotation of rigid bodies, torque, 
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
+![Lever classes are shown with fulcrum, applied force, and load positions.](https://commons.wikimedia.org/wiki/Special:FilePath/Classes-of-levers.svg)
+
+*Figure: Lever diagrams give torque and equilibrium equations a familiar physical apparatus. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Classes-of-levers.svg), MikeRun, CC BY-SA 4.0.*
+
 ## Definitions
 
 - **Scope:** rotation of rigid bodies, torque, rolling, and angular momentum.

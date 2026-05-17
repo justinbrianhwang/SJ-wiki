@@ -7,6 +7,10 @@ sidebar_position: 7
 
 Feedforward neural networks extend linear models by learning hidden representations. Jurafsky and Martin use them to connect logistic regression, embeddings, softmax classification, and neural language modeling. Eisenstein gives a machine-learning-oriented account of nonlinear classification, activation functions, lookup layers, backpropagation, regularization, dropout, and design choices.
 
+![An ELIZA terminal conversation shows an early chatbot responding to typed user input.](https://commons.wikimedia.org/wiki/Special:FilePath/ELIZA_conversation.png)
+
+*Figure: ELIZA provides historical context for dialogue systems and chatbot evaluation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ELIZA_conversation.png), Unknown author, public domain text.*
+
 For NLP, the critical shift is from hand-built sparse features to learned dense features. A word can be mapped through an embedding lookup, combined with nearby words or pooled over a document, transformed by hidden layers, and finally converted to a probability distribution with softmax. This architecture is the ancestor of RNNs, encoder-decoders, and transformers.
 
 ## Definitions

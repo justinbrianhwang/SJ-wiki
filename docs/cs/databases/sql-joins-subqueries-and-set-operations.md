@@ -7,6 +7,10 @@ sidebar_position: 4
 
 The power of SQL appears when a query combines multiple relations. A database is deliberately split into tables so that facts are stored once, constraints are meaningful, and updates do not create contradictory copies. Joins put those facts back together for a particular question. Subqueries let one query depend on another, and set operations combine complete query results.
 
+![A MySQL console screenshot shows a command-line database session with query output.](https://commons.wikimedia.org/wiki/Special:FilePath/Mysql-screenshot.PNG)
+
+*Figure: SQL pages connect abstract relational operations to the database console used in practice. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mysql-screenshot.PNG), Wikimedia Commons contributors, public domain text.*
+
 This page sits between basic SQL and query optimization. A correct join predicate is a logical statement about the database design, but the DBMS may evaluate it with many physical algorithms. The same result can be expressed as an explicit join, a semijoin-style `EXISTS`, a set operation, or an aggregation query. Choosing the clearest expression helps both people and optimizers.
 
 ## Definitions

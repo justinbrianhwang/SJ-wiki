@@ -9,6 +9,10 @@ Effective field theory is the modern interpretation of why QFT works so broadly.
 
 This viewpoint turns old language about nonrenormalizable theories upside down. Nonrenormalizable interactions are not forbidden; they are usually suppressed by a heavy scale and become small at low energy. Zee's final chapters use this perspective to connect particle physics, condensed matter, gravity, and newer developments: field theory is a language for scale-separated ignorance.
 
+![A Feynman diagram shows two electrons scattering by exchanging a photon.](https://commons.wikimedia.org/wiki/Special:FilePath/Electron-scattering.svg)
+
+*Figure: A Feynman diagram turns perturbation theory into a compact bookkeeping picture for particles, propagators, and vertices. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Electron-scattering.svg), KCVelaga, CC BY-SA 4.0.*
+
 ## Definitions
 
 An effective Lagrangian has the schematic form

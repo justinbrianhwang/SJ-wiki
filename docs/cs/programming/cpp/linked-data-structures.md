@@ -7,6 +7,10 @@ sidebar_position: 16
 
 Linked data structures store data in nodes connected by pointers. Unlike arrays, the nodes do not need to occupy one contiguous block of memory. This makes linked structures useful when a collection grows, shrinks, or rearranges frequently, but the flexibility comes with pointer management responsibilities.
 
+![The ISO C++ logo marks pages on classes, templates, containers, and modern C++ idioms.](https://commons.wikimedia.org/wiki/Special:FilePath/ISO_C%2B%2B_Logo.svg)
+
+*Figure: C++ extends systems programming with abstraction, generic code, and deterministic resource management. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ISO_C%2B%2B_Logo.svg), Jeremy Kratz, public domain text logo.*
+
 Savitch's linked-list material builds directly on pointers, dynamic memory, classes, destructors, and copy control. A node allocated with `new` must eventually be released with `delete`, and a class that owns a chain of nodes needs a destructor, copy constructor, and assignment operator if it allows copying.
 
 ## Definitions

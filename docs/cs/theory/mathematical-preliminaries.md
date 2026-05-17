@@ -7,6 +7,10 @@ sidebar_position: 2
 
 Theory of computation is written in the language of discrete mathematics. The machines are finite descriptions, the inputs are strings, the behaviors are languages, and the proofs reason about sets, functions, relations, graphs, and logical statements. A student who can manipulate these objects cleanly will find automata theory much less mysterious because most machine definitions are just tuples of sets and functions.
 
+![A square Kufic algorithms mark introduces the study of designed procedures.](https://commons.wikimedia.org/wiki/Special:FilePath/Algorithms.svg)
+
+*Figure: The algorithms mark gives the abstract algorithms pages a concrete visual anchor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Algorithms.svg), Jeff Erickson, CC BY 4.0.*
+
 The aim of this page is not to repeat a full discrete-math course. It is to collect the notation and habits that appear constantly in automata, computability, and complexity. The most important shift is to treat syntax as data. Strings are mathematical objects; encodings of graphs and programs are strings too; and a decision problem is represented by the set of strings whose answer is yes.
 
 ## Definitions

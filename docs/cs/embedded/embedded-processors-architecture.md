@@ -7,6 +7,10 @@ sidebar_position: 57
 
 Embedded processors are chosen under constraints that are different from desktop computing. Performance still matters, but so do timing predictability, energy, cost, memory size, peripheral support, arithmetic format, and how well the processor matches the application. A small microcontroller, a DSP, a GPU, a PLC, and a heterogeneous multicore system are all plausible embedded processors, but they expose very different design tradeoffs.
 
+![An Arduino Uno board shows a familiar microcontroller development board with headers and USB.](https://commons.wikimedia.org/wiki/Special:FilePath/Arduino_Uno_-_R3.jpg)
+
+*Figure: Arduino boards make microcontroller I/O and prototyping tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Arduino_Uno_-_R3.jpg), SparkFun Electronics, CC BY 2.0.*
+
 Lee and Seshia emphasize the distinction between an instruction set architecture and a processor realization. The ISA defines what instructions mean. A chip implements that ISA with pipelines, caches, buses, memories, peripherals, and parallel hardware. Two chips may run the same machine code but have very different timing, which is central in cyber-physical systems.
 
 ## Definitions

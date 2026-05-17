@@ -7,6 +7,10 @@ sidebar_position: 12
 
 A recurrence relation defines each term of a sequence from previous terms. It is a natural language for processes that evolve step by step: population models, recursive algorithms, dynamic programming, and counting strings with constraints.
 
+![Pascal's triangle fills in row by row with binomial coefficients.](https://commons.wikimedia.org/wiki/Special:FilePath/PascalTriangleAnimated2.gif)
+
+*Figure: Pascal's triangle organizes binomial coefficients, combinations, and recurrence patterns. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PascalTriangleAnimated2.gif), Hersfold, public domain.*
+
 Solving a recurrence means replacing the step-by-step definition with a closed form or at least a sharp growth estimate. Modeling and solving are different skills. The modeling step explains why the terms satisfy the recurrence; the solving step uses iteration, characteristic equations, generating functions, recursion trees, or asymptotic methods.
 
 ## Definitions

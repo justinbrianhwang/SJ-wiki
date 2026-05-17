@@ -7,6 +7,10 @@ sidebar_position: 9
 
 D2L's modern CNN chapters show how image models evolved from LeNet into deeper, more modular architectures. AlexNet demonstrated that large CNNs trained on GPUs could dominate image recognition. VGG made depth systematic through repeated small convolutional blocks. NiN and GoogLeNet introduced channel mixing and multi-branch computation. Batch normalization stabilized deep training. ResNet changed the default architecture by making identity paths explicit, and DenseNet pushed feature reuse even further.
 
+![A grid of MNIST handwritten digits shows the small grayscale examples used in many ML tutorials.](https://commons.wikimedia.org/wiki/Special:FilePath/MNIST_dataset_example.png)
+
+*Figure: MNIST gives classification, vision, and neural-network pages a familiar benchmark image. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:MNIST_dataset_example.png), Suvanjanprasai, CC BY-SA 4.0.*
+
 These models are more than a historical sequence. They introduce reusable design ideas: blocks, bottlenecks, normalization, residual connections, concatenation, global average pooling, and computational tradeoffs between width, depth, and resolution. Modern vision models still rely on these ideas even when attention or hybrid architectures are added.
 
 ## Definitions

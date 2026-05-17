@@ -7,6 +7,10 @@ sidebar_position: 12
 
 Classes let Python programs define new kinds of objects. The textbook introduces classes with a `Car` example: attributes such as model and color, an initializer, object creation, and methods that print object state. That is the right starting point. Object-oriented programming becomes useful when data and behavior belong together and when the program benefits from a named concept rather than loose dictionaries and functions.
 
+![The Python logo marks pages on scripting, testing, packaging, and scientific programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Python-logo-notext.svg)
+
+*Figure: Python provides the practical environment for many CS, ML, and data examples. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Python-logo-notext.svg), Python Software Foundation, GPL-compatible free license; trademark terms apply.*
+
 Python's object model is broad. It includes ordinary classes, special or "dunder" methods, properties, inheritance, mixins, and dataclasses. The main engineering judgment is knowing when a class clarifies the design. If a problem is just transforming a list of numbers, a function is enough. If the problem has entities with state, invariants, and operations, a class may make the code easier to reason about.
 
 ## Definitions

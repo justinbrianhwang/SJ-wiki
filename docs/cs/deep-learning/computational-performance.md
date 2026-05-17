@@ -7,6 +7,10 @@ sidebar_position: 15
 
 Deep learning performance is not only about choosing a good model. D2L devotes a chapter to compilers, asynchronous execution, parallelism, multiple GPUs, and parameter servers because large models are systems as much as they are mathematics. A model that is theoretically reasonable can be unusable if data loading stalls, tensor transfers dominate runtime, or distributed workers communicate inefficiently.
 
+![An artificial neural network diagram shows input, hidden, and output layers connected by weights.](https://commons.wikimedia.org/wiki/Special:FilePath/Artificial_neural_network.svg)
+
+*Figure: Layered neural networks make differentiable function approximation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Artificial_neural_network.svg), Cburnett, CC BY-SA 3.0/GFDL.*
+
 The central performance question is where time and memory go. Computation happens in kernels, data moves across device boundaries, gradients synchronize across workers, and framework execution may be lazy or asynchronous. Good engineering overlaps work where possible, batches small operations into larger ones, keeps tensors on the right device, and uses parallelism only when communication costs justify it.
 
 ## Definitions

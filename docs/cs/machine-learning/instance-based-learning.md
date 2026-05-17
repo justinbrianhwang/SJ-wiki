@@ -7,6 +7,10 @@ sidebar_position: 10
 
 Instance-based learning postpones generalization until a query arrives. Instead of eagerly building a global model during training, the learner stores examples and uses nearby cases to answer new questions. Mitchell uses this chapter to introduce k-nearest neighbor, distance-weighted voting, locally weighted regression, radial basis functions, case-based reasoning, and the distinction between lazy and eager learning.
 
+![An Iris dataset scatterplot compares flower measurements colored by species.](https://commons.wikimedia.org/wiki/Special:FilePath/Iris_dataset_scatterplot.svg)
+
+*Figure: The Iris scatterplot makes feature spaces and class separation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Iris_dataset_scatterplot.svg), Nicoguaro, CC BY 4.0.*
+
 The central idea is locality. If similar instances tend to have similar target values, then nearby training examples are useful evidence. This is simple and powerful, but it makes the choice of distance metric, feature scaling, and local weighting extremely important.
 
 ## Definitions

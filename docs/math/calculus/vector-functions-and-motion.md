@@ -7,6 +7,10 @@ sidebar_position: 17
 
 Vector functions describe curves and motion in the plane or in space. Instead of tracking one output, a vector function tracks several coordinates at once. The derivative of a vector function gives velocity, and the second derivative gives acceleration. This makes vector calculus a natural extension of parametric calculus.
 
+![The Lorenz attractor forms two looping wings in phase space.](https://commons.wikimedia.org/wiki/Special:FilePath/Lorenz_attractor_yb.svg)
+
+*Figure: The Lorenz attractor visualizes sensitive dependence on initial conditions in nonlinear systems. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Lorenz_attractor_yb.svg), Wikimol and Dschwen, CC BY-SA 3.0.*
+
 Motion problems become clearer when position, velocity, acceleration, speed, tangent direction, and curvature are separated. The vector notation keeps direction and magnitude together while still allowing ordinary differentiation component by component.
 
 ## Definitions

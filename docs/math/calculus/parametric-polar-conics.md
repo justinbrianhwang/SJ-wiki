@@ -9,7 +9,7 @@ Parametric, polar, and conic descriptions give alternatives to writing a curve a
 
 These descriptions are useful because many curves fail the vertical line test, loop back on themselves, or are naturally described by rotation. Calculus still applies, but derivatives, area, and arc length must be translated into the coordinate system being used.
 
-![A cardioid curve is drawn in polar form with a cusp at the origin.](https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Cardioid.svg/500px-Cardioid.svg.png)
+![A cardioid curve is drawn in polar form with a cusp at the origin.](https://commons.wikimedia.org/wiki/Special:FilePath/Cardioid.svg)
 
 *Figure: Cardioid curve $r=a(1+\cos\theta)$. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cardioid.svg), D.328, CC BY-SA 2.1 JP.*
 

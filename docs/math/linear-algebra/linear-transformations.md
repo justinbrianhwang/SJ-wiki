@@ -7,6 +7,10 @@ sidebar_position: 17
 
 Linear transformations are the function version of matrices. They preserve addition and scalar multiplication, so they preserve linear structure: lines through the origin, spans, subspaces, dependence relations, and coordinates. Matrices are concrete representations of linear transformations after bases are chosen.
 
+![A matrix transforms two vectors into new positions in the plane.](https://commons.wikimedia.org/wiki/Special:FilePath/Matrix_multiplication.svg)
+
+*Figure: Matrix multiplication can be read geometrically as a transformation of vectors. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Matrix_multiplication.svg), Jakob.scholbach and Pbroks13, CC BY-SA 3.0.*
+
 This page ties together two viewpoints. A matrix can be read as an array of numbers, but it is often better read as an action on vectors. Conversely, an abstract linear function becomes computable once bases are chosen, because its behavior on a basis determines its behavior everywhere.
 
 ## Definitions

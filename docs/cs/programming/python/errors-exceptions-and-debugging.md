@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Errors are not a side topic in programming; they are how a running program tells you which assumption failed. Halvorsen's textbook distinguishes syntax errors from exceptions, shows examples such as missing quotes and division by zero, and introduces `try`, `except`, and `finally`. It also has a short debugging chapter that frames debugging as the process of finding and resolving defects.
 
+![The Python logo marks pages on scripting, testing, packaging, and scientific programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Python-logo-notext.svg)
+
+*Figure: Python provides the practical environment for many CS, ML, and data examples. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Python-logo-notext.svg), Python Software Foundation, GPL-compatible free license; trademark terms apply.*
+
 The practical goal is not to prevent every error message. The goal is to make failures local, understandable, and recoverable when recovery is possible. Syntax errors must be fixed before the program runs. Exceptions may indicate invalid input, missing files, unavailable resources, or programmer mistakes. Debugging is the disciplined process of reducing the distance between observed behavior and intended behavior.
 
 ## Definitions

@@ -9,6 +9,10 @@ Chemical equilibrium is a thermodynamic condition, not a statement that reaction
 
 Atkins frames equilibrium through the reaction Gibbs energy and the extent of reaction. This approach unifies gas-phase equilibria, solution equilibria, biological coupling, and electrochemical cells: the same $\Delta_rG$ decides direction, and $\Delta_rG=0$ defines equilibrium.
 
+![A Gibbs energy curve shows a reaction mixture relaxing toward an equilibrium composition.](https://commons.wikimedia.org/wiki/Special:FilePath/Gibbs-Energie-Veranschaulichung.svg)
+
+*Figure: Gibbs energy minimum as the thermodynamic definition of equilibrium. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Gibbs-Energie-Veranschaulichung.svg), Johannes Schneider, CC BY-SA 4.0.*
+
 ## Definitions
 
 For a reaction

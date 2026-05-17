@@ -7,6 +7,10 @@ sidebar_position: 15
 
 Multiversion concurrency control, usually called MVCC, keeps multiple committed versions of data so that readers and writers do not always block each other. Instead of making every reader wait behind a writer, the DBMS can let a transaction read a version that was committed as of the transaction's snapshot. This is one reason modern relational systems can support high read concurrency.
 
+![A pgAdmin screenshot shows a real database administration interface with schema objects.](https://commons.wikimedia.org/wiki/Special:FilePath/PgAdminScreenshot.png)
+
+*Figure: A database system is experienced through schemas, queries, connections, and administration tools. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PgAdminScreenshot.png), Boshomi, CC BY-SA 3.0.*
+
 Snapshot isolation is a common isolation model built on MVCC. It gives each transaction a consistent snapshot and checks write-write conflicts at commit. It prevents dirty reads and many lost updates, but it is not the same as serializability. The classic anomaly is write skew, where two transactions read the same snapshot, update different rows, and jointly violate an invariant.
 
 ## Definitions

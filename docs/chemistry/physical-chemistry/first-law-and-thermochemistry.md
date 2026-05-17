@@ -9,6 +9,10 @@ The First Law is the bookkeeping rule for energy. It says that energy can cross 
 
 Atkins uses the First Law to connect molecular changes with measurable thermal effects. The same formalism explains why a gas cools or warms during expansion, why reactions at constant pressure are reported as enthalpies, and why Hess's law works.
 
+![A schematic calorimeter shows an insulated vessel, thermometer, and stirrer used to measure heat transfer.](https://commons.wikimedia.org/wiki/Special:FilePath/Calorimeter.svg)
+
+*Figure: Calorimeter apparatus as the laboratory setting for First Law energy accounting. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Calorimeter.svg), Li-on, public domain.*
+
 ## Definitions
 
 A **system** is the part of the universe under study; the **surroundings** are everything else. A **closed system** exchanges energy but not matter. An **isolated system** exchanges neither matter nor energy. The internal energy $U$ is a state function, so $\Delta U$ depends only on initial and final states.

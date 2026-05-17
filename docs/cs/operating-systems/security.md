@@ -7,6 +7,10 @@ sidebar_position: 15
 
 Security extends protection beyond internal access control into the environment where users, programs, networks, and attackers interact. A protection matrix is useless if an attacker steals credentials, installs a Trojan horse, exploits a buffer overflow, or tricks a user into running malicious code. Security therefore combines authentication, authorization, cryptography, auditing, defensive design, and operational discipline.
 
+![The Linux mascot marks the operating-system pages that use Linux as a recurring case study.](https://commons.wikimedia.org/wiki/Special:FilePath/Tux.svg)
+
+*Figure: Linux provides the concrete kernel case study for many OS abstractions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tux.svg), Larry Ewing, Simon Budig, and Garrett LeSage, CC0/attribution permission.*
+
 The textbook's security chapter covers threats, program attacks, system and network attacks, cryptography, user authentication, defenses, firewalls, classifications, and a Windows example. This page emphasizes the conceptual mechanics: what can go wrong, what cryptography can and cannot provide, and how layered defenses reduce risk.
 
 ## Definitions

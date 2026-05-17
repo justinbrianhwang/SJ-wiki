@@ -7,6 +7,10 @@ sidebar_position: 8
 
 Recurrent neural networks process sequences by carrying a hidden state forward through time. Jurafsky and Martin present RNNs and LSTMs as the bridge from fixed-window feedforward language models to encoder-decoder models and attention. Eisenstein introduces recurrent neural language models, backpropagation through time, gated recurrent networks, and sequence labeling variants from a more formal learning perspective.
 
+![An ELIZA terminal conversation shows an early chatbot responding to typed user input.](https://commons.wikimedia.org/wiki/Special:FilePath/ELIZA_conversation.png)
+
+*Figure: ELIZA provides historical context for dialogue systems and chatbot evaluation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ELIZA_conversation.png), Unknown author, public domain text.*
+
 The core motivation is simple: language is not a fixed-size input. A word's interpretation can depend on earlier words, and sequence tasks require predictions at many positions. RNNs encode a prefix into a vector state; LSTMs improve that state with gates that control what is remembered, forgotten, and exposed.
 
 ## Definitions

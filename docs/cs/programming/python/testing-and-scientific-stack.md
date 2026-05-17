@@ -7,6 +7,10 @@ sidebar_position: 16
 
 Testing and scientific computing sit at different ends of many Python courses, but they reinforce each other. Testing asks whether code behaves as intended. Scientific computing asks Python to calculate, transform, and visualize data correctly. Halvorsen's textbook includes many exercises and a short mathematics section with math functions, statistics, trigonometry, polynomials, NumPy, SciPy, Matplotlib, and pandas mentioned as important packages. This page gives a compact bridge from beginner scripts to reliable numeric work.
 
+![The Python logo marks pages on scripting, testing, packaging, and scientific programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Python-logo-notext.svg)
+
+*Figure: Python provides the practical environment for many CS, ML, and data examples. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Python-logo-notext.svg), Python Software Foundation, GPL-compatible free license; trademark terms apply.*
+
 The most important habit is to separate calculation from presentation. A function that returns a result can be tested. A plotting function that depends on a tested calculation is easier to trust. A data-analysis notebook that uses small tested helpers is more reproducible than one long sequence of manually edited cells.
 
 ## Definitions

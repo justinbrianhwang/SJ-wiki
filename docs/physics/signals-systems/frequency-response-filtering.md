@@ -9,6 +9,10 @@ Frequency response describes how an LTI system changes sinusoidal or complex exp
 
 This page connects Fourier transforms, Laplace transforms, and $z$-transforms. In continuous time, the frequency response is $H(j\omega)$. In discrete time, it is $H(e^{j\Omega})$. In both cases, it is obtained from the impulse response of an LTI system and used through multiplication in the frequency domain.
 
+![An animation decomposes a square wave into sinusoidal components and a frequency-domain spectrum.](https://commons.wikimedia.org/wiki/Special:FilePath/Fourier_transform_time_and_frequency_domains.gif)
+
+*Figure: Fourier analysis becomes concrete when a time waveform and its spectral lines are shown side by side. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fourier_transform_time_and_frequency_domains.gif), Lucas Vieira, public domain.*
+
 ## Definitions
 
 For a continuous-time LTI system with impulse response $h(t)$, the frequency response is

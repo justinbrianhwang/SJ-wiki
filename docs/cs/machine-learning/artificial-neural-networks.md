@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Mitchell's neural-network chapter predates the modern deep learning era, but many core ideas are the same: differentiable units, gradient descent, backpropagation, hidden representations, overfitting, and validation-based stopping. The networks are smaller, the examples are era-appropriate, and GPU-scale training is outside the scope, but the mathematical mechanism remains recognizable.
 
+![An artificial neural network diagram shows input, hidden, and output layers connected by weights.](https://commons.wikimedia.org/wiki/Special:FilePath/Artificial_neural_network.svg)
+
+*Figure: Layered neural networks make differentiable function approximation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Artificial_neural_network.svg), Cburnett, CC BY-SA 3.0/GFDL.*
+
 The chapter connects neural networks to the earlier checkers learner. Both use parameterized functions and error gradients. A perceptron is a linear threshold hypothesis; a multilayer network composes many differentiable units to represent nonlinear decision surfaces.
 
 ## Definitions

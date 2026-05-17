@@ -9,6 +9,10 @@ Molecular interactions explain why real gases, liquids, surfaces, and condensed 
 
 Atkins connects these ideas across gases, liquids, electrolyte solutions, diffusion, and molecular beams. The same microscopic forces that produce virial coefficients and liquid structure also influence viscosity, diffusion, conductivity, and rates of encounters.
 
+![A ball-and-stick water dimer model shows two water molecules joined by a hydrogen bond.](https://commons.wikimedia.org/wiki/Special:FilePath/Water-dimer-3D-balls.png)
+
+*Figure: Water dimer as a small-molecule picture of hydrogen bonding and intermolecular attraction. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Water-dimer-3D-balls.png), Hoa112008, public domain.*
+
 ## Definitions
 
 An electric dipole moment is

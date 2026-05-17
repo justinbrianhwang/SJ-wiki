@@ -7,6 +7,10 @@ sidebar_position: 13
 
 Data poisoning attacks change the training process rather than only the test-time input. Backdoor attacks are the most important special case for deep models: the model behaves normally on clean inputs, but an attacker-chosen trigger activates a hidden behavior at deployment time.
 
+![A physical adversarial patch on a tabletop changes a banana scene into a toaster prediction.](https://ar5iv.labs.arxiv.org/html/1712.09665/assets/banana_attack_diagram.png)
+
+*Figure: Physical patches show that adversarial examples can survive outside the pixel-only setting. Image: [ar5iv](https://arxiv.org/abs/1712.09665), Brown et al., educational use with attribution.*
+
 This threat model is different from FGSM, PGD, and patch attacks. In an evasion attack, the trained model is fixed and the attacker perturbs the input. In a backdoor attack, the attacker has influenced the dataset, labels, training service, pretrained checkpoint, or fine-tuning process before deployment.
 
 ## Definitions

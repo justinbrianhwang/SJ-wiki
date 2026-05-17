@@ -7,6 +7,10 @@ sidebar_position: 10
 
 Generics are one of the major Java 5 additions emphasized by the fourth edition. They let classes, interfaces, methods, and constructors express type relationships without giving up reusable code. A `List<String>` says that the list is intended to contain strings; a `Comparable<T>` says that comparison is tied to a type parameter; a generic method can preserve a relationship between input and output types.
 
+![The Sun Microsystems logo gives Java pages historical context for the language and platform.](https://commons.wikimedia.org/wiki/Special:FilePath/Sun_Microsystems_logo.svg)
+
+*Figure: Java's early development at Sun shaped its portability, virtual-machine model, and library ecosystem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sun_Microsystems_logo.svg), Sun Microsystems and Afrank99, public domain text logo.*
+
 The source book also stresses the cost of migration compatibility. Java generics are implemented with erasure rather than fully reified runtime type arguments. That choice allowed old and new code to interoperate, but it explains raw types, unchecked warnings, limits around generic arrays, bridge methods, and why some type information is not available at runtime.
 
 ## Definitions

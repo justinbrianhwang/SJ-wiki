@@ -7,6 +7,10 @@ sidebar_position: 16
 
 Discrete probability assigns weights to finite or countable outcomes. It uses counting when outcomes are equally likely, and it uses functions on sample spaces when outcomes have different probabilities. The subject is essential for randomized algorithms, average-case analysis, hashing, data science, and risk reasoning.
 
+![A Galton box diagram shows balls falling through pegs into bins.](https://commons.wikimedia.org/wiki/Special:FilePath/Galton_Box.svg)
+
+*Figure: A Galton box turns repeated random left-right choices into an approximate bell-shaped distribution. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Galton_Box.svg), Marcin Floryan, CC BY-SA 3.0.*
+
 In discrete mathematics, probability is often a counting problem with uncertainty attached. A clean sample space, precise events, and careful conditioning are more important than formula memorization. Random variables then turn outcomes into numbers, making expected values and variances possible.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 8
 
 Software quality assurance is the planned set of activities that helps a team build confidence in the product and the process used to create it. Gustafson's chapter focuses on formal inspections and technical reviews, software reliability, statistical quality assurance, and the IEEE outline for an SQA plan. The chapter treats quality as something that must be planned, measured, reviewed, and followed up.
 
+![Two programmers work together at one computer in a pair-programming setup.](https://commons.wikimedia.org/wiki/Special:FilePath/Pair_Programming.jpg)
+
+*Figure: Pair programming makes collaboration and review practices concrete. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pair_Programming.jpg), Calqui, CC BY-SA 3.0.*
+
 Quality assurance is broader than testing. Testing executes software to reveal failures; inspections examine work products directly; reliability estimates use failure data; statistical quality assurance uses samples to infer quality; an SQA plan states who will do which quality activities and under what standards. Together, these practices reduce the chance that defects survive until late phases or customer use.
 
 ## Definitions

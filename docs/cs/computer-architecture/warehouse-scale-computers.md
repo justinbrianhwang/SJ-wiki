@@ -7,6 +7,10 @@ sidebar_position: 15
 
 Warehouse-scale computers, WSCs, treat a building full of servers, networking, power distribution, cooling, and storage as one large computer. They are built to serve Internet-scale workloads: search, storage, maps, machine learning services, streaming, social applications, and many independent user requests. H&P separates WSCs from traditional supercomputers because their goals and constraints differ.
 
+![An ENIAC installation shows early computer architecture as cabinets, switches, and wiring.](https://commons.wikimedia.org/wiki/Special:FilePath/ENIAC_Penn1.jpg)
+
+*Figure: ENIAC gives architecture pages a physical reference point before modern chips. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ENIAC_Penn1.jpg), Paul W. Shaffer and TexasDex, CC BY-SA 3.0/GFDL.*
+
 A supercomputer often targets tightly coupled scientific jobs and expensive low-latency interconnects. A WSC targets request-level parallelism, data-level parallelism across huge datasets, operational cost, energy proportionality, fault tolerance, and software systems that survive component failures. The individual server matters, but the architecture of the whole facility matters more.
 
 ## Definitions

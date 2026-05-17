@@ -7,6 +7,10 @@ sidebar_position: 18
 
 Conjugate gradient is an iterative method designed for symmetric positive definite linear systems. It improves on stationary iterations by choosing search directions that are conjugate with respect to the matrix $A$, which prevents the method from repeatedly correcting the same error component. For large sparse SPD systems, CG is often the first serious method to try.
 
+![A matrix transforms two vectors into new positions in the plane.](https://commons.wikimedia.org/wiki/Special:FilePath/Matrix_multiplication.svg)
+
+*Figure: Matrix multiplication can be read geometrically as a transformation of vectors. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Matrix_multiplication.svg), Jakob.scholbach and Pbroks13, CC BY-SA 3.0.*
+
 Iterative refinement is a different idea: compute a solution, form the residual, solve for a correction, and update the solution. It can improve the accuracy of a direct solve when the residual is computed accurately enough and the original problem is not too ill-conditioned.
 
 ## Definitions

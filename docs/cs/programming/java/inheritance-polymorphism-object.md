@@ -7,6 +7,10 @@ sidebar_position: 8
 
 Inheritance lets a class extend another class, reusing and refining behavior under a subtype relationship. A subclass object can be used where a superclass reference is expected, and overridden instance methods are selected dynamically according to the actual object. That is the heart of Java polymorphism.
 
+![The Sun Microsystems logo gives Java pages historical context for the language and platform.](https://commons.wikimedia.org/wiki/Special:FilePath/Sun_Microsystems_logo.svg)
+
+*Figure: Java's early development at Sun shaped its portability, virtual-machine model, and library ecosystem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sun_Microsystems_logo.svg), Sun Microsystems and Afrank99, public domain text logo.*
+
 The source book is careful about inheritance because extension is powerful but easy to misuse. A superclass contract must remain valid for subclass objects. Fields should usually remain private, `protected` must be understood precisely, `final` can prevent unsafe extension, and `Object` methods such as `toString`, `equals`, `hashCode`, and `clone` have contracts that affect all classes.
 
 ## Definitions

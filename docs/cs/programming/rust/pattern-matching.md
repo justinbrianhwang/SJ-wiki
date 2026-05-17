@@ -7,6 +7,10 @@ sidebar_position: 7
 
 Pattern matching is Rust's way to describe the shape of data and bind useful pieces of it. It appears in `match`, `if let`, `while let`, `let` bindings, `for` loops, function parameters, and closures. The basic idea is simple: compare a value to patterns from top to bottom, run the first matching arm, and let the compiler check whether all possible cases have been covered where exhaustive handling is required.
 
+![The Rust logo marks pages on ownership, borrowing, traits, and safe systems programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Rust_programming_language_black_logo.svg)
+
+*Figure: Rust connects systems control with compile-time memory-safety guarantees. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Rust_programming_language_black_logo.svg), Rust Foundation, CC BY 4.0.*
+
 This page expands the enum material from [structs, methods, and enums](/cs/programming/rust/structs-methods-enums). It also connects to [error handling](/cs/programming/rust/error-handling), because `Result` is usually handled with patterns, and to [ownership](/cs/programming/rust/ownership-references-slices), because patterns can move, copy, or borrow parts of a value.
 
 ## Definitions

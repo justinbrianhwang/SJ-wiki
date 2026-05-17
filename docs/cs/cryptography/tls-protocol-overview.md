@@ -7,6 +7,10 @@ sidebar_position: 15
 
 TLS is the protocol layer that turns cryptographic primitives into secure client-server communication. It negotiates algorithms, authenticates endpoints, establishes shared secrets, derives traffic keys, and protects application records. It is not a single primitive; it is a carefully sequenced protocol combining key exchange, signatures or certificates, KDFs, AEAD, transcript hashing, alerts, and version negotiation.
 
+![A public-key diagram shows Alice encrypting a message that only Bob can decrypt.](https://commons.wikimedia.org/wiki/Special:FilePath/Public_key_encryption_alice_to_bob.svg)
+
+*Figure: Public-key encryption makes the Alice-to-Bob security goal explicit. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Public_key_encryption_alice_to_bob.svg), Winstonlee, CC0.*
+
 Katz and Lindell use SSL/TLS as a culmination of private-key encryption, MACs, public-key encryption, signatures, certificates, and key exchange. Smart's material on certificates, key exchange, signatures, and hybrid encryption fills in the infrastructure view. For current TLS 1.3 details, the primary standard is [RFC 8446](https://www.rfc-editor.org/rfc/rfc8446), published in August 2018.
 
 ## Definitions

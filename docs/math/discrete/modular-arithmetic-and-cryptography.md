@@ -7,6 +7,10 @@ sidebar_position: 10
 
 Modular arithmetic treats integers by their remainders. This turns infinite integer questions into finite arithmetic on residue classes, which is why it appears in hashing, pseudorandom generators, checksums, calendars, cyclic schedules, and public-key cryptography.
 
+![A Diffie-Hellman diagram shows two parties combining public and private values.](https://commons.wikimedia.org/wiki/Special:FilePath/Diffie-Hellman_Key_Exchange.svg)
+
+*Figure: Diffie-Hellman key exchange is a standard application of modular arithmetic to secure communication. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Diffie-Hellman_Key_Exchange.svg), A. J. Han Vinck and Flugaal, public domain.*
+
 The main shift is to stop asking for the exact integer and ask only for its class modulo $m$. Once this is done carefully, addition, multiplication, inverses, and exponentiation can be performed with small representatives. Cryptography then uses the fact that some modular operations are easy in one direction but hard to reverse without hidden information.
 
 ## Definitions

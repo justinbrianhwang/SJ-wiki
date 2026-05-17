@@ -7,6 +7,10 @@ sidebar_position: 3
 
 Conditional probability is the mathematics of updating. It asks how the probability of an event changes after learning that another event occurred. In statistics, this is the bridge between prior information and evidence; in everyday reasoning, it is where many probability mistakes happen because the direction of conditioning matters.
 
+![Tree diagrams organize conditional probabilities for Bayes' theorem.](https://commons.wikimedia.org/wiki/Special:FilePath/Bayes_theorem_tree_diagrams.svg)
+
+*Figure: Probability trees make the conditioning structure in Bayes' theorem explicit. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bayes_theorem_tree_diagrams.svg), Gnathan87, CC0 1.0.*
+
 The probability chapter in Lane et al. emphasizes conditional probability through cards, disease testing, base rates, and Bayes' theorem. This page develops the same ideas formally and connects them to independence, tree diagrams, and diagnostic reasoning.
 
 ## Definitions

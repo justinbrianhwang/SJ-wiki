@@ -7,6 +7,10 @@ sidebar_position: 9
 
 Optimization uses derivatives to find the best value of a quantity under stated constraints. Newton's method uses tangent lines to solve equations numerically. Antiderivatives reverse differentiation and prepare the transition from derivative calculus to integral calculus. These topics are often taught near each other because all three depend on interpreting $f'$ as local linear information.
 
+![Newton iteration follows tangent lines toward a root of a curve.](https://commons.wikimedia.org/wiki/Special:FilePath/Newton_iteration.svg)
+
+*Figure: Newton iteration uses local linearization to turn calculus into a fast root-finding algorithm. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Newton_iteration.svg), Oleg Alexandrov and Pbroks13, public domain.*
+
 The shared habit is to turn a problem into a function, then use derivative information carefully. In optimization, zeros of $f'$ identify candidates. In Newton's method, $f'$ determines a tangent-line correction. In antiderivatives, knowing a derivative pattern lets us reconstruct a family of original functions.
 
 ## Definitions

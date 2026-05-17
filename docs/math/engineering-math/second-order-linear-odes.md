@@ -7,6 +7,10 @@ sidebar_position: 4
 
 Second-order linear ODEs model systems with inertia or storage in two forms: displacement and velocity, charge and current, or position and momentum. The second derivative records acceleration or curvature, so these equations appear in vibrations, circuits, beams, control systems, and diffusion approximations after modal decomposition.
 
+![An inverted pendulum is balanced above a movable base.](https://commons.wikimedia.org/wiki/Special:FilePath/2-D_inverted_pendulum.svg)
+
+*Figure: The inverted pendulum is a compact physical model for stability, linearization, and control. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:2-D_inverted_pendulum.svg), Arne Nordmann, CC BY-SA 3.0.*
+
 The main advantage of linearity is superposition. Once two independent homogeneous solutions are known, their linear combination gives the full homogeneous response. Nonhomogeneous problems then add a particular response determined by the forcing. This page focuses on the homogeneous constant-coefficient case and the language needed for later forced problems.
 
 ## Definitions

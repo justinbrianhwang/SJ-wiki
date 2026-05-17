@@ -7,6 +7,10 @@ sidebar_position: 12
 
 Variance measures how one random variable spreads around its mean. Covariance measures how two variables move together. Conditional expectation measures the best average prediction after observing information. These ideas are conceptually different, but they meet in formulas such as the law of total variance and in examples where one random variable is used to predict another.
 
+![Scatterplots show several patterns and Pearson correlation coefficients.](https://commons.wikimedia.org/wiki/Special:FilePath/Correlation_examples2.svg)
+
+*Figure: Correlation examples show how association strength and visual pattern are related but not identical. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Correlation_examples2.svg), DenisBoigelot and Imagecreator, public domain.*
+
 MIT 18.440 develops covariance and correlation before moving to conditional expectation. The lectures emphasize two warnings: independence implies zero covariance, but zero covariance does not imply independence; and conditional expectation can behave counterintuitively when expectations are infinite or when the conditioning information is misunderstood.
 
 ## Definitions

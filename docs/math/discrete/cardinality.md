@@ -7,6 +7,10 @@ sidebar_position: 7
 
 Cardinality measures the size of a set. For finite sets, this is just counting elements. Infinite sets require a deeper idea: two sets have the same size when their elements can be paired perfectly by a bijection. This makes it possible to compare infinities without treating all infinite sets as the same.
 
+![David Hilbert is shown wearing a hat in a historical photograph.](https://commons.wikimedia.org/wiki/Special:FilePath/Hilbert.jpg)
+
+*Figure: David Hilbert's work frames modern foundations, geometry, and infinite-dimensional thinking. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hilbert.jpg), Unknown author, public domain.*
+
 The topic is surprising because infinite sets can behave unlike finite sets. A proper subset of an infinite set can have the same cardinality as the whole set, as the even positive integers do with the positive integers. At the same time, Cantor's diagonal argument shows that some infinite sets are strictly larger than countable ones.
 
 ## Definitions

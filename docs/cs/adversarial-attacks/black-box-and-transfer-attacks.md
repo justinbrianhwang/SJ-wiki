@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Black-box attacks study what an adversary can do without direct access to model weights or gradients. That restriction is common in deployed systems: an attacker may only submit inputs to an API, observe labels or confidence scores, and pay a cost for every query. Transfer attacks are even more restrictive at attack time: the adversary builds adversarial examples on a surrogate model and hopes they generalize to the target.
 
+![A visually similar adversarial panda image is classified as a gibbon by an ImageNet model.](https://ar5iv.labs.arxiv.org/html/1412.6572/assets/gibbon_993.png)
+
+*Figure: The FGSM panda example shows that imperceptible perturbations can change model decisions. Image: [ar5iv](https://arxiv.org/abs/1412.6572), Goodfellow, Shlens, and Szegedy, educational use with attribution.*
+
 These attacks matter because white-box robustness is not the only operational question. A public classifier, moderation model, malware detector, speech recognizer, or LLM endpoint may expose limited feedback rather than gradients. The right evaluation asks how success changes with attacker knowledge, feedback type, query budget, surrogate data, and distribution shift.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 52
 
 Discrete dynamics describes systems whose behavior advances through reactions rather than through smooth motion. A reaction may be triggered by an input event, a clock tick, an interrupt, or the decision of a surrounding model of computation. In embedded systems, discrete models capture controller modes, protocol states, counters, task states, and many parts of software behavior.
 
+![An Arduino Uno board shows a familiar microcontroller development board with headers and USB.](https://commons.wikimedia.org/wiki/Special:FilePath/Arduino_Uno_-_R3.jpg)
+
+*Figure: Arduino boards make microcontroller I/O and prototyping tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Arduino_Uno_-_R3.jpg), SparkFun Electronics, CC BY 2.0.*
+
 Lee and Seshia use finite-state machines and extended state machines as the core notation for this topic. These models make informal requirements precise: they say what state is remembered, what inputs are accepted, what outputs are produced, and how the next state is chosen. That precision is what later enables composition, temporal logic, refinement, reachability analysis, and model checking.
 
 ## Definitions

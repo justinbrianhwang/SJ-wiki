@@ -7,6 +7,10 @@ sidebar_position: 12
 
 Eligibility traces provide a bridge between one-step TD methods and Monte Carlo methods. They let recent states or state-action pairs remain eligible for credit when later TD errors arrive. The forward view describes the target as a weighted mixture of n-step returns. The backward view gives an online mechanism: maintain a trace vector, update it each step, and use the current TD error to adjust all recently eligible predictions.
 
+![A cart-pole animation shows a controller trying to balance an inverted pole on a moving cart.](https://commons.wikimedia.org/wiki/Special:FilePath/Cartpole.gif)
+
+*Figure: Cart-pole is a standard control and reinforcement-learning benchmark. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cartpole.gif), Condordellanebbia, CC BY-SA 4.0.*
+
 Sutton and Barto use eligibility traces to unify many earlier ideas. TD($\lambda$), SARSA($\lambda$), true online TD($\lambda$), Watkins's Q($\lambda$), and tree-backup traces differ in how traces are accumulated, cleared, or weighted, but they share the idea that credit assignment should extend over time without waiting for a full episode.
 
 ## Definitions

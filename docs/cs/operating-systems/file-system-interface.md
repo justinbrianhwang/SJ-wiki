@@ -7,6 +7,10 @@ sidebar_position: 10
 
 The file system is often the most visible part of an operating system. Users name, organize, copy, protect, and share files every day, while programs rely on a stable interface for persistent data. The OS hides the physical differences among disks, SSDs, optical media, and network storage behind the logical idea of a file: a named collection of information with attributes and operations.
 
+![A Linux kernel map organizes subsystems such as memory, filesystems, networking, and drivers.](https://commons.wikimedia.org/wiki/Special:FilePath/Linux_kernel_map.png)
+
+*Figure: The Linux kernel map shows how OS services become interacting subsystems. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Linux_kernel_map.png), Conan at English Wikipedia, CC BY 3.0.*
+
 This page focuses on the interface rather than the implementation. The implementation page explains directory structures, allocation, free-space management, and recovery. Here the central questions are what a file is, how it is accessed, how directories name files, how file systems are mounted, what sharing means, and how access is protected.
 
 ## Definitions

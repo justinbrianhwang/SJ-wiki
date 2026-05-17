@@ -7,6 +7,10 @@ sidebar_position: 10
 
 The 8255 programmable peripheral interface is the bridge between a processor bus and parallel real-world signals. The source treats it after 8051 interrupt programming because it is a classic example of a peripheral whose behavior is selected by a control word rather than by rewiring hardware. In an 8085 system it is commonly connected as an I/O-mapped or memory-mapped device; in an 8051 expansion system it can add more parallel ports.
 
+![An Arduino Uno board shows a familiar microcontroller development board with headers and USB.](https://commons.wikimedia.org/wiki/Special:FilePath/Arduino_Uno_-_R3.jpg)
+
+*Figure: Arduino boards make microcontroller I/O and prototyping tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Arduino_Uno_-_R3.jpg), SparkFun Electronics, CC BY 2.0.*
+
 The key learning value of the 8255 is configurability. The same chip can provide simple input and output ports, handshaked input, handshaked output, bidirectional transfer, or single-bit set/reset on Port C. Correct use depends on decoding its internal addresses, writing the right control word, and matching the external device's timing expectations.
 
 ## Definitions

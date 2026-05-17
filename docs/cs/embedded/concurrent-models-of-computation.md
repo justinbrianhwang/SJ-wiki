@@ -7,6 +7,10 @@ sidebar_position: 55
 
 A model of computation gives the rules for how actors execute and communicate. This is more than an implementation detail. In embedded systems, a drawing with boxes and wires can mean many different things: simultaneous reactions at logical clock ticks, asynchronous token flow through buffers, rendezvous between processes, time-stamped events, or continuous-time signal equations solved by a numerical integrator.
 
+![An Arduino Uno board shows a familiar microcontroller development board with headers and USB.](https://commons.wikimedia.org/wiki/Special:FilePath/Arduino_Uno_-_R3.jpg)
+
+*Figure: Arduino boards make microcontroller I/O and prototyping tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Arduino_Uno_-_R3.jpg), SparkFun Electronics, CC BY 2.0.*
+
 Lee and Seshia use this topic to organize concurrency at a level above raw threads and interrupts. The same actor may be a state machine, a program, or a hardware block, but the surrounding model of computation determines when it runs, what it sees at its input ports, how it produces outputs, and whether the whole network is deterministic.
 
 ## Definitions

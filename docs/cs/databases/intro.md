@@ -7,6 +7,18 @@ sidebar_position: 1
 
 Database systems are the software layer that lets people store, query, update, protect, and share large collections of data. A database-management system is not just a file format. It includes data models, query languages, storage structures, indexing methods, query optimizers, transaction managers, recovery logic, authorization, and distributed coordination. The central promise is data independence: users should describe the information they need, while the system decides how to store and retrieve it efficiently and safely.
 
+![A pgAdmin screenshot shows a real database administration interface with schema objects.](https://commons.wikimedia.org/wiki/Special:FilePath/PgAdminScreenshot.png)
+
+*Figure: A database system is experienced through schemas, queries, connections, and administration tools. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PgAdminScreenshot.png), Boshomi, CC BY-SA 3.0.*
+
+![An entity-relationship table diagram shows linked tables for relational modeling.](https://commons.wikimedia.org/wiki/Special:FilePath/CPT-Databases-ExampleLinkTables.svg)
+
+*Figure: Link tables make many-to-many relationships concrete in a relational schema. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:CPT-Databases-ExampleLinkTables.svg), Pluke, CC0.*
+
+![A PostgreSQL B-tree diagram shows index pages connected by parent and leaf links.](https://commons.wikimedia.org/wiki/Special:FilePath/PostgreSQL_B-tree.svg)
+
+*Figure: PostgreSQL B-tree pages show how logical indexes map to storage structures. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PostgreSQL_B-tree.svg), Kelti, CC BY-SA 4.0.*
+
 These notes follow the structure and emphasis of Silberschatz, Korth, and Sudarshan's *Database System Concepts*, 7th edition, using the local source PDF's extracted table of contents as the roadmap. The pages are written as study notes rather than a replacement for the book: they compress the core definitions, algorithms, trade-offs, and worked examples needed to connect SQL practice with database internals.
 
 ## Definitions

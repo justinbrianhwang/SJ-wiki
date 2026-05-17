@@ -7,6 +7,10 @@ sidebar_position: 16
 
 Time series mining studies ordered numeric observations such as sensor readings, stock prices, demand curves, medical signals, click rates, and weather measurements. Aggarwal's time-series chapter covers preparation and similarity, forecasting, motifs, clustering, outlier detection, and classification. The key difference from ordinary vector data is that order matters: shifts, trends, seasonality, autocorrelation, and local shape all affect the analysis.
 
+![An Iris dataset scatterplot compares flower measurements colored by species.](https://commons.wikimedia.org/wiki/Special:FilePath/Iris_dataset_scatterplot.svg)
+
+*Figure: The Iris scatterplot makes feature spaces and class separation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Iris_dataset_scatterplot.svg), Nicoguaro, CC BY 4.0.*
+
 This page focuses on the major tasks and representations: smoothing, normalization, windowing, dynamic time warping, forecasting, motif discovery, clustering, anomaly detection, and classification.
 
 ## Definitions

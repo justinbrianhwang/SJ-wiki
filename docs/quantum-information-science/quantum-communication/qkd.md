@@ -9,6 +9,10 @@ Quantum key distribution is a protocol family for generating shared secret key m
 
 This page combines the existing SJ Wiki overview with Nielsen and Chuang's Chapter 12 treatment. Nielsen and Chuang emphasize three linked ideas: nonorthogonal states cannot be distinguished without disturbance, Holevo's theorem bounds accessible classical information from quantum states, and BB84 security can be proved by reducing an entanglement-distillation protocol based on CSS codes to ordinary prepare-and-measure BB84. The modern engineering variants below extend that foundation to weak coherent sources, side channels, finite-key security, and network deployment.
 
+![A glowing optical fiber cable shows light confined inside a communications fiber.](https://commons.wikimedia.org/wiki/Special:FilePath/Fiber_Optical_Cable.jpg)
+
+*Figure: Deployed QKD has to turn security proofs into optical links with attenuation, connectors, detectors, synchronization, and key-management policy. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fiber_Optical_Cable.jpg), Bquast, CC0 1.0.*
+
 ## Definitions
 
 **QKD protocol** means the full key-generation procedure: quantum transmission, public sifting, parameter estimation, information reconciliation, verification, privacy amplification, and transcript authentication.

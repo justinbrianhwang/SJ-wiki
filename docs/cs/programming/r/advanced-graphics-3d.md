@@ -7,6 +7,10 @@ sidebar_position: 18
 
 The later graphics chapters of *The Book of R* move beyond first plots into devices, margins, annotations, colors, palettes, higher-dimensional displays, contours, surfaces, and interactive 3D graphics. These topics are not separate from statistics: visualization choices determine whether patterns, residual structure, clusters, and model surfaces can be understood.
 
+![The R logo marks pages on statistical computing, graphics, and data analysis.](https://commons.wikimedia.org/wiki/Special:FilePath/R_logo.svg)
+
+*Figure: R connects programming examples to statistical modeling and visualization workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:R_logo.svg), The R Foundation, CC BY-SA 4.0.*
+
 Advanced plotting in R has two sides. One side is control over a two-dimensional figure: devices, margins, axes, clipping, legends, mathematical labels, and color. The other side is representing more than two variables: color scales, facets, contours, perspective surfaces, and interactive rotation. The goal is not decoration. It is to make structure visible without misleading the reader.
 
 ## Definitions

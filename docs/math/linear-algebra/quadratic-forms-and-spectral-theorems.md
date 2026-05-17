@@ -7,6 +7,10 @@ sidebar_position: 16
 
 Quadratic forms turn symmetric matrices into scalar-valued geometry. They describe conic sections, surfaces, energy functions, constrained extrema, and optimization tests. The spectral theorem is the key simplifier: a real symmetric matrix can be diagonalized by an orthogonal change of coordinates.
 
+![An eigenvector keeps its direction while a matrix scales it.](https://commons.wikimedia.org/wiki/Special:FilePath/Eigenvalue_equation.svg)
+
+*Figure: The eigenvalue equation captures directions preserved by a linear transformation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Eigenvalue_equation.svg), Lyudmil Antonov, CC BY-SA 4.0.*
+
 The reason symmetry matters is that symmetric matrices have especially clean eigenstructure. Their eigenvalues are real, eigenvectors from different eigenspaces are orthogonal, and an orthonormal eigenbasis exists. That lets quadratic forms be rotated into a coordinate system with no cross terms.
 
 ## Definitions

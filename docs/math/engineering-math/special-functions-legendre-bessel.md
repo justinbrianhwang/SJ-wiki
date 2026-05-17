@@ -7,6 +7,10 @@ sidebar_position: 9
 
 Legendre and Bessel functions are special functions because they solve recurring differential equations from geometry. Legendre functions appear with spherical symmetry, angular variables, and expansions on $[-1,1]$. Bessel functions appear with cylindrical symmetry, radial vibration, heat flow in disks, and wave propagation in circular domains.
 
+![Adrien-Marie Legendre is shown in a historical portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Legendre.jpg)
+
+*Figure: Adrien-Marie Legendre's name appears in orthogonal polynomials and special functions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Legendre.jpg), Julien-Leopold Boilly, public domain.*
+
 The important lesson is that special functions are not arbitrary new objects. They are named solution families with well-studied series, orthogonality, recurrence relations, and zeros. In engineering mathematics they play the same role that sine and cosine play for rectangular domains: they provide modes adapted to the geometry and boundary conditions.
 
 ## Definitions

@@ -9,6 +9,14 @@ The final scope of physical chemistry in Atkins moves from isolated molecules to
 
 This page combines selected highlights: how catalysts change mechanisms, how adsorption controls surface chemistry, how macromolecular size and shape are measured, and how solid-state structure determines material properties.
 
+![A rotating model shows the tetrahedral network of the diamond cubic crystal structure.](https://commons.wikimedia.org/wiki/Special:FilePath/Diamond_cubic_animation.gif)
+
+*Figure: Diamond cubic lattice as a solid-state structure example. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Diamond_cubic_animation.gif), MarinaVladivostok, CC0.*
+
+![A reaction coordinate diagram marks the activation energy between reactants and products.](https://commons.wikimedia.org/wiki/Special:FilePath/Activation_Energy.svg)
+
+*Figure: Activation energy as the barrier a catalyst changes by altering the reaction pathway. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Activation_Energy.svg), Risibot based on Brazosport College, CC BY-SA 4.0.*
+
 ## Definitions
 
 A **catalyst** increases the rate of a reaction without being consumed in the overall stoichiometric equation. It changes the mechanism and lowers the effective activation Gibbs energy:

@@ -9,6 +9,10 @@ Quantum field theory begins with a change in what we regard as primary. In nonre
 
 This point of view also unifies forces and matter. A classical field can store energy, carry momentum, and mediate interactions; a quantum field does the same while allowing exchange in discrete quanta. Zee's opening chapters stress this physical motivation before machinery: fields are not decorative notation for particles, but the bookkeeping system demanded by locality, relativity, and quantum mechanics together.
 
+![The Standard Model chart groups quarks, leptons, gauge bosons, and the Higgs boson.](https://commons.wikimedia.org/wiki/Special:FilePath/Standard_Model_of_Elementary_Particles.svg)
+
+*Figure: The Standard Model chart gives QFT pages a concrete particle-spectrum map. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Standard_Model_of_Elementary_Particles.svg), Cush and MissMJ, public domain/CC BY 3.0.*
+
 ## Definitions
 
 A **classical field** is a function on spacetime. A real scalar field is the simplest example:

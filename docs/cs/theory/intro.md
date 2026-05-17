@@ -7,6 +7,18 @@ sidebar_position: 1
 
 Theory of computation studies computation before it becomes a particular programming language, operating system, or machine architecture. It asks which problems can be solved at all, which ones can be solved by limited devices such as finite automata or pushdown automata, and which solvable problems demand unreasonable resources. The subject is abstract, but its abstractions are practical: scanners in compilers behave like finite automata, parsers are organized around context-free grammars, termination questions explain why fully automatic program verification is limited, and complexity theory explains why many optimization problems need reductions, approximations, heuristics, or randomized methods.
 
+![A portrait of Alan Turing as a teenager gives computability theory historical context.](https://commons.wikimedia.org/wiki/Special:FilePath/Alan_Turing_Aged_16.jpg)
+
+*Figure: Alan Turing's work on computation and undecidability frames the theory section. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Alan_Turing_Aged_16.jpg), Unknown photographer, public domain.*
+
+![A parse tree expands a formal grammar from the start symbol down to terminal tokens.](https://commons.wikimedia.org/wiki/Special:FilePath/Parse-tree.svg)
+
+*Figure: Parse trees make grammar derivations visible as rooted syntax structures. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Parse-tree.svg), Martin Thoma, CC BY 3.0.*
+
+![A square Kufic algorithms mark introduces the study of designed procedures.](https://commons.wikimedia.org/wiki/Special:FilePath/Algorithms.svg)
+
+*Figure: The algorithms mark gives the abstract algorithms pages a concrete visual anchor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Algorithms.svg), Jeff Erickson, CC BY 4.0.*
+
 These notes follow the scope of Michael Sipser's *Introduction to the Theory of Computation*, third edition, without reproducing its text. They use the textbook as a map of topics: mathematical preliminaries, automata and languages, computability, decidability, reducibility, time complexity, space complexity, and selected advanced topics. Each page is written as a study note with definitions, key results, visual anchors, worked examples, code, pitfalls, and links to neighboring pages.
 
 ## Definitions

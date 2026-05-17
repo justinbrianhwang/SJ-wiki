@@ -7,6 +7,10 @@ sidebar_position: 51
 
 Continuous dynamics is the part of embedded-systems modeling where variables evolve over real time rather than only at discrete program steps. In the cyber-physical view, a controller is not merely a program that transforms inputs into outputs. It is a participant in a feedback loop with a plant whose position, velocity, current, pressure, temperature, or concentration is changing continuously while the processor is computing.
 
+![An Arduino Uno board shows a familiar microcontroller development board with headers and USB.](https://commons.wikimedia.org/wiki/Special:FilePath/Arduino_Uno_-_R3.jpg)
+
+*Figure: Arduino boards make microcontroller I/O and prototyping tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Arduino_Uno_-_R3.jpg), SparkFun Electronics, CC BY 2.0.*
+
 Lee and Seshia use this topic to connect classical engineering models, especially ordinary differential equations, with actor models used in tools such as Simulink and LabVIEW. The key lesson is not that every physical process is perfectly smooth. It is that smooth models are often the right first abstraction, and that their assumptions must be made explicit before they are composed with software, sensors, actuators, and schedulers.
 
 ## Definitions

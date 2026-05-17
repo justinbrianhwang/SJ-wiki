@@ -7,6 +7,10 @@ sidebar_position: 19
 
 Nise's main development is linear control, but the book repeatedly notes nonlinear effects such as saturation, dead zone, backlash, and small-signal linearization. This page is a short supplementary bridge into nonlinear control ideas that commonly follow an undergraduate linear-control course: describing functions, phase-plane analysis, and Lyapunov stability. It stays light because these topics are not the central scope of Nise's text.
 
+![An inverted pendulum on a cart shows the unstable plant used in many control examples.](https://commons.wikimedia.org/wiki/Special:FilePath/Cart-pendulum.svg)
+
+*Figure: The cart-pendulum is a concrete plant for modeling, stabilization, and control design. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cart-pendulum.svg), Krishnavedala, CC0.*
+
 The practical lesson is that every real control system is nonlinear somewhere. Linear design is valuable because it works near an operating point and gives strong intuition, but actuator limits, friction, geometry, quantization, and switching logic can dominate behavior when signals become large. Nonlinear analysis asks what remains true outside the small-signal model.
 
 ## Definitions

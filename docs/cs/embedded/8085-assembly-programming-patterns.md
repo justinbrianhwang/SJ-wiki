@@ -7,6 +7,10 @@ sidebar_position: 5
 
 The programming chapters in the source move from isolated instructions to complete assembly language programs. That shift is important: real 8085 work is about arranging instructions into loops, counters, conversions, subroutines, stack usage, and I/O sequences that are easy to trace and test. The same ideas later reappear in 8051 assembly, but with different registers and memory spaces.
 
+![An Intel 4004 package shows one of the first commercial microprocessors.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_4004.jpg)
+
+*Figure: The Intel 4004 marks the transition from board-level logic to microprocessors. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_4004.jpg), LucaDetomi at Italian Wikipedia, CC BY-SA 3.0/GFDL.*
+
 This page focuses on reusable patterns rather than a large catalog of opcodes. If a student can design a counted loop, build a delay loop, pass a parameter to a subroutine, save registers on the stack, and convert between binary and display codes, then many textbook examples become variations of a few reliable methods.
 
 ## Definitions

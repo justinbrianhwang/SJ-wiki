@@ -7,6 +7,10 @@ sidebar_position: 13
 
 Vector differential calculus describes how scalar and vector fields change in space. Gradients point in directions of greatest increase, divergence measures local source strength, and curl measures local rotation. These operations are the local language behind fluid flow, electromagnetism, heat transfer, mechanics, and geometry.
 
+![Arrows rotate around the origin in a two-dimensional vector field.](https://commons.wikimedia.org/wiki/Special:FilePath/Vector_field.svg)
+
+*Figure: A planar vector field shows how direction and magnitude vary from point to point. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Vector_field.svg), Fibonacci, public domain.*
+
 This topic extends multivariable calculus into a compact operator notation. The same symbol $\nabla$ produces different objects depending on whether it acts on a scalar field or a vector field. Understanding the type of each expression prevents many mistakes and prepares the ground for line, surface, and volume integral theorems.
 
 ## Definitions

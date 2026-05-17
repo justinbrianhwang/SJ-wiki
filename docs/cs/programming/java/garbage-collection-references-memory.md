@@ -7,6 +7,10 @@ sidebar_position: 17
 
 Java manages object memory through garbage collection. Programs allocate objects, keep references to the objects they still need, and the runtime reclaims objects that are no longer reachable. This does not eliminate resource management, but it changes what programmers manage directly: object memory is automatic, while files, sockets, locks, and other external resources still require explicit cleanup.
 
+![The Sun Microsystems logo gives Java pages historical context for the language and platform.](https://commons.wikimedia.org/wiki/Special:FilePath/Sun_Microsystems_logo.svg)
+
+*Figure: Java's early development at Sun shaped its portability, virtual-machine model, and library ecosystem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sun_Microsystems_logo.svg), Sun Microsystems and Afrank99, public domain text logo.*
+
 The source book's memory chapter focuses on reachability. An object is alive for program purposes while it can be reached from active roots through strong references. Reference objects such as soft, weak, and phantom references allow programs to interact with reachability in controlled ways. Finalization is covered, but with strong warnings about design hazards.
 
 ## Definitions

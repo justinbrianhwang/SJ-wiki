@@ -7,6 +7,10 @@ sidebar_position: 13
 
 Moment generating functions and characteristic functions encode probability laws as functions. The central idea is that multiplying independent transforms is easier than convolving densities or mass functions. This is why transforms are powerful for sums of independent random variables and why MIT 18.440 uses them to prove the weak law of large numbers and the central limit theorem.
 
+![Pierre-Simon de Laplace is shown in a historical engraved portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Pierre-Simon_de_Laplace.jpg)
+
+*Figure: Pierre-Simon de Laplace is a key figure in probability, transforms, and potential theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pierre-Simon_de_Laplace.jpg), Louis Delaistre after Armand-Charles Guilleminot, public domain.*
+
 Moment generating functions are intuitive because their derivatives generate moments, but they may fail to exist for heavy-tailed distributions. Characteristic functions insert the complex number $i$ and are always defined, making them more robust. They are Fourier transforms of probability distributions and are the standard tool behind convergence in distribution.
 
 ## Definitions

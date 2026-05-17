@@ -9,6 +9,10 @@ The hydrogen atom is the central bound-state problem of nonrelativistic quantum 
 
 Sakurai treats hydrogen and hydrogenlike atoms after angular momentum and again in approximation methods through fine structure and Zeeman effects. Ballentine's bound-state chapter emphasizes estimates, variational reasoning, and perturbative corrections. The Gottfried-named notes use hydrogen as a perturbation-theory example. Schiff's traditional wave-mechanics approach is the classic separation into radial and angular equations.
 
+![Hydrogen orbital density plots show bright probability regions for several quantum numbers.](https://commons.wikimedia.org/wiki/Special:FilePath/Hydrogen_Density_Plots.png)
+
+*Figure: Hydrogen density plots make angular momentum, nodes, and probability density visible in real atomic structure. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hydrogen_Density_Plots.png), PoorLeno, public domain.*
+
 ## Definitions
 
 A **central potential** depends only on radius:

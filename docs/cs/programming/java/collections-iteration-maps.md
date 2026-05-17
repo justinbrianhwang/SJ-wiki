@@ -7,6 +7,10 @@ sidebar_position: 14
 
 The collections framework is the standard vocabulary for groups of objects in Java. Lists preserve sequence, sets prevent duplicates according to equality rules, queues model ordered processing, and maps associate keys with values. Java 5 generics make these contracts more precise by letting a collection say what element, key, or value type it is intended to contain.
 
+![The Sun Microsystems logo gives Java pages historical context for the language and platform.](https://commons.wikimedia.org/wiki/Special:FilePath/Sun_Microsystems_logo.svg)
+
+*Figure: Java's early development at Sun shaped its portability, virtual-machine model, and library ecosystem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sun_Microsystems_logo.svg), Sun Microsystems and Afrank99, public domain text logo.*
+
 Iteration is the bridge between collection abstraction and algorithms. A program can traverse a collection through `Iterator`, enhanced `for`, or specialized interfaces without needing to know whether the data is stored in an array, linked list, tree, hash table, or wrapper. The source book presents collections as contracts first and implementations second.
 
 ## Definitions

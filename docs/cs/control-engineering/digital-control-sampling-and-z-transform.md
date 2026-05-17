@@ -7,6 +7,10 @@ sidebar_position: 17
 
 Digital controllers place a computer in the loop. Nise's final chapter shows how continuous signals, sampled data, zero-order holds, and pulse transfer functions let classical control ideas move from the $s$-plane to the $z$-plane. The practical motivation is strong: software can implement compensators, schedule multiple loops, change parameters, and integrate diagnostics more flexibly than fixed analog hardware.
 
+![A feedback control block diagram shows compensators wrapped around a plant.](https://commons.wikimedia.org/wiki/Special:FilePath/Control_System.svg)
+
+*Figure: The standard feedback loop keeps control pages tied to the plant-controller interface. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Control_System.svg), Inductiveload, public domain.*
+
 Sampling also adds new design constraints. The controller sees signals only at sampling instants, the hold reconstructs an actuator command between samples, and computational delay can reduce phase margin. Digital control is not just analog control typed into a processor; it is a sampled-data system with its own transform and stability geometry.
 
 ## Definitions

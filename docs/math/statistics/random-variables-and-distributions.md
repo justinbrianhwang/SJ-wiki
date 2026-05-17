@@ -7,6 +7,10 @@ sidebar_position: 7
 
 A random variable turns uncertain outcomes into numbers. Once outcomes are numeric, we can describe their long-run behavior with a probability distribution, compute expected values, and model real processes such as successes in repeated trials, arrivals in a time interval, or draws from a finite collection. The Lane text introduces the binomial, Poisson, multinomial, and hypergeometric distributions as probability models that later support inference.
 
+![A Galton box diagram shows balls falling through pegs into bins.](https://commons.wikimedia.org/wiki/Special:FilePath/Galton_Box.svg)
+
+*Figure: A Galton box turns repeated random left-right choices into an approximate bell-shaped distribution. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Galton_Box.svg), Marcin Floryan, CC BY-SA 3.0.*
+
 The art is matching assumptions to context. A binomial model is natural for a fixed number of independent success/failure trials with constant success probability. A Poisson model is natural for counts of rare events in a fixed interval when events occur independently at a stable rate. A hypergeometric model is natural for sampling without replacement. When the model assumptions fail, the formula may still produce a number, but the number no longer answers the intended question.
 
 ## Definitions

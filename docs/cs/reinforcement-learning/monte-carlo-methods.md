@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Monte Carlo methods learn value functions and policies from complete sampled episodes. They do not require a model of the environment, and they do not bootstrap from current value estimates. Instead, they wait until an episode has ended, compute actual returns, and average those returns for states or state-action pairs. This makes Monte Carlo learning conceptually simple and statistically direct.
 
+![A cart-pole animation shows a controller trying to balance an inverted pole on a moving cart.](https://commons.wikimedia.org/wiki/Special:FilePath/Cartpole.gif)
+
+*Figure: Cart-pole is a standard control and reinforcement-learning benchmark. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cartpole.gif), Condordellanebbia, CC BY-SA 4.0.*
+
 The price is that Monte Carlo methods apply most naturally to episodic tasks. They can have high variance because a return contains all later random rewards in an episode. Sutton and Barto use Monte Carlo methods as the first major model-free solution method, then contrast them with temporal-difference learning, which learns online from incomplete experience by bootstrapping.
 
 ## Definitions

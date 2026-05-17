@@ -7,6 +7,10 @@ sidebar_position: 18
 
 Dialogue systems interact with users over multiple turns. Jurafsky and Martin cover properties of conversation, frame-based systems, dialogue acts, dialogue state, chatbots, and dialogue system design. Eisenstein discusses dialogue in the broader text generation chapter, including finite-state and agenda-based systems, Markov decision processes, POMDPs, neural encoder-decoder chatbots, and integration with task-oriented dialogue.
 
+![An ELIZA terminal conversation shows an early chatbot responding to typed user input.](https://commons.wikimedia.org/wiki/Special:FilePath/ELIZA_conversation.png)
+
+*Figure: ELIZA provides historical context for dialogue systems and chatbot evaluation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ELIZA_conversation.png), Unknown author, public domain text.*
+
 Dialogue is not just text generation repeated turn by turn. A system must track user goals, slot values, grounding, corrections, initiative, persona, safety constraints, and sometimes speech recognition uncertainty. Chatbots range from scripted pattern systems like ELIZA to task-oriented assistants and open-domain LLM interfaces.
 
 ## Definitions

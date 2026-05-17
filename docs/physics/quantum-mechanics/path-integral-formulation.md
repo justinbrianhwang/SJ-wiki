@@ -9,6 +9,10 @@ The path integral reformulates quantum mechanics as a sum over histories. Instea
 
 Sakurai sketches propagators, composition, and Feynman's formulation after Schrodinger dynamics and WKB. Ballentine introduces path integrals in coordinate-representation applications. The Gottfried-named notes discuss propagators and Feynman's formulation in the dynamics chapter. Schiff's classic book predates the modern path-integral-first style, so its closest connection is through propagators and semiclassical wave mechanics.
 
+![A double-slit setup sends waves through two openings to form an interference pattern on a screen.](https://commons.wikimedia.org/wiki/Special:FilePath/Double-slit.svg)
+
+*Figure: The double-slit experiment is the canonical setting where path difference becomes an observable fringe pattern. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Double-slit.svg), NekoJaNekoJa and Johannes Kalliauer, CC BY-SA 4.0.*
+
 ## Definitions
 
 The propagator is the position-space transition amplitude

@@ -9,6 +9,10 @@ The power of statistical thermodynamics is that once the partition function is k
 
 Atkins uses this machinery to show that classical thermodynamic quantities are not independent assumptions. They emerge from molecular state counting, especially through the canonical partition function $Q$ and the Helmholtz energy $A=-kT\ln Q$.
 
+![A Maxwell-Boltzmann distribution plot compares molecular speed distributions for several noble gases.](https://commons.wikimedia.org/wiki/Special:FilePath/MaxwellBoltzmann-en.svg)
+
+*Figure: Molecular speed distributions as one route from microscopic state populations to thermodynamic functions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:MaxwellBoltzmann-en.svg), Pdbailey, Cryptic C62, and Lilyu, public domain.*
+
 ## Definitions
 
 The canonical ensemble describes systems with fixed $N$, $V$, and $T$, in thermal contact with a heat reservoir. Its partition function is

@@ -9,6 +9,22 @@ General physics is the discipline of turning ordinary events into quantitative m
 
 The notes in this folder are structured as study pages rather than textbook replacements. Each page gives definitions, key results, a visual anchor, two worked numerical examples, a short code check, common mistakes, and links to neighboring ideas. The intended use is active: read the statement of a worked example, cover the solution, attempt the method yourself, and then compare the algebra, units, and limiting-case checks.
 
+![William Blake's portrait of Isaac Newton shows geometry as a physical way of thinking.](https://commons.wikimedia.org/wiki/Special:FilePath/Newton-WilliamBlake.jpg)
+
+*Figure: Blake's Newton gives the mechanics section a historical anchor for forces, geometry, and idealization. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Newton-WilliamBlake.jpg), William Blake, public domain.*
+
+![A projectile follows a parabolic trajectory with launch angle, range, and maximum height marked.](https://commons.wikimedia.org/wiki/Special:FilePath/Projectile_motion.svg)
+
+*Figure: Projectile motion is the standard visual model for decomposing one motion into horizontal and vertical components. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Projectile_motion.svg), Maxmath12, CC0 1.0.*
+
+![A double-slit setup sends waves through two openings to form an interference pattern on a screen.](https://commons.wikimedia.org/wiki/Special:FilePath/Double-slit.svg)
+
+*Figure: The double-slit experiment is the canonical setting where path difference becomes an observable fringe pattern. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Double-slit.svg), NekoJaNekoJa and Johannes Kalliauer, CC BY-SA 4.0.*
+
+![The electromagnetic spectrum is arranged by wavelength, frequency, and representative sources.](https://commons.wikimedia.org/wiki/Special:FilePath/EM_Spectrum_Properties_edit.svg)
+
+*Figure: The electromagnetic spectrum ties circuit-scale oscillations, radio links, optics, and thermal radiation into one continuum. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:EM_Spectrum_Properties_edit.svg), Inductiveload, public domain.*
+
 ## Definitions
 
 A **physical model** is a simplified representation of a real situation. A point particle model ignores size and rotation; a rigid body model ignores deformation; an ideal fluid has no viscosity and is incompressible; an ideal gas follows a simple equation of state; an electrostatic model assumes charges are at rest. A **state variable** is a measurable quantity that helps specify a system, such as position, velocity, temperature, pressure, charge, current, or angular velocity. A **law** connects state variables and interactions. A **conservation principle** states that some quantity changes only by transfer across the system boundary.

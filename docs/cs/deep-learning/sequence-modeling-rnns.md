@@ -7,6 +7,10 @@ sidebar_position: 10
 
 Sequence modeling handles data where order matters: text, time series, speech, click streams, and trajectories. D2L starts with autoregressive prediction and language modeling because they reveal the central issue: the prediction at one time step depends on previous observations. Recurrent neural networks address this by carrying a hidden state forward through time.
 
+![An ELIZA terminal conversation shows an early chatbot responding to typed user input.](https://commons.wikimedia.org/wiki/Special:FilePath/ELIZA_conversation.png)
+
+*Figure: ELIZA provides historical context for dialogue systems and chatbot evaluation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ELIZA_conversation.png), Unknown author, public domain text.*
+
 RNNs are no longer the default architecture for large-scale language modeling, but they remain conceptually important. They introduce hidden states, truncated backpropagation through time, gradient clipping, teacher-forced sequence training, and the difference between training with known histories and generating one token at a time. These ideas reappear in encoder-decoder models, attention, transformers, and reinforcement learning.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 15
 
 Reinforcement learning studies how an agent learns to choose actions through interaction with an environment. Mitchell's final chapter presents the problem through Markov decision processes, delayed reward, Q-learning, exploration, temporal-difference learning, and generalization. It also connects back to the checkers learner from Chapter 1, where values of earlier states were updated from estimated values of later states.
 
+![A cart-pole animation shows a controller trying to balance an inverted pole on a moving cart.](https://commons.wikimedia.org/wiki/Special:FilePath/Cartpole.gif)
+
+*Figure: Cart-pole is a standard control and reinforcement-learning benchmark. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cartpole.gif), Condordellanebbia, CC BY-SA 4.0.*
+
 This is a compact introduction compared with modern reinforcement learning, but the core concepts are still central. Current deep RL often replaces tabular values with neural networks and trains at much larger scale, yet it still wrestles with delayed reward, exploration, bootstrapping, instability, and the relation between value functions and policies.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 15
 
 Gaussian elimination solves a linear system by eliminating unknowns until the system is triangular. LU factorization records the elimination steps as matrix factors so that the same coefficient matrix can be reused for many right-hand sides. Pivoting makes the process reliable by avoiding zero or dangerously small pivots.
 
+![Gaussian elimination turns a linear system into triangular form.](https://commons.wikimedia.org/wiki/Special:FilePath/File_Gaussian_elimination.svg)
+
+*Figure: Gaussian elimination uses row operations to expose pivots, rank, and solvability. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:File_Gaussian_elimination.svg), Akira tanzivana, CC BY-SA 4.0.*
+
 This topic is the entry point for direct linear algebra in numerical analysis. Later factorizations, iterative methods, least squares solvers, eigenvalue algorithms, and implicit differential equation methods all rely on the same ideas: preserve algebraic equivalence while controlling rounding error and computational cost.
 
 ## Definitions

@@ -9,6 +9,10 @@ Uniform plane waves are the simplest full electromagnetic waves. The fields are 
 
 This page develops plane waves in lossless and lossy media, polarization, skin depth, and electromagnetic power density. These ideas connect transmission-line wave impedance to free-space and material intrinsic impedance, and they prepare for reflection, refraction, waveguides, antennas, and radar.
 
+![The electromagnetic spectrum is arranged by wavelength, frequency, and representative sources.](https://commons.wikimedia.org/wiki/Special:FilePath/EM_Spectrum_Properties_edit.svg)
+
+*Figure: The electromagnetic spectrum ties circuit-scale oscillations, radio links, optics, and thermal radiation into one continuum. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:EM_Spectrum_Properties_edit.svg), Inductiveload, public domain.*
+
 ## Definitions
 
 For a time-harmonic uniform plane wave traveling in $+z$ with electric field polarized in $\hat x$,

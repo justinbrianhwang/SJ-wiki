@@ -7,6 +7,10 @@ sidebar_position: 9
 
 Analysis starts when data enters R and becomes an object with known columns, classes, and missing-value conventions. *The Book of R* introduces built-in data sets, text tables, spreadsheet workbooks, web files, graphics output, and ad hoc object storage. The details vary by file type, but the same discipline applies: know the path, know the delimiter, inspect the imported object, and save outputs in a format suited to their next use.
 
+![The R logo marks pages on statistical computing, graphics, and data analysis.](https://commons.wikimedia.org/wiki/Special:FilePath/R_logo.svg)
+
+*Figure: R connects programming examples to statistical modeling and visualization workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:R_logo.svg), The R Foundation, CC BY-SA 4.0.*
+
 The safest workflow is to separate raw input from derived output. Raw files should remain unchanged. R scripts should read raw files, perform explicit cleaning steps, and write cleaned data, tables, plots, or serialized R objects to predictable locations. This keeps the analysis reproducible and makes mistakes easier to trace.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 4
 
 Operators are the compact vocabulary of Python programs. They let you compute numbers, compare values, combine logic, index containers, and build expressions that can be passed to functions or assigned to names. In the textbook, operators first appear in simple formulas such as `y = a*x + b`, in string examples such as indexing and slicing, and in conditions used by `if` statements and loops.
 
+![The Python logo marks pages on scripting, testing, packaging, and scientific programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Python-logo-notext.svg)
+
+*Figure: Python provides the practical environment for many CS, ML, and data examples. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Python-logo-notext.svg), Python Software Foundation, GPL-compatible free license; trademark terms apply.*
+
 The important habit is to read an expression in layers. Start with literals and names, then function calls and indexing, then arithmetic, comparisons, boolean logic, and finally assignment statements that store the result. Python has a precedence table, but professional code does not rely on readers memorizing every row. Parentheses are cheap; use them when they clarify intent.
 
 ## Definitions

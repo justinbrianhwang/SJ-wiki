@@ -9,6 +9,10 @@ First Law, Entropy, and Second Law covers thermodynamic energy accounting, gas w
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
+![A pressure-volume diagram traces the four legs of a Carnot cycle.](https://commons.wikimedia.org/wiki/Special:FilePath/Carnot-cycle-p-V-diagram.svg)
+
+*Figure: The Carnot cycle is a compact visual anchor for heat engines, reversible processes, and efficiency bounds. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Carnot-cycle-p-V-diagram.svg), Derkleinebauer, public domain.*
+
 ## Definitions
 
 - **Scope:** thermodynamic energy accounting, gas work, entropy, engines, and irreversibility.

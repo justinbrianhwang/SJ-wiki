@@ -7,6 +7,10 @@ sidebar_position: 3
 
 A distribution describes how the values of a variable are arranged. Before computing sophisticated summaries, a statistician should look. Graphs reveal shape, center, spread, clusters, gaps, possible data-entry errors, and outliers. The Lane text devotes an early chapter to graphing because most later methods silently assume something about the shape of the data: whether values are symmetric, skewed, roughly normal, grouped by category, or separated into distinct subpopulations.
 
+![Anscombe's quartet shows four scatterplots with similar summary statistics.](https://commons.wikimedia.org/wiki/Special:FilePath/AnscombeQuartet.svg)
+
+*Figure: Anscombe's quartet shows why visualization matters even when numerical summaries agree. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:AnscombeQuartet.svg), Gabry, CC BY-SA 3.0.*
+
 Different variables require different displays. A bar chart is natural for categories, while a histogram or stem-and-leaf plot is natural for quantitative values. A box plot compresses a distribution into a five-number summary and is especially useful for comparing several groups. The goal is not decoration; the goal is to choose a display that lets the structure of the data answer the statistical question.
 
 ## Definitions

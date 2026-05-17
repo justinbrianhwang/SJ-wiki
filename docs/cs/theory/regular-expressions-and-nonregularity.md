@@ -7,6 +7,10 @@ sidebar_position: 6
 
 Regular expressions give an algebraic notation for regular languages. They describe languages from atomic pieces using union, concatenation, and star. In practice, regex syntax in programming languages includes many extensions, but the mathematical core is deliberately small. That small core is exactly equivalent to finite automata.
 
+![A parse tree expands a formal grammar from the start symbol down to terminal tokens.](https://commons.wikimedia.org/wiki/Special:FilePath/Parse-tree.svg)
+
+*Figure: Parse trees make grammar derivations visible as rooted syntax structures. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Parse-tree.svg), Martin Thoma, CC BY 3.0.*
+
 The same chapter of the theory also introduces nonregularity. Once we know many languages are regular, we need a principled way to show that some are not. The pumping lemma is the standard first tool. It proves that every regular language has a finite-memory repetition property, then shows that certain languages violate it.
 
 ## Definitions

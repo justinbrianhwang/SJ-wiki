@@ -9,6 +9,10 @@ Scattering turns quantum mechanics into an experimental engine. Instead of prepa
 
 Sakurai treats scattering through time-dependent perturbation ideas, amplitudes, Born approximation, partial waves, and symmetry. Ballentine has a broad scattering chapter with cross sections, spherical potentials, scattering operators, resonances, and identical-particle effects. The Gottfried-named notes touch scattering through diffraction and perturbation methods. Schiff's classic account is a standard source for partial waves and potential scattering notation.
 
+![A double-slit setup sends waves through two openings to form an interference pattern on a screen.](https://commons.wikimedia.org/wiki/Special:FilePath/Double-slit.svg)
+
+*Figure: The double-slit experiment is the canonical setting where path difference becomes an observable fringe pattern. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Double-slit.svg), NekoJaNekoJa and Johannes Kalliauer, CC BY-SA 4.0.*
+
 ## Definitions
 
 For elastic scattering from a localized potential, the asymptotic stationary wave function has the form

@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Diffie-Hellman key exchange is the public-key revolution in its most compact form: two parties who share no secret can agree on a shared secret over an eavesdropped channel. The protocol relies on a group where exponentiation is efficient but discrete logarithms and related Diffie-Hellman problems are hard.
 
+![A public-key diagram shows Alice encrypting a message that only Bob can decrypt.](https://commons.wikimedia.org/wiki/Special:FilePath/Public_key_encryption_alice_to_bob.svg)
+
+*Figure: Public-key encryption makes the Alice-to-Bob security goal explicit. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Public_key_encryption_alice_to_bob.svg), Winstonlee, CC0.*
+
 Katz and Lindell separate the number-theory assumptions from the key-exchange protocol, which is the right proof-aware view. Smart gives more algorithmic background for discrete logarithms and signatures based on the same structures. Together they show that the protocol transcript is simple, but the security claim depends on the chosen group, parameter sizes, validation rules, and authentication layer.
 
 ## Definitions

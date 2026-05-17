@@ -7,6 +7,10 @@ sidebar_position: 22
 
 Privacy-preserving data mining studies how to extract useful patterns while reducing the risk of exposing sensitive information about individuals or organizations. Aggarwal's final chapter covers privacy during data collection, privacy-preserving data publishing, output privacy, and distributed privacy. The topic matters because mining systems often combine large, detailed, linkable data sets, and utility can conflict directly with confidentiality.
 
+![A hash list diagram links data blocks to hashes that can verify later blocks.](https://commons.wikimedia.org/wiki/Special:FilePath/Hash_list.svg)
+
+*Figure: Hash lists connect hashing to integrity checking and authenticated data structures. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hash_list.svg), David Gothberg and DataWraith, public domain.*
+
 This page covers randomization, anonymization, $k$-anonymity-style publishing, l-diversity and t-closeness intuition, output privacy, distributed privacy, and evaluation of the privacy-utility tradeoff. It is not legal advice; it is an algorithmic summary.
 
 ## Definitions

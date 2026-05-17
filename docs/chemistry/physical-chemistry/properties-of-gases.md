@@ -9,9 +9,13 @@ Gases are the simplest macroscopic systems in physical chemistry because their p
 
 The perfect gas is the reference model: molecules are treated as point particles with negligible intermolecular forces except during collisions. Real gases depart from that model when attractions, repulsions, and finite molecular size become important, especially at high pressure and near condensation.
 
-![A Maxwell-Boltzmann distribution plot shows molecular speed distributions for several noble gases.](https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/MaxwellBoltzmann-en.svg/500px-MaxwellBoltzmann-en.svg.png)
+![A Maxwell-Boltzmann distribution plot shows molecular speed distributions for several noble gases.](https://commons.wikimedia.org/wiki/Special:FilePath/MaxwellBoltzmann-en.svg)
 
 *Figure: Maxwell-Boltzmann molecular speed distributions for noble gases. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:MaxwellBoltzmann-en.svg), Pdbailey with SVG conversion by Lilyu, public domain.*
+
+![An animation shows a large particle jostled by many smaller particles in Brownian motion.](https://commons.wikimedia.org/wiki/Special:FilePath/Brownian_motion_large.gif)
+
+*Figure: Brownian motion as direct visual context for molecular collisions and thermal motion. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Brownian_motion_large.gif), Lookang with model by Francisco Esquembre and Fu-Kwun, CC BY-SA 3.0.*
 
 ## Definitions
 

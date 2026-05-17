@@ -9,6 +9,10 @@ Electric Potential and Capacitance covers electric potential, potential energy, 
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
+![A parallel-plate capacitor diagram marks plate area, separation, and dielectric region.](https://commons.wikimedia.org/wiki/Special:FilePath/Parallel_plate_capacitor.svg)
+
+*Figure: The parallel-plate capacitor is the basic field-storage apparatus behind electrostatic energy and lumped capacitance. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Parallel_plate_capacitor.svg), Inductiveload, public domain.*
+
 ## Definitions
 
 - **Scope:** electric potential, potential energy, equipotentials, capacitors, and stored field energy.

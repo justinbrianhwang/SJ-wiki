@@ -7,6 +7,10 @@ sidebar_position: 8
 
 A priority queue (우선순위 큐) stores items so that the most important item can be removed first. A heap (히프) is the standard array-based implementation for this ADT when priorities are ordered by a key. Unlike a binary search tree, a heap does not support fast search for arbitrary keys. Its purpose is narrower and very powerful: fast insert and fast removal of the minimum or maximum.
 
+![A binary tree diagram shows a rooted hierarchy with left and right child links.](https://commons.wikimedia.org/wiki/Special:FilePath/Binary_tree.svg)
+
+*Figure: Binary trees make recursive structure and pointer relationships visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Binary_tree.svg), Derrick Coetzee, public domain.*
+
 The source textbook introduces heaps in the tree chapter and later revisits advanced priority queues. The basic binary heap is the essential core. It combines two ideas: a complete binary-tree shape, which packs neatly into an array, and a heap-order property, which keeps the highest-priority key at the root.
 
 ## Definitions

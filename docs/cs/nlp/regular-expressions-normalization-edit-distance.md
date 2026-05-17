@@ -7,6 +7,10 @@ sidebar_position: 2
 
 Regular expressions and normalization are the front door of most NLP pipelines. Before a classifier, parser, or language model can reason about text, the raw character stream must be segmented into units, cleaned into a consistent representation, and sometimes compared against other strings. Jurafsky and Martin treat these as the first concrete algorithms of NLP because they turn informal text into structured inputs. Eisenstein places the same ideas inside finite-state language theory, emphasizing that many practical tokenizers and morphological analyzers are regular languages or finite-state transducers.
 
+![An ELIZA terminal conversation shows an early chatbot responding to typed user input.](https://commons.wikimedia.org/wiki/Special:FilePath/ELIZA_conversation.png)
+
+*Figure: ELIZA provides historical context for dialogue systems and chatbot evaluation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ELIZA_conversation.png), Unknown author, public domain text.*
+
 The practical lesson is that preprocessing is not a harmless detail. Tokenization choices affect vocabulary size, named entity boundaries, speech transcripts, subword models, and evaluation. Edit distance then gives a dynamic programming bridge between surface forms, supporting spelling correction, speech error analysis, approximate matching, and minimum-error alignments.
 
 ## Definitions

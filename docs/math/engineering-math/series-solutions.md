@@ -7,6 +7,10 @@ sidebar_position: 8
 
 Series methods solve differential equations near points where elementary closed forms are unavailable or inconvenient. Instead of guessing exponentials or trigonometric functions, we assume the solution has a power series and determine its coefficients recursively. This turns a differential equation into algebra on sequences.
 
+![Taylor polynomial curves approximate the sine function near the origin.](https://commons.wikimedia.org/wiki/Special:FilePath/Taylor_Approximation_of_sin%28x%29.svg)
+
+*Figure: Taylor polynomials approximate a smooth function by matching derivatives at one point. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Taylor_Approximation_of_sin%28x%29.svg), MikeRun, CC BY-SA 4.0.*
+
 The method is central in engineering mathematics because many special functions, including Bessel and Legendre functions, arise as series solutions of variable-coefficient ODEs. Series also give local approximations for numerical work, asymptotic analysis, and checking software results near singular points.
 
 ## Definitions

@@ -7,6 +7,18 @@ sidebar_position: 1
 
 Data structures are organized ways to store data so that the operations a program needs can be performed efficiently and correctly. In a C course, this subject is especially concrete. Every abstraction eventually becomes an arrangement of arrays, structures, pointers, dynamically allocated blocks, and functions that enforce an invariant. That makes C demanding, but also useful: it shows exactly what a stack, list, heap, hash table, tree, or graph costs in memory and time.
 
+![A binary tree diagram shows a rooted hierarchy with left and right child links.](https://commons.wikimedia.org/wiki/Special:FilePath/Binary_tree.svg)
+
+*Figure: Binary trees make recursive structure and pointer relationships visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Binary_tree.svg), Derrick Coetzee, public domain.*
+
+![A hash table diagram shows keys mapped into buckets with linked-list collision chains.](https://commons.wikimedia.org/wiki/Special:FilePath/Dsa_hash_table.svg)
+
+*Figure: Separate chaining shows how a hash table stores multiple keys at the same bucket. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dsa_hash_table.svg), Amit6, public domain.*
+
+![A Dijkstra animation highlights tentative distances as the shortest path grows through a graph.](https://commons.wikimedia.org/wiki/Special:FilePath/Dijkstra_Animation.gif)
+
+*Figure: Dijkstra's algorithm is a concrete example of graph search becoming a path. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dijkstra_Animation.gif), Ibmua, public domain.*
+
 These notes follow the core scope of a Korean-language C data-structures textbook, *C로 쓴 자료구조론*, whose table of contents includes algorithm specification, abstract data types, arrays, stacks and queues, linked lists, trees, heaps, binary search trees, graphs, sorting, hashing, and advanced search structures. The pages here focus on the standard curriculum topics requested for SJ Wiki: the structures and algorithms most students are expected to implement and trace by hand in a Data Structures in C course.
 
 ## Definitions

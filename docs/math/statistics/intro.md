@@ -7,6 +7,18 @@ sidebar_position: 1
 
 This statistics section is based on *Introduction to Statistics, Online Edition*, identified from the source PDF cover and table of contents. The primary author and editor listed on the cover are David M. Lane of Rice University, with other authors David Scott, Mikki Hebl, Rudy Guerra, Dan Osherson, and Heidi Zimmer of the University of Houston, Downtown Campus. The cover states that the work is in the public domain, and the table of contents organizes the course around introductory statistical literacy, graphing, summaries, probability, research design, sampling distributions, estimation, hypothesis testing, mean tests, power, regression, ANOVA, transformations, chi-square methods, distribution-free tests, effect size, case studies, and glossary material.
 
+![Anscombe's quartet shows four scatterplots with similar summary statistics.](https://commons.wikimedia.org/wiki/Special:FilePath/AnscombeQuartet.svg)
+
+*Figure: Anscombe's quartet shows why visualization matters even when numerical summaries agree. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:AnscombeQuartet.svg), Gabry, CC BY-SA 3.0.*
+
+![A Galton box diagram shows balls falling through pegs into bins.](https://commons.wikimedia.org/wiki/Special:FilePath/Galton_Box.svg)
+
+*Figure: A Galton box turns repeated random left-right choices into an approximate bell-shaped distribution. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Galton_Box.svg), Marcin Floryan, CC BY-SA 3.0.*
+
+![A central limit theorem simulation shows sample means becoming bell shaped.](https://commons.wikimedia.org/wiki/Special:FilePath/Central_Limit_Theorem.png)
+
+*Figure: A central limit theorem simulation shows why sample means often become approximately normal. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Central_Limit_Theorem.png), Daniel Resende, CC BY-SA 4.0.*
+
 The notes below turn that textbook scope into a focused wiki sequence. They are not a replacement for reading the examples in the source text; they are structured study pages that emphasize definitions, formulas, worked examples, visuals, Python snippets, pitfalls, and cross-links. The sequence moves from data description to probability models, then from sampling distributions to inference, and finally to regression, ANOVA, categorical tests, effect size, and resampling.
 
 ## Definitions

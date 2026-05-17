@@ -7,6 +7,10 @@ sidebar_position: 12
 
 Private caches are essential for multicore performance, but they create a correctness problem. If two cores cache the same memory block and one core writes it, what should the other core see? Cache coherence protocols maintain a single coherent view of each memory location. Memory consistency models define the ordering rules that programmers can rely on across different memory locations.
 
+![An opened Intel 4004 processor exposes the silicon die inside its package.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_4004_open.jpg)
+
+*Figure: Opening the package links instruction-set discussions to the physical die. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_4004_open.jpg), Science Museum Group, CC BY 4.0.*
+
 These two ideas are related but not identical. Coherence is about one address: all cores should agree on the order of writes to that address. Consistency is about the ordering of operations to different addresses: when a thread writes `data` and then writes `flag`, when may another thread see the flag and the data?
 
 ## Definitions

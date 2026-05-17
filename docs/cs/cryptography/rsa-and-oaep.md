@@ -7,6 +7,10 @@ sidebar_position: 12
 
 RSA is the best-known public-key cryptosystem and a central example of trapdoor arithmetic. Public operations raise values to an exponent modulo $N=pq$. Private operations use knowledge of $p$ and $q$ to invert that exponent. The algebra is elegant, but textbook RSA is not secure encryption. Padding and security definitions are not optional details; they are the difference between a math function and a cryptographic scheme.
 
+![A public-key diagram shows Alice encrypting a message that only Bob can decrypt.](https://commons.wikimedia.org/wiki/Special:FilePath/Public_key_encryption_alice_to_bob.svg)
+
+*Figure: Public-key encryption makes the Alice-to-Bob security goal explicit. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Public_key_encryption_alice_to_bob.svg), Winstonlee, CC0.*
+
 Katz and Lindell distinguish plain RSA, RSA assumptions, padded RSA, OAEP, CCA security, and implementation pitfalls. Smart gives complementary arithmetic examples, implementation notes, and public-key attack context. Taken together, they show why modern RSA encryption is normally used as a KEM or through standardized padding, not as $c=m^e\bmod N$ on raw messages.
 
 ## Definitions

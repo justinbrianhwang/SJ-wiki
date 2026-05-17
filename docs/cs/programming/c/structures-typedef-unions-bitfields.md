@@ -7,6 +7,10 @@ sidebar_position: 10
 
 Structures let C group related objects under one name while keeping each member's type. K&R introduces them with geometric points and rectangles, then moves toward tables, trees, unions, typedefs, and bit fields. The theme is organization: once a program has more than a few related variables, a structure gives those variables a shape that functions can pass, return, store in arrays, and access through pointers.
 
+![A C language logo marks the systems-programming pages built around C examples.](https://commons.wikimedia.org/wiki/Special:FilePath/C_Programming_Language.svg)
+
+*Figure: C remains the reference language for low-level memory, pointers, and Unix interfaces. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:C_Programming_Language.svg), ElodinKaldwin, public domain text logo.*
+
 ANSI C made structure assignment, passing, and returning precise, so structures are not merely layout tricks. They are real values, although they cannot be compared directly. This page covers the core structure operations plus `typedef`, `union`, and bit-field notation; linked structures and hash tables are handled separately.
 
 ## Definitions

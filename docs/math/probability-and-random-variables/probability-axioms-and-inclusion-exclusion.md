@@ -7,6 +7,10 @@ sidebar_position: 3
 
 After counting comes formal probability. A sample space records the possible outcomes of an experiment, events are subsets of that space, and a probability measure assigns numbers to events in a way that behaves like normalized size. The MIT lectures emphasize that the axioms are not merely formal rules: they encode consistency requirements for frequency interpretations, market prices, and personal degrees of belief.
 
+![Two overlapping circles show a highlighted Venn diagram region.](https://commons.wikimedia.org/wiki/Special:FilePath/Venn0001.svg)
+
+*Figure: A Venn diagram connects set operations with the same logical connectives used in proofs. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Venn0001.svg), Watchduck, public domain.*
+
 Finite equally likely models are the easiest place to see the connection between counting and probability. If every outcome in a finite sample space has the same probability, then $P(A)=\vert A\vert /\vert S\vert $. The axioms then explain how probabilities of complements, unions, and intersections must behave. Inclusion-exclusion is the main tool for turning overlapping event counts into exact probabilities.
 
 ## Definitions

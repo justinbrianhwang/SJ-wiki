@@ -7,6 +7,10 @@ sidebar_position: 18
 
 A relation records which ordered pairs are connected by a rule. Functions are special relations, but relations are more flexible: one input may be related to many outputs, to no outputs, or to itself. They model databases, directed graphs, modular congruence, ordering, reachability, and equivalence.
 
+![Two overlapping circles show a highlighted Venn diagram region.](https://commons.wikimedia.org/wiki/Special:FilePath/Venn0001.svg)
+
+*Figure: A Venn diagram connects set operations with the same logical connectives used in proofs. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Venn0001.svg), Watchduck, public domain.*
+
 Relations are the common language behind many discrete structures. A directed graph is a relation on vertices. A database table is a finite relation among attribute domains. A partial order is a relation with reflexivity, antisymmetry, and transitivity. Because of this, learning relation properties pays off repeatedly.
 
 ## Definitions

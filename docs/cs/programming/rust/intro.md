@@ -7,6 +7,10 @@ sidebar_position: 1
 
 Rust is a systems programming language focused on memory safety, predictable performance, and practical tooling. The source text for these notes is *The Rust Programming Language* by Steve Klabnik and Carol Nichols, with contributions from the Rust community. The PDF used here states that it assumes Rust 1.65 or later, so the notes follow that edition's main chapter sequence rather than adding unrelated modern ecosystem material.
 
+![The Rust logo marks pages on ownership, borrowing, traits, and safe systems programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Rust_programming_language_black_logo.svg)
+
+*Figure: Rust connects systems control with compile-time memory-safety guarantees. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Rust_programming_language_black_logo.svg), Rust Foundation, CC BY 4.0.*
+
 These pages are organized as a guided companion to the book. They begin with the toolchain and a first project, move through ownership and the core type system, then build toward tests, iterators, Cargo publishing, smart pointers, concurrency, advanced features, unsafe Rust, macros, and the final multithreaded web server. Async/await is not treated as a detail page because this source edition does not develop it as a dedicated main chapter.
 
 ## Definitions

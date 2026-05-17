@@ -7,6 +7,10 @@ sidebar_position: 3
 
 An n-gram language model assigns probabilities to word sequences by assuming that each word depends on a fixed-size history. Jurafsky and Martin use n-grams to introduce the language modeling task, perplexity, smoothing, backoff, interpolation, and Kneser-Ney. Eisenstein gives a more formal probabilistic treatment and connects smoothing to the same bias-variance tradeoff seen in Naive Bayes.
 
+![A skip-gram word embedding diagram predicts surrounding context words from a center word.](https://commons.wikimedia.org/wiki/Special:FilePath/Word_embeddings_Skip-gram.svg)
+
+*Figure: Skip-gram training ties word meaning to surrounding context. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Word_embeddings_Skip-gram.svg), Jeran Renz, CC BY-SA 4.0.*
+
 N-grams are no longer the strongest language models, but they remain essential for understanding modern NLP. They clarify what a probability over text means, why unseen events are dangerous, how intrinsic evaluation works, and why neural models were such a major change. They also remain useful in speech recognition, spelling correction, input methods, decoding features, and small-data baselines.
 
 ## Definitions

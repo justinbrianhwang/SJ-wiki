@@ -7,6 +7,10 @@ sidebar_position: 4
 
 Java has primitive types for numeric, character, and boolean values, and it has reference types for objects and arrays. The source book treats primitives carefully because they behave differently from objects in assignment, method invocation, default values, arithmetic, comparison, and boxing. A Java programmer must know both worlds because ordinary code constantly crosses between them.
 
+![The Sun Microsystems logo gives Java pages historical context for the language and platform.](https://commons.wikimedia.org/wiki/Special:FilePath/Sun_Microsystems_logo.svg)
+
+*Figure: Java's early development at Sun shaped its portability, virtual-machine model, and library ecosystem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sun_Microsystems_logo.svg), Sun Microsystems and Afrank99, public domain text logo.*
+
 Operators make expressions compact, but compactness can hide conversions. Arithmetic may promote smaller integer types to `int`, integer division discards a remainder, compound assignment performs an implicit cast, `==` compares primitive values or reference identity depending on operands, and member access uses the dot operator. The chapter on operators is therefore less about memorizing symbols and more about predicting the type and value of each expression.
 
 ## Definitions

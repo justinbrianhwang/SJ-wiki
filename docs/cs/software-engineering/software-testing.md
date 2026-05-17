@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Software testing executes software with selected inputs to reveal failures and build evidence about behavior. Gustafson's testing chapter covers testing fundamentals, coverage criteria, subsumption, functional testing, test matrices, structural testing, data flow testing, random testing, operational profiles, statistical inference, and boundary testing. The examples repeatedly use the classic triangle classification problem because it exposes how easy it is to miss important cases.
 
+![Two programmers work together at one computer in a pair-programming setup.](https://commons.wikimedia.org/wiki/Special:FilePath/Pair_Programming.jpg)
+
+*Figure: Pair programming makes collaboration and review practices concrete. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pair_Programming.jpg), Calqui, CC BY-SA 3.0.*
+
 Testing is not exhaustive for realistic programs. A function with two 32-bit integer inputs has more than $2^{64}$ possible input pairs. The engineering problem is therefore selection: choose tests that are meaningful, cover important domains or code structures, and expose likely faults. Coverage criteria provide stopping rules and force attention to parts of the specification or implementation that a developer might unconsciously avoid.
 
 ## Definitions

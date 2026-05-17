@@ -7,6 +7,10 @@ sidebar_position: 12
 
 A minimum spanning tree, or MST (최소 비용 신장 트리), connects all vertices of a weighted undirected graph with the least possible total edge weight and no cycles. It is a graph problem, but it is also a data-structures lesson: Kruskal's algorithm relies on disjoint sets, Prim's algorithm relies on a priority queue, and both rely on careful graph representation.
 
+![A binary tree diagram shows a rooted hierarchy with left and right child links.](https://commons.wikimedia.org/wiki/Special:FilePath/Binary_tree.svg)
+
+*Figure: Binary trees make recursive structure and pointer relationships visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Binary_tree.svg), Derrick Coetzee, public domain.*
+
 The source textbook places minimum-cost spanning trees after graph traversal and connected components. That sequence is logical. A spanning tree exists only inside a connected undirected graph; traversal explains reachability, and MST algorithms then ask which connecting edges are cheapest without forming unnecessary cycles.
 
 ## Definitions

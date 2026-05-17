@@ -9,6 +9,10 @@ Centroids and second moments connect geometry to mechanics. The centroid locates
 
 The computations look similar, but the physical meanings differ. A centroid is a first moment divided by a total measure. A second moment is an integral of squared distance. Both reward careful coordinate choice, symmetry recognition, and composite-body bookkeeping.
 
+![A beam bends under transverse loading in a simple mechanics schematic.](https://commons.wikimedia.org/wiki/Special:FilePath/Beam_bending.svg)
+
+*Figure: Beam bending connects support reactions, internal shear, bending moment, and section stiffness. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Beam_bending.svg), Krishnavedala, CC0 1.0.*
+
 ## Definitions
 
 For an area $A$ in the $xy$ plane, the **centroid** $(\bar{x},\bar{y})$ is

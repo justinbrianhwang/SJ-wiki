@@ -7,6 +7,10 @@ sidebar_position: 14
 
 Inheritance lets a derived class reuse and specialize a base class, but polymorphism is what lets a program treat related objects through a common interface while still running the derived behavior. In Savitch's treatment, this is the point where an inheritance hierarchy becomes more than shared code: a base-class pointer or reference can refer to objects of several derived types, and a virtual member function chooses the right implementation at run time.
 
+![The ISO C++ logo marks pages on classes, templates, containers, and modern C++ idioms.](https://commons.wikimedia.org/wiki/Special:FilePath/ISO_C%2B%2B_Logo.svg)
+
+*Figure: C++ extends systems programming with abstraction, generic code, and deterministic resource management. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ISO_C%2B%2B_Logo.svg), Jeremy Kratz, public domain text logo.*
+
 This matters whenever a program should work with a general concept such as a sale, employee, shape, account, or stream, while the exact subtype is not known until the program is running. The cost is that the programmer must design the base interface carefully, avoid slicing, and remember that destruction through a base pointer needs a virtual destructor.
 
 ## Definitions

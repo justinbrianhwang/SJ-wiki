@@ -7,6 +7,10 @@ sidebar_position: 23
 
 Boundary value problems prescribe conditions at two or more points instead of giving all initial data at one point. This changes the numerical character of the problem. An initial-value method marches forward, while a boundary value method must coordinate the whole interval so that the endpoint conditions are satisfied together.
 
+![Arrows rotate around the origin in a two-dimensional vector field.](https://commons.wikimedia.org/wiki/Special:FilePath/Vector_field.svg)
+
+*Figure: A planar vector field shows how direction and magnitude vary from point to point. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Vector_field.svg), Fibonacci, public domain.*
+
 Two standard approaches are shooting and finite differences. Shooting guesses missing initial data and solves IVPs until the far boundary matches. Finite differences replace derivatives by algebraic equations at grid points, producing a linear or nonlinear system for all unknown values at once.
 
 ## Definitions

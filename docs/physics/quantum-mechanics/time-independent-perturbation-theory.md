@@ -9,6 +9,10 @@ Most useful Hamiltonians cannot be solved exactly. Time-independent perturbation
 
 Sakurai presents nondegenerate and degenerate perturbation theory, then applies it to hydrogenlike atoms, fine structure, and electromagnetic-field interactions. Ballentine gives a careful stationary-state perturbation chapter with variational comparison. The Gottfried-named notes emphasize Rayleigh-Schrodinger expansions and hydrogen in fields. Schiff's classic treatment is often more coordinate-based and calculation-heavy.
 
+![Hydrogen orbital density plots show bright probability regions for several quantum numbers.](https://commons.wikimedia.org/wiki/Special:FilePath/Hydrogen_Density_Plots.png)
+
+*Figure: Hydrogen density plots make angular momentum, nodes, and probability density visible in real atomic structure. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hydrogen_Density_Plots.png), PoorLeno, public domain.*
+
 ## Definitions
 
 Write the Hamiltonian as

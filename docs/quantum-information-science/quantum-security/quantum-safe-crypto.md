@@ -9,6 +9,14 @@ Quantum-safe cryptography is the engineering program that moves deployed systems
 
 The practical goal is not to panic about every cryptographic primitive. The goal is to identify where RSA, Diffie-Hellman, ECDH, DSA, ECDSA, and EdDSA are used for key establishment or signatures, then replace those uses with standardized post-quantum or hybrid constructions. Symmetric cryptography usually needs parameter review, such as preferring 256-bit keys for long-lived confidentiality, but the main operational burden is public-key migration.
 
+![A public-key shared-secret diagram shows two parties deriving a shared value from private and public inputs.](https://commons.wikimedia.org/wiki/Special:FilePath/Public_key_shared_secret.svg)
+
+*Figure: Migration work starts where public-key key establishment appears in real protocols, because those exchanges expose long-lived confidentiality to harvest-now risk. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Public_key_shared_secret.svg), Davidgothberg, public domain.*
+
+![A public-key encryption diagram shows Alice encrypting to Bob with a public key and Bob decrypting with a private key.](https://commons.wikimedia.org/wiki/Special:FilePath/Public_key_encryption.svg)
+
+*Figure: Quantum-safe migration separates key establishment, encryption, signatures, certificates, and trust anchors because each one changes on a different operational timeline. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Public_key_encryption.svg), Davidgothberg, public domain.*
+
 ## Definitions
 
 **Quantum-safe cryptography** means cryptographic deployment that is intended to remain secure in the presence of known quantum attacks. In practice this usually means PQC for public-key functions, adequate symmetric key lengths, and protocols that can negotiate or rotate algorithms without redesign.

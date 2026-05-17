@@ -7,6 +7,10 @@ sidebar_position: 24
 
 Finite difference methods approximate partial derivatives on a grid. They turn differential equations into algebraic equations that can be solved step by step or as large linear systems. The method is conceptually simple, but accuracy, stability, boundary handling, and matrix structure must all be managed carefully.
 
+![A matrix multiplication diagram highlights row and column products.](https://commons.wikimedia.org/wiki/Special:FilePath/Matrix_multiplication_diagram.svg)
+
+*Figure: A matrix multiplication diagram makes the row-column structure of linear algebra visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Matrix_multiplication_diagram.svg), Bilou, CC BY-SA 3.0.*
+
 PDE type matters. Elliptic problems such as Laplace's equation usually produce coupled spatial systems. Parabolic problems such as the heat equation involve time stepping with smoothing. Hyperbolic problems such as wave and advection equations require special attention to propagation speed and numerical dispersion.
 
 ## Definitions

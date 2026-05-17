@@ -7,6 +7,10 @@ sidebar_position: 15
 
 Cargo begins as a build command, but the Rust book later returns to it as an ecosystem tool. Cargo manages profiles, documentation, publishing, workspaces, dependency versions, and crates.io packaging. This matters because Rust development is rarely only about compiling one crate. Real projects depend on public crates, share code across packages, publish libraries, and control build settings for development and release.
 
+![The Rust logo marks pages on ownership, borrowing, traits, and safe systems programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Rust_programming_language_black_logo.svg)
+
+*Figure: Rust connects systems control with compile-time memory-safety guarantees. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Rust_programming_language_black_logo.svg), Rust Foundation, CC BY 4.0.*
+
 This page extends [getting started](/cs/programming/rust/getting-started-toolchain-cargo) and the [minigrep project](/cs/programming/rust/io-project-minigrep). It focuses on what changes when code moves from local learning project to reusable crate or multi-crate workspace.
 
 ## Definitions

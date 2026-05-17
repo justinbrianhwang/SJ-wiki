@@ -7,6 +7,10 @@ sidebar_position: 53
 
 Hybrid systems combine discrete mode changes with continuous-time dynamics. They are a natural modeling language for cyber-physical systems because physical plants often evolve continuously while embedded software changes their operating mode abruptly. A thermostat switches between heating and cooling; a vehicle switches between left, straight, right, and stop; a bouncing ball follows differential equations between impacts but changes velocity discontinuously at impact.
 
+![An Arduino Uno board shows a familiar microcontroller development board with headers and USB.](https://commons.wikimedia.org/wiki/Special:FilePath/Arduino_Uno_-_R3.jpg)
+
+*Figure: Arduino boards make microcontroller I/O and prototyping tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Arduino_Uno_-_R3.jpg), SparkFun Electronics, CC BY 2.0.*
+
 The main idea is hierarchy. The outer state machine chooses a mode. Each mode is refined by a time-based system, often an ODE or a clock. Transitions between modes are controlled by guards that may mention continuous variables, and transition actions may reset or modify continuous state.
 
 ## Definitions

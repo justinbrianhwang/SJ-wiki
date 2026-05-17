@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Basic RNNs carry hidden states through time, but they struggle to preserve useful information over long spans. D2L addresses this with gated recurrent units and long short-term memory networks, then uses recurrent encoders and decoders for machine translation. The result is the classic sequence-to-sequence pattern: one network reads an input sequence into a state representation, and another network generates an output sequence.
 
+![An ELIZA terminal conversation shows an early chatbot responding to typed user input.](https://commons.wikimedia.org/wiki/Special:FilePath/ELIZA_conversation.png)
+
+*Figure: ELIZA provides historical context for dialogue systems and chatbot evaluation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ELIZA_conversation.png), Unknown author, public domain text.*
+
 This page is a bridge between vanilla recurrence and attention-based models. Gating explains how neural networks can decide what to remember, what to forget, and what to expose. Encoder-decoder training introduces teacher forcing, padding masks, sequence loss, and decoding. Beam search then shows that prediction is not just a forward pass; it is a search problem over possible output sequences.
 
 ## Definitions

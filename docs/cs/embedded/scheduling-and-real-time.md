@@ -7,6 +7,10 @@ sidebar_position: 61
 
 Scheduling decides which task executes when. In general-purpose computing, scheduling is often about throughput, fairness, or responsiveness. In embedded systems, scheduling is often about correctness: a controller that computes the right output too late can be wrong. Real-time scheduling therefore connects software execution to physical time.
 
+![An Arduino Uno board shows a familiar microcontroller development board with headers and USB.](https://commons.wikimedia.org/wiki/Special:FilePath/Arduino_Uno_-_R3.jpg)
+
+*Figure: Arduino boards make microcontroller I/O and prototyping tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Arduino_Uno_-_R3.jpg), SparkFun Electronics, CC BY 2.0.*
+
 Lee and Seshia present scheduling as a design and analysis problem over tasks, deadlines, periods, precedence constraints, mutual exclusion, and processor assignment. Rate-monotonic scheduling and earliest-deadline-first scheduling are the central uniprocessor examples, while priority inversion and multiprocessor anomalies show why timing remains difficult in realistic systems.
 
 ## Definitions

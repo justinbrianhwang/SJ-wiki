@@ -9,6 +9,10 @@ Work and energy track how interactions transfer the capacity to produce motion, 
 
 Mechanical energy conservation is a statement about a chosen system. If only conservative forces act internally, $K+U$ is constant. If friction, drag, motors, or other nonconservative transfers occur, mechanical energy changes while total energy accounting remains valid.
 
+![A simple pendulum diagram shows a mass suspended from a pivot with its angular displacement marked.](https://commons.wikimedia.org/wiki/Special:FilePath/Simple_pendulum.svg)
+
+*Figure: A pendulum makes the links among gravity, constraint forces, energy exchange, and small-oscillation models concrete. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Simple_pendulum.svg), Chris-martin, after Unc.hbar, public domain.*
+
 ## Definitions
 
 - **Work** is $W=\vec F\cdot\vec d=Fd\cos\theta$ for a constant force.

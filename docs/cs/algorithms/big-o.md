@@ -7,6 +7,10 @@ sidebar_position: 2
 
 **Big-O notation** describes the asymptotic upper bound of a function's growth rate. It's how we compare algorithm efficiency without caring about constants or hardware.
 
+![A square Kufic algorithms mark introduces the study of designed procedures.](https://commons.wikimedia.org/wiki/Special:FilePath/Algorithms.svg)
+
+*Figure: The algorithms mark gives the abstract algorithms pages a concrete visual anchor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Algorithms.svg), Jeff Erickson, CC BY 4.0.*
+
 ## Formal definition
 
 We say $f(n) = O(g(n))$ if there exist positive constants $c$ and $n_0$ such that:

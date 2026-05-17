@@ -7,6 +7,10 @@ sidebar_position: 1
 
 R is a language for programming with data and a working environment for statistics, graphics, simulation, and modeling. Tilman M. Davies's *The Book of R* teaches these pieces in a deliberate order: first the language, then programming structures, then probability and statistics, then statistical modeling, and finally richer graphics. These notes follow that arc while keeping each page focused on the concepts, R idioms, worked examples, and cross-links needed for SJ Wiki review.
 
+![The R logo marks pages on statistical computing, graphics, and data analysis.](https://commons.wikimedia.org/wiki/Special:FilePath/R_logo.svg)
+
+*Figure: R connects programming examples to statistical modeling and visualization workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:R_logo.svg), The R Foundation, CC BY-SA 4.0.*
+
 The course begins with interactive work in the console and scripts, then builds outward from vectors to matrices, lists, data frames, factors, files, functions, apply-style iteration, descriptive statistics, probability distributions, inference, regression, generalized models, object-oriented behavior, and plotting systems. The pages are original study notes based on the textbook's scope rather than a replacement for the book's exercises or prose.
 
 ## Definitions

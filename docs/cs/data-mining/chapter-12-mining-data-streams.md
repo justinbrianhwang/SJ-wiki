@@ -7,6 +7,10 @@ sidebar_position: 14
 
 Data stream mining studies data that arrive continuously and may be too large to store, revisit, or process with multiple full passes. Aggarwal's stream chapter covers synopsis structures, reservoir sampling, sketches, streaming frequent patterns, stream clustering, streaming outlier detection, and streaming classification. The broader big-data issue also includes disk-resident and distributed batch settings, where frameworks such as MapReduce can scan huge stored data but do not replace real-time stream algorithms.
 
+![An Iris dataset scatterplot compares flower measurements colored by species.](https://commons.wikimedia.org/wiki/Special:FilePath/Iris_dataset_scatterplot.svg)
+
+*Figure: The Iris scatterplot makes feature spaces and class separation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Iris_dataset_scatterplot.svg), Nicoguaro, CC BY 4.0.*
+
 This page connects scalability to the rest of the book. Most familiar mining tasks have streaming versions, but the one-pass constraint, concept drift, memory limits, and real-time deadlines change the algorithms.
 
 ## Definitions

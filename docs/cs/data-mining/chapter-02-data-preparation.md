@@ -7,6 +7,10 @@ sidebar_position: 3
 
 Data preparation is the part of data mining that converts raw evidence into a representation algorithms can actually use. Aggarwal gives it a central role: logs, documents, images, transactions, streams, and graphs rarely arrive as clean rows in a matrix. The analyst must extract features, repair or remove errors, integrate sources, normalize scales, and sometimes convert one data type into another.
 
+![An Iris dataset scatterplot compares flower measurements colored by species.](https://commons.wikimedia.org/wiki/Special:FilePath/Iris_dataset_scatterplot.svg)
+
+*Figure: The Iris scatterplot makes feature spaces and class separation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Iris_dataset_scatterplot.svg), Nicoguaro, CC BY 4.0.*
+
 This topic sits directly after the mining pipeline because preparation is where many modeling choices become irreversible. A missing value can be imputed, marked, or removed; a numeric value can be standardized or discretized; a categorical value can be one-hot encoded or grouped; a time series can remain ordered or be summarized into statistics. Each choice changes which patterns are visible to later mining algorithms.
 
 ## Definitions

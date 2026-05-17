@@ -7,6 +7,10 @@ sidebar_position: 21
 
 Complex analysis studies functions of a complex variable $z=x+iy$. The surprising feature is that complex differentiability is much stronger than real differentiability. If a function is analytic on a region, it has derivatives of all orders, local power series, and real and imaginary parts that satisfy Laplace's equation.
 
+![The Mandelbrot set forms a black fractal boundary in the complex plane.](https://commons.wikimedia.org/wiki/Special:FilePath/Mandelbrot_set.png)
+
+*Figure: The Mandelbrot set turns iteration of a simple complex quadratic map into intricate geometry. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mandelbrot_set.png), Einottaja, attribution required.*
+
 For engineering mathematics, analytic functions connect potential flow, electrostatics, conformal mapping, residues, Fourier and Laplace methods, and two-dimensional harmonic functions. The Cauchy-Riemann equations are the first test for analyticity, but domain and differentiability assumptions matter.
 
 ## Definitions

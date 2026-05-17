@@ -7,6 +7,10 @@ sidebar_position: 4
 
 Control flow is the order in which a C program performs computations. K&R has already used `if`, `while`, and `for` before formally describing them; Chapter 3 completes the set with `else if`, `switch`, `do while`, `break`, `continue`, and `goto`. The language provides only a few constructs, but they combine into compact loops, filters, searches, and parsers.
 
+![A C language logo marks the systems-programming pages built around C examples.](https://commons.wikimedia.org/wiki/Special:FilePath/C_Programming_Language.svg)
+
+*Figure: C remains the reference language for low-level memory, pointers, and Unix interfaces. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:C_Programming_Language.svg), ElodinKaldwin, public domain text logo.*
+
 The important habit is to choose the construct that exposes the shape of the computation. A `for` loop is ideal when initialization, test, and increment belong together. A `while` loop fits input-driven repetition. A `switch` is clear for a fixed set of integer or character cases. `goto` is rare, but K&R does not pretend it is forbidden; it is mainly useful for leaving deeply nested logic or centralizing cleanup in old C code.
 
 ## Definitions

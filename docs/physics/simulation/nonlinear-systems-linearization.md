@@ -9,6 +9,14 @@ Nonlinear systems are the rule rather than the exception in realistic simulation
 
 Linearization builds a local linear approximation around an equilibrium or trajectory. It does not make the original system linear; it gives a model that predicts small deviations near the chosen point. This is especially useful for controller design, small-signal frequency response, and quick stability checks before running large nonlinear simulations.
 
+![A harmonic oscillator phase portrait traces closed loops in position-velocity space.](https://commons.wikimedia.org/wiki/Special:FilePath/Oscillator_phase_portrait.svg)
+
+*Figure: Phase portraits reveal system behavior in state space rather than as a single time plot. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Oscillator_phase_portrait.svg), Frobnitzem, CC BY-SA 3.0.*
+
+![A Lorenz attractor coils through phase space in two butterfly-like lobes.](https://commons.wikimedia.org/wiki/Special:FilePath/Lorenz_attractor_yb.svg)
+
+*Figure: The Lorenz attractor is the standard visual scene for sensitive dependence and nonlinear simulation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Lorenz_attractor_yb.svg), Wikimol and Dschwen, CC BY-SA 3.0/GFDL.*
+
 ## Definitions
 
 A nonlinear state model has the form

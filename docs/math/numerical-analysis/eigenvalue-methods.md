@@ -7,6 +7,10 @@ sidebar_position: 21
 
 Eigenvalue algorithms approximate scalars and vectors satisfying $Av=\lambda v$. They are central because eigenvalues describe stability, vibration modes, principal components, graph connectivity, and convergence rates of iterative methods. Numerical eigenvalue methods are built from the same matrix transformations used in linear systems, but their goal is spectral information rather than a solution to one right-hand side.
 
+![An eigenvector keeps its direction while a matrix scales it.](https://commons.wikimedia.org/wiki/Special:FilePath/Eigenvalue_equation.svg)
+
+*Figure: The eigenvalue equation captures directions preserved by a linear transformation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Eigenvalue_equation.svg), Lyudmil Antonov, CC BY-SA 4.0.*
+
 The power method finds a dominant eigenvalue. Inverse iteration targets an eigenvalue near a shift. Householder reductions and QR iteration form the backbone of dense eigenvalue software. The algorithms differ in scope, but they all try to reveal eigenvalues while controlling the effect of roundoff.
 
 ## Definitions

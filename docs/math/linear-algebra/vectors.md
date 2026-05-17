@@ -7,6 +7,10 @@ sidebar_position: 7
 
 Vectors in $\mathbb{R}^n$ are ordered lists of real numbers, but they should be read as more than lists. They encode displacement, data, forces, coefficients, states, and solutions. Linear algebra studies operations that preserve the two essential vector actions: adding vectors and scaling them.
 
+![Two vectors add tip to tail to form a resultant vector.](https://commons.wikimedia.org/wiki/Special:FilePath/Vectoraddition.svg)
+
+*Figure: Vector addition is the geometric base case for linear combinations and span. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Vectoraddition.svg), Svjo, CC0 1.0.*
+
 This page is the concrete starting point for the rest of the subject. Later pages abstract these same operations to general vector spaces, but the intuition usually comes from $\mathbb{R}^2$ and $\mathbb{R}^3$: arrows can be added tip-to-tail, stretched by scalars, and combined to reach new locations. The same algebra also describes columns of a matrix, feature vectors in data, and state vectors in applied models.
 
 ## Definitions

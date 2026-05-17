@@ -7,6 +7,10 @@ sidebar_position: 56
 
 Sensors and actuators are the boundary between the physical world and the computational model. A sensor converts a physical quantity into data. An actuator converts data or electrical signals into physical action. The cyber-physical perspective treats both as modeled components with range, bias, quantization, noise, sampling, delay, and saturation, not as perfect wires between reality and software.
 
+![An Arduino Uno board shows a familiar microcontroller development board with headers and USB.](https://commons.wikimedia.org/wiki/Special:FilePath/Arduino_Uno_-_R3.jpg)
+
+*Figure: Arduino boards make microcontroller I/O and prototyping tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Arduino_Uno_-_R3.jpg), SparkFun Electronics, CC BY 2.0.*
+
 This topic is complementary to hardware-interfacing notes such as GPIO, ADCs, serial buses, and microcontroller ports. Lee and Seshia focus on the modeling question: what relationship is assumed between a physical variable and the number seen or commanded by software, and what can go wrong when that relationship is approximate?
 
 ## Definitions

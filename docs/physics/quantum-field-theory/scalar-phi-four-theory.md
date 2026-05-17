@@ -9,6 +9,10 @@ Real scalar $\phi^4$ theory is the laboratory model of perturbative quantum fiel
 
 The theory is also physically flexible. In relativistic particle physics it models contact scattering and spontaneous symmetry breaking. In condensed matter, its Euclidean version becomes the Landau-Ginzburg theory of critical phenomena. Zee uses this kind of model repeatedly because it is simple enough to calculate with and rich enough to display the logic of QFT.
 
+![A Mexican-hat potential surface has a central peak surrounded by a circular valley.](https://commons.wikimedia.org/wiki/Special:FilePath/Mexican_hat_potential_polar.svg)
+
+*Figure: The Mexican-hat potential visualizes spontaneous symmetry breaking as a choice among degenerate minima. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mexican_hat_potential_polar.svg), Rupert Millard, public domain.*
+
 ## Definitions
 
 The Lagrangian density for a real scalar with quartic interaction is

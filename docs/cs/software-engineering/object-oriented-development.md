@@ -7,6 +7,10 @@ sidebar_position: 12
 
 Object-oriented development models a problem in terms of objects, classes, attributes, operations, and relationships. Gustafson's chapter on object-oriented development covers inheritance, polymorphism, object identification, noun-in-text analysis, domain analysis for reuse, use-case-driven object discovery, association identification, existence dependency, and multiplicity. The chapter is practical: it shows how to move from a problem statement to candidate objects and relationships.
 
+![The Git logo marks distributed version control as a core software-engineering tool.](https://commons.wikimedia.org/wiki/Special:FilePath/Git-logo.svg)
+
+*Figure: Git is a practical substrate for collaboration, branching, review, and release workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Git-logo.svg), Jason Long, CC BY 3.0.*
+
 The central challenge is deciding what should become an object, what should become an attribute, and what is merely an external entity or relationship. A grocery store, family tree, library, college, bed-and-breakfast, and dental office appear in the examples because they expose common modeling choices: inheritance versus aggregation, relationship objects, multiplicity, and reuse.
 
 ## Definitions

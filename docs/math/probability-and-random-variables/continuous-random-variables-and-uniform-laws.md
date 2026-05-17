@@ -7,6 +7,10 @@ sidebar_position: 8
 
 Continuous random variables replace probability masses at individual points with probability densities spread across intervals. The conceptual shift is important: for a continuous variable, a single exact value usually has probability zero, even though intervals have positive probability. This is not a paradox; density is not probability, but probability per unit length.
 
+![Several exponential density curves are plotted for different rates.](https://commons.wikimedia.org/wiki/Special:FilePath/Exponential_pdf.svg)
+
+*Figure: Exponential distributions model waiting times in memoryless processes. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Exponential_pdf.svg), Skbkekas, CC BY 3.0.*
+
 The MIT lectures first introduce general continuous random variables and then use the uniform distribution as the simplest example. Uniform random variables also explain percentiles, random arrival times modulo a schedule, and the idea that a probability law can be invariant under translations on an interval. They provide the cleanest bridge from finite equally likely outcomes to densities.
 
 ## Definitions

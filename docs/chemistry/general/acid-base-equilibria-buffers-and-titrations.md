@@ -9,9 +9,13 @@ Acid-base equilibria extend pH calculations beyond strong acids and bases. Weak 
 
 In the Ebbing and Gammon sequence this topic sits near weak acid ionization, polyprotic acids, base ionization, salt hydrolysis, common-ion effect, buffers, and titration curves. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
-![A titration curve shows pH rising as a weak acid is titrated with a strong base.](https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Titration_of_weak_acid_with_strong_base.PNG/500px-Titration_of_weak_acid_with_strong_base.PNG)
+![A titration curve shows pH rising as a weak acid is titrated with a strong base.](https://commons.wikimedia.org/wiki/Special:FilePath/Titration_of_weak_acid_with_strong_base.PNG)
 
 *Figure: Weak acid-strong base titration curve. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Titration_of_weak_acid_with_strong_base.PNG), Quantumkinetics, CC BY 3.0.*
+
+![A burette diagram shows the graduated glass tube used to deliver titrant during volumetric analysis.](https://commons.wikimedia.org/wiki/Special:FilePath/Burette.svg)
+
+*Figure: Burette used to add titrant precisely in acid-base titrations. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Burette.svg), Mysid based on Quantockgoblin, public domain.*
 
 ## Definitions
 

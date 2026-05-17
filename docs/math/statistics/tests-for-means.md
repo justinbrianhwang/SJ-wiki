@@ -7,6 +7,10 @@ sidebar_position: 12
 
 Tests for means compare observed sample means with null hypotheses about population means. They are among the most common procedures in introductory statistics because many variables are quantitative: reaction times, exam scores, blood pressure, monthly revenue, machine fill volume, and so on. The Lane text discusses tests of a single mean, independent-group differences, and correlated-pair differences as separate cases because the standard error changes with the design.
 
+![Several Student t density curves approach the normal curve.](https://commons.wikimedia.org/wiki/Special:FilePath/Student_t_pdf.svg)
+
+*Figure: Student t distributions encode extra uncertainty from estimating variance with small samples. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Student_t_pdf.svg), Skbkekas, CC BY 3.0.*
+
 The central question is not simply how many means are being compared. It is whether observations are independent, paired, or grouped. A before-after study on the same people is not an independent two-sample study. A treatment-control comparison with different people in each group is not a paired study. Choosing the wrong test means choosing the wrong standard error, which changes the p-value and interval.
 
 ## Definitions

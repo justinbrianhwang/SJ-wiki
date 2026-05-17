@@ -7,6 +7,10 @@ sidebar_position: 18
 
 The Standard Template Library gives C++ reusable containers such as `vector`, `list`, `set`, and `map`. Savitch places the STL after templates, exceptions, and linked data structures because STL containers are class templates that hide most of the memory management details while preserving efficient specialized behavior.
 
+![The ISO C++ logo marks pages on classes, templates, containers, and modern C++ idioms.](https://commons.wikimedia.org/wiki/Special:FilePath/ISO_C%2B%2B_Logo.svg)
+
+*Figure: C++ extends systems programming with abstraction, generic code, and deterministic resource management. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ISO_C%2B%2B_Logo.svg), Jeremy Kratz, public domain text logo.*
+
 The practical lesson is not merely "use a library." It is to choose a container whose operations match the problem. A `vector` is usually the first choice for a growable sequence with fast indexing. A `list` supports efficient insertion and deletion when an iterator already points to the position. A `set` stores unique ordered keys. A `map` stores key-value pairs.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 11.5
 
 The vanilla LSTM cell with input / forget / output gates is the most commonly taught form, but a long series of papers explored variants that adjust gating, memory pathways, or topology. This page surveys the variants most likely to appear in production code, in papers, or in interview questions, and explains when each is actually worth using.
 
+![An ELIZA terminal conversation shows an early chatbot responding to typed user input.](https://commons.wikimedia.org/wiki/Special:FilePath/ELIZA_conversation.png)
+
+*Figure: ELIZA provides historical context for dialogue systems and chatbot evaluation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ELIZA_conversation.png), Unknown author, public domain text.*
+
 For the baseline LSTM definition (cell state $C_t$, gates $i_t$, $f_t$, $o_t$, additive memory path), see [Gated RNNs and Sequence-to-Sequence](/cs/deep-learning/gated-rnns-seq2seq).
 
 ## Quick reference

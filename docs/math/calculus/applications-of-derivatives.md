@@ -7,6 +7,10 @@ sidebar_position: 8
 
 Derivatives turn local rate information into global conclusions about a function. Once $f'$ and $f''$ are known, we can identify increasing and decreasing intervals, local extrema, concavity, inflection points, and approximate behavior near a point. This is the foundation for curve sketching and for many applied decisions.
 
+![Newton iteration follows tangent lines toward a root of a curve.](https://commons.wikimedia.org/wiki/Special:FilePath/Newton_iteration.svg)
+
+*Figure: Newton iteration uses local linearization to turn calculus into a fast root-finding algorithm. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Newton_iteration.svg), Oleg Alexandrov and Pbroks13, public domain.*
+
 The central theme is that signs carry meaning. The sign of $f'$ describes whether the graph rises or falls. The sign of $f''$ describes how the slope itself changes. Theorems such as Rolle's Theorem and the Mean Value Theorem justify moving from pointwise derivative information to interval-level conclusions.
 
 ## Definitions

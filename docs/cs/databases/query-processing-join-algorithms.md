@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Query processing is the path from a declarative SQL statement to executable operations. The DBMS parses the query, validates names and types, rewrites it into an internal algebraic form, chooses a physical plan, and executes that plan using operators such as scans, selections, sorts, aggregations, and joins. The user asks a logical question; the query processor turns it into work.
 
+![A PostgreSQL B-tree diagram shows index pages connected by parent and leaf links.](https://commons.wikimedia.org/wiki/Special:FilePath/PostgreSQL_B-tree.svg)
+
+*Figure: PostgreSQL B-tree pages show how logical indexes map to storage structures. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PostgreSQL_B-tree.svg), Kelti, CC BY-SA 4.0.*
+
 Joins are the central expensive operation in relational systems because they combine rows from different relations. A join can be implemented by nested loops, indexed lookups, sorting, hashing, or parallel variants. The best algorithm depends on relation sizes, available memory, indexes, sort order, predicate type, and whether results can be pipelined to later operators.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 8
 
 Classes are the point where C++ stops being only a procedural language and becomes a language for defining new types. A class can store data, protect representation details, and provide operations that preserve the meaning of the type. Savitch introduces structures first, then classes, so the transition is concrete: a `struct` groups related variables, while a class usually adds member functions and hides member variables behind a public interface.
 
+![The ISO C++ logo marks pages on classes, templates, containers, and modern C++ idioms.](https://commons.wikimedia.org/wiki/Special:FilePath/ISO_C%2B%2B_Logo.svg)
+
+*Figure: C++ extends systems programming with abstraction, generic code, and deterministic resource management. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ISO_C%2B%2B_Logo.svg), Jeremy Kratz, public domain text logo.*
+
 Encapsulation is the main idea. A well-designed class lets users think in terms of dates, bank accounts, time values, students, or money amounts instead of raw fields. The implementation can change later, but code using the class should continue to work if the public interface keeps the same contract.
 
 ## Definitions

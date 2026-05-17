@@ -7,6 +7,10 @@ sidebar_position: 15
 
 The book introduces `ggplot2` as a grammar-of-graphics alternative to base plotting. Instead of drawing a figure procedurally, `ggplot2` builds a plot from a data frame, aesthetic mappings, geometric layers, scales, facets, coordinates, and themes. This structure is especially strong when a plot should encode multiple variables consistently or produce a family of related panels.
 
+![The R logo marks pages on statistical computing, graphics, and data analysis.](https://commons.wikimedia.org/wiki/Special:FilePath/R_logo.svg)
+
+*Figure: R connects programming examples to statistical modeling and visualization workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:R_logo.svg), The R Foundation, CC BY-SA 4.0.*
+
 The central shift is from "draw points, then add a line" to "declare the data, map variables to visual properties, and add layers that use those mappings." Once that grammar is understood, scatterplots, histograms, smoothers, facets, and density plots become variations on the same template.
 
 ## Definitions

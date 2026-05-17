@@ -7,6 +7,10 @@ sidebar_position: 7
 
 References and operator overloading make user-defined types feel like built-in types when used carefully. A reference gives another name for an existing object. Operator overloading lets a class define meanings for operators such as `+`, `==`, `<<`, `>>`, `[]`, and assignment. Savitch groups these ideas with friend functions because many useful operator overloads must either access private data or support conversions on both operands.
 
+![The ISO C++ logo marks pages on classes, templates, containers, and modern C++ idioms.](https://commons.wikimedia.org/wiki/Special:FilePath/ISO_C%2B%2B_Logo.svg)
+
+*Figure: C++ extends systems programming with abstraction, generic code, and deterministic resource management. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ISO_C%2B%2B_Logo.svg), Jeremy Kratz, public domain text logo.*
+
 The goal is not to overload every possible operator. The goal is to make class objects obey the same mental model users already have for numbers, strings, streams, and arrays. A good overloaded operator is unsurprising, efficient enough, and consistent with the rest of the class interface.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 17
 
 Information extraction turns unstructured text into structured records. Jurafsky and Martin cover relation extraction, relation algorithms, events, time, aspect, temporal datasets, automatic temporal analysis, and template filling. Eisenstein gives a complementary account of entities, relation extraction patterns, classification, neural relation extraction, distant supervision, open information extraction, events, modality, negation, and links to question answering.
 
+![An ELIZA terminal conversation shows an early chatbot responding to typed user input.](https://commons.wikimedia.org/wiki/Special:FilePath/ELIZA_conversation.png)
+
+*Figure: ELIZA provides historical context for dialogue systems and chatbot evaluation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ELIZA_conversation.png), Unknown author, public domain text.*
+
 IE is useful when the goal is not to understand every sentence completely but to populate a database, knowledge graph, alert, timeline, or report. It asks targeted questions: Which entities are mentioned? What relation holds between them? Did an event happen? Who participated? When? Was it negated, hypothetical, or certain?
 
 ## Definitions

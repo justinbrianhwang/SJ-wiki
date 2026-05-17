@@ -7,6 +7,10 @@ sidebar_position: 7
 
 Systems of ODEs model several state variables changing together. A mass-spring system uses position and velocity, a predator-prey model uses two populations, and an electrical network may use several currents and capacitor voltages. The phase plane replaces a single graph $y(t)$ with trajectories in state space, making stability and long-term behavior visible.
 
+![The Lorenz attractor forms two looping wings in phase space.](https://commons.wikimedia.org/wiki/Special:FilePath/Lorenz_attractor_yb.svg)
+
+*Figure: The Lorenz attractor visualizes sensitive dependence on initial conditions in nonlinear systems. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Lorenz_attractor_yb.svg), Wikimol and Dschwen, CC BY-SA 3.0.*
+
 Linear systems connect ODEs to eigenvalues and eigenvectors. Nonlinear systems are often understood by equilibria, linearization, nullclines, and numerical trajectories. The goal is not only to solve equations, but to classify behavior: attraction, repulsion, spiraling, saddle behavior, periodic motion, and sensitivity to initial conditions.
 
 ## Definitions

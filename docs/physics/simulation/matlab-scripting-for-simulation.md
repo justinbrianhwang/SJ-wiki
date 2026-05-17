@@ -9,6 +9,10 @@ MATLAB scripting is the most direct way to turn a mathematical model into a repe
 
 A good simulation script is not just a sequence of commands that happens to make a plot. It should make assumptions visible, keep model equations in one place, label units, set solver tolerances intentionally, and preserve enough results to reproduce the run. This page focuses on the workflow that connects a state equation to MATLAB code and then to Simulink-compatible thinking.
 
+![A Lorenz attractor coils through phase space in two butterfly-like lobes.](https://commons.wikimedia.org/wiki/Special:FilePath/Lorenz_attractor_yb.svg)
+
+*Figure: The Lorenz attractor is the standard visual scene for sensitive dependence and nonlinear simulation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Lorenz_attractor_yb.svg), Wikimol and Dschwen, CC BY-SA 3.0/GFDL.*
+
 ## Definitions
 
 A MATLAB ODE derivative function has the form

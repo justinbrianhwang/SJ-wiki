@@ -9,6 +9,10 @@ The variational principle and WKB approximation are complementary tools for prob
 
 Sakurai introduces WKB among elementary solutions of the Schrodinger equation and uses variational ideas in approximation methods. Ballentine gives a substantial variational-method treatment in the bound-state chapter and discusses semiclassical limits separately. The Gottfried-named notes include WKB and perturbative comparisons in approximation methods. Schiff's classic presentation is especially close to the traditional one-dimensional WKB connection-formula style.
 
+![A particle-in-a-box diagram shows standing-wave probability structure between hard walls.](https://commons.wikimedia.org/wiki/Special:FilePath/Particle_in_a_box.svg)
+
+*Figure: The infinite square well is the simplest visual example of confinement producing discrete energy levels. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Particle_in_a_box.svg), Pieter Kuiper, public domain.*
+
 ## Definitions
 
 For a normalized trial state $\vert \alpha\rangle$, the variational energy is

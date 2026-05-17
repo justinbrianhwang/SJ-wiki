@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Pseudorandomness is the practical substitute for true randomness. A one-time pad needs a key as long as the message because it uses truly uniform keystream bits. A pseudorandom generator expands a short uniform seed into a longer string that efficient adversaries cannot distinguish from uniform. A pseudorandom function goes further: it gives keyed random-looking answers on many inputs.
 
+![A public-key encryption diagram separates public encryption from private decryption.](https://commons.wikimedia.org/wiki/Special:FilePath/Public_key_encryption.svg)
+
+*Figure: Asymmetric encryption turns key distribution into a public and private key pair. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Public_key_encryption.svg), Davidgothberg, public domain.*
+
 Katz and Lindell treat PRGs and PRFs as foundational primitives for private-key encryption and MACs. Smart approaches the same territory through stream ciphers, LFSRs, block ciphers, and the later provable-security vocabulary. The synthesis is useful: a practical stream cipher is engineered machinery, but the security goal it tries to approximate is the PRG indistinguishability experiment.
 
 ## Definitions

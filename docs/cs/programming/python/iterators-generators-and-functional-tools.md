@@ -7,6 +7,10 @@ sidebar_position: 13
 
 Many Python programs process streams of values: lines in a file, rows in a table, measurements from a sensor, tasks from a queue, or combinations produced by an algorithm. The beginner version is a `for` loop over a list. The deeper version is Python's iteration protocol, which lets code consume values one at a time without knowing where they came from or whether all values exist in memory.
 
+![The Python logo marks pages on scripting, testing, packaging, and scientific programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Python-logo-notext.svg)
+
+*Figure: Python provides the practical environment for many CS, ML, and data examples. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Python-logo-notext.svg), Python Software Foundation, GPL-compatible free license; trademark terms apply.*
+
 This topic extends the textbook's loops, arrays, functions, and modules into more idiomatic Python. Iterators and generators make lazy pipelines possible. Functional tools such as `map`, `filter`, `functools`, and `itertools` provide reusable building blocks. The point is not to replace every loop. The point is to know when a loop should become a reusable iterator, when a list should become a lazy sequence, and when a standard library tool already expresses the pattern.
 
 ## Definitions

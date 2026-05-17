@@ -9,6 +9,10 @@ Identical particles force a change in what counts as a physical state. If two el
 
 Sakurai places identical particles after scattering, using permutation symmetry, the symmetrization postulate, and second-quantized notation. Ballentine gives a careful account of permutation symmetry and indistinguishability, then connects it to many-fermion systems. The Gottfried-named notes relate identical particles to symmetries and spin-statistics. Schiff's traditional examples include helium, exchange degeneracy, and atomic shell structure.
 
+![Hydrogen orbital density plots show bright probability regions for several quantum numbers.](https://commons.wikimedia.org/wiki/Special:FilePath/Hydrogen_Density_Plots.png)
+
+*Figure: Hydrogen density plots make angular momentum, nodes, and probability density visible in real atomic structure. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hydrogen_Density_Plots.png), PoorLeno, public domain.*
+
 ## Definitions
 
 For two particles, the exchange operator $P_{12}$ acts as

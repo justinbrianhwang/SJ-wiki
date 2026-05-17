@@ -7,6 +7,10 @@ sidebar_position: 17
 
 Iterative methods for linear systems generate a sequence of approximate solutions instead of factoring the matrix directly. They are attractive when the matrix is large, sparse, and structured, because each iteration may be cheap and memory efficient. The tradeoff is that convergence is not automatic.
 
+![A matrix multiplication diagram highlights row and column products.](https://commons.wikimedia.org/wiki/Special:FilePath/Matrix_multiplication_diagram.svg)
+
+*Figure: A matrix multiplication diagram makes the row-column structure of linear algebra visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Matrix_multiplication_diagram.svg), Bilou, CC BY-SA 3.0.*
+
 Jacobi, Gauss-Seidel, and successive over-relaxation are classical stationary iterations. They are easy to derive from a matrix splitting and they remain useful as smoothers, preconditioners, and teaching models for more advanced Krylov methods such as conjugate gradient.
 
 ## Definitions

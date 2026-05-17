@@ -7,6 +7,10 @@ sidebar_position: 3
 
 Propositional logic cannot express statements such as "every prime greater than $2$ is odd" without flattening the whole sentence into one atomic symbol. Predicate logic opens the sentence and exposes its variables. A predicate such as $P(x)$ becomes a proposition only after $x$ is assigned a value or after a quantifier says how broadly $P$ is being asserted.
 
+![Two overlapping circles show a highlighted Venn diagram region.](https://commons.wikimedia.org/wiki/Special:FilePath/Venn0001.svg)
+
+*Figure: A Venn diagram connects set operations with the same logical connectives used in proofs. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Venn0001.svg), Watchduck, public domain.*
+
 This is the language used for definitions, theorems, loop invariants, database queries, and specifications. Universal quantifiers support claims about all objects in a domain. Existential quantifiers support claims that at least one object exists. Much of proof writing is the disciplined process of introducing, transforming, and eliminating these quantifiers.
 
 ## Definitions

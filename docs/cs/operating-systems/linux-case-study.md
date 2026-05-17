@@ -7,6 +7,14 @@ sidebar_position: 16
 
 The Linux case study ties the course concepts to a real operating system. The textbook chapter describes Linux through the 3.2 kernel era and presents it as a UNIX-like system that runs from small devices to large servers. Linux is useful pedagogically because it exposes the same abstractions studied earlier: processes, kernel threads, scheduling, memory management, file systems, I/O, IPC, networking, modules, and security.
 
+![A Linux kernel map organizes subsystems such as memory, filesystems, networking, and drivers.](https://commons.wikimedia.org/wiki/Special:FilePath/Linux_kernel_map.png)
+
+*Figure: The Linux kernel map shows how OS services become interacting subsystems. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Linux_kernel_map.png), Conan at English Wikipedia, CC BY 3.0.*
+
+![The Linux mascot marks the operating-system pages that use Linux as a recurring case study.](https://commons.wikimedia.org/wiki/Special:FilePath/Tux.svg)
+
+*Figure: Linux provides the concrete kernel case study for many OS abstractions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tux.svg), Larry Ewing, Simon Budig, and Garrett LeSage, CC0/attribution permission.*
+
 This page is not a full Linux internals manual. It is a bridge from concept to implementation. The point is to see how a production kernel combines ideas that were studied separately: a modular monolithic kernel, process descriptors, preemptive scheduling, virtual memory areas, page cache, virtual file system, block I/O layer, device drivers, and permission checks.
 
 ## Definitions

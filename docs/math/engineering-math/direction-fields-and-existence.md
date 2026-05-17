@@ -7,6 +7,10 @@ sidebar_position: 3
 
 Direction fields connect the equation $y'=f(x,y)$ to the geometry of its solutions. At each point $(x,y)$ in the plane, the value $f(x,y)$ gives the slope of any solution curve that passes through that point. Before solving symbolically, a direction field can reveal equilibrium solutions, blow-up, attraction, repulsion, and whether a proposed formula has the right qualitative behavior.
 
+![Arrows rotate around the origin in a two-dimensional vector field.](https://commons.wikimedia.org/wiki/Special:FilePath/Vector_field.svg)
+
+*Figure: A planar vector field shows how direction and magnitude vary from point to point. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Vector_field.svg), Fibonacci, public domain.*
+
 Existence and uniqueness theorems explain when an initial value problem is well posed. They do not usually give the solution, but they tell us whether one solution curve should pass through a starting point or whether several curves might pass through the same point. This is essential in engineering modeling because a deterministic model should usually produce a unique future from a specified present state.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 17
 
 Generating functions turn sequences into algebraic objects. Instead of studying $a_0,a_1,a_2,\dots$ directly, package the sequence as coefficients of a power series. Algebraic operations on the series then correspond to counting constructions, recurrence solving, and convolution.
 
+![Pascal's triangle fills in row by row with binomial coefficients.](https://commons.wikimedia.org/wiki/Special:FilePath/PascalTriangleAnimated2.gif)
+
+*Figure: Pascal's triangle organizes binomial coefficients, combinations, and recurrence patterns. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PascalTriangleAnimated2.gif), Hersfold, public domain.*
+
 The main idea is that the exponent tracks size while the coefficient tracks how many objects have that size. Once a counting problem is translated into a generating function, multiplication, coefficient extraction, and algebraic simplification do the bookkeeping that would otherwise require many cases.
 
 ## Definitions

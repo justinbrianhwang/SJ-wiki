@@ -7,6 +7,10 @@ sidebar_position: 3
 
 C expressions are compact because the language gives programmers direct access to arithmetic, comparisons, bit operations, assignments, and type conversions. K&R's second chapter is where C starts to look less like pseudocode and more like a systems language: the type of every object constrains its values, and the operator chosen often reveals how the underlying representation is being used.
 
+![A C language logo marks the systems-programming pages built around C examples.](https://commons.wikimedia.org/wiki/Special:FilePath/C_Programming_Language.svg)
+
+*Figure: C remains the reference language for low-level memory, pointers, and Unix interfaces. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:C_Programming_Language.svg), ElodinKaldwin, public domain text logo.*
+
 This topic sits between the tutorial programs and the later chapters on pointers, structures, and I/O. You cannot understand pointer arithmetic without integer conversions, cannot read declarations without knowing qualifiers, and cannot write robust macros without knowing precedence and evaluation order. K&R's style is terse, but it depends on precise rules.
 
 ## Definitions

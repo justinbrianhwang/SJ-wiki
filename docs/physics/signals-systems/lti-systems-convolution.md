@@ -9,6 +9,10 @@ Linear time-invariant systems are the central model class in signals and systems
 
 Convolution is often introduced as a formula, but its meaning is constructive. Break the input into weighted impulses. Pass each impulse through the system. Shift and scale the impulse response for each piece. Add all those responses. In continuous time this addition becomes an integral; in discrete time it becomes a sum.
 
+![A diagram compares a signal representation in time with its frequency-domain counterpart.](https://commons.wikimedia.org/wiki/Special:FilePath/Time_and_frequency_domains.svg)
+
+*Figure: Time and frequency views highlight why transforms are alternate coordinates for the same signal behavior. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Time_and_frequency_domains.svg), Juanlu001, CC0 1.0.*
+
 ## Definitions
 
 The impulse response of a continuous-time system is the output when the input is $\delta(t)$:

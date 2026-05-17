@@ -7,6 +7,10 @@ sidebar_position: 12
 
 Query optimization is the process of choosing an efficient execution plan among many equivalent plans. SQL is declarative, so the user does not usually specify join order, access paths, or physical algorithms. The optimizer uses algebraic equivalences and cost estimates to search the plan space and choose a plan expected to be cheap.
 
+![A PostgreSQL B-tree diagram shows index pages connected by parent and leaf links.](https://commons.wikimedia.org/wiki/Special:FilePath/PostgreSQL_B-tree.svg)
+
+*Figure: PostgreSQL B-tree pages show how logical indexes map to storage structures. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PostgreSQL_B-tree.svg), Kelti, CC BY-SA 4.0.*
+
 Optimization is difficult because the number of possible plans grows quickly. A query with several joins can be evaluated in many join orders, with different join algorithms and indexes at each step. The optimizer therefore relies on statistics, heuristics, and dynamic programming rather than exhaustive physical experimentation. A good plan can be thousands of times faster than a bad one.
 
 ## Definitions

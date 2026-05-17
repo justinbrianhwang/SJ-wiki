@@ -7,6 +7,10 @@ sidebar_position: 8
 
 Empirical defenses try strong attacks and report whether the model survives. Certified defenses make a different kind of claim: within a specified perturbation set, no adversarial example exists for a particular input. This distinction is essential. A failed PGD attack is evidence; a valid certificate is a proof under assumptions.
 
+![A visually similar adversarial panda image is classified as a gibbon by an ImageNet model.](https://ar5iv.labs.arxiv.org/html/1412.6572/assets/gibbon_993.png)
+
+*Figure: The FGSM panda example shows that imperceptible perturbations can change model decisions. Image: [ar5iv](https://arxiv.org/abs/1412.6572), Goodfellow, Shlens, and Szegedy, educational use with attribution.*
+
 The field contains many certification approaches, including interval bound propagation, linear relaxations such as CROWN-style methods, convex relaxations, exact verification for small networks, and randomized smoothing. Randomized smoothing is especially important because it scales to large classifiers and gives clean $\ell_2$ certificates by wrapping a base classifier with Gaussian noise.
 
 ## Definitions

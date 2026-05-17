@@ -7,6 +7,10 @@ sidebar_position: 4
 
 The 8085 instruction set is small enough to learn systematically but rich enough to show the essential patterns of assembly programming: data movement, arithmetic, logic, branches, stack operations, I/O operations, and machine control. The book places this topic after the 8085 architecture because each instruction is easier to understand once registers, flags, memory cycles, and the program counter are already familiar.
 
+![An Intel 4004 package shows one of the first commercial microprocessors.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_4004.jpg)
+
+*Figure: The Intel 4004 marks the transition from board-level logic to microprocessors. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_4004.jpg), LucaDetomi at Italian Wikipedia, CC BY-SA 3.0/GFDL.*
+
 Instruction study should not be reduced to opcode memorization. A useful mental model asks four questions for every instruction: where are the operands, where is the result stored, which flags change, and how many bytes must be fetched? Those questions explain both program behavior and bus timing.
 
 ## Definitions

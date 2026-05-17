@@ -129,7 +129,7 @@ flowchart TB
   Contextual --> Use
 ```
 
-![Skip-gram word embedding model — the figure shows a center word used to predict neighboring context words in the skip-gram architecture.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Word_embeddings_Skip-gram.svg/1280px-Word_embeddings_Skip-gram.svg.png)
+![Skip-gram word embedding model — the figure shows a center word used to predict neighboring context words in the skip-gram architecture.](https://commons.wikimedia.org/wiki/Special:FilePath/Word_embeddings_Skip-gram.svg)
 
 *Figure: The skip-gram architecture trains a word vector by predicting surrounding context words. From [Jeran Renz, 2019](https://commons.wikimedia.org/wiki/File:Word_embeddings_Skip-gram.svg) — CC BY-SA 4.0.*
 

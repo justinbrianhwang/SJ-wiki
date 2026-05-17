@@ -9,6 +9,10 @@ Maxwell's equations use two dialects of vector calculus. The differential dialec
 
 The two dialects are equivalent when fields are sufficiently smooth, but each highlights different physics. Gauss's law is often easiest as a flux integral when symmetry is high; Faraday's law is often clearest as a circulation integral when a changing magnetic flux threads a loop. This page summarizes the tools used throughout applied electromagnetics and connects to [vector differential calculus](/math/engineering-math/vector-differential-calculus) and [vector integral calculus](/math/engineering-math/vector-integral-calculus).
 
+![Four electric dipole configurations are drawn with dense field-line patterns.](https://commons.wikimedia.org/wiki/Special:FilePath/VFPt_dipoles_electric.svg)
+
+*Figure: Dipole field lines make superposition, potential gradients, and boundary intuition visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:VFPt_dipoles_electric.svg), Geek3, CC BY-SA 4.0.*
+
 ## Definitions
 
 For a scalar field $V(x,y,z)$, the gradient is

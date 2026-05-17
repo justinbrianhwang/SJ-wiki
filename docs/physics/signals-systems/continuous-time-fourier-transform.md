@@ -9,6 +9,10 @@ The continuous-time Fourier transform extends Fourier analysis from periodic sig
 
 For LTI systems, the CTFT turns convolution into multiplication. This is the main computational payoff: differential equations, filters, and cascade systems become algebraic in frequency. The transform also gives a precise language for bandwidth, ideal filtering, modulation, and sampling.
 
+![An animation decomposes a square wave into sinusoidal components and a frequency-domain spectrum.](https://commons.wikimedia.org/wiki/Special:FilePath/Fourier_transform_time_and_frequency_domains.gif)
+
+*Figure: Fourier analysis becomes concrete when a time waveform and its spectral lines are shown side by side. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fourier_transform_time_and_frequency_domains.gif), Lucas Vieira, public domain.*
+
 ## Definitions
 
 The continuous-time Fourier transform of $x(t)$ is

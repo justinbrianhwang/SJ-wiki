@@ -7,6 +7,10 @@ sidebar_position: 5
 
 Sets are the basic containers of discrete mathematics. Relations are sets of ordered pairs, graphs are sets of vertices and edges, languages are sets of strings, and events in probability are sets of outcomes. The discipline around sets is simple but strict: order does not matter, repetition does not matter, and membership is the central question.
 
+![Two overlapping circles show a highlighted Venn diagram region.](https://commons.wikimedia.org/wiki/Special:FilePath/Venn0001.svg)
+
+*Figure: A Venn diagram connects set operations with the same logical connectives used in proofs. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Venn0001.svg), Watchduck, public domain.*
+
 Set notation gives a compact way to describe large or infinite collections. Instead of listing every object, we can define a set by a property, combine sets with operations, and prove two descriptions match by checking membership element by element. This makes set theory the bridge between logic and the rest of the subject.
 
 ## Definitions

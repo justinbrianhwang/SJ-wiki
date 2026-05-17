@@ -9,6 +9,10 @@ The postulates are the grammar that lets experiments, probabilities, and time ev
 
 Sakurai builds this grammar from Stern-Gerlach experiments and Dirac notation, so the postulates feel operational rather than decorative. Ballentine states the same mathematics with more emphasis on ensembles and probability distributions, warning that a state vector need not be read as a literal property list for one individual system. The Gottfried-named notes use a conventional postulate-first structure. Schiff's older wave-mechanics style is best treated here as the coordinate-representation version of the same rules.
 
+![A Stern-Gerlach apparatus splits a beam into discrete spin outcomes.](https://commons.wikimedia.org/wiki/Special:FilePath/Stern-Gerlach_experiment.svg)
+
+*Figure: The Stern-Gerlach experiment is the physical scene behind spin quantization and quantum measurement. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Stern-Gerlach_experiment.svg), Tatoute, CC BY-SA 4.0.*
+
 ## Definitions
 
 A **pure state** is represented by a normalized vector $\vert \psi\rangle$ in a complex Hilbert space, with physically identical rays $\vert \psi\rangle$ and $e^{i\alpha}\vert \psi\rangle$. Normalization means

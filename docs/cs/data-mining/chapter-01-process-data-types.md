@@ -7,6 +7,10 @@ sidebar_position: 2
 
 Data mining is the disciplined process of turning raw, messy, application-specific data into useful patterns, predictions, or decisions. In Aggarwal's organization, the field is not just a list of algorithms. It is a pipeline: collect data, extract usable features, clean and integrate them, choose an analytical formulation, evaluate the output, and often feed the result back into earlier stages. This matters because the quality of a mining result is usually limited more by representation and preprocessing than by the final model.
 
+![An Iris dataset scatterplot compares flower measurements colored by species.](https://commons.wikimedia.org/wiki/Special:FilePath/Iris_dataset_scatterplot.svg)
+
+*Figure: The Iris scatterplot makes feature spaces and class separation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Iris_dataset_scatterplot.svg), Nicoguaro, CC BY 4.0.*
+
 This page sits before the specialized topics. Association patterns, clustering, outlier detection, and classification appear later as major building blocks, but they all depend on the same questions: What is one data object? What are its features? Are the objects independent records, or are they connected by time, sequence, space, or graph edges? Which transformations preserve the information needed by the task?
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 3
 
 A process is a program in execution, but that phrase is only the beginning. The executable file is passive bytes on storage; the process is active state: an address space, a program counter, CPU registers, open files, accounting data, scheduling information, and relationships to other processes. Modern operating systems are built around this abstraction because many activities must appear to progress at once even when the machine has fewer CPUs than runnable activities.
 
+![A Linux kernel map organizes subsystems such as memory, filesystems, networking, and drivers.](https://commons.wikimedia.org/wiki/Special:FilePath/Linux_kernel_map.png)
+
+*Figure: The Linux kernel map shows how OS services become interacting subsystems. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Linux_kernel_map.png), Conan at English Wikipedia, CC BY 3.0.*
+
 Processes connect the user-level idea of "running a program" to the kernel-level mechanisms of scheduling, memory isolation, resource ownership, and interprocess communication. The process page therefore prepares for CPU scheduling, synchronization, virtual memory, file systems, and protection. Once a program becomes a process, it is no longer just code; it is a managed object in the kernel.
 
 ## Definitions

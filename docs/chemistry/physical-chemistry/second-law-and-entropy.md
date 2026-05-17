@@ -9,6 +9,10 @@ The Second Law explains why energy conservation is not enough to predict change.
 
 In Atkins' treatment, entropy begins as a thermodynamic state function defined through reversible heat transfer, then gains a molecular interpretation through the number of accessible microstates. The bridge between those views is central to equilibrium, phase change, free energy, and statistical thermodynamics.
 
+![An animation shows a large particle randomly jostled by many smaller particles.](https://commons.wikimedia.org/wiki/Special:FilePath/Brownian_motion_large.gif)
+
+*Figure: Brownian motion as a visual reminder that thermal behavior reflects many microscopic arrangements. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Brownian_motion_large.gif), Lookang with model by Francisco Esquembre and Fu-Kwun, CC BY-SA 3.0.*
+
 ## Definitions
 
 The thermodynamic definition of entropy change is

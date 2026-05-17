@@ -9,6 +9,10 @@ Measurement gives physics its contact with the world, and vectors give it a prec
 
 Vectors enter as soon as direction matters. Displacement, velocity, acceleration, force, momentum, electric field, and magnetic field cannot be described by magnitude alone. Components let us convert geometric statements into algebra, while dimensional analysis checks whether the algebra still describes a possible physical relationship.
 
+![Two vectors are added tip-to-tail and by the parallelogram construction.](https://commons.wikimedia.org/wiki/Special:FilePath/Vector_addition.svg)
+
+*Figure: Vector addition is the visual grammar behind force resultants, displacements, and field components. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Vector_addition.svg), Benjamin D. Esham, public domain.*
+
 ## Definitions
 
 - A **physical quantity** is a number times a unit.

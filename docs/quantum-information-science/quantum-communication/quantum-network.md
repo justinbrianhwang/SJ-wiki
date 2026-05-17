@@ -11,6 +11,14 @@ The distinction matters because "network" can hide very different trust assumpti
 
 Nielsen and Chuang are not primarily a quantum-networking reference, but their channel and cryptography chapters fix the foundations used here: quantum noise is modeled by quantum operations, unknown states cannot be amplified by copying, and QKD security depends on authenticated classical communication plus postprocessing. The networking layer below should therefore be read as a system-level extension of the [BB84](/quantum-information-science/quantum-communication/bb84) and [QKD](/quantum-information-science/quantum-communication/qkd) pages, not as a separate security proof.
 
+![A single-mode fiber optic cable carries light through a bend, illustrating an optical quantum-network link.](https://commons.wikimedia.org/wiki/Special:FilePath/Fiber_Optical_Cable.jpg)
+
+*Figure: Quantum networks still run through ordinary physical infrastructure, but unknown qubits make loss, buffering, and routing fundamentally different from classical packet forwarding. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fiber_Optical_Cable.jpg), Bquast, CC0 1.0.*
+
+![A quantum buffer diagram shows entangled optical images delayed by a rubidium vapor cell.](https://commons.wikimedia.org/wiki/Special:FilePath/Quantum_buffer_%285940501733%29.jpg)
+
+*Figure: Buffering and memory are network-level problems because one successful quantum link may need to wait for another link and a heralding message. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quantum_buffer_%285940501733%29.jpg), National Institute of Standards and Technology / A. Marino, public domain.*
+
 ## Definitions
 
 **Quantum node** is a device that can prepare, measure, store, or process quantum states. A simple QKD transmitter or receiver is a node. A more advanced repeater node may contain quantum memories, Bell-state measurement hardware, and local gates.

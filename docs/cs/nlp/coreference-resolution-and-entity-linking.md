@@ -7,6 +7,10 @@ sidebar_position: 16
 
 Coreference resolution links mentions that refer to the same discourse entity. Entity linking connects a mention to an external knowledge base entry. Jurafsky and Martin cover coreference phenomena, datasets, architectures, neural mention-ranking, entity linking, evaluation, Winograd-style reasoning, and gender bias. Eisenstein contributes a formal reference-resolution chapter, including mention detection, coreference algorithms, representations, evaluation, and the relationship between coreference and information extraction.
 
+![An ELIZA terminal conversation shows an early chatbot responding to typed user input.](https://commons.wikimedia.org/wiki/Special:FilePath/ELIZA_conversation.png)
+
+*Figure: ELIZA provides historical context for dialogue systems and chatbot evaluation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ELIZA_conversation.png), Unknown author, public domain text.*
+
 These tasks matter because texts refer to the same entity in many ways: `Marie Curie`, `Curie`, `the scientist`, `she`, and `the Nobel laureate`. Downstream systems need to know when these expressions co-refer. Entity linking goes one step further and asks which real-world entity the cluster denotes.
 
 ## Definitions

@@ -9,6 +9,10 @@ Molecular structure arises when atomic nuclei and electrons are treated quantum 
 
 Atkins presents these models as complementary. Valence-bond language emphasizes localized bonds and resonance; molecular orbital language emphasizes delocalized orbitals and orbital energies; computational chemistry turns both into numerical predictions.
 
+![A ball-and-stick model shows benzene as a planar aromatic ring with delocalized bonding.](https://commons.wikimedia.org/wiki/Special:FilePath/Benzene-aromatic-3D-balls.png)
+
+*Figure: Benzene as a familiar molecule where structure, bonding models, and computation meet. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Benzene-aromatic-3D-balls.png), Benjah-bmm27, public domain.*
+
 ## Definitions
 
 The **Born-Oppenheimer approximation** separates electronic and nuclear motion because nuclei are much heavier than electrons. The electronic Schrodinger equation is solved at fixed nuclear positions, giving an electronic energy that acts as a potential energy surface for nuclear motion.

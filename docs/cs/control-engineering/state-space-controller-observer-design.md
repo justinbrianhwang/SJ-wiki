@@ -7,6 +7,10 @@ sidebar_position: 16
 
 State-space design moves beyond shaping transfer-function plots and directly assigns the dynamics of internal state equations. Nise's state-space design chapter develops controllability, pole placement, Ackermann's formula, observer design, observability, and integral control for steady-state error. This page also adds a short supplementary LQR overview because it is the standard modern extension of the same framework.
 
+![An inverted pendulum on a cart shows the unstable plant used in many control examples.](https://commons.wikimedia.org/wiki/Special:FilePath/Cart-pendulum.svg)
+
+*Figure: The cart-pendulum is a concrete plant for modeling, stabilization, and control design. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cart-pendulum.svg), Krishnavedala, CC0.*
+
 The state-space viewpoint is powerful because it separates what can be controlled from what can be measured. A plant may have states that are not directly sensed, so an observer estimates them. A plant may have modes that an input cannot influence, so pole placement cannot move them. These structural questions must be answered before choosing gains.
 
 ## Definitions

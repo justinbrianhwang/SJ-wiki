@@ -9,6 +9,10 @@ Trusses, frames, and machines are assemblies of connected members. The same equi
 
 A truss is primarily a force-carrying structure. A frame is primarily a support structure whose members may carry more than two forces. A machine is an assembly meant to transform forces and motion. These categories are not rigid; what matters mechanically is whether a member can be idealized as a two-force body or must be treated as a general rigid body.
 
+![A truss bridge diagram shows triangular members carrying loads across a span.](https://commons.wikimedia.org/wiki/Special:FilePath/Truss_bridge.svg)
+
+*Figure: A truss bridge gives statics pages an immediate real structure for joints, members, and load paths. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Truss_bridge.svg), Noleander, CC0 1.0.*
+
 ## Definitions
 
 A **truss** is an assembly of slender members connected at their ends, commonly idealized with frictionless pins. Loads and supports are assumed to act at joints. Under the usual idealization, each truss member is a two-force member, so it carries only axial tension or compression.

@@ -7,6 +7,10 @@ sidebar_position: 6
 
 Mitchell's evaluation chapter gives the statistical machinery needed to say whether a learned hypothesis is actually good. Earlier chapters build hypotheses; this chapter asks how accurately their future performance can be estimated from finite samples. The key warning is simple: training accuracy is not enough, and even test accuracy is an estimate with uncertainty.
 
+![An Iris dataset scatterplot compares flower measurements colored by species.](https://commons.wikimedia.org/wiki/Special:FilePath/Iris_dataset_scatterplot.svg)
+
+*Figure: The Iris scatterplot makes feature spaces and class separation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Iris_dataset_scatterplot.svg), Nicoguaro, CC BY 4.0.*
+
 The chapter is intentionally practical. It introduces sample error, true error, confidence intervals, tests for comparing hypotheses, and paired tests for comparing learning algorithms. These tools connect directly to modern model evaluation, even though modern practice often uses larger datasets, cross-validation, bootstrap procedures, and benchmark suites.
 
 ## Definitions

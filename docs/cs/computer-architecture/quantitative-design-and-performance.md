@@ -7,6 +7,10 @@ sidebar_position: 2
 
 Computer architecture is not mainly a catalog of clever hardware structures. In the Hennessy and Patterson style, it is an engineering discipline built around measurement, trade-offs, and explicit assumptions. A proposed pipeline, cache, instruction set, or multiprocessor mechanism is only meaningful after asking: what workload does it improve, by how much, at what cost, and under which power or reliability limits?
 
+![An opened Intel 4004 processor exposes the silicon die inside its package.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_4004_open.jpg)
+
+*Figure: Opening the package links instruction-set discussions to the physical die. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_4004_open.jpg), Science Museum Group, CC BY 4.0.*
+
 This page introduces the quantitative habits used throughout the rest of the architecture notes. The same ideas reappear in cache design, branch prediction, vector machines, warehouse-scale computers, and storage systems: define the metric, decompose execution time, estimate the affected fraction, and distrust improvements that optimize a narrow component while hurting the complete system.
 
 ## Definitions

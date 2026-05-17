@@ -7,6 +7,10 @@ sidebar_position: 12
 
 C itself does not define input and output statements. K&R therefore treats I/O as a standard-library topic: streams, `getchar`, `putchar`, `printf`, `scanf`, line input, and file access are provided by headers and functions rather than by language syntax. This division is important because portable C programs interact with their environment through library contracts.
 
+![A C language logo marks the systems-programming pages built around C examples.](https://commons.wikimedia.org/wiki/Special:FilePath/C_Programming_Language.svg)
+
+*Figure: C remains the reference language for low-level memory, pointers, and Unix interfaces. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:C_Programming_Language.svg), ElodinKaldwin, public domain text logo.*
+
 The first I/O model is a text stream: a sequence of characters, often organized as lines ending in newline. The next layer is formatted conversion, where `printf` turns internal values into text and `scanf` turns text into internal values. These functions are powerful, but because they use variable argument lists, the compiler cannot always protect you from mismatched formats and arguments.
 
 ## Definitions

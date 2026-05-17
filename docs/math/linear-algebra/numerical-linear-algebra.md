@@ -7,6 +7,10 @@ sidebar_position: 18
 
 Exact row reduction explains the theory, but computers work with finite precision. Numerical linear algebra studies algorithms that are efficient, stable, and reusable. Anton's numerical chapter highlights LU decomposition, the power method, operation counts, roundoff behavior, and the practical preference for factorizations over symbolic formulas.
 
+![Gaussian elimination turns a linear system into triangular form.](https://commons.wikimedia.org/wiki/Special:FilePath/File_Gaussian_elimination.svg)
+
+*Figure: Gaussian elimination uses row operations to expose pivots, rank, and solvability. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:File_Gaussian_elimination.svg), Akira tanzivana, CC BY-SA 4.0.*
+
 The central shift is from "Can this be solved?" to "Can this be solved accurately, quickly, and repeatedly on real hardware?" A formula may be mathematically correct and still be a poor computational method. Numerical linear algebra asks how errors propagate and how algorithms behave as problem sizes grow.
 
 ## Definitions

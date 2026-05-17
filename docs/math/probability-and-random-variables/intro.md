@@ -7,6 +7,18 @@ sidebar_position: 1
 
 This section is a rigorous probability course map following MIT 18.440 Probability and Random Variables, Scott Sheffield, Spring 2014. It begins with counting and axioms, then builds random variables, expectation, variance, standard distributions, joint laws, transforms, limit theorems, Markov chains, entropy, martingales, and the risk-neutral probability viewpoint used in Black-Scholes.
 
+![Pierre-Simon de Laplace is shown in a historical engraved portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Pierre-Simon_de_Laplace.jpg)
+
+*Figure: Pierre-Simon de Laplace is a key figure in probability, transforms, and potential theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pierre-Simon_de_Laplace.jpg), Louis Delaistre after Armand-Charles Guilleminot, public domain.*
+
+![A Galton box diagram shows balls falling through pegs into bins.](https://commons.wikimedia.org/wiki/Special:FilePath/Galton_Box.svg)
+
+*Figure: A Galton box turns repeated random left-right choices into an approximate bell-shaped distribution. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Galton_Box.svg), Marcin Floryan, CC BY-SA 3.0.*
+
+![Tree diagrams organize conditional probabilities for Bayes' theorem.](https://commons.wikimedia.org/wiki/Special:FilePath/Bayes_theorem_tree_diagrams.svg)
+
+*Figure: Probability trees make the conditioning structure in Bayes' theorem explicit. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bayes_theorem_tree_diagrams.svg), Gnathan87, CC0 1.0.*
+
 The notes are meant to sit between a short applied probability introduction and a measure-theoretic graduate course. They use finite and countable models when possible, continuous densities when needed, and proof sketches for the structural results that students repeatedly use. The section also links outward to the shorter `/math/probability/` pages, discrete mathematics probability, and statistics when the same ideas appear in a different style.
 
 ## Definitions

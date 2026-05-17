@@ -7,6 +7,10 @@ sidebar_position: 50
 
 This section supplements the hardware-and-assembly-oriented embedded notes with the cyber-physical systems perspective from Lee and Seshia. The existing notes in this folder focus on microprocessors, microcontrollers, buses, peripheral chips, assembly programming, and concrete interfacing. This supplement focuses on models: continuous dynamics, discrete state machines, hybrid systems, concurrency semantics, timing, verification, quantitative analysis, and security.
 
+![An Arduino Uno board shows a familiar microcontroller development board with headers and USB.](https://commons.wikimedia.org/wiki/Special:FilePath/Arduino_Uno_-_R3.jpg)
+
+*Figure: Arduino boards make microcontroller I/O and prototyping tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Arduino_Uno_-_R3.jpg), SparkFun Electronics, CC BY 2.0.*
+
 The shift in emphasis matters because embedded software is not only software running on small computers. In a cyber-physical system, computation is coupled to physical processes through sensors, actuators, networks, and feedback. Correctness can depend on real time, state evolution, environmental assumptions, and whether the chosen abstraction is sound enough to justify the design.
 
 ## Definitions

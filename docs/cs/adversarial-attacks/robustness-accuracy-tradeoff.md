@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Robust models often lose clean accuracy compared with standard models. This is not just an implementation inconvenience; in many settings robustness changes the classification problem. A classifier that must be correct on every point in an $\epsilon$-ball needs larger margins, smoother decision boundaries, different features, and often more data or compute.
 
+![A visually similar adversarial panda image is classified as a gibbon by an ImageNet model.](https://ar5iv.labs.arxiv.org/html/1412.6572/assets/gibbon_993.png)
+
+*Figure: The FGSM panda example shows that imperceptible perturbations can change model decisions. Image: [ar5iv](https://arxiv.org/abs/1412.6572), Goodfellow, Shlens, and Szegedy, educational use with attribution.*
+
 The tradeoff should not be oversold as an absolute law for every dataset and architecture. Better data, architectures, training methods, and scale can improve both clean and robust accuracy. But the tension is real enough that every robustness result should report both metrics and name the threat model. This page explains the formal decomposition, geometric intuition, and practical consequences.
 
 ## Definitions

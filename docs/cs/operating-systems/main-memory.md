@@ -7,6 +7,10 @@ sidebar_position: 8
 
 Main memory management explains how several processes can coexist in RAM while each program behaves as if it has its own orderly address space. CPU scheduling improves utilization only if multiple processes are available to run, and that requires memory sharing. The OS must decide where processes live, how logical addresses become physical addresses, how protection is enforced, and how fragmentation is controlled.
 
+![A Linux kernel map organizes subsystems such as memory, filesystems, networking, and drivers.](https://commons.wikimedia.org/wiki/Special:FilePath/Linux_kernel_map.png)
+
+*Figure: The Linux kernel map shows how OS services become interacting subsystems. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Linux_kernel_map.png), Conan at English Wikipedia, CC BY 3.0.*
+
 This page covers the mechanisms emphasized before virtual memory: address binding, relocation, contiguous allocation, segmentation, paging, page tables, and the translation lookaside buffer. Virtual memory builds on these ideas by allowing pages to be absent from RAM; main-memory management first explains what it means for an address to be valid and translated at all.
 
 ## Definitions

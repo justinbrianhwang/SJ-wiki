@@ -7,6 +7,10 @@ sidebar_position: 4
 
 Bisection and fixed-point iteration are the first two root-finding methods worth separating carefully. Bisection asks for very little: a continuous function and a sign change. In exchange, it gives a guaranteed shrinking interval. Fixed-point iteration can be much faster, but only after the equation has been rearranged into a map whose repeated application actually pulls guesses toward the solution.
 
+![The bisection method repeatedly narrows an interval around a root.](https://commons.wikimedia.org/wiki/Special:FilePath/Bisection_method.svg)
+
+*Figure: Bisection is a robust root-finding method built from the intermediate value theorem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bisection_method.svg), Tokuchan after Dake, CC BY-SA 3.0.*
+
 The pair also introduces a pattern that appears throughout numerical analysis. A robust method usually has a theorem that protects it from bad initial guesses, while a fast method usually needs local assumptions. Good practical solvers often combine both ideas: first locate a safe region, then switch to a faster local iteration.
 
 ## Definitions

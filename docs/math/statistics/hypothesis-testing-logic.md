@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Hypothesis testing is a formal way to compare observed data with what would be expected if a specified null claim were true. The Lane text presents the logic of significance testing, one- and two-tailed tests, errors, power, and common misconceptions because this topic is widely used and widely misread. A test is not a machine for proving a research hypothesis; it is a probability calculation under a model.
 
+![Tree diagrams organize conditional probabilities for Bayes' theorem.](https://commons.wikimedia.org/wiki/Special:FilePath/Bayes_theorem_tree_diagrams.svg)
+
+*Figure: Probability trees make the conditioning structure in Bayes' theorem explicit. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bayes_theorem_tree_diagrams.svg), Gnathan87, CC0 1.0.*
+
 The core question is: If the null hypothesis were true and the assumptions were reasonable, how surprising would a statistic at least as extreme as the observed one be? The answer is the p-value. A small p-value indicates that the data are unusual under the null model, but it does not measure the probability that the null is true, the probability that the result will replicate, or the practical importance of the effect.
 
 ## Definitions

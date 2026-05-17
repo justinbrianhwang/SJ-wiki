@@ -7,6 +7,10 @@ sidebar_position: 6
 
 Software metrics try to make important software attributes measurable. Gustafson's metrics chapter starts with measurement theory, then applies it to product metrics, process metrics, and the Goal-Question-Metric approach. The chapter is careful about validation: a number is not useful merely because it can be computed. A metric must represent an attribute in a meaningful way, and the use of the metric must be justified.
 
+![Two programmers work together at one computer in a pair-programming setup.](https://commons.wikimedia.org/wiki/Special:FilePath/Pair_Programming.jpg)
+
+*Figure: Pair programming makes collaboration and review practices concrete. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pair_Programming.jpg), Calqui, CC BY-SA 3.0.*
+
 This topic sits between project management and quality assurance. Managers need measures to estimate, track, and improve work; engineers need measures that signal complexity, maintainability, and test risk. The chapter covers common size and complexity measures such as LOC, McCabe's cyclomatic number, Halstead's software science measures, Henry-Kafura information flow, productivity, and GQM.
 
 ## Definitions

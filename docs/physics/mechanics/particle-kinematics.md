@@ -9,6 +9,10 @@ Kinematics describes motion without asking what force caused it. For a particle,
 
 This topic bridges statics and dynamics. In statics, acceleration is zero and the equations collapse to equilibrium. In dynamics, acceleration is usually the unknown that connects motion to force through Newton's second law. A clear kinematic description is therefore the setup step for every kinetics problem.
 
+![A projectile follows a parabolic trajectory with launch angle, range, and maximum height marked.](https://commons.wikimedia.org/wiki/Special:FilePath/Projectile_motion.svg)
+
+*Figure: Projectile motion is the standard visual model for decomposing one motion into horizontal and vertical components. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Projectile_motion.svg), Maxmath12, CC0 1.0.*
+
 ## Definitions
 
 The position vector of a particle is

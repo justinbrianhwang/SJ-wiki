@@ -7,6 +7,10 @@ sidebar_position: 59
 
 Input and output are where sequential software meets a concurrent physical world. A microcontroller can execute one instruction stream, but switches bounce, serial bytes arrive, timers expire, motors turn, sensors sample, and interrupt lines change independently. I/O design is therefore partly electrical, partly architectural, and partly semantic: what does software assume about when external events become visible?
 
+![An Arduino Uno board shows a familiar microcontroller development board with headers and USB.](https://commons.wikimedia.org/wiki/Special:FilePath/Arduino_Uno_-_R3.jpg)
+
+*Figure: Arduino boards make microcontroller I/O and prototyping tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Arduino_Uno_-_R3.jpg), SparkFun Electronics, CC BY 2.0.*
+
 Lee and Seshia use I/O to expose a central CPS tension. Software is written as ordered statements, but the environment is not ordered by the program. Polling, interrupts, GPIO, PWM, serial interfaces, buses, memory-mapped registers, and device drivers are all mechanisms for reconciling that mismatch.
 
 ## Definitions

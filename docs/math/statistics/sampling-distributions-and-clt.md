@@ -9,7 +9,7 @@ A sampling distribution is the probability distribution of a statistic over repe
 
 The central limit theorem is the most important approximation in introductory statistics. It explains why sample means are often approximately normal even when the original observations are not. This is the reason normal and $t$ procedures appear so widely. The theorem does not say that the raw data become normal; it says that the distribution of the sample mean becomes approximately normal under suitable conditions as sample size grows.
 
-![A central limit theorem simulation shows sample means becoming bell-shaped with larger sample sizes.](https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Central_Limit_Theorem.png/500px-Central_Limit_Theorem.png)
+![A central limit theorem simulation shows sample means becoming bell-shaped with larger sample sizes.](https://commons.wikimedia.org/wiki/Special:FilePath/Central_Limit_Theorem.png)
 
 *Figure: Simulation of sample-mean distributions under the central limit theorem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Central_Limit_Theorem.png), Daniel Resende, CC BY-SA 4.0.*
 

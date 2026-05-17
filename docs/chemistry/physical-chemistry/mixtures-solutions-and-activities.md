@@ -9,6 +9,10 @@ Mixtures are where chemical potential becomes unavoidable. The properties of a s
 
 Atkins develops simple mixtures from ideal gas mixing through ideal and nonideal liquid solutions, then extends the discussion to activities, colligative properties, and electrolyte solutions. The central idea is that equilibrium is governed by chemical potential, while composition enters through activity rather than bare concentration whenever nonideality matters.
 
+![A diagram shows red blood cells changing volume in hypotonic, isotonic, and hypertonic solutions.](https://commons.wikimedia.org/wiki/Special:FilePath/Osmotic_pressure_on_blood_cells_diagram.svg)
+
+*Figure: Osmotic pressure as a macroscopic consequence of chemical-potential differences in solution. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Osmotic_pressure_on_blood_cells_diagram.svg), LadyofHats, public domain.*
+
 ## Definitions
 
 The **partial molar quantity** of component $J$ for an extensive property $X$ is

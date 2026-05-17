@@ -7,6 +7,10 @@ sidebar_position: 14
 
 Digital signatures are the public-key analogue of message authentication, but with a crucial difference: verification uses a public key. Anyone can check a valid signature, while only the signer should be able to create one. This gives integrity, origin authentication, and transferability in settings where a shared MAC key would not be enough.
 
+![A public-key diagram shows Alice encrypting a message that only Bob can decrypt.](https://commons.wikimedia.org/wiki/Special:FilePath/Public_key_encryption_alice_to_bob.svg)
+
+*Figure: Public-key encryption makes the Alice-to-Bob security goal explicit. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Public_key_encryption_alice_to_bob.svg), Winstonlee, CC0.*
+
 Katz and Lindell present signatures through formal unforgeability definitions, hash-and-sign, RSA-FDH, Schnorr, DSA, ECDSA, certificate infrastructure, and TLS. Smart adds concrete public-key signature algorithms, implementation concerns, and the connection between signatures and authentic public keys. The modern view is that a signature scheme is not just a trapdoor operation; it is a randomized or carefully encoded protocol with a security proof target.
 
 ## Definitions

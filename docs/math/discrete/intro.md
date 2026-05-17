@@ -7,6 +7,18 @@ sidebar_position: 1
 
 Discrete mathematics studies objects that are separated rather than continuous: propositions, integers, sets, functions, strings, relations, graphs, trees, and finite machines. These notes follow the scope of Rosen's *Discrete Mathematics and Its Applications*, 8th edition, with emphasis on the proof techniques and structures used throughout computer science.
 
+![Two overlapping circles show a highlighted Venn diagram region.](https://commons.wikimedia.org/wiki/Special:FilePath/Venn0001.svg)
+
+*Figure: A Venn diagram connects set operations with the same logical connectives used in proofs. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Venn0001.svg), Watchduck, public domain.*
+
+![Pascal's triangle fills in row by row with binomial coefficients.](https://commons.wikimedia.org/wiki/Special:FilePath/PascalTriangleAnimated2.gif)
+
+*Figure: Pascal's triangle organizes binomial coefficients, combinations, and recurrence patterns. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PascalTriangleAnimated2.gif), Hersfold, public domain.*
+
+![George Boole is shown in a historical portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/George_Boole_color.jpg)
+
+*Figure: George Boole's algebraic logic underlies Boolean algebra and digital circuits. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:George_Boole_color.jpg), Unknown author, public domain.*
+
 The path starts with logic, predicates, and proof methods because every later topic depends on precise statements and valid inference. It then builds the standard discrete structures: sets, functions, sequences, sums, cardinality, algorithms, number theory, induction, recurrence relations, counting, probability, relations, graphs, trees, Boolean algebra, and models of computation. The pages are written as study notes rather than as a replacement for the textbook: each page highlights definitions, theorem statements and proof patterns, worked examples, and short Python snippets where computation clarifies the idea.
 
 Use these notes actively. Translate definitions into your own examples, prove small claims before reading the proof sketch, and run or modify the code blocks to test edge cases.

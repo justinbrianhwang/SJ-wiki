@@ -9,6 +9,10 @@ Relativity Intro covers special relativity, Lorentz factor, time dilation, lengt
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
+![Albert Einstein is shown in a formal 1947 portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Albert_Einstein_Head.jpg)
+
+*Figure: Einstein is a natural historical anchor for relativity and the modern limits of classical mechanics. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Albert_Einstein_Head.jpg), Orren Jack Turner, public domain.*
+
 ## Definitions
 
 - **Scope:** special relativity, Lorentz factor, time dilation, length contraction, relativistic energy, and velocity addition.

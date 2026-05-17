@@ -7,6 +7,10 @@ sidebar_position: 4
 
 Once values are in a vector, the next task is choosing the right values. R gives several indexing styles: positive positions, negative omissions, logical filters, character names, and empty selections. The book introduces these early because subsetting is not a side topic in R; it is how you inspect data, clean data, replace values, and pass selected observations into statistical functions.
 
+![The R logo marks pages on statistical computing, graphics, and data analysis.](https://commons.wikimedia.org/wiki/Special:FilePath/R_logo.svg)
+
+*Figure: R connects programming examples to statistical modeling and visualization workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:R_logo.svg), The R Foundation, CC BY-SA 4.0.*
+
 Names and recycling make indexing more expressive but also more dangerous. Names let you ask for `"height"` or `"control"` rather than position 3. Recycling lets short vectors align with long vectors, making scalar operations easy, but accidental recycling can silently produce wrong answers. Good R code makes the intended shape clear before it subsets or combines objects.
 
 ## Definitions

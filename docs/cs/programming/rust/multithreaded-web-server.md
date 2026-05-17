@@ -7,6 +7,10 @@ sidebar_position: 20
 
 The Rust book ends with a low-level web server project. It is intentionally small: bind a TCP listener, accept incoming streams, parse enough HTTP to distinguish a few paths, write responses, then add a thread pool so slow requests do not block every other request. The project is a practical review of ownership, error handling, traits, closures, channels, mutexes, and graceful cleanup.
 
+![The Rust logo marks pages on ownership, borrowing, traits, and safe systems programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Rust_programming_language_black_logo.svg)
+
+*Figure: Rust connects systems control with compile-time memory-safety guarantees. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Rust_programming_language_black_logo.svg), Rust Foundation, CC BY 4.0.*
+
 This source edition uses a blocking, thread-pool design rather than an async/await design. That is important: async Rust is a major ecosystem topic, but it is not developed as a dedicated chapter in this PDF's main sequence. The server here should be understood as the book's concrete final project, not as a complete production web framework.
 
 ## Definitions

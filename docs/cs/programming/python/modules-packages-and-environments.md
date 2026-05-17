@@ -7,6 +7,10 @@ sidebar_position: 9
 
 As Python programs grow, one file becomes too crowded. The textbook introduces modules as Python files that contain definitions and statements, then demonstrates importing conversion functions from another file. It also discusses the standard library, third-party packages, `pip`, Anaconda, Conda, and virtual environments. Those topics belong together because importing code and managing installed code are two sides of the same workflow.
 
+![The Python logo marks pages on scripting, testing, packaging, and scientific programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Python-logo-notext.svg)
+
+*Figure: Python provides the practical environment for many CS, ML, and data examples. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Python-logo-notext.svg), Python Software Foundation, GPL-compatible free license; trademark terms apply.*
+
 A module gives code a home. A package groups related modules. An environment decides which interpreter and installed packages are available. Good Python projects keep these layers explicit: local modules for project code, the standard library for built-in capabilities, third-party packages for external functionality, and an isolated environment to make the setup reproducible.
 
 ## Definitions

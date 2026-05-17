@@ -7,6 +7,10 @@ sidebar_position: 12
 
 Attention lets a model choose which pieces of information to use for each prediction. D2L introduces attention through queries, keys, and values, then builds scoring functions, multi-head attention, self-attention, positional encoding, and the Transformer architecture. This progression explains why attention displaced recurrence for many sequence tasks: it creates direct paths between all positions and parallelizes efficiently.
 
+![An ELIZA terminal conversation shows an early chatbot responding to typed user input.](https://commons.wikimedia.org/wiki/Special:FilePath/ELIZA_conversation.png)
+
+*Figure: ELIZA provides historical context for dialogue systems and chatbot evaluation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ELIZA_conversation.png), Unknown author, public domain text.*
+
 A Transformer is not just attention. It combines multi-head self-attention, positionwise feed-forward networks, residual connections, layer normalization, masking, and positional information. Each component solves a specific problem: attention mixes tokens, feed-forward layers transform each position, residual paths stabilize optimization, masks preserve causality or ignore padding, and positional encodings restore order information that pure attention does not have.
 
 ## Definitions

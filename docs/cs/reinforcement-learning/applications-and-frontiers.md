@@ -7,6 +7,10 @@ sidebar_position: 16
 
 Sutton and Barto close the book by showing how reinforcement learning ideas appear in substantial systems and open research directions. The case studies include TD-Gammon, Samuel's checkers player, Watson's Daily Double wagering, memory control, Atari game playing, AlphaGo and AlphaGo Zero, personalized web services, and thermal soaring. The frontier topics include general value functions, options, state representation, reward design, and unresolved issues in sample efficiency and abstraction.
 
+![A Waymo self-driving car drives on a public road with roof-mounted sensors.](https://commons.wikimedia.org/wiki/Special:FilePath/Waymo_self-driving_car_front_view.gk.jpg)
+
+*Figure: A real autonomous vehicle grounds the driving stack in a physical platform. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Waymo_self-driving_car_front_view.gk.jpg), Grendelkhan, CC BY-SA 4.0.*
+
 The practical lesson is that successful RL systems rarely use one idea in isolation. They combine value learning, function approximation, planning, search, simulation, domain structure, and carefully chosen reward signals. The frontier lesson is similar: many hard problems in RL are not solved merely by scaling an algorithm. The agent still needs useful state, exploration, temporal abstraction, and objectives that match the intended task.
 
 ## Definitions

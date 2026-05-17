@@ -7,6 +7,10 @@ sidebar_position: 12
 
 Classical controllers add simple dynamics to reshape steady-state error, transient response, and robustness. Nise discusses compensation primarily through root locus and frequency response. The familiar PI, PD, and PID actions fit naturally into that framework: proportional gain moves poles along an existing locus, integral action adds low-frequency gain, and derivative action adds phase lead.
 
+![A compact PID controller block shows proportional, integral, and derivative action.](https://commons.wikimedia.org/wiki/Special:FilePath/PID_Controller.png)
+
+*Figure: PID control turns error history into a practical actuator command. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PID_Controller.png), Hew, public domain.*
+
 This page emphasizes what each compensator changes structurally. A controller is not chosen because its name is familiar; it is chosen because the plant's deficiencies are clear. If the system is too slow, lacks damping, or has inadequate phase margin, lead or derivative action may help. If tracking error is too large, integral or lag action may help. If both are inadequate, combined compensation is needed.
 
 ## Definitions

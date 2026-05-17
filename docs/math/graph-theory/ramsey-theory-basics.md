@@ -7,6 +7,10 @@ sidebar_position: 17
 
 Ramsey theory says that complete disorder is impossible in a sufficiently large structure. If every edge of a large complete graph is coloured red or blue, then some large one-colour pattern must appear. The simplest famous result is $R(3,3)=6$: every red-blue colouring of the edges of $K_6$ contains a monochromatic triangle.
 
+![A two-colour complete graph diagram illustrates a Ramsey theorem proof.](https://commons.wikimedia.org/wiki/Special:FilePath/Ramsey_theorem_visual_proof.svg)
+
+*Figure: A visual proof of a small Ramsey theorem shows why large enough networks force ordered substructure. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Ramsey_theorem_visual_proof.svg), Cmglee, CC BY-SA 4.0.*
+
 This topic sits between graph colouring, extremal graph theory, and combinatorics. Instead of asking how to avoid conflicts with few colours, Ramsey theory asks how large a graph must be before a specified one-colour configuration becomes unavoidable.
 
 ## Definitions

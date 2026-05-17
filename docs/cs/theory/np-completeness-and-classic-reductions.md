@@ -7,6 +7,10 @@ sidebar_position: 15
 
 NP-completeness gives a rigorous way to say that a problem is at least as hard as every problem in NP. It does not prove that the problem lacks a polynomial-time algorithm, because that would prove $P\ne NP$. Instead, it provides strong evidence: a polynomial-time algorithm for any NP-complete problem would yield polynomial-time algorithms for all NP problems.
 
+![A square Kufic algorithms mark introduces the study of designed procedures.](https://commons.wikimedia.org/wiki/Special:FilePath/Algorithms.svg)
+
+*Figure: The algorithms mark gives the abstract algorithms pages a concrete visual anchor. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Algorithms.svg), Jeff Erickson, CC BY 4.0.*
+
 The engine is polynomial-time reducibility. To prove a new problem NP-complete, show it is in NP and transform a known NP-complete problem into it. The transformation must preserve yes/no answers and run in polynomial time. Classic reductions build a network of hard problems from SAT to CLIQUE, VERTEX-COVER, HAMPATH, SUBSETSUM, and many others.
 
 ## Definitions

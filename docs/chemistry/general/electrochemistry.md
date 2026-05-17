@@ -9,6 +9,10 @@ Electrochemistry connects electron transfer to electrical work. In a galvanic ce
 
 In the Ebbing and Gammon sequence this topic sits near balancing redox in acidic and basic solution, voltaic cells, cell notation, cell potential, standard electrode potentials, equilibrium constants from cell potentials, Nernst equation, commercial cells, electrolytic cells, and electrolysis stoichiometry. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
+![A galvanic cell diagram shows two half-cells connected by a salt bridge and external circuit.](https://commons.wikimedia.org/wiki/Special:FilePath/Galvanic_Cell.svg)
+
+*Figure: Galvanic cell separating oxidation and reduction into two half-reactions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Galvanic_Cell.svg), Gringer, CC BY-SA 3.0/GFDL.*
+
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.

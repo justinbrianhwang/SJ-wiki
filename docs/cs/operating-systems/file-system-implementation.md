@@ -7,6 +7,10 @@ sidebar_position: 11
 
 File-system implementation explains how the friendly interface of files and directories becomes persistent structures on storage. The user sees names, folders, permissions, and bytes. The OS must maintain metadata, allocate blocks, track free space, cache data, recover after crashes, and connect the file-system layer to the block-device layer. Good implementation turns slow storage into a usable abstraction without losing consistency.
 
+![A Linux kernel map organizes subsystems such as memory, filesystems, networking, and drivers.](https://commons.wikimedia.org/wiki/Special:FilePath/Linux_kernel_map.png)
+
+*Figure: The Linux kernel map shows how OS services become interacting subsystems. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Linux_kernel_map.png), Conan at English Wikipedia, CC BY 3.0.*
+
 The textbook separates file-system interface from implementation because the two levels answer different questions. The interface says what operations mean; the implementation says how to store and retrieve the data. This page focuses on file-control blocks, directory implementation, allocation methods, free-space management, caching, recovery, NFS, and the WAFL example mentioned in the chapter.
 
 ## Definitions

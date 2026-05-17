@@ -7,6 +7,10 @@ sidebar_position: 3
 
 Transfer functions are the main algebraic language of classical control. Nise introduces them after a Laplace-transform refresher because the transform converts constant-coefficient differential equations into polynomial equations in $s$. Once inputs and outputs are expressed in the same domain, subsystems can be multiplied, divided, and connected with block-diagram rules.
 
+![A feedback control block diagram shows compensators wrapped around a plant.](https://commons.wikimedia.org/wiki/Special:FilePath/Control_System.svg)
+
+*Figure: The standard feedback loop keeps control pages tied to the plant-controller interface. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Control_System.svg), Inductiveload, public domain.*
+
 This page combines the frequency-domain modeling foundation with the small-signal linearization step needed before transfer functions are valid. The unspoken discipline is important: a transfer function is not the physical system itself. It is a linear, time-invariant, zero-initial-condition input-output model that is useful only over the operating range where the assumptions are defensible.
 
 ## Definitions

@@ -9,7 +9,7 @@ Directed graphs add orientation to adjacency. A road may be one-way, a web page 
 
 Tournaments and Markov chains are two important directed examples. A tournament orients every edge of a complete graph, modelling pairwise contests. A Markov chain assigns transition probabilities to directed edges, modelling repeated movement between states.
 
-![A transitive tournament on eight vertices has directed edges arranged around a circle.](https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/8-tournament-transitive.svg/500px-8-tournament-transitive.svg.png)
+![A transitive tournament on eight vertices has directed edges arranged around a circle.](https://commons.wikimedia.org/wiki/Special:FilePath/8-tournament-transitive.svg)
 
 *Figure: Transitive tournament on eight vertices. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:8-tournament-transitive.svg), Booyabazooka, public domain.*
 

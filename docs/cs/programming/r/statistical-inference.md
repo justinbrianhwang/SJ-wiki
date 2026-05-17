@@ -7,6 +7,10 @@ sidebar_position: 16
 
 Statistical inference uses sample data to make statements about a broader population or data-generating process. The book's inference chapters cover sampling distributions, confidence intervals, hypothesis tests, proportions, categorical tests, errors, power, and ANOVA. R supplies many standard tests as functions, but the function call is only the final step. The analyst must know the question, assumptions, null hypothesis, alternative hypothesis, test statistic, p-value, and interpretation.
 
+![The R logo marks pages on statistical computing, graphics, and data analysis.](https://commons.wikimedia.org/wiki/Special:FilePath/R_logo.svg)
+
+*Figure: R connects programming examples to statistical modeling and visualization workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:R_logo.svg), The R Foundation, CC BY-SA 4.0.*
+
 The danger in R is that tests are easy to run before the problem is clear. A good inference workflow starts with a study question and descriptive checks, then chooses a method whose assumptions are defensible. The output is interpreted in the scale of the data, not just as "significant" or "not significant."
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 8
 
 Mitchell's Bayesian chapter ranges from Bayes' theorem to practical probabilistic models. Three ideas are especially important: Naive Bayes classification, Bayesian belief networks, and expectation-maximization. Naive Bayes shows how a strong conditional-independence assumption can produce a simple, effective classifier. Bayesian networks represent structured conditional independencies among variables. EM handles hidden or missing variables by alternating between estimating unobserved quantities and improving parameters.
 
+![An Iris dataset scatterplot compares flower measurements colored by species.](https://commons.wikimedia.org/wiki/Special:FilePath/Iris_dataset_scatterplot.svg)
+
+*Figure: The Iris scatterplot makes feature spaces and class separation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Iris_dataset_scatterplot.svg), Nicoguaro, CC BY 4.0.*
+
 These methods are historically central. Naive Bayes became a baseline for text classification, Bayesian networks shaped probabilistic AI, and EM remains a standard algorithm for mixture models and latent-variable estimation.
 
 ## Definitions

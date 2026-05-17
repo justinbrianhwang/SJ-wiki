@@ -7,6 +7,10 @@ sidebar_position: 4
 
 Linear regression is the first complete supervised learning system in D2L. It has a model, a loss function, an optimization algorithm, a data iterator, and an evaluation loop. The model is simple enough to solve analytically, but training it with minibatch stochastic gradient descent teaches the same mechanics used for deep networks.
 
+![An artificial neural network diagram shows input, hidden, and output layers connected by weights.](https://commons.wikimedia.org/wiki/Special:FilePath/Artificial_neural_network.svg)
+
+*Figure: Layered neural networks make differentiable function approximation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Artificial_neural_network.svg), Cburnett, CC BY-SA 3.0/GFDL.*
+
 The key idea is to predict a numeric target as a weighted sum of input features. In a deep learning framework, that weighted sum is just a linear layer. Once the training loop works for linear regression, the model can be replaced by an MLP, CNN, RNN, or transformer while keeping the outer logic mostly intact: load a minibatch, compute predictions, compute loss, backpropagate, update parameters, and monitor metrics.
 
 ## Definitions

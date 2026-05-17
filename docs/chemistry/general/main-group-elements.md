@@ -9,6 +9,10 @@ Descriptive chemistry of the main-group elements applies periodic trends to real
 
 In the Ebbing and Gammon sequence this topic sits near general observations, main-group metals, metallic bonding, alkali metals, alkaline earth metals, group IIIA and IVA metals, hydrogen, carbon family, nitrogen and phosphorus family, oxygen and sulfur family, halogens, and noble gases. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
+![A color-coded periodic table highlights metals, nonmetals, and metalloids across the main groups.](https://commons.wikimedia.org/wiki/Special:FilePath/Periodic_Table_Of_Elements.svg)
+
+*Figure: Periodic-table context for main-group element families. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Periodic_Table_Of_Elements.svg), Dmarcus100, CC BY-SA 4.0.*
+
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.

@@ -9,6 +9,14 @@ Quantum hardware is the engineering layer that turns abstract qubits, gates, and
 
 *This page synthesizes the wiki's earlier hardware draft with Chapter 7 of Nielsen and Chuang. N&C's central organizing idea is implementation requirements: represent quantum information robustly, perform controlled unitary transformations, prepare fiducial input states, and measure outputs. Modern superconducting, neutral-atom, and topological notes are supplementary context beyond the book's original platform emphasis.*
 
+![A NIST surface ion-trap apparatus contains a gold chip and nearby electrodes used to confine ions for quantum logic experiments.](https://commons.wikimedia.org/wiki/Special:FilePath/Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg)
+
+*Figure: Trapped-ion hardware makes qubits from individual charged atoms, laser control, fluorescence readout, and engineered electromagnetic confinement. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg), National Institute of Standards and Technology / Y. Colombe, public domain.*
+
+![A scanning electron micrograph shows a Y-junction surface ion trap with routed electrodes and an inset chain of trapped ions.](https://commons.wikimedia.org/wiki/Special:FilePath/Sandia-surface-junction-ion-trap_NJP13.075018.jpg)
+
+*Figure: Scalable trapped-ion processors depend on microfabricated electrode layouts that route, split, and recombine ion chains. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sandia-surface-junction-ion-trap_NJP13.075018.jpg), Moehring et al., CC BY-SA 3.0.*
+
 ## Definitions
 
 A **physical qubit** is a two-level subsystem chosen inside a real device. It may be two hyperfine states of a trapped ion, two polarization or spatial modes of a photon, two nuclear spin states in a molecule, two levels of a superconducting circuit, two clock states of a neutral atom, or a protected parity degree of freedom in a topological proposal. The computational basis is written with explicit basis labels, such as $\vert 0\rangle, \vert 1\rangle$, but the laboratory system may have many extra levels that cause leakage.

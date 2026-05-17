@@ -7,6 +7,10 @@ sidebar_position: 63
 
 Equivalence and refinement answer a practical engineering question: when can one model safely replace another? In embedded-system design, an abstract model may be a specification, a detailed model may be an implementation, and an optimized model may be a later redesign. We need precise ways to say whether the new model preserves the behaviors that matter.
 
+![An Arduino Uno board shows a familiar microcontroller development board with headers and USB.](https://commons.wikimedia.org/wiki/Special:FilePath/Arduino_Uno_-_R3.jpg)
+
+*Figure: Arduino boards make microcontroller I/O and prototyping tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Arduino_Uno_-_R3.jpg), SparkFun Electronics, CC BY 2.0.*
+
 Lee and Seshia present a ladder of increasingly strong comparisons: type refinement, language containment, simulation, and bisimulation. Each level cares about more information. Type refinement checks ports and data types. Language containment checks observable input/output behaviors. Simulation checks step-by-step state correspondence. Bisimulation checks mutual step-by-step indistinguishability, especially important for nondeterministic machines.
 
 ## Definitions

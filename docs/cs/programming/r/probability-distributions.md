@@ -7,6 +7,10 @@ sidebar_position: 12
 
 R has a consistent interface for probability distributions. The book uses probability as a bridge between programming and statistics: once you can create vectors, call functions, and plot results, you can compute probabilities, quantiles, simulated samples, and distribution curves. This makes abstract probability concrete because every distribution family has a small set of related functions.
 
+![The R logo marks pages on statistical computing, graphics, and data analysis.](https://commons.wikimedia.org/wiki/Special:FilePath/R_logo.svg)
+
+*Figure: R connects programming examples to statistical modeling and visualization workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:R_logo.svg), The R Foundation, CC BY-SA 4.0.*
+
 Most distribution functions come in four forms. For a distribution root such as `norm`, R provides `dnorm` for density, `pnorm` for cumulative probability, `qnorm` for quantiles, and `rnorm` for random generation. The same prefix pattern appears for binomial (`binom`), Poisson (`pois`), uniform (`unif`), exponential (`exp`), t (`t`), chi-square (`chisq`), F (`f`), and many others.
 
 ## Definitions

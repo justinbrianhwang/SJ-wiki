@@ -7,6 +7,10 @@ sidebar_position: 4
 
 An instruction set architecture, or ISA, is the contract between software and hardware. Compilers, assemblers, operating systems, debuggers, and binary tools depend on it. Microarchitectures can change radically underneath the same ISA: a simple in-order core, an out-of-order superscalar core, and a translated internal core can all implement the same programmer-visible instructions.
 
+![An opened Intel 4004 processor exposes the silicon die inside its package.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_4004_open.jpg)
+
+*Figure: Opening the package links instruction-set discussions to the physical die. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_4004_open.jpg), Science Museum Group, CC BY 4.0.*
+
 H&P treats ISA design as one part of architecture, not the whole field. That distinction matters. A clean load-store ISA can simplify pipelining and compiler reasoning, but performance also depends on branch prediction, caches, memory systems, and implementation technology. This page focuses on ISA concepts using MIPS-like and RISC-V-like examples, while contrasting them with more complex CISC styles such as x86.
 
 ## Definitions

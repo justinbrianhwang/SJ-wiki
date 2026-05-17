@@ -7,6 +7,10 @@ sidebar_position: 10
 
 Graphs (그래프) model relationships. Vertices represent objects, and edges represent connections between them. The same abstraction can describe roads, prerequisites, network links, social relationships, control flow, and dependency graphs. The representation chosen in C determines the cost of every graph algorithm that follows.
 
+![A Dijkstra animation highlights tentative distances as the shortest path grows through a graph.](https://commons.wikimedia.org/wiki/Special:FilePath/Dijkstra_Animation.gif)
+
+*Figure: Dijkstra's algorithm is a concrete example of graph search becoming a path. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dijkstra_Animation.gif), Ibmua, public domain.*
+
 The source textbook's graph chapter begins with the graph ADT and representations before moving to traversal, components, spanning trees, shortest paths, and activity networks. That order is essential. BFS, DFS, Prim, Kruskal, Dijkstra, and Floyd-Warshall all operate on the same mathematical object, but their running times and code shape depend heavily on whether the graph is stored as an adjacency matrix, adjacency lists, or edge lists.
 
 ## Definitions

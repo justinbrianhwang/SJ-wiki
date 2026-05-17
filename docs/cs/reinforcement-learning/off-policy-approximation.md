@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Off-policy learning is attractive because an agent can learn about one policy while behaving according to another. With tabular methods this is already subtle. With function approximation and bootstrapping, it becomes one of the central stability problems in reinforcement learning. Sutton and Barto call attention to the deadly triad: function approximation, bootstrapping, and off-policy learning.
 
+![A cart-pole animation shows a controller trying to balance an inverted pole on a moving cart.](https://commons.wikimedia.org/wiki/Special:FilePath/Cartpole.gif)
+
+*Figure: Cart-pole is a standard control and reinforcement-learning benchmark. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cartpole.gif), Condordellanebbia, CC BY-SA 4.0.*
+
 This topic explains why algorithms that look like harmless extensions of tabular TD can diverge. It also motivates gradient TD and emphatic TD methods, which are designed to produce stable learning objectives under off-policy sampling. The lesson is not that off-policy approximation is impossible, but that the update geometry matters.
 
 ## Definitions

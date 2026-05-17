@@ -7,6 +7,10 @@ sidebar_position: 6
 
 Symmetric encryption is the workhorse of secure communication. Once two parties share a secret key, they need to encrypt many messages of many lengths without leaking equality patterns, block structure, or relations between plaintexts. The core mathematical object may be a PRF, PRP, stream cipher, or block cipher, but the mode of operation determines whether that object is used safely.
 
+![A public-key encryption diagram separates public encryption from private decryption.](https://commons.wikimedia.org/wiki/Special:FilePath/Public_key_encryption.svg)
+
+*Figure: Asymmetric encryption turns key distribution into a public and private key pair. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Public_key_encryption.svg), Davidgothberg, public domain.*
+
 Katz and Lindell emphasize security definitions such as eavesdropping security, multiple-message security, CPA security, and CCA security. Smart complements this with a practical tour of stream ciphers, DES, Rijndael/AES, and block-cipher modes. The combined lesson is that AES by itself is not an encryption scheme for arbitrary messages. The scheme is AES plus a mode, nonce or IV rules, padding rules, and an integrity plan.
 
 ## Definitions

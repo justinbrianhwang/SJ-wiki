@@ -7,6 +7,10 @@ sidebar_position: 11
 
 Matrices organize linear relationships. In engineering mathematics they represent systems of algebraic equations, coordinate transformations, discretized differential equations, least-squares fits, network laws, and linearized models. A matrix is not only a table of numbers; it is a linear map whose algebra reflects geometry and computation.
 
+![Gaussian elimination turns a linear system into triangular form.](https://commons.wikimedia.org/wiki/Special:FilePath/File_Gaussian_elimination.svg)
+
+*Figure: Gaussian elimination uses row operations to expose pivots, rank, and solvability. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:File_Gaussian_elimination.svg), Akira tanzivana, CC BY-SA 4.0.*
+
 Solving $A\mathbf{x}=\mathbf{b}$ is one of the core tasks in applied mathematics. Exact row reduction teaches structure, while numerical factorization teaches reliability and cost. The same ideas support eigenvalue problems, finite-difference PDE solvers, regression, optimization, and control.
 
 ## Definitions

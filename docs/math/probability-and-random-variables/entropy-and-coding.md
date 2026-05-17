@@ -7,6 +7,10 @@ sidebar_position: 17
 
 Entropy measures the average information or uncertainty in a random variable. A fair coin has one bit of entropy because one yes-or-no question is needed on average to learn its outcome. A biased coin has less entropy because one outcome is easier to guess. A uniform choice among many possibilities has more entropy because the outcome is harder to identify.
 
+![A PGP workflow diagram shows encryption, signing, and message transfer.](https://commons.wikimedia.org/wiki/Special:FilePath/PGP_diagram.svg)
+
+*Figure: PGP combines public-key and symmetric-key ideas in an applied cryptographic workflow. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PGP_diagram.svg), xaedes, jfreax, and Acdx, CC BY-SA 3.0.*
+
 MIT 18.440 introduces Shannon entropy, noiseless coding, entropy of pairs, and conditional entropy. The main conceptual result is that entropy lower-bounds the expected number of binary questions needed to identify a random outcome. Conditional entropy then formalizes how much uncertainty remains about one random variable after observing another.
 
 ## Definitions

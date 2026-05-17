@@ -7,6 +7,10 @@ sidebar_position: 4
 
 Conditional probability is the mathematical operation of updating the sample space after learning information. If event $B$ has occurred, outcomes outside $B$ are no longer possible, and the probability measure is renormalized on $B$. This idea is simple in a finite picture, but it drives many subtle examples: witness reliability, medical testing, Monty Hall, repeated trials, and the difference between pairwise independence and full independence.
 
+![Tree diagrams organize conditional probabilities for Bayes' theorem.](https://commons.wikimedia.org/wiki/Special:FilePath/Bayes_theorem_tree_diagrams.svg)
+
+*Figure: Probability trees make the conditioning structure in Bayes' theorem explicit. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bayes_theorem_tree_diagrams.svg), Gnathan87, CC0 1.0.*
+
 The MIT lectures treat Bayes' formula as the algebra of probability revision and independence as the case where conditioning makes no difference. These ideas are linked: $A$ and $B$ are independent exactly when $P(A\mid B)=P(A)$, provided $P(B)\gt 0$. When they are not independent, Bayes' formula gives the disciplined way to update.
 
 ## Definitions

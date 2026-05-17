@@ -9,6 +9,10 @@ Transition metals are characterized by accessible d orbitals, variable oxidation
 
 In the Ebbing and Gammon sequence this topic sits near periodic trends in transition elements, chemistry of selected transition elements, complex formation, coordination compound naming, isomerism, valence bond theory of complexes, and crystal field theory. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
+![Blue copper sulfate crystals show the vivid colors often associated with transition-metal compounds.](https://commons.wikimedia.org/wiki/Special:FilePath/Copper_Sulfate_Crystals.jpg)
+
+*Figure: Copper sulfate crystals as a visible example of transition-metal color and coordination environment. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Copper_Sulfate_Crystals.jpg), Crystal Titan, CC BY-SA 4.0.*
+
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.

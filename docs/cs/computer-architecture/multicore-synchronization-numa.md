@@ -7,6 +7,10 @@ sidebar_position: 13
 
 When single-core performance scaling slowed, architects turned to multiple cores per chip and multiple processors per system. Multicore design exploits thread-level parallelism: separate instruction streams cooperate on a shared problem or serve independent requests. The architectural challenge is to provide useful parallel speedup without letting communication, synchronization, memory bandwidth, and coherence traffic dominate.
 
+![An opened Intel 4004 processor exposes the silicon die inside its package.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_4004_open.jpg)
+
+*Figure: Opening the package links instruction-set discussions to the physical die. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_4004_open.jpg), Science Museum Group, CC BY 4.0.*
+
 Shared-memory multiprocessors are attractive because threads can communicate by reading and writing ordinary addresses. That convenience hides complexity. Locks, barriers, atomic instructions, cache coherence, memory consistency, and nonuniform memory access all determine whether a parallel program scales.
 
 ## Definitions

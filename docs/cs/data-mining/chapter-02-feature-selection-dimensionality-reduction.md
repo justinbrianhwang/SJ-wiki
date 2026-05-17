@@ -7,6 +7,10 @@ sidebar_position: 4
 
 Feature selection and dimensionality reduction address the same pressure from different directions: real data sets often have too many variables, many of which are noisy, redundant, expensive, or irrelevant. Aggarwal separates feature subset selection from transformations such as principal component analysis, singular value decomposition, latent semantic analysis, wavelets, multidimensional scaling, and graph spectral embeddings. The shared goal is to keep the structure that matters while reducing computational and statistical burden.
 
+![An Iris dataset scatterplot compares flower measurements colored by species.](https://commons.wikimedia.org/wiki/Special:FilePath/Iris_dataset_scatterplot.svg)
+
+*Figure: The Iris scatterplot makes feature spaces and class separation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Iris_dataset_scatterplot.svg), Nicoguaro, CC BY 4.0.*
+
 This page belongs with data preparation, but it also connects to nearly every later chapter. Clustering in high dimensions becomes unstable because distances concentrate. Text mining depends on sparse high-dimensional vectors, then often reduces them with SVD or topic models. Stream mining uses compact synopses. Graph mining uses spectral transformations to turn topology into coordinates.
 
 ## Definitions

@@ -9,6 +9,10 @@ Free energies translate the Second Law into criteria that use the variables chem
 
 The chemical potential is the central quantity that lets thermodynamics handle changing composition. It is the partial molar Gibbs energy and therefore the energetic "price" of adding a small amount of a substance to a mixture at fixed temperature and pressure.
 
+![A Gibbs energy curve shows a reaction mixture relaxing toward an equilibrium composition.](https://commons.wikimedia.org/wiki/Special:FilePath/Gibbs-Energie-Veranschaulichung.svg)
+
+*Figure: Gibbs energy minimum as the thermodynamic basis of chemical potential and equilibrium. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Gibbs-Energie-Veranschaulichung.svg), Johannes Schneider, CC BY-SA 4.0.*
+
 ## Definitions
 
 The Helmholtz energy is

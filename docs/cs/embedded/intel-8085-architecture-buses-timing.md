@@ -7,6 +7,10 @@ sidebar_position: 3
 
 The 8085 is the book's central microprocessor example. It is a good teaching CPU because the external bus is visible, the instruction set is compact, and the timing signals directly show how a processor talks to memory and I/O. Learning the 8085 is less about memorizing pins and more about understanding how one instruction becomes a sequence of bus cycles.
 
+![An Intel 4004 package shows one of the first commercial microprocessors.](https://commons.wikimedia.org/wiki/Special:FilePath/Intel_4004.jpg)
+
+*Figure: The Intel 4004 marks the transition from board-level logic to microprocessors. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Intel_4004.jpg), LucaDetomi at Italian Wikipedia, CC BY-SA 3.0/GFDL.*
+
 The architecture page sits between the simple microprocessor model and the instruction-set pages. It names the blocks that execute instructions, but it also explains why extra hardware is needed around the chip: the lower address bus is multiplexed with the data bus, memory and I/O chips need selection signals, and slow devices may require wait states.
 
 ## Definitions

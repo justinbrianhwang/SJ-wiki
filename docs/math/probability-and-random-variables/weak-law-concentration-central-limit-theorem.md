@@ -7,6 +7,10 @@ sidebar_position: 14
 
 Limit theorems explain why probability becomes predictable at large scale. The weak law of large numbers says sample averages concentrate near the mean. The central limit theorem says the remaining fluctuations, after scaling by $\sqrt n$, often look normal. These two statements answer different questions: the weak law gives convergence to a constant, while the central limit theorem describes the shape of the error.
 
+![A central limit theorem simulation shows sample means becoming bell shaped.](https://commons.wikimedia.org/wiki/Special:FilePath/Central_Limit_Theorem.png)
+
+*Figure: A central limit theorem simulation shows why sample means often become approximately normal. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Central_Limit_Theorem.png), Daniel Resende, CC BY-SA 4.0.*
+
 MIT 18.440 proves the weak law first through Markov and Chebyshev inequalities, then revisits it with characteristic functions. The central limit theorem is then proved with transform methods. The lecture sequence makes clear why moment hypotheses matter: finite variance gives a short Chebyshev proof of the weak law, while characteristic functions allow more general convergence arguments.
 
 ## Definitions

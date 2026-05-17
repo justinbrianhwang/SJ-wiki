@@ -7,6 +7,10 @@ sidebar_position: 10
 
 An index is an auxiliary access structure that helps the DBMS find records without scanning an entire file. It is the database analogue of a book index, but with stronger correctness and update requirements. Every insert, delete, and update that affects indexed columns must maintain the index, so indexes trade write cost and storage space for faster reads.
 
+![A PostgreSQL B-tree diagram shows index pages connected by parent and leaf links.](https://commons.wikimedia.org/wiki/Special:FilePath/PostgreSQL_B-tree.svg)
+
+*Figure: PostgreSQL B-tree pages show how logical indexes map to storage structures. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PostgreSQL_B-tree.svg), Kelti, CC BY-SA 4.0.*
+
 Indexing belongs after storage because an index is itself stored in pages. B+ trees, hash indexes, and bitmap indexes support different query patterns. There is no universally best index. The right choice depends on equality versus range predicates, key cardinality, clustering, update frequency, and whether the workload is transactional or analytical.
 
 ## Definitions

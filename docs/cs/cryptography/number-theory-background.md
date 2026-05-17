@@ -7,6 +7,10 @@ sidebar_position: 10
 
 Public-key cryptography is built on arithmetic that is easy to compute in one direction and hard to reverse without special information. RSA uses modular exponentiation modulo a product of primes. Diffie-Hellman uses exponentiation in cyclic groups where discrete logarithms are believed hard. Elliptic-curve systems use the same group language over points on curves. Before those schemes make sense, the number-theory toolkit must be precise.
 
+![A public-key encryption diagram separates public encryption from private decryption.](https://commons.wikimedia.org/wiki/Special:FilePath/Public_key_encryption.svg)
+
+*Figure: Asymmetric encryption turns key distribution into a public and private key pair. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Public_key_encryption.svg), Davidgothberg, public domain.*
+
 Katz and Lindell give a self-contained number-theory chapter for primes, modular arithmetic, groups, Euler's theorem, the Chinese remainder theorem, RSA and Diffie-Hellman assumptions. Smart covers similar ground early, with more explicit algorithms for Euclid, inverses, CRT, finite fields, and implementation issues. The common theme is computational: the arithmetic operations are efficient, while selected inverse problems are believed infeasible at cryptographic sizes.
 
 ## Definitions

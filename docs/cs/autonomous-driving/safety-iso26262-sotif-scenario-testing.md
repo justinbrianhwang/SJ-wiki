@@ -7,6 +7,10 @@ sidebar_position: 14
 
 Autonomous-driving safety is not a single metric. It combines functional safety, intended-functionality safety, cybersecurity, validation, operational limits, human factors, scenario coverage, monitoring, and organizational discipline. A vehicle can fail because a component breaks, because a component works as designed but the design was insufficient, because a machine-learning model generalizes poorly, or because the operational design domain was misunderstood.
 
+![A Waymo self-driving car drives on a public road with roof-mounted sensors.](https://commons.wikimedia.org/wiki/Special:FilePath/Waymo_self-driving_car_front_view.gk.jpg)
+
+*Figure: A real autonomous vehicle grounds the driving stack in a physical platform. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Waymo_self-driving_car_front_view.gk.jpg), Grendelkhan, CC BY-SA 4.0.*
+
 This page introduces ISO 26262, ISO 21448 SOTIF, ASIL, scenario testing, formal safety arguments, Mobileye RSS, edge-case mining, and the difference between component reliability and system-level safety. It is the foundation for evaluating every technical page in this section, from [sensors](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu) to [end-to-end driving](/cs/autonomous-driving/end-to-end-driving).
 
 ## Definitions

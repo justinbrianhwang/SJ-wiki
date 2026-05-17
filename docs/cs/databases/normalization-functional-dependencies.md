@@ -7,6 +7,10 @@ sidebar_position: 7
 
 Normalization is the discipline of designing relation schemas so that facts are stored in the right place. It is not an aesthetic rule about making many small tables. Its purpose is to avoid update anomalies, insertion anomalies, deletion anomalies, and contradictions caused by storing the same fact in multiple rows. Functional dependencies are the formal tool used to reason about those risks.
 
+![An entity-relationship table diagram shows linked tables for relational modeling.](https://commons.wikimedia.org/wiki/Special:FilePath/CPT-Databases-ExampleLinkTables.svg)
+
+*Figure: Link tables make many-to-many relationships concrete in a relational schema. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:CPT-Databases-ExampleLinkTables.svg), Pluke, CC0.*
+
 This topic follows E-R design because a first relational schema often comes from conceptual modeling. Normalization then checks whether each relation has a clean meaning. A relation should say one kind of thing. If it mixes independent facts, such as instructor salary and department building in every course row, updates become unsafe and constraints become hard to enforce.
 
 ## Definitions

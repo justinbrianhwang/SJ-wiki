@@ -9,6 +9,10 @@ Engineering mechanics starts by treating force as a vector: it has magnitude, di
 
 This page builds the vector habits used everywhere else in statics and dynamics. Before drawing an equilibrium equation or an equation of motion, you usually resolve forces into components, add them into a resultant, and check whether the answer makes physical sense. A clean vector calculation is not cosmetic; it is what prevents sign errors, wrong angles, and accidental mixing of scalars with vectors.
 
+![Two vectors are added tip-to-tail and by the parallelogram construction.](https://commons.wikimedia.org/wiki/Special:FilePath/Vector_addition.svg)
+
+*Figure: Vector addition is the visual grammar behind force resultants, displacements, and field components. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Vector_addition.svg), Benjamin D. Esham, public domain.*
+
 ## Definitions
 
 A **scalar** has magnitude only. Mass, distance, time, speed, work, and energy are scalars. A **vector** has magnitude and direction. Force $\mathbf{F}$, position $\mathbf{r}$, velocity $\mathbf{v}$, acceleration $\mathbf{a}$, and moment $\mathbf{M}$ are vectors. In Cartesian components,

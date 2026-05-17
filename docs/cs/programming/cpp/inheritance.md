@@ -7,6 +7,10 @@ sidebar_position: 13
 
 Inheritance lets a class reuse and specialize another class. A derived class automatically has the data and ordinary member functions of its base class, then adds or redefines behavior for its more specific role. Savitch introduces inheritance through employee classes: an hourly employee and a salaried employee are both employees, but their pay calculations differ.
 
+![The ISO C++ logo marks pages on classes, templates, containers, and modern C++ idioms.](https://commons.wikimedia.org/wiki/Special:FilePath/ISO_C%2B%2B_Logo.svg)
+
+*Figure: C++ extends systems programming with abstraction, generic code, and deterministic resource management. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ISO_C%2B%2B_Logo.svg), Jeremy Kratz, public domain text logo.*
+
 The most important design question is whether the relationship is truly "is a." If a `SalariedEmployee` is an `Employee`, inheritance may fit. If a `Car` has an `Engine`, composition is better. Inheritance is powerful, but using it where composition belongs creates brittle designs.
 
 ## Definitions

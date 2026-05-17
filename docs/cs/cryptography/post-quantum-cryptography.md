@@ -7,6 +7,10 @@ sidebar_position: 17
 
 Post-quantum cryptography studies public-key algorithms intended to remain secure against attackers with large quantum computers. The motivation is simple: Shor's algorithm would break the factoring and discrete-log assumptions behind RSA, finite-field Diffie-Hellman, elliptic-curve Diffie-Hellman, DSA, Schnorr, and ECDSA if sufficiently large fault-tolerant quantum computers become available. Symmetric cryptography is affected differently: Grover's algorithm gives a quadratic search speedup, so larger symmetric keys and hash outputs can compensate.
 
+![An Alice and Bob quantum-cryptography setup exchanges polarized photons over a channel.](https://commons.wikimedia.org/wiki/Special:FilePath/Alice_e_Bob_(crittografia_quantistica).png)
+
+*Figure: Alice and Bob diagrams make communication and adversary models easier to track. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Alice_e_Bob_(crittografia_quantistica).png), Ft1 at Italian Wikipedia, public domain.*
+
 The two supplied textbooks predate the current NIST post-quantum standards, so this page necessarily goes beyond them. It uses their framework of assumptions, reductions, hybrid encryption, signatures, and symmetric primitives, and adds current standardization context from NIST. NIST published FIPS 203, FIPS 204, and FIPS 205 on August 13, 2024, covering ML-KEM, ML-DSA, and SLH-DSA; its PQC process page also notes HQC selection for future standardization on March 11, 2025.
 
 ## Definitions

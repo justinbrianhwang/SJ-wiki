@@ -7,6 +7,10 @@ sidebar_position: 10
 
 R is vector-oriented, but real programs still need decisions, repetition, reusable functions, error checks, and local variables. The programming part of *The Book of R* moves from calling functions to writing functions, using `if`, `else`, `for`, `while`, `repeat`, `break`, `next`, and understanding where R looks for names. These tools turn isolated commands into reliable analysis programs.
 
+![The R logo marks pages on statistical computing, graphics, and data analysis.](https://commons.wikimedia.org/wiki/Special:FilePath/R_logo.svg)
+
+*Figure: R connects programming examples to statistical modeling and visualization workflows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:R_logo.svg), The R Foundation, CC BY-SA 4.0.*
+
 The main design principle is to keep data flow visible. A function should receive inputs as arguments, compute using local variables, and return a value. It should not depend on a mysterious object in the global environment unless that object is intentionally part of the interface. Scoping rules make R flexible, but they also allow hidden dependencies if code is written casually.
 
 ## Definitions

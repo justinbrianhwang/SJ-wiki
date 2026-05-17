@@ -7,6 +7,10 @@ sidebar_position: 4
 
 Software project management is the discipline of making technical work coordinated, measurable, and correctable. Gustafson's project management chapter covers management approaches, team organization, critical practices, the Capability Maturity Model, the Personal Software Process, earned value analysis, error tracking, and postmortem reviews. The emphasis is not only on planning before work begins but also on feedback while work is underway.
 
+![A Kanban board screenshot shows work items organized by workflow state.](https://commons.wikimedia.org/wiki/Special:FilePath/Openproject_kanban.PNG)
+
+*Figure: Kanban boards turn process state into a visible project-management surface. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Openproject_kanban.PNG), OpenProject contributors, CC0.*
+
 The chapter sits between life cycle theory and detailed planning. A life cycle tells us what kinds of activities exist; project management asks who will do them, how the team will know whether work is on track, what practices deserve special attention, and how the organization learns from completed projects. It also introduces earned value analysis, which connects planned cost, actual cost, and completed work into objective progress indicators.
 
 ## Definitions

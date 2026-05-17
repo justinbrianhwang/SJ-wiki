@@ -9,6 +9,10 @@ External equilibrium finds support reactions, but it does not directly show what
 
 The core idea is an imaginary cut. Slice the beam at a chosen position, keep one side, and replace the removed side by internal resultants on the cut face. Then write equilibrium of the retained piece. Repeating this process along the span produces axial-force, shear-force, and bending-moment diagrams.
 
+![A beam bends under transverse loading in a simple mechanics schematic.](https://commons.wikimedia.org/wiki/Special:FilePath/Beam_bending.svg)
+
+*Figure: Beam bending connects support reactions, internal shear, bending moment, and section stiffness. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Beam_bending.svg), Krishnavedala, CC0 1.0.*
+
 ## Definitions
 
 A **beam** is a slender member that primarily carries transverse loads. A general planar cut exposes three internal resultants:

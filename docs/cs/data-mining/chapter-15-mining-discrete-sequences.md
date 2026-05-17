@@ -7,6 +7,10 @@ sidebar_position: 17
 
 Discrete sequence mining studies ordered symbolic data: click paths, purchase histories, DNA strings, event logs, user actions, command traces, and words at the token level. Aggarwal's sequence chapter covers sequential pattern mining, sequence clustering, outlier detection, hidden Markov models, and sequence classification. Unlike transaction mining, order is part of the pattern; unlike time series, values are symbols rather than continuous measurements.
 
+![An Iris dataset scatterplot compares flower measurements colored by species.](https://commons.wikimedia.org/wiki/Special:FilePath/Iris_dataset_scatterplot.svg)
+
+*Figure: The Iris scatterplot makes feature spaces and class separation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Iris_dataset_scatterplot.svg), Nicoguaro, CC BY 4.0.*
+
 This page connects association mining, similarity measures, probabilistic models, and classification. The main challenge is deciding which forms of order matter: contiguous substrings, noncontiguous subsequences, edit operations, state transitions, or learned latent states.
 
 ## Definitions

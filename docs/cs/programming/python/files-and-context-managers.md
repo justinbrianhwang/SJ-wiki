@@ -7,6 +7,10 @@ sidebar_position: 10
 
 Files let Python programs persist data beyond one run. The textbook introduces the built-in `open()` function, file modes such as read, write, append, and create, and simple data logging examples. That is the right foundation, but modern Python code should add two habits immediately: use context managers with `with`, and prefer `pathlib.Path` for filesystem paths.
 
+![The Python logo marks pages on scripting, testing, packaging, and scientific programming.](https://commons.wikimedia.org/wiki/Special:FilePath/Python-logo-notext.svg)
+
+*Figure: Python provides the practical environment for many CS, ML, and data examples. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Python-logo-notext.svg), Python Software Foundation, GPL-compatible free license; trademark terms apply.*
+
 File handling is a boundary between a program and the outside world. That boundary can fail: a file may not exist, a directory may be missing, permissions may block access, data may have the wrong encoding, or a record may be malformed. Good file code is explicit about mode, encoding, expected format, and cleanup.
 
 ## Definitions

@@ -7,6 +7,10 @@ sidebar_position: 3
 
 The mathematical preliminaries in D2L are intentionally compact: enough linear algebra to express neural networks, enough calculus to understand gradient-based learning, enough automatic differentiation to implement training, and enough probability to reason about data, uncertainty, loss functions, and generalization. The point is not to turn every model into a theorem, but to make the symbols in later chapters operational.
 
+![An artificial neural network diagram shows input, hidden, and output layers connected by weights.](https://commons.wikimedia.org/wiki/Special:FilePath/Artificial_neural_network.svg)
+
+*Figure: Layered neural networks make differentiable function approximation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Artificial_neural_network.svg), Cburnett, CC BY-SA 3.0/GFDL.*
+
 Deep learning repeatedly applies the same pattern. A model maps inputs to predictions through differentiable tensor operations. A loss function turns predictions into a scalar objective. Automatic differentiation computes gradients of that scalar with respect to model parameters. An optimizer uses those gradients to change the parameters. Linear algebra describes the computation; calculus supplies the local direction of improvement; probability explains why losses such as squared error and cross-entropy are natural.
 
 ## Definitions

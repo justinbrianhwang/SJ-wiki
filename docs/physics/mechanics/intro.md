@@ -11,6 +11,18 @@ The source PDF's table of contents separates the subject into mechanics basics, 
 
 Use the pages in order for a first pass. Later, jump directly to the method family needed for a problem.
 
+![A truss bridge diagram shows triangular members carrying loads across a span.](https://commons.wikimedia.org/wiki/Special:FilePath/Truss_bridge.svg)
+
+*Figure: A truss bridge gives statics pages an immediate real structure for joints, members, and load paths. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Truss_bridge.svg), Noleander, CC0 1.0.*
+
+![A beam bends under transverse loading in a simple mechanics schematic.](https://commons.wikimedia.org/wiki/Special:FilePath/Beam_bending.svg)
+
+*Figure: Beam bending connects support reactions, internal shear, bending moment, and section stiffness. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Beam_bending.svg), Krishnavedala, CC0 1.0.*
+
+![An inverted pendulum is mounted on a cart with its angle and cart position labeled.](https://commons.wikimedia.org/wiki/Special:FilePath/Cart-pendulum.svg)
+
+*Figure: The cart-pendulum setup is a classic benchmark for unstable dynamics, feedback, and hybrid simulation tests. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cart-pendulum.svg), Krishnavedala, CC0 1.0.*
+
 ## Chapter List
 
 1. [Force Vectors, Resultants, and Components](/physics/mechanics/force-vectors-resultants-components)
