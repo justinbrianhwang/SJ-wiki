@@ -83,6 +83,10 @@ flowchart TD
   F --> J[Dense retrieval or span QA]
 ```
 
+![BERT input representation — the figure shows token, segment, and position embeddings combined before entering the bidirectional encoder.](https://ar5iv.labs.arxiv.org/html/1810.04805/assets/x2.png)
+
+*Figure: BERT forms each input vector by summing token, segment, and position embeddings before bidirectional Transformer encoding. From [Devlin et al., 2018](https://arxiv.org/abs/1810.04805) — embedded under educational fair use with attribution.*
+
 | Model family | Attention direction | Objective | Best-known use |
 |---|---|---|---|
 | GPT-style decoder | left-to-right causal | next-token prediction | generation, prompting |

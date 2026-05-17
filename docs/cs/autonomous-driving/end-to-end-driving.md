@@ -258,6 +258,10 @@ flowchart TB
   Obs -. "hard cases" .-> Losses
 ```
 
+![UniAD planning-oriented autonomous driving architecture — the figure contrasts task-oriented and planning-oriented designs for a unified driving stack.](https://ar5iv.labs.arxiv.org/html/2212.10156/assets/x1.png)
+
+*Figure: UniAD organizes perception, prediction, mapping, occupancy, and planning around the final ego trajectory. From [Hu et al., 2023](https://arxiv.org/abs/2212.10156) — embedded under educational fair use with attribution.*
+
 This diagram compares end-to-end driving families by their internal contracts. ChauffeurNet uses rasterized top-down inputs and imitation losses, TransFuser fuses camera and lidar features with attention, UniAD exposes tracking/map/motion/planning queries, and world-model or VLA systems route tokens through memory and rollout before a safety wrapper turns outputs into vehicle motion.
 
 ## Worked example 1: Why route conditioning matters

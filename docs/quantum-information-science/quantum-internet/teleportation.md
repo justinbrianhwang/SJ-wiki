@@ -201,6 +201,10 @@ flowchart LR
   MB -. "classical bit c1" .-> XCorr
 ```
 
+![Quantum teleportation circuit with Pauli corrections — the figure shows Alice's Bell measurement, two classical bits, and Bob's conditional X and Z corrections.](https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Quantum_teleportation_circuit_pauli_gates.svg/1280px-Quantum_teleportation_circuit_pauli_gates.svg.png)
+
+*Figure: The teleportation circuit implements a Bell-basis measurement followed by classically controlled Pauli corrections. From [Buecherdiebin, 2024](https://commons.wikimedia.org/wiki/File:Quantum_teleportation_circuit_pauli_gates.svg) — CC BY-SA 4.0.*
+
 The circuit shows all three resources in the teleportation identity: Alice's unknown input, the pre-shared Bell pair, and the two classical correction bits. Alice performs a CNOT and Hadamard before measuring both local qubits, which destroys the original input while producing $c_0$ and $c_1$. Bob's dotted classical controls select the $X$ and $Z$ Pauli corrections that reconstruct the input state on his qubit.
 
 | Resource consumed | Amount per teleported qubit | Why it is needed |

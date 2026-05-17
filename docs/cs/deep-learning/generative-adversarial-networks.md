@@ -127,6 +127,10 @@ flowchart TB
   end
 ```
 
+![The DCGAN generator architecture projects a 100-dimensional latent vector into feature maps and upsamples through fractionally strided convolutions to produce an image.](https://ar5iv.labs.arxiv.org/html/1511.06434/assets/lsun_bedrooms_generator.png)
+
+*Figure: DCGAN generator architecture from [Radford, Metz, and Chintala, 2015](https://arxiv.org/abs/1511.06434) — embedded under educational fair use with attribution.*
+
 The DCGAN generator progressively upsamples a latent 1 x 1 tensor to a 64 x 64 RGB image with transposed convolutions, batch normalization, and ReLU. The discriminator mirrors that shape path with strided convolutions, LeakyReLU, and a final scalar logit. The paired diagrams show the image prior: generation increases spatial resolution while discrimination collapses spatial evidence into a real/fake score.
 
 | Component | Input | Output | Training signal |

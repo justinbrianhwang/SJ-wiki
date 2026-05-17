@@ -97,6 +97,10 @@ flowchart TB
   Head --> Mask(("Per-pixel class map"))
 ```
 
+![The original U-Net architecture shows a contracting path, an expansive path, skip connections, and per-pixel segmentation output.](https://ar5iv.labs.arxiv.org/html/1505.04597/assets/x1.png)
+
+*Figure: Original U-Net architecture from [Ronneberger, Fischer, and Brox, 2015](https://arxiv.org/abs/1505.04597) — embedded under educational fair use with attribution.*
+
 The U-Net diagram shows the hourglass explicitly: the contracting path doubles channels while pooling reduces resolution, and the expanding path upsamples while concatenating same-level encoder features. Dotted skip connections carry high-resolution detail into each decoder level, which is why U-Net is effective for boundary-sensitive segmentation. The labels use the original valid-convolution shape progression from 572 x 572 input to 388 x 388 logits.
 
 ```mermaid
@@ -135,6 +139,10 @@ flowchart TB
   Score --> Filter
   Filter --> Out(("Single-shot detections"))
 ```
+
+![The YOLO detection schematic divides an image into a grid, predicts boxes and confidence, forms class probability maps, and outputs final detections.](https://ar5iv.labs.arxiv.org/html/1506.02640/assets/x2.png)
+
+*Figure: YOLO unified detection schematic from [Redmon et al., 2015](https://arxiv.org/abs/1506.02640) — embedded under educational fair use with attribution.*
 
 YOLO-style detectors predict boxes and classes in one dense pass instead of classifying proposal crops. The diagram shows the detection tensor split into box geometry, objectness, and class logits before decoding and NMS. The single-shot contract trades proposal-stage flexibility for a simpler low-latency pipeline.
 

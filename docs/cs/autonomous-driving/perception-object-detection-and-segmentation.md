@@ -195,6 +195,14 @@ flowchart TB
   Scene --> Plan["Planning input: collision geometry + semantic constraints"]
 ```
 
+![PointPillars architecture — the figure shows LiDAR points encoded into pillars, scattered into a pseudo-image, and processed by a 2D backbone and detection head.](https://ar5iv.labs.arxiv.org/html/1812.05784/assets/x2.png)
+
+*Figure: PointPillars converts sparse point clouds into pillar features before 2D convolutional detection. From [Lang et al., 2019](https://arxiv.org/abs/1812.05784) — embedded under educational fair use with attribution.*
+
+![CenterPoint detection and tracking output — the figure shows center-based 3D detections and tracked objects in a driving scene.](https://github.com/tianweiy/CenterPoint/raw/refs/heads/master/docs/imgs/nusc_teaser.png?raw=true)
+
+*Figure: CenterPoint represents objects by BEV centers and uses those centers for 3D detection and tracking. From [Yin et al., 2021](https://arxiv.org/abs/2006.11275), via the authors' [CenterPoint repository](https://github.com/tianweiy/CenterPoint) — embedded under educational fair use with attribution.*
+
 This diagram expands perception into the standard camera, PointPillars/CenterPoint, VoxelNet, and radar branches. The key shape transition is from unordered lidar points to voxels/pillars and then to a BEV tensor, while the downstream association block turns raw detections into tracked objects and uncertainty for prediction and planning.
 
 ## Worked example 1: Computing IoU for two boxes

@@ -108,6 +108,10 @@ sequenceDiagram
     Agent->>Environment: next action a_{t+1}
 ```
 
+![An agent-environment loop shows actions flowing from the agent to the environment and reward and state flowing back to the agent.](https://commons.wikimedia.org/wiki/Special:FilePath/Agent-environment-diagram-rl.svg)
+
+*Figure: Agent-environment interface diagram by [Martin Thoma, 2016](https://commons.wikimedia.org/wiki/File:Agent-environment-diagram-rl.svg) — CC0 via Wikimedia Commons with attribution.*
+
 The training loop is interactive. The agent's current policy changes the future data it receives.
 
 ## Worked example 1: One deterministic Q update

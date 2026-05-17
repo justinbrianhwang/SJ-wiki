@@ -160,6 +160,12 @@ g = gradient(loss(model(x), y), x)
 x_adv = clip(x + epsilon * sign(g), 0, 1)
 ```
 
+| Clean input | Signed perturbation | Adversarial output |
+|---|---|---|
+| ![A clean panda image is classified as a panda by the ImageNet model.](https://ar5iv.labs.arxiv.org/html/1412.6572/assets/panda_577.png) | ![A high-frequency signed gradient perturbation is shown as a colorful noise pattern.](https://ar5iv.labs.arxiv.org/html/1412.6572/assets/nematode_082.png) | ![The visually similar perturbed panda image is classified as a gibbon with high confidence.](https://ar5iv.labs.arxiv.org/html/1412.6572/assets/gibbon_993.png) |
+
+*Figure: FGSM's canonical panda-plus-perturbation example from [Goodfellow, Shlens, and Szegedy, 2014](https://arxiv.org/abs/1412.6572) — embedded under educational fair use with attribution.*
+
 This one backward pass is useful as a sanity check and teaching baseline. It is not a complete robustness evaluation because it trusts the loss surface at exactly the clean input.
 
 ### Iterative projected gradient methods

@@ -247,6 +247,10 @@ flowchart TB
   Softmax --> Probs["Output token probabilities"]
 ```
 
+![The original Transformer encoder-decoder architecture shows stacked self-attention, cross-attention, feed-forward layers, residual paths, and output softmax.](https://ar5iv.labs.arxiv.org/html/1706.03762/assets/Figures/ModalNet-21.png)
+
+*Figure: Original Transformer architecture from [Vaswani et al., 2017](https://arxiv.org/abs/1706.03762) — embedded under educational fair use with attribution.*
+
 The block diagram above shows the canonical encoder–decoder Transformer of Vaswani et al. [1]:
 
 - **Encoder layer** (left) has two sublayers — multi-head self-attention and a position-wise feed-forward network — each wrapped in a residual connection followed by layer normalization. Stacked $N$ times.
@@ -340,6 +344,10 @@ flowchart LR
   Add --> Enc[Transformer encoder stack]
   Enc --> Head[Class-token head]
 ```
+
+![The Vision Transformer overview splits an image into fixed-size patches, embeds them with positions, prepends a class token, and feeds the sequence into a Transformer encoder.](https://ar5iv.labs.arxiv.org/html/2010.11929/assets/x1.png)
+
+*Figure: Vision Transformer patch-token pipeline from [Dosovitskiy et al., 2020](https://arxiv.org/abs/2010.11929) — embedded under educational fair use with attribution.*
 
 The tradeoff is data efficiency versus architectural flexibility. CNNs hard-code locality, weight sharing, and translation equivariance, so they are strong on moderate image datasets. A patch-token Transformer has fewer image-specific priors, so it usually needs larger pretraining data or stronger regularization to match CNNs from scratch. The upside is a generic token mixer that scales well when pretraining data is large and that transfers naturally to masked image modeling, multimodal models, and video or high-resolution patch sequences.
 

@@ -140,6 +140,10 @@ flowchart TB
   Test --> Deployed("(classifier f(x") with documented preprocessing contract"))
 ```
 
+![Simple decision tree — the figure shows a binary decision tree that separates four shapes by answering two yes-or-no questions.](https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Simple_decision_tree.svg/960px-Simple_decision_tree.svg.png)
+
+*Figure: A decision tree routes an example through successive feature tests until it reaches a class leaf. From [Eviatar Bach, 2013](https://commons.wikimedia.org/wiki/File:Simple_decision_tree.svg) — CC0 1.0.*
+
 The classification diagram makes preprocessing, model-family internals, and validation part of one deployable system instead of treating the classifier as a black box. The SVM branch includes the decision boundary, the two margin hyperplanes, support vectors, soft-margin violations, and the kernel option; the other branches expose their own sufficient statistics, split criteria, parameters, or stored examples.
 
 | Classifier | Strength | Main hyperparameters | Good first use |

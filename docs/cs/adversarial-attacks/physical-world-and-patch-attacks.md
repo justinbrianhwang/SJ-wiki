@@ -158,6 +158,10 @@ for each optimization step:
     clamp patch to valid printable values
 ```
 
+![A physical adversarial patch placed on a tabletop changes a banana scene into a high-confidence toaster prediction.](https://ar5iv.labs.arxiv.org/html/1712.09665/assets/banana_attack_diagram.png)
+
+*Figure: Physical adversarial patch demonstration from [Brown et al., 2017](https://arxiv.org/abs/1712.09665) — embedded under educational fair use with attribution.*
+
 Patch reports should state area, shape, allowed locations, transformation distribution, target behavior, and whether the result is digital, printed, or physically photographed.
 
 ### Robust physical road-sign markings
@@ -182,6 +186,10 @@ x'=(1-m)\odot x+m\odot p.
 $$
 
 Worked micro-example: if three transformed views have target losses $0.8$, $1.1$, and $0.5$, the EOT estimate is $0.8$. If $R(p)=0.2$ and $\lambda=0.5$, the total objective estimate is $0.8+0.1=0.9$.
+
+![The RP2 pipeline samples physical stop-sign views, optimizes a masked perturbation, and evaluates perturbed stop signs across distances and angles.](https://ar5iv.labs.arxiv.org/html/1707.08945/assets/figs/pip4.png)
+
+*Figure: RP2 physical stop-sign attack pipeline from [Eykholt et al., 2017](https://arxiv.org/abs/1707.08945) — embedded under educational fair use with attribution.*
 
 This attack family illustrates why physical evaluation must report distance, angle, lighting, camera, print medium, number of trials, and failed attempts. A cropped sign classifier result is not automatically a result for a full driving stack.
 

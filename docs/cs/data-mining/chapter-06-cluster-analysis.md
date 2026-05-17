@@ -87,6 +87,10 @@ flowchart TD
   Update -. "centroids move to within-cluster means" .-> OneIter
 ```
 
+![K-means convergence animation — the figure shows centroids and Voronoi boundaries changing over iterations until the clustering stabilizes.](https://upload.wikimedia.org/wikipedia/commons/e/ea/K-means_convergence.gif)
+
+*Figure: K-means alternates assignment and centroid-update steps until the cluster boundaries stop changing. From [Chire, 2017](https://commons.wikimedia.org/wiki/File:K-means_convergence.gif) — CC BY-SA 4.0.*
+
 This k-means diagram shows the full alternating optimization loop instead of only naming clustering families. The input shape, centroid dimensions, assignment formula, centroid update rule, SSE objective, and convergence test are all labeled, so the reader can see why each iteration cannot increase the squared-error objective. The side example traces the one-dimensional worked example from initial centroids through assignments to updated centroids.
 
 | Algorithm | Cluster shape | Parameters | Strength | Weakness |

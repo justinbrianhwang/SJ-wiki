@@ -91,6 +91,10 @@ flowchart TD
   H --> I[Next-token distribution]
 ```
 
+![Original Transformer architecture — the figure shows encoder and decoder stacks with multi-head attention, feed-forward layers, residual connections, and softmax output.](https://ar5iv.labs.arxiv.org/html/1706.03762/assets/x1.png)
+
+*Figure: The original Transformer separates encoder self-attention, decoder masked self-attention, and encoder-decoder attention. From [Vaswani et al., 2017](https://arxiv.org/abs/1706.03762) — embedded under educational fair use with attribution.*
+
 | Attention type | Can attend to future? | Typical model | Common task |
 |---|---:|---|---|
 | Causal self-attention | no | GPT-style decoder | generation |

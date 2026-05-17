@@ -425,6 +425,10 @@ flowchart TB
   SCFrame --> Goal
 ```
 
+![Google surface-code memory result — the figure shows the Willow surface-code experiment and logical error behavior across code distances.](https://ar5iv.labs.arxiv.org/html/2408.13687/assets/x1.png)
+
+*Figure: Google Quantum AI's Willow experiment reports below-threshold surface-code memory scaling across increasing code distance. From [Google Quantum AI and Collaborators, 2024](https://arxiv.org/abs/2408.13687) — embedded under educational fair use with attribution.*
+
 The diagram shows QEC at four scales: a full 3-qubit bit-flip encoding/syndrome/correction circuit, the nested structure of Shor's 9-qubit code, the CSS stabilizer split of the Steane code, and a surface-code patch with repeated ancilla rounds. The labeled syndrome paths make clear that the measurement reveals error information, not the encoded amplitudes. The dotted surface-code feedback arrow shows the ongoing decoder and Pauli-frame loop used in fault-tolerant operation.
 
 | Object | N&C notation | Role in QEC | Common mistake |

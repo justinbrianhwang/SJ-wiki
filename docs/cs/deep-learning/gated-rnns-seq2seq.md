@@ -126,6 +126,10 @@ flowchart TB
   end
 ```
 
+![An LSTM chain diagram shows repeating cells with gates controlling memory update, forgetting, and hidden-state output over time.](https://colah.github.io/posts/2015-08-Understanding-LSTMs/img/LSTM3-chain.png)
+
+*Figure: LSTM cell chain visualization from [Christopher Olah, 2015](https://colah.github.io/posts/2015-08-Understanding-LSTMs/) — embedded under educational fair use with attribution.*
+
 The LSTM cell diagram shows all four gate computations from the concatenated `[h_{t-1}, x_t]` input and the additive memory update `C_t = f_t*C_{t-1} + i_t*g_t`. The dotted path highlights the cell state's nearly direct route through time, while the output gate controls what part of `tanh(C_t)` becomes the exposed hidden state. The seq2seq subgraph then shows how encoder final states initialize the decoder, with teacher-forced target tokens feeding the decoder during training.
 
 | Model | Extra state or gates | Strength | Limitation |

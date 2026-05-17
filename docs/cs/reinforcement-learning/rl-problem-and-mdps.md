@@ -152,6 +152,10 @@ flowchart LR
   Bellman -. "bootstrapping target" .-> Values
 ```
 
+![An agent-environment loop shows the agent sending actions to the environment and receiving reward and state feedback.](https://commons.wikimedia.org/wiki/Special:FilePath/Agent-environment-diagram-rl.svg)
+
+*Figure: Agent-environment interface diagram by [Martin Thoma, 2016](https://commons.wikimedia.org/wiki/File:Agent-environment-diagram-rl.svg) — CC0 via Wikimedia Commons with attribution.*
+
 This MDP diagram makes the agent-environment contract explicit at time `t`: state enters the policy, an action enters the transition kernel, and the environment returns reward plus next state. The value/model block feeds policy improvement, while the return edge shows why immediate reward and future consequences are both part of the objective. The Bellman subgraph labels the expectation and optimality backups that later become TD, dynamic-programming, and control targets.
 
 | Concept | Symbol | Role in the MDP | Common confusion |

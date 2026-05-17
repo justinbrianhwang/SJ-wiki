@@ -82,6 +82,10 @@ flowchart TB
   Cluster -. "summaries or constraints can replace raw expansion in advanced settings" .-> Scalable
 ```
 
+![DBSCAN core, border, and noise points — the figure shows core points around A, density-reachable border points B and C, and noise point N.](https://upload.wikimedia.org/wikipedia/commons/a/af/DBSCAN-Illustration.svg)
+
+*Figure: DBSCAN classifies points as core, border, or noise according to epsilon-neighborhood density and reachability. From [Chire, 2011](https://commons.wikimedia.org/wiki/File:DBSCAN-Illustration.svg) — CC BY-SA 3.0.*
+
 This DBSCAN-centered diagram makes density reachability explicit. A point becomes core, border, or noise from the `epsilon` range query and `MinPts` count, and clusters grow by repeatedly expanding core-neighborhood seed queues. The scalable/high-dimensional side branch connects the same clustering problem to summaries, subspaces, constraints, and ensembles that the advanced chapter discusses.
 
 | Challenge | Why basic k-means struggles | Typical adaptation |

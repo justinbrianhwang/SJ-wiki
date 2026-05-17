@@ -90,6 +90,10 @@ flowchart TB
   end
 ```
 
+![A LeNet-5 architecture diagram shows convolution, subsampling, and fully connected stages for digit recognition.](https://upload.wikimedia.org/wikipedia/commons/3/35/LeNet-5_architecture.svg)
+
+*Figure: LeNet-5 architecture diagram by Zhang, Lipton, Li, and Smola, 2023, from [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:LeNet-5_architecture.svg) — CC BY-SA 4.0 with attribution.*
+
 The generic block shows the modern Conv-BN-ReLU-Pool pattern with the spatial-size controls called out on the convolution and pooling layers. The LeNet diagram then expands the classic conv-pool-conv-pool-fc-fc-fc contract, including the standard channel counts and key tensor shapes from `[N, 1, 28, 28]` to `[N, 400]` before classification. The final node separates logits from optional softmax probabilities, matching how training code usually consumes classifier outputs.
 
 | Operation | Learned parameters | Main effect | Shape control |

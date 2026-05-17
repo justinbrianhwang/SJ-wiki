@@ -104,6 +104,10 @@ flowchart TB
   end
 ```
 
+![The BERT input representation sums token embeddings, segment embeddings, and position embeddings for a packed sentence-pair sequence.](https://ar5iv.labs.arxiv.org/html/1810.04805/assets/x2.png)
+
+*Figure: BERT input representation from [Devlin et al., 2018](https://arxiv.org/abs/1810.04805) — embedded under educational fair use with attribution.*
+
 BERT, GPT, and T5 differ mainly in attention direction and output contract. BERT uses bidirectional encoder layers and splits into MLM plus sequence-level heads, GPT uses a causal decoder-only stack whose next-token predictions feed generation, and T5 uses an encoder memory that the causal decoder reads through cross-attention. The diagram labels the token formatting, masks, and head shapes that determine which tasks each family naturally supports.
 
 | Transformer family | Attention direction | Pretraining objective | Best matched tasks |

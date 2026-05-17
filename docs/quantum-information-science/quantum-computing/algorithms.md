@@ -250,6 +250,10 @@ flowchart TB
   HHLobs --> Linear["state-output linear algebra<br/>read observables only"]
 ```
 
+![Grover circuit — the figure shows Hadamards, oracle queries, the diffuser, repeated iterations, and measurement for amplitude amplification.](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Grover%27s_algorithm_circuit.svg/960px-Grover%27s_algorithm_circuit.svg.png)
+
+*Figure: Grover's algorithm alternates an oracle phase flip with diffusion before measuring the search register. From [Fawly, 2021](https://commons.wikimedia.org/wiki/File:Grover%27s_algorithm_circuit.svg) — CC BY-SA 4.0.*
+
 This diagram replaces the old taxonomy with circuit-level views of the core algorithms. The kickback circuits show the query register, ancilla preparation, oracle action, final Hadamards, and measurement contract; QFT and QPE expose the controlled-phase and controlled-power ladders used by Shor. Grover's loop shows the oracle and diffusion sub-operations explicitly, while HHL shows the phase-estimation, controlled-rotation, uncomputation, and postselection structure that makes its output a quantum state rather than a full classical vector.
 
 | Algorithmic pattern | N&C representative | Quantum operation | Classical post-processing | Main caveat |

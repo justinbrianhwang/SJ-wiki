@@ -190,6 +190,14 @@ flowchart TB
   Output --> Planner(("Risk-aware behavior and motion planning"))
 ```
 
+![VectorNet scene encoding — the figure shows a driving scene converted into vectorized agent and map polylines for motion forecasting.](https://ar5iv.labs.arxiv.org/html/2005.04259/assets/x2.png)
+
+*Figure: VectorNet encodes agent histories and HD map elements as polylines before global interaction modeling. From [Gao et al., 2020](https://arxiv.org/abs/2005.04259) — embedded under educational fair use with attribution.*
+
+![HiVT hierarchical motion prediction — the figure shows local agent-map context encoders feeding global interaction modules for multi-agent forecasting.](https://github.com/ZikangZhou/HiVT/raw/refs/heads/main/figures/overview.png?raw=true)
+
+*Figure: HiVT separates local context extraction from global agent interaction in vectorized motion prediction. From [Zhou et al., 2022](https://arxiv.org/abs/2205.08518), via the authors' [HiVT repository](https://github.com/ZikangZhou/HiVT) — embedded under educational fair use with attribution.*
+
 This diagram shows two common forecasting architectures at sublayer level. VectorNet builds polyline embeddings and a global graph, while HiVT uses hierarchical temporal, map, local-interaction, and global-interaction attention; both produce multimodal future trajectories with probabilities for planning.
 
 ## Worked example 1: Constant-velocity forecast
