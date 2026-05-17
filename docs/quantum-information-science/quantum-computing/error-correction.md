@@ -367,10 +367,10 @@ flowchart TB
     BFS1 --> BFSyn["syndrome pair<br/>(s12, s23)"]
     BFS2 --> BFSyn
     BFSyn --> BFDec{"decoder table<br/>which bit flipped?"}
-    BFDec -->|"(+,+)"| BFI["do nothing"]
-    BFDec -->|"(-,+)"| BFX1["apply X1"]
-    BFDec -->|"(-,-)"| BFX2["apply X2"]
-    BFDec -->|"(+,-)"| BFX3["apply X3"]
+    BFDec -->|"("+,+")"| BFI["do nothing"]
+    BFDec -->|"("-,+")"| BFX1["apply X1"]
+    BFDec -->|"("-,-")"| BFX2["apply X2"]
+    BFDec -->|"("+,-")"| BFX3["apply X3"]
     BFI --> BFOut["logical state restored<br/>up to correctable error"]
     BFX1 --> BFOut
     BFX2 --> BFOut

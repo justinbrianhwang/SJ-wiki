@@ -33,6 +33,14 @@ $$
 
 ## Key results
 
+![BEVFormer architecture with BEV queries, temporal self-attention, and spatial cross-attention over multi-camera features.](https://ar5iv.labs.arxiv.org/html/2203.17270/assets/x2.png)
+
+*Figure: BEVFormer builds a temporal bird's-eye-view representation from multi-camera image features using transformer attention. From [Li et al., 2022](https://arxiv.org/abs/2203.17270) — embedded under educational fair use with attribution.*
+
+![DETR3D query refinement figure showing object queries producing progressively improved 3D boxes.](https://ar5iv.labs.arxiv.org/html/2110.06922/assets/x2.png)
+
+*Figure: DETR3D illustrates how 3D object queries are refined across detection-head layers for camera-only 3D detection. From [Wang et al., 2021](https://arxiv.org/abs/2110.06922) — embedded under educational fair use with attribution.*
+
 Modern AV perception draws from several detector families. One-stage detectors such as YOLO and RetinaNet directly predict boxes from dense feature maps. Two-stage detectors generate proposals and refine them. Transformer-based detectors such as DETR use set prediction and bipartite matching to avoid hand-designed anchor assignment. 3D lidar detectors such as PointPillars [1] convert point clouds into pseudo-images, while CenterPoint [2] detects object centers in bird's-eye view. Camera-only 3D detection often predicts depth, lifts image features into 3D or BEV, and reasons over multiple cameras and time.
 
 ### Pillar-based 3D detection
@@ -80,6 +88,10 @@ Worked example: with $x \in [0,4)$, $y \in [-2,2)$, and $\Delta x=\Delta y=1$, p
 The main tradeoff is vertical compression. Pillars are fast and well matched to road BEV reasoning, but overpasses, stacked objects, steep grades, and unusual vertical structure can be harder to represent when all height variation in one column is summarized by one feature.
 
 ### Center-based 3D detection and tracking
+
+![CenterPoint center-based detection figure contrasting anchor boxes with point centers in rotated road scenes.](https://ar5iv.labs.arxiv.org/html/2006.11275/assets/x1.png)
+
+*Figure: CenterPoint reframes 3D detection and tracking around object centers instead of anchor boxes. From [Yin et al., 2020](https://arxiv.org/abs/2006.11275) — embedded under educational fair use with attribution.*
 
 Anchor-based 3D detectors tile BEV space with many candidate boxes, sizes, and yaw priors. Center-based detectors instead predict object-center heatmaps and regress box attributes only at likely centers. CenterPoint [2] made this idea practical for LiDAR 3D detection and short-term tracking.
 

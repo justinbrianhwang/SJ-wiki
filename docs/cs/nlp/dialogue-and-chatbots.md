@@ -5,6 +5,10 @@ sidebar_position: 18
 
 # Dialogue and Chatbots
 
+![InstructGPT RLHF pipeline showing supervised fine-tuning, reward model training, and PPO optimization.](https://ar5iv.labs.arxiv.org/html/2203.02155/assets/x2.png)
+
+*Figure: InstructGPT aligns a pretrained language model through demonstrations, preference-ranked comparisons, reward modeling, and PPO. From [Ouyang et al., 2022](https://arxiv.org/abs/2203.02155) — embedded under educational fair use with attribution.*
+
 Dialogue systems interact with users over multiple turns. Jurafsky and Martin cover properties of conversation, frame-based systems, dialogue acts, dialogue state, chatbots, and dialogue system design. Eisenstein discusses dialogue in the broader text generation chapter, including finite-state and agenda-based systems, Markov decision processes, POMDPs, neural encoder-decoder chatbots, and integration with task-oriented dialogue.
 
 ![An ELIZA terminal conversation shows an early chatbot responding to typed user input.](https://commons.wikimedia.org/wiki/Special:FilePath/ELIZA_conversation.png)

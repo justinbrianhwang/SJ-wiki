@@ -15,9 +15,9 @@ Cryptography studies mathematical techniques for protecting information against 
 
 *Figure: Enigma provides historical context for classical ciphers and cryptanalysis. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Enigma-Machine.jpg), United States Central Intelligence Agency, public domain.*
 
-![An Alice and Bob quantum-cryptography setup exchanges polarized photons over a channel.](https://commons.wikimedia.org/wiki/Special:FilePath/Alice_e_Bob_(crittografia_quantistica).png)
+![An Alice and Bob quantum-cryptography setup exchanges polarized photons over a channel.](https://commons.wikimedia.org/wiki/Special:FilePath/Alice_e_Bob_%28crittografia_quantistica%29.png)
 
-*Figure: Alice and Bob diagrams make communication and adversary models easier to track. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Alice_e_Bob_(crittografia_quantistica).png), Ft1 at Italian Wikipedia, public domain.*
+*Figure: Alice and Bob diagrams make communication and adversary models easier to track. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Alice_e_Bob_%28crittografia_quantistica%29.png), Ft1 at Italian Wikipedia, public domain.*
 
 These notes combine two complementary sources. Katz and Lindell's *Introduction to Modern Cryptography*, 2nd edition, is the canonical source for formal definitions, provable-security style, reductions, symmetric and public-key constructions, and security experiments. `IntroToCrypto.pdf` is Nigel Smart's *Cryptography: An Introduction*, a different textbook with a more applied and historical presentation; it is especially useful for hand examples, classical ciphers, Enigma-era intuition, finite-field algorithms, implementation concerns, hybrid encryption, certificates, and zero-knowledge. The post-quantum page goes beyond both books because they predate the current NIST post-quantum standards.
 

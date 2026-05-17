@@ -170,6 +170,10 @@ This one backward pass is useful as a sanity check and teaching baseline. It is 
 
 ### Iterative projected gradient methods
 
+![The robust optimization figure shows loss landscapes around data points and the role of adversarial perturbation sets.](https://ar5iv.labs.arxiv.org/html/1706.06083/assets/x1.png)
+
+*Figure: PGD adversarial examples support the robust optimization view of local worst-case loss. From [Madry et al., 2017](https://arxiv.org/abs/1706.06083) — embedded under educational fair use with attribution.*
+
 Kurakin, Goodfellow, and Bengio [2] popularized basic iterative methods, also called BIM or I-FGSM, by repeating small clipped sign-gradient steps. Madry et al. [3] made the projected-gradient view central to robust optimization: the same inner maximization used for evaluation also becomes the workhorse inner loop of adversarial training.
 
 For $\ell_\infty$ attacks, initialize either at $x^0=x$ or at a random point in the ball:

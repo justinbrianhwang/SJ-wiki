@@ -148,7 +148,7 @@ flowchart LR
     B2["Optimality backup: max_a sum_s',r p(s',r|s,a)(r + gamma V(s'))"]
   end
 
-  Env -. "model-based methods use p(s',r|s,a)" .-> Bellman
+  Env -. "model-based methods use p("s',r|s,a")" .-> Bellman
   Bellman -. "bootstrapping target" .-> Values
 ```
 

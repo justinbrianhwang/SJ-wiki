@@ -71,15 +71,15 @@ Fine-tuning also changes the representation. The pretrained model is not merely 
 flowchart TB
   subgraph BERT["BERT encoder-only pretraining and fine-tuning"]
     direction TB
-    BTok["Input tokens: (CLS) sentence A [SEP] sentence B [SEP]"]
+    BTok["Input tokens: (CLS) sentence A #lsqb;SEP"] sentence B [SEP]"]
     BTok --> BEmb["Token + segment + position embeddings -> (N, T, d_model)"]
     BEmb --> BMask["Bidirectional self-attention mask, padding only"]
     BMask --> BEnc["Transformer encoder stack, e.g. 12 or 24 layers"]
-    BEnc --> BCLS["(CLS) representation -> ["N, d_model)"]
+    BEnc --> BCLS["(CLS) representation -> #lsqb;N, d_model)"]
     BEnc --> BMasked["Hidden states at masked token positions"]
     BCLS --> NSP["NSP or sentence-pair classification head -> (N, 2)"]
     BMasked --> MLM["MLM head: dense + activation + layer norm + tied vocab projection"]
-    MLM --> MLMOut("(Masked-token logits (M, |V|))")
+    MLM --> MLMOut("(Masked-token logits (M, |V|"))")
     NSP --> NSPOut(("Sentence/task logits"))
   end
 
@@ -89,7 +89,7 @@ flowchart TB
     GEmb --> GMask["Causal mask: token t attends only to positions through t"]
     GMask --> GDec["Transformer decoder blocks: masked self-attn + MLP"]
     GDec --> GHead["Tied linear vocab head"]
-    GHead --> GOut("(Next-token logits (N, T, |V|))")
+    GHead --> GOut("(Next-token logits (N, T, |V|"))")
     GOut -. "autoregressive sampling feeds token T+1 back as input" .-> GTok
   end
 

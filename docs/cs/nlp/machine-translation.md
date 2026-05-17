@@ -5,6 +5,10 @@ sidebar_position: 14
 
 # Machine Translation
 
+![Attention-based neural machine translation model with a bidirectional encoder, alignment model, context vector, and decoder.](https://ar5iv.labs.arxiv.org/html/1409.0473/assets/x1.png)
+
+*Figure: Bahdanau attention lets the decoder form a context vector from source annotations at each target step. From [Bahdanau et al., 2014](https://arxiv.org/abs/1409.0473) — embedded under educational fair use with attribution.*
+
 Machine translation maps text from a source language to a target language. Jurafsky and Martin emphasize modern encoder-decoder transformer translation, typological divergences, beam search, low-resource settings, and evaluation with chrF and BLEU. Eisenstein gives a complementary historical and formal view: translation as an optimization problem, statistical machine translation with latent alignments, phrase-based and syntax-based ideas, and neural machine translation with attention.
 
 ![An ELIZA terminal conversation shows an early chatbot responding to typed user input.](https://commons.wikimedia.org/wiki/Special:FilePath/ELIZA_conversation.png)

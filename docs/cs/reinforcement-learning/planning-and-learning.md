@@ -5,6 +5,10 @@ sidebar_position: 8
 
 # Planning and Learning with Tabular Methods
 
+![Monte Carlo tree search diagram showing selection, expansion, rollout, and backpropagation through a search tree.](https://commons.wikimedia.org/wiki/Special:FilePath/MCTS_Algorithm.png)
+
+*Figure: Monte Carlo tree search cycles through selection, expansion, rollout, and backpropagation during decision-time planning. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:MCTS_Algorithm.png), Robert Moss, CC BY-SA 4.0.*
+
 Planning and learning meet when an agent uses both real experience and a model. A model may be given, learned, deterministic, stochastic, exact, or approximate. Sutton and Barto's Dyna architecture makes the relationship concrete: real interaction updates values and the model, then simulated experience from the model performs additional value updates.
 
 ![An agent-environment loop shows actions, observations, and rewards cycling through interaction.](https://commons.wikimedia.org/wiki/Special:FilePath/Agent-environment-diagram-rl.svg)

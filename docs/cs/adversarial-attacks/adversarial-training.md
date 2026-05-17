@@ -92,6 +92,10 @@ Finally, adversarial training is not a drop-in patch after a model is finished. 
 
 ## Visual
 
+![The TRADES figure illustrates the accuracy-robustness tradeoff behind robustness regularization.](https://ar5iv.labs.arxiv.org/html/1901.08573/assets/x1.png)
+
+*Figure: TRADES frames adversarial training as an explicit tradeoff between natural accuracy and robustness. From [Zhang et al., 2019](https://arxiv.org/abs/1901.08573) — embedded under educational fair use with attribution.*
+
 ```mermaid
 flowchart TB
   Batch["Mini-batch (x, y) and current parameters theta"]

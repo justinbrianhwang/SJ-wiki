@@ -87,6 +87,10 @@ A useful habit is to phrase every table caption as a threat-model statement. If 
 
 ### Ensemble baselines for empirical robustness
 
+![The AutoAttack evaluation diagram shows an ensemble of parameter-free attacks used for robust accuracy reporting.](https://ar5iv.labs.arxiv.org/html/2003.01690/assets/x1.png)
+
+*Figure: AutoAttack combines complementary attacks to reduce dependence on one manually tuned PGD configuration. From [Croce and Hein, 2020](https://arxiv.org/abs/2003.01690) — embedded under educational fair use with attribution.*
+
 Croce and Hein [1] introduced AutoAttack as an ensemble-style protocol for reliable empirical evaluation under standard norm-bounded threat models. The point is not that any finite suite is exhaustive; it is that combining attacks with different losses and search behavior reduces the chance that a single mis-tuned PGD run gives a misleading robustness number.
 
 The evaluation logic is:

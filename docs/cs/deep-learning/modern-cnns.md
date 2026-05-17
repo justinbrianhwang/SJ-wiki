@@ -118,6 +118,10 @@ flowchart TB
 
 VGG is intentionally regular: each stage keeps the same spatial size inside the repeated 3 x 3 convolutions, then halves resolution with max pooling. The diagram distinguishes VGG-16 and VGG-19 by the number of convolutions in the later blocks while preserving the same 224 -> 112 -> 56 -> 28 -> 14 -> 7 spatial path. It also shows why the original classifier head is parameter-heavy after flattening 512 x 7 x 7 features.
 
+![The Inception module diagram shows parallel 1 x 1, 3 x 3, 5 x 5, and pooling branches with channel concatenation.](https://ar5iv.labs.arxiv.org/html/1409.4842/assets/x4.png)
+
+*Figure: GoogLeNet's Inception module exposes the multi-branch bottleneck design used inside the network. From [Szegedy et al., 2014](https://arxiv.org/abs/1409.4842) — embedded under educational fair use with attribution.*
+
 ```mermaid
 flowchart TB
   X["Input feature map: (N, 192, H, W)"] --> B1R["Branch 1 reduce: Conv 1 x 1, 64 -> (N, 64, H, W)"]
@@ -165,9 +169,9 @@ flowchart TB
   In["Input image: (N, 3, 224, 224)"] --> Stem["Stem: Conv 7 x 7, 64, stride 2 -> (N, 64, 112, 112)"]
   Stem --> Pool["MaxPool 3 x 3, stride 2 -> (N, 64, 56, 56)"]
   Pool --> S1["conv2_x: 3 bottlenecks (1 x 1,64; 3 x 3,64; 1 x 1,256) -> (N, 256, 56, 56)"]
-  S1 --> S2["conv3_x: 4 bottlenecks (1 x 1,128; 3 x 3,128; 1 x 1,512), first stride 2 -> ["N, 512, 28, 28)"]
-  S2 --> S3["conv4_x: 6 bottlenecks (1 x 1,256; 3 x 3,256; 1 x 1,1024), first stride 2 -> ["N, 1024, 14, 14)"]
-  S3 --> S4["conv5_x: 3 bottlenecks (1 x 1,512; 3 x 3,512; 1 x 1,2048), first stride 2 -> ["N, 2048, 7, 7)"]
+  S1 --> S2["conv3_x: 4 bottlenecks (1 x 1,128; 3 x 3,128; 1 x 1,512), first stride 2 -> #lsqb;N, 512, 28, 28)"]
+  S2 --> S3["conv4_x: 6 bottlenecks (1 x 1,256; 3 x 3,256; 1 x 1,1024), first stride 2 -> #lsqb;N, 1024, 14, 14)"]
+  S3 --> S4["conv5_x: 3 bottlenecks (1 x 1,512; 3 x 3,512; 1 x 1,2048), first stride 2 -> #lsqb;N, 2048, 7, 7)"]
   S4 --> GAP["Global average pool over 7 x 7 -> (N, 2048)"]
   GAP --> FC["FC 1000 logits"]
   FC --> Out(("Class distribution"))
@@ -198,6 +202,10 @@ flowchart TB
 *Figure: DenseNet architecture overview from [Huang et al., 2016](https://arxiv.org/abs/1608.06993) — embedded under educational fair use with attribution.*
 
 DenseNet differs from ResNet by concatenating features instead of adding them. Every new layer contributes `k` growth-rate channels, so the dense block output channel count grows from `C0` to `C0+3k` in this three-layer example. The transition layer then compresses channels and downsamples spatial resolution to control memory.
+
+![The MobileNet block diagram contrasts standard convolution with depthwise separable convolution.](https://ar5iv.labs.arxiv.org/html/1704.04861/assets/x5.png)
+
+*Figure: MobileNet's depthwise separable convolution splits spatial filtering from channel mixing to reduce computation. From [Howard et al., 2017](https://arxiv.org/abs/1704.04861) — embedded under educational fair use with attribution.*
 
 ```mermaid
 flowchart TB

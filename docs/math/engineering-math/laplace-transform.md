@@ -161,7 +161,7 @@ flowchart LR
   SolveY --> Decomp["Partial fractions and shift theorems<br/>match table-compatible pieces"]
   Decomp --> Inverse["Inverse Laplace transform<br/>Y(s) to y(t)"]
   Inverse --> Check["Time-domain checks<br/>initial values, continuity jumps, final value stability"]
-  Check --> Solution(("Solution y(t)"))
+  Check --> Solution("(Solution y(t")"))
   Check -. "failed check" .-> Prep
 ```
 

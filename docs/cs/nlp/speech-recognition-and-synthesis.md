@@ -5,6 +5,18 @@ sidebar_position: 19
 
 # Speech Recognition and Synthesis
 
+![Tacotron 2 system architecture mapping input text through attention and spectrogram prediction into a WaveNet vocoder.](https://ar5iv.labs.arxiv.org/html/1712.05884/assets/x1.png)
+
+*Figure: Tacotron 2 predicts mel spectrograms from text and uses a WaveNet vocoder to synthesize waveform samples. From [Shen et al., 2017](https://arxiv.org/abs/1712.05884) — embedded under educational fair use with attribution.*
+
+![wav2vec 2.0 framework with a convolutional feature encoder, masking, Transformer context network, and quantized targets.](https://ar5iv.labs.arxiv.org/html/2006.11477/assets/x1.png)
+
+*Figure: wav2vec 2.0 learns speech representations by contrasting masked contextual states with quantized latent speech units. From [Baevski et al., 2020](https://arxiv.org/abs/2006.11477) — embedded under educational fair use with attribution.*
+
+![Whisper multitask speech model with an encoder-decoder Transformer trained on speech recognition, translation, language identification, and voice activity detection.](https://ar5iv.labs.arxiv.org/html/2212.04356/assets/x1.png)
+
+*Figure: Whisper uses a single sequence-to-sequence Transformer interface for multiple speech-processing tasks. From [Radford et al., 2022](https://arxiv.org/abs/2212.04356) — embedded under educational fair use with attribution.*
+
 Speech processing connects language to sound. Jurafsky and Martin include automatic speech recognition, log Mel features, encoder-decoder ASR, CTC, word error rate, text-to-speech, text normalization, spectrogram prediction, and vocoding. Eisenstein treats speech as a neighboring field to NLP and notes the role of language models in recognition and spoken dialogue. The combined view is that speech systems are language systems plus acoustic modeling and signal representations.
 
 ![An ELIZA terminal conversation shows an early chatbot responding to typed user input.](https://commons.wikimedia.org/wiki/Special:FilePath/ELIZA_conversation.png)

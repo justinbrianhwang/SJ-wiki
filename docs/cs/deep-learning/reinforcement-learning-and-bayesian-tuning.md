@@ -89,6 +89,10 @@ Bayesian optimization depends on an acquisition function, such as expected impro
 
 ## Visual
 
+![A reinforcement learning diagram shows an agent choosing actions in an environment and receiving state and reward feedback.](https://commons.wikimedia.org/wiki/Special:FilePath/Reinforcement_learning_diagram.svg)
+
+*Figure: Agent-environment feedback loop used as fallback visual context for DQN's value-learning setup. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Reinforcement_learning_diagram.svg), Megajuice, CC0.*
+
 ```mermaid
 flowchart TB
   subgraph ActorCritic["Actor-critic interaction loop"]

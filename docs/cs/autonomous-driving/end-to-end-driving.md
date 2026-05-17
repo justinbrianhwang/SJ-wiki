@@ -77,6 +77,10 @@ Worked example: if the lookahead point is $(10,2)$ m, then $\kappa=4/104=0.0385\
 
 ### Mid-level and privileged imitation
 
+![ChauffeurNet mid-level imitation pipeline with rasterized scene inputs, trajectory prediction, and environment losses.](https://ar5iv.labs.arxiv.org/html/1812.03079/assets/x1.png)
+
+*Figure: ChauffeurNet represents driving with mid-level inputs and planning-shaped outputs for robust imitation learning. From [Bansal et al., 2018](https://arxiv.org/abs/1812.03079) — embedded under educational fair use with attribution.*
+
 Behavior cloning fails when closed-loop errors push the vehicle into states absent from expert logs. ChauffeurNet [2] addressed this by using a mid-level top-down scene representation, predicting future ego waypoints, synthesizing perturbations, and adding losses for collisions, off-road motion, and lack of progress:
 
 $$
@@ -113,6 +117,14 @@ The common theme is that imitation learning improves when the training distribut
 
 ### Transformer fusion for learned driving policies
 
+![TransFuser architecture fusing RGB image and LiDAR BEV streams with transformer modules before waypoint prediction.](https://ar5iv.labs.arxiv.org/html/2205.15997/assets/x2.png)
+
+*Figure: TransFuser uses multi-scale transformer fusion between camera and LiDAR features for waypoint-based driving. From [Chitta et al., 2022](https://arxiv.org/abs/2205.15997) — embedded under educational fair use with attribution.*
+
+![InterFuser framework combining multi-view cameras, LiDAR, interpretable scene features, and a safety controller.](https://ar5iv.labs.arxiv.org/html/2207.14024/assets/x2.png)
+
+*Figure: InterFuser exposes interpretable sensor-fusion features that feed a safety-constrained driving controller. From [Shao et al., 2022](https://arxiv.org/abs/2207.14024) — embedded under educational fair use with attribution.*
+
 Multi-modal end-to-end policies must decide where sensor streams meet. TransFuser [5] uses transformer attention to fuse camera and LiDAR features at multiple scales before predicting waypoints. Its contribution is global cross-modal context: a traffic light in an image, an obstacle in BEV, and the ego route may be far apart in feature coordinates but tightly related for driving.
 
 Self-attention over concatenated image and LiDAR tokens computes:
@@ -132,6 +144,10 @@ $$
 Worked example: if a proposed waypoint $(8,0)$ m is only $0.54$ m from an obstacle and the clearance threshold is $1.0$ m, the controller should reject or modify it. The intermediate "mind map" is useful only because it participates in the action interface; a post-hoc explanation with no operational role would be much weaker.
 
 ### Planning-oriented full-stack learning
+
+![VAD architecture with BEV encoding, vectorized scene learning, a planning transformer, and vectorized constraints.](https://ar5iv.labs.arxiv.org/html/2303.12077/assets/x2.png)
+
+*Figure: VAD connects BEV features, vectorized agent and map queries, ego planning, and vectorized planning constraints. From [Jiang et al., 2023](https://arxiv.org/abs/2303.12077) — embedded under educational fair use with attribution.*
 
 Unified learned stacks try to train perception, prediction, and planning around the final ego plan rather than around isolated module metrics. UniAD [7] uses query-based transformer modules for tracks, map elements, motion forecasts, occupancy, and ego planning. A simplified information flow is:
 
@@ -158,6 +174,18 @@ Worked example: if an ego waypoint is $(5.0,1.0)$ m and a predicted agent waypoi
 The practical tradeoff is complexity. Unified models can improve task coordination, but they are harder to train, debug, schedule, and validate. Production systems usually still need independent monitors and fallback behavior even when the main planner is learned.
 
 ### Generative planning and world models
+
+![MILE multimodal future prediction figure showing BEV semantic rollouts under different imagined futures.](https://ar5iv.labs.arxiv.org/html/2210.07729/assets/x2.png)
+
+*Figure: MILE shows how a learned world model can imagine multiple BEV semantic futures from driving context. From [Hu et al., 2022](https://arxiv.org/abs/2210.07729) — embedded under educational fair use with attribution.*
+
+![DriveDreamer overview showing controllable driving video generation from text, structure, and action conditions.](https://ar5iv.labs.arxiv.org/html/2309.09777/assets/x1.png)
+
+*Figure: DriveDreamer grounds a driving world model in structured traffic constraints and action-conditioned future video. From [Wang et al., 2023](https://arxiv.org/abs/2309.09777) — embedded under educational fair use with attribution.*
+
+![GAIA-1 multimodal generation figure showing video, text, and action-conditioned driving rollouts.](https://ar5iv.labs.arxiv.org/html/2309.17080/assets/x1.png)
+
+*Figure: GAIA-1 demonstrates generative world-model rollouts controlled by video prompts, text, and ego actions. From [Hu et al., 2023](https://arxiv.org/abs/2309.17080) — embedded under educational fair use with attribution.*
 
 World models learn future scene distributions conditioned on observations, actions, maps, text, or traffic structure. DriveDreamer [9] and GAIA-1 [10] are representative generative driving systems: the first uses diffusion and traffic-structure conditioning, while the second uses latent sequence modeling with video, text, and action inputs. The planning-relevant object is an action-conditioned future:
 

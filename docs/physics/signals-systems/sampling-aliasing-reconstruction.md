@@ -173,7 +173,7 @@ flowchart TB
   Fold --> Loss["lost information cannot be recovered by ideal interpolation"]
   Recon -- "yes" --> IdealLP["ideal lowpass interpolation<br/>sinc reconstruction for bandlimited signal"]
   Recon -- "practical" --> Practical["hold, interpolation, or reconstruction filter<br/>adds distortion or delay"]
-  IdealLP --> Output(("reconstructed x_c(t)"))
+  IdealLP --> Output("(reconstructed x_c(t")"))
   Practical --> Output
   Loss --> Output
 ```

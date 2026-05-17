@@ -5,6 +5,10 @@ sidebar_position: 6
 
 # Vector Semantics and Embeddings
 
+![word2vec CBOW and skip-gram architectures showing context words, projection layers, and predicted target or context outputs.](https://ar5iv.labs.arxiv.org/html/1301.3781/assets/x1.png)
+
+*Figure: word2vec introduced CBOW and skip-gram architectures for learning distributed word representations from local context. From [Mikolov et al., 2013](https://arxiv.org/abs/1301.3781) — embedded under educational fair use with attribution.*
+
 Vector semantics represents word meaning with numbers. Jurafsky and Martin introduce count vectors, cosine similarity, TF-IDF, PMI, PPMI, word2vec, GloVe, visualization, evaluation, and bias. Eisenstein frames the same area around the distributional hypothesis, distinguishing distributional statistics from distributed representations and adding Brown clusters, latent semantic analysis, structured contexts, and formal links among embedding objectives.
 
 The central idea is that words occurring in similar contexts tend to have related meanings. Count-based methods make this idea explicit with word-context matrices. Predictive embedding methods learn dense vectors that are more compact and often more useful downstream. Modern contextual language models extend the same idea by giving each token occurrence its own vector.

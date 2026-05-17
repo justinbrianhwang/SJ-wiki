@@ -107,6 +107,10 @@ flowchart TB
 
 The U-Net diagram shows the hourglass explicitly: the contracting path doubles channels while pooling reduces resolution, and the expanding path upsamples while concatenating same-level encoder features. Dotted skip connections carry high-resolution detail into each decoder level, which is why U-Net is effective for boundary-sensitive segmentation. The labels use the original valid-convolution shape progression from 572 x 572 input to 388 x 388 logits.
 
+![The Faster R-CNN diagram shows a Region Proposal Network sharing convolutional features with the detection head.](https://ar5iv.labs.arxiv.org/html/1506.01497/assets/x2.png)
+
+*Figure: Faster R-CNN integrates region proposal generation into the detection network. From [Ren et al., 2015](https://arxiv.org/abs/1506.01497) — embedded under educational fair use with attribution.*
+
 ```mermaid
 flowchart TB
   Img["Input image"] --> Proposals["External region proposals, e.g. selective search"]
@@ -150,6 +154,10 @@ flowchart TB
 
 YOLO-style detectors predict boxes and classes in one dense pass instead of classifying proposal crops. The diagram shows the detection tensor split into box geometry, objectness, and class logits before decoding and NMS. The single-shot contract trades proposal-stage flexibility for a simpler low-latency pipeline.
 
+![The Mask R-CNN framework diagram shows a Faster R-CNN detector with an added parallel mask prediction branch.](https://ar5iv.labs.arxiv.org/html/1703.06870/assets/x1.png)
+
+*Figure: Mask R-CNN adds an aligned per-RoI mask branch to the two-stage detector. From [He et al., 2017](https://arxiv.org/abs/1703.06870) — embedded under educational fair use with attribution.*
+
 ```mermaid
 flowchart TB
   Img["Input image"] --> Backbone["Backbone + FPN feature pyramid"]
@@ -162,7 +170,7 @@ flowchart TB
   MaskHead --> Masks["K binary masks per RoI, e.g. 28 x 28"]
   Boxes --> Select["Select mask for predicted class and paste into image"]
   Masks --> Select
-  Select --> Out("(Instances: box, class, score, mask)")
+  Select --> Out("(Instances: box, class, score, mask")")
 ```
 
 Mask R-CNN extends Faster R-CNN with a parallel mask branch after RoIAlign. The box branch predicts classes and refined boxes, while the mask branch keeps spatial structure inside each RoI to produce per-instance masks. RoIAlign is labeled because mask quality depends on preserving feature-to-pixel alignment.

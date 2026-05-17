@@ -118,13 +118,13 @@ The MLP is also a reference model for non-image tabular features. Even when spec
 
 ```mermaid
 flowchart TB
-  X["Input batch X: (N, d_in)"] --> L1["Linear 1: W1 (d_in, h1) + b1 -> ["N, h1)"]
+  X["Input batch X: (N, d_in)"] --> L1["Linear 1: W1 (d_in, h1) + b1 -> #lsqb;N, h1)"]
   L1 --> A1["Activation phi, e.g. ReLU -> (N, h1)"]
   A1 --> D1["Dropout train only: mask m1 ~ Bernoulli(q), h1*m1/q"]
-  D1 --> L2["Linear 2: W2 (h1, h2) + b2 -> ["N, h2)"]
+  D1 --> L2["Linear 2: W2 (h1, h2) + b2 -> #lsqb;N, h2)"]
   L2 --> A2["Activation phi -> (N, h2)"]
   A2 --> D2["Dropout train only: mask m2 ~ Bernoulli(q)"]
-  D2 --> L3["Output linear: W3 (h2, K) + b3 -> logits ["N, K)"]
+  D2 --> L3["Output linear: W3 (h2, K) + b3 -> logits #lsqb;N, K)"]
   L3 --> CE["Cross-entropy or task loss"]
   CE --> Total["Regularized objective: loss + lambda/2 * ||W||_2^2"]
 

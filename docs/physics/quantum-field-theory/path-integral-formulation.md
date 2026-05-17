@@ -123,7 +123,7 @@ The formalism also clarifies why classical physics emerges. When the action is l
 ```mermaid
 flowchart TD
   A[Classical action S] --> B[Sum over histories]
-  B --> C["Generating functional Z[J]"]
+  B --> C["Generating functional Z#lsqb;J"]"]
   C --> D[Functional derivatives]
   D --> E[Correlation functions]
   C --> F[Expand interactions]

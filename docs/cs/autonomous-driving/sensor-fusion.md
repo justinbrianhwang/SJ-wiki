@@ -31,6 +31,10 @@ An **occupancy grid** stores whether each cell in space is free, occupied, or un
 
 ## Key results
 
+![Lift-Splat-Shoot diagram contrasting image-plane perception with bird's-eye-view planning coordinates.](https://ar5iv.labs.arxiv.org/html/2008.05711/assets/x2.png)
+
+*Figure: Lift-Splat-Shoot motivates lifting multi-camera image features into a planning-aligned BEV representation. From [Philion et al., 2020](https://arxiv.org/abs/2008.05711) — embedded under educational fair use with attribution.*
+
 Fusion requires consistent coordinate transforms. A lidar point in lidar coordinates can be projected into the camera by:
 
 $$

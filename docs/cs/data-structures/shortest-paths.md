@@ -78,14 +78,14 @@ flowchart TB
     C -- "5" --> E
   end
 
-  Init["Initialize d(A)=0; all other d[v]=infinity; parent[v]=null"] --> PQ["Priority queue keyed by tentative distance"]
+  Init["Initialize d(A)=0; all other d#lsqb;v"]=infinity; parent[v]=null"] --> PQ["Priority queue keyed by tentative distance"]
   Graph --> PQ
   PQ --> Extract["Extract unsettled vertex u with smallest d(u)"]
   Extract --> Finalize["Finalize u; d(u) is now shortest because weights are nonnegative"]
   Finalize --> Edges["For each outgoing edge u -> v with weight w"]
   Edges --> Relax{"d[u] + w < d[v]?"}
-  Relax -- "yes" --> Update["Set d(v)=d[u]+w; parent[v]=u; decrease-key or push duplicate"]
-  Relax -- "no" --> Keep["Keep current d(v) and parent[v]"]
+  Relax -- "yes" --> Update["Set d(v)=d#lsqb;u"]+w; parent[v]=u; decrease-key or push duplicate"]
+  Relax -- "no" --> Keep["Keep current d(v) and parent#lsqb;v"]"]
   Update --> PQ
   Keep --> More{"Unsettled vertices remain?"}
   PQ --> More

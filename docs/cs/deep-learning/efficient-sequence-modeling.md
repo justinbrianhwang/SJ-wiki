@@ -50,9 +50,9 @@ flowchart TB
   Scan -. "implemented by associative parallel scan, not a Python time loop" .-> OutProj
 ```
 
-![The Mamba selective state-space diagram shows token-dependent B and C parameters, a discretization step, a recurrent state, and GPU memory hierarchy.](https://github.com/state-spaces/mamba/raw/main/assets/selection.png)
+![The Mamba selective state-space diagram shows token-dependent B and C parameters, a discretization step, a recurrent state, and GPU memory hierarchy.](https://ar5iv.labs.arxiv.org/html/2312.00752/assets/x1.png)
 
-*Figure: Selective state-space mechanism from [Gu and Dao, 2023](https://arxiv.org/abs/2312.00752), via the [state-spaces/mamba GitHub repository](https://github.com/state-spaces/mamba) — embedded under educational fair use with attribution.*
+*Figure: Mamba's selective state-space mechanism makes recurrent state updates depend on token content. From [Gu and Dao, 2023](https://arxiv.org/abs/2312.00752) — embedded under educational fair use with attribution.*
 
 The Mamba block starts with normalized token states, expands channels, applies a short causal depthwise convolution, and then generates input-dependent SSM parameters `Delta_t`, `B_t`, and `C_t`. The selective scan updates a fixed recurrent state while the output gate controls which scanned features pass through the projection. The dotted note highlights the implementation trick: the recurrence is trained with a fused associative scan even though it behaves like a recurrent state at inference.
 
@@ -82,6 +82,10 @@ flowchart TB
 *Figure: RWKV block structure from [Peng et al., 2023](https://arxiv.org/abs/2305.13048) — embedded under educational fair use with attribution.*
 
 RWKV combines an attention-like decayed key-value recurrence with a separate channel-mixing block. The time-mixing path uses token shift, keys, values, learned decay, and a receptance gate to maintain fixed-size numerator and denominator state instead of a growing KV cache. The residual channel-mixing path supplies the feed-forward capacity that a Transformer would normally place after attention.
+
+![The Hyena hierarchy diagram shows long implicit convolutions interleaved with input-controlled gates.](https://ar5iv.labs.arxiv.org/html/2302.10866/assets/x1.png)
+
+*Figure: Hyena replaces pairwise attention with a hierarchy of gated long convolutions for sequence mixing. From [Poli et al., 2023](https://arxiv.org/abs/2302.10866) — embedded under educational fair use with attribution.*
 
 ```mermaid
 flowchart TB

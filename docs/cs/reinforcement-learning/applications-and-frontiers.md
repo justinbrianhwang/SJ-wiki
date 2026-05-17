@@ -5,6 +5,10 @@ sidebar_position: 16
 
 # Applications and Frontiers
 
+![Atari screenshots from the original deep Q-learning benchmark including Pong, Breakout, Space Invaders, Seaquest, and Beam Rider.](https://ar5iv.labs.arxiv.org/html/1312.5602/assets/x1.png)
+
+*Figure: DQN evaluated a single convolutional Q-network on raw Atari screen inputs across several games. From [Mnih et al., 2013](https://arxiv.org/abs/1312.5602) — embedded under educational fair use with attribution.*
+
 Sutton and Barto close the book by showing how reinforcement learning ideas appear in substantial systems and open research directions. The case studies include TD-Gammon, Samuel's checkers player, Watson's Daily Double wagering, memory control, Atari game playing, AlphaGo and AlphaGo Zero, personalized web services, and thermal soaring. The frontier topics include general value functions, options, state representation, reward design, and unresolved issues in sample efficiency and abstraction.
 
 ![A Waymo self-driving car drives on a public road with roof-mounted sensors.](https://commons.wikimedia.org/wiki/Special:FilePath/Waymo_self-driving_car_front_view.gk.jpg)

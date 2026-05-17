@@ -119,11 +119,11 @@ q -----^
 
 ```mermaid
 flowchart TD
-  A["Allocate with new or new[]"] --> B[Store returned pointer]
+  A["Allocate with new or new#lsqb;"]"] --> B[Store returned pointer]
   B --> C[Use only while object is alive]
   C --> D{"Single object or array?"}
   D -->|single| E[delete pointer]
-  D -->|array| F["delete[] pointer"]
+  D -->|array| F["delete#lsqb;"] pointer"]
   E --> G[Set pointer to nullptr if reused]
   F --> G
   G --> H[Do not dereference after delete]
