@@ -162,13 +162,58 @@ flowchart LR
 
 This transform diagram makes the analysis/synthesis contract explicit: an aperiodic signal becomes a continuous spectrum, operations are performed as algebraic multipliers or phase factors, and the inverse integral reconstructs the result. The operations subgraph covers the common architecture behind filtering, convolution, differentiation, and PDE evolution. The verification branch is necessary because Fourier conventions and units change the constants even when the structural pipeline is the same.
 
-| Time or space operation | Frequency effect |
+The expanded tables below use the angular-frequency convention $\hat f(\omega)=\int_{-\infty}^{\infty}f(x)e^{-i\omega x}\,dx$. The constants for the cycles-per-unit convention $\xi=\omega/(2\pi)$ are listed in a separate row when they differ.
+
+### Operational rules
+
+| Time or space operation on $f(x)$ | Frequency-domain effect on $\hat f(\omega)$ |
 |---|---|
-| Shift $f(x-a)$ | Multiply by $e^{-i\omega a}$ |
-| Modulate $e^{iax}f(x)$ | Shift spectrum to $\omega-a$ |
-| Differentiate $f'$ | Multiply by $i\omega$ |
-| Convolve $f*g$ | Multiply transforms |
-| Compress $f(ax)$ | Stretch spectrum and scale by $1/\vert a\vert $ |
+| Linearity $af+bg$ | $a\hat f+b\hat g$ |
+| Conjugate $\overline{f(x)}$ | $\overline{\hat f(-\omega)}$ |
+| Reflection $f(-x)$ | $\hat f(-\omega)$ |
+| Shift $f(x-a)$ | $e^{-i\omega a}\,\hat f(\omega)$ |
+| Modulation $e^{iax}f(x)$ | $\hat f(\omega-a)$ |
+| Scaling $f(\alpha x)$, $\alpha\ne 0$ | $\dfrac{1}{\lvert \alpha\rvert }\hat f\!\left(\dfrac{\omega}{\alpha}\right)$ |
+| Derivative $f^{(n)}(x)$ | $(i\omega)^n\hat f(\omega)$ |
+| Multiplication by $x^n$: $x^n f(x)$ | $i^n\,\hat f^{(n)}(\omega)$ |
+| Integral $\displaystyle\int_{-\infty}^{x}f$ (if it decays) | $\dfrac{\hat f(\omega)}{i\omega}+\pi\hat f(0)\delta(\omega)$ |
+| Convolution $(f*g)(x)$ | $\hat f(\omega)\,\hat g(\omega)$ |
+| Pointwise product $f(x)g(x)$ | $\dfrac{1}{2\pi}(\hat f*\hat g)(\omega)$ |
+| Parseval / Plancherel | $\displaystyle\int\lvert f\rvert ^2\,dx=\dfrac{1}{2\pi}\int\lvert \hat f\rvert ^2\,d\omega$ |
+| Duality | $\mathcal{F}\{\hat f\}(\omega)=2\pi\,f(-\omega)$ |
+
+### Transform pairs (angular-frequency convention)
+
+| $f(x)$ | $\hat f(\omega)$ | Notes |
+|---|---|---|
+| $\delta(x)$ | $1$ | Identity for convolution |
+| $\delta(x-a)$ | $e^{-i\omega a}$ | Shifted impulse |
+| $1$ | $2\pi\,\delta(\omega)$ | Distributional pair |
+| $e^{iax}$ | $2\pi\,\delta(\omega-a)$ | Modulation of constant |
+| $\cos(ax)$ | $\pi\bigl[\delta(\omega-a)+\delta(\omega+a)\bigr]$ | Even sinusoid |
+| $\sin(ax)$ | $-i\pi\bigl[\delta(\omega-a)-\delta(\omega+a)\bigr]$ | Odd sinusoid |
+| $\operatorname{sgn}(x)$ | $\dfrac{2}{i\omega}$ | Principal value sense |
+| $u(x)$ (Heaviside) | $\pi\delta(\omega)+\dfrac{1}{i\omega}$ | One-sided step |
+| $\dfrac{1}{x}$ | $-i\pi\,\operatorname{sgn}(\omega)$ | Principal value |
+| Rectangular pulse $\mathbf{1}_{\lvert x\rvert \le a}$ | $\dfrac{2\sin(\omega a)}{\omega}$ | $\operatorname{sinc}$-shape |
+| Triangular pulse $\bigl(1-\lvert x\rvert /a\bigr)_+$ | $\dfrac{4\sin^2(\omega a/2)}{a\,\omega^2}$ | Auto-correlation of rectangle |
+| One-sided $e^{-ax}u(x)$, $a\gt 0$ | $\dfrac{1}{a+i\omega}$ | Causal exponential |
+| Two-sided $e^{-a\lvert x\rvert }$, $a\gt 0$ | $\dfrac{2a}{a^2+\omega^2}$ | Lorentzian / Cauchy form |
+| Lorentzian $\dfrac{1}{a^2+x^2}$, $a\gt 0$ | $\dfrac{\pi}{a}\,e^{-a\lvert \omega\rvert }$ | Inverse of the previous row |
+| Gaussian $e^{-x^2/(2\sigma^2)}$ | $\sigma\sqrt{2\pi}\,e^{-\sigma^2\omega^2/2}$ | Self-Fourier up to scaling |
+| Sinc $\dfrac{\sin(\Omega x)}{\pi x}$ | $\mathbf{1}_{\lvert \omega\rvert \le \Omega}$ | Ideal lowpass kernel |
+| $x\,e^{-a x^2}$, $a\gt 0$ | $-\dfrac{i\omega}{2a}\sqrt{\dfrac{\pi}{a}}\,e^{-\omega^2/(4a)}$ | Derivative of Gaussian |
+
+### Convention factor cheatsheet
+
+The convention $\hat f(\xi)=\int f(x)e^{-2\pi i\xi x}\,dx$ (cycles per unit) replaces $\omega$ by $2\pi\xi$ everywhere. The effect on common rules:
+
+| Quantity | Angular ($\omega$) | Cycles ($\xi=\omega/2\pi$) |
+|---|---|---|
+| Derivative factor | $i\omega$ | $2\pi i\xi$ |
+| Gaussian self-pair | $\sigma\sqrt{2\pi}\,e^{-\sigma^2\omega^2/2}$ | $\sigma\,e^{-2\pi^2\sigma^2\xi^2}$ |
+| Inversion constant | $\dfrac{1}{2\pi}$ in front | $1$ in front |
+| Parseval | $\int\lvert f\rvert ^2=\dfrac{1}{2\pi}\int\lvert \hat f\rvert ^2$ | $\int\lvert f\rvert ^2=\int\lvert \hat f\rvert ^2$ |
 
 ## Worked example 1: Transform of a rectangular pulse
 

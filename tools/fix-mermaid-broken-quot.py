@@ -19,10 +19,32 @@ import sys
 import pathlib
 
 
+_BROKEN_PAREN_NODE = re.compile(r'(\w+)\("\(([^"]*)"\)"\)+')
+
+
+def _repair_broken_paren_node(line: str) -> str:
+    """Rewrite `Name("(label")")` (and variants with extra trailing `)`) to `Name(("label"))`.
+
+    Origin: earlier sanitizer wrapped node text whose content contained `(` and the closing
+    `)` got placed outside the quoted label, producing mismatched quotes/parens that fail
+    the Mermaid parser. The intent was a double-paren circle node `Name(("..."))`.
+    Balances any unmatched `(` inside the captured label by appending `)`.
+    """
+    def repl(m: "re.Match[str]") -> str:
+        name, inner = m.group(1), m.group(2)
+        deficit = inner.count('(') - inner.count(')')
+        if deficit > 0:
+            inner = inner + (')' * deficit)
+        return f'{name}(("{inner}"))'
+    return _BROKEN_PAREN_NODE.sub(repl, line)
+
+
 def fix_mermaid_block(body: str) -> str:
     lines = body.split("\n")
     out = []
     for line in lines:
+        if _BROKEN_PAREN_NODE.search(line):
+            line = _repair_broken_paren_node(line)
         if "#quot;" not in line:
             out.append(line)
             continue

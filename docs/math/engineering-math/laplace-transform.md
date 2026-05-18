@@ -70,15 +70,63 @@ $$
 
 The standard transform method for a linear IVP is direct. Transform every term, insert initial conditions through the derivative formulas, solve for $Y(s)$, decompose into recognizable pieces, and invert. The initial conditions are not applied after the inverse transform; they have already entered the algebra.
 
-Some basic transforms are used constantly:
+Some basic transforms are used constantly. The expanded table below covers the entries most often needed for ODE solving, control problems, and circuit analysis. ROC means region of convergence in the complex $s$-plane; $n$ is a non-negative integer and $a,b$ are real constants unless stated otherwise.
 
-| $f(t)$ | $F(s)$ | Condition |
+### Elementary transforms
+
+| $f(t)$ ($t\ge 0$) | $F(s)=\mathcal{L}\{f\}$ | ROC |
 |---|---|---|
-| $1$ | $1/s$ | $\operatorname{Re}s\gt 0$ |
-| $t^n$ | $n!/s^{n+1}$ | $\operatorname{Re}s\gt 0$ |
-| $e^{at}$ | $1/(s-a)$ | $\operatorname{Re}s\gt a$ |
-| $\cos bt$ | $s/(s^2+b^2)$ | $\operatorname{Re}s\gt 0$ |
-| $\sin bt$ | $b/(s^2+b^2)$ | $\operatorname{Re}s\gt 0$ |
+| $1$ | $\dfrac{1}{s}$ | $\operatorname{Re}s\gt 0$ |
+| $t$ | $\dfrac{1}{s^2}$ | $\operatorname{Re}s\gt 0$ |
+| $t^n$, $n\in\mathbb{N}$ | $\dfrac{n!}{s^{n+1}}$ | $\operatorname{Re}s\gt 0$ |
+| $t^\alpha$, $\alpha\gt -1$ | $\dfrac{\Gamma(\alpha+1)}{s^{\alpha+1}}$ | $\operatorname{Re}s\gt 0$ |
+| $e^{at}$ | $\dfrac{1}{s-a}$ | $\operatorname{Re}s\gt a$ |
+| $t^n e^{at}$ | $\dfrac{n!}{(s-a)^{n+1}}$ | $\operatorname{Re}s\gt a$ |
+
+### Trigonometric and hyperbolic transforms
+
+| $f(t)$ ($t\ge 0$) | $F(s)$ | ROC |
+|---|---|---|
+| $\sin bt$ | $\dfrac{b}{s^2+b^2}$ | $\operatorname{Re}s\gt 0$ |
+| $\cos bt$ | $\dfrac{s}{s^2+b^2}$ | $\operatorname{Re}s\gt 0$ |
+| $\sinh bt$ | $\dfrac{b}{s^2-b^2}$ | $\operatorname{Re}s\gt \lvert b\rvert$ |
+| $\cosh bt$ | $\dfrac{s}{s^2-b^2}$ | $\operatorname{Re}s\gt \lvert b\rvert$ |
+| $e^{at}\sin bt$ | $\dfrac{b}{(s-a)^2+b^2}$ | $\operatorname{Re}s\gt a$ |
+| $e^{at}\cos bt$ | $\dfrac{s-a}{(s-a)^2+b^2}$ | $\operatorname{Re}s\gt a$ |
+| $t\sin bt$ | $\dfrac{2bs}{(s^2+b^2)^2}$ | $\operatorname{Re}s\gt 0$ |
+| $t\cos bt$ | $\dfrac{s^2-b^2}{(s^2+b^2)^2}$ | $\operatorname{Re}s\gt 0$ |
+| $\dfrac{\sin bt}{t}$ | $\arctan\dfrac{b}{s}$ | $\operatorname{Re}s\gt 0$ |
+| $\dfrac{1-\cos bt}{t}$ | $\dfrac{1}{2}\ln\dfrac{s^2+b^2}{s^2}$ | $\operatorname{Re}s\gt 0$ |
+
+### Distributions and switching signals
+
+| $f(t)$ | $F(s)$ | Comment |
+|---|---|---|
+| $\delta(t)$ | $1$ | Dirac impulse at the origin |
+| $\delta(t-a)$ | $e^{-as}$ | Impulse at $t=a$, $a\ge 0$ |
+| $u(t)$ | $\dfrac{1}{s}$ | Unit step (Heaviside) |
+| $u(t-a)$ | $\dfrac{e^{-as}}{s}$ | Step turning on at $t=a$ |
+| $u(t-a)f(t-a)$ | $e^{-as}F(s)$ | Second shifting theorem |
+| Rectangular pulse $u(t-a)-u(t-b)$ | $\dfrac{e^{-as}-e^{-bs}}{s}$ | Width $b-a$ for $b\gt a$ |
+| Periodic $f$ with period $T$ | $\dfrac{1}{1-e^{-Ts}}\displaystyle\int_0^T e^{-st}f(t)\,dt$ | $f(t+T)=f(t)$, $t\ge 0$ |
+
+### Operational rules
+
+| Operation on $f(t)$ | Effect on $F(s)$ |
+|---|---|
+| Linearity $af+bg$ | $aF+bG$ |
+| First shifting $e^{at}f(t)$ | $F(s-a)$ |
+| Time shift $u(t-a)f(t-a)$ | $e^{-as}F(s)$ |
+| Scaling $f(\alpha t)$, $\alpha\gt 0$ | $\dfrac{1}{\alpha}F\!\left(\dfrac{s}{\alpha}\right)$ |
+| Derivative $f'(t)$ | $sF(s)-f(0)$ |
+| Second derivative $f''(t)$ | $s^2F(s)-sf(0)-f'(0)$ |
+| Integral $\displaystyle\int_0^t f(\tau)\,d\tau$ | $\dfrac{F(s)}{s}$ |
+| Multiplication by $t$: $tf(t)$ | $-F'(s)$ |
+| Multiplication by $t^n$: $t^n f(t)$ | $(-1)^n F^{(n)}(s)$ |
+| Division by $t$: $f(t)/t$ | $\displaystyle\int_s^\infty F(\sigma)\,d\sigma$ (when convergent) |
+| Convolution $(f*g)(t)$ | $F(s)G(s)$ |
+| Initial value | $f(0^+)=\displaystyle\lim_{s\to\infty}sF(s)$ |
+| Final value (if stable) | $\displaystyle\lim_{t\to\infty}f(t)=\lim_{s\to 0}sF(s)$ |
 
 The first shifting theorem says
 
@@ -161,7 +209,7 @@ flowchart LR
   SolveY --> Decomp["Partial fractions and shift theorems<br/>match table-compatible pieces"]
   Decomp --> Inverse["Inverse Laplace transform<br/>Y(s) to y(t)"]
   Inverse --> Check["Time-domain checks<br/>initial values, continuity jumps, final value stability"]
-  Check --> Solution("(Solution y(t")"))
+  Check --> Solution(("Solution y(t)"))
   Check -. "failed check" .-> Prep
 ```
 

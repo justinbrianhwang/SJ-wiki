@@ -170,7 +170,7 @@ flowchart TB
   MaskHead --> Masks["K binary masks per RoI, e.g. 28 x 28"]
   Boxes --> Select["Select mask for predicted class and paste into image"]
   Masks --> Select
-  Select --> Out("(Instances: box, class, score, mask")")
+  Select --> Out(("Instances: box, class, score, mask"))
 ```
 
 Mask R-CNN extends Faster R-CNN with a parallel mask branch after RoIAlign. The box branch predicts classes and refined boxes, while the mask branch keeps spatial structure inside each RoI to produce per-instance masks. RoIAlign is labeled because mask quality depends on preserving feature-to-pixel alignment.
