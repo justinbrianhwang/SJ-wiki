@@ -175,10 +175,6 @@ The practical tradeoff is complexity. Unified models can improve task coordinati
 
 ### Generative planning and world models
 
-![MILE multimodal future prediction figure showing BEV semantic rollouts under different imagined futures.](https://ar5iv.labs.arxiv.org/html/2210.07729/assets/x2.png)
-
-*Figure: MILE shows how a learned world model can imagine multiple BEV semantic futures from driving context. From [Hu et al., 2022](https://arxiv.org/abs/2210.07729) — embedded under educational fair use with attribution.*
-
 ![DriveDreamer overview showing controllable driving video generation from text, structure, and action conditions.](https://ar5iv.labs.arxiv.org/html/2309.09777/assets/x1.png)
 
 *Figure: DriveDreamer grounds a driving world model in structured traffic constraints and action-conditioned future video. From [Wang et al., 2023](https://arxiv.org/abs/2309.09777) — embedded under educational fair use with attribution.*

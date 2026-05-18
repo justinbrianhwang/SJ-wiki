@@ -1,0 +1,8 @@
+{
+  "label": "Federated Learning",
+  "position": 15,
+  "link": {
+    "type": "doc",
+    "id": "cs/federated-learning/intro"
+  }
+}

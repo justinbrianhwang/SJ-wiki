@@ -102,7 +102,7 @@ Worked example: if lane $L_2$ has successor $L_3$ and left neighbor $L_5$, then 
 
 ### Hierarchical multi-agent forecasting
 
-![Wayformer architecture showing an attention-based scene encoder and decoder for motion forecasting.](https://ar5iv.labs.arxiv.org/html/2207.05844/assets/x1.png)
+![Wayformer architecture showing an attention-based scene encoder and decoder for motion forecasting.](https://ar5iv.labs.arxiv.org/html/2207.05844/assets/x4.png)
 
 *Figure: Wayformer compares attention-based encoder-decoder fusion strategies for motion forecasting. From [Nayakanti et al., 2022](https://arxiv.org/abs/2207.05844) — embedded under educational fair use with attribution.*
 

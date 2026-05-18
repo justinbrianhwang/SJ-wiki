@@ -37,7 +37,7 @@ $$
 
 *Figure: BEVFormer builds a temporal bird's-eye-view representation from multi-camera image features using transformer attention. From [Li et al., 2022](https://arxiv.org/abs/2203.17270) — embedded under educational fair use with attribution.*
 
-![DETR3D query refinement figure showing object queries producing progressively improved 3D boxes.](https://ar5iv.labs.arxiv.org/html/2110.06922/assets/x2.png)
+![DETR3D query refinement figure showing object queries producing progressively improved 3D boxes.](https://ar5iv.labs.arxiv.org/html/2110.06922/assets/x1.png)
 
 *Figure: DETR3D illustrates how 3D object queries are refined across detection-head layers for camera-only 3D detection. From [Wang et al., 2021](https://arxiv.org/abs/2110.06922) — embedded under educational fair use with attribution.*
 

@@ -92,10 +92,6 @@ $$
 
 The sum aggregator is crucial. Xu et al. showed that injective multiset aggregation makes GIN as powerful as the 1-dimensional Weisfeiler-Lehman, or 1-WL, graph isomorphism test within the message-passing family [9].
 
-![A GAT diagram shows attention coefficients weighting neighbor contributions before aggregation, with multiple parallel heads.](https://ar5iv.labs.arxiv.org/html/1710.10903/assets/x1.png)
-
-*Figure: Graph attention network applies learned attention coefficients over neighborhoods, with multi-head outputs concatenated or averaged. From [Velickovic et al., 2018](https://arxiv.org/abs/1710.10903) — embedded under educational fair use with attribution.*
-
 Graph attention networks assign different weights to different neighbors [10]. With transformed node features $Wh_i$, a typical single-head GAT coefficient is
 
 $$

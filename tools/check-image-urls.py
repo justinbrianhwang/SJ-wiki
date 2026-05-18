@@ -55,6 +55,9 @@ def host_of(url: str) -> str:
     return url.split("/", 3)[2] if "://" in url else ""
 
 
+AR5IV_PLACEHOLDER_BYTES = 20498  # ar5iv serves a 20498-byte placeholder PNG for missing figures
+
+
 def check_once(url: str, method: str) -> tuple[int | None, str]:
     headers = {"User-Agent": "Mozilla/5.0 (SJ-Wiki link checker)"}
     if method == "GET":
@@ -62,6 +65,13 @@ def check_once(url: str, method: str) -> tuple[int | None, str]:
     req = urllib.request.Request(url, method=method, headers=headers)
     try:
         with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
+            if (
+                method == "HEAD"
+                and "ar5iv.labs.arxiv.org" in url
+                and resp.headers.get("Content-Length") == str(AR5IV_PLACEHOLDER_BYTES)
+            ):
+                # ar5iv sends a placeholder PNG with a HTTP 200; treat as broken.
+                return 404, f"ar5iv placeholder ({AR5IV_PLACEHOLDER_BYTES} bytes)"
             return resp.status, "ok"
     except urllib.error.HTTPError as e:
         return e.code, f"HTTP {e.code}"
