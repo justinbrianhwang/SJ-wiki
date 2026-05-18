@@ -21,12 +21,20 @@ Step-by-step procedures for solving computational problems.
 
 ## Topics
 
-- [Big-O Notation](./big-o)
-- Sorting algorithms *(coming soon)*
-- Searching algorithms *(coming soon)*
-- Dynamic programming *(coming soon)*
-- Greedy algorithms *(coming soon)*
-- Graph algorithms *(coming soon)*
+1. [Big-O Notation](./big-o)
+2. [Sorting Algorithms](./sorting-algorithms)
+3. [Searching Algorithms](./searching-algorithms)
+4. [Divide and Conquer](./divide-and-conquer)
+5. [Dynamic Programming](./dynamic-programming)
+6. [Greedy Algorithms](./greedy-algorithms)
+7. [Backtracking and Branch & Bound](./backtracking-and-branch-and-bound)
+8. [Graph Algorithms](./graph-algorithms)
+9. [Network Flow and Matching](./network-flow-and-matching)
+10. [String Algorithms](./string-algorithms)
+11. [Number-Theoretic and Algebraic Algorithms](./number-theoretic-and-algebraic-algorithms)
+12. [Computational Geometry](./computational-geometry)
+13. [Randomized Algorithms](./randomized-algorithms)
+14. [Approximation Algorithms](./approximation-algorithms)
 
 ## Why it matters
 
