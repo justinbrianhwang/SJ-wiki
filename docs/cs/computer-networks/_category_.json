@@ -1,0 +1,8 @@
+{
+  "label": "Computer Networks",
+  "position": 20,
+  "link": {
+    "type": "doc",
+    "id": "cs/computer-networks/intro"
+  }
+}

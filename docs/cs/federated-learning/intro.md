@@ -21,3 +21,4 @@ This chapter sequence is a graduate-level survey. It begins with the FedAvg base
 4. [Privacy: Differential Privacy and Secure Aggregation](/cs/federated-learning/privacy-differential-and-secure-aggregation)
 5. [Communication Efficiency and Robustness](/cs/federated-learning/communication-efficiency-and-robustness)
 6. [Applications and Systems](/cs/federated-learning/applications-and-systems)
+7. [Federated Unlearning](/cs/federated-learning/federated-unlearning)
