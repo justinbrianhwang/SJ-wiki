@@ -277,6 +277,10 @@ print("pure pursuit deg:", np.rad2deg(delta_pp))
 print("stanley deg:", np.rad2deg(delta_st))
 ```
 
+## Recent systems and papers
+
+Vu et al. study receding-horizon MPC for autonomous-vehicle trajectory tracking, using a bicycle-like vehicle model to turn a planned reference from [motion planning](/cs/autonomous-driving/motion-planning) into speed and steering-rate commands under constraints [1]. Their state is position, body heading, and steering angle, with controls for vehicle speed and steering angular velocity; the nonlinear model is locally linearized around the reference trajectory, discretized, and stacked into a finite-horizon quadratic program with tracking-error, control-effort, input-bound, input-increment, and output-bound terms [1]. As in practical MPC, only the first optimized control action is applied, then the state is measured again and the horizon is shifted, so solver timing and warm starts matter as much as the optimization equation [1]. The paper's most useful control lesson is that making every output constraint hard can make the online problem infeasible when the vehicle starts outside a bound or the reference demands more than the horizon can achieve [1]. Softened constraints add nonnegative slack variables and heavy penalties, letting the optimizer return a recovery action while still preferring zero violation whenever a hard-feasible solution exists [1]. In simulation, softened constraints improve feasibility and transient recovery but increase CPU time, while horizon length, sampling interval, and $Q/R$ weights change smoothness, tracking error, sensitivity, and real-time cost, reinforcing that MPC is a constrained control framework rather than an automatic safety guarantee [1].
+
 ## Common pitfalls
 
 - Mixing sign conventions for cross-track error. A controller can steer away from the path if the coordinate convention is inconsistent.
@@ -295,3 +299,7 @@ print("stanley deg:", np.rad2deg(delta_st))
 - [Engineering math for controls and ODEs](/math/engineering-math/)
 - [Physics of signals and systems](/physics/signals-systems/)
 - Further reading: Stanley controller from the DARPA Grand Challenge, pure pursuit robotics literature, Rajamani's vehicle dynamics, MPC texts, and PID control references.
+
+## References
+
+[1] T. M. Vu, R. Moezzi, J. Cyrus, and J. Hlava, "Model Predictive Control for Autonomous Driving Vehicles," Electronics, vol. 10, no. 21, article 2593, 2021.

@@ -254,6 +254,12 @@ def astar_grid(start, goal, blocked, width, height):
 print(astar_grid((0, 0), (3, 0), blocked={(1, 0)}, width=4, height=3))
 ```
 
+## Recent systems and papers
+
+Ma et al. adapt RRT-style sampling to structured on-road driving by adding road-scene priors, exact-goal pressure, and vehicle-model postprocessing [1]. Their "fast RRT" starts with offline rule templates for common maneuvers such as straight driving, left turns, right turns, and U-turns, attaches the collision-free parts of those templates to the search tree, and then uses an aggressive extension step that tries to connect directly to the goal instead of merely sampling the goal more often [1]. If that direct rush collides, the algorithm keeps a useful collision-free prefix as a multi-edge branch; if templates and rushing are insufficient, it falls back to ordinary RRT-style expansion with scene-aware sampling and a Dubins-like metric [1]. The resulting path is smoothed through model-based prediction so that the planner outputs a feasible control sequence for a front-steered bicycle model, which is why the method sits between sampling-based planning and the low-level [control](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley) concerns on this page [1]. For moving obstacles, the paper lifts the problem into configuration-time space, where a spatially clear path can still be rejected because it intersects a future obstacle volume [1]. The reported evidence is scenario-based simulation with prototype constraints, not a modern public AV benchmark: the method is very fast in simple template-covered scenes, remains below real-time budgets in multi-obstacle examples, and should be read as a structured-road planner rather than a generic replacement for closed-loop urban planning [1].
+
+Fu et al. present an urban planning and decision layer built for the IN2BOT competition vehicle, where the hard problem is not finding a globally optimal curve but keeping path and speed commands stable when lane detection, GPS, and GIS map alignment are imperfect [2]. The system fuses lidar, radar, camera, integrated navigation, wheel encoder, obstacle-map, traffic-light, traffic-sign, pedestrian, moving-vehicle, and GIS-route information into local path planning plus a run/stop and expected-speed decision output [2]. Its local planner scores parallel candidate lines on a $3000\times3000$ grid representing a $60$ m by $60$ m area, using obstacle cost, distance cost, and rule cost; it switches among lane-based, GIS-line-based, and road-edge-centerline modes depending on lane availability and the correlation between GIS and perceived road edges [2]. The mode switching and stop/run decisions use hysteresis, and the selected 301-point path is temporally filtered before control so that noisy perception or a mode change does not immediately produce a lateral jump [2]. This is a useful complement to [decision making and behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning): it shows how behavior cues such as crossroads, stop signs, traffic signs, selected-line angle, obstacle distance, and path confidence can shape speed before the controller sees the trajectory [2]. Evaluation is competition-style rather than dataset-style, with a 14.5 km route requiring four interventions, a 5 km route completed without intervention, and average speed around 35 km/h, so the paper is best treated as a robust structured-urban integration pattern rather than proof of broad dense-city autonomy [2].
+
 ## Common pitfalls
 
 - Planning a path without timing. Collision avoidance needs time because other agents move.
@@ -272,3 +278,9 @@ print(astar_grid((0, 0), (3, 0), blocked={(1, 0)}, width=4, height=3))
 - [Reinforcement learning](/cs/reinforcement-learning/)
 - [Engineering math for optimization and ODEs](/math/engineering-math/)
 - Further reading: LaValle's planning text, A*, Hybrid A*, RRT*, lattice planning papers, MPC and iLQR trajectory optimization literature.
+
+## References
+
+[1] L. Ma, J. Xue, K. Kawabata, J. Zhu, C. Ma, and N. Zheng, "Efficient Sampling-Based Motion Planning for On-Road Autonomous Driving," IEEE Transactions on Intelligent Transportation Systems, vol. 16, no. 4, pp. 1961-1976, Aug. 2015.
+
+[2] M. Fu, W. Song, Y. Yang, and M. Wang, "Path Planning and Decision Making for Autonomous Vehicle in Urban Environment," in Proc. IEEE 18th International Conference on Intelligent Transportation Systems, 2015, pp. 686-692.

@@ -101,6 +101,16 @@ The page set produced here is:
 
 17. [Foundation Models for Driving](/cs/autonomous-driving/foundation-models-for-driving) - MLLMs, VLMs, VLA policies, action interfaces, grounding, and closed-loop evaluation.
 
+## System and paper deep-dives
+
+Beyond the foundational layer above, these pages are focused deep-dives into landmark systems and datasets. Many other recent papers are folded directly into the foundational pages as cited sections — see the *Recent systems and papers* sections and *References* in [sensor fusion](/cs/autonomous-driving/sensor-fusion), [motion planning](/cs/autonomous-driving/motion-planning), [control](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley), [V2X](/cs/autonomous-driving/v2x-and-connected-vehicles), and [safety](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing).
+
+- [CenterPoint](/cs/autonomous-driving/centerpoint) — center-based (anchor-free) 3D detection and tracking on point clouds (Yin et al., 2021).
+- [BEVFusion (MIT)](/cs/autonomous-driving/bevfusion-mit) — unified BEV representation for multi-task multi-sensor fusion (Liu et al., 2023).
+- [Frenét-Frame Trajectory Generation](/cs/autonomous-driving/frenet-trajectory-generation) — jerk-optimal quintic-polynomial planning (Werling et al., 2010).
+- [TUMTraf V2X Cooperative Perception Dataset](/cs/autonomous-driving/tumtraf-v2x-dataset) — infrastructure + vehicle cooperative dataset and benchmark (Zimmer et al., 2024).
+- [Shield Synthesis: Runtime Enforcement](/cs/autonomous-driving/shield-synthesis-runtime-enforcement) — synthesized safety shields wrapping reactive controllers (Bloem et al., 2015).
+
 ## Visual
 
 ```mermaid

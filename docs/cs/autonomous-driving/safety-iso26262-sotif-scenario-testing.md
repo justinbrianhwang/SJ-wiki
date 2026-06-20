@@ -210,6 +210,10 @@ print("safe distance:", d)
 print("scenario score:", severity_score(collisions=0, near_misses=2, hard_brakes=7))
 ```
 
+## Recent systems and papers
+
+Matos, Duraes, and Cunha turn sensor-failure discussion into a closed-loop safety-evaluation workflow by injecting faults into CARLA sensor streams before Autoware.Universe consumes them, then classifying the route outcome as `OK`, `Timeout`, `Out`, or `Collision` [1]. The framework combines CARLA 0.9.15, a modified CARLA ROS bridge, Scenario Runner, and Autoware, with faults applied at the bridge layer so the autonomy stack still receives ordinary ROS topics and the experiment tests system response rather than a single isolated module [1]. The fault model varies location, type, trigger, and duration: LiDAR, GNSS, IMU gyroscope, IMU accelerometer, and IMU quaternion streams are subjected to silent failure or severe noise at route triggers such as start, stop sign, right turn, crosswalk, and final intersection, with the fault persisting after activation [1]. The reported results are stack-specific but instructive: all nominal-noise golden tests completed, GNSS faults and accelerometer/quaternion faults were tolerated in this LiDAR-map-dominated setup, severe gyroscope noise produced collisions, departures, and timeouts, LiDAR severe noise caused fail-safe non-completion, and silent LiDAR failure caused collisions in all five main triggers [1]. This evidence complements scenario testing and formal runtime ideas such as [shield synthesis and runtime enforcement](/cs/autonomous-driving/shield-synthesis-runtime-enforcement): simulation fault injection can reveal whether monitors, fusion, localization, planning, and minimal-risk behavior actually contain a degraded sensor instead of merely assuming diagnostics will work [1]. The paper should not be read as a fleet crash-rate estimate or a universal sensor ranking, because the camera pipeline was excluded and different ODDs, Autoware versions, redundancy choices, and fault monitors could change the outcome pattern [1].
+
 ## Common pitfalls
 
 - Treating ISO 26262 compliance as full AV safety. It addresses malfunctioning E/E systems, not every intended-functionality limitation.
@@ -228,3 +232,7 @@ print("scenario score:", severity_score(collisions=0, near_misses=2, hard_brakes
 - [Embedded systems](/cs/embedded/)
 - [Engineering math for probability and control](/math/engineering-math/)
 - Further reading: ISO 26262, ISO 21448 SOTIF, Mobileye RSS, UL 4600, safety-case literature, scenario-based testing papers, and public AV safety reports.
+
+## References
+
+[1] F. Matos, J. Duraes, and J. Cunha, "Simulating the Effects of Sensor Failures on Autonomous Vehicles for Safety Evaluation," *Informatics*, vol. 12, no. 3, article 94, 2025.

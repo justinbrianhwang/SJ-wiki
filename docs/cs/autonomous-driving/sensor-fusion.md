@@ -236,6 +236,28 @@ print(points_vehicle)
 print("updated occupancy:", prob)
 ```
 
+## Recent BEV LiDAR–camera fusion systems
+
+Modern BEV fusion systems usually share a top-down representation, but they differ in what they trust, where they align modalities, and how they handle degraded sensors. The [MIT BEVFusion](/cs/autonomous-driving/bevfusion-mit) and [CenterPoint](/cs/autonomous-driving/centerpoint) pages remain useful standalone background for optimized BEV pooling, multi-task BEV perception, and center-based detection heads. The papers below are best read as a compact family of BEV-fusion design patterns rather than as mutually exclusive recipes.
+
+**Robust two-stream BEV fusion.** Liang et al.'s BEVFusion keeps camera and LiDAR encoders independent until both have produced BEV features [1]. Earlier point-level and proposal-level fusion often used LiDAR points or LiDAR proposals as the queries into image features, which meant the camera branch could become operationally dependent on healthy LiDAR. This system instead lifts multi-view image features into BEV with an LSS-style depth projection and spatial-to-channel height compression, while the LiDAR side can use PointPillars, CenterPoint, or TransFusion-L. A lightweight fusion block concatenates the two BEV streams, applies convolutional channel/spatial fusion, and then uses adaptive feature selection to reweight the fused channels. The main problem it solves is robustness under limited LiDAR field of view, missing object returns, or camera malfunction without forcing either modality to be merely an auxiliary query source.
+
+![The robust BEVFusion comparison figure shows point-level fusion, feature-level fusion, and the paper's independent camera and LiDAR BEV streams.](https://ar5iv.labs.arxiv.org/html/2205.13790/assets/x1.png)
+
+*Figure: Robust BEVFusion separates camera and LiDAR encoding until both streams are represented in BEV. From [Liang et al., 2022](https://arxiv.org/abs/2205.13790) — embedded under educational fair use with attribution.*
+
+**LiDAR-centric dilation fusion.** BEVDilation argues that symmetric BEV fusion can pollute accurate LiDAR geometry with camera BEV features whose spatial position depends on uncertain depth estimation [2]. Its Sparse Voxel Dilation Block predicts likely foreground regions from image and LiDAR BEV context, then inserts learnable voxels in foreground cells where LiDAR occupancy is missing. Those original and padded sparse voxels are serialized with a Hilbert curve and refined with a Mamba layer so the padded support is contextual rather than treated as measured points. Its Semantic-Guided BEV Dilation Block uses image-conditioned deformable offsets and modulation scalars to diffuse LiDAR BEV features, but the sampled feature values remain LiDAR-centric. The design repairs LiDAR sparsity and missing object support while reducing sensitivity to camera depth noise and BEV misalignment.
+
+**Comprehensive image exploitation.** Fusion4CA keeps a BEVFusion-style LiDAR-camera detector but adds modules intended to make the camera branch contribute more strongly instead of being dominated by LiDAR geometry [3]. A contrastive alignment module aligns RGB features with depth or projected point-cloud features before view transformation, and a training-only camera auxiliary branch adds direct CenterPoint-style supervision to the image side. Cognitive adapters tune a frozen Swin image backbone efficiently, while coordinate attention after fusion emphasizes spatially discriminative fused channels. The alignment and auxiliary branch are removed at inference, so the deployed overhead comes mainly from the adapters and attention module. This addresses a common BEVFusion failure mode: the camera stream exists architecturally, but its useful semantic evidence is weakly trained or underweighted.
+
+**Contrastive BEV feature alignment.** ContrastAlign targets the fact that camera and LiDAR tensors can share a BEV grid while still putting the same object in nearby but different cells [4]. Small extrinsic errors, vehicle vibration, and camera depth mistakes all create object-level feature shifts that dense concatenation has no explicit way to resolve. The method adds camera and LiDAR instance proposal modules, samples RoI features at each proposal center and edge centers, and constructs positive pairs by BEV IoU. Nearby camera instances become hard negatives in an InfoNCE-style loss, so the model learns to prefer the correct cross-modal instance over plausible neighbors. At inference, learned similarity chooses the best neighboring camera instance for each LiDAR instance before final fusion, improving robustness under calibration noise and depth-induced BEV shifts.
+
+**Post-fusion BEV stabilization.** Post Fusion Stabilization treats robustness as a correction problem after the existing BEV fusion layer rather than as a replacement for the camera encoder, LiDAR encoder, or detection head [5]. The host detector is frozen, and a small stabilizer receives the fused BEV tensor immediately before the original head. Its blocks perform near-identity shift normalization, predict a spatial reliability map supervised by corrupted-versus-clean LiDAR point-density ratios, and apply gated semantic/geometric residual correction. Identity-biased initialization keeps the module from damaging clean performance before it learns useful corrections. This is aimed at low light, rain lens effects, camera dropout, LiDAR beam loss, sector dropout, range dropout, and mild miscalibration that leave structured artifacts in the fused BEV representation.
+
+**Hybrid self- and cross-attention fusion.** MMF-BEV is a radar-camera system rather than a LiDAR-camera system, but it is a useful BEV-fusion analogue because radar supplies sparse metric evidence while cameras supply dense semantic evidence [6]. Each modality first refines its own BEV map with deformable self-attention. Then camera queries attend to radar BEV features, and radar queries attend to camera BEV features through bidirectional deformable cross-attention. The self-attended and cross-attended outputs are concatenated and fused with convolution before a CenterPoint-style head. This solves a limitation of naive concatenation: learned offsets and cross-modal queries can compensate for small spatial disagreement while preserving the different strengths of camera semantics and radar geometry.
+
+**Weather-occlusion robustness study.** Kumar et al. do not propose a new detector; they evaluate BEVFusion under inference-time camera soiling masks and LiDAR point dropout on nuScenes [7]. The clean fused detector performs best, but that does not imply equal tolerance to all sensor failures. Camera occlusion heavily damages camera-only inference, yet when clean LiDAR remains available the fused model stays close to clean performance. Severe LiDAR dropout is much more damaging: clean cameras recover some detections, but they do not replace the lost geometric point structure needed for 3D localization. The study addresses an evaluation gap by making modality dependence explicit and motivating occlusion-aware training, temporal aggregation, reliability estimation, and sensor-health monitoring.
+
 ## Common pitfalls
 
 - Fusing measurements with mismatched timestamps. At city speeds, tens of milliseconds can move objects enough to corrupt associations.
@@ -254,3 +276,19 @@ print("updated occupancy:", prob)
 - [Deep learning](/cs/deep-learning/)
 - [Engineering math for Bayesian filtering](/math/engineering-math/)
 - Further reading: Kalman filtering texts, occupancy grid mapping, BEVFormer, BEVFusion, CenterPoint, and multi-sensor calibration literature.
+
+## References
+
+[1] T. Liang, H. Xie, K. Yu, Z. Xia, Z. Lin, Y. Wang, T. Tang, B. Wang, and Z. Tang, "BEVFusion: A Simple and Robust LiDAR-Camera Fusion Framework," in Advances in Neural Information Processing Systems (NeurIPS), 2022.
+
+[2] G. Zhang, C. He, L. Chen, and L. Zhang, "BEVDilation: LiDAR-Centric Multi-Modal Fusion for 3D Object Detection," arXiv:2512.02972, 2025.
+
+[3] K. Luo, X. Chen, Y. Xiao, and H. Wang, "Fusion4CA: Boosting 3D Object Detection via Comprehensive Image Exploitation," arXiv:2603.05305, 2026.
+
+[4] Z. Song, F. Jia, H. Pan, Y. Luo, C. Jia, G. Zhang, L. Liu, Y. Ji, L. Yang, and L. Wang, "ContrastAlign: Toward Robust BEV Feature Alignment via Contrastive Learning for Multi-Modal 3D Object Detection," NeurIPS, 2024.
+
+[5] T. T. Dong, D. Thakkar, A. Sargolzaei, and X. Lin, "Post Fusion Bird's Eye View Feature Stabilization for Robust Multimodal 3D Detection," arXiv:2603.05623, 2026.
+
+[6] M. Mayank, B. Duraisamy, F. Geiss, and A. Valada, "Multi-Modal Sensor Fusion using Hybrid Attention for Autonomous Driving," arXiv:2604.04797, 2026.
+
+[7] S. Kumar, T. Brophy, E. M. Grua, G. Sistu, V. Donzella, and C. Eising, "Evaluating the Impact of Weather-Induced Sensor Occlusion on BEVFusion for 3D Object Detection," arXiv:2511.04347, 2025.

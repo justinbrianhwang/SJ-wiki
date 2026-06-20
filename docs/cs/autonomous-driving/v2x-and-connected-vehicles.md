@@ -170,6 +170,10 @@ msg = V2XMessage("veh-12", 100.0, 10.0, 2.0, 27.0, 0.0, True)
 print(compensate_message(msg, receive_time_s=100.15))
 ```
 
+## Recent systems and papers
+
+Shahbaz and Agarwal's TUMTraf V2X system is a concrete cooperative-perception example for V2I camera-LiDAR fusion rather than just a communication protocol case study [1]. In the DriveX 2026 cooperative 3D object detection setting, the detector uses three infrastructure cameras together with a dataset-provided, pre-registered infrastructure-plus-vehicle point cloud from the [TUMTraf V2X dataset](/cs/autonomous-driving/tumtraf-v2x-dataset), then fuses evidence in a shared BEV representation [1]. The LiDAR side voxelizes the fused point cloud and builds BEV features with an attention-style pillar encoder and large-kernel BEV backbone, while the camera side lifts EfficientNet/FPN image features into BEV using calibration and a small set of sampled heights [1]. Fusion is mid-level: camera BEV features predict a squeeze-and-excitation gate over LiDAR BEV channels, the gated LiDAR and camera maps are concatenated, and a CenterPoint-style head predicts 3D boxes with an IoU-quality score used to rerank detections [1]. For V2X engineering, the important limitation is that the benchmark input already supplies a registered fused point cloud, so packet loss, online registration, clock drift, bandwidth scheduling, and trust management are mostly outside the experiment; a deployed version would still need to decide whether raw points, BEV features, boxes, or tracks cross the V2I link [1]. The paper also reports that 44 of 50 public test frames overlapped released train or validation data, so its 0.85 public score is best read as a useful architecture result with benchmark-leakage caveats, while higher overlap-focused studies are diagnostics rather than clean generalization evidence [1].
+
 ## Common pitfalls
 
 - Treating V2X as guaranteed infrastructure. Many roads and agents will be unequipped.
@@ -188,3 +192,7 @@ print(compensate_message(msg, receive_time_s=100.15))
 - [Embedded systems](/cs/embedded/)
 - [Physics of signals and systems](/physics/signals-systems/)
 - Further reading: IEEE 802.11p and DSRC materials, 3GPP C-V2X specifications, ETSI and SAE V2X message standards, cooperative perception papers, and vehicular PKI literature.
+
+## References
+
+[1] M. Shahbaz and S. Agarwal, "Camera and LiDAR BEV Fusion for Cooperative 3D Object Detection on TUMTraf V2X," arXiv:2606.12981, 2026.
