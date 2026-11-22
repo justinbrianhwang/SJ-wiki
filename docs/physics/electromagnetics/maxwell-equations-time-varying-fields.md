@@ -9,7 +9,7 @@ Time-varying electromagnetics is where electric and magnetic fields stop being s
 
 The static laws remain visible as limiting cases. Electrostatics keeps $\nabla\times\vec E=0$ because $\partial\vec B/\partial t=0$. Magnetostatics keeps $\nabla\times\vec H=\vec J$ because displacement current is absent or negligible. In the full theory, Faraday's law and the Ampere-Maxwell law join Gauss's laws to form a complete field description.
 
-## Definitions
+## The four field laws
 
 Maxwell's equations in differential form are
 
@@ -57,7 +57,11 @@ It is not conduction of free charge through an insulator; it is the term require
 
 In material media, the fields are connected by constitutive relations such as $\vec D=\epsilon\vec E$, $\vec B=\mu\vec H$, and $\vec J=\sigma\vec E$ for linear isotropic conductors and dielectrics. Maxwell's equations alone give the field structure; constitutive relations describe the medium. Changing the medium changes wave speed, attenuation, boundary behavior, and energy storage without changing the four Maxwell equations themselves.
 
-## Key results
+Each equation separates sources from response. Free charge is the source of $\vec D$ divergence, while no analogous magnetic charge appears in the divergence of $\vec B$. Electric circulation is sourced by changing $\vec B$. Magnetic circulation is sourced by conduction current and changing $\vec D$. Bound charge and magnetization are absorbed into $\epsilon$, $\mu$, $\vec D$, and $\vec H$ when macroscopic fields are used; microscopic equations can instead place all charges and currents explicitly on the source side.
+
+The integral curl laws require an orientation pair. Once the surface normal is selected, positive circulation around its boundary follows the right-hand rule. The minus sign in Faraday's law then expresses Lenz's law. Changing the selected normal changes both the flux sign and the boundary direction, leaving the physical emf unchanged.
+
+## Why displacement current is required
 
 The continuity equation expresses local charge conservation:
 
@@ -74,6 +78,17 @@ $$
 $$
 
 This derivation shows why Maxwell's displacement current is not optional. Without it, Ampere's law would imply $\nabla\cdot\vec J=0$ even when charge density changes.
+
+The charging-capacitor argument gives the same result globally. Choose a loop around one lead and span it first with a flat surface cutting the wire. The conduction-current flux through that surface is $I$. Now bow the surface outward so that it passes between the capacitor plates without cutting the wire. Its conduction-current flux is zero. Ampere's original circuital law would assign two different magnetic circulations to the same boundary loop. During charging, however,
+
+$$
+\frac{d}{dt}\int_S\vec D\cdot d\vec S
+=\frac{dQ}{dt}=I,
+$$
+
+so conduction current through the first surface and displacement current through the second give the same circulation.
+
+## Phasors and the meaning of material loss
 
 For time-harmonic fields with $e^{j\omega t}$ convention,
 
@@ -140,16 +155,140 @@ The quasistatic approximation is used when dimensions are small enough compared 
 
 Sign convention should be tracked consistently. These notes use phasors with $e^{j\omega t}$ time dependence, so Faraday's law becomes $\nabla\times\tilde{\vec E}=-j\omega\tilde{\vec B}$. Texts or software using $e^{-j\omega t}$ reverse the signs of the $j\omega$ terms. The physics is unchanged, but mixing conventions corrupts wave and impedance formulas.
 
-## Visual
+The ratio
+
+$$
+\frac{\sigma}{\omega\epsilon}
+$$
+
+compares conduction current density with displacement current density in a sinusoidal field. When it is much larger than one, the medium behaves as a good conductor at that frequency; when much smaller, it behaves mainly as a dielectric. The classification depends on frequency. A material need not be labeled conductor or dielectric without qualification.
+
+At the crossover $\sigma=\omega\epsilon$, conduction and displacement current amplitudes are equal. Their phasors are in quadrature for real, frequency-independent $\sigma$ and $\epsilon$, so magnitudes cannot be added as ordinary signed scalars.
+
+## Deriving the electromagnetic wave equation
+
+Consider a homogeneous, source-free, lossless region with constant $\epsilon$ and $\mu$. Then $\rho_v=0$, $\vec J=0$, and the curl equations are
+
+$$
+\nabla\times\vec E=-\mu\frac{\partial\vec H}{\partial t},
+\qquad
+\nabla\times\vec H=\epsilon\frac{\partial\vec E}{\partial t}.
+$$
+
+Take the curl of Faraday's law:
+
+$$
+\nabla\times(\nabla\times\vec E)
+=-\mu\frac{\partial}{\partial t}(\nabla\times\vec H)
+=-\mu\epsilon\frac{\partial^2\vec E}{\partial t^2}.
+$$
+
+Use the vector identity
+
+$$
+\nabla\times(\nabla\times\vec E)
+=\nabla(\nabla\cdot\vec E)-\nabla^2\vec E.
+$$
+
+Gauss's law gives $\nabla\cdot\vec E=0$ because $\epsilon$ is constant and the region is charge-free. The result is
+
+$$
+\nabla^2\vec E
+-\mu\epsilon\frac{\partial^2\vec E}{\partial t^2}=0.
+$$
+
+Repeating the steps for $\vec H$ gives
+
+$$
+\nabla^2\vec H
+-\mu\epsilon\frac{\partial^2\vec H}{\partial t^2}=0.
+$$
+
+These are wave equations with phase speed
+
+$$
+v=\frac{1}{\sqrt{\mu\epsilon}}.
+$$
+
+In vacuum, $v=1/\sqrt{\mu_0\epsilon_0}=c$. The appearance of the measured speed of light from electrical and magnetic constants was the decisive clue that light is an electromagnetic wave.
+
+If conductivity is included, Ampere-Maxwell becomes $\nabla\times\vec H=\sigma\vec E+\epsilon\partial_t\vec E$. The electric-field equation acquires a first-time-derivative term:
+
+$$
+\nabla^2\vec E
+-\mu\sigma\frac{\partial\vec E}{\partial t}
+-\mu\epsilon\frac{\partial^2\vec E}{\partial t^2}=0.
+$$
+
+That term represents attenuation and conversion of field energy to heat.
+
+## Potentials, gauge freedom, and propagation delay
+
+The definition $\vec B=\nabla\times\vec A$ automatically satisfies $\nabla\cdot\vec B=0$. Substituting it into Faraday's law gives
+
+$$
+\nabla\times
+\left(
+\vec E+\frac{\partial\vec A}{\partial t}
+\right)=0,
+$$
+
+so the expression in parentheses can be written as $-\nabla V$. Hence
+
+$$
+\vec E=-\nabla V-\frac{\partial\vec A}{\partial t}.
+$$
+
+The potentials are not unique. For any sufficiently smooth scalar function $\chi$,
+
+$$
+\vec A'=\vec A+\nabla\chi,
+\qquad
+V'=V-\frac{\partial\chi}{\partial t}
+$$
+
+produce exactly the same $\vec E$ and $\vec B$. Choosing a gauge imposes an extra condition on the potentials so their equations become convenient to solve. The Lorenz gauge leads to wave equations whose source solutions are retarded: the potential observed at time $t$ depends on source values at the earlier time $t-R/v$.
+
+Retardation matters when propagation time across a structure is not negligible relative to a signal period or rise time. If a structure has largest dimension $L$, the dimensionless ratio $L/\lambda$ is a useful first check for sinusoidal operation. Lumped circuit models are accurate when this ratio is small enough that voltage and current phase variation across each component can be ignored. The acceptable threshold depends on the required error and geometry, so no single frequency separates circuit theory from field theory.
+
+Potentials are especially useful for radiation because charge and current distributions enter their source integrals directly. Fields follow by spatial and temporal differentiation. Near a source, terms with different distance dependence coexist; far away, the $1/R$ radiation terms dominate over faster-decaying induction and electrostatic terms.
+
+## Energy flow from the field equations
+
+Poynting's theorem follows directly from the two curl equations. Dot $\vec E$ with Ampere-Maxwell, dot $\vec H$ with Faraday, and subtract. The identity
+
+$$
+\nabla\cdot(\vec E\times\vec H)
+=\vec H\cdot(\nabla\times\vec E)
+-\vec E\cdot(\nabla\times\vec H)
+$$
+
+then gives, for linear nondispersive media,
+
+$$
+\frac{\partial}{\partial t}
+\left(
+\frac12\vec E\cdot\vec D
++\frac12\vec B\cdot\vec H
+\right)
++\nabla\cdot(\vec E\times\vec H)
++\vec J\cdot\vec E=0.
+$$
+
+The first term is the rate of change of stored electric and magnetic energy density. The vector $\vec S=\vec E\times\vec H$ is power flux density in W/m$^2$. The final term is power transferred from the field to matter per unit volume; for $\vec J=\sigma\vec E$ it becomes the nonnegative Joule-heating density $\sigma\vert \vec E\vert ^2$.
+
+Integrating over a fixed volume converts $\nabla\cdot\vec S$ to outward surface power. A negative outward flux means net electromagnetic power is entering the volume. Sign errors are easier to spot when the terms are read as an energy balance rather than manipulated as symbols.
+
+## How the curl laws sustain a wave
 
 ```mermaid
 flowchart TD
-  A[Changing B flux] --> B[Circulating E field]
-  B --> C[Voltage induced around loop]
-  D[Changing D flux] --> E[Circulating H field]
-  F[Conduction current J] --> E
-  E --> G[Magnetic field around current and displacement current]
-  B --> H[Electromagnetic waves]
+  A["Changing B flux"] --> B["Circulating E field"]
+  B --> C["Induced emf"]
+  D["Changing D flux"] --> E["Circulating H field"]
+  F["Conduction current J"] --> E
+  E --> G["Magnetic circulation"]
+  B --> H["Electromagnetic propagation"]
   E --> H
 ```
 
@@ -160,7 +299,7 @@ flowchart TD
 | Gauss electric | $\nabla\cdot\vec D=\rho_v$ | electric flux equals enclosed free charge |
 | Gauss magnetic | $\nabla\cdot\vec B=0$ | magnetic flux has no isolated source |
 
-## Worked example 1: Sinusoidal transformer emf
+## Worked example: sinusoidal transformer emf
 
 Problem: A stationary single-turn loop has area $A=20\ \mathrm{cm^2}$ and normal aligned with a uniform magnetic flux density
 
@@ -210,7 +349,7 @@ $$
 
 Check: The induced emf is $90^\circ$ shifted from the magnetic flux, as differentiation requires.
 
-## Worked example 2: Displacement current in a capacitor
+## Worked example: displacement current in a capacitor
 
 Problem: A parallel-plate capacitor has plate area $A=5\ \mathrm{cm^2}$ and plate separation filled with dielectric $\epsilon_r=4$. The electric field between plates is
 
@@ -270,32 +409,25 @@ $$
 
 Check: The current leads the voltage-like electric field by $90^\circ$, consistent with capacitor behavior.
 
-## Code
+## Reading boundary conditions correctly
 
-```python
-import numpy as np
-import matplotlib.pyplot as plt
+The four boundary conditions follow from shrinking the integral laws around an interface. A narrow rectangular loop crossing the interface has two long sides parallel to it. As the short sides shrink, Faraday's law gives continuity of tangential $\vec E$ when $\partial\vec B/\partial t$ remains finite. The same loop applied to Ampere-Maxwell leaves a finite surface-current contribution, producing
 
-eps0 = 8.8541878128e-12
-er = 4
-A = 5e-4
-E0 = 1e5
-f = 1e6
-omega = 2 * np.pi * f
+$$
+\hat n\times(\vec H_2-\vec H_1)=\vec J_s.
+$$
 
-t = np.linspace(0, 2/f, 1000)
-E = E0 * np.cos(omega * t)
-Id = A * eps0 * er * (-E0 * omega * np.sin(omega * t))
+A thin pillbox applied to the two Gauss laws gives the jumps in normal components:
 
-plt.plot(t * 1e6, E / E0, label="E / E0")
-plt.plot(t * 1e6, Id / np.max(np.abs(Id)), label="Id normalized")
-plt.xlabel("time (microseconds)")
-plt.grid(True)
-plt.legend()
-plt.show()
-```
+$$
+\hat n\cdot(\vec D_2-\vec D_1)=\rho_s,
+\qquad
+\hat n\cdot(\vec B_2-\vec B_1)=0.
+$$
 
-## Common pitfalls
+Here $\hat n$ points from medium 1 into medium 2. Reversing the normal reverses the written jump order. The conditions constrain field components, not necessarily their magnitudes. With no free surface charge, normal $D$ is continuous, but normal $E$ changes when $\epsilon$ changes. With no surface current, tangential $H$ is continuous, but tangential $B$ changes when $\mu$ changes.
+
+## Mistakes that change the physics
 
 - Treating induced emf as caused only by a physical battery. A nonconservative electric field can circulate around a loop.
 - Forgetting Lenz's law sign in Faraday's law. The induced effect opposes the change in magnetic flux.
@@ -305,7 +437,7 @@ plt.show()
 - Assuming time-varying fields can always be represented by scalar potential only. In general, vector potential is needed too.
 - Forgetting that constitutive relations are material models, not additional Maxwell equations.
 
-## Connections
+## Related pages
 
 - [Gradient, divergence, curl, and integral theorems](/physics/electromagnetics/gradient-divergence-curl-integral-theorems) for Stokes and divergence theorem links.
 - [Magnetostatic forces, Biot-Savart law, and Ampere law](/physics/electromagnetics/magnetostatic-forces-biot-savart-ampere) for the static form of Ampere's law.

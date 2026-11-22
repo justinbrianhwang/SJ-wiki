@@ -9,7 +9,7 @@ Quantum dynamics describes how probability amplitudes change between preparation
 
 Sakurai develops the time-evolution operator first, then compares pictures and applies the result to spin precession, Ehrenfest's theorem, and transition amplitudes. Ballentine puts dynamics inside a broader symmetry and transformation framework. The Gottfried-named notes emphasize propagators and density operators soon after the picture change. Schiff's wave-mechanics tradition corresponds most directly to Schrodinger's differential equation in coordinate representation.
 
-## Definitions
+## Unitary evolution before choosing a picture
 
 The **time-evolution operator** satisfies
 
@@ -34,6 +34,18 @@ If $H(t)$ depends on time and does not commute with itself at different times, t
 $$
 U(t,t_0)=\mathcal T\exp\left[-{i\over\hbar}\int_{t_0}^{t}H(t')\,dt'\right].
 $$
+
+The need for $\mathcal T$ appears already at second order. Direct iteration of the Schrödinger equation produces
+
+$$
+U(t,t_0)=I-{i\over\hbar}\int_{t_0}^t dt_1H(t_1)
++\left(-{i\over\hbar}\right)^2
+\int_{t_0}^t dt_1\int_{t_0}^{t_1}dt_2H(t_1)H(t_2)+\cdots.
+$$
+
+The later-time operator stands to the left. If all $H(t)$ commute, the triangular integration regions combine into the ordinary exponential of the integral. Otherwise, exchanging the order changes the product.
+
+## Moving time dependence between states and operators
 
 In the **Schrodinger picture**, states carry time dependence:
 
@@ -63,7 +75,7 @@ $$
 V_I(t)=e^{iH_0(t-t_0)/\hbar}V(t)e^{-iH_0(t-t_0)/\hbar}.
 $$
 
-## Key results
+## Equations of motion and conserved quantities
 
 The Heisenberg equation of motion is
 
@@ -114,9 +126,21 @@ $$
 \end{aligned}
 $$
 
-Sakurai uses this machinery for time-dependent perturbation theory. Ballentine's transformation-centered viewpoint makes clear that changing pictures is not changing the experiment; it is changing where time dependence is stored.
+Changing pictures does not change the experiment; it changes where the time dependence is stored. More generally, for a time-dependent unitary change of representation $W(t)$,
 
-## Visual
+$$
+|\psi'\rangle=W|\psi\rangle,
+$$
+
+the transformed Hamiltonian is
+
+$$
+H'=WHW^\dagger+i\hbar\dot W W^\dagger.
+$$
+
+The second term is easy to miss. Taking $W=e^{iH_0(t-t_0)/\hbar}$ gives the interaction-picture Hamiltonian $V_I(t)$ after cancellation of the free part.
+
+## Comparing the three standard pictures
 
 ```mermaid
 flowchart TB
@@ -137,7 +161,7 @@ flowchart TB
 | Heisenberg | fixed $\vert \psi_H\rangle$ | $A_H(t)$ | conservation laws, commutators, field theory style |
 | Interaction | $\vert \psi_I(t)\rangle$ from $V_I$ | $A_I(t)$ from $H_0$ | perturbation theory and transitions |
 
-## Worked example 1: Free particle Ehrenfest theorem
+## Worked example: free-particle motion in the Heisenberg picture
 
 **Problem.** For
 
@@ -187,7 +211,7 @@ $$
 
 **Checked answer.** Taking expectation values gives $\langle X\rangle(t)=\langle X\rangle(0)+\langle P\rangle t/m$, the quantum analogue of uniform classical motion.
 
-## Worked example 2: Two-level evolution under a diagonal Hamiltonian
+## Worked example: two-level phase evolution
 
 **Problem.** Let
 
@@ -231,23 +255,21 @@ $$
 
 **Checked answer.** The $z$ probabilities remain $1/2$ and $1/2$, while the relative phase produces oscillation in the $x$ expectation value.
 
-## Code
+The same result can be obtained with a fixed state and evolving operator. Since
 
-```python
-import numpy as np
+$$
+S_{x,H}(t)=e^{i\Omega t\sigma_z/2}S_xe^{-i\Omega t\sigma_z/2},
+$$
 
-hbar = 1.0
-omega = 2.0
-sx = np.array([[0, 1], [1, 0]], dtype=complex) * hbar / 2
-psi0 = np.array([1, 1], dtype=complex) / np.sqrt(2)
+Pauli-matrix multiplication gives
 
-for t in np.linspace(0, np.pi / omega, 5):
-    u = np.diag([np.exp(-1j * omega * t / 2), np.exp(1j * omega * t / 2)])
-    psi = u @ psi0
-    print(round(t, 3), np.vdot(psi, sx @ psi).real)
-```
+$$
+S_{x,H}(t)=S_x\cos\Omega t-S_y\sin\Omega t.
+$$
 
-## Common pitfalls
+The initial $\vert +x\rangle$ state has $\langle S_x\rangle=\hbar/2$ and $\langle S_y\rangle=0$, reproducing the Schrödinger-picture answer.
+
+## Sign and ordering errors
 
 - Thinking the three pictures are different theories. They are equivalent representations of the same amplitudes.
 - Applying $e^{-iHt/\hbar}$ when $H(t_1)$ and $H(t_2)$ do not commute. Time ordering is then required.
@@ -263,13 +285,55 @@ Picture independence is a useful error check. If a probability or expectation va
 
 Time-dependent Hamiltonians require more care than the compact notation suggests. The expression $e^{-i\int Hdt/\hbar}$ is valid only when Hamiltonians at different times commute or when time ordering is included. This issue is not pedantic: driven two-level systems, magnetic resonance, and perturbation theory all involve operators whose values at different times may fail to commute. Sakurai's development of the time-evolution operator makes this point structurally clear.
 
-Numerical dynamics should respect the same structure. Exact closed-system evolution is unitary, so a finite-step approximation that steadily changes the norm is not just imprecise; it is violating a core physical constraint. For small matrices, exponentiating a Hermitian Hamiltonian gives a unitary step. For differential wave equations, stable unitary or norm-preserving schemes are preferred when long-time phase accuracy matters.
+Numerical dynamics should respect the same structure. Exact closed-system evolution is unitary, so a finite-step approximation that steadily changes the norm violates a core physical constraint. For small matrices, exponentiating a Hermitian Hamiltonian gives a unitary step. For differential wave equations, unitary or norm-preserving schemes are preferable when long-time phase accuracy matters.
 
-A final check is to distinguish time dependence of phases from time dependence of probabilities. Energy eigenstates acquire phases, but their energy measurement probabilities do not change under a time-independent Hamiltonian. Superpositions acquire relative phases, and those relative phases can change probabilities for other observables. Many spin-precession and two-level interference effects are nothing more than this relative-phase evolution made visible.
+A final check is to distinguish time dependence of phases from time dependence of probabilities. Energy eigenstates acquire phases, but their energy measurement probabilities do not change under a time-independent Hamiltonian. Superpositions acquire relative phases, and those phases can change probabilities for other observables. Spin precession and two-level interference are direct manifestations of that evolution.
 
 When a problem includes measurement at an intermediate time, split the calculation into unitary pieces separated by state-update rules. Do not evolve through a measurement as if it were just another Hamiltonian interval unless the measurement interaction is explicitly modeled.
 
-## Connections
+## Propagators and spectral evolution
+
+For a time-independent Hamiltonian with a complete energy basis, the evolution operator has a spectral expansion in which each energy projector acquires its own phase. Expanding an initial state in that basis therefore reduces evolution to phase bookkeeping. Energy probabilities remain fixed, while observables that connect different energies can oscillate at their energy-difference frequencies.
+
+The position-space matrix element of the evolution operator is the propagator. Inserting a position identity lets it evolve a wavefunction; inserting an energy identity expresses it as a sum or integral over stationary states. These two expansions are useful in different regimes. The energy sum is efficient when the spectrum is known, while direct propagation may be better for a localized packet or a time-dependent potential.
+
+Composition in time follows from operator multiplication. The propagator over a long interval equals an integral over every intermediate position of the product of two shorter propagators. Unitarity gives a second identity: integrating a kernel times its complex conjugate over the final coordinate returns a delta function in the initial coordinates. These are strong checks on proposed kernels.
+
+An overall phase on a state has no observable effect, but dynamical phases become relative when several energy components are present. Degenerate components acquire the same phase under the unperturbed Hamiltonian and do not dephase relative to one another. A perturbation that splits the degeneracy introduces new beat frequencies.
+
+## Ehrenfest's theorem and its limits
+
+The first Ehrenfest equation has the classical form for the standard kinetic energy. The second contains the expectation value of the force, not necessarily the force evaluated at the mean position. They agree for constant or linear forces, and also for a quadratic potential because its force is linear. The center of a harmonic-oscillator packet consequently follows the exact classical equation even when the packet is broad.
+
+For a nonlinear force, expand it around the mean position. Corrections involve the position variance and higher central moments. A narrow packet can follow an approximately classical trajectory for a while, but spreading and nonlinear dynamics can eventually invalidate the approximation. Classical motion of the mean is therefore a controlled statement about both the potential and the state.
+
+Quantum dynamics also governs the moments themselves. The time derivative of the position variance couples to a position–momentum covariance, and the covariance couples to momentum variance and force gradients. For quadratic Hamiltonians this hierarchy closes at second order; for nonquadratic systems it extends to higher moments. Gaussian states remain Gaussian under quadratic evolution because of that closure.
+
+## Sudden and adiabatic changes
+
+Two opposite time scales organize many driven problems. In a sudden change, the Hamiltonian varies so quickly that the state has little time to evolve during the switch. Immediately afterward the ket is essentially unchanged, but its expansion in the new energy basis can contain many levels. Subsequent phases then produce nontrivial motion.
+
+In an adiabatic change, a nondegenerate eigenstate follows the corresponding instantaneous eigenspace when the Hamiltonian varies slowly compared with the relevant inverse gaps. Besides the ordinary dynamical phase, the state can acquire a geometric phase determined by the path of the eigenspace in parameter space. Near degeneracies the required slowness becomes more demanding.
+
+Slow does not mean that the perturbation is weak, and sudden does not mean that its final size is small. These approximations concern switching time relative to internal dynamical scales. A large Hamiltonian change can be adiabatic if performed sufficiently slowly, while a tiny change can be sudden if applied sufficiently fast.
+
+## Density operators in different pictures
+
+Mixed states transform between pictures by the same unitary conjugations as pure-state projectors. In the Schrödinger picture the density operator obeys the von Neumann equation. In the Heisenberg picture a closed-system density operator is fixed and observables evolve. The trace of their product gives the same expectation value in either description.
+
+Unitary evolution preserves the eigenvalues of the density operator and hence its entropy and purity. Apparent loss of purity for a subsystem arises after another subsystem is traced out, not from the unitary picture change. Open-system master equations can produce nonunitary reduced evolution, but their generators must preserve trace and positivity if they are to describe valid states.
+
+Correlation functions often favor the Heisenberg picture. A two-time expression contains operators at different times acting on one fixed state. Its time ordering and commutators encode response and fluctuations. Equal-time expectation values alone do not determine such dynamical correlations.
+
+## Choosing a numerical propagator
+
+A first-order Euler step applied to the Schrödinger equation is generally not unitary and accumulates norm error. Exponentiating a Hermitian matrix gives an exactly unitary finite step when the Hamiltonian is constant over that step. For large sparse systems, Krylov methods approximate the action of the exponential without forming a dense matrix.
+
+Split-operator methods alternate kinetic and potential exponentials and use Fourier transforms to move between their diagonal representations. Their error comes from noncommutativity and can be reduced with a symmetric ordering. Time-dependent Hamiltonians require steps short enough to resolve the drive and may need midpoint or Magnus-based approximations to retain geometric structure.
+
+Norm conservation alone is not a complete accuracy test. A unitary method can still accumulate phase error or fail to resolve a resonance. Convergence should be checked by reducing the time step and monitoring the observables relevant to the problem, along with any exactly conserved quantities.
+
+## Related pages
 
 - [Postulates of quantum mechanics](/physics/quantum-mechanics/postulates-of-quantum-mechanics)
 - [Spin-1/2 systems](/physics/quantum-mechanics/spin-one-half-systems)

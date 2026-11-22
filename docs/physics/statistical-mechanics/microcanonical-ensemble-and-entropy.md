@@ -9,7 +9,7 @@ The microcanonical ensemble describes an isolated system whose energy, volume, a
 
 Its central idea is Boltzmann's: entropy is the logarithm of accessible microscopic multiplicity. The logarithm converts multiplication of independent state counts into addition of entropies, which is exactly what thermodynamics requires for macroscopic subsystems.
 
-## Definitions
+## What is held fixed
 
 For a classical isolated system with Hamiltonian $H(q,p)$, define the energy-shell density of states
 
@@ -17,7 +17,7 @@ $$
 \Omega(E,V,N)=\int {dq\,dp\over h^{3N}N!}\,\delta(E-H(q,p)).
 $$
 
-The factor $h^{3N}$ makes the phase-space count dimensionless, and $N!$ removes the Gibbs overcounting of identical classical particles. A related integrated volume is
+The factor $h^{3N}$ supplies a phase-space cell, and $N!$ removes the Gibbs overcounting of identical classical particles. Because the delta function has units of inverse energy, $\Omega$ as written is a density per unit energy. A count in a narrow window is $\Omega(E)\Delta E$; the arbitrary fixed width contributes only an additive entropy constant. A related dimensionless integrated volume is
 
 $$
 \Gamma(E,V,N)=\int_{H(q,p)\le E}{dq\,dp\over h^{3N}N!}.
@@ -50,9 +50,31 @@ $$
 
 with the same measure convention as above.
 
-## Key results
+An observable $A(q,p)$ has microcanonical average
+
+$$
+\langle A\rangle_E
+={1\over\Omega(E)}
+\int {dq\,dp\over h^{3N}N!}
+A(q,p)\delta(E-H).
+$$
+
+The delta function confines integration to the energy surface with the induced measure $d\Sigma/\vert \nabla H\vert $, not uniform Euclidean surface area. Regions where the Hamiltonian changes slowly normal to the surface receive more weight. For numerical work, a thin shell is often easier to sample than a literal delta function, and the shell thickness must remain small compared with the macroscopic energy resolution.
+
+For a quantum Hamiltonian with discrete levels, the sharp analogue is a normalized projector onto an energy window,
+
+$$
+\rho_{\mathrm{mc}}={P_{[E,E+\Delta E]}\over
+\operatorname{Tr}P_{[E,E+\Delta E]}}.
+$$
+
+The window is narrow on macroscopic energy scales but broad enough to contain many levels. An exact single eigenvalue is usually too restrictive for thermodynamics, especially when finite-size level spacings and degeneracies matter.
+
+## Why equal weights lead to temperature
 
 The equal a priori probability postulate says that all microstates compatible with the macroscopic constraints are assigned equal statistical weight. This is not a statement that all phase-space points are dynamically visited in a literal finite time; it is the equilibrium hypothesis for an isolated macrostate.
+
+Maximizing Gibbs--Shannon entropy under normalization and an exact restriction to the allowed shell gives the same uniform distribution. That variational statement reorganizes the postulate; it does not prove that a particular Hamiltonian trajectory equilibrates. Mixing, chaos, typicality, and coupling to measuring devices belong to the dynamical justification.
 
 If two weakly interacting isolated systems $A$ and $B$ share total energy $E$, the probability that $A$ has energy $E_A$ is proportional to
 
@@ -71,6 +93,24 @@ $$
 or $T_A=T_B$. Thus equality of temperature is not added from thermodynamics; it follows from maximizing multiplicity.
 
 The width of the distribution is obtained by expanding entropy around the maximum. Since heat capacities are extensive, the standard deviation of subsystem energy scales like $\sqrt{N}$ while the energy scales like $N$. This is the microcanonical root of ensemble equivalence.
+
+More explicitly, use
+
+$$
+{\partial^2S\over\partial E^2}
+=-{1\over T^2C_V}.
+$$
+
+Expanding $S_A(E_A)+S_B(E-E_A)$ about its maximum gives a Gaussian energy-sharing distribution with
+
+$$
+{1\over\langle(\Delta E_A)^2\rangle}
+={1\over k_BT^2}\left({1\over C_A}+{1\over C_B}\right).
+$$
+
+If $B$ is an enormous bath, $C_B\to\infty$ and the variance reduces to $k_BT^2C_A$, the canonical result. If the two subsystems are comparable, conservation of total energy suppresses the fluctuations relative to that bath limit.
+
+## Counting the ideal-gas shell
 
 For the classical ideal gas,
 
@@ -95,6 +135,25 @@ $$
 
 These equations show the deductive structure Schwabl stresses: thermodynamics appears as derivatives of microscopic counting.
 
+The phase-space volume below energy $E$ can be written explicitly:
+
+$$
+\Gamma(E,V,N)
+={V^N\over N!h^{3N}}
+{\pi^{3N/2}(2mE)^{3N/2}\over
+\Gamma(3N/2+1)}.
+$$
+
+The $V^N$ is the configuration-space volume. The remaining factor is the volume of a $3N$-dimensional momentum sphere of radius $\sqrt{2mE}$. Taking $k_B\ln\Gamma$, then using Stirling's approximation for both $N!$ and the gamma function, gives the Sackur--Tetrode expression. Differentiating before making the large-$N$ approximation also gives
+
+$$
+{1\over T}=k_B{3N\over2E}
+$$
+
+for the volume entropy, up to the finite-$N$ convention. The energy-shell definition instead replaces $3N/2$ by $3N/2-1$ in this intermediate result. Their relative difference is of order $1/N$.
+
+## Concavity, stability, and ensemble inequivalence
+
 The choice between $\Omega(E)$ and $\Gamma(E)$ is usually harmless in the thermodynamic limit but conceptually important in small systems. $\Omega(E)$ counts states on an energy shell, while $\Gamma(E)$ counts states below an energy. Their logarithms differ by terms involving the density-of-states growth scale. For macroscopic systems with short-range interactions, entropy is extensive and such differences are negligible compared with $N$. For few-body systems or systems with unusual spectra, however, the distinction can affect definitions of temperature and heat capacity.
 
 The concavity of entropy is the statistical statement of thermodynamic stability. If two subsystems exchange energy, the total entropy
@@ -114,6 +173,8 @@ For ordinary systems this is equivalent to positive heat capacities. Long-range 
 
 The microcanonical ensemble also clarifies adiabatic invariance. For a quasistatic change of an external parameter, an isolated system remains on an energy shell whose enclosed phase-space volume changes in a controlled way. This is the mechanical root of reversible adiabatic thermodynamics. In practice, the wall motion or parameter change must be slow compared with microscopic equilibration but fast enough to avoid heat exchange with the environment.
 
+Negative absolute temperature should not be confused with a temperature below zero kelvin in an unbounded system. It requires entropy to decrease as energy approaches an upper spectral bound, as in the finite spin example below. Such a state is hotter than every positive-temperature state in the sense that, when coupled consistently, energy flows from the negative-temperature system to the positive-temperature one.
+
 A final caution is that "equal probability" applies to microstates in the correct measure, not to arbitrary macroscopic variables. For an ideal gas, equal weight in phase space does not mean equal probability for each particle speed. The speed distribution includes the geometric volume of momentum shells, which is why the Maxwell speed density contains $4\pi v^2$.
 
 The microcanonical ensemble is therefore both narrower and stronger than the slogan "all states are equally likely." It specifies the constraint surface, the measure on that surface, and the macroscopic equivalence class being described. If a container is split by an insulating wall, the relevant constraints include the separate energies of the two sides. If the wall conducts heat, only the total energy is fixed and the most probable energy division is found by maximizing total entropy. Changing constraints changes the ensemble.
@@ -122,7 +183,13 @@ This is the statistical version of thermodynamic preparation. The same Hamiltoni
 
 Additivity is the hidden assumption behind most of the familiar thermodynamic conclusions. If two weakly coupled parts have entropies that add, then maximizing total entropy gives sharp equilibrium conditions. Surface terms, long-range interactions, and small-system corrections can spoil exact additivity. Schwabl's graduate-level presentation keeps these qualifications visible because they mark the boundary between textbook thermodynamics and active statistical-mechanics problems.
 
-## Visual
+The logarithm is forced by this composition rule. Independent subsystems have multiplicities $W_{AB}=W_AW_B$. If entropy is a continuous function of multiplicity and must satisfy $S(W_AW_B)=S(W_A)+S(W_B)$, its form is proportional to $\ln W$. The constant of proportionality is $k_B$, which fixes the temperature scale. This argument explains the functional form but not the equal-weight postulate or which constraints define $W$.
+
+Extensivity is related but separate. For short-range matter, doubling $E,V,N$ at fixed densities doubles the leading entropy. Boundaries contribute more slowly than volume and disappear per particle. Gravity and other sufficiently long-range forces can keep interactions between distant pieces comparable to bulk energies, breaking the usual additive construction.
+
+Phase coexistence appears as a nearly linear segment of entropy versus energy in the thermodynamic limit. Its slope is the common inverse temperature while added energy changes the phase fraction rather than temperature. For a finite short-range system, interface free energy can produce a convex-looking correction over a small range. One must separate that finite-size surface effect from genuine bulk nonconcavity caused by nonadditive long-range interactions.
+
+Numerically, microcanonical molecular dynamics fixes energy only up to integration error. A symplectic method controls long-time drift better than a generic solver, but measured averages still need equilibration checks and uncertainty estimates based on correlated samples.
 
 ```mermaid
 graph LR
@@ -222,36 +289,63 @@ $$
 
 Checked answer: no kinetic-theory wall-collision argument was needed. The pressure is the entropy gain available when volume increases.
 
-## Code
+## Worked example 3: sharing a fixed number of quanta
 
-```python
-import math
+Two Einstein solids contain $N_A$ and $N_B$ oscillators and share $q$ indistinguishable energy quanta. The multiplicity of one solid with $N$ oscillators and $q$ quanta is
 
-def spin_entropy(N, n, kB=1.0):
-    return kB * (math.lgamma(N + 1) - math.lgamma(n + 1) - math.lgamma(N - n + 1))
+$$
+\Omega(N,q)={q+N-1\choose q}.
+$$
 
-N = 200
-eps = 1.0
-for n in [60, 100, 140]:
-    E = eps * (2 * n - N)
-    # central difference in energy using n +/- 1
-    dS_dE = (spin_entropy(N, n + 1) - spin_entropy(N, n - 1)) / (4 * eps)
-    T = 1.0 / dS_dE if dS_dE != 0 else float("inf")
-    print(n, E, T)
-```
+If solid $A$ holds $q_A$ quanta, the combined multiplicity is
 
-## Common pitfalls
+$$
+\Omega_{\mathrm{tot}}(q_A)
+=\Omega(N_A,q_A)\Omega(N_B,q-q_A).
+$$
 
-- Omitting the $N!$ factor for identical classical particles, which leads to the Gibbs paradox and nonextensive entropy.
-- Treating the energy shell width as physically important for macroscopic thermodynamics. It affects normalization but not leading thermodynamic derivatives.
-- Forgetting that negative temperatures require an upper-bounded spectrum; they do not occur for an ideal gas with unbounded kinetic energy.
-- Confusing $\Omega(E)$ with $\Gamma(E)$. They are closely related for large systems but not identical in small-system calculations.
-- Assuming the microcanonical ensemble is only classical. Quantum mechanically, it is a normalized projector onto an energy window.
+To locate its maximum exactly, compare adjacent terms. The ratio for one solid is
 
-## Connections
+$$
+{\Omega(N,q+1)\over\Omega(N,q)}={q+N\over q+1}.
+$$
+
+Moving one quantum from $B$ to $A$ changes total multiplicity by
+
+$$
+{\Omega_{\mathrm{tot}}(q_A+1)\over\Omega_{\mathrm{tot}}(q_A)}
+={q_A+N_A\over q_A+1}
+{q_B\over q_B+N_B-1},
+\qquad q_B=q-q_A.
+$$
+
+The most probable division lies where this ratio crosses one. For large $q$ and $N$, dropping the additive ones gives
+
+$$
+{q_A+N_A\over q_A}{q_B\over q_B+N_B}\simeq1,
+$$
+
+which reduces to
+
+$$
+{q_A\over N_A}\simeq{q_B\over N_B}.
+$$
+
+Energy is shared so that the mean number of quanta per oscillator agrees. Taking logarithms and derivatives expresses the same condition as equal microcanonical temperatures. The full distribution still has a width; equilibrium selects a sharply dominant range rather than one compulsory microstate.
+
+## What to check in a state count
+
+- Identical classical particles require the $N!$ divisor. Without it, entropy is nonextensive and mixing identical samples produces the Gibbs paradox.
+- The shell width fixes a normalization convention. A fixed, macroscopically narrow width does not affect leading derivatives, but an energy-dependent width can.
+- Negative temperatures require an upper-bounded spectrum. Unbounded kinetic energy prevents them for the ordinary ideal gas.
+- $\Omega(E)$ and $\Gamma(E)$ are closely related at large $N$ but yield different finite-size derivatives. The chosen entropy convention should be stated.
+- Equal weight means equal weight in the invariant phase-space measure, not equal probability for a nonlinear coordinate or a coarse macrovariable.
+- Quantum microcanonical states use an energy-window projector. Replacing it by one arbitrary eigenstate requires an additional typicality or eigenstate-thermalization argument.
+
+## Related pages
 
 - [Phase space, Liouville theorem, and ergodicity](/physics/statistical-mechanics/phase-space-liouville-ergodicity)
 - [Canonical ensemble and fluctuations](/physics/statistical-mechanics/canonical-ensemble-and-fluctuations)
 - [Classical ideal gas and Maxwell distribution](/physics/statistical-mechanics/classical-ideal-gas-and-maxwell-distribution)
-- [Thermodynamics](/physics/thermodynamics/)
+- [Thermodynamics](/physics/thermodynamics/intro)
 - [Entropy and coding](/math/probability-and-random-variables/entropy-and-coding)

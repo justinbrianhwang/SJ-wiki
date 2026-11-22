@@ -9,7 +9,7 @@ Functions are the first major abstraction tool in C++. They let a program give a
 
 The central discipline is to think about what a function promises, not only what lines of code it contains. A good function has a narrow purpose, a clear parameter list, and a return mode that matches the job. It either computes and returns a value, performs an action through side effects, or carefully combines both when that combination is justified.
 
-## Definitions
+## Declarations, definitions, and calls
 
 A **function declaration** or **prototype** tells the compiler the function name, return type, and parameter types before the function is called.
 
@@ -74,7 +74,18 @@ void printName(const std::string& name) {
 
 **Scope** is the region of a program where a name can be used. Local variables are visible only inside their block. A nested block may introduce a new variable whose name hides an outer one.
 
-## Key results
+A declaration is enough to type-check a call, but one definition must eventually be available to the linker for every used non-inline function. The declaration and definition must describe the same function type. A mismatch such as declaring `double area(int)` and defining `double area(double)` creates two overloads; it does not define the declared integer version, so a call to that version can fail at link time.
+
+Parameter names are optional in a declaration because callers need only the types, but useful names document the role of each position. They do not have to match names in the definition:
+
+```cpp
+double unitPrice(int diameter, double price);
+double unitPrice(int d, double p) { /* ... */ }
+```
+
+The return statement ends the current function immediately. For a non-void function it also initializes the result object. Returning a class object by value is normal C++; copy elision and moves usually avoid an expensive extra copy. Returning a reference is appropriate only when the referred object will outlive the caller's use of that reference.
+
+## Choosing how each argument crosses the boundary
 
 Function calls evaluate arguments first, initialize parameters, execute the function body, then return control to the caller. With call by value, the parameter is a new local variable. With call by reference, the parameter is another name for the caller's variable. This difference explains why `swap` needs references:
 
@@ -87,6 +98,8 @@ void swapValues(int& a, int& b) {
 ```
 
 Without `&`, the function would only swap local copies.
+
+References introduce aliasing. A call such as `swapValues(x, x)` binds both parameters to the same object. The function remains harmless, but more complicated functions can produce surprising results when two output references alias. If distinct arguments are required, that condition belongs in the contract or should be designed out of the interface.
 
 Use parameter modes deliberately:
 
@@ -111,6 +124,8 @@ double average(double a, double b, double c) {
 
 The compiler chooses the overload by matching argument count and types. A return type alone is not enough to distinguish overloads.
 
+Overload resolution ranks viable conversions. An exact match normally beats a promotion, which beats a broader standard conversion. User-defined conversions enter later. Ambiguity is a compile error rather than a run-time choice. Literal types matter: `f(1)` favors an `int` overload, `f(1.0)` favors `double`, and `f('a')` favors `char` when present.
+
 **Default arguments** provide values when the caller omits trailing arguments.
 
 ```cpp
@@ -130,13 +145,17 @@ double divide(double numerator, double denominator) {
 }
 ```
 
-## Visual
+Assertions state programmer assumptions, not recoverable input errors. A build may define `NDEBUG` and remove every `assert` expression, so an assertion must have no necessary side effect. User-supplied zero still needs an ordinary check if it can occur legitimately.
+
+Argument expressions are evaluated before the function body, but code should not depend on a particular order among separate arguments where the standard leaves latitude. A call such as `f(i++, i++)` is obscure even under modern sequencing rules because readers must recall version-specific details. Compute the two arguments in separate statements.
+
+## Scope and lifetime are different questions
 
 ```mermaid
 sequenceDiagram
   participant Caller
   participant Function
-  Caller->>Function: call f(argument)
+  Caller->>Function: call f with argument
   Note over Function: initialize parameters
   alt call by value
     Note over Function: parameter is a local copy
@@ -154,7 +173,22 @@ sequenceDiagram
 | global constant | `const int MAX = 100` outside functions | whole program | from declaration onward |
 | global variable | `int total` outside functions | whole program | from declaration onward |
 
-## Worked example 1: choosing parameter modes for a pizza comparison
+Scope concerns where a name can be written; lifetime concerns when an object exists. A local `static` object has block scope but static storage duration: it is initialized the first time control reaches its declaration and survives until program shutdown. An ordinary local has automatic storage duration and is destroyed when its block exits. A dynamically allocated object has no inherent source-level name and lives until its owning mechanism releases it.
+
+Name hiding is legal but easy to misread:
+
+```cpp
+int count = 10;
+{
+    int count = 2;
+    std::cout << count; // 2
+}
+std::cout << count;     // 10
+```
+
+A local variable with the same name does not modify the outer one. Compiler warnings for shadowing are valuable because accidental hiding often resembles a failed assignment to a member or global.
+
+## Worked example: choosing parameter modes for a pizza comparison
 
 Problem: Given diameters and prices for two pizzas, decide which has lower price per square inch.
 
@@ -216,7 +250,9 @@ Checked answer:
 4. Large unit price is `14.75 / 132.73`, about `0.1111`.
 5. The small pizza is the better buy.
 
-## Worked example 2: tracing value and reference parameters
+Both dimensions should be positive. A zero diameter makes area zero and the division invalid; a negative diameter produces a positive squared area but has no domain meaning. A complete contract either rejects nonpositive dimensions, throws an exception, or returns a type capable of representing failure. The formula alone does not validate its inputs.
+
+## Worked example: tracing value and reference parameters
 
 Problem: Predict the output when a function receives one value parameter and one reference parameter.
 
@@ -256,19 +292,27 @@ inside: 11 12
 outside: 1 12
 ```
 
-## Code
+At function exit, `valueCopy` is destroyed. `referenceAlias` is not a separately owned integer and has nothing independent to destroy; it was another name for `second`. Reference binding cannot later be changed to make the same reference name a different object.
+
+## A small function set with validated input
 
 This program uses a small function set, const references, reference output parameters, and overloads.
 
 ```cpp
 #include <iostream>
+#include <limits>
 #include <string>
 
 void readScore(const std::string& label, int& score) {
-    do {
+    while (true) {
         std::cout << label << " score (0-100): ";
-        std::cin >> score;
-    } while (score < 0 || score > 100);
+        if (std::cin >> score && score >= 0 && score <= 100) {
+            return;
+        }
+        std::cout << "Enter an integer from 0 through 100.\n";
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
 }
 
 double average(int a, int b) {
@@ -305,7 +349,11 @@ int main() {
 }
 ```
 
-## Common pitfalls
+The extraction check comes before the range checks because `&&` short-circuits. If extraction fails, `score` is not treated as a fresh input value. Clearing the fail state enables later extraction, and `ignore` removes the malformed remainder of the line. Without both steps, the loop could repeatedly examine the same bad token.
+
+Returning the score instead of using an output reference would be an equally good, arguably cleaner interface: `int readScore(const std::string& label)`. The output parameter is retained here to contrast parameter modes. When there is one natural result, a return value generally gives the call site a more direct data flow.
+
+## Interface and lifetime mistakes
 
 - Omitting a function prototype when the call appears before the definition.
 - Confusing parameters with arguments. Parameters are in the function definition; arguments are supplied at the call site.
@@ -316,7 +364,7 @@ int main() {
 - Overloading functions whose calls become ambiguous after implicit conversions.
 - Putting default arguments in multiple declarations inconsistently.
 
-Parameter-design checks:
+For each parameter:
 
 - Use call-by-value when the function needs its own independent copy or when the value is small and cheap to copy, such as an `int`, `char`, or `double`.
 - Use call-by-reference when the function's purpose is to modify the caller's object, as in `readInput(int& value)` or `swapValues(int& a, int& b)`.
@@ -325,7 +373,15 @@ Parameter-design checks:
 - Avoid hidden dependencies on global variables. A function whose result depends only on its parameters is easier to test, reuse, and reason about.
 - Check each return path. Every non-`void` function should return a value on every possible path, including error branches and boundary cases.
 
-## Connections
+Default arguments are substituted at the call site based on the declaration visible there. They are not selected dynamically. Changing a default in a library header requires callers to be recompiled before their calls use the new value. Virtual functions and default arguments therefore form a particularly awkward pair: virtual dispatch chooses the override, while the default argument comes from the static type at the call site.
+
+An `inline` declaration permits identical definitions in multiple translation units, which is why short functions defined in headers often use it. It is not a command that the compiler must substitute the body at every call. Optimization decisions are separate from the language's one-definition rules.
+
+Global variables create hidden inputs and outputs. They also complicate initialization order across source files and make concurrent access a synchronization problem. Global constants with compile-time values are much less troublesome; mutable process-wide state should have a clear owner and a narrow interface.
+
+Recursive and reentrant calls reinforce the value of local state. Each invocation receives its own value parameters and automatic locals, so one active call does not overwrite another call's frame. A local static is shared instead, which can be useful for immutable cached data but needs synchronization if several threads may initialize or modify related state. The parameter list remains the clearest record of what varies per call.
+
+## Related pages
 
 - [C++ basics and control flow](/cs/programming/cpp/cpp-basics-and-control-flow)
 - [arrays](/cs/programming/cpp/arrays)

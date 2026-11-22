@@ -9,7 +9,7 @@ Constructors make class objects usable from the moment they are created. Destruc
 
 The guiding principle is resource ownership. If a class only stores simple values, the compiler-generated copy behavior is often fine. If a class owns memory, a file handle, or another resource, memberwise copying is usually not enough. The class must decide whether copying means deep copy, shared ownership, disabled copy, or move-style transfer in modern C++.
 
-## Definitions
+## How an object enters and leaves its lifetime
 
 A **constructor** is a member function with the same name as the class and no return type. It initializes new objects.
 
@@ -61,7 +61,22 @@ The **rule of three** says that if a class needs a custom destructor, copy const
 
 Modern C++ adds move construction and move assignment, giving the **rule of five**. Savitch's fifth edition centers on copy control, but the same ownership reasoning explains move semantics.
 
-## Key results
+Construction is not assignment to raw storage. Before the constructor body starts, base-class subobjects and data members have already been initialized. The initialization list chooses how. If a member is omitted, it uses its default member initializer or is default-initialized. For a built-in member with neither, that may leave an indeterminate value.
+
+Members are initialized in the order in which they are declared in the class, regardless of their order in the initialization list. Code such as the following is wrong because `size_` is declared after `data_`, so `data_` is initialized first:
+
+```cpp
+class Buffer {
+    int* data_;
+    int size_;
+public:
+    Buffer(int size) : size_(size), data_(new int[size_]) {}
+};
+```
+
+Using the constructor parameter directly would repair the allocation, but keeping the list in declaration order is clearer and avoids compiler warnings. Destruction runs in the exact reverse order of completed construction. If construction of a later member throws, already constructed members are destroyed automatically; the class destructor itself does not run because the whole object never completed construction.
+
+## Ownership determines copy behavior
 
 Constructors should establish class invariants. If a `BankAccount` stores dollars and cents separately, every constructor must ensure the representation is consistent.
 
@@ -88,7 +103,25 @@ It should also avoid destroying the old resource before successfully allocating 
 
 Static members belong to the class as a whole rather than to one object. They are useful for shared counters, configuration, or factory state, but should not replace ordinary object state.
 
-## Visual
+Copy construction and copy assignment answer different lifetime questions. In `T b = a;`, `b` has no prior value, so the copy constructor builds it. In `b = a;`, both objects already exist, so assignment must release or reuse `b`'s old resource before taking on `a`'s value. The equals sign in initialization does not imply assignment.
+
+Move operations exploit a temporary or otherwise expendable source. A move constructor can copy a pointer, set the source pointer to null, and avoid copying every element. The moved-from object remains alive and must be destructible and assignable, but its ordinary value is often unspecified. Move operations should usually be `noexcept` when transferring ownership cannot fail; containers such as `std::vector` can then move elements during reallocation while preserving their exception guarantees.
+
+The preferred modern rule is often the **rule of zero**: put ownership in members whose types already implement correct destruction, copying, and moving. Replacing `int* data_` plus `int size_` with `std::vector<int> data_` removes all five special member functions from many classes. The compiler-generated operations compose the vector's value semantics correctly.
+
+When copying has no sensible meaning, say so in the type:
+
+```cpp
+class FileLock {
+public:
+    FileLock(const FileLock&) = delete;
+    FileLock& operator=(const FileLock&) = delete;
+};
+```
+
+Silently sharing a resource is a separate semantic choice, not a cheap substitute for deep copying. Shared ownership is best expressed by an ownership type such as `std::shared_ptr`, whose reference-counting cost and possible cycles are then apparent in the representation.
+
+## Lifetime and the special member functions
 
 ```mermaid
 flowchart TD
@@ -112,7 +145,11 @@ flowchart TD
 | destructor | scope exit or `delete` | release owned resources |
 | move constructor | `T x = std::move(y);` | transfer resources when supported |
 
-## Worked example 1: constructor initialization for a clock time
+The compiler's implicit-generation rules have accumulated historical detail, so a reliable design should not depend on memorizing every corner. A user-declared destructor suppresses implicit move generation in common cases; a reference or const data member may cause assignment to be deleted; a base or member with unavailable copy operations makes the containing operation unavailable. `= default` requests the generated operation explicitly, and `= delete` rejects a call with a direct compile-time diagnostic.
+
+The destructor must not throw. During exception propagation, another thrown exception from a destructor leads to `std::terminate`. Resource wrappers therefore perform cleanup operations that cannot fail or record/report cleanup failure through some separate mechanism.
+
+## Worked example: constructor initialization for a clock time
 
 Problem: Define a `ClockTime` class that stores hour and minute. Normalize `24:00` to `0:00` and reject invalid values.
 
@@ -170,7 +207,9 @@ int main() {
 
 Checked answer: the constructor accepts `24:00`, stores `0:00`, and prints `0:00`.
 
-## Worked example 2: shallow copy failure and deep copy fix
+For a reusable library type, terminating the whole process is a harsh response to invalid input. Alternatives include throwing `std::invalid_argument`, returning an optional value from a named factory, or defining a normalization policy. The choice belongs in the constructor's contract. What should not happen is constructing a quietly invalid object and expecting every later member call to rediscover the problem.
+
+## Worked example: shallow copy failure and deep copy fix
 
 Problem: A class owns a dynamic array. Show why the default copy constructor is wrong and how a deep copy fixes it.
 
@@ -186,6 +225,7 @@ Method:
 ```cpp
 #include <algorithm>
 #include <iostream>
+#include <stdexcept>
 
 class Scores {
 public:
@@ -222,7 +262,9 @@ int main() {
 
 Checked answer: `second` owns a separate array and prints `100`. When `first` and `second` are destroyed, each deletes only its own storage.
 
-## Code
+The deep-copy trace is explicit. Constructing `first` allocates block A. Copy-constructing `second` allocates block B of the same length, then copies three integers from A to B. The two `data_` pointers differ. Destruction of `second` frees B; destruction of `first` later frees A. With the generated shallow copy, both pointers would name A, mutation would alias, and the second deletion of A would have undefined behavior.
+
+## Copy assignment with the strong guarantee
 
 This complete rule-of-three example supports assignment safely.
 
@@ -233,7 +275,7 @@ This complete rule-of-three example supports assignment safely.
 class DoubleArray {
 public:
     explicit DoubleArray(int size)
-        : size_(size), data_(new double[size]) {
+        : size_(checkedSize(size)), data_(new double[size_]) {
         std::fill(data_, data_ + size_, 0.0);
     }
 
@@ -269,6 +311,13 @@ public:
     }
 
 private:
+    static int checkedSize(int size) {
+        if (size < 0) {
+            throw std::invalid_argument("negative array size");
+        }
+        return size;
+    }
+
     int size_;
     double* data_;
 };
@@ -286,7 +335,11 @@ int main() {
 }
 ```
 
-## Common pitfalls
+The `checkedSize` helper runs while initializing `size_`, before the allocation for `data_`. A negative argument therefore throws without attempting an enormous allocation after integer conversion. Validation required before member construction cannot be postponed to the constructor body. A vector-backed version would remove the manual ownership code while retaining the same precondition check.
+
+Apart from that input defect, the assignment algorithm gives a strong exception guarantee. Allocation and copying happen before `data_` is deleted. If `new` throws, the function exits and the left-hand object still owns its original block. Only after the replacement is ready does the function commit by deleting the old block and installing the new pointer. A copy-and-swap implementation packages the same transaction: copy the right-hand side into a temporary, swap representations, and let the temporary destroy the former state.
+
+## Failure modes worth tracing by hand
 
 - Assuming constructors return values. They initialize objects; they do not have return types.
 - Forgetting to define a default constructor when code needs arrays or default-created objects.
@@ -297,7 +350,7 @@ int main() {
 - Returning a local object by reference instead of by value.
 - Forgetting to make base class destructors virtual when deleting derived objects through base pointers.
 
-Copy-control checks:
+A copy-control audit:
 
 - Ask whether the class owns a resource. Dynamic memory, file handles, locks, and network connections all count. If ownership exists, the compiler-generated copy operations may be wrong even when the code compiles cleanly.
 - Trace the lifetime of one object on paper: construction, ordinary member calls, copying, assignment, and destruction. Every allocated resource should appear exactly once in the construction path and exactly once in the destruction path.
@@ -307,9 +360,15 @@ Copy-control checks:
 - Prefer member initialization lists for all data members, not just for references and constants. Initialization lists express construction directly and avoid default-construct-then-assign behavior for class-type members.
 - If a class only stores standard library members such as `string` and `vector`, the compiler-generated destructor, copy constructor, and assignment operator are usually correct. Manual copy control is mainly needed when the class directly owns a lower-level resource.
 
-Quick self-test: create two objects, copy one into the other, mutate one object, and then let both destructors run. If changing the copy changes the original, the copy is shallow. If the program crashes at destruction, two objects may be trying to free the same resource. These tests are small but catch many copy-control errors.
+Create two objects, copy one into the other, mutate one object, and then let both destructors run. If changing the copy changes the original, the copy is shallow. If the program crashes at destruction, two objects may be trying to free the same resource. These tests are small but catch many copy-control errors.
 
-## Connections
+Array ownership has another syntactic trap: memory acquired by `new T[n]` must be released by `delete[]`, while one object acquired by `new T` uses `delete`. Mixing the forms has undefined behavior even when `T` has a trivial destructor. A null pointer is safe to pass to either matching delete expression, which supports simple moved-from states.
+
+Self-assignment guards are useful in direct resource-managing code, but they are not the whole correctness argument. Aliasing can occur through distinct references that name the same object, and exception safety still matters for non-self assignment. Copy-and-swap naturally tolerates `x = x` without a special branch, at the cost of making a copy. Reuse-oriented assignment can be faster but needs more careful case analysis.
+
+Object slicing is also a copy-semantic problem. Copying a derived object into a base object by value copies only the base subobject; derived state and overriding behavior are gone. Polymorphic hierarchies normally pass objects by reference or pointer and, when value-like copying is required, provide a virtual `clone` operation returning an owning smart pointer.
+
+## Related pages
 
 - [classes and encapsulation](/cs/programming/cpp/classes-and-encapsulation)
 - [pointers and dynamic memory](/cs/programming/cpp/pointers-and-dynamic-memory)

@@ -9,7 +9,7 @@ The density operator is the language of incomplete information, subsystems, stat
 
 Sakurai introduces density operators in the angular-momentum chapter through pure versus mixed ensembles and later uses spin correlations and Bell inequalities. Ballentine gives extensive attention to pure and general states, measurement, and ensemble interpretation. The Gottfried-named notes develop density matrices for spin-1/2 and mixed beams. Schiff's older treatment is less centered on density operators, reflecting the historical emphasis on wave functions.
 
-## Definitions
+## States when a ket is insufficient
 
 A density operator $\rho$ is a positive semidefinite, trace-one operator:
 
@@ -60,7 +60,7 @@ $$
 S(\rho)=-\mathrm{Tr}(\rho\ln\rho).
 $$
 
-## Key results
+## Purity, Bloch vectors, and spectral form
 
 A state is pure if and only if
 
@@ -94,6 +94,29 @@ $$
 
 Pure states sit on the Bloch sphere, and mixed states sit inside it.
 
+The eigenvalues of the qubit state are
+
+$$
+\lambda_\pm={1\pm|\mathbf r|\over2}.
+$$
+
+This immediately gives
+
+$$
+\mathrm{Tr}(\rho^2)={1+|\mathbf r|^2\over2}.
+$$
+
+The center of the Bloch ball is maximally mixed, while points on the surface have one eigenvalue zero. A general finite-dimensional density operator likewise has a spectral decomposition
+
+$$
+\rho=\sum_k\lambda_k|k\rangle\langle k|,
+\qquad \lambda_k\geq0,quad\sum_k\lambda_k=1.
+$$
+
+Its eigenvalues, not a particular ensemble decomposition, determine purity and entropy. Distinct ensembles can produce the same operator and are indistinguishable by any measurement performed on that system.
+
+## Reduced states and entanglement
+
 Entanglement means that a composite pure state cannot be factored into subsystem states. The Bell state
 
 $$
@@ -114,9 +137,52 @@ $$
 
 Thus the whole state is pure while each subsystem is maximally mixed. This is not ignorance about which pure state $A$ "really has"; it is a structural feature of entanglement.
 
-Decoherence occurs when a system becomes entangled with environmental degrees of freedom and interference terms in a preferred basis become practically inaccessible. It does not by itself choose one outcome, but it explains why coherent superpositions become hard to observe locally. Ballentine's ensemble caution and Sakurai's spin-correlation discussion are both useful here: density matrices encode predictions without requiring a single interpretation of collapse.
+For any bipartite pure state, the Schmidt decomposition gives
 
-## Visual
+$$
+|\Psi\rangle=\sum_k\sqrt{\lambda_k}
+|a_k\rangle|b_k\rangle.
+$$
+
+The reduced operators have the same nonzero eigenvalues:
+
+$$
+\rho_A=\sum_k\lambda_k|a_k\rangle\langle a_k|,
+\qquad
+\rho_B=\sum_k\lambda_k|b_k\rangle\langle b_k|.
+$$
+
+One Schmidt coefficient means a product state. More than one means entanglement. For a bipartite pure state, $S(\rho_A)=S(\rho_B)$ measures entanglement; for a mixed joint state, entropy also contains ordinary mixing and is no longer an entanglement measure by itself.
+
+## How environmental entanglement removes local interference
+
+Begin with a system superposition and an environment reference state:
+
+$$
+|\Psi(0)\rangle=(\alpha|0\rangle+\beta|1\rangle)|E_*\rangle.
+$$
+
+An interaction that records the system basis in the environment produces
+
+$$
+|\Psi(t)\rangle
+=\alpha|0\rangle|E_0(t)\rangle
++\beta|1\rangle|E_1(t)\rangle.
+$$
+
+Tracing over the environment gives
+
+$$
+\rho_S=
+\begin{pmatrix}
+|\alpha|^2 & \alpha\beta^*\langle E_1|E_0\rangle\\
+\alpha^*\beta\langle E_0|E_1\rangle & |\beta|^2
+\end{pmatrix}.
+$$
+
+The overlap $D(t)=\langle E_1(t)\vert E_0(t)\rangle$ is a decoherence factor. When the two environment records become nearly orthogonal, $\vert D(t)\vert \ll1$, local interference is suppressed. The joint state has not become a classical mixture; it remains a coherent entangled state if the total evolution is unitary. Recovering the phase would require a measurement controlling the relevant environment degrees of freedom.
+
+The basis recorded by a stable system–environment interaction is called a pointer basis. Decoherence is basis-dependent because the interaction Hamiltonian selects which system observable is redundantly imprinted in the environment. It does not, on its own, select one term as the observed outcome.
 
 ```mermaid
 flowchart TD
@@ -135,7 +201,7 @@ flowchart TD
 | Entangled pure state | cannot factor $\vert \psi\rangle_A\vert \phi\rangle_B$ | subsystems need density operators |
 | Decoherence | local off-diagonal terms shrink | interference becomes inaccessible |
 
-## Worked example 1: Pure or mixed spin state
+## Worked example: purity and entropy of a spin state
 
 **Problem.** Consider
 
@@ -190,7 +256,16 @@ $$
 
 **Checked answer.** The state is pure only for $r=\pm1$. For $r=0$, it is maximally mixed: $\rho=I/2$.
 
-## Worked example 2: Partial trace of a Bell state
+Its von Neumann entropy is
+
+$$
+S(\rho)=-{1+r\over2}\ln{1+r\over2}
+-{1-r\over2}\ln{1-r\over2}.
+$$
+
+At $r=\pm1$, one eigenvalue is one and the other is zero, with the convention $0\ln0=0$, so $S=0$. At $r=0$, both eigenvalues are $1/2$ and $S=\ln2$.
+
+## Worked example: partial trace of a Bell state
 
 **Problem.** For
 
@@ -245,7 +320,7 @@ $$
 
 **Checked answer.** The subsystem is maximally mixed even though the joint state is pure.
 
-## Code
+## Checking a partial trace by reshaping indices
 
 ```python
 import numpy as np
@@ -258,7 +333,7 @@ print(rho_a)
 print("purity subsystem:", np.trace(rho_a @ rho_a).real)
 ```
 
-## Common pitfalls
+## Distinctions that matter
 
 - Confusing a mixed state with a superposition. A mixture has probabilities over preparations; a superposition has coherent amplitudes.
 - Assuming every density matrix decomposition into pure states is unique. It is not.
@@ -266,25 +341,53 @@ print("purity subsystem:", np.trace(rho_a @ rho_a).real)
 - Forgetting the trace in expectation values. With density operators, use $\mathrm{Tr}(\rho A)$.
 - Thinking decoherence alone solves every measurement problem. It suppresses local interference but does not by itself select a unique experienced outcome.
 - Ignoring positivity. Trace one is not enough for a valid density matrix.
-- Confusing classical correlation with entanglement. Entanglement is not just strong correlation; it is nonfactorization of quantum state structure.
+- Confusing classical correlation with entanglement. Entanglement is nonseparability of the joint state, not merely a large correlation coefficient.
 
-Density matrices are especially useful because they separate two operations that state vectors mix together: coherent superposition and probabilistic mixing. Off-diagonal entries in a basis represent coherence relative to that basis. Diagonal entries represent populations. A unitary basis change can move coherence around, so one should not say a density matrix is "diagonal" without naming the basis. Decoherence is the physical suppression of off-diagonal terms in a dynamically selected pointer basis, not in every possible basis at once.
+Density matrices separate coherent superposition from probabilistic mixing. Off-diagonal entries in a basis represent coherence relative to that basis; diagonal entries represent populations. A unitary basis change can move coherence around, so a claim that a density matrix is diagonal must name the basis. Decoherence suppresses off-diagonal terms in a dynamically selected pointer basis, not in every basis at once.
 
 Purity is a quick diagnostic but not a complete interpretation. If $\mathrm{Tr}(\rho^2)=1$, the state is pure. If it is less than one, the state is mixed. The same mixed density operator may describe ignorance about a preparation procedure or the reduced state of an entangled subsystem. These two cases can be operationally identical for measurements on the subsystem alone, but they differ when joint measurements or purification questions are considered.
 
-The partial trace is often the first place tensor-product bookkeeping becomes unavoidable. Write basis indices explicitly if needed: $\rho_{aa',bb'}$ becomes $(\rho_A)_{aa'}=\sum_b \rho_{aa',bb}$. This index contraction is not a physical loss of information by itself; it represents choosing not to access subsystem $B$. In open-system physics, the environment has many degrees of freedom, so recovering the full phase information is practically impossible even though the total system may evolve unitarily.
+The partial trace is often the first place tensor-product bookkeeping becomes unavoidable. With explicit basis indices, $\rho_{aa',bb'}$ becomes $(\rho_A)_{aa'}=\sum_b \rho_{aa',bb}$. This index contraction does not physically destroy information; it represents choosing not to access subsystem $B$. An environment has many degrees of freedom, so recovering the full phase information can be infeasible even while the total system evolves unitarily.
 
 Ballentine's ensemble emphasis and Sakurai's density-operator spin examples complement each other. Ballentine keeps the statistical meaning of $\rho$ explicit. Sakurai shows how $\rho$ handles pure and mixed spin beams in the same algebraic language. Together they make density operators feel less like an advanced add-on and more like the natural generalization of the Born rule.
 
 A useful computational habit is to diagonalize $\rho$ when interpreting a state. Its eigenvalues are probabilities in the basis that makes the mixture look classical, and they determine entropy and purity. But the eigenbasis of $\rho$ is not automatically the measurement basis of interest. A detector measuring $S_z$ cares about diagonal entries in the $z$ basis, while entropy cares about the eigenvalues of $\rho$ itself. Confusing these two diagonalizations leads to wrong statements about coherence.
 
-For entanglement, avoid relying only on visual inspection of a state vector. A two-qubit pure state is entangled if the reduced density matrix of either qubit is mixed, or equivalently if the coefficient matrix has rank greater than one. This gives a practical test: reshape the coefficient vector into a matrix and check whether it factors into one column times one row. The Bell examples are maximally entangled, but partially entangled states require this more careful diagnosis.
+For entanglement, avoid relying only on visual inspection of a state vector. A two-qubit pure state is entangled if the reduced density matrix of either qubit is mixed, or equivalently if the coefficient matrix has rank greater than one. One direct test reshapes the coefficient vector into a matrix and checks whether it factors into one column times one row. The Bell examples are maximally entangled, but partially entangled states require this more careful diagnosis.
 
 In calculations involving measurement, density operators also prevent accidental conditioning. If the outcome is known, update with the corresponding normalized branch. If the outcome is not known or is deliberately ignored, sum over all branches. Both are legitimate operations, but they answer different experimental questions. This distinction is central to interpreting decoherence and mixed spin beams.
 
 Whenever a problem mentions an unobserved subsystem, an imperfect preparation, or discarded measurement records, switch to density-operator language early rather than trying to force a single ket to carry missing information.
 
-## Connections
+## Proper and improper mixtures
+
+A preparation mixture can arise because a source deliberately chooses among several pure states and discards the classical record. A reduced state can arise because the system is entangled with another system that is not measured. The same density operator may result in both cases, so no experiment confined to the subsystem can distinguish them. The distinction concerns how the state was prepared and which larger measurements remain possible.
+
+Calling the reduced case an improper mixture is a reminder that the joint system has not secretly selected one member of the subsystem ensemble. If the purifying subsystem becomes accessible, joint interference measurements can reveal phase relations absent from the reduced description. In a preparation mixture with an irretrievably randomized classical choice, no analogous purification is available unless the choice record is included as another physical system.
+
+Ensemble decompositions are nonunique. The maximally mixed qubit can be written as an equal mixture of vertical spin states, horizontal spin states, or the two eigenstates along any axis. These are not different density operators. A measurement on the qubit sees identical statistics. If a preparation label is retained and correlated with another register, the enlarged joint density operators differ and the label can be used to sort the data.
+
+## Measurement maps and discarded outcomes
+
+For a projective measurement with projectors $P_a$, the probability of outcome $a$ is the trace of the product of the state and the projector. Conditional on observing that outcome, the normalized post-measurement state is obtained by placing the projector on both sides of the density operator and dividing by the probability. This is the density-operator form of the usual projection rule.
+
+If the apparatus performs the measurement but the outcome record is ignored, the correct state is the sum of all unnormalized branches. Off-diagonal terms between different projected sectors disappear. This nonselective update differs from conditioning on a known result. It also differs from unitary evolution of the system alone, although a larger unitary model including the apparatus can produce it after the apparatus is traced out.
+
+More general measurements use positive operators that sum to the identity, together with measurement operators describing the state update. The probability operators alone determine outcome statistics, while different physical instruments can share those statistics and disturb the state differently. Keeping probability and disturbance separate prevents an overgeneralization of the simple projection postulate.
+
+## Entropy, correlations, and what they do not prove
+
+Von Neumann entropy is invariant under unitary changes of basis because unitary conjugation preserves the eigenvalues of a density operator. Closed-system evolution therefore preserves entropy. A subsystem's entropy may increase or decrease as it exchanges correlations with another subsystem even while the entropy of the joint pure state remains zero.
+
+For a bipartite pure state, nonzero reduced entropy is equivalent to entanglement. For a mixed joint state, the same conclusion does not follow. Classical correlations can make each subsystem uncertain while the joint state remains separable. Determining mixed-state entanglement generally needs a more specialized criterion, and no single entropy of one subsystem settles every case.
+
+Mutual information compares the entropy of the parts with the entropy of the whole and counts total correlations, both classical and quantum. It vanishes for a product state. A nonzero value proves correlation but does not by itself prove entanglement. This distinction matters when environmental decoherence creates strong classical records of a system observable.
+
+Decoherence rates depend on how distinguishable the environment records become. A large environment is not sufficient by itself; the interaction must correlate different system alternatives with different environmental states. If both alternatives produce the same environment state, their overlap remains one and no local coherence is lost. Conversely, many weakly affected environmental degrees of freedom can make the total overlap decay rapidly because their individual overlaps multiply.
+
+Recoherence is allowed by unitary dynamics. In a small controlled environment, records can return to overlap and interference can revive. Macroscopic irreversibility comes from the huge number of degrees of freedom, uncontrolled phases, and recurrence times, rather than from an exact nonunitary law for the total isolated system.
+
+## Related pages
 
 - [Spin-1/2 systems](/physics/quantum-mechanics/spin-one-half-systems)
 - [Postulates of quantum mechanics](/physics/quantum-mechanics/postulates-of-quantum-mechanics)

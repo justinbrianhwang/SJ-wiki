@@ -7,9 +7,9 @@ sidebar_position: 14
 
 Data stream mining studies data that arrive continuously and may be too large to store, revisit, or process with multiple full passes. Aggarwal's stream chapter covers synopsis structures, reservoir sampling, sketches, streaming frequent patterns, stream clustering, streaming outlier detection, and streaming classification. The broader big-data issue also includes disk-resident and distributed batch settings, where frameworks such as MapReduce can scan huge stored data but do not replace real-time stream algorithms.
 
-This page connects scalability to the rest of the book. Most familiar mining tasks have streaming versions, but the one-pass constraint, concept drift, memory limits, and real-time deadlines change the algorithms.
+Most familiar mining tasks have streaming versions, but the one-pass constraint, concept drift, memory limits, and real-time deadlines change the algorithms. The central question becomes which summary can be updated before the next event arrives and still answer the intended query.
 
-## Definitions
+## The stream model
 
 A **data stream** is a sequence $X_1,X_2,\dots$ observed over time, often with no known endpoint.
 
@@ -29,7 +29,11 @@ A **decay model** weights recent observations more heavily than old observations
 
 **Microclusters** are compact cluster summaries with counts and sufficient statistics, often used by stream clustering methods.
 
-## Key results
+Streams can follow several access models. A cash-register stream receives positive increments to item counts. A turnstile stream permits positive and negative updates, as when records are inserted and deleted. Some summaries that work for nonnegative counts fail when updates can cancel. A sliding window expires old events, requiring either deletion support or a data structure organized by age.
+
+Bounded memory is meaningful only relative to something. An algorithm using memory logarithmic in stream length can run indefinitely; one storing all distinct keys may still exhaust memory even though it never stores duplicate events. State growth, per-event update time, and query time should be stated separately.
+
+## What approximation buys
 
 **Streaming changes exactness expectations.** Many exact batch algorithms need repeated scans or random access. Stream methods often return approximate answers with bounded memory.
 
@@ -37,9 +41,44 @@ A **decay model** weights recent observations more heavily than old observations
 
 **Sketches trade memory for controlled error.** Count-min sketch, Bloom filters, and related structures use hash functions to summarize frequencies or membership. They can update quickly but may have false positives or overestimates.
 
+For a count-min sketch with width $w=\lceil e/\epsilon\rceil$ and depth $d=\lceil\ln(1/\delta)\rceil$, the usual guarantee for nonnegative updates is
+
+$$
+c_i\leq\widehat{c}_i\leq c_i+\epsilon N
+$$
+
+with probability at least $1-\delta$, where $N$ is the total count mass. Each row's collision noise has expectation at most $N/w$; Markov's inequality bounds the chance of a large overestimate in one row, and taking the minimum across independently hashed rows reduces the failure probability exponentially. The estimate never falls below the true count because collisions only add.
+
+Width controls additive error; depth controls confidence. Doubling depth does not halve the collision error. Negative updates break the simple no-underestimate property unless a compatible variant and assumptions are used.
+
+A Bloom filter answers whether a key may have appeared. Bits set by collisions cause false positives, but an ordinary filter has no false negatives as long as bits are never cleared. It cannot recover counts or enumerate stored keys. Count-min sketch and Bloom filter both use hashing, yet their query semantics differ.
+
+Reservoir sampling supplies unbiased inclusion over positions, not guaranteed representation of every rare group. Stratified reservoirs can preserve known groups, while priority sampling supports weighted inclusion. If recent observations matter more, a uniform reservoir is the wrong synopsis.
+
+## Recent data and gradual forgetting
+
 **Stream clustering separates online and offline phases.** The online phase maintains microclusters. The offline phase reclusters summaries when a user asks for a current clustering. This avoids storing all raw points.
 
 **Concept drift requires recency.** A classifier trained on all historical data may be worse than one trained on recent data if behavior changes. Sliding windows, decay, and adaptive ensembles address this.
+
+Under exponential decay, an observation $a$ time units old receives weight
+
+$$
+w(a)=2^{-a/h},
+$$
+
+where $h$ is the half-life. The weight is $1/2$ after one half-life and $1/4$ after two. If updates arrive at fixed intervals, a decayed total can be maintained recursively as
+
+$$
+S_t=\lambda S_{t-1}+x_t,
+\qquad 0<\lambda<1.
+$$
+
+The effective memory is smooth rather than a hard cutoff. Old events never vanish exactly, and comparing systems requires reporting $\lambda$ or half-life.
+
+Drift may affect the marginal feature distribution $P(X)$, the class prevalence $P(y)$, or the conditional relation $P(y\mid X)$. Only the last necessarily invalidates the decision boundary, though the others can change calibration and workload. Labels often arrive after predictions, so supervised drift detection lags. Unsupervised feature drift is faster to observe but can raise alarms for harmless changes.
+
+## Online summaries and offline models
 
 **Distributed batch is not the same as streaming.** MapReduce can compute item counts or model updates over huge stored files. A stream method must update continuously and may never see the full data again.
 
@@ -53,7 +92,15 @@ A **decay model** weights recent observations more heavily than old observations
 
 **Replay is valuable when available.** Even if production is one-pass, archived samples let engineers test new stream logic against historical bursts, outages, and drift events before deployment.
 
-## Visual
+## Event time, processing time, and late records
+
+Event time records when the source says an event occurred; processing time records when the mining system handled it. Network delay and retries can reorder these. A watermark is a system's claim that most events earlier than a time have arrived. Window results emitted before the watermark may be revised when late data are accepted, or late data may be dropped according to policy.
+
+Deduplication needs a stable event identifier and a retention horizon. Keeping every identifier forever violates bounded memory; forgetting identifiers too soon allows delayed retries to count twice. Approximate membership filters save memory but can discard a genuinely new event through a false positive. These are data semantics, not merely infrastructure details, because they change counts and model updates.
+
+Backpressure occurs when processing cannot keep up with arrival. Buffering raises latency, sampling changes statistical coverage, and dropping newest or oldest events creates different biases. Monitoring should expose lag and loss alongside mining outputs.
+
+## Which synopsis answers which query
 
 ```mermaid
 flowchart LR
@@ -156,7 +203,33 @@ $$
 
 **Checked answer.** The microcluster summary $(N,LS,SS)=(3,14,84)$ is enough to compute centroid 4.667 and variance 6.222 without storing the three raw points.
 
-## Code
+Two microclusters can be merged without raw points by adding their $N$, $LS$, and $SS$ values. They can also support decay by multiplying all three statistics by the same factor before a new update. They cannot reconstruct multimodality inside a summary: points $0,10$ and repeated points near $5$ can share a mean while having different shapes. Microclusters therefore need radius controls and periodic maintenance.
+
+## Worked example 3: exponential half-life
+
+**Problem.** A counter has value $S_0=8$. No new events arrive for two time steps, and the decay factor is $\lambda=0.5$. Then an event of weight 3 arrives. Compute the state after each update.
+
+**Method.** After one empty step,
+
+$$
+S_1=0.5(8)+0=4.
+$$
+
+After the second,
+
+$$
+S_2=0.5(4)+0=2.
+$$
+
+At the third step, include the new event:
+
+$$
+S_3=0.5(2)+3=4.
+$$
+
+**Checked answer.** The original mass of 8 contributes only 1 to $S_3$ after three decays, while the new event contributes 3. The resulting state is 4. The recursion applies decay before adding the current event; reversing that convention would decay a new event immediately and give a different result.
+
+## Implementing two small synopses
 
 Pseudocode for reservoir sampling:
 
@@ -214,7 +287,9 @@ for item in stream:
 print({item: cms.estimate(item) for item in sorted(set(stream))})
 ```
 
-## Common pitfalls
+Python's built-in `hash` is randomized between interpreter processes, so this educational sketch is not suitable for persisted or distributed state: different workers or restarts can map the same item to different counters. A deployed sketch needs a stable, specified hash function and serialized seeds. It also needs counter-width planning because fixed-width counters can overflow on long streams.
+
+## Failure modes
 
 - Applying a batch algorithm that needs repeated scans to a true stream.
 - Ignoring concept drift and letting stale data dominate a current model.
@@ -223,8 +298,11 @@ print({item: cms.estimate(item) for item in sorted(set(stream))})
 - Confusing distributed batch processing with real-time stream processing.
 - Keeping a reservoir sample when the task requires recency-biased behavior.
 - Forgetting that stream labels may arrive late, which complicates supervised evaluation.
+- Measuring average update latency while ignoring tail latency; a small fraction of slow updates can create sustained queue growth.
+- Evaluating drift adaptation on randomly shuffled data, which destroys the temporal change the method is supposed to handle.
+- Using processing-time windows for events whose business meaning is defined by event time.
 
-## Connections
+## Related pages
 
 - [Data Mining Process and Data Types](/cs/data-mining/chapter-01-process-data-types)
 - [Data Preparation](/cs/data-mining/chapter-02-data-preparation)

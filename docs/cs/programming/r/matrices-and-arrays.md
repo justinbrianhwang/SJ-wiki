@@ -9,7 +9,7 @@ Vectors are one-dimensional. Matrices and arrays extend the same atomic-vector s
 
 The book's matrix chapter connects everyday R syntax with linear algebra. A matrix still contains one atomic type, but it has a `dim` attribute that tells R how to arrange the values into rows and columns. Arrays generalize that idea to three or more dimensions. The key mental model is that R stores the values in a vector and layers dimension metadata on top.
 
-## Definitions
+## Dimensions laid over an atomic vector
 
 A **matrix** is a two-dimensional atomic object with rows and columns. It is created with `matrix`, `cbind`, `rbind`, or by assigning `dim` to a vector. All elements have the same atomic type.
 
@@ -21,7 +21,7 @@ An **array** is a matrix generalized to more than two dimensions. For example, `
 
 **Matrix multiplication** uses `%*%`, while `*` is element-wise multiplication. This distinction is critical: `A * B` multiplies corresponding entries; `A %*% B` performs linear algebra multiplication where rows of `A` are combined with columns of `B`.
 
-## Key results
+## Construction, coercion, and indexing
 
 Matrix creation is controlled by dimensions and fill direction:
 
@@ -48,7 +48,21 @@ R's `drop` behavior is a frequent surprise. Selecting one row or one column from
 
 Arrays use the same idea with more indices: `x[i, j, k]`. In statistics, arrays are useful for simulation output where one dimension can represent replications, another variables, and another scenarios.
 
-## Visual
+Because a matrix is atomic, combining unlike values applies R's coercion hierarchy. Adding a character column to numeric columns with `cbind` can turn the whole result into a character matrix. A data frame is the appropriate rectangular structure when columns genuinely have different types. `data.matrix` or `model.matrix` can convert selected tabular data to numeric form, but factor and character encoding rules must be checked rather than assumed.
+
+One-index subsetting follows the underlying column-major vector. If `M` has $n$ rows, element $(i,j)$ has linear position
+
+$$
+i+(j-1)n.
+$$
+
+For a three-row matrix, `M[2, 3]` is therefore `M[8]`. Two-index notation communicates the geometry better, while linear indexing is useful when an algorithm deliberately treats all cells as one vector.
+
+Logical and name indexing work on dimensions as they do on vectors. `M[M < 0] <- 0` uses a logical matrix to replace every negative entry. `M[c("A", "C"), "Feb", drop = FALSE]` selects named rows and one named column. Names reduce positional mistakes, but duplicated names are allowed and can make selection ambiguous. Validate uniqueness when names act as identifiers.
+
+R recycles shorter vectors in many element-wise operations. Subtracting a length-$p$ vector from an $n$ by $p$ matrix does not automatically mean “subtract by column”; recycling follows the column-major underlying vector and may accidentally appear correct. `sweep` states the margin explicitly. It also checks dimensions more clearly than relying on implicit recycling.
+
+## Column-major storage as a map
 
 ```text
 matrix(1:6, nrow = 2)
@@ -71,6 +85,10 @@ flowchart LR
   C --> G[Rectangular indexing]
   E --> H[Multidimensional simulation output]
 ```
+
+Column-major order aligns R with BLAS and LAPACK conventions used by its linear-algebra routines. Consecutive values in one column are adjacent in memory. Most R code should favor clear vectorized operations over hand-tuned traversal, but storage order explains both `matrix()` filling and why imported row-major binary data may need reshaping or transposition.
+
+Assigning `dim(x) <- c(2, 3)` does not reorder `x`; it changes how the same six values are indexed and printed. Likewise, `as.vector(M)` drops dimensions in column order. Transpose `t(M)` creates the mathematical transpose and a new arrangement; merely swapping the `dim` attribute would reinterpret positions without moving corresponding values and would not compute the transpose.
 
 ## Worked example 1: Matrix multiplication by hand and in R
 
@@ -159,7 +177,38 @@ rowSums(counts)
 
 Checked answer: after replacement, row C is `9 + 11 + 14 = 34`. Row A is `12 + 15 + 13 = 40`, and row B is `20 + 18 + 21 = 59`. The `drop = FALSE` extraction keeps the two-dimensional structure, which is useful when downstream code expects a matrix.
 
-## Code
+## Solving systems without forming an inverse
+
+For $Ax=b$, `solve(A, b)` computes the solution directly. Writing `solve(A) %*% b` first forms an explicit inverse, does more work, and usually accumulates more numerical error. An inverse is appropriate when the inverse itself is the desired mathematical object; solving a system is the usual computational task.
+
+Consider
+
+$$
+A=\begin{bmatrix}2&1\\1&3\end{bmatrix},
+\qquad
+b=\begin{bmatrix}5\\7\end{bmatrix}.
+$$
+
+The equations are $2x+y=5$ and $x+3y=7$. From the first, $y=5-2x$. Substitution gives
+
+$$
+x+3(5-2x)=7,
+$$
+
+so $-5x=-8$, $x=1.6$, and $y=1.8$. In R:
+
+```r
+A <- matrix(c(2, 1, 1, 3), nrow = 2)
+b <- c(5, 7)
+x <- solve(A, b)
+stopifnot(isTRUE(all.equal(as.vector(A %*% x), b)))
+```
+
+The residual $Ax-b$ should be small, but a small residual alone does not ensure an accurate solution when $A$ is ill-conditioned. `kappa(A)` estimates sensitivity. Nearly dependent columns make some coefficient combinations weakly determined: tiny changes in data can produce large changes in $x$.
+
+Least-squares problems should use `qr.solve`, `lm`, or another factorization-based routine rather than manually computing $(X^TX)^{-1}X^Ty$. Forming $X^TX$ squares the condition number and discards useful rank information. `crossprod(X)` is efficient when the cross-product itself is required, but efficiency does not remove that numerical limitation.
+
+## Standardizing columns with matrix-aware helpers
 
 ```r
 # Simulate a small matrix of measurements and standardize each column.
@@ -198,7 +247,17 @@ Before leaving a matrix result, run a small plausibility check. Row sums, column
 
 If a matrix is feeding a statistical model, remember that rows normally represent observations and columns represent variables or constructed features. Keeping that convention stable makes later regression and diagnostic pages easier to understand.
 
-## Common pitfalls
+## Arrays beyond two dimensions
+
+An array's `dim` vector supplies one extent per axis. If simulation output has dimensions `c(replicate = 1000, variable = 4, scenario = 3)`, an element uses three indices. Naming both dimensions and their levels makes an extraction such as `sim[, "loss", "baseline"]` understandable without a comment. With one variable and one scenario selected, use `drop = FALSE` when later code still expects three axes.
+
+`apply(x, MARGIN, FUN)` keeps the dimensions listed in `MARGIN` and reduces over the others. For a replicate-by-variable-by-scenario array, `apply(sim, c(2, 3), mean)` averages over replicates and returns a variable-by-scenario matrix. `rowSums`, `colSums`, `rowMeans`, and `colMeans` are faster and clearer for their common matrix cases.
+
+`aperm` permutes axes. It is the multidimensional counterpart of transpose: `aperm(x, c(3, 1, 2))` makes the old third dimension first, then the old first and second. This matters when an external library expects a different axis convention, such as samples-first versus channels-first. Always write down old and new dimension meanings; matching extents do not prove axes are semantically aligned.
+
+Arrays can store repeated model or simulation output compactly, but not every collection is rectangular. If scenarios return different numbers of events or different model objects, a list is more honest than padding an array with many missing cells. Arrays work best when every position has the same type and each axis has a stable interpretation.
+
+## Shape and numerical mistakes
 
 - Expecting `matrix(1:6, nrow = 2)` to fill by row. R fills by column unless `byrow = TRUE`.
 - Using `*` when matrix multiplication requires `%*%`.
@@ -206,8 +265,12 @@ If a matrix is feeding a statistical model, remember that rows normally represen
 - Trying to put mixed types in a matrix. A matrix is atomic, so mixing numbers and text coerces everything to a common type.
 - Solving a singular or nearly singular system with `solve` without checking whether the matrix is invertible or ill-conditioned.
 - Losing dimension names during transformations and then relying on positional indexing.
+- Depending on silent vector recycling to perform row- or column-wise arithmetic.
+- Computing an explicit inverse when only a linear-system solution is needed.
+- Treating a small residual as proof that an ill-conditioned system has stable coefficients.
+- Permuting array axes without carrying their semantic names along.
 
-## Connections
+## Related pages
 
 - [Vectors, arithmetic, and comparison](/cs/programming/r/vectors-arithmetic-comparison)
 - [Indexing, names, and recycling](/cs/programming/r/indexing-names-recycling)

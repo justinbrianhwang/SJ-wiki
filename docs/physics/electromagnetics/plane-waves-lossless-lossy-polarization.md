@@ -7,9 +7,9 @@ sidebar_position: 14
 
 Uniform plane waves are the simplest full electromagnetic waves. The fields are transverse to the direction of propagation, the wavefronts are infinite planes, and the field variation depends on one spatial coordinate. Real antennas and apertures do not create perfect plane waves everywhere, but far from a source or over a small region of a large wavefront, the plane-wave model is often the right local approximation.
 
-This page develops plane waves in lossless and lossy media, polarization, skin depth, and electromagnetic power density. These ideas connect transmission-line wave impedance to free-space and material intrinsic impedance, and they prepare for reflection, refraction, waveguides, antennas, and radar.
+The same model connects transmission-line wave impedance to free-space and material intrinsic impedance, and it prepares the calculations used for reflection, refraction, waveguides, antennas, and radar.
 
-## Definitions
+## The uniform plane-wave solution
 
 For a time-harmonic uniform plane wave traveling in $+z$ with electric field polarized in $\hat x$,
 
@@ -70,7 +70,15 @@ It gives average power flow density in W/m$^2$.
 
 For a wave traveling in an arbitrary direction $\hat k$, the field directions must satisfy $\tilde{\vec E}\perp\hat k$, $\tilde{\vec H}\perp\hat k$, and $\tilde{\vec H}=(1/\eta)\hat k\times\tilde{\vec E}$ for a lossless medium. This compact vector relation is safer than memorizing separate $x$, $y$, and $z$ cases. It also makes polarization calculations easier because the electric-field vector can be decomposed into any two orthogonal transverse components.
 
-## Key results
+The phasor $e^{-\gamma z}$ corresponds to $e^{j\omega t}$ time dependence. Its real time-domain factor is
+
+$$
+e^{-\alpha z}\cos(\omega t-\beta z+\phi).
+$$
+
+Constant phase satisfies $\omega t-\beta z=\text{constant}$, so the phase travels toward increasing $z$ at $v_p=\omega/\beta$. Changing the spatial sign to $e^{+\gamma z}$ describes propagation toward decreasing $z$. An inconsistent combination of time convention and spatial sign reverses the inferred direction.
+
+## Obtaining $\gamma$ and $\eta$ from Maxwell's equations
 
 The wave equation in a source-free homogeneous medium follows from the phasor Maxwell curl equations:
 
@@ -89,6 +97,58 @@ and the propagation direction is set by
 $$
 \tilde{\vec E}\times\tilde{\vec H}.
 $$
+
+For the $+z$ wave with $\tilde{\vec E}=\hat x E_x(z)$, Faraday's law gives
+
+$$
+\frac{dE_x}{dz}=-\gamma E_x
+\quad\Longrightarrow\quad
+\tilde{\vec H}=\hat y\frac{E_x}{\eta}.
+$$
+
+Substitution into both curl equations yields
+
+$$
+\gamma^2=j\omega\mu(\sigma+j\omega\epsilon),
+\qquad
+\eta^2=\frac{j\omega\mu}{\sigma+j\omega\epsilon}.
+$$
+
+Writing $\gamma=\alpha+j\beta$ and equating real and imaginary parts gives exact expressions for real $\epsilon$, $\mu$, and $\sigma$:
+
+$$
+\alpha=omega\sqrt{\frac{\mu\epsilon}{2}}
+\left[
+\sqrt{1+\left(\frac{\sigma}{\omega\epsilon}\right)^2}-1
+\right]^{1/2},
+$$
+
+$$
+\beta=omega\sqrt{\frac{\mu\epsilon}{2}}
+\left[
+\sqrt{1+\left(\frac{\sigma}{\omega\epsilon}\right)^2}+1
+\right]^{1/2}.
+$$
+
+These reduce smoothly to the lossless and good-conductor limits. For a low-loss dielectric with $\sigma/(\omega\epsilon)\ll1$, a binomial expansion gives
+
+$$
+\alpha\approx\frac{\sigma}{2}\sqrt{\frac{\mu}{\epsilon}},
+\qquad
+\beta\approx\omega\sqrt{\mu\epsilon}.
+$$
+
+For a good conductor, the conduction term dominates:
+
+$$
+\gamma\approx(1+j)\sqrt{\frac{\omega\mu\sigma}{2}},
+\qquad
+\eta\approx(1+j)\sqrt{\frac{\omega\mu}{2\sigma}}.
+$$
+
+The $45^\circ$ phase of $\eta$ means the electric field leads the magnetic field by $45^\circ$ under the stated convention. The equality $\alpha\approx\beta$ means the amplitude drops by $e^{-2\pi}$ over one wavelength inside a good conductor; very few internal wavelengths survive.
+
+## Power flow and local dissipation
 
 In a lossless medium, $\eta$ is real, so $\vec E$ and $\vec H$ are in time phase. The average power density magnitude is
 
@@ -136,18 +196,30 @@ For power, the same numerical dB loss over distance results from $e^{-2\alpha z}
 
 A final consistency check is the direction of average power flow. For a passive medium with a wave attenuating in $+z$, $\langle\vec S\rangle$ should point in $+z$ and decrease with $z$. If the calculated $\vec E\times\vec H^*$ points backward, the assumed magnetic-field direction or propagation sign is likely reversed.
 
-## Visual
+For the $+z$ wave, average power is
+
+$$
+\langle S_z(z)\rangle
+=\frac12|E_0|^2e^{-2\alpha z}
+\operatorname{Re}\left\{\frac{1}{\eta^*}\right\}.
+$$
+
+In a conducting medium, Poynting's theorem relates the decline in this power to Joule heating. For a slab of unit cross-sectional area between $z_1$ and $z_2$, the difference $\langle S_z(z_1)\rangle-\langle S_z(z_2)\rangle$ equals the time-average heat generated in that slab. Attenuation is therefore an energy transfer, not disappearance of energy.
+
+Reactive power also appears when $\eta$ is complex. The imaginary part of the complex Poynting vector describes energy exchanged with local electric and magnetic storage over a cycle. Only its real part is net time-average transport.
+
+## Reading a polarization state
 
 ```mermaid
 flowchart LR
-  A[Maxwell curl equations] --> B[Wave equation]
-  B --> C[Propagation constant gamma]
-  B --> D[Intrinsic impedance eta]
-  C --> E[alpha attenuation]
-  C --> F[beta phase]
-  D --> G[E/H ratio]
-  G --> H[Poynting vector]
-  B --> I[Polarization state]
+  A["Maxwell curl equations"] --> B["Wave equation"]
+  B --> C["Propagation constant gamma"]
+  B --> D["Intrinsic impedance eta"]
+  C --> E["attenuation alpha"]
+  C --> F["phase beta"]
+  D --> G["E to H ratio"]
+  G --> H["Poynting vector"]
+  B --> I["Polarization state"]
 ```
 
 | Medium | Condition | $\alpha$ | $\beta$ | $\eta$ behavior |
@@ -157,7 +229,52 @@ flowchart LR
 | Good conductor | $\sigma\gg\omega\epsilon$ | $\sqrt{\pi f\mu\sigma}$ | approximately $\alpha$ | complex, small magnitude |
 | Free space | $\epsilon_0,\mu_0,\sigma=0$ | 0 | $\omega/c$ | $377\ \Omega$ |
 
-## Worked example 1: Plane wave in air
+At a fixed position, write the real electric components as
+
+$$
+E_x(t)=A\cos\omega t,
+\qquad
+E_y(t)=B\cos(\omega t+\delta).
+$$
+
+Eliminating time produces the polarization ellipse:
+
+$$
+\left(\frac{E_x}{A}\right)^2
++\left(\frac{E_y}{B}\right)^2
+-2\frac{E_xE_y}{AB}\cos\delta
+=\sin^2\delta.
+$$
+
+When $\delta=0$ or $\pi$, the right side vanishes and the ellipse collapses to a line. When $A=B$ and $\delta=\pm\pi/2$, it becomes a circle. Every other nondegenerate case is elliptical. The major-axis direction and axial ratio depend on both amplitude ratio and phase difference; inspecting phase alone is insufficient.
+
+Handedness requires a stated viewpoint. One may describe the rotation seen looking in the direction of propagation or looking back toward the source, and those viewpoints reverse clockwise and counterclockwise. Engineering standards also differ in naming conventions. Recording the phasor, time convention, propagation direction, and viewing direction removes the ambiguity.
+
+Polarization is preserved in a homogeneous isotropic medium because both transverse components see the same propagation constant. Anisotropic materials can give the components different phase velocities, turning linear polarization into elliptical polarization as the wave travels. Differential attenuation can also change the axial ratio.
+
+## Phase, envelopes, and penetration depth
+
+For a single sinusoid, phase velocity is $v_p=\omega/\beta$. A modulated signal or pulse contains a band of frequencies. If the propagation constant varies with frequency, the envelope travels approximately at the group velocity
+
+$$
+v_g=\left(\frac{d\beta}{d\omega}\right)^{-1}.
+$$
+
+When $\beta$ is proportional to $\omega$, all frequency components accumulate delay in the same proportion and the medium is nondispersive over that band. When $d^2\beta/d\omega^2$ is appreciable, spectral components separate in time and the pulse shape changes. Attenuation that varies with frequency adds another source of distortion. Phase velocity can exceed $c$ in some dispersive ranges without carrying information faster than $c$; causal signal propagation is governed by the full waveform and material response.
+
+Skin depth is an amplitude length scale. At $z=\delta=1/\alpha$, the field amplitude is $e^{-1}$ of its surface value, while the power density is $e^{-2}$ of its surface value. At depth $n\delta$, these factors become $e^{-n}$ and $e^{-2n}$. Calling $\delta$ the depth where current ends is therefore inaccurate; the decay is continuous.
+
+The good-conductor result
+
+$$
+\delta=\sqrt{\frac{2}{\omega\mu\sigma}}
+$$
+
+shows three trends. Higher frequency confines current nearer the surface. Higher permeability has the same effect. Higher conductivity also reduces penetration even though it reduces resistive loss for a fixed uniform current distribution. At high frequency the available conducting area shrinks, so conductor resistance becomes frequency dependent.
+
+Plane-wave fields inside a good conductor have locally comparable attenuation and phase constants. Over one skin depth, phase advances by roughly one radian as amplitude falls by $e^{-1}$. This coupled phase and amplitude behavior distinguishes diffusion-like penetration into a conductor from propagation in a lossless dielectric.
+
+## Worked example: plane wave in air
 
 Problem: A $300$ MHz uniform plane wave in air has peak electric-field amplitude $E_0=10\ \mathrm{V/m}$ and travels in $+z$ with $\vec E$ along $\hat x$. Find wavelength, $\beta$, magnetic-field amplitude, and average power density.
 
@@ -190,7 +307,7 @@ $$
 
 Check: Units are W/m$^2$, and the power direction is $+\hat z$.
 
-## Worked example 2: Skin depth in copper
+## Worked example: skin depth in copper
 
 Problem: Estimate the skin depth in copper at $f=10$ MHz. Use $\sigma=5.8\times10^7\ \mathrm{S/m}$ and $\mu\approx\mu_0$.
 
@@ -227,28 +344,50 @@ $$
 
 Check: Radio-frequency currents in copper are confined to a thin surface layer, so tens of micrometers at 10 MHz is plausible.
 
-## Code
+## Worked example: identify polarization and mismatch loss
 
-```python
-import numpy as np
-import matplotlib.pyplot as plt
+At a fixed point, a wave traveling in $+z$ has phasor
 
-mu0 = 4 * np.pi * 1e-7
-eps0 = 8.8541878128e-12
-sigma = 5.8e7
+$$
+\tilde{\vec E}=3\hat x-j3\hat y\ \mathrm{V/m},
+$$
 
-freq = np.logspace(3, 10, 400)
-alpha = np.sqrt(np.pi * freq * mu0 * sigma)
-delta = 1 / alpha
+with $e^{j\omega t}$ convention. Find the polarization shape and the fraction of power accepted by an ideal $\hat x$-polarized receiving antenna.
 
-plt.loglog(freq, delta)
-plt.xlabel("frequency (Hz)")
-plt.ylabel("skin depth in copper (m)")
-plt.grid(True, which="both")
-plt.show()
-```
+The components have equal magnitudes. Their phases are
 
-## Common pitfalls
+$$
+\angle E_x=0,
+\qquad
+\angle E_y=-\frac{\pi}{2}.
+$$
+
+Equal orthogonal components in quadrature trace a circle, so the wave is circularly polarized. To see the rotation directly,
+
+$$
+\vec E(t)=
+3\cos\omega t\,\hat x
++3\sin\omega t\,\hat y.
+$$
+
+At $t=0$ the vector points along $+\hat x$; shortly afterward it rotates toward $+\hat y$. A handedness label would additionally state the adopted viewing convention.
+
+The total squared field amplitude is
+
+$$
+|\tilde{\vec E}|^2=|3|^2+|-j3|^2=18.
+$$
+
+The $\hat x$ antenna selects only the $x$ component, whose squared amplitude is $9$. Therefore the polarization coupling factor is
+
+$$
+\frac{|E_x|^2}{|\tilde{\vec E}|^2}
+=\frac{9}{18}=\frac12.
+$$
+
+The antenna accepts half the available power, corresponding to a polarization mismatch loss of $3.01$ dB.
+
+## Checks that prevent convention errors
 
 - Forgetting that $\vec E$, $\vec H$, and propagation direction form a right-handed triad for a forward plane wave.
 - Using rms formulas with peak phasors or peak formulas with rms phasors. The factor of $1/2$ depends on convention.
@@ -258,7 +397,7 @@ plt.show()
 - Assuming plane waves have longitudinal field components. Uniform plane waves in homogeneous source-free media are transverse.
 - Comparing penetration depths at different frequencies without noting that $\delta$ decreases as frequency increases in good conductors.
 
-## Connections
+## Related pages
 
 - [Maxwell equations for time-varying fields](/physics/electromagnetics/maxwell-equations-time-varying-fields) for the wave-equation derivation.
 - [Waves, phasors, and spectrum](/physics/electromagnetics/waves-phasors-spectrum) for $\alpha$, $\beta$, $\gamma$, and phasor notation.

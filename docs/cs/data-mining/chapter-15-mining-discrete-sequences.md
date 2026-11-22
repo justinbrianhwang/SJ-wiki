@@ -7,9 +7,9 @@ sidebar_position: 17
 
 Discrete sequence mining studies ordered symbolic data: click paths, purchase histories, DNA strings, event logs, user actions, command traces, and words at the token level. Aggarwal's sequence chapter covers sequential pattern mining, sequence clustering, outlier detection, hidden Markov models, and sequence classification. Unlike transaction mining, order is part of the pattern; unlike time series, values are symbols rather than continuous measurements.
 
-This page connects association mining, similarity measures, probabilistic models, and classification. The main challenge is deciding which forms of order matter: contiguous substrings, noncontiguous subsequences, edit operations, state transitions, or learned latent states.
+The main modeling choice is which forms of order matter: contiguous substrings, noncontiguous subsequences, edit operations, state transitions, or learned latent states. Two methods can use the same event log and answer quite different questions.
 
-## Definitions
+## Strings, subsequences, and event sequences
 
 A **sequence** is an ordered list of symbols:
 
@@ -31,15 +31,57 @@ A **hidden Markov model (HMM)** is a probabilistic sequence model with hidden st
 
 **Sequence classification** predicts a label for an entire sequence, often using $k$-gram features, edit-distance nearest neighbors, HMM likelihoods, or discriminative models.
 
-## Key results
+Sequence databases often represent each subject by an ordered list. Support normally counts subjects, not the number of embeddings within a subject. If $(A,B)$ occurs ten times in one customer's history and once in another's, its support count is two. Occurrence frequency is a separate statistic.
+
+For sequences of itemsets, the notation is richer: $\langle\{A,B\},\{C\}\rangle$ means $A$ and $B$ occurred together in one event, followed later by $C$. It differs from $\langle\{A\},\{B\},\{C\}\rangle$. In MDX prose, the braces are escaped; in the displayed math they retain their usual set meaning.
+
+## Mining frequent order patterns
 
 **Sequential patterns generalize itemsets with order.** In transaction mining, \{A,B\} ignores order. In sequence mining, $(A,B)$ and $(B,A)$ are different patterns.
 
 **Downward closure still helps.** If a sequence pattern is frequent, then all of its subsequences are frequent. If a pattern is infrequent, all supersequences are infrequent. This supports Apriori-like pruning for sequences.
 
+The proof is a containment argument. If database sequence $S$ contains pattern $P$, then $S$ also contains every subsequence $Q$ of $P$ by deleting the same matched elements. Therefore the set of records supporting $P$ is a subset of those supporting $Q$:
+
+$$
+\operatorname{supp}(P)\leq\operatorname{supp}(Q).
+$$
+
+If $Q$ is below minimum support, no supersequence containing $Q$ can recover enough supporting records. The property prunes candidates, but the remaining search can still be large because a frequent short pattern may have many frequent extensions.
+
+Projected-database methods avoid generating every candidate explicitly. For a prefix $P$, they retain suffixes that follow occurrences of $P$ and mine extensions only in that projected collection. Vertical methods store occurrence lists or sequence identifiers and intersect them. These reorganizations preserve the support definition while reducing repeated scans.
+
 **Edit distance supports noisy matching.** It is useful when insertions, deletions, or substitutions are natural, such as spelling variations, biological mutations, or optional user actions.
 
+Costs should reflect the process. In a click path, inserting an advertisement impression may be cheap while reversing checkout and payment is not representable as one ordinary edit. In biological sequence comparison, substitution costs can depend on which symbols replace one another. A learned or domain-defined cost matrix is often more faithful than unit Levenshtein distance.
+
+## Hidden states and the forward recursion
+
 **HMMs summarize variable-length sequences.** An HMM can assign a likelihood to a sequence, infer likely hidden states, and support classification by choosing the class model with highest likelihood.
+
+An HMM assumes the next hidden state depends only on the current state and that an observation depends only on its current hidden state. Let transition probability be $a_{ij}$ and emission probability for observation $o_t$ in state $j$ be $b_j(o_t)$. Define
+
+$$
+\alpha_t(j)=P(o_1,\ldots,o_t,z_t=j).
+$$
+
+Initialization and recursion are
+
+$$
+\alpha_1(j)=\pi_jb_j(o_1),
+$$
+
+$$
+\alpha_t(j)=b_j(o_t)\sum_i\alpha_{t-1}(i)a_{ij}.
+$$
+
+The sequence likelihood is $\sum_j\alpha_T(j)$. This costs $O(TK^2)$ for $K$ states rather than enumerating $K^T$ hidden paths. Long-sequence probabilities underflow, so implementations use scaling factors or log-space calculations.
+
+The Viterbi algorithm replaces the sum with a maximum and stores backpointers. It returns the single most likely state path, whose probability is generally smaller than the total sequence likelihood because the latter sums all paths. Confusing the two changes both scoring and interpretation.
+
+HMM parameters can be estimated from labeled states by counts or from observations alone with the Baum--Welch expectation-maximization procedure. Hidden-state labels are arbitrary, and local optima make multiple initializations useful.
+
+## Representations for prediction and grouping
 
 **Sequence clustering needs alignment or features.** One can cluster with edit distance, longest common subsequence similarity, HMM parameters, or $k$-gram vectors. Each choice captures different order structure.
 
@@ -57,7 +99,25 @@ A **hidden Markov model (HMM)** is a probabilistic sequence model with hidden st
 
 **Repeated symbols need careful handling.** A sequence such as $(A,A,B)$ can mean two separate actions or one repeated state. Counting rules should preserve that distinction when repetition is meaningful.
 
-## Visual
+$k$-gram features turn a sequence into counts of contiguous length-$k$ patterns. For alphabet size $m$, there are up to $m^k$ possible grams, so sparsity grows quickly. Hashing controls vocabulary memory but introduces collisions. Skip-grams retain limited gaps and occupy a middle ground between contiguous grams and arbitrary subsequences.
+
+For class-specific HMMs, comparing raw sequence likelihoods across lengths is misleading because probabilities shrink as more emissions are multiplied. Average log-likelihood per symbol,
+
+$$
+\frac{1}{T}\log P(S),
+$$
+
+supports length-normalized ranking, although length itself may be predictive and should then remain as a separate feature.
+
+Sequence-aware validation groups correlated records before splitting. Sessions from the same user, overlapping windows from one trace, or multiple samples from one biological subject should not straddle train and test folds when the target is a new subject. A future-prediction task also preserves chronology. Random event-level splitting can let a model memorize identity or local context instead of learning transferable sequence structure.
+
+Sequence endings can be censored. A user session may stop because logging ended, not because the user chose to leave; a patient history may end at the study cutoff. Treating every final observed event as a completed outcome biases transition estimates and next-event labels. Store whether an ending is observed or censored, and construct prediction examples only at times when the target window is fully observable. Similar care applies to beginnings when the database starts midway through an ongoing process.
+
+Very long sequences contribute many more windows than short ones. Event-level training can therefore let a few active entities dominate the objective. Weighting by entity, sampling windows, or reporting both event-weighted and entity-weighted metrics clarifies whose behavior the model fits.
+
+Label construction can leak future events into earlier features. If a session is labeled “converted” because a purchase occurs at its end, a feature that counts the full session already contains the outcome when used to predict conversion midway through the visit. Every training example needs an explicit prediction time, an observation prefix ending there, and a later outcome window. Events after the prediction time belong only to the label.
+
+## Choosing an order representation
 
 ```mermaid
 flowchart TD
@@ -160,7 +220,27 @@ $$
 
 **Checked answer.** The observation likelihood is 0.111. The SS path contributes most because `walk` is much more likely under Sunny.
 
-## Code
+The same answer follows from the forward recursion. At time 1,
+
+$$
+\alpha_1(R)=0.6(0.1)=0.06,
+\qquad
+\alpha_1(S)=0.4(0.6)=0.24.
+$$
+
+At time 2,
+
+$$
+\alpha_2(R)=0.1[0.06(0.7)+0.24(0.4)]=0.0138,
+$$
+
+$$
+\alpha_2(S)=0.6[0.06(0.3)+0.24(0.6)]=0.0972.
+$$
+
+Their sum is $0.111$. The recursion groups paths by their ending state instead of listing them individually.
+
+## Enumerating toy patterns and likelihoods
 
 Pseudocode for Apriori-style sequential pattern mining:
 
@@ -180,7 +260,7 @@ return union of Fk
 ```
 
 ```python
-from itertools import combinations
+from itertools import product
 
 sequences = [
     ("A", "B", "C", "D"),
@@ -198,7 +278,7 @@ def support(pattern):
 symbols = sorted(set().union(*map(set, sequences)))
 patterns = []
 for length in [1, 2, 3]:
-    for pattern in combinations(symbols, length):
+    for pattern in product(symbols, repeat=length):
         s = support(pattern)
         if s >= 2:
             patterns.append((pattern, s))
@@ -218,7 +298,9 @@ def forward_walk_walk():
 print(round(forward_walk_walk(), 3))
 ```
 
-## Common pitfalls
+`product` is necessary because sequence candidates are ordered and may repeat symbols. `combinations` would emit `(A,B)` but never `(B,A)` or `(A,A)`. This exhaustive code is suitable only for the tiny alphabet shown; a real miner uses support pruning or projected databases instead of testing all $m^k$ strings.
+
+## Failure modes
 
 - Confusing itemsets with sequences and accidentally ignoring order.
 - Treating subsequences and substrings as the same concept.
@@ -227,8 +309,11 @@ print(round(forward_walk_walk(), 3))
 - Choosing HMM state counts without validation.
 - Training sequence classifiers on overlapping windows and testing on nearby overlapping windows from the same original sequence.
 - Ignoring time gaps between events when gaps carry meaning.
+- Counting ten occurrences in one long record as support ten when support is defined over database sequences.
+- Comparing raw HMM likelihoods for sequences of very different lengths without a length model or normalization.
+- Treating the Viterbi path probability as the total likelihood of the observed sequence.
 
-## Connections
+## Related pages
 
 - [Association Pattern Mining](/cs/data-mining/chapter-04-association-pattern-mining)
 - [Advanced Association Patterns](/cs/data-mining/chapter-05-advanced-association-patterns)

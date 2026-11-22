@@ -5,256 +5,347 @@ sidebar_position: 6
 
 # Temporal-Difference Learning
 
-Temporal-difference learning combines two ideas that earlier appeared separately: sampling from Monte Carlo methods and bootstrapping from dynamic programming. A TD method learns from actual experience, but it does not wait for the final return. It updates a value estimate toward a target that includes the observed reward plus the current estimate of the next state's value.
+Temporal-difference learning updates a prediction after one or a few transitions rather than waiting for the final return. It samples experience like Monte Carlo and bootstraps from a current estimate like dynamic programming. That combination supports online learning without a transition model.
 
-This makes TD learning central in Sutton and Barto's account. TD(0), SARSA, Q-learning, Expected SARSA, and Double Q-learning are compact algorithms that explain much of tabular RL practice. They also introduce themes that continue through approximation: bootstrapping bias, online learning, off-policy control, and maximization bias.
+The family is broader than one formula. TD(0) predicts state values; SARSA evaluates and improves the behavior policy; Q-learning targets a greedy policy; Expected SARSA averages over next actions; double learning addresses bias created by maximizing noisy estimates. Their update skeleton is nearly identical, but the continuation target changes what each algorithm learns.
 
-## Definitions
+## TD prediction from one transition
 
-TD(0) prediction for a fixed policy $\pi$ updates
-
-$$
-V(S_t) \leftarrow V(S_t) +
-\alpha\left[
-R_{t+1} + \gamma V(S_{t+1}) - V(S_t)
-\right].
-$$
-
-The quantity
+For fixed policy $\pi$, TD(0) forms the target
 
 $$
-\delta_t = R_{t+1} + \gamma V(S_{t+1}) - V(S_t)
+R_{t+1}+\gamma V_t(S_{t+1})
 $$
 
-is the TD error. It measures the discrepancy between the current value and a one-step bootstrapped target.
-
-SARSA is on-policy TD control. Its name comes from the transition tuple
+and updates
 
 $$
-S_t,A_t,R_{t+1},S_{t+1},A_{t+1}.
+V_{t+1}(S_t)=V_t(S_t)
++\alpha_t\delta_t,
 $$
 
-The update is
+where
 
 $$
-Q(S_t,A_t) \leftarrow Q(S_t,A_t) +
-\alpha\left[
-R_{t+1}+\gamma Q(S_{t+1},A_{t+1})-Q(S_t,A_t)
-\right].
+\delta_t=R_{t+1}+\gamma V_t(S_{t+1})-V_t(S_t).
 $$
 
-Q-learning is off-policy TD control:
+Other states retain their old values. At a true terminal transition, continuation value is zero:
 
 $$
-Q(S_t,A_t) \leftarrow Q(S_t,A_t) +
-\alpha\left[
-R_{t+1}+\gamma \max_a Q(S_{t+1},a)-Q(S_t,A_t)
-\right].
+\delta_t=R_{t+1}-V_t(S_t).
 $$
 
-Expected SARSA replaces the sampled next action value with the expectation under the current policy:
+The TD error measures a local inconsistency. If values exactly satisfy the Bellman equation, its conditional expectation given $S_t$ is zero, although individual errors remain noisy. A zero error on one transition does not prove the value function is correct; reward and successor randomness can cancel by chance.
+
+TD can update in continuing tasks and before an episode ends. Its target contains only one sampled reward, usually reducing variance relative to a complete Monte Carlo return. The price is dependence on the current successor estimate. Early errors propagate through bootstrapping, then can be corrected as states are revisited.
+
+## Why TD and Monte Carlo can prefer different compromises
+
+Monte Carlo moves toward an observed return $G_t$. Conditional on state, that return has expectation $V_\pi(S_t)$, so tabular MC directly averages return samples. TD moves toward a reward plus another learned prediction. In a table, both converge to $V_\pi$ under standard conditions, but their finite-sample behavior differs.
+
+TD exploits the Markov structure. If two episodes pass through the same state, TD treats future outcomes after that state as evidence for the same continuation value, regardless of the earlier path. Monte Carlo assigns each earlier state its own complete sampled outcome. This often lets TD learn efficiently from overlapping trajectories.
+
+Bootstrapping also creates a chain of moving targets. With function approximation or off-policy data, that chain can become unstable. The tabular on-policy convergence result does not transfer automatically to neural networks.
+
+For tabular prediction, common sufficient conditions include repeated visitation and step sizes satisfying
 
 $$
-Q(S_t,A_t) \leftarrow Q(S_t,A_t) +
-\alpha\left[
-R_{t+1}+\gamma \sum_a \pi(a \mid S_{t+1})Q(S_{t+1},a)-Q(S_t,A_t)
-\right].
+\sum_t\alpha_t(s)=\infty,
+\qquad
+\sum_t\alpha_t(s)^2<\infty
 $$
 
-Double Q-learning maintains two value estimates and uses one to select the maximizing action while the other evaluates it, reducing maximization bias.
+for each state. A sample-average schedule eventually settles; a small constant step size continues tracking and fluctuating, which can be preferable in a nonstationary environment.
 
-## Key results
+## From prediction to action values
 
-TD methods can learn before an episode ends. This is a major operational advantage over Monte Carlo learning for long or continuing tasks. A single transition gives a valid TD update because the target uses $R_{t+1}$ and the current estimate for the remaining return.
+Control algorithms estimate $Q(s,a)$ and couple evaluation to policy improvement. Their targets differ only after the observed transition.
 
-TD(0) has a bias-variance tradeoff relative to Monte Carlo prediction. The TD target is biased when $V(S_{t+1})$ is inaccurate, but it often has lower variance because it does not include all future random rewards. Monte Carlo targets are unbiased samples of the return but can have high variance.
+| Method | Continuation estimate at $S_{t+1}$ | Relation between behavior and target |
+|---|---|---|
+| SARSA | $Q(S_{t+1},A_{t+1})$ | on-policy |
+| Expected SARSA | $\sum_a\pi(a\mid S_{t+1})Q(S_{t+1},a)$ | on-policy or off-policy |
+| Q-learning | $\max_aQ(S_{t+1},a)$ | greedy target, exploratory behavior allowed |
+| Double Q-learning | selected by one table, evaluated by the other | greedy target with reduced max bias |
 
-For tabular prediction under a fixed policy, TD(0) converges to $V_\pi$ under standard stochastic approximation conditions, such as sufficient state visitation and decreasing step sizes satisfying
+All use
 
 $$
-\sum_t \alpha_t = \infty,\qquad \sum_t \alpha_t^2 < \infty.
+Q(S_t,A_t)\leftarrow Q(S_t,A_t)
++\alpha\left(\text{target}-Q(S_t,A_t)\right).
 $$
 
-SARSA learns the value of the policy it actually follows. If the behavior policy is $\epsilon$-greedy, SARSA's learned action values reflect the costs of exploratory actions. This matters in tasks where exploration can be dangerous or costly.
+### SARSA includes the cost of exploration
 
-Q-learning learns the greedy target policy while following an exploratory behavior policy, provided sufficient exploration continues. This is off-policy control: the update target uses $\max_a Q(S_{t+1},a)$ rather than the action actually taken next.
+SARSA observes the tuple $(S_t,A_t,R_{t+1},S_{t+1},A_{t+1})$ and uses
 
-Expected SARSA can reduce variance relative to SARSA because it uses an expectation over next actions instead of a sample. It can also be off-policy if the expectation is taken under a target policy different from the behavior policy.
+$$
+R_{t+1}+\gamma Q(S_{t+1},A_{t+1}).
+$$
 
-Maximization bias occurs because the maximum of noisy estimates tends to overestimate the maximum true value. Double learning reduces this by decoupling selection from evaluation.
+The next action is sampled from the same policy being evaluated. If that policy is $\epsilon$-greedy, its value includes the chance of future exploratory actions. Near a cliff or other hazard, a route with a high greedy value may have poor on-policy value because random deviations are costly.
 
-TD learning is often described as learning from a guess, but the phrase should be read carefully. The update target is partly a guess because it includes $V(S_{t+1})$ or $Q(S_{t+1},a)$, yet it is anchored by a real observed reward and transition. This makes TD updates local in time and cheap to compute. The cost is that early errors can bootstrap into other estimates, which is why step size, exploration, and sufficient revisitation remain important.
+For convergence toward optimal behavior, exploration is commonly reduced while every state--action pair continues to be sampled sufficiently. This *greedy in the limit with infinite exploration* condition captures the tension: keep learning about alternatives, yet let the limiting policy become greedy.
 
-The cliff-walking example in Sutton and Barto is a useful interpretation of SARSA versus Q-learning. SARSA's values include the possibility that the current exploratory policy may choose a bad action near the cliff, so it tends to learn a safer path when exploration continues. Q-learning learns the value of the greedy path, even while exploratory behavior sometimes falls. Neither update is universally "better"; they answer different questions about the relationship between behavior and target policy.
+### Q-learning separates behavior from its greedy target
 
-Expected SARSA is a reminder that sampling is optional in parts of the target when probabilities are known. If the next policy distribution is available, averaging over actions can remove action-selection noise. This is a small version of the expected-backup versus sample-backup tradeoff that also appears in dynamic programming and planning.
+Q-learning uses
 
-## Visual
+$$
+R_{t+1}+\gamma\max_aQ(S_{t+1},a).
+$$
+
+The behavior may remain $\epsilon$-greedy or follow another exploratory policy. The update evaluates what a greedy action would do next, not what behavior actually selects. Tabular Q-learning converges to $Q_*$ under appropriate visitation and step-size conditions.
+
+Calling it off-policy does not remove coverage requirements. A behavior policy that never tries an action cannot establish its value. Aggressive policy changes, large constant step sizes, or approximation can also violate the clean tabular theory.
+
+### Expected SARSA removes next-action sampling noise
+
+Expected SARSA uses
+
+$$
+R_{t+1}+\gamma
+\sum_a\pi(a\mid S_{t+1})Q(S_{t+1},a).
+$$
+
+For an $\epsilon$-greedy policy with a unique greedy action and $k$ actions, the greedy action has probability $1-\epsilon+\epsilon/k$, while each other action has $\epsilon/k$. Computing the expectation costs a pass over actions but removes randomness from sampling $A_{t+1}$.
+
+Choosing $\pi$ equal to behavior makes it on-policy. Choosing a greedy target distribution while behavior explores makes it off-policy and yields the same continuation value as Q-learning when ties are handled consistently.
 
 ```mermaid
 flowchart TD
-  Step["Experience tuple: S_t, A_t, R_(t+1), S_(t+1)"] --> Mode{"Prediction or control method"}
-  Mode -- "TD(0) prediction" --> TD0["Target = R + gamma V(S')"]
-  Mode -- "SARSA on-policy" --> NextAct["Choose A_(t+1) from behavior policy"]
-  NextAct --> Sarsa["Target = R + gamma Q(S', A')"]
-  Mode -- "Q-learning off-policy" --> Qlearn["Target = R + gamma max_a Q(S', a)"]
-  Mode -- "Expected SARSA" --> Expected["Target = R + gamma sum_a pi(a|S') Q(S',a)"]
-
-  TD0 --> Error["TD error delta = target - current estimate"]
-  Sarsa --> Error
-  Qlearn --> Error
-  Expected --> Error
-  Error --> Update["Update: estimate <- estimate + alpha * delta"]
-  Update --> Table["Value table or function approximator weights"]
-  Table -. "bootstrapped estimate supplies next target" .-> TD0
-  Table -. "behavior and target policies may differ" .-> Qlearn
-
-  subgraph DoubleQ["Double Q-learning target"]
-    direction LR
-    Q1["Use Q1 to select argmax action"] --> Q2["Use Q2 to evaluate selected action"]
-    Q2 --> Bias["Reduces maximization bias from noisy single estimate"]
-  end
-
-  Qlearn -. "decouple selection/evaluation variant" .-> DoubleQ
+  X[Observed transition] --> M{"Continuation rule"}
+  M -- Sample next action --> S[SARSA target]
+  M -- Average policy actions --> E[Expected SARSA target]
+  M -- Maximize next action --> Q[Q-learning target]
+  S --> D[TD error]
+  E --> D
+  Q --> D
+  D --> U[Update current state-action value]
 ```
 
-This TD-learning diagram shows the shared update skeleton and the exact target chosen by each method. TD(0), SARSA, Q-learning, and Expected SARSA differ only in how they estimate the post-transition continuation value, but that choice determines prediction versus control and on-policy versus off-policy behavior. The Double Q-learning branch labels the selection/evaluation split that reduces maximization bias.
+## Maximization bias and double learning
 
-| Method | Target uses | Policy relation | Learns online? | Typical use |
-|---|---|---|---|---|
-| TD(0) | $R+\gamma V(S')$ | Prediction for fixed $\pi$ | Yes | State-value prediction |
-| SARSA | $R+\gamma Q(S',A')$ | On-policy | Yes | Control with exploration costs included |
-| Q-learning | $R+\gamma\max_a Q(S',a)$ | Off-policy | Yes | Greedy optimal control |
-| Expected SARSA | $R+\gamma\sum_a \pi(a\mid S')Q(S',a)$ | On- or off-policy | Yes | Lower-variance TD control |
-| Double Q-learning | Cross-evaluated max | Off-policy | Yes | Reducing maximization bias |
+Suppose every action has true value zero, but estimates contain independent zero-mean noise. The maximum estimate is usually positive because the maximization selects whichever error happened to be largest:
 
-## Worked example 1: TD(0) prediction update
+$$
+\mathbb E\left[\max_a\hat q(a)\right]
+\geq\max_a\mathbb E[\hat q(a)].
+$$
 
-Problem: In state $s$, the current estimate is $V(s)=4.0$. The agent receives reward $R_{t+1}=2$, moves to $s'$, and $V(s')=5.0$. Let $\gamma=0.9$ and $\alpha=0.1$. Compute the TD error and updated value.
+The inequality can be strict. Q-learning uses the same estimates to select and evaluate the maximizing action, so this optimism enters its target.
 
-Step 1: Compute the TD target:
+Double Q-learning maintains $Q^A$ and $Q^B$. On an update to $Q^A$, select with $Q^A$ and evaluate with $Q^B$:
+
+$$
+a^*=\arg\max_aQ^A(S_{t+1},a),
+$$
+
+$$
+R_{t+1}+\gamma Q^B(S_{t+1},a^*).
+$$
+
+On other steps, reverse the roles. If the estimation errors are sufficiently independent, the evaluator does not automatically share the selector's positive error. Double learning reduces bias; it does not guarantee pessimism-free or variance-free values.
+
+## Worked example: one TD(0) update
+
+Let $V(s)=4$, reward $R_{t+1}=2$, $V(s')=5$, $\gamma=0.9$, and $\alpha=0.1$. The target is
+
+$$
+2+0.9(5)=6.5.
+$$
+
+The TD error is
+
+$$
+\delta=6.5-4=2.5.
+$$
+
+Therefore
+
+$$
+V_{\mathrm{new}}(s)=4+0.1(2.5)=4.25.
+$$
+
+If $s'$ were terminal, its stored value would be ignored. The target would be $2$, the error $-2$, and the update would decrease $V(s)$ to $3.8$.
+
+## Worked example: SARSA, Expected SARSA, and Q-learning
+
+A transition gives reward $-1$, $\gamma=1$, and the old value is $Q(S_t,A_t)=3$. At the next state,
+
+$$
+Q(s',\mathrm{safe})=2,
+\qquad
+Q(s',\mathrm{risky})=10.
+$$
+
+The $\epsilon$-greedy behavior has $\epsilon=0.2$ over two actions and actually samples `safe`. Since `risky` is uniquely greedy,
+
+$$
+\pi(\mathrm{risky}\mid s')=0.9,
+\qquad
+\pi(\mathrm{safe}\mid s')=0.1.
+$$
+
+SARSA uses the sampled action:
+
+$$
+y_{\mathrm{SARSA}}=-1+2=1.
+$$
+
+Expected SARSA uses
 
 $$
 \begin{aligned}
-\text{target} &= R_{t+1}+\gamma V(s') \\
-&= 2 + 0.9(5.0) \\
-&= 2 + 4.5 \\
-&= 6.5.
+y_{\mathrm{Exp}}
+&=-1+0.1(2)+0.9(10)\\
+&=-1+0.2+9\\
+&=8.2.
 \end{aligned}
 $$
 
-Step 2: Compute the TD error:
+Q-learning uses
 
 $$
-\delta_t = 6.5 - V(s) = 6.5 - 4.0 = 2.5.
+y_Q=-1+\max(2,10)=9.
 $$
 
-Step 3: Apply the update:
+With $\alpha=0.5$, the updated current value is respectively
 
 $$
-\begin{aligned}
-V_{\text{new}}(s) &= 4.0 + 0.1(2.5) \\
-&= 4.0 + 0.25 \\
-&= 4.25.
-\end{aligned}
+Q'_{\mathrm{SARSA}}=3+0.5(1-3)=2,
 $$
 
-Check: The target is above the old estimate, so the value should increase. It does, from $4.0$ to $4.25$.
-
-## Worked example 2: Comparing SARSA and Q-learning targets
-
-Problem: A transition has $R_{t+1}=-1$, $\gamma=1$, and old $Q(S_t,A_t)=3$. In next state $s'$, action values are
-
 $$
-Q(s',\text{safe})=2,\qquad Q(s',\text{risky})=10.
+Q'_{\mathrm{Exp}}=3+0.5(8.2-3)=5.6,
 $$
 
-The behavior policy actually selects safe as $A_{t+1}$. With $\alpha=0.5$, compute the SARSA and Q-learning updates for $Q(S_t,A_t)$.
-
-Step 1: SARSA target uses the actually selected next action:
-
 $$
-\text{target}_{\text{SARSA}} = -1 + 1 \cdot Q(s',\text{safe}) = -1 + 2 = 1.
+Q'_Q=3+0.5(9-3)=6.
 $$
 
-Step 2: SARSA update:
+One observed transition produces three answers because the algorithms ask about three different continuation policies.
+
+## Worked example: visible maximization bias
+
+Two actions both have true value zero. Suppose one noisy estimate set is
 
 $$
-\begin{aligned}
-Q_{\text{new}} &= 3 + 0.5(1-3) \\
-&= 3 - 1 \\
-&= 2.
-\end{aligned}
+Q^A(a_1)=1.2,\qquad Q^A(a_2)=-0.2.
 $$
 
-Step 3: Q-learning target uses the greedy next action:
+A single-estimator max reports $1.2$, an overestimate of the true maximum $0$. A second independent table has
 
 $$
-\text{target}_{Q} = -1 + \max(2,10) = 9.
+Q^B(a_1)=-0.4,\qquad Q^B(a_2)=0.3.
 $$
 
-Step 4: Q-learning update:
+Double Q selects $a_1$ using $Q^A$ but evaluates it with $Q^B$:
 
 $$
-\begin{aligned}
-Q_{\text{new}} &= 3 + 0.5(9-3) \\
-&= 3 + 3 \\
-&= 6.
-\end{aligned}
+Q^B(\arg\max_aQ^A(a))=Q^B(a_1)=-0.4.
 $$
 
-Check: The updates move in opposite directions because SARSA evaluates the exploratory behavior that chose safe, while Q-learning evaluates a greedy target that would choose risky.
+This sample is pessimistic, but it does not systematically select the evaluator's largest positive noise. On an update to the other table, $Q^B$ would select $a_2$ and $Q^A$ would evaluate it as $-0.2$.
 
-## Code
+## Terminal states, time limits, and initialization
+
+A task-defined terminal transition has zero continuation. A time-limit truncation may end data collection while the underlying process could continue. Setting its continuation to zero teaches the agent that the horizon itself destroys future reward. When that is not part of the task, bootstrap from the final observation instead.
+
+Optimistic Q initialization encourages exploration in small deterministic settings because untried actions retain high estimates. It interacts with step size and reward scale, and repeated stochastic disappointment may be needed to erase optimism. It does not replace a continuing exploration policy in nonstationary or poorly covered tasks.
+
+Tie-breaking should be random among maximizing actions. Deterministically choosing the first array index can prevent nominally greedy optimistic initialization from trying every action.
+
+## Tabular SARSA with explicit terminal handling
 
 ```python
 import numpy as np
 
 rng = np.random.default_rng(3)
 n_states, n_actions = 5, 2
-Q = np.zeros((n_states, n_actions))
+q = np.zeros((n_states, n_actions))
 alpha, gamma, epsilon = 0.2, 0.9, 0.1
 
-def step(s, a):
-    # Simple chain. action 1 moves right, action 0 moves left.
-    ns = min(4, s + 1) if a == 1 else max(0, s - 1)
-    reward = 1.0 if ns == 4 else -0.01
-    done = ns == 4
-    return ns, reward, done
+def step(state, action):
+    next_state = min(4, state + 1) if action == 1 else max(0, state - 1)
+    terminal = next_state == 4
+    reward = 1.0 if terminal else -0.01
+    return next_state, reward, terminal
 
-def eps_greedy(s):
+def epsilon_greedy(state):
     if rng.random() < epsilon:
         return int(rng.integers(n_actions))
-    return int(rng.choice(np.flatnonzero(Q[s] == Q[s].max())))
+    tied = np.flatnonzero(q[state] == q[state].max())
+    return int(rng.choice(tied))
 
-for episode in range(200):
-    s = 0
-    a = eps_greedy(s)
-    done = False
-    while not done:
-        ns, r, done = step(s, a)
-        na = eps_greedy(ns)
-        target = r if done else r + gamma * Q[ns, na]
-        Q[s, a] += alpha * (target - Q[s, a])
-        s, a = ns, na
+for _ in range(200):
+    state = 0
+    action = epsilon_greedy(state)
+    terminal = False
 
-print(np.round(Q, 3))
-print("Greedy actions:", np.argmax(Q, axis=1).tolist())
+    while not terminal:
+        next_state, reward, terminal = step(state, action)
+        if terminal:
+            target = reward
+            next_action = None
+        else:
+            next_action = epsilon_greedy(next_state)
+            target = reward + gamma * q[next_state, next_action]
+
+        q[state, action] += alpha * (target - q[state, action])
+        state, action = next_state, next_action
 ```
 
-## Common pitfalls
+Selecting `next_action` only for nonterminal states avoids querying a policy where no action exists. The code is SARSA because the same sampled `next_action` appears in both the target and the next environment step.
 
-- Calling any one-step update "TD" without identifying the target. SARSA, Q-learning, and Expected SARSA differ exactly in the next-value part of the target.
-- Forgetting to zero out the next value at terminal states.
-- Treating Q-learning's behavior as greedy during training. It can follow an exploratory behavior policy while learning a greedy target policy.
-- Assuming TD is always better than Monte Carlo. TD often learns faster, but bootstrapping can introduce bias and instability with approximation.
-- Ignoring maximization bias. A max over noisy estimates can be overly optimistic even if each estimate is unbiased.
-- Using too large a step size and mistaking oscillation for exploration.
+Learning curves should report return under both training behavior and the intended evaluation policy when they differ. Q-learning may learn a good greedy policy while accumulating poor exploratory returns; SARSA may choose a safer policy while exploration remains active. Reporting only the table values obscures that operational difference.
 
-## Connections
+## Reward propagation and initialization
+
+In a deterministic chain with reward only at the end, one-step TD moves information backward roughly one transition at a time. After the terminal transition updates its predecessor, an earlier state can benefit on a later visit. Online update order can accelerate propagation within an episode if the trajectory revisits states, but it cannot use a reward before that reward has been observed.
+
+Optimistic initialization changes the transient direction. A state with value ten and a zero-reward successor also valued ten has TD error $\gamma10-10$, negative when $\gamma\lt 1$. Optimism decays even without a disappointing immediate reward because discounting makes unsupported continuation inconsistent. In episodic undiscounted tasks, terminal observations are what finally remove unsupported optimism.
+
+Initial values encode assumptions about unseen regions. Zero is pessimistic when returns are positive and optimistic when returns are negative. Comparing algorithms with the same numeric initialization can therefore give them different exploration pressure if their reward transformations differ.
+
+## Step size per visit or per clock tick
+
+A tabular sample-average-style schedule uses a separate count for each state or state--action pair. The $n$th visit receives step size $1/n$. A global schedule tied to total environment steps shrinks learning for rare states before they have enough samples. Per-pair schedules better match the convergence conditions but require counts and adapt poorly to drift.
+
+Constant step size gives recent transitions persistent influence. Its stable range depends on reward scale, discount, visitation, and whether updates occur in batches. A value that works for TD(0) may be too large for multi-step returns or function approximation.
+
+When several workers update one table asynchronously, effective step sizes and ordering change. Stale reads can be tolerable in a tabular problem and harmful near policy ties. Reproducible comparisons should distinguish environment parallelism from algorithmic changes.
+
+## Expected backups still use sampled states
+
+Expected SARSA averages over the next action, but it usually observes only one next state and reward. It removes action-selection variance, not transition variance. A full dynamic-programming backup would also average over every possible $(s',r)$ under the model.
+
+This distinction helps compare computational cost. If the action set is small and policy probabilities are already available, Expected SARSA adds little work. In a huge action space, summing all actions may be harder than accepting one sampled action. Sampling several actions offers an intermediate estimator.
+
+The expectation must use a normalized policy after legal-action masking. Ties under $\epsilon$-greedy need a defined distribution: exploration probability plus the greedy share can be divided among all maximizing actions. Assuming one unique greedy action when there are ties changes the target.
+
+## Overestimation is not the only bias
+
+Maximization bias arises from selecting noisy high estimates, but function approximation and data distribution can create underestimation too. Double learning targets one particular mechanism; it does not make estimates unbiased in general. If both tables share data, features, and initialization, their errors are correlated and bias reduction can be smaller than the ideal argument suggests.
+
+Maintaining two tables also halves the update frequency per table when one is chosen at random each step. Learning can initially be slower. Summing or averaging the tables for behavior uses both data streams while preserving cross-evaluation in targets.
+
+Clipped double estimators that take the minimum of two critics deliberately introduce pessimism to counter overestimation. That is a different estimator from tabular Double Q-learning. The names are related, but selection/evaluation separation and minimum-taking should not be conflated.
+
+## Diagnosing a TD agent
+
+Large TD errors can mean surprising rewards, wrong successor values, an abrupt policy change, or a coding bug. Log the target components separately. A huge max continuation with ordinary rewards points toward value explosion; a huge reward points toward environment scaling or terminal handling.
+
+Mean TD error near zero can conceal large positive and negative errors. Track absolute or squared error distributions by state visitation. Persistent signed error in a region suggests insufficient representation or nonstationarity. Declining error alongside declining return may mean the agent has settled into an easily predicted poor policy.
+
+Evaluate greedy actions and their margins. If the top two values differ by less than update noise, behavior can flip often even while values appear stable. Tie-aware metrics and policy-change counts reveal this instability.
+
+Finally, test the target formulas on one deterministic transition before running an environment. Give successor actions conspicuously different values and verify that SARSA, Expected SARSA, and Q-learning produce the intended numbers. Most algorithm swaps require changing one target line; that same similarity makes silent swaps easy.
+
+## Related pages
 
 - [Monte Carlo methods](/cs/reinforcement-learning/monte-carlo-methods)
 - [n-step bootstrapping](/cs/reinforcement-learning/n-step-bootstrapping)
 - [Eligibility traces](/cs/reinforcement-learning/eligibility-traces)
-- [Off-policy methods with approximation](/cs/reinforcement-learning/off-policy-approximation)
-- [Machine learning](/cs/machine-learning/)
+- [Off-policy approximation](/cs/reinforcement-learning/off-policy-approximation)

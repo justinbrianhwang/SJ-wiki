@@ -7,9 +7,9 @@ sidebar_position: 4
 
 Conditional probability is the mathematical operation of updating the sample space after learning information. If event $B$ has occurred, outcomes outside $B$ are no longer possible, and the probability measure is renormalized on $B$. This idea is simple in a finite picture, but it drives many subtle examples: witness reliability, medical testing, Monty Hall, repeated trials, and the difference between pairwise independence and full independence.
 
-The MIT lectures treat Bayes' formula as the algebra of probability revision and independence as the case where conditioning makes no difference. These ideas are linked: $A$ and $B$ are independent exactly when $P(A\mid B)=P(A)$, provided $P(B)\gt 0$. When they are not independent, Bayes' formula gives the disciplined way to update.
+Bayes' formula is the algebra of probability revision, while independence is the special case in which conditioning changes nothing: $A$ and $B$ are independent exactly when $P(A\mid B)=P(A)$, provided $P(B)\gt 0$. The formulas are short. Most errors come from defining the events poorly, forgetting the population base rate, or assuming that a verbal lack of connection implies mathematical independence.
 
-## Definitions
+## Restricting the sample space
 
 If $P(B)\gt 0$, the **conditional probability** of $A$ given $B$ is
 
@@ -48,7 +48,7 @@ $$
 
 Pairwise independence only checks subsets of size $2$; it is weaker than mutual independence.
 
-## Key results
+## Reversing the condition with Bayes' formula
 
 **Bayes' formula** follows by writing $P(A\cap B)$ in two ways:
 
@@ -106,7 +106,7 @@ Independence is also a property of the probability model, not merely of the word
 
 For more than two events, mutual independence requires checking all nonempty subcollections. Pairwise independence means every pair factors, but it says nothing about triple intersections. This distinction becomes important in later random-variable settings, where variables may have zero pairwise covariance or pairwise independence while still being collectively constrained.
 
-## Visual
+## A calculation map
 
 ```mermaid
 graph TD
@@ -125,7 +125,7 @@ graph TD
 | Bayes' formula | $P(A\mid B)=P(B\mid A)P(A)/P(B)$ | reverse the conditioning |
 | Total probability | $P(B)=\sum_iP(B\mid A_i)P(A_i)$ | average over cases |
 
-## Worked example 1: the taxi witness problem
+## Worked example: the taxi witness problem
 
 Problem: A town has two taxi companies. On the night of an accident, $85\%$ of taxis are green and $15\%$ are blue. A witness says the taxi was blue. Under similar conditions, the witness identifies taxi color correctly $80\%$ of the time. What is the probability the taxi was actually blue?
 
@@ -168,7 +168,7 @@ $$
 
 Checked answer: even a fairly reliable witness does not overcome the base rate entirely. The posterior probability is about $41.4\%$, not $80\%$.
 
-## Worked example 2: pairwise independent but not mutually independent
+## Worked example: pairwise but not mutually independent
 
 Problem: Toss two fair coins. Let $A$ be "first coin is heads", $B$ be "second coin is heads", and $C$ be "the number of heads is even". Are $A,B,C$ mutually independent?
 
@@ -220,46 +220,156 @@ $$
 
 Checked answer: $A,B,C$ are pairwise independent but not mutually independent. Knowing any one of them alone gives no information about another one, but knowing two determines the third.
 
-## Code
+## A second positive test
 
-```python
-def bayes(prior, sensitivity, false_positive):
-    p_b = prior
-    p_not_b = 1 - prior
-    evidence = sensitivity * p_b + false_positive * p_not_b
-    return sensitivity * p_b / evidence
+Suppose a disease has prevalence $1\%$. A diagnostic test has sensitivity $0.95$ and specificity $0.90$. Sensitivity is $P(+\mid D)$; specificity is $P(-\mid D^c)$, so the false-positive probability is $P(+\mid D^c)=0.10$.
 
-print("Taxi posterior:", bayes(0.15, 0.80, 0.20))
+For one positive result,
 
-outcomes = ["HH", "HT", "TH", "TT"]
-events = {
-    "A": {o for o in outcomes if o[0] == "H"},
-    "B": {o for o in outcomes if o[1] == "H"},
-    "C": {o for o in outcomes if o.count("H") % 2 == 0},
-}
+$$
+\begin{aligned}
+P(D\mid +)
+&=\frac{P(+\mid D)P(D)}{P(+\mid D)P(D)+P(+\mid D^c)P(D^c)}\\
+&=\frac{0.95(0.01)}{0.95(0.01)+0.10(0.99)}\\
+&=\frac{0.0095}{0.1085}\\
+&\approx0.0876.
+\end{aligned}
+$$
 
-def prob(event):
-    return len(event) / len(outcomes)
+A population-of-10,000 table says the same thing without symbolic manipulation. About $100$ people have the disease, of whom $95$ test positive. Of the other $9{,}900$, about $990$ test positive. Among the $1{,}085$ positive results, only $95$ are true positives.
 
-for x, y in [("A", "B"), ("A", "C"), ("B", "C")]:
-    print(x, y, prob(events[x] & events[y]), prob(events[x]) * prob(events[y]))
+Now suppose the same test is repeated on a fresh specimen and gives another positive result. It is tempting to square both likelihoods:
 
-triple = events["A"] & events["B"] & events["C"]
-print("triple:", prob(triple), prob(events["A"]) * prob(events["B"]) * prob(events["C"]))
-```
+$$
+P(D\mid +,+)
+=\frac{0.95^2(0.01)}{0.95^2(0.01)+0.10^2(0.99)}
+\approx0.4776.
+$$
 
-## Common pitfalls
+That answer requires the two test outcomes to be conditionally independent given disease status. It can fail when the same contamination, medication, calibration error, or biological feature affects both tests. Ordinary independence of the two results is neither expected nor needed; conditional independence under each hypothesis is the relevant assumption.
+
+## Conditional independence and screening off
+
+Events $A$ and $B$ are conditionally independent given $C$ when
+
+$$
+P(A\cap B\mid C)=P(A\mid C)P(B\mid C).
+$$
+
+Conditional independence does not imply unconditional independence, and unconditional independence does not imply conditional independence. A common-cause example shows the first point. Let $C$ denote whether a coin chosen at random is two-headed or two-tailed, and toss it twice. Given $C$, the two tosses are deterministic and hence conditionally independent. Without knowing $C$, the tosses are perfectly correlated.
+
+For the reverse phenomenon, toss two independent fair coins, with indicators $X$ and $Y$, and condition on their sum being one. Before conditioning, $X$ and $Y$ are independent. Given $X+Y=1$, learning $X=1$ forces $Y=0$; conditioning has created dependence by selecting a constrained subset.
+
+The idea often appears as “screening off”: once a sufficiently informative common cause is known, two observations may no longer provide information about each other. Bayesian networks encode such statements, but the probability equality remains the definition.
+
+## Sequential information and the chain rule
+
+The multiplication rule extends by repeated use of the two-event identity:
+
+$$
+\begin{aligned}
+P(E_1\cap E_2\cap E_3)
+&=P(E_3\mid E_1\cap E_2)P(E_1\cap E_2)\\
+&=P(E_1)P(E_2\mid E_1)P(E_3\mid E_1\cap E_2).
+\end{aligned}
+$$
+
+For a shuffled deck, consider the probability that the first three cards are all hearts:
+
+$$
+\begin{aligned}
+P(H_1\cap H_2\cap H_3)
+&=P(H_1)P(H_2\mid H_1)P(H_3\mid H_1\cap H_2)\\
+&=\frac{13}{52}\frac{12}{51}\frac{11}{50}\\
+&=\frac{11}{850}.
+\end{aligned}
+$$
+
+The factors change because each observed heart removes one favorable card and one card overall. If cards were replaced and the deck reshuffled after every draw, every factor would instead be $13/52$.
+
+The chain rule also clarifies likelihood calculations. For observations $x_1,\ldots,x_n$ under a hypothesis $H$,
+
+$$
+P(x_1,\ldots,x_n\mid H)
+=\prod_{i=1}^nP(x_i\mid x_1,\ldots,x_{i-1},H).
+$$
+
+Replacing each conditional factor by $P(x_i\mid H)$ is an extra conditional-independence assumption, not a consequence of Bayes' formula.
+
+## Zero-probability conditions
+
+The elementary ratio $P(A\cap B)/P(B)$ is undefined when $P(B)=0$. This matters for continuous variables because events such as $X=x$ usually have probability zero. Nevertheless, expressions such as $P(Y\le y\mid X=x)$ can be defined through a conditional density:
+
+$$
+f_{Y\mid X}(y\mid x)=\frac{f_{X,Y}(x,y)}{f_X(x)},
+$$
+
+when $f_X(x)\gt 0$. More general conditional probabilities are defined as conditional expectations and are determined only up to sets of probability zero. One should not substitute zero into the elementary event ratio.
+
+## Where calculations go wrong
+
+### Odds form and sequential evidence
+
+For two hypotheses $H_1$ and $H_0$, Bayes' formula can be written as
+
+$$
+\frac{P(H_1\mid E)}{P(H_0\mid E)}
+=\frac{P(H_1)}{P(H_0)}
+\frac{P(E\mid H_1)}{P(E\mid H_0)}.
+$$
+
+The three factors are posterior odds, prior odds, and the likelihood ratio. If evidence arrives in stages and $E_1,E_2$ are conditionally independent under each hypothesis, then
+
+$$
+\frac{P(H_1\mid E_1,E_2)}{P(H_0\mid E_1,E_2)}
+=\frac{P(H_1)}{P(H_0)}
+\prod_{j=1}^2\frac{P(E_j\mid H_1)}{P(E_j\mid H_0)}.
+$$
+
+Each observation multiplies the current odds. On a logarithmic scale these updates add, which is convenient when many likelihood ratios would overflow or underflow numerically.
+
+As an example, take prior odds $1:9$ and evidence with likelihood ratio $6$. The posterior odds are $6:9=2:3$, corresponding to posterior probability $2/(2+3)=0.4$. A second conditionally independent observation with likelihood ratio $3$ changes the odds to $6:9\times3=2:1$, or probability $2/3$. Multiplying a probability directly by a likelihood ratio would give the wrong normalization; odds are the quantity that updates multiplicatively.
+
+### Independence survives functions on separate sides
+
+If $X$ and $Y$ are independent, then $g(X)$ and $h(Y)$ are independent for measurable functions $g$ and $h$. Events determined only by $X$ remain independent of events determined only by $Y$. The result follows because preimages reduce the claim to the defining factorization:
+
+$$
+P(g(X)\in A,h(Y)\in B)
+=P(X\in g^{-1}(A),Y\in h^{-1}(B)).
+$$
+
+Applying a joint function can destroy the separation. Even when $X$ and $Y$ are independent, $X+Y$ is usually dependent on $X$. Independence belongs to collections of information, not merely to variables before algebraic manipulation.
 
 - Ignoring the base rate in Bayes problems. $P(B\mid A)$ is not determined by test accuracy alone.
 - Reversing conditional probabilities. In general $P(A\mid B)\ne P(B\mid A)$.
-- Saying events are independent because they are disjoint. Nontrivial disjoint events are usually dependent because occurrence of one rules out the other.
+- Saying events are independent because they are disjoint. If disjoint events both have positive probability, then $P(A\cap B)=0$ while $P(A)P(B)\gt 0$, so they are dependent.
 - Checking only pairwise independence when a problem asks for mutual independence.
 - Conditioning on an event of probability zero. For continuous random variables this requires conditional densities or a limiting interpretation, not the elementary ratio formula.
 
-## Connections
+## Subtleties of conditioning
+
+### Conditioning can create or reverse associations
+
+Conditioning changes the reference population, so an association may reverse after groups are combined. Suppose two clinics treat easy and difficult cases in different proportions. Clinic A succeeds on $90$ of $100$ easy cases and $1$ of $10$ difficult cases, for $91/110\approx82.7\%$ overall. Clinic B succeeds on $19$ of $20$ easy cases and $30$ of $100$ difficult cases, for $49/120\approx40.8\%$ overall. Within easy cases B has $95\%$ versus A's $90\%$; within difficult cases B has $30\%$ versus A's $10\%$. B is better in each stratum yet worse after aggregation because it handles far more difficult cases. This is Simpson's paradox.
+
+There is no contradiction. The overall rates are weighted averages with different weights:
+
+$$
+P(S\mid A)=\sum_dP(S\mid A,d)P(d\mid A),
+$$
+
+and the distribution of difficulty $d$ differs by clinic. A comparison must decide whether the target is each clinic's actual case mix or a common standardized mix.
+
+Conditioning can also create dependence between initially independent causes. Let two independent fair coins indicate whether two applicants meet separate criteria, and inspect only cases where at least one criterion is met. Before selection, the criteria are independent. Within the selected group, learning that the first criterion failed forces the second to have passed. The selection event acts as a common consequence, sometimes called a collider.
+
+These examples matter because “control for another variable” is not automatically sound. Conditioning on a common cause can remove a spurious association; conditioning on a common effect can introduce one. Probability identities state what follows from a chosen model, but they do not decide which variables should be conditioned on in a causal question.
+
+Natural-frequency tables remain a good arithmetic check. Choose a hypothetical population size that turns base rates into counts, pass each subgroup through its corresponding likelihood, and condition by restricting to the observed row. If the resulting denominator disagrees with the law of total probability, an event has likely been reversed or omitted.
+
+## Related pages
 
 - [Probability axioms and inclusion-exclusion](/math/probability-and-random-variables/probability-axioms-and-inclusion-exclusion)
 - [Discrete random variables, expectation, and variance](/math/probability-and-random-variables/discrete-random-variables-expectation-variance)
 - [Joint distributions, transformations, and independence](/math/probability-and-random-variables/joint-distributions-transformations-independence)
 - [Conditional expectation](/math/probability-and-random-variables/covariance-correlation-conditional-expectation)
-- [Conditional probability and Bayes in the shorter section](/math/probability/conditional-probability-bayes)

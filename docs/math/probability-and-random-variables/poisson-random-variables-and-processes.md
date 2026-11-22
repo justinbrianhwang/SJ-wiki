@@ -7,13 +7,9 @@ sidebar_position: 7
 
 The Poisson distribution models counts of rare events in a fixed region of time or space: emissions in a time interval, calls to a call center, goals in a match, or unusual events in a large number of trials. MIT 18.440 introduces it as a limit of binomial random variables where $n$ is large, $p$ is small, and $np$ remains near a fixed value $\lambda$.
 
-The Poisson process extends this count model from one interval to an entire random counting function $N(t)$. Its central assumptions are independent increments, stationary increments, and a constant rate. From these assumptions come Poisson counts over intervals and exponential waiting times between events, linking this page to the continuous distributions later in the course.
+The Poisson process extends this count model from one interval to an entire random counting function $N(t)$. Independent increments, stationary increments, and a constant rate produce Poisson counts over intervals and exponential gaps between events. The count and waiting-time descriptions are two coordinate systems for the same random arrival sequence.
 
-![Several Poisson probability mass functions are plotted for different rate parameters.](https://commons.wikimedia.org/wiki/Special:FilePath/Poisson_pmf.svg)
-
-*Figure: Poisson probability mass functions for several parameter values. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Poisson_pmf.svg), Skbkekas, CC BY 3.0.*
-
-## Definitions
+## A count law with one parameter
 
 A random variable $X$ has the **Poisson distribution** with parameter $\lambda\gt 0$ if
 
@@ -40,7 +36,7 @@ $$
 
 so $T_1$ is exponential with rate $\lambda$.
 
-## Key results
+## The rare-event limit
 
 The Poisson distribution arises from the binomial law. Let $X_n\sim\operatorname{Binomial}(n,\lambda/n)$. For fixed $k$,
 
@@ -116,9 +112,9 @@ $$
 P(T_1>t)=P(N(t)=0)=e^{-\lambda t}.
 $$
 
-Differentiating $1-e^{-\lambda t}$ gives the exponential density $\lambda e^{-\lambda t}$. This is why the Poisson and exponential distributions should be learned as a pair, not as unrelated formulas.
+Differentiating $1-e^{-\lambda t}$ gives the exponential density $\lambda e^{-\lambda t}$. Poisson counts and exponential waits are therefore paired descriptions of one process.
 
-## Visual
+## From local arrival rules to a process
 
 ```mermaid
 sequenceDiagram
@@ -143,7 +139,7 @@ The sequence diagram describes a small-time heuristic. Over a tiny interval of l
 
 This heuristic also explains why simultaneous events have probability zero in the ideal continuous-time model. If the interval is made very small, the chance of two or more events in that interval is negligible compared with $h$. Real systems may have batching or dependence, but the mathematical Poisson process assumes events arrive singly in continuous time.
 
-## Worked example 1: rare poker event approximation
+## Worked example: rare poker event approximation
 
 Problem: Suppose the probability that a five-card poker hand is a royal flush is $1/649740$. In $1{,}000{,}000$ independent hands, approximate the probability of seeing exactly two royal flushes.
 
@@ -188,7 +184,7 @@ $$
 
 Checked answer: the expected number is about $1.54$, so seeing exactly two is quite plausible.
 
-## Worked example 2: waiting for the first event in a process
+## Worked example: waiting for the first event in a process
 
 Problem: Calls arrive according to a Poisson process at rate $\lambda=3$ per hour. What is the probability that no call arrives in the next $20$ minutes, and what is the expected waiting time until the first call?
 
@@ -221,28 +217,122 @@ $$
 
 Checked answer: the probability of waiting longer than the mean is $e^{-1}$ for an exponential random variable, exactly matching the no-call probability over $20$ minutes.
 
-## Code
+## Event times conditional on the count
 
-```python
-from math import exp, factorial
+There is more structure inside an interval than the count alone shows. Conditional on $N(t)=n$, the unordered event times behave as $n$ independent uniform points on $(0,t)$; the ordered arrival times are their order statistics.
 
-def poisson_pmf(lam, k):
-    return exp(-lam) * (lam ** k) / factorial(k)
+For one event, divide $(0,t)$ into an early part of length $s$ and a late part of length $t-s$. Independent increments give
 
-lam = 1_000_000 / 649_740
-print("lambda:", lam)
-print("P(two royal flushes):", poisson_pmf(lam, 2))
+$$
+\begin{aligned}
+P(T_1\le s\mid N(t)=1)
+&=\frac{P(N(s)=1,N(t)-N(s)=0)}{P(N(t)=1)}\\
+&=\frac{(\lambda s)e^{-\lambda s}e^{-\lambda(t-s)}}{(\lambda t)e^{-\lambda t}}\\
+&=\frac st.
+\end{aligned}
+$$
 
-rate_per_hour = 3
-t_hours = 20 / 60
-print("P(no calls in 20 minutes):", poisson_pmf(rate_per_hour * t_hours, 0))
-print("Expected wait in minutes:", 60 / rate_per_hour)
+That is the CDF of a uniform variable on $(0,t)$. The general statement follows by partitioning the interval and comparing multinomial cell counts.
 
-# Verify total mass over a large initial range.
-print("Poisson mass k<=30:", sum(poisson_pmf(4.0, k) for k in range(31)))
-```
+As an example, suppose a rate-$4$ process is observed for two hours and exactly three events occurred. Given that count, the rate no longer affects their relative locations. The probability that all three occurred in the first half hour is
 
-## Common pitfalls
+$$
+\left(\frac{0.5}{2}
+ight)^3=\frac1{64}.
+$$
+
+Without conditioning on the total count, the corresponding event is $N(0.5)=3$ and $N(2)-N(0.5)=0$, whose probability is different.
+
+## Splitting and superposition
+
+Suppose every event of a rate-$\lambda$ process is independently labeled type A with probability $p$ and type B otherwise. The type-A count in time $t$ is Poisson with mean $p\lambda t$. Condition on the original count:
+
+$$
+\begin{aligned}
+P(N_A(t)=k)
+&=\sum_{n=k}^{\infty}P(N_A(t)=k\mid N(t)=n)P(N(t)=n)\\
+&=\sum_{n=k}^{\infty}\binom nkp^k(1-p)^{n-k}
+e^{-\lambda t}\frac{(\lambda t)^n}{n!}\\
+&=e^{-p\lambda t}\frac{(p\lambda t)^k}{k!}.
+\end{aligned}
+$$
+
+In the last step, set $m=n-k$ and recognize an exponential series. The type-B process has rate $(1-p)\lambda$, and the two thinned processes are independent. Random routing of calls, radioactive decay detection with imperfect efficiency, and category labels on arrivals use this construction.
+
+The reverse operation is superposition. If independent processes have rates $\lambda_1$ and $\lambda_2$, then their combined count over length $t$ is the sum of independent Poisson variables and hence is Poisson with parameter $(\lambda_1+\lambda_2)t$. Given that an event occurred in the combined process, its source is process 1 with probability
+
+$$
+\frac{\lambda_1}{\lambda_1+\lambda_2}.
+$$
+
+## Worked example: waiting for the third arrival
+
+Trains arrive according to a Poisson process at rate $2$ per hour. Let $T_3$ be the time of the third arrival. Find $P(T_3\gt 1)$ and $E[T_3]$.
+
+The event $T_3\gt 1$ means that fewer than three trains arrived during the first hour. Since $N(1)\sim\operatorname{Poisson}(2)$,
+
+$$
+\begin{aligned}
+P(T_3>1)
+&=P(N(1)\le2)\\
+&=e^{-2}\left(1+2+\frac{2^2}{2!}\right)\\
+&=5e^{-2}\\
+&\approx0.6767.
+\end{aligned}
+$$
+
+The third arrival time is a sum of three independent exponential$(2)$ gaps, so it has a gamma distribution with shape $3$ and rate $2$. Therefore
+
+$$
+E[T_3]=\frac32\text{ hours},\qquad
+\operatorname{Var}(T_3)=\frac34\text{ hours}^2.
+$$
+
+The identity
+
+$$
+\{T_r>t\}=\{N(t)<r\}
+$$
+
+is the continuous-time counterpart of the binomial/negative-binomial inverse relationship.
+
+## When a constant-rate model is too rigid
+
+For real count data, equality of mean and variance is a diagnostic rather than a law of nature. Unobserved heterogeneity in rates often creates overdispersion; inhibition or capacity constraints can create underdispersion. Daily seasonality violates stationary increments even if disjoint interval counts remain close to independent.
+
+A nonhomogeneous Poisson process allows a deterministic rate $\lambda(t)$ that varies with time. Its count over $(s,t]$ is Poisson with mean
+
+$$
+\Lambda(s,t)=\int_s^t\lambda(u)\,du.
+$$
+
+It retains independent increments but loses stationarity. A self-exciting arrival stream, where one event temporarily raises the chance of another, loses independent increments as well and needs a different process model.
+
+## Assumptions worth checking
+
+### Factorial moments and variance
+
+The equality of Poisson mean and variance follows neatly from factorial moments. For $X\sim\operatorname{Poisson}(\lambda)$,
+
+$$
+\begin{aligned}
+E[X(X-1)]
+&=\sum_{k=2}^{\infty}k(k-1)e^{-\lambda}\frac{\lambda^k}{k!}\\
+&=\lambda^2e^{-\lambda}\sum_{j=0}^{\infty}\frac{\lambda^j}{j!}\\
+&=\lambda^2.
+\end{aligned}
+$$
+
+Since $X^2=X(X-1)+X$,
+
+$$
+\operatorname{Var}(X)
+=E[X(X-1)]+E[X]-E[X]^2
+=\lambda^2+\lambda-\lambda^2
+=\lambda.
+$$
+
+For data, a sample variance far above the sample mean can signal varying rates, clustering, or dependence. A variance below the mean can signal inhibition or a fixed capacity. Sampling noise alone also creates discrepancies, so the mean-variance comparison is a diagnostic, not a proof of model failure.
 
 - Using a Poisson approximation when events are not rare or trials are not close to independent.
 - Confusing the process rate $\lambda$ with the interval parameter $\lambda t$.
@@ -250,7 +340,33 @@ print("Poisson mass k<=30:", sum(poisson_pmf(4.0, k) for k in range(31)))
 - Treating independent increments as automatic. It is an assumption of the Poisson process model.
 - Thinking exponential waiting times are an extra assumption unrelated to Poisson counts. In the process model, they are two views of the same structure.
 
-## Connections
+## Model diagnostics
+
+### Diagnosing a Poisson model from data
+
+A constant-rate Poisson model imposes more than a marginal count distribution. Counts from disjoint intervals should be independent, expected counts should scale with exposure, and the variance should match the mean at a fixed exposure. Each condition can fail for a different reason.
+
+Seasonal intensity makes counts depend on clock time. A nonhomogeneous Poisson process can retain independent increments while replacing $\lambda t$ by an integrated intensity
+
+$$
+\Lambda(s,t)=\int_s^t\lambda(u)\,du.
+$$
+
+Then $N(t)-N(s)$ is Poisson with mean $\Lambda(s,t)$, but increments are no longer stationary. Clustering after an event violates independence and often produces serial correlation. A population with varying hidden rates produces overdispersion even when each individual source is conditionally Poisson.
+
+Zeros provide a quick diagnostic. A Poisson variable with mean $\lambda$ has
+
+$$
+P(X=0)=e^{-\lambda}.
+$$
+
+If the sample mean is $2$, the fitted model predicts about $e^{-2}\approx13.5\%$ zero intervals. A much larger zero fraction may indicate inactive periods or a mixture of rates; a smaller fraction may indicate regular spacing or capacity constraints. Such comparisons are exploratory because parameter estimation introduces sampling error.
+
+The time-rescaling idea gives a deeper check. Under a correctly specified time-varying intensity, integrated hazards between successive events should behave like independent exponential variables with rate one. Systematic departures in those transformed gaps reveal missed periodicity, dependence, or incorrect exposure measurement.
+
+Poisson approximation for a Bernoulli sum also has a scope condition: no individual event should dominate. A sum containing one indicator with probability $0.5$ and many extremely rare indicators may have the right mean but a poor Poisson shape. The maximum individual probability and local dependence structure matter, not only the total $\lambda$.
+
+## Related pages
 
 - [Bernoulli, binomial, geometric, and negative binomial laws](/math/probability-and-random-variables/bernoulli-binomial-geometric-negative-binomial)
 - [Continuous random variables and uniform laws](/math/probability-and-random-variables/continuous-random-variables-and-uniform-laws)

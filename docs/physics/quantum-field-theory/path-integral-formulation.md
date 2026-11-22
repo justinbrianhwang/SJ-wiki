@@ -5,267 +5,563 @@ sidebar_position: 3
 
 # Path Integral Formulation
 
-The path integral replaces the question "which path did the particle take?" with "how do all paths interfere?" In ordinary quantum mechanics this is already a radical idea. In quantum field theory it becomes almost unavoidable, because the histories being summed are field configurations over spacetime, and the formalism treats symmetries, perturbation theory, and tunneling in a unified way.
+The path integral expresses a quantum amplitude as a sum over histories. For a field theory, a “history” is a complete field configuration on spacetime. The classical action supplies a phase $e^{iS}$, and configurations interfere. Correlation functions, perturbative diagrams, tunneling amplitudes, and effective actions can all be obtained from the same construction.
 
-Zee emphasizes the path integral early because it gives a compact route from quantum mechanics to field theory. Instead of beginning with commutators and Hilbert-space operators, one starts with the classical action and integrates over configurations weighted by $e^{iS}$. Correlation functions, propagators, Feynman rules, and semiclassical approximations all come from the same generating functional.
+The notation $\mathcal D\phi$ is compact but formal. Its reliable meaning begins with a regulator: discretize time, put spacetime on a lattice, truncate modes, or otherwise reduce the problem to finitely many ordinary integrals. Manipulations of the continuum expression inherit their meaning from that regulated limit.
 
-## Definitions
+## From the evolution operator to a sum over paths
 
-For a single quantum-mechanical coordinate $q(t)$, the transition amplitude is formally
+For one coordinate with Hamiltonian
+
+$$
+H=\frac{p^2}{2m}+V(q),
+$$
+
+split the interval $T=t_f-t_i$ into $N$ steps of size $\epsilon=T/N$. Insert position resolutions of the identity between short-time evolution operators:
+
+$$
+\langle q_f|e^{-iHT}|q_i\rangle
+=\int\prod_{n=1}^{N-1}dq_n
+\prod_{n=0}^{N-1}
+\langle q_{n+1}|e^{-iH\epsilon}|q_n\rangle.
+$$
+
+For small $\epsilon$, separate kinetic and potential evolution up to errors that vanish in the limit. Insert momentum states in each factor:
+
+$$
+\langle q_{n+1}|e^{-iH\epsilon}|q_n\rangle
+\approx
+\int\frac{dp_n}{2\pi}
+\exp\left[
+ip_n(q_{n+1}-q_n)
+-i\epsilon\left(\frac{p_n^2}{2m}+V(q_n)\right)
+\right].
+$$
+
+The $p_n$ integral is Gaussian. Performing it leaves a normalization times
+
+$$
+\exp\left[
+i\epsilon\left(
+\frac m2\left(\frac{q_{n+1}-q_n}{\epsilon}\right)^2
+-V(q_n)
+\right)
+\right].
+$$
+
+Multiplying the slices and taking $N\to\infty$ gives
 
 $$
 \langle q_f,t_f|q_i,t_i\rangle
-=\int_{q(t_i)=q_i}^{q(t_f)=q_f}\mathcal{D}q(t)\,e^{iS[q]}.
+=\int_{q(t_i)=q_i}^{q(t_f)=q_f}
+\mathcal Dq\,e^{iS[q]}.
 $$
 
-For a scalar field,
+The measure includes normalization factors inherited from every Gaussian momentum integral. They often cancel in normalized expectation values but matter when absolute determinants or vacuum energies are being compared.
+
+## The field generating functional
+
+For a real scalar field, introduce an external source $J(x)$:
 
 $$
-Z=\int \mathcal{D}\phi\,e^{iS[\phi]},
-\qquad
-S[\phi]=\int d^4x\,\mathcal{L}.
+Z[J]=
+\int\mathcal D\phi\,
+\exp\left\{
+iS[\phi]+i\int d^4x\,J(x)\phi(x)
+\right\}.
 $$
 
-The **generating functional** adds a source $J(x)$:
+It is convenient to normalize $Z[0]=1$ when vacuum bubbles are not of interest. Functional differentiation inserts fields because
 
 $$
-Z[J]=\int \mathcal{D}\phi\,
-\exp\left(iS[\phi]+i\int d^4x\,J(x)\phi(x)\right).
+\frac1i\frac{\delta}{\delta J(x)}
+e^{i\int J\phi}
+=\phi(x)e^{i\int J\phi}.
 $$
 
-Correlation functions are obtained by functional differentiation:
+Therefore
 
 $$
-\langle 0|T\phi(x_1)\cdots \phi(x_n)|0\rangle
-=\frac{1}{Z[0]}\left.
-\frac{1}{i^n}
-\frac{\delta^n Z[J]}{\delta J(x_1)\cdots\delta J(x_n)}
+\langle0|T\phi(x_1)\cdots\phi(x_n)|0\rangle
+=
+\left.
+\frac1{i^n}
+\frac{\delta^n Z[J]}
+{\delta J(x_1)\cdots\delta J(x_n)}
 \right|_{J=0}.
 $$
 
-The free scalar action can be written as a quadratic form:
+If $Z$ has not been normalized, divide the right side by $Z[0]$. The time ordering is encoded by the vacuum boundary condition and the Feynman $i\epsilon$ prescription, not added after differentiation.
+
+## Doing the free Gaussian exactly
+
+After integration by parts, write the free action as
 
 $$
-S_0[\phi]=\frac{1}{2}\int d^4x\,\phi(x)\left(-\partial^2-m^2+i\epsilon\right)\phi(x),
+S_0[\phi]
+=-\frac12\int d^4x\,d^4y\,
+\phi(x)K(x,y)\phi(y),
 $$
 
-where the $i\epsilon$ prescription selects the Feynman contour and vacuum boundary condition.
-
-## Key results
-
-The central identity behind perturbative QFT is the Gaussian integral. In finite dimensions,
+where
 
 $$
-\int d^n x\,\exp\left(\frac{i}{2}x^TAx+iJ^Tx\right)
-\propto
-\exp\left(-\frac{i}{2}J^TA^{-1}J\right).
+K(x,y)=(\Box_x+m^2-i\epsilon)\delta^{(4)}(x-y).
 $$
 
-The field-theory version gives the free generating functional:
+Define the Feynman propagator by
 
 $$
-Z_0[J]=Z_0[0]\exp\left(
-\frac{i}{2}\int d^4x\,d^4y\,J(x)\Delta_F(x-y)J(y)
-\right),
+K_x\Delta_F(x-y)=-i\delta^{(4)}(x-y),
 $$
 
-where the Feynman propagator satisfies
+so that
 
 $$
-(-\partial^2-m^2+i\epsilon)\Delta_F(x-y)=i\delta^{(4)}(x-y).
+\Delta_F(x-y)
+=\int\frac{d^4p}{(2\pi)^4}
+\frac{i\,e^{-ip\cdot(x-y)}}{p^2-m^2+i\epsilon}.
 $$
 
-Interactions can be represented as differential operators acting on $Z_0[J]$. For $\phi^4$ theory,
+Completing the functional square gives the normalized free functional
 
 $$
-Z[J]=\exp\left(
--i\int d^4x\,\frac{\lambda}{4!}
-\left(\frac{1}{i}\frac{\delta}{\delta J(x)}\right)^4
-\right)Z_0[J].
+Z_0[J]
+=\exp\left[
+-\frac i2
+\int d^4x\,d^4y\,
+J(x)\Delta_F(x-y)J(y)
+\right].
 $$
 
-This compact expression is the seed of Feynman diagrams. Each source derivative pulls down propagators; each interaction term supplies a vertex; combinatorics counts contractions.
-
-The Euclidean path integral is obtained by Wick rotation $t=-i\tau$:
+With this convention, two source derivatives yield
 
 $$
-Z_E=\int \mathcal{D}\phi\,e^{-S_E[\phi]}.
+\left.
+\frac1{i^2}
+\frac{\delta^2Z_0}
+{\delta J(x)\delta J(y)}
+\right|_{J=0}
+=\Delta_F(x-y).
 $$
 
-Euclidean form makes the connection with statistical mechanics direct: $e^{-S_E}$ resembles the Boltzmann weight $e^{-\beta H}$. This is why the same field-theoretic tools apply to thermal systems and critical phenomena.
+Books distribute factors of $i$ between the inverse kernel and the symbol $\Delta_F$ differently. A consistent check is more useful than memorizing a sign: differentiating $Z_0$ twice must reproduce the propagator used in the Feynman rules.
 
-The path integral is best understood as a regulated construction before it is treated formally. In quantum mechanics one divides the time interval into $N$ small pieces, inserts complete sets of position eigenstates, and then lets $N\to\infty$. In field theory one can similarly imagine putting spacetime on a lattice, integrating over the field value at each lattice site, and only afterward asking for the continuum limit. This picture prevents a common misunderstanding: $\mathcal{D}\phi$ is not a magical measure with all properties obvious from notation. Its meaning is supplied by a regulator and by the limiting procedure.
+## Interactions as source derivatives
 
-Another important object is the connected generating functional
-
-$$
-W[J]=-i\log Z[J].
-$$
-
-Functional derivatives of $W[J]$ generate connected correlation functions. A further Legendre transform gives the effective action
+For
 
 $$
-\Gamma[\varphi]=W[J]-\int d^4x\,J(x)\varphi(x),
-\qquad
-\varphi(x)=\frac{\delta W}{\delta J(x)}.
+\mathcal L_{\mathrm{int}}=-\frac{\lambda}{4!}\phi^4,
 $$
 
-The effective action is the quantum-corrected analog of the classical action. Its stationary point gives the expectation value of the field, and its expansion contains one-particle-irreducible vertices. This is the bridge from the path integral to loop-corrected equations of motion and the effective potential used in symmetry breaking.
+replace every field in the interaction exponential by $(1/i)\delta/\delta J$:
 
-The formalism also clarifies why classical physics emerges. When the action is large compared with $\hbar$, rapidly oscillating phases cancel except near stationary points of $S$. Restoring $\hbar$ for one sentence, the weight is $e^{iS/\hbar}$; the limit $\hbar\to0$ selects configurations satisfying $\delta S=0$. Quantum corrections are fluctuations around those stationary configurations.
+$$
+Z[J]
+=
+\exp\left[
+-i\frac{\lambda}{4!}
+\int d^4x
+\left(
+\frac1i\frac{\delta}{\delta J(x)}
+\right)^4
+\right]
+Z_0[J],
+$$
 
-## Visual
+followed by normalization. Expanding the first exponential in powers of $\lambda$ generates vertices. Differentiating the Gaussian pairs source insertions; each pairing is a contraction and supplies a propagator. Feynman diagrams are a compact record of these pairings and their combinatorial multiplicities.
+
+Vacuum bubbles appear in both numerator and denominator of normalized correlation functions and cancel. The logarithm selects connected diagrams:
+
+$$
+Z[J]=e^{iW[J]}.
+$$
+
+With this convention, derivatives of $W$ generate connected correlators, including the appropriate factors of $i$. A second construction, the Legendre transform, isolates one-particle-irreducible information.
 
 ```mermaid
 flowchart TD
-  A[Classical action S] --> B[Sum over histories]
-  B --> C["Generating functional Z#lsqb;J"]"]
-  C --> D[Functional derivatives]
-  D --> E[Correlation functions]
-  C --> F[Expand interactions]
-  F --> G[Feynman diagrams]
-  B --> H[Wick rotation]
-  H --> I[Euclidean statistical field theory]
+  A["Regulated action and measure"] --> B["Generating functional Z of J"]
+  B --> C["Differentiate with respect to J"]
+  C --> D["Time-ordered correlators"]
+  B --> E["Take logarithm"]
+  E --> F["Connected functional W"]
+  F --> G["Legendre transform"]
+  G --> H["Effective action Gamma"]
+  B --> I["Expand the interaction"]
+  I --> J["Feynman diagrams"]
 ```
 
-| Object | Minkowski form | Euclidean form | Main use |
-|---|---|---|---|
-| Weight | $e^{iS}$ | $e^{-S_E}$ | Oscillatory vs damped integral |
-| Time | $t$ | $\tau=it$ | Real-time scattering vs equilibrium |
-| Propagator pole | $i\epsilon$ prescription | elliptic inverse operator | Causality vs convergence |
-| Analogy | interference phase | Boltzmann weight | Quantum amplitudes vs statistical averages |
+## Connected functions and the effective action
 
-## Worked example 1: Free generating functional in one dimension
-
-Problem: Evaluate the finite-dimensional analog
+Define the classical or mean field in the presence of the source by
 
 $$
-I(J)=\int_{-\infty}^{\infty} dx\,\exp\left(\frac{i}{2}ax^2+iJx\right)
+\varphi(x)=\frac{\delta W[J]}{\delta J(x)}.
 $$
 
-up to a $J$-independent constant, assuming the contour is chosen so the Gaussian is defined.
-
-Step 1: Complete the square:
+The effective action is conventionally
 
 $$
-\frac{i}{2}ax^2+iJx
-=\frac{i}{2}a\left(x^2+\frac{2J}{a}x\right).
+\Gamma[\varphi]
+=W[J]-\int d^4x\,J(x)\varphi(x),
 $$
 
-Step 2: Add and subtract $(J/a)^2$:
+with $J$ eliminated in favor of $\varphi$. Then
 
 $$
-x^2+\frac{2J}{a}x
-=\left(x+\frac{J}{a}\right)^2-\frac{J^2}{a^2}.
+\frac{\delta\Gamma}{\delta\varphi(x)}=-J(x).
 $$
 
-Step 3: Substitute:
+At zero source, the quantum expectation value obeys $\delta\Gamma/\delta\varphi=0$. At tree level $\Gamma$ reduces to the classical action. Loop corrections turn it into a quantum-corrected action, and its functional derivatives give one-particle-irreducible vertices.
+
+For a constant field, one writes
 
 $$
-\frac{i}{2}a\left(x+\frac{J}{a}\right)^2
--\frac{i}{2}\frac{J^2}{a}.
+\Gamma[\varphi]
+=-\int d^4x\,V_{\mathrm{eff}}(\varphi)
++\text{derivative terms}.
 $$
 
-Step 4: Shift the integration variable $y=x+J/a$. The $y$ integral does not depend on $J$:
+Minima of $V_{\mathrm{eff}}$ determine candidate vacuum expectation values after quantum corrections. Gauge theories require care because the off-shell effective potential can depend on gauge choice even though properly defined physical predictions do not.
+
+## Wick rotation and Euclidean fields
+
+The Minkowski weight $e^{iS}$ oscillates and is not an ordinary probability measure. Formally rotating $t=-i\tau$ converts it to
 
 $$
-I(J)=I(0)\exp\left(-\frac{i}{2}\frac{J^2}{a}\right).
+Z_E=\int\mathcal D\phi\,e^{-S_E[\phi]}.
 $$
 
-Step 5: Check by differentiating:
+For the scalar theory,
 
 $$
-\frac{1}{I(0)}\left.\frac{1}{i^2}\frac{d^2 I}{dJ^2}\right|_{J=0}
-=\frac{i}{a}.
+S_E=\int d^4x_E
+\left[
+\frac12(\partial_\mu\phi)^2
++\frac12m^2\phi^2
++V_{\mathrm{int}}(\phi)
+\right].
 $$
 
-The result is the finite-dimensional propagator. In field theory, $a^{-1}$ becomes the inverse differential operator $\Delta_F$.
+When $S_E$ is bounded below, the weight is damped. The resemblance to a statistical-mechanical Boltzmann factor enables numerical lattice methods and connects a $d$-dimensional Euclidean field theory to classical critical systems in $d$ dimensions.
 
-## Worked example 2: Extracting the two-point function
+The rotation is a contour deformation, not the substitution of $t=-i\tau$ into isolated formulas. Poles, boundary conditions, tensor components, and factors in the measure must be rotated consistently. Real-time observables may require analytic continuation back to Minkowski signature.
 
-Problem: Use
+## Semiclassical expansion
 
-$$
-Z_0[J]=Z_0[0]\exp\left(
-\frac{i}{2}\int d^4x\,d^4y\,J(x)\Delta_F(x-y)J(y)
-\right)
-$$
-
-to compute $\langle T\phi(a)\phi(b)\rangle$.
-
-Step 1: Define $W[J]$ by $Z_0[J]=Z_0[0]e^{W[J]}$, with
+Restore $\hbar$ temporarily:
 
 $$
-W[J]=\frac{i}{2}\int d^4x\,d^4y\,J(x)\Delta_F(x-y)J(y).
+Z=\int\mathcal D\phi\,e^{iS[\phi]/\hbar}.
 $$
 
-Step 2: Differentiate once:
+When $S/\hbar$ varies rapidly, nearby configurations cancel except near stationary points satisfying
 
 $$
-\frac{\delta W}{\delta J(a)}
-=i\int d^4y\,\Delta_F(a-y)J(y).
+\frac{\delta S}{\delta\phi}=0.
 $$
 
-Step 3: Differentiate twice:
+Write $\phi=\phi_{\mathrm{cl}}+\eta$ and expand:
 
 $$
-\frac{\delta^2 W}{\delta J(a)\delta J(b)}
-=i\Delta_F(a-b).
+S[\phi]
+=S[\phi_{\mathrm{cl}}]
++\frac12\int\eta K_{\mathrm{cl}}\eta
++O(\eta^3).
 $$
 
-Step 4: At $J=0$, the first derivative of $W$ vanishes, so the second derivative of $Z_0$ is
+The linear term vanishes by the classical equation. Gaussian integration over $\eta$ gives a determinant, which is the one-loop correction. Higher powers produce higher-loop terms. More than one saddle may contribute; Euclidean finite-action saddles describe tunneling and other nonperturbative effects.
+
+## Fermions and gauge fields
+
+Fermionic path integrals use Grassmann-valued fields. Their Gaussian rule reverses the determinant:
 
 $$
-\left.\frac{\delta^2 Z_0}{\delta J(a)\delta J(b)}\right|_{J=0}
-=Z_0[0]\,i\Delta_F(a-b).
+\int\mathcal D\bar\psi\,\mathcal D\psi\,
+e^{i\bar\psi D\psi}
+\propto\det D,
 $$
 
-Step 5: Apply the factor $1/i^2$ and divide by $Z_0[0]$:
+whereas a real bosonic Gaussian gives a power of $(\det K)^{-1/2}$. The Grassmann sign is the path-integral origin of the extra minus sign for a closed fermion loop.
+
+Gauge-field integration requires gauge fixing because gauge-related configurations otherwise appear repeatedly and the quadratic operator has zero modes. The Faddeev--Popov determinant introduces ghost fields in nonabelian theories. In abelian QED with a linear gauge condition, those ghosts decouple.
+
+## Worked example: a one-variable Gaussian with a source
+
+Consider
 
 $$
-\langle T\phi(a)\phi(b)\rangle
-=\frac{1}{i^2}i\Delta_F(a-b)
-=\frac{1}{i}\Delta_F(a-b).
+I(J)=\int_{-\infty}^{\infty}dx\,
+\exp\left(\frac i2ax^2+iJx\right),
 $$
 
-Depending on convention, the object called $\Delta_F$ may include the factor of $i$. The checked point is structural: the two-point function is the inverse of the quadratic kernel in the action.
+with a small convergence prescription understood. Complete the square:
 
-## Code
+$$
+\frac i2ax^2+iJx
+=\frac i2a\left(x+\frac Ja\right)^2
+-\frac i2\frac{J^2}{a}.
+$$
 
-```python
-import cmath
+Shift $y=x+J/a$. The remaining integral is independent of $J$:
 
-def gaussian_ratio(a, source):
-    # J-dependent part of integral exp(i/2 a x^2 + i J x).
-    return cmath.exp(-0.5j * source * source / a)
+$$
+\frac{I(J)}{I(0)}
+=\exp\left(-\frac i2\frac{J^2}{a}\right).
+$$
 
-def second_derivative_at_zero(a, h=1e-4):
-    f0 = gaussian_ratio(a, 0.0)
-    fp = gaussian_ratio(a, h)
-    fm = gaussian_ratio(a, -h)
-    return (fp - 2 * f0 + fm) / (h * h)
+Now differentiate:
 
-a = 3.0
-print("I(J)/I(0) at J=0.5:", gaussian_ratio(a, 0.5))
-print("second derivative:", second_derivative_at_zero(a))
-print("expected:", -1j / a)
-```
+$$
+\left.
+\frac1{i^2}\frac{d^2}{dJ^2}
+\frac{I(J)}{I(0)}
+\right|_{J=0}
+=-\left(-\frac ia\right)
+=\frac ia.
+$$
 
-## Common pitfalls
+The result $i/a$ is the inverse quadratic kernel with the Minkowski factor. Replacing $a$ by a differential operator gives the free field propagator.
 
-- Thinking the path integral is an ordinary integral over one variable. It is a regulated limit of many coupled integrations.
-- Ignoring boundary conditions. The $i\epsilon$ prescription is not cosmetic; it selects the vacuum propagator.
-- Forgetting normalization by $Z[0]$ when computing expectation values.
-- Mixing Minkowski and Euclidean signs without Wick rotating the action consistently.
-- Treating functional derivatives as mysterious. They are the continuum version of differentiating a Gaussian with respect to many sources.
-- Assuming every formal manipulation of $\mathcal{D}\phi$ is legal. A regulator, boundary condition, and limiting prescription are part of the definition.
-- Confusing $Z[J]$, $W[J]$, and $\Gamma[\varphi]$. They generate all diagrams, connected diagrams, and one-particle-irreducible vertices respectively.
+## Worked example: first-order four-point function in $\phi^4$
 
-## Connections
+To first order in $\lambda$, the connected four-point function contains
 
-Read this page before doing any serious diagram calculation. The key connection is that perturbation theory is not an independent set of rules; it is the expansion of the interacting path integral around a Gaussian. The same source method also reappears in effective actions, statistical mechanics, finite-temperature field theory, and semiclassical tunneling. When later pages use propagators, loop corrections, or one-particle-irreducible vertices, they are using objects that originate here.
+$$
+-\frac{i\lambda}{4!}
+\int d^4z\,
+\left\langle
+T\phi(x_1)\phi(x_2)\phi(x_3)\phi(x_4)\phi(z)^4
+\right\rangle_0.
+$$
+
+For the tree contribution, contract each external field with one of the four fields at $z$. There are
+
+$$
+4!=24
+$$
+
+such pairings. They cancel the $1/4!$ in the interaction. Each contraction supplies a propagator:
+
+$$
+G_c^{(4)}(x_1,x_2,x_3,x_4)
+=
+-i\lambda
+\int d^4z\,
+\prod_{r=1}^4\Delta_F(x_r-z)
++O(\lambda^2).
+$$
+
+After Fourier transformation, integration over $z$ produces the momentum-conserving delta function, and the remaining vertex factor is $-i\lambda$. The factorial in the Lagrangian was chosen so the rule has no leftover combinatorial factor.
+
+## Worked example: Euclidean ground-state projection
+
+Take a Hamiltonian with energy eigenstates $\vert n\rangle$ and energies $E_n$. Euclidean evolution gives
+
+$$
+e^{-HT}|\\Psi\rangle
+=\sum_n c_n e^{-E_nT}|n\rangle.
+$$
+
+Factor out the lowest energy with nonzero overlap:
+
+$$
+e^{-HT}|\\Psi\rangle
+=e^{-E_0T}
+\left[
+c_0|0\rangle
++\sum_{n>0}c_ne^{-(E_n-E_0)T}|n\rangle
+\right].
+$$
+
+As $T\to\infty$, every excited contribution is exponentially suppressed. Euclidean correlation functions exploit the same mechanism: their long-time decay isolates the lightest state carrying the chosen quantum numbers.
+
+## Failure modes in formal manipulations
+
+- $\mathcal D\phi$ is not translation-invariant by decree in every problem. Anomalies can arise because a regulated measure changes under a classical symmetry.
+- Omitting $i\epsilon$ leaves the inverse kernel and vacuum boundary condition ambiguous.
+- $Z$, $W$, and $\Gamma$ generate all diagrams, connected diagrams, and one-particle-irreducible vertices, respectively.
+- Wick rotation can fail when contours cannot be deformed past singularities. Finite density and real-time nonequilibrium problems need additional care.
+- A Euclidean weight is not always positive. Fermion determinants, topological terms, and chemical potentials may produce a sign problem.
+- Expanding around one saddle misses other saddles and effects nonanalytic in the coupling, such as terms proportional to $e^{-1/g^2}$.
+
+## Schwinger--Dyson equations from a change of variables
+
+Ordinary integration of a total derivative vanishes when boundary terms do. The functional version starts from
+
+$$
+0=
+\int\mathcal D\phi,
+\frac{\delta}{\delta\phi(x)}
+\left[
+F[\phi]e^{iS[\phi]}
+\right].
+$$
+
+Expanding the derivative gives
+
+$$
+\left\langle
+\frac{\delta F}{\delta\phi(x)}
++iF\frac{\delta S}{\delta\phi(x)}
+\right\rangle=0.
+$$
+
+Choosing different functionals $F$ produces an infinite hierarchy of relations among correlation functions, called the Schwinger--Dyson equations. With $F=1$, the expectation value of the classical equation-of-motion operator vanishes. With $F=\phi(y)$, differentiating the insertion produces a delta-function contact term.
+
+For a scalar action with interaction $V(\phi)$, the source-dependent identity is schematically
+
+$$
+\left[
+(\Box+m^2)\frac1i\frac{\delta}{\delta J(x)}
++V'\left(\frac1i\frac{\delta}{\delta J(x)}\right)
+-J(x)
+\right]Z[J]=0.
+$$
+
+It is an exact functional differential equation. Perturbation theory solves it as a series, while nonperturbative truncations attempt to close a finite subset. A truncation must respect symmetries or it can violate Ward identities.
+
+## Determinants and one-loop effective actions
+
+Expand a Euclidean action about a background $\varphi$:
+
+$$
+S_E[\varphi+\eta]
+=S_E[\varphi]
++\frac12\eta K[\varphi]\eta
++O(\eta^3).
+$$
+
+The Gaussian fluctuation integral gives
+
+$$
+\int\mathcal D\eta,
+e^{-\frac12\eta K\eta}
+\propto(\det K)^{-1/2}.
+$$
+
+Taking a logarithm turns the determinant into a trace:
+
+$$
+\Gamma_E^{(1)}[\varphi]
+=\frac12\operatorname{Tr}\log K[\varphi].
+$$
+
+For Grassmann fields, the Gaussian integral yields $\det D$, so their loop contribution carries the opposite sign in the logarithm. Expanding $\operatorname{Tr}\log$ in the background reproduces the sum of one-loop diagrams with any number of external background insertions.
+
+The determinant is divergent and needs regularization. Heat-kernel, dimensional, zeta-function, or lattice methods define it in different settings. Its local ultraviolet terms renormalize operators in the action, while nonlocal finite terms encode propagation over macroscopic distances.
+
+## A regulated lattice picture of the measure
+
+Discretize a scalar field on $N$ lattice sites. The functional measure becomes
+
+$$
+\mathcal D\phi
+\longrightarrow
+\prod_{n=1}^N d\phi_n,
+$$
+
+and the action becomes an ordinary function of $N$ variables. Functional derivatives become partial derivatives divided by lattice-volume factors. The free kinetic operator is an $N\times N$ matrix, and its inverse is the lattice propagator.
+
+The continuum limit is not obtained merely by setting the lattice spacing to zero at fixed bare parameters. Couplings must be tuned along an RG trajectory so physical correlation lengths in lattice units grow. A continuum quantum field theory corresponds to approaching a suitable critical surface where the lattice spacing can be removed while selected physical scales remain fixed.
+
+This finite-dimensional picture also clarifies changes of variables. A linear transformation contributes its determinant to the measure. For an infinite collection of modes, the regulated determinant may leave a finite remnant after the cutoff is removed. Fujikawa's derivation of chiral anomalies uses exactly such a regulated Jacobian.
+
+## Euclidean correlation functions and spectral information
+
+Let an operator $O$ carry chosen quantum numbers. In Euclidean time,
+
+$$
+C(\tau)
+=\langle0|O(\tau)O^\dagger(0)|0\rangle.
+$$
+
+Insert a complete set of energy eigenstates:
+
+$$
+C(\tau)
+=\sum_n
+|\langle0|O|n\rangle|^2
+e^{-(E_n-E_0)\tau}.
+$$
+
+At large $\tau$, the lightest state with nonzero overlap dominates. The slope of $\log C(\tau)$ approaches minus its energy gap. Lattice calculations use this decay to extract masses.
+
+Choosing $O$ poorly can suppress the desired overlap and leave excited-state contamination at accessible times. Statistical noise may also grow relative to the signal. Operators are therefore designed or combined variationally to isolate states; the formal spectral sum does not guarantee an easy numerical measurement.
+
+## Worked example: Schwinger--Dyson equation for the free propagator
+
+Take the normalized free path integral and choose $F[\phi]=\phi(y)$. The total derivative identity gives
+
+$$
+0=
+\int\mathcal D\phi
+\left[
+\delta^{(4)}(x-y)
++i\phi(y)\frac{\delta S_0}{\delta\phi(x)}
+\right]e^{iS_0}.
+$$
+
+For
+
+$$
+S_0
+=\frac12\int d^4z\,
+\left[
+(\partial\phi)^2-m^2\phi^2
+\right],
+$$
+
+the functional derivative is
+
+$$
+\frac{\delta S_0}{\delta\phi(x)}
+=-(\Box_x+m^2)\phi(x).
+$$
+
+Divide by the vacuum functional and rearrange:
+
+$$
+(\Box_x+m^2)
+\langle T\phi(x)\phi(y)\rangle
+=-i\delta^{(4)}(x-y).
+$$
+
+The two-point correlation function is therefore the Green function of the quadratic equation-of-motion operator with Feynman boundary conditions. The contact term came from differentiating the inserted field, not from the classical equation alone.
+
+## Why vacuum bubbles cancel
+
+Expand an interacting expectation value as
+
+$$
+\langle T\mathcal O\rangle
+=
+\frac{
+\langle T\mathcal O
+\exp(i\int\mathcal L_{\mathrm{int}})\rangle_0
+}{
+\langle T
+\exp(i\int\mathcal L_{\mathrm{int}})\rangle_0
+}.
+$$
+
+Wick contractions in the numerator separate into components connected to $\mathcal O$ and components connected only to themselves. The latter are vacuum bubbles. Combinatorics exponentiates the sum of connected vacuum diagrams, so the same factor multiplies every numerator and appears in the denominator. It cancels from normalized correlators.
+
+Vacuum diagrams cannot always be discarded. Their logarithm contributes to the vacuum energy and to the partition function in statistical mechanics. When gravity is dynamical, absolute vacuum energy affects the field equations. The cancellation applies to normalized nongravitational correlators, not to every question involving the generating functional.
+
+Similarly, taking $\log Z[J]$ removes disconnected products but retains connected vacuum information at $J=0$. Differentiating $W[J]$ then selects connected correlators because a derivative marks a source insertion inside a connected component. The Legendre transform goes one step further by reorganizing connected graphs into one-particle-irreducible vertices linked by full propagators.
+
+Boundary conditions deserve the same attention as the integrand. A transition kernel fixes field values at initial and final times. An in--out generating functional selects vacuum behavior in the remote past and future and produces time-ordered amplitudes. Expectation values at a finite time in a specified initial state instead require a closed time contour, often called the Schwinger--Keldysh formalism. Its fields run forward and backward in time so the final state is summed rather than fixed.
+
+Using an in--out effective action for a real-time response problem can produce equations that are neither causal nor real. The contour must match the question: scattering amplitudes, thermal equilibrium, and nonequilibrium evolution use related path integrals with different boundary data.
+
+## Related pages
 
 - [Motivation, Fields, and Quanta](/physics/quantum-field-theory/motivation-fields-and-quanta)
 - [Perturbation Theory and Feynman Diagrams](/physics/quantum-field-theory/perturbation-and-feynman-diagrams)
 - [Scalar Phi-Four Theory](/physics/quantum-field-theory/scalar-phi-four-theory)
-- [Collective and Condensed Matter Field Theory](/physics/quantum-field-theory/collective-and-condensed-matter-field-theory)
+- [Gauge Invariance and QED](/physics/quantum-field-theory/gauge-invariance-and-qed)
+- [Chiral Anomalies](/physics/quantum-field-theory/chiral-anomalies)
+

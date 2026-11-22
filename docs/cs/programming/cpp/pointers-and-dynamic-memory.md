@@ -9,7 +9,7 @@ Pointers expose the address-based side of C++. They make it possible to create o
 
 The power of pointers is balanced by responsibility. A pointer can point to a valid object, point to nothing, point to an object that has already been destroyed, or be uninitialized. Correct pointer programs maintain ownership and lifetime invariants as carefully as numeric programs maintain arithmetic invariants.
 
-## Definitions
+## Addresses, pointees, and lifetime
 
 A **pointer** is a value that stores the address of an object. A pointer variable has a pointer type.
 
@@ -68,7 +68,19 @@ std::cout << point->x << '\n'; // same as (*point).x
 delete point;
 ```
 
-## Key results
+`nullptr` is the null pointer literal introduced in C++11. It converts to any object-pointer type without also behaving like the integer zero, which avoids overload ambiguities associated with older `NULL` macros. A null pointer points to no object. Comparing it is valid; dereferencing it is undefined behavior.
+
+Const placement describes either the pointee or the pointer itself:
+
+| Declaration | Meaning |
+|---|---|
+| `const int* p` | pointer to an integer that cannot be changed through `p` |
+| `int* const p` | fixed pointer to a modifiable integer |
+| `const int* const p` | fixed pointer to a const integer |
+
+Reading declarations from the name outward helps: in `int* const p`, `p` is const, then a pointer, then to int. Top-level pointer constness disappears when a pointer is passed by value because the parameter receives its own copied address; constness of the pointed-to value remains significant.
+
+## Aliasing, arithmetic, and ownership
 
 Pointer assignment copies an address, not the object being pointed to. After this code, `p` and `q` point to the same dynamic integer:
 
@@ -88,11 +100,19 @@ int* p = fixed;    // OK
 // fixed = p;      // not OK
 ```
 
-When a class owns dynamic memory, the default copy behavior is usually wrong. Default memberwise copying copies pointer values, causing two objects to point to the same dynamic storage. That can cause double deletion, accidental sharing, or stale data. This is why destructors, copy constructors, and assignment operators matter.
+When a class owns dynamic memory, the default copy behavior is usually wrong. Default memberwise copying copies pointer values, causing two objects to point to the same dynamic storage. That can cause double deletion, accidental sharing, or stale data. Destructors, copy constructors, and assignment operators define the required ownership behavior.
 
 Modern C++ often uses standard containers and smart pointers instead of raw owning pointers. Savitch's raw-pointer treatment remains essential because it explains how arrays, dynamic allocation, linked lists, and class copy semantics work underneath.
 
-## Visual
+Pointer arithmetic is defined only within one array object, including a special one-past-the-end position. If `p` points at element zero, `p + n` can point one past the last element and may be used as a boundary, but it cannot be dereferenced. Forming unrelated addresses by arithmetic or subtracting pointers from different arrays has undefined behavior. The machine may represent addresses as integers, yet the C++ object model imposes stricter provenance and lifetime rules.
+
+Two pointers that hold the same address alias the same object. Mutation through one is observed through the other. Setting one alias to null after deletion does not update the rest; they remain dangling. Nulling a pointer is therefore a local defensive step, not a substitute for an ownership model.
+
+Use `std::unique_ptr<T>` for exclusive dynamic ownership that should move but not copy. Use `std::shared_ptr<T>` only when ownership genuinely has multiple independent participants; it adds reference-counting work and cannot reclaim a cycle without `std::weak_ptr`. A raw pointer or reference can still be the right expression for temporary non-owning access when the owner and lifetime are clear.
+
+Allocation can fail by throwing `std::bad_alloc`. More commonly, an operation after allocation throws. If the resource is already held by a vector or smart pointer, stack unwinding releases it. With a raw local owning pointer, every exceptional and early-return path must reach the matching delete, which is easy to miss.
+
+## What pointer assignment actually copies
 
 ```text
 Pointer assignment copies the address:
@@ -115,17 +135,17 @@ q -----^
 
 ```mermaid
 flowchart TD
-  A["Allocate with new or new#lsqb;"]"] --> B[Store returned pointer]
+  A["Allocate one object or an array"] --> B[Store returned pointer]
   B --> C[Use only while object is alive]
   C --> D{"Single object or array?"}
   D -->|single| E[delete pointer]
-  D -->|array| F["delete#lsqb;"] pointer"]
+  D -->|array| F["delete array pointer"]
   E --> G[Set pointer to nullptr if reused]
   F --> G
   G --> H[Do not dereference after delete]
 ```
 
-## Worked example 1: tracing pointer assignment
+## Worked example: tracing pointer assignment
 
 Problem: Predict the output.
 
@@ -172,7 +192,9 @@ Checked answer:
 
 The code intentionally demonstrates a leak. A production version would delete the object pointed to by `p1` before overwriting `p1`.
 
-## Worked example 2: dynamic array average
+That repair must occur before aliasing: `delete p1; p1 = p2;`. Deleting after the assignment would instead delete the shared `20` object and leave both variables dangling, while the original `10` object would still be leaked. The order follows ownership: release the resource currently owned through `p1`, then make `p1` a non-owning alias or define a new ownership policy.
+
+## Worked example: dynamic array average
 
 Problem: Read `n`, allocate an array of `n` exam scores, and compute the average.
 
@@ -230,18 +252,21 @@ $$
 
 The array is released with `delete[]`, matching `new[]`.
 
-## Code
+If reading a score fails after allocation, the example continues with invalid stream state and an unchanged array element. A safer modern version validates input into an `std::vector<double>`, whose destructor covers every return and exception path. If raw allocation is the subject of the exercise, the loop must detect failure, call `delete[] scores`, and return before using the incomplete total.
+
+## A resource-owning buffer
 
 This class owns a dynamic array and follows the basic rule of three: destructor, copy constructor, and assignment operator.
 
 ```cpp
 #include <algorithm>
 #include <iostream>
+#include <stdexcept>
 
 class IntBuffer {
 public:
     explicit IntBuffer(int size)
-        : size_(size), data_(new int[size]) {
+        : size_(checkedSize(size)), data_(new int[size_]) {
         std::fill(data_, data_ + size_, 0);
     }
 
@@ -277,6 +302,13 @@ public:
     }
 
 private:
+    static int checkedSize(int size) {
+        if (size < 0) {
+            throw std::invalid_argument("negative buffer size");
+        }
+        return size;
+    }
+
     int size_;
     int* data_;
 };
@@ -294,7 +326,11 @@ int main() {
 }
 ```
 
-## Common pitfalls
+`checkedSize` runs before allocation and prevents a negative `int` from becoming a huge unsigned allocation size. The buffer still has an intentionally low-level interface: `operator[]` performs no bounds check, and it lacks a const overload. A production value type would normally use `std::vector<int>` or add checked `at` operations, const access, moves, and a size type capable of representing the allocation.
+
+The assignment operator allocates and copies before deleting the old array. If allocation fails, the left operand retains its original value. The explicit self-assignment check prevents reading from storage just deleted by the same object. Copy-and-swap can express the same strong guarantee with less repeated ownership logic.
+
+## Undefined behavior tends to look ordinary
 
 - Dereferencing an uninitialized pointer.
 - Using a pointer after `delete`.
@@ -305,7 +341,7 @@ int main() {
 - Returning a pointer to a local automatic variable.
 - Writing outside a dynamic array because the allocated size is not tracked.
 
-Ownership checks:
+For each pointer:
 
 - Write down who owns each dynamically allocated object. If the answer is "several parts of the program," the design is probably ambiguous unless shared ownership is deliberately modeled.
 - Initialize pointers immediately. A pointer should either hold a valid address or `nullptr`; an uninitialized pointer contains an indeterminate address and must not be dereferenced or deleted.
@@ -315,15 +351,25 @@ Ownership checks:
 - For dynamic arrays, store the size next to the pointer in the owning object. A raw pointer alone does not remember how many elements were allocated.
 - Use standard containers when the array size is the only dynamic feature. A `vector<int>` usually expresses a growable array more safely than `int*` plus manual capacity management.
 
-Quick self-test: replace every raw pointer in a small program with the phrase "address of ...". If the phrase is not meaningful, the pointer probably does not have a clear role. For example, `int* scores` might be "address of the first element of a dynamic array of scores," but that sentence also reveals that the size must be stored somewhere else.
+Replace every raw pointer in a small program with the phrase "address of ...". If the phrase is not meaningful, the pointer probably does not have a clear role. For example, `int* scores` might be "address of the first element of a dynamic array of scores," but that sentence also reveals that the size must be stored somewhere else.
 
 When reviewing a function, pair every allocation with the cleanup path that owns it. If the allocation happens in one function and deletion in another, document that transfer clearly or wrap the resource in an object whose destructor makes the transfer unnecessary.
 
-A final review question is whether the pointer expresses observation or ownership. Observing pointers may point to objects owned elsewhere and must not delete them. Owning pointers are responsible for cleanup and should usually be wrapped in a class so destruction is automatic.
+Each pointer should express observation or ownership. Observing pointers may point to objects owned elsewhere and must not delete them. Owning pointers are responsible for cleanup and should usually be wrapped in a class so destruction is automatic.
 
-Extended practice: draw memory as two regions, stack objects and dynamic objects. Local pointer variables live on the stack, while objects created with `new` live in dynamic storage. Deleting the dynamic object does not remove the pointer variable; it only makes the stored address unsafe to use.
+Drawing memory as two regions helps with an initial trace: local pointer variables usually occupy stack storage, while objects created with `new` use dynamic storage. Deleting the dynamic object does not remove the pointer variable; it only makes the stored address unsafe to use.
 
-## Connections
+The common “stack versus heap” sketch is useful but incomplete. Objects with automatic storage duration are often implemented on a call stack, but the C++ standard specifies storage duration and lifetime rather than mandating those physical regions. A compiler may optimize an object into registers or remove it entirely while preserving observable behavior.
+
+Dereferencing requires more than a non-null numeric address. The pointer must designate a live object of a compatible type and meet alignment requirements. A pointer to a local variable becomes invalid when its scope exits; a pointer into a vector may become invalid after reallocation; a pointer to a deleted object is invalid even if a later allocation happens to reuse the same address.
+
+`delete` is valid only for the pointer value produced by the matching `new` expression, subject to permitted base-class conversions. Deleting a pointer into the middle of an array, deleting stack storage, or deleting the same allocation twice is undefined behavior. A no-op on `nullptr` is guaranteed, which simplifies destructors and moved-from states.
+
+Low-level memory tools and compiler sanitizers are useful because undefined behavior may remain quiet in ordinary tests. AddressSanitizer can detect many out-of-bounds accesses, use-after-free errors, and double deletions. It supplements ownership reasoning; it cannot prove that every possible path is safe.
+
+Valgrind-style leak checkers can also report allocations that remain reachable or are lost at process exit. A clean report is useful evidence, but only exercised paths are observed. Unit tests should cover early returns, failed allocations where controllable, copy and move paths, and destruction after partial work.
+
+## Related pages
 
 - [arrays](/cs/programming/cpp/arrays)
 - [strings](/cs/programming/cpp/strings)

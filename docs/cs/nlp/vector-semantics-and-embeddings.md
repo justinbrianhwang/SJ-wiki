@@ -5,141 +5,121 @@ sidebar_position: 6
 
 # Vector Semantics and Embeddings
 
-![word2vec CBOW and skip-gram architectures showing context words, projection layers, and predicted target or context outputs.](https://ar5iv.labs.arxiv.org/html/1301.3781/assets/x1.png)
+Vector semantics starts from an observable claim: words used in similar linguistic environments tend to have related meanings. A corpus can therefore supply coordinates for a word without a hand-built dictionary. The coordinates may be explicit context counts or dense parameters learned by a prediction objective.
 
-*Figure: word2vec introduced CBOW and skip-gram architectures for learning distributed word representations from local context. From [Mikolov et al., 2013](https://arxiv.org/abs/1301.3781) — embedded under educational fair use with attribution.*
+The word *similar* needs care. Two words can share topics, syntactic roles, sentiment, or reference types without being synonyms. `doctor` and `hospital` are topically associated; `doctor` and `nurse` are more substitutable in many sentences. A vector space reflects the corpus and the chosen definition of context, so its geometry has no context-free semantic interpretation.
 
-Vector semantics represents word meaning with numbers. Jurafsky and Martin introduce count vectors, cosine similarity, TF-IDF, PMI, PPMI, word2vec, GloVe, visualization, evaluation, and bias. Eisenstein frames the same area around the distributional hypothesis, distinguishing distributional statistics from distributed representations and adding Brown clusters, latent semantic analysis, structured contexts, and formal links among embedding objectives.
+## Building a word--context matrix
 
-The central idea is that words occurring in similar contexts tend to have related meanings. Count-based methods make this idea explicit with word-context matrices. Predictive embedding methods learn dense vectors that are more compact and often more useful downstream. Modern contextual language models extend the same idea by giving each token occurrence its own vector.
+Let rows index target words and columns index contexts. An entry $X_{wc}$ records how often target $w$ occurs with context $c$. Context might mean a neighboring word in a symmetric window, a word at a particular relative position, a dependency relation, or an entire document.
 
-## Definitions
+For the sentence `the dog chased the cat` with a window of one, `chased` yields pairs with `dog` and `the`. A position-sensitive design would make `dog@-1` different from `the@+1`. A dependency design might use `dog:nsubj` and `cat:obj`. The resulting vectors answer different questions.
 
-The **distributional hypothesis** says that a word's meaning is reflected in the contexts in which it appears. A **word-context matrix** $X$ has rows for target words and columns for contexts. An entry might be a raw count, a weighted count, or a transformed association score.
+| Context definition | Geometry tends to emphasize | Cost or limitation |
+|---|---|---|
+| wide symmetric window | topic and broad association | weakens word order and syntax |
+| narrow window | local substitutability | fewer observations per word |
+| position-labeled window | order-sensitive lexical patterns | more context columns |
+| dependency relation | syntactic and functional similarity | requires a parser and inherits its errors |
+| document ID | topic and retrieval similarity | coarse for lexical relations |
 
-**Cosine similarity** compares vector directions:
+Raw counts are dominated by frequent words and frequent contexts. A transformation is usually more useful than $X$ itself.
 
-$$
-\cos(u,v)=\frac{u^\top v}{||u||\,||v||}.
-$$
+## Weighting counts by informativeness
 
-Cosine is common because vector length often reflects frequency more than semantic content.
-
-**TF-IDF** weights a term by how frequent it is in a document and how rare it is across documents:
-
-$$
-\mathrm{tfidf}(t,d)=\mathrm{tf}(t,d)\log\frac{N}{\mathrm{df}(t)}.
-$$
-
-**Pointwise mutual information** measures association between a word $w$ and context $c$:
+TF--IDF is mainly a term--document weighting. With $N$ documents and document frequency $\operatorname{df}(t)$,
 
 $$
-\mathrm{PMI}(w,c)=\log\frac{P(w,c)}{P(w)P(c)}.
+\operatorname{tfidf}(t,d)
+=\operatorname{tf}(t,d)\log\frac{N}{\operatorname{df}(t)}.
 $$
 
-**Positive PMI** clips negative values:
+Terms frequent in one document but common across few documents receive high weight. Exact systems vary: term frequency may be binary, raw, or logarithmically scaled; inverse document frequency is often smoothed; document vectors are commonly normalized. These variants change numerical values, so an experiment should record the convention rather than saying only "TF--IDF."
+
+For word--context matrices, pointwise mutual information compares observed co-occurrence with independence:
 
 $$
-\mathrm{PPMI}(w,c)=\max(\mathrm{PMI}(w,c),0).
+\operatorname{PMI}(w,c)
+=\log\frac{P(w,c)}{P(w)P(c)}.
 $$
 
-**Embeddings** are dense vectors, usually with tens to thousands of dimensions. Word2vec learns embeddings by predicting words from contexts or contexts from words. GloVe factorizes a transformation of global co-occurrence counts. Both produce static embeddings: one vector per word type.
-
-## Key results
-
-Sparse count vectors are interpretable but high-dimensional. Dense embeddings are less interpretable but compact and effective. Count-based and predictive methods are not opposites: many predictive objectives can be understood as implicitly factorizing a shifted PMI-like matrix.
-
-The skip-gram version of word2vec predicts context words from a target word. With negative sampling, it trains a binary classifier to distinguish observed word-context pairs from randomly sampled noise pairs. For target $w$, observed context $c$, and negative samples $n_i$, a simplified objective is
+PMI is zero when the pair occurs at the rate predicted by independent marginals. It is positive for attraction and negative for avoidance. Positive PMI discards the negative entries:
 
 $$
-\log\sigma(v_c^\top u_w)+\sum_i\log\sigma(-v_{n_i}^\top u_w).
+\operatorname{PPMI}(w,c)=\max(\operatorname{PMI}(w,c),0).
 $$
 
-CBOW reverses the direction: it predicts the target from a bag or average of context embeddings. GloVe minimizes a weighted squared error:
+PPMI keeps a sparse nonnegative matrix and often works well for similarity. Its serious weakness is rare-event inflation. A pair observed once can receive a large value if both marginals are tiny. Minimum count thresholds, smoothing, or context-distribution smoothing reduce the problem. Missing pairs also need interpretation: a zero count is not strong evidence of negative association in a finite corpus.
+
+## Comparing directions with cosine
+
+Cosine similarity is
 
 $$
-J=\sum_{i,j} f(X_{ij})\left(w_i^\top \tilde{w}_j+b_i+\tilde{b}_j-\log X_{ij}\right)^2.
+\cos(u,v)=\frac{u^\top v}{\lVert u\rVert_2\lVert v\rVert_2}.
 $$
 
-Context definition changes what similarity means. A small symmetric window captures topical and functional similarity. Dependency contexts can emphasize syntactic substitutability. Document contexts support information retrieval and topic similarity. Subword-enriched embeddings improve rare and morphologically complex words.
+It compares directions and ignores positive scaling. For count vectors this helps separate context profile from raw frequency. A zero vector has no defined direction; software must choose whether to return zero, missing, or an error.
 
-Static embeddings conflate senses. The vector for `bank` averages financial and river contexts. Contextual embeddings from BERT-style and GPT-style models produce different vectors for different occurrences, which helps word-sense disambiguation and downstream tasks.
+Cosine can be negative for signed dense vectors, though PPMI vectors are nonnegative. A high cosine does not establish synonymy. Antonyms such as `hot` and `cold` occur in similar contexts and can be near each other. Nearest-neighbor results should be described as distributional similarity under a particular representation.
 
-Embeddings also encode social biases present in training corpora. Bias is not only a geometric artifact; it is a data, annotation, deployment, and evaluation issue. Measuring nearest neighbors, analogy behavior, or downstream disparities can reveal problems, but mitigation must be tied to the actual application.
+Euclidean distance retains sensitivity to vector norms. Dot products reward both alignment and magnitude and are the native scores in many embedding objectives. Choosing cosine after training removes norm information that the model may have used, sometimes beneficially and sometimes not.
 
-Count vectors and embeddings differ in how much they expose the modeling assumptions. With PPMI, one can inspect which contexts make two words similar. With dense vectors, the dimensions are usually not directly interpretable, but the model can compress many weak contextual signals into a useful representation. This creates a tradeoff between transparency and downstream accuracy. A good workflow is to start with count-based representations to understand the corpus, then use embeddings when generalization and compactness matter.
+## Compressing sparse statistics
 
-The context window is a hidden semantic choice. A wide window tends to group words by topic, so `doctor` may be close to `hospital`. A narrow or dependency-based context tends to group words by substitutability, so `doctor` may be closer to `nurse` or `surgeon`. Neither is universally correct. Information retrieval, analogy solving, WSD, and syntactic features can prefer different context definitions.
+A word--context matrix may contain hundreds of thousands of columns. Truncated singular value decomposition approximates it as
 
-Static embeddings are often evaluated with word similarity or analogy datasets, but these tests cover only a small slice of usefulness. Downstream evaluation is still necessary. A representation that looks worse on analogies may be better for NER, sentiment, or low-resource transfer if its subword modeling, corpus domain, or frequency handling better matches the task.
+$$
+X\approx U_k\Sigma_kV_k^\top,
+$$
 
-## Visual
+where $k$ is much smaller than the original rank. Rows of $U_k\Sigma_k$ are dense word representations. This family of approaches is often called latent semantic analysis when applied to term--document data.
 
-| Representation | Matrix or objective | Best for | Main limitation |
-|---|---|---|---|
-| Raw counts | $C(w,c)$ | transparent corpus analysis | frequency dominates |
-| TF-IDF | term by document | retrieval and document similarity | not a lexical semantic model by itself |
-| PPMI | word by context | interpretable association | sparse and noisy for rare words |
-| LSA/SVD | low-rank count matrix | compression and smoothing | expensive on large matrices |
-| word2vec | prediction with negative sampling | efficient dense embeddings | static senses |
-| GloVe | weighted count factorization | global co-occurrence structure | static senses |
-| Contextual LM | transformer hidden states | token meaning in context | expensive and layer-dependent |
+Low-rank approximation shares evidence: two words need not overlap on every explicit context if their patterns can be explained by similar latent directions. It also erases detail and can be expensive on very large matrices. Whether to use $U_k$, $U_k\Sigma_k$, or a fractional power of $\Sigma_k$ changes the geometry. There is no single representation automatically implied by "apply SVD."
+
+Sparse count vectors retain inspectable coordinates. If `coffee` is close to `tea`, one can list the contexts contributing to their dot product. Dense dimensions generally mix many contexts and resist such direct naming. The compactness is useful; the loss of transparency is real.
+
+## Predictive embeddings
+
+Word2vec learns two vector tables: target vectors $u_w$ and context vectors $v_c$. Skip-gram predicts nearby contexts from a target. With negative sampling, an observed pair $(w,c)$ is contrasted with $k$ noise contexts $n_i$:
+
+$$
+\log\sigma(v_c^\top u_w)
++\sum_{i=1}^{k}\log\sigma(-v_{n_i}^\top u_w).
+$$
+
+The positive dot product is pushed upward and negative dot products downward. Noise examples are usually sampled from a transformed unigram distribution rather than uniformly. Frequent words appear often enough to need subsampling; otherwise they dominate training with weakly informative pairs.
+
+CBOW reverses the prediction direction. It combines context embeddings, often by summing or averaging them, and predicts the center word. CBOW is fast and smooths across a bag of nearby words. Skip-gram gives each target--context pair its own update and often represents rarer words better, at greater training cost.
+
+Negative-sampling skip-gram has a close mathematical relationship to factorizing a shifted PMI matrix under simplifying assumptions. Count-based and predictive methods are therefore not clean opposites. Both extract co-occurrence structure; they differ in weighting, parameterization, optimization, and what is stored explicitly.
+
+GloVe begins from global co-occurrence counts and fits
+
+$$
+J=\sum_{i,j}f(X_{ij})
+\left(w_i^\top\tilde w_j+b_i+\tilde b_j-\log X_{ij}\right)^2.
+$$
+
+The weighting function $f$ limits the influence of very frequent pairs and gives little or no weight to absent pairs. Bias terms absorb much of the marginal-frequency effect. Like word2vec, GloVe produces static type vectors rather than a different vector for each token occurrence.
 
 ```mermaid
 flowchart TB
-  Corpus["Corpus tokens"] --> Context["Choose context window or dependency context"]
-  Context --> Pairs["Observed positive word-context pairs (w,c)"]
-
-  subgraph Count["Count-based path"]
-    direction TB
-    Matrix["Word-context count matrix C(w,c)"]
-    Weight["Transform counts: TF-IDF, PMI, or PPMI"]
-    SVD["Optional SVD/LSA compression"]
-    Matrix --> Weight
-    Weight --> SVD
-  end
-
-  subgraph SGNS["word2vec skip-gram with negative sampling"]
-    direction TB
-    Target["Target embedding u_w"]
-    Pos["Positive context embedding v_c"]
-    Neg["k negative contexts sampled from noise distribution"]
-    DotPos["Maximize log sigmoid(v_c dot u_w)"]
-    DotNeg["Maximize sum_i log sigmoid(-v_n_i dot u_w)"]
-    Update["Update target and context vectors by SGD"]
-    Target --> DotPos
-    Pos --> DotPos
-    Target --> DotNeg
-    Neg --> DotNeg
-    DotPos --> Update
-    DotNeg --> Update
-  end
-
-  Pairs --> Matrix
-  Pairs --> Target
-  Update --> Dense["Dense static embeddings: one vector per word type"]
-  SVD --> Dense
-  Dense --> Use(("Cosine similarity, retrieval features, downstream NLP"))
-
-  subgraph Contextual["Contextual embedding path"]
-    direction TB
-    Sent["Sentence with token occurrence"]
-    Encoder["Transformer or BiLSTM encoder"]
-    TokenVec["Context-specific vector for this token occurrence"]
-    Sent --> Encoder
-    Encoder --> TokenVec
-  end
-
-  Contextual --> Use
+  A[Corpus] --> B[Choose target and context events]
+  B --> C[Co-occurrence pairs]
+  C --> D[Count matrix]
+  D --> E[PPMI or other weighting]
+  E --> F[Optional low-rank factorization]
+  C --> G[Positive and negative training pairs]
+  G --> H[Skip-gram or CBOW optimization]
+  F --> I[Dense or sparse static vectors]
+  H --> I
+  I --> J[Similarity and downstream features]
 ```
 
-This embedding diagram separates count-based vector semantics from predictive skip-gram training and contextual encoders. The word2vec branch labels the target vector, positive context vector, negative samples, dot products, sigmoid objectives, and SGD update. The count branch shows TF-IDF/PMI/PPMI and optional SVD, while the contextual branch explains why modern encoders produce a different vector for each token occurrence.
+## Worked example: TF--IDF by hand
 
-## Worked example 1: TF-IDF by hand
-
-Problem: compute TF-IDF for `cat` in document $d_1$.
-
-Corpus:
+Consider three documents:
 
 ```text
 d1: cat sat cat
@@ -147,79 +127,134 @@ d2: dog sat
 d3: cat ate fish
 ```
 
-Use raw term frequency and $\mathrm{idf}(t)=\log(N/\mathrm{df}(t))$.
-
-1. Number of documents:
+Using raw term frequency and natural-log IDF, compute the weight of `cat` in $d_1$. The corpus size is $N=3$. The token appears twice in $d_1$, so
 
 $$
-N=3.
+\operatorname{tf}(\mathrm{cat},d_1)=2.
 $$
 
-2. Term frequency of `cat` in $d_1$:
+It occurs in $d_1$ and $d_3$, hence
 
 $$
-\mathrm{tf}(\mathrm{cat},d_1)=2.
+\operatorname{df}(\mathrm{cat})=2.
 $$
 
-3. Document frequency of `cat`: it appears in $d_1$ and $d_3$, so
+The inverse document frequency is
 
 $$
-\mathrm{df}(\mathrm{cat})=2.
+\operatorname{idf}(\mathrm{cat})
+=\log\frac32
+\approx0.4055.
 $$
 
-4. IDF:
+Therefore
 
 $$
-\mathrm{idf}(\mathrm{cat})=\log\frac{3}{2}\approx0.405.
+\operatorname{tfidf}(\mathrm{cat},d_1)
+=2(0.4055)
+\approx0.8109.
 $$
 
-5. TF-IDF:
+For comparison, `fish` occurs once and appears in only one document:
 
 $$
-\mathrm{tfidf}(\mathrm{cat},d_1)=2(0.405)=0.811.
+\operatorname{tfidf}(\mathrm{fish},d_3)
+=1\log\frac31
+\approx1.0986.
 $$
 
-Checked answer: `cat` in $d_1$ has TF-IDF about $0.811$ with natural logarithms. It receives less weight than a word that appears only in one document, because it is not maximally document-specific.
+Although `cat` is more frequent within $d_1$, `fish` is more document-specific under this weighting.
 
-## Worked example 2: PPMI for a word-context pair
+## Worked example: PPMI and rare-event sensitivity
 
-Problem: compute PPMI for target `coffee` and context `drink`. Suppose a corpus has $1000$ total word-context pairs. The pair (`coffee`, `drink`) occurs $20$ times. `coffee` appears in $50$ pairs, and `drink` appears as a context in $100$ pairs.
-
-1. Estimate probabilities:
+Suppose a corpus contains $1000$ target--context pairs. The pair (`coffee`, `drink`) occurs $20$ times; `coffee` appears as target in $50$ pairs; `drink` appears as context in $100$ pairs. Then
 
 $$
-P(\mathrm{coffee},\mathrm{drink})=\frac{20}{1000}=0.02.
+P(\mathrm{coffee},\mathrm{drink})=\frac{20}{1000}=0.02,
 $$
 
-$$
-P(\mathrm{coffee})=\frac{50}{1000}=0.05,\qquad
-P(\mathrm{drink})=\frac{100}{1000}=0.10.
-$$
-
-2. Compute independence expectation:
+and
 
 $$
-P(\mathrm{coffee})P(\mathrm{drink})=0.05(0.10)=0.005.
+P(\mathrm{coffee})=0.05,
+\qquad
+P(\mathrm{drink})=0.10.
 $$
 
-3. Compute PMI:
+Independence predicts joint probability $0.05(0.10)=0.005$. Thus
 
 $$
-\mathrm{PMI}=\log\frac{0.02}{0.005}=\log 4\approx1.386.
+\operatorname{PMI}
+=\log\frac{0.02}{0.005}
+=\log4
+\approx1.386.
 $$
 
-4. Clip at zero:
+The value is positive, so PPMI remains $1.386$. The observed pair is four times as likely as independent marginals predict.
+
+Now consider a pair seen once where each marginal also occurs once. Its empirical probabilities are all $0.001$, giving
 
 $$
-\mathrm{PPMI}=\max(1.386,0)=1.386.
+\operatorname{PMI}_{\mathrm{rare}}
+=\log\frac{0.001}{(0.001)(0.001)}
+=\log1000
+\approx6.908.
 $$
 
-Checked answer: PPMI is about $1.386$, indicating that `coffee` and `drink` co-occur four times more often than independence would predict.
+One observation receives a much larger score than the twenty-count `coffee` pair. That is the rare-event bias in numerical form, not evidence that the rare pair carries a more stable semantic relation.
 
-## Code
+## Worked example: cosine similarity
+
+Let three explicit context coordinates be `drink`, `hot`, and `bark`, with
+
+$$
+u_{\mathrm{coffee}}=[2,1,0],
+\quad
+u_{\mathrm{tea}}=[1,2,0],
+\quad
+u_{\mathrm{dog}}=[0,0,3].
+$$
+
+For coffee and tea, the dot product is
+
+$$
+u_{\mathrm{coffee}}^\top u_{\mathrm{tea}}
+=2(1)+1(2)+0(0)=4.
+$$
+
+Both norms equal $\sqrt{2^2+1^2}=\sqrt5$, so
+
+$$
+\cos(u_{\mathrm{coffee}},u_{\mathrm{tea}})
+=\frac4{\sqrt5\sqrt5}=\frac45=0.8.
+$$
+
+Coffee and dog have dot product zero. Since both norms are nonzero,
+
+$$
+\cos(u_{\mathrm{coffee}},u_{\mathrm{dog}})=0.
+$$
+
+In this tiny representation, coffee and tea share beverage contexts while dog lies on an unrelated context axis.
+
+## Static vectors, analogies, and context-sensitive meaning
+
+A static embedding assigns one vector to the type `bank`. Financial and river uses are blended according to their corpus frequencies. Sometimes the dominant sense overwhelms the other; sometimes the vector occupies an average region that represents neither cleanly.
+
+Contextual encoders instead produce a vector for each token occurrence. The representation of `bank` in `deposit at the bank` depends on surrounding tokens and differs from its representation in `sat on the river bank`. Layers also specialize: earlier representations tend to retain more local form, while later ones are shaped by the model objective and broader context. Pooling decisions and layer selection matter in downstream use.
+
+Vector offsets can support analogies by searching near $v_b-v_a+v_c$. Successful cases indicate regularities in the learned geometry, not symbolic rules that hold uniformly. Results depend on vocabulary, normalization, corpus balance, and the exclusion of query words from candidates. Intrinsic similarity and analogy benchmarks cover only a narrow slice of utility. Downstream evaluation under the target domain is usually more informative.
+
+## Corpus bias appears in the geometry
+
+Embeddings reproduce statistical associations in their training text, including stereotypes and historical inequities. Nearest neighbors and association tests can reveal some patterns, but a single projection that removes one direction does not settle downstream behavior. Bias can reappear through correlated dimensions, tokenization, labels, or application data.
+
+Evaluation should connect a representation to a use: which groups and language varieties are present, which errors cause harm, and whether similarity is even the right operation. Corpus documentation and subgroup error analysis are more defensible than treating geometric debiasing as a universal preprocessing step.
+
+## A small inspectable PPMI model
 
 ```python
-from collections import Counter, defaultdict
+from collections import Counter
 from math import log, sqrt
 
 sentences = [
@@ -231,55 +266,85 @@ sentences = [
 
 window = 1
 pairs = Counter()
-word_counts = Counter()
-context_counts = Counter()
+target_totals = Counter()
+context_totals = Counter()
 
-for sent in sentences:
-    words = sent.split()
-    for i, w in enumerate(words):
-        word_counts[w] += 1
-        for j in range(max(0, i - window), min(len(words), i + window + 1)):
-            if i == j:
-                continue
-            c = words[j]
-            pairs[(w, c)] += 1
-            context_counts[c] += 1
+for sentence in sentences:
+    words = sentence.split()
+    for i, word in enumerate(words):
+        left = max(0, i - window)
+        right = min(len(words), i + window + 1)
+        for j in range(left, right):
+            if i != j:
+                context = words[j]
+                pairs[word, context] += 1
+                target_totals[word] += 1
+                context_totals[context] += 1
 
 total = sum(pairs.values())
-vocab = sorted(word_counts)
+contexts = sorted(context_totals)
 
-def ppmi(w, c):
-    if pairs[(w, c)] == 0:
+def ppmi(word, context):
+    count = pairs[word, context]
+    if count == 0:
         return 0.0
-    p_wc = pairs[(w, c)] / total
-    p_w = sum(pairs[(w, x)] for x in context_counts) / total
-    p_c = context_counts[c] / total
+    p_wc = count / total
+    p_w = target_totals[word] / total
+    p_c = context_totals[context] / total
     return max(log(p_wc / (p_w * p_c)), 0.0)
 
-def vector(w):
-    return [ppmi(w, c) for c in vocab]
+def vector(word):
+    return [ppmi(word, context) for context in contexts]
 
 def cosine(a, b):
     dot = sum(x * y for x, y in zip(a, b))
-    na = sqrt(sum(x * x for x in a))
-    nb = sqrt(sum(y * y for y in b))
-    return dot / (na * nb) if na and nb else 0.0
+    norm_a = sqrt(sum(x * x for x in a))
+    norm_b = sqrt(sum(y * y for y in b))
+    return dot / (norm_a * norm_b) if norm_a and norm_b else 0.0
 
 print(cosine(vector("coffee"), vector("tea")))
 print(cosine(vector("coffee"), vector("dog")))
 ```
 
-## Common pitfalls
+The explicit vectors are suitable for corpus inspection, not large-scale training. A production implementation would build a sparse matrix, prune unreliable events, and use optimized sparse linear algebra.
 
-- Treating cosine similarity as meaning equivalence; it may reflect topic, syntax, domain, or frequency artifacts.
-- Forgetting that PMI is biased toward rare events unless counts are smoothed or thresholded.
-- Comparing embeddings trained with different corpora, dimensions, tokenization, or context windows as if they were directly equivalent.
-- Ignoring out-of-vocabulary and rare word behavior.
-- Assuming analogies prove deep semantic understanding.
-- Using static embeddings for sense-sensitive tasks without checking ambiguity.
-- Treating embedding bias as solved by a single vector projection.
+## Frequency is present even when it is not a coordinate
 
-## Connections
+High-frequency words have better-estimated vectors because they participate in more updates, but frequency also changes geometry in less desirable ways. Very common contexts appear with many targets and contribute broad, weak signals. Subsampling frequent tokens in predictive training reduces their computational dominance. In count models, PMI divides by context marginals and TF--IDF downweights common document terms for related reasons.
+
+Rare words sit at the other extreme. Their nearest neighbors can be driven by one accidental context, spelling artifacts, or a shared document. A cosine value does not carry its own confidence interval. Minimum counts, subword composition, and uncertainty-aware reporting are more honest than presenting a rare word's top neighbor as a stable semantic fact.
+
+Vocabulary pruning changes the normalization statistics. Removing rare contexts before calculating PMI is not equivalent to calculating PMI first and deleting columns. The total pair count and marginals change. Corpus preprocessing, window boundaries, sentence segmentation, and whether a token can pair with itself all belong in a reproducible representation specification.
+
+Multiple occurrences within one short window can also be counted in different ways. A frequency-weighted matrix counts every pair; a binary window records only whether the context appeared around a target occurrence. Distance weighting can give adjacent words more influence than distant ones. These choices are semantic assumptions expressed as counting rules.
+
+## Comparing spaces requires alignment
+
+Dense embedding axes have no fixed meaning. Two runs of the same objective can rotate or reflect the space while preserving all internal dot products. Coordinate 17 from one run cannot be compared directly with coordinate 17 from another. Neighbor sets and pairwise similarities are rotation-invariant; raw coordinates are not.
+
+To study semantic change across time, independently trained spaces are often aligned with an orthogonal transformation using a shared anchor vocabulary. The alignment itself assumes that enough anchors are stable. Apparent movement may come from corpus composition, frequency, or optimization noise rather than meaning change. Multiple runs and control words help estimate that background variability.
+
+Averaging independently trained embeddings coordinatewise is invalid without alignment. Concatenating them preserves each geometry but changes dimension and weighting. Training on the combined corpus answers a different question because it erases the separation between sources.
+
+## Composing words into larger units
+
+A sentence vector formed by averaging word embeddings is a strong and surprisingly stubborn baseline. It represents lexical content and ignores order. Weighting words by inverse frequency can keep function words from dominating; subtracting a leading common component is another corpus-dependent adjustment. Both transformations must be fitted on training data.
+
+Additive composition cannot distinguish `dog bites man` from `man bites dog`. Concatenation preserves fixed positions but fails for variable length. Recurrent networks, convolution, and self-attention learn context-sensitive composition, though their output geometry depends on the supervised or self-supervised objective rather than only local co-occurrence.
+
+Static embeddings used as classifier features can be frozen or fine-tuned. Freezing preserves the pretrained space and limits parameters. Fine-tuning can specialize a word such as `positive` differently in medical and sentiment corpora, but rare words may move on scant evidence. Reporting only the source embedding name omits this consequential training choice.
+
+Out-of-vocabulary behavior should be evaluated explicitly. Mapping every unknown form to one vector makes unrelated words identical. Subword models can construct vectors for unseen spellings, but their quality depends on whether the pieces are informative; opaque identifiers and novel scripts remain difficult. Character information improves coverage, not guaranteed semantics.
+
+## Evaluating a representation without circular claims
+
+Intrinsic evaluation compares similarities, analogies, or clusters to a small labeled resource. Such tests are quick and isolate the representation, yet human similarity judgments vary with instructions and domain. Coverage can dominate results when one model lacks many benchmark words.
+
+Extrinsic evaluation inserts the representation into a downstream system. It measures usefulness for that architecture and dataset, not an eternal quality of the vectors. If embeddings are fine-tuned, improvements may come from adaptable initialization rather than their original geometry. Keeping the downstream model and tuning budget fixed is necessary for a fair comparison.
+
+Nearest-neighbor inspection remains valuable as qualitative error analysis. Query frequent, rare, polysemous, demographic, and domain-specific terms rather than selecting only appealing examples. Hubness in high-dimensional spaces can cause a few vectors to appear as neighbors of many queries. Measuring reverse-neighbor counts exposes these hubs and tempers semantic interpretations.
+
+## Related pages
 
 - [Pretrained language models](/cs/nlp/pretrained-language-models)
 - [Logistic regression for text](/cs/nlp/logistic-regression-for-text)

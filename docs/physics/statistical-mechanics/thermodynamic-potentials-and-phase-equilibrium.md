@@ -269,4 +269,4 @@ for C, P in [(1, 1), (1, 2), (1, 3), (2, 2)]:
 - [Grand canonical ensemble and particle exchange](/physics/statistical-mechanics/grand-canonical-ensemble-and-particle-exchange)
 - [Real gases, virial expansion, and van der Waals theory](/physics/statistical-mechanics/real-gases-virial-expansion-and-van-der-waals-theory)
 - [Phase transitions and order parameters](/physics/statistical-mechanics/phase-transitions-and-order-parameters)
-- [Thermodynamics](/physics/thermodynamics/)
+- [Thermodynamics](/physics/thermodynamics/intro)

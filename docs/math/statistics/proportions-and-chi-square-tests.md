@@ -9,11 +9,7 @@ Many statistical questions involve counts rather than measurements: how many res
 
 The main distinction is between one categorical variable and two categorical variables. With one variable, we may estimate or test a population proportion, or test whether several category probabilities match a claimed distribution. With two variables, we ask whether the variables are independent or associated in a population. The calculations use counts, but the interpretation must return to proportions, context, and design.
 
-![Several chi-square density curves are plotted for different degrees of freedom.](https://commons.wikimedia.org/wiki/Special:FilePath/Chi-square_distributionPDF.svg)
-
-*Figure: Chi-square density curves for different degrees of freedom. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Chi-square_distributionPDF.svg), Jona, CC BY-SA 4.0.*
-
-## Definitions
+## Binary outcomes and category counts
 
 A **sample proportion** is
 
@@ -67,7 +63,7 @@ $$
 
 summed over all cells.
 
-## Key results
+## Why tests and intervals use different standard errors
 
 For a one-proportion z test, the normal approximation works best when expected successes and failures under the null are sufficiently large:
 
@@ -76,6 +72,41 @@ np_0 \ge 10,\quad n(1-p_0)\ge10
 $$
 
 is a common introductory rule. For intervals, the analogous check often uses $n\hat{p}$ and $n(1-\hat{p})$.
+
+The distinction follows from the question. A hypothesis test asks how variable $\hat p$ would be if $p=p_0$, so its standard error uses $p_0$. An interval estimates uncertainty without fixing $p$, so a Wald interval substitutes $\hat p$. Mixing the two denominators breaks the correspondence between the test and its reference distribution.
+
+The Wald interval has unreliable coverage for small $n$ and for proportions near 0 or 1. Wilson's score interval comes from inverting the null-based score test and stays inside the parameter range more naturally. Exact binomial tests and intervals avoid the normal approximation but can be conservative because a discrete distribution cannot usually attain the nominal tail probability exactly.
+
+For two independent proportions, the null test of $p_1=p_2$ uses a pooled estimate
+
+$$
+\hat p=\frac{x_1+x_2}{n_1+n_2}
+$$
+
+in the null standard error. A confidence interval for $p_1-p_2$ uses separate sample proportions because it estimates the difference rather than imposing equality. Paired binary outcomes require McNemar's test or another matched method; the ordinary two-proportion calculation assumes independent groups.
+
+## Expected counts under independence
+
+If row and column variables are independent, then
+
+$$
+P(R_i\cap C_j)=P(R_i)P(C_j).
+$$
+
+Replacing marginal probabilities by sample margins gives
+
+$$
+E_{ij}=N\frac{R_i}{N}\frac{C_j}{N}
+=\frac{R_iC_j}{N}.
+$$
+
+The expected table preserves every observed row and column total. In an $r\times c$ table, the margins impose $r+c-1$ independent constraints on $rc$ cells, leaving
+
+$$
+rc-(r+c-1)=(r-1)(c-1)
+$$
+
+degrees of freedom.
 
 For a two-way table with $r$ rows and $c$ columns, the degrees of freedom for the chi-square independence test are
 
@@ -91,6 +122,16 @@ $$
 
 Expected counts, not observed counts, determine whether the large-sample chi-square approximation is reliable. A common rule is that all expected counts should be at least 5, though modern practice is more nuanced. When counts are small in a $2\times2$ table, Fisher's exact test is often used.
 
+Pearson residuals
+
+$$
+r_{ij}=\frac{O_{ij}-E_{ij}}{\sqrt{E_{ij}}}
+$$
+
+show which cells contribute to $\chi^2$, since $\chi^2=\sum r_{ij}^2$. Adjusted standardized residuals account for row and column leverage and are better for cell-level follow-up. Looking only at the largest raw difference can be misleading because a difference of 10 is far more surprising when the expected count is 5 than when it is 500.
+
+For goodness-of-fit tests, estimating parameters from the same counts consumes degrees of freedom. If $m$ parameters are estimated, the usual count is $k-1-m$, provided regularity conditions hold. Combining categories after seeing which cells fit poorly changes the analysis; sparse categories should be combined only when their substantive meaning permits it and preferably before inspecting discrepancies.
+
 For a $2\times2$ table, effect sizes include risk difference, relative risk, odds ratio, and phi. For larger tables, Cramer's $V$ summarizes association strength:
 
 $$
@@ -99,9 +140,35 @@ $$
 
 The p-value answers whether the data are surprising under independence; effect size answers how strong the association is.
 
+These $2\times2$ measures answer different questions. If risks are $p_1$ and $p_0$, the risk difference $p_1-p_0$ gives an absolute change, relative risk $p_1/p_0$ gives a multiplicative change, and the odds ratio compares $p/(1-p)$. When events are common, the odds ratio can look much farther from 1 than the relative risk. Case-control sampling often identifies an odds ratio but does not directly estimate population risks because the numbers of cases and controls were fixed by design.
+
 Percentages should usually be reported in the direction that matches the question. If the rows are class years and the question is whether first-year and upper-year students prefer different formats, compare row percentages. If the columns are formats and the question is what kinds of students choose each format, compare column percentages. The same table can support both summaries, but mixing denominators in one sentence creates confusion. Always name the denominator: "60% of commuters work 10+ hours" is clearer than "60% work," especially when several groups appear in the table.
 
-## Visual
+## Fisher's exact test and fixed margins
+
+For a $2\times2$ table with fixed row and column totals, specifying one cell determines the other three. Under independence, the upper-left count has a hypergeometric distribution. Fisher's exact test sums probabilities of tables at least as incompatible with the null as the observed table, according to a stated two-sided convention.
+
+The method does not rely on a large-sample chi-square approximation, so it is valuable with sparse counts. “Exact” describes the null calculation conditional on the margins; it does not make the sampling design unbiased or eliminate uncertainty. With larger samples it can be conservative, and unconditional exact alternatives also exist.
+
+Yates's continuity correction is sometimes applied to Pearson's chi-square statistic in $2\times2$ tables. It reduces the discrepancy to account for approximating a discrete distribution with a continuous one, usually increasing the p-value. Modern software differs in defaults. A report should say whether the correction was used rather than mixing a hand calculation without it and software output with it.
+
+## Sampling design behind the counts
+
+Chi-square procedures expect each observational unit to contribute to one cell. A multiple-response survey in which one person selects several categories does not yield independent cell counts in the ordinary multinomial sense. Repeated visits by the same customer and household samples with several members have similar dependence.
+
+Survey weights also matter. Expanding weighted counts and feeding them to an ordinary chi-square test can produce an enormous fictitious sample size. Complex-survey tests adjust for strata, clusters, and weights. The displayed weighted percentages may look like a contingency table, but their sampling variance does not follow the simple count formula.
+
+Case-control studies fix numbers by outcome, so row or column percentages must follow the sampling direction. They can estimate exposure odds ratios but not disease prevalence or risk directly. Cohort data, where exposed and unexposed groups are followed for outcomes, support risks and relative risks.
+
+## Follow-up after a significant table
+
+An omnibus chi-square result says some cell pattern departs from independence. Inspect adjusted residuals and substantively meaningful percentage differences next. Testing every cell separately creates multiplicity; adjusted p-values or prespecified contrasts keep the family of follow-ups explicit.
+
+Collapsing categories can change the conclusion. Combining groups with opposite associations may hide structure, while splitting many categories creates sparse expected counts. Category definitions should follow the measurement and research question. Rebinning repeatedly until significance appears changes the null distribution and must not be presented as a prespecified test.
+
+For ordered categories, Pearson's chi-square ignores the ordering. A trend test or ordinal model can be more powerful and more interpretable when a monotone pattern is the scientific target. Using scores for ordered categories adds assumptions about their spacing, so those scores should be defensible.
+
+## Matching the test to the table
 
 ```mermaid
 flowchart TD
@@ -270,11 +337,21 @@ $$
 
 6. The p-value is $P(\chi^2_2\ge8.728)\approx0.0127$.
 
+7. Cramer's $V$ is
+
+$$
+V=\sqrt{\frac{8.728}{180\min(1,2)}}
+=\sqrt{0.04849}
+\approx0.220.
+$$
+
+The test detects association, while $V$ supplies a scale-free summary of its sample strength. The row percentages describe the direction: 33.3% of first-year students prefer in-person study, compared with 56.7% of upper-year students.
+
 Answer: Reject independence at $\alpha=0.05$. There is evidence of an association between class year and preferred study format. The table suggests upper-year students choose in-person more often than expected under independence.
 
 Checked answer: All expected counts exceed 5, so the chi-square approximation is reasonable. The largest discrepancy is first-year in-person, where the observed count 20 is much lower than expected 29.33.
 
-## Code
+## Inspecting expected counts in code
 
 ```python
 import numpy as np
@@ -298,7 +375,7 @@ print(expected)
 
 The chi-square function returns the expected-count table. Always inspect it; a p-value is not enough if the approximation conditions are poor.
 
-## Common pitfalls
+## Errors of denominator and design
 
 - Using the sample proportion in the standard error for a hypothesis test instead of the null proportion.
 - Treating the chi-square statistic as if negative discrepancies cancel positive discrepancies. Squaring prevents cancellation.
@@ -307,7 +384,7 @@ The chi-square function returns the expected-count table. Always inspect it; a p
 - Using chi-square tests for percentages without the underlying counts.
 - Reporting association as causation in an observational contingency table.
 
-## Connections
+## Related pages
 
 - [Probability basics](/math/statistics/probability-basics)
 - [Random variables and probability distributions](/math/statistics/random-variables-and-distributions)

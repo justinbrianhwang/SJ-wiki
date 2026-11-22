@@ -9,11 +9,7 @@ Analysis of variance, or ANOVA, compares means by partitioning variability. Inst
 
 The name can be confusing: ANOVA tests hypotheses about means by analyzing variances. If group means are far apart relative to variation within groups, the between-group mean square becomes large compared with the within-group mean square, producing a large $F$ statistic. If group means differ only by the amount expected from within-group noise, the $F$ statistic tends to be near 1.
 
-![Several F distribution density curves are plotted for different numerator and denominator degrees of freedom.](https://commons.wikimedia.org/wiki/Special:FilePath/F-distribution_pdf.svg)
-
-*Figure: $F$ distribution density curves for several degrees-of-freedom choices. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:F-distribution_pdf.svg), IkamusumeFan, CC BY-SA 4.0.*
-
-## Definitions
+## Partitioning variation around two kinds of mean
 
 In a **one-way ANOVA**, one categorical explanatory variable, called a factor, has $k$ levels or groups. The response variable is quantitative. The null hypothesis is
 
@@ -65,9 +61,55 @@ $$
 
 Under the null hypothesis and assumptions, $F$ follows an $F$ distribution with $k-1$ and $N-k$ degrees of freedom.
 
-## Key results
+## Why the sums of squares add
+
+For an observation in group $i$,
+
+$$
+x_{ij}-\bar{x}=(x_{ij}-\bar{x}_i)+(\bar{x}_i-\bar{x}).
+$$
+
+Squaring and summing produces a cross term
+
+$$
+2\sum_i\sum_j(x_{ij}-\bar{x}_i)(\bar{x}_i-\bar{x}).
+$$
+
+Within each group, $\sum_j(x_{ij}-\bar{x}_i)=0$, so the cross term vanishes. What remains is exactly
+
+$$
+SS_{\text{total}}=SS_{\text{within}}+SS_{\text{between}}.
+$$
+
+The decomposition is an identity for the observed data; it does not require normality. Distributional assumptions enter when the ratio of mean squares is assigned an $F$ reference distribution.
+
+Under $H_0$ and the equal-variance model, both mean squares estimate the common error variance $\sigma^2$. The within mean square estimates it from deviations around group means. The between mean square also estimates it when population means are equal, because sample means differ only through sampling noise. Under unequal population means, $MS_{\text{between}}$ tends to be inflated while $MS_{\text{within}}$ still tracks within-group noise. Their ratio therefore tends to exceed one.
+
+## Assumptions belong to the design
 
 ANOVA assumptions include independent observations, approximately normal response distributions within groups or sufficient sample sizes, and reasonably similar within-group variances for the classical fixed-effects one-way ANOVA. The method is fairly robust to mild normality departures when group sizes are balanced, but strong skewness, outliers, dependence, or severe unequal variances can distort conclusions.
+
+Independence cannot be diagnosed from an ANOVA residual plot. It comes from how units were sampled and treatments assigned. Repeated observations on one person, students within the same classroom, or measurements from adjacent locations usually share dependence. Treating them as independent creates too many apparent degrees of freedom.
+
+Equal variance matters most when group sizes are unequal. A small high-variance group and a large low-variance group can make the classical $F$ test anti-conservative. Welch's ANOVA replaces the pooled within variance with a heteroscedastic adjustment and is a reasonable alternative when spreads differ. For heavily skewed outcomes, robust, permutation, or rank-based methods may answer a better-defined question than forcing the classical model.
+
+Residuals are $e_{ij}=x_{ij}-\bar{x}_i$ in the one-way model. A residual-versus-fitted plot shows whether spread changes with group mean; group box plots reveal outliers and skewness; a Q--Q plot checks whether residual tails are grossly inconsistent with normal errors. With large samples, tiny visual departures are less important than outliers, dependence, and systematic variance patterns.
+
+## The linear-model view
+
+With group A as a reference, a three-group model can be written
+
+$$
+Y_i=\beta_0+\beta_1I(B_i)+\beta_2I(C_i)+\varepsilon_i.
+$$
+
+Here $\beta_0$ is the mean of A, $\beta_1$ is the B-minus-A difference, and $\beta_2$ is the C-minus-A difference. The omnibus null $\mu_A=\mu_B=\mu_C$ is the joint hypothesis
+
+$$
+H_0:\beta_1=\beta_2=0.
+$$
+
+The ANOVA $F$ statistic compares the reduction in residual sum of squares from adding both indicators with the remaining residual variance. Different contrast codings change coefficient meanings but not the fitted group means or omnibus test.
 
 A significant one-way ANOVA tells us that at least one population mean differs from another. It does not identify which means differ. Follow-up comparisons, such as Tukey's HSD, planned contrasts, or adjusted pairwise tests, are needed for specific group differences.
 
@@ -85,7 +127,27 @@ ANOVA is closely related to regression. A one-way ANOVA can be written as a line
 
 Planned comparisons should be distinguished from exploratory comparisons. If researchers specify before collecting data that Method C should exceed the average of Methods A and B, that contrast can be tested directly. If researchers inspect all group means and then test only the largest-looking difference, the Type I error rate is no longer the one advertised by a single comparison. ANOVA workflows therefore need both statistical calculation and a transparent comparison plan.
 
-## Visual
+Tukey's method controls familywise error for all pairwise mean comparisons under the usual model. Dunnett's method is tailored to several treatments against one control. A planned contrast such as
+
+$$
+L=-\frac12\mu_A-\frac12\mu_B+\mu_C
+$$
+
+asks a narrower question and may have better power than an all-pairs procedure. The coefficients sum to zero, so the contrast compares means rather than their overall level.
+
+Failure to reject the omnibus null does not establish equal means. It says the observed separation is not sufficiently large relative to uncertainty for the specified test. Conversely, a large sample can make a small, unimportant difference significant. Report group means, uncertainty, and an effect size alongside the test.
+
+## Factorial designs and interactions
+
+In a balanced two-factor design, variation can be partitioned into factor A, factor B, their interaction, and residual error. An interaction compares differences of differences. If the effect of A is the same at every level of B, the population interaction is zero even when both factors have large main effects.
+
+Main effects become delicate when an interaction is present. Averaging a treatment effect over two age groups may describe no actual age group if the treatment helps one and harms the other. Report cell means and simple effects before treating an averaged main effect as the scientific result.
+
+Unbalanced designs lose some of the clean orthogonality of balanced ANOVA. Sums of squares can depend on which effects are adjusted for which others, leading software to offer Type I, II, and III tables. These are different hypotheses, not competing arithmetic conventions. The appropriate test follows the model hierarchy, contrast coding, and research question. Stating the fitted model and intended comparison is safer than reporting a “type” without its hypothesis.
+
+Randomized blocks and repeated-measures designs partition nuisance variation using known dependence. They require their own error terms or mixed models. Treating subject, classroom, or block effects as ordinary independent residual noise wastes the design and often understates uncertainty.
+
+## Reading the ANOVA table
 
 ```mermaid
 flowchart TD
@@ -194,6 +256,18 @@ $$
 F=110.58/2.50=44.23.
 $$
 
+8. Total sum of squares and effect size provide arithmetic checks:
+
+$$
+SS_T=221.16+22.50=243.66,
+$$
+
+$$
+\eta^2=\frac{221.16}{243.66}=0.908.
+$$
+
+About 90.8% of the observed score variation is between the three method groups in this small data set. That estimate is sample-specific and tends to be optimistic as a population effect-size estimate, especially with small samples.
+
 Answer: The $F$ statistic is about 44.23 with $df=(2,9)$, giving a very small p-value. Reject the null hypothesis of equal means. The study methods differ in mean score.
 
 Checked answer: Within-group variation is small compared with the separation among group means, so a large $F$ statistic is expected.
@@ -239,7 +313,7 @@ Answer: Yes, the table suggests an interaction: spaced practice appears much mor
 
 Checked answer: Main effects alone would average over the other factor and could hide the conditional pattern. The interaction check compares differences of differences.
 
-## Code
+## Model fit in code
 
 ```python
 import pandas as pd
@@ -261,7 +335,7 @@ print("eta squared:", ss_between / ss_total)
 
 Statsmodels uses formula notation. `C(method)` tells the model to treat method as a categorical factor rather than a numeric predictor.
 
-## Common pitfalls
+## Interpretation traps
 
 - Running many unadjusted pairwise $t$ tests instead of starting with a planned ANOVA or adjusted comparisons.
 - Thinking a significant ANOVA identifies exactly which groups differ.
@@ -270,7 +344,7 @@ Statsmodels uses formula notation. `C(method)` tells the model to treat method a
 - Treating ordinal ratings with few levels as if they were precise normal measurements without checking whether that is defensible.
 - Reporting only the p-value and omitting group means, variability, and an effect-size measure.
 
-## Connections
+## Related pages
 
 - [Tests for means](/math/statistics/tests-for-means)
 - [Hypothesis testing logic](/math/statistics/hypothesis-testing-logic)

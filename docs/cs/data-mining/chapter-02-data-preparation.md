@@ -9,7 +9,7 @@ Data preparation is the part of data mining that converts raw evidence into a re
 
 This topic sits directly after the mining pipeline because preparation is where many modeling choices become irreversible. A missing value can be imputed, marked, or removed; a numeric value can be standardized or discretized; a categorical value can be one-hot encoded or grouped; a time series can remain ordered or be summarized into statistics. Each choice changes which patterns are visible to later mining algorithms.
 
-## Definitions
+## From raw objects to features
 
 **Feature extraction** maps raw objects into variables useful for mining. A document may become a vector of term weights; a time series may become trend, variance, and seasonal features; a graph may become degree, clustering coefficient, or subgraph-count features.
 
@@ -35,7 +35,32 @@ $$
 
 **Sampling** selects a subset of records to reduce cost. In a stream, reservoir sampling maintains a sample of fixed size while items arrive one at a time.
 
-## Key results
+Feature extraction is already a model of the data. A bag-of-words representation says that word counts matter and word order does not. Summarizing a sensor trace by its mean and variance says that timing details can be discarded. Graph degree records local connectivity but cannot distinguish many non-isomorphic graphs. Before choosing an algorithm, it helps to write down which information a representation preserves, which invariances it introduces, and which distinctions it erases.
+
+| Transformation | Preserves | Discards or distorts |
+|---|---|---|
+| Standardization | Order and linear relationships | Original unit and absolute scale |
+| Log transform | Order and ratios approximately | Differences on the original scale |
+| Equal-width bins | Coarse order | Position within a bin; often produces sparse tail bins |
+| Equal-depth bins | Rank groups | Numeric interval width |
+| One-hot encoding | Category identity | Any unrecorded relation between categories |
+| Aggregation over time | Chosen summaries | Event ordering within the window |
+
+## Missing data is part of the measurement process
+
+A blank cell does not have one universal meaning. It may mean that a value was not measured, was measured but lost, was inapplicable, or was suppressed. Statistical treatments often distinguish three mechanisms. With observed data $X_{obs}$, missing data $X_{mis}$, and a missingness indicator $R$, the informal distinctions are:
+
+- **Missing completely at random (MCAR):** $R$ is independent of both observed and missing values. Dropping incomplete rows remains unbiased for many estimates, although it wastes data.
+- **Missing at random (MAR):** after conditioning on observed variables, missingness no longer depends on the missing value. A salary field may be absent more often for some recorded occupations. Models using occupation can sometimes account for that pattern.
+- **Missing not at random (MNAR):** missingness still depends on the unobserved value. People with very high salaries may be especially reluctant to report them. Ordinary imputation cannot recover the missing distribution without assumptions about the missingness process.
+
+The names are easy to misread: MAR does not mean rows disappear randomly without qualification. It is a conditional statement. The mechanism cannot usually be identified from the incomplete table alone, so collection knowledge matters.
+
+Mean imputation replaces each missing $x_i$ by the observed mean $\bar{x}$. The completed mean stays $\bar{x}$, but the inserted observations have zero deviation from it. If $r$ of $n$ values were observed, the sum of squared deviations remains the sum from those $r$ values while the denominator grows to $n$; variance is therefore pulled downward. Correlations can also be weakened because imputed values do not retain their original joint relationship with other columns.
+
+A missingness indicator can help a predictive model use a systematic absence pattern, but it does not repair the missing value. It may also encode an unstable operational detail: if a hospital changes which test it orders, a classifier that learned “test absent” rather than patient physiology may drift badly.
+
+## Preparation choices change the question
 
 **Cleaning is task dependent.** A value that looks like an outlier may be an error in a sales forecasting task but the most important case in a fraud-detection task. Preparation must respect the mining objective.
 
@@ -47,7 +72,23 @@ $$
 
 **Type transformations create tradeoffs.** Discretization can make noisy continuous values more robust and useful for pattern mining, but it loses order detail within each bin. One-hot encoding makes categories usable for linear models, but high-cardinality categorical variables can create sparse, high-dimensional data.
 
-## Visual
+The preparation pipeline should be fitted on training data and then applied unchanged to validation, test, and future data. “Fitted” includes apparently harmless operations: computing a mean, choosing quantile boundaries, learning a category vocabulary, selecting frequent terms, or estimating principal components. If test observations contribute to those quantities, evaluation has already seen the test distribution.
+
+For cross-validation, fitting happens separately inside every fold. A preprocessing pipeline is more than convenient software organization; it enforces the statistical boundary between the observations used to learn parameters and the observations used to estimate generalization.
+
+### Choosing a scale
+
+Min-max scaling maps the observed training range to $[0,1]$. It is useful when a bounded range is needed, but one extreme point can compress all ordinary observations. Future values may also lie outside $[0,1]$; clipping them hides that fact rather than solving it.
+
+Z-score standardization gives a feature mean zero and variance one. It works well for roughly symmetric distributions, yet its mean and standard deviation are sensitive to heavy tails. A robust alternative uses the median $m$ and interquartile range $IQR=Q_3-Q_1$:
+
+$$
+x'=\frac{x-m}{IQR}.
+$$
+
+No scaling rule decides how much a feature ought to matter. Standardizing age and a binary disease indicator gives them comparable numerical spread, not comparable scientific importance. Feature weighting remains a modeling decision.
+
+The sequence below is a useful default for tabular work. Some steps may be absent, but their order is deliberate.
 
 ```mermaid
 flowchart TD
@@ -73,6 +114,10 @@ flowchart TD
 | Different scales | Age vs. income | Standardize or normalize | Removing meaningful magnitude |
 | High cardinality | Thousands of IDs | Hashing, grouping, embeddings | Collisions or lost detail |
 | Stream volume | Cannot store all rows | Reservoir sample or sketch | Approximation error |
+
+Two validation layers are useful. **Syntactic validation** checks parseability, types, ranges, uniqueness, and referential constraints. **Semantic validation** checks claims that require domain knowledge: discharge time should follow admission time, a currency amount should have a currency code, and a cumulative meter normally should not decrease unless it was reset. Silent violations are usually more dangerous than rows that fail to parse.
+
+Duplicate handling also needs a definition of identity. Byte-identical rows may be legitimate repeated events. Conversely, records for the same person may differ by spelling, address, or timestamp. Entity resolution is probabilistic when no stable identifier exists; merging uncertain matches can contaminate every later count.
 
 ## Worked example 1: Cleaning and scaling a customer table
 
@@ -149,7 +194,7 @@ Assume the first three items fill the reservoir. Use the following random choice
 
 **Checked answer.** The final reservoir for this random run is $[F,D,H]$. Over many random runs, each of the eight items has probability $3/8$ of appearing in the final reservoir.
 
-## Code
+## A leakage-safe preparation pipeline
 
 Pseudocode for robust preparation:
 
@@ -208,7 +253,11 @@ X = prep.fit_transform(df)
 print(np.round(X, 3))
 ```
 
-## Common pitfalls
+For an actual evaluation, `fit_transform` belongs on the training frame. The held-out frame must use `prep.transform(test_df)`. The transformer stores the training median, scale parameters, and category vocabulary. Unknown categories need an explicit policy such as `handle_unknown="ignore"`; otherwise a category first seen after deployment may cause an error. Ignoring it produces an all-zero indicator block, which is safe mechanically but may or may not be meaningful for the model.
+
+Reproducibility requires preserving more than the final numeric matrix. Keep the raw-data version, schema, category mapping, unit conversions, fitted transformer, and split definition. Without them, a model can be impossible to audit even when its weights are available.
+
+## Failure modes that survive into modeling
 
 - Imputing missing values before train-test splitting, which leaks test-set information into the model.
 - Normalizing identifiers as if their numeric order has meaning.
@@ -217,8 +266,20 @@ print(np.round(X, 3))
 - Treating outliers as errors without checking the task; anomaly detection needs unusual cases.
 - Using a sample that is convenient rather than representative, especially when streams or logs have time-of-day patterns.
 - Discretizing continuous features too aggressively and erasing useful thresholds.
+- Filling a missing timestamp with midnight, thereby creating an artificial daily spike.
+- Treating a sentinel such as `-999` as a real measurement before scaling. Its effect then spreads into the mean and variance of every normal row.
+- Removing duplicates after splitting. Copies of the same record can land in both train and test sets and produce an optimistic score.
+- Learning category cleanup rules only from spelling similarity. `US` and `U.S.` are probably equivalent; `Congo` and `DR Congo` are not.
 
-## Connections
+Preparation can also create a train-serving mismatch. A notebook may calculate a seven-day rolling feature with future records accidentally included, while the deployed system only has past records. Time-aware features should state their cutoff explicitly. At prediction time $t$, every input must be computable from information available no later than $t$.
+
+## Deciding whether a transformation helped
+
+Inspect intermediate distributions rather than accepting a pipeline because it runs. For numeric columns, compare quantiles before and after transformation and count values clipped or imputed. For categories, inspect the frequency assigned to “other” and the fraction of unseen values in later data. For joined sources, compare row counts before and after each join and check whether a supposed one-to-one key multiplied rows.
+
+The final test is downstream and task-specific. A log transform may improve a linear model by making a multiplicative relation closer to linear, but a tree can often split a skewed raw feature without it. Standardization is central to nearest-neighbor search and regularized linear models, while ordinary decision trees are invariant to monotone transformations of a single feature. Preparation should follow the assumptions of the estimator and the semantics of the measurements, not a fixed checklist.
+
+## Related pages
 
 - [Data Mining Process and Data Types](/cs/data-mining/chapter-01-process-data-types)
 - [Feature Selection and Dimensionality Reduction](/cs/data-mining/chapter-02-feature-selection-dimensionality-reduction)

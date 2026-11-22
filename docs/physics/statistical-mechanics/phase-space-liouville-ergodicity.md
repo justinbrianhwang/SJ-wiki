@@ -7,9 +7,9 @@ sidebar_position: 3
 
 Classical statistical mechanics represents a microstate of $N$ particles by a point in $6N$-dimensional phase space. The statistical state is not a single point but a density $\rho(q,p,t)$ over many possible microscopic states compatible with the observed macrostate. The microscopic dynamics moves this density according to Hamilton's equations.
 
-This page explains why Hamiltonian flow preserves phase-space volume, why stationary distributions must be functions of conserved quantities, and why the ergodic hypothesis is a bridge rather than a theorem for every physical system. It is the dynamical background for the microcanonical ensemble and for the later discussion of irreversibility.
+Hamiltonian flow preserves phase-space volume, but volume preservation alone does not imply thermalization. Stationarity, ergodicity, and mixing answer different questions and must be kept separate when connecting microscopic mechanics to equilibrium ensembles.
 
-## Definitions
+## Points, densities, and Hamiltonian flow
 
 For $N$ particles in three spatial dimensions, write
 
@@ -44,7 +44,17 @@ $$
 
 A distribution is stationary when $\partial_t\rho=0$. A constant of motion $I(q,p)$ satisfies $\dot I=\{I,H\}=0$. Ergodicity, in its physical use, means that a typical trajectory on the energy surface samples that surface in such a way that long-time averages equal microcanonical phase-space averages.
 
-## Key results
+## Deriving Liouville's equation
+
+Probability conservation in the full phase space is a continuity equation,
+
+$$
+{\partial\rho\over\partial t}
++\sum_i\left[{partial(\rho\dot q_i)\over\partial q_i}
++{\partial(\rho\dot p_i)\over\partial p_i}\right]=0.
+$$
+
+Expanding the derivatives produces an advection term and the divergence of the phase-space velocity. Hamilton's equations make that divergence vanish because mixed derivatives of $H$ cancel. What remains is the Liouville equation
 
 The Liouville equation follows by applying probability conservation in phase space:
 
@@ -79,6 +89,16 @@ $$
 
 Therefore a phase-space volume element transported by Hamiltonian dynamics preserves its volume. This is Liouville's theorem.
 
+The same fact can be stated with the flow map $X_0\mapsto X_t$, where $X=(q,p)$. Its Jacobian $J(t)=\det(\partial X_t/\partial X_0)$ obeys
+
+$$
+{d\over dt}\ln J=\nabla_X\cdot\dot X=0,
+$$
+
+so $J(t)=1$ if it begins at one. Hamiltonian maps preserve more than volume: they preserve the symplectic two-form $\sum_i dq_i\wedge dp_i$. Volume preservation is a consequence of that stronger canonical structure. A generic incompressible flow need not be Hamiltonian.
+
+## Stationary measures and conserved quantities
+
 Any density of the form $\rho=f(H)$ is stationary for an isolated time-independent Hamiltonian because
 
 $$
@@ -95,17 +115,66 @@ $$
 
 or a thin energy window when a literal delta function is too singular. Schwabl emphasizes that this is the basic equilibrium hypothesis for isolated systems. The canonical and grand canonical ensembles are then derived by considering small subsystems of a larger isolated whole.
 
+If there are further integrals of motion $I_1,I_2,\ldots$, any function $f(H,I_1,I_2,\ldots)$ is also stationary. Energy alone does not identify the equilibrium measure. Momentum and angular momentum may need to be fixed; integrable systems possess enough conserved actions to confine trajectories to invariant tori. In quantum integrable systems, analogous constraints motivate generalized Gibbs ensembles.
+
+A time-dependent Hamiltonian still generates a volume-preserving flow in the extended sense, but $f(H(q,p,t))$ is generally not stationary because the numerical value of $H$ changes along the driven trajectory. Dissipative equations are different: friction contracts phase-space volume unless extra bath variables or noise restore a larger Hamiltonian description.
+
+## Ergodicity is a statement about averages
+
 Ergodicity adds an interpretive layer. If time averages equal microcanonical averages, then the ensemble is not merely a calculational device; it predicts the result of long measurements on one system. However, exact ergodicity can fail in integrable systems, systems with conserved quantities beyond energy, and systems trapped in disconnected regions of phase space. Statistical mechanics remains powerful because weak perturbations, large dimensionality, and coarse macroscopic observables often make the microcanonical ensemble correct even when mathematical ergodicity is delicate.
 
-It is also useful to separate three related but different ideas. Stationarity means the density does not change in time. Mixing means initially localized distributions are stretched and folded so that coarse-grained observations look uniform over the accessible region. Ergodicity means almost every trajectory has time averages equal to phase-space averages. A stationary distribution need not be mixing, and a system can be nonergodic while still giving accurate thermodynamics for a restricted class of observables. For example, a harmonic oscillator has closed ellipses in phase space and is not ergodic on the filled energy disk, yet its energy-shell description is still meaningful for the one conserved energy.
+It is also useful to separate three related but different ideas. Stationarity means the density does not change in time. Mixing means initially localized distributions are stretched and folded so that coarse-grained observations look uniform over the accessible region. Ergodicity means almost every trajectory has time averages equal to phase-space averages. A stationary distribution need not be mixing, and a system can be nonergodic while still giving accurate thermodynamics for a restricted class of observables. A one-dimensional harmonic oscillator periodically covers its energy ellipse and can be ergodic with respect to the uniform measure on that orbit, but it is not mixing: correlations recur exactly. Two uncoupled oscillators have separately conserved actions and are generally nonergodic on the larger surface of fixed total energy.
+
+For an observable $A$, the two averages being compared are
+
+$$
+\overline A(X_0)=\lim_{\tau\to\infty}{1\over\tau}
+\int_0^\tau A(X_t)\,dt
+$$
+
+and
+
+$$
+\langle A\rangle_E={1\over\Omega(E)}
+\int d\Gamma\,A(X)\delta(E-H(X)).
+$$
+
+Ergodicity asserts equality for almost every initial point on the relevant energy surface and for suitable observables. It says nothing about how fast the limit is reached. Mixing is stronger and implies decay of correlations in a measure-theoretic sense. Experimental equilibration only needs the observables and time scales at hand to lose sensitivity to preparation; full mathematical mixing may be unnecessary.
+
+## Fine-grained conservation and macroscopic irreversibility
 
 Liouville's theorem also explains why irreversibility cannot follow from exact fine-grained Hamiltonian flow alone. A compact blob in phase space may stretch into thin filaments, but its volume is preserved. Macroscopic entropy increase appears when we replace the filamented exact density by a coarse-grained description that cannot resolve microscopic folds. This point is not a technicality: it is the core reason that kinetic theory needs an assumption such as molecular chaos and why recurrence objections can be logically sharp even when recurrence times are physically irrelevant.
 
+For the fine-grained Gibbs entropy
+
+$$
+S_G=-k_B\int d\Gamma\,\rho\ln\rho,
+$$
+
+differentiate and insert the Liouville equation:
+
+$$
+{dS_G\over dt}
+=k_B\int d\Gamma\,(1+\ln\rho)\{\rho,H\}.
+$$
+
+Integration by parts in phase space, with vanishing boundary terms, turns this into zero. Equivalently, each fluid element keeps both its volume and its density. A coarse partition replaces the filamented density by cell averages; mixing can then spread probability among more resolved cells and increase the corresponding coarse entropy. The increase depends on resolution and on the restriction to macroscopic variables.
+
+Time reversal sharpens the issue. If all momenta of an isolated Hamiltonian system are reversed at some instant, the trajectory retraces its earlier path when the Hamiltonian is time-reversal invariant. Nothing in Hamilton's equations forbids an entropy-decreasing history. Such finely prepared reversed states occupy the same phase volume but are extraordinarily atypical relative to simple macroscopic preparation procedures.
+
+Poincaré recurrence adds another constraint: a finite-volume, measure-preserving system returns arbitrarily close to almost every initial point after a sufficiently long time. The theorem gives no useful laboratory recurrence time, and macroscopic recurrence times grow enormously with system size. It nevertheless rules out literal convergence of the exact microscopic state to one permanent attractor. Equilibrium is instead expressed through stationary statistics and stable macroscopic observations.
+
 Finally, the classical theorem has a quantum parallel. The von Neumann equation preserves the eigenvalues of $\rho$ under unitary time evolution, just as Liouville flow preserves phase-space volume. Therefore $\mathrm{Tr}\,\rho^n$ and the fine-grained von Neumann entropy are constants for a closed quantum system. Equilibrium statistical mechanics enters when one restricts attention to macroscopic data, subsystems, or coarse observables rather than the full microscopic state.
+
+For a subsystem, unitary evolution of the whole can still increase entanglement entropy because correlations with the unobserved complement grow. Tracing out that complement produces nonunitary reduced dynamics. The classical analogue is marginalizing over unresolved degrees of freedom, which can generate apparent dissipation and stochasticity even though the complete flow remains Hamiltonian.
 
 This perspective also explains why the thermodynamic limit is taken before many idealizations. A small Hamiltonian system may visibly remember its initial condition, while a macroscopic one distributes that information among an enormous number of degrees of freedom. The information is not destroyed in the exact equations, but it becomes practically inaccessible to the few macroscopic observables that define a thermodynamic state.
 
-## Visual
+KAM theory supplies a warning against assuming that any weak perturbation produces global chaos. In a nearly integrable Hamiltonian system, many invariant tori survive sufficiently small perturbations, while resonant regions become chaotic. Phase space may then be mixed, with regular islands embedded in a chaotic sea. A trajectory cannot average over components it cannot enter, and equilibration times can be dominated by slow transport between partially connected regions.
+
+Numerical integrators can obscure these distinctions. A generic time-stepping method may drift in energy or contract phase-space volume, creating artificial relaxation. Symplectic integrators preserve the canonical geometry and usually keep energy errors bounded over long runs, although they do not make a nonergodic model ergodic. Numerical agreement with an ensemble requires checks of conserved quantities, step-size dependence, and sampling across the accessible components.
+
+Constraints change the measure as well as the dimension. Fixing total momentum, angular momentum, or a rigid bond restricts phase space to a submanifold with its induced measure. Simply deleting coordinates without the corresponding Jacobian can bias averages.
 
 ```mermaid
 flowchart LR
@@ -224,7 +293,29 @@ $$
 
 Checked answer: any function of $H$ is stationary. The canonical form is selected not by stationarity alone, but by contact with a heat bath or by entropy maximization with fixed mean energy.
 
-## Code
+## Worked example 3: quasiperiodic motion on a torus
+
+Take two uncoupled oscillators with angle variables
+
+$$
+\theta_1(t)=\theta_1(0)+\omega_1t,
+\qquad
+\theta_2(t)=\theta_2(0)+\omega_2t
+$$
+
+modulo $2\pi$. The actions, and therefore each oscillator energy, remain fixed. If $\omega_1/\omega_2=p/q$ is rational, both angles return after the common period $2\pi q/\omega_2$, so the orbit is a closed curve on the two-torus.
+
+If the frequency ratio is irrational, the orbit is dense on that torus. For a Fourier mode $A=e^{i(n_1\theta_1+n_2\theta_2)}$,
+
+$$
+{1\over\tau}\int_0^\tau A(t)\,dt
+=A(0){e^{i(n_1\omega_1+n_2\omega_2)\tau}-1
+\over i\tau(n_1\omega_1+n_2\omega_2)}.
+$$
+
+For nonzero integer pair $(n_1,n_2)$, irrationality makes the denominator frequency nonzero, so the long-time average vanishes. This equals the uniform torus average. The motion can therefore be ergodic on its invariant torus while remaining nonergodic on the larger constant-total-energy surface, because the two separate actions never change.
+
+## Numerical area-preservation check
 
 ```python
 import numpy as np
@@ -243,18 +334,19 @@ for time in [0.0, 0.7, 1.4]:
     print(time, area)
 ```
 
-## Common pitfalls
+## Distinctions that prevent wrong conclusions
 
-- Reading Liouville's theorem as "entropy cannot increase." Fine-grained Gibbs entropy is constant under Hamiltonian flow, but coarse-graining and macroscopic relaxation are separate issues.
-- Thinking stationarity alone selects the correct ensemble. Many functions of constants of motion are stationary.
-- Treating ergodicity as automatically true for every many-body Hamiltonian. Extra conserved quantities and broken phase-space connectivity matter.
-- Confusing phase-space volume with ordinary spatial volume. The preserved object is $dq\,dp$, not $dq$ alone.
-- Forgetting that external time-dependent driving can invalidate the simple $f(H)$ stationarity argument.
+- Liouville conservation fixes the fine-grained Gibbs entropy. Coarse-grained entropy and thermodynamic relaxation concern information discarded by the chosen observables.
+- Stationarity does not select a unique ensemble. Every function of all conserved quantities is a candidate stationary density.
+- Many degrees of freedom do not guarantee ergodicity. Extra integrals, invariant tori, glassy barriers, and disconnected components can retain memory.
+- The preserved element is $dq\,dp$, not ordinary spatial volume $dq$. A gas can expand spatially while its phase-space volume remains unchanged.
+- Under explicit driving, $f(H)$ need not be stationary even though the instantaneous Hamiltonian flow remains divergence-free.
+- A dense trajectory need not explore the whole energy surface; it may be dense only within a lower-dimensional invariant set.
 
-## Connections
+## Related pages
 
 - [Probability and density matrices](/physics/statistical-mechanics/probability-and-density-matrices)
 - [Microcanonical ensemble and entropy](/physics/statistical-mechanics/microcanonical-ensemble-and-entropy)
 - [Irreversibility, master equations, and finite-temperature field theory](/physics/statistical-mechanics/irreversibility-master-equations-and-finite-temperature-field-theory)
 - [Hamiltonian dynamics in quantum mechanics](/physics/quantum-mechanics/quantum-dynamics-pictures)
-- [Thermodynamics](/physics/thermodynamics/)
+- [Thermodynamics](/physics/thermodynamics/intro)

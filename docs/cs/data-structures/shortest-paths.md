@@ -5,11 +5,11 @@ sidebar_position: 13
 
 # Shortest Paths
 
-Shortest-path algorithms find minimum-cost routes through weighted graphs. They are related to traversal, but weights change the problem. BFS is enough when every edge has equal cost; once edges have different nonnegative weights, Dijkstra's algorithm is the standard single-source method. For all-pairs shortest paths, Floyd-Warshall uses dynamic programming over an adjacency matrix.
+Shortest-path algorithms find minimum-cost routes through weighted graphs. BFS handles equal-cost edges; Dijkstra handles general nonnegative weights; Bellman–Ford permits negative edges; Floyd–Warshall computes all pairs by dynamic programming. The weight restrictions are part of each algorithm's correctness, not a minor implementation condition.
 
-The source textbook's graph chapter treats shortest paths after spanning trees. That contrast is important. A minimum spanning tree minimizes the total weight of a connecting tree, while shortest paths minimize route cost between specified vertices. The MST of a road network does not necessarily contain the shortest route between two cities.
+A minimum spanning tree solves a different optimization problem. It minimizes the total weight of a tree connecting all vertices, while a shortest-path tree minimizes source-to-vertex route costs. The minimum spanning tree of a road network need not contain the shortest route between two chosen cities.
 
-## Definitions
+## Distances and relaxation
 
 Let $G = (V, E)$ be a weighted graph with edge weight function $w(u,v)$. The **length** of a path is the sum of its edge weights. A **shortest path** from source `s` to vertex `v` is a path with minimum total weight among all paths from `s` to `v`.
 
@@ -31,27 +31,13 @@ $$
 \text{if } d[u] + w(u,v) < d[v], \text{ then } d[v] = d[u] + w(u,v)
 $$
 
-Dijkstra's algorithm assumes all edge weights are nonnegative. Floyd-Warshall can handle negative edges, but not negative cycles. A negative cycle makes shortest paths undefined for reachable pairs because the path cost can be reduced without bound.
+Dijkstra's algorithm assumes all edge weights are nonnegative. Bellman–Ford and Floyd–Warshall can handle negative edges, but a reachable negative cycle makes a finite shortest path undefined: walking around the cycle again reduces the path cost without bound.
 
-## Key results
+## Why Dijkstra may finalize a vertex
 
 Dijkstra's algorithm maintains a set of finalized vertices whose distances are known to be optimal. At each step it selects the unsettled vertex with the smallest tentative distance. With nonnegative weights, no later path through another unsettled vertex can improve it, because every extra edge adds a nonnegative amount.
 
 Using an adjacency matrix and scanning for the next minimum tentative distance gives $O(V^2)$ time. Using adjacency lists and a binary heap priority queue gives $O((V + E)\log V)$ in a typical implementation.
-
-Floyd-Warshall uses the recurrence:
-
-$$
-D^{(k)}[i][j] = \min\left(D^{(k-1)}[i][j],\ D^{(k-1)}[i][k] + D^{(k-1)}[k][j]\right)
-$$
-
-Here $D^{(k)}[i][j]$ is the best distance from `i` to `j` using only intermediate vertices from the set `{0, 1, ..., k}`. The final matrix after all `k` values gives all-pairs shortest paths. The time complexity is $O(V^3)$ and the matrix space is $O(V^2)$.
-
-| Algorithm | Problem | Weight restrictions | Time with common representation | Main data structure |
-|---|---|---|---:|---|
-| BFS | single-source unweighted | all edges equal | $O(V + E)$ | queue |
-| Dijkstra | single-source weighted | nonnegative weights | $O(V^2)$ matrix or $O(E \log V)$ heap | priority queue or arrays |
-| Floyd-Warshall | all-pairs weighted | no negative cycles | $O(V^3)$ | distance matrix |
 
 Shortest-path implementations usually store a predecessor or parent array in addition to distances. Distances answer "how much does the best path cost?" Parents answer "what is the path?" After Dijkstra finishes, following `parent[target]`, then `parent[parent[target]]`, and so on reconstructs the path backward from the target to the source. If the parent remains `-1` for a non-source vertex, the vertex was unreachable.
 
@@ -59,7 +45,54 @@ The choice between Dijkstra and Floyd-Warshall is mostly about query pattern and
 
 Negative weights require special care. A single negative edge can invalidate Dijkstra's finalized-distance argument. Floyd-Warshall can incorporate negative edges, but a negative diagonal entry after the algorithm indicates a negative cycle reachable from that vertex.
 
-## Visual
+The Dijkstra proof uses a cut argument. Suppose `u` is the unsettled vertex with minimum tentative distance, and imagine a shorter path from the source to `u`. On that path, take the first unsettled vertex `x` and its settled predecessor `p`. When `p` was processed, relaxation established
+
+$$
+d[x]\le d[p]+w(p,x)=\delta(s,x).
+$$
+
+Because the remaining edges on the imagined path are nonnegative, $\delta(s,x)\le\delta(s,u)$. Minimum selection also gives $d[u]\le d[x]$. These inequalities contradict the claim that a path shorter than $d[u]$ exists. A negative edge breaks the nonnegative-remainder step, so an apparently final distance can later improve.
+
+With a binary heap, many implementations insert a new pair whenever a distance improves rather than implementing decrease-key. When a pair `(du, u)` is popped, discard it if `du != dist[u]`. Each successful relaxation may create one heap entry, so the bound is commonly written $O((V+E)\log V)$ or $O(E\log V)$ for a connected graph. The stale-entry test avoids scanning outgoing edges again for an obsolete key.
+
+## Negative edges and Bellman–Ford
+
+Bellman–Ford repeatedly relaxes every edge. Any simple shortest path in a graph with $V$ vertices uses at most $V-1$ edges; if it repeated a vertex, removing the resulting nonnegative cycle would not increase cost. After pass $k$, all shortest paths that use at most $k$ edges have been propagated. Therefore $V-1$ passes suffice when no reachable negative cycle exists.
+
+One additional pass detects a reachable negative cycle: if any distance can still decrease, there is a cheaper walk with at least $V$ edges, which must repeat a vertex. The repeated portion has negative total weight. Edges whose source remains unreachable must be skipped, or sentinel arithmetic can create a false relaxation.
+
+Bellman–Ford costs $O(VE)$, much slower than heap Dijkstra on sparse nonnegative graphs. Its value is the broader weight model and the explicit negative-cycle test.
+
+| Algorithm | Scope | Weight condition | Typical time |
+|---|---|---|---:|
+| BFS | one source | equal edge costs | $O(V+E)$ |
+| Dijkstra | one source | nonnegative | $O((V+E)\log V)$ with binary heap |
+| Bellman–Ford | one source | negative allowed; reports reachable negative cycle | $O(VE)$ |
+| Floyd–Warshall | all pairs | negative allowed; no relevant negative cycle | $O(V^3)$ |
+
+There are useful special cases outside the table. In a directed acyclic graph, process vertices in topological order and relax outgoing edges once. Every predecessor of a vertex has already been processed, so distances settle without a priority queue. The cost is $O(V+E)$ and negative edges are allowed because a DAG cannot contain a negative cycle.
+
+For all-pairs queries on a sparse graph with nonnegative weights, running heap Dijkstra from every source costs roughly $O(VE\log V)$ and avoids a dense distance matrix during each run. Floyd–Warshall is often simpler for dense or modest-sized graphs and naturally returns a full matrix. The graph density, number of sources, permitted weights, and need to reconstruct paths all belong in the choice.
+
+## Floyd–Warshall as a dynamic program
+
+Let $D^{(k)}[i][j]$ be the best route from `i` to `j` whose intermediate vertices come only from `0..k`. Such a route either avoids vertex `k`, or it splits into a route from `i` to `k` and one from `k` to `j`. Hence
+
+$$
+D^{(k)}[i][j]=\min\left(D^{(k-1)}[i][j],D^{(k-1)}[i][k]+D^{(k-1)}[k][j]\right).
+$$
+
+The matrix can be updated in place when `k` is the outermost loop, because entries involving the newly allowed intermediate remain valid for the same stage. Swapping the loop order changes the dependency schedule and generally breaks the algorithm.
+
+Initialize diagonal entries to zero, direct edges to their weights, and absent edges to infinity. After completion, `D[v][v] < 0` signals a negative cycle reachable from `v`. For a pair `(i,j)`, no finite shortest distance exists if `i` can reach such a cycle and the cycle can reach `j`.
+
+## Distances are not paths
+
+A predecessor array stores the last edge of each chosen best route. On relaxation through `u`, set `parent[v] = u`. To reconstruct a route to `t`, follow parents backward until the source, then reverse the sequence. If `dist[t]` is infinity, no parent chain should be followed.
+
+Equal-cost alternatives need a policy if output must be deterministic. One implementation may keep the first predecessor found; another may prefer the smaller vertex identifier. Both distances are correct, but tests comparing an exact path must reflect the tie rule.
+
+## Dijkstra's settle-and-relax loop
 
 ```mermaid
 flowchart TB
@@ -74,14 +107,14 @@ flowchart TB
     C -- "5" --> E
   end
 
-  Init["Initialize d(A)=0; all other d#lsqb;v"]=infinity; parent[v]=null"] --> PQ["Priority queue keyed by tentative distance"]
+  Init["Set d(A) = 0 and all other distances to infinity"] --> PQ["Priority queue keyed by tentative distance"]
   Graph --> PQ
   PQ --> Extract["Extract unsettled vertex u with smallest d(u)"]
   Extract --> Finalize["Finalize u; d(u) is now shortest because weights are nonnegative"]
   Finalize --> Edges["For each outgoing edge u -> v with weight w"]
   Edges --> Relax{"d[u] + w < d[v]?"}
-  Relax -- "yes" --> Update["Set d(v)=d#lsqb;u"]+w; parent[v]=u; decrease-key or push duplicate"]
-  Relax -- "no" --> Keep["Keep current d(v) and parent#lsqb;v"]"]
+  Relax -- "yes" --> Update["Update distance and parent; push the new key"]
+  Relax -- "no" --> Keep["Keep the current distance and parent"]
   Update --> PQ
   Keep --> More{"Unsettled vertices remain?"}
   PQ --> More
@@ -91,11 +124,11 @@ flowchart TB
 
 This Dijkstra diagram combines the weighted graph, priority queue, finalization invariant, and relaxation operation. The extract-min step is what makes a vertex settled, while each outgoing edge may update a tentative distance and predecessor. The update label includes the two common heap strategies: true decrease-key or inserting a duplicate entry and ignoring stale removals later.
 
-## Worked example 1: Dijkstra from A
+## Worked example: Dijkstra from A
 
-Problem: Run Dijkstra's algorithm from `A` on the graph in the visual.
+Run Dijkstra's algorithm from `A` on the graph above.
 
-Method: keep tentative distances. Use infinity for unknown distances. Choose the unsettled vertex with smallest tentative distance each round.
+Keep tentative distances, use infinity for unknown values, and choose the unsettled vertex with smallest tentative distance each round.
 
 Initial:
 
@@ -121,11 +154,11 @@ settled = {}
    Settled: `{A,B,C,D}`.
 5. Choose `E` with distance `5`. No outgoing improvements. Done.
 
-Checked answer: distances are `A:0`, `B:2`, `C:3`, `D:4`, `E:5`. The shortest path to `E` is `A -> B -> D -> E`, with cost `2 + 2 + 1 = 5`.
+The final distances are `A:0`, `B:2`, `C:3`, `D:4`, `E:5`. The shortest path to `E` is `A -> B -> D -> E`, with cost `2 + 2 + 1 = 5`.
 
-## Worked example 2: one Floyd-Warshall update
+## Worked example: one Floyd–Warshall stage
 
-Problem: Suppose vertices are `0, 1, 2`, and the current distance matrix before allowing vertex `1` as an intermediate is:
+Suppose vertices are `0, 1, 2`, and the current distance matrix before allowing vertex `1` as an intermediate is:
 
 ```text
       0   1   2
@@ -136,7 +169,7 @@ Problem: Suppose vertices are `0, 1, 2`, and the current distance matrix before 
 
 Update distances using vertex `1` as a possible intermediate.
 
-Method: for every pair `(i,j)`, test whether `D[i][1] + D[1][j]` improves `D[i][j]`.
+For every pair `(i,j)`, test whether `D[i][1] + D[1][j]` improves `D[i][j]`.
 
 1. Pair `(0,2)`:
 
@@ -163,9 +196,21 @@ Updated matrix:
 2   inf inf    0
 ```
 
-Checked answer: the new shortest known path from `0` to `2` is `0 -> 1 -> 2` with cost `7`, replacing the direct edge cost `10`.
+The new shortest known path from `0` to `2` is `0 -> 1 -> 2` with cost `7`, replacing the direct edge cost `10`.
 
-## Code
+## Worked example: why Dijkstra fails on a negative edge
+
+Take directed edges `S -> A` of weight `2`, `S -> B` of weight `5`, and `B -> A` of weight `-10`.
+
+1. Initialization gives `d[S]=0`, `d[A]=inf`, and `d[B]=inf`.
+2. Relaxing edges from `S` gives `d[A]=2` and `d[B]=5`.
+3. Dijkstra chooses `A` next because `2 < 5` and finalizes it.
+4. Later it chooses `B`. Relaxing `B -> A` proposes $5+(-10)=-5$.
+5. The true shortest path is `S -> B -> A` with cost `-5`, contradicting the earlier finalized value `2`.
+
+The failure does not require a negative cycle. One negative edge is enough to invalidate the settle-once proof. Bellman–Ford handles the graph: after a pass establishes `d[B]=5`, a later relaxation of `B -> A` lowers `d[A]` to `-5`.
+
+## Matrix-based Dijkstra in C
 
 This C program implements Dijkstra's algorithm with an adjacency matrix and simple $O(V^2)$ minimum selection.
 
@@ -232,7 +277,7 @@ int main(void) {
 }
 ```
 
-## Common pitfalls
+## Failure modes in implementations
 
 - Running Dijkstra on graphs with negative edge weights. The finalized-distance argument no longer works.
 - Confusing unreachable distance with a large real distance. Choose `INF` carefully to avoid overflow in `dist[u] + weight`.
@@ -241,7 +286,13 @@ int main(void) {
 - Using Floyd-Warshall on a graph with a negative cycle and interpreting the output as finite shortest paths.
 - In an adjacency matrix, using `0` for "no edge" when zero-weight edges are possible.
 
-## Connections
+Integer overflow deserves more than a large `INF` constant. Before computing `dist[u] + weight`, establish that `dist[u]` is finite and that the addition fits the distance type. Using a wider signed type helps but does not remove the need for a bound when input weights are untrusted.
+
+Early termination is sound in Dijkstra when the requested target is extracted with its current minimum key, not merely when it is first discovered. Discovery provides a tentative route; extraction under the nonnegative-weight invariant finalizes it.
+
+For floating-point weights, comparisons near equality can make tie behavior platform-dependent. Negative zero and NaN also need a policy. Many graph applications avoid those questions by storing scaled integer costs when the domain permits it.
+
+## Related pages
 
 - [graph representation](/cs/data-structures/graph-representation)
 - [graph traversals](/cs/data-structures/graph-traversals)

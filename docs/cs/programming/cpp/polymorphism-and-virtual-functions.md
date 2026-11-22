@@ -9,7 +9,7 @@ Inheritance lets a derived class reuse and specialize a base class, but polymorp
 
 This matters whenever a program should work with a general concept such as a sale, employee, shape, account, or stream, while the exact subtype is not known until the program is running. The cost is that the programmer must design the base interface carefully, avoid slicing, and remember that destruction through a base pointer needs a virtual destructor.
 
-## Definitions
+## Dynamic type enters the call
 
 A **virtual function** is a member function declared with the keyword `virtual` in a base class. When a virtual function is called through a base-class pointer or reference, C++ uses the dynamic type of the object to select the function body.
 
@@ -48,7 +48,11 @@ DiscountSale d(100.0, 0.20);
 Sale s = d;              // slicing: s is a Sale, not a DiscountSale
 ```
 
-## Key results
+Every expression has a static type known to the compiler. A glvalue that denotes a polymorphic object may also have a more-derived dynamic type at run time. Virtual dispatch uses the final overrider associated with that dynamic type. Nonvirtual name lookup and overload resolution still begin from static type information, so polymorphism does not turn C++ into a wholly dynamic language.
+
+The `override` specifier does not create virtual behavior; it verifies it. If a base declares `virtual void draw() const`, then `void draw() override` fails to compile because the missing `const` means the signatures differ. The older code would silently introduce a new function and leave calls through the base using the base implementation. `final` can prevent further overriding of one function or prevent derivation from an entire class.
+
+## Dispatch rules and their limits
 
 If a member function should behave differently for different derived classes, declare it virtual in the base class. The `virtual` keyword is needed in the base-class declaration; derived declarations are also commonly marked `virtual` or `override` in modern C++, but the essential decision begins in the base interface.
 
@@ -73,7 +77,15 @@ Abstract base classes are useful when the base concept is real but incomplete. A
 
 A short proof sketch for dynamic dispatch is design-based rather than algebraic. The compiler knows the static type of a base pointer, but the object it points to can vary at run time. A virtual function call therefore cannot be fully resolved from the pointer's declared type. The implementation stores enough class information with the object to choose the final override when the call happens.
 
-## Visual
+Virtual calls made from constructors and destructors do not dispatch to a more-derived part that is not currently alive. During base construction, derived members have not been initialized; during base destruction, they have already been destroyed. Calling a virtual helper from a base constructor therefore selects the base-level implementation. Pure virtual calls from construction or destruction can lead to serious failures and should be designed out.
+
+Default arguments are also statically chosen. If a base virtual function and its override supply different defaults, a call through a base reference uses the base declaration's default but dispatches to the derived body. Keeping defaults identical—or avoiding defaults on virtual functions—prevents this split decision.
+
+A virtual function need not be public. The non-virtual interface pattern gives clients a stable public function that validates inputs and then calls a protected or private virtual customization point. Derived classes vary the step while the base retains control of shared preconditions and postconditions.
+
+Run-time type information supports `dynamic_cast` and `typeid` for polymorphic types. A pointer `dynamic_cast` returns null when the object is not of the requested derived type; a reference cast throws `std::bad_cast`. Occasional boundary checks are legitimate, but repeated subtype tests often signal that a needed operation is missing from the virtual interface.
+
+## The usual vtable model
 
 ```mermaid
 flowchart TB
@@ -121,6 +133,8 @@ flowchart TB
 
 This C++ polymorphism diagram shows the usual object-layout mechanism behind virtual dispatch. A base pointer addresses the base subobject, the object stores a vptr, and the vptr selects a vtable whose fixed slot points to the dynamic type's override. The slicing branch makes the failure mode explicit: copying a derived object into a base object discards derived storage, so later calls no longer have a derived dynamic type to dispatch to.
 
+Vtables and vptrs are a widespread implementation strategy, not terms required by the C++ standard's abstract machine. The language promises the observable dispatch behavior. Compilers may devirtualize a call when analysis proves the dynamic type, avoiding the indirect call without changing semantics.
+
 | Call form | Virtual? | Object expression | Binding result |
 |---|---:|---|---|
 | `base.bill()` | Yes | Base object | Calls base version because the object is base |
@@ -129,7 +143,7 @@ This C++ polymorphism diagram shows the usual object-layout mechanism behind vir
 | `baseRef.bill()` | No | Base reference to derived object | Calls base version |
 | `baseObject = derivedObject; baseObject.bill()` | Yes | Sliced base object | Calls base version |
 
-## Worked example 1: Computing bills through a base reference
+## Worked example: computing bills through a base reference
 
 Problem: A regular sale costs `$100.00`. A discount sale has the same starting price but gives a `25%` discount. A reporting function accepts `const Sale&`. Which bill should it print for each object?
 
@@ -185,7 +199,9 @@ $$
 
 Checked answer: the regular sale prints `100`, and the discount sale prints `75`. The key check is that the call uses a reference and `bill` is virtual.
 
-## Worked example 2: Detecting object slicing
+The derived class duplicates the original price because the base keeps it private without a protected accessor. A cleaner base could expose `protected: double price() const`, letting the derived calculation reuse the base representation through a controlled function. Making the field protected would couple derived classes directly to its storage. Discount validation also belongs at construction: a fraction below zero increases the bill, and one above one produces a negative bill.
+
+## Worked example: detecting object slicing
 
 Problem: A program has a `Pet` base class and a `Dog` derived class. The base class has a virtual `speak` function. Compare these three cases:
 
@@ -214,7 +230,9 @@ Method:
 
 Checked answer: the assignment `Pet pet = dog;` is the slicing case. The reference and pointer forms preserve polymorphism.
 
-## Code
+Slicing can also happen through function parameters and containers. A function `void visit(Pet pet)` slices its argument; `std::vector<Pet>` slices a `Dog` passed to `push_back`. Use a reference for non-owning visits and an owning pointer such as `std::unique_ptr<Pet>` for a heterogeneous collection whose elements must outlive their original scope.
+
+## Heterogeneous collections and lifetime
 
 ```cpp
 #include <cmath>
@@ -279,6 +297,20 @@ int main() {
 }
 ```
 
+The vector stores non-owning pointers to local objects. It is safe only because `c` and `r` live until after the loop and the vector never deletes them. If shapes are constructed dynamically or returned from a factory, prefer `std::vector<std::unique_ptr<Shape>>`; the virtual destructor then ensures deleting a pointer to `Shape` runs the complete derived destruction chain.
+
+Value-like copying of a polymorphic object cannot use the ordinary base copy constructor without slicing. A common explicit solution is a virtual clone:
+
+```cpp
+class Shape {
+public:
+    virtual ~Shape() = default;
+    virtual std::unique_ptr<Shape> clone() const = 0;
+};
+```
+
+Each override returns a newly allocated copy of its own type. The caller receives ownership without needing to know that type. This operation should exist only when independent copying is meaningful for every subtype.
+
 ```cpp
 #include <iostream>
 using namespace std;
@@ -323,7 +355,9 @@ int main() {
 }
 ```
 
-## Common pitfalls
+The `Account&` parameter preserves identity and permits mutation, so `closeMonth(savings)` updates the original savings object. Passing by value would slice it to `Account`, run the base implementation, and update no savings interest. The protected balance exposes representation to subclasses; a larger design might keep it private and provide a protected operation that applies a validated credit.
+
+## Silent loss of dynamic behavior
 
 - Declaring an override in the derived class but forgetting `virtual` in the base class. The call will be statically bound when made through a base pointer or reference.
 - Passing polymorphic objects by value. This slices derived objects and removes the part that dynamic binding needs.
@@ -332,7 +366,13 @@ int main() {
 - Changing the parameter type or `const` qualifier accidentally. `double area()` does not override `double area() const`.
 - Using inheritance where a simple member object would express the design better. Polymorphism is for an "is a" relationship with substitutable behavior.
 
-## Connections
+Covariant return types are a narrow exception to exact signature matching. An overriding virtual function may return a pointer or reference to a more-derived class when the base version returns the corresponding base pointer or reference. Smart-pointer types are not covariant in this language sense; `std::unique_ptr<Derived>` cannot directly override a function returning `std::unique_ptr<Base>`.
+
+Qualified calls suppress virtual dispatch. Inside an override, `Base::draw()` deliberately runs the base implementation, often to extend shared behavior. The unqualified call through `this` remains virtual and can recurse if it resolves back to the same override.
+
+Virtual dispatch carries an indirect-call and object-layout cost, usually small but real. The larger cost is contractual: every derived class must preserve the base semantics, and changing the virtual interface affects the whole hierarchy. Templates or variants can be better when the set of types is known at compile time and value semantics matter more than open-ended extension.
+
+## Related pages
 
 - [inheritance](/cs/programming/cpp/inheritance)
 - [classes and encapsulation](/cs/programming/cpp/classes-and-encapsulation)

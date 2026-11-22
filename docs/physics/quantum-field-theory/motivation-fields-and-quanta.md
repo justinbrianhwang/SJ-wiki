@@ -5,248 +5,436 @@ sidebar_position: 2
 
 # Motivation, Fields, and Quanta
 
-Quantum field theory begins with a change in what we regard as primary. In nonrelativistic quantum mechanics a particle has a wavefunction, but relativistic physics makes fixed particle number unstable: enough energy can create new particles, and a localized particle state spreads in ways that fight the simple one-particle picture. A field is the more natural object because it assigns degrees of freedom to every point in space, and particles appear as quantized excitations of those degrees of freedom.
+Relativistic quantum mechanics cannot keep particle number fixed. An energetic collision may create new particles, an unstable particle may decay, and radiation can be emitted in arbitrarily many soft quanta. A one-particle wavefunction has no operators that perform those changes. Quantum field theory instead assigns a quantum degree of freedom to each spatial point, or equivalently to each momentum mode, and lets creation and annihilation arise from the field operator.
 
-This point of view also unifies forces and matter. A classical field can store energy, carry momentum, and mediate interactions; a quantum field does the same while allowing exchange in discrete quanta. Zee's opening chapters stress this physical motivation before machinery: fields are not decorative notation for particles, but the bookkeeping system demanded by locality, relativity, and quantum mechanics together.
+The particle picture remains useful. In a free theory it is exact, and in an interacting theory it describes sufficiently stable asymptotic excitations. It is no longer the fundamental bookkeeping device. Fields carry locality and symmetry directly; particles are particular states of those fields.
 
-## Definitions
+## Three pressures toward fields
 
-A **classical field** is a function on spacetime. A real scalar field is the simplest example:
+### Relativity allows creation
 
-$$
-\phi:\mathbb{R}^{1,3}\to \mathbb{R}, \qquad x^\mu=(t,\mathbf{x}).
-$$
-
-In natural units, $c=\hbar=1$, time and length are measured in inverse energy. The action is the spacetime integral of a Lagrangian density:
+The relativistic dispersion relation is
 
 $$
-S[\phi]=\int d^4x\,\mathcal{L}(\phi,\partial_\mu\phi).
+E^2=\mathbf p^2+m^2.
 $$
 
-For a free real scalar field,
+Once an interaction concentrates enough center-of-mass energy, additional rest mass can be produced without violating energy or momentum conservation. A Hilbert space with exactly one electron, for example, cannot describe electron--positron pair creation. Fock space handles all allowed occupation numbers,
 
 $$
-\mathcal{L}=\frac{1}{2}\partial_\mu\phi\,\partial^\mu\phi-\frac{1}{2}m^2\phi^2.
+\mathcal F=\mathcal H_0\oplus\mathcal H_1\oplus\mathcal H_2\oplus\cdots,
 $$
 
-The Euler-Lagrange equation for fields is
+and field operators connect its different sectors.
+
+### Relativity favors local interactions
+
+A relativistic theory should not transmit controllable effects outside the light cone. Local fields support a direct condition: bosonic observables commute at spacelike separation,
 
 $$
-\frac{\partial \mathcal{L}}{\partial \phi}
--\partial_\mu\left(\frac{\partial \mathcal{L}}{\partial(\partial_\mu\phi)}\right)=0.
+[\mathcal O(x),\mathcal O(y)]=0
+\qquad\text{for}\qquad
+(x-y)^2<0.
 $$
 
-Applying it to the free scalar Lagrangian gives the Klein-Gordon equation:
+Fermionic fields anticommute at spacelike separation, while their observable bilinears commute. This microcausality condition is sharper than trying to formulate an instantaneous potential compatible with special relativity.
+
+### Identical particles are already field-like
+
+In many-body quantum mechanics one symmetrizes or antisymmetrizes wavefunctions by hand. Creation operators make the same structure automatic. A bosonic operator may occupy a mode repeatedly; a fermionic creation operator squares to zero. Position-space fields are Fourier transforms of those mode operators. The distinction between “many identical particles” and “one quantized field with many excitations” is then a choice of language, with the latter scaling better when occupation number changes.
+
+## The classical scalar field as the starting model
+
+Take a real scalar field $\phi(x)$ in flat spacetime with metric signature $(+---)$. In natural units, $c=\hbar=1$, the action is
 
 $$
-(\partial_\mu\partial^\mu+m^2)\phi=0.
-$$
-
-A **quantum field** promotes the field and its conjugate momentum to operators. Equal-time canonical quantization imposes
-
-$$
-[\hat{\phi}(t,\mathbf{x}),\hat{\pi}(t,\mathbf{y})]=i\delta^{(3)}(\mathbf{x}-\mathbf{y}),
+S[\phi]=\int d^4x\,\mathcal L,
 \qquad
-\hat{\pi}=\frac{\partial \mathcal{L}}{\partial\dot{\phi}}.
+\mathcal L=
+\frac12\partial_\mu\phi\,\partial^\mu\phi
+-\frac12m^2\phi^2.
 $$
 
-A **particle** is an excitation created by a creation operator acting on the vacuum:
+Varying $\phi\to\phi+\delta\phi$ gives
 
 $$
-| \mathbf{p}\rangle = a^\dagger_{\mathbf{p}}|0\rangle .
+\delta S
+=\int d^4x\left[
+\partial_\mu\phi\,\partial^\mu\delta\phi
+-m^2\phi\,\delta\phi
+\right].
 $$
 
-Thus the field is the operator that creates and destroys quanta, not merely a wavefunction for one quantum.
-
-## Key results
-
-The first structural result is that a free relativistic field decomposes into independent harmonic oscillators, one for each momentum mode. Write, schematically,
+Integrating the first term by parts and taking $\delta\phi$ to vanish at the boundary gives
 
 $$
-\hat{\phi}(x)=
-\int\frac{d^3p}{(2\pi)^3}\frac{1}{\sqrt{2E_{\mathbf{p}}}}
-\left(a_{\mathbf{p}}e^{-ip\cdot x}+a^\dagger_{\mathbf{p}}e^{ip\cdot x}\right),
-\qquad E_{\mathbf{p}}=\sqrt{\mathbf{p}^2+m^2}.
+\delta S
+=-\int d^4x\,
+(\Box\phi+m^2\phi)\delta\phi.
 $$
 
-The energy operator becomes a sum over oscillator energies:
+Stationarity for arbitrary $\delta\phi$ yields the Klein--Gordon equation,
 
 $$
-\hat{H}=\int \frac{d^3p}{(2\pi)^3}E_{\mathbf{p}}
-\left(a^\dagger_{\mathbf{p}}a_{\mathbf{p}}+\frac{1}{2}\delta^{(3)}(0)\right).
+(\Box+m^2)\phi=0,
+\qquad
+\Box=\partial_t^2-\nabla^2.
 $$
 
-The infinite zero-point term is already a warning sign: quantum fields naturally produce ultraviolet-sensitive quantities. In many nongravitational calculations only energy differences matter, but once gravity is included the vacuum energy becomes physically serious.
-
-The second structural result is locality. Local interactions are built from products of fields at the same spacetime point, for example
+A plane wave $e^{-ip\cdot x}$ is a solution only if
 
 $$
-\mathcal{L}_{\text{int}}=-\frac{\lambda}{4!}\phi^4.
+p^2=m^2,
+\qquad
+p^0=\pm E_{\mathbf p},
+\qquad
+E_{\mathbf p}=\sqrt{\mathbf p^2+m^2}.
 $$
 
-Locality keeps cause and effect compatible with relativity. It also makes the theory predictive when combined with symmetry and dimensional analysis, because only certain interactions remain important at long distances.
+Both frequency signs are needed for a real classical field. After quantization they become annihilation and creation parts of one Hermitian operator.
 
-A third result is crossing between classical waves and particles. A classical field configuration can be understood as a coherent state containing many quanta. Conversely, a one-particle state is a small excitation of the quantum field. The language changes smoothly between particle physics, condensed matter, and classical field theory.
+## A field is a continuum of oscillators
 
-There is also a useful diagnostic for when a field description is forced on us. If the question involves creation or annihilation, radiation, collective oscillation, or a local conservation law, a fixed-particle Hilbert space is usually the wrong starting point. A decaying excited atom emits a photon; an accelerated charge radiates; a hot gas produces and absorbs quanta; a crystal has phonons whose number is not conserved. The field supplies operators that create and destroy these excitations while keeping energy, momentum, charge, and spin under control.
-
-The field viewpoint also makes causality sharper. Relativistic locality is expressed by the vanishing of commutators or anticommutators at spacelike separation, for example schematically
+Put the theory temporarily in a finite periodic box. Expand
 
 $$
-[\mathcal{O}(x),\mathcal{O}(y)]=0
-\quad\text{when}\quad (x-y)^2<0
+\phi(t,\mathbf x)
+=\frac1{\sqrt V}\sum_{\mathbf p}
+q_{\mathbf p}(t)e^{i\mathbf p\cdot\mathbf x},
 $$
 
-for bosonic observables. This condition says that measurements outside each other's light cones cannot be used to send signals. It is much more natural to impose this on local fields and local composite operators than on an instantaneous potential between particles.
+with the reality condition $q_{-\mathbf p}=q_{\mathbf p}^*$. Substitution into the action gives a sum of decoupled oscillator terms whose frequencies are
 
-Finally, fields make approximation systematic. One writes the most general local Lagrangian consistent with the symmetries and orders the terms by dimension or by the number of derivatives. The result may be a fundamental-looking theory, such as QED over a wide range of scales, or an effective theory, such as phonons in a solid. In both cases the same mathematical structure explains why only a few terms dominate the low-energy behavior.
+$$
+\omega_{\mathbf p}=E_{\mathbf p}.
+$$
 
-## Visual
+The continuum has not disappeared; it has been reorganized by Fourier modes. Quantizing the field means quantizing every oscillator. The canonical momentum is
+
+$$
+\pi(t,\mathbf x)
+=\frac{\partial\mathcal L}{\partial\dot\phi}
+=\dot\phi(t,\mathbf x),
+$$
+
+and the equal-time commutator is
+
+$$
+[\phi(t,\mathbf x),\pi(t,\mathbf y)]
+=i\delta^{(3)}(\mathbf x-\mathbf y).
+$$
+
+A normalization consistent with this commutator is
+
+$$
+\phi(x)=
+\int\frac{d^3p}{(2\pi)^3}
+\frac1{\sqrt{2E_{\mathbf p}}}
+\left[
+a(\mathbf p)e^{-ip\cdot x}
++a^\dagger(\mathbf p)e^{ip\cdot x}
+\right],
+$$
+
+where
+
+$$
+[a(\mathbf p),a^\dagger(\mathbf q)]
+=(2\pi)^3\delta^{(3)}(\mathbf p-\mathbf q).
+$$
+
+The vacuum obeys $a(\mathbf p)\vert 0\rangle=0$. A one-particle momentum eigenstate is $a^\dagger(\mathbf p)\vert 0\rangle$, and repeated action constructs multiparticle states.
+
+The Hamiltonian is
+
+$$
+H=\int\frac{d^3p}{(2\pi)^3}
+E_{\mathbf p}
+\left[
+a^\dagger(\mathbf p)a(\mathbf p)
++\frac12(2\pi)^3\delta^{(3)}(0)
+\right].
+$$
+
+The second term is the sum of zero-point energies. In nongravitational scattering one can normal-order the free Hamiltonian and subtract this constant. In gravity, an absolute vacuum-energy density affects spacetime curvature, so the subtraction is no longer conceptually harmless.
 
 ```mermaid
 flowchart LR
-  A[Classical field] --> B[Fourier modes]
-  B --> C[Independent oscillators]
-  C --> D[Quantize each oscillator]
-  D --> E[Creation and annihilation operators]
-  E --> F[Particles as field quanta]
-  F --> G[Interactions from local terms]
+  A["Local classical field"] --> B["Fourier transform"]
+  B --> C["One oscillator per momentum"]
+  C --> D["Canonical quantization"]
+  D --> E["Creation and annihilation operators"]
+  E --> F["Fock-space states"]
+  F --> G["Particles as quanta"]
+  A --> H["Local interaction terms"]
+  H --> I["Scattering and changing particle number"]
 ```
 
-| Idea | Particle-first language | Field-first language | Why field-first wins |
-|---|---|---|---|
-| Basic object | Trajectory or wavefunction | Operator-valued field | Handles changing particle number |
-| Locality | Must be imposed indirectly | Built from local densities | Relativity is transparent |
-| Forces | Potentials between particles | Exchange of field quanta | Fits radiation and scattering |
-| Vacuum | Empty background | Lowest-energy field state | Vacuum fluctuations are dynamical |
-| Many-body systems | Large Hilbert space | Same field with many excitations | Natural for collective modes |
+## What a particle means in an interacting theory
 
-## Worked example 1: Deriving the Klein-Gordon equation
-
-Problem: Starting from
+For a free field, $a^\dagger(\mathbf p)\vert 0\rangle$ is an exact energy eigenstate. Interactions complicate the statement. The bare field in the Lagrangian can create a superposition containing a one-particle pole and multiparticle states. A stable particle corresponds to an isolated pole of the exact two-point function,
 
 $$
-\mathcal{L}=\frac{1}{2}\partial_\mu\phi\,\partial^\mu\phi-\frac{1}{2}m^2\phi^2,
+\widetilde G(p)
+\sim\frac{iZ}{p^2-m_{\mathrm{phys}}^2+i\epsilon}
++\text{terms regular at the pole}.
 $$
 
-derive the equation of motion.
+Here $m_{\mathrm{phys}}$ is the measured mass and $Z$ measures the overlap between the field and the one-particle state. A resonance that can decay has no normalizable asymptotic one-particle state; its pole moves away from the real axis and its finite width records the lifetime.
 
-Step 1: Differentiate with respect to the field:
+The notion of particle can also depend on the background and observer. In ordinary Minkowski scattering there is a preferred time-translation symmetry and an unambiguous positive-frequency split. Curved spacetime or accelerated coordinates may not provide the same split. The local field remains the more durable object.
 
-$$
-\frac{\partial \mathcal{L}}{\partial \phi}=-m^2\phi.
-$$
+Condensed-matter examples reinforce the distinction. A phonon is a quantum of lattice displacement, not an elementary constituent of the solid. Magnons and quasiparticles have similar status. QFT applies because quantized collective fields obey the same oscillator and interaction logic.
 
-Step 2: Differentiate with respect to the field derivative:
+## Local interactions and an effective expansion
 
-$$
-\frac{\partial \mathcal{L}}{\partial(\partial_\mu\phi)}
-=\partial^\mu\phi.
-$$
-
-Step 3: Insert both pieces into the field Euler-Lagrange equation:
+A scalar interaction can be added locally:
 
 $$
--m^2\phi-\partial_\mu(\partial^\mu\phi)=0.
+\mathcal L_{\mathrm{int}}
+=-\frac{\lambda}{4!}\phi^4.
 $$
 
-Step 4: Move signs into the standard form:
+The product occurs at one spacetime point. In perturbation theory it allows two quanta to scatter into two and, when kinematics permits in more general theories, permits particle number to change.
+
+Locality and symmetry do not force a finite list of all possible terms. One may also write operators such as $\phi^6$, $(\partial\phi)^4$, and higher derivatives if the symmetries allow them. Dimensional analysis orders their importance. In four dimensions the Lagrangian density has mass dimension four, while the kinetic term gives
 
 $$
-(\partial_\mu\partial^\mu+m^2)\phi=0.
+[\phi]=1.
 $$
 
-Step 5: Check with a plane wave $\phi=e^{-ip\cdot x}$. Since $\partial_\mu\partial^\mu e^{-ip\cdot x}=-p_\mu p^\mu e^{-ip\cdot x}$, the equation becomes
+Thus $[\lambda]=0$ for $\phi^4$, whereas the coefficient of $\phi^6$ has dimension $-2$. Writing it as $c_6/\Lambda^2$ shows that its effects are suppressed at characteristic energy $E\ll\Lambda$.
+
+| Feature | Fixed-particle quantum mechanics | Quantum field theory |
+|---|---|---|
+| State space | chosen particle number | Fock space with many sectors |
+| Basic local object | particle coordinate | field operator |
+| Creation and decay | outside the original Hilbert space | generated by interactions |
+| Relativistic causality | difficult with instantaneous potentials | encoded by local commutators |
+| Collective excitations | separate many-body construction | quanta of an effective field |
+
+## Worked example: deriving the dispersion relation
+
+Insert
 
 $$
-(-p^2+m^2)e^{-ip\cdot x}=0,
+\phi(x)=A e^{-iEt+i\mathbf p\cdot\mathbf x}
 $$
 
-so $p^2=m^2$, or $E^2=\mathbf{p}^2+m^2$. The field equation reproduces the relativistic energy-momentum relation.
-
-## Worked example 2: Mass dimension of a scalar interaction
-
-Problem: In four spacetime dimensions, find the mass dimensions of $\phi$, $m$, and $\lambda$ in the interaction $-\lambda \phi^4/4!$.
-
-Step 1: The action is dimensionless in natural units:
+into $(\Box+m^2)\phi=0$. The time derivatives give
 
 $$
-[S]=0.
+\partial_t^2\phi=(-iE)^2\phi=-E^2\phi,
 $$
 
-Step 2: Since $d^4x$ has dimension $-4$, the Lagrangian density has dimension
+and the spatial Laplacian gives
 
 $$
-[\mathcal{L}]=4.
-$$
-
-Step 3: The kinetic term is $\frac{1}{2}\partial_\mu\phi\partial^\mu\phi$. Since $[\partial_\mu]=1$,
-
-$$
-[\partial_\mu\phi\partial^\mu\phi]=2+2[\phi].
-$$
-
-Set this equal to $4$:
-
-$$
-2+2[\phi]=4 \quad \Rightarrow \quad [\phi]=1.
-$$
-
-Step 4: The mass term has dimension
-
-$$
-[m^2\phi^2]=2[m]+2[\phi].
-$$
-
-Using $[\phi]=1$ and setting the result equal to $4$ gives
-
-$$
-2[m]+2=4 \quad \Rightarrow \quad [m]=1.
-$$
-
-Step 5: The quartic interaction has dimension
-
-$$
-[\lambda\phi^4]=[\lambda]+4[\phi]=[\lambda]+4.
+\nabla^2\phi=(i\mathbf p)^2\phi=-\mathbf p^2\phi.
 $$
 
 Therefore
 
 $$
-[\lambda]+4=4 \quad \Rightarrow \quad [\lambda]=0.
+(\partial_t^2-\nabla^2+m^2)\phi
+=(-E^2+\mathbf p^2+m^2)\phi=0.
 $$
 
-The checked answer is $[\phi]=1$, $[m]=1$, and $[\lambda]=0$. A dimensionless coupling is a first hint that $\phi^4$ theory in four dimensions is marginal by power counting.
+For a nonzero amplitude,
 
-## Code
+$$
+E^2=\mathbf p^2+m^2.
+$$
 
-```python
-import math
+The field equation contains both signs $E=\pm E_{\mathbf p}$. The operator expansion assigns the positive-frequency coefficient to $a$ and the negative-frequency coefficient to $a^\dagger$, so both branches contribute without introducing negative-energy particles.
 
-def scalar_dimensions(spacetime_dim):
-    # From [L] = d and [(partial phi)^2] = 2 + 2[phi].
-    phi_dim = (spacetime_dim - 2) / 2
-    m_dim = 1
-    lambda_phi4_dim = spacetime_dim - 4 * phi_dim
-    return phi_dim, m_dim, lambda_phi4_dim
+## Worked example: checking the mode normalization
 
-for d in [2, 3, 4, 5, 6]:
-    phi_dim, m_dim, lam_dim = scalar_dimensions(d)
-    print(f"d={d}: [phi]={phi_dim:.1f}, [m]={m_dim}, [lambda_phi4]={lam_dim:.1f}")
-```
+Start from the field expansion and its time derivative at equal time:
 
-## Common pitfalls
+$$
+\begin{aligned}
+\phi(t,\mathbf x)
+&=\int\frac{d^3p}{(2\pi)^3\sqrt{2E_{\mathbf p}}}
+\left[
+a_{\mathbf p}e^{-ipx}
++a_{\mathbf p}^\dagger e^{ipx}
+\right],\\
+\pi(t,\mathbf y)
+&=\int\frac{d^3q}{(2\pi)^3\sqrt{2E_{\mathbf q}}}
+\left[
+-iE_{\mathbf q}a_{\mathbf q}e^{-iqy}
++iE_{\mathbf q}a_{\mathbf q}^\dagger e^{iqy}
+\right].
+\end{aligned}
+$$
 
-- Treating a quantum field as a one-particle wavefunction. The field operator acts on Fock space and changes particle number.
-- Forgetting that $\mathcal{L}$ usually means Lagrangian density in field theory, not the spatially integrated Lagrangian.
-- Dropping metric signs inconsistently. With signature $(+,-,-,-)$, $\partial_\mu\partial^\mu=\partial_t^2-\nabla^2$.
-- Thinking the vacuum is empty in the classical sense. The quantum vacuum is the lowest-energy state of fields and can have correlations.
-- Confusing the mass parameter $m$ with a coupling. In natural units it has dimension one, while $\lambda$ in four-dimensional $\phi^4$ theory is dimensionless.
-- Missing the operational test: if the process can emit, absorb, or exchange quanta, use field operators rather than a fixed-particle wavefunction.
+Only the $[a,a^\dagger]$ and $[a^\dagger,a]$ terms survive. Using the momentum delta function sets $\mathbf q=\mathbf p$, so the energy factors reduce to $1/2$ in each contribution. At equal time,
 
-## Connections
+$$
+[\phi(t,\mathbf x),\pi(t,\mathbf y)]
+=i\int\frac{d^3p}{(2\pi)^3}
+\frac12
+\left[
+e^{i\mathbf p\cdot(\mathbf x-\mathbf y)}
++e^{-i\mathbf p\cdot(\mathbf x-\mathbf y)}
+\right].
+$$
 
+Changing $\mathbf p\to-\mathbf p$ in the second integral makes the two terms equal:
+
+$$
+[\phi(t,\mathbf x),\pi(t,\mathbf y)]
+=i\int\frac{d^3p}{(2\pi)^3}
+e^{i\mathbf p\cdot(\mathbf x-\mathbf y)}
+=i\delta^{(3)}(\mathbf x-\mathbf y).
+$$
+
+The factor $1/\sqrt{2E_{\mathbf p}}$ is fixed by canonical normalization.
+
+## Worked example: dimensions of scalar operators
+
+In $d$ spacetime dimensions, $[d^dx]=-d$ and a dimensionless action requires $[\mathcal L]=d$. From the kinetic term,
+
+$$
+2+2[\phi]=d,
+$$
+
+so
+
+$$
+[\phi]=\frac{d-2}{2}.
+$$
+
+For an interaction $g_n\phi^n$,
+
+$$
+[g_n]=d-n\frac{d-2}{2}.
+$$
+
+Set $d=4$. Then $[\phi]=1$ and
+
+$$
+[g_2]=2,\qquad
+[g_3]=1,\qquad
+[g_4]=0,\qquad
+[g_6]=-2.
+$$
+
+Positive, zero, and negative coupling dimensions correspond to relevant, marginal, and irrelevant power-counting classifications near the Gaussian fixed point. “Irrelevant” means suppressed at low energy, not physically meaningless.
+
+## Conceptual traps
+
+- A field operator is not a one-particle wavefunction. It acts on the vacuum and on every multiparticle sector of Fock space.
+- A mode is not localized at a point; it extends across space. Localized wave packets are superpositions of momentum modes.
+- Virtual particles are internal terms in a perturbative expansion, not transient measurable objects that violate energy conservation.
+- The classical limit usually involves states with large coherent occupation, not taking $\hbar$ to zero inside one isolated number eigenstate.
+- Normal ordering removes the free zero-point constant from selected nongravitational expressions. It does not solve the gravitational vacuum-energy problem.
+- An interacting field need not correspond one-to-one with a stable particle. Confining theories and unstable resonances make that limitation explicit.
+
+## Symmetry becomes a local conservation law
+
+Fields make Noether's theorem natural because the action is an integral of a local density. Suppose a continuous transformation changes the field by $\delta\phi=\epsilon\Delta\phi$ and leaves the action invariant. Promoting the constant parameter $\epsilon$ temporarily to a function of position isolates a current:
+
+$$
+\delta S
+=-\int d^4x\,
+(\partial_\mu\epsilon)j^\mu
+$$
+
+up to equations of motion and boundary terms. Returning to constant $\epsilon$ gives
+
+$$
+\partial_\mu j^\mu=0.
+$$
+
+The conserved charge is an integral over space,
+
+$$
+Q=\int d^3x,j^0,
+$$
+
+and acts as the generator of the symmetry on quantum fields. Translation symmetry gives the stress-energy tensor and conservation of energy--momentum. Internal phase symmetry gives charge conservation. Rotational and Lorentz symmetries give angular-momentum currents containing both orbital and spin pieces.
+
+Local conservation is stronger than a statement about the total charge. It tells how charge flows through a boundary. Integrating over a spatial region gives
+
+$$
+\frac{d}{dt}\int_Vd^3x,j^0
+=-\int_{\partial V}d\mathbf S\cdot\mathbf j.
+$$
+
+Particle language can count charges on asymptotic states, but the field current also describes transport, radiation, and charge density during an interaction.
+
+## Correlators are closer to measurements than field values
+
+A quantum field operator at a point is not itself a classical random number. Observable predictions come from matrix elements and correlation functions. The vacuum two-point function
+
+$$
+G(x-y)
+=\langle0|T\phi(x)\phi(y)|0\rangle
+$$
+
+is an amplitude for a disturbance inserted at one point to be removed at another, with time ordering appropriate to perturbation theory. Its momentum-space pole identifies a stable one-particle mass, while branch cuts begin at multiparticle thresholds.
+
+Higher correlators contain interaction data. After amputation of external propagators and taking momenta on shell, the LSZ reduction procedure relates them to scattering amplitudes. The fields used in a Lagrangian may be changed by local redefinitions; on-shell amplitudes remain the same when the transformation is nonsingular and all induced terms are retained. The field is therefore a coordinate on theory space as well as a local operator, while the scattering data are invariant outputs.
+
+Equal-time expectation values can resemble classical fields in suitable states. A coherent state $\vert \alpha\rangle$ satisfies
+
+$$
+a_{\mathbf p}|\alpha\rangle
+=\alpha_{\mathbf p}|\alpha\rangle.
+$$
+
+Its field expectation value obeys the classical free equation, and relative number fluctuations decrease when occupation is large. Laser light is well described this way. A number eigenstate, by contrast, can have zero field expectation even when it contains many quanta. “Many particles” alone is not enough; phase coherence matters.
+
+## Locality does not mean point particles
+
+Relativistic fields are operator-valued distributions. Products such as $\phi(x)^2$ at exactly the same point are singular before renormalization. One should smear a field with a smooth test function,
+
+$$
+\phi(f)=\int d^4x,f(x)\phi(x),
+$$
+
+or define composite operators through a regulator and subtraction prescription. The word local means that interactions and observables can be associated with arbitrarily small spacetime regions in the continuum limit, not that unsmeared operator products are ordinary finite numbers.
+
+The Reeh--Schlieder property gives a subtler warning against a naive particle picture: local operators acting on the vacuum can approximate a very large set of states. A sharply localized field operation does not create a state confined forever to that spatial region. Causality is protected by commutators of observables, not by requiring a relativistic one-particle wavefunction to have compact support at every later time.
+
+## Antiparticles from the field expansion
+
+For a complex scalar field, the mode expansion contains independent operators:
+
+$$
+\phi(x)
+=\int\frac{d^3p}{(2\pi)^3\sqrt{2E_{\mathbf p}}}
+\left[
+a(\mathbf p)e^{-ipx}
++b^\dagger(\mathbf p)e^{ipx}
+\right].
+$$
+
+The $a^\dagger$ operators create particles and $b^\dagger$ create antiparticles. A conserved $U(1)$ charge takes the normal-ordered form
+
+$$
+Q
+=\int\frac{d^3p}{(2\pi)^3}
+\left[
+a^\dagger a-b^\dagger b
+\right].
+$$
+
+Negative-frequency solutions have become positive-energy excitations with opposite charge. For a real scalar field, $b$ and $a$ are the same operator and the quanta are their own antiparticles. For Dirac fields, anticommutation changes the algebra but the reinterpretation has the same broad purpose: energy stays bounded below while both charge signs are present.
+
+## Where effective fields come from
+
+The microscopic variables need not resemble the low-energy fields. In a crystal, atomic displacements combine into phonon modes. In a superfluid, the phase of an order parameter becomes the long-wavelength field. In a confining gauge theory, hadron fields may describe the infrared even though quark and gluon fields organize short-distance calculations.
+
+Integrating out high-energy modes changes coefficients and generates additional interactions, but it preserves locality as a derivative expansion when there is a separation of scales. The low-energy observer can work with the fields that create the accessible excitations and include every symmetry-allowed operator to the needed order. Whether a field is “fundamental” cannot usually be decided from low-energy equations alone.
+
+## Related pages
+
+- [Scalar Phi-Four Theory](/physics/quantum-field-theory/scalar-phi-four-theory)
+- [Dirac Fields and Spinors](/physics/quantum-field-theory/dirac-fields-and-spinors)
 - [Path Integral Formulation](/physics/quantum-field-theory/path-integral-formulation)
 - [Perturbation Theory and Feynman Diagrams](/physics/quantum-field-theory/perturbation-and-feynman-diagrams)
-- [Scalar Phi-Four Theory](/physics/quantum-field-theory/scalar-phi-four-theory)
-- [Renormalization and Counterterms](/physics/quantum-field-theory/renormalization-and-counterterms)
+- [Effective Field Theory](/physics/quantum-field-theory/effective-field-theory)
+

@@ -9,7 +9,7 @@ Recursion is a way to solve a problem by reducing it to smaller versions of the 
 
 Recursion is especially natural for numbers written digit by digit, divide-and-conquer search, tree traversal, expression parsing, and backtracking. It is not always faster than iteration, but it can make the structure of a solution match the structure of the problem.
 
-## Definitions
+## A function may delegate to a smaller call
 
 A **recursive function** contains a call to itself, directly or through another function.
 
@@ -43,7 +43,11 @@ The **call stack** stores activation frames for active function calls. Each recu
 
 **Tail recursion** occurs when the recursive call is the final action of the function. Some compilers can optimize simple tail recursion, but C++ does not require all such calls to be optimized.
 
-## Key results
+The smaller call has the same contract as the original call. When writing `factorial(n - 1)`, reasoning does not reopen the implementation and mentally trace every nested level. It assumes the contract for a smaller valid argument, then asks whether multiplying by `n` produces the required result. This separation is the recursive counterpart of trusting a called helper function.
+
+Progress needs a well-founded measure: a quantity that cannot decrease forever. A nonnegative integer argument, the length of a remaining range, or the height of a finite tree can serve. “Looks smaller” is not enough if a path can oscillate between states or cross below the base case.
+
+## Correctness, work, and stack depth
 
 Every correct recursive function needs progress toward a base case. A common proof structure is induction:
 
@@ -88,7 +92,25 @@ This yields $O(\log n)$ comparisons.
 
 Mutual recursion occurs when functions call each other. For example, `isEven(n)` may call `isOdd(n - 1)`, and `isOdd(n)` may call `isEven(n - 1)`.
 
-## Visual
+Time and stack space answer different questions. Factorial makes one smaller call per level, giving
+
+$$
+T(n) = T(n-1) + O(1) = O(n),
+$$
+
+and holds $O(n)$ frames. Binary search also holds one frame per level, but the problem size halves, so both its time and recursive stack are $O(\log n)$. A recursive tree traversal may take $O(n)$ time while using only $O(h)$ stack space, where $h$ is the tree height; a balanced tree has logarithmic height, while a chain has linear height.
+
+Naive Fibonacci branches twice:
+
+$$
+T(n) = T(n-1) + T(n-2) + O(1).
+$$
+
+The same subproblems are recomputed many times, producing exponential growth. Memoization stores results by argument and reduces the work to a linear number of distinct subproblems. Bottom-up iteration often supplies the same dynamic-programming result with less stack overhead.
+
+Tail-call elimination is permitted but not guaranteed. A release build may optimize a tail-recursive call while a debug build retains every frame. Code whose input can reach millions of linear steps should use an explicit loop when bounded stack use is required.
+
+## Reading the call stack
 
 ```mermaid
 flowchart TD
@@ -111,7 +133,9 @@ flowchart TD
 | binary search | search half of range | empty range or match |
 | tree traversal | visit child subtrees | null child |
 
-## Worked example 1: writing digits vertically
+In the factorial diagram, descent creates suspended multiplications. The frame for `factorial(4)` cannot return until the result of `factorial(3)` arrives. Unwinding evaluates the multiplications in reverse call order. Local variables from different frames have separate storage even though they have the same source name.
+
+## Worked example: writing digits vertically
 
 Problem: Write the digits of `1234` one per line.
 
@@ -126,7 +150,9 @@ $$
 1234 / 10 = 123
 $$
 
-   $$1234 \% 10 = 4$$
+$$
+1234 \% 10 = 4
+$$
 
 ```cpp
 #include <iostream>
@@ -162,7 +188,9 @@ Checked answer:
 4
 ```
 
-## Worked example 2: recursive binary search
+The stated contract covers nonnegative integers. With a negative input, the base test and remainder behavior would print a minus sign incorrectly or recurse through negative quotients in an unintended way. A wrapper can print `'-'`, convert the magnitude safely to a wider or unsigned type, and then call a helper whose precondition is nonnegative. The most negative signed integer needs care because its positive magnitude may not fit in the same signed type.
+
+## Worked example: recursive binary search
 
 Problem: In the sorted array `{2, 5, 9, 14, 20, 33, 41}`, find the index of `20`.
 
@@ -214,7 +242,11 @@ int main() {
 
 Checked answer: the function returns index `4`.
 
-## Code
+The failure trace is equally important. Searching for `18` first examines indexes `3`, then `5`, then `4`. Since `18 < 20`, the next range is `low = 4`, `high = 3`. The base test returns `-1` before computing a midpoint. Each unsuccessful comparison strictly shortens the inclusive range, so termination follows.
+
+The midpoint expression `low + (high - low) / 2` avoids the overflow risk of `(low + high) / 2` when two large positive indexes are added. Its precondition is still a valid range within the array.
+
+## Mutual recursion, with a narrow domain
 
 This program demonstrates mutual recursion for even and odd numbers.
 
@@ -222,22 +254,16 @@ This program demonstrates mutual recursion for even and odd numbers.
 #include <cstdlib>
 #include <iostream>
 
-bool isOdd(int n);
+bool isOdd(unsigned int n);
 
-bool isEven(int n) {
-    if (n < 0) {
-        n = -n;
-    }
+bool isEven(unsigned int n) {
     if (n == 0) {
         return true;
     }
     return isOdd(n - 1);
 }
 
-bool isOdd(int n) {
-    if (n < 0) {
-        n = -n;
-    }
+bool isOdd(unsigned int n) {
     if (n == 0) {
         return false;
     }
@@ -245,13 +271,15 @@ bool isOdd(int n) {
 }
 
 int main() {
-    for (int n = 0; n <= 5; ++n) {
+    for (unsigned int n = 0; n <= 5; ++n) {
         std::cout << n << " even? " << std::boolalpha << isEven(n) << '\n';
     }
 }
 ```
 
-## Common pitfalls
+Using an unsigned domain makes the decreasing measure explicit and avoids negating the most-negative signed integer, which would overflow. The example is pedagogical rather than efficient: `n % 2 == 0` answers the question in constant time and constant stack space. Mutual recursion is more convincing in parsers where grammar rules genuinely refer to one another.
+
+## When recursive structure goes wrong
 
 - Missing a base case.
 - Writing a recursive case that does not make the input smaller or simpler.
@@ -262,7 +290,7 @@ int main() {
 - Causing stack overflow with extremely deep recursion.
 - Modifying global state in recursive functions without carefully undoing it during backtracking.
 
-Recursion-design checks:
+Before writing the recursive body:
 
 - Identify the measure that gets smaller on every recursive call. For factorial it is `n`; for a list it might be the number of remaining nodes; for a binary search it is the length of the current interval.
 - Write the base case before the recursive case. If the base case is unclear, the recursive version is probably not ready to code.
@@ -272,17 +300,27 @@ Recursion-design checks:
 - Separate "do work before the recursive call" from "do work after the recursive call." The first gives forward-order behavior; the second often gives reverse-order behavior.
 - Watch stack depth. Recursion is elegant for trees and divide-and-conquer algorithms, but a simple loop may be safer for a million-element linear process.
 
-Quick self-test: write the recursive function's contract without mentioning recursion. For example, "`sum(a, n)` returns the sum of the first `n` values" is clearer than "`sum` calls itself on a smaller array." The recursive case should then combine one small piece of work with a call that satisfies the same contract for a smaller input.
+Write the function's contract without mentioning recursion. For example, "`sum(a, n)` returns the sum of the first `n` values" is clearer than "`sum` calls itself on a smaller array." The recursive case should then combine one small piece of work with a call that satisfies the same contract for a smaller input.
 
-For debugging, add temporary output that prints the argument at function entry and just before returning. The indentation depth can be increased on each call. This makes the call tree visible and helps separate two common failures: never reaching the base case, and reaching the base case but combining the returned values incorrectly.
+For debugging, add temporary output that prints the argument at function entry and just before returning. Increasing indentation on each call exposes the shape of the call tree and separates two common failures: never reaching the base case, and reaching the base case but combining returned values incorrectly.
 
-A final review question is whether the recursive solution mirrors the structure of the data. Recursion is natural for trees because each subtree is itself a tree. It is also natural for divide-and-conquer ranges because each subrange is the same kind of problem. For simple counting loops, recursion may add stack cost without adding clarity.
+The recursive solution should mirror the structure of the data. Recursion is natural for trees because each subtree is itself a tree. It is also natural for divide-and-conquer ranges because each subrange is the same kind of problem. For simple counting loops, recursion may add stack cost without adding clarity.
 
-Extended practice: convert a simple loop to recursion and then convert it back. The loop version usually carries state in variables; the recursive version carries state in parameters and return values. Seeing the same computation in both forms clarifies which parts are essential and which parts are artifacts of the chosen control structure.
+Converting a simple loop to recursion and back shows where state lives. The loop version usually carries it in variables; the recursive version carries it in parameters and return values. Comparing the two forms separates the essential computation from artifacts of the control structure.
 
 Also compare tail-recursive and non-tail-recursive shapes. A tail-recursive function returns the recursive call directly, while a non-tail-recursive function still has work to do after the call returns. That difference affects tracing and, in some languages, optimization.
 
-## Connections
+Backtracking adds a second invariant: every failed branch must undo any state it added before another branch begins. A maze solver may mark a square, recursively try each neighbor, then unmark the square if all choices fail. Forgetting the undo step makes later branches see state belonging to an abandoned path. Passing an independent state value avoids undo work but may copy much more data.
+
+Recursing over externally supplied tree or graph data needs a depth policy. A mathematically valid input can be shaped as a million-node chain and overflow the process stack. An explicit stack container turns call depth into dynamic storage and permits a checked limit. Graph traversal also needs a visited set; otherwise a cycle violates the assumption that recursive descent reaches a null child.
+
+Exceptions unwind recursive frames automatically, destroying completed local objects on the way out. Manual resources held only by raw pointers can still leak. The same RAII rule used elsewhere becomes more important when many return and failure paths are nested across calls.
+
+Memoization changes the state model. A cache key must contain every input that affects the result; omitting part of the state can reuse an answer from a different subproblem. The stored result must also remain valid for the cache's lifetime. Local memo tables passed by reference make ownership and one top-level computation clear, while global caches can accidentally mix independent runs and retain memory indefinitely.
+
+Divide-and-conquer recursion also needs a combine-cost analysis. Merge sort makes two half-size calls, then merges in linear time, giving $T(n)=2T(n/2)+O(n)=O(n\log n)$. Halving the input does not alone guarantee logarithmic total time when both halves are explored.
+
+## Related pages
 
 - [functions and parameters](/cs/programming/cpp/functions-parameters-and-scope)
 - [arrays](/cs/programming/cpp/arrays)

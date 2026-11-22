@@ -7,9 +7,9 @@ sidebar_position: 18
 
 Spatial data mining studies objects with location, geometry, distance, neighborhood, and regional context. Aggarwal's spatial chapter covers mining with contextual spatial attributes and trajectory mining. Spatial data sits between multidimensional mining and graph/time-series mining: a point has numeric coordinates, but its meaning often depends on nearby objects, regions, paths, and movement through space.
 
-This page covers spatial context, spatial autocorrelation, spatial clustering, spatial outlier detection, trajectory pattern mining, trajectory clustering, trajectory outlier detection, and trajectory classification.
+Static spatial analysis uses location and neighborhood context; trajectory analysis adds order, direction, duration, and movement constraints. Both require a declared coordinate system and a defensible notion of proximity before a mining algorithm is chosen.
 
-## Definitions
+## Geometry, attributes, and neighborhoods
 
 A **spatial object** has geometric information such as a point, line, polygon, raster cell, or region.
 
@@ -31,19 +31,60 @@ $$
 
 **Trajectory similarity** may use pointwise distance, longest common subsequence, edit-distance variants, dynamic time warping, or route-overlap measures.
 
-## Key results
+The spatial weights matrix $W=(w_{ij})$ makes neighborhood assumptions explicit. Binary contiguity uses $w_{ij}=1$ for adjacent regions. Distance weights may decay with separation, and $k$-nearest-neighbor weights give every object the same nominal neighbor count. Row standardization divides each row by its sum, changing both interpretation and the influence of areas with many neighbors.
+
+Neighborhood construction can be asymmetric: $j$ may be among $i$'s $k$ nearest neighbors while $i$ is not among $j$'s. Some statistics and graph algorithms expect symmetry, so mutual or union-based symmetrization must be chosen deliberately.
+
+## Spatial context and local dependence
 
 **Spatial context changes feature meaning.** A high crime count may be expected in a dense downtown region and unusual in a small residential region. Spatial mining often needs contextual normalization.
 
 **Nearby observations are not independent.** Standard validation assumptions can fail when train and test sets contain neighboring locations. Spatial cross-validation should separate regions when testing generalization to new areas.
 
+Moran's $I$ is a common global autocorrelation statistic. For $n$ observations, deviations $z_i=x_i-\bar{x}$, and $S_0=\sum_i\sum_jw_{ij}$,
+
+$$
+I=\frac{n}{S_0}
+\frac{\sum_i\sum_j w_{ij}z_i z_j}
+{\sum_i z_i^2}.
+$$
+
+Positive values indicate that linked locations tend to have deviations with the same sign; negative values indicate neighboring contrasts. The expected value under one common randomization null is $-1/(n-1)$, not exactly zero. Significance depends on the null model and weights, often assessed with permutations.
+
+Global autocorrelation can coexist with local exceptions. Local indicators compare each location with its neighborhood and can identify high-high regions, low-low regions, and spatial outliers such as a high value surrounded by low values. Testing many locations again raises a multiple-comparison problem.
+
+Aggregation boundaries can change a spatial conclusion. Counts summarized by census tract may show a different correlation or cluster pattern from the same events summarized by grid cell or district. This is the modifiable areal unit problem: both the scale and the placement of boundaries affect statistics. Polygon-level averages also hide within-region variation. Repeating an analysis across reasonable partitions, using point-level models when possible, and reporting population or exposure denominators helps separate stable structure from an artifact of zoning.
+
+Area-level relationships need not describe individuals. A district with high income and high transit use does not imply that its high-income residents are the transit users. Drawing individual conclusions from aggregate spatial associations is an ecological fallacy. The available unit of observation limits the claim.
+
 **Spatial outliers are often local.** A location may be globally ordinary but locally anomalous relative to its neighbors. A temperature of 30 degrees may be normal in summer overall but unusual if surrounding sensors report 20.
 
-**Trajectory mining combines order and geometry.** A trajectory is not just a set of coordinates. Direction, speed, stops, turns, and time gaps can be essential.
+**Trajectory mining combines order and geometry.** A trajectory cannot be reduced to an unordered coordinate set when direction, speed, stops, turns, or time gaps carry meaning.
+
+## Distances, coordinate systems, and path geometry
 
 **Trajectory simplification can reduce noise.** GPS traces may contain many redundant points. Simplification keeps shape-defining points, reducing cost before clustering or classification.
 
 **Road-network distance may matter more than Euclidean distance.** Two points separated by a river, wall, or road network may be close geometrically but far in travel time.
+
+Latitude and longitude are angular coordinates. For nearby points and modest regions, a suitable projected coordinate reference system turns them into planar units for Euclidean calculation. For points on a sphere, the haversine central angle is
+
+$$
+a=\sin^2\left(\frac{\Delta\phi}{2}\right)
++\cos\phi_1\cos\phi_2
+\sin^2\left(\frac{\Delta\lambda}{2}\right),
+$$
+
+$$
+c=2\operatorname{atan2}(\sqrt{a},\sqrt{1-a}),
+\qquad d=Rc,
+$$
+
+where latitudes $\phi$ and longitudes $\lambda$ are in radians and $R$ is an Earth-radius approximation. Ellipsoidal geodesics are preferable when accuracy over large distances matters.
+
+Polygon area is particularly projection-sensitive. A map projection suitable for visual navigation may distort area badly. Analyses of density need an equal-area projection or geodesic area calculation, while local distance analysis usually uses a projection designed for the study region.
+
+## From raw geography to mining records
 
 **Spatial scale controls what counts as local.** A neighborhood radius of 100 meters might detect building-level anomalies, while 10 kilometers might detect city-level regions. The same point can be normal at one scale and unusual at another. Multi-scale analysis is common in spatial mining because geographic processes such as traffic, disease, weather, and retail demand operate at different resolutions.
 
@@ -61,7 +102,13 @@ $$
 
 **Temporal context often matters for spatial data.** A location pattern during rush hour, a storm, or a holiday may be normal only within that temporal context. Spatial and time-series preparation frequently need to be combined.
 
-## Visual
+Map matching is an inference problem because the nearest road segment is not always the driven road. GPS error, parallel roads, tunnels, and sparse samples create ambiguity. A common hidden-state formulation scores candidate road positions by observation likelihood and transitions between candidates by route plausibility. The most likely path can differ from the sequence of nearest segments.
+
+Trajectory distance depends on the question. Discrete Frechet distance preserves traversal order and is often described through a person-and-dog leash analogy. DTW aligns sampled positions or derived features while allowing timing differences. Longest-common-subsequence variants tolerate unmatched points within a spatial threshold. Route overlap on a road network emphasizes shared segments and may ignore timing entirely.
+
+Simplification algorithms such as Douglas--Peucker recursively keep the point with largest perpendicular distance from the segment joining interval endpoints. A spatial tolerance bounds geometric deviation in the chosen coordinate units. It does not preserve speed profiles or stop duration unless time is included separately.
+
+## Static and moving-object tasks
 
 ```mermaid
 flowchart TD
@@ -164,7 +211,34 @@ $$
 
 **Checked answer.** Remove $P_2$ under tolerance 0.2; keep $P_1$, $P_3$, and $P_4$ for the simplified trajectory.
 
-## Code
+## Worked example 3: Moran's numerator on a line
+
+**Problem.** Three regions lie in a line, with values $(1,2,3)$. Neighbors are $1\leftrightarrow2\leftrightarrow3$, weights are symmetric and binary, and the diagonal is zero. Compute Moran's $I$.
+
+**Method.** The mean is 2, so deviations are $z=(-1,0,1)$. There are four directed nonzero weights: $w_{12},w_{21},w_{23},w_{32}$, hence $S_0=4$.
+
+Every weighted cross-product includes the center deviation zero:
+
+$$
+\sum_i\sum_jw_{ij}z_i z_j
+=(-1)(0)+(0)(-1)+(0)(1)+(1)(0)=0.
+$$
+
+The denominator is
+
+$$
+\sum_i z_i^2=1+0+1=2.
+$$
+
+Therefore
+
+$$
+I=\frac{3}{4}\frac{0}{2}=0.
+$$
+
+**Checked answer.** Moran's $I$ is zero for this particular weights matrix. The monotonically increasing values might look spatially structured, but the middle observation equals the mean, so adjacent deviation products vanish. With only three regions, a significance claim would be especially weak.
+
+## Computing local context
 
 Pseudocode for local spatial outlier detection:
 
@@ -203,7 +277,9 @@ route_clusters = DBSCAN(eps=1.5, min_samples=2).fit_predict(trajectory_points)
 print("point-level spatial clusters:", route_clusters)
 ```
 
-## Common pitfalls
+The neighbor query requests three returned points, including the query itself, so each expectation averages only two other sensors in this code. That differs from the four-sensor prose example, where every sensor uses all three others. Neighborhood definitions must match when scores are compared. The DBSCAN call clusters sampled points, not whole trajectories; route clustering would first require a trajectory-level distance or representation.
+
+## Failure modes
 
 - Treating latitude and longitude as ordinary Euclidean coordinates over large areas.
 - Ignoring road-network or barrier effects when travel distance matters.
@@ -212,8 +288,11 @@ print("point-level spatial clusters:", route_clusters)
 - Comparing trajectories only by start and end points.
 - Forgetting that local spatial outliers can be hidden by global statistics.
 - Using a single spatial scale when patterns exist at multiple scales.
+- Computing distances in degrees and reporting them as if they were meters.
+- Choosing spatial folds after viewing outcomes, which can tune the evaluation geography to the desired result.
+- Publishing fine-grained trajectories after removing names and assuming location sequences are anonymous.
 
-## Connections
+## Related pages
 
 - [Mining Time Series Data](/cs/data-mining/chapter-14-mining-time-series-data)
 - [Mining Discrete Sequences](/cs/data-mining/chapter-15-mining-discrete-sequences)

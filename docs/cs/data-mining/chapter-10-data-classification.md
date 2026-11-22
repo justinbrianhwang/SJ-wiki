@@ -7,9 +7,9 @@ sidebar_position: 12
 
 Data classification learns a model from labeled examples and uses it to assign labels to new objects. Aggarwal's classification chapter covers feature selection, decision trees, rule-based classifiers, probabilistic classifiers such as naive Bayes, support vector machines, neural networks, instance-based learning, and evaluation. Classification is supervised: unlike clustering, it is judged by how well it predicts known labels or future outcomes.
 
-This page covers the core classification toolkit. The advanced page covers multiclass learning, rare classes, scalability, regression, semi-supervised learning, active learning, and ensembles.
+The core toolkit spans trees and rules, probability models, margin methods, neural networks, and stored-example methods. Later extensions handle multiclass learning, rare classes, regression, semi-supervised learning, active learning, and ensembles.
 
-## Definitions
+## From labeled examples to a decision rule
 
 A **training set** consists of pairs $(X_i,y_i)$, where $X_i$ is a feature vector and $y_i$ is a class label.
 
@@ -43,13 +43,56 @@ $$
 
 **Instance-based learning** predicts from nearby training examples, as in $k$-nearest-neighbor classification.
 
-## Key results
+The learned score and the action taken from it should be separated. A classifier may output a class, a margin, or an estimated probability. A decision rule then combines that output with error costs and capacity. This separation allows the same fraud model to support a small manual-review queue and a stricter automatic block.
+
+## Trees: local purity, global complexity
 
 **Tree splits are greedy.** A decision tree usually chooses the split that most improves purity at the current node. This does not guarantee the globally smallest or most accurate tree, but it is efficient and interpretable.
 
+Information gain is the parent entropy minus the sample-weighted child entropy. Gini reduction has the same structure with Gini impurity. Both prefer purer children, but high-cardinality categorical attributes can produce deceptively strong training splits by creating many small groups. Minimum leaf sizes, restricted splits, and validation-based pruning control that tendency.
+
+A fully grown tree often has low training error and high variance. Pre-pruning stops growth using depth or sample thresholds. Post-pruning first grows a larger tree and then replaces subtrees with leaves when validation does not justify their complexity. Cost-complexity pruning minimizes an objective of the form
+
+$$
+R_\alpha(T)=R(T)+\alpha|T|,
+$$
+
+where $R(T)$ is the empirical leaf error or impurity and $\vert T\vert $ is the number of terminal nodes. Cross-validation selects $\alpha$; the penalty turns the accuracy-versus-size tradeoff into an explicit criterion.
+
+## Naive Bayes in log space
+
 **Naive Bayes can work even when independence is false.** The independence assumption may be unrealistic, especially for text terms or correlated attributes, but classification only requires the correct class to get the highest posterior score. Probability calibration may still be poor.
 
+Products of many small likelihoods underflow numerically. Implementations compare log scores:
+
+$$
+\log P(y)+\sum_{j=1}^d\log P(x_j\mid y).
+$$
+
+For multinomial counts, additive smoothing prevents a term absent from one class's training documents from zeroing the whole class score. If term $j$ has class count $n_{jy}$, total token count $N_y$, vocabulary size $V$, and smoothing $\alpha$, then
+
+$$
+\widehat{P}(x_j\mid y)=\frac{n_{jy}+\alpha}{N_y+\alpha V}.
+$$
+
+Smoothing allocates probability to unseen events; it is not evidence that those events were observed.
+
+## Margin geometry
+
 **SVM margin controls generalization.** For linearly separable data, the maximum-margin separator is the one farthest from the nearest training points. Soft-margin SVMs allow violations with a penalty parameter.
+
+With labels $y_i\in\{-1,+1\}$, the canonical hard-margin constraints are $y_i(w^\top x_i+b)\geq1$. The two supporting hyperplanes are $w^\top x+b=\pm1$. Their perpendicular distance is $2/\|w\|$, so maximizing the margin is equivalent to minimizing $\frac12\|w\|^2$ subject to the constraints.
+
+The soft-margin objective introduces slack through hinge loss:
+
+$$
+\min_{w,b}\ \frac12\|w\|^2
++C\sum_i\max\{0,1-y_i(w^\top x_i+b)\}.
+$$
+
+Large $C$ penalizes violations strongly and can fit a tighter boundary; small $C$ accepts more violations for a wider margin. Kernel methods replace dot products with $K(x_i,x_j)$, but the kernel and its scale then become part of the geometry. An RBF kernel with an extreme bandwidth can behave almost linearly or memorize isolated points.
+
+## Evaluation is an estimate of deployment
 
 **Neural networks trade interpretability for representation power.** They can learn complex nonlinear boundaries, but require careful regularization, scaling, architecture choices, and validation.
 
@@ -57,7 +100,7 @@ $$
 
 **Feature selection for classification should be supervised.** A feature with little variance may perfectly indicate a rare class. A high-variance feature may be irrelevant. Use label-aware criteria on training data only.
 
-**The training protocol is part of the classifier.** A model is not just a fitted tree, SVM, or neural network; it also includes the split strategy, preprocessing fit, class weighting, hyperparameter search, and threshold selection. If any of these steps use validation or test labels improperly, the reported performance is no longer an honest estimate. In data mining applications with time, users, or graph links, the split must also reflect the future deployment setting.
+**The training protocol is part of the classifier.** A deployable model includes the fitted tree, SVM, or neural network together with the split strategy, preprocessing fit, class weighting, hyperparameter search, and threshold selection. If any of these steps use validation or test labels improperly, the reported performance is no longer an honest estimate. In data mining applications with time, users, or graph links, the split must also reflect the future deployment setting.
 
 **Probabilistic output and decisions are different layers.** A model may estimate $P(y=1\mid X)$, but the action threshold should depend on costs, capacity, and risk. Medical screening, fraud review, and product targeting rarely use 0.5 as the best threshold. Evaluation should therefore include both ranking quality and the chosen operating point.
 
@@ -69,7 +112,25 @@ $$
 
 **Baselines are mandatory.** A majority-class classifier, simple rule, or naive Bayes model gives context for whether a complex classifier is actually adding value.
 
-## Visual
+For binary labels, let true positives, false positives, false negatives, and true negatives be $TP,FP,FN,TN$. Then
+
+$$
+\operatorname{precision}=\frac{TP}{TP+FP},
+\qquad
+\operatorname{recall}=\frac{TP}{TP+FN}.
+$$
+
+ROC curves plot true-positive rate against false-positive rate over thresholds. Precision-recall curves expose performance more directly when positives are rare because precision includes the false alarms created by class prevalence. Neither AUC fixes an operating threshold or expresses asymmetric costs.
+
+Metrics also move when prevalence changes. Sensitivity and specificity condition on the true class and can remain stable while precision falls sharply in a population with fewer positives. A test set should therefore resemble the deployment population, or the report should adjust expected counts to the deployment prevalence. Confusion-matrix totals at the chosen threshold are often easier to interpret than a scale-free metric alone.
+
+Cross-validation estimates variability across training samples, provided every data-dependent step occurs inside each fold. Repeated observations from the same person belong in the same fold when deployment predicts new people. Time-ordered deployment needs forward validation. Random row splitting answers the wrong question if it lets future events, duplicate entities, or related graph nodes appear on both sides.
+
+A classifier may also abstain. If the largest predicted probability is low, two class scores are nearly tied, or the input lies far from training support, sending the case to a human or a fallback rule can be safer than forcing a label. Selective classification evaluates error among accepted cases together with coverage, the fraction accepted. Raising the confidence threshold usually reduces coverage and can reduce error, but only if confidence has a meaningful relation to correctness. Out-of-distribution inputs can receive confident predictions, so uncertainty and support checks need separate validation.
+
+After deployment, monitor inputs, score distributions, chosen actions, and delayed outcomes separately. A change in input distribution does not always reduce accuracy, while stable inputs can hide a changed label rule. Retraining should respond to measured degradation or a known process change rather than a calendar alone.
+
+## Anatomy of a classification pipeline
 
 ```mermaid
 flowchart TB
@@ -232,7 +293,39 @@ $$
 
 **Checked answer.** The classifier predicts spam, with normalized posterior 0.625 under this simplified model.
 
-## Code
+## Worked example 3: deriving a cost-sensitive threshold
+
+**Problem.** A calibrated model estimates $p=P(y=1\mid x)$. Acting on a negative case costs $C_{FP}=2$, while failing to act on a positive case costs $C_{FN}=8$. Correct actions have zero cost. Find the probability threshold.
+
+**Method.** If we predict positive, expected cost is the false-positive cost times the probability that the case is negative:
+
+$$
+R(positive\mid x)=2(1-p).
+$$
+
+If we predict negative,
+
+$$
+R(negative\mid x)=8p.
+$$
+
+Choose positive when its risk is smaller:
+
+$$
+2(1-p)<8p.
+$$
+
+Solving gives
+
+$$
+2<10p,
+\qquad
+p>0.2.
+$$
+
+**Checked answer.** The cost-minimizing threshold is $0.2$, not $0.5$. This calculation assumes calibrated probabilities and fixed per-case costs. A hard daily capacity limit may require ranking cases and selecting only the highest scores instead.
+
+## Comparing two baseline classifiers
 
 Pseudocode for supervised classification:
 
@@ -275,7 +368,9 @@ for name, model in models.items():
     print(name, "accuracy", round(accuracy_score(y_test, pred), 3), "f1", round(f1, 3))
 ```
 
-## Common pitfalls
+The code uses a single held-out split for compactness. Model selection would use training-only cross-validation and reserve `X_test` for one final estimate. The standard scaler in the Gaussian naive Bayes pipeline is not required for the Gaussian likelihood model; it is harmless because an invertible per-feature affine transform leaves its standardized class separation unchanged. Including it demonstrates pipeline fitting, not a universal preprocessing rule.
+
+## Failure modes
 
 - Reporting accuracy alone on imbalanced data.
 - Selecting features or tuning hyperparameters on the test set.
@@ -284,8 +379,11 @@ for name, model in models.items():
 - Interpreting naive Bayes probabilities as calibrated without checking calibration.
 - Using an SVM or kNN without scaling numeric features.
 - Comparing classifiers without consistent train-test splits or cross-validation.
+- Choosing a probability threshold on the test set and then reporting performance on that same set.
+- Applying ordinary cross-validation to records with repeated patients, customers, or devices and leaking entity-specific patterns across folds.
+- Reading feature importance as causal effect. Predictive association can reflect confounding, proxies, or data collection rules.
 
-## Connections
+## Related pages
 
 - [Advanced Classification Concepts](/cs/data-mining/chapter-11-advanced-classification)
 - [Data Preparation](/cs/data-mining/chapter-02-data-preparation)

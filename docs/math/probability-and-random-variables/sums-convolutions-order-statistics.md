@@ -7,9 +7,9 @@ sidebar_position: 11
 
 Once random variables are defined jointly, the next natural question is what happens when we combine them. Sums of independent random variables produce convolutions. Maxima, minima, and sorted samples produce order statistics. These constructions explain why gamma distributions arise from exponential waiting times, why sums of uniforms have triangular and then smoother densities, and why sorted uniform samples lead to beta distributions.
 
-MIT 18.440 uses these topics to connect earlier distribution families with joint densities and conditional reasoning. A key theme is that formulas often become simple when one first draws the right region in the plane or cube: the density of $X+Y$ integrates over the line $x+y=a$, while order statistics integrate over the ways sample points can be arranged.
+The formulas often become simple after drawing the relevant region. A sum integrates joint density along compatible pairs, while an order statistic counts how many sample points fall below and above a proposed value. Support geometry should be settled before integration limits are written.
 
-## Definitions
+## Adding random variables
 
 If $X$ and $Y$ are independent continuous random variables with densities $f_X$ and $f_Y$, then the density of $Z=X+Y$ is the **convolution**
 
@@ -49,7 +49,7 @@ y^{k-1}(1-y)^{n-k},
 \qquad 0<y<1.
 $$
 
-## Key results
+## Families closed under addition
 
 Sums preserve several distribution families:
 
@@ -108,7 +108,7 @@ contains one factor for each point below and above the observed order statistic.
 
 Sums and order statistics also demonstrate that functions of independent variables need not be independent. The pair $(X+Y,X-Y)$ may be independent in special normal cases, but not generally. The sorted values of a sample are especially dependent: if the maximum is small, all other order statistics must also be small.
 
-## Visual
+## Geometry of the convolution region
 
 ```mermaid
 graph TD
@@ -137,9 +137,9 @@ The first diagram gives the algebraic route: compute a CDF over a region, then d
 
 Order statistics have a similar geometric interpretation in higher-dimensional cubes. For $n$ independent uniforms, the unordered sample is uniform on the cube $[0,1]^n$. Sorting folds the cube into $n!$ congruent regions corresponding to the possible orderings. This symmetry is why factorial factors appear in order-statistic densities.
 
-For repeated sums, direct convolution quickly becomes cumbersome. This is why the course soon moves to moment generating functions and characteristic functions: transforms turn repeated convolution into powers of a single function. The convolution view is still essential, because it explains what those transforms are simplifying and how support constraints enter before algebra begins. Without that geometric understanding, transform answers can become detached from the original random variables. Start with the region, then simplify the algebra carefully afterward.
+For repeated sums, direct convolution quickly becomes cumbersome. Transforms turn repeated convolution into powers of a single function. The convolution view remains useful because it records support constraints that can disappear inside transform algebra.
 
-## Worked example 1: sum of two independent uniforms
+## Worked example: sum of two independent uniforms
 
 Problem: Let $X,Y$ be independent uniform random variables on $[0,1]$. Find the density of $Z=X+Y$.
 
@@ -195,7 +195,7 @@ $$
 =\frac12+\frac12=1.
 $$
 
-## Worked example 2: maximum of independent uniforms
+## Worked example: maximum of independent uniforms
 
 Problem: Let $X_1,\ldots,X_n$ be independent uniform variables on $[0,1]$, and let $M=\max(X_1,\ldots,X_n)$. Find the CDF, density, and expectation of $M$.
 
@@ -229,36 +229,157 @@ $$
 
 Checked answer: for $n=1$, $E[M]=1/2$, the mean of one uniform. As $n$ grows, $n/(n+1)$ approaches $1$, which matches the intuition that the maximum of many uniform samples is near the right endpoint.
 
-## Code
+## Deriving the general order-statistic density
 
-```python
-import numpy as np
+Let $X_1,\ldots,X_n$ be i.i.d. with continuous CDF $F$ and density $f$, and let $X_{(k)}$ be the $k$th smallest observation. For $X_{(k)}$ to fall in a short interval near $x$, there must be $k-1$ observations below $x$, one observation near $x$, and $n-k$ above $x$.
 
-def triangular_sum_density(z):
-    z = np.asarray(z)
-    out = np.zeros_like(z, dtype=float)
-    left = (0 <= z) & (z <= 1)
-    right = (1 < z) & (z <= 2)
-    out[left] = z[left]
-    out[right] = 2 - z[right]
-    return out
+There are $n$ choices for the observation near $x$ and $\binom{n-1}{k-1}$ ways to choose those below it. Dividing the short-interval probability by its width gives
 
-grid = np.linspace(0, 2, 2001)
-area = np.trapz(triangular_sum_density(grid), grid)
-print("area under triangular density:", area)
+$$
+f_{X_{(k)}}(x)
+=\frac{n!}{(k-1)!(n-k)!}
+[F(x)]^{k-1}[1-F(x)]^{n-k}f(x).
+$$
 
-def max_uniform_mean(n):
-    return n / (n + 1)
+For a uniform distribution on $(0,1)$, $F(x)=x$ and $f(x)=1$, producing the beta$(k,n+1-k)$ density. For a general continuous law, the probability integral transform gives
 
-for n in [1, 2, 10, 100]:
-    print(n, max_uniform_mean(n))
+$$
+F(X_{(k)})\sim\operatorname{Beta}(k,n+1-k).
+$$
 
-rng = np.random.default_rng(0)
-samples = rng.random((100_000, 10)).max(axis=1)
-print("simulated max mean for n=10:", samples.mean())
-```
+This identity is used in exact quantile intervals and distribution-free rank procedures.
 
-## Common pitfalls
+The CDF can also be read as a binomial tail. The event $X_{(k)}\le x$ means that at least $k$ sample points are at most $x$, so
+
+$$
+P(X_{(k)}\le x)
+=\sum_{j=k}^n\binom njF(x)^j[1-F(x)]^{n-j}.
+$$
+
+Differentiating this expression yields the same density after cancellation.
+
+## Worked example: the sample median
+
+Five independent observations are uniform on $[0,1]$. The sample median is $X_{(3)}$. Substituting $n=5$ and $k=3$ gives
+
+$$
+f_{X_{(3)}}(x)
+=\frac{5!}{2!2!}x^2(1-x)^2
+=30x^2(1-x)^2,
+\qquad 0<x<1.
+$$
+
+Find the probability that the median lies between $0.25$ and $0.75$. Symmetry gives equal tails, and the lower tail can be computed as the probability that at least three observations are at most $0.25$:
+
+$$
+\begin{aligned}
+P(X_{(3)}\le0.25)
+&=\sum_{j=3}^{5}\binom5j(0.25)^j(0.75)^{5-j}\\
+&=10\frac{1}{64}\frac{9}{16}
++5\frac{1}{256}\frac34
++\frac{1}{1024}\\
+&=\frac{106}{1024}.
+\end{aligned}
+$$
+
+Therefore
+
+$$
+P(0.25<X_{(3)}<0.75)
+=1-2\frac{106}{1024}
+=\frac{203}{256}
+\approx0.7930.
+$$
+
+The open or closed endpoints do not affect the answer because the distribution is continuous.
+
+## Joint behavior of the minimum and maximum
+
+For i.i.d. continuous variables supported on an interval, let $U=X_{(1)}$ and $V=X_{(n)}$. To have $U$ near $u$ and $V$ near $v$, choose which observation supplies each endpoint and require the other $n-2$ observations to lie between them. The joint density is
+
+$$
+f_{U,V}(u,v)
+=n(n-1)[F(v)-F(u)]^{n-2}f(u)f(v),
+\qquad u<v.
+$$
+
+For uniforms this becomes $n(n-1)(v-u)^{n-2}$ on $0\lt u\lt v\lt 1$. The density depends on the range $v-u$, and the constraint $u\lt v$ already shows that minimum and maximum are dependent.
+
+The sample range $R=V-U$ can then be found by integrating over $u$:
+
+$$
+\begin{aligned}
+f_R(r)
+&=\int_0^{1-r}n(n-1)r^{n-2}\,du\\
+&=n(n-1)r^{n-2}(1-r),
+\qquad 0<r<1.
+\end{aligned}
+$$
+
+Its mean is $(n-1)/(n+1)$. The formula agrees with the small cases: one observation has range zero, while a large uniform sample nearly spans the unit interval.
+
+## Dependence changes convolution
+
+If $X$ and $Y$ have joint density $f_{X,Y}$ but are not independent, the sum density is
+
+$$
+f_{X+Y}(z)=\int_{-\infty}^{\infty}f_{X,Y}(x,z-x)\,dx.
+$$
+
+Only under independence may $f_{X,Y}(x,z-x)$ be replaced by $f_X(x)f_Y(z-x)$. Marginals alone cannot determine a sum law. If $Y=X$, then $X+Y=2X$; if $Y=-X$, then $X+Y=0$. These pairs can be built with identical marginals when $X$ is symmetric, yet their sums are entirely different.
+
+## Errors that usually come from the support
+
+### Random sums
+
+Sometimes the number of summands is random. Let
+
+$$
+S_N=X_1+\cdots+X_N,
+$$
+
+where $N$ is a nonnegative integer-valued variable independent of the i.i.d. $X_i$. Conditioning on $N$ gives the mean without finding the full distribution:
+
+$$
+E[S_N\mid N]=N E[X_1],
+$$
+
+so
+
+$$
+E[S_N]=E[N]E[X_1].
+$$
+
+The law of total variance gives
+
+$$
+\operatorname{Var}(S_N)
+=E[N]\operatorname{Var}(X_1)
++\operatorname{Var}(N)E[X_1]^2.
+$$
+
+The first term is average within-count variability; the second is variability from the random count itself. If $N\sim\operatorname{Poisson}(\lambda)$, the result is a compound Poisson sum. Its MGF is
+
+$$
+M_{S_N}(t)=\exp\left(\lambda(M_X(t)-1)\right).
+$$
+
+For example, if claims arrive as a Poisson count and claim sizes are i.i.d., aggregate loss has mean $\lambda E[X]$ and variance $\lambda E[X^2]$. The latter equals $\lambda\operatorname{Var}(X)+\lambda E[X]^2$, showing that count uncertainty remains even when individual claim sizes have little spread.
+
+### Ties in discrete samples
+
+The clean order-statistic density assumes a continuous parent law, so ties occur with probability zero. Discrete samples can have repeated values, and the argument selecting one observation “near $x$” no longer applies. CDF identities remain reliable. For the maximum,
+
+$$
+P(X_{(n)}\le x)=F(x)^n
+$$
+
+holds for discrete, continuous, and mixed laws. Point probabilities can then be obtained by taking jumps. If $X_i$ are fair die rolls, for instance,
+
+$$
+P(X_{(n)}=m)=\left(\frac m6\right)^n-\left(\frac{m-1}{6}\right)^n,
+\qquad m=1,\ldots,6.
+$$
 
 - Forgetting independence in convolution formulas. Without independence, the joint density is not the product of marginals.
 - Using the same convolution limits for every value of $a$. Supports change the limits piece by piece.
@@ -266,7 +387,43 @@ print("simulated max mean for n=10:", samples.mean())
 - Assuming order statistics are independent. Sorted sample values are strongly dependent.
 - Forgetting the combinatorial factor in the density of the $k$th order statistic.
 
-## Connections
+## Further consequences
+
+Convolution is associative and commutative whenever the relevant integrals exist. The distribution of an independent sum does not depend on the order in which summands are combined. Computational order can still matter because convolving narrow-support arrays first may keep intermediate representations smaller. Fast Fourier transforms turn long discrete convolutions into pointwise products, but zero-padding is required to prevent circular wraparound from corrupting the desired linear convolution.
+
+### Spacings between uniform order statistics
+
+Uniform order statistics create random gaps. With $0=U_{(0)}\lt U_{(1)}\lt \cdots\lt U_{(n)}\lt U_{(n+1)}=1$, define
+
+$$
+D_i=U_{(i)}-U_{(i-1)},\qquad i=1,\ldots,n+1.
+$$
+
+The gaps are nonnegative and sum to one. Symmetry gives each gap the same mean, hence
+
+$$
+E[D_i]=\frac{1}{n+1}.
+$$
+
+They are not independent because their sum is fixed. Their joint distribution is uniform on the simplex of nonnegative vectors summing to one, a Dirichlet distribution with all parameters equal to one.
+
+For a concrete calculation, the first gap $D_1=U_{(1)}$ is the minimum. Its survival function is
+
+$$
+P(D_1>x)=P(U_1>x,\ldots,U_n>x)=(1-x)^n,
+$$
+
+so it has beta$(1,n)$ density $n(1-x)^{n-1}$. The same marginal law holds for the last gap $1-U_{(n)}$ and, less obviously, for every interior gap. Large empty stretches are therefore rare as the sample grows, though the largest gap needs a separate extreme-value analysis.
+
+### Repeated convolution smooths shapes
+
+The sum of $n$ independent uniform$(0,1)$ variables has the Irwin–Hall distribution. Its density is piecewise polynomial of degree $n-1$. Each convolution raises smoothness because integration averages sharp features of the preceding density. After centering and scaling, these densities approach a normal curve by the central limit theorem.
+
+Support still remembers the finite sum: the unscaled distribution lives on $[0,n]$, while a normal density has unbounded support. A normal approximation can assign small positive probability outside the possible interval. Near hard boundaries or in far tails, exact convolution or transform inversion may be preferable even when the center appears Gaussian.
+
+Convolution is associative, so numerical algorithms can combine balanced pairs rather than convolving one distribution at a time. For lattice distributions, fast Fourier transforms turn convolution into pointwise multiplication. Padding is needed to prevent circular wraparound from contaminating the linear convolution.
+
+## Related pages
 
 - [Joint distributions, transformations, and independence](/math/probability-and-random-variables/joint-distributions-transformations-independence)
 - [Normal, exponential, gamma, beta, and Cauchy laws](/math/probability-and-random-variables/normal-exponential-gamma-beta-cauchy)

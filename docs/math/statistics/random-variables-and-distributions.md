@@ -9,7 +9,7 @@ A random variable turns uncertain outcomes into numbers. Once outcomes are numer
 
 The art is matching assumptions to context. A binomial model is natural for a fixed number of independent success/failure trials with constant success probability. A Poisson model is natural for counts of rare events in a fixed interval when events occur independently at a stable rate. A hypergeometric model is natural for sampling without replacement. When the model assumptions fail, the formula may still produce a number, but the number no longer answers the intended question.
 
-## Definitions
+## From outcomes to numerical distributions
 
 A **random variable** $X$ assigns a numerical value to each outcome of a random process. A **discrete random variable** has countable possible values, such as 0, 1, 2, and so on. A **continuous random variable** has possible values over intervals, such as time, length, or measurement error.
 
@@ -26,6 +26,16 @@ F(x)=P(X\le x).
 $$
 
 For continuous variables, probabilities are areas under a density curve rather than heights at individual points. For a continuous random variable, $P(X=a)=0$ for any exact value $a$, even though intervals can have positive probability.
+
+If a continuous variable has density $f$, then
+
+$$
+P(a\le X\le b)=\int_a^b f(x)\,dx,
+\qquad
+F(x)=\int_{-\infty}^x f(t)\,dt.
+$$
+
+Density height is not itself a probability and may exceed 1; only area must lie between 0 and 1. For continuous variables, strict or inclusive endpoints give the same probability because single points have probability zero. For discrete variables they can differ by a full mass.
 
 The **expected value** or mean of a discrete random variable is
 
@@ -57,7 +67,33 @@ $$
 
 For a Poisson random variable, $E(X)=\lambda$ and $\mathrm{Var}(X)=\lambda$.
 
-## Key results
+## Expectation and spread
+
+Expectation is linear whether or not variables are independent:
+
+$$
+E(aX+bY+c)=aE(X)+bE(Y)+c.
+$$
+
+Variance behaves differently. For two variables,
+
+$$
+\operatorname{Var}(X+Y)
+=\operatorname{Var}(X)+\operatorname{Var}(Y)
++2\operatorname{Cov}(X,Y).
+$$
+
+Only when covariance is zero does the cross term disappear. Independence implies zero covariance when moments exist, but zero covariance does not generally imply independence.
+
+The identity
+
+$$
+\operatorname{Var}(X)=E(X^2)-[E(X)]^2
+$$
+
+comes from expanding $(X-\mu)^2$. It is convenient for hand calculations, although subtracting nearly equal floating-point numbers can be unstable in software. Expectation need not be a possible outcome: an expected count of 2.4 is a long-run average over repetitions, not a prediction that one experiment will produce a fractional event.
+
+## Deriving the binomial moments
 
 The binomial distribution has mean and variance
 
@@ -75,6 +111,22 @@ $$
 E(X)=E(X_1)+\cdots+E(X_n)=np.
 $$
 
+Since a Bernoulli variable satisfies $X_i^2=X_i$,
+
+$$
+\operatorname{Var}(X_i)=E(X_i^2)-E(X_i)^2=p-p^2=p(1-p).
+$$
+
+Independence removes all covariance terms, giving
+
+$$
+\operatorname{Var}\left(\sum_{i=1}^nX_i\right)
+=\sum_{i=1}^n\operatorname{Var}(X_i)
+=np(1-p).
+$$
+
+The binomial mass has three pieces. $p^k(1-p)^{n-k}$ is the probability of one specified sequence with $k$ successes, and $\binom nk$ counts the positions in which those successes can occur. The formula needs a fixed $n$, two outcomes per trial, constant $p$, and independent trials.
+
 The hypergeometric distribution models the number of successes in $n$ draws without replacement from a population of $N$ objects containing $K$ successes:
 
 $$
@@ -82,6 +134,15 @@ P(X=k)=\frac{\binom{K}{k}\binom{N-K}{n-k}}{\binom{N}{n}}.
 $$
 
 This distribution differs from the binomial because the draws are dependent: after one success is drawn, fewer successes remain.
+
+Writing $p=K/N$, its mean is still $np$, but its variance is
+
+$$
+\operatorname{Var}(X)
+=np(1-p)\frac{N-n}{N-1}.
+$$
+
+The final factor is the finite-population correction. It is below one because sampling without replacement creates negative dependence: observing a success makes another success slightly less likely. When $n/N$ is tiny, the factor is close to one and the binomial approximation is often adequate.
 
 The multinomial distribution generalizes the binomial to more than two categories. If $n$ independent trials fall into $c$ categories with probabilities $p_1,\dots,p_c$, then counts $X_1,\dots,X_c$ have probability
 
@@ -94,9 +155,51 @@ where $x_1+\cdots+x_c=n$.
 
 The Poisson distribution can approximate a binomial distribution when $n$ is large, $p$ is small, and $\lambda=np$ is moderate. This approximation is useful for rare-event counts, but it should not hide the assumptions: events should occur independently and at a stable average rate across the interval.
 
+If counts in disjoint intervals are independent and rates add, then the sum of independent Poisson variables is Poisson with parameter equal to the sum of rates. A rate of 3 calls per half hour corresponds to mean 6 per hour only when the rate is stable over that hour.
+
+The equality of Poisson mean and variance is a useful diagnostic. Count data with variance far above the mean show overdispersion, often caused by changing rates, clustering, or unobserved heterogeneity. A negative-binomial model may then be more suitable. Variance below the mean can arise from spacing or capacity constraints.
+
 Distribution choice is also a modeling claim. If a call center receives more calls during lunch than at midnight, a single Poisson rate for the whole day may be too crude even if the total count is a nonnegative integer. If survey responses are clustered by classroom, a binomial model that treats every student response as independent may underestimate variability. If a quality inspector samples a large warehouse without replacement but the sample is tiny relative to the warehouse, a binomial approximation may be acceptable. The formulas become useful only after the data-generating process has been described clearly enough to defend the assumptions.
 
-## Visual
+## CDFs, tails, and quantiles
+
+Software usually computes cumulative probabilities more accurately than a hand-built sum of many masses. For a discrete variable,
+
+$$
+P(X\ge k)=1-P(X\le k-1),
+$$
+
+not $1-P(X\le k)$. The one-step distinction causes many off-by-one errors. Survival-function routines calculate upper tails directly and can be more accurate than subtracting a probability extremely close to one.
+
+Quantiles reverse the CDF. A 0.95 quantile is a value $q$ with roughly 95% of the distribution at or below it. For a discrete distribution, no value may give exactly 0.95, so a common convention chooses the smallest $q$ whose CDF reaches the requested level.
+
+## Transformations and joint behavior
+
+For $Y=aX+b$,
+
+$$
+E(Y)=aE(X)+b,
+\qquad
+\operatorname{Var}(Y)=a^2\operatorname{Var}(X).
+$$
+
+Adding a constant shifts a distribution without changing spread; multiplying by $a$ scales standard deviation by $\vert a\vert $. The square on variance prevents a negative scale from producing a negative spread.
+
+For a nonlinear transformation $Y=g(X)$, generally $E[g(X)]\ne g(E[X])$. If $X$ is a fair die roll, $E(X)=3.5$ but $E(X^2)=91/6$, not $3.5^2$. Convexity explains the direction of many such differences through Jensen's inequality.
+
+A marginal distribution describes one variable alone. A joint distribution is needed for sums, comparisons, and conditional probabilities involving several variables. Two pairs $(X,Y)$ can have identical marginals but different dependence, leading to different distributions of $X+Y$.
+
+Multinomial counts show this dependence clearly. Since $X_1+\cdots+X_c=n$ is fixed, a large count in one category leaves fewer trials for others. For $i\ne j$,
+
+$$
+\operatorname{Cov}(X_i,X_j)=-np_ip_j.
+$$
+
+Each individual category count is binomial with parameters $n$ and $p_i$, but the category counts are not independent. Treating them as separate binomials loses the fixed-total constraint.
+
+Conditional distributions answer questions after information arrives. If $X$ and $Y$ are independent, conditioning on $Y$ leaves the distribution of $X$ unchanged. Otherwise the conditional mean $E(X\mid Y)$ can vary with $Y$ and serves as the population target of regression.
+
+## Choosing a count model
 
 | Distribution | Random variable | Parameters | Mean | Variance | Typical setting |
 |---|---|---:|---:|---:|---|
@@ -219,7 +322,7 @@ Answer: The exact probability is about 0.094. A binomial model with $p=6/50=0.12
 
 Checked answer: The numerator counts ways to choose 2 defectives and 3 nondefectives. The denominator counts all possible sets of 5 devices, so the ratio matches the sampling mechanism.
 
-## Code
+## Distribution functions in code
 
 ```python
 from scipy.stats import binom, hypergeom, poisson
@@ -240,7 +343,7 @@ print("P(6 calls in an hour):", poisson.pmf(6, mu=4))
 
 SciPy uses `pmf` for discrete probability mass functions and `cdf` for cumulative probabilities. Naming the parameters in comments is useful because different distributions use different conventions.
 
-## Common pitfalls
+## Modeling and arithmetic traps
 
 - Using a binomial model for sampling without replacement from a small finite population.
 - Forgetting that "at most 1" means $P(X=0)+P(X=1)$.
@@ -249,7 +352,7 @@ SciPy uses `pmf` for discrete probability mass functions and `cdf` for cumulativ
 - Ignoring dependence among trials, such as multiple purchases by the same customer.
 - Rounding intermediate probabilities too aggressively.
 
-## Connections
+## Related pages
 
 - [Probability basics](/math/statistics/probability-basics)
 - [Normal, t, chi-square, and F distributions](/math/statistics/normal-t-chi-square-and-f-distributions)

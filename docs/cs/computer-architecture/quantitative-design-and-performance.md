@@ -5,255 +5,292 @@ sidebar_position: 2
 
 # Quantitative Design and Performance
 
-Computer architecture is not mainly a catalog of clever hardware structures. In the Hennessy and Patterson style, it is an engineering discipline built around measurement, trade-offs, and explicit assumptions. A proposed pipeline, cache, instruction set, or multiprocessor mechanism is only meaningful after asking: what workload does it improve, by how much, at what cost, and under which power or reliability limits?
+Computer architecture advances through measurements tied to explicit assumptions. A deeper pipeline, larger cache, or wider issue engine has no independent value; it matters when a stated workload completes sooner or supports more requests within its power, cost, and latency limits. Hennessy and Patterson's quantitative style starts from a baseline, explains where time goes, changes one part of that budget, and recomputes the whole result.
 
-This page introduces the quantitative habits used throughout the rest of the architecture notes. The same ideas reappear in cache design, branch prediction, vector machines, warehouse-scale computers, and storage systems: define the metric, decompose execution time, estimate the affected fraction, and distrust improvements that optimize a narrow component while hurting the complete system.
+That discipline guards against appealing but incomplete claims. A unit can become ten times faster while the program improves by only a few percent. A higher clock can lose to a lower clock with fewer instructions or less stalling. Peak throughput can increase while users see worse tail latency. The unit of work and the observation boundary must be chosen before the metric.
 
-## Definitions
+## What “faster” means
 
-The most important performance metric is execution time. If machine $X$ finishes a fixed program in less time than machine $Y$, then $X$ is faster for that program. Performance is the reciprocal of execution time:
-
-$$
-\mathrm{Performance}_X = \frac{1}{\mathrm{Execution\ time}_X}
-$$
-
-The speedup of a new design over an old design is:
+For one fixed task, lower execution time means higher performance:
 
 $$
-\mathrm{Speedup} =
-\frac{\mathrm{Execution\ time}_{old}}{\mathrm{Execution\ time}_{new}}
-=
-\frac{\mathrm{Performance}_{new}}{\mathrm{Performance}_{old}}
+\mathrm{Performance}_X=\frac{1}{\mathrm{Execution\ time}_X}.
 $$
 
-CPU execution time is commonly decomposed as:
+If an old system takes $T_{old}$ and a new one takes $T_{new}$, speedup is
 
 $$
-\mathrm{CPU\ time} =
-\mathrm{Instruction\ count} \times \mathrm{CPI} \times \mathrm{Clock\ cycle\ time}
+S=\frac{T_{old}}{T_{new}}
+=\frac{\mathrm{Performance}_{new}}{\mathrm{Performance}_{old}}.
 $$
 
-Equivalently, because $\mathrm{Clock\ rate}=1/\mathrm{Clock\ cycle\ time}$:
+A speedup of $1.25\times$ means the new time is $1/1.25=0.8$ of the old time, a 20% time reduction. It does **not** mean time fell by 25%. Conversely, a 25% time reduction gives speedup $1/0.75=1.333\times$. Keeping ratios and percentage reductions separate prevents many reporting errors.
+
+Latency is the elapsed time for one request. Throughput is completed work per unit time. They interact but are not interchangeable. Four cores may nearly quadruple throughput on independent jobs while leaving single-job latency unchanged. Batching can raise throughput while making each request wait longer. Server measurements often report throughput subject to a percentile-latency bound, because throughput obtained by building an unbounded queue is useless.
+
+Elapsed time includes CPU execution, I/O waits, operating-system scheduling, and time spent on other processors or accelerators. CPU time isolates time executing on the processor. The right choice follows the question. A user cares about elapsed response time; a microarchitecture study may isolate CPU time to reduce unrelated variation, then separately account for system effects.
+
+## Decomposing processor time
+
+The classic CPU equation is
 
 $$
-\mathrm{CPU\ time} =
-\frac{\mathrm{Instruction\ count} \times \mathrm{CPI}}{\mathrm{Clock\ rate}}
+\mathrm{CPU\ time}
+=IC\times CPI\times T_{cycle}
+=\frac{IC\times CPI}{f_{clock}}.
 $$
 
-For an instruction mix with classes $i$, total CPI is a weighted average:
+$IC$ is the dynamic instruction count, not the number of instructions in the executable. Loops and control flow determine how often instructions execute. $CPI$ is average cycles per instruction, including stalls under the chosen accounting convention. Clock period $T_{cycle}$ is the reciprocal of clock rate.
+
+The three factors are coupled. A compiler optimization may reduce instruction count but introduce slower instructions. A shorter clock period may require a deeper pipeline, increasing branch-misprediction cost and CPI. A complex instruction may reduce $IC$ while taking several cycles. Comparing only one factor assumes the other two remain fixed, which architecture changes rarely guarantee.
+
+For instruction classes $i$,
 
 $$
-\mathrm{CPI} =
-\frac{\sum_i IC_i \times CPI_i}{\sum_i IC_i}
+CPI=\frac{\sum_i IC_iCPI_i}{\sum_i IC_i}
+=\sum_i w_iCPI_i,
 $$
 
-where $IC_i$ is the number of executed instructions of class $i$. This formula is useful because it makes a hidden workload assumption explicit: a faster floating-point unit helps only in proportion to how much floating-point work is actually executed.
+where $w_i=IC_i/IC$. This weighted mean is a useful bookkeeping model, though measured CPI classes may overlap. A cache miss can delay a load, block dependent arithmetic, and eventually limit instruction issue. Adding separately measured “memory CPI” and “dependency CPI” can double-count the same cycles. Hardware counters need a documented attribution scheme.
 
-Benchmarks are controlled workloads used to compare systems. A good benchmark suite includes real programs, reproducible build and run conditions, input sets large enough to exercise the system, and reporting rules that prevent benchmark-specific tricks from replacing genuine design improvement. Throughput benchmarks measure completed jobs per unit time; latency benchmarks measure time for one job.
-
-The geometric mean is often used to summarize normalized benchmark ratios:
+Another decomposition starts from ideal CPI:
 
 $$
-\mathrm{Geomean}(r_1,\ldots,r_n) =
-\left(\prod_{k=1}^{n} r_k\right)^{1/n}
+CPI=CPI_{base}+CPI_{memory}+CPI_{branch}+CPI_{other}.
 $$
 
-It is preferred for ratios because it treats reciprocal changes symmetrically: a $2\times$ improvement and a $2\times$ slowdown average to $1\times$, not to an arithmetic mean of $1.25\times$.
-
-## Key results
-
-Amdahl's law is the central warning against over-valuing local optimization. If fraction $f$ of the original execution time can be improved by factor $s$, the overall speedup is:
+For a simple cache model,
 
 $$
-\mathrm{Speedup}_{overall} =
-\frac{1}{(1-f)+\frac{f}{s}}
+CPI_{memory}
+=\mathrm{memory\ accesses/instruction}
+\times\mathrm{miss\ rate}
+\times\mathrm{miss\ penalty}.
 $$
 
-The proof is a direct normalization. Let old execution time be $1$. The unaffected part remains $(1-f)$. The improved part becomes $f/s$. The new time is $(1-f)+f/s$, so speedup is the reciprocal.
-
-The same idea applies to parallel processors. If fraction $p$ can run perfectly on $N$ processors and the rest is serial, then:
-
-$$
-\mathrm{Speedup}(N)=
-\frac{1}{(1-p)+\frac{p}{N}}
-$$
-
-As $N \to \infty$, the limiting speedup is $1/(1-p)$. A program that is $95\%$ parallel has an upper bound of $20\times$ no matter how many processors are purchased, unless the serial fraction is reduced.
-
-The CPU time equation also explains why comparing only clock rates is a pitfall. A design with a higher clock rate can still lose if it executes more instructions or has a worse CPI. A compressed instruction set may reduce instruction count and instruction-cache misses but complicate decoding. A deeper pipeline may shorten clock cycle time but increase branch misprediction penalties. A wider issue processor may reduce CPI on one benchmark and waste power on another.
-
-A useful performance argument therefore has three parts:
-
-- Workload: the exact program or benchmark family being optimized.
-- Decomposition: the pieces of time, CPI, miss penalty, or stall time that explain the result.
-- Constraint: cost, energy, die area, complexity, verification risk, and availability.
-
-The decomposition step is also how architects avoid double counting. Suppose a branch predictor reduces branch stalls, and a larger instruction window also reduces the visible cost of some branch stalls by finding independent work. Adding the two isolated speedups will overstate the combined result, because both features attack some of the same baseline cycles. A safer method is to build a single baseline time budget, subtract or scale each component once, and then recompute total time.
-
-Another useful habit is to distinguish latency-oriented and throughput-oriented claims. A faster core may reduce the response time of one request, while more cores may increase requests per second. These are both performance improvements, but they answer different questions. In a web service, the better design may be the one that delivers more throughput at a fixed 99th percentile latency. In an interactive application, the better design may be the one that lowers one user's response time even if peak throughput is unchanged.
-
-Finally, measurements should be reproducible. A benchmark report should describe hardware, compiler version, flags, memory size, operating system, input set, thermal settings, and whether turbo or automatic parallelization was enabled. Without those details, a number may be true for one run but not useful for engineering comparison.
-
-## Visual
+The formula identifies leverage. Cutting a 100-cycle penalty in half matters little when misses are vanishingly rare; reducing a common stall by one cycle may matter more.
 
 ```mermaid
 flowchart TD
-    A[Architecture idea] --> B[Choose workload]
-    B --> C[Measure baseline time]
-    C --> D["Decompose time: IC, CPI, clock, stalls"]
-    D --> E[Estimate affected fraction]
-    E --> F[Apply Amdahl or CPI model]
-    F --> G{"Whole-system win?"}
-    G -->|yes| H[Keep and refine]
-    G -->|no| I[Reject or narrow scope]
+    A["Choose workload and metric"] --> B["Measure baseline"]
+    B --> C["Decompose time or throughput"]
+    C --> D["Identify affected fraction"]
+    D --> E["Model local change"]
+    E --> F["Recompute whole-system result"]
+    F --> G{"Constraints still met?"}
+    G -->|yes| H["Validate with measurement"]
+    G -->|no| I["Revise or reject"]
 ```
 
-| Metric | Formula | Best use | Common trap |
-|---|---:|---|---|
-| Execution time | measured seconds | User-visible latency | Ignoring I/O and OS effects |
-| CPU time | $IC \times CPI \times T_{cycle}$ | Processor-focused studies | Treating it as wall-clock time |
-| Throughput | jobs per second | Servers and WSCs | Ignoring response-time limits |
-| Speedup | $T_{old}/T_{new}$ | Comparing two designs | Reporting only the optimized component |
-| Geomean ratio | $(\prod r_i)^{1/n}$ | Benchmark-suite summaries | Mixing unrelated baselines |
+## Worked example: instruction mix and a design tradeoff
 
-## Worked example 1: CPI from an instruction mix
+A program executes $2.0\times10^9$ instructions on a 2.5 GHz processor. Its mix is 45% integer ALU instructions at CPI 1, 25% loads and stores at CPI 2, 20% branches at CPI 1.5, and 10% floating-point instructions at CPI 4.
 
-Problem: A program executes 2.0 billion instructions on a 2.5 GHz processor. The instruction mix is 45% integer ALU at CPI 1, 25% loads/stores at CPI 2, 20% branches at CPI 1.5, and 10% floating-point at CPI 4. Find average CPI and CPU time.
-
-Method:
-
-1. Convert percentages into weights.
+The weighted CPI is
 
 $$
 \begin{aligned}
-w_{int} &= 0.45 \\
-w_{mem} &= 0.25 \\
-w_{br} &= 0.20 \\
-w_{fp} &= 0.10
+CPI
+&=0.45(1)+0.25(2)+0.20(1.5)+0.10(4)\\
+&=0.45+0.50+0.30+0.40\\
+&=1.65.
 \end{aligned}
 $$
 
-2. Compute weighted CPI.
+Total cycles and CPU time follow directly:
 
 $$
 \begin{aligned}
-\mathrm{CPI}
-&= 0.45(1) + 0.25(2) + 0.20(1.5) + 0.10(4) \\
-&= 0.45 + 0.50 + 0.30 + 0.40 \\
-&= 1.65
+\mathrm{cycles}
+&=(2.0\times10^9)(1.65)\\
+&=3.30\times10^9,\\
+T
+&=\frac{3.30\times10^9}{2.5\times10^9}\\
+&=1.32\ \mathrm{s}.
 \end{aligned}
 $$
 
-3. Compute total cycles.
+Now consider a new floating-point unit that lowers floating-point CPI from 4 to 2 but lengthens the clock period enough to reduce frequency from 2.5 to 2.3 GHz. The new CPI is
 
 $$
 \begin{aligned}
-\mathrm{Cycles}
-&= IC \times CPI \\
-&= 2.0 \times 10^9 \times 1.65 \\
-&= 3.30 \times 10^9
+CPI_{new}
+&=0.45+0.50+0.30+0.10(2)\\
+&=1.45.
 \end{aligned}
 $$
 
-4. Divide by clock rate.
+Its time is
 
 $$
-\begin{aligned}
-\mathrm{CPU\ time}
-&= \frac{3.30 \times 10^9}{2.5 \times 10^9} \\
-&= 1.32\ \mathrm{s}
-\end{aligned}
+T_{new}
+=\frac{(2.0\times10^9)(1.45)}{2.3\times10^9}
+=1.2609\ \mathrm{s},
 $$
 
-Checked answer: The average CPI is $1.65$, and the CPU time is $1.32$ seconds. A quick sanity check says the time should be slightly more than one second because the program needs 3.3 billion cycles and the processor supplies 2.5 billion cycles per second.
-
-## Worked example 2: Amdahl's law with a faster floating-point unit
-
-Problem: In a baseline run, floating-point operations account for 30% of execution time. A new floating-point unit makes that part $5\times$ faster, but it does not change the rest of the program. What is the overall speedup? What fraction of the new execution time is floating-point?
-
-Method:
-
-1. Normalize old execution time to $1$.
+so
 
 $$
-\begin{aligned}
-T_{old} &= 1.00 \\
-f &= 0.30 \\
-s &= 5
-\end{aligned}
+S=\frac{1.32}{1.2609}=1.0469.
 $$
 
-2. Compute new time.
+The local floating-point improvement looks large, but the complete design is only about 4.7% faster. If the frequency had fallen below $2.197$ GHz, found by solving $(2.0\times10^9)(1.45)/f=1.32$, the new unit would have made this program slower.
+
+## Amdahl's law and the shrinking target
+
+If fraction $a$ of original execution time is accelerated by factor $s$, normalize old time to 1. The unchanged time remains $1-a$, and improved time becomes $a/s$:
+
+$$
+T_{new}=(1-a)+\frac{a}{s}.
+$$
+
+Taking the reciprocal gives Amdahl's law:
+
+$$
+S_{overall}=\frac{1}{(1-a)+a/s}.
+$$
+
+Even an infinitely fast enhancement has limit
+
+$$
+\lim_{s\to\infty}S_{overall}=\frac{1}{1-a}.
+$$
+
+The law is less a parallel-computing formula than a general rule about limited scope. It applies to faster functional units, compression, cache improvements, vectorization, storage acceleration, and any optimization that affects only part of elapsed time.
+
+After acceleration, the improved portion occupies a smaller fraction of the new run:
+
+$$
+a_{new}=\frac{a/s}{(1-a)+a/s}.
+$$
+
+Optimization therefore moves the bottleneck. Once floating-point work is cheap, memory or serial setup may dominate. Profiles must be collected again rather than reused indefinitely.
+
+### Worked example: five-times-faster floating point
+
+Floating-point work occupies 30% of a baseline run and becomes $5\times$ faster. Normalize $T_{old}=1$:
 
 $$
 \begin{aligned}
 T_{new}
-&= (1-f)+\frac{f}{s} \\
-&= 0.70 + \frac{0.30}{5} \\
-&= 0.70 + 0.06 \\
-&= 0.76
+&=(1-0.30)+\frac{0.30}{5}\\
+&=0.70+0.06\\
+&=0.76,\\
+S&=1/0.76=1.3158.
 \end{aligned}
 $$
 
-3. Compute speedup.
+The new floating-point fraction is
 
 $$
-\mathrm{Speedup}=\frac{1}{0.76}=1.3158
+\frac{0.30/5}{0.76}
+=\frac{0.06}{0.76}
+=0.0789.
 $$
 
-4. Compute the new floating-point fraction.
+Only 7.9% of the new execution time remains in floating point. If the unit could somehow become infinitely fast, the best possible speedup from the original baseline would be $1/(1-0.30)=1.4286\times$.
+
+Suppose instead that using the new unit adds setup overhead equal to 3% of old time. Then $T_{new}=0.70+0.06+0.03=0.79$ and speedup falls to $1.266\times$. Overheads belong in the unaffected or newly added portion; omitting them exaggerates accelerator results.
+
+For parallel execution with parallel fraction $p$ on $N$ processors,
 
 $$
-\begin{aligned}
-\mathrm{FP\ fraction}_{new}
-&= \frac{0.30/5}{0.76} \\
-&= \frac{0.06}{0.76} \\
-&= 0.0789
-\end{aligned}
+S(N)=\frac{1}{(1-p)+p/N}.
 $$
 
-Checked answer: The overall speedup is about $1.32\times$, not $5\times$. After the change, floating-point work is only about $7.9\%$ of execution time, so further floating-point acceleration would have much less value.
+A 95% parallel program is bounded by $20\times$ for a fixed problem size. Gustafson's observation addresses a different experiment: users often increase the problem size when more processors are available, keeping elapsed time roughly fixed. Amdahl answers fixed-work speedup; scaled speedup answers how much larger a problem fits in the same time. Neither invalidates the other.
 
-## Code
+## Benchmark suites and honest summaries
+
+A benchmark result is meaningful only with its workload and run conditions. Relevant details include input size, compiler and flags, thread count, memory configuration, operating system, warm-up policy, thermal state, and whether turbo behavior was enabled. Repeated runs expose noise from scheduling, background work, and temperature. Medians resist outliers; confidence intervals convey uncertainty better than excessive decimal places.
+
+Benchmarks can be kernels, full applications, or service traces. Kernels isolate a mechanism and are easier to interpret, but full programs include interactions the kernel omits. A suite reduces the chance of optimizing one unusual workload. The suite should represent the intended use rather than whatever programs happen to be convenient.
+
+Normalized ratios require care. If machine A takes 10 s and B takes 5 s, B's normalized performance relative to A is 2. Reversing the baseline gives $1/2$. For positive ratios $r_i$, the geometric mean is
+
+$$
+G=\left(\prod_{i=1}^n r_i\right)^{1/n}
+=\exp\left(\frac{1}{n}\sum_i\ln r_i\right).
+$$
+
+It is insensitive to the choice of common reference machine and treats reciprocal factors symmetrically. For ratios $2$ and $1/2$, $G=1$. The arithmetic mean would be $1.25$, incorrectly suggesting an average advantage from two reciprocal outcomes.
+
+The geometric mean is suitable for normalized speed ratios, not for aggregating raw execution times or rates with different units. If total completion time across a known workload mix matters, sum the actual times with appropriate weights. For rates over equal amounts of work, the harmonic mean may be relevant, but only after defining how the work is combined.
+
+### Worked example: comparing a suite
+
+Four benchmarks have old times $[20,40,10,30]$ seconds and new times $[16,50,5,30]$. Per-benchmark speedups are
+
+$$
+[20/16,40/50,10/5,30/30]=[1.25,0.8,2,1].
+$$
+
+Their geometric mean is
+
+$$
+G=(1.25\times0.8\times2\times1)^{1/4}
+=2^{1/4}
+=1.1892.
+$$
+
+For one run of every benchmark, however, total old time is $100$ s and total new time is $101$ s, so aggregate speedup is $100/101=0.9901$. Both results are arithmetically correct and answer different questions. The geometric mean gives each benchmark equal multiplicative weight. Summed time weights long-running members more heavily. A report should say which interpretation matches the workload.
+
+## Designing a measurement that can be repeated
+
+A timing experiment needs a stable beginning and end. For a command-line program, elapsed time may include process startup and file reads; for a long-running server, requests may be timed only after caches and connection pools are warm. Neither choice is inherently better, but mixing cold and warm runs produces a statistic with no clear interpretation. The input data and output validation should also be fixed. A compiler that removes unused computation can produce a wonderfully fast program that no longer performs the intended work.
+
+Warm-up deserves explicit treatment on managed runtimes and adaptive systems. Just-in-time compilation, branch predictors, caches, storage buffers, and dynamic frequency control all change during early iterations. One approach is to discard a documented warm-up period and measure steady state. Another is to include startup because users repeatedly invoke short-lived jobs. The workload determines which behavior counts.
+
+Noise cannot be eliminated completely. Interrupts, scheduler migration, background services, temperature, and shared-resource contention perturb runs. Pinning threads, controlling background work, recording frequency, and randomizing the order of compared variants can reduce bias. Repetition then shows the remaining distribution. Reporting the minimum assumes noise only adds delay and may be useful for studying an ideal machine path. Reporting the median describes a typical observed run. High percentiles matter for latency-sensitive services. The statistic should be selected before looking at which one favors a design.
+
+Precision in the result should match precision in the experiment. If repeated times vary between 99 and 103 ms, claiming an improvement from 100.037 to 99.982 ms is not supported. Confidence intervals or a direct distribution plot are preferable to a single long decimal. Statistical significance alone is also insufficient: with enough repetitions, a tiny but operationally irrelevant difference can be detected. Architecture decisions need effect size, uncertainty, and the cost of obtaining that effect.
+
+Comparisons require equivalent work. Different compiler flags, numerical tolerances, database durability settings, image quality, or model accuracy can silently trade correctness for speed. Approximate computing and reduced precision may be valid design choices, but their output loss becomes another reported metric. The fastest result among unequal computations is not a performance comparison.
+
+Microbenchmarks require extra skepticism. A loop crafted to fit in cache can isolate instruction throughput or memory latency, which is useful for testing a model. It cannot establish application speedup unless the application exhibits the same access pattern and bottleneck. Full applications supply realism but are harder to explain. Using both establishes a chain: the microbenchmark confirms the mechanism, counters show that the real workload invokes it, and end-to-end timing measures the benefit.
+
+## Keeping the model tied to the machine
+
+| Quantity | Useful for | Frequent misreading |
+|---|---|---|
+| Elapsed time | User-visible latency | Attributing all time to the CPU |
+| CPU time | Processor-focused comparison | Ignoring I/O and accelerator time |
+| CPI | Explaining cycle use | Comparing different ISAs without $IC$ |
+| Clock rate | One factor in CPU time | Treating GHz as overall speed |
+| Throughput | Capacity planning | Ignoring queueing and latency bounds |
+| Peak rate | Hardware upper bound | Presenting it as sustained application rate |
+| Geometric mean | Equal-weight ratio summary | Using it for raw seconds |
+
+Measurements should first pass simple consistency checks. Cycle count should equal instruction count times CPI. Time should equal cycles divided by frequency. Claimed component savings should not exceed the original component time. Combined optimizations should be applied to one time budget, since adding their isolated speedups can count overlapping cycles twice.
+
+Simulation adds another layer of assumptions. A trace-driven cache model may omit wrong-path accesses, operating-system activity, or timing feedback. A cycle-level simulator may be detailed but slow enough to require small inputs. Model validation against real hardware, where available, is more valuable than reporting extra precision from an unvalidated model.
+
+## A small calculation aid
 
 ```python
 from math import prod
 
-def weighted_cpi(classes):
-    total_ic = sum(ic for ic, _ in classes)
-    total_cycles = sum(ic * cpi for ic, cpi in classes)
-    return total_cycles / total_ic
+def weighted_cpi(mix):
+    """mix contains (dynamic_instruction_count, class_cpi) pairs."""
+    instructions = sum(count for count, _ in mix)
+    cycles = sum(count * cpi for count, cpi in mix)
+    return cycles / instructions
 
-def amdahl(fraction, local_speedup):
-    return 1.0 / ((1.0 - fraction) + fraction / local_speedup)
+def amdahl(fraction, local_speedup, added_time=0.0):
+    return 1.0 / ((1.0 - fraction) + fraction / local_speedup + added_time)
 
-def geomean(ratios):
+def geometric_mean(ratios):
     return prod(ratios) ** (1.0 / len(ratios))
 
-mix = [
-    (0.45 * 2_000_000_000, 1.0),
-    (0.25 * 2_000_000_000, 2.0),
-    (0.20 * 2_000_000_000, 1.5),
-    (0.10 * 2_000_000_000, 4.0),
-]
-
-cpi = weighted_cpi(mix)
-cpu_time = 2_000_000_000 * cpi / 2_500_000_000
-print(f"CPI = {cpi:.2f}, CPU time = {cpu_time:.2f} s")
-print(f"Amdahl speedup = {amdahl(0.30, 5):.3f}x")
-print(f"Geomean = {geomean([1.2, 0.9, 1.5, 1.1]):.3f}x")
+mix = [(0.45, 1.0), (0.25, 2.0), (0.20, 1.5), (0.10, 4.0)]
+print(weighted_cpi(mix))                    # 1.65
+print(amdahl(0.30, 5.0))                   # 1.315789...
+print(geometric_mean([1.25, 0.8, 2, 1]))   # 1.189207...
 ```
 
-## Common pitfalls
+The functions encode formulas, not experimental method. They cannot decide whether fractions overlap, whether an input is representative, or whether elapsed time includes the relevant system costs.
 
-- Optimizing a component and reporting the component speedup as if it were system speedup.
-- Comparing clock rates without comparing instruction count and CPI.
-- Using arithmetic means for normalized benchmark ratios.
-- Forgetting that benchmark inputs can change cache behavior and branch behavior.
-- Treating peak throughput as useful throughput when response-time constraints are violated.
-- Ignoring the energy, cost, and verification cost of a performance feature.
-
-## Connections
+## Related pages
 
 - [Power, Energy, Cost, and Dependability](/cs/computer-architecture/power-energy-cost-dependability)
 - [Cache Organization and AMAT](/cs/computer-architecture/cache-organization-amat)

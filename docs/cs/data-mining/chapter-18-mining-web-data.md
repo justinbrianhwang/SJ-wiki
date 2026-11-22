@@ -5,11 +5,11 @@ sidebar_position: 20
 
 # Mining Web Data and Recommenders
 
-Web mining studies documents, links, queries, user behavior, and recommender interactions on the web. Aggarwal's web chapter covers crawling and resource discovery, search engine indexing and query processing, ranking algorithms, recommender systems, and web usage mining. Web data combines text, graphs, streams, sequences, and large-scale systems, so it acts as a practical synthesis of many earlier chapters.
+Web mining studies documents, links, queries, user behavior, and recommender interactions on the web. Aggarwal's web chapter covers crawling and resource discovery, search engine indexing and query processing, ranking algorithms, recommender systems, and web usage mining. Web data combines text, graphs, streams, sequences, and large-scale systems, so it synthesizes many earlier chapters.
 
-This page focuses on crawling, inverted indexes, link analysis, PageRank-style ranking, collaborative filtering, content-based recommendation, and web usage patterns.
+The major pipeline runs from acquisition and canonicalization through indexing and ranking, while a parallel interaction pipeline turns exposures, clicks, ratings, and sessions into recommendation or usage models. Errors in the early stages constrain every later model.
 
-## Definitions
+## Two web-mining pipelines
 
 A **web crawler** discovers pages by fetching URLs and following links under politeness and priority rules.
 
@@ -31,17 +31,60 @@ A **recommender system** predicts items a user may like. Collaborative filtering
 
 **Web usage mining** analyzes clickstreams, sessions, visits, paths, and conversions.
 
-## Key results
+Search begins with documents and explicit information needs. Recommendation begins with a catalog and a history of user-item interactions. Both ultimately rank candidates, but their candidate generation, relevance evidence, and evaluation populations differ.
+
+## Crawling and canonicalization
 
 **Crawling is a scheduling problem.** A crawler cannot fetch the whole web instantly. It must prioritize URLs, avoid traps, respect robots and politeness policies, refresh changing pages, and manage duplicates.
 
+The URL frontier normally separates scheduling by host so requests to one site can be spaced apart. Priority may combine page importance, expected change rate, and crawl history. Redirect chains, calendar links, generated query parameters, and session identifiers can create effectively infinite crawl spaces.
+
+Several URLs can return the same content, and the same URL can change. Canonicalization normalizes safe URL variations and consumes declared canonical hints; content fingerprints detect exact duplicates, while shingling and locality-sensitive hashing help find near duplicates. Over-aggressive canonicalization can merge genuinely different pages, such as localized or filtered views.
+
+Freshness is a resource-allocation problem. A page that changes hourly should be revisited more often than an archival page, but change frequency must first be estimated from past fetches. Conditional HTTP requests can avoid downloading unchanged content even though they still consume a request.
+
+## What an inverted index stores
+
 **Inverted indexes make search feasible.** Instead of scanning every document for every query, the engine intersects or scores postings lists for query terms.
+
+A posting commonly stores a document identifier, term frequency, and perhaps token positions. Positions support phrase and proximity queries. Skip data and block-level upper bounds let query processors bypass postings that cannot enter the top results. Compression is effective because sorted document identifiers are stored as small gaps.
+
+For a conjunctive query, processing the shortest postings list first reduces work. Ranked retrieval often uses document-at-a-time or term-at-a-time accumulation with early termination. The index also needs a forward store or document table for titles, fields, lengths, and display metadata.
+
+Index-time tokenization must match query-time analysis. Stemming only one side creates systematic misses. Field-aware ranking distinguishes a term in a title from one in boilerplate. Access control must be applied before results are shown; filtering afterward can leak counts or snippets.
+
+## PageRank as a stationary distribution
 
 **Ranking combines content and authority.** Text relevance alone can be manipulated or ambiguous. Link structure, freshness, user behavior, and personalization can adjust ranking.
 
 **PageRank is an eigenvector-like centrality.** A page receives rank from pages linking to it, weighted by their own rank and outgoing degree. Teleportation prevents sinks and disconnected components from trapping all probability.
 
+If every row of $P$ sums to one, the update is multiplication by a stochastic transition matrix with teleportation. For $0\lt \alpha\lt 1$ and a teleport vector positive on all pages, the resulting Markov chain is irreducible and aperiodic, giving a unique stationary distribution. Power iteration repeatedly applies the update until a norm of $r^{(t+1)}-r^{(t)}$ is small.
+
+Dangling pages have no outgoing links, so their transition rows are undefined. A standard repair redistributes their mass according to $v$, as though they linked to the teleport distribution. Omitting this step causes rank mass to disappear during iteration.
+
+PageRank measures graph authority under its random-surfer model, not query relevance. A highly ranked page can be irrelevant to a specific query. Search ranking therefore combines textual match and many other signals, with link authority serving as one prior-like feature.
+
+## Recommendation from explicit and implicit feedback
+
 **Collaborative filtering uses interaction patterns.** Users with similar histories may receive similar recommendations, and items liked by similar users become candidates. Matrix factorization embeds users and items into a shared latent space.
+
+A basic explicit-rating factorization solves
+
+$$
+\min_{p_u,q_i,b_u,b_i}
+\sum_{(u,i)\in\Omega}
+\left[r_{ui}-(\mu+b_u+b_i+p_u^\top q_i)\right]^2
++\lambda\left(\|p_u\|^2+\|q_i\|^2+b_u^2+b_i^2\right),
+$$
+
+where $\Omega$ contains observed ratings. Bias terms capture generous users and generally popular items; latent dot products capture residual compatibility. The regularizer limits extreme factors for users or items with little data.
+
+Clicks and purchases are implicit feedback: absence of interaction does not mean dislike because the user may never have seen the item. Training needs exposure-aware negatives, sampled unobserved items, pairwise ranking losses, or confidence weights. Treating every unclicked catalog item as equally negative overwhelms the positive signal and encodes the current serving policy.
+
+Content-based models can recommend a new item from its text or attributes, but may over-specialize around a user's history. Hybrid recommenders combine collaborative and content evidence, often with popularity and freshness features.
+
+## Sessions, exposure, and feedback loops
 
 **Web usage mining is sequence mining at scale.** A session is an ordered sequence of page visits. Frequent paths, drop-off points, and anomalous access patterns support site design, personalization, and security.
 
@@ -61,7 +104,11 @@ A **recommender system** predicts items a user may like. Collaborative filtering
 
 **Query intent is heterogeneous.** Navigational, informational, and transactional queries should not always be judged by the same ranking signals. Web mining systems often segment intent before evaluation.
 
-## Visual
+Offline recommender evaluation should use candidate sets that resemble serving. Ranking one held-out positive against four random unpopular items produces an easier task than ranking against the live eligible catalog. Recall at $k$ asks whether relevant items appear near the top. NDCG discounts relevant items by rank and can use graded relevance. Coverage and diversity measure behavior that accuracy alone omits.
+
+Online experiments capture response to actual exposure but require guardrails. Click-through rate can reward clickbait; watch time can reward excessive consumption; short-term conversion can reduce long-term trust. Logging the candidate set, chosen ranking, propensities for randomized actions, and eventual outcomes supports later causal or counterfactual analysis.
+
+## Components and failure points
 
 ```mermaid
 flowchart TD
@@ -168,7 +215,43 @@ $$
 
 **Checked answer.** The predicted rating is about 4.48. In a real system, mean-centering and more neighbors would usually be used.
 
-## Code
+Raw cosine gives U1 and U3 similarity $0.908$ even though one rates the co-rated items high and the other low. Their vectors point in a similar positive direction because all ratings are positive. Centering by user mean would make their deviations opposite. U2 has no variation across I1 and I2 after centering, so its correlation is undefined from only two equal ratings. The example demonstrates the arithmetic of weighted cosine, not a reliable neighborhood estimate.
+
+## Worked example 3: discounted ranking gain
+
+**Problem.** A three-result ranking has graded relevance $(3,0,2)$. Compute DCG at 3 using
+
+$$
+DCG@3=\sum_{j=1}^{3}\frac{2^{rel_j}-1}{\log_2(j+1)},
+$$
+
+then normalize by the ideal order.
+
+**Method.** The observed ranking gives
+
+$$
+DCG@3=\frac{2^3-1}{\log_2 2}
++\frac{2^0-1}{\log_2 3}
++\frac{2^2-1}{\log_2 4}
+=7+0+1.5=8.5.
+$$
+
+The ideal order is $(3,2,0)$:
+
+$$
+IDCG@3=7+\frac{3}{\log_2 3}+0
+\approx7+1.893=8.893.
+$$
+
+Therefore
+
+$$
+NDCG@3=\frac{8.5}{8.893}\approx0.956.
+$$
+
+**Checked answer.** NDCG is about $0.956$. The relevant item of grade 2 appears one position later than ideal, so the score is high but below one. A binary metric would lose the distinction between relevance grades 3 and 2.
+
+## Reproducing ranking calculations
 
 Pseudocode for user-based recommendation:
 
@@ -206,7 +289,9 @@ prediction = np.dot(sim, item3) / sim.sum()
 print(round(prediction, 3))
 ```
 
-## Common pitfalls
+The PageRank call includes dangling-node handling internally. Library defaults can change, so reproducible analysis records tolerance, iteration limit, edge weights, personalization, and package version. The recommender code deliberately mirrors the hand calculation; it does not handle missing co-ratings, baselines, significance weighting, or candidate filtering.
+
+## Failure modes
 
 - Treating crawled pages as independent when link structure is central.
 - Ignoring duplicate or near-duplicate pages in indexing and ranking.
@@ -215,8 +300,12 @@ print(round(prediction, 3))
 - Ignoring cold-start users or items with no interaction history.
 - Treating bot traffic as normal web usage.
 - Splitting recommender data randomly when temporal leakage matters.
+- Training on clicks without logging which items were actually exposed.
+- Comparing recommenders on different candidate sets and attributing the difference to model quality.
+- Letting URL parameters generate an unbounded crawler frontier.
+- Treating PageRank as a substitute for query-dependent relevance.
 
-## Connections
+## Related pages
 
 - [Mining Text Data](/cs/data-mining/chapter-13-mining-text-data)
 - [Mining Graph Data](/cs/data-mining/chapter-17-mining-graph-data)

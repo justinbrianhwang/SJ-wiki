@@ -7,13 +7,9 @@ sidebar_position: 12
 
 Tests for means compare observed sample means with null hypotheses about population means. They are among the most common procedures in introductory statistics because many variables are quantitative: reaction times, exam scores, blood pressure, monthly revenue, machine fill volume, and so on. The Lane text discusses tests of a single mean, independent-group differences, and correlated-pair differences as separate cases because the standard error changes with the design.
 
-![Several Student t density curves approach the normal curve.](https://commons.wikimedia.org/wiki/Special:FilePath/Student_t_pdf.svg)
+The central question goes beyond how many means are being compared. It asks whether observations are independent, paired, or grouped. A before-after study on the same people is not an independent two-sample study. A treatment-control comparison with different people in each group is not a paired study. Choosing the wrong test means choosing the wrong standard error, which changes the p-value and interval.
 
-*Figure: Student t distributions encode extra uncertainty from estimating variance with small samples. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Student_t_pdf.svg), Skbkekas, CC BY 3.0.*
-
-The central question is not simply how many means are being compared. It is whether observations are independent, paired, or grouped. A before-after study on the same people is not an independent two-sample study. A treatment-control comparison with different people in each group is not a paired study. Choosing the wrong test means choosing the wrong standard error, which changes the p-value and interval.
-
-## Definitions
+## The design selects the standard error
 
 A **one-sample $t$ test** compares a sample mean $\bar{x}$ with a hypothesized population mean $\mu_0$:
 
@@ -54,7 +50,34 @@ $$
 
 The usual null is $\mu_{d,0}=0$.
 
-## Key results
+## Where the $t$ reference comes from
+
+If observations are normal with unknown variance, then
+
+$$
+\frac{\bar X-\mu}{S/\sqrt n}
+$$
+
+has a Student $t$ distribution with $n-1$ degrees of freedom. The heavier tails account for replacing $\sigma$ by the random estimate $S$. As $n$ grows, $S$ stabilizes and the $t$ distribution approaches the standard normal.
+
+For Welch's comparison, the estimated variance of $\bar X_1-\bar X_2$ is
+
+$$
+v=\frac{s_1^2}{n_1}+\frac{s_2^2}{n_2}.
+$$
+
+The reference degrees of freedom are approximated by
+
+$$
+\nu=
+\frac{v^2}
+{\dfrac{(s_1^2/n_1)^2}{n_1-1}
++\dfrac{(s_2^2/n_2)^2}{n_2-1}}.
+$$
+
+The result need not be an integer. Statistical software evaluates the $t$ distribution at the fractional value rather than rounding it.
+
+## Why pairing can gain precision
 
 The design determines the denominator. For a one-sample mean, the standard error is $s/\sqrt{n}$. For independent groups, the standard error combines two independent sources of variation:
 
@@ -70,15 +93,53 @@ $$
 
 Pairing is useful when units differ substantially at baseline but within-unit changes are measured precisely. If each patient serves as their own control, the paired analysis removes some between-person variation.
 
+For before and after measurements $A$ and $B$,
+
+$$
+\operatorname{Var}(A-B)
+=\operatorname{Var}(A)+\operatorname{Var}(B)
+-2\operatorname{Cov}(A,B).
+$$
+
+Positive within-person correlation reduces the variance of differences and can make the paired test much more precise. If the correlation is weak or negative, pairing may offer little gain. The pairs must be genuine; matching unrelated observations after seeing their values fabricates dependence and invalidates the analysis.
+
+Missing one member of a pair requires a stated strategy. A complete-case paired test discards the unmatched measurement and assumes the missingness mechanism does not bias the remaining differences. Treating the remaining before and after columns as independent is not an automatic fix.
+
+## Assumptions and robust alternatives
+
 Assumptions for $t$ procedures include independent sampling or independent pairs, quantitative response data, and a sampling distribution of the mean or mean difference that is approximately normal. For small samples, the raw data or differences should not show severe skewness or extreme outliers. For large samples, the central limit theorem makes $t$ methods more robust, though dependence and biased sampling remain serious problems.
 
+The relevant plot follows the unit of analysis. A paired test needs a plot of differences; normal-looking marginal before and after distributions can still yield skewed differences. An independent comparison needs separate group plots. Strongly unequal spreads are compatible with Welch's standard error but can still signal outliers or different distribution shapes that make a mean contrast incomplete.
+
+For symmetric distributions with heavy outliers, a permutation test on a suitable statistic or a robust location method may be preferable. The Wilcoxon signed-rank and rank-sum procedures test distributional hypotheses that are not automatically identical to hypotheses about means. A bootstrap interval for a mean difference can help, but the resampling must preserve pairs or group membership.
+
+## Decisions, intervals, and power
+
 A test for means should usually be accompanied by a confidence interval and an effect size. A statistically significant difference of 0.2 points on a 100-point scale may be unimportant; a non-significant difference of 8 points in a small pilot study may still be practically promising.
+
+For a two-sided level-$\alpha$ test, the matching $(1-\alpha)$ confidence interval excludes the null value exactly when the test rejects, subject to the same method and assumptions. The interval also gives the direction and range of effect sizes supported by the data.
+
+Cohen's standardized mean difference divides a mean contrast by a standard deviation, but the choice of denominator must be explicit. For paired data, standardizing by the standard deviation of differences answers a different question from standardizing by a baseline or pooled between-person standard deviation. Raw units are often easier to interpret and should be reported even when a standardized effect is included.
+
+Power rises with a larger true difference, smaller variability, larger sample size, or a less stringent significance threshold. Choosing a one-sided alternative can increase power in one direction only when the opposite direction would genuinely lead to the same action as no effect. Selecting the direction after seeing the sample invalidates the advertised p-value.
+
+Failure to reject $H_0$ leaves open both a negligible effect and an imprecisely estimated important effect. Equivalence testing reverses the logic by defining a smallest important range $(-\Delta,\Delta)$ and asking whether the data rule out effects outside it. A conventional non-significant test of zero is not an equivalence test.
+
+## Data-dependent choices change the error rate
+
+Trying one-sample, paired, pooled, Welch, transformed, and subgroup tests and reporting only the smallest p-value does not preserve a 5% Type I error rate. The test choice should follow the design and a prespecified analysis plan. Sensitivity analyses can be reported together, with their purpose and multiplicity stated.
+
+Optional stopping has the same problem. Rechecking a conventional p-value after every few observations and stopping when it crosses 0.05 raises the false-positive probability. Sequential designs use adjusted boundaries or always-valid procedures that account for repeated looks.
+
+Data cleaning can also become part of the test. Removing an outlier because it weakens significance is indefensible. If a value is impossible by measurement rules, correct or exclude it using those rules; if it is valid but influential, report robust and ordinary analyses and explain what population each targets.
+
+Random assignment supports a treatment comparison, while random sampling supports generalization to a population. A perfectly randomized experiment on volunteers can estimate a causal effect for the study sample yet still generalize poorly. A representative observational sample can estimate an association well without making it causal. The $t$ statistic alone does not supply either design property.
 
 The same sample summaries can lead to different conclusions when the research question changes. If the goal is quality control, a one-sample test may compare a process mean with a fixed target. If the goal is a treatment comparison, an independent or paired design determines the analysis. If the goal is equivalence or noninferiority, the null and alternative are reversed from the usual "no difference" test, and a standard two-sided significance test is not enough. For introductory work, the main discipline is to write the parameter and hypotheses in words before calculating. That step exposes whether the mean, mean difference, or paired mean difference is really the quantity of interest.
 
 Graphical checks should use the unit of analysis. For paired data, graph the differences, not just the two marginal distributions before and after. For independent groups, compare group histograms or box plots and look for severe imbalance in spread, skewness, or outliers. These checks do not replace the test, but they explain whether the test is summarizing the data in a defensible way.
 
-## Visual
+## Selecting the comparison
 
 ```mermaid
 flowchart TD
@@ -148,6 +209,17 @@ t=\frac{24}{10.63}=2.26.
 $$
 
 7. Welch degrees of freedom are approximate. Software gives about $df=34$ for these values.
+
+Using the Welch formula gives
+
+$$
+\nu=
+\frac{(68.06+45)^2}
+{68.06^2/17+45^2/19}
+\approx33.7,
+$$
+
+so the reported value depends slightly on rounding of the summaries.
 8. The two-sided p-value for $t=2.26$ with about 34 degrees of freedom is about 0.030.
 
 Answer: Reject $H_0$ at the 0.05 level. The data provide evidence that the population mean weekly exercise minutes differ, with Group A higher by about 24 minutes in the sample.
@@ -226,7 +298,7 @@ Answer: The improvement is statistically significant by any common significance 
 
 Checked answer: Because all eight differences are positive and tightly clustered between 2 and 4, a very large $t$ statistic is plausible.
 
-## Code
+## Keeping the design explicit in code
 
 ```python
 import numpy as np
@@ -250,7 +322,7 @@ print(stats.ttest_rel(after, before, alternative="greater"))
 
 The independent-group call uses only summary statistics; the paired call uses raw paired scores. That distinction mirrors the design distinction in the formulas.
 
-## Common pitfalls
+## Design and interpretation failures
 
 - Using an independent two-sample test for paired before-after data.
 - Using a paired test for two unrelated groups because the sample sizes happen to match.
@@ -259,7 +331,7 @@ The independent-group call uses only summary statistics; the paired call uses ra
 - Ignoring outliers in small samples, where a single value can dominate the mean and standard deviation.
 - Reporting the p-value without the observed mean difference and confidence interval.
 
-## Connections
+## Related pages
 
 - [Estimation and confidence intervals](/math/statistics/estimation-and-confidence-intervals)
 - [Hypothesis testing logic](/math/statistics/hypothesis-testing-logic)

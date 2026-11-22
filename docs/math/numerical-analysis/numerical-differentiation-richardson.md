@@ -7,13 +7,9 @@ sidebar_position: 9
 
 Numerical differentiation estimates derivatives from function values. It looks simple because the formulas resemble the limit definitions from calculus, but it is one of the most error-sensitive tasks in numerical analysis. Difference quotients subtract nearby values, and that subtraction can amplify both measurement noise and floating-point roundoff.
 
-![A tangent line touches a curve at a point to show instantaneous slope.](https://commons.wikimedia.org/wiki/Special:FilePath/Derivative_with_tangent.svg)
-
-*Figure: A tangent line gives the local geometric meaning of a derivative. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Derivative_with_tangent.svg), Olivier Cleynen, CC0 1.0.*
-
 Richardson extrapolation improves a difference formula by combining approximations computed with different step sizes. When the leading error term is known, the combination cancels that term and raises the order. The idea appears again in Romberg integration, deferred correction, and step-size control for differential equations.
 
-## Definitions
+## Difference formulas from Taylor series
 
 The forward difference approximation to $f'(x)$ is
 
@@ -57,7 +53,7 @@ $$
 A_R=\frac{2^pA(h/2)-A(h)}{2^p-1}.
 $$
 
-## Key results
+## Cancellation produces the order
 
 Taylor's theorem is the source of finite-difference formulas. For example,
 
@@ -78,21 +74,177 @@ $$
 
 where $u$ is unit roundoff. The first term decreases as $h$ decreases; the second term increases because subtracting nearby rounded values and dividing by $h$ magnifies roundoff. Therefore the best $h$ is not the smallest possible $h$.
 
-Richardson extrapolation is reliable only when the assumed asymptotic error expansion has begun to dominate. If $h$ is too large, higher-order terms spoil the cancellation. If $h$ is too small, roundoff and data noise dominate. A practical implementation computes a table and stops when improvement stalls.
+Richardson extrapolation is reliable only when the assumed asymptotic error expansion has begun to dominate. If $h$ is too large, higher-order terms spoil the cancellation. If $h$ is too small, roundoff and data noise dominate. A sound implementation computes a table and stops when improvement stalls.
 
-A reliable way to use these results is to keep the analysis tied to the actual numerical question rather than to the formula alone. For numerical differentiation and Richardson extrapolation, the input record should include the function values, step sequence, formula order, and noise level. Without that record, two computations that look similar on paper may have different numerical meanings. The same formula can be a safe production tool in one scaling and a fragile experiment in another. This is why the examples on this page show the intermediate arithmetic: the goal is not only to reach a number, but to expose what assumptions made that number meaningful.
+Dividing the forward Taylor series by $h$ gives
 
-The next record is the verification record. Useful diagnostics for this topic include step-halving tables, extrapolated differences, and roundoff plateaus. A diagnostic should be chosen before the computation is trusted, not after a pleasing answer appears. When an exact answer is unavailable, compare two independent approximations, refine the mesh or tolerance, check a residual, or test the method on a neighboring problem with known behavior. If several diagnostics disagree, treat the disagreement as information about conditioning, stability, or implementation rather than as a nuisance to be averaged away.
+$$
+\frac{f(x+h)-f(x)}{h}
+=f'(x)+\frac{h}{2}f''(x)+O(h^2).
+$$
 
-The cost record matters as well. In this topic the dominant costs are usually function evaluations per derivative estimate and reuse of symmetric samples. Numerical analysis is full of methods that are mathematically attractive but computationally mismatched to the problem size. A dense factorization may be acceptable for a classroom matrix and impossible for a PDE grid. A high-order rule may use fewer steps but more expensive stages. A guaranteed method may take many iterations but provide a bound that a faster method cannot. The right comparison is therefore cost to reach a verified tolerance, not order or elegance in isolation.
+The leading bias is proportional to $h$. Subtracting the backward expansion from the forward expansion removes every even-power term before division:
 
-Finally, every method here has a recognizable failure mode: choosing h too small, differentiating noisy data, and extrapolating before asymptotic behavior appears. These failures are not edge cases to memorize; they are signals that the hypotheses behind the result have been violated or that a different numerical model is needed. A good implementation makes such failures visible through exceptions, warnings, residual reports, or conservative stopping rules. A good hand solution does the same thing in prose by naming the assumption being used and checking it at the point where it matters.
+$$
+\frac{f(x+h)-f(x-h)}{2h}
+=f'(x)+\frac{h^2}{6}f^{(3)}(x)+O(h^4).
+$$
 
-For study purposes, the most useful habit is to separate four layers: the continuous mathematical problem, the discrete approximation, the algebraic or iterative algorithm used to compute it, and the diagnostic used to judge the result. Many mistakes come from mixing these layers. A small algebraic residual may not mean a small modeling error. A small step-to-step change may not mean the discrete equations are solved. A high-order truncation formula may not help when the data are noisy or the arithmetic is unstable. Keeping the layers separate makes the results on this page portable to larger examples.
+Adding the two expansions and subtracting $2f(x)$ instead isolates the second derivative:
 
-A compact derivative report should include the step sizes, the base formula, and the extrapolation table. Without the table, the final extrapolated number can hide the moment when roundoff began to dominate. The best evidence for a derivative estimate is a visible plateau of stable digits across several reasonable step choices.
+$$
+\frac{f(x+h)-2f(x)+f(x-h)}{h^2}
+=f''(x)+\frac{h^2}{12}f^{(4)}(x)+O(h^4).
+$$
 
-## Visual
+Symmetry earns second order with only two samples for the first derivative, but it is unavailable at a boundary. A second-order forward formula can be derived by choosing weights that cancel the constant and second-derivative terms:
+
+$$
+f'(x)\approx\frac{-3f(x)+4f(x+h)-f(x+2h)}{2h}.
+$$
+
+The larger coefficients amplify noisy data more than the first-order forward quotient. Order and robustness are separate properties.
+
+## Why a smaller step eventually hurts
+
+Suppose each function value carries absolute error of size roughly $\delta$. A first-difference quotient can amplify that error to order $\delta/h$. For floating-point evaluation of a well-scaled smooth function, $\delta$ is often comparable to unit roundoff $u$ times the function scale. The centered first derivative then has the model
+
+$$
+E(h)\approx C_th^2+C_r\frac{u}{h}.
+$$
+
+Balancing the terms gives an optimal scale proportional to $u^{1/3}$, not $u$ itself. For a forward difference, balancing $C_th$ with $C_ru/h$ gives a scale proportional to $u^{1/2}$. The unknown constants depend on derivative and function magnitudes, so these are starting scales rather than universal step sizes.
+
+Second derivatives are harsher: roundoff is divided by $h^2$, while the centered truncation error remains $O(h^2)$. Their balance occurs around $u^{1/4}$ after scaling. Numerical differentiation is therefore often the wrong operation for raw measured data. A fitted local polynomial or smoothing spline can estimate a derivative while controlling noise amplification.
+
+Absolute scaling matters too. Perturbing a value $x=10^8$ by $h=10^{-8}$ may produce no representable change at all. Step choices often use $h$ relative to $\max(1,\vert x\vert )$, and implementations should verify that $x+h\ne x$ in floating-point arithmetic.
+
+## Richardson columns and their assumptions
+
+For a symmetric base formula,
+
+$$
+A(h)=A+c_2h^2+c_4h^4+c_6h^6+\cdots.
+$$
+
+The first Richardson column uses
+
+$$
+A_1(h)=\frac{4A(h/2)-A(h)}{3}
+=A+O(h^4).
+$$
+
+A second extrapolation combines $A_1(h)$ and $A_1(h/2)$ with factor $16$:
+
+$$
+A_2(h)=\frac{16A_1(h/2)-A_1(h)}{15}
+=A+O(h^6).
+$$
+
+The factor changes by column because the leading power changes. A table routine that repeatedly uses the same factor of four after the first column is wrong.
+
+Extrapolation assumes a smooth power-series error and that the selected $h$ values already lie in its asymptotic range. A kink, branch switch, noisy evaluation, or discontinuous higher derivative can invalidate it. A useful table shows the base estimates and every extrapolated column. Stable digits should appear across adjacent rows before the final entry is trusted.
+
+## Alternatives when the function is available as code
+
+The complex-step formula avoids subtracting two nearby real numbers. For a real analytic function extended to complex arguments,
+
+$$
+f(x+\mathrm{i}h)=f(x)+\mathrm{i}hf'(x)-\frac{h^2}{2}f''(x)+O(h^3),
+$$
+
+so
+
+$$
+f'(x)\approx\frac{\operatorname{Im}f(x+\mathrm{i}h)}{h}
+$$
+
+with $O(h^2)$ truncation error. Very small $h$ can be used because there is no real subtraction. The method fails when the program discards imaginary parts, uses nonanalytic operations such as absolute value, or branches differently for complex input.
+
+Automatic differentiation propagates derivatives through program operations and avoids truncation error. Symbolic differentiation gives an expression when the function is sufficiently manageable. Finite differences remain useful for black-box functions and for checking an analytic or automatic derivative. A directional check is often cheaper than testing every partial derivative separately.
+
+## Reading an error curve
+
+The left side of the sketch corresponds to tiny $h$, where roundoff or data error dominates. The right side corresponds to large $h$, where truncation dominates. A step-halving experiment should first improve at the expected rate and then flatten or worsen. If no expected-rate region appears, increasing the extrapolation depth will not rescue the estimate.
+
+## Unequally spaced samples
+
+Uniform-grid formulas cannot be copied unchanged onto irregular data. Suppose values are known at $x-h_-$, $x$, and $x+h_+$ with unequal positive spacings. Differentiating the quadratic interpolant gives
+
+$$
+f'(x)\approx
+-\frac{h_+}{h_-(h_-+h_+)}f(x-h_-)
++\frac{h_+-h_-}{h_-h_+}f(x)
++\frac{h_-}{h_+(h_-+h_+)}f(x+h_+).
+$$
+
+When $h_-=h_+=h$, the center coefficient vanishes and the formula reduces to the usual centered difference. With unequal spacings, simply dividing the endpoint difference by $h_-+h_+$ generally leaves a first-order bias.
+
+Finite-difference weights for more points can be obtained by requiring exactness on monomials up to a chosen degree. For nodes $x_j$, choose weights $w_j$ so that
+
+$$
+\sum_jw_j(x_j-x)^m=
+\begin{cases}
+1,&m=1,\\
+0,&m=0,2,\ldots,q.
+\end{cases}
+$$
+
+Then $\sum_jw_jf(x_j)$ approximates $f'(x)$. The resulting Vandermonde-like system can be ill-conditioned when formed naively for high degree, so established weight-generation recurrences are preferable in software. Irregular spacing also complicates error estimates. A nominally high-degree interpolant may be dominated by one distant point, and clustered nodes can create large alternating weights.
+
+## Derivatives from measured data
+
+When samples contain noise $y_i=f(x_i)+\varepsilon_i$, differencing treats the noise as signal. A centered quotient has noise contribution
+
+$$
+\frac{\varepsilon_{i+1}-\varepsilon_{i-1}}{2h},
+$$
+
+whose variance is $\sigma_\varepsilon^2/(2h^2)$ for independent equal-variance errors. Collecting measurements more densely without reducing noise can therefore make a raw derivative estimate more variable.
+
+Local polynomial regression addresses the tradeoff. Around $x_0$, fit
+
+$$
+y\approx a_0+a_1(x-x_0)+a_2(x-x_0)^2+\cdots
+$$
+
+by weighted least squares, then use $a_1$ as the derivative estimate. A wider neighborhood reduces noise but smooths genuine local features; a narrower neighborhood follows features but has higher variance. Savitzky--Golay filters are fixed-grid versions of this local polynomial idea.
+
+Smoothing splines choose a function by balancing fit to the data against a roughness penalty such as
+
+$$
+\sum_i(y_i-s(x_i))^2
++\lambda\int[s''(x)]^2\,dx.
+$$
+
+The derivative comes from the fitted smooth function. The parameter $\lambda$ controls the bias--variance compromise and should be selected from the measurement goal, cross-validation, or a noise model rather than chosen to make the derivative curve attractive.
+
+## Partial derivatives and Jacobian checks
+
+For $F:\mathbb R^n\to\mathbb R^m$, a forward-difference Jacobian column costs one additional evaluation of the whole vector function:
+
+$$
+J_{\cdot j}(x)\approx
+\frac{F(x+h_je_j)-F(x)}{h_j}.
+$$
+
+A dense Jacobian therefore costs $n+1$ evaluations, while central differences cost about $2n$. If the Jacobian is sparse and the sparsity pattern is known, structurally independent columns can be perturbed together, reducing evaluation count through graph coloring.
+
+A directional derivative check avoids constructing all columns. Choose a vector $v$ and compare $J(x)v$ with
+
+$$
+\frac{F(x+hv)-F(x)}{h}.
+$$
+
+Trying several step sizes should show the expected decrease and eventual roundoff plateau. Several directions catch many analytic-Jacobian bugs, though they do not certify every entry.
+
+## Differentiation matrices and boundary rows
+
+On a fixed grid, all finite differences can be assembled into a matrix $D$ so that sampled derivatives are approximated by $D\mathbf f$. Interior rows may use centered formulas while boundary rows use one-sided formulas. This form is convenient for PDE discretizations and repeated differentiation, but it also exposes noise amplification through $\|D\|$, which grows as the grid is refined.
+
+Repeatedly applying a first-derivative matrix need not equal a carefully derived second-derivative matrix at boundaries. The product $D^2$ inherits two layers of boundary closure and can have different accuracy or stability. For a second derivative, use a stencil and boundary treatment designed for that operator rather than assuming matrix powers preserve the desired properties.
+
+Units remain a useful guardrail. If $f$ is measured in meters and $x$ in seconds, a first derivative must have units meters per second and a second derivative meters per second squared. Each first-derivative weight therefore carries inverse-time units. Missing a power of $h$ in a second-difference formula changes both convergence and dimensions, a mistake that a numerical spot check at one spacing may not reveal.
 
 | Formula | Approximation | Truncation order | Function values | Main risk |
 |---|---|---:|---:|---|
@@ -186,7 +338,9 @@ $$
 
 **Checked answer.** Richardson extrapolation reduces the error from about $1.67\times 10^{-3}$ to about $2.08\times 10^{-7}$ for this smooth example.
 
-## Code
+The improvement also matches the predicted orders. Halving $h$ reduces the centered error by about four, while cancelling that $h^2$ term leaves an $h^4$ error. Repeating the calculation at $h=0.05$ and $0.025$ gives another extrapolated value; agreement between the two extrapolated rows is stronger evidence than one impressive-looking number.
+
+## Step-halving code
 
 ```python
 import math
@@ -217,7 +371,7 @@ for row in richardson(vals, p=2):
 print(centered_second(math.exp, 0.0, 0.01), "exact", 1.0)
 ```
 
-## Common pitfalls
+## Failure patterns
 
 - Making $h$ extremely small and expecting a better derivative. Roundoff grows like a negative power of $h$.
 - Differentiating noisy data with high-order formulas. Differentiation amplifies high-frequency noise.
@@ -225,7 +379,7 @@ print(centered_second(math.exp, 0.0, 0.01), "exact", 1.0)
 - Forgetting that one-sided formulas are lower order unless specially designed.
 - Using a derivative estimate without checking sensitivity to several nearby step sizes.
 
-## Connections
+## Related pages
 
 - [mathematical preliminaries and error analysis](/math/numerical-analysis/mathematical-preliminaries-error-analysis)
 - [floating point conditioning and stability](/math/numerical-analysis/floating-point-conditioning-stability)

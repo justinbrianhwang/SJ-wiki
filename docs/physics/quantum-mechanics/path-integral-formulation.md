@@ -9,7 +9,7 @@ The path integral reformulates quantum mechanics as a sum over histories. Instea
 
 Sakurai sketches propagators, composition, and Feynman's formulation after Schrodinger dynamics and WKB. Ballentine introduces path integrals in coordinate-representation applications. The Gottfried-named notes discuss propagators and Feynman's formulation in the dynamics chapter. Schiff's classic book predates the modern path-integral-first style, so its closest connection is through propagators and semiclassical wave mechanics.
 
-## Definitions
+## From the propagator to histories
 
 The propagator is the position-space transition amplitude
 
@@ -56,9 +56,17 @@ $$
 x(t_a)=x_a,\qquad x(t_b)=x_b.
 $$
 
-## Key results
+## Time slicing and the short-time kernel
 
-The path integral is built by slicing time into many small intervals. For one short step,
+Write $T=t_b-t_a=N\epsilon$. For $H=P^2/(2m)+V(X)$, the Trotter product gives
+
+$$
+e^{-iH\epsilon/\hbar}
+=e^{-iP^2\epsilon/(2m\hbar)}e^{-iV(X)\epsilon/\hbar}
++O(\epsilon^2).
+$$
+
+Inserting a momentum identity between the factors and doing the Gaussian momentum integral gives the one-step kernel
 
 $$
 K(x_{j+1},t+\epsilon;x_j,t)
@@ -69,7 +77,17 @@ K(x_{j+1},t+\epsilon;x_j,t)
 -V(x_j)\right)\right].
 $$
 
-Multiplying short-time kernels and integrating over intermediate positions gives the formal measure $\mathcal D[x(t)]$.
+Multiplying the kernels and integrating over $x_1,\ldots,x_{N-1}$ gives
+
+$$
+K=\lim_{N\to\infty}
+\left({m\over2\pi i\hbar\epsilon}\right)^{N/2}
+\int\prod_{j=1}^{N-1}dx_j\,
+\exp\left[{i\epsilon\over\hbar}\sum_{j=0}^{N-1}
+\left({m\over2}{(x_{j+1}-x_j)^2\over\epsilon^2}-V(x_j)\right)\right].
+$$
+
+The symbols $\mathcal D[x(t)]$ abbreviate this regulated limit; they are not an ordinary translation-invariant measure on an infinite-dimensional space.
 
 For a free particle in one dimension, the exact propagator is
 
@@ -93,7 +111,7 @@ $$
 
 That is the conceptual bridge between WKB, classical mechanics, and Feynman's formulation. Sakurai emphasizes this physical meaning: classical motion emerges not because nonclassical paths are absent, but because their phases destructively interfere.
 
-## Visual
+## What interferes in the classical limit
 
 ```mermaid
 flowchart LR
@@ -111,7 +129,7 @@ flowchart LR
 | Path integral | histories with $e^{iS/\hbar}$ | semiclassical intuition, field theory | propagators, tunneling estimates |
 | WKB | local action phase | approximate spectra and tunneling | slowly varying potentials |
 
-## Worked example 1: Free-particle classical action
+## Worked example: free-particle action and kernel
 
 **Problem.** Find the classical action for a free particle moving from $x_a$ at $t=0$ to $x_b$ at time $t$.
 
@@ -150,7 +168,22 @@ $$
 
 **Checked answer.** This is exactly the phase in the free-particle propagator exponent, $e^{iS_{\mathrm{cl}}/\hbar}$.
 
-## Worked example 2: Propagator composition for a free particle
+The prefactor can be fixed without evaluating every sliced integral. Translation invariance and the quadratic action suggest
+
+$$
+K_0(x_b,T;x_a,0)=A(T)
+\exp\left[{im(x_b-x_a)^2\over2\hbar T}\right].
+$$
+
+Requiring the kernel to approach $\delta(x_b-x_a)$ as $T\to0^+$ fixes
+
+$$
+A(T)=\sqrt{m\over2\pi i\hbar T},
+$$
+
+with the square-root branch chosen continuously from positive time. Direct substitution verifies that $K_0$ satisfies the Schrödinger equation in its final coordinate.
+
+## Worked example: composition as a Gaussian integral
 
 **Problem.** Explain why the free propagator composition integrates over all intermediate positions.
 
@@ -189,23 +222,22 @@ $$
 
 **Checked answer.** The sum over paths is the repeated resolution of the identity in the position basis.
 
-## Code
+For free propagation, the integral can be evaluated explicitly. Let $T_1=t_c-t_a$ and $T_2=t_b-t_c$. The exponent is quadratic in $x_c$:
 
-```python
-import numpy as np
+$$
+{im\over2\hbar}
+\left[{(x_b-x_c)^2\over T_2}+{(x_c-x_a)^2\over T_1}\right].
+$$
 
-def free_kernel(xb, xa, t, m=1.0, hbar=1.0):
-    prefactor = np.sqrt(m / (2 * np.pi * 1j * hbar * t))
-    phase = np.exp(1j * m * (xb - xa) ** 2 / (2 * hbar * t))
-    return prefactor * phase
+Completing the square centers the intermediate point at
 
-xa, xb, t = 0.0, 1.0, 2.0
-k = free_kernel(xb, xa, t)
-print(k)
-print("magnitude:", abs(k))
-```
+$$
+\bar x_c={T_1x_b+T_2x_a\over T_1+T_2},
+$$
 
-## Common pitfalls
+the point reached by the classical straight path. The Gaussian integral combines the two prefactors into $\sqrt{m/[2\pi i\hbar(T_1+T_2)]}$ and leaves the phase $im(x_b-x_a)^2/[2\hbar(T_1+T_2)]$. Composition therefore reproduces the free kernel at the total time.
+
+## Where the formalism needs restraint
 
 - Thinking particles literally take every path as a classical trajectory. The path integral is an amplitude rule, not a collection of observed paths.
 - Forgetting that the measure $\mathcal D[x(t)]$ is formal in elementary presentations.
@@ -221,13 +253,13 @@ Stationary phase is the key semiclassical idea. When the action is large compare
 
 Real-time path integrals are oscillatory and mathematically delicate. Imaginary-time path integrals, obtained by a Wick rotation in suitable systems, replace $e^{iS/\hbar}$ with a decaying exponential weight resembling statistical mechanics. This is powerful for ground-state projection and quantum field theory, but it is not the same object as the real-time transition amplitude. Confusing the two can lead to wrong signs, wrong normalization, and wrong physical interpretation.
 
-Sakurai's brief treatment is enough to understand propagators and semiclassical intuition, while Ballentine's coordinate-representation path-integral discussion makes the connection to wave mechanics. In practice, path integrals become indispensable in field theory and many-body physics because they handle symmetries, perturbation expansions, and collective variables naturally. For elementary quantum mechanics, their main value is conceptual unity: amplitudes, action, propagators, and classical limits become one story.
+Path integrals become indispensable in field theory and many-body physics because they handle perturbation expansions and collective variables naturally. In elementary quantum mechanics they tie amplitudes, action, propagators, and the classical limit into one construction.
 
-A useful way to read the free-particle kernel is as three factors at once. The exponential contains the classical action and therefore the phase information. The prefactor carries normalization and spreading with time. The complex phase in the prefactor is needed for exact composition and unitarity, not just for aesthetics. Dropping the prefactor may be harmless for rough stationary-phase intuition, but it is not harmless when evolving a normalized wave packet.
+A useful way to read the free-particle kernel is to separate phase from normalization. The exponential contains the classical action. The prefactor carries normalization and spreading with time, and its complex phase is needed for exact composition and unitarity. Dropping it may be harmless for rough stationary-phase intuition, but it fails when evolving a normalized wave packet.
 
 Potential terms enter the sliced path integral through short-time approximations, so operator-ordering subtleties can appear when the Hamiltonian is more complicated than $P^2/2m+V(X)$. This is one reason operator methods remain important. A path-integral expression should be checked against the Hamiltonian it claims to represent. In simple Cartesian problems the correspondence is direct; in curved coordinates, constrained systems, or systems with gauge fields, the measure and phase require more care.
 
-Path integrals also clarify tunneling. In real time, tunneling is encoded in oscillatory amplitudes and analytic continuation. In imaginary time, classically forbidden motion can be described by instanton-like paths contributing exponentially small factors. This connects the WKB tunneling exponent with an action viewpoint. The elementary page does not require instanton machinery, but recognizing the connection helps explain why action integrals appear in both WKB and Feynman's formulation.
+Path integrals also clarify tunneling. In real time, tunneling is encoded in oscillatory amplitudes and analytic continuation. In imaginary time, classically forbidden motion can be described by instanton-like paths contributing exponentially small factors. The WKB tunneling exponent then has an action interpretation. Instanton machinery is unnecessary for the elementary construction, but the connection explains why action integrals appear in both WKB and Feynman's formulation.
 
 For ordinary homework problems, the path integral is often most useful as a check on propagators. Verify endpoint limits, composition, and the classical-action phase. If those three features are present, the expression is usually consistent with the operator evolution it represents.
 
@@ -235,7 +267,43 @@ If any one of those checks fails, return to the short-time kernel before trustin
 
 Normalization matters because amplitudes must compose consistently in time.
 
-## Connections
+## Quadratic actions and fluctuations around the classical path
+
+For a quadratic Lagrangian, write every path as the classical path plus a fluctuation that vanishes at both endpoints. The action separates into the classical action and a quadratic fluctuation term. The linear term vanishes because the classical path satisfies the Euler–Lagrange equation and the endpoint variation is zero.
+
+The fluctuation integral depends on the elapsed time and system parameters but not on the endpoint values. The entire endpoint-dependent phase is therefore the classical action. This explains why both the free-particle and harmonic-oscillator propagators have an exponential of the classical action multiplied by a determinant-like prefactor. For genuinely quadratic systems the stationary-phase result is exact, not merely an asymptotic approximation.
+
+For a nonquadratic potential, expanding around a stationary path generates cubic and higher fluctuation terms. Keeping only the quadratic term gives the semiclassical propagator. Its prefactor measures how nearby classical trajectories spread or focus. At caustics that prefactor needs careful phase tracking, an issue related to the turning-point phases found in WKB.
+
+There may be several classical paths between fixed endpoints. The semiclassical kernel then sums a contribution from each one. Their phases can interfere, so the classical limit need not mean that one path is selected. Optics provides a close analogy: several stationary optical paths can create interference even when the wavelength is short.
+
+## Imaginary time and ground-state projection
+
+Set real time equal to minus an imaginary interval. The oscillatory evolution operator becomes a decaying exponential of the Hamiltonian. Expanding an initial state in energy eigenstates shows that every excited component is suppressed relative to the ground state as the imaginary interval grows, provided the initial state has nonzero ground-state overlap.
+
+This gives a route to ground-state calculations. The imaginary-time kernel resembles a statistical-mechanical Boltzmann weight, with the Euclidean action replacing energy divided by temperature. The correspondence connects a quantum system in one spatial dimension to a classical statistical system with one additional Euclidean-time dimension.
+
+The rotation is more than a substitution in a final formula. Boundary conditions, convergence prescriptions, and analytic structure must permit the continuation. Returning to real time can be ill-conditioned because exponential data do not retain oscillatory phase information in a numerically stable way.
+
+Tunneling becomes geometrically clearer in Euclidean time. Motion through a classically forbidden region can correspond to a real stationary path of the Euclidean action. Its positive action supplies an exponentially small weight. The exponent agrees with the leading WKB barrier integral when both approximations apply.
+
+## Sources and correlation functions
+
+Adding an external source linearly coupled to the coordinate creates a generating functional. Differentiating it with respect to the source inserts coordinate factors into the path integral. Repeated derivatives produce time-ordered correlation functions. This bookkeeping device becomes central in field theory, where the coordinate is replaced by a field and correlations encode propagation and response.
+
+The time ordering appears automatically because the path integral represents the time-evolution operator split into ordered slices. Equal-time conventions can still matter, especially when momenta or derivative couplings are present. Operator derivations remain the safest reference for resolving such contact terms.
+
+Perturbation theory can also be organized by expanding the exponential of the interaction action around a solvable quadratic theory. Gaussian averages pair fields or coordinates, producing the same series as the interaction-picture Dyson expansion. Diagrammatic methods are compact records of those pairings rather than an additional dynamical postulate.
+
+## Coordinate choices and measures
+
+Cartesian coordinates with a standard kinetic term hide many measure issues. In polar or curved coordinates, the configuration-space volume element carries coordinate-dependent factors. A careless continuum symbol can miss those Jacobians or generate an incorrect quantum potential. Deriving the sliced measure from a known operator Hamiltonian avoids guessing.
+
+Gauge systems introduce redundancy: different paths in configuration space may represent the same physical history. Integrating over all redundant descriptions multiplies the result by an infinite gauge volume unless a gauge condition and its associated measure are supplied. Ordinary particle mechanics with an electromagnetic vector potential already hints at the issue through path-dependent phases, while full gauge fixing belongs to field theory.
+
+The path integral and canonical quantization are equivalent only after their domains, measures, ordering, and boundary conditions are matched. In simple one-dimensional Cartesian problems those choices are nearly invisible. Their reappearance in more complicated systems is a warning against treating the formal continuum notation as self-defining.
+
+## Related pages
 
 - [Quantum dynamics and pictures](/physics/quantum-mechanics/quantum-dynamics-pictures)
 - [One-dimensional Schrodinger systems](/physics/quantum-mechanics/one-dimensional-schrodinger-systems)

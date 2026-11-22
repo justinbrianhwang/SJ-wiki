@@ -9,7 +9,7 @@ The hydrogen atom is the central bound-state problem of nonrelativistic quantum 
 
 Sakurai treats hydrogen and hydrogenlike atoms after angular momentum and again in approximation methods through fine structure and Zeeman effects. Ballentine's bound-state chapter emphasizes estimates, variational reasoning, and perturbative corrections. The Gottfried-named notes use hydrogen as a perturbation-theory example. Schiff's traditional wave-mechanics approach is the classic separation into radial and angular equations.
 
-## Definitions
+## Separating a central-force problem
 
 A **central potential** depends only on radius:
 
@@ -45,11 +45,13 @@ $$
 \psi_{n\ell m}(r,\theta,\phi)=R_{n\ell}(r)Y_\ell^m(\theta,\phi).
 $$
 
-The Bohr radius is
+Using the reduced mass, the natural Coulomb length is
 
 $$
 a_0={4\pi\epsilon_0\hbar^2\over \mu e^2}.
 $$
+
+Strictly, the conventional Bohr radius uses the electron mass $m_e$; replacing it by $\mu$ gives the reduced-mass Bohr radius. The distinction is small for ordinary hydrogen but important in precision comparisons and large in muonic atoms.
 
 The principal quantum number is
 
@@ -65,18 +67,48 @@ $$
 m=-\ell,\ldots,\ell.
 $$
 
-## Key results
+Substitution of $\psi=R(r)Y_\ell^m(\theta,\phi)$ into the Schrödinger equation gives
 
-The bound-state energies are
+$$
+-{\hbar^2\over2\mu}
+\left[{1\over r^2}{d\over dr}\left(r^2{dR\over dr}\right)
+-{\ell(\ell+1)\over r^2}R\right]+V(r)R=ER.
+$$
+
+The first derivative is removed by defining $u(r)=rR(r)$. The normalization becomes $\int_0^\infty\vert u(r)\vert ^2dr=1$, and the equation becomes a one-dimensional problem on the half-line:
+
+$$
+-{\hbar^2\over2\mu}{d^2u\over dr^2}
++\left[V(r)+{\hbar^2\ell(\ell+1)\over2\mu r^2}\right]u=Eu.
+$$
+
+The second term in brackets is the centrifugal barrier. It is absent for $\ell=0$ and repels higher-$\ell$ probability from the origin. Regularity of $R=u/r$ requires $u(0)=0$ for the usual nonsingular solutions.
+
+## How the Coulomb spectrum is quantized
+
+For $E\lt 0$, write $\kappa=\sqrt{-2\mu E}/\hbar$ and $\rho=2\kappa r$. At large $r$, the radial equation gives $u\sim e^{-\kappa r}$; the growing exponential is not normalizable. Near the origin, the regular solution behaves as $u\sim r^{\ell+1}$. Factoring out both endpoint behaviors,
+
+$$
+u(\rho)=\rho^{\ell+1}e^{-\rho/2}v(\rho),
+$$
+
+leaves a confluent hypergeometric equation for $v$. Its generic solution grows exponentially and would undo the chosen decay. Normalizability therefore requires the power series for $v$ to terminate, making it an associated Laguerre polynomial. The termination condition is
+
+$$
+{1\over\kappa a_0}=n,
+\qquad n=n_r+\ell+1,
+$$
+
+where the radial quantum number $n_r=0,1,2,\ldots$ counts radial nodes. Substituting $\kappa=1/(na_0)$ gives
 
 $$
 E_n=-{\mu e^4\over 2(4\pi\epsilon_0)^2\hbar^2}{1\over n^2}
-=-{13.6\,\mathrm{eV}\over n^2}
+\simeq-{13.6\,\mathrm{eV}\over n^2}
 $$
 
 for hydrogen to the usual reduced-mass approximation.
 
-The energy depends only on $n$ in the nonrelativistic Coulomb problem. For a fixed $n$, the degeneracy counting without spin is
+The energy depends only on $n$ in the nonrelativistic Coulomb problem. Since $n_r=n-\ell-1$ cannot be negative, $\ell$ runs from $0$ to $n-1$. For a fixed $n$, the degeneracy without spin is
 
 $$
 \sum_{\ell=0}^{n-1}(2\ell+1)=n^2.
@@ -99,9 +131,9 @@ $$
 
 It is largest at $r=a_0$, even though the wave function itself is largest at $r=0$. This distinction between amplitude density and radial shell probability is a common conceptual test.
 
-Fine structure corrections include relativistic kinetic energy, spin-orbit coupling, and the Darwin term. Zeeman splitting in a weak magnetic field is governed by magnetic moments and angular momentum projections. Sakurai's treatment uses angular-momentum machinery; Schiff's older notation often presents these corrections in a more wave-equation-centered form.
+The $n$-only spectrum is more degenerate than rotational invariance alone requires. Rotations explain degeneracy in $m$ for fixed $\ell$, but they do not relate different $\ell$ values. The extra Coulomb degeneracy is associated with conservation of the quantum Runge–Lenz vector. Perturbations such as fine structure or an external field generally break part of that larger symmetry.
 
-## Visual
+## Reading the level scheme
 
 ```mermaid
 graph TD
@@ -121,7 +153,7 @@ graph TD
 | $s$ | $1/2$ for electron | intrinsic spin |
 | $j$ | $\ell\pm1/2$ | total electronic angular momentum |
 
-## Worked example 1: Most probable radius in the ground state
+## Worked example: most probable and mean ground-state radii
 
 **Problem.** Show that the most probable radius in the hydrogen ground state is $a_0$.
 
@@ -164,9 +196,27 @@ $$
 r=a_0.
 $$
 
-**Checked answer.** The amplitude is largest at the origin, but the radial probability includes the shell factor $4\pi r^2$.
+The expectation value answers a different question:
 
-## Worked example 2: Energy of a Lyman-alpha photon
+$$
+\begin{aligned}
+\langle r\rangle
+&=\int_0^\infty rP(r)\,dr\\
+&={4\over a_0^3}\int_0^\infty r^3e^{-2r/a_0}\,dr.
+\end{aligned}
+$$
+
+Using $\int_0^\infty r^ne^{-\alpha r}dr=n!/\alpha^{n+1}$,
+
+$$
+\langle r\rangle
+={4\over a_0^3}{3!\over(2/a_0)^4}
+={3a_0\over2}.
+$$
+
+The most probable radius is $a_0$, while the mean is $3a_0/2$. The long exponential tail pulls the mean outward.
+
+## Worked example: energy of a Lyman-$\alpha$ photon
 
 **Problem.** Find the photon energy for the transition $n=2\to n=1$ in hydrogen using the nonrelativistic formula.
 
@@ -206,22 +256,13 @@ $$
 
 **Checked answer.** This is ultraviolet light, consistent with the Lyman series.
 
-## Code
+## What changes outside the ideal Coulomb model
 
-```python
-import numpy as np
+The sequence of corrections matters. The Coulomb Hamiltonian with reduced mass sets the gross spectrum. Relativistic kinetic energy, spin–orbit coupling, and the Darwin term produce fine structure. Nuclear spin produces hyperfine structure. The Lamb shift comes from quantum electrodynamics and lies outside ordinary Schrödinger theory. Electric and magnetic fields add Stark and Zeeman terms. Each interaction preserves a different subset of the original quantum numbers.
 
-a0 = 1.0
-r = np.linspace(0, 8 * a0, 1000)
-radial_prob = 4 * r**2 / a0**3 * np.exp(-2 * r / a0)
-r_peak = r[np.argmax(radial_prob)]
+For a generic central potential, only rotational degeneracy is guaranteed. Energies are commonly labeled by $n_r$ and $\ell$, and different $\ell$ values need not coincide. The isotropic harmonic oscillator has its own enlarged degeneracy, but with a pattern different from the Coulomb problem.
 
-for n in [1, 2, 3, 4]:
-    print(n, -13.6 / n**2)
-print("peak radius in units of a0:", r_peak)
-```
-
-## Common pitfalls
+## Frequent sources of wrong answers
 
 - Confusing $R_{n\ell}(r)$, $\psi_{n\ell m}$, and radial probability density. The shell factor matters.
 - Forgetting reduced mass. Precision spectroscopy needs $\mu$, not exactly the electron mass.
@@ -231,11 +272,11 @@ print("peak radius in units of a0:", r_peak)
 - Calling $a_0$ the average radius. In the ground state, the most probable radius is $a_0$, while the expectation value is $3a_0/2$.
 - Applying nonrelativistic hydrogen energies to fine spectral details without corrections.
 
-Central-potential problems are a lesson in using symmetry before solving equations. Rotational invariance tells you that $L^2$ and $L_z$ commute with the Hamiltonian, so the angular dependence must be organized by spherical harmonics. The remaining problem is radial. This separation is not a computational trick; it is the mathematical expression of the fact that no direction in space is preferred by $V(r)$. Sakurai's route through angular momentum makes this structure explicit before the hydrogen formulas appear.
+Central-potential problems reward using symmetry before solving equations. Rotational invariance says that $L^2$ and $L_z$ commute with the Hamiltonian, so spherical harmonics organize the angular dependence and leave a radial equation. The separation expresses the absence of a preferred direction in $V(r)$.
 
-The Coulomb potential has an additional hidden symmetry, which is why the nonrelativistic energy depends only on $n$ rather than on $\ell$. That degeneracy is special. A generic central potential has energies depending on the radial quantum number and $\ell$. When fine structure, Lamb shift, hyperfine coupling, or external fields are included, the simple $n^2$ degeneracy is partially or fully lifted. Treat the $-13.6/n^2$ formula as the leading idealization, not the full story of real hydrogen spectroscopy.
+The Coulomb potential has an additional hidden symmetry, so the nonrelativistic energy depends only on $n$ rather than on $\ell$. That degeneracy is special. Fine structure, the Lamb shift, hyperfine coupling, and external fields partially or fully lift it. The $-13.6/n^2$ formula is the leading idealization for real hydrogen spectroscopy.
 
-Radial probability is another conceptual trap. The probability density in three dimensions is $\vert \psi(\mathbf r)\vert ^2$, but the probability for a radius interval includes the volume element $4\pi r^2dr$ for spherically symmetric states. This is why the ground-state wave function is largest at the origin while the most probable radius is $a_0$. Whenever a problem asks "where is the electron most likely to be found," check whether it means a point density or a radial shell probability.
+Radial probability is another conceptual trap. The probability density in three dimensions is $\vert \psi(\mathbf r)\vert ^2$, but the probability for a radius interval includes the volume element $4\pi r^2dr$ for spherically symmetric states. The ground-state wave function is largest at the origin while the most probable radius is $a_0$. When a problem asks where the electron is most likely to be found, check whether it means a point density or a radial shell probability.
 
 Hydrogen also functions as a meeting point for later approximation methods. The Stark effect uses degenerate perturbation theory in excited shells. The Zeeman effect uses angular momentum and magnetic moments. Variational estimates reproduce the ground energy when the trial family contains the exact exponential form. Scattering from Coulomb-like potentials requires special care because the potential is long-ranged. One atom therefore exercises nearly the whole nonrelativistic toolkit.
 
@@ -245,7 +286,35 @@ The radial equation is also a good place to practice dimensional reasoning. Leng
 
 For problem solving, start by identifying which labels remain good quantum numbers after each added interaction. Pure Coulomb hydrogen uses $n,\ell,m$ and spin separately. Spin-orbit coupling favors $j,m_j$. A magnetic field may make a projection quantum number central. Choosing labels before calculating keeps degeneracy splitting organized.
 
-## Connections
+## Radial nodes and the shape of orbitals
+
+The principal quantum number does not by itself describe spatial shape. The orbital label controls the centrifugal barrier and angular nodes, while the radial quantum number counts nodes away from the origin. Their relation says that the number of radial nodes is the principal label minus the orbital label minus one. A ground-state orbital has no node. A higher state with zero orbital angular momentum can pass through several sign changes in radius, while a state with larger orbital angular momentum may have fewer radial nodes but more angular structure.
+
+Nodes matter because probability vanishes there even though neighboring regions may carry substantial density. A node is also a phase boundary: the real radial wavefunction changes sign across a simple node. Probability density alone hides that sign, but interference and matrix elements retain it. Radial integrals can be small because positive and negative regions cancel, not because the wavefunctions barely overlap in magnitude.
+
+The centrifugal barrier gives regular radial solutions their near-origin behavior. For positive orbital angular momentum, the radial wavefunction vanishes as a power of radius. Only zero-orbital states have nonzero density at the origin. The Darwin correction and contact hyperfine interactions therefore affect those states especially strongly. This qualitative conclusion follows before any detailed integral is evaluated.
+
+The familiar orbital pictures are angular probability plots, often multiplied by an arbitrary radial surface. They should not be read as electron trajectories or hard boundaries. A stationary orbital is a complex probability amplitude; a measurement samples a position according to its density. Different real linear combinations within a degenerate subspace can produce differently oriented lobes without changing the energy.
+
+## Scaling and virial checks
+
+The Coulomb problem has a useful scale argument. Localizing a state to size $a$ gives kinetic energy of order $\hbar^2/(2\mu a^2)$ and potential energy of order $-e^2/(4\pi\epsilon_0 a)$. Minimizing their sum gives a length of the order of the reduced-mass Bohr radius and an energy of the order of the Rydberg scale. The estimate misses numerical details but explains why the characteristic size and binding energy have their particular dependence on mass, charge, and Planck's constant.
+
+For any bound eigenstate in an inverse-radius potential, the virial theorem gives twice the mean kinetic energy plus the mean potential energy equal to zero. Consequently the mean potential energy is twice the total energy and the mean kinetic energy is minus the total energy. These relations provide strong checks on expectation-value calculations. A proposed hydrogen ground state with negative mean kinetic energy or with the wrong ratio cannot be correct.
+
+The scaling also extends to hydrogenlike ions. Replacing the nuclear charge by $Z$ multiplies binding energies by $Z^2$ in the nonrelativistic point-nucleus model and contracts characteristic radii by $1/Z$. Reduced mass must still be used. At large nuclear charge, relativistic and finite-nuclear-size corrections grow and the simple scaling loses precision.
+
+## Spectral lines and selection rules
+
+An energy difference determines a possible photon frequency, but a nonzero transition matrix element determines whether the line appears strongly. In the electric-dipole approximation, the perturbation is proportional to the position operator. Its odd parity connects states of opposite orbital parity, and its vector character restricts changes of orbital angular momentum and projection. Energy conservation alone would predict many lines that are absent or extremely weak.
+
+Degenerate states require special care in external fields. The first excited Coulomb shell contains states with different orbital labels at the same unperturbed energy. An electric field can mix states within that shell at first order, so nondegenerate perturbation theory gives the wrong Stark effect. The perturbation must first be diagonalized inside the degenerate subspace.
+
+Magnetic fields expose a different hierarchy. When spin–orbit coupling dominates the field interaction, total electronic angular momentum remains the useful approximate label and the field splits its projections. In a much stronger field, orbital and spin projections can decouple and become the more useful labels. The crossover is a basis-change problem governed by competing energy scales.
+
+Real spectra also depend on nuclear motion. Using the reduced mass already shifts every gross-structure level relative to the infinite-mass result and creates isotope shifts. Nuclear size, nuclear spin, radiative effects, and relativistic dynamics add smaller corrections. Stating the Hamiltonian is therefore part of stating any quoted hydrogen energy.
+
+## Related pages
 
 - [Angular momentum algebra](/physics/quantum-mechanics/angular-momentum-algebra)
 - [Addition of angular momentum](/physics/quantum-mechanics/addition-of-angular-momentum)

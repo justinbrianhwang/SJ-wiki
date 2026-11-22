@@ -7,9 +7,9 @@ sidebar_position: 14
 
 Training a neural network is an optimization problem, but D2L is careful to separate optimization from generalization. Optimization asks how to reduce the training objective. Generalization asks whether the learned model works on new data. Deep learning needs both, and the optimizer often determines whether a reasonable architecture trains at all.
 
-The D2L optimization chapters move from gradient descent and convexity to stochastic gradients, minibatches, momentum, adaptive learning rates, and schedules. These methods are not just implementation variants. Each one makes a different tradeoff among gradient noise, curvature, memory, compute, and hyperparameter sensitivity. Understanding the update equations makes debugging training curves much easier.
+The D2L optimization chapters move from gradient descent and convexity to stochastic gradients, minibatches, momentum, adaptive learning rates, and schedules. These methods make different tradeoffs among gradient noise, curvature, memory, compute, and hyperparameter sensitivity. Understanding the update equations makes debugging training curves much easier.
 
-## Definitions
+## The update every optimizer starts from
 
 An **objective function** $f(\theta)$ maps parameters to a scalar value. In supervised learning, $f$ is usually empirical risk plus optional regularization.
 
@@ -53,9 +53,27 @@ $$
 
 A **learning-rate schedule** changes $\eta$ over time. Common schedules include step decay, exponential decay, cosine decay, warmup, and inverse square-root decay.
 
-## Key results
+## What a quadratic says about learning rate
 
 For smooth objectives, a learning rate that is too large can diverge even when the gradient direction is correct. A learning rate that is too small may make training appear stuck. The useful range depends on curvature, batch size, normalization, initialization, and optimizer choice.
+
+The one-dimensional quadratic $f(x)=ax^2/2$ gives an exact picture. Since $f'(x)=ax$, gradient descent produces
+
+$$
+x_{t+1}=x_t-\eta ax_t=(1-\eta a)x_t.
+$$
+
+Convergence requires the magnitude of the multiplier to be below one:
+
+$$
+|1-\eta a|<1
+\quad\Longleftrightarrow\quad
+0<\eta<\frac{2}{a}.
+$$
+
+When $0\lt \eta\lt 1/a$, the iterates approach zero from one side. Between $1/a$ and $2/a$, signs alternate but magnitude still shrinks. At $2/a$ the iterate oscillates forever; above it, the oscillations grow. The gradient continues to point uphill-to-downhill correctly throughout, but the finite step overshoots.
+
+In many dimensions with positive-definite Hessian $H$, each eigenvector behaves like a one-dimensional quadratic whose curvature is an eigenvalue. Stability is limited by the largest eigenvalue, while progress in the flattest direction is governed by the smallest. If these differ greatly, a stable rate for the steep direction advances slowly along the flat one. Feature scaling, normalization, and preconditioning attack that poor conditioning.
 
 Convexity provides clean guarantees, but deep networks are nonconvex. D2L still studies convexity because it gives language for local minima, saddle points, curvature, and the difference between optimization difficulty and model expressiveness.
 
@@ -89,7 +107,7 @@ Learning-rate schedules are often as important as the optimizer family. A high i
 
 Weight decay should be interpreted carefully with adaptive methods. Classical $L_2$ regularization adds $\lambda w$ to the gradient, after which an adaptive optimizer rescales it along with the loss gradient. Decoupled weight decay, used by optimizers such as AdamW, applies shrinkage separately from the adaptive gradient step. D2L's weight-decay treatment gives the mathematical penalty; modern optimizer APIs may expose both coupled and decoupled variants.
 
-Stochastic gradients also act as noise. That noise can help escape sharp or poor regions, but too much noise prevents convergence. Batch size, data order, augmentation, dropout, and distributed training all affect the noise scale. This is why training recipes specify the optimizer, batch size, schedule, and regularization together rather than independently.
+Stochastic gradients also act as noise. That noise can help escape sharp or poor regions, but too much noise prevents convergence. Batch size, data order, augmentation, dropout, and distributed training all affect the noise scale. Training recipes therefore specify the optimizer, batch size, schedule, and regularization together rather than independently.
 
 Training curves should be interpreted jointly. If training loss does not decrease, suspect optimization: learning rate, initialization, gradients, architecture, or data pipeline. If training loss decreases but validation loss worsens, suspect overfitting or distribution mismatch. If both losses are noisy, inspect batch size, label noise, and optimizer settings. Optimizers provide update rules, but diagnostics decide which rule or hyperparameter needs attention.
 
@@ -97,7 +115,33 @@ Gradient norms are a compact health signal. Norms near zero can indicate saturat
 
 The optimizer state should be treated as part of training. Resuming from a checkpoint with model weights but without momentum or Adam moments changes the next updates. For serious experiments, save model state, optimizer state, scheduler state, and epoch or step counters together.
 
-## Visual
+## How momentum changes the path
+
+Plain gradient descent responds only to the current slope. Momentum accumulates a moving average of recent gradients:
+
+$$
+v_t=\beta v_{t-1}+g_t,
+\qquad
+\theta_t=\theta_{t-1}-\eta v_t.
+$$
+
+Conventions differ: some definitions multiply the new gradient by $1-\beta$, while common SGD implementations do not. The effective learning-rate scale therefore depends on the convention. Equations and framework settings should be compared before transferring hyperparameters.
+
+Suppose gradients along one coordinate alternate $+1,-1,+1,-1$ because updates cross a narrow valley. Their contributions to velocity partially cancel. Along a coordinate with repeated gradient $+1$, velocity grows toward $1/(1-\beta)$ under the unnormalized convention. Momentum damps zigzagging and amplifies persistent direction. A high $\beta$ also means slow response when the useful direction changes.
+
+Nesterov momentum evaluates a gradient after looking ahead along the accumulated velocity. Its motivation is to correct the course before taking the full momentum step. Deep-learning libraries expose variants with slightly different update ordering, so exact reproducibility requires saving the optimizer implementation and version as well as the nominal coefficient.
+
+## Adaptive coordinate scaling
+
+AdaGrad stores the cumulative sum of squared gradients. A coordinate that has seen large or frequent gradients receives progressively smaller effective steps; a rare feature can retain a larger step. This suits some sparse problems, but the accumulator only grows, so learning may decay too far during long training.
+
+RMSProp replaces the cumulative sum with an exponential moving average. Old gradients fade, allowing the scale estimate to follow a changing objective. Adam adds a first-moment average and corrects the initial bias of both moment estimates. At early steps, moment buffers start at zero, so without bias correction they would be systematically too small.
+
+The denominator in an adaptive update is also a numerical and behavioral choice. Epsilon prevents division by zero, but placing it inside or outside the square root changes updates when second moments are tiny. Mixed-precision training usually keeps optimizer states or master weights in higher precision because small accumulated values can underflow.
+
+Adaptive scaling does not remove the global learning rate. It changes the relative scale among coordinates, while $\eta$ still controls the whole update. Adam can diverge or stall when its rate is unsuitable. Its convenience comes from often tolerating heterogeneous gradients, not from eliminating tuning.
+
+## The optimizer step in context
 
 ```mermaid
 flowchart TB
@@ -105,7 +149,7 @@ flowchart TB
   Forward --> Loss["Loss L_t, plus optional weight decay term"]
   Loss --> Grad["Backprop gradient g_t = grad_theta L_t"]
   Grad --> Clip{"Clip gradient norm?"}
-  Clip -->|"yes"| Gclip["Set g_t to min(1, theta_norm/||g_t||) * g_t"]
+  Clip -->|"yes"| Gclip["Set g_t to min(1, tau/||g_t||) * g_t"]
   Clip -->|"no"| Graw["Use raw g_t"]
   Gclip --> Route{"Optimizer state update"}
   Graw --> Route
@@ -145,7 +189,7 @@ flowchart TB
   Update -. "next minibatch uses updated theta" .-> Batch
 ```
 
-The optimizer diagram separates the raw gradient computation from optimizer state, learning-rate scheduling, and parameter updates. Momentum keeps a velocity state, while Adam keeps first and second moments and applies bias correction before the adaptive step. The schedule subgraph supplies `eta_t` to either branch, and the checkpoint node shows why optimizer and scheduler states are part of a reproducible training run.
+The diagram separates raw gradient computation from optimizer state, learning-rate scheduling, and parameter updates. Momentum keeps a velocity state, while Adam keeps first and second moments and applies bias correction before the adaptive step. The schedule supplies `eta_t` to either branch. Checkpointing after the update must preserve all these states.
 
 | Optimizer | Extra state | Strength | Main tuning concern |
 |---|---|---|---|
@@ -245,7 +289,17 @@ $$
 
 Checked answer: the first Adam step subtracts approximately $0.001$ from the parameter. Bias correction makes the first step behave like a normalized gradient step rather than a tiny moment estimate.
 
-## Code
+## Batch size, schedules, and update budget
+
+The full gradient averages all examples and is deterministic for fixed parameters and data. A minibatch gradient has sampling variance. Increasing batch size reduces that variance and often improves accelerator utilization until memory bandwidth, kernel shape, or device capacity becomes limiting. It also reduces the number of updates per epoch: with $n$ examples, batch size $B$ gives about $n/B$ steps. Comparing runs only by epochs can therefore give different optimizers very different update counts.
+
+Learning-rate scaling with batch size is a heuristic, not an identity. Linear scaling tries $k\eta$ when batch size grows by $k$, motivated by accumulating $k$ small-batch gradients into one update. Square-root scaling appears under other noise assumptions. Large jumps may need warmup because parameters and optimizer moments are poorly calibrated at the beginning. The proposed rate still needs validation with the actual model.
+
+A schedule states how the step scale changes. Step decay drops the rate at selected milestones. Cosine decay moves smoothly from a maximum toward a minimum. Exponential decay multiplies by a constant factor. Warmup precedes the main schedule and avoids an abrupt large update when activations, moments, or normalization statistics are unsettled. Schedulers may advance per optimizer step or per epoch; confusing those units can compress a year-long intended decay into one epoch.
+
+The training budget should be fixed when comparing methods: number of examples processed, optimizer steps, wall-clock time, or a stated compute budget. Equal epochs are reasonable when batches match. Equal wall time is relevant for deployment deadlines. Equal steps isolates update behavior but may expose methods to different amounts of data. No single budget answers every experiment.
+
+## Comparing two optimizers in code
 
 ```python
 import torch
@@ -281,7 +335,17 @@ print("SGD with momentum:", train("sgd"))
 print("Adam:", train("adam"))
 ```
 
-## Common pitfalls
+The code is a smoke test rather than evidence that one optimizer is generally better. Both receive the same nominal rate even though their useful ranges differ, and the function does not reset the random seed before each model initialization. A fair study would reuse identical initial weights and minibatch order, tune each optimizer on validation data under the same budget, repeat several seeds, and report uncertainty as well as final loss.
+
+## Reading training failures
+
+An optimizer should be debugged from measurements rather than swapped at random. Start with loss, learning rate, gradient norm, and update norm. The ratio $\lVert\Delta\theta\rVert/\lVert\theta\rVert$ gives a rough scale of how aggressively parameters move. A zero gradient may mean saturation, detached tensors, a masking error, or a genuinely flat region. A finite gradient followed by `NaN` parameters points toward an excessive step or low-precision overflow.
+
+Loss spikes can be isolated to a batch. Inspect its inputs, labels, sequence length, and gradient norm. One corrupted label or extreme feature can dominate a mean loss. If every batch is unstable, reduce the learning rate and verify normalization and loss reduction. Gradient clipping can protect recurrent or transformer training from rare explosions, but continuous clipping indicates that the underlying scale remains poorly controlled.
+
+Training and validation curves answer different questions. Flat high training loss suggests optimization trouble or under-capacity. Falling training loss with rising validation loss suggests overfitting or distribution mismatch. Both curves falling slowly may justify more training; both suddenly becoming non-finite suggests a numerical failure. Validation metrics should not drive the optimizer step directly unless the method explicitly uses them, but they determine checkpoint selection and schedule decisions.
+
+## Mistakes that distort comparisons
 
 - Treating the optimizer as a magic default instead of checking update scale and schedules.
 - Comparing optimizers with different effective learning-rate tuning effort.
@@ -289,11 +353,12 @@ print("Adam:", train("adam"))
 - Increasing batch size without reconsidering learning rate, warmup, and memory limits.
 - Ignoring gradient clipping in recurrent or very deep models with unstable gradients.
 - Reading training loss alone; optimization success still needs validation checks for generalization.
+- Stepping a scheduler at the wrong frequency or resuming it with a reset step counter.
+- Restoring model weights without momentum, moment buffers, gradient-scaler state, and random-number state when exact continuation matters.
 
-## Connections
+## Related pages
 
 - [Linear regression and training loops](/cs/deep-learning/linear-regression-training)
 - [Multilayer perceptrons and regularization](/cs/deep-learning/multilayer-perceptrons-regularization)
 - [Computational performance](/cs/deep-learning/computational-performance)
-- [Machine learning](/cs/machine-learning/)
-- [Calculus](/math/calculus/)
+- [Math for deep learning](/cs/deep-learning/math-for-deep-learning)

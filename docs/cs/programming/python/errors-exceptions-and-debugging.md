@@ -9,7 +9,7 @@ Errors are not a side topic in programming; they are how a running program tells
 
 The practical goal is not to prevent every error message. The goal is to make failures local, understandable, and recoverable when recovery is possible. Syntax errors must be fixed before the program runs. Exceptions may indicate invalid input, missing files, unavailable resources, or programmer mistakes. Debugging is the disciplined process of reducing the distance between observed behavior and intended behavior.
 
-## Definitions
+## Parse failures, runtime failures, and tracebacks
 
 A **syntax error** is invalid Python grammar. The interpreter cannot run the program until it is fixed:
 
@@ -42,7 +42,7 @@ raise ValueError("window must be positive")
 
 A **debugger** lets a programmer pause execution, inspect variables, step through code, and resume. Editors such as Spyder, VS Code, PyCharm, and Visual Studio provide integrated debuggers; Python also includes `pdb`.
 
-## Key results
+## Catch only what can be handled
 
 The first key result is that exception types matter. Catching bare `except:` hides too much, including programming mistakes and keyboard interrupts. Catch the narrow exception you expect:
 
@@ -69,7 +69,43 @@ An eighth result is that debugging benefits from narrowing. If a script fails af
 
 Finally, not every exception should be recovered from. A command-line tool may catch invalid user input and show a friendly message. A library function should often raise a clear exception and let the caller decide. A program that silently "recovers" from corrupt data may produce a wrong answer, which is worse than stopping with a useful traceback.
 
-## Visual
+Python exceptions form a class hierarchy. Catching `OSError` also catches subclasses such as `FileNotFoundError` and `PermissionError`; catching `Exception` covers most application failures but intentionally excludes control-flow exceptions such as `KeyboardInterrupt` and `SystemExit`, which inherit directly from `BaseException`. Ordering matters: put a specific handler before a broad parent handler or the specific one can never run.
+
+The exception object carries structured information in addition to its message. `OSError` instances may expose `filename` and `errno`; custom exceptions can store domain fields. Code should branch on exception type or documented attributes, not parse human-readable message text that may change across versions or locales.
+
+An `except` suite runs only for exceptions raised in its associated `try` suite. Exceptions raised inside the handler are new failures. The `else` suite is useful because it keeps successful follow-up code outside the protected region. If that follow-up fails, it is not mistaken for the narrow operation the handler was designed to recover from.
+
+## Raising, translating, and chaining exceptions
+
+Raise an exception at the point where an invariant is known to be violated. Use `ValueError` when an argument has the right general type but an unacceptable value, `TypeError` when an API explicitly checks an inappropriate type, and a domain-specific class when callers need to distinguish a business or protocol failure from built-in errors.
+
+```python
+class ConfigurationError(Exception):
+    """Configuration is present but invalid."""
+
+def positive_port(value: str) -> int:
+    try:
+        port = int(value)
+    except ValueError as exc:
+        raise ConfigurationError(f"invalid port {value!r}") from exc
+    if not 1 <= port <= 65535:
+        raise ConfigurationError(f"port out of range: {port}")
+    return port
+```
+
+`raise ... from exc` records explicit causality. The traceback shows the low-level conversion failure and the configuration-level meaning. A bare `raise` inside a handler re-raises the current exception with its original traceback, useful after logging or partial cleanup. `raise ... from None` suppresses display of an irrelevant implementation detail, but should be used sparingly because hidden causes make diagnosis harder.
+
+Custom exception hierarchies let a library offer one broad catch point and several precise ones. For example, `PackageError` can be the base for `ParseError` and `TransportError`. Callers that can retry transport failures catch the latter; callers that only need to add top-level context catch the base. Avoid defining a distinct class for every message when no caller will behave differently.
+
+## EAFP, validation, and race conditions
+
+Python code often follows “easier to ask forgiveness than permission”: attempt the operation and catch its expected failure. Looking before leaping can be clearer for cheap pure conditions, such as rejecting an empty list before division. For external state, checking first can be wrong because state changes between check and use. Testing whether a file exists and then opening it still permits deletion or permission changes in the gap. Opening directly and catching `FileNotFoundError` handles the actual operation.
+
+Exception handling should not wrap routine success paths at extremely fine granularity without reason, nor should it replace clear conditionals. Dictionary `.get()` is clearer when absence is normal and a default is valid. A `KeyError` handler is clearer when lookup and use form one atomic idea or when computing a default would be expensive. The expected frequency and meaning of failure guide the choice.
+
+Validation at an input boundary can improve messages, but repeating internal checks everywhere adds noise. Once a parser has converted and validated a record, downstream functions can rely on the documented type and invariants. Assertions can encode those internal assumptions during development. They cannot protect security, money, file integrity, or user input because optimized execution may remove them.
+
+## From failure to a useful diagnosis
 
 ```mermaid
 flowchart TD
@@ -93,6 +129,12 @@ flowchart TD
 | `IndexError` | Sequence index out of range | Check length or loop directly |
 | `FileNotFoundError` | Missing path | Show path, create file, or fail clearly |
 | `ZeroDivisionError` | Divisor is zero | Validate denominator |
+
+Read a traceback from the final line upward. The final line names the exception and message. The frames above show calls from outermost to innermost; the last frame in code you control is often the immediate failure site. That line may only reveal the symptom. If `total / count` fails because `count` is zero, inspect where `count` was produced and which assumption allowed an empty collection.
+
+Tracebacks preserve local line context but not every value. A debugger can stop on a raised exception before the stack unwinds. In `pdb`, `where` displays the stack, `up` and `down` move among frames, `p expression` evaluates an expression, `next` advances over a line, and `step` enters a call. `breakpoint()` invokes the configured debugger and is safer than scattering permanent prints through library code.
+
+Logging should add information once, at the layer that owns it. If every layer logs the same exception and re-raises, one failure becomes a page of duplicate messages. `logging.exception()` inside a handler includes the traceback. At a command boundary, it may be appropriate to log an operational error and return a nonzero exit status; inside a reusable library, raising with context is usually enough.
 
 ## Worked example 1: handle invalid numeric input
 
@@ -190,7 +232,7 @@ Check:
 
 Checked answer: `[20.0, 30.0]`.
 
-## Code
+## A recovery policy at the batch boundary
 
 ```python
 import logging
@@ -217,7 +259,17 @@ The snippet uses explicit validation, a narrow exception handler, and logging wi
 
 The loop is intentionally written so one bad dataset does not stop later datasets from being processed. That is a recovery policy, and it belongs at the level that owns the batch. The `safe_mean` function itself does not decide to skip anything; it raises a clear exception. This separation keeps the calculation honest and lets different callers choose different policies. A command-line report might skip bad input, while a test or scientific analysis might stop immediately.
 
-## Common pitfalls
+## A repeatable debugging loop
+
+Begin by making the failure deterministic. Save the exact input, random seed, environment, and command. State the expected result and observed result in concrete terms. “Sometimes wrong” is not yet a reproducible defect; “input X returns 14 instead of 15 on Python Y” is.
+
+Reduce the case without changing the behavior. Remove unrelated files, columns, requests, or function calls. A minimal reproducer reveals which assumptions are essential and is easier to turn into a regression test. When the failure appeared after a known-good revision, binary search over changes can find the first bad version much faster than reading every intervening diff.
+
+Form one hypothesis and choose an observation that can disprove it. If a moving window misses an item, inspect generated indices before rewriting the averaging code. If data become `None`, stop where the value first changes rather than adding guards at the final crash. Assertions, temporary logging, and conditional breakpoints are instruments for testing the hypothesis.
+
+Once fixed, write a test that fails for the original bug and passes for the correction. Then remove diagnostic noise that no longer serves operations. A fix without a regression test can disappear during a later refactor, especially when the erroneous edge case looked harmless.
+
+## Failure-handling mistakes
 
 - Catching every exception with bare `except:` and hiding real bugs.
 - Placing too much code inside `try`, making it unclear which operation failed.
@@ -226,8 +278,11 @@ The loop is intentionally written so one bad dataset does not stop later dataset
 - Ignoring tracebacks instead of reading the bottom exception type and relevant file line.
 - Debugging by changing many things at once. Change one hypothesis at a time.
 - Swallowing exceptions in libraries that should let callers decide how to handle failure.
+- Raising a replacement exception without chaining, which discards the low-level cause.
+- Retrying every failure, including invalid input that will never succeed unchanged.
+- Logging the same traceback at every layer before re-raising it.
 
-## Connections
+## Related pages
 
 - [Files and Context Managers](/cs/programming/python/files-and-context-managers)
 - [Control Flow and Comprehensions](/cs/programming/python/control-flow-and-comprehensions)

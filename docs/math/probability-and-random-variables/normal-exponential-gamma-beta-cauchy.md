@@ -7,13 +7,9 @@ sidebar_position: 9
 
 The continuous distributions in the middle of MIT 18.440 each encode a different mechanism. The normal law describes the accumulated effect of many small mostly independent influences. The exponential law describes memoryless waiting times. The gamma law describes sums of exponential waits. The beta law describes random probabilities and order-statistic shapes. The Cauchy law is a warning: a natural density may fail to have a finite mean or variance.
 
-These distributions are not just a catalog. Their formulas explain why later theorems need hypotheses. The central limit theorem uses finite variance; the law of large numbers needs finite mean; the Cauchy distribution violates these assumptions. The exponential and gamma laws connect continuous densities back to Poisson processes.
+Their formulas also mark the hypotheses needed later. The central limit theorem uses finite variance; the usual law of large numbers needs a finite mean; the Cauchy law violates both assumptions. Exponential and gamma laws connect densities to Poisson-process waiting times, while beta laws provide a natural calculus for unknown proportions.
 
-![Several normal density curves show changes in mean and variance.](https://commons.wikimedia.org/wiki/Special:FilePath/Normal_Distribution_PDF.svg)
-
-*Figure: Normal density functions with different means and variances. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Normal_Distribution_PDF.svg), Inductiveload, public domain.*
-
-## Definitions
+## Five families and their parameters
 
 A **standard normal** random variable has density
 
@@ -65,7 +61,7 @@ $$
 f(x)=\frac{1}{\pi(1+x^2)}.
 $$
 
-## Key results
+## Location, scale, and memorylessness
 
 If $Z$ is standard normal, then
 
@@ -119,9 +115,9 @@ $$
 
 which is beta$(h+1,t+1)$.
 
-The Cauchy distribution has no finite expectation. The positive and negative tails are too heavy for $\int \vert x\vert f(x)\,dx$ to converge. This is why one must not apply mean-based limit theorems blindly.
+The Cauchy distribution has no finite expectation. The positive and negative tails are too heavy for $\int \vert x\vert f(x)\,dx$ to converge, so mean-based limit theorems do not apply.
 
-The normal distribution is determined by location and scale. Translating changes the mean but not the shape; multiplying by a positive constant stretches the standard deviation by that constant and the variance by its square. This is why standardization is so useful: every normal probability can be reduced to a probability for the standard normal variable $Z$.
+The normal distribution is determined by location and scale. Translating changes the mean but not the shape; multiplying by a positive constant stretches the standard deviation by that constant and the variance by its square. Standardization therefore reduces every normal probability to one for the standard normal variable $Z$.
 
 The exponential distribution is the continuous analogue of the geometric distribution. Both are memoryless, and both describe waiting for the first success or event. The parameter conventions are different: geometric uses success probability per trial, while exponential uses rate per unit time. In a Poisson process with rate $\lambda$, the exponential mean $1/\lambda$ is the average waiting time between events.
 
@@ -131,7 +127,7 @@ The beta distribution is flexible on $[0,1]$. When $a=b=1$, it is uniform. When 
 
 The Cauchy distribution shows why formulas must include hypotheses. It has a symmetric bell-like density, but its tails decay like $1/x^2$, too slowly for $E[\vert X\vert ]$ to be finite. A sample average of independent Cauchy variables does not settle down according to the usual law of large numbers; in fact, the average has the same Cauchy distribution as each summand. This is not a contradiction, because the theorem's finite-mean assumption fails.
 
-## Visual
+## How the families relate
 
 | Distribution | Support | Main mechanism | Mean | Variance |
 |---|---|---|---:|---:|
@@ -155,7 +151,7 @@ The comparison table is meant to prevent formula memorization from replacing mod
 
 These families also interact. Exponential waiting times come from Poisson processes, gamma variables are sums of exponentials, normal variables are stable under independent addition, and beta variables arise from uniform order statistics and Bayesian updating for Bernoulli trials. The Cauchy law is deliberately different: it is stable under averaging in a way that breaks the usual mean-based intuition.
 
-## Worked example 1: a standardized normal probability
+## Worked example: a standardized normal probability
 
 Problem: Let $X$ be normal with mean $10$ and variance $4$. Express $P(8\le X\le 13)$ in terms of the standard normal CDF $\Phi$.
 
@@ -198,7 +194,7 @@ $$
 
 Checked answer: using approximate values $\Phi(1.5)\approx0.9332$ and $\Phi(-1)\approx0.1587$, the probability is about $0.7745$.
 
-## Worked example 2: competing exponential clocks
+## Worked example: competing exponential clocks
 
 Problem: Two independent clocks ring after exponential waiting times. Clock 1 has rate $\lambda_1=2$ per hour, and clock 2 has rate $\lambda_2=3$ per hour. Find the distribution of the first ringing time and the probability clock 1 rings first.
 
@@ -241,29 +237,172 @@ $$
 
 Checked answer: clock 1 has rate $2$ out of total rate $5$, so its chance of being first is $2/5$.
 
-## Code
+## Deriving the gamma moments
 
-```python
-from math import erf, sqrt, exp
+Parameter conventions cause more trouble for the gamma law than its calculus does. Here $\lambda$ is a **rate**, not a scale. Starting from
 
-def normal_cdf(x, mu=0.0, sigma=1.0):
-    z = (x - mu) / (sigma * sqrt(2))
-    return 0.5 * (1 + erf(z))
+$$
+f(x)=\frac{\lambda^\alpha}{\Gamma(\alpha)}x^{\alpha-1}e^{-\lambda x},
+$$
 
-prob = normal_cdf(13, 10, 2) - normal_cdf(8, 10, 2)
-print("P(8 <= X <= 13):", prob)
+the $k$th raw moment is
 
-lambda1, lambda2 = 2.0, 3.0
-print("first ringing rate:", lambda1 + lambda2)
-print("P(clock 1 first):", lambda1 / (lambda1 + lambda2))
+$$
+\begin{aligned}
+E[X^k]
+&=\frac{\lambda^\alpha}{\Gamma(\alpha)}
+\int_0^\infty x^{\alpha+k-1}e^{-\lambda x}\,dx\\
+&=\frac{\lambda^\alpha}{\Gamma(\alpha)}
+\frac{\Gamma(\alpha+k)}{\lambda^{\alpha+k}}\\
+&=\frac{\Gamma(\alpha+k)}{\Gamma(\alpha)\lambda^k}.
+\end{aligned}
+$$
 
-def exponential_survival(rate, t):
-    return exp(-rate * t)
+The substitution $u=\lambda x$ gives the second line. Since $\Gamma(\alpha+1)=\alpha\Gamma(\alpha)$,
 
-print("P(first ringing after 0.5 hours):", exponential_survival(5, 0.5))
-```
+$$
+E[X]=\frac\alpha\lambda,
+$$
 
-## Common pitfalls
+and
+
+$$
+\begin{aligned}
+E[X^2]&=\frac{\alpha(\alpha+1)}{\lambda^2},\\
+\operatorname{Var}(X)&=E[X^2]-E[X]^2=\frac\alpha{\lambda^2}.
+\end{aligned}
+$$
+
+Under the alternative scale parameter $\theta=1/\lambda$, the same quantities are written $E[X]=\alpha\theta$ and $\operatorname{Var}(X)=\alpha\theta^2$. Software documentation must be checked before passing the second parameter.
+
+## Beta normalization and Bernoulli updating
+
+The beta normalizing constant is the reciprocal of the beta integral
+
+$$
+B(a,b)=\int_0^1x^{a-1}(1-x)^{b-1}\,dx
+=\frac{\Gamma(a)\Gamma(b)}{\Gamma(a+b)}.
+$$
+
+Its mean follows from a ratio of beta integrals:
+
+$$
+E[X]=\frac{B(a+1,b)}{B(a,b)}=\frac{a}{a+b}.
+$$
+
+Likewise,
+
+$$
+E[X^2]=\frac{a(a+1)}{(a+b)(a+b+1)},
+$$
+
+which yields
+
+$$
+\operatorname{Var}(X)=\frac{ab}{(a+b)^2(a+b+1)}.
+$$
+
+For a beta$(a,b)$ prior on an unknown Bernoulli probability $p$, observing $h$ successes and $t$ failures multiplies the density by $p^h(1-p)^t$. The posterior is beta$(a+h,b+t)$. For example, beta$(2,2)$ followed by $7$ successes and $3$ failures produces beta$(9,5)$, with posterior mean
+
+$$
+\frac{9}{14}\approx0.643.
+$$
+
+The observed fraction is $0.7$, while the prior mean is $0.5$; the posterior mean lies between them. The parameters act like prior success and failure counts for the algebra, though interpreting them as literal earlier observations is optional.
+
+## Why the Cauchy mean is undefined
+
+Symmetry may tempt one to declare the Cauchy mean zero. The ordinary expectation exists only if at least one of the positive and negative parts has a finite integral; equivalently, absolute integrability is a sufficient condition used in elementary probability. For standard Cauchy,
+
+$$
+\int_0^R x\frac{1}{\pi(1+x^2)}\,dx
+=\frac{1}{2\pi}\log(1+R^2),
+$$
+
+which diverges as $R\to\infty$. The negative part diverges as well. A symmetric principal value equals zero, but it is not $E[X]$.
+
+The stability claim can be checked with characteristic functions. A standard Cauchy variable has $\varphi_X(t)=e^{-\vert t\vert }$. For independent copies,
+
+$$
+\varphi_{(X_1+\cdots+X_n)/n}(t)
+=\left[\varphi_X\left(\frac tn\right)\right]^n
+=\left[e^{-|t|/n}\right]^n
+=e^{-|t|}.
+$$
+
+Thus every sample mean has the same standard Cauchy distribution, however large $n$ becomes.
+
+## Worked example: time of the fourth event
+
+Events arrive according to a Poisson process at rate $3$ per hour. Let $T_4$ be the time of the fourth event. It is a sum of four independent exponential$(3)$ interarrival times, so
+
+$$
+T_4\sim\operatorname{Gamma}(\alpha=4,\lambda=3).
+$$
+
+Its mean and variance are
+
+$$
+E[T_4]=\frac43\text{ hours},\qquad
+\operatorname{Var}(T_4)=\frac49\text{ hours}^2.
+$$
+
+To find the probability that the fourth event arrives within one hour, use the equivalent count event. If $N(1)\sim\operatorname{Poisson}(3)$, then $T_4\le1$ exactly when $N(1)\ge4$:
+
+$$
+\begin{aligned}
+P(T_4\le1)
+&=1-P(N(1)\le3)\\
+&=1-e^{-3}\sum_{k=0}^3\frac{3^k}{k!}\\
+&=1-e^{-3}\left(1+3+\frac92+\frac{27}{6}\right)\\
+&=1-13e^{-3}\\
+&\approx0.3528.
+\end{aligned}
+$$
+
+This count/waiting-time equivalence often avoids integrating a gamma density.
+
+## Parameter and modeling traps
+
+### The normalizing constant of the Gaussian
+
+The factor $1/\sqrt{2\pi}$ comes from the Gaussian integral. Let
+
+$$
+I=\int_{-\infty}^{\infty}e^{-x^2/2}\,dx.
+$$
+
+Squaring and switching to polar coordinates gives
+
+$$
+\begin{aligned}
+I^2
+&=\int_{\mathbb R^2}e^{-(x^2+y^2)/2}\,dx\,dy\\
+&=\int_0^{2\pi}\int_0^\infty e^{-r^2/2}r\,dr\,d\theta\\
+&=2\pi\left[-e^{-r^2/2}\right]_0^\infty\\
+&=2\pi.
+\end{aligned}
+$$
+
+Since $I\gt 0$, $I=\sqrt{2\pi}$. The substitution $z=(x-\mu)/\sigma$ then supplies the additional $1/\sigma$ in a general normal density.
+
+Normal variables also have an exact closure property. If $X$ and $Y$ are independent normals, their MGFs multiply to
+
+$$
+\exp\left((\mu_X+\mu_Y)t+\frac{(\sigma_X^2+\sigma_Y^2)t^2}{2}\right),
+$$
+
+so $X+Y$ is normal with the summed mean and variance. The CLT concerns a different statement: sums of many nonnormal variables become approximately normal after centering and scaling.
+
+### Hazard rates distinguish waiting-time models
+
+For a nonnegative continuous lifetime with density $f$ and survival function $S(t)=P(X\gt t)$, the hazard rate is
+
+$$
+h(t)=\frac{f(t)}{S(t)}.
+$$
+
+An exponential variable has $h(t)=\lambda$, constant in age. A gamma lifetime with shape greater than one has an increasing hazard, reflecting several stages before failure or completion; with shape below one, its hazard decreases. Memorylessness and constant hazard are equivalent under ordinary regularity conditions. A mean waiting time alone cannot distinguish these models.
 
 - Forgetting the normalizing factor $1/(\sigma\sqrt{2\pi})$ in a normal density.
 - Confusing exponential rate $\lambda$ with mean $1/\lambda$.
@@ -271,7 +410,35 @@ print("P(first ringing after 0.5 hours):", exponential_survival(5, 0.5))
 - Assuming every familiar-looking density has a finite mean. The Cauchy density is the standard warning example.
 - Using a beta distribution outside $[0,1]$. It models proportions and probabilities, not arbitrary real-valued measurements.
 
-## Connections
+## Structural relationships
+
+Normal upper-tail probabilities should be computed with a survival function when the threshold is far above the mean. Subtracting a CDF extremely close to one can erase significant digits. Symmetry gives equal left and right tails at opposite cutoffs. The familiar “number of standard deviations” scale is meaningful only after the location and variance model has been justified; standardizing data does not make their distribution Gaussian.
+
+### Ratios explain beta and Cauchy laws
+
+Several families arise from simple transformations of independent variables. Let $G_1\sim\operatorname{Gamma}(a,1)$ and $G_2\sim\operatorname{Gamma}(b,1)$ be independent, and define
+
+$$
+R=\frac{G_1}{G_1+G_2},\qquad S=G_1+G_2.
+$$
+
+The inverse transformation is $g_1=rs$, $g_2=(1-r)s$, with absolute Jacobian $s$. The joint density becomes proportional to
+
+$$
+r^{a-1}(1-r)^{b-1}s^{a+b-1}e^{-s},
+$$
+
+on $0\lt r\lt 1$, $s\gt 0$. It factors into a beta$(a,b)$ density for $R$ and a gamma$(a+b,1)$ density for $S$. Hence $R$ and $S$ are independent. The result connects a random proportion to two competing positive totals.
+
+The Cauchy law also comes from a ratio. If $Z_1,Z_2$ are independent standard normals, then $Z_1/Z_2$ is standard Cauchy. Rotational symmetry gives a geometric explanation: the angle of $(Z_2,Z_1)$ is uniform, and the ratio is its tangent. The denominator can fall arbitrarily close to zero, producing the heavy tails.
+
+These representations help simulate the distributions, but they also clarify their shapes. Beta endpoint behavior corresponds to one gamma component being small relative to the other. Cauchy extremes come from division by a near-zero normal, not from unusually large numerators alone.
+
+### Parameter checks from dimensions
+
+Rates have units of inverse time; scales have units of time. If $X$ is exponential with rate $3$ per hour, $E[X]=1/3$ hour. Writing a mean of $3$ hours signals a rate/scale reversal. Gamma shape and beta parameters are dimensionless. A normal variance carries squared measurement units, while its standard deviation carries the original units. Dimensional checks cannot prove a formula, but they expose many parameter mistakes immediately.
+
+## Related pages
 
 - [Poisson random variables and Poisson processes](/math/probability-and-random-variables/poisson-random-variables-and-processes)
 - [Continuous random variables and uniform laws](/math/probability-and-random-variables/continuous-random-variables-and-uniform-laws)

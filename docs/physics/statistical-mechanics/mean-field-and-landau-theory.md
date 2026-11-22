@@ -9,13 +9,31 @@ Mean-field theory replaces a fluctuating environment by its average effect. It i
 
 Landau theory is powerful because it does not require microscopic spin variables. It writes the free energy as a symmetry-constrained expansion in an order parameter. The coefficients depend on temperature and other control variables, and the stable phase is found by minimizing the free energy.
 
-## Definitions
+## Replacing neighbors by an average field
 
 The Curie-Weiss mean-field equation for an Ising ferromagnet is
 
 $$
 m=\tanh[\beta(h+zJm)].
 $$
+
+For Ising spins $s_i=\pm1$ with interaction $-J\sum_{\langle ij\rangle}s_is_j$, write $s_i=m+\delta s_i$. Discarding the quadratic fluctuation term $\delta s_i\delta s_j$ gives
+
+$$
+s_is_j\simeq m(s_i+s_j)-m^2.
+$$
+
+Each site then sees an effective field $h_{\mathrm{eff}}=h+zJm$, where $z$ is the coordination number. A single spin in that field has average $\tanh(\beta h_{\mathrm{eff}})$, and self-consistency requires this average to equal the $m$ used in the decoupling. The approximation neglects connected correlations between neighboring fluctuations.
+
+Linearizing at $h=0$ gives $m\simeq\beta zJm$, so the mean-field critical temperature is $k_BT_c=zJ$. Expanding one order further,
+
+$$
+0=(1-\beta zJ)m+{1\over3}(\beta zJm)^3+\cdots,
+$$
+
+already displays the Landau equation of state near $T_c$.
+
+## Building the free energy from symmetry
 
 The Landau free-energy density for a scalar order parameter $m$ with $m\to -m$ symmetry is
 
@@ -47,7 +65,9 @@ F[m]=\int d^d x\left[
 \right].
 $$
 
-## Key results
+Analyticity and symmetry determine which powers appear, while stability constrains the highest retained even coefficient. The expansion is local in both $m$ and position. It may fail if the effective interaction is nonlocal or if integrating out another gapless variable generates nonanalytic terms.
+
+## Minima and mean-field exponents
 
 At $h=0$, the stationary equation is
 
@@ -100,9 +120,24 @@ $$
 
 The heat-capacity exponent is $\alpha_{\mathrm{MF}}=0$ because Landau theory gives a finite jump rather than a power-law divergence.
 
+The jump follows by evaluating the minimized free energy. Above $T_c$, $m=0$ and the singular contribution is zero. Below $T_c$, substitute $m_0^2=-at/b$:
+
+$$
+f_{\min}-f_0
+={a\over2}t\left(-{at\over b}\right)
++{b\over4}\left({a^2t^2\over b^2}\right)
+=-{a^2t^2\over4b}.
+$$
+
+Two temperature derivatives produce a finite constant below the transition and zero above within this truncated model. The regular background heat capacity remains present; Landau theory predicts the discontinuity in its singular part.
+
+The exponents obey the mean-field scaling relations $\alpha+2\beta+\gamma=2$ and $\gamma=\beta(\delta-1)$. These equalities are more robust than the individual mean-field values, although fluctuation effects change the values below the upper critical dimension.
+
+## Spatial variations and correlation length
+
 The Ginzburg criterion estimates where fluctuations invalidate mean-field theory. Roughly, mean-field theory is self-consistent when order-parameter fluctuations inside a correlation volume are small compared with the squared mean order parameter. This tends to be better in high dimensions and worse near $T_c$.
 
-Landau theory is a local analytic expansion, so it assumes that the order parameter is small and that no other soft modes have been omitted. This is why it works best near continuous transitions above the upper critical dimension or outside the narrow fluctuation-dominated region. It also explains why symmetry is the starting point: terms absent by symmetry cannot be generated in the free energy unless the symmetry is explicitly broken.
+Landau theory is a local analytic expansion, so it assumes that the order parameter is small and that no other soft modes have been omitted. It works best near continuous transitions above the upper critical dimension or outside the narrow fluctuation-dominated region. Symmetry is the starting point: forbidden terms cannot be generated in the free energy unless the symmetry is explicitly broken.
 
 The gradient term in Ginzburg-Landau theory penalizes rapid spatial variation. Linearizing about the disordered phase gives a Gaussian functional
 
@@ -140,27 +175,87 @@ $$
 
 then two minima can coexist while the order parameter jumps. If a symmetry forbids the cubic term but the quartic coefficient becomes negative, a stabilizing sixth-order term produces a first-order transition. Thus discontinuity is not an accident; it is encoded in the allowed structure of the free-energy expansion.
 
+For the symmetric sixth-order form
+
+$$
+f(m)={r\over2}m^2+{u\over4}m^4+{v\over6}m^6,
+\qquad u<0,\quad v>0,
+$$
+
+coexistence requires both stationarity at $m=m_*$ and equal free energy with the $m=0$ phase. Writing $x=m_*^2$, these conditions are
+
+$$
+r+ux+vx^2=0,
+$$
+
+and
+
+$$
+{r\over2}x+{u\over4}x^2+{v\over6}x^3=0.
+$$
+
+Eliminating $r$ gives $x=-3u/(4v)$, followed by
+
+$$
+r={3u^2\over16v}>0.
+$$
+
+The ordered minimum therefore becomes globally competitive while the quadratic coefficient is still positive, and $m$ jumps from zero to $\sqrt{-3u/(4v)}$. The point $r=u=0$ separating continuous and first-order lines is a mean-field tricritical point; its leading stabilizing nonlinearity is sixth order.
+
 The Curie-Weiss equation can be understood as a microscopic realization of Landau theory. Expanding
 
 $$
 m=\tanh[\beta(zJm+h)]
 $$
 
-for small $m$ and $h$ produces an equation of state with the same powers of $m$ as the Landau derivative $\partial f/\partial m=h$. The coefficient of $m$ changes sign at $T_c$, while the cubic term stabilizes the ordered solution. This is why mean-field spin models and phenomenological Landau expansions share the same critical exponents.
+for small $m$ and $h$ produces an equation of state with the same powers of $m$ as the Landau derivative $\partial f/\partial m=h$. The coefficient of $m$ changes sign at $T_c$, while the cubic term stabilizes the ordered solution. Mean-field spin models and phenomenological Landau expansions therefore share the same critical exponents.
 
 Ginzburg-Landau theory adds interfaces. For two coexisting minima, a domain wall is a spatial solution interpolating between them. The gradient term sets a wall width of order the correlation length, and the free-energy cost per area is the surface tension. This connects phase-transition theory with nucleation, magnetic domains, and pattern formation.
 
+For the scalar $m^4$ theory, balancing the gradient and quadratic terms gives $\xi\sim\sqrt{c/(a\vert t\vert )}$. A Gaussian estimate of fluctuations in a correlation volume leads to the dimensionless comparison
+
+$$
+{\langle(\delta m)^2\rangle_\xi\over m_0^2}
+\sim |t|^{(d-4)/2}
+$$
+
+up to coefficient-dependent factors. It grows as $t\to0$ for $d\lt 4$, identifying four as the upper critical dimension for short-range scalar $\phi^4$ theory. At $d\gt 4$, fluctuations become relatively less important near the transition; at $d=4$, logarithmic corrections require finer analysis.
+
 External fields round the zero-field singularity. In the Ising case, $h\ne 0$ explicitly favors one sign of $m$, so the order parameter no longer changes sign discontinuously at $T_c$. The critical isotherm $h\propto m^\delta$ is therefore measured by tuning temperature to $T_c$ and varying the field, not by crossing the transition at nonzero field.
+
+Below $T_c$, a small field leaves a local minimum opposed to the field. It is metastable until that minimum meets the intervening maximum at a spinodal. For the quartic model, the spinodal satisfies both
+
+$$
+h=at m+bm^3
+$$
+
+and
+
+$$
+{dh\over dm}=at+3bm^2=0.
+$$
+
+Thus $m_{\mathrm{sp}}^2=-at/(3b)$, and substitution gives the limiting field. A real finite-range system normally nucleates before reaching this mean-field spinodal, because a droplet of the stable phase can cross a finite barrier. The local-minimum picture is still useful for separating coexistence, metastability, and linear instability.
+
+Hysteresis obtained by following metastable minima is therefore protocol dependent, not an equilibrium equation of state. Equilibrium always selects the global minimum. Confusing those two constructions can turn a kinetic delay into a supposed thermodynamic phase boundary.
 
 Landau coefficients are phenomenological unless derived from a microscopic model. Their signs and temperature dependence carry physical content, but the expansion is not unique without specifying normalization of the order parameter.
 
-The normalization issue is harmless for exponents but important for amplitudes. Rescaling $m$ changes $a$, $b$, and $h$, while leaving predictions such as $\beta=1/2$ unchanged. This is why Landau theory is best at classifying qualitative behavior and exponent values, not at predicting precise material constants without microscopic input.
+Several distinct approximations are often grouped under the label ``mean field.'' The Curie--Weiss decoupling replaces neighboring spins by their mean. Landau theory assumes an analytic free energy organized by symmetry. Saddle-point evaluation of a field theory neglects fluctuations around a stationary configuration. They frequently lead to the same exponents, but their inputs and failure modes differ.
+
+Order-parameter dimension also matters. A scalar Ising order parameter has two disconnected minima below $T_c$. A vector order parameter with continuous rotational symmetry has a whole sphere of minima, producing transverse Goldstone modes when the symmetry is broken. The scalar formulas for susceptibility and domain walls cannot be copied unchanged into that case.
+
+Coupled order parameters can alter even the qualitative phase diagram. If two scalar orders $m$ and $\psi$ are both allowed, the lowest mixed term is often $g m^2\psi^2$. Positive $g$ makes the orders compete, while negative $g$ favors coexistence, subject to overall stability of the quartic form. Eliminating a secondary noncritical variable can renormalize the coefficients of the primary Landau expansion and may turn a continuous transition first order.
+
+Conservation laws do not change the static minimum but do change relaxation. A nonconserved magnetization can relax locally toward lower free energy; a conserved density must move through a current and relax diffusively. Static Landau theory alone therefore cannot assign a dynamic critical exponent. A time-dependent equation must state which variables are conserved and what noise is coupled to them.
+
+Boundary conditions matter for finite samples. A surface may favor one sign of the order parameter, suppress its magnitude, or impose a twist. Such terms shift finite-size behavior even when they disappear from the bulk free-energy density.
+
+The normalization issue is harmless for exponents but important for amplitudes. Rescaling $m$ changes $a$, $b$, and $h$, while leaving predictions such as $\beta=1/2$ unchanged. Landau theory is strongest at classifying qualitative behavior and exponent values; precise material constants require microscopic input.
 
 Despite its limits, Landau theory remains a useful first pass because it forces the analyst to identify the order parameter, symmetry, allowed couplings, and stability conditions. Those same ingredients are required before applying more sophisticated RG or numerical methods.
 
-In that sense, Landau theory is often the grammar of the problem even when it is not the final quantitative solution.
-
-## Visual
+Landau theory remains the grammar of many transition problems even when it is not the final quantitative solution.
 
 | Exponent | Definition | Mean-field value |
 |---|---:|---:|
@@ -275,36 +370,49 @@ $$
 
 Checked answer: the exponent is the same on both sides, but amplitudes differ.
 
-## Code
+## Worked example 3: a planar domain wall
 
-```python
-import numpy as np
+At $t\lt 0$ and $h=0$, consider a profile depending only on $x$ and joining the two minima. Varying the functional gives
 
-def landau_order_parameter(t, a=1.0, b=1.0):
-    if t >= 0:
-        return 0.0
-    return np.sqrt(-a * t / b)
+$$
+c{d^2m\over dx^2}=at\,m+bm^3.
+$$
 
-def landau_susceptibility(t, a=1.0):
-    if t > 0:
-        return 1.0 / (a * t)
-    if t < 0:
-        return 1.0 / (-2.0 * a * t)
-    return np.inf
+Set $m_0=\sqrt{-at/b}$ and try $m(x)=m_0\tanh(x/\ell)$. Its derivatives are
 
-for t in [0.2, 0.05, -0.05, -0.2]:
-    print(t, landau_order_parameter(t), landau_susceptibility(t))
-```
+$$
+m'= {m_0\over\ell}\operatorname{sech}^2(x/\ell),
+$$
 
-## Common pitfalls
+$$
+m''=-{2m_0\over\ell^2}\tanh(x/\ell)\operatorname{sech}^2(x/\ell).
+$$
 
-- Forgetting to include all symmetry-allowed terms. A cubic term is forbidden by $m\to -m$ symmetry but allowed in other transitions.
-- Assuming $b\gt 0$ automatically. If $b\lt 0$, a stabilizing sixth-order term changes the transition character.
-- Confusing the Landau exponent $\beta$ with inverse temperature $\beta=1/(k_BT)$.
-- Trusting mean-field exponents too close to the critical point in low-dimensional systems.
-- Minimizing the free energy without checking second derivatives and global stability.
+On the right-hand side,
 
-## Connections
+$$
+at\,m+bm^3
+=at\,m_0\tanh(x/\ell)\operatorname{sech}^2(x/\ell),
+$$
+
+because $bm_0^2=-at$. Matching coefficients gives
+
+$$
+\ell=\sqrt{2c\over-a t}=\sqrt2\,\xi_-.
+$$
+
+The wall broadens on approach to $T_c$. Substituting the solution back into the excess free energy gives a positive surface tension proportional to $c^{1/2}(-at)^{3/2}/b$, which vanishes as the two phases become indistinguishable.
+
+## Where the approximation fails
+
+- A term cannot be omitted merely because it complicates the minimum. A cubic invariant is forbidden by Ising symmetry but allowed for other order parameters and can change the transition order.
+- If $b\lt 0$, the quartic truncation is unbounded. A positive sixth-order term is then required, and coexistence must be found by comparing global minima.
+- The exponent $\beta$ and inverse temperature $\beta=1/(k_BT)$ share a symbol in standard notation; context must distinguish them.
+- Low-dimensional short-range systems have strong critical fluctuations. Mean-field exponents should not be fitted arbitrarily close to $T_c$ there.
+- Solving $df/dm=0$ finds stationary points, including maxima and metastable minima. Curvature and global free energy both need checking.
+- An incorrect order parameter or a missing conserved or gapless field cannot be repaired by retaining more powers of the same scalar $m$.
+
+## Related pages
 
 - [Phase transitions and order parameters](/physics/statistical-mechanics/phase-transitions-and-order-parameters)
 - [Magnetism, lattice gases, and binary alloys](/physics/statistical-mechanics/magnetism-lattice-gases-and-binary-alloys)

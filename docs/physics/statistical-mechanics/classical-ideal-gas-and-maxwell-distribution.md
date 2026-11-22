@@ -9,7 +9,7 @@ The classical ideal gas is the simplest nontrivial laboratory for statistical me
 
 Schwabl treats the ideal gas in both microcanonical and canonical language. The agreement between them is a concrete example of ensemble equivalence: the microcanonical shell count and the canonical Gaussian momentum integrals produce the same macroscopic thermodynamics when $N$ is large.
 
-## Definitions
+## Factorizing the classical partition function
 
 For $N$ identical classical particles of mass $m$ in volume $V$,
 
@@ -53,7 +53,17 @@ P(v)=4\pi v^2
 \qquad v\ge 0.
 $$
 
-## Key results
+The factor $V^N$ comes from integrating each position uniformly over the container. The momentum integral factors into $3N$ Gaussian integrals. Indistinguishability contributes $1/N!$, and the phase-space cell $h^{3N}$ makes the result dimensionless. The compact result
+
+$$
+Z_N={Z_1^N\over N!},
+\qquad
+Z_1={V\over\lambda_T^3},
+$$
+
+therefore combines free translation, Gaussian kinetic energy, and corrected counting of identical particles. Interactions would couple the position integrals; quantum degeneracy would invalidate the classical state counting.
+
+## Thermodynamics from $Z_N$
 
 The free energy follows from $F=-k_BT\ln Z_N$. Using Stirling's approximation,
 
@@ -100,6 +110,18 @@ $$
 
 Equipartition explains this result: every quadratic term in the Hamiltonian contributes $(1/2)k_BT$ to the mean energy. Each particle has three quadratic momentum components, hence $(3/2)k_BT$ per particle.
 
+The entropy formula above is the Sackur--Tetrode expression in the large-$N$ limit. It is extensive because $V/(N\lambda_T^3)$ depends on density rather than total volume. Without $N!$, the logarithm would contain $V/\lambda_T^3$ and mixing two samples of the same gas would spuriously increase the entropy. Stirling's omitted logarithmic corrections matter for very small $N$ but vanish relative to $N$ in the thermodynamic limit.
+
+There is also a mechanical route to the equation of state. A molecule with normal velocity component $v_x$ transfers momentum $2mv_x$ upon an elastic collision with a wall. Counting collisions and averaging over an isotropic distribution gives
+
+$$
+p={1\over3}nm\langle v^2\rangle,
+$$
+
+where $n=N/V$. Maxwell's distribution has $m\langle v^2\rangle=3k_BT$, hence $p=nk_BT$. The factor $1/3$ is geometric: the mean squared velocity is shared equally among the three Cartesian directions.
+
+## The Maxwell distribution and its moments
+
 The Maxwell distribution has several characteristic speeds:
 
 $$
@@ -109,6 +131,36 @@ v_{\mathrm{mp}}=\sqrt{2k_BT\over m},
 \qquad
 v_{\mathrm{rms}}=\sqrt{3k_BT\over m}.
 $$
+
+All speed moments can be evaluated at once. With $a=m/(2k_BT)$,
+
+$$
+\langle v^r\rangle
+=4\pi\left({a\over\pi}\right)^{3/2}
+\int_0^\infty v^{r+2}e^{-av^2}\,dv.
+$$
+
+Using the gamma-function integral gives
+
+$$
+\langle v^r\rangle
+={2\over\sqrt\pi}
+\Gamma\left({r+3\over2}\right)
+\left({2k_BT\over m}\right)^{r/2}.
+$$
+
+Setting $r=1$ and $2$ yields the mean and RMS speeds. Maximizing $P(v)$ gives the most probable speed: differentiating $\ln P=2\ln v-av^2+\text{constant}$ gives $2/v-2av=0$, or $v^2=1/a$. The three characteristic speeds answer different statistical questions and should not be interchanged.
+
+The distribution of kinetic energy $\varepsilon=mv^2/2$ follows by changing variables, $P_\varepsilon(\varepsilon)d\varepsilon=P(v)dv$:
+
+$$
+P_\varepsilon(\varepsilon)
+={2\over\sqrt\pi}{\sqrt\varepsilon\over(k_BT)^{3/2}}
+e^{-\varepsilon/(k_BT)},
+\qquad \varepsilon\ge0.
+$$
+
+Its square-root factor is the three-dimensional one-particle density of states. The Boltzmann exponential alone is therefore not the energy distribution.
 
 In a gravitational field, canonical weighting gives the barometric formula
 
@@ -143,17 +195,70 @@ $$
 
 When this fails, the $N!$ correction is not enough; Bose or Fermi occupation restrictions change the thermodynamics. Conversely, a very dilute gas with complicated molecules can still be nonideal in heat capacity because internal rotational and vibrational modes contribute to $z_{\mathrm{int}}$.
 
+## Gravity, effusion, and local equilibrium
+
 The barometric formula illustrates local equilibrium. Each height slice is assumed to have a Maxwellian velocity distribution at the same temperature, while density changes with potential energy. This separation between fast velocity equilibration and slow spatial variation reappears in the Boltzmann equation through the local Maxwell distribution.
 
+A related measurement samples a different distribution. Molecules escaping through a small hole are weighted by their speed toward the hole, because faster molecules strike it more often. An effusive beam therefore has a flux distribution proportional to $vP(v)$ rather than $P(v)$. Using an ordinary Maxwell speed distribution for such a beam underestimates its mean kinetic energy. The gas inside the vessel remains Maxwellian if the aperture is small enough that escape does not appreciably disturb equilibrium.
+
+For gravity, hydrostatic balance supplies an independent derivation. With mass density $mn(z)$,
+
+$$
+{dp\over dz}=-mgn,
+\qquad p=nk_BT.
+$$
+
+At constant temperature this becomes $d\ln n/dz=-mg/(k_BT)$ and integrates to the barometric law. If temperature varies with height, the simple exponential no longer follows; both $n(z)$ and $T(z)$ enter the pressure gradient.
+
+## Counting states and the classical limit
+
 The ideal gas also sets a baseline for interacting systems. Virial coefficients, transport coefficients, and phase-transition models are often stated as deviations from ideal behavior. When an equation of state is written as $pV=Nk_BT$ times a correction factor, the correction has meaning only because the ideal gas has already fixed the natural scale of pressure. Similarly, heat capacities of molecular gases are interpreted by asking which degrees of freedom have been added to the translational ideal-gas value.
+
+The chemical potential follows by differentiating the free energy at fixed $T,V$:
+
+$$
+\mu=\left({\partial F\over\partial N}\right)_{T,V}
+=k_BT\ln(n\lambda_T^3)
+$$
+
+in the classical large-$N$ limit. Since $n\lambda_T^3\ll1$, the ideal-gas chemical potential is negative relative to the chosen zero of single-particle energy. Adding a particle is entropically favorable because many translational states are available. Equality of chemical potentials, rather than equality of densities, controls diffusive equilibrium between regions or species.
+
+For two different ideal gases, removing a partition increases entropy because each species gains accessible volume. If the species are identical, the $N!$ counting cancels that apparent gain. The distinction is physical: a semipermeable membrane can sort distinct species but cannot sort molecules that differ only by an arbitrary label.
 
 Finally, the ideal gas is one of the best examples of ensemble equivalence. Microcanonical counting, canonical Gaussian integration, and grand-canonical Poisson statistics all produce the same thermodynamic equation of state in the macroscopic limit. Their fluctuations differ because their constraints differ, but the leading thermodynamic functions agree.
 
 It is also a model of what interactions do not affect. In an ideal gas, the internal energy is independent of volume because there is no potential energy. Therefore a free expansion at fixed internal energy leaves the temperature unchanged for a classical monatomic ideal gas. Real gases do not obey this exactly because intermolecular attractions and repulsions make internal energy depend on density. The contrast is a useful diagnostic when studying Joule expansion and virial corrections.
 
+For a quasistatic adiabatic change, the first law gives $dE=-p\,dV$. With $E=C_VT$ and $p=Nk_BT/V$,
+
+$$
+C_V{dT\over T}=-Nk_B{dV\over V}.
+$$
+
+For a monatomic gas $C_V=3Nk_B/2$, so integration gives $TV^{2/3}=\text{constant}$. Since $pV=Nk_BT$, this is equivalent to
+
+$$
+pV^{5/3}=\text{constant}.
+$$
+
+More generally $pV^\gamma$ is constant with $\gamma=C_P/C_V$, provided the heat capacities are effectively constant over the temperature range. For a monatomic ideal gas, $C_P=C_V+Nk_B=5Nk_B/2$ and $\gamma=5/3$. These relations concern a reversible adiabatic path; they do not describe a free expansion, which is irreversible even though no heat enters.
+
+The same ratio controls the adiabatic sound speed,
+
+$$
+c_s=\sqrt{\gamma p\over\rho}
+=\sqrt{\gamma k_BT\over m}.
+$$
+
+It is comparable to the thermal molecular speed but not equal to any one of $v_{\mathrm{mp}}$, $\langle v\rangle$, or $v_{\mathrm{rms}}$. Sound is a collective pressure disturbance whose coefficient depends on the thermodynamic constraint during compression.
+
 The Maxwell distribution should be interpreted component by component and speed by speed. Each Cartesian component is Gaussian with variance $k_BT/m$, while the speed has a skewed distribution because many velocity vectors share the same magnitude.
 
-## Visual
+The center-of-mass constraint supplies a small finite-system correction. If the total momentum is fixed at zero, only $3N-3$ independent quadratic momentum coordinates remain rather than $3N$. The mean kinetic energy is then $3(N-1)k_BT/2$. Ordinary canonical formulas allow the center of mass to move and recover $3Nk_BT/2$; the difference is negligible per particle at large $N$ but matters when comparing small simulations with different momentum constraints.
+
+Mixtures retain a Maxwell distribution for each species at the common temperature. A heavier species has a narrower component distribution and smaller characteristic speed, since all species share mean translational energy rather than mean speed. Collisions exchange momentum and energy until the temperature agrees; they do not force molecular speeds to agree. This distinction is useful when interpreting diffusion, effusion, or time-of-flight measurements in mixed gases.
+
+The ideal model assumes equilibrium, not merely the absence of interactions. A collisionless collection can keep a non-Maxwellian velocity distribution indefinitely. Even weak interactions are dynamically important because they redistribute energy among directions and species. Statistical equilibrium supplies the Maxwell form after thermalization; the ideal Hamiltonian then supplies the thermodynamics once that state has been reached.
 
 | Result | Formula | Comment |
 |---|---:|---|
@@ -264,7 +369,39 @@ $$
 
 Checked answer: the ordering $v_{\mathrm{mp}}\lt \langle v\rangle\lt v_{\mathrm{rms}}$ is required by the right-skewed speed distribution.
 
-## Code
+## Worked example 3: atmospheric scale height
+
+For an isothermal dilute gas, define the scale height
+
+$$
+H={k_BT\over mg},
+$$
+
+so $n(z)=n(0)e^{-z/H}$. For nitrogen near $T=300\,\mathrm K$, using $m=4.65\times10^{-26}\,\mathrm{kg}$ and $g=9.81\,\mathrm{m/s^2}$ gives
+
+$$
+H={4.141947\times10^{-21}\,\mathrm J
+\over(4.65\times10^{-26}\,\mathrm{kg})(9.81\,\mathrm{m/s^2})}
+\approx9.08\times10^3\,\mathrm m.
+$$
+
+At one scale height, the density ratio is
+
+$$
+{n(H)\over n(0)}=e^{-1}\approx0.368.
+$$
+
+At $z=5.0\,\mathrm{km}$,
+
+$$
+{n(z)\over n(0)}
+=\exp\left(-{5000\over9080}\right)
+\approx0.576.
+$$
+
+The numerical value is only an isothermal estimate for the real atmosphere, where temperature, composition, and gravity vary. The calculation does show how molecular mass enters: at a common temperature, a heavier species has a smaller scale height and its concentration decreases more rapidly with altitude.
+
+## Numerical check of the speed moments
 
 ```python
 import numpy as np
@@ -283,18 +420,19 @@ print("rms speed", np.sqrt(np.trapz(v**2 * P, v)))
 print("most probable grid speed", v[np.argmax(P)])
 ```
 
-## Common pitfalls
+## Diagnostic checks
 
-- Forgetting the $4\pi v^2$ factor when moving from velocity density to speed density.
-- Treating the Maxwell distribution as valid for dense or strongly interacting gases without corrections.
-- Dropping $N!$ in $Z_N$ and producing nonextensive entropy.
-- Applying classical equipartition to frozen rotational, vibrational, or electronic modes at low temperature.
-- Confusing $\lambda_T$ with a literal molecular size. It is a quantum length scale controlling the validity of the classical approximation.
+- The vector density $f(\mathbf v)$ and speed density $P(v)$ have different measures. The latter needs the spherical-shell factor $4\pi v^2$.
+- Maxwell statistics assume a dilute, equilibrated classical gas. Dense fluids require correlations; degenerate gases require Bose or Fermi statistics.
+- Omitting $N!$ produces a nonextensive entropy and an artificial entropy of mixing for identical gases.
+- Translational equipartition can hold while rotational or vibrational modes remain quantum mechanically frozen. Molecular heat capacity must be assessed mode by mode.
+- The thermal wavelength is a quantum overlap scale, not a molecular diameter. Interaction diluteness and quantum nondegeneracy are separate conditions.
+- A velocity-selected or flux-selected sample is not distributed like molecules chosen uniformly from the volume. Effusion is the standard counterexample.
 
-## Connections
+## Related pages
 
 - [Canonical ensemble and fluctuations](/physics/statistical-mechanics/canonical-ensemble-and-fluctuations)
 - [Microcanonical ensemble and entropy](/physics/statistical-mechanics/microcanonical-ensemble-and-entropy)
 - [Molecular gases, mixtures, and solutions](/physics/statistical-mechanics/molecular-gases-mixtures-and-solutions)
 - [Boltzmann equation and transport](/physics/statistical-mechanics/boltzmann-equation-and-transport)
-- [Thermodynamics](/physics/thermodynamics/)
+- [Thermodynamics](/physics/thermodynamics/intro)

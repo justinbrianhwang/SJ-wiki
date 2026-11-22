@@ -9,11 +9,7 @@ Linear regression models the mean of a quantitative response as a linear functio
 
 A regression line is not merely a line drawn through a scatterplot by eye. It is the line that minimizes the sum of squared residuals. That least-squares criterion gives precise formulas, but the model must still be checked. Outliers, curvature, nonconstant variance, dependence, and extrapolation can make a technically correct line misleading.
 
-![A scatterplot has a red least-squares regression line fitted through the data.](https://commons.wikimedia.org/wiki/Special:FilePath/Linear_regression.svg)
-
-*Figure: Linear regression line fitted to random data points. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Linear_regression.svg), Sewaqu, public domain.*
-
-## Definitions
+## The line chosen by squared error
 
 The **simple linear regression model** is
 
@@ -67,7 +63,47 @@ $$
 
 In simple regression with an intercept, $R^2=r^2$.
 
-## Key results
+## Deriving the least-squares coefficients
+
+Write
+
+$$
+Q(b_0,b_1)=\sum_{i=1}^n(y_i-b_0-b_1x_i)^2.
+$$
+
+Setting both partial derivatives to zero gives the normal equations
+
+$$
+\sum(y_i-b_0-b_1x_i)=0,
+$$
+
+$$
+\sum x_i(y_i-b_0-b_1x_i)=0.
+$$
+
+The first says the residuals sum to zero and gives $b_0=\bar y-b_1\bar x$. Substitution into the second yields
+
+$$
+b_1=\frac{S_{xy}}{S_{xx}},
+\qquad
+S_{xy}=\sum(x_i-\bar x)(y_i-\bar y),
+\qquad
+S_{xx}=\sum(x_i-\bar x)^2.
+$$
+
+Because the fitted line contains $(\bar x,\bar y)$, centering the predictor changes the intercept but not the slope or fitted values. Replacing $x$ by $x-\bar x$ makes the intercept equal to the fitted response at the observed mean, often a far more interpretable quantity than the response at $x=0$.
+
+The least-squares residuals are orthogonal to both the constant vector and the predictor vector:
+
+$$
+\sum e_i=0,
+\qquad
+\sum x_ie_i=0.
+$$
+
+These identities explain the variation decomposition $SST=SSR+SSE$ for a model with an intercept. They are algebraic properties of the fit, not evidence that the model assumptions hold.
+
+## Uncertainty around the slope and predictions
 
 Inference for the slope commonly tests
 
@@ -95,7 +131,45 @@ $$
 
 It measures typical vertical scatter around the fitted line in response units.
 
+In simple regression,
+
+$$
+SE(b_1)=\frac{s_e}{\sqrt{S_{xx}}}.
+$$
+
+Slope precision improves when residual scatter is smaller, when there are more observations, and when predictor values cover a wider range. Replicating many observations near $\bar x$ estimates the local mean well but adds little information about slope compared with observations spread across the relevant predictor range.
+
+At $x_0$, the fitted mean has standard error
+
+$$
+SE_{\text{mean}}(x_0)=s_e
+\sqrt{\frac1n+\frac{(x_0-\bar x)^2}{S_{xx}}}.
+$$
+
+For a new individual response, the standard error is
+
+$$
+SE_{\text{pred}}(x_0)=s_e
+\sqrt{1+\frac1n+\frac{(x_0-\bar x)^2}{S_{xx}}}.
+$$
+
+The extra 1 represents irreducible individual error. Both intervals widen away from $\bar x$, even within the data range, because the line is less precisely located at its ends.
+
 Regression assumptions for classical inference include linear mean structure, independent errors, constant error variance, and approximately normal errors for small-sample p-values and intervals. The predictor values need not be normally distributed. Residual plots are central: plot residuals against fitted values and predictors to check curvature and changing spread; use Q-Q plots to assess normality; inspect leverage and influence.
+
+## Diagnostics answer different questions
+
+A curved residual pattern challenges the linear mean model. A funnel shape challenges constant variance. Long runs of residuals with the same sign in collection order suggest dependence. A Q--Q plot mainly addresses tail behavior and the small-sample calibration of tests; it does not diagnose linearity or independence.
+
+Leverage in simple regression is
+
+$$
+h_{ii}=\frac1n+\frac{(x_i-\bar x)^2}{S_{xx}}.
+$$
+
+It depends only on predictor location. Studentized residuals scale vertical discrepancy, while Cook's distance combines discrepancy and leverage to estimate influence on the fitted coefficients. No universal cutoff replaces looking at the observation, checking data provenance, and fitting a sensitivity analysis.
+
+Nonconstant variance does not necessarily bias the least-squares line when the conditional mean is correctly specified, but it makes the usual standard errors wrong. Heteroscedasticity-consistent standard errors can repair inference for coefficients under suitable independence conditions. They do not repair curvature, omitted variables, or extrapolation.
 
 A **confidence interval for the mean response** at a given $x_0$ estimates the average $Y$ among cases with that predictor value. A **prediction interval** estimates a new individual response at $x_0$. Prediction intervals are wider because they include both uncertainty in the mean and individual-level noise.
 
@@ -109,7 +183,29 @@ Influence diagnostics ask whether one or a few observations are driving the fitt
 
 Good regression reporting includes the fitted equation, units, uncertainty for key coefficients, residual diagnostics, and the observed predictor range.
 
-## Visual
+With several predictors, coefficients are conditional on the other columns in the model. Strong collinearity can make individual coefficient estimates unstable even when overall predictions are adequate. Interactions change the meaning further: in a model containing $x$, group, and $x\times$group, the coefficient of $x$ is the slope in the reference group, not an average slope shared by all groups.
+
+## Omitted variables and transformations
+
+If an omitted variable affects $Y$ and is associated with an included predictor, the fitted slope can absorb part of its effect. The direction of bias depends on both associations; adding any available covariate does not automatically help. A mediator can remove part of the effect one intended to estimate, while a collider can create an association that was absent. Model specification therefore starts from the design and causal question, not from stepwise p-values.
+
+Transformations change coefficient interpretation. In
+
+$$
+\log Y=\beta_0+\beta_1x+\varepsilon,
+$$
+
+a one-unit increase in $x$ multiplies the conditional geometric mean by $e^{\beta_1}$ under the log-scale model. For small $\beta_1$, $100\beta_1$ is an approximate percent change, while $100(e^{\beta_1}-1)$ is the exact model-based percentage. Transforming fitted log means back with an exponential does not generally recover the arithmetic mean of $Y$ because $E(e^Z)\ne e^{E(Z)}$.
+
+A polynomial term such as $x^2$ can represent smooth curvature while remaining linear in coefficients. The coefficient of $x$ alone is then not a constant slope; the derivative of the fitted mean is $\beta_1+2\beta_2x$. Centering $x$ before squaring often improves interpretation and reduces avoidable collinearity between $x$ and $x^2$.
+
+## Validation is distinct from fitting
+
+$R^2$ never decreases when another predictor is added to the training data, even if that predictor is noise. Adjusted $R^2$ adds a complexity penalty, but prediction claims are better checked on held-out data or by cross-validation. All preprocessing and variable selection must occur inside each training fold; performing them once on the full data leaks information into validation.
+
+Prediction error on new cases includes model misspecification, coefficient uncertainty, and irreducible noise. A narrow textbook prediction interval assumes the future case follows the same model and population as the training cases. Distribution shift, new measurement procedures, or a different predictor range can invalidate it without altering the original residual diagnostics.
+
+## Fit, diagnose, then interpret
 
 ```mermaid
 flowchart TD
@@ -164,40 +260,40 @@ $$
 3. Compute
 
 $$
-S_{xx}=\sum(x_i-\bar{x})^2=35.5.
+S_{xx}=\sum(x_i-\bar{x})^2=37.5.
 $$
 
 4. Slope:
 
 $$
-b_1=\frac{127.5}{35.5}=3.5915.
+b_1=\frac{127.5}{37.5}=3.4.
 $$
 
 5. Intercept:
 
 $$
-b_0=\bar{y}-b_1\bar{x}=79.5-3.5915(5.5).
+b_0=\bar{y}-b_1\bar{x}=79.5-3.4(5.5).
 $$
 
 6. Calculate:
 
 $$
-b_0=79.5-19.753=59.747.
+b_0=79.5-18.7=60.8.
 $$
 
 7. Fitted line:
 
 $$
-\hat{y}=59.747+3.592x.
+\hat{y}=60.8+3.4x.
 $$
 
 8. Predict at $x=7$:
 
 $$
-\hat{y}=59.747+3.592(7)=59.747+25.144=84.891.
+\hat{y}=60.8+3.4(7)=60.8+23.8=84.6.
 $$
 
-Answer: The fitted line is approximately $\hat{y}=59.75+3.59x$. For 7 study hours, the predicted exam score is about 84.9.
+Answer: The fitted line is $\hat{y}=60.8+3.4x$. For 7 study hours, the predicted exam score is 84.6.
 
 Checked answer: The slope is positive, matching the scatterplot. The prediction at 7 hours lies between the observed scores for 6 and 8 hours, which is reasonable.
 
@@ -248,7 +344,9 @@ Answer: There is statistically significant evidence of a nonzero linear slope. T
 
 Checked answer: The interval does not include 0, agreeing with the two-sided test at $\alpha=0.05$. The conclusion is about association and prediction unless the data came from a design supporting causation.
 
-## Code
+The same fitted slope may be useful for prediction while remaining poor evidence about intervention. If temperature is correlated with season, occupancy, or tariff changes, the slope absorbs those associations unless the model and design separate them.
+
+## Fit and prediction intervals in code
 
 ```python
 import pandas as pd
@@ -270,7 +368,7 @@ print(prediction.summary_frame(alpha=0.05))
 
 The summary includes slope, intercept, standard errors, p-values, and $R^2$. The prediction frame includes both a confidence interval for the mean score at 7 hours and a prediction interval for an individual student.
 
-## Common pitfalls
+## Misuses that survive a good-looking line
 
 - Interpreting the intercept when $x=0$ is outside the observed range or meaningless.
 - Treating correlation and regression slope as the same quantity.
@@ -279,7 +377,7 @@ The summary includes slope, intercept, standard errors, p-values, and $R^2$. The
 - Reading a statistically significant slope as proof of causation.
 - Confusing confidence intervals for the mean response with prediction intervals for individuals.
 
-## Connections
+## Related pages
 
 - [Bivariate data and correlation](/math/statistics/bivariate-data-and-correlation)
 - [Summarizing distributions](/math/statistics/summarizing-distributions)

@@ -5,184 +5,254 @@ sidebar_position: 7
 
 # Neural Networks for NLP
 
-Feedforward neural networks extend linear models by learning hidden representations. Jurafsky and Martin use them to connect logistic regression, embeddings, softmax classification, and neural language modeling. Eisenstein gives a machine-learning-oriented account of nonlinear classification, activation functions, lookup layers, backpropagation, regularization, dropout, and design choices.
+A feedforward network adds one important capability to a linear text classifier: it can learn intermediate features rather than requiring every useful conjunction to be named in advance. The output may still be an ordinary softmax classifier, but it now operates on a representation produced jointly with the classifier.
 
-For NLP, the critical shift is from hand-built sparse features to learned dense features. A word can be mapped through an embedding lookup, combined with nearby words or pooled over a document, transformed by hidden layers, and finally converted to a probability distribution with softmax. This architecture is the ancestor of RNNs, encoder-decoders, and transformers.
+The gain is easy to overstate. Averaging word embeddings and passing the result through a multilayer perceptron still discards word order. A hidden layer does not recover information already erased by the input representation. Neural models help when their input and architecture preserve the distinctions the task needs, and when the data is sufficient to estimate the extra parameters.
 
-## Definitions
+## A network as a stack of affine maps and nonlinearities
 
-A **feedforward neural network** maps an input vector $x$ to an output through layers with no cycles. A one-hidden-layer network is
+For input $x\in\mathbb{R}^d$, a one-hidden-layer classifier is
 
 $$
 \begin{aligned}
-h &= g(Wx+b),\\
+a &= Wx+b,\\
+h &= g(a),\\
 z &= Uh+c,\\
-\hat{y} &= \mathrm{softmax}(z).
+\hat y &= \operatorname{softmax}(z).
 \end{aligned}
 $$
 
-Here $g$ is an activation function such as ReLU:
+If there are $m$ hidden units and $K$ classes, then $W\in\mathbb{R}^{m\times d}$, $b\in\mathbb{R}^m$, $U\in\mathbb{R}^{K\times m}$, and $c\in\mathbb{R}^K$. Writing the shapes beside an equation is a useful defense against silent broadcasting errors.
+
+The nonlinearity $g$ is essential. With $g(a)=a$, two affine layers collapse:
 
 $$
-\mathrm{ReLU}(a)=\max(a,0).
+U(Wx+b)+c=(UW)x+(Ub+c),
 $$
 
-An **embedding layer** is a lookup table $E\in\mathbb{R}^{\vert V\vert \times d}$. If word $w$ has index $i$, its embedding is row $E_i$. Multiplying a one-hot vector by an embedding matrix is equivalent to selecting one row or column, but implementations use direct lookup.
+which is still one affine map. Depth without nonlinearities adds parameters but no new class of functions.
 
-For classification, the output softmax is
-
-$$
-\hat{y}_k=\frac{\exp(z_k)}{\sum_{j=1}^K\exp(z_j)}.
-$$
-
-For language modeling, the classes are vocabulary items, so the network predicts the next token:
+ReLU is the common simple choice,
 
 $$
-P(w_t\mid w_{t-n+1},\ldots,w_{t-1}).
+\operatorname{ReLU}(a)=\max(a,0),
 $$
 
-**Backpropagation** computes gradients of the loss with respect to all parameters by applying the chain rule from output to input. **Dropout** randomly masks hidden units during training to reduce overfitting. **Pretraining** initializes embeddings or models from a separate objective before supervised training.
+applied coordinatewise. Its derivative is $1$ for positive inputs and $0$ for negative inputs; a conventional subgradient is chosen at zero. ReLU avoids the severe positive-region saturation of sigmoid and is cheap to compute. A unit that receives negative preactivations for every example has zero gradient and can remain "dead." GELU and related smooth activations are common in transformer blocks, while tanh remains natural in recurrent equations because its bounded signed output fits state updates.
 
-## Key results
+Each hidden ReLU introduces a boundary where one affine response switches on. The network partitions input space into regions and fits a different linear function in each. That piecewise-linear view is more informative than saying that the model vaguely "learns features."
 
-A linear classifier can only learn linear decision boundaries in its input features. A neural network with nonlinear hidden layers can learn feature interactions. In text classification, this means a hidden layer can learn combinations such as sentiment-bearing adjective plus negation cue, or domain-specific combinations that would otherwise require manual feature engineering.
+## Tokens enter through a lookup table
 
-The neural language model solves two weaknesses of n-grams. First, embeddings let the model share statistical strength across similar words: if `cat` and `dog` have nearby vectors, the model can generalize from contexts containing one to contexts containing the other. Second, hidden layers learn distributed representations of contexts rather than separate count tables for every exact n-gram.
+Discrete token IDs cannot be fed directly as magnitudes: token 500 is not semantically five times token 100. An embedding table $E\in\mathbb{R}^{\vert V\vert \times d_e}$ assigns each vocabulary item a trainable vector. For token ID $i$, the embedding is row $E_i$.
 
-Training minimizes cross-entropy:
+Looking up $E_i$ is algebraically equivalent to multiplying the one-hot row vector for $i$ by $E$. Direct indexing avoids constructing a mostly zero vector. During a minibatch update, only rows for tokens in that batch receive gradients, though weight decay or some optimizer implementations may affect more parameters.
 
-$$
-L=-\log \hat{y}_c
-$$
+Rare tokens get few updates and are easily overfit. Word-level vocabularies also have no natural vector for unseen forms. Subword tokenization shares pieces across related or novel words; character encoders go further and construct representations from spelling. Pretrained embeddings supply a useful starting geometry, but static vectors still assign one vector to a word such as `bank` in every context.
 
-where $c$ is the correct class. Unlike logistic regression, multilayer networks have nonconvex objectives. Initialization, learning rate, optimizer, normalization, regularization, and batch size can change results. Random initialization must break symmetry; if all hidden units start identically, they receive identical gradients.
+### Turning a variable-length document into one vector
 
-Lookup layers make NLP models efficient but introduce vocabulary and tokenization decisions. Unknown words, rare words, casing, subwords, and domain-specific terms all affect the embedding table. Modern models often replace word-level lookup with subword lookup to handle rare forms.
+A feedforward classifier expects a fixed-size input. Several reductions are common:
 
-A feedforward neural language model with a fixed context window is still limited: it cannot naturally condition on arbitrary-length history. RNNs and transformers address that limitation differently, but they keep the same core components: embeddings, learned transformations, softmax output, and cross-entropy training.
+| Reduction | Preserves | Loses or risks |
+|---|---|---|
+| mean pooling | average lexical content, length normalization | order and sharp local evidence |
+| sum pooling | token frequency and accumulated evidence | scale varies with length |
+| max pooling | strongest activation per coordinate | frequency and most context |
+| concatenated window | position inside a fixed window | all tokens outside the window |
+| learned attention pooling | task-weighted token mixture | adds parameters and may still blur order |
 
-One conceptual shift from linear models is that features no longer need to be named by the engineer. In logistic regression, a useful interaction such as `not` plus a positive adjective must be inserted as a feature template or n-gram. In a neural network, the hidden layer can learn a detector for that interaction if the architecture and data make it learnable. This does not remove feature design completely; tokenization, pooling, window size, pretrained embeddings, and loss function are still design choices.
-
-The lookup layer is especially important in NLP. It is a parameter matrix indexed by discrete symbols, so only rows for observed tokens receive updates in a batch. Frequent tokens are updated often; rare tokens may remain poorly estimated. Subword tokenization, character encoders, pretrained embeddings, and regularization are different responses to the same rare-word problem. Eisenstein's discussion of lookup layers makes this explicit, while Jurafsky and Martin connect the same idea to word2vec, GloVe, and later contextual representations.
-
-Neural networks should be compared to strong linear baselines. If a feedforward classifier uses averaged embeddings, it may lose word order and perform similarly to a bag-of-words model. Its advantage appears when dense semantic similarity, nonlinear interactions, or pretrained representations provide information that sparse features cannot easily capture.
-
-Another practical distinction is between learning embeddings from scratch and fine-tuning pretrained embeddings. Learning from scratch lets the representation specialize to the task, but it needs enough labeled or self-supervised data to estimate many embedding rows. Starting from pretrained word vectors gives useful geometry immediately, especially for small supervised datasets. Freezing the embeddings reduces overfitting and compute; updating them can improve task fit but may damage general-purpose similarity if the dataset is narrow.
-
-The loss surface is nonconvex, so reproducibility requires more care than with logistic regression. Random seeds, initialization, batch order, dropout, optimizer, and hardware kernels can all change the final model slightly. Serious experiments report mean and variance across runs or at least fix seeds and keep validation curves, especially on small NLP datasets.
-
-## Visual
+Padding must be excluded from a mean. If a three-token sentence is padded to length five and the padding embedding is included, its vector is divided by five rather than three. Setting the padding row to zero prevents a direct contribution but does not fix the denominator. A mask must supply the count of real tokens.
 
 ```mermaid
 flowchart LR
-  A[Tokens] --> B[Embedding lookup E]
-  B --> C[Concatenate or pool]
-  C --> D[Hidden layer ReLU]
-  D --> E[Logits]
-  E --> F[Softmax]
-  F --> G[Cross-entropy loss]
+  A[Token IDs] --> B[Embedding lookup]
+  B --> C[Masked pooling or concatenation]
+  C --> D[Affine hidden layer]
+  D --> E[Nonlinearity]
+  E --> F[Class logits]
+  F --> G[Cross-entropy]
   G --> H[Backpropagation]
   H --> B
   H --> D
 ```
 
-| Component | Shape example | Role in NLP |
-|---|---:|---|
-| Embedding table $E$ | $\vert V\vert \times d$ | maps token ids to dense vectors |
-| Pooled document vector | $d$ | summarizes variable-length text |
-| Hidden layer $W$ | $h\times d$ | learns nonlinear feature combinations |
-| Output matrix $U$ | $K\times h$ | scores classes or vocabulary words |
-| Softmax | $K$ | converts logits into probabilities |
+## What backpropagation computes
 
-## Worked example 1: forward pass for a tiny classifier
-
-Problem: classify a two-dimensional pooled embedding $x=[1,2]$ with a hidden layer of size $2$ and two output classes. Let
+For a gold class $y$, softmax cross-entropy is
 
 $$
-W=\begin{bmatrix}1&-1\\0.5&0.5\end{bmatrix},\quad
-b=\begin{bmatrix}0\\0\end{bmatrix}.
+L=-\log\hat y_y.
 $$
 
-Let
+The derivative with respect to each output logit is
 
 $$
-U=\begin{bmatrix}1&0\\0&1\end{bmatrix},\quad c=\begin{bmatrix}0\\0\end{bmatrix}.
+\delta^{(z)}_k=\frac{\partial L}{\partial z_k}
+=\hat y_k-\mathbb{1}[k=y].
 $$
 
-Use ReLU and softmax.
-
-1. Hidden preactivation:
+From there the chain rule moves backward:
 
 $$
-Wx+b=
-\begin{bmatrix}1(1)+(-1)(2)\\0.5(1)+0.5(2)\end{bmatrix}
-=\begin{bmatrix}-1\\1.5\end{bmatrix}.
+\begin{aligned}
+\frac{\partial L}{\partial U}&=\delta^{(z)}h^\top,\\
+\frac{\partial L}{\partial c}&=\delta^{(z)},\\
+\delta^{(h)}&=U^\top\delta^{(z)},\\
+\delta^{(a)}&=\delta^{(h)}\odot g'(a),\\
+\frac{\partial L}{\partial W}&=\delta^{(a)}x^\top,\\
+\frac{\partial L}{\partial b}&=\delta^{(a)}.
+\end{aligned}
 $$
 
-2. ReLU activation:
+The outer-product form explains which parameters change. An inactive ReLU has $g'(a)=0$, blocking the gradient to its incoming weights for that example. The input gradient $W^\top\delta^{(a)}$ continues into a pooling operation and then into the embedding rows that supplied the pooled vector.
+
+Automatic differentiation performs these operations, but the equations remain useful for debugging detached tensors, wrong dimensions, and unexpectedly zero gradients. Backpropagation is an efficient organization of the chain rule, not a distinct learning objective.
+
+Unlike logistic regression, the objective is nonconvex. Hidden-unit permutations alone create many equivalent parameter settings. Initialization must break symmetry: if two units begin with identical incoming and outgoing weights, their gradients remain identical. Variance-aware initializations keep activations from exploding or shrinking as they pass through layers.
+
+## Worked example: complete forward pass
+
+Take a pooled embedding $x=[1,2]^\top$, two hidden units, and two classes:
 
 $$
-h=\begin{bmatrix}\max(-1,0)\\\max(1.5,0)\end{bmatrix}
-=\begin{bmatrix}0\\1.5\end{bmatrix}.
+W=\begin{bmatrix}1&-1\\0.5&0.5\end{bmatrix},
+\quad b=\begin{bmatrix}0\\0\end{bmatrix},
+\quad U=\begin{bmatrix}1&0\\0&1\end{bmatrix},
+\quad c=\begin{bmatrix}0\\0\end{bmatrix}.
 $$
 
-3. Output logits:
+First calculate the hidden preactivation:
+
+$$
+\begin{aligned}
+a=Wx+b
+&=\begin{bmatrix}
+1(1)+(-1)(2)\\
+0.5(1)+0.5(2)
+\end{bmatrix}\\
+&=\begin{bmatrix}-1\\1.5\end{bmatrix}.
+\end{aligned}
+$$
+
+ReLU clips the first coordinate:
+
+$$
+h=\begin{bmatrix}0\\1.5\end{bmatrix}.
+$$
+
+The identity output matrix gives
 
 $$
 z=Uh+c=\begin{bmatrix}0\\1.5\end{bmatrix}.
 $$
 
-4. Softmax:
+After subtracting the maximum logit, the exponentials are $[e^{-1.5},e^0]\approx[0.2231,1]$. Therefore
 
 $$
-\hat{y}_1=\frac{e^0}{e^0+e^{1.5}}\approx\frac{1}{1+4.482}=0.182,
+\hat y
+=\frac{[0.2231,1]}{1.2231}
+\approx[0.1824,0.8176].
 $$
 
-$$
-\hat{y}_2=\frac{e^{1.5}}{e^0+e^{1.5}}\approx0.818.
-$$
-
-Checked answer: class $2$ is predicted with probability about $0.818$.
-
-## Worked example 2: feedforward neural language model context
-
-Problem: a vocabulary has embeddings of dimension $2$:
-
-| token | embedding |
-|---|---|
-| `the` | $[1,0]$ |
-| `cat` | $[0,1]$ |
-| `sat` | $[1,1]$ |
-
-For a window model that predicts the next word from the previous two words, form the input vector for context `the cat`.
-
-1. Look up embeddings:
+Class 2 is predicted. If class 1 is correct, the loss is
 
 $$
-e(\mathrm{the})=[1,0],\qquad e(\mathrm{cat})=[0,1].
+L=-\log(0.1824)\approx1.701.
 $$
 
-2. Concatenate in time order:
+## Worked example: one gradient reaches the first layer
+
+Continue the same example with gold class 1. The logit error is
+
+$$
+\delta^{(z)}=\hat y-[1,0]^\top
+=\begin{bmatrix}-0.8176\\0.8176\end{bmatrix}.
+$$
+
+Because $U$ is the identity,
+
+$$
+\delta^{(h)}=U^\top\delta^{(z)}
+=\begin{bmatrix}-0.8176\\0.8176\end{bmatrix}.
+$$
+
+The first preactivation was negative and the second positive, so the ReLU derivative is $[0,1]^\top$. Elementwise multiplication gives
+
+$$
+\delta^{(a)}
+=\delta^{(h)}\odot[0,1]^\top
+=\begin{bmatrix}0\\0.8176\end{bmatrix}.
+$$
+
+The first-layer weight gradient is the outer product
+
+$$
+\begin{aligned}
+\frac{\partial L}{\partial W}
+&=\delta^{(a)}x^\top\\
+&=\begin{bmatrix}0\\0.8176\end{bmatrix}
+\begin{bmatrix}1&2\end{bmatrix}\\
+&=\begin{bmatrix}0&0\\0.8176&1.6352\end{bmatrix}.
+\end{aligned}
+$$
+
+With learning rate $0.1$, the second row changes from $[0.5,0.5]$ to
+
+$$
+[0.5,0.5]-0.1[0.8176,1.6352]
+=[0.4182,0.3365].
+$$
+
+The first row receives no update from this example because its ReLU was off. The output matrix also changes: $\partial L/\partial U=\delta^{(z)}h^\top$, so only its second column has nonzero entries.
+
+## A fixed-window neural language model
+
+An early neural language model predicts the next token from the previous $n-1$ token embeddings. For context `the cat` with
+
+$$
+e(\mathrm{the})=[1,0],\qquad e(\mathrm{cat})=[0,1],
+$$
+
+concatenation in temporal order produces
 
 $$
 x=[e(\mathrm{the});e(\mathrm{cat})]=[1,0,0,1].
 $$
 
-3. If the hidden layer has matrix $W\in\mathbb{R}^{h\times4}$, then the first layer can learn different weights for the same word depending on position. The first two input dimensions represent the word two steps back; the last two represent the previous word.
+A matrix $W\in\mathbb{R}^{h\times4}$ can give different weights to `the` two positions back and the same embedding one position back. The hidden vector then feeds a vocabulary-sized softmax:
 
-Checked answer: the neural LM input vector is $[1,0,0,1]$. It is dense, fixed length, and position-sensitive because of concatenation.
+$$
+P(w_t\mid w_{t-2},w_{t-1})
+=\operatorname{softmax}(Uh+c).
+$$
 
-## Code
+Compared with an $n$-gram table, embeddings share evidence across similar tokens and the hidden layer shares evidence across similar contexts. The window is still fixed. Nothing before $w_{t-2}$ can influence the prediction, which motivates recurrent networks and attention-based models.
+
+Large-vocabulary softmax is expensive because $U$ has one row per output token and normalization scores every row. Hierarchical softmax, sampled losses, and related approximations reduce training cost, though exact probabilities at evaluation still require care.
+
+## Training choices that change the result
+
+Mini-batch stochastic optimization estimates the full-data gradient from a subset of examples. Adam often reaches a useful solution quickly; SGD can generalize well with tuned schedules. Learning rates that are too large cause unstable loss, while very small rates can make a healthy model look broken. Keep training and validation curves rather than relying on the final epoch.
+
+Dropout replaces randomly selected activations with zero during training and rescales the survivors, discouraging brittle co-adaptation. It must be disabled at evaluation. Weight decay constrains parameter magnitudes, while early stopping limits how far fitting proceeds after validation performance stalls. These methods are related but not interchangeable.
+
+Pretrained embeddings can be frozen, fine-tuned, or assigned a smaller learning rate than the classifier. Freezing reduces variance on a small labeled set. Fine-tuning can adapt meanings to a domain but may move rare rows based on very few examples. Report which choice was used.
+
+Random seeds affect initialization, minibatch order, and dropout masks. A difference smaller than run-to-run variation is not persuasive. For small datasets, several runs and a mean with dispersion give a more honest comparison than one favorable seed.
+
+## Masked mean pooling in code
 
 ```python
 import torch
 import torch.nn as nn
 
-class TinyTextClassifier(nn.Module):
-    def __init__(self, vocab_size, emb_dim, hidden_dim, num_classes):
+class MeanPoolClassifier(nn.Module):
+    def __init__(self, vocab_size, emb_dim, hidden_dim, num_classes, pad_id=0):
         super().__init__()
-        self.embedding = nn.Embedding(vocab_size, emb_dim)
-        self.ffn = nn.Sequential(
+        self.pad_id = pad_id
+        self.embedding = nn.Embedding(vocab_size, emb_dim, padding_idx=pad_id)
+        self.classifier = nn.Sequential(
             nn.Linear(emb_dim, hidden_dim),
             nn.ReLU(),
             nn.Dropout(0.1),
@@ -190,30 +260,56 @@ class TinyTextClassifier(nn.Module):
         )
 
     def forward(self, token_ids):
-        emb = self.embedding(token_ids)          # batch x length x emb_dim
-        pooled = emb.mean(dim=1)                # batch x emb_dim
-        return self.ffn(pooled)                 # logits
+        mask = token_ids.ne(self.pad_id).unsqueeze(-1)
+        embedded = self.embedding(token_ids)
+        summed = (embedded * mask).sum(dim=1)
+        lengths = mask.sum(dim=1).clamp_min(1)
+        pooled = summed / lengths
+        return self.classifier(pooled)  # raw logits
 
-model = TinyTextClassifier(vocab_size=1000, emb_dim=64, hidden_dim=32, num_classes=3)
-batch = torch.randint(0, 1000, (8, 12))
-labels = torch.randint(0, 3, (8,))
+model = MeanPoolClassifier(1000, 64, 32, 3)
+batch = torch.tensor([[5, 9, 2, 0], [8, 4, 7, 3]])
+labels = torch.tensor([1, 2])
 logits = model(batch)
 loss = nn.CrossEntropyLoss()(logits, labels)
 loss.backward()
-print(logits.shape, loss.item())
 ```
 
-## Common pitfalls
+`CrossEntropyLoss` expects raw logits and performs a stable log-softmax internally. Passing already-normalized probabilities changes the computation. The clamp handles an all-padding row without division by zero, though an empty document policy should be decided explicitly rather than encountered accidentally.
 
-- Passing probabilities rather than logits into `CrossEntropyLoss`; most frameworks combine log-softmax and negative log likelihood.
-- Averaging embeddings and assuming word order is preserved.
-- Forgetting padding masks, so padded tokens affect pooled representations.
-- Initializing all hidden units identically.
-- Using a huge vocabulary without handling rare or unknown words.
-- Treating nonconvex training curves like logistic regression; neural models need validation, early stopping, and careful hyperparameters.
-- Confusing static pretrained embeddings with contextual embeddings from transformers.
+When an averaged-embedding model fails, check information loss before adding layers. Reversing every sentence leaves its pooled vector unchanged. Phrase-sensitive labels call for convolution, recurrence, or attention; a deeper multilayer perceptron on the same average cannot distinguish the sequences.
 
-## Connections
+## Batches, normalization, and the shape of optimization
+
+Minibatches do more than save compute. Their size controls the noise of a gradient estimate. Small batches produce variable directions that can help move through flat regions but make validation curves noisy. Large batches use hardware efficiently and give stable gradients, yet often need a larger learning rate or warmup. Comparing batch sizes while leaving every other optimization setting fixed is rarely a controlled comparison.
+
+Text batches have variable lengths. Bucketing examples with similar lengths reduces padding, while shuffling across buckets preserves enough randomness. If examples are sorted once by length and never reshuffled, the optimizer sees a curriculum that may correlate with labels or document source. Padding masks must follow every operation that mixes token positions, not only the first embedding lookup.
+
+Layer normalization standardizes features within each example and is well suited to variable sequence lengths. Batch normalization uses statistics across examples and can behave awkwardly when padding, length, or batch composition varies. A plain pooled classifier may need neither, but deeper networks often benefit from normalization and residual connections. Adding them changes the optimization geometry, so old learning-rate settings may no longer transfer.
+
+Class imbalance changes minibatch composition. Stratified sampling gives minority examples more updates but alters the effective training distribution. Weighted loss changes error costs without changing which examples are seen. Both can improve minority recall, and both can distort raw probability calibration. The choice should follow the operational objective and be recorded with the evaluation protocol.
+
+## Parameter counts and where capacity goes
+
+In many NLP models the embedding table dominates the parameter count. A vocabulary of $50{,}000$ tokens with $300$-dimensional vectors contains fifteen million parameters before the classifier begins. Most rows may receive sparse updates on a small supervised corpus. Reducing hidden width while leaving a huge trainable vocabulary untouched may save little memory and little overfitting risk.
+
+Tying an input embedding matrix to a language model's output matrix reduces parameters and imposes a useful relation between how a token is read and how it is predicted. The dimensions must match, and the choice is less natural when input and output vocabularies differ. Classification models do not normally have a vocabulary-sized output, so there is nothing analogous to tie.
+
+Freezing pretrained embeddings turns them into fixed input features. The optimizer then estimates only the classifier, which can be a strong small-data baseline. Gradual unfreezing or a smaller embedding learning rate allows limited adaptation. Monitoring nearest neighbors before and after fine-tuning can reveal whether a narrow dataset has distorted broadly useful geometry, though downstream validation remains the deciding evidence.
+
+Capacity should be compared with data volume and label noise. A hidden layer wide enough to memorize every training item can still generalize under strong regularization, but training accuracy alone no longer diagnoses useful learning. Learning curves over increasing training-set sizes are more informative: a persistent train--validation gap suggests variance, while both curves remaining poor suggests missing information, excessive regularization, or an unsuitable architecture.
+
+## Debugging the computation before tuning it
+
+A tiny batch should be overfittable. If the loss cannot approach zero on ten clean examples, suspect a bug in labels, masking, optimizer steps, or the output/loss pairing. This check is stronger than watching a large run slowly improve. Disable dropout during the test and verify that gradients reach embeddings and every intended layer.
+
+Inspect logits rather than only probabilities. Identical logits across examples often mean pooling returned the same vector, perhaps because every token was masked. Constant predictions with changing hidden states point toward the output layer or labels. NaNs usually originate in an excessive learning rate, invalid logarithm, division by a zero length, or half-precision overflow.
+
+Evaluation mode matters. Dropout must stop sampling masks, and modules that maintain running statistics must use their stored values. Forgetting `model.eval()` makes repeated evaluation nondeterministic. Forgetting to return to training mode then silently disables regularization.
+
+Gradient norms can distinguish saturation from disconnection. A parameter with `None` gradient is absent from the graph; a tensor of zeros is connected but received zero local derivative. The remedies differ. Automatic differentiation reports the symptom faithfully, but it cannot say whether the intended computation was built.
+
+## Related pages
 
 - [Logistic regression for text](/cs/nlp/logistic-regression-for-text)
 - [RNNs and LSTMs for sequence modeling](/cs/nlp/rnns-lstms-sequence-modeling)

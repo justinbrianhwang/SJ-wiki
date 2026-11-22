@@ -9,7 +9,7 @@ Finite difference methods approximate partial derivatives on a grid. They turn d
 
 PDE type matters. Elliptic problems such as Laplace's equation usually produce coupled spatial systems. Parabolic problems such as the heat equation involve time stepping with smoothing. Hyperbolic problems such as wave and advection equations require special attention to propagation speed and numerical dispersion.
 
-## Definitions
+## From derivatives to stencils
 
 For a grid point $x_i=x_0+i\Delta x$, centered differences include
 
@@ -49,7 +49,7 @@ $$
 4u_{i,j}=u_{i-1,j}+u_{i+1,j}+u_{i,j-1}+u_{i,j+1}.
 $$
 
-## Key results
+## What consistency and stability say
 
 Consistency means the finite difference formula approaches the PDE as the mesh spacings go to zero. Stability means errors do not grow uncontrollably under the numerical update. Convergence follows when a consistent scheme is stable for a well-posed linear problem; this is the practical message of the Lax equivalence theorem.
 
@@ -65,19 +65,183 @@ Finite difference matrices are sparse. A one-dimensional second derivative gives
 
 Boundary conditions are not afterthoughts. Dirichlet values enter the right-hand side, Neumann values require derivative approximations, and mixed conditions can change both the matrix and the accuracy near the boundary.
 
-A reliable way to use these results is to keep the analysis tied to the actual numerical question rather than to the formula alone. For finite difference PDE methods, the input record should include the PDE type, mesh spacings, boundary conditions, and stencil. Without that record, two computations that look similar on paper may have different numerical meanings. The same formula can be a safe production tool in one scaling and a fragile experiment in another. This is why the examples on this page show the intermediate arithmetic: the goal is not only to reach a number, but to expose what assumptions made that number meaningful.
+The centered second derivative follows by expanding on both sides of $x_i$:
 
-The next record is the verification record. Useful diagnostics for this topic include discrete residuals, conservation or maximum-principle checks, and grid refinement. A diagnostic should be chosen before the computation is trusted, not after a pleasing answer appears. When an exact answer is unavailable, compare two independent approximations, refine the mesh or tolerance, check a residual, or test the method on a neighboring problem with known behavior. If several diagnostics disagree, treat the disagreement as information about conditioning, stability, or implementation rather than as a nuisance to be averaged away.
+$$
+\begin{aligned}
+u(x_i+h)&=u_i+hu_i'+\frac{h^2}{2}u_i''+\frac{h^3}{6}u_i'''+\frac{h^4}{24}u_i^{(4)}+O(h^5),\\
+u(x_i-h)&=u_i-hu_i'+\frac{h^2}{2}u_i''-\frac{h^3}{6}u_i'''+\frac{h^4}{24}u_i^{(4)}+O(h^5).
+\end{aligned}
+$$
 
-The cost record matters as well. In this topic the dominant costs are usually sparse matrix storage, time-step restrictions, and solver complexity. Numerical analysis is full of methods that are mathematically attractive but computationally mismatched to the problem size. A dense factorization may be acceptable for a classroom matrix and impossible for a PDE grid. A high-order rule may use fewer steps but more expensive stages. A guaranteed method may take many iterations but provide a bound that a faster method cannot. The right comparison is therefore cost to reach a verified tolerance, not order or elegance in isolation.
+Adding cancels the odd derivatives. After subtracting $2u_i$ and dividing by $h^2$,
 
-Finally, every method here has a recognizable failure mode: CFL violations, boundary-condition mistakes, and dense treatment of sparse grids. These failures are not edge cases to memorize; they are signals that the hypotheses behind the result have been violated or that a different numerical model is needed. A good implementation makes such failures visible through exceptions, warnings, residual reports, or conservative stopping rules. A good hand solution does the same thing in prose by naming the assumption being used and checking it at the point where it matters.
+$$
+\frac{u_{i-1}-2u_i+u_{i+1}}{h^2}
+=u_i''+\frac{h^2}{12}u_i^{(4)}+O(h^4).
+$$
 
-For study purposes, the most useful habit is to separate four layers: the continuous mathematical problem, the discrete approximation, the algebraic or iterative algorithm used to compute it, and the diagnostic used to judge the result. Many mistakes come from mixing these layers. A small algebraic residual may not mean a small modeling error. A small step-to-step change may not mean the discrete equations are solved. A high-order truncation formula may not help when the data are noisy or the arithmetic is unstable. Keeping the layers separate makes the results on this page portable to larger examples.
+The stencil is therefore second-order accurate when the fourth derivative is bounded. The qualifier matters. A solution with a corner singularity or a jump in a derivative need not display second-order convergence even though the algebra of the stencil is unchanged.
 
-Grid refinement is the most important practical audit. Run the same PDE with half the mesh spacing, adjust the time step consistently, and compare the solutions in a common norm. If the observed order is far below the stencil order, boundary conditions, nonsmooth data, solver tolerance, or stability limits are usually responsible.
+For the explicit heat method, a Fourier mode gives a clean stability calculation. Write the error as $e_i^n=g^n e^{\mathrm{i}i\theta}$. Substitution into the update yields
 
-## Visual
+$$
+g=1+r(e^{-\mathrm{i}\theta}-2+e^{\mathrm{i}\theta})
+=1-4r\sin^2(\theta/2).
+$$
+
+Stability requires $\vert g\vert \le1$ for every wave number. Its smallest possible value is $1-4r$, so $1-4r\ge-1$, or $r\le1/2$. High-frequency error produces the binding restriction. In two dimensions with equal spacings, the same calculation gives $r_x+r_y\le1/2$; when $r_x=r_y=r$, this becomes $r\le1/4$.
+
+Consistency alone does not prevent a calculation from blowing up. Stability controls the accumulation of roundoff, initial error, and local truncation error. For a well-posed linear initial-value problem, the Lax equivalence theorem turns those two statements into convergence. It applies to a specified problem and scheme, not to finite differences as a whole.
+
+## Boundary rows are part of the method
+
+Dirichlet data are the easiest case. If $u(0)=a$ and the first interior equation contains $u_0$, move its known contribution to the right-hand side. For the one-dimensional Poisson equation $-u''=f$,
+
+$$
+-u_{i-1}+2u_i-u_{i+1}=h^2f_i.
+$$
+
+At $i=1$, the right-hand side becomes $h^2f_1+a$. Nothing is “patched” after the solve; the boundary value has already changed the algebraic equation.
+
+A Neumann condition needs a derivative formula. The first-order row
+
+$$
+\frac{u_1-u_0}{h}=q
+$$
+
+is simple but can reduce the global order. A second-order one-sided formula,
+
+$$
+\frac{-3u_0+4u_1-u_2}{2h}=q,
+$$
+
+keeps the boundary truncation error aligned with a second-order interior stencil. Ghost points offer another route: extend the centered derivative across the boundary, use the boundary condition to eliminate the ghost value, and substitute into the PDE row.
+
+Pure Neumann Poisson problems have a structural complication. Adding a constant to a solution changes no derivative, so the discrete matrix is singular. A solution exists only when the source and boundary flux satisfy a compatibility condition, and one normalization such as zero mean is needed to select a unique representative.
+
+## Explicit, backward Euler, and Crank--Nicolson
+
+Let $L_h$ denote the discrete Laplacian. Three common heat updates are
+
+$$
+\begin{aligned}
+\text{forward Euler: }&u^{n+1}=(I+\alpha\Delta tL_h)u^n,\\
+\text{backward Euler: }&(I-\alpha\Delta tL_h)u^{n+1}=u^n,\\
+\text{Crank--Nicolson: }&(I-\tfrac12\alpha\Delta tL_h)u^{n+1}
+=(I+\tfrac12\alpha\Delta tL_h)u^n.
+\end{aligned}
+$$
+
+Forward Euler is first order in time and second order in space, conditional on the stability limit. Backward Euler has the same formal orders but is unconditionally stable for the linear heat equation and damps short waves strongly. Crank--Nicolson is second order in time and unconditionally stable in the usual norm, yet it can preserve oscillatory signs for very large time steps. “Unconditionally stable” therefore does not mean that any time step gives an accurate or visually smooth solution.
+
+The algebraic cost changes with the choice. An explicit step is a sparse matrix-vector update. An implicit step solves a tridiagonal system in one dimension or a large sparse system in higher dimensions. Since the matrix is unchanged when coefficients and step sizes are fixed, its factorization or preconditioner can be reused over all time levels.
+
+## From stencil to sparse matrix
+
+Numbering a two-dimensional $m\times m$ interior grid row by row turns the five-point Laplacian into a matrix with $m^2$ rows and at most five nonzeros per row. It can be written with Kronecker products:
+
+$$
+A=I_m\otimes T+T\otimes I_m,
+\qquad
+T=\operatorname{tridiag}(-1,2,-1).
+$$
+
+The matrix has $O(m^2)$ unknowns but only $O(m^2)$ nonzeros. A dense representation would require $O(m^4)$ storage. Direct sparse factorization can create fill-in, so large three-dimensional problems usually call for iterative methods and preconditioning rather than dense elimination.
+
+The following map keeps the PDE classification tied to its numerical consequence.
+
+## Advection exposes a different stability problem
+
+For the transport equation
+
+$$
+u_t+cu_x=0,
+$$
+
+the exact solution is $u(x,t)=u_0(x-ct)$: the initial profile travels at speed $c$ without changing shape. A forward-time centered-space update is
+
+$$
+u_i^{n+1}=u_i^n-
+\frac{c\Delta t}{2\Delta x}(u_{i+1}^n-u_{i-1}^n).
+$$
+
+Although each derivative approximation is consistent, von Neumann analysis gives amplification magnitude greater than one for nonconstant modes. The method is unconditionally unstable. Centering, which works well for diffusion, does not automatically suit one-way propagation.
+
+For $c\gt 0$, the first-order upwind scheme uses information from the left:
+
+$$
+u_i^{n+1}=u_i^n-
+\nu(u_i^n-u_{i-1}^n),
+\qquad
+\nu=\frac{c\Delta t}{\Delta x}.
+$$
+
+It is stable for $0\le\nu\le1$. The number $\nu$ is the Courant number: physical information travels distance $c\Delta t$ during one step, while the numerical stencil reaches one cell, distance $\Delta x$. If $\nu\gt 1$, the physical domain of dependence extends beyond the numerical one.
+
+Upwinding pays for stability with numerical diffusion. A sharp front spreads over several cells. Higher-order schemes can reduce smearing but may create oscillations near discontinuities; flux limiters and other nonlinear devices balance those effects. The lesson from the heat scheme cannot be transferred by changing only the PDE name. Diffusion and transport have different characteristic behavior.
+
+For the wave equation, centered differences in both space and time give
+
+$$
+u_i^{n+1}=2u_i^n-u_i^{n-1}
++\nu^2(u_{i-1}^n-2u_i^n+u_{i+1}^n),
+$$
+
+with $\nu=c\Delta t/\Delta x\le1$ in one dimension. Even when stable, different discrete wavelengths travel at slightly different speeds. That numerical dispersion can shift wave phases without producing obvious growth.
+
+## Measuring convergence on a known solution
+
+A manufactured solution separates implementation mistakes from modeling difficulty. Choose, for example,
+
+$$
+u(x,y)=\sin(\pi x)\sin(\pi y)
+$$
+
+on the unit square. Then define the Poisson source from the chosen function:
+
+$$
+-\Delta u=2\pi^2\sin(\pi x)\sin(\pi y),
+$$
+
+with zero Dirichlet boundary data. The exact grid error can now be measured even though the source was selected artificially.
+
+If $E_h$ is an error norm on spacing $h$ and the method is order $p$, then $E_h\approx Ch^p$. Two grids give an observed order
+
+$$
+p_{\mathrm{obs}}=
+\frac{\log(E_h/E_{h/2})}{\log 2}.
+$$
+
+Suppose the maximum errors are $1.20\times10^{-3}$ and $3.05\times10^{-4}$. Then
+
+$$
+p_{\mathrm{obs}}
+=\frac{\log(1.20\times10^{-3}/3.05\times10^{-4})}{\log2}
+\approx1.98,
+$$
+
+consistent with a second-order stencil. If the linear solver tolerance is too loose, its algebraic error eventually masks the discretization error and the observed order falls. Solver tolerances should therefore be tightened enough that refinement measures the stencil rather than the stopping rule.
+
+For transient problems, refine space and time in a way that separates their contributions. Forward Euler for heat has error $O(\Delta t+\Delta x^2)$. Taking $\Delta t$ proportional to $\Delta x^2$ respects stability and balances the two terms. Crank--Nicolson has $O(\Delta t^2+\Delta x^2)$, so $\Delta t$ proportional to $\Delta x$ balances formal orders. Comparing solutions at unmatched times or grid points requires interpolation, which adds another error source that should be stated.
+
+Qualitative invariants supply checks even when no exact solution is known. With $0\le r\le1/2$, the explicit heat update is a convex combination
+
+$$
+u_i^{n+1}=r u_{i-1}^n+(1-2r)u_i^n+r u_{i+1}^n.
+$$
+
+It cannot create a new interior maximum above all three contributing values or a new minimum below them. Unexpected overshoots under nonnegative Dirichlet data therefore point to a violated stability bound, a boundary error, or a different scheme whose coefficients are not monotone.
+
+Conservative equations should be discretized in flux form. For $u_t+f(u)_x=0$,
+
+$$
+u_i^{n+1}=u_i^n-
+\frac{\Delta t}{\Delta x}
+(F_{i+1/2}^n-F_{i-1/2}^n).
+$$
+
+Summing over cells cancels internal numerical fluxes pairwise; only boundary fluxes change the total mass. A pointwise residual can be small while a nonconservative discretization drifts in total mass, so conservation is an independent diagnostic.
 
 ```mermaid
 flowchart TB
@@ -185,7 +349,7 @@ $$
 
 **Checked answer.** The one-point finite difference approximation gives temperature $25$ at the center.
 
-## Code
+## A small solver and its checks
 
 ```python
 import numpy as np
@@ -221,7 +385,7 @@ print(heat_explicit([0.0, 1.0, 0.0], alpha=1.0, dx=1.0, dt=0.25, steps=1)[-1])
 print(laplace_jacobi(100.0, 0.0, 0.0, 0.0, n=1))
 ```
 
-## Common pitfalls
+## Failure patterns worth recognizing
 
 - Choosing $\Delta t$ for accuracy but violating the CFL or heat stability condition.
 - Treating boundary conditions as values to patch in after solving instead of building them into the scheme.
@@ -229,7 +393,7 @@ print(laplace_jacobi(100.0, 0.0, 0.0, 0.0, n=1))
 - Using centered differences for advection-dominated hyperbolic problems without stabilization.
 - Refining space without refining time consistently for transient problems.
 
-## Connections
+## Related pages
 
 - [boundary value problems](/math/numerical-analysis/boundary-value-problems)
 - [matrix factorizations and special systems](/math/numerical-analysis/matrix-factorizations-special-systems)

@@ -5,274 +5,400 @@ sidebar_position: 8
 
 # Electrostatic Fields and Potential
 
-Electrostatics studies electric fields produced by stationary charge distributions. It is a special case of Maxwell's equations in which fields do not vary with time and magnetic induction is absent from the electric-field equation. The central objects are charge density, electric field intensity $\vec E$, electric flux density $\vec D$, scalar potential $V$, and the force on charge.
+Electrostatics is the time-independent part of electromagnetism. Charges may be distributed through a material, fixed on an insulating surface, or free to rearrange on a conductor, but the macroscopic charge density and fields do not change with time. The main quantities are charge density, electric field intensity $\vec E$, electric flux density $\vec D$, and scalar potential $V$.
 
-The value of electrostatics is larger than "charges at rest." Capacitance, insulation design, electrostatic sensors, semiconductor depletion regions, and many boundary-value methods all begin here. Later, time-varying electromagnetics keeps the same electric field concepts but couples them to magnetic fields through Faraday's law and the displacement current.
+The static approximation covers more than isolated charges in vacuum. Capacitors, cable insulation, electrostatic shielding, depletion-layer models, and many sensor geometries are boundary-value problems for the same equations. The approximation fails when magnetic induction contributes appreciably to the electric field; then $\nabla\times\vec E$ need not vanish and a scalar potential alone cannot describe $\vec E$.
 
-## Definitions
+## From Coulomb force to a field
 
-Charge can be modeled in several idealized ways:
+Charge is represented at the geometric scale appropriate to the source:
 
 $$
-Q=\int_L \rho_l\,dl,\qquad
-Q=\int_S \rho_s\,dS,\qquad
-Q=\int_V \rho_v\,dv,
+Q=\int_L \rho_l\,dl,
+\qquad
+Q=\int_S \rho_s\,dS,
+\qquad
+Q=\int_\mathcal{V} \rho_v\,dv.
 $$
 
-where $\rho_l$ is line charge density in C/m, $\rho_s$ is surface charge density in C/m$^2$, and $\rho_v$ is volume charge density in C/m$^3$.
+Here $\rho_l$, $\rho_s$, and $\rho_v$ have units C/m, C/m$^2$, and C/m$^3$. A point charge is the limiting idealization in which the source size is negligible compared with all observation distances.
 
-Coulomb's law for the force on $q_2$ due to $q_1$ is
+For two point charges in a homogeneous medium,
 
 $$
 \vec F_{12}=\frac{q_1q_2}{4\pi\epsilon R^2}\hat R,
 $$
 
-where $\vec R=\vec r_2-\vec r_1$ points from $q_1$ to $q_2$. The electric field is force per unit test charge:
+where $\vec R=\vec r_2-\vec r_1$ points from the source $q_1$ to the charge $q_2$. Dividing by a small positive test charge defines the electric field:
 
 $$
-\vec E=\frac{\vec F}{q}.
+\vec E(\vec r)=\frac{\vec F}{q_{\text{test}}}.
 $$
 
-For a point charge $q$ at the origin in a homogeneous medium,
+For a source charge $q$ at $\vec r'$, the source-to-observation vector is
 
 $$
-\vec E=\frac{q}{4\pi\epsilon r^2}\hat r.
+\vec R=\vec r-\vec r',
+\qquad R=|\vec R|,
+\qquad \hat R=\frac{\vec R}{R},
 $$
 
-For many point charges,
+and therefore
 
 $$
-\vec E(\vec r)=\sum_n \frac{q_n}{4\pi\epsilon R_n^2}\hat R_n.
+\vec E(\vec r)=\frac{q}{4\pi\epsilon}\frac{\vec R}{R^3}.
 $$
 
-For continuous charge,
+Writing the result as $\vec R/R^3$ is often safer than writing $\hat R/R^2$: the direction is then carried by the same displacement vector used to compute the distance.
+
+Ordinary linear electrostatics obeys superposition. For point charges,
 
 $$
-\vec E(\vec r)=\int \frac{\rho(\vec r')}{4\pi\epsilon R^2}\hat R\,d\ell',\ dS',\ \text{or}\ dv',
+\vec E(\vec r)=\frac{1}{4\pi\epsilon}
+\sum_n q_n\frac{\vec r-\vec r_n}{|\vec r-\vec r_n|^3},
 $$
 
-with the proper density and source element.
-
-Electric potential difference is related to the field by
+while a volume distribution gives
 
 $$
-V_{ab}=V(a)-V(b)=-\int_b^a \vec E\cdot d\vec l.
+\vec E(\vec r)=\frac{1}{4\pi\epsilon}
+\int_\mathcal{V}
+\rho_v(\vec r')
+\frac{\vec r-\vec r'}{|\vec r-\vec r'|^3}
+\,dv'.
 $$
 
-If the reference is infinity, the potential of a point charge is
+The corresponding line and surface integrals replace $\rho_v,dv'$ by $\rho_l,dl'$ or $\rho_s,dS'$. The permittivity may be taken outside the integral only when the medium is homogeneous. At interfaces between materials, Coulomb's homogeneous-medium formula is usually replaced by field equations plus boundary conditions.
+
+## Potential as accumulated work
+
+The work done by the electric field on charge $q$ along a path is
 
 $$
-V(r)=\frac{q}{4\pi\epsilon r}.
+W_{a\to b}^{\text{field}}
+=q\int_a^b \vec E\cdot d\vec l.
 $$
 
-The electrostatic field is conservative:
+In electrostatics the line integral around any closed contour is zero. The work depends only on the endpoints, so one can define potential difference by
 
 $$
-\nabla\times\vec E=0,\qquad \vec E=-\nabla V.
+V(b)-V(a)=-\int_a^b \vec E\cdot d\vec l.
 $$
 
-The zero-curl statement has an important qualification: it holds for electrostatics, not for time-varying magnetic fields. Once $\partial\vec B/\partial t$ is nonzero, Faraday's law gives $\nabla\times\vec E=-\partial\vec B/\partial t$, and a single-valued scalar potential is not enough to describe the entire electric field. Electrostatic potential methods are therefore powerful but belong to the static limit or to quasistatic cases where induction is negligible.
+The minus sign says that $V$ decreases in the direction of $\vec E$. A positive charge released from rest tends to move toward lower potential energy $U=qV$; a negative charge tends the other way because multiplication by $q\lt 0$ reverses the ordering.
 
-## Key results
-
-The superposition principle is the workhorse of electrostatics. Because the governing equations are linear in charge and field for ordinary media with constant $\epsilon$, fields and potentials from separate sources add. It is often easier to add scalar potentials and then take a gradient than to add vector fields directly:
+Choosing infinity as the zero of potential gives, for a localized point charge,
 
 $$
-V(\vec r)=\int \frac{\rho(\vec r')}{4\pi\epsilon R}\,dv',
-\qquad
+V(\vec r)=\frac{q}{4\pi\epsilon R}.
+$$
+
+Potentials add as scalars:
+
+$$
+V(\vec r)=\frac{1}{4\pi\epsilon}
+\int_\mathcal{V}\frac{\rho_v(\vec r')}{|\vec r-\vec r'|}\,dv'.
+$$
+
+After finding $V$, recover the field from
+
+$$
 \vec E=-\nabla V.
 $$
 
-For electrostatics in a homogeneous region,
+This route is often shorter than integrating vectors. Source elements may point in many directions at the observation point, whereas every contribution to $V$ is a signed scalar. The reference value of $V$ remains arbitrary: replacing $V$ by $V+C$ changes neither $\vec E$ nor any measured voltage.
+
+The reference at infinity is unsuitable for every idealized distribution. An infinite line charge has $E\propto 1/\rho$, so integrating the field from a finite radius to infinity diverges logarithmically. One must specify a finite reference radius $\rho_0$, giving a potential difference proportional to $\ln(\rho_0/\rho)$. Infinite planes present a similar issue because their field does not decay with distance.
+
+## Differential equations behind the Coulomb integral
+
+Gauss's law and the electrostatic curl equation are
 
 $$
-\nabla\cdot\vec D=\rho_v,\qquad \vec D=\epsilon\vec E.
+\nabla\cdot\vec D=\rho_v,
+\qquad
+\nabla\times\vec E=0.
 $$
 
-Combining this with $\vec E=-\nabla V$ gives Poisson's equation:
+For a linear isotropic medium, $\vec D=\epsilon\vec E$. Since a curl-free field can locally be written as the gradient of a scalar, substitution of $\vec E=-\nabla V$ gives
 
 $$
-\nabla^2V=-\frac{\rho_v}{\epsilon}.
+\nabla\cdot(\epsilon\nabla V)=-\rho_v.
 $$
 
-In charge-free regions, it reduces to Laplace's equation:
+If $\epsilon$ is constant within the region,
+
+$$
+\nabla^2V=-\frac{\rho_v}{\epsilon},
+$$
+
+which is Poisson's equation. In a charge-free region it becomes Laplace's equation,
 
 $$
 \nabla^2V=0.
 $$
 
-Potential energy of a point charge in a potential is
+Laplace's equation says that the value of $V$ at a point is tied to nearby values; it cannot have an isolated interior maximum or minimum in a charge-free region. Electrostatic trapping of a free charge by a purely static field therefore runs into a structural obstruction, not merely a poor choice of electrode shape.
+
+The Coulomb integral and Poisson equation are two views of the same theory. The integral is convenient when the charge distribution is given in an unbounded homogeneous medium. The differential equation is better when conductor shapes, specified voltages, dielectric interfaces, or finite boundaries dominate the problem.
+
+Uniqueness makes boundary methods dependable. Suppose $V_1$ and $V_2$ satisfy Poisson's equation with the same charge density and the same specified potential on the boundary. Their difference $u=V_1-V_2$ satisfies $\nabla^2u=0$ and vanishes on the boundary. Applying Green's identity shows that the volume integral of $\vert \nabla u\vert ^2$ is zero, so $\nabla u=0$ everywhere and $u=0$. Once a candidate satisfies both the equation and the boundary data, another distinct solution cannot exist.
+
+## Conductors, surfaces, and stored energy
+
+In electrostatic equilibrium the field inside an ideal conductor is zero. Otherwise free carriers would continue moving. It follows that the conductor is an equipotential, and the tangential electric field immediately outside its surface is zero. Excess free charge resides on the surface. A thin Gaussian pillbox across that surface gives the normal boundary condition
 
 $$
-W=qV.
+\hat n\cdot(\vec D_{\text{out}}-\vec D_{\text{in}})=\rho_s.
 $$
 
-The work done by the field moving charge $q$ from $a$ to $b$ is
+With $\vec D_{\text{in}}=0$ for the conductor,
 
 $$
-W_{\text{field}}=q[V(a)-V(b)].
+\vec E_{\text{out}}=\frac{\rho_s}{\epsilon}\hat n.
 $$
 
-This sign convention is a common source of confusion. A positive charge naturally moves toward lower potential because its potential energy decreases.
+Large surface charge density therefore corresponds to large normal field. Charge crowds near sharp protrusions because a rapidly curving equipotential requires closely spaced neighboring equipotentials. That observation matters in high-voltage design: sharp electrodes promote corona and breakdown.
 
-The electric dipole is a useful far-field approximation for two equal and opposite charges separated by small distance. Its moment is
+Energy can be assembled charge by charge. For discrete charges, excluding each charge's divergent self-energy,
 
 $$
-\vec p=q\vec d,
+U=\frac12\sum_i q_iV_{\text{others}}(\vec r_i).
 $$
 
-directed from negative to positive charge. Far from the dipole, the potential falls as $1/r^2$ rather than $1/r$, because the net charge is zero.
+For a continuous distribution,
 
-Potential is often the better design variable because conductor surfaces in electrostatic equilibrium are equipotentials. If the conductor voltages are known, a boundary-value problem for $V$ can be solved first, then $\vec E=-\nabla V$ gives the field. This sequence is used in capacitance extraction, insulation grading, electrostatic shielding, and semiconductor device approximations. The field is the physically force-producing quantity, but the potential is frequently the simpler mathematical unknown.
+$$
+U=\frac12\int_\mathcal{V}\rho_v V\,dv.
+$$
 
-Dimensional checking is especially helpful in Coulomb integrals. A line charge contribution $\rho_l dl/(4\pi\epsilon R^2)$ has units of V/m after multiplying by $\hat R$, while a potential contribution $\rho_l dl/(4\pi\epsilon R)$ has units of volts. If a result for electric field scales as $1/R$ for an isolated point charge, or a result for potential scales as $1/R^2$, the integration or geometry has likely been mixed up.
+Using Gauss's law and integration by parts converts this to a field expression. If boundary terms vanish or are handled separately,
 
-The choice between field-first and potential-first methods is usually dictated by symmetry. If the vector directions from all source elements combine simply, a direct $\vec E$ integral is efficient. If directions vary but distances are simple, a scalar potential integral may be shorter. If conductor boundaries are specified by voltages, solving for $V$ is usually the natural route.
+$$
+U=\frac12\int_\mathcal{V}\vec E\cdot\vec D\,dv.
+$$
 
-Electrostatic uniqueness is a powerful checking principle. If the potential satisfies the governing equation in the region and satisfies the specified conductor potentials or surface-charge conditions, then no second different electrostatic solution exists for the same problem. This is why boundary-value solutions can be trusted even when the intermediate mathematics looks indirect.
-
-## Visual
+Thus the electric energy density in a linear medium is $u_e=\tfrac12\vec E\cdot\vec D$. In a nonlinear dielectric the factor $1/2$ generally disappears; the energy density is found from the constitutive curve by integrating $\vec E\cdot d\vec D$.
 
 ```mermaid
-flowchart TD
-  A[Charge distribution rho] --> B[Coulomb integral]
-  A --> C[Poisson equation]
-  B --> D[Electric field E]
-  C --> E[Potential V]
-  E --> D
-  D --> F[Force qE]
-  D --> G["Flux density D = epsilon E"]
-  E --> H[Energy qV]
+flowchart LR
+  A["Charge distribution"] --> B["Coulomb integral"]
+  A --> C["Poisson equation"]
+  B --> D["Electric field E"]
+  C --> E["Potential V"]
+  E -->|"negative gradient"| D
+  D --> F["Force qE"]
+  D --> G["Energy density"]
 ```
 
-| Source type | Density | Charge element | Typical symmetry |
-|---|---:|---:|---|
-| Point charge | $q$ | discrete | spherical |
-| Line charge | $\rho_l$ | $\rho_l dl$ | cylindrical |
-| Surface charge | $\rho_s$ | $\rho_s dS$ | planar or shell |
-| Volume charge | $\rho_v$ | $\rho_v dv$ | bulk region |
+## The dipole as the first far-field correction
 
-## Worked example 1: Field of two point charges on an axis
+A localized group of charges looks progressively simpler as the observation distance grows. The leading term depends on the net charge. If the net charge vanishes, the next surviving term is usually the electric dipole.
 
-Problem: Charges $q_1=4\ \mathrm{nC}$ at $x=0$ and $q_2=-1\ \mathrm{nC}$ at $x=3$ cm are in free space. Find $\vec E$ at $x=6$ cm.
-
-Step 1: The observation point is to the right of both charges. Distances are
+Take charges $+q$ and $-q$ separated by displacement $\vec d$, directed from the negative charge to the positive one. Their dipole moment is
 
 $$
-R_1=0.06\ \mathrm{m},\qquad R_2=0.03\ \mathrm{m}.
+\vec p=q\vec d.
 $$
 
-Step 2: Field from $q_1$ points in $+\hat x$ because $q_1$ is positive and the observation point is to its right:
+Place the pair near the origin and observe it at $\vec r$, where $r\gg \vert \vec d\vert $. The exact potential is the difference of two point-charge potentials. Expanding each inverse distance to first order in $d/r$ leaves
 
 $$
-\vec E_1=\frac{1}{4\pi\epsilon_0}\frac{4\times10^{-9}}{(0.06)^2}\hat x.
+V(\vec r)\approx
+\frac{1}{4\pi\epsilon}
+\frac{\vec p\cdot\hat r}{r^2}.
 $$
 
-Using $1/(4\pi\epsilon_0)=8.99\times10^9$,
+For a dipole aligned with the $z$ axis, $\vec p\cdot\hat r=p\cos\theta$, so
 
 $$
-\vec E_1=8.99\times10^9\frac{4\times10^{-9}}{0.0036}\hat x
-=9.99\times10^3\hat x\ \mathrm{V/m}.
+V(r,\theta)=
+\frac{p\cos\theta}{4\pi\epsilon r^2}.
 $$
 
-Step 3: Field from $q_2$ points toward the negative charge, so at $x=6$ cm it points in $-\hat x$:
+Using the spherical-coordinate gradient gives
 
 $$
-\vec E_2=-8.99\times10^9\frac{1\times10^{-9}}{(0.03)^2}\hat x
-=-9.99\times10^3\hat x\ \mathrm{V/m}.
+\begin{aligned}
+E_r&=-\frac{\partial V}{\partial r}
+=\frac{2p\cos\theta}{4\pi\epsilon r^3},\\
+E_\theta&=-\frac{1}{r}\frac{\partial V}{\partial\theta}
+=\frac{p\sin\theta}{4\pi\epsilon r^3},\\
+E_\phi&=0.
+\end{aligned}
 $$
 
-Step 4: Add fields:
+The potential falls as $1/r^2$ and the field as $1/r^3$, faster than the monopole terms $1/r$ and $1/r^2$. Distance therefore filters source detail: far away, net charge dominates; if it is zero, dipole moment dominates; still finer structure appears in higher multipoles.
+
+An external uniform field exerts equal and opposite forces on the two charges, producing no net force but generally producing torque
+
+$$
+\vec\tau=\vec p\times\vec E.
+$$
+
+The associated potential energy is
+
+$$
+U=-\vec p\cdot\vec E.
+$$
+
+The lowest-energy orientation has $\vec p$ parallel to $\vec E$. In a nonuniform field the forces do not cancel exactly, so a dipole can also experience a net force. This distinction separates orientation effects from translational attraction toward regions of stronger field.
+
+## Choosing a solution route
+
+Several methods can solve the same electrostatic problem, but their workloads differ sharply.
+
+| Given information | Usually start with | Reason |
+|---|---|---|
+| A few point charges | Coulomb superposition | Each contribution is explicit |
+| A continuous source with simple distances | Potential integral | Scalar addition avoids component bookkeeping |
+| Strong planar, cylindrical, or spherical symmetry | Gauss's law | The field is constant on a suitable Gaussian surface |
+| Conductor voltages and geometry | Laplace or Poisson equation | Boundary values are already stated in terms of $V$ |
+| A conductor near a point charge | Image method, when geometry permits | A fictitious source can enforce the boundary potential |
+
+Symmetry should be used before calculation. It can show that components vanish, that a field depends on only one coordinate, or that a surface is equipotential. It cannot by itself set the magnitude. For example, cylindrical symmetry around an infinite line fixes the field direction as $\hat\rho$ and rules out dependence on $\phi$ or $z$; Gauss's law then supplies the remaining $1/\rho$ magnitude.
+
+Boundary conditions also need to match the mathematical problem. Specifying $V$ everywhere on the boundary is a Dirichlet condition. Specifying its normal derivative, equivalently the normal electric field or surface charge, is a Neumann condition. A pure Neumann problem determines $V$ only up to an additive constant, which is physically acceptable because voltage differences remain fixed. Mixed problems specify different types of data on different boundary pieces.
+
+## Worked example: cancellation between unequal point charges
+
+Charges $q_1=4\ \mathrm{nC}$ at $x=0$ and $q_2=-1\ \mathrm{nC}$ at $x=3\ \mathrm{cm}$ lie in free space. Find the field at $x=6\ \mathrm{cm}$.
+
+The observation point is to the right of both charges:
+
+$$
+R_1=0.06\ \mathrm{m},
+\qquad
+R_2=0.03\ \mathrm{m}.
+$$
+
+The positive charge produces a field in $+\hat x$:
+
+$$
+\begin{aligned}
+\vec E_1
+&=\frac{1}{4\pi\epsilon_0}
+\frac{4\times10^{-9}}{(0.06)^2}\hat x\\
+&=(8.99\times10^9)
+\frac{4\times10^{-9}}{0.0036}\hat x\\
+&=9.99\times10^3\hat x\ \mathrm{V/m}.
+\end{aligned}
+$$
+
+The field of the negative charge points toward that charge, hence in $-\hat x$ at the observation point:
+
+$$
+\begin{aligned}
+\vec E_2
+&=-\frac{1}{4\pi\epsilon_0}
+\frac{1\times10^{-9}}{(0.03)^2}\hat x\\
+&=-9.99\times10^3\hat x\ \mathrm{V/m}.
+\end{aligned}
+$$
+
+Therefore
 
 $$
 \vec E=\vec E_1+\vec E_2=0.
 $$
 
-Check: Although the charges are unequal, the observation point is twice as far from the larger charge, so the $q/R^2$ factors match.
+There is no symmetry about the observation point. Cancellation occurs because the larger charge is twice as far away, and its fourfold charge is canceled by the fourfold reduction from inverse-square distance. The potential does not cancel there:
 
-## Worked example 2: Potential and field of a uniformly charged ring on its axis
+$$
+V=\frac{1}{4\pi\epsilon_0}
+\left(\frac{4\times10^{-9}}{0.06}
+-\frac{1\times10^{-9}}{0.03}\right)
+\approx 300\ \mathrm{V}.
+$$
 
-Problem: A ring of radius $a$ carries total charge $Q$ uniformly. Find $V$ and $E_z$ at a point on the axis a distance $z$ from the center, using infinity as reference.
+A zero field at one point does not imply zero potential at that point.
 
-Step 1: Every ring element is the same distance from the observation point:
+## Worked example: a uniformly charged ring
+
+A ring of radius $a$ carries total charge $Q$ uniformly. Find the potential and axial field at coordinate $z$, taking $V(\infty)=0$.
+
+Every charge element is the same distance from the observation point:
 
 $$
 R=\sqrt{a^2+z^2}.
 $$
 
-Step 2: The potential contribution is
+The potential contribution is $dV=dq/(4\pi\epsilon R)$. Since $R$ is constant around the ring,
 
 $$
-dV=\frac{dq}{4\pi\epsilon R}.
+\begin{aligned}
+V(z)
+&=\frac{1}{4\pi\epsilon R}\int_{\text{ring}}dq\\
+&=\frac{Q}{4\pi\epsilon\sqrt{a^2+z^2}}.
+\end{aligned}
 $$
 
-Step 3: Integrate around the ring. Since $R$ is constant,
+Rotational symmetry cancels all transverse field components. The remaining component follows by differentiation:
 
 $$
-V(z)=\frac{1}{4\pi\epsilon R}\int dq
-=\frac{Q}{4\pi\epsilon\sqrt{a^2+z^2}}.
+\begin{aligned}
+E_z
+&=-\frac{dV}{dz}\\
+&=-\frac{Q}{4\pi\epsilon}
+\frac{d}{dz}(a^2+z^2)^{-1/2}\\
+&=\frac{Qz}{4\pi\epsilon(a^2+z^2)^{3/2}}.
+\end{aligned}
 $$
 
-Step 4: Use $\vec E=-\nabla V$. On the axis, only $z$ variation remains:
+At the center, $E_z(0)=0$ although $V(0)=Q/(4\pi\epsilon a)$. Far from the ring, expand in the small ratio $a/z$:
 
 $$
-E_z=-\frac{dV}{dz}.
+V(z)=\frac{Q}{4\pi\epsilon z}
+\left(1+\frac{a^2}{z^2}\right)^{-1/2}
+\approx
+\frac{Q}{4\pi\epsilon z}
+\left(1-\frac{a^2}{2z^2}\right).
 $$
 
-Step 5: Differentiate:
+The leading term is the potential of a point charge $Q$; finite-size corrections decay faster.
+
+## Worked example: solving Laplace's equation between plates
+
+Two large parallel conducting plates occupy $x=0$ and $x=d$. Their potentials are $V(0)=V_0$ and $V(d)=0$. Ignore fringing.
+
+Translational symmetry in $y$ and $z$ reduces Laplace's equation to
 
 $$
-\frac{d}{dz}(a^2+z^2)^{-1/2}
-=-\frac{1}{2}(a^2+z^2)^{-3/2}(2z)
-=-z(a^2+z^2)^{-3/2}.
+\frac{d^2V}{dx^2}=0.
 $$
 
-Thus
+Integrating twice gives $V(x)=Ax+B$. The first boundary condition gives $B=V_0$, while the second gives
 
 $$
-E_z=\frac{Qz}{4\pi\epsilon(a^2+z^2)^{3/2}}.
+0=Ad+V_0,
+\qquad
+A=-\frac{V_0}{d}.
 $$
 
-Check: At $z=0$, $E_z=0$ by symmetry. Far away, $E_z\approx Q/(4\pi\epsilon z^2)$, like a point charge.
+Hence
 
-## Code
+$$
+V(x)=V_0\left(1-\frac{x}{d}\right),
+\qquad
+\vec E=-\frac{dV}{dx}\hat x
+=\frac{V_0}{d}\hat x.
+$$
 
-```python
-import numpy as np
-import matplotlib.pyplot as plt
+The uniform field points from the high-potential plate toward the low-potential plate. The surface charge densities on the facing surfaces are $+\epsilon V_0/d$ and $-\epsilon V_0/d$. If the plate area is $A_p$, then $Q=\epsilon A_pV_0/d$ and the capacitance follows as $C=Q/V_0=\epsilon A_p/d$.
 
-eps0 = 8.8541878128e-12
-Q = 1e-9
-a = 0.05
-z = np.linspace(-0.2, 0.2, 500)
+## Checks that catch most errors
 
-V = Q / (4 * np.pi * eps0 * np.sqrt(a**2 + z**2))
-Ez = Q * z / (4 * np.pi * eps0 * (a**2 + z**2)**1.5)
+- Keep the source point $\vec r'$ separate from the observation point $\vec r$. Reversing $\vec r-\vec r'$ reverses every field contribution.
+- Potential is scalar, but it is signed. Negative source charge contributes negative potential when the reference is infinity.
+- A field result should have units V/m or N/C; a potential result should have units volts. Density units must cancel the line, area, or volume element used.
+- The relation $\vec E=-\nabla V$ contains both a derivative and a minus sign. Omitting either changes the dimensions or direction.
+- Do not use $V(\infty)=0$ blindly for infinite source models. Check that the relevant integral converges.
+- The formula $\vec D=\epsilon\vec E$ assumes a linear isotropic material. Anisotropic media require a permittivity tensor, and nonlinear media require a constitutive relation rather than one constant.
+- A zero field at a point says the local slope of $V$ is zero. It says nothing by itself about the numerical value of $V$ or whether the equilibrium is stable.
 
-fig, ax = plt.subplots(2, 1, sharex=True)
-ax[0].plot(z, V)
-ax[0].set_ylabel("V (volts)")
-ax[0].grid(True)
-ax[1].plot(z, Ez)
-ax[1].set_xlabel("z (m)")
-ax[1].set_ylabel("Ez (V/m)")
-ax[1].grid(True)
-plt.show()
-```
+## Related pages
 
-## Common pitfalls
-
-- Using $\vec R$ in the wrong direction. In field integrals, $\vec R$ points from source to observation point.
-- Forgetting that potential is scalar. Add potentials algebraically, then compute $\vec E=-\nabla V$ if needed.
-- Dropping the sign in $\vec E=-\nabla V$. The electric field points toward decreasing potential for positive charge.
-- Applying point-charge formulas inside a continuous charge distribution without integrating.
-- Using $\epsilon_0$ when the charge is embedded in another homogeneous dielectric with $\epsilon=\epsilon_r\epsilon_0$.
-- Ignoring units for charge density. Line, surface, and volume densities use different dimensions.
-- Treating the potential reference as physically measurable. Only potential differences affect work and circuit voltage.
-
-## Connections
-
-- [Vector algebra and coordinate systems](/physics/electromagnetics/vector-algebra-coordinate-systems) for source-to-observer vectors and volume elements.
-- [Gradient, divergence, curl, and integral theorems](/physics/electromagnetics/gradient-divergence-curl-integral-theorems) for $\vec E=-\nabla V$ and Poisson's equation.
-- [Gauss law, dielectrics, and boundaries](/physics/electromagnetics/gauss-law-dielectrics-and-boundaries) for high-symmetry electrostatic fields.
-- [Capacitance, energy, and image method](/physics/electromagnetics/capacitance-energy-and-image-method) for applications of potential differences.
+- [Vector algebra and coordinate systems](/physics/electromagnetics/vector-algebra-coordinate-systems)
+- [Gradient, divergence, curl, and integral theorems](/physics/electromagnetics/gradient-divergence-curl-integral-theorems)
+- [Gauss law, dielectrics, and boundaries](/physics/electromagnetics/gauss-law-dielectrics-and-boundaries)
+- [Capacitance, energy, and image method](/physics/electromagnetics/capacitance-energy-and-image-method)

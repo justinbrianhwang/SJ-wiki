@@ -7,9 +7,9 @@ sidebar_position: 12
 
 Frequency response describes how an LTI system changes sinusoidal or complex exponential components. If the input contains a component at frequency $\omega$, the output contains the same frequency multiplied by a complex number. The magnitude of that number is the gain, and its angle is the phase shift. Filtering is the design or use of frequency response to pass desired components and suppress undesired ones.
 
-This page connects Fourier transforms, Laplace transforms, and $z$-transforms. In continuous time, the frequency response is $H(j\omega)$. In discrete time, it is $H(e^{j\Omega})$. In both cases, it is obtained from the impulse response of an LTI system and used through multiplication in the frequency domain.
+Fourier transforms, Laplace transforms, and $z$-transforms meet here. In continuous time, the frequency response is $H(j\omega)$. In discrete time, it is $H(e^{j\Omega})$. In both cases, it comes from the impulse response and acts through multiplication in the frequency domain.
 
-## Definitions
+## Why complex exponentials pass through unchanged in form
 
 For a continuous-time LTI system with impulse response $h(t)$, the frequency response is
 
@@ -74,7 +74,18 @@ A lowpass filter passes low frequencies and attenuates high frequencies. A highp
 
 The cutoff frequency is a boundary between passband and stopband. For practical filters, passband ripple, stopband attenuation, and transition width replace the impossible ideal brick-wall response.
 
-## Key results
+For a real sinusoid, use conjugate exponentials. If a real LTI system has response $H(j\omega_0)=\vert H\vert e^{j\phi}$, then
+
+$$
+A\cos(\omega_0t+\theta)
+\longmapsto
+A|H(j\omega_0)|
+\cos(\omega_0t+\theta+\phi).
+$$
+
+The steady-state frequency is unchanged. Transient terms can still appear when initial energy is stored in a physical system; frequency response describes the zero-state sinusoidal steady state.
+
+## Ideal responses and the cost of realizability
 
 For an LTI system,
 
@@ -142,11 +153,23 @@ The frequency response is $H(e^{j\Omega})$ if the unit circle is in the ROC. Pol
 
 Filter specifications usually separate passband, transition band, and stopband. In the passband, the filter should preserve desired components within an allowed ripple. In the stopband, the filter should attenuate undesired components by a specified amount. The transition band is the frequency interval where the response moves from passband to stopband. Narrow transition bands require longer FIR filters or higher-order IIR filters.
 
-Phase matters when waveform shape matters. A linear-phase filter delays all frequency components by the same group delay, preserving the shape of broadband pulses apart from delay and magnitude shaping. Nonlinear phase can smear transients even when the magnitude response looks acceptable. This is why audio, communications, and measurement systems often specify both magnitude and phase behavior.
+Phase matters when waveform shape matters. A linear-phase filter delays all frequency components by the same group delay, preserving the shape of broadband pulses apart from delay and magnitude shaping. Nonlinear phase can smear transients even when the magnitude response looks acceptable. Audio, communications, and measurement systems therefore often specify both magnitude and phase behavior.
+
+Write $H=\vert H\vert e^{j\phi}$. Phase delay is $-\phi/\omega$ and group delay is
+
+$$
+\tau_g(\omega)=-\frac{d\phi}{d\omega}
+$$
+
+in continuous time, or the same derivative with respect to $\Omega$ in samples for discrete time. A linear phase $\phi=-\omega t_d+\phi_0$ gives constant group delay $t_d$. Phase must be unwrapped before differentiation; jumps caused only by reporting angles modulo $2\pi$ are not physical delay spikes.
 
 Ideal filters are useful reference models, but realizable filters trade sharpness, delay, ripple, and stability. A causal approximation to an ideal lowpass response cannot have both finite delay and a perfectly sharp cutoff.
 
-## Visual
+The ideal lowpass impulse response decays only as $1/\vert t\vert $ and extends before $t=0$. Shifting it by a finite delay cannot make the left tail vanish. Truncating and delaying gives a realizable FIR approximation, but multiplication by a finite window in time convolves the brick-wall spectrum with the window spectrum. Transition width and ripple appear together.
+
+No causal stable filter can respond to a frequency component before enough samples or time have arrived to identify it. Narrow frequency discrimination requires a long observation memory. This time-frequency tradeoff underlies the growing delay or order needed as the transition band narrows.
+
+## Filter families and design choices
 
 | Filter type | Passes | Rejects | Ideal response sketch |
 |---|---|---|---|
@@ -192,7 +215,43 @@ flowchart TB
   TransformD --> Output
 ```
 
-This filtering diagram connects ideal frequency goals to realizable LTI systems. The central contract is the impulse-response-to-frequency-response path, where magnitude controls pass/stop behavior and phase controls delay or waveform distortion. The realization subgraph shows why FIR, IIR, and analog-prototype filters make different tradeoffs in transition width, delay, order, and stability.
+Ideal frequency goals lead to realizable LTI systems through an impulse response. Magnitude controls passband and stopband behavior; phase controls delay and waveform distortion. FIR, IIR, and analog-prototype filters make different tradeoffs in transition width, order, and stability.
+
+| Choice | Main strength | Main cost |
+|---|---|---|
+| FIR | Exact linear phase is possible; no feedback instability | More taps for a narrow transition |
+| IIR | Sharp magnitude response with lower order | Nonlinear phase and stability constraints |
+| Minimum phase | Least delay for a given causal magnitude response | Phase is fixed by magnitude under stated conditions |
+| Allpass cascade | Changes phase without changing magnitude | Adds delay and implementation complexity |
+
+The names Butterworth, Chebyshev, and elliptic refer to different rational approximation criteria. Butterworth magnitude is maximally flat at zero frequency. Chebyshev designs accept ripple in one band for a sharper transition. Elliptic designs accept ripple in both passband and stopband for the smallest order among the classical choices at a given specification. The choice follows the allowed ripple and phase behavior, not a universal ranking.
+
+## Decibels, Bode plots, and cascades
+
+Magnitude in decibels is
+
+$$
+G_{\mathrm{dB}}(\omega)=20\log_{10}|H(j\omega)|.
+$$
+
+The factor 20 is used because power is proportional to squared voltage or field magnitude when impedance is fixed. A magnitude of $1/\sqrt2$ is approximately $-3.01$ dB, while factors $1/2$ and $1/10$ are about $-6.02$ dB and $-20$ dB.
+
+Cascaded responses multiply:
+
+$$
+H_{\text{total}}=H_1H_2\cdots H_m.
+$$
+
+Their dB magnitudes and phases add. This makes logarithmic Bode plots useful for rational systems. A first-order pole contributes an asymptotic slope change of $-20$ dB per decade after its corner and approaches $-90^\circ$ phase. A first-order zero contributes the opposite trends. Exact curves change gradually around each corner; straight-line asymptotes are estimates.
+
+For the RC lowpass,
+
+$$
+20\log_{10}|H(j\omega)|
+=-10\log_{10}(1+\omega^2R^2C^2).
+$$
+
+Well above cutoff, magnitude is approximately $1/(\omega RC)$, giving the $-20$ dB per decade slope.
 
 ## Worked example 1: RC lowpass frequency response
 
@@ -340,35 +399,80 @@ $$
 
 Checked answer: The filter has exact notches at $\Omega=\pm\Omega_0$. Its zeros lie on the unit circle at $z=e^{j\Omega_0}$ and $z=e^{-j\Omega_0}$.
 
-## Code
+## Worked example: filter a two-tone signal
 
-```python
-import numpy as np
-import matplotlib.pyplot as plt
+Let the RC lowpass have $RC=1\ \mathrm{ms}$, and let
 
-Omega0 = 0.35 * np.pi
-Omega = np.linspace(-np.pi, np.pi, 2000)
+$$
+x(t)=2\cos(100t)+\cos(5000t).
+$$
 
-H_notch = 1 - 2 * np.cos(Omega0) * np.exp(-1j * Omega) + np.exp(-2j * Omega)
-RC = 0.01
-omega = np.linspace(0, 800, 1000)
-H_rc = 1 / (1 + 1j * omega * RC)
+For each tone,
 
-fig, ax = plt.subplots(1, 2, figsize=(10, 3))
-ax[0].plot(omega, np.abs(H_rc))
-ax[0].set_title("RC lowpass magnitude")
-ax[0].grid(True)
+$$
+H(j\omega)=\frac{1}{1+j\omega RC}.
+$$
 
-ax[1].plot(Omega, np.abs(H_notch))
-ax[1].axvline(Omega0, color="r", linestyle="--")
-ax[1].axvline(-Omega0, color="r", linestyle="--")
-ax[1].set_title("FIR notch magnitude")
-ax[1].grid(True)
-plt.tight_layout()
-plt.show()
-```
+At $\omega_1=100$ rad/s, $\omega_1RC=0.1$, so
 
-## Common pitfalls
+$$
+|H(j100)|=\frac{1}{\sqrt{1+0.1^2}}
+\approx0.995,
+$$
+
+$$
+\angle H(j100)=-\tan^{-1}(0.1)
+\approx-5.71^\circ.
+$$
+
+At $\omega_2=5000$ rad/s, $\omega_2RC=5$, giving
+
+$$
+|H(j5000)|=\frac{1}{\sqrt{26}}
+\approx0.196,
+$$
+
+$$
+\angle H(j5000)=-\tan^{-1}(5)
+\approx-78.7^\circ.
+$$
+
+The zero-state steady-state output is
+
+$$
+y_{ss}(t)
+\approx1.99\cos(100t-5.71^\circ)
++0.196\cos(5000t-78.7^\circ).
+$$
+
+The low-frequency tone is almost unchanged, while the high-frequency tone is reduced by roughly a factor of five and strongly phase shifted. Any startup transient from the capacitor's initial condition is separate from this frequency-response calculation and decays with time constant $RC$.
+
+## Poles, zeros, and stability
+
+For rational systems, zeros suppress frequencies near their angular locations and poles enhance them. In discrete time, distance to the unit circle matters: a pole at radius $r\lt 1$ and angle $\Omega_0$ produces a resonance near $\Omega_0$ that becomes narrower and taller as $r$ approaches one. A zero exactly on the unit circle produces an exact null at its angle.
+
+Pole-zero geometry alone does not establish a system's frequency response. The ROC must include the frequency contour: the imaginary axis for a continuous-time Laplace transform or the unit circle for a $z$-transform. A causal rational discrete-time system is BIBO stable only when all poles lie strictly inside the unit circle. Marginal pole locations on the unit circle generally prevent absolute summability even when a formal sinusoidal expression can be written away from the pole.
+
+Moving zeros or poles to sharpen one part of a response affects other properties. A narrow notch is sensitive to coefficient quantization and frequency drift. A high-Q pole pair rings longer in time. The same pole radius that narrows a resonance also lengthens its transient decay.
+
+## Magnitude alone does not determine every filter
+
+Multiplying a stable response by an allpass factor changes phase while leaving magnitude unchanged on the frequency contour. A first-order discrete-time example is
+
+$$
+A(z)=\frac{z^{-1}-a^*}{1-az^{-1}},
+\qquad |a|<1.
+$$
+
+On the unit circle, numerator and denominator have equal magnitudes, so $\vert A(e^{j\Omega})\vert =1$. Cascading this section with another filter preserves its magnitude response and modifies group delay.
+
+Among causal stable systems with a given compatible magnitude, a minimum-phase realization places all zeros in the stable region and has the smallest associated delay in a precise energy-concentration sense. Reflecting a zero across the unit circle can preserve magnitude up to a scale factor while changing phase. Equal magnitude plots therefore do not imply equal transient behavior.
+
+Filtering also cannot generally separate components that occupy the same frequencies. If desired signal and noise overlap spectrally, a fixed LTI magnitude response attenuates both together. Additional structure—statistical models, time variation, multiple sensors, or nonlinear processing—is needed. Calling every denoising operation a frequency filter can conceal that limitation.
+
+Real-time and offline filtering have different causality constraints. An offline zero-phase operation can filter forward and backward, canceling phase distortion but using future samples and squaring the magnitude response. Such an operation is useful for recorded data but cannot be implemented as a causal live system without delay and prediction.
+
+## Specification and interpretation mistakes
 
 - Calling a filter ideal without noticing whether its impulse response is causal or finite-duration.
 - Ignoring phase response. Two systems can have similar magnitude responses but different waveform distortion.
@@ -376,7 +480,7 @@ plt.show()
 - Assuming poles near the unit circle are always bad. They can be useful for resonance, but they reduce stability margin in causal IIR filters.
 - Mixing continuous-time cutoff $\omega_c$ in rad/s with discrete-time cutoff $\Omega_c$ in rad/sample.
 
-## Connections
+## Related pages
 
 - [Continuous-Time Fourier Transform](/physics/signals-systems/continuous-time-fourier-transform)
 - [Discrete-Time Fourier Transform](/physics/signals-systems/discrete-time-fourier-transform)

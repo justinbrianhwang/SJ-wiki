@@ -5,64 +5,97 @@ sidebar_position: 7
 
 # Binary Search Trees
 
-A binary search tree, or BST (이진 탐색 트리), adds an ordering rule to the binary tree shape. For each node, every key in the left subtree is smaller than the node's key, and every key in the right subtree is larger. This rule turns a tree into a searchable dictionary: each comparison chooses left or right, so the search path can be much shorter than a linear scan.
+A binary search tree stores ordered keys in a shape determined by comparisons. At a node with key $k$, every key in the left subtree is less than $k$ and every key in the right subtree is greater than $k$. The rule applies to whole subtrees, not only to the two children.
 
-The main lesson is conditional. A BST is efficient when its height is small; it is inefficient when insertions create a chain. This is why the source textbook treats basic binary search trees before more advanced search trees. The basic BST explains the invariant and the update cases. Balanced trees then add mechanisms to protect the height.
+Search follows one root-to-leaf path. That sounds logarithmic because each comparison chooses one of two directions, but the shape decides how much is actually discarded. A balanced tree has logarithmic height. A chain has linear height and discards only one node per comparison. An ordinary BST maintains order but does nothing to prevent the chain.
 
-## Definitions
+## The ordering invariant
 
-A **binary search tree** is a binary tree in which every node with key `k` satisfies:
+For distinct keys, a node $u$ defines bounds for all of its descendants:
 
 $$
-\text{all keys in left subtree} < k < \text{all keys in right subtree}
+x\in u.\mathrm{left}\Rightarrow x.\mathrm{key}<u.\mathrm{key},
+\qquad
+x\in u.\mathrm{right}\Rightarrow x.\mathrm{key}>u.\mathrm{key}.
 $$
 
-Some implementations allow duplicates by storing a count in the node or by choosing a consistent side for equal keys. The simplest mathematical definition assumes distinct keys.
+Each ancestor adds another bound. If a search for `45` moves left from `50` and then right from `30`, the remaining subtree can contain only keys between `30` and `50`. Checking only that every left child is smaller and every right child is larger is insufficient to validate a BST. The invalid tree below passes that local test at each displayed parent even though `55` lies in the left subtree of `50`:
 
-A BST ADT usually represents a dictionary:
+```text
+       50
+      /
+    30
+      \
+       55
+```
 
-- **`search(T, key)`**: return the node or associated value with `key`, or report failure.
-- **`insert(T, key)`**: add a key while preserving the BST invariant.
-- **`delete(T, key)`**: remove a key while preserving the invariant.
-- **`min(T)`**: find the smallest key by following left links.
-- **`max(T)`**: find the largest key by following right links.
-- **`inorder(T)`**: visit keys in sorted order.
+A correct validator carries a lower and upper bound down the recursion. The bounds also expose a subtle implementation issue: using `key - 1` to make an exclusive integer bound can overflow at the minimum value. Passing bounds as keys with explicit inclusivity, or comparing against ancestor nodes, avoids arithmetic at the limits.
 
-BST search is a guided walk from the root. At node `p`:
+Duplicates require a declared policy. Common choices are:
 
-- If `key == p->key`, search succeeds.
-- If `key < p->key`, continue in `p->left`.
-- If `key > p->key`, continue in `p->right`.
+- reject an equal key, giving set semantics;
+- keep one node and increment a count;
+- store a collection of values under one key, giving multimap semantics;
+- choose a consistent side for equality.
 
-Deletion has three structural cases:
+The last policy is easy to state but can create a long equal-key chain and complicates validation. Keeping a count or value collection usually preserves the structural meaning of one node per distinct key.
 
-1. The node is a leaf: remove it directly.
-2. The node has one child: replace the node by its child.
-3. The node has two children: replace its key by its inorder successor or predecessor, then delete that successor or predecessor from its original position.
+### Validating the whole tree
 
-## Key results
+Validation can run in $O(n)$ time by passing the legal interval to each recursive call. The root begins with no lower or upper bound. Going left replaces the upper bound with the current key; going right replaces the lower bound. Every node must satisfy both bounds inherited from all ancestors.
 
-If the BST height is $h$, search, insert, and delete take $O(h)$ time because each step moves down one level. In the best balanced case, $h = \Theta(\log n)$. In the worst case, $h = n - 1$, and the BST behaves like a linked list.
+For the invalid tree shown earlier, `55` is reached by going left from `50`, so its inherited upper bound is `50`. The comparison with its immediate parent `30` succeeds, but `55 < 50` fails. The bound method catches the violation at the node where it becomes observable.
 
-Inorder traversal of a BST outputs keys in ascending order. Proof sketch: by induction on the tree. The left subtree contains only keys smaller than the root and is printed in sorted order by the induction hypothesis. Then the root is printed. Then the right subtree contains only larger keys and is printed in sorted order. Concatenating these three sorted parts gives a sorted sequence.
+Another valid test performs an inorder traversal and checks that keys are strictly increasing under set semantics. It needs only the previously visited key, but the duplicate policy changes the comparison: a count-per-node tree remains strictly increasing, while a tree that stores equal keys as separate nodes may permit equality in selected positions. The bounds method states that policy more directly.
 
-The inorder successor of a node with a right subtree is the leftmost node in that right subtree. It is the smallest key greater than the node. The inorder predecessor is symmetric: the rightmost node in the left subtree.
+Validation should also consider representation integrity when pointers are mutable. A cycle or a child shared by two parents is not a tree at all; naive recursion may loop forever or visit and free a node twice. Detecting such corruption requires tracking node addresses in addition to checking key order. A module that keeps node links private prevents ordinary callers from creating those shapes.
 
-| Operation | Balanced height | Worst chain height | Reason |
-|---|---:|---:|---|
-| Search | $O(\log n)$ | $O(n)$ | one comparison per level |
-| Insert | $O(\log n)$ | $O(n)$ | search path plus new leaf |
-| Delete | $O(\log n)$ | $O(n)$ | search plus local restructure |
-| Min or max | $O(\log n)$ | $O(n)$ | follow one side |
-| Inorder traversal | $O(n)$ | $O(n)$ | visit every node |
+## Search cost is tree height
 
-The implementation interface should hide node manipulation from callers. If outside code directly changes `left` or `right`, the BST invariant can be destroyed without the tree module knowing. A safer C design exposes functions such as `bst_insert`, `bst_delete`, and `bst_search`, while keeping the node structure private in a `.c` file when possible.
+Search compares at most one key per level:
 
-Recursive BST code is short because every subtree is itself a BST. Iterative code avoids deep recursion on badly shaped trees. A sorted insertion sequence such as `1, 2, 3, 4, 5` produces a chain if the tree is not balanced, and recursive operations on a long chain may overflow the call stack. That risk motivates AVL trees, red-black trees, splay trees, and B-trees in more advanced chapters.
+```text
+search(node, key):
+    while node exists:
+        if key equals node.key: return node
+        if key is smaller:      node = node.left
+        otherwise:              node = node.right
+    return not found
+```
 
-Deletion is the operation that most often breaks student implementations. A good way to reason about it is to ask what subtree should replace the deleted node. For zero or one child, the answer is immediate. For two children, the successor or predecessor is chosen because it preserves the global ordering relation.
+If the tree height is $h$, search is $O(h)$. With height measured in edges, a one-node tree has $h=0$ and a failed search may inspect $h+1$ nodes. The asymptotic statement ignores that harmless offset.
 
-## Visual
+A binary tree of height $h$ contains at most
+
+$$
+1+2+\cdots+2^h=2^{h+1}-1
+$$
+
+nodes. Rearranging gives a lower bound of roughly $\log_2 n$ on the height needed to hold $n$ nodes. A well-balanced search tree approaches that bound. The upper bound is $n-1$, attained by a chain.
+
+The insertion order controls an unbalanced BST's shape. Inserting `1, 2, 3, 4, 5` produces only right children. Searching for `5` then takes five comparisons. Inserting the same keys as `3, 1, 5, 2, 4` gives height two. The set of keys is identical; only arrival order differs.
+
+| Operation | Time in height $h$ | Balanced tree | Chain |
+|---|---:|---:|---:|
+| search | $O(h)$ | $O(\log n)$ | $O(n)$ |
+| insert | $O(h)$ | $O(\log n)$ | $O(n)$ |
+| delete | $O(h)$ | $O(\log n)$ | $O(n)$ |
+| minimum or maximum | $O(h)$ | $O(\log n)$ | $O(n)$ |
+| full traversal | $O(n)$ | $O(n)$ | $O(n)$ |
+
+Insertion first performs an unsuccessful search, then attaches a new leaf at the missing link where that search ended. It never moves existing nodes, so the invariant follows directly from the comparison path. The new key has satisfied every ancestor bound on its way down.
+
+### Worked example: building and searching
+
+Insert `50, 30, 70, 20, 40, 60, 80` into an empty tree.
+
+1. `50` becomes the root.
+2. `30 < 50`, so `30` becomes the left child of `50`.
+3. `70 > 50`, so `70` becomes the right child.
+4. For `20`, move left at `50`, then left at `30`; insert below `30`.
+5. For `40`, move left at `50`, then right at `30`; insert there.
+6. For `60`, move right at `50`, then left at `70`.
+7. For `80`, move right at `50`, then right at `70`.
 
 ```mermaid
 graph TD
@@ -74,59 +107,69 @@ graph TD
   C --> G((80))
 ```
 
-The invariant says each local subtree also forms a valid search tree:
+Now search for `40`. Compare with `50`: smaller, so go left. Compare with `30`: larger, so go right. The next node equals `40`, so the search succeeds after three comparisons. Searching for `45` follows `50` left, `30` right, `40` right, then reaches a null link. That null link is also exactly where `45` would be inserted.
+
+An inorder traversal returns `20, 30, 40, 50, 60, 70, 80`. More generally, inorder traversal of a BST is sorted. Induct on the subtree size: the left traversal is sorted and below the root, then the root is visited, then the right traversal is sorted and above the root. Concatenating those parts preserves order.
+
+## Successors, predecessors, and ordered queries
+
+The minimum node is reached by following left links until none remains. The maximum follows right links. For a node with a right subtree, its successor is the minimum of that right subtree. That node is greater than the original key, and no smaller greater key can exist: any such key would have to lie farther left in the same right subtree.
+
+If a node has no right subtree and parent pointers are available, its successor is the first ancestor for which the node lies in the ancestor's left subtree. Without parent pointers, a search from the root can remember the lowest greater ancestor.
+
+Ordered traversal supports queries that a hash table does not naturally answer. To report keys in the interval $[a,b]$, recursively visit the left subtree only when the current key may have larger qualifying predecessors, emit the current key if it is inside the interval, and visit the right subtree only when qualifying successors may exist. The cost is $O(h+k)$ for $k$ reported keys when pruning is effective.
+
+### Worked example: a range query
+
+Use the tree above to report every key from `35` through `65`, inclusive.
+
+1. At `50`, the key is inside the range. A qualifying smaller key may exist, so inspect the left subtree first.
+2. At `30`, the key is below `35`. Its left subtree is even smaller and can be skipped. Move right to `40`.
+3. `40` is inside the range. Its missing children add nothing. Emit `40`.
+4. Return to `50` and emit `50`.
+5. Inspect the right subtree at `70`. Since `70` exceeds `65`, its right subtree can be skipped. Move left to `60`.
+6. `60` is inside the range, so emit it.
+
+The result is `40, 50, 60`. Only five tree nodes were inspected; `20` and `80` were pruned by the ordering bounds.
+
+Subtree metadata can support richer ordered queries. If every node stores its subtree size, the rank of a key and the $k$th smallest key can be found by comparing $k$ with the left-subtree size. Rotations or updates in a balanced implementation must then repair that size along with child pointers.
+
+## Deletion is a replacement problem
+
+Deletion first searches for the node. The structural work depends on its children.
+
+For a leaf, replace the parent's link with null. For a node with one child, replace the parent's link with that child. Every key in the replacement subtree already satisfied the deleted node's ancestor bounds, so no further rearrangement is needed.
+
+A node with two children cannot be replaced directly by either child without reattaching the other subtree. The usual method chooses the inorder successor—the smallest node in the right subtree—or the predecessor—the largest node in the left subtree. Copy or move the successor's payload into the target, then delete the successor from its old position. Because the successor is leftmost in its subtree, it has no left child. The second deletion therefore reduces to the zero-or-one-child case.
+
+### Worked example: deleting the root
+
+Delete `50` from the seven-node tree.
+
+1. Search finds `50` at the root. It has two children.
+2. Enter its right subtree at `70`.
+3. Follow the left link to `60`. There is no further left child, so `60` is the successor.
+4. Replace the root key `50` with `60`.
+5. Delete the original `60` node. It is a leaf, so set the left link of `70` to null.
 
 ```text
-left of 50:   20, 30, 40  all < 50
-right of 50:  60, 70, 80  all > 50
-inorder:      20, 30, 40, 50, 60, 70, 80
+before:                 after:
+       50                     60
+      /  \                   /  \
+    30    70               30    70
+   / \    / \             / \     \
+ 20  40  60  80          20  40    80
 ```
 
-## Worked example 1: inserting keys into a BST
+The resulting inorder sequence is `20, 30, 40, 60, 70, 80`. The target key is absent, each other key occurs once, and the successor separates the old left subtree from the remaining right subtree.
 
-Problem: Insert the keys `50, 30, 70, 20, 40, 60, 80` into an initially empty BST.
+Copying a key is harmless for a set of integers. For records, the key and associated value must move together. If external code holds pointers to nodes, replacing a payload also changes which logical item that node represents. An implementation requiring stable node identity may splice the successor node into the target's position instead, which needs more pointer updates but preserves object identity.
 
-Method: the first key becomes the root. Each later key follows comparisons until it reaches a missing child position.
+Recursive insertion and deletion must return the new subtree root. The caller assigns that result to its child link, and the top-level caller assigns it to the tree root. Omitting the assignment loses changes when a null subtree gains a node or when the deleted node is replaced by a child.
 
-1. Insert `50`: tree is empty, so `50` becomes root.
-2. Insert `30`: compare with `50`; `30 < 50`, so go left. Left child is empty, insert there.
-3. Insert `70`: compare with `50`; `70 > 50`, so go right. Right child is empty, insert there.
-4. Insert `20`: `20 < 50`, go left to `30`; `20 < 30`, go left. Insert as left child of `30`.
-5. Insert `40`: `40 < 50`, go left to `30`; `40 > 30`, go right. Insert as right child of `30`.
-6. Insert `60`: `60 > 50`, go right to `70`; `60 < 70`, go left. Insert as left child of `70`.
-7. Insert `80`: `80 > 50`, go right to `70`; `80 > 70`, go right. Insert as right child of `70`.
+## A compact set implementation in C
 
-Checked answer: the final tree matches the visual. Inorder traversal gives `20, 30, 40, 50, 60, 70, 80`, which is the sorted insertion set, so the invariant is consistent.
-
-## Worked example 2: deleting a node with two children
-
-Problem: In the BST from the visual, delete key `50`.
-
-Method: `50` has two children, so replace it with its inorder successor. The successor is the smallest key in the right subtree.
-
-1. Start at the right child of `50`, which is `70`.
-2. Follow left links until none remain:
-   - `70` has left child `60`.
-   - `60` has no left child.
-3. The successor is `60`.
-4. Copy `60` into the root position, replacing `50`.
-5. Delete the original node containing `60`. That node is a leaf, so set `70->left = NULL`.
-
-Final tree:
-
-```text
-        60
-      /    \
-    30      70
-   /  \       \
- 20   40       80
-```
-
-Checked answer: inorder traversal is `20, 30, 40, 60, 70, 80`. The key `50` is gone, all remaining keys are present once, and the left and right subtrees of every node satisfy the BST ordering rule.
-
-## Code
-
-This C program implements insertion, search, deletion, inorder printing, and cleanup for a BST with integer keys.
+The implementation below uses distinct integer keys. Equal insertion is a no-op. Its recursive structure mirrors the invariant, while its worst-case call depth is the tree height.
 
 ```c
 #include <stdio.h>
@@ -138,10 +181,10 @@ typedef struct Node {
     struct Node *right;
 } Node;
 
-static Node *make_node(int key) {
+static Node *new_node(int key) {
     Node *n = malloc(sizeof(*n));
     if (n == NULL) {
-        fprintf(stderr, "malloc failed\n");
+        fprintf(stderr, "allocation failed\n");
         exit(EXIT_FAILURE);
     }
     n->key = key;
@@ -151,60 +194,52 @@ static Node *make_node(int key) {
 }
 
 static Node *insert(Node *root, int key) {
-    if (root == NULL) return make_node(key);
-    if (key < root->key) {
-        root->left = insert(root->left, key);
-    } else if (key > root->key) {
-        root->right = insert(root->right, key);
+    if (root == NULL) return new_node(key);
+    if (key < root->key) root->left = insert(root->left, key);
+    if (key > root->key) root->right = insert(root->right, key);
+    return root;
+}
+
+static const Node *search(const Node *root, int key) {
+    while (root != NULL && root->key != key) {
+        root = key < root->key ? root->left : root->right;
     }
     return root;
 }
 
-static Node *find_min(Node *root) {
-    while (root != NULL && root->left != NULL) {
-        root = root->left;
-    }
+static Node *minimum(Node *root) {
+    while (root->left != NULL) root = root->left;
     return root;
 }
 
-static Node *delete_key(Node *root, int key) {
+static Node *delete(Node *root, int key) {
     if (root == NULL) return NULL;
 
     if (key < root->key) {
-        root->left = delete_key(root->left, key);
+        root->left = delete(root->left, key);
     } else if (key > root->key) {
-        root->right = delete_key(root->right, key);
+        root->right = delete(root->right, key);
+    } else if (root->left == NULL) {
+        Node *replacement = root->right;
+        free(root);
+        return replacement;
+    } else if (root->right == NULL) {
+        Node *replacement = root->left;
+        free(root);
+        return replacement;
     } else {
-        if (root->left == NULL) {
-            Node *right = root->right;
-            free(root);
-            return right;
-        }
-        if (root->right == NULL) {
-            Node *left = root->left;
-            free(root);
-            return left;
-        }
-        Node *succ = find_min(root->right);
-        root->key = succ->key;
-        root->right = delete_key(root->right, succ->key);
+        Node *successor = minimum(root->right);
+        root->key = successor->key;
+        root->right = delete(root->right, successor->key);
     }
     return root;
 }
 
-static int search(const Node *root, int key) {
-    while (root != NULL) {
-        if (key == root->key) return 1;
-        root = key < root->key ? root->left : root->right;
-    }
-    return 0;
-}
-
-static void inorder(const Node *root) {
+static void print_inorder(const Node *root) {
     if (root == NULL) return;
-    inorder(root->left);
+    print_inorder(root->left);
     printf("%d ", root->key);
-    inorder(root->right);
+    print_inorder(root->right);
 }
 
 static void destroy(Node *root) {
@@ -217,31 +252,40 @@ static void destroy(Node *root) {
 int main(void) {
     int keys[] = {50, 30, 70, 20, 40, 60, 80};
     Node *root = NULL;
+
     for (size_t i = 0; i < sizeof(keys) / sizeof(keys[0]); ++i) {
         root = insert(root, keys[i]);
     }
-    printf("has 40? %s\n", search(root, 40) ? "yes" : "no");
-    root = delete_key(root, 50);
-    inorder(root);
+    printf("contains 40: %s\n", search(root, 40) ? "yes" : "no");
+    root = delete(root, 50);
+    print_inorder(root);
     printf("\n");
     destroy(root);
     return EXIT_SUCCESS;
 }
 ```
 
-## Common pitfalls
+The recursive cleanup is postorder because both child pointers must be used before their node is freed. On an adversarial chain, recursive search, update, and cleanup can exhaust the call stack. An iterative implementation removes that particular failure but does not repair the linear running time.
 
-- Saying BST operations are always $O(\log n)$. They are $O(h)$; only balanced height gives logarithmic time.
-- Breaking the invariant by placing all smaller keys somewhere in the left child only, rather than anywhere in the entire left subtree.
-- Mishandling deletion with two children. Copy the successor or predecessor key, then delete that replacement node from its old location.
-- Forgetting to return the possibly changed subtree root from recursive insert or delete.
-- Assuming duplicate keys are harmless. The implementation needs an explicit duplicate policy.
-- Using preorder or postorder when sorted output requires inorder traversal.
+## When an ordinary BST is the wrong structure
 
-## Connections
+AVL and red-black trees add rotations and balance metadata to bound height. They preserve the inorder sequence while changing shape. B-trees use wider nodes and are suited to storage systems where fetching a block dominates comparisons. Treaps randomize priorities to make bad height unlikely without depending on input order.
 
-- [binary trees](/cs/data-structures/binary-trees)
-- [searching algorithms](/cs/data-structures/searching-algorithms)
-- [sorting algorithms](/cs/data-structures/sorting-algorithms)
-- [heaps and priority queues](/cs/data-structures/heaps-priority-queues)
-- [hashing](/cs/data-structures/hashing)
+A sorted array also supports logarithmic search and usually has better locality, but middle insertion and deletion are linear. A hash table offers expected constant-time exact lookup, yet it does not keep keys ordered and cannot answer range queries by walking adjacent keys. The workload decides which trade is useful.
+
+| Need | Often suitable |
+|---|---|
+| mostly reads, compact sorted data | sorted array |
+| exact lookup, no order operations | hash table |
+| ordered updates and range queries | balanced search tree |
+| educational or input known to stay shallow | ordinary BST |
+
+Common errors follow the structural cases. Claims of unconditional $O(\log n)$ ignore height. A duplicate policy left unspecified makes insertion, search, and deletion disagree. Deleting a two-child node without removing the successor leaves a duplicate. Freeing a node before saving its child pointer reads freed memory. Recursive updates that ignore the returned root silently detach modifications.
+
+## Related pages
+
+- [Binary trees and traversals](/cs/data-structures/binary-trees)
+- [Searching algorithms](/cs/data-structures/searching-algorithms)
+- [Sorting algorithms](/cs/data-structures/sorting-algorithms)
+- [Heaps and priority queues](/cs/data-structures/heaps-priority-queues)
+- [Hashing](/cs/data-structures/hashing)

@@ -9,7 +9,7 @@ Linked data structures store data in nodes connected by pointers. Unlike arrays,
 
 Savitch's linked-list material builds directly on pointers, dynamic memory, classes, destructors, and copy control. A node allocated with `new` must eventually be released with `delete`, and a class that owns a chain of nodes needs a destructor, copy constructor, and assignment operator if it allows copying.
 
-## Definitions
+## Nodes, links, and ownership
 
 A **node** is a small object that stores data plus one or more links to other nodes. A singly linked list node usually has a data field and a pointer to the next node:
 
@@ -41,7 +41,11 @@ for (Node* p = head; p != nullptr; p = p->next) {
 }
 ```
 
-## Key results
+The arrows express reachability, not physical adjacency. Two neighboring nodes may be far apart in memory, and allocation order need not match list order. A link stores an address; following it requires an extra memory access. That indirection is why the asymptotic benefit of cheap insertion does not automatically translate into faster programs than a contiguous container.
+
+Ownership must be distinguished from navigation. In the elementary representation, the list object owns every node reachable from `head`, while each raw `next` pointer merely records the chain. Client code that retains a node pointer after deletion has a dangling non-owning pointer. A modern implementation can express the one-way ownership chain with `std::unique_ptr<Node>`, though insertion and deletion still require careful link updates.
+
+## Operations and the invariant they preserve
 
 Inserting at the front of a singly linked list is constant time because it changes only two pointers:
 
@@ -78,7 +82,13 @@ A class that owns a linked list must obey the same resource-management rule intr
 
 The central invariant for a well-formed singly linked list is: starting at `head`, following `next` pointers eventually reaches `nullptr` and does not revisit a node. Operations preserve this invariant by connecting new nodes before exposing them through `head`, and by bypassing deleted nodes before freeing them.
 
-## Visual
+Keeping a tail pointer changes which operations are constant time. With only `head`, appending requires a full traversal. With `head` and `tail`, append is constant time, provided every operation maintains two extra conditions: both pointers are null for an empty list, and `tail->next` is null for a nonempty list. Removing the last node of a singly linked list is still linear because there is no link back to its predecessor.
+
+A doubly linked list stores both `next` and `previous`. Given a pointer or iterator to a node, removal can update its two neighbors in constant time. The cost is another pointer per node and more invariant work per mutation. A circular list replaces an end null with a link back to the beginning; traversal then needs an explicit stopping condition to avoid looping forever.
+
+Complexity claims assume the relevant node is already known. “Insert after node $p$” is $O(1)$, but “find the node containing 37 and insert after it” includes an $O(n)$ search. Likewise, deletion by value is linear even though the actual unlink step is constant time.
+
+## Contiguous storage versus linked storage
 
 ```mermaid
 flowchart LR
@@ -96,7 +106,9 @@ flowchart LR
 | Search by value | `O(n)` | `O(n)` | Both may inspect many elements |
 | Extra memory per item | Low | Higher | List stores pointer field |
 
-## Worked example 1: Inserting at the head
+Arrays and vectors benefit from spatial locality: fetching one element often brings nearby elements into cache. A linked traversal may incur a cache miss at each node. For small values and ordinary sequential work, `std::vector` can outperform a linked list even when the vector occasionally shifts elements. Linked structures earn their cost when stable node addresses, cheap splicing, or frequent insertion at a known position matters.
+
+## Worked example: inserting at the head
 
 Problem: Start with an empty list and insert `30`, then `20`, then `10` at the head. What is the final list?
 
@@ -152,7 +164,9 @@ head -> 10 -> 20 -> 30 -> null
 
 Head insertion reverses the order of insertion because each new value becomes the first node.
 
-## Worked example 2: Deleting a middle node
+At every step the new node is fully initialized before `head` changes. If allocation fails, `new` throws and the old list is untouched. Once `newNode->next` records the previous head, assigning `head = newNode` cannot lose the old chain. Reversing those two pointer assignments would make `newNode->next` point to itself and orphan the former list.
+
+## Worked example: deleting a middle node
 
 Problem: A list contains `10 -> 20 -> 30 -> 40 -> null`. A pointer `before` points to the node containing `20`. Delete the following node.
 
@@ -192,7 +206,9 @@ Method:
 
 Checked answer: the value `30` is removed, `20` now points to `40`, and no allocated node has been leaked.
 
-## Code
+The precondition is that `before` and `before->next` are both non-null and belong to this list. If `before` points at the last node, there is no following node to delete. If it comes from another list, relinking can corrupt one structure while freeing storage owned by another. A public container interface normally exposes iterators with documented provenance requirements rather than accepting arbitrary raw node pointers.
+
+## An owning list with deep-copy semantics
 
 ```cpp
 #include <iostream>
@@ -209,16 +225,21 @@ public:
     IntList() : head(nullptr) {}
 
     IntList(const IntList& other) : head(nullptr) {
-        Node* tail = nullptr;
-        for (Node* p = other.head; p != nullptr; p = p->next) {
-            Node* copy = new Node{p->data, nullptr};
-            if (head == nullptr) {
-                head = copy;
-                tail = copy;
-            } else {
-                tail->next = copy;
-                tail = copy;
+        try {
+            Node* tail = nullptr;
+            for (const Node* p = other.head; p != nullptr; p = p->next) {
+                Node* copy = new Node{p->data, nullptr};
+                if (head == nullptr) {
+                    head = copy;
+                    tail = copy;
+                } else {
+                    tail->next = copy;
+                    tail = copy;
+                }
             }
+        } catch (...) {
+            clear();
+            throw;
         }
     }
 
@@ -242,7 +263,7 @@ public:
     }
 
     bool contains(int value) const {
-        for (Node* p = head; p != nullptr; p = p->next) {
+        for (const Node* p = head; p != nullptr; p = p->next) {
             if (p->data == value) {
                 return true;
             }
@@ -251,7 +272,7 @@ public:
     }
 
     void print() const {
-        for (Node* p = head; p != nullptr; p = p->next) {
+        for (const Node* p = head; p != nullptr; p = p->next) {
             cout << p->data << " ";
         }
         cout << endl;
@@ -317,7 +338,13 @@ int main() {
 }
 ```
 
-## Common pitfalls
+The `try` block in the copy constructor closes a subtle leak. If allocating the fifth copied node throws, the `IntList` object has not completed construction, so its destructor will not run. The handler clears the already built prefix and rethrows. Assignment uses copy-and-swap: if copying fails, the left operand is unchanged; if it succeeds, the temporary takes ownership of the old chain and deletes it on return.
+
+The const member functions traverse with `const Node*`. A const list operation should not mutate node data through an internal pointer. The original pointer representation does not enforce deep constness automatically, so choosing a pointer-to-const during read-only traversal records the intended restriction.
+
+The second program uses stack-allocated nodes and owns no dynamic memory. Its links remain valid only while `first`, `second`, and `third` are alive. Returning `&first` from a function would leave every pointer dangling when those local nodes were destroyed.
+
+## Pointer failures and invalidated positions
 
 - Losing the rest of the list by overwriting `head` before storing the old value in `newNode->next`.
 - Deleting a node and then reading `doomed->next`. Save all needed links before `delete`.
@@ -326,7 +353,7 @@ int main() {
 - Treating linked lists as if they had constant-time indexing. To reach item `i`, the program follows `i` links.
 - Failing to handle the empty-list and one-node-list cases separately when they need special pointer updates.
 
-Pointer-tracing checks:
+While tracing links:
 
 - Draw the list before and after every insertion or deletion. Label `head`, any traversal pointer, and the node that will be deleted. Many linked-list bugs become obvious when the arrows are visible.
 - Never overwrite the only pointer to a node unless another pointer already reaches that node. Losing the last pointer to allocated memory creates a leak because the program has no address to pass to `delete`.
@@ -336,13 +363,21 @@ Pointer-tracing checks:
 - Keep traversal loops simple. A loop that advances two or three pointers at once should have a clear invariant, such as "`previous` is always the node before `current`."
 - Prefer STL containers in application code unless the goal is to study links directly. `list`, `vector`, `queue`, and `stack` already implement ownership and cleanup correctly.
 
-Quick self-test: for every pointer variable in a linked-list function, state what it points to before the loop, during one middle iteration, and after the loop. If a pointer's meaning changes from "current node" to "previous node" halfway through the function, rename it or split the logic. Clear pointer roles are more reliable than clever pointer movement.
+For every pointer variable in a linked-list function, state what it points to before the loop, during one middle iteration, and after the loop. If a pointer's meaning changes from "current node" to "previous node" halfway through the function, rename it or split the logic. Clear pointer roles are more reliable than clever pointer movement.
 
 When debugging, print node addresses as well as data values if the output looks impossible. Seeing two list objects print the same node addresses is strong evidence of a shallow copy. Seeing a cycle of repeated addresses explains an infinite traversal loop.
 
-A final review question is whether every path through the operation preserves reachability. After insertion, the new node should be reachable from `head`. After deletion, the remaining nodes should still be reachable, and the deleted node should no longer be reachable from the list.
+Every path through the operation must preserve reachability. After insertion, the new node should be reachable from `head`. After deletion, the remaining nodes should still be reachable, and the deleted node should no longer be reachable from the list.
 
-## Connections
+Iterators and pointers to an erased node become invalid immediately. Other node addresses in a typical linked list remain stable across insertion and unrelated erasure, which is one advantage over vector reallocation. Stability does not extend past destruction of the whole list, and an iterator cannot safely reveal whether its node has already been freed.
+
+Cycle detection is useful when corruption or intentionally cyclic input is possible. Floyd's algorithm advances one pointer by one edge and another by two. If they meet, a cycle exists; if the faster pointer reaches null, the chain terminates. Detection prevents an infinite traversal but does not by itself repair ownership or decide which link should be broken.
+
+Recursive destruction that lets each node delete its successor looks compact, but a very long list can exhaust the call stack. The iterative `clear` loop uses constant call-stack space. Each iteration saves the next link, advances the owning head, and only then frees the old node.
+
+A queue implemented with head and tail pointers exposes a useful empty-state edge case. Enqueueing the first node must set both pointers to that node. Dequeueing the final node advances the head to null and must also reset the tail to null; otherwise the tail dangles. Between those cases, enqueue changes the old tail's next link and then advances tail, while dequeue changes only head and deletes the former first node.
+
+## Related pages
 
 - [pointers and dynamic memory](/cs/programming/cpp/pointers-and-dynamic-memory)
 - [constructors and copy semantics](/cs/programming/cpp/constructors-and-copy-semantics)

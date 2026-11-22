@@ -9,7 +9,7 @@ Inheritance lets a class reuse and specialize another class. A derived class aut
 
 The most important design question is whether the relationship is truly "is a." If a `SalariedEmployee` is an `Employee`, inheritance may fit. If a `Car` has an `Engine`, composition is better. Inheritance is powerful, but using it where composition belongs creates brittle designs.
 
-## Definitions
+## Building a derived type
 
 A **base class** defines common state and behavior.
 
@@ -54,7 +54,11 @@ A derived class may **redefine** a base member function by declaring and definin
 
 The `protected` access level makes a member accessible to derived classes but not to ordinary client code.
 
-## Key results
+Base classes may themselves be inherited with `public`, `protected`, or `private` access. Public inheritance preserves the base interface for clients and represents an “is-a” relationship. Protected and private inheritance change how base public members are exposed; they are implementation techniques and do not offer ordinary client substitutability. Composition is usually clearer when the goal is only to reuse an implementation.
+
+A derived object contains a base-class subobject. The standard specifies construction, conversion, and access behavior around that subobject but does not promise a simplistic byte diagram valid for every compiler. Multiple inheritance, virtual bases, alignment, and virtual dispatch can all affect layout. Code should use language conversions rather than calculate addresses of base parts.
+
+## Construction order and substitutability
 
 Construction proceeds from base to derived:
 
@@ -91,26 +95,34 @@ However, assigning a derived object into a base object slices away the derived p
 
 Inheritance and copy control interact. Derived assignment should account for the base part and the derived part. If dynamic memory is involved, both levels need correct ownership behavior.
 
-## Visual
+The derived initializer list cannot directly initialize private base members. It selects a base constructor, and that constructor establishes the base invariant. If the list omits the base, the compiler tries the base default constructor. Compilation fails when no such constructor exists. The base call is therefore an explicit part of designing every derived constructor, not an optional afterthought.
+
+Substitutability is stronger than “the conversion compiles.” A function accepting an `Employee&` relies on the behavioral promises of `Employee`: valid identity data, meaningful pay operations, or whatever the interface specifies. A derived type must preserve the preconditions and postconditions callers were given. It should not require stricter input or provide weaker results merely because its implementation differs.
+
+Classic shape examples reveal the problem. A mathematical square is a rectangle, but a mutable `Rectangle` interface with independent `setWidth` and `setHeight` operations may not be supportable by `Square` without surprising the caller. The hierarchy fails at the behavioral level even though the nouns sound compatible. Immutable values or different interfaces can remove the contradiction.
+
+Name lookup adds another distinction. Declaring any function named `describe` in the derived class hides base overloads with that name, even if their parameter lists differ. A `using Base::describe;` declaration can bring the base overload set into the derived scope. Overriding, overloading, and hiding are separate mechanisms.
+
+## Reading the employee hierarchy
 
 ```mermaid
 classDiagram
   class Employee {
     -string name_
     -string id_
-    +name() string
-    +id() string
-    +printCheck()
+    +name string
+    +id string
+    +printCheck
   }
   class HourlyEmployee {
     -double rate_
     -double hours_
-    +setHours(double)
-    +printCheck()
+    +setHours hours
+    +printCheck
   }
   class SalariedEmployee {
     -double salary_
-    +printCheck()
+    +printCheck
   }
   Employee <|-- HourlyEmployee
   Employee <|-- SalariedEmployee
@@ -123,7 +135,9 @@ classDiagram
 | "uses a" | no, use parameter/member | `ReportPrinter` uses an `ostream` |
 | "implemented in terms of" | usually composition | `Stack` implemented with `vector` |
 
-## Worked example 1: calling a base constructor
+The diagram shows common identity in `Employee` and pay-specific state in each specialization. If clients merely call non-virtual `printCheck` on concrete objects, inheritance provides shared implementation but little abstraction at the call site. The design becomes more valuable when a base reference can invoke a common virtual operation without asking whether the employee is hourly or salaried.
+
+## Worked example: calling a base constructor
 
 Problem: Define `HourlyEmployee` so it initializes the inherited name and id through the `Employee` constructor.
 
@@ -183,9 +197,13 @@ int main() {
 
 Checked answer: inherited `name()` returns `"Ada"`, and pay is:
 
-$$25.0 \times 8.0 = 200.0$$
+$$
+25.0 \times 8.0 = 200.0
+$$
 
-## Worked example 2: private base data and accessor use
+The trace is base-first. Storage for the full object is reserved, `Employee(name, id)` constructs the base subobject, `rate_` is initialized, and `hours_` becomes zero. Only then could a derived constructor body run. `setHours(8.0)` later changes derived state, while `name()` operates on the embedded base part. A real payroll type would reject negative rates and hours and would specify overtime and currency rounding; the multiplication here isolates inheritance mechanics.
+
+## Worked example: private base data and accessor use
 
 Problem: A derived `SalariedEmployee` needs to print the employee name, but `Employee::name_` is private.
 
@@ -233,7 +251,9 @@ int main() {
 
 Checked answer: the function prints `Pay to Grace: 1500`. It accesses the name through the public base interface rather than touching private storage.
 
-## Code
+Changing `Employee` later to store a structured personal name would not require `SalariedEmployee` to know the new representation, provided `name()` keeps its contract. Making the field protected would save one accessor call in the source but would bind every derived class to the old string representation.
+
+## Redefinition before virtual dispatch
 
 This example shows redefinition without virtual dispatch. The static type of the object determines which function is called unless virtual functions and references/pointers are used.
 
@@ -273,7 +293,19 @@ int main() {
 }
 ```
 
-## Common pitfalls
+Inside `Contractor::describe`, the qualified call `Employee::describe()` deliberately selects the base implementation. Without qualification, `describe()` would resolve to the derived function and recurse indefinitely. The call on `contractor` uses the derived function because the expression's static type is `Contractor`; no run-time dispatch is involved.
+
+If the object is passed by base reference and `describe` is not virtual, the base function is selected:
+
+```cpp
+void report(const Employee& employee) {
+    employee.describe();
+}
+```
+
+Calling `report(contractor)` then prints only the employee line. Adding `virtual` in the base and `override` in the derived changes that behavior. The `override` specifier asks the compiler to verify that the signatures truly match, catching accidental differences in `const`, reference qualification, or parameters.
+
+## Hierarchies that fight their own interface
 
 - Using inheritance for "has a" relationships.
 - Expecting a derived class to access private base members directly.
@@ -284,7 +316,7 @@ int main() {
 - Overusing `protected` data and weakening base-class encapsulation.
 - Forgetting that public inheritance is a promise of substitutability.
 
-Hierarchy-design checks:
+Before adding a base class:
 
 - Test the substitution rule: anywhere a base object is expected, a derived object should make sense without surprising the caller. If this is false, public inheritance is probably the wrong relationship.
 - Keep base classes stable and small. Every public or protected member becomes part of the contract inherited by derived classes, so a large base interface creates many ways to break substitutability.
@@ -294,17 +326,23 @@ Hierarchy-design checks:
 - Check constructor order when debugging initialization. Base-class constructors run before derived-class constructors, and derived destructors run before base destructors.
 - If the hierarchy will be used polymorphically, design the base class with virtual functions from the start. Retrofitting virtual behavior later can change semantics throughout the program.
 
-Quick self-test: write three ordinary-language statements about the hierarchy. "A savings account is an account" supports public inheritance. "A car has an engine" supports composition. "A file logger uses an output stream" suggests membership or dependency, not inheritance. This language test is not a formal proof, but it catches many designs that use inheritance only to borrow code.
+Write ordinary-language statements about the proposed relationship. "A savings account is an account" supports public inheritance. "A car has an engine" supports composition. "A file logger uses an output stream" suggests membership or dependency, not inheritance. The language test is not a formal proof, but it catches many designs that use inheritance only to borrow code.
 
 Another useful check is to read every inherited public function from the derived-class point of view. If a derived class cannot honestly support one of those inherited operations, clients will eventually discover the mismatch through surprising behavior. That is a design problem, not just an implementation detail.
 
-A final review question is whether the base class represents a real abstraction or just a convenient storage bundle. If derived classes share data but not behavior, a helper object or member variable may be better. Inheritance is strongest when clients can program against the base interface and remain deliberately unaware of the derived class they are using.
+A base class should represent a real abstraction rather than a convenient storage bundle. If derived classes share data but not behavior, a helper object or member variable may be better. Inheritance is strongest when clients can program against the base interface and remain deliberately unaware of the derived class they are using.
 
-Extended practice: implement the same example once with inheritance and once with composition. If the composition version has fewer special cases and clearer construction, keep composition. If the inheritance version lets a caller use several derived objects through one base interface without checking their exact types, inheritance is earning its place.
+Implementing one small example with both inheritance and composition exposes the tradeoff. If the composition version has fewer special cases and clearer construction, keep composition. If the inheritance version lets a caller use several derived objects through one base interface without checking their exact types, inheritance is earning its place.
 
-One last check: if a base pointer will own derived objects, the base destructor belongs in the public virtual interface.
+If a base pointer will own derived objects, the base destructor belongs in the public virtual interface.
 
-## Connections
+That destructor rule has a precise scope. Deleting a derived object through a base pointer whose destructor is non-virtual has undefined behavior. A base that is never used for polymorphic deletion can instead have a protected non-virtual destructor, preventing clients from attempting it. Making every class destructor virtual without a polymorphic role adds a dispatch slot and communicates an extension point that may not exist.
+
+Downcasting from base to derived should be rare in client logic. `dynamic_cast` can check a polymorphic object at run time, but a chain of casts usually means the common base interface is missing an operation or the caller is working at the wrong abstraction level. `static_cast` downcasts without a run-time check and has undefined behavior if the object is not actually of the target derived type.
+
+Multiple inheritance can model a type satisfying several independent interfaces, especially when those bases contain little or no state. Inheriting implementation from several stateful bases raises harder questions about duplicate base subobjects and the diamond pattern. Virtual inheritance can share a common base, but it changes construction responsibilities. A single-base hierarchy or composition remains easier to audit when it expresses the model adequately.
+
+## Related pages
 
 - [classes and encapsulation](/cs/programming/cpp/classes-and-encapsulation)
 - [constructors and copy semantics](/cs/programming/cpp/constructors-and-copy-semantics)

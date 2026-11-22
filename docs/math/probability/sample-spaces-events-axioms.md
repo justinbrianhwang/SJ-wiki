@@ -7,9 +7,9 @@ sidebar_position: 2
 
 Probability begins by separating two ideas that everyday language often mixes together: the outcomes that could happen and the numerical rules used to describe how likely those outcomes are. A sample space lists the possible outcomes of an experiment, while events are the subsets of outcomes we ask questions about. Once those objects are clear, probability is not a collection of gambling tricks; it is a measure on events.
 
-This page gives the formal starting point for the rest of probability theory. Lane et al.'s statistics text introduces probability through equally likely outcomes, relative frequencies, simple compound events, and base rates. A probability-theory course keeps those examples but places them inside Kolmogorov's axioms, which work equally well for finite dice rolls, countably infinite waiting times, and continuous measurements such as lifetimes.
+Kolmogorov's axioms use the same framework for finite dice rolls, countably infinite waiting times, and continuous measurements. Equal-count ratios are one special construction inside that framework, not the general definition.
 
-## Definitions
+## Start by choosing outcomes at the right resolution
 
 A **random experiment** is a process whose outcome is not known in advance but whose possible outcomes can be specified. The **sample space** is the set of all possible outcomes and is usually denoted by $\Omega$ or $S$.
 
@@ -41,7 +41,24 @@ $$
 
 This rule is useful but not a definition of probability in general. It applies only when the outcomes are equally likely and the sample space is finite.
 
-## Key results
+The choice of sample space is part of the model. For two dice, ordered pairs $(i,j)$ preserve which die showed which value. If only the sum is retained, the space $\{2,3,\ldots,12\}$ is valid, but its elements are not equally likely. A coarser description can still be used once the induced probabilities are assigned correctly.
+
+Sample spaces should distinguish outcomes needed by later questions without recording irrelevant detail. A model of a component's lifetime may use $\Omega=[0,\infty)$ rather than a complete microscopic history of the component. If a later question concerns failure cause as well as time, that space is too coarse and must be enlarged.
+
+## Why a sigma-algebra appears
+
+For finite spaces one can usually take $\mathcal F$ to be every subset of $\Omega$. On uncountable spaces, assigning probabilities consistently to every conceivable subset leads to pathologies. A sigma-algebra selects a rich collection of measurable events and guarantees that complements, countable unions, and therefore countable intersections remain measurable.
+
+Closure under countable intersections follows from De Morgan's law:
+
+$$
+\bigcap_{i=1}^{\infty}A_i
+=\left(\bigcup_{i=1}^{\infty}A_i^c\right)^c.
+$$
+
+The smallest sigma-algebra containing all open intervals of $\mathbb R$ is the Borel sigma-algebra used for ordinary real-valued probability models.
+
+## What follows from the axioms
 
 The Kolmogorov axioms are the foundation:
 
@@ -98,19 +115,48 @@ $$
 
 The pattern alternates between adding single events, subtracting pairwise intersections, and adding the triple intersection.
 
-The axioms also separate probability from the physical story that motivated it. A coin, a weather forecast, and a randomized algorithm can all be modeled by the same probability rules once the sample space and event class are chosen. The hard modeling work is deciding which outcomes belong in $\Omega$ and which probability assignment is appropriate. In finite examples, the phrase "equally likely" must be justified by symmetry or design. In continuous examples, the probability of a single point is usually zero, so events must be intervals, regions, or other measurable sets. This is why the sigma-algebra $\mathcal{F}$ appears in the formal definition: probability is assigned to events that the model is prepared to measure, not to arbitrary verbal descriptions.
+### The union bound
 
-## Visual
+Dropping all overlap corrections gives a useful inequality:
+
+$$
+P\left(\bigcup_{i=1}^{n}A_i\right)
+\le\sum_{i=1}^{n}P(A_i).
+$$
+
+It remains true for countably many events. The bound may be loose, but it needs no independence assumptions and often turns many small failure probabilities into a bound on the chance of any failure.
+
+### Continuity of probability
+
+If $A_1\subseteq A_2\subseteq\cdots$ is an increasing sequence of events, then
+
+$$
+P\left(\bigcup_{n=1}^{\infty}A_n\right)
+=\lim_{n\to\infty}P(A_n).
+$$
+
+Decompose the union into the disjoint increments $A_1$, $A_2\setminus A_1$, and so on, then apply countable additivity. For decreasing events $A_1\supseteq A_2\supseteq\cdots$,
+
+$$
+P\left(\bigcap_{n=1}^{\infty}A_n\right)
+=\lim_{n\to\infty}P(A_n).
+$$
+
+The decreasing result follows by taking complements. These continuity properties connect finite calculations to limiting events.
+
+The axioms also separate probability from the physical story that motivated it. A coin, a weather forecast, and a randomized algorithm can all be modeled by the same probability rules once the sample space and event class are chosen. The hard modeling work is deciding which outcomes belong in $\Omega$ and which probability assignment is appropriate. In finite examples, the phrase “equally likely” must be justified by symmetry or design. In continuous examples, the probability of a single point is usually zero, so events must be intervals, regions, or other measurable sets. The sigma-algebra $\mathcal{F}$ records the events that the model is prepared to measure.
+
+## Event algebra at a glance
 
 ```mermaid
 graph TD
-  O[Sample space Omega] --> A[Event A]
+  O["Sample space Omega"] --> A["Event A"]
   O --> B[Event B]
-  A --> U[A union B]
+  A --> U["A union B"]
   B --> U
-  A --> I[A intersection B]
+  A --> I["A intersection B"]
   B --> I
-  A --> C[A complement]
+  A --> C["A complement"]
   O --> C
   U --> Add[Addition rule]
   I --> Add
@@ -124,7 +170,108 @@ graph TD
 | $A \setminus B$ | $A$ occurs but $B$ does not | $P(A)-P(A\cap B)$ |
 | disjoint $A,B$ | no shared outcomes | $P(A\cup B)=P(A)+P(B)$ |
 
-## Worked example 1: two dice and event algebra
+## Three standard ways to build a probability model
+
+### Finite uniform models
+
+When a randomized mechanism makes $N$ elementary outcomes symmetric, assign mass $1/N$ to each. Card shuffles, fair dice, and uniformly chosen permutations fit this pattern after outcomes are specified at the correct resolution. The ratio rule then follows from additivity:
+
+$$
+P(A)=\sum_{\omega\in A}\frac1N=\frac{|A|}{N}.
+$$
+
+Symmetry must belong to the elementary outcomes. The eleven possible sums of two dice are not symmetric, even though the thirty-six ordered die pairs are.
+
+### Countable weighted models
+
+For $\Omega=\{\omega_1,\omega_2,\ldots\}$, choose nonnegative weights $p_i$ with sum one. Every event receives the sum of its outcome weights. A geometric waiting-time model uses
+
+$$
+p_k=(1-p)^{k-1}p,
+\qquad k=1,2,\ldots,
+$$
+
+and the geometric-series identity verifies normalization. There is no uniform probability distribution on all positive integers: if every singleton had the same positive mass, the total would diverge; if each had mass zero, countable additivity would give total zero.
+
+### Continuous models
+
+A nonnegative density $f$ satisfying
+
+$$
+\int_{-\infty}^{\infty}f(x)\,dx=1
+$$
+
+defines probabilities by integration. The probability of an interval is its weighted area, not a count of its infinitely many points. Every singleton has zero area, but uncountably many singleton points can combine into an interval of positive probability. Countable additivity does not extend to arbitrary uncountable sums of point probabilities.
+
+## Bounds without independence
+
+Suppose a system has $100$ components and component $i$ fails during a mission with probability at most $0.0001$. No dependence information is available. Let $A_i$ be its failure event. The union bound gives
+
+$$
+P(\text{at least one failure})
+=P\left(\bigcup_{i=1}^{100}A_i\right)
+\le\sum_{i=1}^{100}P(A_i)
+\le0.01.
+$$
+
+The bound remains valid if failures share a common cause. Assuming independence would permit an exact calculation from the individual probabilities, but that assumption is absent. If the events overlap heavily, the actual union probability may be much smaller than one percent.
+
+The complement form is often useful. If each of $n$ desirable conditions fails with probability at most $\epsilon_i$, then all conditions hold simultaneously with probability at least
+
+$$
+1-\sum_{i=1}^{n}\epsilon_i.
+$$
+
+This elementary estimate appears in randomized algorithms and reliability arguments because it composes guarantees without requiring a full joint distribution.
+
+## Limits of events
+
+The event that infinitely many events $A_n$ occur is
+
+$$
+\limsup_{n\to\infty}A_n
+=\bigcap_{m=1}^{\infty}\bigcup_{n=m}^{\infty}A_n.
+$$
+
+An outcome belongs to every tail union exactly when it keeps appearing in the sequence. The event that all but finitely many $A_n$ occur is the corresponding limit inferior. These constructions translate long-run verbal statements into countable unions and intersections, which a sigma-algebra is designed to contain.
+
+## Axioms do not choose the probabilities
+
+The axioms constrain a probability assignment once the model is proposed; they do not determine whether a die is fair or whether tomorrow's rain probability is $0.30$. Such numbers come from physical symmetry, randomization design, empirical calibration, or a stated model of uncertainty.
+
+Two analysts can use the same sample space and assign different probabilities while both obeying the axioms. Evidence and model criticism decide which assignment is useful. Internal consistency is necessary, not sufficient for an empirically good model.
+
+Long-run frequency gives one interpretation. Under repeated comparable trials, a model with event probability $p$ often predicts relative frequency near $p$ through a law of large numbers. The axioms themselves do not require literal repetition; they also support one-time events and conditional beliefs, provided the assignments remain coherent.
+
+Null events need care in conditional statements. The elementary ratio $P(A\cap B)/P(B)$ is unavailable when $P(B)=0$, even if $B$ contains possible outcomes. Continuous models handle conditioning on observed point values through conditional densities or regular conditional distributions, not by declaring every zero-probability condition impossible.
+
+## Disjointness, exhaustiveness, and independence
+
+These terms describe different structures. Events are disjoint when they cannot occur together. A collection is exhaustive when its union is the whole sample space. A partition is both pairwise disjoint and exhaustive. Partitions are useful because probabilities can be computed case by case without overlap corrections.
+
+Independence does not mean disjointness. If positive-probability events $A$ and $B$ are disjoint, then
+
+$$
+P(A\cap B)=0<P(A)P(B),
+$$
+
+so they are dependent. Observing $A$ rules out $B$. Independent events may overlap; their overlap has exactly the product probability.
+
+Exhaustive events need not be disjoint. “The first die is even” and “the second die is odd” do not cover every two-die outcome, while adding their complements creates overlapping coverage. Before adding case probabilities, check that the cases form a partition rather than merely a list of plausible alternatives.
+
+De Morgan's laws translate complements of compound events:
+
+$$
+(A\cup B)^c=A^c\cap B^c,
+\qquad
+(A\cap B)^c=A^c\cup B^c.
+$$
+
+They are the algebra behind replacing “at least one” by the complement of “none” and replacing “not both” by “at least one fails.”
+
+## Worked event calculations
+
+### Two dice and event algebra
 
 **Problem.** Roll two fair six-sided dice. Let $A$ be the event that the sum is $7$, and let $B$ be the event that at least one die shows $6$. Find $P(A)$, $P(B)$, $P(A\cap B)$, and $P(A\cup B)$.
 
@@ -180,9 +327,9 @@ P(A\cup B)
 \end{aligned}
 $$
 
-**Checked answer.** Direct counting confirms this: $A\cup B$ has the $11$ outcomes in $B$ plus the $4$ sum-seven outcomes without a $6$, for $15$ outcomes out of $36$.
+Direct counting confirms this: $A\cup B$ has the $11$ outcomes in $B$ plus the $4$ sum-seven outcomes without a $6$, for $15$ outcomes out of $36$.
 
-## Worked example 2: a countably infinite sample space
+### A countably infinite sample space
 
 **Problem.** A coin is tossed until the first head appears. Let $T$ be the toss number on which the first head appears. For a fair coin, find $P(T\le 3)$ and $P(T\gt 3)$.
 
@@ -225,36 +372,23 @@ $$
 P(T>3)=P(TTT)=\left(\frac{1}{2}\right)^3=\frac{1}{8}.
 $$
 
-**Checked answer.** $P(T\le 3)=7/8$ and $P(T\gt 3)=1/8$. The probabilities over the infinite sample space still sum to one because
+$P(T\le 3)=7/8$ and $P(T\gt 3)=1/8$. The probabilities over the infinite sample space still sum to one because
 
 $$
 \sum_{k=1}^{\infty}\left(\frac{1}{2}\right)^k=1.
 $$
 
-## Code
+### Probability zero is not the empty event
 
-```python
-from fractions import Fraction
+Choose a point uniformly from $[0,1]$, and let $A$ be the event that the selected point equals $1/2$. The event contains a legitimate outcome, so $A\ne\varnothing$. Yet its probability is the length of a degenerate interval:
 
-omega = [(i, j) for i in range(1, 7) for j in range(1, 7)]
-A = {(i, j) for (i, j) in omega if i + j == 7}
-B = {(i, j) for (i, j) in omega if i == 6 or j == 6}
+$$
+P(A)=P(X=1/2)=0.
+$$
 
-def prob(event):
-    return Fraction(len(event), len(omega))
+Now let $B$ be the event that $X$ is irrational. The rational numbers in $[0,1]$ form a countable set, and each singleton has probability zero. Countable additivity gives probability zero to their union, so $P(B)=1$. Irrationality is almost sure, but rational outcomes remain elements of the sample space.
 
-print("P(A) =", prob(A))
-print("P(B) =", prob(B))
-print("P(A and B) =", prob(A & B))
-print("P(A or B) =", prob(A | B))
-
-# Verify the addition rule.
-lhs = prob(A | B)
-rhs = prob(A) + prob(B) - prob(A & B)
-print("addition rule holds:", lhs == rhs)
-```
-
-## Common pitfalls
+## Modeling and algebra errors
 
 - Treating a sample space as equally likely without checking the modeling assumption. The unordered sums of two dice, for example, are not equally likely.
 - Forgetting that $A\cup B$ is inclusive: it includes outcomes where both $A$ and $B$ occur.
@@ -263,7 +397,7 @@ print("addition rule holds:", lhs == rhs)
 - Defining events vaguely. "A high value" is not an event until the cutoff is specified.
 - Assuming probability one means guaranteed in every philosophical sense. In continuous probability, probability-one events may still exclude exceptional outcomes.
 
-## Connections
+## Related pages
 
 - [conditional probability and Bayes' theorem](/math/probability/conditional-probability-bayes)
 - [random variables and distributions](/math/probability/random-variables-distributions)

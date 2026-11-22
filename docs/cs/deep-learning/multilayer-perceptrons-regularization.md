@@ -9,7 +9,7 @@ Multilayer perceptrons extend linear models by composing affine transformations 
 
 The same flexibility creates new training issues. Deep networks can overfit, gradients can vanish or explode, initialization can make learning slow, and regularizers can change both optimization and generalization. D2L treats these as practical engineering concerns rather than isolated theory: activation choice, initialization, dropout, weight decay, and early stopping all shape the behavior of the same training loop.
 
-## Definitions
+## From affine maps to hidden representations
 
 An **MLP** with one hidden layer maps an input $x \in \mathbb{R}^d$ to
 
@@ -43,7 +43,7 @@ $$
 
 **Weight decay** adds an $L_2$ penalty to discourage large weights. **Dropout** randomly sets hidden activations to zero during training and rescales the survivors so their expectation is preserved. **Early stopping** halts training when validation performance stops improving.
 
-## Key results
+## Why depth needs nonlinearity
 
 Without nonlinear activations, stacking affine layers does not increase expressive power. If
 
@@ -104,23 +104,55 @@ Initialization interacts with activation functions. If weights are too small, si
 
 Dropout and weight decay regularize in different ways. Weight decay directly penalizes large weights in the objective. Dropout injects multiplicative noise into activations during training, making the network less dependent on exact co-adaptations among hidden units. They can be used together, but their strengths and tuning knobs are not interchangeable.
 
-Activation distributions are worth monitoring. If most ReLU units are always negative, they output zero and receive no gradient on those examples. If sigmoid or tanh units operate in saturated regions, their derivatives are tiny. Initialization, normalization, learning rate, and input scaling all influence where activations live. This is why preprocessing and initialization are part of the MLP story rather than separate housekeeping.
+Activation distributions are worth monitoring. If most ReLU units are always negative, they output zero and receive no gradient on those examples. If sigmoid or tanh units operate in saturated regions, their derivatives are tiny. Initialization, normalization, learning rate, and input scaling all influence where activations live. Preprocessing and initialization are therefore part of the model design rather than separate housekeeping.
 
 Generalization controls should be evaluated on held-out data. A lower training loss after adding width may simply mean higher capacity. A lower validation loss after adding weight decay, dropout, or early stopping is stronger evidence of improved generalization. D2L's regularization sections are best read as a toolkit for changing the bias of training, not as guarantees that a model will generalize.
 
 The MLP is also a reference model for non-image tabular features. Even when specialized architectures dominate vision and language, a well-regularized MLP remains a useful baseline for dense numeric and categorical features after appropriate preprocessing.
 
-## Visual
+### A two-layer view of the chain rule
+
+For one hidden layer, write $z_1=W_1x+b_1$, $h=\phi(z_1)$, and $o=W_2h+b_2$. Let scalar loss $L$ depend on $o$. Backpropagation computes vector–Jacobian products from right to left. If $\delta_2=\nabla_oL$, then
+
+$$
+\begin{aligned}
+\nabla_{W_2}L&=\delta_2h^T,\\
+\nabla_{b_2}L&=\delta_2,\\
+\delta_1&=(W_2^T\delta_2)\odot\phi'(z_1),\\
+\nabla_{W_1}L&=\delta_1x^T,\\
+\nabla_{b_1}L&=\delta_1.
+\end{aligned}
+$$
+
+The upstream gradient $W_2^T\delta_2$ says how the output responds to each hidden activation. Elementwise multiplication by $\phi'(z_1)$ accounts for the activation. The outer products accumulate parameter gradients. A framework records the forward operations and performs these local chain-rule steps automatically, but tensor shapes remain the programmer's responsibility.
+
+Repeated multiplication explains vanishing and exploding gradients. If layer Jacobians mostly have singular values below one, a gradient propagated through many layers shrinks. Values consistently above one amplify it. Activations, initialization, normalization, residual connections, and clipping all influence this product. Clipping limits the result after it has grown; it does not repair poor signal propagation by itself.
+
+## Choosing and initializing activations
+
+ReLU is piecewise linear and does not saturate on its positive side. Its zero negative derivative can create a dead unit if every relevant preactivation becomes negative. Leaky ReLU retains a small negative slope, while GELU and SiLU gate values smoothly and are common in modern networks. Sigmoid remains appropriate for probabilities at certain outputs, but its derivative $\sigma(x)(1-\sigma(x))$ is at most $1/4$ and approaches zero in both tails. Tanh is zero-centered but also saturates.
+
+Initialization should break symmetry and keep the scale of signals roughly stable. If every hidden weight starts at the same value, all units receive the same gradient and remain copies of one another. Randomness breaks that symmetry. Consider independent, zero-mean inputs and weights in a layer with fan-in $n$. Ignoring correlations,
+
+$$
+\mathrm{Var}(z)\approx n\,\mathrm{Var}(w)\,\mathrm{Var}(x).
+$$
+
+Keeping preactivation variance near input variance suggests $\mathrm{Var}(w)\approx1/n$. Xavier initialization balances fan-in and fan-out, often using variance $2/(n_{in}+n_{out})$ for symmetric activations. ReLU discards roughly half of a centered signal, motivating Kaiming variance near $2/n_{in}$. These are approximations at initialization, not promises that every trained layer maintains perfect variance.
+
+Input scaling works with initialization. A carefully initialized first layer can still saturate if one feature arrives six orders of magnitude larger than another. Standardization also makes a weight-decay coefficient treat feature directions more comparably. For sparse or bounded features, domain-specific transforms may be more suitable than mechanical standardization.
+
+## The forward and backward paths
 
 ```mermaid
 flowchart TB
-  X["Input batch X: (N, d_in)"] --> L1["Linear 1: W1 (d_in, h1) + b1 -> #lsqb;N, h1)"]
+  X["Input batch X: (N, d_in)"] --> L1["Linear 1: W1 (d_in, h1) + b1 -> shape (N, h1)"]
   L1 --> A1["Activation phi, e.g. ReLU -> (N, h1)"]
   A1 --> D1["Dropout train only: mask m1 ~ Bernoulli(q), h1*m1/q"]
-  D1 --> L2["Linear 2: W2 (h1, h2) + b2 -> #lsqb;N, h2)"]
+  D1 --> L2["Linear 2: W2 (h1, h2) + b2 -> shape (N, h2)"]
   L2 --> A2["Activation phi -> (N, h2)"]
   A2 --> D2["Dropout train only: mask m2 ~ Bernoulli(q)"]
-  D2 --> L3["Output linear: W3 (h2, K) + b3 -> logits #lsqb;N, K)"]
+  D2 --> L3["Output linear: W3 (h2, K) + b3 -> logits (N, K)"]
   L3 --> CE["Cross-entropy or task loss"]
   CE --> Total["Regularized objective: loss + lambda/2 * ||W||_2^2"]
 
@@ -144,7 +176,7 @@ flowchart TB
   Opt -. "new W, b for next minibatch" .-> L1
 ```
 
-The MLP diagram keeps the batch dimension visible from input `[N, d_in]` through hidden layers and logits `[N, K]`. Dropout is shown as a training-only activation path, while weight decay is a separate objective path that adds `lambda * W` to weight gradients rather than changing the forward pass. The backward subgraph makes clear that regularization, dropout, and affine layers affect different parts of the training loop.
+The diagram keeps the batch dimension explicit from input `[N, d_in]` through hidden layers and logits `[N, K]`. Dropout belongs to the training-only activation path. An explicit $L_2$ penalty instead contributes to the objective and its gradients. Optimizer implementations may supply *decoupled* weight decay, discussed below, whose update is not identical to adding an $L_2$ term for every optimizer.
 
 | Technique | Main purpose | Training-time behavior | Evaluation-time behavior |
 |---|---|---|---|
@@ -279,9 +311,35 @@ $$
 =[2,4].
 $$
 
-Checked answer: inverted dropout changes individual training passes but preserves the activation expectation. This is why PyTorch dropout layers automatically disable masking in `eval()` mode rather than rescaling outputs again.
+Checked answer: inverted dropout changes individual training passes but preserves the activation expectation. PyTorch dropout layers therefore disable masking in `eval()` mode rather than rescaling outputs again.
 
-## Code
+Preserving the mean does not preserve each output or its variance. For a scalar activation, inverted dropout adds variance $h^2p/q$. Training therefore sees a noisy family of subnetworks, while evaluation uses the deterministic full network. Batch normalization statistics can interact with this train–evaluation difference, so dropout is not automatically helpful in every architecture.
+
+## Three ways to limit overfitting
+
+Weight decay, dropout, and early stopping constrain training through different mechanisms. For ordinary SGD, adding $\lambda\lVert w\rVert_2^2/2$ gives the update
+
+$$
+w\leftarrow w-\eta(\nabla L(w)+\lambda w)
+=(1-\eta\lambda)w-\eta\nabla L(w).
+$$
+
+The multiplicative factor shrinks weights on every step. With adaptive optimizers, an $L_2$ gradient is rescaled by the optimizer's coordinate-wise statistics. Decoupled weight decay, as in AdamW, applies shrinkage separately and is therefore not generally equivalent to an $L_2$ loss penalty. Framework argument names can obscure the distinction, so the optimizer documentation matters.
+
+Dropout injects activation noise and discourages reliance on a precise set of hidden responses. It usually belongs between hidden layers rather than after final logits. The best rate depends on data size, width, normalization, and architecture. A high drop probability can cause underfitting or make optimization needlessly noisy. Validation evidence, not habit, should justify its inclusion.
+
+Early stopping treats training duration as a capacity control. Save the parameters whenever the monitored validation metric improves; stop after a chosen patience interval without improvement; restore the best checkpoint rather than the last one. Validation loss is noisy, so stopping on the first bad epoch is unstable. Repeated tuning against the same validation set gradually overfits model-selection decisions to it, leaving the test set necessary for a final estimate.
+
+| Method | Direct effect | Common tuning signal | Main failure mode |
+|---|---|---|---|
+| Weight decay | Shrinks parameter magnitudes | Validation loss across $\lambda$ | Too much produces an overly smooth, biased fit |
+| Dropout | Adds multiplicative activation noise | Validation metric across drop rate | Too much prevents useful co-adaptation and slows fitting |
+| Early stopping | Limits optimization time | Best validation checkpoint | Noisy metric or short patience stops too soon |
+| Smaller network | Reduces representational capacity | Width/depth sweep | May underfit structure the data support |
+
+Regularization does not compensate for leakage. If validation examples influence preprocessing, feature construction, or checkpoint choices, an apparently strong validation score can coexist with poor deployment performance. Splits should follow the future prediction boundary: by user, time, location, or group when random rows would share information.
+
+## A small nonlinear classification experiment
 
 ```python
 import torch
@@ -304,9 +362,12 @@ model = nn.Sequential(
     nn.Linear(16, 2),
 )
 
-for module in model:
+for i, module in enumerate(model):
     if isinstance(module, nn.Linear):
-        nn.init.kaiming_uniform_(module.weight, nonlinearity="relu")
+        if i < len(model) - 1:
+            nn.init.kaiming_uniform_(module.weight, nonlinearity="relu")
+        else:
+            nn.init.xavier_uniform_(module.weight)
         nn.init.zeros_(module.bias)
 
 loss_fn = nn.CrossEntropyLoss()
@@ -326,7 +387,9 @@ with torch.no_grad():
 print(f"training accuracy: {accuracy:.3f}")
 ```
 
-## Common pitfalls
+The target is whether a point lies outside a circle, so no single straight decision boundary can solve it. Hidden ReLU units piece together multiple linear regions. The example reports training accuracy only to keep focus on representation; a real comparison needs a held-out split and validation-guided regularization. The final linear layer uses Xavier initialization because no ReLU follows its logits.
+
+## Failure modes worth checking first
 
 - Stacking linear layers without nonlinear activations and expecting a deeper model.
 - Leaving dropout active during evaluation by forgetting `model.eval()`.
@@ -334,11 +397,12 @@ print(f"training accuracy: {accuracy:.3f}")
 - Using sigmoid in deep hidden layers without considering saturation and vanishing gradients.
 - Initializing all weights to zero, which makes hidden units learn identical features.
 - Assuming lower training loss always means a better model. Validation behavior is the relevant generalization signal.
+- Applying strong weight decay to biases and normalization scale parameters without checking whether that policy is intended.
+- Comparing regularizers after giving them unequal training budgets or selecting them on test performance.
 
-## Connections
+## Related pages
 
 - [Softmax classification and generalization](/cs/deep-learning/softmax-classification-generalization)
 - [Optimization algorithms](/cs/deep-learning/optimization-algorithms)
 - [PyTorch builders guide](/cs/deep-learning/pytorch-builders-guide)
-- [Classical machine learning](/cs/machine-learning/)
-- [Calculus](/math/calculus/)
+- [Linear regression and training loops](/cs/deep-learning/linear-regression-training)

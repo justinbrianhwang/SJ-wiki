@@ -9,7 +9,7 @@ Estimation is the statistical task of using sample data to learn about an unknow
 
 Confidence intervals are easy to compute mechanically and easy to misinterpret. A 95% confidence interval is not a statement that the fixed parameter has a 95% probability of being in this one computed interval under the usual frequentist interpretation. It means that the procedure, used repeatedly in the same way, would capture the true parameter in about 95% of repetitions. The observed interval is then reported as the set of parameter values reasonably compatible with the data and model.
 
-## Definitions
+## Estimators before intervals
 
 A **point estimator** is a statistic used to estimate a parameter. The sample mean $\bar{X}$ estimates a population mean $\mu$, the sample proportion $\hat{p}$ estimates a population proportion $p$, and the sample correlation $r$ estimates a population correlation $\rho$.
 
@@ -45,7 +45,41 @@ $$
 
 The confidence level, such as 90%, 95%, or 99%, is selected before looking at the data.
 
-## Key results
+## How a confidence procedure is constructed
+
+Suppose $X_1,\ldots,X_n$ are independent normal observations with known $\sigma$. Then
+
+$$
+Z=\frac{\bar{X}-\mu}{\sigma/\sqrt{n}}
+$$
+
+has a standard normal distribution. The central 95% statement is
+
+$$
+P\left(-1.96\le
+\frac{\bar{X}-\mu}{\sigma/\sqrt{n}}
+\le1.96\right)=0.95.
+$$
+
+Rearranging the random inequalities gives
+
+$$
+P\left(\bar{X}-1.96\frac{\sigma}{\sqrt{n}}
+\le\mu\le
+\bar{X}+1.96\frac{\sigma}{\sqrt{n}}\right)=0.95.
+$$
+
+Before sampling, the endpoints are random and the parameter is fixed. After sampling, both endpoints are numbers; the interval either covers $\mu$ or it does not. The 95% refers to the procedure's coverage across repeated samples from the stated model.
+
+When $\sigma$ is unknown and the data are normal,
+
+$$
+T=\frac{\bar{X}-\mu}{S/\sqrt{n}}
+$$
+
+has a $t$ distribution with $n-1$ degrees of freedom. Estimating the scale introduces extra uncertainty, represented by heavier $t$ tails. As the degrees of freedom grow, the $t$ critical value approaches the normal critical value.
+
+## What controls interval width
 
 Higher confidence requires a wider interval if the data and sample size are fixed. A 99% interval uses a larger critical value than a 95% interval because the procedure must capture the parameter more often in repeated sampling.
 
@@ -56,6 +90,24 @@ $$
 $$
 
 decreases as $n$ grows, provided the sample standard deviation is similar. To cut the margin of error in half, the sample size often needs to be about four times as large.
+
+For a mean with planning standard deviation $\sigma$ and target margin $m$, the normal-theory calculation is
+
+$$
+n=\left(\frac{z^*\sigma}{m}\right)^2,
+$$
+
+rounded up. If $\sigma$ is unknown, use a pilot estimate and allow for its uncertainty and expected nonresponse. For a proportion,
+
+$$
+n=\frac{(z^*)^2p(1-p)}{m^2}.
+$$
+
+When no planning value of $p$ is available, $p=0.5$ gives the largest required size because $p(1-p)$ is maximized there. These formulas address simple random sampling; clustering, finite populations, and unequal sampling weights change the precision calculation.
+
+More data reduce random error but do not remove systematic bias. A huge convenience sample can yield a narrow interval around the wrong population quantity. Coverage statements assume the estimator, standard error, and sampling design match the target parameter.
+
+## Choosing the interval, not only the confidence level
 
 For a one-sample mean, the $t$ interval rests on independence and either approximate normality of the population or a sample large enough for the sampling distribution of $\bar{X}$ to be approximately normal. Outliers and strong skewness are more serious in small samples.
 
@@ -81,11 +133,29 @@ $$
 
 The pairing changes the analysis. Treating paired data as independent throws away the design and usually gives the wrong standard error.
 
-A confidence interval should be read together with the measurement scale and the study design. An interval from 0.2 to 0.4 seconds may be huge for a reaction-time experiment and trivial for a shipping-time study. An interval from 3% to 8% may support a practical decision if the cost of intervention is low, but not if the intervention is expensive or risky. The interval also inherits any weakness in data collection: nonresponse, convenience sampling, measurement error, and unmodeled clustering can all make the printed interval too optimistic. The arithmetic margin of error measures random sampling uncertainty, not every source of uncertainty in the project.
+The simple Wald interval for a proportion can extend below 0 or above 1 and has poor coverage near the boundaries or with modest $n$. The Wilson score interval is usually a better default. It comes from inverting the one-proportion score test and has center
+
+$$
+\frac{\hat p+z^{*2}/(2n)}{1+z^{*2}/n}
+$$
+
+with a correspondingly adjusted half-width. Its center is pulled slightly toward $1/2$, especially when the sample is small. “Exact” binomial intervals guarantee at least nominal coverage but can be conservative and wider than necessary.
+
+For skewed statistics or complicated estimators, a bootstrap can approximate sampling uncertainty by resampling observed cases with replacement and recomputing the statistic. The resampling unit must match the design: resample pairs in paired data and whole clusters in clustered data. An ordinary case bootstrap does not fix selection bias or dependence that it ignores.
+
+## Coverage misses and multiplicity
+
+A 95% procedure misses in about 5% of repetitions under its assumptions. Those misses are not necessarily the most visibly noisy samples. Coverage can fail systematically when the standard error is wrong, when a transformation is ignored, or when a selection step is omitted from the analysis.
+
+If twenty unrelated parameters each receive a separate 95% interval, the chance that every interval covers can be much less than 95%. Simultaneous procedures such as Bonferroni intervals widen the individual ranges to control familywise coverage. Whether that adjustment is needed depends on whether the collection is being interpreted jointly or each interval answers a separate prespecified question.
+
+Confidence intervals also connect directly to two-sided tests. Under matching assumptions, a level-$\alpha$ test of $H_0:\theta=\theta_0$ rejects exactly when the $(1-\alpha)$ confidence interval excludes $\theta_0$. The interval contributes more information because it shows the range of parameter values compatible with the data rather than only the decision at one null value.
+
+A confidence interval should be read together with the measurement scale and the study design. An interval from 0.2 to 0.4 seconds may be huge for a reaction-time experiment and trivial for a shipping-time study. An interval from 3% to 8% may guide a decision if the cost of intervention is low, but not if the intervention is expensive or risky. The interval also inherits any weakness in data collection: nonresponse, convenience sampling, measurement error, and unmodeled clustering can all make the printed interval too optimistic. The arithmetic margin of error measures random sampling uncertainty, not every source of uncertainty in the project.
 
 When presenting an interval, include the confidence level, parameter, population, and units in the same sentence. "The interval is 29.7 to 35.1" is incomplete. "A 95% confidence interval for the population mean delivery time is 29.7 to 35.1 minutes" is interpretable and auditable.
 
-## Visual
+## An interval workflow
 
 ```mermaid
 flowchart TD
@@ -199,7 +269,9 @@ Answer: The approximate 95% confidence interval is $(0.196,\ 0.264)$, or about 1
 
 Checked answer: The interval is centered at the observed proportion 23%. The margin of error is about 3.4 percentage points, reasonable for a sample of 600 and a proportion near 0.25.
 
-## Code
+The Wald interval is adequate here because both counts are large and the estimate is far from 0 and 1. A Wilson calculation gives nearly the same endpoints. With 2 successes in 20 trials, the two methods would differ materially, and Wilson should be preferred.
+
+## Computing critical values explicitly
 
 ```python
 import numpy as np
@@ -226,7 +298,7 @@ print("proportion CI:", prop_ci)
 
 The code keeps the critical values explicit. That makes it easy to change from 95% to 90% or 99% confidence without rewriting the statistical logic.
 
-## Common pitfalls
+## Misreadings and design failures
 
 - Saying "there is a 95% probability that $\mu$ is in this interval" in a frequentist interpretation.
 - Forgetting that the confidence interval estimates a population parameter, not the range containing 95% of individual observations.
@@ -235,7 +307,7 @@ The code keeps the critical values explicit. That makes it easy to change from 9
 - Treating paired data as two independent samples.
 - Reporting a confidence interval without units or context.
 
-## Connections
+## Related pages
 
 - [Sampling distributions and the central limit theorem](/math/statistics/sampling-distributions-and-clt)
 - [Hypothesis testing logic](/math/statistics/hypothesis-testing-logic)

@@ -7,9 +7,9 @@ sidebar_position: 10
 
 Many probability questions involve several random variables defined on the same sample space. A joint distribution records how they behave together, not merely how each behaves separately. This distinction matters: the marginal laws of $X$ and $Y$ do not determine whether they are independent, positively related, negatively related, or constrained by an equation such as $Y=X^2$.
 
-MIT 18.440 introduces joint mass functions, joint densities, marginal distributions, independent random variables, and distributions of functions of random variables. These ideas are the technical foundation for convolutions, conditional densities, covariance, order statistics, and the transform methods used later in the course.
+Marginalization discards coordinates; conditioning takes a slice; transformation changes coordinates. Keeping those operations distinct prevents most mistakes with joint laws. They underlie convolutions, covariance, order statistics, and conditional expectation.
 
-## Definitions
+## From a joint law to its margins
 
 For discrete random variables $X$ and $Y$, the **joint probability mass function** is
 
@@ -59,7 +59,7 @@ $$
 
 where densities are defined.
 
-## Key results
+## Independence as factorization
 
 If $Y=g(X)$ and $g$ is strictly increasing, then
 
@@ -101,7 +101,9 @@ Transformations require special care because density is tied to scale. If $Y=2X$
 
 The transformation method has two complementary approaches. The CDF method asks for $P(g(X)\le a)$ and is often best when the event has a simple inequality description. The density method uses inverse branches and derivatives and is often faster when the transformation is monotone or piecewise monotone. Both methods should give the same answer when applied correctly.
 
-Joint distributions are also the setting for conditional densities. If $X$ and $Y$ have joint density $f_{X,Y}$, then the conditional density of $X$ given $Y=y$ is formally
+The support matters when checking a proposed factorization. If a joint density is positive on a triangle such as $0\lt y\lt x\lt 1$, its support is not a Cartesian product, so the variables cannot be independent. A density written as $g(x)h(y)$ only on that triangular region does not establish independence; the indicator of the support is part of the density.
+
+Joint distributions are also the setting for conditional densities. If $X$ and $Y$ have joint density $f_{X,Y}$, then the conditional density of $X$ given $Y=y$ is
 
 $$
 f_{X\mid Y}(x\mid y)=\frac{f_{X,Y}(x,y)}{f_Y(y)}
@@ -109,7 +111,7 @@ $$
 
 when $f_Y(y)\gt 0$. This formula is the continuous analogue of dividing a joint probability table entry by a column total. It prepares for conditional expectation and total variance.
 
-## Visual
+## Three operations on a joint law
 
 ```text
 Discrete joint law as a matrix
@@ -134,7 +136,7 @@ The matrix picture is a useful diagnostic for independence. Once row and column 
 
 For transformations, the table reminds us that discrete and continuous cases use different bookkeeping. A discrete transformation moves point masses and combines masses that land on the same value. A continuous transformation moves density through a change of scale. Forgetting this distinction leads to common errors such as assigning positive probability to a point in a continuous model or omitting a Jacobian factor.
 
-## Worked example 1: checking independence from a joint table
+## Worked example: checking independence from a joint table
 
 Problem: Let $X,Y$ take values in $\{0,1\}$ with joint probabilities
 
@@ -181,7 +183,7 @@ $$
 
 Checked answer: $X$ and $Y$ are not independent. The marginals alone do not reveal this; the joint table does.
 
-## Worked example 2: transforming $X$ to $Y=X^2$
+## Worked example: transforming $X$ to $Y=X^2$
 
 Problem: Let $X$ be uniform on $[-1,1]$ and define $Y=X^2$. Find the density of $Y$.
 
@@ -226,48 +228,226 @@ $$
 
 So it is a valid density.
 
-## Code
+## A two-dimensional change of variables
 
-```python
-import numpy as np
+Let $X$ and $Y$ be independent exponential variables with rate $1$, and define
 
-joint = np.array([[0.30, 0.20],
-                  [0.15, 0.35]])
+$$
+S=X+Y,\qquad R=\frac{X}{X+Y}.
+$$
 
-px = joint.sum(axis=1)
-py = joint.sum(axis=0)
-independent_table = np.outer(px, py)
+Here $S$ is the total and $R$ is the fraction contributed by $X$. Since $X,Y\gt 0$, the transformed support is $s\gt 0$ and $0\lt r\lt 1$. Solve for the original variables:
 
-print("pX:", px)
-print("pY:", py)
-print("independent table would be:")
-print(independent_table)
-print("is independent?", np.allclose(joint, independent_table))
+$$
+x=rs,\qquad y=(1-r)s.
+$$
 
-def density_y_square(y):
-    y = np.asarray(y)
-    out = np.zeros_like(y, dtype=float)
-    mask = (y > 0) & (y < 1)
-    out[mask] = 1 / (2 * np.sqrt(y[mask]))
-    return out
+The inverse Jacobian is
 
-grid = np.linspace(0.001, 0.999, 1000)
-approx_integral = np.trapz(density_y_square(grid), grid)
-print("approx integral:", approx_integral)
-```
+$$
+\frac{\partial(x,y)}{\partial(s,r)}
+=
+\begin{pmatrix}
+r&s\\
+1-r&-s
+\end{pmatrix},
+$$
 
-## Common pitfalls
+so its determinant is $-rs-s(1-r)=-s$ and the absolute determinant is $s$. The original joint density is
+
+$$
+f_{X,Y}(x,y)=e^{-x}e^{-y},\qquad x,y>0.
+$$
+
+Substitution gives
+
+$$
+\begin{aligned}
+f_{S,R}(s,r)
+&=e^{-rs}e^{-(1-r)s}s\\
+&=se^{-s},
+\qquad s>0,\ 0<r<1.
+\end{aligned}
+$$
+
+This factors into
+
+$$
+\underbrace{se^{-s}}_{f_S(s)}
+\underbrace{1}_{f_R(r)}.
+$$
+
+Thus $S$ and $R$ are independent, $S$ has a gamma distribution with shape $2$ and rate $1$, and $R$ is uniform on $(0,1)$. The result is less obvious in the original coordinates: knowing the sum might seem as though it should constrain the fraction, but the exponential joint density and the Jacobian cancel the dependence exactly.
+
+Normalization checks both the formula and the support:
+
+$$
+\int_0^1\int_0^\infty se^{-s}\,ds\,dr
+=1\cdot1=1.
+$$
+
+## Transformation by the CDF method
+
+The inverse-density formula is efficient for monotone maps, but the CDF route often handles boundaries and multiple branches more safely. For $Y=X^2$ with $X$ uniform on $[-1,1]$,
+
+$$
+\begin{aligned}
+F_Y(y)
+&=P(X^2\le y)\\
+&=P(-\sqrt y\le X\le\sqrt y)\\
+&=\frac{2\sqrt y}{2}=\sqrt y,
+\qquad 0\le y\le1.
+\end{aligned}
+$$
+
+Differentiating gives $f_Y(y)=1/(2\sqrt y)$. The complete CDF is piecewise:
+
+$$
+F_Y(y)=
+\begin{cases}
+0,&y<0,\\
+\sqrt y,&0\le y\le1,\\
+1,&y>1.
+\end{cases}
+$$
+
+Writing all pieces prevents a density formula from being applied outside its support. The divergence near zero is integrable; a density may exceed one or even become unbounded as long as its integral is one.
+
+## Expectations without finding the transformed law
+
+If only an expectation is wanted, deriving a new density can be wasted work. The law of the unconscious statistician gives
+
+$$
+E[g(X,Y)]=\iint g(x,y)f_{X,Y}(x,y)\,dx\,dy.
+$$
+
+For independent $X,Y\sim\operatorname{Uniform}(0,1)$, find $E[(X-Y)^2]$ directly:
+
+$$
+\begin{aligned}
+E[(X-Y)^2]
+&=E[X^2]-2E[XY]+E[Y^2]\\
+&=\frac13-2E[X]E[Y]+\frac13\\
+&=\frac23-2\left(\frac12\right)^2\\
+&=\frac16.
+\end{aligned}
+$$
+
+Independence is used only in $E[XY]=E[X]E[Y]$. Without it, the two marginal uniform laws would not determine the answer.
+
+## Boundaries, atoms, and mixed laws
+
+Not every joint distribution has a density. If $Y=X$, all mass lies on the diagonal in the plane, a set of area zero. Both coordinates can have continuous marginal densities even though the pair has no ordinary two-dimensional density. A model may also mix a point mass with a continuous component, as when a device reports exactly zero when inactive and a positive continuous reading when active.
+
+Jacobian formulas apply to absolutely continuous pieces. Atoms must be moved and combined as probability masses. For a discrete map $Z=g(X,Y)$,
+
+$$
+P(Z=z)=\sum_{(x,y):g(x,y)=z}P(X=x,Y=y).
+$$
+
+That sum is the discrete analogue of collecting inverse branches in a continuous transformation.
+
+## Failure modes to check
+
+### Worked example: conditioning on a triangular support
+
+Let the joint density be
+
+$$
+f_{X,Y}(x,y)=2,
+\qquad 0<y<x<1,
+$$
+
+and zero elsewhere. Its integral is $2$ times the area of a triangle of area $1/2$, so it is normalized. Marginalizing in the correct directions gives
+
+$$
+f_X(x)=\int_0^x2\,dy=2x,
+\qquad 0<x<1,
+$$
+
+and
+
+$$
+f_Y(y)=\int_y^12\,dx=2(1-y),
+\qquad 0<y<1.
+$$
+
+The bounds differ because fixing $x$ permits $0\lt y\lt x$, whereas fixing $y$ permits $y\lt x\lt 1$. The variables are not independent: their support is triangular, and
+
+$$
+f_X(x)f_Y(y)=4x(1-y)
+$$
+
+does not equal the constant joint density on that triangle.
+
+For a fixed $y$ with $0\lt y\lt 1$, the conditional density of $X$ is
+
+$$
+f_{X\mid Y}(x\mid y)
+=\frac{2}{2(1-y)}
+=\frac{1}{1-y},
+\qquad y<x<1.
+$$
+
+Thus $X\mid Y=y$ is uniform on $(y,1)$, with
+
+$$
+E[X\mid Y=y]=\frac{1+y}{2}.
+$$
+
+Larger observed values of $Y$ force $X$ upward because the support requires $X\gt Y$. The dependence is carried entirely by the boundary even though the joint density is constant wherever it is positive.
+
+### Jacobian orientation and normalization
+
+The change-of-variables formula uses the determinant of the **inverse** transformation when the original density is evaluated at $x(u,v),y(u,v)$. Using the forward determinant requires taking its reciprocal. The absolute value removes orientation: swapping coordinate order changes the determinant's sign but cannot make density negative.
+
+Three checks catch most errors. State the transformed support, integrate the proposed density to one, and map a simple interior point through both directions. A correct algebraic determinant paired with a wrong support still gives a wrong distribution.
 
 - Assuming marginals determine the joint distribution. They do not.
-- Checking independence at only one point in a joint table. Independence requires factorization everywhere.
+- Checking independence at only one point in a joint table. A single mismatch disproves independence, but agreement at one entry proves nothing.
 - Forgetting the absolute derivative factor when transforming a density.
 - Using a one-to-one change-of-variables formula for a many-to-one map like $Y=X^2$.
 - Treating zero-probability conditioning events in continuous models as if the elementary discrete formula applies unchanged.
 
-## Connections
+## Dependence beyond factorization
+
+Boundary points usually have probability zero for an absolutely continuous law, so strict or non-strict inequalities there do not change probabilities. The boundary can still control an answer by setting integration limits. Mixed laws require separate bookkeeping: a transformation may send an entire region or line to one value and thereby create an atom. Before applying a density formula, check whether the transformed variable can equal some value with positive probability.
+
+### Same marginals, several possible couplings
+
+A **coupling** is any joint distribution with specified marginals. Let $U$ be uniform on $(0,1)$. The pairs $(U,U)$, $(U,1-U)$, and $(U,V)$ with an independent uniform $V$ all have uniform marginal laws. Their dependence is respectively perfectly increasing, perfectly decreasing, and independent.
+
+The difference appears in functions of both coordinates. For the sum,
+
+$$
+U+U=2U,\qquad U+(1-U)=1,
+$$
+
+while $U+V$ has a triangular density. Thus knowing two marginal distributions cannot determine the variance of a portfolio, the probability of simultaneous failure, or the law of a sum.
+
+Covariance distinguishes these three examples:
+
+$$
+\operatorname{Cov}(U,U)=\frac1{12},\qquad
+\operatorname{Cov}(U,1-U)=-\frac1{12},\qquad
+\operatorname{Cov}(U,V)=0.
+$$
+
+Zero covariance alone still does not prove independence. If $X$ is uniform on $[-1,1]$ and $Y=X^2$, symmetry gives $E[XY]=E[X^3]=0$ and $E[X]=0$, hence covariance zero. Yet $Y$ is completely determined by $X$.
+
+For continuous marginals, a copula records the dependence after transforming each coordinate to a uniform scale. Sklar's representation writes a joint CDF as
+
+$$
+F_{X,Y}(x,y)=C(F_X(x),F_Y(y)).
+$$
+
+Independence corresponds to $C(u,v)=uv$. The formalism separates marginal behavior from dependence, which is useful when component distributions are well understood but their joint extremes are not. A correlation coefficient captures only one aspect of that dependence and can miss asymmetric or nonlinear tail association.
+
+When building a model from marginals, independence is therefore an additional modeling choice, not a neutral default forced by the data. It should be supported by the mechanism or checked against joint observations.
+
+## Related pages
 
 - [Conditional probability, Bayes, and independence](/math/probability-and-random-variables/conditional-probability-bayes-independence)
 - [Continuous random variables and uniform laws](/math/probability-and-random-variables/continuous-random-variables-and-uniform-laws)
 - [Sums, convolutions, and order statistics](/math/probability-and-random-variables/sums-convolutions-order-statistics)
 - [Covariance, correlation, and conditional expectation](/math/probability-and-random-variables/covariance-correlation-conditional-expectation)
-- [Joint, marginal, and conditional distributions](/math/probability/joint-marginal-conditional-distributions)

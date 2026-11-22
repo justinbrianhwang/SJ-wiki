@@ -7,9 +7,9 @@ sidebar_position: 10
 
 Structures let C group related objects under one name while keeping each member's type. K&R introduces them with geometric points and rectangles, then moves toward tables, trees, unions, typedefs, and bit fields. The theme is organization: once a program has more than a few related variables, a structure gives those variables a shape that functions can pass, return, store in arrays, and access through pointers.
 
-ANSI C made structure assignment, passing, and returning precise, so structures are not merely layout tricks. They are real values, although they cannot be compared directly. This page covers the core structure operations plus `typedef`, `union`, and bit-field notation; linked structures and hash tables are handled separately.
+ANSI C made structure assignment, passing, and returning precise, so structures are real values rather than layout tricks, although they cannot be compared directly. Linked structures and hash tables build on the same rules and are handled separately.
 
-## Definitions
+## Declaring and using record types
 
 A structure declaration names a collection of members:
 
@@ -82,7 +82,7 @@ struct flags {
 };
 ```
 
-## Key results
+## Value semantics, pointers, and incomplete types
 
 The legal structure operations are assignment, copying, taking an address, accessing members, passing to functions, and returning from functions. Structures cannot be compared with `==` or `!=` as whole values. Compare individual members when equality matters.
 
@@ -104,7 +104,50 @@ Unions and bit fields are closest to representation-level programming. They are 
 
 Arrays of structures and pointers to structures usually appear together. An array gives compact storage and direct indexing; a pointer lets functions operate on one element without copying it. K&R's table examples use both patterns. The expression `tab[i].name` selects from an array element, while `np->name` selects through a pointer as a linked list is traversed.
 
-## Visual
+A structure type may be mentioned before its members are defined. Such an *incomplete type* has unknown size, so code cannot create an object or take `sizeof` it yet. It can declare pointers, which is enough for self-referential structures:
+
+```c
+struct node {
+    char *word;
+    struct node *next;
+};
+```
+
+The member cannot be a `struct node` object directly because that would require each node to contain another complete node forever. A pointer has a known fixed size and ends the recursion. Forward declarations also let headers expose an opaque handle while keeping representation private in a source file.
+
+Structure assignment copies the value of every member, including padding in whatever manner the implementation chooses. Pointer members are copied as pointer values; the pointed-to allocation is not duplicated. Such a *shallow copy* can leave two structures referring to the same buffer. If both believe they own it, double-free and use-after-free bugs follow. C has no automatic copy constructor, so an owning structure needs documented initialization, copy, and destruction functions.
+
+Passing by value gives a callee an independent structure object, though any pointer members still refer to shared targets. Passing a pointer permits mutation of the original. A `const struct item *` prevents modification through that pointer but says nothing about aliases elsewhere. Return-by-value is clear for small records, and modern ABIs or compiler optimization often avoid needless temporary copies. Choose the interface for ownership and mutation semantics before guessing about speed.
+
+## Initialization and layout
+
+Positional initialization follows declaration order. Designated initializers, available since C99, attach values to member names and tolerate later insertion or reordering better:
+
+```c
+struct point p = { .y = 20, .x = 10 };
+```
+
+Members not explicitly initialized are zero-initialized. Assignment after declaration is different from initialization; a brace list by itself is not an assignable structure expression unless a compound literal supplies a type. C99 compound-literal syntax makes the type explicit:
+
+```c
+p = (struct point) { .x = 1, .y = 2 };
+```
+
+Compilers insert padding to satisfy member alignment. Consider a platform where `char` is one byte with alignment one and `int` is four bytes with alignment four:
+
+```c
+struct sample {
+    char tag;
+    int count;
+    char state;
+};
+```
+
+One common layout puts `tag` at offset 0, three padding bytes before `count` at offset 4, `state` at offset 8, and three trailing padding bytes, for total size 12. Reordering the two characters together may reduce the size to 8 on that platform. The C standard does not promise these exact numbers. `sizeof`, `_Alignof`, and `offsetof` are the proper ways to query the implementation.
+
+Trailing padding ensures that every `count` member in an array remains aligned. It also means bytewise comparison with `memcmp` is not a general substitute for member equality: padding bytes can hold unspecified values, floating-point values have special equality cases, and pointer representations need not compare meaningfully byte by byte. Likewise, dumping raw structure bytes to a file bakes in padding, integer width, byte order, and representation. Serialization should write defined fields in a defined external format.
+
+## How nested structures relate
 
 ```mermaid
 classDiagram
@@ -126,6 +169,52 @@ classDiagram
 | `union` | one member's storage, shared | `.` and `->` | variant values, low-level overlays | caller must track active member |
 | bit field | named bits in storage unit | `.` and `->` | compact flags | layout is implementation-defined |
 | enum masks | integer flags | bitwise ops | portable flag logic | less self-documenting than fields |
+
+## Tagged unions make variants explicit
+
+A union's size is sufficient for its largest member, with alignment suitable for every member. All members begin at the same address and overlap. Storing an integer and then storing a pointer replaces the integer representation; there are not two independent values. A separate enumeration records which interpretation currently owns the storage:
+
+```c
+enum value_kind { VALUE_INT, VALUE_DOUBLE, VALUE_TEXT };
+
+struct value {
+    enum value_kind kind;
+    union {
+        long integer;
+        double real;
+        char *text;
+    } as;
+};
+```
+
+Code switches on `kind` before reading `as.integer`, `as.real`, or `as.text`. Constructors can establish the invariant in one place, and a destruction function can free `text` only for `VALUE_TEXT`. Adding a new variant then prompts compiler warnings in exhaustive switches when suitable warning flags are enabled.
+
+Reading a union through a member other than the one most recently stored has narrow language rules and many implementation extensions. It should not be the default technique for reinterpreting floating-point bits. Copying bytes with `memcpy` into an integer type of known width is clearer about the intent and avoids aliasing assumptions, though the result still depends on byte order and floating-point representation. Protocol parsers should decode individual bytes instead of overlaying a union on untrusted input, which can also be misaligned or shorter than expected.
+
+Anonymous unions and structures are available in newer C standards and can reduce member-name nesting, but named layers often document ownership better. The compact spelling is useful when an established codebase already follows it; it is not a reason to obscure which member is active.
+
+## Bit fields versus masks
+
+Bit fields express small values and flags as members. A zero-width unnamed field can force the next field to a new allocation unit, and an unnamed field can reserve bits. The declared base types permitted and the signedness of a plain `int` bit field depend on the language version and implementation. Taking the address of a bit field is impossible because it may not occupy an independently addressable byte.
+
+Hardware register headers sometimes use bit fields, but their layout depends on compiler allocation order, ABI, and target. `volatile` can force accesses to occur, yet it does not standardize which source field maps to which hardware bit, nor does it guarantee an atomic read–modify–write sequence. A write-one-to-clear register can be damaged by an innocent-looking bit-field assignment if the compiler reads the whole register and writes back ones from other flags.
+
+Masks state the representation directly:
+
+```c
+enum {
+    STATUS_READY = 1u << 0,
+    STATUS_ERROR = 1u << 3
+};
+
+status |= STATUS_READY;
+status &= ~STATUS_ERROR;
+if ((status & (STATUS_READY | STATUS_ERROR)) == STATUS_READY) {
+    /* ready and no error */
+}
+```
+
+For file formats, packets, and registers, fixed-width unsigned integers plus shifts and masks make bit positions reviewable. Conversion at the boundary can populate an ordinary structure with named logical fields, keeping representation concerns out of the rest of the program.
 
 ## Worked example 1: Canonicalizing a rectangle
 
@@ -214,7 +303,7 @@ f.is_static = 1;
 
 Checked answer: both representations record the same logical state. Masks give explicit numeric control; bit fields give named member access.
 
-## Code
+## A complete rectangle value type
 
 ```c
 #include <stdio.h>
@@ -260,7 +349,9 @@ int main(void)
 }
 ```
 
-## Common pitfalls
+The half-open containment rule includes the lower-left edge and excludes the upper-right edge. Adjacent rectangles can then partition a grid without double-counting their shared boundary. Returning `Rect` by value also keeps canonicalization free of caller-visible mutation.
+
+## Errors that survive code review
 
 - Comparing structures directly with `==`. C does not define whole-structure equality.
 - Forgetting parentheses in `(*p).member`; prefer `p->member` for structure pointers.
@@ -269,8 +360,11 @@ int main(void)
 - Depending on bit-field layout for file formats, network protocols, or hardware registers without checking the implementation.
 - Passing large structures by value when a `const` pointer would be clearer and cheaper.
 - Reusing member names carelessly across unrelated structures, making code harder to scan even though C permits it.
+- Using `memcmp` as structure equality when padding or special member representations are present.
+- Writing raw structure bytes as a supposedly portable file or wire format.
+- Copying an owning pointer member and later freeing it from both copies.
 
-## Connections
+## Related pages
 
 - [Linked Structures and Hash Tables](/cs/programming/c/linked-structures-hash-tables)
 - [Types, Operators, and Expressions](/cs/programming/c/types-operators-expressions)

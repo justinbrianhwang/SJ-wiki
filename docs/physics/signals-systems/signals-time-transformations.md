@@ -9,11 +9,7 @@ A signal is a function that carries information through variation. In this cours
 
 Time transformations are the first language for describing how signals move, stretch, flip, or line up with other signals. They also prepare the ground for convolution, sampling, Fourier analysis, and modulation. When a problem asks for $x(2-t)$ or $x[3n+1]$, it is asking how the input graph or sequence is re-indexed before values are read.
 
-![A Tektronix oscilloscope sits on a bench with its display and controls visible.](https://commons.wikimedia.org/wiki/Special:FilePath/Tektronix_2235_100Mhz_Oscilloscope.png)
-
-*Figure: An oscilloscope grounds signal language in measured voltage traces, triggering, bandwidth, and time scales. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tektronix_2235_100Mhz_Oscilloscope.png), Dennis van Zuijlekom, CC BY-SA 2.0.*
-
-## Definitions
+## Signals as functions and sequences
 
 A continuous-time signal is a mapping
 
@@ -129,7 +125,26 @@ $$
 
 The same formulas hold for $x[n]$.
 
-## Key results
+Even and odd decomposition is unique. Adding the two expressions recovers $x$, while replacing $t$ by $-t$ verifies their symmetry. For a real signal, the even and odd parts are real. For a complex signal, time symmetry is separate from conjugate symmetry; $x(-t)=x^*(t)$ is a different condition.
+
+Other elementary signals are built from steps and impulses. A finite rectangular pulse can be written as
+
+$$
+u(t-a)-u(t-b),
+\qquad a<b.
+$$
+
+It equals one on the interval from $a$ to $b$, subject to the chosen value of the step at endpoints. A ramp is $r(t)=tu(t)$, and differentiation gives $dr/dt=u(t)$ away from the origin with the distributional boundary term handled consistently.
+
+Complex exponentials unify growth, decay, and oscillation:
+
+$$
+e^{(\sigma+j\omega)t}=e^{\sigma t}e^{j\omega t}.
+$$
+
+The real part $\sigma$ controls the envelope and $\omega$ controls rotation in the complex plane. Euler's identity turns real sinusoids into pairs of complex exponentials, which later become the natural eigenfunctions of LTI systems.
+
+## Mapping time landmarks instead of moving a sketch
 
 The order of visual operations matters when transforming $x(a t+b)$. A reliable method is to transform the independent variable, not the picture by memory. Set $\tau=a t+b$, map old feature locations $\tau_0$ to new locations $t=(\tau_0-b)/a$, and then copy the old value. This prevents the common left-right confusion caused by expressions such as $x(2-t)$.
 
@@ -173,7 +188,52 @@ $$
 
 for every integer $k$, so discrete-time frequency is periodic with period $2\pi$.
 
-## Visual
+The affine argument can be factored in two ways:
+
+$$
+at+b=a\left(t+\frac{b}{a}\right).
+$$
+
+One may describe this as a shift followed by scaling or derive it by mapping landmarks. Verbal operation order is prone to mistakes because horizontal transformations act inside the argument and negative $a$ reverses inequality directions. Solving $\tau=at+b$ handles all cases at once.
+
+Amplitude transformations are separate from time transformations. In
+
+$$
+y(t)=A,x(at+b)+C,
+$$
+
+$A$ scales and possibly reflects values vertically, while $C$ adds a vertical offset. Neither changes the time locations of features. The parameters $a$ and $b$ change locations but do not alter sampled amplitudes inherited from $x$.
+
+## Continuous-time impulse rules
+
+The unit impulse has unit area and zero width in the distributional description. Shifting moves its sampling location:
+
+$$
+\int x(t)\delta(t-t_0)\,dt=x(t_0).
+$$
+
+Multiplying by a continuous function samples that function:
+
+$$
+f(t)\delta(t-t_0)=f(t_0)\delta(t-t_0).
+$$
+
+The scaling factor in $\delta(at)=\delta(t)/\vert a\vert $ preserves area under a change of variables. Ignoring it leads to wrong convolution and transform constants. For an affine argument,
+
+$$
+\delta(at+b)=\frac{1}{|a|}
+\delta\left(t+\frac{b}{a}\right).
+$$
+
+The derivative $\delta'(t)$ acts by
+
+$$
+\int f(t)\delta'(t-t_0)\,dt=-f'(t_0),
+$$
+
+where the minus sign follows from integration by parts. Such generalized derivatives appear when differentiating signals with jumps.
+
+## A table for common time transformations
 
 | Operation | Continuous-time form | Effect on feature at $t=t_0$ or $n=n_0$ | Discrete-time caution |
 |---|---|---|---|
@@ -192,7 +252,7 @@ flowchart TD
   E --> F[Connect intervals with correct reversal and scaling]
 ```
 
-## Worked example 1: transforming a rectangular pulse
+## Worked example: transforming a rectangular pulse
 
 Problem: Let
 
@@ -257,7 +317,7 @@ $$
 
 So $\tau=-1$ maps to $t=3$, and $\tau=3$ maps to $t=-1$. The interval is reversed but has the same endpoints. Since the pulse is constant over that interval, the reversal is not visually obvious. A nonconstant ramp would show the flip.
 
-## Worked example 2: decomposing a sequence into shifted impulses
+## Worked example: decomposing a sequence into shifted impulses
 
 Problem: Write the finite sequence
 
@@ -300,37 +360,112 @@ $$
 x[n]=4\delta[n+1]-2\delta[n]+3\delta[n-2].
 $$
 
-## Code
+## Worked example: affine transformation of a ramp segment
 
-```python
-import numpy as np
-import matplotlib.pyplot as plt
+Let
 
-def x_ct(t):
-    return np.where((-1 <= t) & (t <= 3), 2.0, 0.0)
+$$
+x(t)=
+\begin{cases}
+t+1, & -1\le t\le2,\\
+0, & \text{otherwise},
+\end{cases}
+$$
 
-t = np.linspace(-4, 6, 1001)
-y = x_ct(2 - t)
+and find $y(t)=x(1-2t)$.
 
-n = np.arange(-4, 5)
-x_dt = np.zeros_like(n, dtype=float)
-x_dt[n == -1] = 4
-x_dt[n == 0] = -2
-x_dt[n == 2] = 3
+Set $\tau=1-2t$. The endpoints map according to
 
-fig, ax = plt.subplots(1, 2, figsize=(10, 3))
-ax[0].plot(t, y)
-ax[0].set_title("y(t)=x(2-t)")
-ax[0].grid(True)
+$$
+t=\frac{1-\tau}{2}.
+$$
 
-ax[1].stem(n, x_dt)
-ax[1].set_title("Discrete impulse expansion samples")
-ax[1].grid(True)
-plt.tight_layout()
-plt.show()
-```
+Thus $\tau=-1$ maps to $t=1$, and $\tau=2$ maps to $t=-1/2$. The nonzero interval is therefore
 
-## Common pitfalls
+$$
+-\frac12\le t\le1.
+$$
+
+Within that interval, substitute the transformed argument into the ramp formula:
+
+$$
+y(t)=(1-2t)+1=2-2t.
+$$
+
+Hence
+
+$$
+y(t)=
+\begin{cases}
+2-2t, & -\frac12\le t\le1,\\
+0, & \text{otherwise}.
+\end{cases}
+$$
+
+At the left endpoint, $y(-1/2)=3$, matching $x(2)=3$. At the right endpoint, $y(1)=0$, matching $x(-1)=0$. The original rising ramp becomes a falling ramp, and its duration changes from three units to $3/2$, consistent with compression by $\vert a\vert =2$.
+
+## Discrete-time scaling is resampling
+
+For a sequence, $x[2n]$ keeps only the even-indexed samples. It is often called compression, but no rule supplies the missing odd-indexed values. If
+
+$$
+x[-2]=a,
+\quad x[-1]=b,
+\quad x[0]=c,
+\quad x[1]=d,
+\quad x[2]=e,
+$$
+
+then $x[2n]$ contains $a,c,e$ at indices $-1,0,1$ and discards $b,d$.
+
+An expression such as $x[n/2]$ is undefined at odd $n$ unless a convention is added. In multirate signal processing, expansion by two is defined by
+
+$$
+y[n]=
+\begin{cases}
+x[n/2], & n\ \text{even},\\
+0, & n\ \text{odd}.
+\end{cases}
+$$
+
+Interpolation filtering then fills the inserted zeros. It is misleading to treat $x[n/2]$ as though a discrete sequence already contained values between integer samples.
+
+For $x[an+b]$ with integer $a$ and $b$, solve $k=an+b$ for landmarks, but retain only integer $n$. A source sample can disappear when $(k-b)/a$ is not an integer. Negative $a$ combines reversal with decimation.
+
+## What a plotted signal leaves unspecified
+
+A drawn continuous curve may be an exact mathematical function or only an interpolation between measurements. A stem plot for a discrete sequence defines values only at its stems; connecting lines are usually visual guides, not signal values. Treating a discrete plot as a continuous curve can create nonexistent crossings and fractional-index samples.
+
+Endpoint conventions also matter when steps define pulses. The value assigned to $u(0)$ may be zero, one, or one half. For ordinary integrals and Fourier transforms, changing isolated endpoint values has no effect. For discrete-time sequences, the sample at the endpoint contributes a full term and cannot be ignored.
+
+Units change under normalization. Continuous time may be seconds, distance, or another real coordinate. Discrete index $n$ is dimensionless; physical sample time is $t=nT_s$. A delay of $n_0$ samples corresponds to $n_0T_s$ seconds only after the sampling interval is known.
+
+## Support, sidedness, and duration
+
+The support of a signal is the set of times or indices where it is nonzero, with measure-theoretic qualifications when needed. A right-sided continuous-time signal is zero before some finite time $t_0$; a left-sided signal is zero after some finite time. A two-sided signal extends indefinitely in both directions. These labels describe support, not causality: causality is a property of a system, although causal impulse responses are right-sided at zero.
+
+A time shift translates support. If $x(t)$ is supported on a set $S$, then $x(t-t_0)$ is supported on $S+t_0$. Scaling by nonzero $a$ maps support through $t=S/a$, reversing order when $a\lt 0$. Multiplying two signals intersects their supports, while adding them gives support contained in the union; cancellation can make it smaller.
+
+Duration behaves predictably for continuous affine scaling. A finite interval of length $L$ becomes length $L/\vert a\vert $ under $x(at+b)$. Amplitude does not change unless an outside multiplier is present. Energy, however, changes by the same time-scale factor because integration includes $dt$:
+
+$$
+\int|x(at)|^2dt
+=\frac{1}{|a|}\int|x(\tau)|^2d\tau.
+$$
+
+This distinguishes geometric compression from amplitude scaling.
+
+## Deterministic and random descriptions
+
+A deterministic signal is specified by a formula, table, or reproducible rule. A random signal is modeled as a collection of possible functions indexed by an outcome; one observed function is a realization. The continuous-versus-discrete distinction concerns the independent variable and is separate from randomness.
+
+Likewise, quantized and discrete-time are different ideas. Sampling discretizes time while amplitudes may remain continuous-valued. Quantization restricts amplitudes to levels while time may be continuous or discrete. A digital representation normally uses both sampling and quantization.
+
+Signal models omit aspects of the physical source. A voltage trace may be treated as continuous even though it is recorded by sampled hardware, or as discrete after acquisition. The appropriate model depends on the operation being analyzed. Sampling rate, bandwidth, and interpolation assumptions determine whether transitions between the models are faithful.
+
+Complex signals are often bookkeeping devices for real systems. The analytic representation combines a real waveform with a quadrature component so modulation and filtering can be described with one complex envelope. Measured voltage remains real; the complex form stores amplitude and phase compactly.
+
+## Re-indexing mistakes
 
 - Shifting in the wrong direction. $x(t-t_0)$ is delayed by $t_0$, while $x(t+t_0)$ is advanced by $t_0$.
 - Reversing before locating the new origin. For $x(a t+b)$, solve $\tau=a t+b$ rather than relying on a memorized picture operation.
@@ -338,7 +473,7 @@ plt.show()
 - Forgetting that $x[2n]$ is not a compressed version containing every sample. It reads only even-indexed samples of $x[n]$.
 - Assuming discrete-time frequencies are unique. Frequencies separated by $2\pi$ produce the same sequence.
 
-## Connections
+## Related pages
 
 - [Periodicity, Energy, and Power](/physics/signals-systems/periodicity-energy-power)
 - [System Properties](/physics/signals-systems/system-properties)

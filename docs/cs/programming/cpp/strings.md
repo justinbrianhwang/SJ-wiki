@@ -7,9 +7,9 @@ sidebar_position: 5
 
 C++ has two major string traditions. The older C-style representation stores text in an array of `char` terminated by the null character `'\0'`. The modern standard-library representation uses the class `std::string`, which manages storage and exposes string operations through member functions and overloaded operators. Savitch covers both because C-strings still appear in string literals, command-line arguments, old libraries, and low-level character processing.
 
-The practical rule is simple: use `std::string` for ordinary application code, but understand C-strings well enough to read, interoperate with, and safely maintain code that uses them.
+The default choice is simple: use `std::string` for ordinary application code, but understand C-strings well enough to read, interoperate with, and safely maintain code that uses them.
 
-## Definitions
+## Two representations with different invariants
 
 A **character** is a value of type `char`, usually written with single quotes:
 
@@ -61,7 +61,11 @@ char ch;
 std::cin.get(ch); // reads spaces and newlines too
 ```
 
-## Key results
+A `std::string` stores its current size along with managed contiguous character storage. Since C++11, `&text[0]` for a nonempty string and `text.data()` expose contiguous elements suitable for APIs that accept a character range. `c_str()` supplies a null-terminated view for C interfaces. Pointers obtained from these functions are non-owning and may be invalidated when the string changes.
+
+Unlike a C-string, an `std::string` can contain embedded null characters because its size is stored separately. Constructing from a C-string still stops at the first null unless an explicit length is supplied. Printing with stream insertion uses the string's length and can preserve embedded null bytes, though those bytes have no ordinary visible glyph.
+
+## Length, capacity, and comparison
 
 C-strings are arrays, so they do not behave like ordinary assignable values after declaration. This is illegal:
 
@@ -93,7 +97,9 @@ if (a == b) {
 
 The null terminator is the crucial invariant of C-strings:
 
-$$\text{valid C-string} \Rightarrow \exists i \text{ such that } a[i] = '\backslash 0'$$
+$$
+\text{valid C-string} \Rightarrow \exists i \text{ such that } a[i] = '\backslash 0'
+$$
 
 Many C-string functions scan until they see `'\0'`. If the terminator is missing, the function may read beyond the array.
 
@@ -112,15 +118,21 @@ The common trap is mixing formatted extraction with line input. After `std::cin 
 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 ```
 
-## Visual
+`size()` counts `char` elements, which are bytes on ordinary implementations, not necessarily user-perceived characters. UTF-8 encodes many characters with multiple bytes, and a visible grapheme can contain several Unicode code points. Indexing a UTF-8 `std::string` therefore selects a code unit byte, not reliably a complete character. Unicode-aware segmentation and case conversion require a library or platform facility with an explicit encoding policy.
+
+Like vector, string distinguishes size from capacity. Appending within available capacity can reuse storage; growth beyond it may allocate a new buffer and invalidate pointers, references, and iterators. `reserve` can reduce repeated allocations when the approximate final length is known. It does not change the logical size, and code must not write into merely reserved-but-not-sized elements.
+
+Lexicographic comparison examines corresponding character values until a difference appears, then uses length if one string is a prefix of the other. That is a code-unit ordering, not locale-aware dictionary order. Uppercase, lowercase, accents, and numeric substrings may sort differently from human expectations.
+
+## Where the terminator lives
 
 ```text
 C-string storage for "cat" in char word[6]
 
 index:    0     1     2     3      4      5
-       +-----+-----+-----+------+------ +------+
+       +-----+-----+-----+------+------+------+
 value: | 'c' | 'a' | 't' | '\0' |  ??  |  ??  |
-       +-----+-----+-----+------+------ +------+
+       +-----+-----+-----+------+------+------+
                          terminator
 ```
 
@@ -132,7 +144,9 @@ value: | 'c' | 'a' | 't' | '\0' |  ??  |  ??  |
 | concatenate | `strcat(dest, src)` | `dest += src` | C destination capacity |
 | line input | `cin.getline(buf, n)` | `getline(cin, s)` | leftover newline |
 
-## Worked example 1: why C-string equality needs `strcmp`
+The unused C-array slots have no role in the string value. Library functions are allowed to read only through the terminator; they do not know the array's capacity. By contrast, `std::string` member functions know both size and allocation details and can grow the object when needed.
+
+## Worked example: why C-string equality needs `strcmp`
 
 Problem: Determine whether two C-string variables contain the same visible text.
 
@@ -166,7 +180,9 @@ int main() {
 
 Checked answer: `a == b` prints `false` on normal separate arrays, while `strcmp equal` prints `true`.
 
-## Worked example 2: fixing `cin >>` followed by `getline`
+`strcmp` returns a negative, zero, or positive integer; the magnitude is unspecified. Code should compare the result with zero rather than expect `-1` or `1`. The comparison also ends at the first null, so it cannot compare arbitrary byte buffers containing embedded zeros without a separate length.
+
+## Worked example: fixing `cin >>` followed by `getline`
 
 Problem: Read an integer age and then a full name that may contain spaces.
 
@@ -209,7 +225,9 @@ int main() {
 
 Checked answer: if the input is `20` followed by `Grace Hopper`, the program stores `age == 20` and `name == "Grace Hopper"`.
 
-## Code
+The extraction should also be tested. If the age is nonnumeric, the stream remains failed and `ignore` alone cannot recover; call `clear()` before discarding the malformed line, or report the error and stop. Input recovery is a stream-state problem as well as a string problem.
+
+## Normalizing ASCII-like text for a palindrome test
 
 This program normalizes a line by keeping only letters and converting them to lowercase, then tests whether the result is a palindrome.
 
@@ -230,15 +248,15 @@ std::string normalized(const std::string& input) {
 }
 
 bool isPalindrome(const std::string& text) {
-    int left = 0;
-    int right = static_cast<int>(text.size()) - 1;
+    std::size_t left = 0;
+    std::size_t right = text.size();
 
     while (left < right) {
+        --right;
         if (text[left] != text[right]) {
             return false;
         }
         ++left;
-        --right;
     }
     return true;
 }
@@ -253,7 +271,11 @@ int main() {
 }
 ```
 
-## Common pitfalls
+Using a half-open interval `[left, right)` avoids subtracting one from zero for an empty string and avoids narrowing a potentially large `size_t` into `int`. Each iteration changes the interval only after establishing that it is nonempty. For odd lengths, the two positions meet at the middle element, which needs no comparison with itself.
+
+Casting through `unsigned char` before the `<cctype>` calls avoids undefined behavior for negative plain `char` values. Even so, these functions under the default C locale do not provide general Unicode case folding. The normalization is suitable for ASCII-like input under a chosen locale, not for every written language.
+
+## Buffer errors and text-model assumptions
 
 - Allocating a C-string buffer with no room for `'\0'`.
 - Destroying the null terminator while editing characters in a C-string.
@@ -264,7 +286,7 @@ int main() {
 - Mixing `operator>>` and `getline` without handling the leftover newline.
 - Passing a negative `char` value directly to `std::toupper`, `std::tolower`, or `std::isalpha`; cast to `unsigned char` first in portable code.
 
-String-handling checks:
+For text-handling code:
 
 - Decide whether the data is text or a character buffer. If it is ordinary text in C++, prefer `std::string`; use C-strings mainly when interacting with older interfaces or studying representation.
 - Remember that `std::string::length()` counts characters in the string value, while a C-string function such as `strlen` counts until it finds the first null character.
@@ -274,15 +296,31 @@ String-handling checks:
 - Check the result of `find` against `string::npos`. Treating `npos` as a valid index can lead to very large unsigned values and confusing behavior.
 - Avoid unnecessary conversion between `string` and C-string form. Each conversion adds a chance to lose length information or accidentally depend on null termination.
 
-Quick self-test: trace both the logical length and the storage requirement. The string value `"cat"` has length `3`; a C-string array storing it needs `4` characters because of `'\0'`. This difference explains many one-character buffer overruns.
+Trace both the logical length and the storage requirement. The string value `"cat"` has length `3`; a C-string array storing it needs `4` characters because of `'\0'`. The difference explains many one-character buffer overruns.
 
 When searching inside a `std::string`, handle the "not found" case before using the position. A position returned by `find` is an unsigned size value; `string::npos` is not `-1` in the ordinary signed-integer sense, even though it is often described that way informally.
 
 For parsing, decide whether whitespace is meaningful. If spaces are part of the data, use `getline`; if whitespace separates tokens, formatted extraction may be correct.
 
-A final review question is whether the program needs ownership of text or only a temporary view of characters. Introductory C++ usually uses owning `std::string` values, which copy safely and manage memory automatically; raw character arrays require the programmer to manage both storage and termination.
+Choose explicitly between ownership of text and a temporary view of characters. Introductory C++ usually uses owning `std::string` values, which copy safely and manage memory automatically; raw character arrays require the programmer to manage both storage and termination.
 
-## Connections
+`std::string_view` can express a non-owning contiguous character sequence without copying. It may refer to a string, literal, or substring and stores a length, so it need not be null-terminated. Its small size makes it useful for read-only parameters, but it can dangle when the source string is destroyed or reallocated. Returning a view into a local string is invalid for the same lifetime reason as returning a pointer to a local array.
+
+Substring operations deserve a cost check. `substr` creates a new string and copies characters. Repeated concatenation at the front or repeated substring copying can turn a linear-looking parser into quadratic work. Index ranges or string views avoid copies when ownership is not needed; `reserve` helps when constructing one output incrementally.
+
+The bounded-looking `strncpy` has awkward semantics: it pads the destination with zeros when the source is short and does not append a terminator when the source length reaches the bound. Explicitly writing the final null, as the earlier example does, prevents unterminated output but also truncates. Interfaces carrying both pointer and capacity are safer than a bare destination pointer, while `std::string` remains the ordinary default.
+
+Search positions use `std::string::size_type`, commonly the same unsigned type as `std::size_t`. Adding to `npos` wraps, and subtracting positions without first establishing their order can also wrap. Check for failure and validate range endpoints before arithmetic. Member functions such as `erase`, `insert`, and `replace` accept position-and-count forms whose count may be clipped at the end, but an invalid starting position can throw `std::out_of_range`.
+
+Appending one character at a time is amortized linear because string capacity grows geometrically on typical conforming implementations, though the exact growth policy is unspecified. Inserting repeatedly at the beginning remains costly because existing characters move on each operation. When the final pieces are already known, compute or estimate the total length, reserve once, and append in forward order.
+
+Converting numbers with `std::to_string` is convenient for simple output; parsing with `std::stoi` reports errors through exceptions and can return the position where parsing stopped. String streams provide locale-aware formatted parsing, while `std::from_chars` offers a low-level, locale-independent conversion for supported types without allocation. The right tool depends on whether trailing text, locale, and error representation matter.
+
+C-string interfaces often accept a pointer with no capacity because they predate safer range conventions. Before calling one, identify whether the function reads, writes, or may retain the pointer after return. `std::string::c_str()` is suitable for a read-only call that does not retain it. Casting away constness or letting a C function store the pointer invites mutation or lifetime errors.
+
+Case-insensitive comparison is not obtained safely by lowercasing bytes in every language. Even ASCII-oriented code should cast through `unsigned char`; international text additionally needs Unicode normalization and case-folding rules. State the accepted character set when a parser or identifier comparison deliberately uses ASCII rules.
+
+## Related pages
 
 - [arrays](/cs/programming/cpp/arrays)
 - [streams and file I/O](/cs/programming/cpp/streams-and-file-io)

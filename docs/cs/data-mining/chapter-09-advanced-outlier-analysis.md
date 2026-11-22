@@ -7,9 +7,9 @@ sidebar_position: 11
 
 Advanced outlier analysis studies cases where ordinary numeric, full-dimensional, single-model anomaly detection is inadequate. Aggarwal's advanced chapter focuses on categorical data, high-dimensional outlier detection, ensembles, and applications. These settings are common in data mining: fraud records mix category codes, text vectors have thousands of sparse dimensions, and operational systems often need robust rankings rather than one brittle detector.
 
-This page extends basic outlier analysis. The main message is that an anomaly may be hidden in a subspace, in an unusual categorical combination, or in disagreement among several detectors.
+An anomaly may be hidden in a subspace, in an unusual categorical combination, or in disagreement among several detectors. Each case changes both the search problem and the explanation owed to a reviewer.
 
-## Definitions
+## Where full-dimensional numeric scores fail
 
 **Categorical outlier detection** finds unusual combinations of symbolic attribute values. It often uses frequency, entropy, pattern rarity, or deviations from expected co-occurrence.
 
@@ -21,23 +21,74 @@ This page extends basic outlier analysis. The main message is that an anomaly ma
 
 **Outlier ensembles** combine multiple anomaly scores. Base detectors may vary by algorithm, feature subset, sample, parameter, or random seed.
 
-**Isolation-based detection** ranks objects by how quickly random splits isolate them. Isolation forest is a practical ensemble method: anomalies tend to require shorter paths in random trees.
+**Isolation-based detection** ranks objects by how quickly random splits isolate them. Isolation forest builds an ensemble of such random trees; anomalies tend to require shorter paths.
 
-## Key results
+## Categorical rarity needs a model
 
 **Categorical rarity is combinatorial.** A single category value may be common, but its combination with other values may be rare. For example, country = US and device = desktop may both be common, but a specific browser-language-payment combination may be unusual.
+
+Using the frequency of a complete tuple quickly becomes useless: with many attributes, nearly every tuple may occur once. A factorized model estimates
+
+$$
+P(x_1,\ldots,x_d)\approx\prod_{j=1}^dP(x_j),
+$$
+
+but misses dependencies. A conditional or graphical model can preserve selected dependencies, such as $P(\text{payment}\mid\text{country})$, without requiring counts for every complete combination. Association-rule approaches instead ask whether a record violates a frequent implication.
+
+For a categorical variable with $m$ possible values, additive smoothing estimates
+
+$$
+\widehat{P}(x=v)=\frac{n_v+\alpha}{n+\alpha m}.
+$$
+
+With $\alpha\gt 0$, an unseen value no longer receives zero probability and infinite negative log score. The category universe must still be defined: a malformed code should not be silently accepted as an ordinary unseen category.
+
+## Searching subspaces without manufacturing anomalies
 
 **High-dimensional distance concentration hurts global detectors.** If all pairwise distances become similar, nearest-neighbor scores lose contrast. Subspace methods search for projections in which contrast reappears.
 
 **Subspace search must be controlled.** The number of feature subsets is exponential in dimension. Practical methods use random subspaces, feature bagging, evolutionary search, sparse models, or domain-restricted subsets.
 
+If all nonempty subsets were searched, there would be $2^d-1$ candidates. At $d=40$, that exceeds one trillion. Restricting subspace size reduces cost but also encodes a hypothesis about interaction order. Random subspaces trade exhaustive coverage for diversity; domain groups such as “network,” “billing,” and “device” features give more interpretable tests.
+
+Angle-based methods exploit a different high-dimensional signal. For candidate $x$ and two other observations $y,z$, consider
+
+$$
+\cos\theta=
+\frac{(y-x)^\top(z-x)}{\|y-x\|\,\|z-x\|}.
+$$
+
+An isolated point far outside a cloud sees most other points in similar directions, producing relatively consistent angles. A point inside the cloud sees points in many directions. Angle-based outlier factor formalizes this through a weighted variance of such angles. Computing all triples is expensive, so sampling or approximations are needed at scale.
+
+Subspace scores also create a comparability problem. A two-dimensional score and a twenty-dimensional score need not have the same null distribution. Rank or empirical-tail normalization within each subspace is safer than taking a raw maximum.
+
+## Isolation depth and its normalization
+
 **Ensembles improve robustness when detectors fail differently.** A distance detector, density detector, isolation detector, and subspace detector may rank different objects highly. Combining normalized scores can reduce dependence on one fragile assumption.
 
 **Isolation forest intuition.** Randomly choose a feature and a split value. Points in sparse or extreme regions are separated by fewer random splits. Average path length across many trees becomes an anomaly score.
 
+Raw path length depends on sample size. Isolation forest compares the mean path $E[h(x)]$ with the expected unsuccessful-search depth of a random binary search tree. A standard normalizer is
+
+$$
+c(n)=2H_{n-1}-\frac{2(n-1)}{n},
+$$
+
+where $H_j=\sum_{i=1}^j1/i$ is a harmonic number. The score is commonly written
+
+$$
+s(x,n)=2^{-E[h(x)]/c(n)}.
+$$
+
+Short paths give scores nearer one; paths near the average normal depth give scores around one half. This normalization supports comparison within a fitted forest, not a universal probability of fraud or failure.
+
+Feature subsampling helps diversify the trees, but irrelevant dimensions can still delay isolation because random splits waste chances on them. Categorical variables require a meaningful split representation; arbitrary integer codes impose false order.
+
+## Combining detectors that fail differently
+
 **Score normalization matters.** Combining raw scores from different detectors is meaningless if one detector outputs distances, another outputs negative log-likelihoods, and another outputs path lengths. Convert scores to ranks, quantiles, z-scores, or calibrated probabilities before aggregation.
 
-**Subspace anomalies require evidence control.** In high dimensions, it is easy to find some projection where a point looks strange by chance. This is the anomaly-detection version of multiple testing. A practical workflow limits candidate subspaces with domain knowledge, random feature bagging, minimum support requirements, or validation on known anomalies. The final explanation should name the feature subset that made the point unusual; otherwise reviewers cannot distinguish a meaningful subspace anomaly from a search artifact.
+**Subspace anomalies require evidence control.** In high dimensions, it is easy to find some projection where a point looks strange by chance. This is the anomaly-detection version of multiple testing. Candidate subspaces can be limited with domain knowledge, random feature bagging, minimum support requirements, or validation on known anomalies. The final explanation should name the feature subset that made the point unusual; otherwise reviewers cannot distinguish a meaningful subspace anomaly from a search artifact.
 
 **Categorical anomaly scores need smoothing.** A combination not seen in historical data may have empirical probability zero, but that does not always mean impossible. New products, new countries, and new device types appear over time. Smoothing, hierarchical category grouping, and recency-aware baselines help avoid turning every new legitimate category into a severe alert.
 
@@ -47,7 +98,11 @@ This page extends basic outlier analysis. The main message is that an anomaly ma
 
 **Maintenance matters.** Advanced detectors often depend on background frequencies, subspace samples, or ensemble components. These baselines should be refreshed on a controlled schedule so the model adapts without immediately normalizing every suspicious burst.
 
-## Visual
+Average rank is robust to score units but loses information about the size of gaps. Quantile averaging retains only empirical position. Standardizing scores keeps magnitude but is sensitive to heavy tails. A maximum-rank ensemble catches anything any detector considers extreme and therefore raises false positives. The aggregation rule should match whether consensus or coverage is preferred.
+
+Base diversity must be real. Ten isolation forests with adjacent random seeds may be less diverse than one isolation forest, one local-density method, and one categorical model. Pairwise rank correlation among component scores is a simple diagnostic. High agreement can be reassuring, but it also means the ensemble adds little robustness.
+
+## A map of the advanced methods
 
 ```mermaid
 flowchart TD
@@ -137,7 +192,35 @@ $$
 
 **Checked answer.** The point 9.0 has a short expected isolation path because it is separated by a large empty gap from the rest of the data.
 
-## Code
+## Worked example 3: rank aggregation
+
+**Problem.** Three records $A,B,C$ receive anomaly scores from two detectors. Larger means more anomalous.
+
+| record | detector 1 | detector 2 |
+|---|---:|---:|
+| A | 100 | 0.60 |
+| B | 20 | 0.95 |
+| C | 10 | 0.20 |
+
+Average raw scores are meaningless because the scales differ. Convert each column to ascending quantile ranks using rank divided by three.
+
+**Method.** Detector 1 orders $C\lt B\lt A$, so its quantiles are $1/3,2/3,1$. Detector 2 orders $C\lt A\lt B$, giving $1/3,2/3,1$ to $C,A,B$ respectively.
+
+The ensemble values are
+
+$$
+q_A=\frac{1+2/3}{2}=\frac{5}{6},
+$$
+
+$$
+q_B=\frac{2/3+1}{2}=\frac{5}{6},
+\qquad
+q_C=\frac{1/3+1/3}{2}=\frac{1}{3}.
+$$
+
+**Checked answer.** $A$ and $B$ tie at $5/6$, while $C$ ranks lower. The aggregation records that each of $A$ and $B$ is strongly supported by one detector and moderately supported by the other. With only three records, the quantiles are coarse; larger reference samples give finer ranks.
+
+## Building a rank ensemble
 
 Pseudocode for an outlier ensemble:
 
@@ -186,7 +269,9 @@ print("lof:", np.round(lof_score, 3))
 print("ensemble:", np.round(ensemble, 3))
 ```
 
-## Common pitfalls
+The example fits and scores the same five observations, which is suitable for illustrating unsupervised detection. For novelty detection, component estimators must support scoring new records, and the empirical rank transform must be defined against stored training-score distributions rather than reranking every incoming batch. Batch reranking would make a record's score depend on which other records happened to arrive beside it.
+
+## Failure modes
 
 - Treating rare categorical values as automatically anomalous without accounting for legitimate class imbalance.
 - Searching many subspaces and reporting the best anomaly without correcting for chance discoveries.
@@ -195,8 +280,11 @@ print("ensemble:", np.round(ensemble, 3))
 - Using isolation forest contamination settings as ground truth rather than threshold choices.
 - Ignoring explainability; anomaly reviewers often need the features or patterns that caused the flag.
 - Evaluating only top-ranked examples and missing systematic false positives in protected or operationally sensitive groups.
+- Taking the maximum over thousands of subspace scores without recording how many opportunities each record had to look unusual.
+- Treating unseen categories caused by a schema change as behavioral anomalies rather than pipeline failures.
+- Refreshing the baseline during an attack or outage so quickly that the abnormal regime becomes the new normal.
 
-## Connections
+## Related pages
 
 - [Outlier Analysis](/cs/data-mining/chapter-08-outlier-analysis)
 - [Feature Selection and Dimensionality Reduction](/cs/data-mining/chapter-02-feature-selection-dimensionality-reduction)

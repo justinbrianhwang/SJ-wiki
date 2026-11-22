@@ -5,310 +5,357 @@ sidebar_position: 6
 
 # Internal Forces in Beams
 
-External equilibrium finds support reactions, but it does not directly show what happens inside a beam. A beam may be in overall equilibrium while different cross sections carry different axial force, shear force, and bending moment. Internal force diagrams turn those hidden resultants into functions of position, making them essential for later stress, deflection, and design work.
+Whole-body equilibrium determines support reactions, but it does not say how strongly each cross section is loaded. A beam can have zero resultant force and zero resultant moment while carrying large internal forces. Stress and deflection calculations begin only after those internal resultants are known as functions of position.
 
-The core idea is an imaginary cut. Slice the beam at a chosen position, keep one side, and replace the removed side by internal resultants on the cut face. Then write equilibrium of the retained piece. Repeating this process along the span produces axial-force, shear-force, and bending-moment diagrams.
+The basic operation is an imaginary cut. Keep either side of the cut, replace the discarded material by the forces and couple it exerted across the section, and impose equilibrium on the retained segment. Moving the cut along the member produces axial-force, shear-force, and bending-moment diagrams.
 
-## Definitions
+## What a cut exposes
 
-A **beam** is a slender member that primarily carries transverse loads. A general planar cut exposes three internal resultants:
-
-$$
-N(x)=\text{axial force},\qquad V(x)=\text{shear force},\qquad M(x)=\text{bending moment}.
-$$
-
-Sign conventions vary. This page uses a common convention for the **left segment** of a beam:
-
-- Positive $N$ pulls the cut face to the right, creating tension in the left segment.
-- Positive $V$ acts upward on the cut face of the left segment.
-- Positive $M$ is counterclockwise on the cut face of the left segment, producing sagging curvature for many standard beam diagrams.
-
-The important rule is not which convention is chosen, but that it is used consistently.
-
-A **shear-force diagram** plots $V(x)$ along the beam. A **bending-moment diagram** plots $M(x)$. If a distributed load $w(x)$ is taken positive downward, common differential relations are
+For planar loading, a general section carries three resultants:
 
 $$
-\frac{dV}{dx}=-w(x),
+N(x)=\text{axial force},\qquad
+V(x)=\text{shear force},\qquad
+M(x)=\text{bending moment}.
 $$
 
-$$
-\frac{dM}{dx}=V(x).
-$$
+They are resultants of a stress distribution over the cut area. Normal stress contributes to $N$ and $M$; shear stress contributes to $V$. Replacing that distribution by three section resultants is exact for equilibrium, even before a material law or stress formula is introduced.
 
-These relations are local equilibrium statements for a small beam element. They are powerful checks on hand diagrams.
+A sign convention must pair the two exposed faces correctly. Here, positive diagram values mean:
 
-A **point load** creates a jump in the shear diagram. A **concentrated couple** creates a jump in the moment diagram. A uniformly distributed load creates a linearly changing shear and a quadratic bending moment.
+- $N\gt 0$ is tension. On the right face of a left segment, positive $N$ points right.
+- $V\gt 0$ acts downward on the right face of a left segment and upward on the left face of a right segment.
+- $M\gt 0$ is sagging. It acts counterclockwise on the right face of a left segment and clockwise on the left face of a right segment.
 
-## Key results
-
-For any beam segment, the internal force functions come from equilibrium of a cut part:
-
-$$
-\sum F_x=0,\qquad \sum F_y=0,\qquad \sum M_{\text{cut}}=0.
-$$
-
-Before cutting, always solve support reactions from the whole beam unless the chosen section avoids them. Reactions are external forces and therefore appear in the segment equilibrium.
-
-The load-shear-moment relationships give diagram slopes:
-
-$$
-\Delta V=-\int_{x_1}^{x_2}w(x)\,dx,
-$$
-
-$$
-\Delta M=\int_{x_1}^{x_2}V(x)\,dx.
-$$
-
-Thus the area under the load diagram changes shear, and the area under the shear diagram changes moment. These area relations are useful for checking diagrams without redoing every cut.
-
-For a simply supported beam with no applied end couples, the bending moment at a pin or roller end is zero. A fixed support can provide a reaction moment, so the end bending moment need not be zero. At an internal pin, the bending moment transmitted through the pin is zero, although shear and axial forces may pass through.
-
-Maximum or minimum bending moment occurs where
-
-$$
-V(x)=0
-$$
-
-inside a smooth region, or at a point where $V$ changes sign across a load discontinuity. This comes from $dM/dx=V$.
-
-When a distributed load is replaced by a resultant for support reactions, that replacement is valid for the external equilibrium of the whole beam. For internal diagrams, however, you must keep the actual distribution in the region being cut or use piecewise expressions that account for where the distribution begins and ends.
-
-## Visual
+The forces on opposite cut faces are equal and opposite. With this convention, a positive bending moment tends to put the lower fibers in tension in the usual horizontal beam drawing.
 
 ```text
-Beam with point load
+positive resultants on two matching cut faces
 
- A            P                 B
- ^            v                 ^
- |------------|-----------------|
- x=0          x=a               x=L
-
-Shear V:  jumps up at A, down at P, up/down to zero at B
-Moment M: starts at 0, changes slope at P, returns to 0
+ left segment          right segment
+             N ->    <- N
+             V down  up V
+             M CCW   CW M
 ```
 
-| Loading feature | Effect on $V(x)$ | Effect on $M(x)$ |
-|---|---|---|
-| Upward reaction | Positive jump | Slope changes after support |
-| Downward point load | Negative jump | Moment remains continuous |
-| Applied couple | No shear jump | Moment jumps |
-| Uniform load $w_0$ | Linear slope $-w_0$ | Quadratic curve |
-| No load region | Constant shear | Linear moment |
+If a textbook uses the opposite shear sign, its equations and diagrams can still be correct. Trouble begins when a cut free-body diagram follows one convention and the plotted ordinate follows another.
 
-## Worked example 1: Simply supported beam with an off-center point load
+## From a small element to the load–shear–moment equations
 
-**Problem.** A simply supported beam of length $8$ m has a pin at $A$ and a roller at $B$. A $20$ kN downward point load acts at $x=3$ m from $A$. Find the support reactions and piecewise shear and bending moment functions.
-
-**Method.** Use whole-beam equilibrium for reactions, then cut the beam in regions $0\lt x\lt3$ and $3\lt x\lt8$.
-
-1. Whole-beam moment balance about $A$:
+Let $w(x)$ be distributed load intensity, positive downward. Isolate an element of length $dx$. At its left face the positive shear acts upward; at its right face it acts downward. Vertical equilibrium gives, after dropping products of differentials,
 
 $$
-\sum M_A=0:\quad 8B_y-20(3)=0.
+V-(V+dV)-w(x)\,dx=0.
 $$
+
+Hence
+
+$$
+\boxed{\frac{dV}{dx}=-w(x)}.
+$$
+
+Moment equilibrium about the left face gives
+
+$$
+M+V\,dx-(M+dM)-w(x)\,dx\frac{dx}{2}=0.
+$$
+
+The final term is second order in $dx$, so the limit yields
+
+$$
+\boxed{\frac{dM}{dx}=V(x)}.
+$$
+
+The integral versions are equally useful:
+
+$$
+V(x_2)-V(x_1)=-\int_{x_1}^{x_2}w(x)\,dx,
+$$
+
+$$
+M(x_2)-M(x_1)=\int_{x_1}^{x_2}V(x)\,dx.
+$$
+
+The negative area under a downward load diagram is the change in shear. The signed area under the shear diagram is the change in moment. These statements provide both a construction method and a strong check on piecewise formulas.
+
+The degree of each curve follows immediately. In an unloaded interval, shear is constant and moment is linear. Under uniform load, shear is linear and moment is quadratic. Under linearly varying load, shear is quadratic and moment is cubic.
+
+## Jumps, continuity, and boundary values
+
+Differential relations apply between concentrated actions. At a point load or applied couple, use a jump condition.
+
+| Feature crossed from left to right | Change in $V$ | Change in $M$ |
+|---|---:|---:|
+| Downward point load $P$ | $-P$ | none |
+| Upward point force $R$ | $+R$ | none |
+| Concentrated applied couple | none | jump equal to its signed value |
+| Uniform distributed load | continuous, linear variation | continuous, quadratic variation |
+| No distributed load | constant | linear variation |
+
+A finite point force cannot create an instantaneous moment jump because its lever arm tends to zero as the two sides of the point merge. A concentrated couple has finite moment with no resultant force, so it jumps $M$ without jumping $V$.
+
+Boundary conditions depend on the support, not on a memorized diagram shape. At an unloaded free end, $N=V=M=0$. At a pin or roller end with no applied couple, $M=0$, but shear can equal the support reaction. A fixed end can carry force and moment, so none of the three internal resultants need vanish there. An ideal internal hinge transmits axial force and shear but no bending moment.
+
+Since $dM/dx=V$, an interior smooth maximum or minimum of $M$ occurs where $V=0$. A moment extremum can also occur at a point where shear jumps across zero. Endpoints and moment jumps must be checked separately; differentiating one smooth region cannot find them.
+
+## A reliable order of work
+
+First draw the whole-beam free-body diagram and solve its reactions. Replace a distributed load by its equivalent resultant only for that whole-body equilibrium calculation. Once a cut passes through a loaded region, the retained portion of the distribution changes with $x$ and must be integrated over its actual length.
+
+Next divide the span wherever the loading expression changes: point forces, couples, the start or end of distributed loading, and internal hinges all create region boundaries. Put one symbolic cut in each open region. The cut should not sit exactly at a discontinuity because the left and right limits differ there.
+
+Choose whichever side of the cut contains fewer forces. A right-segment free-body diagram is as valid as a left-segment one, provided the cut-face signs are reversed consistently. Finish with global checks: expected endpoint values, shear jumps equal to point loads, moment jumps equal to couples, and the areas implied by the differential relations.
+
+## Worked example: an off-center point load
+
+A simply supported beam has length $8$ m. A pin at $A$ is at $x=0$, a roller at $B$ is at $x=8$ m, and a $20$ kN downward load acts at $x=3$ m. Find the reactions and the shear and moment functions.
+
+Whole-beam moment equilibrium about $A$ gives
+
+$$
+8B_y-20(3)=0,
+$$
+
+so
 
 $$
 B_y=7.5\ \text{kN}.
 $$
 
-2. Vertical force balance:
+Vertical equilibrium then gives
 
 $$
 A_y+B_y-20=0,
-$$
-
-$$
+\qquad
 A_y=12.5\ \text{kN}.
 $$
 
-3. Region 1: $0\lt x\lt3$. Keep the left segment. Forces are $A_y$ at $x=0$, internal shear $V$, and internal moment $M$ at the cut.
-
-Vertical equilibrium:
+For $0\lt x\lt 3$, the only vertical force to the left of the cut is $A_y$. The positive diagram shear equals the net upward force on that left portion:
 
 $$
-\sum F_y=0:\quad A_y+V=0
+V(x)=12.5\ \text{kN}.
 $$
 
-under a convention where the cut force on the retained left part is drawn downward. If we define positive shear diagram value as the upward internal force on the left face, then
+Taking moments of the external loads to the left of the cut gives
 
 $$
-V(x)=A_y=12.5\ \text{kN}.
+M(x)=12.5x\ \text{kN m}.
 $$
 
-Moment about the cut gives
+For $3\lt x\lt 8$, the point load is included:
 
 $$
-M(x)=A_yx=12.5x\ \text{kN m}.
+V(x)=12.5-20=-7.5\ \text{kN},
 $$
 
-4. Region 2: $3\lt x\lt8$. The left segment includes $A_y$ and the point load.
-
-Shear:
+and
 
 $$
-V(x)=A_y-20=12.5-20=-7.5\ \text{kN}.
+\begin{aligned}
+M(x)&=12.5x-20(x-3)\\
+&=60-7.5x\ \text{kN m}.
+\end{aligned}
 $$
 
-Moment:
-
-$$
-M(x)=A_yx-20(x-3).
-$$
-
-Simplify:
-
-$$
-M(x)=12.5x-20x+60=60-7.5x\ \text{kN m}.
-$$
-
-5. Check endpoint and continuity:
-
-At $x=3^-$,
-
-$$
-M=12.5(3)=37.5\ \text{kN m}.
-$$
-
-At $x=3^+$,
-
-$$
-M=60-7.5(3)=37.5\ \text{kN m}.
-$$
-
-At $x=8$,
-
-$$
-M=60-7.5(8)=0.
-$$
-
-The checked result is
+Thus
 
 $$
 \boxed{
 V(x)=
 \begin{cases}
-12.5,&0\lt x\lt3,\\
--7.5,&3\lt x\lt8,
+12.5,&0<x<3,\\
+-7.5,&3<x<8,
 \end{cases}
 \quad
 M(x)=
 \begin{cases}
-12.5x,&0\lt x\lt3,\\
-60-7.5x,&3\lt x\lt8.
+12.5x,&0<x<3,\\
+60-7.5x,&3<x<8.
 \end{cases}}
 $$
 
-The maximum moment is $37.5$ kN m at the point load, where shear changes sign.
-
-## Worked example 2: Cantilever beam with a uniform load
-
-**Problem.** A cantilever beam is fixed at $A$ and free at $B$. The length is $L=4$ m. A uniform downward load $w=2.5$ kN/m acts over the whole span. Find the fixed-end reactions and internal shear and moment at a section $x$ measured from the fixed end.
-
-**Method.** The total distributed load is $wL$. Use whole-beam equilibrium for reactions, then cut at distance $x$ from $A$.
-
-1. Equivalent load:
+The shear falls by exactly $20$ kN at the load. The moment is continuous there:
 
 $$
-R=wL=2.5(4)=10\ \text{kN}.
+M(3^-)=M(3^+)=37.5\ \text{kN m}.
 $$
 
-It acts at $L/2=2$ m from $A$.
+It returns to zero at $x=8$. Shear changes from positive to negative at the load, so the maximum bending moment is $37.5$ kN m at $x=3$ m.
 
-2. Vertical reaction:
+## Worked example: a partially distributed load
 
-$$
-A_y-10=0,\qquad A_y=10\ \text{kN}.
-$$
+A simply supported $6$ m beam carries a uniform downward load $w_0=4$ kN/m only over $0\le x\le3$ m. Find the reactions and all piecewise functions.
 
-3. Moment reaction at fixed end. Taking counterclockwise positive:
+The distributed load has resultant
 
 $$
-M_A-10(2)=0,\qquad M_A=20\ \text{kN m}.
+W=w_0(3)=12\ \text{kN}
 $$
 
-This is the support moment applied by the wall on the beam.
-
-4. Cut at $0\lt x\lt4$ and keep the left segment. The distributed load on the retained segment has magnitude $wx$ and acts at $x/2$ from $A$.
-
-Shear diagram value:
+acting at its centroid, $x=1.5$ m. Moment equilibrium about $A$ gives
 
 $$
-V(x)=A_y-wx=10-2.5x\ \text{kN}.
+6B_y-12(1.5)=0,
+\qquad
+B_y=3\ \text{kN}.
 $$
 
-5. Bending moment using forces to the left of the cut:
+Then
 
 $$
-M(x)=M_A+A_yx-\frac{wx^2}{2}
+A_y=12-3=9\ \text{kN}.
 $$
 
-with sign depending on the chosen internal moment convention. If the bending moment diagram is taken as the internal moment balancing the left side with sagging positive, the cantilever under downward load is often plotted negative:
+For a cut inside the loaded interval, $0\lt x\lt 3$, the retained load has magnitude $4x$ and acts at $x/2$:
 
 $$
-M_{\text{beam}}(x)=-\frac{w(L-x)^2}{2}.
+V(x)=9-4x\ \text{kN},
 $$
 
-To avoid sign confusion, use the free-end expression for physical magnitude:
-
-At a cut $x$ from the fixed end, the load to the right has length $L-x$ and resultant $w(L-x)$ at a distance $(L-x)/2$ from the cut. Therefore the internal moment magnitude is
-
 $$
-|M(x)|=\frac{w(L-x)^2}{2}.
-$$
-
-6. At the fixed end:
-
-$$
-|M(0)|=\frac{2.5(4)^2}{2}=20\ \text{kN m}.
+\begin{aligned}
+M(x)&=9x-(4x)\frac{x}{2}\\
+&=9x-2x^2\ \text{kN m}.
+\end{aligned}
 $$
 
-At the free end:
+For $3\lt x\lt 6$, the entire $12$ kN resultant lies to the left:
 
 $$
-|M(4)|=0.
+V(x)=9-12=-3\ \text{kN},
 $$
 
-The checked result is
-
 $$
-\boxed{A_y=10\ \text{kN},\quad M_A=20\ \text{kN m},\quad V(x)=10-2.5x,\quad |M(x)|=\frac{2.5(4-x)^2}{2}.}
+M(x)=9x-12(x-1.5)=18-3x\ \text{kN m}.
 $$
 
-The maximum bending moment occurs at the fixed wall, which is why cantilever roots are critical.
+Continuity at $x=3$ checks the algebra:
 
-## Code
+$$
+9(3)-2(3)^2=9\ \text{kN m},
+$$
 
-```python
-import numpy as np
+$$
+18-3(3)=9\ \text{kN m}.
+$$
 
-L = 8.0
-P = 20.0
-a = 3.0
-By = P * a / L
-Ay = P - By
+The shear vanishes inside the first region:
 
-xs = np.linspace(0.0, L, 17)
-V = np.where(xs < a, Ay, Ay - P)
-M = np.where(xs < a, Ay * xs, Ay * xs - P * (xs - a))
+$$
+9-4x=0,
+\qquad
+x=2.25\ \text{m}.
+$$
 
-print(f"Ay={Ay:.2f} kN, By={By:.2f} kN")
-for x, v, m in zip(xs, V, M):
-    print(f"x={x:4.1f} m, V={v:6.2f} kN, M={m:7.2f} kN*m")
-```
+Substitution gives the maximum moment:
 
-## Common pitfalls
+$$
+M_{\max}=9(2.25)-2(2.25)^2=10.125\ \text{kN m}.
+$$
 
-- Drawing internal shear and moment with one sign convention, then interpreting the diagram with another.
-- Replacing a distributed load by a resultant before cutting through the loaded region.
-- Forgetting that point loads jump shear but not bending moment.
-- Forgetting that applied couples jump bending moment but not shear.
-- Looking for maximum bending moment only under point loads instead of also checking where $V=0$.
-- Reporting support reactions without checking that the moment diagram returns to the correct boundary value.
-- Mixing units such as kN and N, or m and mm, in moment calculations.
+The zero-shear location does not coincide with the end or centroid of the distributed load. It emerges from the accumulated load to the left of the section.
 
-## Connections
+## Worked example: a cantilever from the free end
+
+A $4$ m cantilever is fixed at $A$ and carries a uniform downward load $w=2.5$ kN/m over its entire span. Let $x$ be measured from the fixed end. Find $V(x)$ and $M(x)$ with sagging positive.
+
+The support reactions are useful checks:
+
+$$
+A_y=wL=10\ \text{kN},
+$$
+
+and the wall supplies a counterclockwise reaction couple of magnitude
+
+$$
+M_A=\frac{wL^2}{2}=20\ \text{kN m}.
+$$
+
+For internal forces, the right segment is shorter to draw. Its loaded length is $L-x$. The distributed load on it has magnitude $w(L-x)$ and acts halfway along that length. Equilibrium gives
+
+$$
+V(x)=w(L-x)=2.5(4-x)\ \text{kN},
+$$
+
+under the stated positive-shear diagram convention, and
+
+$$
+M(x)=-\frac{w(L-x)^2}{2}
+=-1.25(4-x)^2\ \text{kN m}.
+$$
+
+The negative sign denotes hogging. At the free end, both values are zero. At the wall,
+
+$$
+V(0)=10\ \text{kN},
+\qquad
+M(0)=-20\ \text{kN m}.
+$$
+
+Differentiation checks both relations:
+
+$$
+\frac{dV}{dx}=-2.5=-w,
+\qquad
+\frac{dM}{dx}=2.5(4-x)=V.
+$$
+
+## Axial force and combined loading
+
+Axial force is easy to overlook when attention is on shear and moment. If a horizontal force component acts along the member, include $N(x)$ from $\sum F_x=0$. An inclined point load generally contributes to both axial and transverse diagrams. For a straight prismatic beam with no distributed axial load, $N$ remains constant between axial point loads and jumps by their axial components.
+
+Internal diagrams do not themselves give stress. Under elementary beam assumptions, later formulas use them as inputs: average axial stress involves $N/A$, bending stress involves $My/I$, and transverse shear stress depends on $V$. A zero bending moment does not imply a completely unloaded section if $N$ or $V$ remains nonzero.
+
+## Building diagrams from slopes and areas
+
+Repeated section cuts are systematic, but a complete diagram can often be drawn faster from jumps, slopes, and boundary values. Begin at a boundary where $V$ or $M$ is known. Move from left to right. Apply each point-force jump to shear, use the distributed load to set the shear slope between jumps, and accumulate signed area under $V$ to obtain moment. Apply a moment jump only where an external couple acts.
+
+Consider the point-load example above. Immediately to the right of $A$, the upward reaction jumps shear from zero to $+12.5$ kN. With no distributed load, shear stays horizontal until $x=3$ m. The $20$ kN downward load then drops it to $-7.5$ kN, where it remains until the $+7.5$ kN reaction at $B$ returns it to zero. The moment begins at zero. Its slope is first $+12.5$, then $-7.5$, so it rises linearly to the load and falls linearly afterward. No separate moment calculation is needed to see the shape.
+
+Area gives the ordinates. From $x=0$ to $x=3$ m, the shear area is
+
+$$
+(12.5)(3)=37.5\ \text{kN m},
+$$
+
+which is the moment at the load. From $x=3$ to $x=8$ m, the area is
+
+$$
+(-7.5)(5)=-37.5\ \text{kN m},
+$$
+
+bringing the moment back to zero at the roller. Failure to return to the required boundary value exposes a missed load, bad reaction, or incorrect diagram area.
+
+This graphical construction also distinguishes load intensity from accumulated force. The ordinate of the load diagram has units force per length. Its area has units force and changes shear. Shear has units force; its area has units moment and changes bending moment. Checking these units makes the two integrations easier to remember.
+
+## Sections at concentrated loads and hinges
+
+At a point force, $V(x)$ has different left and right limits, so “the shear at the load” is ambiguous unless a side is specified. The bending moment has one common limiting value when no concentrated couple is present. At an applied couple, the situation reverses: shear is continuous while moment has two limiting values.
+
+An internal hinge imposes $M=0$ at its section but does not generally make the shear zero. It also divides a structure into parts whose equilibrium can supply additional equations. The moment diagram must pass through zero at the hinge, while the equal and opposite hinge forces appear on free-body diagrams of the two substructures.
+
+A point of contraflexure is a location where bending moment changes sign, indicating a reversal between sagging and hogging. It need not be a hinge: the section can carry zero moment at one location while remaining materially continuous. Likewise, a zero shear location is not automatically a support or a load application point; under distributed loading it often lies inside a span.
+
+## What the diagrams can and cannot say
+
+Internal-resultant diagrams are independent of cross-sectional shape for a statically determinate beam. Changing a rectangular section to an I-section does not change $N(x)$, $V(x)$, or $M(x)$ when the external loading and support idealization remain the same. It changes the stresses and deformation produced by those resultants.
+
+The usual later relations introduce section properties and material response. Axial stress scales with $N/A$; elementary bending stress scales with $My/I$; beam curvature is related to $M/(EI)$ under linear elastic, small-deflection assumptions. A maximum $\vert M\vert $ section is often important for bending stress, but the largest stress can occur elsewhere if section modulus varies along the beam. A shear maximum likewise does not determine shear stress without the cross-sectional distribution.
+
+Statics alone also cannot find reactions in a statically indeterminate beam. Extra supports create more reaction unknowns than equilibrium equations, and compatibility of deformation is required. Once those reactions have been found by a suitable method, however, the same cutting and load–shear–moment relations construct the internal diagrams.
+
+## Errors that survive neat algebra
+
+- Replacing a distributed load by its full resultant after cutting inside the loaded interval changes both its magnitude and its centroid. Use only the portion actually retained.
+- A point load changes shear abruptly but leaves moment continuous. Drawing a moment jump under a force violates local moment equilibrium.
+- A concentrated couple changes moment abruptly without changing shear. Its sign follows the chosen moment convention.
+- Solving only one region misses every downstream load. Place region boundaries wherever the loading description changes.
+- The condition $V=0$ locates smooth interior extrema of $M$, not every possible maximum. Check boundaries and both sides of jumps as well.
+- Units can conceal a factor of one thousand. If force is in kN and distance in m, moment is in kN m; stress work often requires conversion to N and mm.
+
+## Related pages
 
 - [Rigid-body equilibrium](/physics/mechanics/rigid-body-equilibrium)
 - [Centroids and second moments](/physics/mechanics/centroids-second-moments)
-- [Work-energy methods](/physics/mechanics/work-energy-methods)
-- [Planar rigid-body motion](/physics/mechanics/planar-rigid-body-motion)
+- [Trusses, frames, and machines](/physics/mechanics/trusses-frames-machines)
+- [Equilibrium and elasticity](/physics/general/equilibrium-and-elasticity)

@@ -9,7 +9,7 @@ Files let Python programs persist data beyond one run. The textbook introduces t
 
 File handling is a boundary between a program and the outside world. That boundary can fail: a file may not exist, a directory may be missing, permissions may block access, data may have the wrong encoding, or a record may be malformed. Good file code is explicit about mode, encoding, expected format, and cleanup.
 
-## Definitions
+## Paths, streams, and modes
 
 A **file object** is returned by `open()` and provides methods such as `.read()`, `.readline()`, `.write()`, and iteration over lines.
 
@@ -46,7 +46,7 @@ It avoids many platform-specific string path problems.
 
 A **record** is one logical unit in a file, often one line in a text file. A **delimiter** separates fields inside a record, such as a comma in CSV.
 
-## Key results
+## Text is decoded bytes
 
 The first key result is that `with open(...)` should be the default pattern. Manual `close()` works in tiny examples, but it is easy to forget when exceptions occur. A context manager makes cleanup structural.
 
@@ -74,7 +74,37 @@ An eighth result is that file writes should be considered failure-prone. A disk 
 
 Finally, keep parsing and computation separate. A reader function should convert file text into structured Python values. A calculation function should accept those values without knowing which file they came from. This makes it possible to test the calculation with in-memory sample data and test the parser with tiny fixture files.
 
-## Visual
+At the operating-system boundary, files contain bytes. A text stream inserts an encoder and decoder between those bytes and Python `str` objects. Reading UTF-8 bytes as a legacy encoding may produce wrong characters without raising an error; reading invalid UTF-8 normally raises `UnicodeDecodeError`. An explicit encoding records the format assumption. The optional `errors` policy controls malformed input: `strict` fails, `replace` inserts replacement characters, and `ignore` discards bytes. Silent loss is rarely suitable for data pipelines.
+
+Text mode also performs newline translation. Python presents line endings as `\n` under universal-newline reading even if a file used a platform-specific convention. For CSV, the module documentation recommends opening with `newline=""` so the CSV parser controls embedded and record newlines correctly. Binary mode performs neither decoding nor newline conversion; reads return `bytes`, writes require bytes-like values, and byte offsets have their literal meaning.
+
+File objects maintain a current position. `.tell()` reports it and `.seek()` moves it, subject to restrictions of text streams where character encodings make arbitrary byte offsets unsafe. Sequential iteration is simpler and usually faster for large text. Seeking is useful for binary formats with explicit offsets or for rewinding a small stream, but a database or indexed format is better when random lookup dominates.
+
+Writes are buffered. Returning from `.write()` does not necessarily mean bytes have reached physical storage. Closing or flushing pushes Python's buffer toward the operating system; `os.fsync()` can request stronger durability from the OS, though hardware and filesystem guarantees still vary. Most reports and caches do not need that cost. Data whose loss would be serious needs an explicit durability design rather than an assumption that `close()` is a transaction.
+
+## What `with` actually guarantees
+
+A context manager implements `__enter__` and `__exit__`. `with` calls `__enter__`, binds its result after `as`, and calls `__exit__` when control leaves the block by normal completion, `return`, or exception. If `__exit__` returns a truthy value, it suppresses the exception. Most resource managers return a false value so failures continue after cleanup.
+
+The essential control flow is equivalent to a `try`/`finally`: acquire the resource, run the body, then release it. Context managers apply beyond files to locks, database transactions, temporary directories, redirected output, and numerical state. They express a bounded lifetime in the indentation of the program.
+
+`contextlib.contextmanager` can build a manager from a generator. Code before `yield` acquires, the yielded value enters the block, and `finally` code releases:
+
+```python
+from contextlib import contextmanager
+
+@contextmanager
+def opened_utf8(path, mode="r"):
+    file = path.open(mode, encoding="utf-8")
+    try:
+        yield file
+    finally:
+        file.close()
+```
+
+This wrapper is educational but redundant because file objects already implement the protocol. Custom managers earn their place when acquisition and cleanup form a domain operation that cannot be expressed by an existing manager. `ExitStack` helps when the number of resources is determined dynamically; it closes them in reverse acquisition order.
+
+## The lifetime of an open file
 
 ```mermaid
 sequenceDiagram
@@ -94,6 +124,27 @@ sequenceDiagram
 | `"x"` | exclusive create | yes | error if exists | avoid overwrite |
 | `"rb"` | read binary | no | preserved | images or binary data |
 | `"wb"` | write binary | yes | replaced | generated binary output |
+
+## Paths and filesystem boundaries
+
+`Path` joins components with `/`, exposes names and suffixes, and offers methods such as `.exists()`, `.mkdir()`, `.iterdir()`, `.read_text()`, and `.write_text()`. The convenience read/write methods open and close automatically, making them suitable for small whole-file operations. Streaming still needs an explicit `open()` block.
+
+Relative paths are resolved against the process's current working directory, not automatically against the source file. A script launched from an editor and the same script launched from another directory can therefore find different files. Configuration should define whether a path is relative to the working directory, a project root, a user-data directory, or the module location. Hiding that decision behind repeated `chdir()` calls makes behavior difficult to reason about.
+
+Checking `.exists()` before opening is useful for user-interface choices but does not guarantee the later operation: another process can remove or replace the path between calls. Attempt the operation and handle the expected exception when correctness depends on it. Similar races affect “check then create”; mode `x` asks the filesystem to perform exclusive creation as one operation.
+
+Paths received from users are also trust-boundary data. Joining an upload name such as `../settings.ini` to a destination may escape the intended directory. Code that writes untrusted names should reject traversal, generate its own storage name, or resolve and verify containment according to a well-defined policy. Symlinks add another layer, so security-sensitive code needs operating-system-aware handling rather than a string-prefix test.
+
+## Choosing a format
+
+| Format | Strength | Limitation | Suitable use |
+|---|---|---|---|
+| Plain lines | Human-readable and streamable | Schema is implicit | one value or event per line |
+| CSV | Interoperable tables | Types and nested data are weak | rectangular records |
+| JSON | Named and nested values | No comments; numbers and dates need conventions | configuration and exchange records |
+| Binary format | Compact and exact types | Requires a specified decoder | images, arrays, protocol payloads |
+
+CSV should be handled with `csv`, because quoting allows delimiters and line breaks inside a field. JSON should be handled with `json`, which validates syntax and escapes strings. Neither format validates the intended schema by itself. A successful parse can still lack required fields, contain an unexpected unit, or use a string where the program expects a number. Parsing turns bytes into generic Python values; validation turns those values into trusted application data.
 
 ## Worked example 1: write and read a small log
 
@@ -197,7 +248,7 @@ sum(loaded["readings"]) / len(loaded["readings"]) == 21.416666666666668
 
 The structure is explicit, so a later script does not have to guess which line means unit and which line means data.
 
-## Code
+## A typed CSV boundary
 
 ```python
 import csv
@@ -227,7 +278,35 @@ The `csv` module handles delimiters and newlines more reliably than manual strin
 
 This code also separates serialization from calculation. The writer receives rows that are already structured, and the reader returns rows with corrected types. A later average-temperature function should not need to know that the data came from CSV. That separation is what makes the file layer replaceable: the same calculation could be fed by JSON, a database query, or a hard-coded test list. Good file code turns external bytes into internal values and back again with as little hidden policy as possible.
 
-## Common pitfalls
+## Replacing a file without exposing a partial write
+
+Opening an important target with `w` truncates it before new content is complete. If serialization fails halfway or the process stops, the old valid file is gone and the new one is partial. A safer pattern writes a temporary file in the same directory, flushes and closes it, then replaces the target with `os.replace()`. Same-filesystem replacement is atomic on mainstream local filesystems, meaning readers see either old or new name content rather than half a rename. Durability across power loss is a separate concern.
+
+```python
+import json
+import os
+import tempfile
+from pathlib import Path
+
+def write_json_atomic(path: Path, value) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, temporary_name = tempfile.mkstemp(dir=path.parent, prefix=path.name)
+    temporary = Path(temporary_name)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as file:
+            json.dump(value, file, indent=2)
+            file.write("\n")
+            file.flush()
+            os.fsync(file.fileno())
+        os.replace(temporary, path)
+    except BaseException:
+        temporary.unlink(missing_ok=True)
+        raise
+```
+
+Creating the temporary file in the target directory keeps replacement on the same filesystem. The exclusive temporary-file creation avoids a predictable-name race. The cleanup re-raises the original failure after removing a leftover. Applications with concurrent writers, network filesystems, or strict crash-durability requirements need stronger coordination or a transactional store.
+
+## File-handling mistakes
 
 - Forgetting to close files when not using `with`.
 - Using `"w"` and accidentally erasing a file that should have been appended to.
@@ -236,8 +315,11 @@ This code also separates serialization from calculation. The writer receives row
 - Splitting CSV lines manually even though quoted fields can contain commas.
 - Building paths with string concatenation instead of `Path` or `os.path.join`.
 - Catching file errors and silently continuing, which hides missing input data.
+- Treating `flush()` as a full transactional or hardware-durability guarantee.
+- Checking existence and assuming a later open cannot race with another process.
+- Loading valid JSON or CSV and skipping application-level schema validation.
 
-## Connections
+## Related pages
 
 - [Strings and Text Processing](/cs/programming/python/strings-and-text-processing)
 - [Errors, Exceptions, and Debugging](/cs/programming/python/errors-exceptions-and-debugging)

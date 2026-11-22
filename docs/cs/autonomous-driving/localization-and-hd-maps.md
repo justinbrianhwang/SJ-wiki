@@ -5,199 +5,256 @@ sidebar_position: 7
 
 # Localization and HD Maps
 
-Localization estimates where the ego vehicle is, how fast it is moving, and how uncertain that estimate is. HD maps encode lane geometry, traffic-control elements, road boundaries, crosswalks, speed limits, and topology at a level of precision useful for automated driving. Together, localization and maps let a vehicle reason about where it is in the road network, not only where it is on Earth.
+Localization answers a more demanding question than “what are the latitude and longitude?” An automated vehicle needs a pose in a well-defined frame, a velocity, an estimate of sensor biases, and uncertainty. The estimate must remain smooth enough for control while staying tied to the road network. A planner also needs to know whether the vehicle is in the left lane or the right lane, before or after a stop line, and aligned with the correct branch of an intersection.
 
-This page covers GNSS plus IMU dead reckoning, visual-inertial odometry, lidar-inertial odometry, GraphSLAM, map matching, vector maps, lanelet maps, and map-light alternatives. It connects [sensors](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu) and [sensor fusion](/cs/autonomous-driving/sensor-fusion) to [behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning), because a planner cannot choose the correct lane, yield line, or turn if the vehicle's pose and map context are ambiguous.
+No single sensor supplies all of that reliably. IMUs and wheel encoders provide fast relative motion but drift. GNSS provides global position but may jump or acquire a slowly varying bias. Cameras and lidar can align observations with local structure, provided the scene has enough texture or geometry and the reference map is current. A production estimator therefore combines complementary measurements and reports when their agreement deteriorates.
 
-## Definitions
+## Pose only has meaning with a frame
 
-**Localization** estimates the vehicle pose, usually position and orientation, in a coordinate frame. A common planar pose is $(x,y,\psi)$, where $\psi$ is yaw. Full 3D pose uses translation and rotation in $SE(3)$.
+A planar road model often represents pose as $(x,y,\psi)$, with yaw $\psi$. A full spatial pose is an element of $SE(3)$: a rotation $R\in SO(3)$ and translation $p\in\mathbb{R}^3$. The notation is compact, but the frame attached to each quantity cannot be implicit.
 
-**Dead reckoning** propagates pose using motion measurements such as wheel speed, steering angle, accelerometer data, and gyroscope data. It works over short intervals but drifts without external correction.
+Common frames include:
 
-**SLAM**, simultaneous localization and mapping, estimates the vehicle trajectory and a map at the same time. **VIO** uses visual and inertial measurements. **LIO** uses lidar and inertial measurements. **GraphSLAM** represents poses and landmarks as graph nodes connected by measurement constraints.
+- an Earth-fixed or local east-north-up frame for global coordinates;
+- a map frame in which mapped lanes and landmarks are stored;
+- a locally continuous odometry frame, allowed to drift relative to the map;
+- the vehicle body frame, usually fixed near the rear axle or IMU;
+- a frame for every camera, lidar, radar, and GNSS antenna.
 
-An **HD map** is a high-definition road map that can contain centimeter-level lane geometry, lane boundaries, traffic lights, stop lines, signs, crosswalks, curbs, drivable areas, and semantic topology. It is not just a navigation map.
+The rigid transform from the body to a sensor is its **extrinsic calibration**. If that transform is wrong, otherwise good measurements disagree in a repeatable way. A ten-centimetre GNSS antenna offset, for example, rotates around the body reference point during a turn. Treating the antenna position as the rear-axle position creates a heading-dependent position error.
 
-A **vector map** stores geometric primitives such as lane centerlines, lane boundaries, polygons, stop lines, and traffic-control objects. A **lanelet** is a map element representing a lane segment with boundaries and connectivity, widely used in research and open-source autonomy stacks.
+It is useful to keep a continuous odometry pose separate from a map correction. A new GNSS or map-matching update may revise the map-to-odometry transform without introducing a discontinuity into the short-horizon pose consumed by control. The planner gets the corrected global context; the controller keeps a smooth local trajectory.
 
-**Map matching** aligns current sensor observations or estimated pose to a map. It may use GNSS priors, lane markings, lidar intensity, traffic signs, poles, curbs, road edges, or learned descriptors.
+An estimator state commonly extends far beyond pose:
 
-**Localization without HD maps** refers to approaches that rely less on prebuilt centimeter maps. They may use online perception, standard-definition maps, crowdsourced map layers, lane graph inference, or end-to-end learned representations. These approaches reduce map maintenance burden but shift more responsibility to online perception and planning.
+$$
+x = \begin{bmatrix}
+p & v & q & b_a & b_g
+\end{bmatrix}^{\top},
+$$
 
-## Key results
+where $p$ is position, $v$ velocity, $q$ orientation, and $b_a,b_g$ accelerometer and gyroscope biases. Wheel scale, steering offset, clock offset, or sensor extrinsics may also be estimated when they are sufficiently observable.
 
-Pose propagation for planar dead reckoning can use a kinematic bicycle model:
+## Propagating motion between external fixes
+
+At road speeds, the estimator must propagate state much faster than global corrections arrive. A planar kinematic bicycle model gives a useful first approximation:
 
 $$
 \begin{aligned}
-x_{t+\Delta t} &= x_t + v_t\cos(\psi_t)\Delta t, \\
-y_{t+\Delta t} &= y_t + v_t\sin(\psi_t)\Delta t, \\
-\psi_{t+\Delta t} &= \psi_t + \frac{v_t}{L}\tan(\delta_t)\Delta t,
+\dot{x} &= v\cos\psi, \\
+\dot{y} &= v\sin\psi, \\
+\dot{\psi} &= \frac{v}{L}\tan\delta,
 \end{aligned}
 $$
 
-where $v$ is speed, $L$ is wheelbase, and $\delta$ is steering angle. This is simple and useful, but tire slip, slopes, steering calibration, and wheel-speed errors cause drift.
+where $L$ is wheelbase and $\delta$ is the front-wheel steering angle. Its curvature is $\kappa=\tan\delta/L$. The model assumes low sideslip and a suitable conversion from steering-wheel angle to road-wheel angle. Tire compliance, bank angle, wheel slip, and an incorrect steering ratio all violate those assumptions.
 
-An EKF localization system separates prediction from update:
+An IMU supplies angular rate and specific force. Ignoring Earth rotation for a local road-scale derivation, propagation has the form
 
 $$
 \begin{aligned}
-x_t^- &= f(x_{t-1}^+, u_t), \\
-P_t^- &= F_tP_{t-1}^+F_t^\top + Q_t, \\
-K_t &= P_t^-H_t^\top(H_tP_t^-H_t^\top + R_t)^{-1}, \\
-x_t^+ &= x_t^- + K_t(z_t - h(x_t^-)).
+\dot{R} &= R[\omega_m-b_g-n_g]_{\times}, \\
+\dot{v} &= R(a_m-b_a-n_a)+g, \\
+\dot{p} &= v.
 \end{aligned}
 $$
 
-Here $P$ is covariance, $Q$ process noise, $R$ measurement noise, $F$ the motion Jacobian, and $H$ the measurement Jacobian. The core idea is that dead reckoning predicts continuously, while GNSS, lidar map matching, visual landmarks, or lane detections correct drift.
+The bracket $[\cdot]_{\times}$ is the skew-symmetric matrix used for a cross product. An accelerometer does not directly measure world-frame linear acceleration: gravity, orientation, bias, and noise must be handled together. A small attitude error tilts the estimated gravity vector into the horizontal plane, producing a persistent false acceleration. Integrating that error once corrupts velocity and integrating it again corrupts position.
 
-GraphSLAM solves a nonlinear least-squares problem:
+Wheel odometry constrains forward speed well on dry pavement, while the IMU captures rapid rotation and acceleration. Their failure modes differ. Wheel speed can be wrong during braking or on loose ground; the IMU continues smoothly but accumulates bias. Fusing both gives better short-term motion than either alone, yet the result remains dead reckoning and requires an external reference.
+
+### Worked example: one constant-steering update
+
+Suppose $L=2.8$ m, $v=10$ m/s, $\delta=5^\circ$, and $\Delta t=0.1$ s. The initial pose is $(0,0,0)$. Assume speed and steering remain constant during the interval.
+
+First convert the steering angle and calculate curvature:
 
 $$
-\min_X \sum_i \left\| r_i(X_i, X_j, z_i) \right\|_{\Omega_i}^2,
+\begin{aligned}
+\delta &= 5\frac{\pi}{180}=0.08727\ \mathrm{rad}, \\
+\kappa &= \frac{\tan(0.08727)}{2.8}
+\approx 0.03125\ \mathrm{m}^{-1}.
+\end{aligned}
 $$
 
-where residuals compare predicted measurements to observed constraints, and $\Omega_i$ is information. Loop closures are powerful because revisiting a place constrains accumulated drift.
+The yaw change equals travelled distance times curvature:
 
-HD maps improve prediction and planning by providing lane topology, legal connections, crosswalks, stop lines, traffic-light associations, and speed limits. They also introduce operational dependencies: map coverage, freshness, construction changes, lane closures, temporary traffic control, and localization confidence. A map-aware system must know when the map is stale or incompatible with current observations.
+$$
+\begin{aligned}
+s &= v\Delta t=10(0.1)=1.0\ \mathrm{m}, \\
+\Delta\psi &= s\kappa\approx0.03125\ \mathrm{rad}
+\approx1.79^\circ.
+\end{aligned}
+$$
 
-Map maintenance is a data problem. A fleet may detect changed lane markings, new work zones, missing signs, or altered speed limits, but those observations must be validated before becoming trusted map updates. The system needs provenance, confidence, versioning, rollback, and region-specific release controls. A bad map update can be as dangerous as a bad perception model because it can affect many vehicles consistently.
+For nonzero curvature, the path is an arc with radius $r=1/\kappa\approx32.0$ m. Exact constant-curvature integration from zero yaw gives
 
-Map-light autonomy reduces some maintenance burden but increases online uncertainty. If the vehicle infers lane topology and traffic-control relationships on the fly, it needs stronger perception, prediction, and rule reasoning at intersections and construction zones. The engineering choice is not "map or no map"; it is how much prior structure to depend on and how the system behaves when online evidence disagrees with that prior.
+$$
+\begin{aligned}
+x_1 &= r\sin(\Delta\psi)
+\approx32.0\sin(0.03125)
+\approx0.9998\ \mathrm{m}, \\
+y_1 &= r\left(1-\cos(\Delta\psi)\right)
+\approx32.0\left(1-\cos(0.03125)\right)
+\approx0.0156\ \mathrm{m}, \\
+\psi_1 &= 0.03125\ \mathrm{rad}.
+\end{aligned}
+$$
 
-Localization accuracy should be evaluated relative to task risk. A 30 cm pose error may be acceptable on a wide highway lane but unacceptable near a curb, narrow construction barrier, toll gate, or stop line. Heading error is equally important: a small yaw mistake projects into a large lateral error at long lookahead distances, which can distort lane association and planned trajectories.
+A forward-Euler update evaluated at the initial yaw would return $(1.0,0,0.03125)$. The lateral difference is small over $0.1$ s, but repeated coarse Euler steps accumulate integration error even if the motion model itself is exact.
 
-A good localization interface reports degradation early. Planning can slow down or increase margins when covariance grows, but only if the estimator exposes uncertainty before the pose becomes obviously wrong.
+## Corrections, innovations, and covariance
 
-## Visual
+An extended Kalman filter alternates prediction and measurement update:
+
+$$
+\begin{aligned}
+x_k^- &= f(x_{k-1}^+,u_k), \\
+P_k^- &= F_kP_{k-1}^+F_k^{\top}+Q_k, \\
+r_k &= z_k-h(x_k^-), \\
+S_k &= H_kP_k^-H_k^{\top}+R_k, \\
+K_k &= P_k^-H_k^{\top}S_k^{-1}, \\
+x_k^+ &= x_k^-+K_kr_k.
+\end{aligned}
+$$
+
+$P$ represents state uncertainty, $Q$ process uncertainty, and $R$ measurement uncertainty. The innovation $r_k$ is the part of the observation not predicted by the current state. Its expected covariance is $S_k$. Large innovations can be legitimate after a long outage, or they can indicate multipath, a false landmark association, bad calibration, or a stale map. Accepting every update is unsafe; rejecting every surprising update prevents recovery.
+
+GNSS is valuable because it anchors long-term drift, not because every fix is ground truth. Buildings reflect satellite signals, tunnels block them, and common atmospheric or receiver errors can be correlated over time. A receiver-provided covariance may also be optimistic. Systems often combine position, velocity, satellite-quality indicators, consistency checks, and inertial history before trusting a fix.
+
+Map matching supplies another correction. A lidar scan can be aligned to a point-cloud or reflectivity map; camera detections can be aligned to lane markings, signs, poles, or traffic lights. The matcher must handle association as well as geometry. Two parallel lanes may produce nearly identical local observations, so a confident local optimum can still be the wrong lane.
+
+### Worked example: fusing a lateral map observation
+
+Assume the predicted lateral offset from a mapped lane center is $y^-=0.45$ m with standard deviation $\sigma_p=0.30$ m. A lane detector says the vehicle is on the centerline, $z=0$, with standard deviation $\sigma_m=0.20$ m. This is a scalar Kalman update with $H=1$.
+
+Convert standard deviations to variances:
+
+$$
+P^-=(0.30)^2=0.09,\qquad R=(0.20)^2=0.04.
+$$
+
+The innovation and its variance are
+
+$$
+r=z-y^-=0-0.45=-0.45,\qquad S=P^-+R=0.13.
+$$
+
+The Kalman gain is
+
+$$
+K=\frac{P^-}{P^-+R}=\frac{0.09}{0.13}\approx0.6923.
+$$
+
+Apply the correction:
+
+$$
+\begin{aligned}
+y^+ &= y^-+Kr \\
+&=0.45+0.6923(-0.45) \\
+&\approx0.1385\ \mathrm{m}, \\
+P^+ &= (1-K)P^- \\
+&\approx(1-0.6923)(0.09) \\
+&\approx0.0277.
+\end{aligned}
+$$
+
+The posterior standard deviation is $\sqrt{0.0277}\approx0.166$ m. The estimate moves toward the measurement but does not jump fully to zero because both sources are uncertain. The normalized innovation squared is
+
+$$
+r^2/S=0.45^2/0.13\approx1.56,
+$$
+
+which can be compared with a chosen statistical gate. Such a gate only has the intended meaning when $P$ and $R$ are reasonably calibrated.
+
+## Visual-inertial and lidar-inertial odometry
+
+Visual-inertial odometry tracks image features or photometric patches while using the IMU to constrain rapid motion and scale. A monocular camera alone cannot recover absolute metric scale from arbitrary motion; inertial measurements make scale observable under sufficiently exciting motion. Stereo cameras provide direct geometric scale but still benefit from the IMU during blur or low texture.
+
+VIO weakens in darkness, glare, repeated texture, and scenes dominated by independently moving objects. It also needs accurate camera timing and rolling-shutter handling. A few milliseconds of timestamp error can resemble a geometric calibration error during fast rotation.
+
+Lidar-inertial odometry aligns successive scans or scan features and uses inertial propagation between them. Lidar directly measures metric range and is less sensitive to illumination, but rain, snow, dust, sparse returns, and geometrically repetitive corridors can cause trouble. A spinning lidar also records different points at different times; deskewing the scan requires a motion estimate.
+
+Both VIO and LIO are primarily relative estimators. They can be tied to a global map, or they can become the front end of SLAM. Neither sensor name guarantees robustness. Observability, time synchronization, calibration, scene structure, and outlier rejection matter more than the acronym.
+
+## Factor graphs and map construction
+
+Graph-based estimation represents poses, landmarks, biases, and sometimes calibration parameters as variables. Measurements become factors connecting the variables they constrain. The estimate minimizes weighted residuals:
+
+$$
+X^*=\arg\min_X\sum_i r_i(X)^{\top}\Omega_i r_i(X),
+$$
+
+where $\Omega_i$ is an information matrix. Odometry factors connect adjacent poses, GNSS factors anchor poses globally, landmark factors connect observations to mapped objects, and loop-closure factors connect places observed at different times.
+
+A loop closure can remove drift accumulated over a long route, but a false closure can deform the entire solution. Candidate retrieval and geometric verification are therefore separate stages. Robust loss functions can reduce the influence of an outlier; they do not turn a bad association into a good one.
+
+Offline map building can afford smoothing over future and past measurements, repeated passes, and human or automated quality checks. Online localization usually has a strict latency budget and cannot revise the distant past freely. Many systems use a high-quality offline map with a smaller online filtering or fixed-lag smoothing problem.
+
+## What an HD map contributes
+
+An HD road map is better viewed as several linked layers than as one image. A geometric layer may contain lane boundaries, centerlines, curbs, stop lines, and drivable polygons. A semantic layer adds boundary types, speed limits, turn restrictions, crosswalks, signs, and traffic-light associations. A topological layer records which lane segments precede, follow, merge with, or conflict with others.
+
+A lanelet represents a short lane segment by left and right boundaries plus attributes and relations. Chaining lanelets forms a routing graph. Direction and boundary order matter: reversing them changes the implied direction of travel and which boundary is left. Intersection rules may refer to several lanelets and regulatory elements rather than a single polyline.
+
+Maps help perception by supplying priors and help planning by supplying legal connectivity beyond sensor range. They also create dependencies:
+
+| Map contribution | Benefit | Failure when wrong or missing |
+|---|---|---|
+| lane geometry | stable lane-relative pose | wrong-lane association, biased path |
+| topology | legal routes through merges and intersections | impossible or illegal maneuver choice |
+| traffic-control association | links lights and stop lines to lanes | reaction to the wrong signal |
+| speed and access rules | behavior constraints | unsafe or unlawful plan |
+| static landmarks | drift correction | localization jump after a scene change |
+
+Map data needs provenance, geographic versioning, validation, and rollback. A fleet observation that a lane marking moved is evidence, not an immediate trusted edit. Construction zones are especially difficult because barriers and markings can change daily while the legal route may be communicated by temporary signs or workers.
+
+When observations disagree with the map, the software should preserve both hypotheses long enough to diagnose the conflict. Silently forcing perception into the mapped geometry can produce a precise but false pose. Silently discarding the map loses useful prior structure. Confidence-aware behavior may reduce speed, enlarge clearance, avoid a disputed lane change, or request a fallback depending on the operational design domain.
+
+Map-light systems shift more work online. Standard-definition maps can provide coarse route context while perception infers current lanes and controls. The maintenance burden falls, but intersection topology and temporary layouts must then be reconstructed under real-time uncertainty. The engineering question is how much prior information the system assumes and what it does when that assumption fails.
 
 ```mermaid
 flowchart LR
-  A["Wheel odometry and IMU"] --> B["Dead reckoning prediction"]
-  C["GNSS"] --> D["Global pose update"]
-  E["LiDAR or camera landmarks"] --> F["Map matching"]
-  G["HD map lane graph"] --> F
-  B --> H["Pose estimate with covariance"]
-  D --> H
-  F --> H
-  H --> I["Behavior planning"]
-  H --> J["Motion planning"]
+  A["Wheel odometry and IMU"] --> B["Continuous motion prediction"]
+  C["GNSS position and velocity"] --> E["Consistency checks and fusion"]
+  D["Camera or lidar observations"] --> F["Landmark and lane matching"]
+  G["Versioned HD map"] --> F
+  B --> E
+  F --> E
+  E --> H["Pose, velocity, biases, covariance"]
+  H --> I["Planning and control"]
+  H --> J["Degradation monitor"]
 ```
 
-## Worked example 1: Dead-reckoning pose update
+## Evaluating the estimator that planning actually receives
 
-Problem: A vehicle has wheelbase $L=2.8$ m, speed $v=10$ m/s, yaw $\psi=0$, steering angle $\delta=5^\circ$, and time step $\Delta t=0.1$ s. Use the kinematic bicycle model to estimate the next pose from $(x,y,\psi)=(0,0,0)$.
+Average position error hides the cases that matter. Evaluation should separate longitudinal, lateral, vertical, and heading error; measure tails and outage duration; and segment results by environment. Lane association and stop-line error are often more informative than a single Euclidean distance.
 
-1. Convert steering to radians:
-
-$$
-5^\circ = 5\frac{\pi}{180} \approx 0.0873\ \mathrm{rad}.
-$$
-
-2. Compute position update:
+Heading error grows into lateral look-ahead error. At distance $d$, a small yaw error $\Delta\psi$ contributes roughly
 
 $$
-\begin{aligned}
-x_{1} &= 0 + 10\cos(0)(0.1)=1.0\ \mathrm{m}, \\
-y_{1} &= 0 + 10\sin(0)(0.1)=0.
-\end{aligned}
+e_{\mathrm{lat}}\approx d\sin(\Delta\psi)\approx d\Delta\psi.
 $$
 
-3. Compute yaw update:
+At a 50 m look-ahead, a $1^\circ$ error gives about $50(0.01745)=0.87$ m. A position estimate can appear locally acceptable while its orientation sends a planned path toward the neighboring lane.
 
-$$
-\begin{aligned}
-\Delta \psi &= \frac{v}{L}\tan(\delta)\Delta t \\
-&= \frac{10}{2.8}\tan(0.0873)(0.1) \\
-&\approx 3.571(0.0875)(0.1) \\
-&\approx 0.0313\ \mathrm{rad}.
-\end{aligned}
-$$
+Tests should include GNSS denial and recovery, map transitions, repeated structures, calibration perturbations, dropped or delayed messages, wheel slip, and changed road geometry. Uncertainty deserves a calibration check: among estimates labelled with a given confidence, the observed errors should have the corresponding distribution often enough. An overconfident estimator is harder for planning to handle than an honestly uncertain one.
 
-4. Convert yaw change to degrees:
+Operational monitoring also needs discontinuity limits and cross-sensor residuals. A map-matching score alone is weak evidence because a matcher can be confidently wrong. Agreement among independent cues, sustained over time and consistent with vehicle dynamics, is stronger.
 
-$$
-0.0313 \times \frac{180}{\pi} \approx 1.79^\circ.
-$$
+## Failure patterns to keep in mind
 
-Answer: the next pose is approximately $(1.0,0,0.0313)$, with yaw changed by about $1.79^\circ$.
+- A high-quality GNSS status flag does not rule out a common bias affecting all satellites in view. Motion consistency and other sensors still matter.
+- Covariance can look small because a model omitted a source of error. Calibration drift and correlated map error do not disappear when the filter matrix is confident.
+- Lane markings are ambiguous evidence on parallel roads, reversible lanes, and recently repainted surfaces. Topology and temporal continuity should participate in association.
+- Extrinsic and timing calibration errors often masquerade as motion-dependent localization error. Retuning measurement noise may hide the symptom while retaining the bias.
+- The kinematic bicycle model is weakest during high sideslip, wheel lift, or aggressive transients. A neat dead-reckoning trace is not proof that the assumed dynamics held.
+- A fresh map can still be incompatible with current temporary traffic control. Release age and scene agreement answer different questions.
 
-Check: The vehicle has moved about 1 m in 0.1 s, which matches 10 m/s. Small steering produces a modest yaw change.
+## Related pages
 
-## Worked example 2: Simple map-matching likelihood
-
-Problem: A localization module predicts that the vehicle is 0.45 m to the right of a mapped lane centerline. The lateral localization standard deviation is $\sigma=0.30$ m. Under a Gaussian lateral error model, compute the unnormalized likelihood factor $\exp(-e^2/(2\sigma^2))$.
-
-1. Define lateral error:
-
-$$
-e = 0.45\ \mathrm{m}.
-$$
-
-2. Compute denominator:
-
-$$
-2\sigma^2 = 2(0.30)^2 = 0.18.
-$$
-
-3. Compute exponent:
-
-$$
--\frac{e^2}{2\sigma^2}
-= -\frac{0.45^2}{0.18}
-= -\frac{0.2025}{0.18}
-= -1.125.
-$$
-
-4. Exponentiate:
-
-$$
-\exp(-1.125)\approx 0.325.
-$$
-
-Answer: the unnormalized likelihood factor is about 0.325.
-
-Check: Since the error is $1.5\sigma$, the likelihood is lower than a near-center hypothesis but not impossible. A competing lane hypothesis with smaller error may dominate.
-
-## Code
-
-```python
-import numpy as np
-
-def bicycle_step(state, speed, steer, wheelbase, dt):
-    x, y, yaw = state
-    x += speed * np.cos(yaw) * dt
-    y += speed * np.sin(yaw) * dt
-    yaw += speed / wheelbase * np.tan(steer) * dt
-    return np.array([x, y, yaw])
-
-def lane_likelihood(lateral_error_m, sigma_m):
-    return np.exp(-(lateral_error_m ** 2) / (2.0 * sigma_m ** 2))
-
-state = np.array([0.0, 0.0, 0.0])
-for _ in range(10):
-    state = bicycle_step(state, speed=10.0, steer=np.deg2rad(5.0), wheelbase=2.8, dt=0.1)
-
-print("pose after 1s:", state)
-print("map likelihood:", lane_likelihood(0.45, 0.30))
-```
-
-## Common pitfalls
-
-- Treating GNSS as ground truth. GNSS can be biased by multipath, blocked in tunnels, or attacked.
-- Using HD maps without freshness checks. Construction, temporary closures, repainted lanes, and movable signs can invalidate map assumptions.
-- Ignoring covariance. A pose estimate without uncertainty is not enough for planning near curbs, narrow lanes, or stop lines.
-- Confusing localization accuracy with control accuracy. Even perfect localization cannot compensate for tire slip, actuator delay, or bad trajectory generation.
-- Building maps that downstream modules cannot interpret. Lane geometry must include topology, traffic-control associations, and legal connectivity.
-- Assuming map-light means perception-light. Removing HD maps often increases the burden on online perception, prediction, and rule reasoning.
-
-## Connections
-
+- [Sensors: cameras, lidar, radar, and IMU](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu)
 - [Sensor fusion](/cs/autonomous-driving/sensor-fusion)
 - [Motion planning](/cs/autonomous-driving/motion-planning)
 - [Decision making and behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning)
 - [Simulation and data](/cs/autonomous-driving/simulation-and-data)
-- [Engineering math for estimation](/math/engineering-math/)
-- [Embedded systems](/cs/embedded/)
-- Further reading: *Probabilistic Robotics*; GraphSLAM and factor graph papers; Lanelet2; lidar-inertial odometry and visual-inertial odometry surveys.

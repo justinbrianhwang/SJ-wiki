@@ -9,7 +9,7 @@ STL algorithms are generic functions that operate on ranges. They are separate f
 
 Iterators make generic algorithms possible. Instead of hard-coding array indexes or node pointers, an algorithm receives a beginning iterator and an ending iterator. The ending iterator is one past the last element, which gives C++ a consistent half-open range notation: `[begin, end)`.
 
-## Definitions
+## Ranges separate traversal from storage
 
 An **iterator** is an object that refers to a position in a container. It behaves somewhat like a pointer:
 
@@ -43,7 +43,11 @@ for (vector<int>::reverse_iterator p = v.rbegin(); p != v.rend(); ++p) {
 
 An **STL algorithm** is a template function such as `find`, `count`, `sort`, `copy`, or `for_each`. Algorithms are declared in headers such as `<algorithm>` and `<numeric>`.
 
-## Key results
+The iterator pair carries position but generally not ownership. An algorithm does not keep a container alive and usually cannot verify that both iterators come from the same range. Its preconditions are part of the interface. A pair with `first == last` describes an empty range without a special null representation, and two adjacent ranges can share a boundary: `[first, middle)` followed by `[middle, last)`.
+
+Modern C++ ranges package a range and allow calls such as `std::ranges::sort(values)`. They reduce mismatched begin/end pairs and produce clearer constraints, but the iterator and sentinel model remains underneath. Classic iterator-pair algorithms are still pervasive and work across language versions.
+
+## Iterator strength limits the available algorithms
 
 Most STL algorithms use half-open ranges:
 
@@ -75,7 +79,13 @@ Algorithms usually do not change container size unless they are paired with an i
 
 The complexity of an algorithm depends on both the algorithm and the iterator/container. `find` is linear because it may inspect every item. `sort` is typically `O(n log n)`. Associative containers such as `set` and `map` provide logarithmic member `find`, which is usually better than the generic linear `find`.
 
-## Visual
+An algorithm may require properties of the values as well as the iterators. `std::sort` needs a comparison that defines a strict weak ordering. Informally, no value is less than itself, if $a\lt b$ then $b\lt a$ is false, and equivalence induced by the comparison behaves consistently. A predicate such as `left <= right` is invalid for sorting because equal elements compare in both directions. Violating the requirement can produce arbitrary ordering behavior.
+
+`std::lower_bound` illustrates why preconditions matter. On a sorted random-access range it uses logarithmically many comparisons and returns the first position where the target could be inserted without breaking order. On forward iterators it still uses logarithmically many comparisons but may perform linear iterator increments. Calling it on an unsorted range does not mean “search approximately”; the result lacks the promised meaning.
+
+Many algorithms return information that would otherwise be hidden in a loop variable. `find` returns a position, `count` returns a number, `accumulate` returns a folded value, and `partition` returns the boundary between groups. Reading the return-type contract is part of using the algorithm.
+
+## Iterator capabilities and invalidation
 
 ```mermaid
 flowchart LR
@@ -94,7 +104,11 @@ flowchart LR
 | Bidirectional | Forward and backward | `list`, `set`, `map` | Reverse traversal |
 | Random access | Jump by offset, compare positions | `vector`, `deque`, arrays | `sort`, binary search |
 
-## Worked example 1: Tracing find
+Iterator category says what traversal operations are supported; invalidation says whether a saved position remains usable after mutation. For a vector, reallocation invalidates all iterators, pointers, and references to elements. Erasing without reallocation invalidates positions at and after the erased element. A list insertion preserves existing iterators, while erasing invalidates only those to erased nodes. Container documentation is the authority for each operation.
+
+An invalid iterator is not safely comparable to `end()`. Once invalidated, it must be discarded rather than tested. The common erasing loop uses the iterator returned by `erase`, which already denotes the next surviving element.
+
+## Worked example: tracing `find`
 
 Problem: Given `vector<int> v = {4, 8, 15, 16, 23, 42};`, trace `find(v.begin(), v.end(), 16)`.
 
@@ -124,7 +138,9 @@ Method:
 
 Checked answer: the result is not `v.end()`, and dereferencing it gives `16`.
 
-## Worked example 2: Sorting and removing duplicates
+The result's distance from the beginning is `3`, obtainable with `std::distance(v.begin(), p)`. For vector iterators that is constant time; for a list it walks the range. If the target were absent, `p` would equal `v.end()`, and dereferencing it would be invalid. The equality check precedes every use of `*p`.
+
+## Worked example: sorting and removing duplicates
 
 Problem: Transform `4, 2, 4, 1, 2` into a sorted list of unique values using a vector.
 
@@ -176,7 +192,9 @@ Checked answer:
 
 The sort step is necessary because `unique` removes adjacent duplicates, not all duplicates scattered throughout an unsorted range.
 
-## Code
+After `unique`, the values in the tail are valid but unspecified; the question marks do not mean uninitialized memory. The vector still has size five until `erase` destroys the tail. Any iterator at or after the erase point is then invalidated.
+
+## Named loop patterns
 
 ```cpp
 #include <algorithm>
@@ -213,6 +231,8 @@ int main() {
 }
 ```
 
+The first program composes three distinct contracts: sort establishes adjacency of equal values, unique compacts one representative of each adjacent group, and erase changes container size. None of the steps by itself means “make this vector a sorted set.”
+
 ```cpp
 #include <algorithm>
 #include <iostream>
@@ -242,7 +262,16 @@ int main() {
 }
 ```
 
-## Common pitfalls
+The predicate for `count_if` observes each string and returns a Boolean; it must not invalidate the range. A lambda can keep a short condition beside the call:
+
+```cpp
+auto shortCount = std::count_if(words.begin(), words.end(),
+    [](const std::string& word) { return word.size() < 5; });
+```
+
+Predicates may capture configuration such as a length threshold, but mutating captured state can make repeated calls order-dependent. Pure predicates are easier to test and are compatible with more execution strategies.
+
+## Range-contract failures
 
 - Dereferencing `end()`. The end iterator is a sentinel and not an element.
 - Passing the wrong range, especially mixing iterators from different containers.
@@ -251,7 +280,7 @@ int main() {
 - Forgetting that associative containers have faster member search functions than generic linear `find`.
 - Modifying a container while iterating without understanding whether the operation invalidates the iterator.
 
-Iterator-safety checks:
+For each algorithm call:
 
 - Treat every algorithm call as a contract over a range. The iterators must come from the same container, the start must be reachable from the end, and the algorithm must support that iterator category.
 - Check whether the algorithm changes values, order, or neither. `find` only observes; `sort` reorders; `copy` writes to an output range; `remove` moves kept values forward but does not erase from the container.
@@ -261,21 +290,35 @@ Iterator-safety checks:
 - For half-open ranges, read `[first, last)` as "start included, stop excluded." This convention makes empty ranges natural because `first == last`.
 - When `unique` or `remove` returns an iterator, name it `newEnd` or similar. That reminder helps prevent the common mistake of thinking the container has already changed size.
 
-Quick self-test: read an algorithm call from left to right and name the range before naming the operation. In `sort(v.begin() + 1, v.end())`, the range is "all elements except the first," not the whole vector. Many algorithm bugs are range bugs rather than sorting, searching, or copying bugs.
+Read the call from left to right and name the range before naming the operation. In `sort(v.begin() + 1, v.end())`, the range is "all elements except the first," not the whole vector. Many algorithm bugs are range bugs rather than sorting, searching, or copying bugs.
 
 When an algorithm returns an iterator, immediately decide what that iterator means. `find` returns the found position or `end`; `lower_bound` returns an insertion position; `remove` and `unique` return a new logical end. Treating all returned iterators as "the answer element" leads to wrong code.
 
 If a container has a member algorithm-like function, check it first. `list::sort`, `set::find`, and `map::find` know the container's structure, while generic algorithms only see an iterator range.
 
-A final review question is whether an algorithm's preconditions match the range. Binary search algorithms require sorted ranges. `unique` only removes adjacent duplicates. `sort` requires random-access iterators. Generic code is powerful, but it assumes the caller supplies a range where the algorithm's contract is true.
+An algorithm's preconditions must match the range. Binary search algorithms require sorted ranges. `unique` only removes adjacent duplicates. `sort` requires random-access iterators. Generic code assumes the caller supplies a range where the algorithm's contract is true.
 
-Extended practice: implement a small search loop manually, then replace it with `find`. The manual loop teaches what the iterator is doing; the algorithm call removes boilerplate once the pattern is familiar. Do the same with counting, copying, and sorting. STL algorithms become readable when each is recognized as a named version of a loop pattern.
+Implementing a small search loop manually before replacing it with `find` clarifies what the iterator does. The algorithm call removes boilerplate once the pattern is familiar. The same comparison works for counting, copying, and sorting; each library algorithm names a recurring loop pattern.
 
 When an algorithm takes a predicate, test the predicate alone first. If `count_if` returns an unexpected answer, the bug may be in the predicate rather than in the algorithm or container.
 
-One last check: never dereference an iterator until you have proved it is not the range's end iterator.
+Never dereference an iterator until it has been shown not to equal the range's end iterator.
 
-## Connections
+Copy algorithms require a valid destination. If a destination vector is empty, its `begin()` offers no writable elements. `std::back_inserter(dest)` adapts `push_back` into an output iterator and grows the vector. If storage and size are already prepared, copying to `dest.begin()` avoids repeated insertion.
+
+Overlapping ranges need an algorithm whose contract allows them. `std::copy` works for some overlap directions but not arbitrary ones; `std::copy_backward` handles movement toward higher positions. Library container operations such as vector insertion specify their own behavior and are safer than guessing about an overlapping raw copy.
+
+Parallel algorithm overloads place stronger demands on callables: shared mutation can create data races, and execution order may differ. Even with ordinary sequential algorithms, relying on an unspecified visitation order makes a predicate or transformation fragile. Use algorithms for their stated result, not for incidental call sequencing.
+
+Stable ordering matters when records have several keys. `std::stable_sort` preserves the original relative order of elements that compare equivalent. Sorting first by a secondary key and then stably by a primary key can produce a multi-key order, though one comparator expressing both keys is often clearer. Ordinary `std::sort` makes no stability promise.
+
+`std::transform` writes one output for each input and is preferable to `for_each` when the result is a new sequence. `std::accumulate` folds a range into one value; its initial value controls the accumulator type. Starting an average sum with integer zero can force integer accumulation even when elements convert later, so the seed should match the desired result type.
+
+Iterator adaptors encode destination behavior. A back inserter appends, a front inserter prepends where supported, and a general inserter repeatedly inserts at a chosen position. They avoid manual growth but inherit the container's allocation and invalidation behavior. When the output size is known, pre-sizing or reserving a vector can reduce reallocations.
+
+Projection is another useful separation in modern ranges. Instead of writing a comparator that repeatedly extracts `employee.name()`, an algorithm can compare by a projected member or accessor. Classic algorithms express the same idea with a lambda. Either form keeps the ordering rule beside the call rather than embedding it in the stored type.
+
+## Related pages
 
 - [stl containers](/cs/programming/cpp/stl-containers)
 - [templates](/cs/programming/cpp/templates)

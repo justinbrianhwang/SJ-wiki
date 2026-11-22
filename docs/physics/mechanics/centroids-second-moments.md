@@ -5,364 +5,551 @@ sidebar_position: 8
 
 # Centroids and Second Moments
 
-Centroids and second moments connect geometry to mechanics. The centroid locates the balance point of an area, line, volume, or mass distribution. The second moment of area describes how area is spread relative to an axis, which later controls bending stress and beam deflection. The mass moment of inertia describes how mass is spread relative to an axis, which later controls rotational dynamics.
+Centroids and second moments connect geometry to mechanics. A centroid locates a weighted center. A second moment measures how widely area or mass is spread about a specified axis. The formulas resemble one another, but their meanings and units do not.
 
-The computations look similar, but the physical meanings differ. A centroid is a first moment divided by a total measure. A second moment is an integral of squared distance. Both reward careful coordinate choice, symmetry recognition, and composite-body bookkeeping.
+The three questions to attach to every calculation are: what is being integrated, where is the reference axis, and what are the units? A first moment of area answers a location question. A second moment of area enters bending and deflection. A mass moment of inertia enters rotational dynamics.
 
-## Definitions
+## From a weighted average to an integral
 
-For an area $A$ in the $xy$ plane, the **centroid** $(\bar{x},\bar{y})$ is
-
-$$
-\bar{x}=\frac{1}{A}\int_A x\,dA,\qquad
-\bar{y}=\frac{1}{A}\int_A y\,dA.
-$$
-
-For a composite area made from simple pieces,
-
-$$
-\bar{x}=\frac{\sum_i A_i x_i}{\sum_i A_i},\qquad
-\bar{y}=\frac{\sum_i A_i y_i}{\sum_i A_i}.
-$$
-
-Voids or holes are included as negative areas. The same idea works for mass centers:
+For point masses, the center coordinate is a weighted average,
 
 $$
 \bar{x}=\frac{\sum_i m_i x_i}{\sum_i m_i}.
 $$
 
-The **first moment of area** about the $y$ axis is
+Replace the discrete masses by small elements $dm$ and take the limit:
 
 $$
-Q_y=\int_A x\,dA=A\bar{x}.
+\bar{x}=\frac{1}{m}\int x\,dm,
+\qquad
+\bar{y}=\frac{1}{m}\int y\,dm,
+\qquad
+m=\int dm.
 $$
 
-The first moment about the $x$ axis is
+For a uniform thin plate, $dm=\rho_A\,dA$ with constant areal density $\rho_A$. The density cancels, leaving the **area centroid**
 
 $$
+\bar{x}=\frac{1}{A}\int_A x\,dA,
+\qquad
+\bar{y}=\frac{1}{A}\int_A y\,dA.
+$$
+
+The corresponding first moments are
+
+$$
+Q_y=\int_A x\,dA=A\bar{x},
+\qquad
 Q_x=\int_A y\,dA=A\bar{y}.
 $$
 
-The **second moment of area** about the $x$ and $y$ axes is
+The subscript identifies the axis about which the moment is taken, so $Q_x$ contains the perpendicular distance $y$. Some books reverse the subscript convention; checking the defining integral is safer than trusting the symbol alone.
+
+Symmetry should be used before integration. Reflection about the $y$ axis pairs each area element at $x$ with one at $-x$, so their contributions to $\int x\,dA$ cancel and $\bar{x}=0$. A centroid must lie on every symmetry line, though it need not lie inside the material. The centroid of a semicircular arc or a C-shaped area can sit in empty space.
+
+For a composite area divided into pieces whose centroids are known,
 
 $$
-I_x=\int_A y^2\,dA,\qquad I_y=\int_A x^2\,dA.
+\bar{x}=\frac{\sum_i A_i x_i}{\sum_i A_i},
+\qquad
+\bar{y}=\frac{\sum_i A_i y_i}{\sum_i A_i}.
 $$
 
-The **polar second moment of area** about point $O$ is
+Holes are entered with negative signed area. Their centroid coordinates remain ordinary coordinates; only the area carries the minus sign. This convention is algebraically identical to subtracting the hole integrals from the solid-region integrals.
+
+## Squared distance and bending resistance
+
+The second moments of area about Cartesian axes are
 
 $$
-J_O=\int_A r^2\,dA=I_x+I_y
+I_x=\int_A y^2\,dA,
+\qquad
+I_y=\int_A x^2\,dA.
 $$
 
-when $x$ and $y$ are perpendicular axes through $O$.
+Area far from an axis contributes disproportionately because the distance is squared. Two sections can have equal area yet very different $I_x$. Moving material away from the neutral axis is the geometric reason an I-section can be much stiffer in bending than a compact rectangle of comparable area.
 
-The **product of inertia** is
-
-$$
-I_{xy}=\int_A xy\,dA.
-$$
-
-It is zero if either the $x$ or $y$ axis is an axis of symmetry for the area.
-
-The **mass moment of inertia** about an axis is
+The product of inertia and polar second moment are
 
 $$
-I=\int r^2\,dm.
+I_{xy}=\int_A xy\,dA,
+\qquad
+J_O=\int_A (x^2+y^2)\,dA=I_x+I_y.
 $$
 
-Its units are mass times length squared, such as kg m$^2$. Do not confuse this with second moment of area, whose units are length to the fourth power.
+$I_{xy}$ can be positive, negative, or zero. If either coordinate axis is a symmetry axis, reflected elements cancel in pairs and $I_{xy}=0$. The sign convention for product of inertia sometimes differs in stress-transformation texts, so transformation formulas should be used with the convention under which they were derived.
 
-## Key results
-
-Symmetry is the first result to use. If an area has a line of symmetry, its centroid lies on that line. If it has two perpendicular symmetry axes, their intersection is the centroid. If an area is symmetric about the $y$ axis, then $I_{xy}=0$ for centroidal axes aligned with that symmetry.
-
-For composite centroid calculations, use signed pieces:
-
-$$
-\bar{x}=\frac{A_1x_1+A_2x_2-A_hx_h}{A_1+A_2-A_h}
-$$
-
-when a hole of area $A_h$ is removed. The centroid of a removed region still has coordinates; the negative sign belongs to the area, not to the coordinate unless the coordinate itself is negative.
-
-The **parallel-axis theorem** for second moments of area states
-
-$$
-I_x=I_{x_c}+Ad^2,
-$$
-
-where $I_{x_c}$ is about a centroidal axis parallel to $x$, and $d$ is the perpendicular distance between the axes. This theorem moves from a centroidal axis to a parallel noncentroidal axis. It does not move between rotated axes.
-
-For mass moments,
-
-$$
-I_O=I_G+md^2,
-$$
-
-where $G$ is the center of mass and $d$ is the perpendicular distance between parallel axes.
-
-Common centroidal second moments of area are:
-
-$$
-I_x=\frac{bh^3}{12}\quad\text{for a rectangle about its centroidal horizontal axis},
-$$
-
-$$
-I_y=\frac{hb^3}{12}\quad\text{for a rectangle about its centroidal vertical axis},
-$$
-
-$$
-I=\frac{\pi r^4}{4}\quad\text{for a circle about a centroidal diameter}.
-$$
-
-These formulas should be paired with a sketch of the axis. The same rectangle has different $I_x$ and $I_y$ when $b\ne h$, because the squared distance is measured perpendicular to the chosen axis.
-
-For distributed loads and hydrostatic pressure, the resultant location is also a centroid idea. The equivalent force of a uniform distributed load acts at the centroid of the loaded length. A linearly varying triangular load acts one third of the base length from the larger-intensity end, or two thirds from the zero-intensity end.
-
-## Visual
-
-```text
-Composite area bookkeeping
-
-      y
-      ^
-      |
-      |     +-----------+
-      |     |           |
-      |     |   hole    |  hole is entered as negative area
-      |     |     o     |
-      |     |           |
-      |     +-----------+
-      |
-      +--------------------> x
-
-Centroid formula: sum(signed area * centroid coordinate) / sum(signed area)
-```
-
-| Quantity | Integral | Units | Main use |
+| Quantity | Integral | Units | Typical use |
 |---|---|---|---|
-| Area centroid $\bar{x},\bar{y}$ | $\bar{x}=\int x\,dA/A$ | length | Resultant location, geometry balance |
-| First moment $Q$ | $Q_x=\int y\,dA$ | length$^3$ | Shear stress, centroid calculations |
-| Second moment $I_x$ | $I_x=\int y^2\,dA$ | length$^4$ | Bending stiffness and stress |
-| Polar second moment $J$ | $J=I_x+I_y$ | length$^4$ | Torsion for circular shafts |
-| Mass moment $I$ | $I=\int r^2\,dm$ | mass length$^2$ | Rotational dynamics |
+| Area centroid | $\bar{x}=\int x\,dA/A$ | length | load location, neutral axis |
+| First moment of area | $Q_x=\int y\,dA$ | length$^3$ | centroid and beam shear |
+| Second moment of area | $I_x=\int y^2\,dA$ | length$^4$ | bending stress and deflection |
+| Polar second moment | $J_O=\int r^2\,dA$ | length$^4$ | circular-shaft torsion |
+| Mass moment of inertia | $I=\int r^2\,dm$ | mass length$^2$ | rotational dynamics |
 
-## Worked example 1: Centroid of an L-shaped plate
-
-**Problem.** An L-shaped plate is made from a $120$ mm by $80$ mm rectangle with a $70$ mm by $40$ mm rectangular cutout removed from the upper right corner. The origin is at the lower-left corner of the original rectangle. The remaining shape consists of the full rectangle minus the cutout occupying $50\le x\le120$ mm and $40\le y\le80$ mm. Find the centroid.
-
-**Method.** Treat the plate as a positive large rectangle plus a negative cutout.
-
-1. Large rectangle:
+The mass moment of inertia has the same mathematical form but a different measure:
 
 $$
-A_1=120(80)=9600\ \text{mm}^2.
+I_z=\int r^2\,dm.
 $$
 
-Its centroid is
+For constant density and thickness it is proportional to an area polar moment, but the two quantities are not interchangeable. Beam tables normally list area moments in mm$^4$ or in$^4$; dynamics tables list mass moments in kg m$^2$ or slug ft$^2$.
+
+## Deriving two standard formulas
+
+For a rectangle of width $b$ and height $h$, use a horizontal strip $dA=b\,dy$ about the centroidal $x$ axis:
 
 $$
-(x_1,y_1)=(60,40)\ \text{mm}.
+\begin{aligned}
+I_x
+&=\int_{-h/2}^{h/2}y^2b\,dy \\
+&=b\left[\frac{y^3}{3}\right]_{-h/2}^{h/2}
+=\frac{bh^3}{12}.
+\end{aligned}
 $$
 
-2. Cutout:
+Interchanging $x$ and $y$ gives
 
 $$
-A_2=70(40)=2800\ \text{mm}^2.
+I_y=\frac{hb^3}{12}.
 $$
 
-Its centroid is halfway through the removed region:
+The cube belongs to the dimension perpendicular to the axis. That observation is more dependable than memorizing which letter goes where.
+
+For a circle of radius $R$, polar coordinates give $dA=r\,dr\,d\theta$:
 
 $$
-x_2=\frac{50+120}{2}=85\ \text{mm},
+\begin{aligned}
+J_O
+&=\int_0^{2\pi}\int_0^R r^2(r\,dr\,d\theta) \\
+&=2\pi\left[\frac{r^4}{4}\right]_0^R
+=\frac{\pi R^4}{2}.
+\end{aligned}
+$$
+
+Symmetry requires $I_x=I_y$, and $J_O=I_x+I_y$, hence
+
+$$
+I_x=I_y=\frac{\pi R^4}{4}.
+$$
+
+These derivations show why tabulated formulas are tied to particular axes. A formula without an axis sketch is incomplete information.
+
+### A triangle from the integral
+
+Consider a triangle of base $b$ on the $x$ axis and height $h$, tapering linearly to zero width at $y=h$. A horizontal strip has width
+
+$$
+b(y)=b\left(1-\frac{y}{h}\right)
+$$
+
+and area $dA=b(y)\,dy$. Its second moment about the base is
+
+$$
+\begin{aligned}
+I_{base}
+&=\int_0^h y^2b\left(1-\frac{y}{h}\right)dy\\
+&=b\left[\frac{y^3}{3}-\frac{y^4}{4h}\right]_0^h\\
+&=\frac{bh^3}{12}.
+\end{aligned}
+$$
+
+The triangle's area is $A=bh/2$, and its centroid lies $h/3$ above the base. Shift from the base to the parallel centroidal axis by rearranging the parallel-axis theorem:
+
+$$
+\begin{aligned}
+I_c
+&=I_{base}-A\left(\frac{h}{3}\right)^2\\
+&=\frac{bh^3}{12}-\frac{bh}{2}\frac{h^2}{9}\\
+&=\frac{bh^3}{36}.
+\end{aligned}
+$$
+
+The edge-axis value is larger, as it must be. This calculation also shows that the parallel-axis theorem can be used in reverse only when the destination is the centroidal parallel axis and the subtraction remains consistent with $I_{base}=I_c+Ad^2$.
+
+## Scaling and section efficiency
+
+Uniformly scale every dimension of a cross section by a factor $s$. Its area scales as $s^2$, its first moments as $s^3$, and its second moments as $s^4$. Doubling a rectangular section's depth while retaining its shape multiplies $I$ by $16$. If only the depth is doubled while width stays fixed, $I_x=bh^3/12$ increases by a factor of $8$.
+
+Beam bending uses the combination $EI$, where $E$ is a material property and $I$ is geometric. Bending stress under moment $M$ is
+
+$$
+\sigma=-\frac{My}{I},
+$$
+
+and the extreme stress is often written
+
+$$
+|\sigma_{max}|=\frac{|M|}{S},
+\qquad
+S=\frac{I}{c},
+$$
+
+where $S$ is the elastic section modulus and $c$ is the farthest distance from the neutral axis. Increasing depth helps twice: it spreads material far from the centroidal axis and usually increases the lever arm to the extreme fiber more slowly than it increases $I$.
+
+The radius of gyration supplies another comparison. Since $I=Ak^2$, sections with the same area but larger $k$ place their material farther from the chosen axis. Thin-walled sections exploit this arrangement efficiently, although local buckling, shear deformation, connection details, and torsion can govern before the full bending efficiency is realized.
+
+Neither $I$ nor $S$ is an intrinsic number for a shape without an axis. A tall rectangle is efficient about its horizontal centroidal axis and relatively weak about its vertical one. Rotating the same physical member by $90^\circ$ exchanges those roles.
+
+## Moving an axis without reintegrating
+
+Let $x_c$ be a centroidal axis and let a parallel axis $x$ be a perpendicular distance $d$ away. Write the distance of an element from $x$ as $y=y'+d$, where $y'$ is measured from $x_c$:
+
+$$
+\begin{aligned}
+I_x
+&=\int_A (y'+d)^2\,dA \\
+&=\int_A y'^2\,dA+2d\int_A y'\,dA+d^2\int_A dA.
+\end{aligned}
+$$
+
+The middle integral is zero because $x_c$ passes through the centroid. Therefore
+
+$$
+I_x=I_{x_c}+Ad^2.
+$$
+
+The parallel-axis theorem only connects parallel axes, and the reference formula must be centroidal. The added term is nonnegative, so among all parallel axes the centroidal one has the smallest second moment. The mass version follows by replacing $dA$ with $dm$:
+
+$$
+I_O=I_G+md^2.
+$$
+
+A related measure is the radius of gyration,
+
+$$
+k_x=\sqrt{\frac{I_x}{A}},
+$$
+
+the distance at which the whole area could be imagined concentrated while retaining the same second moment about the axis. For mass, $k=\sqrt{I/m}$. It is a compact measure of spread, not a physical radius of the boundary.
+
+## Choosing the differential element
+
+Direct integration is often shorter than decomposing a curved boundary into many familiar shapes. The useful element is the one that turns the region into a single integral. For an area under $y=f(x)$, a vertical strip has
+
+$$
+dA=y\,dx,
+$$
+
+and its own centroid lies at $(x,y/2)$. The area and first moments become
+
+$$
+A=\int y\,dx,
+\qquad
+Q_y=\int xy\,dx,
+\qquad
+Q_x=\frac12\int y^2\,dx.
+$$
+
+A horizontal strip may be better when $x$ is naturally a function of $y$. Neither choice changes the answer; it only changes the algebra. Double integrals are needed when the density varies in both directions or when no strip describes the region cleanly.
+
+As an example, consider the parabolic spandrel bounded by
+
+$$
+y=h\left(\frac{x}{b}\right)^2,
+$$
+
+the $x$ axis, and $x=b$, for $0\le x\le b$. A vertical strip gives
+
+$$
+\begin{aligned}
+A
+&=\int_0^b h\frac{x^2}{b^2}\,dx \\
+&=\frac{h}{b^2}\left[\frac{x^3}{3}\right]_0^b
+=\frac{bh}{3}.
+\end{aligned}
+$$
+
+The first moment about the $y$ axis is
+
+$$
+\begin{aligned}
+Q_y
+&=\int_0^b xh\frac{x^2}{b^2}\,dx \\
+&=\frac{h}{b^2}\left[\frac{x^4}{4}\right]_0^b
+=\frac{hb^2}{4}.
+\end{aligned}
+$$
+
+Therefore
+
+$$
+\bar{x}=\frac{Q_y}{A}
+=\frac{hb^2/4}{bh/3}
+=\frac{3b}{4}.
+$$
+
+For the vertical coordinate, remember that each strip's centroid is at $y/2$:
+
+$$
+\begin{aligned}
+Q_x
+&=\int_0^b\frac{y}{2}\,dA
+=\frac12\int_0^b y^2\,dx \\
+&=\frac12\int_0^b
+h^2\frac{x^4}{b^4}\,dx
+=\frac{bh^2}{10}.
+\end{aligned}
+$$
+
+Hence
+
+$$
+\boxed{\bar{x}=\frac{3b}{4},\qquad
+\bar{y}=\frac{3h}{10}.}
+$$
+
+Both coordinates lean toward the tall end at $x=b$, but $\bar{y}$ remains below half height because most of the area is near the base.
+
+## When geometric centroid and mass center separate
+
+The weighting measure changes with the object. A slender wire uses arc length,
+
+$$
+\bar{x}=\frac{1}{L}\int_Cx\,ds,
+$$
+
+while a solid volume uses
+
+$$
+\bar{x}=\frac{1}{V}\int_Vx\,dV.
+$$
+
+With variable line, area, or volume density, insert the density into the measure: $dm=\lambda\,ds$, $dm=\rho_A\,dA$, or $dm=\rho\,dV$. A geometric centroid depends only on shape. A center of mass also depends on how material is distributed. The two coincide under uniform density, but symmetry of the boundary alone cannot locate the mass center when density breaks that symmetry.
+
+The area centroid equals the mass center of a thin plate only when areal density is uniform. For a nonuniform lamina,
+
+$$
+m=\int_A\rho_A(x,y)\,dA,
 $$
 
 $$
-y_2=\frac{40+80}{2}=60\ \text{mm}.
+\bar{x}=\frac{1}{m}\int_Ax\rho_A(x,y)\,dA,
+\qquad
+\bar{y}=\frac{1}{m}\int_Ay\rho_A(x,y)\,dA.
 $$
 
-Use $A_2$ as negative in the composite formula.
-
-3. Remaining area:
+Take a rectangular plate $0\le x\le L$, $0\le y\le H$ whose density increases linearly,
 
 $$
-A=A_1-A_2=9600-2800=6800\ \text{mm}^2.
+\rho_A(x)=\rho_0\left(1+\frac{x}{L}\right).
 $$
 
-4. Compute $\bar{x}$:
+Its mass is
 
 $$
-\bar{x}=\frac{A_1x_1-A_2x_2}{A}
-=\frac{9600(60)-2800(85)}{6800}.
+\begin{aligned}
+m
+&=\int_0^L\int_0^H
+\rho_0\left(1+\frac{x}{L}\right)dy\,dx \\
+&=\rho_0H\left(L+\frac{L}{2}\right)
+=\frac32\rho_0HL.
+\end{aligned}
 $$
 
-$$
-\bar{x}=\frac{576000-238000}{6800}
-=\frac{338000}{6800}=49.71\ \text{mm}.
-$$
-
-5. Compute $\bar{y}$:
+The $x$ numerator is
 
 $$
-\bar{y}=\frac{A_1y_1-A_2y_2}{A}
-=\frac{9600(40)-2800(60)}{6800}.
+\begin{aligned}
+\int_Ax\rho_A\,dA
+&=\rho_0H\int_0^L
+x\left(1+\frac{x}{L}\right)dx \\
+&=\rho_0H\left(\frac{L^2}{2}+\frac{L^2}{3}\right)
+=\frac56\rho_0HL^2.
+\end{aligned}
 $$
 
-$$
-\bar{y}=\frac{384000-168000}{6800}
-=\frac{216000}{6800}=31.76\ \text{mm}.
-$$
-
-The checked answer is
+Thus
 
 $$
-\boxed{(\bar{x},\bar{y})=(49.7,\ 31.8)\ \text{mm}.}
+\bar{x}
+=\frac{(5/6)\rho_0HL^2}{(3/2)\rho_0HL}
+=\frac{5L}{9},
+\qquad
+\bar{y}=\frac{H}{2}.
 $$
 
-The centroid moves down and left from the center of the original rectangle because material was removed from the upper-right corner.
+The geometric centroid remains at $L/2$, while the mass center moves toward the denser right edge. Symmetry in the $y$ direction still fixes $\bar{y}$.
 
-## Worked example 2: Second moment of a composite rectangular section
+## Why the first moment returns in beam shear
 
-**Problem.** A T-section consists of a flange $100$ mm wide by $20$ mm thick on top of a web $20$ mm wide by $120$ mm tall. The web is centered under the flange. Find the centroidal $I_x$ about the horizontal centroidal axis. Measure $y$ upward from the bottom of the web.
+The quantity $Q$ reappears in the beam shear formula
 
-**Method.** Find the composite centroid, then use the parallel-axis theorem for each rectangle.
+$$
+\tau=\frac{VQ}{It}.
+$$
 
-1. Web area and centroid:
+Here $Q$ is the first moment of the portion of cross-sectional area above or below the level where shear stress is evaluated, taken about the neutral axis. It is not usually the first moment of the entire section: that would be zero about a centroidal axis. Confusing the selected partial area with the whole cross section is a common source of a falsely zero shear stress.
+
+Composite calculations benefit from a table containing signed area, centroid coordinates, local centroidal moments, and axis offsets. The centroid must be found before the offsets for a composite $I$ are known. Keeping those stages separate also prevents a local centroidal formula from being shifted twice.
+
+## Worked example: centroid of an L-shaped plate
+
+A $120$ mm by $80$ mm rectangle has a $70$ mm by $40$ mm cutout in its upper-right corner. The removed rectangle occupies $50\le x\le120$ mm and $40\le y\le80$ mm. Take the origin at the lower-left corner of the original rectangle.
+
+Use the full rectangle as a positive piece and the cutout as a negative piece:
+
+| Piece | Signed area (mm$^2$) | $x_i$ (mm) | $y_i$ (mm) |
+|---|---:|---:|---:|
+| Full rectangle | $120(80)=9600$ | $60$ | $40$ |
+| Cutout | $-70(40)=-2800$ | $85$ | $60$ |
+
+The remaining area is
+
+$$
+A=9600-2800=6800\ \text{mm}^2.
+$$
+
+Its horizontal coordinate is
+
+$$
+\begin{aligned}
+\bar{x}
+&=\frac{9600(60)-2800(85)}{6800} \\
+&=\frac{338000}{6800}
+=49.71\ \text{mm}.
+\end{aligned}
+$$
+
+Likewise,
+
+$$
+\begin{aligned}
+\bar{y}
+&=\frac{9600(40)-2800(60)}{6800} \\
+&=\frac{216000}{6800}
+=31.76\ \text{mm}.
+\end{aligned}
+$$
+
+Thus
+
+$$
+\boxed{(\bar{x},\bar{y})=(49.7,31.8)\ \text{mm}.}
+$$
+
+The answer passes two geometric checks. Both coordinates move away from the removed upper-right material, and the centroid remains within the lower-left portion of the plate. Treating $x_2$ or $y_2$ as negative as well as the cutout area would move the result in the wrong direction.
+
+## Worked example: centroidal moment of a T-section
+
+A T-section has a web $20$ mm wide and $120$ mm high, topped by a flange $100$ mm wide and $20$ mm thick. The web is centered below the flange. Find $I_x$ about the horizontal centroidal axis, measuring $y$ upward from the bottom of the web.
+
+First locate the composite centroid. The web and flange data are
 
 $$
 A_w=20(120)=2400\ \text{mm}^2,
+\qquad y_w=60\ \text{mm},
 $$
-
-$$
-y_w=60\ \text{mm}.
-$$
-
-2. Flange area and centroid:
 
 $$
 A_f=100(20)=2000\ \text{mm}^2,
+\qquad y_f=120+10=130\ \text{mm}.
 $$
 
-The flange spans $120\le y\le140$ mm, so
+Then
 
 $$
-y_f=130\ \text{mm}.
+\begin{aligned}
+\bar{y}
+&=\frac{A_wy_w+A_fy_f}{A_w+A_f} \\
+&=\frac{2400(60)+2000(130)}{4400} \\
+&=91.818\ \text{mm}.
+\end{aligned}
 $$
 
-3. Total area:
+The local centroidal moments are
 
 $$
-A=2400+2000=4400\ \text{mm}^2.
-$$
-
-4. Centroid:
-
-$$
-\bar{y}=\frac{2400(60)+2000(130)}{4400}
-=\frac{144000+260000}{4400}=91.82\ \text{mm}.
-$$
-
-5. Web centroidal second moment about its own horizontal centroidal axis:
-
-$$
-I_{x,w,c}=\frac{b h^3}{12}=\frac{20(120)^3}{12}=2{,}880{,}000\ \text{mm}^4.
-$$
-
-Distance to composite centroid:
-
-$$
-d_w=91.82-60=31.82\ \text{mm}.
-$$
-
-Parallel-axis contribution:
-
-$$
-I_{x,w}=2{,}880{,}000+2400(31.82)^2.
+I_{w,c}=\frac{20(120)^3}{12}=2{,}880{,}000\ \text{mm}^4,
 $$
 
 $$
-I_{x,w}=2{,}880{,}000+2{,}430{,}000=5{,}310{,}000\ \text{mm}^4.
+I_{f,c}=\frac{100(20)^3}{12}=66{,}666.7\ \text{mm}^4.
 $$
 
-6. Flange centroidal second moment:
+The distances to the composite centroid are
 
 $$
-I_{x,f,c}=\frac{100(20)^3}{12}=66{,}667\ \text{mm}^4.
-$$
-
-Distance:
-
-$$
-d_f=130-91.82=38.18\ \text{mm}.
+d_w=91.818-60=31.818\ \text{mm},
 $$
 
 $$
-I_{x,f}=66{,}667+2000(38.18)^2.
+d_f=130-91.818=38.182\ \text{mm}.
+$$
+
+Apply the parallel-axis theorem to each piece:
+
+$$
+\begin{aligned}
+I_x
+&=I_{w,c}+A_wd_w^2+I_{f,c}+A_fd_f^2 \\
+&=2{,}880{,}000+2400(31.818)^2 \\
+&\quad+66{,}666.7+2000(38.182)^2 \\
+&\approx8.292\times10^6\ \text{mm}^4.
+\end{aligned}
+$$
+
+Therefore
+
+$$
+\boxed{\bar{y}=91.82\ \text{mm},\qquad I_x\approx8.29\times10^6\ \text{mm}^4.}
+$$
+
+The flange's own centroidal $I_x$ is small because its vertical thickness is only $20$ mm. Its parallel-axis term is large because most of its area sits far from the section centroid. That separation is the main purpose of the flange.
+
+## Rotated axes and principal directions
+
+The parallel-axis theorem cannot rotate an axis. Under a counterclockwise axis rotation by $\theta$, the area moments transform as
+
+$$
+I_{x'}=\frac{I_x+I_y}{2}
++\frac{I_x-I_y}{2}\cos 2\theta
+-I_{xy}\sin 2\theta,
 $$
 
 $$
-I_{x,f}=66{,}667+2{,}916{,}000=2{,}982{,}667\ \text{mm}^4.
+I_{x'y'}=\frac{I_x-I_y}{2}\sin 2\theta+I_{xy}\cos 2\theta.
 $$
 
-7. Total:
+Principal axes are orientations for which $I_{x'y'}=0$. About those axes the second moments take their maximum and minimum values. Symmetry axes through the centroid are principal axes, which is why standard beam sections are normally analyzed in their symmetry directions. For unsymmetric sections such as unequal angles, the principal directions need not align with the drawing axes.
+
+The polar moment about a fixed point is invariant under rotation of the Cartesian axes through that point:
 
 $$
-I_x=5{,}310{,}000+2{,}982{,}667=8{,}292{,}667\ \text{mm}^4.
+I_{x'}+I_{y'}=I_x+I_y=J_O.
 $$
 
-The checked answer is
+Rotation redistributes the total between the two perpendicular axes but cannot change their sum. This provides a quick check on transformed moments. The principal values are
 
 $$
-\boxed{\bar{y}=91.8\ \text{mm},\qquad I_x\approx 8.29\times10^6\ \text{mm}^4.}
+I_{1,2}
+=\frac{I_x+I_y}{2}
+\pm\sqrt{
+\left(\frac{I_x-I_y}{2}\right)^2+I_{xy}^2
+}.
 $$
 
-The flange has a small local $I_x$, but its distance from the centroid makes a large parallel-axis contribution.
+Their sum equals $J_O$, and neither can be negative because each represents an integral of squared distance. A negative transformed second moment indicates a sign or formula error, while a negative product of inertia may be perfectly valid.
 
-## Code
+For composite sections, products of inertia also require a parallel-axis term:
 
-```python
-parts = [
-    # name, area, xbar, ybar
-    ("large rectangle", 120.0 * 80.0, 60.0, 40.0),
-    ("cutout", -70.0 * 40.0, 85.0, 60.0),
-]
+$$
+I_{xy}=I_{xy,c}+A d_xd_y.
+$$
 
-A = sum(area for name, area, x, y in parts)
-xbar = sum(area * x for name, area, x, y in parts) / A
-ybar = sum(area * y for name, area, x, y in parts) / A
+Unlike $Ad^2$, the product $Ad_xd_y$ carries a sign determined by the centroid's quadrant relative to the new axes. Holes again use negative area. Keeping a small coordinate sketch beside the table is especially helpful here because distances in opposite directions can cancel.
 
-print(f"area = {A:.1f} mm^2")
-print(f"xbar = {xbar:.2f} mm")
-print(f"ybar = {ybar:.2f} mm")
+## Checks that catch most errors
 
-# Parallel-axis computation for the T-section.
-rectangles = [
-    ("web", 20.0, 120.0, 60.0),
-    ("flange", 100.0, 20.0, 130.0),
-]
-area_total = sum(b * h for name, b, h, yc in rectangles)
-y_centroid = sum(b * h * yc for name, b, h, yc in rectangles) / area_total
-Ix = 0.0
-for name, b, h, yc in rectangles:
-    area = b * h
-    Ix_local = b * h**3 / 12.0
-    Ix += Ix_local + area * (yc - y_centroid) ** 2
-print(f"T-section ybar = {y_centroid:.2f} mm, Ix = {Ix:.0f} mm^4")
-```
+- A composite centroid should move toward added material and away from a hole. It may fall outside a concave shape, so “inside the material” is not a universal check.
+- The distance in $Ad^2$ is perpendicular to the two parallel axes. A horizontal shift does not change the moment about a horizontal axis.
+- A centroidal rectangle formula cannot be used directly about an edge. For a base axis, $I_x=bh^3/3$, obtained from $bh^3/12+A(h/2)^2$.
+- Keep full precision for $\bar{x}$ and $\bar{y}$ until all parallel-axis terms are evaluated. Squaring an early rounded distance can noticeably alter a built-up section result.
+- Area moments must have fourth-power length units. A result in mm$^2$ or mm$^3$ signals that either the integral or the units were mishandled.
+- $J=I_x+I_y$ holds for perpendicular area axes through the same point. It does not state that every section's torsional stiffness equals $GJ/L$.
 
-## Common pitfalls
-
-- Treating a hole as a positive area in the composite centroid formula.
-- Using a second moment formula about the wrong axis or wrong centroidal orientation.
-- Applying the parallel-axis theorem with distance measured along the axis instead of perpendicular to it.
-- Confusing mass moment of inertia with second moment of area.
-- Dropping units: $I_x$ for an area is length$^4$, not length$^2$.
-- Ignoring symmetry that could simplify a centroid or product-of-inertia calculation.
-- Rounding the centroid too early before using it in a parallel-axis term.
-
-## Connections
+## Related pages
 
 - [Rigid-body equilibrium](/physics/mechanics/rigid-body-equilibrium)
 - [Internal forces in beams](/physics/mechanics/internal-forces-beams)
 - [Planar rigid-body motion](/physics/mechanics/planar-rigid-body-motion)
-- [Planar rigid-body kinetics](/physics/mechanics/planar-rigid-body-motion)

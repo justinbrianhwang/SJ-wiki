@@ -5,195 +5,342 @@ sidebar_position: 2
 
 # Force Vectors, Resultants, and Components
 
-Engineering mechanics starts by treating force as a vector: it has magnitude, direction, and a line of action. That one decision lets a single notation describe cable tensions, weights, contact reactions, distributed loads after reduction, and the resultant force from many applied effects. The same vector language also describes relative position, so forces and geometry can be combined later into moments.
+A force needs a magnitude, a direction, and a line of action. Treating it as a vector handles the first two. Recording where it acts supplies the third, which becomes essential when moments enter the problem.
 
-This page builds the vector habits used everywhere else in statics and dynamics. Before drawing an equilibrium equation or an equation of motion, you usually resolve forces into components, add them into a resultant, and check whether the answer makes physical sense. A clean vector calculation is not cosmetic; it is what prevents sign errors, wrong angles, and accidental mixing of scalars with vectors.
+Most early mechanics errors happen before an equilibrium equation is written: an angle is read from the wrong axis, a cable direction is reversed, or magnitudes are added as though they were signed components. A consistent vector description turns those geometric decisions into ordinary algebra.
 
-![Two vectors are added tip-to-tail and by the parallelogram construction.](https://commons.wikimedia.org/wiki/Special:FilePath/Vector_addition.svg)
+## What the arrow carries
 
-*Figure: Vector addition is the visual grammar behind force resultants, displacements, and field components. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Vector_addition.svg), Benjamin D. Esham, public domain.*
+A scalar has magnitude but no spatial direction. Mass, time, temperature, work, and kinetic energy are scalars. A vector has components that change when the coordinate basis changes while the geometric object itself stays the same. Force, position, velocity, acceleration, and moment are vectors.
 
-## Definitions
-
-A **scalar** has magnitude only. Mass, distance, time, speed, work, and energy are scalars. A **vector** has magnitude and direction. Force $\mathbf{F}$, position $\mathbf{r}$, velocity $\mathbf{v}$, acceleration $\mathbf{a}$, and moment $\mathbf{M}$ are vectors. In Cartesian components,
+In a right-handed Cartesian basis,
 
 $$
-\mathbf{F}=F_x\mathbf{i}+F_y\mathbf{j}+F_z\mathbf{k}
+\mathbf{F}=F_x\mathbf{i}+F_y\mathbf{j}+F_z\mathbf{k}.
 $$
 
-where $\mathbf{i}$, $\mathbf{j}$, and $\mathbf{k}$ are unit basis vectors along the $x$, $y$, and $z$ axes. The magnitude is
+Its magnitude is
 
 $$
-|\mathbf{F}|=\sqrt{F_x^2+F_y^2+F_z^2}.
+F=\lVert\mathbf{F}\rVert
+=\sqrt{F_x^2+F_y^2+F_z^2}.
 $$
 
-A **unit vector** has magnitude one. If a force of magnitude $F$ acts along a line from point $A$ to point $B$, first form the direction vector
+The basis vectors $\mathbf{i}$, $\mathbf{j}$, and $\mathbf{k}$ have unit length and are mutually perpendicular. The signed coefficients $F_x$, $F_y$, and $F_z$ are scalar components. The vectors $F_x\mathbf{i}$, $F_y\mathbf{j}$, and $F_z\mathbf{k}$ are vector components. Textbooks sometimes use “component” for both, so the surrounding equation has to settle which one is meant.
+
+Two vectors are equal when their corresponding components in the same basis are equal. Their points of application do not enter that equality. In rigid-body mechanics, however, equal force vectors applied on different lines can have different rotational effects. A force vector and a fully specified force on a body are therefore related but distinct descriptions.
+
+Vector addition follows the parallelogram or tip-to-tail construction. Algebraically it is component-wise:
 
 $$
-\mathbf{r}_{AB}=(x_B-x_A)\mathbf{i}+(y_B-y_A)\mathbf{j}+(z_B-z_A)\mathbf{k},
+\sum_i\mathbf{F}_i=
+\left(\sum_iF_{ix}\right)\mathbf{i}
++\left(\sum_iF_{iy}\right)\mathbf{j}
++\left(\sum_iF_{iz}\right)\mathbf{k}.
 $$
 
-then normalize it:
-
-$$
-\mathbf{u}_{AB}=\frac{\mathbf{r}_{AB}}{|\mathbf{r}_{AB}|}.
-$$
-
-The force vector is then
-
-$$
-\mathbf{F}=F\mathbf{u}_{AB}.
-$$
-
-A **resultant force** is a single force equal to the vector sum of a system of forces:
+This sum is the **resultant force**
 
 $$
 \mathbf{R}=\sum_i\mathbf{F}_i.
 $$
 
-If all forces act at the same point, the resultant can replace them for force balance. If forces act at different points on a rigid body, the same resultant force alone may not preserve the moment effect; later pages add the associated moment.
+If all forces are concurrent, replacing them by $\mathbf{R}$ at their common point preserves their external effect. For nonconcurrent forces, the resultant alone generally loses moment information.
 
-The **components** of a force are the signed scalar multipliers of the basis vectors. In 2D, if a force $F$ makes an angle $\theta$ counterclockwise from the positive $x$ axis, then
+## Resolving a planar force without guessing signs
 
-$$
-F_x=F\cos\theta,\qquad F_y=F\sin\theta.
-$$
-
-If the angle is measured from another axis, do not blindly use cosine for $x$ and sine for $y$. Draw the right triangle, attach signs from the chosen axes, and only then write the components.
-
-The **dot product** measures projection:
+If $\theta$ is measured counterclockwise from the positive $x$ axis,
 
 $$
-\mathbf{A}\cdot\mathbf{B}=|\mathbf{A}||\mathbf{B}|\cos\theta=A_xB_x+A_yB_y+A_zB_z.
+F_x=F\cos\theta,
+\qquad
+F_y=F\sin\theta.
 $$
 
-The scalar component of $\mathbf{F}$ along a unit direction $\mathbf{u}$ is $\mathbf{F}\cdot\mathbf{u}$. The vector projection is $(\mathbf{F}\cdot\mathbf{u})\mathbf{u}$.
-
-The **cross product** produces a vector perpendicular to two vectors:
+That formula works for angles in any quadrant if the trigonometric functions retain their signs. Many diagrams instead give an acute reference angle from a vertical axis. Then the adjacent component uses cosine and the opposite component uses sine:
 
 $$
-\mathbf{A}\times\mathbf{B}=
+|F_y|=F\cos\beta,
+\qquad
+|F_x|=F\sin\beta
+$$
+
+when $\beta$ is measured from the $y$ direction. Signs come from the arrow's actual directions, not from the triangle lengths.
+
+A robust sequence is:
+
+1. Draw the force arrow in the chosen axes.
+2. Mark the given angle at the axis from which it is measured.
+3. Compute positive triangle lengths.
+4. Attach component signs from left/right and up/down.
+
+For a planar resultant,
+
+$$
+R_x=\sum_iF_{ix},
+\qquad
+R_y=\sum_iF_{iy},
+$$
+
+$$
+R=\sqrt{R_x^2+R_y^2}.
+$$
+
+The direction is best written as
+
+$$
+\theta=\operatorname{atan2}(R_y,R_x),
+$$
+
+because the two-argument arctangent uses the signs of both components. A calculator evaluation of $\tan^{-1}(R_y/R_x)$ cannot distinguish opposite quadrants and fails when $R_x=0$.
+
+The magnitude of a resultant is bounded by the triangle inequality,
+
+$$
+\left\lVert\sum_i\mathbf{F}_i\right\rVert
+\le\sum_i\lVert\mathbf{F}_i\rVert.
+$$
+
+Equality occurs when all nonzero forces point in the same direction. A computed resultant larger than the sum of the force magnitudes is impossible.
+
+### Components are not extra forces
+
+Resolving one force into $x$ and $y$ components creates an equivalent representation, not two additional loads to place beside the original force on a free-body diagram. Either draw the original inclined force or draw its components. Drawing all three double-counts the load.
+
+Cartesian components are especially convenient because perpendicular unit vectors form an orthonormal basis. Components in oblique directions require more care. Suppose
+
+$$
+\mathbf{F}=P\mathbf{u}+Q\mathbf{v},
+$$
+
+where $\mathbf{u}$ and $\mathbf{v}$ are unit vectors that are not perpendicular. The coefficients are found by solving the vector equation; they are not generally the dot products $\mathbf{F}\cdot\mathbf{u}$ and $\mathbf{F}\cdot\mathbf{v}$. Those dot products are orthogonal projections, which differ from oblique resolution because each oblique basis vector itself has a component along the other.
+
+Coordinate choice can reduce the algebra. On an incline, axes tangent and normal to the surface turn the normal reaction into one component and often turn friction into the other. The weight must then be resolved in that rotated basis. Changing axes does not change the physical force or resultant; it changes only their component descriptions.
+
+## Direction from geometry in three dimensions
+
+Cables and links are usually specified by two endpoints rather than three direction angles. If a cable runs from $A$ to $B$, its direction vector is
+
+$$
+\mathbf{r}_{AB}
+=(x_B-x_A)\mathbf{i}
++(y_B-y_A)\mathbf{j}
++(z_B-z_A)\mathbf{k}.
+$$
+
+Normalize it to obtain a unit vector:
+
+$$
+\mathbf{u}_{AB}
+=\frac{\mathbf{r}_{AB}}{\lVert\mathbf{r}_{AB}\rVert}.
+$$
+
+A tension of magnitude $T$ pulling on the attachment at $A$ toward $B$ is
+
+$$
+\mathbf{T}=T\mathbf{u}_{AB}.
+$$
+
+Point order carries the sign. Since $\mathbf{r}_{BA}=-\mathbf{r}_{AB}$, reversing the order reverses the force direction.
+
+The components of a unit vector are also the direction cosines:
+
+$$
+\mathbf{u}
+=(\cos\alpha)\mathbf{i}
++(\cos\beta)\mathbf{j}
++(\cos\gamma)\mathbf{k},
+$$
+
+where $\alpha$, $\beta$, and $\gamma$ are the angles with the positive coordinate axes. Unit length implies
+
+$$
+\cos^2\alpha+\cos^2\beta+\cos^2\gamma=1.
+$$
+
+Three direction angles are therefore not independent. If two cosines and the octant are known, the third follows from normalization. Direction angles are commonly taken between $0^\circ$ and $180^\circ$; a component pointing toward a negative axis has an obtuse direction angle and a negative cosine.
+
+## Solving for unknown force magnitudes
+
+When force directions are known but magnitudes are not, each force can be written as an unknown scalar times a known unit vector:
+
+$$
+\mathbf{F}_i=T_i\mathbf{u}_i.
+$$
+
+An equilibrium or specified-resultant condition then becomes a linear system for the scalars. In three dimensions,
+
+$$
+\begin{bmatrix}
+u_{1x}&u_{2x}&u_{3x}\\
+u_{1y}&u_{2y}&u_{3y}\\
+u_{1z}&u_{2z}&u_{3z}
+\end{bmatrix}
+\begin{bmatrix}
+T_1\\T_2\\T_3
+\end{bmatrix}
+=-\mathbf{F}_{known}.
+$$
+
+The geometry controls whether the system can be solved. If the direction vectors are coplanar, they cannot balance a load with a component normal to that plane. If two directions are nearly parallel, the coefficient matrix is poorly conditioned and small geometric changes can produce large changes in the solved forces.
+
+Assumed arrows determine the signs of the unknown scalars. A negative answer does not automatically indicate failed algebra; it says the actual force acts opposite the assumed arrow. For a cable, a negative tension is physically inadmissible because an ideal cable cannot push. The model must then be reconsidered: that cable would go slack, and the remaining supports would need to satisfy equilibrium.
+
+Graphical force polygons were once a standard engineering method and remain a useful check. For equilibrium, vectors placed tip to tail must close. The polygon shows direction and relative magnitude well, while component equations provide the precision expected in calculations.
+
+## From a physical contact to a free-body arrow
+
+A vector equation is only as complete as the isolated system. Before resolving components, decide which body or particle is being separated from its surroundings. Each cut connection is then replaced by the force that the removed surroundings exert on the isolated object.
+
+Different idealizations imply different unknown vectors. A smooth surface supplies one normal reaction. A rough contact may supply a normal and a tangential friction force. A two-force link supplies one axial force along its centerline. A pin in a planar rigid body generally supplies two force components, while a fixed support also supplies a reaction moment.
+
+Newton's third-law pair belongs on two different free-body diagrams. If a cable pulls a ring toward an anchor, the ring pulls the cable toward the ring with an equal and opposite vector. Placing both arrows on the ring's diagram would cancel a real interaction and erase the cable's effect.
+
+Known geometry should be kept separate from unknown mechanics. The direction of an ideal cable force is known from its endpoints, but its tension magnitude may be unknown. A pin reaction has unknown magnitude and direction, so Cartesian components are more economical than an unknown magnitude plus an unknown angle. Selecting unknowns that enter linearly keeps the eventual equilibrium equations transparent.
+
+## Projections answer a different question
+
+Resolving into Cartesian components asks how much of a vector lies along each coordinate basis direction. Projection can ask the same question along any line.
+
+The dot product is
+
+$$
+\mathbf{A}\cdot\mathbf{B}
+=A_xB_x+A_yB_y+A_zB_z
+=\lVert\mathbf{A}\rVert\lVert\mathbf{B}\rVert\cos\theta.
+$$
+
+For a unit direction $\mathbf{u}$, the signed scalar component of $\mathbf{F}$ along that direction is
+
+$$
+F_u=\mathbf{F}\cdot\mathbf{u}.
+$$
+
+The corresponding vector projection is
+
+$$
+\operatorname{proj}_{\mathbf{u}}\mathbf{F}
+=(\mathbf{F}\cdot\mathbf{u})\mathbf{u}.
+$$
+
+If the supplied direction vector $\mathbf{a}$ is not a unit vector, normalize it first or use
+
+$$
+\operatorname{proj}_{\mathbf{a}}\mathbf{F}
+=\frac{\mathbf{F}\cdot\mathbf{a}}{\mathbf{a}\cdot\mathbf{a}}\mathbf{a}.
+$$
+
+A negative scalar projection means the force points partly opposite the chosen positive direction. It does not mean the projection magnitude is physically negative.
+
+The cross product addresses perpendicular effect:
+
+$$
+\mathbf{A}\times\mathbf{B}
+=
 \begin{vmatrix}
-\mathbf{i} & \mathbf{j} & \mathbf{k}\\
-A_x & A_y & A_z\\
-B_x & B_y & B_z
+\mathbf{i}&\mathbf{j}&\mathbf{k}\\
+A_x&A_y&A_z\\
+B_x&B_y&B_z
 \end{vmatrix}.
 $$
 
-For mechanics, the cross product matters because the moment of a force about a point is $\mathbf{M}=\mathbf{r}\times\mathbf{F}$.
-
-## Key results
-
-Vector addition is component-wise:
+Its magnitude is $AB\sin\theta$, and its direction follows the right-hand rule. In mechanics,
 
 $$
-\sum_i\mathbf{F}_i=
-\left(\sum_i F_{ix}\right)\mathbf{i}
-+\left(\sum_i F_{iy}\right)\mathbf{j}
-+\left(\sum_i F_{iz}\right)\mathbf{k}.
+\mathbf{M}_O=\mathbf{r}\times\mathbf{F}
 $$
 
-This is why most force problems become arithmetic after a good diagram. A force polygon may show the geometry, but component equations compute the answer reliably. In 2D,
+is the moment of a force about $O$. Only the component of $\mathbf{r}$ perpendicular to the force contributes.
+
+| Operation | Result type | Geometric meaning | Mechanics use |
+|---|---|---|---|
+| $\mathbf{A}+\mathbf{B}$ | vector | tip-to-tail combination | resultant force |
+| $\mathbf{A}\cdot\mathbf{B}$ | scalar | aligned projection | work, force along a line |
+| $\mathbf{A}\times\mathbf{B}$ | vector | oriented perpendicular area | moment, angular momentum |
+| $\lVert\mathbf{A}\rVert$ | scalar | vector length | force magnitude |
+
+## A resultant for a rigid body also needs a moment
+
+For forces acting at positions $\mathbf{r}_i$ measured from $O$, form
 
 $$
-R_x=\sum_iF_{ix},\qquad R_y=\sum_iF_{iy},\qquad
-R=\sqrt{R_x^2+R_y^2},\qquad
-\theta=\tan^{-1}\left(\frac{R_y}{R_x}\right)
+\mathbf{R}=\sum_i\mathbf{F}_i,
+\qquad
+\mathbf{M}_O=\sum_i\mathbf{r}_i\times\mathbf{F}_i.
 $$
 
-with the angle placed in the correct quadrant. In code, use `atan2(R_y, R_x)` rather than a plain arctangent.
-
-For 3D cable or link problems, unit-vector construction is usually safer than angle memorization. If a cable force $\mathbf{T}$ pulls from $A$ toward $B$, use
+The pair $(\mathbf{R},\mathbf{M}_O)$ is an equivalent force-couple system at $O$. Moving the reference point to $P$ changes the reported moment according to
 
 $$
-\mathbf{T}=T\frac{\mathbf{r}_{AB}}{|\mathbf{r}_{AB}|}.
+\mathbf{M}_P=\mathbf{M}_O-\mathbf{r}_{OP}\times\mathbf{R}.
 $$
 
-This automatically gives all three component signs. The point order matters: $\mathbf{r}_{AB}$ points from $A$ to $B$, while $\mathbf{r}_{BA}$ points from $B$ to $A$.
-
-Two common checks catch many errors. First, each component must be no larger in magnitude than the force magnitude:
+If $\mathbf{R}\ne\mathbf{0}$, a planar system may sometimes be replaced by a single resultant on a suitable line of action. Its location must satisfy
 
 $$
-|F_x|\le F,\qquad |F_y|\le F,\qquad |F_z|\le F.
+\mathbf{r}\times\mathbf{R}=\mathbf{M}_O.
 $$
 
-Second, the components must reconstruct the magnitude:
+If $\mathbf{R}=\mathbf{0}$ but $\mathbf{M}_O\ne\mathbf{0}$, no single force can represent the system. The remainder is a pure couple, whose moment is the same about every point. This edge case explains why “the resultant is zero” does not always mean “the force system has no external effect.”
+
+For an ideal rigid body, a force may be moved anywhere along its own line of action without changing its external force or moment about any point. This is the principle of transmissibility. Moving the force to a parallel line is different: it changes the moment by $\mathbf{d}\times\mathbf{F}$ and must be accompanied by a couple to retain equivalence.
+
+Transmissibility concerns the body's external rigid-body response. The internal stress distribution near the load application can depend strongly on the actual contact region. A concentrated arrow is an idealization of a bearing, bolt, cable eye, or pressure patch; it should not be used to infer local stress without a more detailed model.
+
+Distributed loads follow the same reduction. For a load intensity $w(x)$ along a beam,
 
 $$
-F_x^2+F_y^2+F_z^2=F^2.
+R=\int_a^b w(x)\,dx,
+\qquad
+x_R=\frac{\int_a^b xw(x)\,dx}{\int_a^b w(x)\,dx}.
 $$
 
-For a set of concurrent forces, equilibrium means $\mathbf{R}=\mathbf{0}$. For a set of nonconcurrent forces on a rigid body, $\mathbf{R}$ is still important, but not complete. The force system also has a moment about any chosen point:
+The resultant equals the area under the load diagram and acts through that area's centroid. A triangular load therefore acts one third of its base length from the larger-intensity end.
 
-$$
-\mathbf{M}_O=\sum_i\mathbf{r}_{Oi}\times\mathbf{F}_i.
-$$
+Several common special cases follow directly:
 
-Later pages use the pair $(\mathbf{R},\mathbf{M}_O)$ to represent equivalent force systems. The key point here is that a vector calculation has a location part and a direction part. Treating a force as only a magnitude and an angle loses information needed for moments.
+| Load shape over length $L$ | Resultant magnitude | Location from the left end |
+|---|---:|---:|
+| Uniform $w_0$ | $w_0L$ | $L/2$ |
+| Triangle from $0$ to $w_0$ | $w_0L/2$ | $2L/3$ |
+| Triangle from $w_0$ to $0$ | $w_0L/2$ | $L/3$ |
+| General $w(x)$ | $\int_0^Lw(x)\,dx$ | $\int_0^Lxw(x)\,dx/R$ |
 
-## Visual
+If $w(x)$ changes sign, the signed area gives the resultant. When the positive and negative areas cancel, $R=0$ and the centroid formula divides by zero. The distribution can still have a nonzero net moment, so its reduction is then a pure couple rather than a force at an infinitely distant point.
 
-```mermaid
-flowchart LR
-  A[Physical force description] --> B{"Known by angle or by two points?"}
-  B -->|magnitude and angle| C[Resolve with sine and cosine]
-  B -->|magnitude and line AB| D[Build unit vector uAB]
-  C --> E[Signed Cartesian components]
-  D --> E
-  E --> F[Add components]
-  F --> G[Resultant vector R]
-  G --> H["Check magnitude, quadrant, and units"]
-```
+## Worked example: three concurrent planar forces
 
-| Task | Reliable expression | Check |
-|---|---:|---|
-| Magnitude from components | $\vert \mathbf{F}\vert =\sqrt{F_x^2+F_y^2+F_z^2}$ | Magnitude is nonnegative |
-| Component from angle to $+x$ | $F_x=F\cos\theta$, $F_y=F\sin\theta$ | Put $\theta$ in correct quadrant |
-| Direction from two points | $\mathbf{u}_{AB}=\mathbf{r}_{AB}/\vert \mathbf{r}_{AB}\vert $ | $\vert \mathbf{u}_{AB}\vert =1$ |
-| Projection along $\mathbf{u}$ | $\mathbf{F}\cdot\mathbf{u}$ | $\mathbf{u}$ must be a unit vector |
-| Resultant | $\mathbf{R}=\sum\mathbf{F}_i$ | Add signed components, not magnitudes |
+Three forces act at a pin: $80$ N at $30^\circ$ above $+x$, $55$ N at $120^\circ$ counterclockwise from $+x$, and $40$ N downward. Find the resultant.
 
-## Worked example 1: Resultant of three planar forces
-
-**Problem.** Three forces act at a pin: $80$ N at $30^\circ$ above the positive $x$ axis, $55$ N at $120^\circ$ from the positive $x$ axis, and $40$ N downward. Find the resultant magnitude and direction.
-
-**Method.** Resolve each force into $x$ and $y$ components, add components, then convert the resultant back to magnitude and angle.
-
-1. Write the first force:
-
-$$
-\mathbf{F}_1=80\cos30^\circ\,\mathbf{i}+80\sin30^\circ\,\mathbf{j}.
-$$
-
-Using $\cos30^\circ=0.8660$ and $\sin30^\circ=0.5$,
-
-$$
-\mathbf{F}_1=69.28\mathbf{i}+40.00\mathbf{j}\ \text{N}.
-$$
-
-2. Write the second force:
-
-$$
-\mathbf{F}_2=55\cos120^\circ\,\mathbf{i}+55\sin120^\circ\,\mathbf{j}.
-$$
-
-Since $\cos120^\circ=-0.5$ and $\sin120^\circ=0.8660$,
-
-$$
-\mathbf{F}_2=-27.50\mathbf{i}+47.63\mathbf{j}\ \text{N}.
-$$
-
-3. Write the vertical force:
-
-$$
-\mathbf{F}_3=0\mathbf{i}-40.00\mathbf{j}\ \text{N}.
-$$
-
-4. Add components:
+Resolve the first force:
 
 $$
 \begin{aligned}
-R_x&=69.28-27.50+0=41.78\ \text{N},\\
+F_{1x}&=80\cos30^\circ=69.28\ \text{N},\\
+F_{1y}&=80\sin30^\circ=40.00\ \text{N}.
+\end{aligned}
+$$
+
+For the second force, $120^\circ$ lies in quadrant II:
+
+$$
+\begin{aligned}
+F_{2x}&=55\cos120^\circ=-27.50\ \text{N},\\
+F_{2y}&=55\sin120^\circ=47.63\ \text{N}.
+\end{aligned}
+$$
+
+The downward force is
+
+$$
+\mathbf{F}_3=-40.00\mathbf{j}\ \text{N}.
+$$
+
+Add signed components:
+
+$$
+\begin{aligned}
+R_x&=69.28-27.50=41.78\ \text{N},\\
 R_y&=40.00+47.63-40.00=47.63\ \text{N}.
 \end{aligned}
 $$
@@ -204,111 +351,191 @@ $$
 \mathbf{R}=41.78\mathbf{i}+47.63\mathbf{j}\ \text{N}.
 $$
 
-5. Compute magnitude and direction:
+Its magnitude is
 
 $$
 R=\sqrt{41.78^2+47.63^2}=63.36\ \text{N}.
 $$
 
-$$
-\theta=\tan^{-1}\left(\frac{47.63}{41.78}\right)=48.7^\circ.
-$$
-
-Both components are positive, so the direction is in quadrant I. The checked answer is
+Both components are positive, so the resultant is in quadrant I:
 
 $$
-\boxed{\mathbf{R}=41.78\mathbf{i}+47.63\mathbf{j}\ \text{N},\quad R=63.36\ \text{N at }48.7^\circ.}
+\theta=\operatorname{atan2}(47.63,41.78)=48.74^\circ.
 $$
 
-The magnitude is less than $80+55+40=175$ N, which is plausible because the forces partly oppose each other.
-
-## Worked example 2: Cable force in 3D
-
-**Problem.** A cable runs from point $A=(1,2,0)$ m to point $B=(4,-1,6)$ m. The cable tension is $240$ N and pulls on the attachment at $A$ toward $B$. Find the Cartesian force vector at $A$.
-
-**Method.** Build the direction vector from $A$ to $B$, normalize it, then multiply by the tension magnitude.
-
-1. Compute the relative position vector:
+The result is
 
 $$
-\mathbf{r}_{AB}=(4-1)\mathbf{i}+(-1-2)\mathbf{j}+(6-0)\mathbf{k}
+\boxed{R=63.36\ \text{N at }48.7^\circ\text{ counterclockwise from }+x.}
+$$
+
+The component reconstruction gives $63.36$ N, and the triangle-inequality bound is $80+55+40=175$ N, so both checks pass.
+
+## Worked example: a cable force and its projection
+
+A cable runs from $A=(1,2,0)$ m to $B=(4,-1,6)$ m. Its tension is $240$ N and it pulls the attachment at $A$ toward $B$. Find the Cartesian force vector. Then find its scalar component along the axis from $A$ toward $C=(3,4,1)$ m.
+
+The cable direction is
+
+$$
+\mathbf{r}_{AB}
+=(4-1)\mathbf{i}+(-1-2)\mathbf{j}+(6-0)\mathbf{k}
 =3\mathbf{i}-3\mathbf{j}+6\mathbf{k}\ \text{m}.
 $$
 
-2. Compute its length:
+Its length is
 
 $$
-|\mathbf{r}_{AB}|=\sqrt{3^2+(-3)^2+6^2}
-=\sqrt{54}=7.348\ \text{m}.
+\lVert\mathbf{r}_{AB}\rVert
+=\sqrt{3^2+(-3)^2+6^2}
+=\sqrt{54}=3\sqrt{6}\ \text{m}.
 $$
 
-3. Form the unit vector:
+Therefore
 
 $$
-\mathbf{u}_{AB}=\frac{3}{7.348}\mathbf{i}-\frac{3}{7.348}\mathbf{j}+\frac{6}{7.348}\mathbf{k}
-=0.4082\mathbf{i}-0.4082\mathbf{j}+0.8165\mathbf{k}.
+\mathbf{u}_{AB}
+=\frac{1}{\sqrt6}\mathbf{i}
+-\frac{1}{\sqrt6}\mathbf{j}
++\frac{2}{\sqrt6}\mathbf{k}.
 $$
 
-4. Multiply by the tension:
+Multiplying by the tension gives
 
 $$
-\mathbf{T}=240\mathbf{u}_{AB}
-=97.98\mathbf{i}-97.98\mathbf{j}+195.96\mathbf{k}\ \text{N}.
+\begin{aligned}
+\mathbf{T}
+&=240\mathbf{u}_{AB}\\
+&=97.98\mathbf{i}-97.98\mathbf{j}+195.96\mathbf{k}\ \text{N}.
+\end{aligned}
 $$
 
-5. Check the magnitude:
+For the requested projection, first form the new unit direction:
 
 $$
-\sqrt{97.98^2+(-97.98)^2+195.96^2}=240.0\ \text{N}.
+\mathbf{r}_{AC}=2\mathbf{i}+2\mathbf{j}+1\mathbf{k},
+\qquad
+\lVert\mathbf{r}_{AC}\rVert=3,
 $$
 
-The checked answer is
+$$
+\mathbf{u}_{AC}
+=\frac23\mathbf{i}+\frac23\mathbf{j}+\frac13\mathbf{k}.
+$$
+
+The signed scalar component is
 
 $$
-\boxed{\mathbf{T}=98.0\mathbf{i}-98.0\mathbf{j}+196.0\mathbf{k}\ \text{N}.}
+\begin{aligned}
+T_{AC}
+&=\mathbf{T}\cdot\mathbf{u}_{AC}\\
+&=97.98\left(\frac23\right)
+-97.98\left(\frac23\right)
++195.96\left(\frac13\right)\\
+&=65.32\ \text{N}.
+\end{aligned}
 $$
 
-The negative $y$ component is not an algebra mistake; the cable goes from $y=2$ to $y=-1$, so it pulls toward decreasing $y$.
+Hence
 
-## Code
+$$
+\boxed{\mathbf{T}=(97.98,-97.98,195.96)\ \text{N},\qquad
+T_{AC}=65.32\ \text{N}.}
+$$
 
-```python
-import math
+The $x$ and $y$ contributions to the projection cancel because the projection axis has equal positive components in those directions. Checking
 
-def components_from_angle(magnitude, degrees):
-    theta = math.radians(degrees)
-    return magnitude * math.cos(theta), magnitude * math.sin(theta)
+$$
+\sqrt{97.98^2+(-97.98)^2+195.96^2}=240.0\ \text{N}
+$$
 
-forces = [
-    components_from_angle(80.0, 30.0),
-    components_from_angle(55.0, 120.0),
-    (0.0, -40.0),
-]
+confirms that normalization preserved the stated cable tension.
 
-rx = sum(fx for fx, fy in forces)
-ry = sum(fy for fx, fy in forces)
-resultant = math.hypot(rx, ry)
-angle = math.degrees(math.atan2(ry, rx))
+## Worked example: reducing a trapezoidal beam load
 
-print(f"R = ({rx:.2f}, {ry:.2f}) N")
-print(f"|R| = {resultant:.2f} N")
-print(f"direction = {angle:.2f} degrees")
-```
+A downward load varies linearly from $2$ kN/m at the left end of a $6$ m interval to $8$ kN/m at the right end. Find its equivalent resultant and line of action.
 
-## Common pitfalls
+Write the intensity as
 
-- Adding force magnitudes instead of signed components.
-- Using $\sin$ and $\cos$ from memory without checking which axis the angle is measured from.
-- Forgetting that a cable pulls away from the point being isolated, along the cable.
-- Reversing $\mathbf{r}_{AB}$ and $\mathbf{r}_{BA}$ in 3D force construction.
-- Reporting $\tan^{-1}(R_y/R_x)$ without checking the quadrant.
-- Dropping units during component work, especially when geometry is in meters and force is in newtons.
-- Treating a force resultant as a complete rigid-body replacement without also preserving moment.
+$$
+w(x)=2+\frac{8-2}{6}x=2+x
+$$
 
-## Connections
+in kN/m, with $x$ in meters from the left end. The resultant magnitude is the signed area:
+
+$$
+\begin{aligned}
+R
+&=\int_0^6(2+x)\,dx \\
+&=\left[2x+\frac{x^2}{2}\right]_0^6 \\
+&=12+18
+=30\ \text{kN}.
+\end{aligned}
+$$
+
+The moment of the distributed load about the left end is
+
+$$
+\begin{aligned}
+M_O
+&=\int_0^6x(2+x)\,dx \\
+&=\left[x^2+\frac{x^3}{3}\right]_0^6 \\
+&=36+72
+=108\ \text{kN m}.
+\end{aligned}
+$$
+
+Place the resultant at $x_R$ so that it produces the same moment:
+
+$$
+Rx_R=M_O,
+$$
+
+$$
+x_R=\frac{108}{30}=3.60\ \text{m}.
+$$
+
+Therefore
+
+$$
+\boxed{R=30\ \text{kN downward at }x=3.60\ \text{m}.}
+$$
+
+The location is to the right of the midpoint because the load is heavier there. The same answer comes from decomposing the trapezoid into a $2$ kN/m rectangle and a $0$-to-$6$ kN/m triangle:
+
+$$
+R_1=2(6)=12\ \text{kN},
+\qquad x_1=3\ \text{m},
+$$
+
+$$
+R_2=\frac12(6)(6)=18\ \text{kN},
+\qquad x_2=\frac23(6)=4\ \text{m}.
+$$
+
+Then
+
+$$
+x_R=\frac{12(3)+18(4)}{12+18}
+=\frac{108}{30}
+=3.60\ \text{m}.
+$$
+
+The integral and composite-area methods are two versions of the same first-moment calculation.
+
+## Sign and modeling checks
+
+- Cable tension on an isolated attachment points away from that attachment along the cable. A cable can pull; an ideal flexible cable cannot push.
+- A component magnitude cannot exceed the vector magnitude when the basis is orthonormal. If $\vert F_x\vert \gt F$, the angle or arithmetic is wrong.
+- Angles must be tied to a named axis and direction of measurement. “$30^\circ$ force” is incomplete.
+- Adding magnitudes discards cancellation. Only collinear forces already carrying signs may be combined as one-dimensional scalars.
+- A unit vector should satisfy $u_x^2+u_y^2+u_z^2=1$ before it is multiplied by a force magnitude.
+- A zero force resultant does not rule out a nonzero couple. Check moments whenever forces are nonconcurrent.
+- Newtons and meters may be used together in a moment calculation, but geometry given in millimeters must first be converted if the desired moment unit is N m.
+
+## Related pages
 
 - [Particle equilibrium](/physics/mechanics/particle-equilibrium)
 - [Rigid-body equilibrium](/physics/mechanics/rigid-body-equilibrium)
 - [Particle kinematics](/physics/mechanics/particle-kinematics)
 - [Impulse, momentum, and impact](/physics/mechanics/impulse-momentum-impact)
-

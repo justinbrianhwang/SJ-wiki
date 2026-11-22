@@ -5,11 +5,11 @@ sidebar_position: 16
 
 # Testing and the Scientific Stack
 
-Testing and scientific computing sit at different ends of many Python courses, but they reinforce each other. Testing asks whether code behaves as intended. Scientific computing asks Python to calculate, transform, and visualize data correctly. Halvorsen's textbook includes many exercises and a short mathematics section with math functions, statistics, trigonometry, polynomials, NumPy, SciPy, Matplotlib, and pandas mentioned as important packages. This page gives a compact bridge from beginner scripts to reliable numeric work.
+Testing and scientific computing sit at different ends of many Python courses, but they reinforce each other. Testing asks whether code behaves as intended. Scientific computing asks Python to calculate, transform, and visualize data correctly. The bridge between them is a collection of small calculations with explicit inputs, checkable outputs, and recorded assumptions.
 
 The most important habit is to separate calculation from presentation. A function that returns a result can be tested. A plotting function that depends on a tested calculation is easier to trust. A data-analysis notebook that uses small tested helpers is more reproducible than one long sequence of manually edited cells.
 
-## Definitions
+## What a test establishes
 
 A **test** is code that checks other code. A test usually arranges input, calls the unit under test, and asserts the expected result.
 
@@ -38,7 +38,7 @@ A **vectorized** operation applies an operation to many values using optimized a
 
 A **fixture** in testing is setup data or resources used by tests. In pytest, fixtures can be functions decorated with `@pytest.fixture`.
 
-## Key results
+## Test behavior, not implementation details
 
 The first key result is that tests should be deterministic. A test should not depend on the current time, random data, network availability, or a file left over from a previous run unless those dependencies are controlled.
 
@@ -64,7 +64,42 @@ An eighth result is that scientific libraries reward vector thinking. If a calcu
 
 Finally, reproducibility is more than a passing test. Record package dependencies, keep raw data separate from derived data, make notebooks restartable from a clean kernel, and avoid hidden manual steps. A result that cannot be rerun is hard to trust, even when the code looked correct once.
 
-## Visual
+A test is an executable claim about behavior. Good tests fail when that claim is broken and remain stable when the implementation is refactored without changing behavior. Testing a private loop counter or exact sequence of helper calls couples the suite to current structure. Testing the returned values, raised exceptions, written records, or public state protects the contract.
+
+Unit and integration tests fail differently. A pure numerical function can be checked against hand calculations in milliseconds. A file-to-report integration test checks that parsing, validation, calculation, and serialization agree, but a failure has a larger search area. A useful suite has many narrow checks and a smaller number of boundary-spanning checks. End-to-end tests then cover a few critical user paths rather than every numerical corner.
+
+Parametrization keeps a family of examples together:
+
+```python
+import pytest
+
+@pytest.mark.parametrize(
+    ("celsius", "fahrenheit"),
+    [(0, 32), (100, 212), (-40, -40)],
+)
+def test_c2f_reference_points(celsius, fahrenheit):
+    assert c2f(celsius) == fahrenheit
+```
+
+The three cases remain independently reported. A fixture is appropriate when setup has a lifecycle or is reused, such as a temporary directory, database connection, or representative dataframe. Local literal inputs are clearer than a fixture used by only one small test. Fixture scope also matters: sharing mutable data across tests can make results depend on execution order.
+
+Some functions are better checked by properties than by a long list of outputs. A temperature round trip should return the starting value within tolerance. Sorting twice should equal sorting once. Normalized nonnegative weights should sum to one. These invariants cover many possible inputs and expose mistaken assumptions. Property-based testing libraries can generate cases, but ordinary parametrized tests already capture many domain properties.
+
+## Numerical equality and error budgets
+
+Floating-point tolerance must reflect the calculation, not merely silence a failure. `math.isclose(a, b, rel_tol=r, abs_tol=s)` accepts values when
+
+$$
+|a-b|\le\max(r\max(|a|,|b|),s).
+$$
+
+Relative tolerance scales with magnitude. Absolute tolerance matters near zero, where any nonzero difference has large relative error. Array helpers such as `numpy.testing.assert_allclose` report mismatched elements and use both tolerances. The chosen values should come from algorithmic error, input precision, and expected platform variation.
+
+NaN requires deliberate handling because it is unequal to itself. A test that expects missing output should check `np.isnan`; a comparison helper may offer an `equal_nan` option. Infinity may be legitimate for a mathematical limit or evidence of overflow. Tests should distinguish those meanings instead of accepting all non-finite values.
+
+Exact equality remains correct for integers, strings, shapes, category labels, and results whose algorithm promises exact representation. It is also appropriate for certain floating operations with exact expected bit patterns, but broad numerical pipelines rarely have that promise. Rounding both sides before comparison changes the quantities and can hide errors near rounding boundaries; tolerance checks state the intended error bound more directly.
+
+## A testable scientific workflow
 
 ```mermaid
 flowchart LR
@@ -85,6 +120,26 @@ flowchart LR
 | pandas | third-party | Tables and labeled data | `pd.DataFrame(...)` |
 | Matplotlib | third-party | Plots | `plt.plot(x, y)` |
 | SciPy | third-party | Scientific algorithms | optimization, integration |
+
+## NumPy arrays: shape, dtype, and broadcasting
+
+NumPy speed comes from dense typed arrays and compiled loops. Every array has a shape, a data type, and strides describing how indices map to memory. Those properties are part of a numerical function's contract. An operation can produce numerically plausible but wrong output when broadcasting aligns an unintended axis.
+
+For arrays shaped $(n,1)$ and $(n,)$, subtraction produces an $(n,n)$ result: the trailing dimensions differ as 1 versus $n$, so NumPy expands both. Reshaping both to $(n,)$ for paired scalars or both to $(n,1)$ for column vectors avoids the outer difference. Tests should assert output shape before checking values when shape errors are dangerous.
+
+Data type also changes results. Integer arrays cannot represent fractions; fixed-width integers overflow according to their type; `float32` has less precision and range than `float64`. NumPy often promotes mixed operands, but in-place operations may attempt to cast back to the original dtype. Constructing measured data with `dtype=float` is a useful explicit choice when later calculations divide or store missing values.
+
+Slicing generally returns a view that shares memory, while advanced indexing commonly returns a copy. Mutating a view can change the source array unexpectedly. `np.shares_memory` can diagnose uncertain cases, and `.copy()` makes isolation explicit. Tests that reuse one array fixture should return a fresh copy if the function under test mutates its input.
+
+Vectorization removes Python-loop overhead, but it can allocate large temporary arrays. An expression that combines several full-size intermediates may exhaust memory even though each operation is fast. Chunking, in-place operations where safe, or a library routine that fuses work can be better. Measure real array sizes rather than assuming vectorized always means efficient.
+
+## pandas and labeled alignment
+
+pandas aligns `Series` and `DataFrame` operations by labels, not merely by row position. Adding two series with different indexes creates the union of labels and missing values where one side is absent. That behavior is powerful for time series and joins, yet it surprises code that expected element-by-element positional arithmetic. Reset, validate, or deliberately align indexes at data boundaries.
+
+Missing values complicate type and aggregation behavior. Many reductions skip missing values by default, so a mean can be computed from fewer observations than expected. Tests should cover all-missing groups, duplicated keys, absent columns, and unexpected categories. Schema validation before a long transformation produces a clearer failure than a later `KeyError` or silent coercion.
+
+Chained indexing can operate on a temporary object and lead to ambiguous assignment. `.loc` expresses row and column selection in one operation. A transformation pipeline is easier to inspect when each step has a named input/output contract and when row counts, unique keys, units, and ranges are asserted at important boundaries.
 
 ## Worked example 1: test a conversion function
 
@@ -195,7 +250,7 @@ average_f == 59.0
 
 The plot should be a straight line because the conversion formula is linear.
 
-## Code
+## Testing a small numerical helper
 
 ```python
 from math import isclose
@@ -224,7 +279,17 @@ This code is written so it can be run by pytest as plain test functions, while u
 
 When converting this style to a larger project, keep tests close to the behavior they protect. A `tests/` directory can mirror the source layout, with test files named after modules. Use small fixtures for representative data instead of depending on large local files. For scientific work, store expected values that can be checked independently, such as hand-calculated reference points or values from a trusted source. The goal is not to test Python or NumPy themselves; it is to test your assumptions, formulas, parsing rules, and data transformations.
 
-## Common pitfalls
+## Randomness, plots, and reproducibility
+
+Randomized algorithms need controlled generators. NumPy's `default_rng(seed)` produces a local generator rather than mutating process-wide random state. Tests can pass a seeded generator or test statistical properties over a sufficiently large deterministic sample. A test should not demand one exact sample sequence unless that sequence is part of the contract; algorithm implementations can change while remaining statistically correct.
+
+Plots are best tested below the pixel level. Verify the data sent to the plot, axis labels, number of lines, or that saving creates a nonempty output. Exact image comparisons are useful for stable rendering components but can be brittle across library versions, fonts, and platforms. Visual review still matters for communication: a correct array can be plotted with a misleading axis, clipped label, or inappropriate scale.
+
+Notebook reproducibility requires execution from a clean kernel in top-to-bottom order. Hidden state appears when a cell depends on a variable created by an earlier run but no longer by preceding cells. Move reusable calculations into modules, keep notebook cells focused on orchestration and explanation, and run the complete notebook before publishing results.
+
+Dependencies are part of the experiment. Record Python and package versions in an environment file or project metadata, and store raw data or a stable retrieval description separately from derived artifacts. A seed controls pseudorandomness but does not guarantee identical parallel floating-point reductions or identical results across library versions and hardware.
+
+## Testing mistakes in numerical code
 
 - Testing only the "happy path" and skipping invalid input, empty data, and boundary values.
 - Comparing computed floats with exact equality when a tolerance is needed.
@@ -233,8 +298,12 @@ When converting this style to a larger project, keep tests close to the behavior
 - Installing NumPy or pandas into one environment and running the notebook or script in another.
 - Using pandas for tiny problems where a list of dictionaries or `csv` is simpler.
 - Trusting a plot without checking the underlying data transformation.
+- Choosing a loose tolerance only after seeing a test fail, without an error budget.
+- Ignoring array shape because broadcasting produced an output without raising.
+- Reusing mutable fixtures so one test contaminates another.
+- Letting a notebook depend on out-of-order cell execution.
 
-## Connections
+## Related pages
 
 - [Functions, Arguments, and Decorators](/cs/programming/python/functions-arguments-and-decorators)
 - [Errors, Exceptions, and Debugging](/cs/programming/python/errors-exceptions-and-debugging)

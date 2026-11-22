@@ -9,7 +9,7 @@ State-space models describe systems using internal variables rather than only in
 
 In a signals and systems course, state space complements convolution and transform methods. Convolution emphasizes the impulse response of an LTI system. Transform methods emphasize poles, zeros, and frequency response. State space emphasizes first-order vector dynamics and internal structure. The same system can often be represented in all three ways.
 
-## Definitions
+## State variables and first-order dynamics
 
 A continuous-time linear time-invariant state-space model is
 
@@ -77,9 +77,31 @@ $$
 H(z)=C(zI-A)^{-1}B+D.
 $$
 
-## Key results
+## Solving the state equation
 
-State-space models convert higher-order scalar equations into first-order vector equations. For example, a second-order differential equation can be represented by choosing state variables such as position and velocity. This is not just bookkeeping: first-order vector form makes interconnection, simulation, and eigenvalue analysis systematic.
+State-space models convert higher-order scalar equations into first-order vector equations. For example, a second-order differential equation can be represented by choosing state variables such as position and velocity. First-order vector form makes interconnection, simulation, and eigenvalue analysis systematic.
+
+The continuous-time solution can be derived with an integrating factor. Since $A$ commutes with its exponential,
+
+$$
+\frac{d}{dt}\left(e^{-At}q(t)\right)
+=e^{-At}Bx(t).
+$$
+
+Integrating from $t_0$ to $t$ and multiplying by $e^{At}$ gives
+
+$$
+q(t)=e^{A(t-t_0)}q(t_0)
++\int_{t_0}^{t}e^{A(t-\tau)}Bx(\tau)\,d\tau.
+$$
+
+The state-transition matrix is $\Phi(t,t_0)=e^{A(t-t_0)}$ for an LTI model. It satisfies
+
+$$
+\Phi(t_2,t_0)=\Phi(t_2,t_1)\Phi(t_1,t_0),
+$$
+
+which expresses propagation through an intermediate time. For time-varying $A(t)$, the transition matrix still exists under suitable conditions but is not generally the ordinary exponential of an integral because matrices at different times may not commute.
 
 The eigenvalues of $A$ are the natural modes of the system. In continuous time, a mode associated with eigenvalue $\lambda$ behaves like $e^{\lambda t}$. For causal finite-dimensional LTI systems, internal asymptotic stability requires
 
@@ -145,7 +167,31 @@ The input-output transfer function assumes zero initial conditions, but state-sp
 
 Dimensions are a useful sanity check. If the state has length $m$, then $A$ is $m\times m$. For a single input, $B$ is $m\times 1$. For a single output, $C$ is $1\times m$. Checking matrix shapes often catches an incorrect state choice before any algebra is done.
 
-## Visual
+## From internal dynamics to a transfer function
+
+Take the unilateral initial state as zero and apply the Laplace transform:
+
+$$
+sQ(s)=AQ(s)+BX(s).
+$$
+
+Rearranging,
+
+$$
+Q(s)=(sI-A)^{-1}BX(s).
+$$
+
+Substitution into $Y=CQ+DX$ yields
+
+$$
+Y(s)=\left[C(sI-A)^{-1}B+D\right]X(s).
+$$
+
+The matrix inverse therefore links internal modes to the input-output transfer matrix. For multiple inputs and outputs, $H(s)$ is a matrix; its $(i,j)$ entry maps input $j$ to output $i$ with all other inputs zero.
+
+The roots of $\det(sI-A)$ are eigenvalues of $A$, but a particular transfer entry may omit a mode if $B$ cannot excite it or $C$ cannot see it. A pole-zero cancellation in a reduced input-output formula can hide an unstable internal state. Minimal realizations contain no uncontrollable or unobservable modes and have the smallest state dimension for that transfer behavior.
+
+## How the matrices connect
 
 ```mermaid
 flowchart LR
@@ -168,7 +214,7 @@ flowchart LR
   Modes --> TF["transfer function<br/>G(s)=C(sI-A)^-1B+D"]
 ```
 
-The state-space diagram labels the dimensions and signal flow in the standard continuous-time realization. Inputs pass through $B$, states feed back through $A$, an integrator bank stores internal memory, and outputs combine $Cx$ with direct feedthrough $Du$. The dotted diagnostic arrows show why state space contains information that a transfer function can hide: modal structure, controllability, and observability.
+Inputs pass through $B$, states feed back through $A$, an integrator bank stores internal memory, and outputs combine the state term with direct feedthrough. The dotted arrows mark modal structure, controllability, and observability.
 
 | Representation | Main object | Best for | Typical equation |
 |---|---|---|---|
@@ -177,7 +223,129 @@ The state-space diagram labels the dimensions and signal flow in the standard co
 | Laplace / $z$ | $H(s)$ or $H(z)$ with ROC | poles, stability, transients | rational system functions |
 | State space | $A,B,C,D$ | internal dynamics and MIMO systems | $\dot q=Aq+Bx$ |
 
-## Worked example 1: building a state model from a differential equation
+## Controllability and observability
+
+For an $n$-state continuous- or discrete-time LTI system, form the controllability matrix
+
+$$
+\mathcal C=
+\begin{bmatrix}
+B&AB&A^2B&\cdots&A^{n-1}B
+\end{bmatrix}.
+$$
+
+The system is controllable when $\mathcal C$ has rank $n$. The columns describe state directions reachable through input action propagated by the dynamics. If rank is smaller, some internal combination cannot be moved by the available inputs.
+
+The observability matrix is
+
+$$
+\mathcal O=
+\begin{bmatrix}
+C\\CA\\CA^2\\\vdots\\CA^{n-1}
+\end{bmatrix}.
+$$
+
+Full column rank means the initial state can be inferred from a finite sequence or interval of ideal output observations when the input is known. Lack of observability means at least one state direction produces no distinguishable output.
+
+For the second-order model used below,
+
+$$
+A=
+\begin{bmatrix}
+0&1\\-2&-3
+\end{bmatrix},
+\quad
+B=
+\begin{bmatrix}0\\1\end{bmatrix},
+\quad
+C=\begin{bmatrix}1&0\end{bmatrix}.
+$$
+
+Then
+
+$$
+\mathcal C=
+\begin{bmatrix}
+0&1\\1&-3
+\end{bmatrix},
+\qquad
+\mathcal O=
+\begin{bmatrix}
+1&0\\0&1
+\end{bmatrix}.
+$$
+
+Both determinants are nonzero, so the realization is controllable and observable. Its two eigenmodes appear in the transfer function.
+
+## Exact conversion from continuous to sampled state updates
+
+If the input is held constant on each sampling interval of length $T_s$, integrate the continuous solution from $kT_s$ to $(k+1)T_s$. The exact discrete model is
+
+$$
+q[k+1]=A_dq[k]+B_dx[k],
+$$
+
+with
+
+$$
+A_d=e^{AT_s},
+$$
+
+$$
+B_d=\int_0^{T_s}e^{A\tau}B\,d\tau.
+$$
+
+The output matrices are usually $C_d=C$ and $D_d=D$ for samples taken at the update instants. If $A$ is invertible,
+
+$$
+B_d=A^{-1}(A_d-I)B,
+$$
+
+though the integral formula remains valid when $A$ is singular.
+
+Continuous eigenvalue $\lambda$ maps to discrete eigenvalue $e^{\lambda T_s}$. The open left half-plane maps inside the unit circle, matching the two stability conditions. Forward Euler instead uses $A_d\approx I+AT_s$ and $B_d\approx T_sB$; it is an approximation whose stability can fail for a step size that is too large.
+
+## Choosing and changing state coordinates
+
+A valid state must summarize all past information needed to predict the future once future input is known. It need not be a measured output, and it should not include redundant variables. Capacitor voltages and inductor currents are natural circuit states because they store energy. Position and velocity are natural mechanical states for a second-order mass system.
+
+Choosing $q_1=y$, $q_2=\dot y$, and so on gives a phase-variable realization of a scalar differential equation. Other choices can improve numerical conditioning or expose physical structure. Modal coordinates diagonalize $A$ when it has a complete eigenvector basis, separating independent modes:
+
+$$
+PAP^{-1}=\operatorname{diag}(\lambda_1,\ldots,\lambda_n).
+$$
+
+If $A$ is defective, Jordan form contains coupling within generalized modes. Jordan form is valuable theoretically but can be numerically fragile near repeated eigenvalues; real Schur forms are often preferred in computation.
+
+Similarity transformations preserve eigenvalues, transfer functions, controllability, and observability. They do not preserve the numerical values or physical interpretation of individual state components. A state estimate expressed in one coordinate system must be transformed before comparing it with another realization.
+
+Scaling matters numerically. If one state is measured in micrometers and another in megavolts, their raw magnitudes can differ enormously. An equivalent rescaling can improve matrix conditioning without changing input-output behavior. Units still constrain the matrix entries: elements of $A$ map state units per second, while $B$ maps input units into state-rate units.
+
+## Computing the matrix exponential
+
+If $A=P\Lambda P^{-1}$ is diagonalizable, then
+
+$$
+e^{At}=Pe^{\Lambda t}P^{-1},
+$$
+
+where $e^{\Lambda t}$ places $e^{\lambda_it}$ on the diagonal. This directly reveals modal growth, decay, and oscillation. Complex-conjugate eigenvalues combine to give real oscillatory responses when $A$ is real.
+
+The matrix exponential is always invertible, with inverse $e^{-At}$. It also commutes with $A$ and satisfies the semigroup law $e^{A(t_1+t_2)}=e^{At_1}e^{At_2}$. These facts follow from the power series because every term is a power of the same matrix.
+
+Computing $e^{At}$ from a truncated power series is rarely the best numerical method for a general matrix. Reliable libraries use algorithms such as scaling and squaring with rational approximations. For small symbolic problems, diagonalization or the Cayley-Hamilton theorem often gives a readable closed form.
+
+Repeated eigenvalues do not always yield pure exponentials. A Jordan block of size two produces terms proportional to $te^{\lambda t}$. Stability still depends on the exponential part: such polynomial factors decay when $\operatorname{Re}\lambda\lt 0$ but grow or persist when the eigenvalue lies on the stability boundary.
+
+## Internal stability versus input-output stability
+
+If every eigenvalue of $A$ is stable, the finite-dimensional system is internally asymptotically stable and its zero-input state decays to zero. The converse can fail when considering only a particular transfer function. An unstable state may be unreachable from the input or invisible at the output, so its pole cancels or never appears in that channel.
+
+For a minimal realization, BIBO stability of the proper rational transfer function and asymptotic stability of $A$ agree. Without minimality, one must inspect the internal modes separately. Hidden instability can still matter through initial conditions, modeling errors, or perturbations that weakly couple the canceled mode.
+
+Direct feedthrough $D$ affects causality and high-frequency gain but adds no dynamic state. A strictly proper transfer function has $D=0$. A merely proper transfer function may have nonzero $D$, meaning the output changes instantaneously with the input in the ideal model.
+
+## Worked example: building a state model from a differential equation
 
 Problem: Convert the differential equation
 
@@ -275,7 +443,20 @@ $$
 
 The eigenvalues of $A$ are $-1$ and $-2$, matching the natural modes of the differential equation.
 
-## Worked example 2: impulse response from discrete-time state space
+The transfer function supplies a cross-check:
+
+$$
+\begin{aligned}
+H(s)
+&=C(sI-A)^{-1}B\\
+&=\frac{1}{s^2+3s+2}\\
+&=\frac{1}{(s+1)(s+2)}.
+\end{aligned}
+$$
+
+Its poles agree with the eigenvalues, and there is no direct term because $D=0$.
+
+## Worked example: impulse response from discrete-time state space
 
 Problem: A discrete-time system is defined by
 
@@ -329,7 +510,7 @@ $$
 
 The system is causal and stable because the state eigenvalue has magnitude $0.5\lt 1$.
 
-## Code
+## Numerical verification
 
 ```python
 import numpy as np
@@ -362,7 +543,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-## Common pitfalls
+## State-coordinate and stability mistakes
 
 - Using $x(t)$ for both input and state without clarifying notation.
 - Forgetting the direct feedthrough term $D$, especially in impulse-response formulas.
@@ -370,7 +551,7 @@ plt.show()
 - Confusing continuous-time stability conditions with discrete-time ones. CT uses left half-plane; DT uses inside the unit circle.
 - Treating state variables as unique. Many different state choices can represent the same input-output behavior.
 
-## Connections
+## Related pages
 
 - [System Properties](/physics/signals-systems/system-properties)
 - [LTI Systems and Convolution](/physics/signals-systems/lti-systems-convolution)

@@ -7,9 +7,9 @@ sidebar_position: 16
 
 General Gaussian elimination is a powerful default, but many matrices have structure that should not be ignored. Symmetric positive definite matrices, tridiagonal matrices, banded matrices, and orthogonal factorizations all allow algorithms that are faster, more stable, or more memory efficient than treating the matrix as dense and unstructured.
 
-The main numerical lesson is to let the matrix structure choose the solver. A direct method that respects symmetry or bandwidth can reduce both arithmetic and roundoff. This page focuses on Cholesky factorization for symmetric positive definite systems and the Thomas algorithm for tridiagonal systems, with QR noted as the stable workhorse for least squares.
+The main numerical lesson is to let the matrix structure choose the solver. A direct method that respects symmetry or bandwidth can reduce both arithmetic and roundoff. The discussion centers on Cholesky factorization for symmetric positive definite systems and the Thomas algorithm for tridiagonal systems, with QR as the stable workhorse for least squares.
 
-## Definitions
+## Recognizing the structure before factoring
 
 A matrix $A$ is **symmetric positive definite** (SPD) if
 
@@ -43,7 +43,7 @@ $$
 
 where $Q$ has orthonormal columns and $R$ is upper triangular. QR is especially important for least squares because orthogonal transformations preserve norms.
 
-## Key results
+## Cholesky from the entries of $A$
 
 Cholesky exists and is unique for SPD matrices when the diagonal of $L$ is required to be positive. The factorization is stable without pivoting for SPD matrices, which is one reason SPD structure is so valuable. In contrast, applying ordinary LU without recognizing symmetry can waste work and lose a useful diagnostic: a nonpositive Cholesky pivot indicates that the matrix is not SPD in working precision.
 
@@ -51,17 +51,171 @@ For a dense $n\times n$ matrix, Cholesky costs about $n^3/3$ floating-point oper
 
 QR factorization is more expensive than normal equations for least squares, but it avoids squaring the condition number. If $A$ is ill-conditioned, solving $A^TAx=A^Tb$ can lose many digits, while Householder QR gives a more stable path.
 
-A reliable way to use these results is to keep the analysis tied to the actual numerical question rather than to the formula alone. For matrix factorizations and special systems, the input record should include symmetry, definiteness, bandwidth, sparsity pattern, and right-hand-side count. Without that record, two computations that look similar on paper may have different numerical meanings. The same formula can be a safe production tool in one scaling and a fragile experiment in another. This is why the examples on this page show the intermediate arithmetic: the goal is not only to reach a number, but to expose what assumptions made that number meaningful.
+Equating entries in $A=LL^T$ gives the Cholesky recurrence. For row $i$ and column $j\lt i$,
 
-The next record is the verification record. Useful diagnostics for this topic include factor residuals, solve residuals, pivot or Cholesky diagnostics, and structure preservation. A diagnostic should be chosen before the computation is trusted, not after a pleasing answer appears. When an exact answer is unavailable, compare two independent approximations, refine the mesh or tolerance, check a residual, or test the method on a neighboring problem with known behavior. If several diagnostics disagree, treat the disagreement as information about conditioning, stability, or implementation rather than as a nuisance to be averaged away.
+$$
+\ell_{ij}=
+\frac{a_{ij}-\sum_{k=1}^{j-1}\ell_{ik}\ell_{jk}}{\ell_{jj}},
+$$
 
-The cost record matters as well. In this topic the dominant costs are usually storage, fill-in, and arithmetic cost compared with dense LU. Numerical analysis is full of methods that are mathematically attractive but computationally mismatched to the problem size. A dense factorization may be acceptable for a classroom matrix and impossible for a PDE grid. A high-order rule may use fewer steps but more expensive stages. A guaranteed method may take many iterations but provide a bound that a faster method cannot. The right comparison is therefore cost to reach a verified tolerance, not order or elegance in isolation.
+and the diagonal is
 
-Finally, every method here has a recognizable failure mode: using the wrong factorization, destroying sparsity, and ignoring condition estimates. These failures are not edge cases to memorize; they are signals that the hypotheses behind the result have been violated or that a different numerical model is needed. A good implementation makes such failures visible through exceptions, warnings, residual reports, or conservative stopping rules. A good hand solution does the same thing in prose by naming the assumption being used and checking it at the point where it matters.
+$$
+\ell_{ii}=
+\sqrt{a_{ii}-\sum_{k=1}^{i-1}\ell_{ik}^2}.
+$$
 
-For study purposes, the most useful habit is to separate four layers: the continuous mathematical problem, the discrete approximation, the algebraic or iterative algorithm used to compute it, and the diagnostic used to judge the result. Many mistakes come from mixing these layers. A small algebraic residual may not mean a small modeling error. A small step-to-step change may not mean the discrete equations are solved. A high-order truncation formula may not help when the data are noisy or the arithmetic is unstable. Keeping the layers separate makes the results on this page portable to larger examples.
+The expression under the square root is the next Schur-complement pivot. Positive definiteness guarantees it is positive in exact arithmetic. A zero or negative value during a hand computation means the matrix is not SPD; in floating-point work, a tiny negative value can also signal severe ill-conditioning or loss of symmetry in the stored data.
 
-## Visual
+Once $L$ is available, solving $Ax=b$ means two triangular solves:
+
+$$
+Ly=b,qquad L^Tx=y.
+$$
+
+Factoring costs about $n^3/3$ flops, but each new right-hand side costs only $O(n^2)$. That separation matters in simulations and optimization, where the same matrix may be used with many load vectors.
+
+Symmetry alone is insufficient. The matrix
+
+$$
+\begin{bmatrix}1&2\\2&1\end{bmatrix}
+$$
+
+is symmetric but has eigenvalues $3$ and $-1$. Cholesky reaches $\ell_{11}=1$ and then asks for $\ell_{22}=\sqrt{1-4}$, exposing the missing definiteness assumption.
+
+## The Thomas sweep for tridiagonal systems
+
+For
+
+$$
+a_i x_{i-1}+b_i x_i+c_i x_{i+1}=d_i,
+$$
+
+eliminate the subdiagonal from top to bottom. At row $i$, the multiplier is
+
+$$
+m_i=\frac{a_i}{\tilde b_{i-1}},
+$$
+
+and the modified coefficients are
+
+$$
+\tilde b_i=b_i-m_ic_{i-1},
+\qquad
+\tilde d_i=d_i-m_i\tilde d_{i-1}.
+$$
+
+Back substitution starts with $x_n=\tilde d_n/\tilde b_n$ and proceeds upward. Only the three diagonals and right-hand side are touched, so both work and storage are linear in $n$.
+
+Thomas elimination normally uses no pivoting. Strict diagonal dominance is a common sufficient condition preventing zero pivots, and SPD tridiagonal matrices are also safe. For a general tridiagonal matrix, partial pivoting may be required; a robust banded solver is preferable to a handwritten Thomas routine when the structure does not supply a stability guarantee.
+
+## Bandwidth, fill-in, and ordering
+
+A matrix with lower and upper bandwidth $w$ needs only $O(nw)$ storage. Banded elimination costs about $O(nw^2)$ rather than $O(n^3)$. Those savings survive only while operations stay inside the band. A careless dense conversion throws away the main advantage before the solve begins.
+
+Sparse matrices introduce a further issue: fill-in. Entries that are zero in $A$ can become nonzero in $L$ and $U$. Reordering unknowns can reduce fill dramatically without changing the mathematical system. Grid problems are a standard example: natural ordering produces a recognizable band, while sparse nested-dissection-style orderings often give a much smaller factorization for large two-dimensional and three-dimensional meshes.
+
+Structure can overlap. A finite-difference matrix may be sparse, banded, symmetric, and positive definite at once. “Use Cholesky” then identifies the algebraic factorization, while “use sparse storage and a fill-reducing ordering” determines whether that factorization fits in memory.
+
+## Why QR is the least-squares default
+
+For an overdetermined system $Ax\approx b$, the least-squares solution satisfies the normal equations
+
+$$
+A^TAx=A^Tb.
+$$
+
+They are cheap to form, but
+
+$$
+\kappa_2(A^TA)=\kappa_2(A)^2.
+$$
+
+The loss can be severe when columns of $A$ are nearly dependent. With $A=QR$ and $Q^TQ=I$,
+
+$$
+\|Ax-b\|_2
+=\|Q^Tb-Rx\|_2
+$$
+
+after extending $Q$ appropriately. The minimizer comes from the triangular system $Rx=Q^Tb$ without squaring the condition number. Householder reflections are the standard dense construction because they apply orthogonal transformations stably; classical Gram--Schmidt is much more vulnerable to loss of orthogonality.
+
+## Checking a factorization rather than trusting it
+
+For a computed Cholesky factor, inspect a scaled factor residual such as
+
+$$
+\frac{\|A-LL^T\|}{\|A\|}.
+$$
+
+For the solved vector, also inspect $\|b-Ax\|$. A small factor residual shows that the algorithm factored a nearby matrix; a small solve residual shows that the returned vector solves the stored system backward stably. Neither guarantees a small forward error when $A$ is ill-conditioned. A condition estimate supplies the missing warning.
+
+The decision map below summarizes which assumption earns which specialized algorithm.
+
+## Symmetric indefinite systems need a different factorization
+
+When $A$ is symmetric but not positive definite, forcing Cholesky is the wrong diagnostic response. A symmetric factorization of the form
+
+$$
+PAP^T=LDL^T
+$$
+
+preserves symmetry while allowing signed diagonal blocks in $D$. Stable algorithms may use both $1\times1$ and $2\times2$ pivot blocks. The permutation $P$ chooses pivots that control growth.
+
+This case appears in constrained optimization. The Karush--Kuhn--Tucker matrix
+
+$$
+\begin{bmatrix}
+H&C^T\\
+C&0
+\end{bmatrix}
+$$
+
+is often symmetric indefinite even when the Hessian block $H$ is positive definite on the feasible subspace. Ordinary Cholesky fails by design, not because the underlying optimization problem is necessarily ill-posed.
+
+If symmetry is absent, pivoted LU remains the standard dense direct route. Partial pivoting exchanges rows to keep multipliers moderate. A specialized solver should be selected from properties actually established, rather than from a matrix that merely looks nearly symmetric when printed.
+
+## Rank deficiency changes the least-squares question
+
+For full-column-rank $A$, the triangular factor $R$ in a thin QR factorization has nonzero diagonal and the least-squares minimizer is unique. If columns are linearly dependent, $R$ is singular and many coefficient vectors may give the same fitted values. A small diagonal of $R$ relative to the leading scale warns of numerical rank deficiency.
+
+QR with column pivoting factors
+
+$$
+AP=QR
+$$
+
+while moving informative columns forward. It provides a usable rank estimate and identifies dependent directions. The singular value decomposition
+
+$$
+A=U\Sigma V^T
+$$
+
+is more expensive but gives the clearest picture: small singular values correspond to directions that data barely determine. Truncating them produces a regularized, lower-rank solution; retaining them can magnify noise by division through tiny values.
+
+Normal equations conceal this issue by squaring the singular values. A direction with relative scale $10^{-8}$ in $A$ appears at $10^{-16}$ in $A^TA$, near double-precision roundoff. QR or SVD is therefore essential when rank is uncertain.
+
+## Reusing factors and solving many right-hand sides
+
+Factorization and triangular solves have different costs. For dense Cholesky, building $L$ costs $O(n^3)$ while solving for one right-hand side costs $O(n^2)$. With $B$ containing many right-hand sides,
+
+$$
+AX=B,
+$$
+
+factor once and apply the two triangular solves to all columns. Recomputing a factor for every column wastes the dominant work and can introduce small inconsistencies between solutions.
+
+If the matrix changes by a low-rank update, specialized update and downdate algorithms may modify a Cholesky factor faster than refactoring. Downdates require care because subtracting a positive semidefinite term can destroy positive definiteness. A failed downdate is meaningful: the updated matrix no longer supports the assumed SPD model in working precision.
+
+For banded time-stepping systems with fixed coefficients, factor reuse is equally important. A backward-Euler discretization may solve the same tridiagonal matrix at every time level with a changing right-hand side. The Thomas forward coefficients can be prepared once, leaving only right-hand-side elimination and back substitution per step.
+
+## Block structure can be more valuable than scalar bandwidth
+
+Systems of PDEs often couple several variables at each grid point. Ordering by point creates a block-tridiagonal or block-banded matrix. Replacing scalar divisions in Thomas elimination with solves against small blocks gives a block Thomas algorithm. Its pivots are matrices, so nonsingularity and conditioning of the block Schur complements matter.
+
+Alternatively, ordering all values of one variable together can expose a $2\times2$ block system. Eliminating one variable produces a Schur complement. That reduction may lead to a strong preconditioner, but explicitly forming a dense Schur complement can destroy sparsity. The useful structure is sometimes a formula for applying the Schur complement, not a stored matrix.
+
+These choices are data-layout decisions as well as algebra. They influence cache use, parallel communication, and fill-in. The best ordering for a proof or a compact printed matrix need not be the best ordering for a large solve.
 
 ```mermaid
 flowchart TB
@@ -164,7 +318,7 @@ $$
 \begin{bmatrix}1\\0\\1\end{bmatrix}.
 $$
 
-**Method.** Use the equations directly to verify the tridiagonal solution.
+**Method.** Carry out the Thomas elimination, then verify the result.
 
 1. The system is
 
@@ -180,23 +334,53 @@ $$
 -x_2+2x_3=1.
 $$
 
-2. Symmetry of the right-hand side suggests $x_1=x_3$.
-
-3. Let $x_1=x_3=s$. The middle equation gives
+2. Eliminate the first subdiagonal entry. The multiplier is
 
 $$
--s+2x_2-s=0 \Rightarrow x_2=s.
+m_2=\frac{-1}{2}=-\frac12.
 $$
 
-4. The first equation gives
+The modified second row has
 
 $$
-2s-s=1 \Rightarrow s=1.
+\tilde b_2=2-\left(-\frac12\right)(-1)=\frac32,
+\qquad
+\tilde d_2=0-\left(-\frac12\right)(1)=\frac12.
 $$
+
+3. For the third row,
+
+$$
+m_3=\frac{-1}{3/2}=-\frac23,
+$$
+
+so
+
+$$
+\tilde b_3=2-\left(-\frac23\right)(-1)=\frac43,
+\qquad
+\tilde d_3=1-\left(-\frac23\right)\left(\frac12\right)=\frac43.
+$$
+
+4. Back substitute:
+
+$$
+x_3=\frac{4/3}{4/3}=1,
+$$
+
+$$
+x_2=\frac{1/2-(-1)(1)}{3/2}=1,
+$$
+
+$$
+x_1=\frac{1-(-1)(1)}{2}=1.
+$$
+
+5. Symmetry of the right-hand side also suggests $x_1=x_3$, which is a useful independent check.
 
 **Checked answer.** The solution is $(1,1,1)^T$. A Thomas algorithm would find the same solution in linear time for larger tridiagonal systems.
 
-## Code
+## Reference implementations
 
 ```python
 import numpy as np
@@ -238,7 +422,7 @@ print(cholesky_lower(A))
 print(thomas([-1.0, -1.0], [2.0, 2.0, 2.0], [-1.0, -1.0], [1.0, 0.0, 1.0]))
 ```
 
-## Common pitfalls
+## Failure patterns
 
 - Running Cholesky on a matrix that is symmetric but not positive definite.
 - Destroying banded sparsity by converting a structured system to a dense matrix.
@@ -246,7 +430,7 @@ print(thomas([-1.0, -1.0], [2.0, 2.0, 2.0], [-1.0, -1.0], [1.0, 0.0, 1.0]))
 - Forgetting that a tridiagonal algorithm assumes nonzero modified pivots.
 - Ignoring storage costs. For large structured systems, memory can matter as much as arithmetic.
 
-## Connections
+## Related pages
 
 - [Gaussian elimination pivoting and LU](/math/numerical-analysis/gaussian-elimination-pivoting-lu)
 - [least squares and Chebyshev approximation](/math/numerical-analysis/least-squares-chebyshev-approximation)

@@ -7,13 +7,9 @@ sidebar_position: 10
 
 Numerical integration, or quadrature, replaces an integral by a weighted sum of function values. Newton-Cotes formulas choose equally spaced nodes and integrate an interpolating polynomial through those nodes. The trapezoidal rule, midpoint rule, and Simpson's rule are the most common members of this family.
 
-![A parabola is fitted over an interval to illustrate Simpson rule.](https://commons.wikimedia.org/wiki/Special:FilePath/Simpsons_rule.svg)
-
-*Figure: Simpson rule improves numerical integration by approximating the integrand with a quadratic arc. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Simpsons_rule.svg), Wdvorak, CC BY-SA 3.0.*
-
 Romberg integration accelerates the composite trapezoidal rule by applying Richardson extrapolation to its even-power error expansion. It is a good example of a general numerical pattern: start with a simple approximation at several mesh sizes, then combine the approximations to cancel leading error terms.
 
-## Definitions
+## Quadrature as integrated interpolation
 
 A quadrature rule has the form
 
@@ -45,7 +41,7 @@ $$
 R_{k,j}=R_{k,j-1}+\frac{R_{k,j-1}-R_{k-1,j-1}}{4^{j-1}-1}.
 $$
 
-## Key results
+## Where the familiar weights come from
 
 The local trapezoidal error is proportional to $f''(\xi)(b-a)^3$, so the composite trapezoidal rule is second-order accurate for smooth functions. Simpson's rule is exact for polynomials of degree at most three and has fourth-order global accuracy when applied as a composite rule on an even number of subintervals.
 
@@ -61,19 +57,210 @@ $$
 R_{2,2}=T(h/2)+\frac{T(h/2)-T(h)}{3}.
 $$
 
-Newton-Cotes rules are easy to implement, but high-order closed Newton-Cotes formulas can have negative weights and poor stability. In practice, low-order composite rules, adaptive Simpson methods, and Gaussian quadrature are used more often than very high-degree Newton-Cotes rules.
+On one interval, replace $f$ by its interpolating polynomial and integrate that polynomial exactly. Linear interpolation through $a$ and $b$ gives
 
-A reliable way to use these results is to keep the analysis tied to the actual numerical question rather than to the formula alone. For Newton-Cotes and Romberg integration, the input record should include the integrand, interval, smoothness, panel count, and endpoint behavior. Without that record, two computations that look similar on paper may have different numerical meanings. The same formula can be a safe production tool in one scaling and a fragile experiment in another. This is why the examples on this page show the intermediate arithmetic: the goal is not only to reach a number, but to expose what assumptions made that number meaningful.
+$$
+p_1(x)=f(a)\frac{b-x}{b-a}+f(b)\frac{x-a}{b-a}.
+$$
 
-The next record is the verification record. Useful diagnostics for this topic include successive mesh differences, Romberg table stability, and comparison with known polynomial exactness. A diagnostic should be chosen before the computation is trusted, not after a pleasing answer appears. When an exact answer is unavailable, compare two independent approximations, refine the mesh or tolerance, check a residual, or test the method on a neighboring problem with known behavior. If several diagnostics disagree, treat the disagreement as information about conditioning, stability, or implementation rather than as a nuisance to be averaged away.
+Both basis functions integrate to $(b-a)/2$, producing the trapezoidal weights. Quadratic interpolation through $a$, $m$, and $b$ produces weights in the ratio $1:4:1$, hence Simpson's rule. The weights are consequences of interpolation, not empirical constants.
 
-The cost record matters as well. In this topic the dominant costs are usually function evaluations and reuse of old trapezoid values. Numerical analysis is full of methods that are mathematically attractive but computationally mismatched to the problem size. A dense factorization may be acceptable for a classroom matrix and impossible for a PDE grid. A high-order rule may use fewer steps but more expensive stages. A guaranteed method may take many iterations but provide a bound that a faster method cannot. The right comparison is therefore cost to reach a verified tolerance, not order or elegance in isolation.
+Taylor expansion gives the one-panel error formulas
 
-Finally, every method here has a recognizable failure mode: endpoint singularities, odd Simpson panel counts, and extrapolation outside the asymptotic regime. These failures are not edge cases to memorize; they are signals that the hypotheses behind the result have been violated or that a different numerical model is needed. A good implementation makes such failures visible through exceptions, warnings, residual reports, or conservative stopping rules. A good hand solution does the same thing in prose by naming the assumption being used and checking it at the point where it matters.
+$$
+I-T=-\frac{(b-a)^3}{12}f''(\xi)
+$$
 
-For study purposes, the most useful habit is to separate four layers: the continuous mathematical problem, the discrete approximation, the algebraic or iterative algorithm used to compute it, and the diagnostic used to judge the result. Many mistakes come from mixing these layers. A small algebraic residual may not mean a small modeling error. A small step-to-step change may not mean the discrete equations are solved. A high-order truncation formula may not help when the data are noisy or the arithmetic is unstable. Keeping the layers separate makes the results on this page portable to larger examples.
+and
 
-## Visual
+$$
+I-S=-\frac{(b-a)^5}{2880}f^{(4)}(\xi)
+$$
+
+for suitable points $\xi$ when the needed derivatives are continuous. Composite rules sum local errors over shrinking panels. With uniform spacing $h$,
+
+$$
+I-T_n=-\frac{b-a}{12}h^2f''(\xi),
+$$
+
+while composite Simpson has global error
+
+$$
+I-S_n=-\frac{b-a}{180}h^4f^{(4)}(\xi).
+$$
+
+Simpson's rule integrates every cubic exactly even though it is built from quadratic interpolation on each pair of subintervals. Symmetry cancels the cubic error term. This extra degree of precision is a recurring feature of symmetric quadrature formulas.
+
+High-degree closed Newton--Cotes rules are rarely the best next step. Their weights eventually alternate in sign and grow in magnitude, so data error and roundoff can be amplified. Repeating a low-degree rule locally is safer and lets refinement concentrate where the integrand is difficult.
+
+## Building the Romberg triangle
+
+Let $R_{k,1}=T_{2^{k-1}}$. If
+
+$$
+R_{k,1}=I+c_2h_k^2+c_4h_k^4+\cdots,
+\qquad h_k=\frac{b-a}{2^{k-1}},
+$$
+
+then the first extrapolation cancels $c_2h^2$:
+
+$$
+R_{k,2}=\frac{4R_{k,1}-R_{k-1,1}}{3}.
+$$
+
+Its leading error is fourth order. Applying the same reasoning to adjacent entries in column two cancels the $h^4$ term, giving denominator $4^2-1=15$. Column $j$ has formal leading order $2j$ under the smooth even-power expansion.
+
+Nested trapezoids avoid wasting function evaluations. If $T_n$ is known, then
+
+$$
+T_{2n}=\frac12T_n+h_{2n}
+\sum_{i=1}^{n}f\bigl(a+(2i-1)h_{2n}\bigr).
+$$
+
+Only the new midpoints are evaluated. A Romberg implementation that recomputes every trapezoid row loses one of the method's cleanest advantages when $f$ is expensive.
+
+The diagonal difference $\vert R_{k,k}-R_{k-1,k-1}\vert $ is a useful error indicator, but it is not a proof. Stop when the diagonal stabilizes relative to the requested absolute and relative tolerances, and also cap the number of levels. A table whose entries improve and then deteriorate is showing the onset of roundoff or a failure of the smooth error model.
+
+## When smoothness assumptions fail
+
+Endpoint singularities such as $f(x)=x^{-1/2}$ violate the bounded-derivative assumptions behind the quoted orders. The integral exists on $[0,1]$, but evaluating $f(0)$ is impossible and Romberg extrapolation on the original variable is unsuitable. The substitution $x=t^2$ turns
+
+$$
+\int_0^1x^{-1/2}\,dx
+=\int_0^1 2\,dt=2,
+$$
+
+removing the singularity before quadrature.
+
+Discontinuities and sharp interior layers call for splitting the interval or adaptive refinement. Oscillatory integrals may need rules designed around the oscillation rather than ever finer uniform panels. Conversely, the trapezoidal rule can converge exceptionally fast for smooth periodic functions sampled over a full period; its endpoint-derivative corrections cancel in the Euler--Maclaurin expansion.
+
+Infinite intervals also require a transformation or a specialized rule. Truncating an infinite interval adds a tail error distinct from quadrature error, and the two should be controlled separately.
+
+## Choosing among the low-order rules
+
+Midpoint and trapezoidal rules are both second order, but their leading errors often have opposite signs for convex functions. For a convex $f$, chords lie above the graph, so trapezoidal overestimates; midpoint rectangles tend to underestimate. Their difference supplies a useful rough check. Simpson can be obtained by combining them on the same two-subinterval panel:
+
+$$
+S_{2n}=\frac{2M_n+T_n}{3}.
+$$
+
+The following comparison assumes smooth data. Function availability, singularities, and the cost of evaluation can overturn a ranking based only on formal order.
+
+## Estimating error from two meshes
+
+Suppose a composite rule has
+
+$$
+Q(h)=I+Ch^p+O(h^{p+q}).
+$$
+
+Then
+
+$$
+Q(h/2)-Q(h)
+=C h^p(2^{-p}-1)+O(h^{p+q}).
+$$
+
+Solving for the leading error of the fine estimate gives
+
+$$
+I-Q(h/2)\approx
+\frac{Q(h/2)-Q(h)}{2^p-1}.
+$$
+
+For trapezoidal $p=2$, divide the mesh difference by 3; for composite Simpson $p=4$, divide by 15. The estimate becomes credible only after successive refinements show the expected ratio. If trapezoidal errors are asymptotically second order, then
+
+$$
+\frac{Q(h)-Q(h/2)}{Q(h/2)-Q(h/4)}\approx4.
+$$
+
+A ratio wandering far from four says that the leading-error model has not settled, the integral lacks smoothness, or roundoff has entered. Reporting an error estimate without this check gives false precision.
+
+As a small calculation, suppose Simpson estimates on spacings $h$ and $h/2$ are $1.718190$ and $1.718276$ for an integral whose value is unknown. The fine-grid correction is
+
+$$
+\frac{1.718276-1.718190}{15}
+=0.00000573.
+$$
+
+The extrapolated estimate is about $1.71828173$. One more mesh is needed to see whether the ratio and stable digits support that many decimals.
+
+## Adaptive Simpson as local error control
+
+A uniform grid spends equal effort where the integrand is flat and where it bends sharply. Adaptive Simpson starts with one Simpson estimate $S_{ab}$ on $[a,b]$, then computes estimates $S_{am}$ and $S_{mb}$ on the two halves. Because Simpson is fourth order, the local error indicator is
+
+$$
+\frac{|S_{am}+S_{mb}-S_{ab}|}{15}.
+$$
+
+If the indicator is below the allocated tolerance, the corrected value
+
+$$
+S_{am}+S_{mb}
++\frac{S_{am}+S_{mb}-S_{ab}}{15}
+$$
+
+is accepted. Otherwise the two halves are treated recursively. A careful implementation reuses endpoint and midpoint evaluations, divides the tolerance across children, and imposes a maximum depth.
+
+Local refinement is effective for a narrow smooth peak because the algorithm places panels around it. It can miss a feature that no sampled point sees, such as a very narrow spike between nodes. Breakpoints known from the model should be supplied explicitly rather than left to chance.
+
+## Transformations before adding panels
+
+Variable substitution can turn a difficult integral into an ordinary smooth one. For an infinite interval,
+
+$$
+\int_0^\infty f(x)\,dx,
+$$
+
+the map $x=t/(1-t)$ gives
+
+$$
+\int_0^1
+f\left(\frac{t}{1-t}\right)
+\frac{dt}{(1-t)^2}.
+$$
+
+Whether this helps depends on the tail of $f$; the transformed integrand may still be steep near $t=1$. For a square-root endpoint behavior, a quadratic substitution often smooths the derivative. For a known interior discontinuity at $c$, split
+
+$$
+\int_a^b f(x)\,dx
+=\int_a^c f(x)\,dx+\int_c^b f(x)\,dx.
+$$
+
+No increase in polynomial order compensates for interpolating across a jump.
+
+Scaling the interval can also improve bookkeeping. With $x=a+(b-a)t$,
+
+$$
+\int_a^b f(x)\,dx
+=(b-a)\int_0^1f(a+(b-a)t)\,dt.
+$$
+
+The normalized interval makes panel counts and tolerances easier to compare across problems, while the outside factor preserves units.
+
+## Roundoff and summation
+
+Composite quadrature may add millions of terms with very different magnitudes. Straight left-to-right summation can lose low-order bits, particularly when the integrand changes sign and the true integral is much smaller than the positive and negative parts. Pairwise or compensated summation reduces that loss.
+
+Refinement eventually reaches a point where truncation shrinks below evaluation and summation error. Romberg extrapolation then magnifies noise because it subtracts nearly equal table entries. A defensible routine stops when progress stalls; it does not continue to the maximum level merely because another row is available.
+
+## Polynomial checks catch weight errors
+
+Degree of precision gives a small, exact test suite. A trapezoidal implementation must integrate $1$ and $x$ exactly on any interval. Simpson must integrate $1$, $x$, $x^2$, and $x^3$ exactly, up to floating-point rounding. Failure on these cases points to incorrect endpoint weights, spacing, or panel indexing rather than insufficient refinement.
+
+Composite Simpson's alternating weights require an even number of subintervals:
+
+$$
+S_n=\frac h3\left[f(x_0)+f(x_n)
++4\sum_{i\text{ odd}}f(x_i)
++2\sum_{i\text{ even},\,i\ne n}f(x_i)\right].
+$$
+
+An odd panel count leaves one interval unpaired. It can be handled by applying another rule to the final portion, but silently applying the alternating pattern changes the formula and its error behavior.
+
+Dimensional analysis is another cheap check. If $x$ has units of seconds and $f$ has units of meters per second, the integral has units of meters. Every Newton--Cotes weight contains a factor of interval length. Omitting $h$ often produces a result whose numerical growth with panel count looks suspicious and whose units are plainly wrong.
+
+When function values are tabulated rather than callable, refinement cannot invent midpoint data. Interpolating new values and then claiming a high-order quadrature error confuses interpolation uncertainty with integration error. A rule should use the available sampling geometry, and the error report should acknowledge measurement and interpolation error alongside truncation.
 
 | Rule | Nodes on one panel | Degree of precision | Composite order | Best use |
 |---|---:|---:|---:|---|
@@ -178,7 +365,29 @@ $$
 
 **Checked answer.** One extrapolation moves the estimate from $3.1$ to $3.133333\ldots$, closer to $\pi\approx 3.141592654$.
 
-## Code
+Continuing one more row shows how the triangle develops. With four panels,
+
+$$
+T_4=3.1311764706\ldots.
+$$
+
+Then
+
+$$
+R_{3,2}=T_4+\frac{T_4-T_2}{3}
+=3.1415686275\ldots,
+$$
+
+and
+
+$$
+R_{3,3}=R_{3,2}+\frac{R_{3,2}-R_{2,2}}{15}
+=3.1421176471\ldots.
+$$
+
+The last entry overshoots $\pi$ slightly. Romberg rows need not approach the answer monotonically; stability across later rows matters more than the direction of a single correction.
+
+## Reusing evaluations in code
 
 ```python
 import math
@@ -214,7 +423,7 @@ for row in romberg(f, 0.0, 1.0, 5):
 print("pi", math.pi)
 ```
 
-## Common pitfalls
+## Failure patterns
 
 - Applying Simpson's composite rule with an odd number of subintervals.
 - Expecting high-order convergence when the integrand is not smooth enough.
@@ -222,7 +431,7 @@ print("pi", math.pi)
 - Treating Romberg table entries as monotone. Extrapolation can overshoot.
 - Ignoring endpoint singularities. Trapezoidal and Simpson error formulas assume bounded derivatives.
 
-## Connections
+## Related pages
 
 - [adaptive and Gaussian quadrature](/math/numerical-analysis/adaptive-gaussian-quadrature)
 - [numerical differentiation and Richardson extrapolation](/math/numerical-analysis/numerical-differentiation-richardson)

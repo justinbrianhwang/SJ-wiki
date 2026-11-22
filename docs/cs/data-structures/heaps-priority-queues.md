@@ -5,11 +5,11 @@ sidebar_position: 8
 
 # Heaps and Priority Queues
 
-A priority queue (우선순위 큐) stores items so that the most important item can be removed first. A heap (히프) is the standard array-based implementation for this ADT when priorities are ordered by a key. Unlike a binary search tree, a heap does not support fast search for arbitrary keys. Its purpose is narrower and very powerful: fast insert and fast removal of the minimum or maximum.
+A priority queue stores items so that the item with the most urgent key can be removed first. A binary heap is the usual array-based implementation. It combines a complete-tree shape, which packs without pointers, with a partial order that keeps the minimum or maximum at the root.
 
-The source textbook introduces heaps in the tree chapter and later revisits advanced priority queues. The basic binary heap is the essential core. It combines two ideas: a complete binary-tree shape, which packs neatly into an array, and a heap-order property, which keeps the highest-priority key at the root.
+The structure deliberately does less than a search tree. It cannot find an arbitrary key quickly, and iteration is not sorted. That narrower contract buys compact storage and logarithmic updates, which is exactly what schedulers, graph algorithms, and event simulations need.
 
-## Definitions
+## Shape and order invariants
 
 A **priority queue ADT** supports:
 
@@ -41,7 +41,7 @@ Two local repair operations are central:
 - **Sift up**: after inserting at the end, repeatedly swap with the parent while heap order is violated.
 - **Sift down**: after moving the last element to the root during deletion, repeatedly swap with the larger child in a max heap or smaller child in a min heap.
 
-## Key results
+## Operation costs from tree height
 
 A binary heap with $n$ elements has height $\lfloor \log_2 n \rfloor$ because it is complete. Therefore insertion and delete-max/delete-min take $O(\log n)$ time. Finding the root maximum or minimum is $O(1)$.
 
@@ -68,7 +68,43 @@ Heaps are also sensitive to boundary tests. The last internal node in a zero-bas
 
 Careful index arithmetic is part of the heap invariant, not a cosmetic implementation detail.
 
-## Visual
+## Why bottom-up construction is linear
+
+Calling `insert` $n$ times gives the valid upper bound $O(n\log n)$, but it overstates the work of Floyd's bottom-up method. Heapify begins at the last internal node and sifts each internal node down. About half the nodes are leaves and need no work; about a quarter can move at most one level; about an eighth can move at most two.
+
+One way to bound the total work is
+
+$$
+n\sum_{h=1}^{\infty}\frac{h}{2^{h+1}}.
+$$
+
+The series converges to a constant, so the total is $O(n)$. Reading the input already costs $\Omega(n)$, making heap construction $\Theta(n)$. The apparently nested “for each node, possibly descend” loops are linear because only a small number of nodes have enough height to descend far.
+
+For zero-based storage, leaves occupy indices from $\lfloor n/2\rfloor$ onward. The loop can therefore start at $\lfloor n/2\rfloor-1$ and move backward to the root. A signed index avoids unsigned underflow when that backward loop passes zero.
+
+## Priorities, ties, and changing keys
+
+If equal-priority items must leave in arrival order, the application needs a stable tie-breaker. Store a monotonically increasing sequence number with each item and compare `(priority, sequence)` pairs. A min queue uses the smaller sequence number when priorities tie. The heap itself promises only the order described by its comparator.
+
+Changing the priority of an element requires knowing its array position. A bare heap cannot locate an arbitrary payload faster than $O(n)$. Implementations that expose `decrease_key`, `increase_key`, or deletion by handle maintain a map from item identifiers to heap indices. Every swap must update that map; forgetting one update creates failures far from the original swap.
+
+If a min-heap key decreases, only the ancestor relation can be violated, so sift up. If it increases, only descendants can be violated, so sift down. For an arbitrary replacement, compare the new key with the old one to choose the repair direction. Dijkstra implementations often avoid handles by pushing a new `(distance, vertex)` pair and discarding an entry when its stored distance no longer equals the best distance. That version is short and reliable, at the cost of extra entries.
+
+## Heap sort and partial order
+
+Heap sort first builds a max heap in place. It then swaps the root with the last active element, shrinks the heap boundary, and sifts the new root down. Each extraction places the next-largest key in its final position. Construction is $\Theta(n)$ and the $n-1$ extractions cost $O(\log n)$ each, giving $\Theta(n\log n)$ worst-case time and $O(1)$ auxiliary array space.
+
+The intermediate heap array is not sorted. From a max-heap root one can identify the largest key, but the second-largest key is merely one of the root's two children. Siblings and separate subtrees have no ordering relation. Consequently, binary search cannot be applied to heap storage.
+
+## Arity and comparator choices
+
+A $d$-ary heap gives each node up to $d$ children. Its height is $\Theta(\log_d n)$, so sift-up crosses fewer levels as $d$ grows. Sift-down must inspect up to $d$ children at each level to choose the best one, producing $O(d\log_d n)$ comparisons. Binary heaps are a balanced default; larger arity can help when upward repairs are frequent or cache layout favors fewer levels.
+
+Priority direction is only a comparator choice. A scheduler may treat an earlier deadline as more urgent and use min-heap order, while another system may assign larger numeric urgency and use max-heap order. Generic APIs commonly expose `push`, `peek`, and `pop` around a comparator instead of assuming that “higher priority” means a larger number.
+
+The comparator must remain consistent while items are stored. If it reads mutable external state, two unchanged array entries can silently reverse order. Store the priority in the heap record and run the appropriate repair whenever that value changes.
+
+## The same heap as a tree and an array
 
 ```mermaid
 flowchart TB
@@ -107,11 +143,11 @@ flowchart TB
 
 This heap diagram ties the complete-tree invariant to the level-order array representation. Each tree node is labeled with its array index, and the formula node gives the exact parent/child index arithmetic used by heap operations. The insert and delete-max repair paths show why only one root-to-leaf or leaf-to-root path needs to be adjusted, giving logarithmic update cost.
 
-## Worked example 1: inserting into a max heap
+## Worked example: inserting into a max heap
 
-Problem: Insert `80` into the max heap with array `[90, 70, 60, 40, 50, 20, 10]`.
+Insert `80` into the max heap with array `[90, 70, 60, 40, 50, 20, 10]`.
 
-Method: append `80` at the next open position, then sift it upward until the parent is larger or it reaches the root.
+Append `80` at the next open position, then sift it upward until the parent is larger or it reaches the root.
 
 1. Append at index `7`:
 
@@ -136,13 +172,13 @@ Method: append `80` at the next open position, then sift it upward until the par
 6. New index is `1`. Parent is `0`, key `90`.
 7. Since `80 <= 90`, stop.
 
-Checked answer: `[90, 80, 60, 70, 50, 20, 10, 40]` is a max heap. Each parent is at least as large as its children: `90 >= 80,60`, `80 >= 70,50`, `60 >= 20,10`, and `70 >= 40`.
+The result `[90, 80, 60, 70, 50, 20, 10, 40]` is a max heap. Each parent is at least as large as its children: `90 >= 80,60`, `80 >= 70,50`, `60 >= 20,10`, and `70 >= 40`.
 
-## Worked example 2: deleting the maximum
+## Worked example: deleting the maximum
 
-Problem: Delete the maximum from `[90, 80, 60, 70, 50, 20, 10, 40]`.
+Delete the maximum from `[90, 80, 60, 70, 50, 20, 10, 40]`.
 
-Method: remove root `90`, move the last key `40` to the root, reduce size, then sift down.
+Remove root `90`, move the last key `40` to the root, reduce the size, then sift down.
 
 1. Save root `90` as the answer.
 2. Move last key `40` to index `0` and remove the last slot:
@@ -165,9 +201,21 @@ Method: remove root `90`, move the last key `40` to the root, reduce size, then 
 
 5. At index `3`, there are no children inside the heap. Stop.
 
-Checked answer: deleted maximum is `90`, and the remaining array `[80, 70, 60, 40, 50, 20, 10]` is a valid max heap.
+The deleted maximum is `90`, and the remaining array `[80, 70, 60, 40, 50, 20, 10]` is a valid max heap.
 
-## Code
+## Worked example: Floyd heapify
+
+Build a max heap from `[4, 10, 3, 5, 1]`. With $n=5$, the last internal index is $\lfloor5/2\rfloor-1=1$.
+
+1. Start at index `1`, key `10`. Its children are indices `3` and `4`, keys `5` and `1`. Since `10` is already at least as large as both, no swap occurs.
+2. Move to index `0`, key `4`. Its children have keys `10` and `3`; choose the larger child `10` at index `1`.
+3. Swap `4` and `10`, giving `[10, 4, 3, 5, 1]`.
+4. The displaced `4` is now at index `1`. Its children have keys `5` and `1`; choose `5` and swap.
+5. The array becomes `[10, 5, 3, 4, 1]`. Index `3` is a leaf, so sifting stops.
+
+Check every internal node: `10 >= 5,3` and `5 >= 4,1`. The result is a max heap. It is not the only max heap that could contain these keys, but Floyd's scan produces this one for the stated child-selection rule.
+
+## Fixed-capacity max heap in C
 
 This program implements a fixed-capacity max heap with insert and delete-max.
 
@@ -244,7 +292,7 @@ int main(void) {
 }
 ```
 
-## Common pitfalls
+## Bugs hidden by happy-path tests
 
 - Expecting a heap array to be fully sorted. Heap order is only between parent and child.
 - Forgetting that complete-tree indexing depends on zero-based versus one-based formulas.
@@ -253,7 +301,13 @@ int main(void) {
 - Treating priority queue search as efficient. Standard heaps do not locate arbitrary keys quickly.
 - Confusing the heap data structure with the C runtime heap used by `malloc`. They are unrelated meanings of the same word.
 
-## Connections
+An empty deletion and a full insertion need explicit results. Returning a boolean and writing the removed value through an output pointer, as in the example, keeps every integer key available as data. Sentinel keys such as `-1` are ambiguous when negative priorities are valid.
+
+Capacity arithmetic matters in a growable heap. Doubling a `size_t` capacity can overflow, and `realloc` failure must not overwrite the only pointer to the old allocation. Those concerns disappear in the fixed-capacity example but return in a reusable library.
+
+Comparators must define a consistent order. A comparator that changes while items are inside the heap, perhaps because it reads mutable external state, invalidates heap order without touching the array. Store immutable priority values or repair the affected item whenever its priority changes.
+
+## Related pages
 
 - [binary trees](/cs/data-structures/binary-trees)
 - [sorting algorithms](/cs/data-structures/sorting-algorithms)

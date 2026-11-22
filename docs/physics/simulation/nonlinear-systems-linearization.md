@@ -5,250 +5,329 @@ sidebar_position: 7
 
 # Nonlinear Systems and Linearization
 
-Nonlinear systems are the rule rather than the exception in realistic simulation. Friction changes sign, actuators saturate, valves have square-root flow laws, biological populations grow with limiting effects, and chemical reaction rates multiply concentrations. Linear tools are still valuable, but only after the modeler recognizes where the nonlinearities enter and what operating region is being studied.
+Most physical models become nonlinear once their full operating range is retained. Flow through an orifice scales like a square root, aerodynamic drag can scale like speed squared, actuator commands clip at hardware limits, and rigid-body geometry introduces sines and products of states.
 
-Linearization builds a local linear approximation around an equilibrium or trajectory. It does not make the original system linear; it gives a model that predicts small deviations near the chosen point. This is especially useful for controller design, small-signal frequency response, and quick stability checks before running large nonlinear simulations.
+Linearization replaces the nonlinear vector field by its tangent map at a stated operating point or along a stated trajectory. The resulting model predicts small deviations. Its matrices have no meaning without the point where their derivatives were evaluated, and local stability says little about behavior far from that point.
 
-![A harmonic oscillator phase portrait traces closed loops in position-velocity space.](https://commons.wikimedia.org/wiki/Special:FilePath/Oscillator_phase_portrait.svg)
+## Start with the operating condition
 
-*Figure: Phase portraits reveal system behavior in state space rather than as a single time plot. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Oscillator_phase_portrait.svg), Frobnitzem, CC BY-SA 3.0.*
-
-## Definitions
-
-A nonlinear state model has the form
+Write a smooth nonlinear model as
 
 $$
-\dot{\mathbf{x}}=\mathbf{f}(\mathbf{x},\mathbf{u}),
+\dot{\mathbf x}
+=\mathbf f(\mathbf x,\mathbf u),
 \qquad
-\mathbf{y}=\mathbf{g}(\mathbf{x},\mathbf{u}).
+\mathbf y
+=\mathbf g(\mathbf x,\mathbf u).
 $$
 
-An equilibrium $(\bar{\mathbf{x}},\bar{\mathbf{u}})$ satisfies
+An equilibrium input--state pair satisfies
 
 $$
-\mathbf{0}=\mathbf{f}(\bar{\mathbf{x}},\bar{\mathbf{u}}).
+\mathbf f(\bar{\mathbf x},\bar{\mathbf u})=\mathbf0.
 $$
 
-Deviation variables measure small changes from the operating point:
+Its output is $\bar{\mathbf y}=\mathbf g(\bar{\mathbf x},\bar{\mathbf u})$. Define deviations
 
 $$
-\delta\mathbf{x}=\mathbf{x}-\bar{\mathbf{x}},
+\delta\mathbf x=\mathbf x-\bar{\mathbf x},
 \qquad
-\delta\mathbf{u}=\mathbf{u}-\bar{\mathbf{u}},
+\delta\mathbf u=\mathbf u-\bar{\mathbf u},
 \qquad
-\delta\mathbf{y}=\mathbf{y}-\bar{\mathbf{y}}.
+\delta\mathbf y=\mathbf y-\bar{\mathbf y}.
 $$
 
-The first-order Taylor approximation gives
+A first-order multivariable Taylor expansion gives
 
 $$
-\delta\dot{\mathbf{x}}
-=A\delta\mathbf{x}+B\delta\mathbf{u},
+\mathbf f(\bar{\mathbf x}+\delta\mathbf x,
+\bar{\mathbf u}+\delta\mathbf u)
+=
+\mathbf f(\bar{\mathbf x},\bar{\mathbf u})
++A\delta\mathbf x+B\delta\mathbf u
++\mathbf r_f,
+$$
+
+where
+
+$$
+A=\left.\frac{\partial\mathbf f}{\partial\mathbf x}\right|_{\bar{\mathbf x},\bar{\mathbf u}},
 \qquad
-\delta\mathbf{y}=C\delta\mathbf{x}+D\delta\mathbf{u},
+B=\left.\frac{\partial\mathbf f}{\partial\mathbf u}\right|_{\bar{\mathbf x},\bar{\mathbf u}}.
 $$
 
-where the Jacobian matrices are evaluated at the operating point:
+For a twice continuously differentiable model, the remainder is second order:
 
 $$
-A=\left.\frac{\partial \mathbf{f}}{\partial \mathbf{x}}\right|_{\bar{x},\bar{u}},
-\quad
-B=\left.\frac{\partial \mathbf{f}}{\partial \mathbf{u}}\right|_{\bar{x},\bar{u}},
-\quad
-C=\left.\frac{\partial \mathbf{g}}{\partial \mathbf{x}}\right|_{\bar{x},\bar{u}},
-\quad
-D=\left.\frac{\partial \mathbf{g}}{\partial \mathbf{u}}\right|_{\bar{x},\bar{u}}.
+\|\mathbf r_f\|
+=O\left(
+\|(\delta\mathbf x,\delta\mathbf u)\|^2
+\right).
 $$
 
-Common nonlinear elements include saturation, dead zone, relay, Coulomb friction, backlash, hysteresis, quantization, square-root flow, and products of states.
-
-## Key results
-
-Linearization is a local approximation. For a scalar function $f(x,u)$,
+At an equilibrium the constant term vanishes, leaving
 
 $$
-f(x,u)\approx f(\bar{x},\bar{u})
-+\left.\frac{\partial f}{\partial x}\right|_{\bar{x},\bar{u}}(x-\bar{x})
-+\left.\frac{\partial f}{\partial u}\right|_{\bar{x},\bar{u}}(u-\bar{u}).
+\delta\dot{\mathbf x}
+=A\delta\mathbf x+B\delta\mathbf u.
 $$
 
-At an equilibrium, $f(\bar{x},\bar{u})=0$, so the constant term disappears in deviation coordinates. Away from equilibrium, the constant term must be retained or the system must be linearized along a trajectory.
-
-For a nonlinear scalar first-order model
+The output expansion is
 
 $$
-\dot{x}=f(x),
+\delta\mathbf y
+=C\delta\mathbf x+D\delta\mathbf u,
 $$
 
-an equilibrium $\bar{x}$ is locally stable if
+with $C=\partial\mathbf g/\partial\mathbf x$ and $D=\partial\mathbf g/\partial\mathbf u$ at the same point. These equations use deviation variables. If absolute variables are needed, restore the offsets explicitly.
+
+## What the eigenvalues can and cannot prove
+
+For the unforced deviation system,
 
 $$
-f'(\bar{x})<0,
+\delta\dot{\mathbf x}=A\delta\mathbf x,
 $$
 
-unstable if $f'(\bar{x})\gt 0$, and inconclusive by first-order linearization if $f'(\bar{x})=0$.
+the eigenvalues of $A$ determine linear stability. If every eigenvalue has negative real part, the nonlinear equilibrium is locally asymptotically stable under standard smoothness assumptions. If any eigenvalue has positive real part, the nonlinear equilibrium is unstable.
 
-Saturation changes effective system behavior. A commanded input $u_c$ passed through saturation is
+When no eigenvalue has zero real part, the equilibrium is **hyperbolic**. Nearby nonlinear trajectories have the same qualitative stable and unstable structure as the linearization, though not necessarily the same timing or geometry.
+
+Eigenvalues on the imaginary axis make first-order analysis inconclusive. Two scalar examples have the same zero linearization at $x=0$:
 
 $$
-u=\operatorname{sat}(u_c)=
-\begin{cases}
-u_\text{max}, & u_c>u_\text{max},\\
-u_c, & u_\text{min}\le u_c\le u_\text{max},\\
-u_\text{min}, & u_c<u_\text{min}.
-\end{cases}
+\dot x=-x^3,
+\qquad
+\dot x=+x^3.
 $$
 
-Inside the linear range, the slope is one; outside, the slope is zero. A linearization taken in saturation therefore may predict loss of control authority.
+For the first, $x\dot x=-x^4\lt 0$ away from zero, so trajectories move toward the origin. For the second they move away. Both have $f'(0)=0$. Higher-order terms or a Lyapunov function are needed.
 
-The operating point must be stored together with the linear model. The matrices $A$, $B$, $C$, and $D$ describe deviations, not absolute variables, unless the model has been written in absolute affine form. For example, a tank linearized at $h=4$ meters and another tank linearized at $h=1$ meter can have different outlet slopes. If their matrices are saved without the corresponding equilibrium heights and inputs, later comparisons can be misleading.
+Local asymptotic stability also does not imply global stability. Other equilibria, finite escape, saturation, or a limited basin of attraction may lie outside the neighborhood where the tangent model is accurate.
 
-For simulation studies, a useful workflow is to run the nonlinear model and the linearized model side by side under the same small perturbation. Agreement near the operating point verifies the Jacobian and confirms that the perturbation is small enough. Disagreement under a larger perturbation is not necessarily a failure; it is often the expected evidence that nonlinear behavior is important. The time-response plot should therefore be read as an operating-range test, not only as a prediction.
+## Linearizing along a trajectory
 
-Linearization can also be performed numerically when symbolic derivatives are inconvenient, but the perturbation size must be chosen carefully. Too large a perturbation measures curvature rather than local slope; too small a perturbation can be dominated by roundoff or solver noise. MATLAB and Simulink linearization tools automate much of this process, yet the resulting matrices still need physical review: signs, units, equilibrium values, and expected mode locations should all be checked.
+An operating point need not be constant. Let nominal signals $\mathbf x_0(t)$ and $\mathbf u_0(t)$ satisfy
 
-## Visual
+$$
+\dot{\mathbf x}_0
+=\mathbf f(\mathbf x_0,\mathbf u_0).
+$$
+
+Set $\mathbf x=\mathbf x_0+\delta\mathbf x$ and $\mathbf u=\mathbf u_0+\delta\mathbf u$. The first-order perturbation model is
+
+$$
+\delta\dot{\mathbf x}
+=A(t)\delta\mathbf x+B(t)\delta\mathbf u,
+$$
+
+where
+
+$$
+A(t)
+=\left.\frac{\partial\mathbf f}{\partial\mathbf x}
+\right|_{\mathbf x_0(t),\mathbf u_0(t)},
+\qquad
+B(t)
+=\left.\frac{\partial\mathbf f}{\partial\mathbf u}
+\right|_{\mathbf x_0(t),\mathbf u_0(t)}.
+$$
+
+No constant residual appears because the nominal trajectory satisfies the nonlinear dynamics. If the chosen reference does not satisfy them, an affine forcing error remains:
+
+$$
+\mathbf d(t)
+=\mathbf f(\mathbf x_0,\mathbf u_0)-\dot{\mathbf x}_0.
+$$
+
+Trajectory linearization produces a linear time-varying model. It is used in gain scheduling, extended Kalman filters, trajectory optimization, and local tracking control. Freezing $A(t)$ at one instant is an additional approximation and can miss time-varying growth.
 
 ```mermaid
 flowchart TD
-  Nonlinear["Nonlinear model<br/>x_dot=f(x,u), y=g(x,u)"] --> Operating["Choose operating point or trajectory<br/>x_bar, u_bar, y_bar"]
-  Operating --> Equil{"equilibrium?"}
-  Equil -- "yes" --> Deviations["define deviation variables<br/>delta x = x - x_bar, delta u = u - u_bar"]
-  Equil -- "no" --> Affine["linearize along trajectory<br/>time-varying A(t), B(t), or affine term"]
-  Deviations --> Jacobian["compute Jacobians<br/>A=df/dx, B=df/du, C=dg/dx, D=dg/du"]
-  Affine --> Jacobian
-  Jacobian --> Linear["local linear model<br/>delta x_dot = A delta x + B delta u"]
-  Linear --> Modes["local modes and gains<br/>eigenvalues, transfer functions, small-signal response"]
-  Modes --> Compare["side-by-side simulation<br/>nonlinear model vs linear model"]
-  Compare --> Range{"agreement over perturbation range?"}
-  Range -- "small deviations agree" --> UseLocal["use linear model locally<br/>store operating point with matrices"]
-  Range -- "large deviations differ" --> UseNL["use nonlinear model or schedule linearizations"]
-  UseNL -. "new operating point" .-> Operating
+  A["Nonlinear equations"] --> B["Choose equilibrium or nominal trajectory"]
+  B --> C["Verify residual"]
+  C --> D["Form Jacobians A B C D"]
+  D --> E["Deviation model"]
+  E --> F["Check eigenvalues gains and units"]
+  F --> G["Simulate linear and nonlinear models together"]
+  G --> H{"Agreement for intended perturbations"}
+  H -->|"Yes"| I["Record valid operating range"]
+  H -->|"No"| J["Reduce perturbation or retain nonlinear model"]
+  J --> B
 ```
 
-The nonlinear-linearization diagram makes the operating point part of the model artifact. It shows the route from nonlinear equations to deviation variables, Jacobians, local linear dynamics, modal analysis, and a side-by-side nonlinear comparison. The feedback arrow marks operating-range testing: disagreement for large perturbations usually means the linear model is being used outside its local contract.
+## Smooth nonlinearities versus switching elements
 
-| Nonlinearity | Mathematical feature | Simulation effect | Linearization warning |
-|---|---|---|---|
-| Saturation | Clipped input/output | Limited response and windup risk | Slope may become zero |
-| Dead zone | No output near zero | Delayed response | Linear slope depends on operating point |
-| Coulomb friction | Sign function | Stick-slip and discontinuity | Not differentiable at zero velocity |
-| Square-root flow | $\sqrt{h}$ | State-dependent time constant | Derivative large near zero |
-| Product term | $xy$ or $xu$ | Coupled gain changes | Jacobian depends on both variables |
+A Jacobian requires differentiability. Common smooth elements behave predictably:
 
-## Worked example 1: Linearize a nonlinear tank outlet
+| Element | Local derivative | Consequence |
+|---|---|---|
+| $\sin x$ | $\cos\bar x$ | restoring gain changes with angle |
+| $x_1x_2$ | $(\bar x_2,\bar x_1)$ | coupling can vanish at the origin |
+| $\sqrt x$ | $1/(2\sqrt{\bar x})$ | slope grows near zero |
+| $x^2$ | $2\bar x$ | first-order effect vanishes at zero |
 
-Problem: A tank obeys
-
-$$
-A\dot{h}=q_\text{in}-k\sqrt{h}
-$$
-
-with $A=2$, $k=0.6$, and nominal inflow $\bar{q}_\text{in}=1.2$. Find the equilibrium height and the linearized model in deviation variables.
-
-1. Write the scalar state equation:
+Saturation is piecewise smooth. Away from its corners,
 
 $$
-\dot{h}=f(h,q)=\frac{1}{A}(q-k\sqrt{h}).
+\operatorname{sat}(u)=
+\begin{cases}
+u_{\max},&u>u_{\max},\\
+u,&u_{\min}<u<u_{\max},\\
+u_{\min},&u<u_{\min}.
+\end{cases}
 $$
 
-2. Find equilibrium by setting $\dot{h}=0$:
+Its slope is one in the interior and zero in either saturated region. A model linearized while saturated correctly reports zero incremental control authority, but it cannot predict when a perturbation crosses back into the linear region.
+
+Coulomb friction, backlash, relays, dead zones, and quantizers can be nondifferentiable or history-dependent. Assigning one derivative at a switching point hides important behavior such as stick--slip motion or limit cycles. Piecewise-affine models, hybrid automata, describing functions, complementarity systems, or direct nonlinear simulation may be more honest tools.
+
+## Numerical Jacobians without fooling oneself
+
+When analytic derivatives are awkward, a centered difference estimates a Jacobian column:
 
 $$
-0=\bar{q}-k\sqrt{\bar{h}}.
+\frac{\partial\mathbf f}{\partial x_i}
+\approx
+\frac{
+\mathbf f(\bar{\mathbf x}+h_i\mathbf e_i,\bar{\mathbf u})
+-\mathbf f(\bar{\mathbf x}-h_i\mathbf e_i,\bar{\mathbf u})
+}{2h_i}.
 $$
 
-3. Solve for $\bar{h}$:
+The truncation error is $O(h_i^2)$ for smooth functions, but roundoff grows as $h_i$ becomes tiny. State scaling matters: one step size is unsuitable when one state is measured in micrometers and another in thousands of kelvin.
+
+A useful check repeats the estimate for several $h_i$ values and looks for a plateau. Automatic differentiation avoids subtractive cancellation and is often preferable for large differentiable models. Complex-step differentiation can give high accuracy for analytic code,
 
 $$
-\sqrt{\bar{h}}=\frac{\bar{q}}{k}=\frac{1.2}{0.6}=2,
+f'(x)\approx\frac{\operatorname{Im}f(x+ih)}{h},
+$$
+
+but fails when the implementation discards complex parts or uses nonanalytic operations such as absolute value and branching.
+
+The operating residual should be checked before any derivative:
+
+$$
+\|\mathbf f(\bar{\mathbf x},\bar{\mathbf u})\|\ll1
+$$
+
+in meaningful scaled units. A large residual means the purported equilibrium is wrong, and the homogeneous deviation model will omit a constant drift.
+
+## Worked example: a tank with square-root outflow
+
+Let
+
+$$
+A_t\dot h=q_{\mathrm{in}}-k\sqrt h,
+$$
+
+with $A_t=2$, $k=0.6$, and nominal inflow $\bar q=1.2$. The equilibrium condition is
+
+$$
+0=\bar q-k\sqrt{\bar h}.
+$$
+
+Therefore
+
+$$
+\sqrt{\bar h}=\frac{1.2}{0.6}=2,
 \qquad
-\bar{h}=4.
+\bar h=4.
 $$
 
-4. Compute the Jacobian with respect to $h$:
+The state equation is
+
+$$
+f(h,q)=\frac1{A_t}(q-k\sqrt h).
+$$
+
+Its derivatives are
 
 $$
 \frac{\partial f}{\partial h}
-=\frac{1}{A}\left(-k\frac{1}{2\sqrt{h}}\right)
-=-\frac{k}{2A\sqrt{h}}.
+=-\frac{k}{2A_t\sqrt h},
+\qquad
+\frac{\partial f}{\partial q}
+=\frac1{A_t}.
 $$
 
-At $\bar{h}=4$,
+At the operating point,
 
 $$
-A_\ell=-\frac{0.6}{2(2)(2)}=-0.075.
+A_\ell
+=-\frac{0.6}{2(2)(2)}
+=-0.075,
+\qquad
+B_\ell=0.5.
 $$
 
-5. Compute the input Jacobian:
+The local model is
 
 $$
-B_\ell=\frac{\partial f}{\partial q}=\frac{1}{A}=0.5.
+\delta\dot h
+=-0.075\,\delta h+0.5\,\delta q.
 $$
 
-6. Write deviation model:
+For a constant small input change $\delta q$, the steady deviation is
 
 $$
-\delta\dot{h}=-0.075\delta h+0.5\delta q.
+\delta h_{\mathrm{ss}}
+=-\frac{B_\ell}{A_\ell}\delta q
+=\frac{0.5}{0.075}\delta q.
 $$
 
-Checked answer: the local time constant is $1/0.075\approx13.33\ \mathrm{s}$. The time-response plot for a small inflow step should resemble a first-order exponential around $h=4$. For a large step, the nonlinear square-root law changes the effective slope and the linear approximation becomes less accurate.
-
-Simulink description: the nonlinear model uses a Sqrt block in the outlet feedback. The linearized model uses a Sum, Gain $0.5$ on $\delta q$, Gain $-0.075$ on $\delta h$, and an Integrator for $\delta h$. Plot both absolute height responses using $h=\bar{h}+\delta h$.
-
-## Worked example 2: Linearize a pendulum near downward equilibrium
-
-Problem: A damped pendulum satisfies
+With $\delta q=0.1$,
 
 $$
-\ddot{\theta}+\frac{b}{m\ell^2}\dot{\theta}+\frac{g}{\ell}\sin\theta=\frac{1}{m\ell^2}\tau.
+\delta h_{\mathrm{ss}}\approx0.6667.
 $$
 
-Let $x_1=\theta$, $x_2=\dot{\theta}$, and input $u=\tau$. Linearize about $\bar{\theta}=0$, $\bar{\dot{\theta}}=0$, $\bar{u}=0$.
+The exact new equilibrium is
 
-1. Write the state equations:
+$$
+h_{\mathrm{new}}
+=\left(\frac{1.3}{0.6}\right)^2
+\approx4.6944,
+$$
+
+so the exact change is $0.6944$. The first-order estimate is close but not exact. The local time constant is
+
+$$
+\tau=-\frac1{A_\ell}\approx13.33.
+$$
+
+At a much lower level the derivative magnitude increases, and both gain and time constant change. A single linear tank model should not be carried across the full level range.
+
+## Worked example: downward and upright pendulum
+
+For a damped pendulum with torque input,
+
+$$
+\ddot\theta
++\frac{b}{m\ell^2}\dot\theta
++\frac g\ell\sin\theta
+=\frac1{m\ell^2}\tau.
+$$
+
+Choose $x_1=\theta$ and $x_2=\dot\theta$:
 
 $$
 \begin{aligned}
-\dot{x}_1 &= x_2,\\
-\dot{x}_2 &= -\frac{b}{m\ell^2}x_2-\frac{g}{\ell}\sin x_1+\frac{1}{m\ell^2}u.
+\dot x_1&=x_2,\\
+\dot x_2&=-\frac g\ell\sin x_1
+-\frac b{m\ell^2}x_2
++\frac1{m\ell^2}u.
 \end{aligned}
 $$
 
-2. Compute partial derivatives for the first equation:
+At the downward equilibrium $(\bar x_1,\bar x_2,\bar u)=(0,0,0)$,
 
 $$
-\frac{\partial \dot{x}_1}{\partial x_1}=0,\qquad
-\frac{\partial \dot{x}_1}{\partial x_2}=1,\qquad
-\frac{\partial \dot{x}_1}{\partial u}=0.
-$$
-
-3. Compute partial derivatives for the second equation:
-
-$$
-\frac{\partial \dot{x}_2}{\partial x_1}
-=-\frac{g}{\ell}\cos x_1,
-\qquad
-\frac{\partial \dot{x}_2}{\partial x_2}
-=-\frac{b}{m\ell^2},
-\qquad
-\frac{\partial \dot{x}_2}{\partial u}
-=\frac{1}{m\ell^2}.
-$$
-
-4. Evaluate at $x_1=0$:
-
-$$
-\cos 0=1.
-$$
-
-5. Assemble matrices:
-
-$$
-A=
+A_{\downarrow}
+=
 \begin{bmatrix}
-0 & 1\\
--g/\ell & -b/(m\ell^2)
+0&1\\
+-g/\ell&-b/(m\ell^2)
 \end{bmatrix},
 \qquad
 B=
@@ -258,62 +337,255 @@ B=
 \end{bmatrix}.
 $$
 
-Checked answer: the small-angle approximation $\sin\theta\approx\theta$ gives the same result. The nonlinear and linear time-response plots should agree for small initial angles such as $5^\circ$, but diverge for large angles such as $60^\circ$ because the sine curve is no longer close to its tangent.
+For positive damping, both eigenvalues have negative real part. Now linearize at the upright equilibrium $(\pi,0,0)$. Since $\cos\pi=-1$,
 
-Simulink description: create the nonlinear pendulum with a Trigonometric Function block for `sin`, damping feedback, torque input, and two integrators. The linear model can use a State-Space block. Scope both angles on the same plot.
+$$
+A_{\uparrow}
+=
+\begin{bmatrix}
+0&1\\
++g/\ell&-b/(m\ell^2)
+\end{bmatrix}.
+$$
 
-## Code
+Its characteristic polynomial is
+
+$$
+\lambda^2+\frac b{m\ell^2}\lambda-\frac g\ell=0.
+$$
+
+The constant term is negative, so the two real roots have opposite signs. The upright equilibrium is unstable without feedback. The same nonlinear plant yields different local models because the tangent of $\sin\theta$ changes sign between the two equilibria.
+
+## Worked example: a zero Jacobian that says nothing
+
+Solve
+
+$$
+\dot x=-x^3
+$$
+
+by separation for $x(0)=x_0\ne0$:
+
+$$
+\frac{dx}{x^3}=-dt.
+$$
+
+Integrating,
+
+$$
+-\frac1{2x^2}=-t-\frac1{2x_0^2}.
+$$
+
+Rearranging,
+
+$$
+x(t)
+=\frac{x_0}{\sqrt{1+2x_0^2t}}.
+$$
+
+The state approaches zero algebraically. Yet the linearization is
+
+$$
+\delta\dot x=f'(0)\delta x=0,
+$$
+
+which predicts a constant perturbation and cannot establish asymptotic stability. Replacing the equation by $\dot x=+x^3$ keeps the same linearization but sends nonzero states away from zero. Higher-order information distinguishes them.
+
+## Side-by-side validation in MATLAB
+
+Code is useful here because the approximation needs an operating-range check, not only a symbolic Jacobian.
 
 ```matlab
 clear; clc; close all;
 
-% Nonlinear tank versus local linear model
-A = 2; k = 0.6; qbar = 1.2; hbar = (qbar/k)^2;
-dfdh = -k/(2*A*sqrt(hbar));
-dfdq = 1/A;
+At = 2.0;
+k = 0.6;
+qbar = 1.2;
+hbar = (qbar / k)^2;
 
-qstep = 0.1;
-nonlinear_tank = @(t,h) (qbar + qstep - k*sqrt(max(h,0)))/A;
-linear_tank = @(t,dh) dfdh*dh + dfdq*qstep;
-[tn, hn] = ode45(nonlinear_tank, [0 80], hbar);
-[tl, dhl] = ode45(linear_tank, [0 80], 0);
+Alin = -k / (2 * At * sqrt(hbar));
+Blin = 1 / At;
 
-figure;
-plot(tn, hn, 'b-', tl, hbar + dhl, 'r--', 'LineWidth', 1.4);
-grid on; xlabel('Time (s)'); ylabel('Height (m)');
-legend('Nonlinear', 'Linearized', 'Location', 'best');
-title('Nonlinear tank and local linear approximation');
+for dq = [0.02, 0.1, 0.6]
+    tankNL = @(t, h) (qbar + dq - k * sqrt(max(h, 0))) / At;
+    tankLin = @(t, dh) Alin * dh + Blin * dq;
 
-% Pendulum nonlinear versus linear for small initial angle
-m = 1; ell = 1; b = 0.1; g = 9.81;
-x0 = [5*pi/180; 0];
-pend_nl = @(t,x) [x(2); -(b/(m*ell^2))*x(2) - (g/ell)*sin(x(1))];
-Apend = [0 1; -g/ell -b/(m*ell^2)];
-pend_lin = @(t,x) Apend*x;
-[t1, xnl] = ode45(pend_nl, [0 10], x0);
-[t2, xlin] = ode45(pend_lin, [0 10], x0);
+    [tn, hn] = ode45(tankNL, [0 80], hbar);
+    [tl, dh] = ode45(tankLin, [0 80], 0);
 
-figure;
-plot(t1, xnl(:,1), 'b-', t2, xlin(:,1), 'r--', 'LineWidth', 1.4);
-grid on; xlabel('Time (s)'); ylabel('\theta (rad)');
-legend('Nonlinear', 'Linearized', 'Location', 'best');
-title('Small-angle pendulum comparison');
+    figure(1); hold on;
+    plot(tn, hn - hbar, 'LineWidth', 1.2);
+    plot(tl, dh, '--', 'LineWidth', 1.2);
+end
+
+grid on;
+xlabel('Time');
+ylabel('Height deviation');
+title('Tank: nonlinear solid, linearized dashed');
 ```
 
-The tank plot should show close agreement for the small inflow perturbation. The pendulum plot should show nearly identical small-angle motion; increasing the initial angle reveals the limits of linearization. These comparisons are stronger than simply deriving a Jacobian because they show the operating range over which the approximation is useful.
+As $\delta q$ shrinks, the response error should decrease faster than the perturbation itself because the omitted Taylor term is second order. If the two responses fail to converge as the perturbation is reduced, check the operating point, offsets, signs, and solver tolerances before blaming nonlinearity.
 
-## Common pitfalls
+## A review checklist for a saved linear model
 
-- Linearizing before finding a valid operating point. The constant term will not vanish unless the point is an equilibrium.
-- Applying a small-signal model to a large transient, especially through saturation or dead-zone regions.
-- Differentiating discontinuous nonlinearities as if they were smooth. Friction, relays, and quantizers need special treatment.
-- Forgetting to convert deviation outputs back to physical variables before comparing with nonlinear simulation.
-- Assuming stability of the linearized model proves global nonlinear stability. It only gives local information under appropriate conditions.
-- Ignoring units in Jacobians. Each matrix entry has units determined by the derivative it represents.
+- Store $\bar{\mathbf x}$, $\bar{\mathbf u}$, and $\bar{\mathbf y}$ beside $A$, $B$, $C$, and $D$.
+- Record state order, input order, units, parameter values, and derivative convention.
+- Verify the equilibrium residual and compare analytic derivatives with finite differences.
+- Perturb one state or input at a time and compare initial slopes in both models.
+- Repeat nonlinear-versus-linear simulations at decreasing perturbation sizes.
+- Check whether a trajectory, saturation boundary, or switching surface was crossed.
+- Treat eigenvalues near the imaginary axis cautiously; neglected nonlinear terms may control the result.
+- Do not infer a global region of attraction from a local state matrix.
 
-## Connections
+## Lyapunov analysis beyond the Jacobian
+
+A Lyapunov function is a scalar $V(\mathbf x)$ that behaves like an energy near an equilibrium. If
+
+$$
+V(\mathbf0)=0,
+\qquad
+V(\mathbf x)>0
+$$
+
+near the origin and
+
+$$
+\dot V
+=\nabla V\cdot\mathbf f(\mathbf x)<0
+$$
+
+away from it, the equilibrium is locally asymptotically stable. If the conditions hold globally and $V$ grows without bound as $\|\mathbf x\|$ grows, they can establish global asymptotic stability.
+
+For a stable linear system $\dot{\mathbf x}=A\mathbf x$, choose any positive definite $Q$ and solve
+
+$$
+A^TP+PA=-Q.
+$$
+
+When $A$ is Hurwitz, the solution $P$ is positive definite. Then
+
+$$
+V=\mathbf x^TP\mathbf x
+$$
+
+satisfies
+
+$$
+\dot V=-\mathbf x^TQ\mathbf x<0.
+$$
+
+The same quadratic function can certify a neighborhood of stability for a nonlinear system written as
+
+$$
+\dot{\mathbf x}
+=A\mathbf x+\mathbf r(\mathbf x),
+$$
+
+provided the remainder is small enough that the negative quadratic term dominates. Bounding that remainder turns a local linear conclusion into an explicit conservative region.
+
+Lyapunov analysis also resolves some cases with zero eigenvalues. For $\dot x=-x^3$, take $V=x^2/2$. Then $\dot V=-x^4$, proving asymptotic stability despite the inconclusive zero Jacobian.
+
+## Linearization under state feedback
+
+Suppose a controller uses
+
+$$
+\delta\mathbf u=-K\delta\mathbf x.
+$$
+
+The closed-loop linearization is
+
+$$
+\delta\dot{\mathbf x}
+=(A-BK)\delta\mathbf x.
+$$
+
+Designing $K$ from $(A,B)$ places or optimizes local closed-loop modes. Applying the same controller to the nonlinear plant gives those dynamics only near the design point. Actuator saturation can invalidate the assumed input, and integral action can continue accumulating while saturated, producing windup.
+
+Anti-windup logic, reference governors, and constrained model-predictive control address different parts of that problem. None expands the validity of the plant Jacobian automatically. A controller can also move the operating point, so the equilibrium must be recomputed with the feedback and reference included.
+
+Controllability of $(A,B)$ is a local property. A nonlinear system may be locally controllable even when a particular linearization loses rank, and the reverse implications require hypotheses. The product-input system
+
+$$
+\dot x=u x
+$$
+
+has $B=\partial(ux)/\partial u=x$. At $x=0$, the linearized input matrix is zero, accurately reflecting that no input can move the state away from exactly zero. At nonzero operating states, input authority reappears.
+
+## Feedback linearization is a different operation
+
+Taylor linearization approximates a nonlinear model. **Feedback linearization** attempts to cancel nonlinearities exactly through a coordinate change and input transformation over a region.
+
+For a scalar system
+
+$$
+\dot x=f(x)+g(x)u,
+$$
+
+if $g(x)\ne0$, choose
+
+$$
+u=\frac{v-f(x)}{g(x)}.
+$$
+
+The transformed dynamics are exactly
+
+$$
+\dot x=v.
+$$
+
+No small-deviation assumption was used. The method fails where $g(x)=0$, may demand unavailable input magnitudes, and can be fragile when $f$ or $g$ is uncertain. For multi-state systems, relative degree and internal zero dynamics determine whether exact cancellation yields a stable useful model.
+
+The distinction matters in documentation. A block diagram labeled "linearized" should say whether it is a tangent approximation, a scheduled family of tangent models, or an exactly transformed closed-loop model.
+
+## Gain scheduling across an operating envelope
+
+When one Jacobian is accurate only locally, compute models at several operating points:
+
+$$
+(A_i,B_i,C_i,D_i,
+\bar x_i,\bar u_i).
+$$
+
+Controllers designed at those points can be interpolated using a scheduling variable such as speed, altitude, or tank level. The schedule must correspond to a measurable variable and vary slowly enough, or be analyzed as a genuinely time-varying closed loop.
+
+Interpolating stable controller gains does not guarantee that every interpolated closed-loop system is stable. Nor does stability at each frozen operating point guarantee stability under rapid scheduling. A common Lyapunov function, parameter-dependent Lyapunov analysis, or direct nonlinear simulation may be needed.
+
+Bumpless transfer also matters. If controller states or equilibrium offsets jump when the schedule changes, the actuator command can jump even when the plant state is continuous. Storing offsets with each local model and initializing controller states consistently prevents an implementation artifact from being mistaken for plant nonlinearity.
+
+## Estimation uses the same Jacobians
+
+An extended Kalman filter propagates a nonlinear state estimate with $\mathbf f$ and evolves covariance using the state Jacobian $A(t)$. At a measurement, it linearizes $\mathbf g$ to obtain $C(t)$. The estimated trajectory, not a fixed design equilibrium, supplies the operating point.
+
+Poor scaling or a wrong Jacobian can make the covariance misleading even when the nominal state integration looks plausible. Finite-difference checks should be performed at representative estimated states. Strong nonlinearities can make a first-order Gaussian approximation inadequate; sigma-point, particle, or ensemble methods then offer alternatives with different computational costs and assumptions.
+
+Linearization error and process noise are not interchangeable. Inflating noise covariances may hide a modeling error for one data set while degrading consistency elsewhere. Innovation statistics and Monte Carlo coverage tests are better diagnostics than visual fit alone.
+
+## Estimating a local validity radius
+
+If the Hessian of each component of $\mathbf f$ is bounded in a neighborhood, Taylor's theorem gives a quantitative remainder bound. Schematically,
+
+$$
+\|\mathbf r_f\|
+\leq\frac12M
+\|\delta\mathbf z\|^2,
+\qquad
+\delta\mathbf z=
+\begin{bmatrix}
+\delta\mathbf x\\
+\delta\mathbf u
+\end{bmatrix}.
+$$
+
+The constant $M$ bounds the relevant second derivatives in the chosen norm. Comparing this bound with $\|A\delta\mathbf x+B\delta\mathbf u\|$ gives a defensible perturbation scale rather than relying only on the phrase “small signal.”
+
+The bound can be conservative, especially when different curvature terms cancel. Simulation sweeps then refine it: scale one perturbation direction by factors of two and verify that the absolute discrepancy decreases approximately quadratically before numerical errors dominate. Different directions may have very different validity radii, so a single spherical operating envelope is often a poor description.
+
+## Related pages
 
 - [State-Space Representation](/physics/simulation/state-space-representation)
-- [Simulink Block Diagrams](/physics/simulation/simulink-block-diagrams)
 - [Linear Systems, Transfer Functions, and Modes](/physics/simulation/linear-systems-transfer-functions-modes)
+- [Simulink Block Diagrams](/physics/simulation/simulink-block-diagrams)
+- [Numerical Integration Methods](/physics/simulation/numerical-integration-methods)
 - [System Properties](/physics/signals-systems/system-properties)
+
