@@ -25,10 +25,6 @@ may have a different minimizer, curvature, gradient scale, or class support than
 
 **Objective inconsistency** is the stronger FedNova failure mode: if clients perform unequal numbers of local steps and the server averages cumulative model deltas naively, the limiting point may minimize a surrogate objective whose weights depend on local update counts, not the intended $n_k/n$ weights [4].
 
-![A FedProx loss-curve figure shows that the proximal term stabilizes convergence under heterogeneous data and variable local work compared with vanilla FedAvg.](https://ar5iv.labs.arxiv.org/html/1812.06127/assets/x1.png)
-
-*Figure: FedProx adds a proximal regularizer at each client and stabilizes non-IID benchmarks where unmodified FedAvg becomes unstable. From [Li et al., 2020](https://arxiv.org/abs/1812.06127), reproduced with attribution for discussion.*
-
 **FedProx** modifies client $k$'s local objective at round $t$:
 
 $$
@@ -36,10 +32,6 @@ $$
 $$
 
 The proximal term discourages local models from moving too far from the broadcast model. FedAvg is the special case $\mu=0$ with uniform local work and SGD local solvers [2].
-
-![A SCAFFOLD diagram illustrates client drift in FedAvg and how control variates pull local updates back toward the global gradient direction.](https://ar5iv.labs.arxiv.org/html/1910.06378/assets/x1.png)
-
-*Figure: SCAFFOLD corrects client drift under non-IID data with paired server and client control variates. From [Karimireddy et al., 2020](https://arxiv.org/abs/1910.06378), reproduced with attribution for discussion.*
 
 **SCAFFOLD** maintains a server control variate $c$ and client control variates $c_k$. A local update uses
 
@@ -52,10 +44,6 @@ where $g_k(w)$ is a stochastic local gradient. The correction $-c_k+c$ estimates
 **FedNova** normalizes each client's accumulated update by its effective local steps before aggregation. For local gradient accumulator $G_k a_k$ and local step count related to $\|a_k\|_1$, the client sends a normalized direction rather than letting larger $\tau_k$ automatically receive larger influence [4].
 
 **FedBN** keeps batch-normalization parameters and running statistics local while averaging non-BN parameters. It is designed for feature-shift non-IID data, such as imaging clients with different scanners or sensors [5].
-
-![A MOON figure illustrates model-contrastive federated learning: the local representation is pulled toward the global model and away from the prior local model.](https://ar5iv.labs.arxiv.org/html/2103.16257/assets/x1.png)
-
-*Figure: MOON aligns local representations with the global model through a contrastive auxiliary loss. From [Li et al., 2021](https://arxiv.org/abs/2103.16257), reproduced with attribution for discussion.*
 
 **MOON** adds a model-contrastive loss. For an input $x$, the current local model representation is encouraged to stay close to the global model representation and away from the previous local model representation when the previous local model reflects drift [6].
 

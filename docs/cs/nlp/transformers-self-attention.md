@@ -93,10 +93,6 @@ flowchart TD
   H --> I[Next-token distribution]
 ```
 
-![Original Transformer architecture showing encoder and decoder stacks with multihead attention, feedforward layers, residual connections, and softmax output.](https://ar5iv.labs.arxiv.org/html/1706.03762/assets/x1.png)
-
-*Figure: The original Transformer separates encoder self-attention, decoder masked self-attention, and encoder-decoder attention. From [Vaswani et al., 2017](https://arxiv.org/abs/1706.03762), embedded under educational fair use with attribution.*
-
 Depth allows later blocks to combine features built by earlier ones. Early layers often emphasize local lexical and positional information, middle layers may combine syntactic or entity cues, and later layers tend to become more specific to the training objective. This is a heuristic rather than a law. Token-classification tasks can benefit from intermediate layers, whereas generation uses the final layer trained to feed the language-modeling head.
 
 Positional encodings or learned position embeddings supply order information. Without them, self-attention is permutation-equivariant: permuting the input tokens permutes the outputs in the same way. Omitting position information therefore leaves the model unable to distinguish sequences that differ only in order.

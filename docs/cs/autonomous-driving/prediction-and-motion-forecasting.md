@@ -102,14 +102,6 @@ Worked example: if lane $L_2$ has successor $L_3$ and left neighbor $L_5$, then 
 
 ### Hierarchical multi-agent forecasting
 
-![Wayformer architecture showing an attention-based scene encoder and decoder for motion forecasting.](https://ar5iv.labs.arxiv.org/html/2207.05844/assets/x4.png)
-
-*Figure: Wayformer compares attention-based encoder-decoder fusion strategies for motion forecasting. From [Nayakanti et al., 2022](https://arxiv.org/abs/2207.05844) — embedded under educational fair use with attribution.*
-
-![MultiPath behavior prediction figure showing anchor-based multimodal trajectory distributions in a three-way intersection.](https://ar5iv.labs.arxiv.org/html/1910.05449/assets/x2.png)
-
-*Figure: MultiPath models multimodal future trajectories with fixed anchors, learned offsets, and uncertainty. From [Chai et al., 2019](https://arxiv.org/abs/1910.05449) — embedded under educational fair use with attribution.*
-
 Target-centric forecasting often normalizes and re-runs the scene once per agent. That is expensive and can produce inconsistent joint futures. HiVT [3] keeps vectorized inputs but separates local context extraction from global interaction: each modeled agent receives a local region of nearby agent and lane vectors, then agent-level context tokens exchange information globally.
 
 The computational motivation is simple. Direct attention over $N$ agents with $T$ history vectors and $L$ lane vectors has token count $NT+L$ and quadratic cost:
@@ -197,10 +189,6 @@ flowchart TB
   Check --> Output["Output: per-agent K future trajectories, probabilities, covariance"]
   Output --> Planner(("Risk-aware behavior and motion planning"))
 ```
-
-![VectorNet scene encoding — the figure shows a driving scene converted into vectorized agent and map polylines for motion forecasting.](https://ar5iv.labs.arxiv.org/html/2005.04259/assets/x2.png)
-
-*Figure: VectorNet encodes agent histories and HD map elements as polylines before global interaction modeling. From [Gao et al., 2020](https://arxiv.org/abs/2005.04259) — embedded under educational fair use with attribution.*
 
 This diagram shows two common forecasting architectures at sublayer level. VectorNet builds polyline embeddings and a global graph, while HiVT uses hierarchical temporal, map, local-interaction, and global-interaction attention; both produce multimodal future trajectories with probabilities for planning.
 

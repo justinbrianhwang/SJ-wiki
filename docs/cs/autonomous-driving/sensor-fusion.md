@@ -7,10 +7,6 @@ sidebar_position: 6
 
 Sensor fusion combines measurements from cameras, lidar, radar, IMU, GNSS, maps, and vehicle odometry into a more useful estimate than any sensor can provide alone. The goal is not merely to average sensors. Fusion must respect coordinate frames, timestamps, uncertainty, occlusion, failure modes, and semantic meaning. A lidar point, a radar target, a camera detection, and a map lane boundary are different kinds of evidence.
 
-![A PointPillars diagram converts LiDAR points into pillars, a pseudo-image, and a detection head.](https://ar5iv.labs.arxiv.org/html/1812.05784/assets/x2.png)
-
-*Figure: PointPillars shows how sparse LiDAR becomes convolution-friendly perception input. Image: [ar5iv](https://arxiv.org/abs/1812.05784), Lang et al., educational use with attribution.*
-
 Fusion sits between [sensors](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu), [perception](/cs/autonomous-driving/perception-object-detection-and-segmentation), [localization](/cs/autonomous-driving/localization-and-hd-maps), and [prediction](/cs/autonomous-driving/prediction-and-motion-forecasting). Early, mid-level, and late fusion make different commitments about calibration, information loss, modularity, and failure isolation.
 
 ## Fusion levels, shared frames, and occupancy
@@ -241,10 +237,6 @@ print("updated occupancy:", prob)
 Modern BEV fusion systems usually share a top-down representation, but they differ in what they trust, where they align modalities, and how they handle degraded sensors. The [MIT BEVFusion](/cs/autonomous-driving/bevfusion-mit) and [CenterPoint](/cs/autonomous-driving/centerpoint) pages remain useful standalone background for optimized BEV pooling, multi-task BEV perception, and center-based detection heads. The papers below are best read as a compact family of BEV-fusion design patterns rather than as mutually exclusive recipes.
 
 **Robust two-stream BEV fusion.** Liang et al.'s BEVFusion keeps camera and LiDAR encoders independent until both have produced BEV features [1]. Earlier point-level and proposal-level fusion often used LiDAR points or LiDAR proposals as the queries into image features, which meant the camera branch could become operationally dependent on healthy LiDAR. This system instead lifts multi-view image features into BEV with an LSS-style depth projection and spatial-to-channel height compression, while the LiDAR side can use PointPillars, CenterPoint, or TransFusion-L. A lightweight fusion block concatenates the two BEV streams, applies convolutional channel/spatial fusion, and then uses adaptive feature selection to reweight the fused channels. The main problem it solves is robustness under limited LiDAR field of view, missing object returns, or camera malfunction without forcing either modality to be merely an auxiliary query source.
-
-![The robust BEVFusion comparison figure shows point-level fusion, feature-level fusion, and the paper's independent camera and LiDAR BEV streams.](https://ar5iv.labs.arxiv.org/html/2205.13790/assets/x1.png)
-
-*Figure: Robust BEVFusion separates camera and LiDAR encoding until both streams are represented in BEV. From [Liang et al., 2022](https://arxiv.org/abs/2205.13790) — embedded under educational fair use with attribution.*
 
 **LiDAR-centric dilation fusion.** BEVDilation argues that symmetric BEV fusion can pollute accurate LiDAR geometry with camera BEV features whose spatial position depends on uncertain depth estimation [2]. Its Sparse Voxel Dilation Block predicts likely foreground regions from image and LiDAR BEV context, then inserts learnable voxels in foreground cells where LiDAR occupancy is missing. Those original and padded sparse voxels are serialized with a Hilbert curve and refined with a Mamba layer so the padded support is contextual rather than treated as measured points. Its Semantic-Guided BEV Dilation Block uses image-conditioned deformable offsets and modulation scalars to diffuse LiDAR BEV features, but the sampled feature values remain LiDAR-centric. The design repairs LiDAR sparsity and missing object support while reducing sensitivity to camera depth noise and BEV misalignment.
 

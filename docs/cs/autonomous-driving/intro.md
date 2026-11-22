@@ -7,10 +7,6 @@ sidebar_position: 1
 
 Autonomous driving is a system-of-systems problem: sensors measure the world, perception turns measurements into objects and free space, prediction estimates what other agents may do, planning chooses a safe and useful maneuver, control tracks the motion, and safety engineering constrains the whole stack inside a defined operational design domain. A self-driving vehicle is not a single model, a single sensor, or a single benchmark score. It is an integrated cyber-physical system that must work under uncertainty, latency, hardware faults, ambiguous road rules, unusual human behavior, and changing weather.
 
-![A UniAD architecture diagram connects perception, prediction, mapping, occupancy, and planning around an ego trajectory.](https://ar5iv.labs.arxiv.org/html/2212.10156/assets/x1.png)
-
-*Figure: UniAD illustrates planning-oriented autonomous-driving architecture. Image: [ar5iv](https://arxiv.org/abs/2212.10156), Hu et al., educational use with attribution.*
-
 The emphasis is architectural: what each layer does, what mathematics it relies on, what can go wrong, and how the layers connect. The reading sequence uses standard terms such as SAE J3016 automation levels, ODD, ISO 26262, SOTIF, sensor fusion, BEV representations, motion forecasting, model predictive control, and scenario-based validation.
 
 ## Responsibility, domain, and stack boundaries

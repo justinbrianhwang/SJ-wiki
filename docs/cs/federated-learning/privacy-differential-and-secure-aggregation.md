@@ -31,10 +31,6 @@ $$
 
 Practical training over many rounds uses composition, moments accountant, or Renyi differential privacy rather than applying this formula naively once [3], [4], [5].
 
-![A secure aggregation protocol diagram shows pairwise masks, Diffie-Hellman key agreement, and Shamir secret sharing that allow a server to sum masked updates without learning individual contributions.](https://ar5iv.labs.arxiv.org/html/1611.04482/assets/x1.png)
-
-*Figure: Bonawitz et al.'s protocol computes the sum of client updates without exposing any surviving client's vector; threshold secret sharing handles dropouts. From [Bonawitz et al., 2017](https://arxiv.org/abs/1611.04482), reproduced with attribution for discussion.*
-
 **Secure aggregation** computes $\sum_k x_k$ without revealing individual $x_k$ to the server. Bonawitz et al. use pairwise masks from key agreement, pseudorandom generators, and secret sharing to handle dropouts [1].
 
 For an ordered set of clients, a simple pairwise-mask expression is
@@ -56,10 +52,6 @@ When the server sums all $z_k$, every pairwise mask cancels.
 Secure aggregation protects individual updates from the server, but only at aggregation time. The Bonawitz protocol is designed for high-dimensional vectors, mobile dropouts, and a server-mediated network where clients do not naturally communicate directly [1]. The key idea is pairwise cancellation: client $u$ and client $v$ agree on a pseudorandom mask. One adds it, the other subtracts it. If both survive, the masks cancel in the aggregate. If one drops out, secret shares allow the server to remove the missing client's mask without revealing surviving clients' inputs. The full protocol uses Diffie-Hellman key agreement, authenticated encryption, signatures, Shamir secret sharing, and a consistency check for stronger adversary models.
 
 Secure aggregation is not the same as differential privacy. It hides the individual update from the server, but the aggregate itself can still reveal information if the cohort is small, the model is maliciously chosen, or repeated rounds isolate a user. DP adds a statistical privacy bound to the released aggregate, often after clipping each contribution. The two mechanisms are complementary: secure aggregation hides who sent what, while DP limits what the sum can reveal.
-
-![A Deep Leakage from Gradients figure shows that optimizing dummy inputs to match observed gradients can recover near-pixel-accurate training images.](https://ar5iv.labs.arxiv.org/html/1906.08935/assets/x1.png)
-
-*Figure: DLG recovers private training images from shared gradients, refuting the assumption that gradient exchange alone preserves privacy. From [Zhu et al., 2019](https://arxiv.org/abs/1906.08935), reproduced with attribution for discussion.*
 
 Gradient inversion makes this complementarity concrete. Deep Leakage from Gradients sets up a dummy input $x^*$ and label $y^*$, computes dummy gradients, and optimizes the dummy data to match the observed real gradients [2]:
 

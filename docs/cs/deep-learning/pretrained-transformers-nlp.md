@@ -36,8 +36,6 @@ The output interface should follow the family. Encoder-only models can use both 
 
 A BERT-style input sums three learned vectors at each position: a token embedding, a segment embedding that distinguishes sentence A from sentence B, and a position embedding that supplies order. A special classification token gives task heads a consistent location for reading a sequence-level representation.
 
-![The BERT input representation sums token embeddings, segment embeddings, and position embeddings for a packed sentence-pair sequence.](https://ar5iv.labs.arxiv.org/html/1810.04805/assets/x2.png)
-
 *BERT input representation from [Devlin et al., 2018](https://arxiv.org/abs/1810.04805), reproduced with attribution for study.*
 
 **Masked language modeling** selects input positions, corrupts them, and trains the encoder to recover the original tokens from both left and right context. The original BERT recipe mixes mask-token replacements, random-token replacements, and unchanged selected tokens. Always replacing a selected token with a visible mask symbol would create an easy cue and a mismatch with fine-tuning inputs, where masks usually do not occur.

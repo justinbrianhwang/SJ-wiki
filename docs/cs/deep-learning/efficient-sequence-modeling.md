@@ -69,10 +69,6 @@ flowchart TB
   Add1 -. "residual" .-> Add2
 ```
 
-![The RWKV residual block diagram shows time mixing, WKV recurrence, receptance gating, channel mixing, and residual connections.](https://ar5iv.labs.arxiv.org/html/2305.13048/assets/x2.png)
-
-*Figure: RWKV block structure from [Peng et al., 2023](https://arxiv.org/abs/2305.13048) — embedded under educational fair use with attribution.*
-
 RWKV combines an attention-like decayed key-value recurrence with a separate channel-mixing block. The time-mixing path uses token shift, keys, values, learned decay, and a receptance gate to maintain fixed-size numerator and denominator state instead of a growing KV cache. The residual channel-mixing path supplies the feed-forward capacity that a Transformer would normally place after attention.
 
 ```mermaid

@@ -38,19 +38,11 @@ Application success usually depends more on graph construction than on a single 
 
 For molecular property prediction, message passing aggregates local chemical environments. MoleculeNet standardized benchmark tasks across solubility, toxicity, quantum properties, and bioactivity [10]. Early neural message passing showed that edge-conditioned messages and set readouts can work well for quantum chemistry [11]. Equivariant models add geometry by respecting rotations and translations, which is essential when 3D conformation influences energy or binding. AlphaFold-style systems are broader than ordinary GNNs, but they show the same principle at scale: relational structure, attention, geometry, and learned pair representations can be combined for biological structure prediction [12].
 
-![A PinSAGE diagram shows random-walk-based importance sampling around an item in a billion-node Pinterest graph, with convolutional aggregation over sampled neighborhoods.](https://ar5iv.labs.arxiv.org/html/1806.01973/assets/x1.png)
-
-*Figure: PinSAGE samples neighborhoods via random walks and aggregates them with a graph convolution to produce item embeddings at Pinterest scale. From [Ying et al., 2018](https://arxiv.org/abs/1806.01973) — embedded under educational fair use with attribution.*
-
 For recommendation, the graph is usually bipartite or multipartite. PinSAGE performs random-walk-based neighbor sampling around items in a huge item graph, then applies graph convolutions for web-scale recommendation [13]. LightGCN removes feature transforms and nonlinearities from graph collaborative filtering, keeping only neighborhood propagation and layer combination [14]. GraphRec incorporates social relations and user-item interactions for social recommendation [15]. The practical pattern is often two-stage: graph embeddings retrieve candidates, and a richer ranker uses context, business constraints, and calibration.
 
 For knowledge graph reasoning, relation type is central. R-GCN can classify entities by aggregating relation-specific neighborhoods [1]. For link prediction, a model scores candidate triples and trains against corrupted negatives. Attention-based reasoning can follow relation paths or weigh neighbors differently, but it must handle high-degree hubs, inverse relations, and incomplete facts. The distinction between closed-world and open-world assumptions is important: an unobserved triple is not always false.
 
 For traffic forecasting, graph structure combines with temporal sequence modeling. DCRNN models diffusion over directed road networks and uses recurrent sequence learning for forecasting [16]. Graph WaveNet learns adaptive adjacency while using dilated temporal convolutions [17]. These models show that the "graph" may be partly physical and partly learned: road distance is useful, but sensor correlations can reveal functional connections not visible in the map.
-
-![A MeshGraphNet architecture shows encoder-processor-decoder graph networks operating on irregular meshes for physics simulation.](https://ar5iv.labs.arxiv.org/html/2010.03409/assets/x1.png)
-
-*Figure: MeshGraphNet uses encoder-processor-decoder message passing over mesh nodes to roll out physics simulations on irregular geometries. From [Pfaff et al., 2020](https://arxiv.org/abs/2010.03409) — embedded under educational fair use with attribution.*
 
 For physics simulation, the graph is a computational substrate. Graph Network Simulator represents particles as nodes and interactions as edges, using message passing to predict accelerations or state changes [18]. MeshGraphNet applies GNNs to mesh-based simulation, adapting to irregular meshes and complex boundaries [19]. These systems often roll out predictions for many steps, so small one-step errors can compound. Conservation laws, equivariance, boundary conditions, and stable integration are as important as test loss.
 

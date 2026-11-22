@@ -33,10 +33,6 @@ $$
 
 where $\mathcal{N}(i)$ contains the $K-f-2$ nearest other updates. The selected update has the smallest score [11].
 
-![A backdoor federated learning figure shows a malicious client crafting a scaled update that overrides the aggregation to inject backdoor behavior into the global model.](https://ar5iv.labs.arxiv.org/html/1807.00459/assets/x1.png)
-
-*Figure: Bagdasaryan et al.'s model-replacement attack shows how one malicious participant can implant a backdoor that evades anomaly detection under secure aggregation. From [Bagdasaryan et al., 2020](https://arxiv.org/abs/1807.00459), reproduced with attribution for discussion.*
-
 **Model replacement** is a backdoor attack where the attacker trains a malicious model $X$ and scales its submitted update so FedAvg moves the global model close to $X$ [10]. If $m$ clients are averaged uniformly in the round, an attacker can submit roughly
 
 $$

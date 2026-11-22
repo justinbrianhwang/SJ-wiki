@@ -9,14 +9,6 @@ sidebar_position: 10
 
 *Figure: GPT-3 frames few-shot prompting as in-context learning during a forward pass. From [Brown et al., 2020](https://arxiv.org/abs/2005.14165) — embedded under educational fair use with attribution.*
 
-![T5 text-to-text framework mapping diverse NLP tasks into input and output text strings.](https://ar5iv.labs.arxiv.org/html/1910.10683/assets/x1.png)
-
-*Figure: T5 casts translation, classification, question answering, and summarization as the same text-to-text problem. From [Raffel et al., 2019](https://arxiv.org/abs/1910.10683) — embedded under educational fair use with attribution.*
-
-![BART denoising architecture with a bidirectional encoder and autoregressive decoder.](https://ar5iv.labs.arxiv.org/html/1910.13461/assets/x1.png)
-
-*Figure: BART combines a corrupted input encoder with an autoregressive decoder for denoising pretraining. From [Lewis et al., 2019](https://arxiv.org/abs/1910.13461) — embedded under educational fair use with attribution.*
-
 Pretrained language models learn general-purpose representations from large unlabeled corpora and are then adapted to tasks. Jurafsky and Martin separate causal transformer LLMs, bidirectional masked language models, fine-tuning, prompting, in-context learning, and instruction tuning. Eisenstein's text predates BERT and GPT-style deployment, but its chapters on language modeling, embeddings, neural networks, and structured prediction explain the underlying probabilistic and optimization ideas.
 
 The practical shift is from training a separate model from scratch for each NLP task to reusing a large model that already encodes syntax, lexical meaning, world associations, and many task formats. Adaptation may happen by adding a classifier head and updating weights, by prompting without weight updates, or by instruction tuning and preference optimization.
@@ -92,10 +84,6 @@ flowchart TD
   F --> I[Fine-tuned classifier or tagger]
   F --> J[Dense retrieval or span QA]
 ```
-
-![BERT input representation — the figure shows token, segment, and position embeddings combined before entering the bidirectional encoder.](https://ar5iv.labs.arxiv.org/html/1810.04805/assets/x2.png)
-
-*Figure: BERT forms each input vector by summing token, segment, and position embeddings before bidirectional Transformer encoding. From [Devlin et al., 2018](https://arxiv.org/abs/1810.04805) — embedded under educational fair use with attribution.*
 
 | Model family | Attention direction | Objective | Best-known use |
 |---|---|---|---|

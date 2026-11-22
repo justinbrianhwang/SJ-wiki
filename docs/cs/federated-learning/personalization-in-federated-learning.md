@@ -32,10 +32,6 @@ $$
 
 pFedMe optimizes the global variable $\theta$ through these smoothed client objectives while each client maintains its own personalized $w_k$ [3].
 
-![A pFedMe diagram shows the two-level personalization structure: each client maintains a personalized model coupled to a shared reference via a Moreau envelope.](https://ar5iv.labs.arxiv.org/html/2006.08848/assets/x1.png)
-
-*Figure: pFedMe couples each client's personalized weights to a global reference through a Moreau envelope. From [Dinh et al., 2020](https://arxiv.org/abs/2006.08848), reproduced with attribution for discussion.*
-
 **Ditto** solves a global FL objective for $w$ and, for each client, a regularized local objective
 
 $$
@@ -43,10 +39,6 @@ $$
 $$
 
 The global model gives shared information; the regularizer prevents the local model from drifting arbitrarily far [4].
-
-![A Ditto diagram illustrates the dual-objective structure: a robust global model plus per-client personalized models regularized toward the global reference.](https://ar5iv.labs.arxiv.org/html/2012.04221/assets/x3.png)
-
-*Figure: Ditto pairs a global model with client models regularized toward that shared reference. From [Li et al., 2021](https://arxiv.org/abs/2012.04221), reproduced with attribution for discussion.*
 
 **Representation-head personalization** splits a neural network into shared representation $\phi$ and local head $h_k$. FedRep and FedPer-style methods share lower layers or representations while personalizing final layers [9], [10]. FedBABU trains the body globally and adapts heads after training [11].
 

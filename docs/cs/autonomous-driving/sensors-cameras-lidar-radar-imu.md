@@ -7,10 +7,6 @@ sidebar_position: 3
 
 Autonomous driving is built on imperfect measurements. Cameras see texture and color, lidar gives accurate 3D range, radar detects velocity and survives some weather, IMUs measure short-term motion, GNSS anchors the vehicle globally, and ultrasonic sensors cover close-range parking distances. No single sensor solves the problem alone; each has blind spots, failure modes, timing issues, and calibration requirements that shape the rest of the stack.
 
-![A PointPillars diagram converts LiDAR points into pillars, a pseudo-image, and a detection head.](https://ar5iv.labs.arxiv.org/html/1812.05784/assets/x2.png)
-
-*Figure: PointPillars shows how sparse LiDAR becomes convolution-friendly perception input. Image: [ar5iv](https://arxiv.org/abs/1812.05784), Lang et al., educational use with attribution.*
-
 Sensor choice constrains [perception](/cs/autonomous-driving/perception-object-detection-and-segmentation), [depth estimation](/cs/autonomous-driving/depth-estimation-and-stereo-vision), [sensor fusion](/cs/autonomous-driving/sensor-fusion), [localization](/cs/autonomous-driving/localization-and-hd-maps), and [safety analysis](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing). It changes which algorithms are credible and which hazards require explicit mitigation.
 
 ## Modalities and calibration

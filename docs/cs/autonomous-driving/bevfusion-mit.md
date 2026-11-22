@@ -71,10 +71,6 @@ where $E_{\mathrm{bev}}$ is a fully convolutional BEV encoder with residual bloc
 
 ### From sensor encoders to task heads
 
-![BEVFusion overview showing camera and LiDAR encoders, camera-to-BEV view transformation, fused BEV features, and task-specific heads.](https://ar5iv.labs.arxiv.org/html/2205.13542/assets/x2.png)
-
-*Figure: BEVFusion unifies camera and LiDAR features in a shared BEV space for detection and map segmentation. From [Liu et al., 2023](https://arxiv.org/abs/2205.13542) — embedded under educational fair use with attribution.*
-
 ```mermaid
 flowchart TB
   Cam["Multi-view camera images"] --> ImgBackbone["Swin-T image backbone plus FPN"]

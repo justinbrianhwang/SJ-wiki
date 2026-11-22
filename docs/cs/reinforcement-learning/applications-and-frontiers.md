@@ -5,10 +5,6 @@ sidebar_position: 16
 
 # Applications and Frontiers
 
-![Atari screenshots from the original deep Q-learning benchmark including Pong, Breakout, Space Invaders, Seaquest, and Beam Rider.](https://ar5iv.labs.arxiv.org/html/1312.5602/assets/x1.png)
-
-*Figure: DQN evaluated a single convolutional Q-network on raw Atari screen inputs across several games. From [Mnih et al., 2013](https://arxiv.org/abs/1312.5602), reproduced here for study with attribution.*
-
 Sutton and Barto close the book by showing how reinforcement learning ideas appear in substantial systems and open research directions. The case studies include TD-Gammon, Samuel's checkers player, Watson's Daily Double wagering, memory control, Atari game playing, AlphaGo and AlphaGo Zero, personalized web services, and thermal soaring. The frontier topics include general value functions, options, state representation, reward design, and unresolved issues in sample efficiency and abstraction.
 
 Successful RL systems rarely use one idea in isolation. They combine value learning, function approximation, planning, search, simulation, domain structure, and carefully chosen reward signals. Many hard problems are not solved merely by scaling an algorithm: the agent still needs useful state, exploration, temporal abstraction, and objectives that match the intended task.

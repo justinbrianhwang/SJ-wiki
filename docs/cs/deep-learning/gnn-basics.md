@@ -104,10 +104,6 @@ Depth introduces two common pathologies. **Over-smoothing** means node embedding
 
 Mitigations alter optimization, propagation, or graph structure. Residual and jumping-knowledge connections preserve early-layer information. PairNorm rescales node embeddings to counter collapse [18]. DropEdge randomly removes edges during training so propagation is less aggressively smoothing [19]. Graph rewiring methods add or remove edges to reduce bottlenecks, improve diffusion, or introduce positional shortcuts. No mitigation is universal: a homophilous citation graph and a molecular geometry graph have different failure modes.
 
-![An EGNN block diagram shows feature and coordinate updates with relative-vector messages that preserve E(n) equivariance.](https://ar5iv.labs.arxiv.org/html/2102.09844/assets/x1.png)
-
-*Figure: E(n)-Equivariant GNN propagates features alongside coordinates so that translations, rotations, and reflections of the input transform the output consistently. From [Satorras et al., 2021](https://arxiv.org/abs/2102.09844) — embedded under educational fair use with attribution.*
-
 Geometric GNNs add symmetry constraints beyond node permutation. A graph model is **permutation equivariant** if reordering node indices reorders node outputs the same way. For point clouds and molecules, we may also require translation, rotation, and reflection behavior. SchNet models continuous-filter interactions between atoms using distances, making it suitable for quantum chemistry [20]. EGNNs update both features and coordinates while preserving $E(n)$ equivariance [21]. A simplified coordinate update has the form
 
 $$

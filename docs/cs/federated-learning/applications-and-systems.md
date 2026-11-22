@@ -49,10 +49,6 @@ Recommendation systems are a bridge between personalization and privacy. A globa
 
 The LLM era changes scale. Full-model FL for a 7B-parameter model is usually infeasible for cross-device clients: even float16 model deltas are about $14$ GB per client per round before optimizer state or protocol overhead. Federated LLM work therefore emphasizes prompt tuning, parameter-efficient fine-tuning, zeroth-order or forward-only methods, distillation, and heterogeneous device support [2]. The FedLLM survey highlights fine-tuning and prompt learning as the central categories, with open directions in pre-training, federated agents, and LLMs assisting FL workflows [2].
 
-![A FedLoRA diagram contrasts full-parameter federated fine-tuning with low-rank adapter exchange across clients and a server-side aggregator.](https://ar5iv.labs.arxiv.org/html/2505.13502/assets/x1.png)
-
-*Figure: FedLoRA exchanges only low-rank adapter parameters, reducing per-round communication relative to full-model federated fine-tuning. From [Yang et al., 2025](https://arxiv.org/abs/2505.13502), reproduced with attribution for discussion.*
-
 FedLoRA is the most important adapter-based pattern. Instead of transmitting every parameter, clients send low-rank matrices. If $W$ is $4096\times4096$ and rank $r=8$, a full matrix update has $16{,}777{,}216$ parameters, while LoRA has $8(4096+4096)=65{,}536$ parameters, a $256$ times reduction before metadata. The challenge is aggregation: averaging $A$ and $B$ separately is not generally equivalent to averaging $BA$. Yang et al. describe approaches such as full-rank reconstruction then decomposition, stacking, selective aggregation, heterogeneous ranks, and personalized adapters [3].
 
 | Deployment | Typical FL type | Main blocker | Common system choices |

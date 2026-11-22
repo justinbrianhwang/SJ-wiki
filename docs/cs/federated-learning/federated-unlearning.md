@@ -9,10 +9,6 @@ Federated unlearning asks how a federated model can remove the influence of a cl
 
 The difficulty is that federated learning does not merely append independent client records to a model. Every round broadcasts a model already influenced by earlier clients, then asks later clients to train from that coupled state. Federated unlearning is therefore a systems and optimization problem spanning the FedAvg loop, privacy controls, poisoning recovery, and audit requirements.
 
-![FedOSD three-client gradient-conflict diagram](https://ar5iv.labs.arxiv.org/html/2412.20200/assets/x1.png)
-
-*Figure: FedOSD's three-client gradient-conflict geometry. A naive unlearning direction for the target client can conflict with retained clients, while the projected direction is non-conflicting. From [Pan et al., 2025](https://arxiv.org/abs/2412.20200), reproduced with attribution for discussion.*
-
 ## What it means for a federated model to forget
 
 **Machine unlearning** is the task of producing a model that behaves as if some training data had never been used. The gold standard is exact retraining: delete the requested data, rerun the original training algorithm on the retained data with the same protocol, and deploy the retrained model. Exact retraining is conceptually clean but can be unaffordable in FL because it repeats communication rounds, client scheduling, local training, secure aggregation, validation, and rollout.

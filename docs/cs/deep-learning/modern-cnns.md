@@ -114,10 +114,6 @@ flowchart TB
 
 VGG is intentionally regular: each stage keeps the same spatial size inside the repeated 3 x 3 convolutions, then halves resolution with max pooling. The diagram distinguishes VGG-16 and VGG-19 by the number of convolutions in the later blocks while preserving the same 224 -> 112 -> 56 -> 28 -> 14 -> 7 spatial path. It also shows why the original classifier head is parameter-heavy after flattening 512 x 7 x 7 features.
 
-![The Inception module diagram shows parallel 1 x 1, 3 x 3, 5 x 5, and pooling branches with channel concatenation.](https://ar5iv.labs.arxiv.org/html/1409.4842/assets/x4.png)
-
-*Figure: GoogLeNet's Inception module exposes the multi-branch bottleneck design used inside the network. From [Szegedy et al., 2014](https://arxiv.org/abs/1409.4842) — embedded under educational fair use with attribution.*
-
 ```mermaid
 flowchart TB
   X["Input feature map: (N, 192, H, W)"] --> B1R["Branch 1 reduce: Conv 1 x 1, 64 -> (N, 64, H, W)"]
@@ -154,10 +150,6 @@ flowchart TB
   Act --> Y["Block output: (N, 4*C_mid, H/s, W/s)"]
 ```
 
-![The original residual learning block shows a two-layer residual branch added to an identity shortcut before a ReLU.](https://ar5iv.labs.arxiv.org/html/1512.03385/assets/x2.png)
-
-*Figure: Original residual learning block from [He et al., 2015](https://arxiv.org/abs/1512.03385) — embedded under educational fair use with attribution.*
-
 This bottleneck block shows ResNet's expansion factor of 4: the residual branch compresses with 1 x 1, processes with 3 x 3, then expands back to `4*C_mid`. The shortcut is identity only when channel and spatial shapes already match; otherwise a 1 x 1 projection aligns both the channel count and stride. The addition node is the explicit residual merge.
 
 ```mermaid
@@ -193,15 +185,7 @@ flowchart TB
   Cat3 --> Trans["Transition: 1 x 1 conv compression theta + avg pool 2 x 2 -> (N, floor(theta*(C0+3k)), H/2, W/2)"]
 ```
 
-![The DenseNet overview shows dense blocks connected by transition layers, with each block reusing features from earlier layers.](https://ar5iv.labs.arxiv.org/html/1608.06993/assets/x2.png)
-
-*Figure: DenseNet architecture overview from [Huang et al., 2016](https://arxiv.org/abs/1608.06993) — embedded under educational fair use with attribution.*
-
 DenseNet differs from ResNet by concatenating features instead of adding them. Every new layer contributes `k` growth-rate channels, so the dense block output channel count grows from `C0` to `C0+3k` in this three-layer example. The transition layer then compresses channels and downsamples spatial resolution to control memory.
-
-![The MobileNet block diagram contrasts standard convolution with depthwise separable convolution.](https://ar5iv.labs.arxiv.org/html/1704.04861/assets/x5.png)
-
-*Figure: MobileNet's depthwise separable convolution splits spatial filtering from channel mixing to reduce computation. From [Howard et al., 2017](https://arxiv.org/abs/1704.04861) — embedded under educational fair use with attribution.*
 
 ```mermaid
 flowchart TB

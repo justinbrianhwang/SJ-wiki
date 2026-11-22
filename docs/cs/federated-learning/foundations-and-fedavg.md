@@ -5,10 +5,6 @@ sidebar_position: 1
 
 # Foundations and FedAvg
 
-![A FedAvg training-curve figure compares federated averaging against synchronized SGD across communication rounds.](https://ar5iv.labs.arxiv.org/html/1602.05629/assets/x1.png)
-
-*Figure: In the original FedAvg experiments, local SGD averaging reached target accuracy in fewer rounds than synchronized FedSGD on MNIST, CIFAR, and Shakespeare. From [McMahan et al., 2017](https://arxiv.org/abs/1602.05629), reproduced with attribution for discussion.*
-
 Federated learning is the training pattern where data remains on clients while models or model updates move. The usual mental picture is a server coordinating many clients: it broadcasts a current model, selected clients run local optimization, and the server aggregates the returned updates. McMahan et al. developed the method for decentralized mobile data and showed that local computation can reduce communication rounds by large factors compared with synchronized FedSGD [1].
 
 The foundation matters because nearly every later federated-learning idea modifies one of four design choices: which clients participate, how much local computation they do, what they send, and how the server aggregates it. Cross-device systems emphasize massive scale, intermittent availability, and privacy-preserving aggregation. Cross-silo systems emphasize governance, auditability, higher client reliability, and institutional data sovereignty. In both cases, FedAvg is the baseline to understand before studying heterogeneity, personalization, privacy, compression, or robustness.
