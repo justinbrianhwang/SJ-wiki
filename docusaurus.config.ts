@@ -126,16 +126,6 @@ const config: Config = {
       style: 'light',
       links: [
         {
-          title: 'Subjects',
-          items: [
-            {label: 'Mathematics', to: '/math'},
-            {label: 'Computer Science', to: '/cs'},
-            {label: 'Physics', to: '/physics'},
-            {label: 'Chemistry', to: '/chemistry'},
-            {label: 'Quantum Information Science', to: '/quantum-information-science'},
-          ],
-        },
-        {
           title: 'More',
           items: [
             {
