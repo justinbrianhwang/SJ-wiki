@@ -47,6 +47,10 @@ export default function Home(): ReactNode {
       description="Personal notes on mathematics, computer science, physics and chemistry.">
       <div className={styles.page}>
         <aside className={styles.side}>
+          <div className={styles.brand}>
+            <img src="img/logo.png" alt="" className={styles.brandLogo} />
+            <span>SJ Wiki</span>
+          </div>
           <div className={styles.meta}>Library</div>
           <ul>
             {sections.map((s) => (
