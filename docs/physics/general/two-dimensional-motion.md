@@ -9,10 +9,6 @@ Two-dimensional motion is where vector components become necessary. A projectile
 
 Projectile motion and circular motion teach complementary lessons. Projectile motion separates into horizontal constant-velocity motion and vertical constant-acceleration motion when air resistance is neglected. Circular motion keeps radius fixed and bends velocity with inward acceleration.
 
-![A projectile follows a parabolic trajectory with launch angle, range, and maximum height marked.](https://commons.wikimedia.org/wiki/Special:FilePath/Projectile_motion.svg)
-
-*Figure: Projectile motion is the standard visual model for decomposing one motion into horizontal and vertical components. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Projectile_motion.svg), Maxmath12, CC0 1.0.*
-
 ## Definitions
 
 - **Projectile motion** is motion under gravity alone after launch.
@@ -135,8 +131,6 @@ $$
 **Checked answer.** Acceleration is inward and about one third of $g$.
 
 ## Code
-
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
 
 ```python
 import math

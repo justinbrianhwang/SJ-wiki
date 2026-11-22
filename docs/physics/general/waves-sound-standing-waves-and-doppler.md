@@ -63,7 +63,7 @@ graph LR
 | Key formulas | $v=f\lambda$, $y=A\sin(kx-\omega t)$, $v=\sqrt{F_T/\mu}$, $f_n=nv/(2L)$, $f'=f(v\pm v_o)/(v\mp v_s)$ | check dimensions term by term |
 | Limiting case | simplify one parameter | result should match intuition |
 
-## Worked example 1: Direct calculation
+## Worked example 1
 
 **Problem.** A string has tension $80\,\mathrm{N}$ and linear density $0.020\,\mathrm{kg/m}$. Find wave speed and wavelength at $50\,\mathrm{Hz}$.
 
@@ -82,7 +82,7 @@ $$
 
 **Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
 
-## Worked example 2: Rearranged calculation
+## Worked example 2
 
 **Problem.** A $700\,\mathrm{Hz}$ siren approaches a stationary observer at $25\,\mathrm{m/s}$. Use sound speed $343\,\mathrm{m/s}$.
 
@@ -102,8 +102,6 @@ $$
 **Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
 
 ## Code
-
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
 
 ```python
 import math

@@ -63,7 +63,7 @@ graph LR
 | Key formulas | $\Delta E_{int}=Q-W$, $W=\int P\,dV$, $dS=dQ_{rev}/T$, $e_{Carnot}=1-T_C/T_H$ | check dimensions term by term |
 | Limiting case | simplify one parameter | result should match intuition |
 
-## Worked example 1: Direct calculation
+## Worked example 1
 
 **Problem.** A gas absorbs $500\,\mathrm{J}$ of heat and does $180\,\mathrm{J}$ of work. Find $\Delta E_{int}$.
 
@@ -82,7 +82,7 @@ $$
 
 **Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
 
-## Worked example 2: Rearranged calculation
+## Worked example 2
 
 **Problem.** A heat engine runs between $600\,\mathrm{K}$ and $300\,\mathrm{K}$ and absorbs $2000\,\mathrm{J}$. Find maximum efficiency and work.
 
@@ -102,8 +102,6 @@ $$
 **Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
 
 ## Code
-
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
 
 ```python
 Q=500; W=180

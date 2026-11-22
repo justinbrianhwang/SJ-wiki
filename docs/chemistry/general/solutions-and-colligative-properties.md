@@ -108,8 +108,6 @@ Problem. Find the osmotic pressure at 298 K of 0.0100 M glucose solution.
 
 ## Code
 
-The snippet below is intentionally small, but it is runnable and mirrors the calculation style used in the worked examples. It keeps units visible in variable names so that the computation remains auditable.
-
 ```python
 R = 0.082057
 

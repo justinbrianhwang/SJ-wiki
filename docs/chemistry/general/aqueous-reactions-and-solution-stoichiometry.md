@@ -106,8 +106,6 @@ Problem. A 25.00 mL sample of sulfuric acid requires 32.40 mL of 0.1500 M NaOH f
 
 ## Code
 
-The snippet below is intentionally small, but it is runnable and mirrors the calculation style used in the worked examples. It keeps units visible in variable names so that the computation remains auditable.
-
 ```python
 def molarity_from_titration(base_M, base_mL, acid_mL, base_per_acid):
     base_mol = base_M * base_mL / 1000.0

@@ -9,10 +9,6 @@ Temperature, Heat, and Kinetic Theory covers temperature, heat transfer, phase c
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
-![Maxwell-Boltzmann speed distributions show how molecular speeds spread with temperature and gas species.](https://commons.wikimedia.org/wiki/Special:FilePath/MaxwellBoltzmann-en.svg)
-
-*Figure: The speed distribution connects microscopic molecular motion with temperature and thermal averages. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:MaxwellBoltzmann-en.svg), Pdbailey, with later SVG conversion by Lilyu, public domain.*
-
 ## Definitions
 
 - **Scope:** temperature, heat transfer, phase change, ideal gases, and molecular kinetic energy.
@@ -63,7 +59,7 @@ graph LR
 | Key formulas | $Q=mc\Delta T$, $Q=mL$, $PV=nRT$, $K_{avg}=\frac32k_BT$, $E_{int}=\frac32nRT$ | check dimensions term by term |
 | Limiting case | simplify one parameter | result should match intuition |
 
-## Worked example 1: Direct calculation
+## Worked example 1
 
 **Problem.** Heat $0.50\,\mathrm{kg}$ of water from $20^\circ\mathrm{C}$ to $80^\circ\mathrm{C}$ using $c=4186\,\mathrm{J/(kg\,K)}$.
 
@@ -82,7 +78,7 @@ $$
 
 **Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
 
-## Worked example 2: Rearranged calculation
+## Worked example 2
 
 **Problem.** An ideal gas goes from $P_1=1.0\,\mathrm{atm}$, $V_1=3.0\,\mathrm{L}$, $T_1=300\,\mathrm{K}$ to $V_2=1.5\,\mathrm{L}$, $T_2=360\,\mathrm{K}$. Find $P_2$.
 
@@ -102,8 +98,6 @@ $$
 **Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
 
 ## Code
-
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
 
 ```python
 Q=0.50*4186*(80-20)

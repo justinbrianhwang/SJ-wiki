@@ -7,10 +7,6 @@ sidebar_position: 1
 
 These notes organize Stewart's *Essential Calculus: Early Transcendentals* scope into a compact study path from single-variable foundations through vector calculus. The source PDF available in this workspace is the Appendix E odd-answer material, so the structure follows the chapter and exercise coverage reflected there: functions and limits, derivatives and their applications, integrals and integration techniques, infinite series, parametric and polar curves, vectors and space geometry, partial derivatives, multiple integrals, and the major theorems of vector calculus.
 
-![William Blake depicts Isaac Newton bent over a geometric diagram.](https://commons.wikimedia.org/wiki/Special:FilePath/Newton-WilliamBlake.jpg)
-
-*Figure: William Blake's image of Newton as a geometer gives historical context for calculus, geometry, and modeling. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Newton-WilliamBlake.jpg), William Blake, public domain.*
-
 ![Gottfried Wilhelm Leibniz is shown in a historical portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Gottfried_Wilhelm_von_Leibniz.jpg)
 
 *Figure: Gottfried Wilhelm Leibniz's notation shaped differential and integral calculus. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Gottfried_Wilhelm_von_Leibniz.jpg), Bernhard Christoph Francke, public domain.*

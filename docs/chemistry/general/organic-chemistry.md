@@ -110,8 +110,6 @@ Problem. Balance combustion of ethanol, $\mathrm{C_2H_6O}$, and find moles $\mat
 
 ## Code
 
-The snippet below is intentionally small, but it is runnable and mirrors the calculation style used in the worked examples. It keeps units visible in variable names so that the computation remains auditable.
-
 ```python
 def alkane_formula(n):
     return f"C{n}H{2*n + 2}"

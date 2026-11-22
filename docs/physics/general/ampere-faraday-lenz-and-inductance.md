@@ -63,7 +63,7 @@ graph LR
 | Key formulas | $\oint\vec B\cdot d\vec l=\mu_0I_{enc}$, $B=\mu_0I/(2\pi r)$, $\mathcal E=-N d\Phi_B/dt$, $U_L=\frac12LI^2$ | check dimensions term by term |
 | Limiting case | simplify one parameter | result should match intuition |
 
-## Worked example 1: Direct calculation
+## Worked example 1
 
 **Problem.** A long straight wire carries $12\,\mathrm{A}$. Find $B$ at $0.050\,\mathrm{m}$.
 
@@ -82,7 +82,7 @@ $$
 
 **Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
 
-## Worked example 2: Rearranged calculation
+## Worked example 2
 
 **Problem.** A $200$-turn coil of area $0.010\,\mathrm{m^2}$ changes from $0.20\,\mathrm{T}$ to $0.050\,\mathrm{T}$ in $0.30\,\mathrm{s}$. Find emf magnitude.
 
@@ -102,8 +102,6 @@ $$
 **Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
 
 ## Code
-
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
 
 ```python
 import math

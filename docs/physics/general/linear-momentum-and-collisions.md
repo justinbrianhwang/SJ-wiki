@@ -9,10 +9,6 @@ Momentum tracks motion through interactions, especially brief interactions where
 
 Energy may transform into sound, heat, or deformation during a crash, but momentum conservation survives if the system boundary is chosen well. This makes momentum the natural language for impact processes.
 
-![A projectile follows a parabolic trajectory with launch angle, range, and maximum height marked.](https://commons.wikimedia.org/wiki/Special:FilePath/Projectile_motion.svg)
-
-*Figure: Projectile motion is the standard visual model for decomposing one motion into horizontal and vertical components. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Projectile_motion.svg), Maxmath12, CC0 1.0.*
-
 ## Definitions
 
 - **Momentum** is $\vec p=m\vec v$.
@@ -128,8 +124,6 @@ $$
 **Checked answer.** $\mathrm{N\,s}$ equals $\mathrm{kg\,m/s}$, so dividing by mass gives speed.
 
 ## Code
-
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
 
 ```python
 m1,v1,m2,v2 = 0.20,3.0,0.30,0.0

@@ -105,8 +105,6 @@ Problem. Will $\mathrm{Cl_2}$ oxidize $\mathrm{Br^-}$ to $\mathrm{Br_2}$ in wate
 
 ## Code
 
-The snippet below is intentionally small, but it is runnable and mirrors the calculation style used in the worked examples. It keeps units visible in variable names so that the computation remains auditable.
-
 ```python
 def hydrogen_from_sodium(mass_na_g):
     mol_na = mass_na_g / 22.99

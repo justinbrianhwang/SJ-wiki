@@ -13,10 +13,6 @@ Linearization builds a local linear approximation around an equilibrium or traje
 
 *Figure: Phase portraits reveal system behavior in state space rather than as a single time plot. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Oscillator_phase_portrait.svg), Frobnitzem, CC BY-SA 3.0.*
 
-![A Lorenz attractor coils through phase space in two butterfly-like lobes.](https://commons.wikimedia.org/wiki/Special:FilePath/Lorenz_attractor_yb.svg)
-
-*Figure: The Lorenz attractor is the standard visual scene for sensitive dependence and nonlinear simulation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Lorenz_attractor_yb.svg), Wikimol and Dschwen, CC BY-SA 3.0/GFDL.*
-
 ## Definitions
 
 A nonlinear state model has the form

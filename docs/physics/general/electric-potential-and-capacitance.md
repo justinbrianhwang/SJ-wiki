@@ -63,7 +63,7 @@ graph LR
 | Key formulas | $V=U/q$, $V=kq/r$, $\Delta V=-\int\vec E\cdot d\vec s$, $C=Q/\Delta V$, $U_C=\frac12C(\Delta V)^2$ | check dimensions term by term |
 | Limiting case | simplify one parameter | result should match intuition |
 
-## Worked example 1: Direct calculation
+## Worked example 1
 
 **Problem.** A point is $0.20\,\mathrm{m}$ from $+5.0\,\mathrm{nC}$ and $0.30\,\mathrm{m}$ from $-2.0\,\mathrm{nC}$. Find potential.
 
@@ -82,7 +82,7 @@ $$
 
 **Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
 
-## Worked example 2: Rearranged calculation
+## Worked example 2
 
 **Problem.** A $10\,\mu\mathrm{F}$ capacitor is connected to $9.0\,\mathrm{V}$. Find charge and stored energy.
 
@@ -102,8 +102,6 @@ $$
 **Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
 
 ## Code
-
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
 
 ```python
 k=8.99e9

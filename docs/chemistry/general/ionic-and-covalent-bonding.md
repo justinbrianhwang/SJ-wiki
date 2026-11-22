@@ -113,8 +113,6 @@ Problem. Estimate $\Delta H$ for $\mathrm{H_2 + Cl_2 \to 2HCl}$ using $D(H-H)=43
 
 ## Code
 
-The snippet below is intentionally small, but it is runnable and mirrors the calculation style used in the worked examples. It keeps units visible in variable names so that the computation remains auditable.
-
 ```python
 def formal_charge(valence, nonbonding, bonding_electrons):
     return valence - nonbonding - bonding_electrons / 2

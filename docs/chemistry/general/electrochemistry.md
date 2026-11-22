@@ -128,8 +128,6 @@ Problem. How many grams of copper are plated from $\mathrm{Cu^{2+}}$ by a 2.00 A
 
 ## Code
 
-The snippet below is intentionally small, but it is runnable and mirrors the calculation style used in the worked examples. It keeps units visible in variable names so that the computation remains auditable.
-
 ```python
 F = 96485
 

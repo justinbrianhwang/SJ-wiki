@@ -104,8 +104,6 @@ Problem. An electron in hydrogen falls from $n=3$ to $n=2$. Find the emitted pho
 
 ## Code
 
-The snippet below is intentionally small, but it is runnable and mirrors the calculation style used in the worked examples. It keeps units visible in variable names so that the computation remains auditable.
-
 ```python
 h = 6.626e-34
 c = 2.998e8

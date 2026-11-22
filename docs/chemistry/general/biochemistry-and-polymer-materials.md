@@ -106,8 +106,6 @@ Problem. A DNA strand has sequence 5'-ATGCCGA-3'. Write the complementary strand
 
 ## Code
 
-The snippet below is intentionally small, but it is runnable and mirrors the calculation style used in the worked examples. It keeps units visible in variable names so that the computation remains auditable.
-
 ```python
 def polymer_molar_mass(degree_polymerization, repeat_mass):
     return degree_polymerization * repeat_mass

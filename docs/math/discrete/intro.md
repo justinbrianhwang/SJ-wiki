@@ -7,14 +7,6 @@ sidebar_position: 1
 
 Discrete mathematics studies objects that are separated rather than continuous: propositions, integers, sets, functions, strings, relations, graphs, trees, and finite machines. These notes follow the scope of Rosen's *Discrete Mathematics and Its Applications*, 8th edition, with emphasis on the proof techniques and structures used throughout computer science.
 
-![Two overlapping circles show a highlighted Venn diagram region.](https://commons.wikimedia.org/wiki/Special:FilePath/Venn0001.svg)
-
-*Figure: A Venn diagram connects set operations with the same logical connectives used in proofs. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Venn0001.svg), Watchduck, public domain.*
-
-![Pascal's triangle fills in row by row with binomial coefficients.](https://commons.wikimedia.org/wiki/Special:FilePath/PascalTriangleAnimated2.gif)
-
-*Figure: Pascal's triangle organizes binomial coefficients, combinations, and recurrence patterns. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PascalTriangleAnimated2.gif), Hersfold, public domain.*
-
 ![George Boole is shown in a historical portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/George_Boole_color.jpg)
 
 *Figure: George Boole's algebraic logic underlies Boolean algebra and digital circuits. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:George_Boole_color.jpg), Unknown author, public domain.*

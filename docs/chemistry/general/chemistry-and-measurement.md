@@ -109,8 +109,6 @@ Problem. A medicine solution contains 25.0 mg of solute per 5.00 mL. Convert the
 
 ## Code
 
-The snippet below is intentionally small, but it is runnable and mirrors the calculation style used in the worked examples. It keeps units visible in variable names so that the computation remains auditable.
-
 ```python
 def density_from_displacement(mass_g, initial_ml, final_ml):
     volume_ml = final_ml - initial_ml

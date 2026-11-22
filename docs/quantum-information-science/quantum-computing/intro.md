@@ -9,10 +9,6 @@ Quantum computing studies information processing in systems whose states are vec
 
 The foundational pages in this section now use Michael A. Nielsen and Isaac L. Chuang's *Quantum Computation and Quantum Information* as the primary textbook reference, synthesized with the wiki's earlier draft material. The current split is practical: [hardware](/quantum-information-science/quantum-computing/hardware) asks how qubits are physically made; [algorithms](/quantum-information-science/quantum-computing/algorithms) asks where coherent quantum evolution changes complexity; [quantum error correction](/quantum-information-science/quantum-computing/error-correction) asks how fragile states can be protected; and [quantum machine learning](/quantum-information-science/quantum-computing/quantum-ml) asks which learning or optimization workflows may benefit from quantum subroutines without overstating speculative claims.
 
-![A Bloch sphere diagram represents a qubit state by polar and azimuthal angles on a sphere.](https://commons.wikimedia.org/wiki/Special:FilePath/Bloch_sphere.svg)
-
-*Figure: The Bloch sphere is the most compact visual model of a single qubit, while multi-qubit computation quickly leaves this geometry behind. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bloch_sphere.svg), Smite-Meister, CC BY-SA 3.0.*
-
 ![An IBM Quantum System One shows a full superconducting quantum computer integrated into a cryogenic hardware stack.](https://commons.wikimedia.org/wiki/Special:FilePath/IBM_Q_system_%28Fraunhofer_2%29.jpg)
 
 *Figure: Real quantum computers are laboratory systems with cryogenics, microwave electronics, shielding, calibration, and readout around the abstract circuit model. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:IBM_Q_system_%28Fraunhofer_2%29.jpg), IBM Research, CC BY 2.0.*

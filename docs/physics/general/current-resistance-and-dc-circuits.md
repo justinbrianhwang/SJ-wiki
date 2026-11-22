@@ -63,7 +63,7 @@ graph LR
 | Key formulas | $I=dQ/dt$, $V=IR$, $R=\rho L/A$, $P=IV=I^2R=V^2/R$, $V_C=\mathcal E(1-e^{-t/RC})$ | check dimensions term by term |
 | Limiting case | simplify one parameter | result should match intuition |
 
-## Worked example 1: Direct calculation
+## Worked example 1
 
 **Problem.** A $12\,\mathrm{V}$ battery drives $100\,\Omega$ and $220\,\Omega$ resistors in series. Find current and power in $220\,\Omega$.
 
@@ -82,7 +82,7 @@ $$
 
 **Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
 
-## Worked example 2: Rearranged calculation
+## Worked example 2
 
 **Problem.** A $10\,\mu\mathrm{F}$ capacitor charges through $200\,\mathrm{k\Omega}$ from $9.0\,\mathrm{V}$. Find $\tau$ and $V_C(\tau)$.
 
@@ -102,8 +102,6 @@ $$
 **Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
 
 ## Code
-
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
 
 ```python
 import math

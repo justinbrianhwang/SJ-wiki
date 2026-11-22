@@ -1,5 +1,4 @@
 import type {ReactNode} from 'react';
-import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
@@ -7,94 +6,38 @@ import Heading from '@theme/Heading';
 
 import styles from './index.module.css';
 
-function HomepageHeader() {
-  const {siteConfig} = useDocusaurusContext();
-  return (
-    <header className={clsx('hero hero--primary', styles.heroBanner)}>
-      <div className="container">
-        <img
-          src="img/logo.png"
-          alt="SJ Wiki Logo"
-          className={styles.heroLogo}
-        />
-        <Heading as="h1" className="hero__title">
-          {siteConfig.title}
-        </Heading>
-        <p className="hero__subtitle">{siteConfig.tagline}</p>
-      </div>
-    </header>
-  );
-}
-
-type Section = {
-  image: string;
-  title: string;
-  description: string;
-  to: string;
-};
-
-const sections: Section[] = [
+const sections = [
   {
-    image: 'assets/math.png',
     title: 'Mathematics',
+    to: '/math',
     description:
       'Calculus, linear algebra, engineering math, probability, statistics, discrete math, numerical analysis, graph theory.',
-    to: '/math',
   },
   {
-    image: 'assets/cs.png',
     title: 'Computer Science',
-    description:
-      'Algorithms, data structures, programming languages, OS, databases, computer architecture, NLP, cryptography, software engineering.',
     to: '/cs',
+    description:
+      'Algorithms, data structures, programming languages, OS, databases, architecture, ML, NLP, cryptography, software engineering.',
   },
   {
-    image: 'assets/physics.png',
     title: 'Physics',
-    description:
-      'General physics, mechanics, signals & systems, quantum mechanics, quantum field theory, simulation of dynamical systems.',
     to: '/physics',
+    description:
+      'General physics, mechanics, signals & systems, quantum mechanics, quantum field theory, dynamical systems.',
   },
   {
-    image: 'assets/chemistry.png',
     title: 'Chemistry',
-    description:
-      'General chemistry — atoms, bonds, reactions, thermodynamics, kinetics, and basic organic chemistry.',
     to: '/chemistry',
+    description:
+      'General chemistry: atoms, bonds, reactions, thermodynamics, kinetics, basic organic chemistry.',
   },
   {
-    image: 'assets/quantum-computing.png',
     title: 'Quantum Information Science',
-    description:
-      'Quantum computing, communication, internet, sensing, and security — qubits, QKD, teleportation, quantum repeaters, PQC.',
     to: '/quantum-information-science',
+    description:
+      'Quantum computing, communication, sensing, and security: qubits, QKD, teleportation, repeaters, PQC.',
   },
 ];
-
-function HomepageSections() {
-  return (
-    <section className={styles.sections}>
-      <div className="container">
-        <div className="row">
-          {sections.map((section) => (
-            <div key={section.title} className={clsx('col col--6', styles.col)}>
-              <Link to={section.to} className={styles.sectionCard}>
-                <img
-                  src={section.image}
-                  alt={`${section.title} logo`}
-                  className={styles.sectionImage}
-                />
-                <Heading as="h2">{section.title}</Heading>
-                <p>{section.description}</p>
-                <span className={styles.sectionCta}>Browse →</span>
-              </Link>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
 export default function Home(): ReactNode {
   const {siteConfig} = useDocusaurusContext();
@@ -102,10 +45,43 @@ export default function Home(): ReactNode {
     <Layout
       title={siteConfig.title}
       description="Personal notes on mathematics, computer science, physics and chemistry.">
-      <HomepageHeader />
-      <main>
-        <HomepageSections />
-      </main>
+      <div className={styles.page}>
+        <aside className={styles.side}>
+          <div className={styles.meta}>Library</div>
+          <ul>
+            {sections.map((s) => (
+              <li key={s.to}>
+                <Link to={s.to}>{s.title}</Link>
+              </li>
+            ))}
+          </ul>
+        </aside>
+        <main>
+          <div className={styles.meta}>Personal knowledge base</div>
+          <Heading as="h1" className={styles.title}>
+            Sunjun Hwang&apos;s Wiki
+          </Heading>
+          <p className={styles.lede}>
+            Notes I keep while studying mathematics, computer science, physics
+            and chemistry, plus reading notes on papers.
+          </p>
+          <Heading as="h2" className={styles.h2}>
+            Explore the library
+          </Heading>
+          <ol className={styles.index}>
+            {sections.map((s, i) => (
+              <li key={s.to}>
+                <span className={styles.num}>{String(i + 1).padStart(2, '0')}</span>
+                <Link to={s.to} className={styles.row}>
+                  <span className={styles.name}>{s.title}</span>
+                  <span className={styles.desc}>{s.description}</span>
+                  <span className={styles.arrow} aria-hidden="true">↗</span>
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </main>
+      </div>
     </Layout>
   );
 }

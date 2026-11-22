@@ -63,7 +63,7 @@ graph LR
 | Key formulas | $P=P_0+\rho gh$, $F_B=\rho_f gV$, $A_1v_1=A_2v_2$, $P+\frac12\rho v^2+\rho gy=constant$ | check dimensions term by term |
 | Limiting case | simplify one parameter | result should match intuition |
 
-## Worked example 1: Direct calculation
+## Worked example 1
 
 **Problem.** A hatch of area $0.80\,\mathrm{m^2}$ is $5.0\,\mathrm{m}$ under fresh water. Find gauge pressure and force.
 
@@ -82,7 +82,7 @@ $$
 
 **Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
 
-## Worked example 2: Rearranged calculation
+## Worked example 2
 
 **Problem.** Water in a horizontal pipe moves at $1.5\,\mathrm{m/s}$ where radius is $4.0\,\mathrm{cm}$. What is speed where radius is $2.0\,\mathrm{cm}$?
 
@@ -102,8 +102,6 @@ $$
 **Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
 
 ## Code
-
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
 
 ```python
 rho=1000; g=9.8

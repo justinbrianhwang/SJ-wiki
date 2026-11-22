@@ -9,10 +9,6 @@ Applied electromagnetics studies how electric and magnetic fields are generated,
 
 The notes emphasize engineering use: choosing the right coordinate system, converting Maxwell's equations between differential and integral form, recognizing when lumped-circuit assumptions fail, matching impedances, applying boundary conditions, computing stored field energy, and using antenna gain and propagation loss in system calculations. Each detail page includes definitions, key formulas, at least one visual reference, worked examples, runnable code, common mistakes, and cross-links to neighboring mathematics, signals, and introductory physics material.
 
-![The electromagnetic spectrum is arranged by wavelength, frequency, and representative sources.](https://commons.wikimedia.org/wiki/Special:FilePath/EM_Spectrum_Properties_edit.svg)
-
-*Figure: The electromagnetic spectrum ties circuit-scale oscillations, radio links, optics, and thermal radiation into one continuum. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:EM_Spectrum_Properties_edit.svg), Inductiveload, public domain.*
-
 ![A coaxial cable cutaway shows conductor, dielectric, shield, and jacket layers.](https://commons.wikimedia.org/wiki/Special:FilePath/Coaxial_cable_cutaway.svg)
 
 *Figure: A coaxial line makes distributed inductance, capacitance, impedance, and guided waves tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Coaxial_cable_cutaway.svg), Tkgd2007, CC BY 3.0.*

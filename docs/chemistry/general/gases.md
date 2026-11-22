@@ -9,10 +9,6 @@ Gases are the simplest state of matter to model quantitatively because molecules
 
 In the Ebbing and Gammon sequence this topic sits near gas pressure, empirical gas laws, ideal gas law, gas stoichiometry, Dalton's law, kinetic theory, diffusion, effusion, and real gases. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
 
-![A Maxwell-Boltzmann distribution plot compares molecular speed distributions for several noble gases.](https://commons.wikimedia.org/wiki/Special:FilePath/MaxwellBoltzmann-en.svg)
-
-*Figure: Molecular speed distributions connecting temperature, mass, and gas behavior. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:MaxwellBoltzmann-en.svg), Pdbailey, Cryptic C62, and Lilyu, public domain.*
-
 ## Definitions
 
 The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.
@@ -104,8 +100,6 @@ Problem. A mixture contains 0.200 mol He, 0.300 mol Ne, and 0.500 mol Ar at tota
     The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
 
 ## Code
-
-The snippet below is intentionally small, but it is runnable and mirrors the calculation style used in the worked examples. It keeps units visible in variable names so that the computation remains auditable.
 
 ```python
 R = 0.082057  # L atm mol^-1 K^-1

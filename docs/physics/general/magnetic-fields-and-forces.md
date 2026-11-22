@@ -63,7 +63,7 @@ graph LR
 | Key formulas | $\vec F=q\vec v\times\vec B$, $F=\vert q\vert vB\sin\theta$, $\vec F=I\vec L\times\vec B$, $r=mv/(\vert q\vert B)$ | check dimensions term by term |
 | Limiting case | simplify one parameter | result should match intuition |
 
-## Worked example 1: Direct calculation
+## Worked example 1
 
 **Problem.** A proton moves at $2.0\times10^6\,\mathrm{m/s}$ perpendicular to $0.50\,\mathrm{T}$. Find radius.
 
@@ -82,7 +82,7 @@ $$
 
 **Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
 
-## Worked example 2: Rearranged calculation
+## Worked example 2
 
 **Problem.** A $0.30\,\mathrm{m}$ wire carries $4.0\,\mathrm{A}$ perpendicular to $0.20\,\mathrm{T}$. Find force.
 
@@ -102,8 +102,6 @@ $$
 **Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
 
 ## Code
-
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
 
 ```python
 mp=1.67e-27; e=1.60e-19

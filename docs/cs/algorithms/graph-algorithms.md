@@ -9,10 +9,6 @@ Graphs model relationships: roads between cities, prerequisites between courses,
 
 This page gives a course-scale map rather than a single algorithm. Breadth-first search and depth-first search provide the basic traversal grammar. Topological sorting, connected components, strongly connected components, bridges, articulation points, MSTs, and shortest paths layer additional invariants on top. The important distinction is what the edge weights and graph direction allow: unweighted graphs favor BFS, nonnegative weighted graphs allow Dijkstra, negative edges require Bellman-Ford or reweighting, and arbitrary all-pairs shortest paths use Floyd-Warshall or Johnson's algorithm [1], [6].
 
-![Dijkstra animation showing tentative distances.](https://commons.wikimedia.org/wiki/Special:FilePath/Dijkstra_Animation.gif)
-
-*Figure: Dijkstra's algorithm repeatedly finalizes the unsettled vertex with minimum tentative distance. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dijkstra_Animation.gif), public domain or CC-BY-SA via Wikimedia Commons.*
-
 ![Breadth-first search animation.](https://commons.wikimedia.org/wiki/Special:FilePath/Animated_BFS.gif)
 
 *Figure: BFS expands a graph layer by layer from the source. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Animated_BFS.gif), public domain or CC-BY-SA via Wikimedia Commons.*

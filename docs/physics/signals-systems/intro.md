@@ -13,14 +13,6 @@ The notes in this section follow the usual second-edition course arc: begin with
 
 *Figure: An oscilloscope grounds signal language in measured voltage traces, triggering, bandwidth, and time scales. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tektronix_2235_100Mhz_Oscilloscope.png), Dennis van Zuijlekom, CC BY-SA 2.0.*
 
-![An animation decomposes a square wave into sinusoidal components and a frequency-domain spectrum.](https://commons.wikimedia.org/wiki/Special:FilePath/Fourier_transform_time_and_frequency_domains.gif)
-
-*Figure: Fourier analysis becomes concrete when a time waveform and its spectral lines are shown side by side. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fourier_transform_time_and_frequency_domains.gif), Lucas Vieira, public domain.*
-
-![Two sine waves pass through the same sampled points, illustrating aliasing.](https://commons.wikimedia.org/wiki/Special:FilePath/AliasingSines.svg)
-
-*Figure: Aliasing shows why sampling rate is a physical constraint, not just a numerical detail. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:AliasingSines.svg), Moxfyre, CC BY-SA 3.0/GFDL.*
-
 ## Definitions
 
 A signal is a function of one or more independent variables. In this section the independent variable is time, so continuous-time signals are written as $x(t)$ and discrete-time signals are written as $x[n]$. Continuous time uses real-valued time $t\in\mathbb{R}$; discrete time uses integer sample index $n\in\mathbb{Z}$. This difference determines whether formulas use integrals or sums, whether frequency is unique or periodic, and whether time shifts can be arbitrary real numbers or must be integer sample shifts.

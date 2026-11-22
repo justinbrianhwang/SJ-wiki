@@ -63,7 +63,7 @@ graph LR
 | Key formulas | $\gamma=1/\sqrt{1-v^2/c^2}$, $\Delta t=\gamma\Delta t_0$, $L=L_0/\gamma$, $K=(\gamma-1)mc^2$ | check dimensions term by term |
 | Limiting case | simplify one parameter | result should match intuition |
 
-## Worked example 1: Direct calculation
+## Worked example 1
 
 **Problem.** A muon with proper lifetime $2.2\,\mu\mathrm{s}$ moves at $0.98c$. Find lab lifetime.
 
@@ -82,7 +82,7 @@ $$
 
 **Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
 
-## Worked example 2: Rearranged calculation
+## Worked example 2
 
 **Problem.** Find kinetic energy of an electron moving at $0.80c$ in units of $mc^2$.
 
@@ -102,8 +102,6 @@ $$
 **Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
 
 ## Code
-
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
 
 ```python
 import math

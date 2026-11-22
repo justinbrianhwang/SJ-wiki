@@ -125,7 +125,7 @@ The map segmentation numbers are especially important. Point-level fusion method
 
 The analysis section also shows robustness trends. In rainy scenes, BEVFusion improves over the LiDAR-only CenterPoint baseline by 10.7 mAP in the paper's reported split. At night, multi-modal BEVFusion improves BEV map segmentation by 12.8 mIoU over the camera-only variant, highlighting the value of geometry when images degrade.
 
-## Worked example  (or step-by-step walkthrough)
+## Worked example
 
 **Walkthrough 1: assigning lifted camera features to a BEV cell.** Suppose a camera feature at one pixel has feature vector $f=[2,-1]$ and the depth head predicts three depth probabilities:
 

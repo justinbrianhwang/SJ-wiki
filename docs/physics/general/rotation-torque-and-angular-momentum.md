@@ -63,7 +63,7 @@ graph LR
 | Key formulas | $\tau=rF\sin\theta$, $\sum\tau=I\alpha$, $K=\frac12I\omega^2$, $L=I\omega$, $v=R\omega$ | check dimensions term by term |
 | Limiting case | simplify one parameter | result should match intuition |
 
-## Worked example 1: Direct calculation
+## Worked example 1
 
 **Problem.** A wheel starts from rest with $\alpha=3.0\,\mathrm{rad/s^2}$ for $4.0\,\mathrm{s}$.
 
@@ -82,7 +82,7 @@ $$
 
 **Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
 
-## Worked example 2: Rearranged calculation
+## Worked example 2
 
 **Problem.** A solid cylinder rolls down height $1.2\,\mathrm{m}$.
 
@@ -102,8 +102,6 @@ $$
 **Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
 
 ## Code
-
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
 
 ```python
 omega=3.0*4.0

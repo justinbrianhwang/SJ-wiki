@@ -63,7 +63,7 @@ graph LR
 | Key formulas | $a=-\omega^2x$, $x=A\cos(\omega t+\phi)$, $T=2\pi\sqrt{m/k}$, $T=2\pi\sqrt{L/g}$, $E=\frac12kA^2$ | check dimensions term by term |
 | Limiting case | simplify one parameter | result should match intuition |
 
-## Worked example 1: Direct calculation
+## Worked example 1
 
 **Problem.** A $0.40\,\mathrm{kg}$ mass on a $160\,\mathrm{N/m}$ spring oscillates with amplitude $0.050\,\mathrm{m}$. Find period and maximum speed.
 
@@ -82,7 +82,7 @@ $$
 
 **Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
 
-## Worked example 2: Rearranged calculation
+## Worked example 2
 
 **Problem.** What pendulum length gives $T=1.50\,\mathrm{s}$ near Earth?
 
@@ -102,8 +102,6 @@ $$
 **Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
 
 ## Code
-
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
 
 ```python
 import math

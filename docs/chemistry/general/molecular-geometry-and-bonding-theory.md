@@ -110,8 +110,6 @@ Problem. Use a simple MO count to find bond order for $\mathrm{O_2}$ and decide 
 
 ## Code
 
-The snippet below is intentionally small, but it is runnable and mirrors the calculation style used in the worked examples. It keeps units visible in variable names so that the computation remains auditable.
-
 ```python
 def vsepr_label(steric_number, lone_pairs):
     table = {

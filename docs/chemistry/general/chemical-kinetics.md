@@ -122,8 +122,6 @@ Problem. A first-order decomposition has $k=0.0230\ \mathrm{min^{-1}}$. How long
 
 ## Code
 
-The snippet below is intentionally small, but it is runnable and mirrors the calculation style used in the worked examples. It keeps units visible in variable names so that the computation remains auditable.
-
 ```python
 from math import log
 

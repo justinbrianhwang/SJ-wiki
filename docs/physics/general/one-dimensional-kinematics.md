@@ -9,10 +9,6 @@ One-dimensional kinematics describes motion along a line without asking what cau
 
 The topic is simple enough to solve exactly and important enough to reappear everywhere. Free fall, braking, elevators, oscillation near equilibrium, and charged particles in uniform fields reuse the same structure. The main skill is keeping instantaneous quantities, averages, signs, and graph meanings separate.
 
-![A projectile follows a parabolic trajectory with launch angle, range, and maximum height marked.](https://commons.wikimedia.org/wiki/Special:FilePath/Projectile_motion.svg)
-
-*Figure: Projectile motion is the standard visual model for decomposing one motion into horizontal and vertical components. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Projectile_motion.svg), Maxmath12, CC0 1.0.*
-
 ## Definitions
 
 - **Position** $x(t)$ locates a particle on the chosen axis.
@@ -119,8 +115,6 @@ $$
 **Checked answer.** A rise time under two seconds and a height of several stories are plausible for this launch speed.
 
 ## Code
-
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
 
 ```python
 v0, a = 25.0, -6.0

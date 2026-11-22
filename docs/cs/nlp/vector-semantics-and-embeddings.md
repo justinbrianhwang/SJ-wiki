@@ -133,10 +133,6 @@ flowchart TB
   Contextual --> Use
 ```
 
-![Skip-gram word embedding model — the figure shows a center word used to predict neighboring context words in the skip-gram architecture.](https://commons.wikimedia.org/wiki/Special:FilePath/Word_embeddings_Skip-gram.svg)
-
-*Figure: The skip-gram architecture trains a word vector by predicting surrounding context words. From [Jeran Renz, 2019](https://commons.wikimedia.org/wiki/File:Word_embeddings_Skip-gram.svg) — CC BY-SA 4.0.*
-
 This embedding diagram separates count-based vector semantics from predictive skip-gram training and contextual encoders. The word2vec branch labels the target vector, positive context vector, negative samples, dot products, sigmoid objectives, and SGD update. The count branch shows TF-IDF/PMI/PPMI and optional SVD, while the contextual branch explains why modern encoders produce a different vector for each token occurrence.
 
 ## Worked example 1: TF-IDF by hand

@@ -9,10 +9,6 @@ Gravitation and Kepler's Laws covers Newtonian gravitation, orbital motion, grav
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
-![William Blake's portrait of Isaac Newton shows geometry as a physical way of thinking.](https://commons.wikimedia.org/wiki/Special:FilePath/Newton-WilliamBlake.jpg)
-
-*Figure: Blake's Newton gives the mechanics section a historical anchor for forces, geometry, and idealization. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Newton-WilliamBlake.jpg), William Blake, public domain.*
-
 ## Definitions
 
 - **Scope:** Newtonian gravitation, orbital motion, gravitational potential energy, and Kepler's laws.
@@ -63,7 +59,7 @@ graph LR
 | Key formulas | $F=Gm_1m_2/r^2$, $g=GM/r^2$, $v=\sqrt{GM/r}$, $T=2\pi\sqrt{r^3/(GM)}$, $v_e=\sqrt{2GM/r}$ | check dimensions term by term |
 | Limiting case | simplify one parameter | result should match intuition |
 
-## Worked example 1: Direct calculation
+## Worked example 1
 
 **Problem.** Find the speed of a satellite $400\,\mathrm{km}$ above Earth using $GM=3.986\times10^{14}\,\mathrm{m^3/s^2}$ and $R=6.37\times10^6\,\mathrm{m}$.
 
@@ -82,7 +78,7 @@ $$
 
 **Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
 
-## Worked example 2: Rearranged calculation
+## Worked example 2
 
 **Problem.** Find escape speed from Earth's surface with the same $GM$ and $R$.
 
@@ -102,8 +98,6 @@ $$
 **Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
 
 ## Code
-
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
 
 ```python
 import math

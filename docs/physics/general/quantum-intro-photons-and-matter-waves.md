@@ -9,10 +9,6 @@ Quantum Intro: Photons and Matter Waves covers photons, photoelectric effect, ma
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
-![A double-slit setup sends waves through two openings to form an interference pattern on a screen.](https://commons.wikimedia.org/wiki/Special:FilePath/Double-slit.svg)
-
-*Figure: The double-slit experiment is the canonical setting where path difference becomes an observable fringe pattern. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Double-slit.svg), NekoJaNekoJa and Johannes Kalliauer, CC BY-SA 4.0.*
-
 ## Definitions
 
 - **Scope:** photons, photoelectric effect, matter waves, uncertainty, and quantization.
@@ -63,7 +59,7 @@ graph LR
 | Key formulas | $E=hf=hc/\lambda$, $p=h/\lambda$, $K_{max}=hf-\phi$, $\lambda=h/p$, $\Delta x\Delta p\ge\hbar/2$ | check dimensions term by term |
 | Limiting case | simplify one parameter | result should match intuition |
 
-## Worked example 1: Direct calculation
+## Worked example 1
 
 **Problem.** Find energy of a $500\,\mathrm{nm}$ photon using $hc=1240\,\mathrm{eV\,nm}$.
 
@@ -82,7 +78,7 @@ $$
 
 **Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
 
-## Worked example 2: Rearranged calculation
+## Worked example 2
 
 **Problem.** Find the de Broglie wavelength of an electron moving at $1.0\times10^6\,\mathrm{m/s}$.
 
@@ -102,8 +98,6 @@ $$
 **Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
 
 ## Code
-
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
 
 ```python
 h=6.626e-34

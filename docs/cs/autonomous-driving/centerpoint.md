@@ -174,7 +174,7 @@ The ablations make the representation argument more concrete. On Waymo validatio
 
 For the second stage on Waymo validation, VoxelNet first-stage performance is 66.5 vehicle mAPH and 62.7 pedestrian mAPH. Sampling the box center improves to 68.0 and 64.9; sampling the center plus side-face centers improves to 68.3 and 65.3, with about 6 ms refinement overhead. The comparable dense sampling variant reaches similar accuracy but is slower. The conclusion is not that CenterPoint needs a heavy second stage. It is that a few carefully chosen point features recover lost local geometry at a much smaller cost than full 3D RoI feature extraction.
 
-## Worked example  (or step-by-step walkthrough)
+## Worked example
 
 **Walkthrough 1: heatmap target and metric box reconstruction.** Suppose the BEV grid origin is $(x_{\min},y_{\min})=(-51.2,-51.2)$ m and the output stride is $s=0.4$ m per heatmap cell. A car center is at metric coordinate $(12.3,-4.1)$ m.
 

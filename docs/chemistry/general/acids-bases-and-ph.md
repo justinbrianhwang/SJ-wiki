@@ -102,8 +102,6 @@ Problem. Mix 40.0 mL of 0.100 M HNO3 with 25.0 mL of 0.120 M KOH. Find final pH.
 
 ## Code
 
-The snippet below is intentionally small, but it is runnable and mirrors the calculation style used in the worked examples. It keeps units visible in variable names so that the computation remains auditable.
-
 ```python
 from math import log10
 

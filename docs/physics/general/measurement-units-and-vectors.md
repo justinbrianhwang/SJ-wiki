@@ -130,8 +130,6 @@ $$
 
 ## Code
 
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
-
 ```python
 import math
 

@@ -7,10 +7,6 @@ sidebar_position: 8
 
 Convolutional neural networks exploit the structure of images. A fully connected layer treats every pixel position as unrelated to every other position, but images have local patterns, repeated motifs, and spatial neighborhoods. D2L develops CNNs by moving from the idea of translation-aware feature extraction to the concrete cross-correlation operation used in deep learning libraries.
 
-![An artificial neural network diagram shows input, hidden, and output layers connected by weights.](https://commons.wikimedia.org/wiki/Special:FilePath/Artificial_neural_network.svg)
-
-*Figure: Layered neural networks make differentiable function approximation visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Artificial_neural_network.svg), Cburnett, CC BY-SA 3.0/GFDL.*
-
 The core insight is parameter sharing. A small kernel slides across an image and applies the same weights at every location. This makes the model efficient, encourages it to detect the same pattern anywhere in the image, and builds feature maps that preserve spatial layout. Padding, stride, channels, pooling, and stacked convolutional layers then turn this simple operation into a complete architecture such as LeNet.
 
 ## Definitions

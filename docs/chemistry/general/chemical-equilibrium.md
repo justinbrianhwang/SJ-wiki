@@ -126,8 +126,6 @@ Problem. For $\mathrm{H_2(g)+I_2(g)\rightleftharpoons 2HI(g)}$, $K_c=50.0$. A mi
 
 ## Code
 
-The snippet below is intentionally small, but it is runnable and mirrors the calculation style used in the worked examples. It keeps units visible in variable names so that the computation remains auditable.
-
 ```python
 from math import sqrt
 

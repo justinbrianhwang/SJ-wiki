@@ -107,8 +107,6 @@ Problem. Rank $\mathrm{Na}$, $\mathrm{Mg}$, and $\mathrm{K}$ from smallest to la
 
 ## Code
 
-The snippet below is intentionally small, but it is runnable and mirrors the calculation style used in the worked examples. It keeps units visible in variable names so that the computation remains auditable.
-
 ```python
 capacities = {"s": 2, "p": 6, "d": 10, "f": 14}
 filling = [("1s", 2), ("2s", 2), ("2p", 6), ("3s", 2),

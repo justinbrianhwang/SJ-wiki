@@ -7,14 +7,6 @@ sidebar_position: 1
 
 Probability is the mathematical language for uncertain outcomes. It starts with sample spaces and events, then builds numerical rules for assigning likelihoods consistently. From there, random variables turn outcomes into numbers, distributions describe how probability is spread across those values, and expectation, variance, and dependence measure the main features of a model.
 
-![A Galton box diagram shows balls falling through pegs into bins.](https://commons.wikimedia.org/wiki/Special:FilePath/Galton_Box.svg)
-
-*Figure: A Galton box turns repeated random left-right choices into an approximate bell-shaped distribution. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Galton_Box.svg), Marcin Floryan, CC BY-SA 3.0.*
-
-![Tree diagrams organize conditional probabilities for Bayes' theorem.](https://commons.wikimedia.org/wiki/Special:FilePath/Bayes_theorem_tree_diagrams.svg)
-
-*Figure: Probability trees make the conditioning structure in Bayes' theorem explicit. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bayes_theorem_tree_diagrams.svg), Gnathan87, CC0 1.0.*
-
 ![The Monty Hall problem is shown with three doors and one open door.](https://commons.wikimedia.org/wiki/Special:FilePath/Monty_open_door.svg)
 
 *Figure: The Monty Hall problem is a compact example of conditional probability and base-rate intuition. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Monty_open_door.svg), Cepheus, public domain.*

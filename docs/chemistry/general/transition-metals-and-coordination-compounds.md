@@ -106,8 +106,6 @@ Problem. Predict the number of unpaired electrons for high-spin octahedral $\mat
 
 ## Code
 
-The snippet below is intentionally small, but it is runnable and mirrors the calculation style used in the worked examples. It keeps units visible in variable names so that the computation remains auditable.
-
 ```python
 def metal_oxidation_state(complex_charge, ligand_charges):
     return complex_charge - sum(ligand_charges)

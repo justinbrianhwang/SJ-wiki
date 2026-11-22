@@ -9,10 +9,6 @@ Newton's laws connect motion to interaction. Kinematics says how motion changes;
 
 A free-body diagram is a physics argument, not decoration. It states the system, lists only external forces, chooses axes, and prepares the component equations. Most mistakes come from drawing forces that do not act on the chosen body or from assuming the normal force, tension, or friction has a value before the equations determine it.
 
-![William Blake's portrait of Isaac Newton shows geometry as a physical way of thinking.](https://commons.wikimedia.org/wiki/Special:FilePath/Newton-WilliamBlake.jpg)
-
-*Figure: Blake's Newton gives the mechanics section a historical anchor for forces, geometry, and idealization. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Newton-WilliamBlake.jpg), William Blake, public domain.*
-
 ## Definitions
 
 - **First law:** zero net external force means constant velocity in an inertial frame.
@@ -117,8 +113,6 @@ $$
 **Checked answer.** Tension lies between the two weights, as expected.
 
 ## Code
-
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
 
 ```python
 m, g = 20.0, 9.8

@@ -9,10 +9,6 @@ Gauss's Law and Electric Flux covers electric flux, Gaussian surfaces, symmetry,
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
-![Four electric dipole configurations are drawn with dense field-line patterns.](https://commons.wikimedia.org/wiki/Special:FilePath/VFPt_dipoles_electric.svg)
-
-*Figure: Dipole field lines make superposition, potential gradients, and boundary intuition visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:VFPt_dipoles_electric.svg), Geek3, CC BY-SA 4.0.*
-
 ## Definitions
 
 - **Scope:** electric flux, Gaussian surfaces, symmetry, and conductors.
@@ -63,7 +59,7 @@ graph LR
 | Key formulas | $\Phi_E=\int\vec E\cdot d\vec A$, $\oint\vec E\cdot d\vec A=q_{enc}/\epsilon_0$, $E_{line}=\lambda/(2\pi\epsilon_0r)$ | check dimensions term by term |
 | Limiting case | simplify one parameter | result should match intuition |
 
-## Worked example 1: Direct calculation
+## Worked example 1
 
 **Problem.** A very long line has $\lambda=3.0\times10^{-6}\,\mathrm{C/m}$. Find $E$ at $0.20\,\mathrm{m}$.
 
@@ -82,7 +78,7 @@ $$
 
 **Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
 
-## Worked example 2: Rearranged calculation
+## Worked example 2
 
 **Problem.** A closed surface encloses $+5.0\,\mathrm{nC}$. Find total flux.
 
@@ -102,8 +98,6 @@ $$
 **Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
 
 ## Code
-
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
 
 ```python
 import math

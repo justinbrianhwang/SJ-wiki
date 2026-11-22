@@ -109,8 +109,6 @@ Problem. Write the formula and name for the compound made from $\mathrm{Ca^{2+}}
 
 ## Code
 
-The snippet below is intentionally small, but it is runnable and mirrors the calculation style used in the worked examples. It keeps units visible in variable names so that the computation remains auditable.
-
 ```python
 def weighted_average(isotopes):
     return sum(mass * abundance for mass, abundance in isotopes)

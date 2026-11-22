@@ -9,10 +9,6 @@ Interference, Diffraction, and Gratings covers wave optics, phase, Young's exper
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
-![A double-slit setup sends waves through two openings to form an interference pattern on a screen.](https://commons.wikimedia.org/wiki/Special:FilePath/Double-slit.svg)
-
-*Figure: The double-slit experiment is the canonical setting where path difference becomes an observable fringe pattern. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Double-slit.svg), NekoJaNekoJa and Johannes Kalliauer, CC BY-SA 4.0.*
-
 ## Definitions
 
 - **Scope:** wave optics, phase, Young's experiment, single-slit diffraction, and gratings.
@@ -63,7 +59,7 @@ graph LR
 | Key formulas | $d\sin\theta=m\lambda$, $d\sin\theta=(m+1/2)\lambda$, $a\sin\theta=m\lambda$, $\Delta y=\lambda L/d$ | check dimensions term by term |
 | Limiting case | simplify one parameter | result should match intuition |
 
-## Worked example 1: Direct calculation
+## Worked example 1
 
 **Problem.** Light of $600\,\mathrm{nm}$ passes through slits separated by $0.20\,\mathrm{mm}$ onto a screen $2.0\,\mathrm{m}$ away. Find bright-fringe spacing.
 
@@ -82,7 +78,7 @@ $$
 
 **Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
 
-## Worked example 2: Rearranged calculation
+## Worked example 2
 
 **Problem.** A slit width $0.10\,\mathrm{mm}$ is illuminated by $500\,\mathrm{nm}$ light. Find first minimum angle.
 
@@ -102,8 +98,6 @@ $$
 **Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
 
 ## Code
-
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
 
 ```python
 import math

@@ -162,7 +162,7 @@ The headline improvement is the cooperative camera-LiDAR result over the vehicle
 
 The paper also compares CoopDet3D against InfraDet3D on the earlier TUMTraf Intersection test set. CoopDet3D generally outperforms the late-fusion InfraDet3D baseline in average $mAP_{\mathrm{3D}}$, especially for camera-LiDAR settings. The authors interpret this as evidence that deep feature fusion is more effective than combining already-decoded outputs when geometry and semantics need to support each other. The same discussion notes a deployment caveat: if deep features are transmitted over V2I links, bandwidth and latency become first-class system constraints.
 
-## Worked example  (or step-by-step walkthrough)
+## Worked example
 
 **Walkthrough 1: computing the cooperative 3D mAP gain.** Suppose we want to verify the headline improvement over vehicle-only perception from Table 2.
 

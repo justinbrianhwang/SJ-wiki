@@ -11,10 +11,6 @@ These notes cover reinforcement learning following Richard S. Sutton and Andrew 
 
 *Figure: The agent-environment interface is the basic situation that defines reinforcement learning. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Agent-environment-diagram-rl.svg), Martin Thoma, CC0.*
 
-![A cart-pole animation shows a controller trying to balance an inverted pole on a moving cart.](https://commons.wikimedia.org/wiki/Special:FilePath/Cartpole.gif)
-
-*Figure: Cart-pole is a standard control and reinforcement-learning benchmark. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cartpole.gif), Condordellanebbia, CC BY-SA 4.0.*
-
 The organizing thread is value: how to predict return, how to improve policies from value estimates, and when direct policy optimization or planning is more appropriate. Read the pages in order if you want the Sutton-Barto progression from bandits to dynamic programming, Monte Carlo methods, temporal-difference learning, approximation, and policy gradients.
 
 1. [Reinforcement Learning Problem and Finite MDPs](/cs/reinforcement-learning/rl-problem-and-mdps)

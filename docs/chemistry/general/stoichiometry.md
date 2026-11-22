@@ -111,8 +111,6 @@ Problem. Hydrogen and nitrogen react as $\mathrm{N_2 + 3H_2 \to 2NH_3}$. If 10.0
 
 ## Code
 
-The snippet below is intentionally small, but it is runnable and mirrors the calculation style used in the worked examples. It keeps units visible in variable names so that the computation remains auditable.
-
 ```python
 def empirical_ratio(masses, molar_masses):
     moles = [m / M for m, M in zip(masses, molar_masses)]

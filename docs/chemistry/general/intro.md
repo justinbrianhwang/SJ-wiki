@@ -153,8 +153,6 @@ Problem. A student mixes 25.00 mL of 0.1000 M HCl with 25.00 mL of 0.0800 M NaOH
 
 ## Code
 
-The snippet below is intentionally small, but it is runnable and mirrors the calculation style used in the worked examples. It keeps units visible in variable names so that the computation remains auditable.
-
 ```python
 from math import log10
 

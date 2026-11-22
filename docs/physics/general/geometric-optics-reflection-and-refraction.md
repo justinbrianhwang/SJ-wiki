@@ -63,7 +63,7 @@ graph LR
 | Key formulas | $\theta_r=\theta_i$, $n_1\sin\theta_1=n_2\sin\theta_2$, $1/f=1/d_o+1/d_i$, $m=-d_i/d_o$ | check dimensions term by term |
 | Limiting case | simplify one parameter | result should match intuition |
 
-## Worked example 1: Direct calculation
+## Worked example 1
 
 **Problem.** Light in air enters glass with $n=1.50$ at $40^\circ$ from the normal. Find refracted angle.
 
@@ -82,7 +82,7 @@ $$
 
 **Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
 
-## Worked example 2: Rearranged calculation
+## Worked example 2
 
 **Problem.** An object is $30\,\mathrm{cm}$ from a converging lens with $f=10\,\mathrm{cm}$. Find image distance and magnification.
 
@@ -102,8 +102,6 @@ $$
 **Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
 
 ## Code
-
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
 
 ```python
 import math

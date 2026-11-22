@@ -9,10 +9,6 @@ Equilibrium and Elasticity covers static equilibrium, torque balance, stress, st
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
-![A beam bends under transverse loading in a simple mechanics schematic.](https://commons.wikimedia.org/wiki/Special:FilePath/Beam_bending.svg)
-
-*Figure: Beam bending connects support reactions, internal shear, bending moment, and section stiffness. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Beam_bending.svg), Krishnavedala, CC0 1.0.*
-
 ## Definitions
 
 - **Scope:** static equilibrium, torque balance, stress, strain, and elastic moduli.
@@ -63,7 +59,7 @@ graph LR
 | Key formulas | $\sum F_x=0$, $\sum F_y=0$, $\sum\tau=0$, $\Delta L=FL/(AY)$ | check dimensions term by term |
 | Limiting case | simplify one parameter | result should match intuition |
 
-## Worked example 1: Direct calculation
+## Worked example 1
 
 **Problem.** A $4.0\,\mathrm{m}$ beam of weight $120\,\mathrm{N}$ holds a $200\,\mathrm{N}$ sign at its end; a cable at the end is $30^\circ$ above the beam.
 
@@ -82,7 +78,7 @@ $$
 
 **Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
 
-## Worked example 2: Rearranged calculation
+## Worked example 2
 
 **Problem.** A steel wire has $L=2.0\,\mathrm{m}$, $A=1.0\times10^{-6}\,\mathrm{m^2}$, $Y=2.0\times10^{11}\,\mathrm{Pa}$, and load $50\,\mathrm{N}$.
 
@@ -102,8 +98,6 @@ $$
 **Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
 
 ## Code
-
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
 
 ```python
 import math

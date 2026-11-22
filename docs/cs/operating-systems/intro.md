@@ -11,10 +11,6 @@ Operating systems sit between applications and hardware. They make programs easi
 
 *Figure: Linux provides the concrete kernel case study for many OS abstractions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tux.svg), Larry Ewing, Simon Budig, and Garrett LeSage, CC0/attribution permission.*
 
-![A Linux kernel map organizes subsystems such as memory, filesystems, networking, and drivers.](https://commons.wikimedia.org/wiki/Special:FilePath/Linux_kernel_map.png)
-
-*Figure: The Linux kernel map shows how OS services become interacting subsystems. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Linux_kernel_map.png), Conan at English Wikipedia, CC BY 3.0.*
-
 ![A Unix family tree traces the historical branches leading to modern Unix-like systems.](https://commons.wikimedia.org/wiki/Special:FilePath/Unix_history-simple.svg)
 
 *Figure: Unix history gives Linux, BSD, and commercial Unix systems shared lineage. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Unix_history-simple.svg), Eraserhead1, Infinity0, and Sav vas, CC BY-SA 3.0/GFDL.*

@@ -13,10 +13,6 @@ This cluster of ideas is central to both particle physics and condensed matter. 
 
 *Figure: Mexican-hat potential used to visualize spontaneous symmetry breaking. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mexican_hat_potential_polar.svg), Rupert Millard, public domain.*
 
-![The Standard Model chart groups quarks, leptons, gauge bosons, and the Higgs boson.](https://commons.wikimedia.org/wiki/Special:FilePath/Standard_Model_of_Elementary_Particles.svg)
-
-*Figure: The Standard Model chart gives QFT pages a concrete particle-spectrum map. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Standard_Model_of_Elementary_Particles.svg), Cush and MissMJ, public domain/CC BY 3.0.*
-
 ## Definitions
 
 A symmetry transformation maps fields to fields while preserving the action:

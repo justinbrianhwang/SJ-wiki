@@ -13,10 +13,6 @@ The core idea is not a list of formulas but a model. Once the model is chosen, t
 
 *Figure: An oscilloscope grounds signal language in measured voltage traces, triggering, bandwidth, and time scales. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tektronix_2235_100Mhz_Oscilloscope.png), Dennis van Zuijlekom, CC BY-SA 2.0.*
 
-![The electromagnetic spectrum is arranged by wavelength, frequency, and representative sources.](https://commons.wikimedia.org/wiki/Special:FilePath/EM_Spectrum_Properties_edit.svg)
-
-*Figure: The electromagnetic spectrum ties circuit-scale oscillations, radio links, optics, and thermal radiation into one continuum. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:EM_Spectrum_Properties_edit.svg), Inductiveload, public domain.*
-
 ## Definitions
 
 - **Scope:** sinusoidal circuits, reactance, resonance, Maxwell wave ideas, and the electromagnetic spectrum.
@@ -67,7 +63,7 @@ graph LR
 | Key formulas | $X_L=\omega L$, $X_C=1/(\omega C)$, $Z=\sqrt{R^2+(X_L-X_C)^2}$, $\omega_0=1/\sqrt{LC}$, $c=f\lambda$, $E=cB$ | check dimensions term by term |
 | Limiting case | simplify one parameter | result should match intuition |
 
-## Worked example 1: Direct calculation
+## Worked example 1
 
 **Problem.** A series circuit has $R=40\,\Omega$, $L=0.20\,\mathrm{H}$, $C=50\,\mu\mathrm{F}$, $f=60\,\mathrm{Hz}$, and $120\,\mathrm{V_{rms}}$. Find current.
 
@@ -86,7 +82,7 @@ $$
 
 **Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
 
-## Worked example 2: Rearranged calculation
+## Worked example 2
 
 **Problem.** Find wavelength of a $100\,\mathrm{MHz}$ FM wave.
 
@@ -106,8 +102,6 @@ $$
 **Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
 
 ## Code
-
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
 
 ```python
 import math

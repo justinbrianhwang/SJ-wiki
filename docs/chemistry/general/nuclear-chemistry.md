@@ -107,8 +107,6 @@ Problem. Complete $^{14}_7\mathrm{N}+^4_2\mathrm{He}\to ^{17}_8\mathrm{O}+?$.
 
 ## Code
 
-The snippet below is intentionally small, but it is runnable and mirrors the calculation style used in the worked examples. It keeps units visible in variable names so that the computation remains auditable.
-
 ```python
 from math import log, exp
 

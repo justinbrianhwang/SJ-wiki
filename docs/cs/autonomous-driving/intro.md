@@ -7,10 +7,6 @@ sidebar_position: 1
 
 Autonomous driving is a system-of-systems problem: sensors measure the world, perception turns measurements into objects and free space, prediction estimates what other agents may do, planning chooses a safe and useful maneuver, control tracks the motion, and safety engineering constrains the whole stack inside a defined operational design domain. A self-driving vehicle is not a single model, a single sensor, or a single benchmark score. It is an integrated cyber-physical system that must work under uncertainty, latency, hardware faults, ambiguous road rules, unusual human behavior, and changing weather.
 
-![A Waymo self-driving car drives on a public road with roof-mounted sensors.](https://commons.wikimedia.org/wiki/Special:FilePath/Waymo_self-driving_car_front_view.gk.jpg)
-
-*Figure: A real autonomous vehicle grounds the driving stack in a physical platform. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Waymo_self-driving_car_front_view.gk.jpg), Grendelkhan, CC BY-SA 4.0.*
-
 ![A Tesla driver-assistance display shows lane centering and following behavior in traffic.](https://commons.wikimedia.org/wiki/Special:FilePath/Tesla_Autopilot_Engaged_in_Model_X.jpg)
 
 *Figure: Driver-assistance interfaces show how perception and control reach the driver-facing product. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tesla_Autopilot_Engaged_in_Model_X.jpg), Ian Maddox, CC BY-SA 4.0.*

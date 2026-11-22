@@ -9,10 +9,6 @@ Coulomb's Law and Electric Fields covers electric charge, Coulomb force, electri
 
 The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
 
-![Four electric dipole configurations are drawn with dense field-line patterns.](https://commons.wikimedia.org/wiki/Special:FilePath/VFPt_dipoles_electric.svg)
-
-*Figure: Dipole field lines make superposition, potential gradients, and boundary intuition visible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:VFPt_dipoles_electric.svg), Geek3, CC BY-SA 4.0.*
-
 ## Definitions
 
 - **Scope:** electric charge, Coulomb force, electric fields, superposition, and field lines.
@@ -63,7 +59,7 @@ graph LR
 | Key formulas | $F=k\vert q_1q_2\vert /r^2$, $\vec E=\vec F/q_0$, $E=k\vert q\vert /r^2$, $\vec F=q\vec E$ | check dimensions term by term |
 | Limiting case | simplify one parameter | result should match intuition |
 
-## Worked example 1: Direct calculation
+## Worked example 1
 
 **Problem.** Charges $+4.0\,\mathrm{nC}$ and $-6.0\,\mathrm{nC}$ are separated by $0.030\,\mathrm{m}$. Find force magnitude.
 
@@ -82,7 +78,7 @@ $$
 
 **Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
 
-## Worked example 2: Rearranged calculation
+## Worked example 2
 
 **Problem.** Two equal positive charges are at $x=\pm0.10\,\mathrm{m}$. Find the field at the origin.
 
@@ -102,8 +98,6 @@ $$
 **Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
 
 ## Code
-
-The snippet below is a small numerical check for the page. It uses only Python's standard library and keeps the physical constants visible so the assumptions can be changed.
 
 ```python
 k=8.99e9

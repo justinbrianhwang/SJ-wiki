@@ -1,60 +1,103 @@
-.heroBanner {
-  padding: 4rem 0 3rem;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
+.page {
+  display: grid;
+  grid-template-columns: 12rem 1fr;
+  gap: 3rem;
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 4rem 1rem 5rem;
 }
 
-@media screen and (max-width: 996px) {
-  .heroBanner {
-    padding: 2rem;
+@media (max-width: 768px) {
+  .page {
+    grid-template-columns: 1fr;
+    padding-top: 2rem;
+  }
+  .side {
+    display: none;
   }
 }
 
-.heroLogo {
-  width: 140px;
-  height: auto;
-  margin-bottom: 1rem;
-  border-radius: 12px;
+.side ul {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+}
+.side li {
+  margin: 0.3rem 0;
+}
+.side a {
+  color: var(--ink);
 }
 
-.sections {
-  padding: 3rem 0 4rem;
+.meta {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
 }
 
-.col {
-  margin-bottom: 1.5rem;
+.title {
+  font-size: 2.2rem;
+  margin: 0.5rem 0 0.75rem;
 }
 
-.sectionCard {
-  display: block;
-  background: var(--ifm-background-surface-color);
-  border: 1px solid var(--ifm-color-emphasis-200);
-  border-radius: 12px;
-  padding: 2rem;
-  height: 100%;
+.lede {
+  color: var(--ink-soft);
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 2rem;
+}
+
+.h2 {
+  font-size: 1.3rem;
+}
+
+.index {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.index li {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr;
+  border-bottom: 1px solid var(--rule);
+}
+
+.num {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  padding-top: 1.35rem;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  padding: 1.1rem 0;
+  color: var(--ink) !important;
   text-decoration: none !important;
-  color: inherit !important;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
-.sectionCard:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  border-color: var(--ifm-color-primary);
-}
-
-.sectionImage {
-  width: 120px;
-  height: 120px;
-  object-fit: contain;
-  display: block;
-  margin: 0 auto 1rem;
-}
-
-.sectionCta {
-  display: inline-block;
-  margin-top: 0.5rem;
+.name {
+  font-size: 1.15rem;
   font-weight: 600;
-  color: var(--ifm-color-primary);
+}
+
+.desc {
+  grid-column: 1;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+
+.arrow {
+  grid-column: 2;
+  grid-row: 1;
+  color: var(--ink-soft);
+}
+
+.row:hover .name,
+.row:hover .arrow {
+  color: var(--accent);
 }

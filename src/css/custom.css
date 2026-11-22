@@ -1,30 +1,170 @@
-/**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
- */
-
-/* You can override the default Infima variables here. */
+/* Research-notebook theme: paper background, serif body, mono metadata. */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --paper: #fbf8f1;
+  --paper-2: #f3eee2;
+  --ink: #2b2824;
+  --ink-soft: #6b645a;
+  --rule: #e2dccd;
+  --accent: #8a3b12;
+
+  --ifm-color-primary: var(--accent);
+  --ifm-color-primary-dark: #7a3410;
+  --ifm-color-primary-darker: #73310f;
+  --ifm-color-primary-darkest: #5f280c;
+  --ifm-color-primary-light: #9a4214;
+  --ifm-color-primary-lighter: #a24515;
+  --ifm-color-primary-lightest: #b54e18;
+
+  --ifm-background-color: var(--paper);
+  --ifm-background-surface-color: var(--paper);
+  --ifm-navbar-background-color: var(--paper);
+  --ifm-footer-background-color: var(--paper-2);
+  --ifm-font-color-base: var(--ink);
+  --ifm-heading-color: var(--ink);
+  --ifm-toc-border-color: var(--rule);
+  --ifm-hr-border-color: var(--rule);
+  --ifm-table-border-color: var(--rule);
+  --ifm-table-stripe-background: var(--paper-2);
+  --ifm-code-background: var(--paper-2);
+
+  --ifm-font-family-base: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --ifm-heading-font-family: var(--ifm-font-family-base);
+  --ifm-font-family-monospace: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+  --ifm-font-size-base: 17px;
+  --ifm-line-height-base: 1.7;
+  --ifm-heading-font-weight: 600;
+  --ifm-code-font-size: 88%;
+  --ifm-global-shadow-lw: none;
+  --ifm-navbar-shadow: none;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.06);
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --paper: #1c1a17;
+  --paper-2: #24211d;
+  --ink: #e6e0d4;
+  --ink-soft: #a39b8d;
+  --rule: #3a352e;
+  --accent: #e0915a;
+
+  --ifm-color-primary: var(--accent);
+  --ifm-color-primary-dark: #dc844a;
+  --ifm-color-primary-darker: #da7d40;
+  --ifm-color-primary-darkest: #cf6a26;
+  --ifm-color-primary-light: #e49e6a;
+  --ifm-color-primary-lighter: #e6a574;
+  --ifm-color-primary-lightest: #ecb993;
+  --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.06);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* Navbar: a thin ruled header, not a toolbar. */
+.navbar {
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.85rem;
+}
+.navbar__title {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* Sidebar and TOC in mono, muted. */
+.menu,
+.table-of-contents {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8rem;
+}
+.menu__link {
+  border-radius: 0;
+  color: var(--ink-soft);
+}
+.menu__link--active:not(.menu__link--sublist) {
+  background: none;
+  color: var(--accent);
+  border-left: 2px solid var(--accent);
+}
+.theme-doc-sidebar-container {
+  border-right-color: var(--rule) !important;
+}
+
+/* Reading column. */
+.theme-doc-markdown {
+  max-width: 46rem;
+}
+.markdown h1 {
+  font-size: 2.1rem;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 0.4rem;
+}
+.markdown h2 {
+  font-size: 1.4rem;
+  margin-top: 2.5rem;
+}
+.markdown h2::before {
+  content: '§ ';
+  color: var(--ink-soft);
+  font-weight: 400;
+}
+.markdown a {
+  text-decoration: underline;
+  text-decoration-color: var(--rule);
+  text-underline-offset: 3px;
+}
+.markdown a:hover {
+  text-decoration-color: var(--accent);
+}
+.markdown blockquote {
+  border-left: 2px solid var(--accent);
+  background: none;
+  color: var(--ink-soft);
+}
+.markdown img {
+  border: 1px solid var(--rule);
+}
+/* Figure captions read like margin notes. */
+.markdown p > em:only-child {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+code {
+  border: none;
+}
+.theme-code-block {
+  border: 1px solid var(--rule);
+  box-shadow: none;
+}
+table {
+  font-size: 0.92rem;
+}
+
+/* Metadata (last updated, edit link) in mono. */
+.theme-doc-footer,
+.theme-last-updated,
+.pagination-nav__sublabel,
+.breadcrumbs {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.78rem;
+}
+.pagination-nav__link {
+  border-radius: 0;
+  border-color: var(--rule);
+}
+
+.footer {
+  border-top: 1px solid var(--rule);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8rem;
+}
+.footer,
+.footer__title,
+.footer__link-item,
+.footer__copyright {
+  color: var(--ink-soft);
 }

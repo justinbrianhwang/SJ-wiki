@@ -46,6 +46,7 @@ const config: Config = {
           routeBasePath: '/',
           editUrl:
             'https://github.com/justinbrianhwang/SJ-wiki/tree/main/',
+          showLastUpdateTime: true,
           remarkPlugins: [remarkMath],
           rehypePlugins: [rehypeKatex],
         },
@@ -58,6 +59,10 @@ const config: Config = {
   ],
 
   stylesheets: [
+    {
+      href: 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap',
+      type: 'text/css',
+    },
     {
       href: 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css',
       type: 'text/css',
@@ -118,7 +123,7 @@ const config: Config = {
       ],
     },
     footer: {
-      style: 'dark',
+      style: 'light',
       links: [
         {
           title: 'Subjects',
@@ -144,7 +149,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} SJ Wiki. Built with Docusaurus.`,
+      copyright: `© ${new Date().getFullYear()} Sunjun Hwang`,
     },
     prism: {
       theme: prismThemes.github,
