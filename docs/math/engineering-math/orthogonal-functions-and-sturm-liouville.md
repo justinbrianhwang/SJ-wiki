@@ -7,13 +7,9 @@ sidebar_position: 16
 
 Orthogonal functions generalize perpendicular vectors to function spaces. Instead of a dot product of finite vectors, we use an integral inner product. This turns functions into modes that can be projected, expanded, and compared by energy. Fourier series are the most familiar example, but Legendre polynomials and Bessel functions fit the same pattern.
 
-![Adrien-Marie Legendre is shown in a historical portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Legendre.jpg)
-
-*Figure: Adrien-Marie Legendre's name appears in orthogonal polynomials and special functions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Legendre.jpg), Julien-Leopold Boilly, public domain.*
-
 Sturm-Liouville theory explains why these mode families appear in boundary-value problems. A differential operator with suitable boundary conditions has real eigenvalues and orthogonal eigenfunctions. This is the structural reason separation of variables works for many heat, wave, and potential problems.
 
-## Definitions
+## Weighted geometry for functions
 
 An inner product for functions on $[a,b]$ with weight $w(x)\gt 0$ is
 
@@ -55,7 +51,7 @@ $$
 c_n=\frac{\langle f,\phi_n\rangle}{\langle \phi_n,\phi_n\rangle}.
 $$
 
-## Key results
+## Self-adjointness forces orthogonality
 
 Self-adjointness is the key property. Under suitable boundary conditions, the Sturm-Liouville operator
 
@@ -127,7 +123,9 @@ From a computational viewpoint, truncating an eigenfunction expansion creates a 
 
 The boundary conditions are part of the operator. The same differential expression $-y''$ has different eigenfunctions under Dirichlet, Neumann, periodic, or mixed boundary conditions. It is therefore imprecise to say "the eigenfunctions of $-y''$" without specifying the interval and boundary conditions.
 
-## Visual
+## From an eigenproblem to a modal solution
+
+For self-adjoint problems, the operator supplies a sequence of modes that can be used to project data and solve a PDE one coefficient at a time.
 
 ```mermaid
 flowchart TD
@@ -146,7 +144,9 @@ flowchart TD
 | Legendre | $P_n(x)$ | $1$ | Spherical angular modes |
 | Bessel radial | $J_n(\alpha r)$ | $r$ | Circular membranes and disks |
 
-## Worked example 1: Orthogonality of sine modes
+The weight and boundary conditions in the table are part of each eigenproblem; changing either one changes the projection space.
+
+## Orthogonality of fixed-end sine modes
 
 Problem. Show that
 
@@ -211,7 +211,7 @@ Check. The result matches the Sturm-Liouville orthogonality theorem for distinct
 
 This direct calculation is useful because it shows exactly where integer mode numbers enter. The endpoint sines vanish because the interval length and the frequencies fit together. If the frequency were not an integer multiple of $\pi/L$, the same cancellation would not occur, and the function would not satisfy the same fixed-end eigenvalue problem.
 
-## Worked example 2: Projection coefficient
+## Projecting $f(x)=x$ onto sine modes
 
 Problem. Expand $f(x)=x$ on $0\lt x\lt L$ in sine modes and find $b_n$.
 
@@ -277,7 +277,7 @@ Check. Setting $L=\pi$ recovers $b_n=2(-1)^{n+1}/n$.
 
 The denominator $L/2$ is the squared norm of the sine mode. If the mode had been normalized to unit length, the coefficient formula would look different because the basis function itself would include a factor. Both conventions are correct when used consistently.
 
-## Code
+## Checking projection coefficients by quadrature
 
 ```python
 import numpy as np
@@ -300,7 +300,7 @@ The numerical projection approximates the weighted inner products by quadrature.
 
 For highly oscillatory modes, quadrature needs enough sample points to resolve the oscillations. Otherwise a coefficient may appear small or large because of numerical aliasing rather than true orthogonality. This is the continuous analog of sampling issues in discrete Fourier computations.
 
-## Common pitfalls
+## Keeping the modal conventions consistent
 
 - Forgetting the weight function in the inner product.
 - Assuming orthogonal functions are automatically normalized.
@@ -313,9 +313,8 @@ For highly oscillatory modes, quadrature needs enough sample points to resolve t
 - Calling a set a basis after checking only pairwise orthogonality. Completeness is a separate issue.
 - Comparing modal coefficients from different normalizations without converting the basis norms.
 
-## Connections
+<div className="see-also">
 
-- [Fourier Series](/math/engineering-math/fourier-series)
-- [Special Functions: Legendre and Bessel](/math/engineering-math/special-functions-legendre-bessel)
-- [PDEs by Separation of Variables](/math/engineering-math/pdes-separation-of-variables)
-- [Wave and Heat Equations](/math/engineering-math/wave-and-heat-equations)
+See also: [Fourier Series](/math/engineering-math/fourier-series) · [Special Functions: Legendre and Bessel](/math/engineering-math/special-functions-legendre-bessel) · [PDEs by Separation of Variables](/math/engineering-math/pdes-separation-of-variables) · [Wave and Heat Equations](/math/engineering-math/wave-and-heat-equations)
+
+</div>

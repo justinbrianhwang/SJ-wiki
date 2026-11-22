@@ -406,10 +406,8 @@ largest at half coverage. For $M$ independent sites, $\mathcal Z=\mathcal Z_1^M$
 - Fermionic levels admit zero or one particle; bosonic levels admit every nonnegative integer. The different sums produce the sign change in their occupation laws.
 - When differentiating in $\beta$, say whether $\mu$ or $z$ is fixed. They are related by $z=e^{\beta\mu}$, so these derivatives are not interchangeable.
 
-## Related pages
+<div className="see-also">
 
-- [Canonical ensemble and fluctuations](/physics/statistical-mechanics/canonical-ensemble-and-fluctuations)
-- [Quantum statistics and ideal quantum gases](/physics/statistical-mechanics/quantum-statistics-and-ideal-quantum-gases)
-- [Bose gases, photons, and phonons](/physics/statistical-mechanics/bose-gases-photons-and-phonons)
-- [Identical particles in quantum mechanics](/physics/quantum-mechanics/identical-particles-symmetrization)
-- [Thermodynamics](/physics/thermodynamics/intro)
+See also: [Canonical ensemble and fluctuations](/physics/statistical-mechanics/canonical-ensemble-and-fluctuations) · [Quantum statistics and ideal quantum gases](/physics/statistical-mechanics/quantum-statistics-and-ideal-quantum-gases) · [Bose gases, photons, and phonons](/physics/statistical-mechanics/bose-gases-photons-and-phonons) · [Identical particles in quantum mechanics](/physics/quantum-mechanics/identical-particles-symmetrization) · [Thermodynamics](/physics/thermodynamics/intro)
+
+</div>

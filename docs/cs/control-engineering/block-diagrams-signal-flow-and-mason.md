@@ -5,55 +5,43 @@ sidebar_position: 7
 
 # Block Diagrams, Signal Flow, and Mason Rule
 
-Real control systems are built from interconnected subsystems. Nise's reduction chapter shows how to collapse block diagrams and signal-flow graphs into equivalent transfer functions, so that the response and stability tools from earlier chapters can be applied. This is where modeling becomes system analysis: motors, sensors, amplifiers, loads, and feedback paths become one closed-loop expression.
+Real control systems are built from interconnected subsystems. Motors, sensors, amplifiers, loads, and feedback paths must eventually become transfer functions suitable for response and stability analysis. Block-diagram reduction does that algebra while retaining the physical architecture; signal-flow graphs are a compact alternative when many loops interact.
 
-The methods here are algebraic, but they are also organizational. A clean block diagram exposes where disturbances enter, where sensor dynamics sit, and which signals are internal. Signal-flow graphs provide a compact alternative when many loops interact. Mason's gain formula is especially useful when block-diagram reduction becomes visually messy.
+## From interconnections to signal equations
 
-## Definitions
+A **block diagram** represents subsystem transfer functions as directed blocks connected by signals. A **summing junction** forms a signed algebraic sum, and a **pickoff point** copies a signal without changing it.
 
-A **block diagram** represents subsystem transfer functions as directed blocks connected by signals. A **summing junction** forms a signed algebraic sum. A **pickoff point** copies a signal without changing it.
-
-For blocks in series,
+The elementary reductions are
 
 $$
-G_{\text{eq}}(s)=G_1(s)G_2(s).
+G_{\text{series}}(s)=G_1(s)G_2(s),
 $$
 
-For blocks in parallel,
-
 $$
-G_{\text{eq}}(s)=G_1(s)+G_2(s)
+G_{\text{parallel}}(s)=G_1(s)+G_2(s),
 $$
 
-when their outputs are added.
-
-For a single negative-feedback loop,
+when the parallel outputs are added, and
 
 $$
-G_{\text{eq}}(s)=\frac{G(s)}{1+G(s)H(s)}.
+G_{\text{feedback}}(s)=\frac{G(s)}{1+G(s)H(s)}
 $$
 
-For positive feedback, the denominator becomes $1-G(s)H(s)$.
+for a single negative-feedback loop. Positive feedback changes the denominator to $1-G(s)H(s)$.
 
-A **signal-flow graph** has nodes representing signals and directed branches representing gains. A **forward path** is a path from input node to output node that does not touch any node more than once. A **loop** is a closed path that starts and ends at the same node without touching another node more than once. Non-touching loops share no nodes.
-
-Mason's gain formula gives the overall transfer function:
+Writing the signal equations before moving blocks is safer than memorizing a large catalog of diagram transformations. If
 
 $$
-T=\frac{\sum_{k=1}^N P_k\Delta_k}{\Delta},
+X=G(R-HY), \qquad Y=PX,
 $$
 
-where $P_k$ is the gain of the $k$th forward path,
+then substitution gives the result even when the drawing is crowded with disturbances and sensor paths.
 
-$$
-\Delta=1-\sum L_i+\sum L_iL_j-\sum L_iL_jL_m+\cdots
-$$
+For nonunity feedback, the error at the summing junction is $R(s)-H(s)C(s)$, not generally $R(s)-C(s)$. That distinction carries into steady-state error and sensor-scaling calculations.
 
-with products taken over non-touching loops, and $\Delta_k$ is $\Delta$ with all loops touching the $k$th forward path removed.
+## Reducing a crowded diagram without changing it
 
-## Key results
-
-Moving summing junctions and pickoff points changes local block labels but must preserve every signal equation. Two common transformations are:
+Nested diagrams are usually reduced from the inner loop outward, followed by series and parallel combinations. Moving a summing junction or pickoff point is valid only if every signal equation remains unchanged.
 
 | Move | Required change |
 |---|---|
@@ -62,53 +50,17 @@ Moving summing junctions and pickoff points changes local block labels but must 
 | Move summing junction before a block $G$ to after it | multiply side input by $G$ |
 | Move summing junction after a block $G$ to before it | divide side input by $G$ |
 
-Closed-loop block diagrams are usually reduced from inner loops outward. If a diagram has nested loops, reduce the innermost loop first, then combine series and parallel blocks. If loops overlap heavily, construct a signal-flow graph and use Mason's formula.
-
-For nonunity feedback with forward path $G(s)$ and feedback path $H(s)$, the closed-loop transfer function from reference to output is
-
-$$
-T(s)=\frac{G(s)}{1+G(s)H(s)}.
-$$
-
-The error signal at the summing junction is not necessarily $R(s)-C(s)$; it is $R(s)-H(s)C(s)$. This distinction matters when computing steady-state error or interpreting sensor scaling.
-
-State equations can also be represented by signal-flow graphs. Each integrator output is a state variable, and branches correspond to matrix coefficients. This creates a bridge between transfer-function diagrams and state-space models.
-
-A useful reduction habit is to write the signal equations before moving blocks. For example, if $X=G(R-HY)$ and $Y=PX$, the algebra is unambiguous even when the diagram is visually crowded. After the equations are written, reduction is just substitution. This is often safer than memorizing many diagram moves, especially when disturbances and sensor noise enter at multiple points.
-
-Disturbance paths should be kept separate from reference paths until the end. A closed-loop system has different transfer functions from reference to output, disturbance to output, sensor noise to output, and reference to error. Collapsing the whole diagram into one block too early can hide these distinctions. In design, a controller may improve reference tracking while worsening noise transmission, so separate transfer functions are needed to see the trade-off.
-
-Mason's formula is most helpful when loops overlap. In a graph with several feedback paths, a brute-force block reduction may require repeated movement of summing junctions and pickoff points. Signal-flow graphs instead count forward paths, loops, and non-touching loop products. The price is careful bookkeeping: missing one non-touching loop product changes the determinant $\Delta$ and therefore the final transfer function.
-
-Internal stability is not guaranteed by a pleasant reduced transfer function. If an unstable pole is exactly cancelled by a zero in the algebra, the input-output transfer function may look stable even though an internal signal can grow. Physical systems rarely achieve exact cancellation under parameter uncertainty. For control design, exact cancellation of unstable or lightly damped modes is normally avoided unless a deeper robust-control argument supports it.
-
-Block diagrams also encode units. A summing junction is meaningful only when the incoming signals share compatible units or have already been scaled by transducers. Adding an angle command in radians directly to a voltage feedback signal is physically wrong unless a potentiometer or sensor gain has converted one into the other's units. Many errors in feedback modeling are unit errors disguised as algebra errors.
-
-Reduction should preserve the question being asked. If the task is to find $C(s)/R(s)$, internal error signals may disappear from the final expression. If the task is to size an amplifier, compute actuator effort, or check sensor noise, those internal signals must be retained or recovered after reduction. A single equivalent block is useful for pole and output-response analysis, but engineering design often needs several transfer functions from different inputs to different internal and external signals.
-
-In large diagrams, it is often better to name intermediate transfer functions than to force one enormous expression immediately. For example, reduce an actuator-motor-load group to $G_p(s)$, a sensor-filter group to $H(s)$, and a compensator to $G_c(s)$, then form $G_cG_p/(1+G_cG_pH)$. This keeps algebra readable and makes later design changes localized.
-
-For documentation, include both the original unreduced diagram and the reduced result. The unreduced diagram explains the physical architecture; the reduced transfer function supports calculation. Keeping both prevents later readers from losing the connection between mathematical poles and actual components.
-
-This also makes audits and later redesigns much easier.
-
-It preserves design intent.
-
-It also supports maintenance.
-
-## Visual
-
 ```mermaid
 flowchart TB
   subgraph Original["Unreduced block diagram with separate paths"]
     direction LR
-    R["R(s)"] --> S1(("Σ"))
+    R["R(s)"] --> S1(("sum"))
     FB["-H(s)C(s)"] --> S1
     S1 --> E["E(s)"]
     E --> G1["G1(s)"]
     G1 --> Pick["Pickoff: X(s)"]
     Pick --> G2["G2(s)"]
-    G2 --> S2(("Σ"))
+    G2 --> S2(("sum"))
     D["D(s): disturbance"] --> S2
     S2 --> C["C(s)"]
     C --> H["H(s)"]
@@ -121,7 +73,7 @@ flowchart TB
     Series["Series: G_eq = G1 * G2"]
     Parallel["Parallel sum: G_eq = G1 + G2"]
     Feedback["Negative feedback: G_eq = G / (1 + G H)"]
-    Move["Move pickoff/summing junction only with compensating G or 1/G factor"]
+    Move["Compensate a moved pickoff or summing junction with G or 1/G"]
     Series --> Feedback
     Parallel --> Feedback
     Move --> Feedback
@@ -144,7 +96,7 @@ flowchart TB
   MasonEq --> Reduced
 ```
 
-This diagram keeps the unreduced control architecture, the algebraic reduction rules, and the Mason signal-flow alternative visible at the same time. The disturbance and internal pickoff paths show why a single collapsed `C(s)/R(s)` block is not enough when the design question involves disturbance rejection, sensor noise, actuator effort, or internal stability.
+The unreduced diagram records where the disturbance enters and where the internal signal is measured. Those paths should stay separate until the desired transfer function is clear: reference to output, disturbance to output, sensor noise to output, or reference to error. A controller can improve tracking while worsening noise transmission.
 
 | Interconnection | Formula | Stability denominator |
 |---|---|---|
@@ -154,28 +106,68 @@ This diagram keeps the unreduced control architecture, the algebraic reduction r
 | positive feedback | $G/(1-GH)$ | $1-GH=0$ after clearing fractions |
 | Mason graph | $\sum P_k\Delta_k/\Delta$ | $\Delta=0$ |
 
-## Worked example 1: nested block reduction
+## Keeping reference, disturbance, and noise paths distinct
 
-Problem: A forward path contains $G_1(s)=2$ followed by an inner negative-feedback loop with $G_2(s)=5/(s+1)$ and $H_2(s)=0.4$. The result is followed by $G_3(s)=1/(s+3)$ with outer unity negative feedback. Find the closed-loop transfer function.
-
-Method:
-
-1. Reduce the inner loop:
+An equivalent block is meaningful only for a stated input-output pair. Consider a forward path $G(s)$, feedback path $H(s)$, an output disturbance $D(s)$, and measurement noise $N(s)$ added in the feedback signal. The equations are
 
 $$
-G_{2,\text{cl}}=\frac{G_2}{1+G_2H_2}.
+E=R-HY-N, \qquad Y=GE+D.
 $$
 
-2. Substitute:
+Solving once while retaining all three inputs gives
 
 $$
+Y=\frac{G}{1+GH}R+\frac{1}{1+GH}D-\frac{G}{1+GH}N.
+$$
+
+The three coefficients answer different design questions:
+
+$$
+\frac{Y}{R}=\frac{G}{1+GH}, \qquad
+\frac{Y}{D}=\frac{1}{1+GH}, \qquad
+\frac{Y}{N}=-\frac{G}{1+GH}.
+$$
+
+Collapsing the diagram directly to $Y/R$ would discard the disturbance and noise paths. The same warning applies to actuator effort and internal error. If the actuator command is $U=G_cE$, then $U/R$, $U/D$, and $U/N$ may expose saturation or noise amplification that is absent from the output response.
+
+Units provide another check on the signal equations. Inputs to a summing junction need compatible units or an explicit transducer gain. An angle command in radians cannot be added directly to a feedback voltage; the sensor must first supply the corresponding volts per radian. A diagram that is algebraically reducible can still be physically inconsistent.
+
+## Mason's formula for overlapping loops
+
+A **signal-flow graph** uses nodes for signals and directed branches for gains. A **forward path** runs from input to output without touching a node more than once. A **loop** starts and ends at the same node without otherwise repeating a node. Non-touching loops share no nodes.
+
+Mason's gain formula is
+
+$$
+T=\frac{\sum_{k=1}^N P_k\Delta_k}{\Delta},
+$$
+
+where $P_k$ is the gain of the $k$th forward path and
+
+$$
+\Delta=1-\sum L_i+\sum L_iL_j-\sum L_iL_jL_m+\cdots.
+$$
+
+Each product is taken over mutually non-touching loops. The factor $\Delta_k$ is formed after removing every loop that touches the $k$th forward path. The method replaces repeated movement of summing junctions with careful bookkeeping; omitting one non-touching loop product changes the result.
+
+State equations also admit a signal-flow representation. Integrator outputs serve as state variables, and branch gains are matrix coefficients, linking transfer-function diagrams to state-space models.
+
+## Nested-loop reduction by hand
+
+Take $G_1(s)=2$, followed by an inner negative-feedback loop with $G_2(s)=5/(s+1)$ and $H_2(s)=0.4$. The result passes through $G_3(s)=1/(s+3)$ and an outer unity negative-feedback loop.
+
+Reduce the inner loop first:
+
+$$
+\begin{aligned}
 G_{2,\text{cl}}
-=\frac{\frac{5}{s+1}}{1+\frac{5}{s+1}(0.4)}
-=\frac{5}{s+1+2}
-=\frac{5}{s+3}.
+&=\frac{G_2}{1+G_2H_2}\\
+&=\frac{\frac{5}{s+1}}{1+\frac{5}{s+1}(0.4)}\\
+&=\frac{5}{s+3}.
+\end{aligned}
 $$
 
-3. Combine the forward path:
+The forward path is then
 
 $$
 G_{\text{forward}}=G_1G_{2,\text{cl}}G_3
@@ -183,66 +175,37 @@ G_{\text{forward}}=G_1G_{2,\text{cl}}G_3
 =\frac{10}{(s+3)^2}.
 $$
 
-4. Apply outer unity feedback:
+Applying the outer loop gives
 
 $$
-T(s)=\frac{G_{\text{forward}}}{1+G_{\text{forward}}}
-=\frac{\frac{10}{(s+3)^2}}{1+\frac{10}{(s+3)^2}}.
+\begin{aligned}
+T(s)
+&=\frac{G_{\text{forward}}}{1+G_{\text{forward}}}\\
+&=\frac{10}{(s+3)^2+10}\\
+&=\frac{10}{s^2+6s+19}.
+\end{aligned}
 $$
 
-5. Clear the fraction:
+## A two-loop Mason calculation
 
-$$
-T(s)=\frac{10}{(s+3)^2+10}
-=\frac{10}{s^2+6s+19}.
-$$
-
-Checked answer: $T(s)=10/(s^2+6s+19)$.
-
-## Worked example 2: Mason gain formula
-
-Problem: A signal-flow graph has one input-output forward path $P_1=G_1G_2G_3$. It has two loops: $L_1=-G_2H_1$ touching the forward path and $L_2=-G_3H_2$ also touching the forward path. The two loops do not touch each other. Find $T$.
-
-Method:
-
-1. Write the determinant:
-
-$$
-\Delta=1-\sum L_i+\sum L_iL_j.
-$$
-
-2. Substitute the loops:
-
-$$
-\Delta=1-(L_1+L_2)+L_1L_2.
-$$
-
-3. Replace $L_1$ and $L_2$:
+Suppose one input-output path has gain $P_1=G_1G_2G_3$. The graph contains $L_1=-G_2H_1$ and $L_2=-G_3H_2$; both touch the forward path, but they do not touch each other. Then
 
 $$
 \begin{aligned}
 \Delta
-&=1-\left(-G_2H_1-G_3H_2\right)+(-G_2H_1)(-G_3H_2)\\
-&=1+G_2H_1+G_3H_2+G_2G_3H_1H_2.
+&=1-(L_1+L_2)+L_1L_2\\
+&=1+G_2H_1+G_3H_2+G_2G_3H_1H_2\\
+&=(1+G_2H_1)(1+G_3H_2).
 \end{aligned}
 $$
 
-4. Since both loops touch the only forward path, no loops remain for $\Delta_1$:
+Both loops are removed when forming $\Delta_1$, so $\Delta_1=1$ and
 
 $$
-\Delta_1=1.
+T=\frac{G_1G_2G_3}{1+G_2H_1+G_3H_2+G_2G_3H_1H_2}.
 $$
 
-5. Apply Mason:
-
-$$
-T=\frac{P_1\Delta_1}{\Delta}
-=\frac{G_1G_2G_3}{1+G_2H_1+G_3H_2+G_2G_3H_1H_2}.
-$$
-
-Checked answer: The determinant factors as $(1+G_2H_1)(1+G_3H_2)$ because the loops are non-touching.
-
-## Code
+## Checking a reduction with SymPy
 
 ```python
 import sympy as sp
@@ -262,19 +225,20 @@ print("forward path:", sp.factor(forward))
 print("closed-loop T:", sp.factor(closed))
 ```
 
-## Common pitfalls
+## What a reduced transfer function can hide
 
-- Reducing a feedback loop before checking the sign at the summing junction.
-- Treating nonunity feedback as if the summing-junction error were $R-C$.
-- Moving pickoff points across blocks without compensating by $G$ or $1/G$.
-- Cancelling pole-zero factors too early. A cancelled unstable internal mode may still matter physically if the realization is not exact.
-- Missing non-touching loop products in Mason's determinant.
-- Forgetting that disturbance transfer functions differ depending on where the disturbance enters.
+The sign at each summing junction must be checked before reducing a loop. Nonunity feedback, moved pickoff points, and disturbance locations are common sources of otherwise plausible algebra errors. Unit consistency matters too: a summing junction can combine only signals with compatible units or signals already converted by a transducer gain.
 
-## Connections
+Pole-zero cancellation needs particular care. An unstable pole cancelled in the input-output transfer function can remain in an internal signal, and real components rarely produce an exact cancellation under parameter uncertainty. Lightly damped and unstable modes are therefore not normally cancelled without a robust-stability argument.
 
-- [Introduction to feedback](/cs/control-engineering/introduction-to-feedback-control) introduces the closed-loop formula.
-- [Physical system modeling](/cs/control-engineering/physical-system-modeling-frequency-domain) supplies subsystem blocks.
-- [Steady-state errors](/cs/control-engineering/steady-state-errors-and-sensitivity) rely on correctly reduced error transfer functions.
-- [Root locus](/cs/control-engineering/root-locus-sketching-and-analysis) starts from the characteristic equation found after reduction.
-- [Digital control](/cs/control-engineering/digital-control-sampling-z-transform-design) repeats many reduction ideas in the $z$-domain.
+Reduction should preserve the quantity being designed. A single equivalent block is enough for output poles and response, but actuator sizing, amplifier limits, sensor noise, and internal stability require additional input-to-internal-signal transfer functions. Naming intermediate groups such as $G_p(s)$, $H(s)$, and $G_c(s)$ keeps those expressions readable. Documentation is strongest when it retains both the physical, unreduced diagram and the reduced equations.
+
+Large diagrams are easier to audit when each physical group is reduced only as far as the next design boundary. An actuator-motor-load group can become $G_p(s)$, a sensor-filter group can become $H(s)$, and the controller can remain $G_c(s)$. The closed-loop expression stays compact, while a later controller or sensor change remains localized to one named block.
+
+The unreduced and reduced forms serve different purposes. The first records disturbance locations, units, and actual components; the second exposes poles and supports calculation. Keeping both also makes it possible to recover internal signals after the main transfer function has been simplified.
+
+<div className="see-also">
+
+See also: [Introduction to feedback](/cs/control-engineering/introduction-to-feedback-control) · [Physical system modeling](/cs/control-engineering/physical-system-modeling-frequency-domain) · [Steady-state errors](/cs/control-engineering/steady-state-errors-and-sensitivity) · [Root locus](/cs/control-engineering/root-locus-sketching-and-analysis) · [Digital control](/cs/control-engineering/digital-control-sampling-and-z-transform)
+
+</div>

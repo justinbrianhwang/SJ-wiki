@@ -7,13 +7,9 @@ sidebar_position: 6
 
 The determinant compresses important information about a square matrix into one scalar. It detects invertibility, gives signed area or volume scaling, changes predictably under row operations, and produces formulas such as Cramer's rule. Determinants are not the preferred way to solve large systems, but they are conceptually central.
 
-![A matrix transforms two vectors into new positions in the plane.](https://commons.wikimedia.org/wiki/Special:FilePath/Matrix_multiplication.svg)
-
-*Figure: Matrix multiplication can be read geometrically as a transformation of vectors. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Matrix_multiplication.svg), Jakob.scholbach and Pbroks13, CC BY-SA 3.0.*
-
 A useful way to read $\det(A)$ is as a signed scaling factor. In $\mathbb{R}^2$, the absolute value of the determinant is the area-scaling factor of the linear transformation $\mathbf{x}\mapsto A\mathbf{x}$. In $\mathbb{R}^3$, it is the volume-scaling factor. The sign records whether orientation is preserved or reversed.
 
-## Definitions
+## Computing from minors and triangular form
 
 For a $2\times2$ matrix,
 
@@ -38,7 +34,7 @@ $$
 \det(A)=a_{i1}C_{i1}+a_{i2}C_{i2}+\cdots+a_{in}C_{in}.
 $$
 
-Expansion along a column is analogous. In practice, cofactor expansion is best used when a row or column has many zeros.
+Expansion along a column is analogous. Cofactor expansion is best used when a row or column has many zeros.
 
 For a triangular matrix, the determinant is the product of diagonal entries:
 
@@ -48,7 +44,7 @@ $$
 
 This is one reason row reduction is useful for determinant computation.
 
-## Key results
+## Area, orientation, and invertibility
 
 Row operation rules:
 
@@ -120,8 +116,6 @@ asks for the values of $\lambda$ that make $A-\lambda I$ singular. Equivalently,
 
 In computation, determinant values can be misleading when matrices are large or ill-conditioned. A determinant may be extremely small or large because it multiplies many scale factors together. For solving systems, rank decisions, or conditioning, factorizations and singular values usually provide more reliable information. Determinants remain invaluable for theory, orientation, exact symbolic work, and low-dimensional calculations.
 
-## Visual
-
 ASCII cofactor expansion along the first row of a $3\times3$ matrix:
 
 ```text
@@ -145,7 +139,7 @@ flowchart TD
   C --> G["Area/volume scaled by absolute det(A)"]
 ```
 
-## Worked example 1: Compute by cofactor expansion
+## Expanding along a sparse row
 
 Problem: compute
 
@@ -196,7 +190,7 @@ $$
 
 Checked answer: $\det(A)=-19$, so $A$ is invertible.
 
-## Worked example 2: Compute by row reduction
+## Preserving the determinant during elimination
 
 Problem: compute the determinant of
 
@@ -245,7 +239,7 @@ $$
 
 Step 4: check row-operation effects. We used only row replacements, so no sign changes or scaling corrections are needed. The checked answer is $\det(B)=5$.
 
-## Code
+## Floating-point determinants in NumPy
 
 ```python
 import numpy as np
@@ -264,7 +258,7 @@ print(np.linalg.det(A) != 0)
 
 Floating-point determinant calculations can contain small roundoff error, so the example rounds values that are mathematically integers. For exact symbolic determinant work, use rational arithmetic or a computer algebra system.
 
-## Common pitfalls
+## Choosing a method and interpreting the result
 
 - Using the $2\times2$ formula on a larger matrix by multiplying only diagonal products.
 - Forgetting the alternating cofactor signs.
@@ -289,9 +283,8 @@ Determinants also detect orientation in change of variables. In multivariable ca
 
 As a final check, a matrix with two equal rows or two equal columns has determinant zero because swapping those rows or columns changes the sign but leaves the matrix unchanged.
 
-## Connections
+<div className="see-also">
 
-- [Matrix Inverses and Elementary Matrices](/math/linear-algebra/matrix-inverses-and-elementary-matrices)
-- [Gaussian Elimination](/math/linear-algebra/gaussian-elimination)
-- [Eigenvalues and Eigenvectors](/math/linear-algebra/eigenvalues-and-eigenvectors)
-- [Quadratic Forms and Spectral Theorems](/math/linear-algebra/quadratic-forms-and-spectral-theorems)
+See also: [Matrix Inverses and Elementary Matrices](/math/linear-algebra/matrix-inverses-and-elementary-matrices) · [Gaussian Elimination](/math/linear-algebra/gaussian-elimination) · [Eigenvalues and Eigenvectors](/math/linear-algebra/eigenvalues-and-eigenvectors) · [Quadratic Forms and Spectral Theorems](/math/linear-algebra/quadratic-forms-and-spectral-theorems)
+
+</div>

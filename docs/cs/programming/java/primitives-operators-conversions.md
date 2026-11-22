@@ -5,52 +5,44 @@ sidebar_position: 4
 
 # Primitives, Operators, and Conversions
 
-Java has primitive types for numeric, character, and boolean values, and it has reference types for objects and arrays. The source book treats primitives carefully because they behave differently from objects in assignment, method invocation, default values, arithmetic, comparison, and boxing. A Java programmer must know both worlds because ordinary code constantly crosses between them.
+Java has primitive types for numeric, character, and boolean values, and reference types for objects and arrays. The distinction affects assignment, method invocation, default values, arithmetic, comparison, and boxing. Ordinary Java code crosses between the two domains often enough that neither can be treated as a special case.
 
-Operators make expressions compact, but compactness can hide conversions. Arithmetic may promote smaller integer types to `int`, integer division discards a remainder, compound assignment performs an implicit cast, `==` compares primitive values or reference identity depending on operands, and member access uses the dot operator. The chapter on operators is therefore less about memorizing symbols and more about predicting the type and value of each expression.
+Operators keep expressions compact, but conversions happen between the tokens. Arithmetic may promote smaller integer types to `int`; integer division discards a remainder; compound assignment includes an implicit cast; and `==` compares either primitive values or reference identity. The reliable question is always two-part: what value does the expression produce, and what is its type?
 
-## Definitions
+## The primitive and wrapper split
 
-The source basis for this page is Chapters 8 and 9 on primitive wrapper types, boxing conversions, arithmetic operations, general operators, expressions, type conversions, precedence, associativity, and member access. The terms below are written as contracts: each one tells you what the compiler can check, what the runtime must preserve, and what a reader of the program may rely on.
+A **primitive type** stores a non-object value. Java's primitive categories are the integral types (`byte`, `short`, `int`, `long`, and `char`), the floating-point types (`float` and `double`), and `boolean`.
 
-**Primitive type.** A primitive type stores a non-object value. Java's primitive categories are integral types, floating-point types, `char`, and `boolean`. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+A **wrapper type** such as `Integer`, `Double`, `Character`, or `Boolean` supplies an object representation of a primitive value. **Boxing** converts a primitive to the corresponding wrapper when a reference is required; **unboxing** extracts the primitive when an operation requires it.
 
-**Wrapper type.** A wrapper class such as `Integer`, `Double`, `Character`, or `Boolean` provides an object representation for a primitive value. The source covers common wrapper behavior and Java 5 boxing conversions. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+Autoboxing removes ceremony around generic collections and wrapper-based APIs, but the primitive/reference boundary still matters. A wrapper may be `null`, so unboxing can throw `NullPointerException`. Wrapper identity is also separate from numeric equality; caching makes identity comparisons especially misleading.
 
-**Boxing conversion.** Boxing converts a primitive value to a corresponding wrapper object when a reference is needed. Unboxing extracts the primitive value from a wrapper when a primitive operation is required. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+For example:
 
-**Numeric promotion.** Numeric promotion is the set of rules that convert operands to a common type for arithmetic. For many integer operations, `byte`, `short`, and `char` are promoted to `int`. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+```java
+Integer boxed = Integer.valueOf(15);
+int unboxed = boxed.intValue();
+```
 
-**Compound assignment.** An operator such as `+=` combines an operation with assignment. In Java it includes an implicit conversion back to the left-hand variable type when the operation is allowed. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+The explicit methods show the two conversions that autoboxing syntax can otherwise conceal.
 
-**Precedence.** Precedence determines how operators group when parentheses are absent. Associativity determines grouping among operators at the same precedence level. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+Unlike C, Java fixes the sizes and two's-complement behavior of integral primitive types. `byte` is 8-bit signed, `short` is 16-bit signed, `int` is 32-bit signed, and `long` is 64-bit signed. `char` is an unsigned 16-bit UTF-16 code unit with range $0$ through $65535$. It is not guaranteed to hold one complete Unicode character because supplementary code points use a surrogate pair.
 
-**Member access.** Member access uses `.` to select a field, method, or nested type from a type name, object reference, or package-qualified name, depending on context. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+`float` uses 32-bit IEEE 754 binary floating point and `double` uses 64-bit binary floating point. Their values include positive and negative infinity, NaN, and signed zero. `boolean` has only `true` and `false`; Java does not convert integers or references to boolean conditions.
 
-## Key results
+Fields receive default values when an object or array is created: numeric zero, `false`, or `null` as appropriate. Local variables do not receive a usable default merely because they were declared. The compiler requires a local variable to be definitely assigned before reading it.
 
-**Expression type matters as much as expression value.** The expression `1 + 2` has an integer value and an `int` type. The expression `1 + 2.0` has a floating-point value and a `double` type. Later assignment, overload selection, and method invocation depend on the type produced by the expression, not only on the mathematical value. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+### Literals choose the starting type
 
-**Integer division is not real-number division.** If both operands of `/` are integer types, Java performs integer division and discards the fractional part. The operation is not rounded to the nearest integer. To get floating-point division, at least one operand must be converted to `float` or `double` before the division. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+An unsuffixed integral literal is normally `int` if representable; suffix `L` requests `long`. An unsuffixed floating literal is `double`; suffix `F` requests `float`. Thus `float f = 0.1;` does not compile without a cast because the literal is a `double`, while `float f = 0.1F;` does.
 
-**`==` has two different everyday meanings.** For primitives, `==` compares values. For references, `==` compares whether two reference values refer to the same object or are both `null`. Object content equality is normally expressed by a method such as `equals`, whose contract belongs to the class. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+Decimal, hexadecimal, binary, and octal spellings describe the same integral values. A leading zero denotes octal, so `010` is eight. Underscores may separate digits where the grammar permits them and do not change the value.
 
-**Boxing is convenient but not invisible design.** Autoboxing reduces boilerplate when primitives move into generic collections or wrapper APIs. It can also hide object creation, null unboxing failures, and identity confusion. The source presents boxing as a conversion feature, not as a reason to forget the primitive/reference distinction. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+The most negative `int`, $-2^{31}$, has no corresponding positive `int`. The token sequence `-2147483648` is handled as the special boundary case permitted for the decimal literal under unary minus; attempting to write positive `2147483648` as an `int` literal fails. `Integer.MIN_VALUE == -Integer.MIN_VALUE` is true because negation overflows back to the same bit pattern.
 
-**Parentheses are cheap documentation.** Operator precedence rules are precise, but readers should not have to reconstruct a difficult expression mentally. Parentheses can make intended grouping obvious, especially around assignment inside conditions, bit operations, and mixed arithmetic. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+## Trace an expression from operands to destination
 
-A practical expression-tracing method is to annotate every subexpression with a type. Start with literals and variables, apply promotions, apply the operator, then check assignment conversion at the end. For example, `short s = 1; s = s + 1;` fails because `s + 1` is promoted to `int`, while `s += 1;` is allowed because compound assignment includes a conversion back to `short`. That behavior is not arbitrary; it follows from the separate rules for binary numeric promotion and compound assignment. The same discipline catches integer division errors and overloaded-method surprises.
-
-## Visual
-
-| Operation family | Example | Important rule | Common check |
-|---|---|---|---|
-| Arithmetic | `a + b`, `x / y` | Numeric promotion determines result type | Are both operands integers? |
-| Comparison | `x < y`, `a == b` | Produces `boolean`; `==` depends on operand kind | Are references being compared by identity? |
-| Logical | `&&`, `||`, `!` | Operates on `boolean`; short-circuit forms skip work | Can the right side be skipped? |
-| Bitwise | `&`, `|`, `^`, `~`, shifts | Operates on integral values or booleans for some operators | Is sign extension relevant? |
-| Assignment | `=`, `+=`, `*=` | Stores into a variable after conversion checks | What is the left-hand declared type? |
-| Member access | `obj.method()`, `Type.field` | Selects members by type or object reference | Is the receiver a type name or reference? |
+**Numeric promotion** converts operands to the types required by an operator. Most arithmetic on `byte`, `short`, and `char` first promotes their values to `int`. The result type belongs to the expression itself; a later assignment does not retroactively change how that expression was evaluated.
 
 ```mermaid
 flowchart TD
@@ -61,35 +53,152 @@ flowchart TD
   E --> F[Assignment or method invocation check]
 ```
 
-## Worked example 1: predicting integer and floating division
+A useful tracing routine is to annotate each subexpression with a type, starting with literals and variables. Apply promotions, then the operator, and only then check assignment or method-invocation conversion.
 
-Problem: Compute `int a = 7 / 2; double b = 7 / 2; double c = 7 / 2.0;`.
+Binary numeric promotion first unboxes wrapper operands when needed. If either operand is `double`, both become `double`; otherwise `float`, then `long`, then `int` wins. The smaller integral types never remain the result type of ordinary binary arithmetic.
 
-Method:
+Assignment conversion is a separate stage. Widening from `int` to `long`, or from `float` to `double`, needs no cast. Narrowing may discard high bits or precision and normally requires a cast. A constant expression receives one useful exception:
 
-1. For `a`, both operands are integer literals, so Java performs integer division. `7 / 2` produces `3`, and `3` is assigned to `a`.
-2. For `b`, the expression is still evaluated before assignment. Both operands are integers, so `7 / 2` again produces integer `3`.
-3. The integer result `3` is then widened to `double` for assignment, producing `3.0` in `b`.
-4. For `c`, `2.0` is a `double` literal, so the other operand is converted and floating-point division is used.
-5. `7.0 / 2.0` produces `3.5`, and that value is assigned to `c`.
+```java
+byte ok = 100;       // constant value fits
+// byte bad = 128;   // constant value is out of range
+int n = 100;
+// byte b = n;       // n is not a constant expression
+```
 
-Checked answer: `a` is `3`, `b` is `3.0`, and `c` is `3.5`. Assignment to `double` after integer division cannot recover the discarded fractional part.
+The compiler can prove the first value fits from the expression itself. A `final int` initialized with a constant expression may also participate in constant narrowing; an ordinary variable cannot, even if its run-time value happens to be small.
 
-## Worked example 2: understanding compound assignment
+| Operation family | Example | Governing rule | Question to ask |
+|---|---|---|---|
+| Arithmetic | `a + b`, `x / y` | Numeric promotion determines the result type | Are both operands integers? |
+| Comparison | `x < y`, `a == b` | Produces `boolean`; `==` depends on operand kind | Are references being compared by identity? |
+| Logical | `&&`, `||`, `!` | Operates on `boolean`; short-circuit forms may skip work | Can the right side be skipped? |
+| Bitwise | `&`, `|`, `^`, `~`, shifts | Operates on integral values, or booleans for `&`, `|`, and `^` | Is sign extension relevant? |
+| Assignment | `=`, `+=`, `*=` | Stores after the applicable conversion checks | What is the declared type on the left? |
+| Member access | `obj.method()`, `Type.field` | `.` selects a field, method, or nested type | Is the receiver a type name or a reference? |
 
-Problem: Explain why `short s = 10; s += 5;` compiles, while `s = s + 5;` requires a cast.
+**Precedence** determines how operators group in the absence of parentheses; **associativity** resolves operators at the same precedence level. The rules are precise, but parentheses are often better documentation around mixed arithmetic, bit operations, and assignments used as subexpressions.
 
-Method:
+Java evaluates operands left to right. `f() + g()` calls `f` before `g`, although the operator still performs numeric promotion on their returned values. `&&`, `||`, and `?:` go further by conditionally skipping an operand. `&` and `|` on booleans evaluate both sides, which matters when the right side has a side effect or unsafe dereference.
 
-1. `s` has declared type `short`, but arithmetic on `short` values is promoted to `int` for the binary `+` operator.
-2. In `s = s + 5`, the right side has type `int`. Assigning an arbitrary `int` to a `short` is a narrowing conversion and is not allowed implicitly in this context.
-3. In `s += 5`, Java defines compound assignment roughly as `s = (short)(s + 5)`, with the left-hand variable evaluated only once.
-4. The implicit narrowing conversion is part of the compound assignment rule, so the statement compiles.
-5. The programmer is still responsible for understanding possible overflow or truncation.
+## Integer division happens before assignment
 
-Checked answer: `s += 5` compiles because compound assignment includes conversion back to the left-hand type. `s = s + 5` exposes the promoted `int` result and needs an explicit cast if the programmer accepts narrowing.
+Consider:
 
-## Code
+```java
+int a = 7 / 2;
+double b = 7 / 2;
+double c = 7 / 2.0;
+```
+
+For `a`, both operands are integer literals, so integer division produces `3`. The expression assigned to `b` is evaluated the same way; only afterward is `3` widened to `3.0`. In the final line, `2.0` is a `double`, so binary numeric promotion converts the other operand and the division produces `3.5`.
+
+The results are therefore `a == 3`, `b == 3.0`, and `c == 3.5`. Assigning an integer result to `double` cannot restore a fraction already discarded.
+
+Remainder follows truncated division. For integer operands with nonzero divisor,
+
+$$
+a=(a/b)b+(a\%b).
+$$
+
+Since `-7 / 2` is `-3`, `-7 % 2` is `-1`. `%` is therefore a remainder operator, not a mathematical modulo function that always returns a nonnegative value. `Math.floorMod(-7, 2)` returns `1` when a nonnegative residue is required.
+
+Integer division by zero throws `ArithmeticException`. Floating-point division follows IEEE 754 instead: `1.0 / 0.0` is positive infinity, `-1.0 / 0.0` is negative infinity, and `0.0 / 0.0` is NaN.
+
+## Why `s += 5` and `s = s + 5` differ
+
+A **compound assignment** combines an operator with assignment and includes a conversion back to the left-hand variable's type. Given:
+
+```java
+short s = 10;
+s += 5;
+```
+
+the binary addition promotes `s` to `int`, but the compound-assignment rule converts the result back to `short`. It behaves roughly like `s = (short) (s + 5)`, except that the left-hand expression is evaluated only once.
+
+By contrast, `s = s + 5` exposes the `int` result of `+`. Assigning that result to `short` is a narrowing conversion, so an explicit cast is required. The implicit conversion in `+=` can still overflow or truncate; compilation does not prove that the narrowed value is numerically safe.
+
+The “left side once” rule matters for arrays. In `a[index()] += value()`, the array reference and index are evaluated once before the right operand. Rewriting it as `a[index()] = (T)(a[index()] + value())` would call `index()` twice and could access different elements.
+
+## Overflow and bit operations are defined, but still hazardous
+
+Integral overflow wraps modulo $2^w$ for a type width $w$. For `int`, compute
+
+$$
+2{,}147{,}483{,}647+1.
+$$
+
+The mathematical result is $2{,}147{,}483{,}648$. Its low 32 bits are hexadecimal `0x80000000`, interpreted as `Integer.MIN_VALUE`, or $-2{,}147{,}483{,}648$. Java does not throw for this ordinary addition. `Math.addExact` and related methods can request an exception when overflow must be detected.
+
+Shift operators promote a `byte`, `short`, or `char` left operand to `int`. `>>` is an arithmetic right shift and extends the sign bit; `>>>` shifts zeros into the high positions. For
+
+```java
+int x = -8;            // 0xfffffff8
+int a = x >> 2;        // 0xfffffffe, which is -2
+int b = x >>> 2;       // 0x3ffffffe, which is 1073741822
+```
+
+the two operators preserve different interpretations of the bit pattern. Shift distances are masked: an `int` shift uses only the low five bits, so `1 << 32` is the same as `1 << 0`, not zero and not an error. Code should validate an external shift count rather than relying on that masking.
+
+Bitwise `&`, `|`, and `^` also work on booleans, producing boolean results without short-circuiting. They do not convert booleans to integers.
+
+Narrowing an integer keeps the low-order bits and then interprets them in the destination type. Casting integer $300$ to `byte` retains hexadecimal `0x2c`, because
+
+$$
+300\bmod256=44.
+$$
+
+The result is therefore $44$. Casting $200$ to `byte` retains `0xc8`; as an 8-bit signed value that represents $-56$. A cast asserts that this conversion is intended, not that the source value lies in the destination range.
+
+Widening an integer is exact, but widening `int` or `long` to floating point can lose low-order precision. Every 32-bit `int` is exactly representable as `double`, while not every 64-bit `long` is. Converting the rounded floating result back can therefore fail to reproduce the original long even though the first conversion required no cast.
+
+Before comparing values of mixed numeric types, Java applies promotion. A large `long` compared with a nearby `float` may compare equal because the long is converted to a float whose spacing is coarse at that magnitude. “Widening” describes the set of representable magnitudes and language permission, not a guarantee that every numeric value remains exact.
+
+## Floating point has its own equality cases
+
+Binary floating point cannot represent most decimal fractions exactly. `0.1 + 0.2 == 0.3` is false under `double` arithmetic because the rounded operands and rounded sum do not equal the nearest representation chosen for `0.3`. Decimal financial quantities that require specified base-10 rounding often use `BigDecimal`, constructed from a decimal string or by `BigDecimal.valueOf`, rather than from the already rounded binary value of `new BigDecimal(0.1)`.
+
+NaN compares unequal to every value, including itself:
+
+```java
+double x = Double.NaN;
+boolean same = x == x;              // false
+boolean nan = Double.isNaN(x);       // true
+```
+
+Positive and negative zero compare equal with primitive `==`, but can behave differently in division: `1.0 / 0.0` is positive infinity and `1.0 / -0.0` is negative infinity. Wrapper comparison and ordering methods define their own total-order details, so primitive `==`, `Double.equals`, and `Double.compare` should not be treated as interchangeable.
+
+## Equality depends on the operand category
+
+For primitive operands, `==` compares values after the applicable promotions. For references, it tests whether both references designate the same object, or whether both are `null`. Content equality is normally expressed by `equals`, under the contract defined by the class.
+
+This distinction is easy to lose when boxing is involved. Two `Integer` references can represent the same number without reference identity being the right comparison. Unbox them for numeric comparison or use `equals` when comparing wrapper values as objects.
+
+### A boxing trace with `null` and overloads
+
+Consider:
+
+```java
+Integer count = null;
+// int next = count + 1;
+```
+
+The `+` operator requires numeric operands. Java first tries to unbox `count` by calling its integer-value conversion; because the reference is null, the expression throws before addition.
+
+Method selection can also prefer a widening primitive conversion over boxing:
+
+```java
+static String choose(long x)    { return "long"; }
+static String choose(Integer x) { return "Integer"; }
+
+String result = choose(1);
+```
+
+The literal `1` has type `int`. Widening it to `long` is selected in an earlier overload phase than boxing it to `Integer`, so `result` is `"long"`. Autoboxing convenience does not erase overload-resolution rules.
+
+Wrapper caches are an implementation-visible reason to reject identity comparisons. Some small boxed values may reuse instances, making `a == b` appear to work, while larger or differently created wrappers do not. `a.equals(b)` expresses wrapper value equality, provided `a` is non-null; `Objects.equals(a, b)` handles null references symmetrically.
+
+## One trace with all the conversions exposed
 
 ```java
 public class OperatorTrace {
@@ -113,17 +222,21 @@ public class OperatorTrace {
 }
 ```
 
-## Common pitfalls
+The output is `a = 3`, `b = 3.0`, `c = 3.5`, `s = 15`, and `unboxed = 15`.
 
-- Do not assume a `double` variable forces floating-point division. The division expression may have already been evaluated as integer arithmetic.
-- Do not use `==` for object content unless the class explicitly defines identity as the desired comparison. Use `equals` when the object contract says so.
-- Do not forget that unboxing a `null` wrapper reference fails at runtime.
-- Do not rely on readers remembering obscure precedence combinations. Use parentheses when grouping affects interpretation.
-- Do not treat compound assignment as merely shorthand. It has a specific conversion rule and evaluates the left-hand side only once.
+## Failure modes worth checking
 
-## Connections
+- A `double` destination does not force floating-point division if the division expression has already used integer operands.
+- `==` does not compare object content unless identity is the intended relation.
+- Unboxing a `null` wrapper throws at runtime.
+- Dense precedence combinations are easier to misread than an equivalent parenthesized expression.
+- Compound assignment has its own conversion rule and evaluates its left-hand side only once.
+- Integer overflow wraps silently unless a checked arithmetic method is used.
+- `char` arithmetic produces `int`, and a `char` may contain only half of a supplementary Unicode character.
+- Floating NaN needs `isNaN`; equality with NaN is always false.
+- Shift distances are masked to five bits for `int` and six for `long`.
 
-- [Tokens, Values, and Variables](/cs/programming/java/tokens-values-variables): supplies declared types and values for expressions.
+## Continue with expressions in context
+
+- [Tokens, Values, and Variables](/cs/programming/java/tokens-values-variables): supplies the declared types and values used by expressions.
 - [Control Flow, Arrays, and Strings](/cs/programming/java/control-flow-arrays-strings): uses boolean expressions to drive branches and loops.
-- [Generics, Wildcards, and Erasure](/cs/programming/java/generics-wildcards-erasure): explains why primitives need wrappers for generic collections.
-- [Collections, Iteration, and Maps](/cs/programming/java/collections-iteration-maps): shows boxing in practical collection code.

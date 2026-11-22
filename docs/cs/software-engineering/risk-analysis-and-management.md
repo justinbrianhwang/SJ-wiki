@@ -9,7 +9,7 @@ Risk analysis asks what could go wrong, how likely it is, what it would cost, an
 
 Risk management belongs near the start of a project, but it does not end there. New risks appear as requirements change, suppliers slip, prototypes reveal limitations, or defects cluster in critical modules. A useful risk process turns vague concern into named risks with probabilities, impacts, triggers, owners, mitigation strategies, and contingency plans.
 
-## Definitions
+## From uncertain event to owned response
 
 A **risk** is a possible future event or condition that would have a negative effect on project objectives if it occurred. A risk is not the same as a current problem. "The database server is down" is an issue. "The database server may not scale to expected load" is a risk until it becomes true.
 
@@ -35,7 +35,7 @@ A **contingency plan** describes what the team will do if a risk trigger occurs.
 
 A **risk management plan** records the risk identifier, description, probability, impact, exposure, mitigation, trigger, contingency, owner, and current status.
 
-## Key results
+## Exposure, mitigation, and judgment
 
 The most important formula in this chapter is simple:
 
@@ -59,7 +59,7 @@ Risk management is iterative. Probability and impact estimates should be revised
 
 Risk exposure is useful for comparing mitigation options, but it should not erase judgment about distribution. Two risks can have the same expected value while having very different consequences. A 50 percent chance of losing two days and a 1 percent chance of causing a safety failure should not be managed in the same casual way just because an arithmetic exposure looks similar. Expected value supports decisions; it does not replace engineering responsibility.
 
-## Visual
+### The risk register as a control loop
 
 ```mermaid
 flowchart TD
@@ -89,11 +89,11 @@ flowchart TD
 | Contingency | action after trigger | freeze adapter, shift sprint scope |
 | Owner | accountable watcher | integration lead |
 
-## Worked example 1: Calculating risk exposure
+## Expected loss from a rare regulatory fault
 
-**Problem.** A project has a 0.5 percent probability of an undetected fault that would cause USD 100,000 in regulatory fines. Calculate the risk exposure.
+A project has a 0.5 percent probability of an undetected fault that would cause USD 100,000 in regulatory fines. Its risk exposure follows directly from probability and impact.
 
-**Method.** Convert the probability to a decimal and multiply by impact.
+Convert the probability to a decimal and multiply by the impact.
 
 1. Probability:
 
@@ -113,13 +113,13 @@ $$
 RE = 0.005 \times 100000 = 500
 $$
 
-**Checked answer.** The risk exposure is USD 500. This does not mean the company will pay USD 500. It means the expected loss from this risk, under the estimate, is USD 500. The possible actual outcomes are closer to either USD 0 or USD 100,000, but expected value helps compare prevention options.
+The risk exposure is USD 500. The company will not literally pay USD 500: the likely realized outcomes are USD 0 or USD 100,000. The expected value is useful for comparing prevention options.
 
-## Worked example 2: Evaluating an additional review
+## Is an additional review worth its cost?
 
-**Problem.** Use the previous risk. An additional review costs USD 100 and eliminates the fault 50 percent of the time. Should the project perform the review using expected cost?
+For the same risk, an additional review costs USD 100 and eliminates the fault 50 percent of the time. Expected cost provides one basis for deciding whether to perform it.
 
-**Method.** Compute the new probability, include review cost, and compare with the original exposure.
+Compute the new probability, include the review cost in every outcome, and compare the result with the original exposure.
 
 1. Original probability is 0.005.
 
@@ -153,9 +153,9 @@ $$
 350 < 500
 $$
 
-**Checked answer.** The additional review is justified by expected cost because it reduces expected loss from USD 500 to USD 350. The check is that the review cost was included in both outcome branches, not only in the branch where the fault remains.
+The additional review is justified by expected cost because it reduces expected loss from USD 500 to USD 350. The review cost belongs in both outcome branches, not only in the branch where the fault remains.
 
-## Code
+## Comparing mitigation options in code
 
 ```python
 from dataclasses import dataclass
@@ -182,7 +182,7 @@ print("without review:", risk.exposure_without_mitigation())
 print("with review:", risk.expected_cost_with_mitigation())
 ```
 
-## Common pitfalls
+## When a risk register stops helping
 
 - Calling current issues risks. Risks are uncertain future events; current failures need issue management.
 - Estimating only probability and ignoring impact, or estimating only impact and ignoring probability.
@@ -192,10 +192,8 @@ print("with review:", risk.expected_cost_with_mitigation())
 - Assigning no owner to a risk.
 - Using expected value mechanically when safety, legal, or ethical constraints require stronger controls.
 
-## Connections
+<div className="see-also">
 
-- [Project management and process improvement](/cs/software-engineering/project-management-and-process-improvement)
-- [Project planning and estimation](/cs/software-engineering/project-planning-and-estimation)
-- [Software quality assurance](/cs/software-engineering/software-quality-assurance)
-- [Software life cycle models](/cs/software-engineering/software-life-cycle-models)
-- [Software testing](/cs/software-engineering/software-testing)
+See also: [Project management and process improvement](/cs/software-engineering/project-management-and-process-improvement) · [Project planning and estimation](/cs/software-engineering/project-planning-and-estimation) · [Software quality assurance](/cs/software-engineering/software-quality-assurance) · [Software life cycle models](/cs/software-engineering/software-life-cycle-models) · [Software testing](/cs/software-engineering/software-testing)
+
+</div>

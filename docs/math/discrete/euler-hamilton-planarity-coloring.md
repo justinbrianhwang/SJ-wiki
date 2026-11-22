@@ -13,7 +13,7 @@ These problems look similar because they all concern graph structure, but their 
 
 *Figure: The complete bipartite graph $K_{3,3}$, a classical nonplanar graph. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Complete_bipartite_graph_K3%2C3.svg), David Benbennick, public domain.*
 
-## Definitions
+## Four different questions about one graph
 
 An **Euler path** uses every edge of a graph exactly once. An **Euler circuit** is an Euler path that starts and ends at the same vertex.
 
@@ -25,7 +25,7 @@ A **proper vertex coloring** assigns colors to vertices so adjacent vertices hav
 
 A **bridge** is an edge whose removal increases the number of connected components. A **cut vertex** is a vertex whose removal increases the number of connected components. These features often affect Euler and Hamilton behavior.
 
-## Key results
+## Degree tests, planar bounds, and coloring guarantees
 
 For a connected undirected multigraph with at least two vertices:
 
@@ -58,7 +58,7 @@ Unlike Euler circuits, Hamilton circuits have no simple degree test that is both
 
 Every planar graph is $4$-colorable, by the four color theorem. Many elementary problems require fewer tools: bipartite graphs are exactly the graphs with chromatic number at most $2$, except edgeless graphs may have chromatic number $1$.
 
-## Visual
+The same small graph can be examined through each of these lenses:
 
 ```mermaid
 graph LR
@@ -77,7 +77,7 @@ graph LR
 | planarity | drawing without crossings | Euler formula and inequalities | a bad drawing does not prove nonplanarity |
 | coloring | adjacent vertices differ | greedy, bipartite test, bounds | greedy may use too many colors |
 
-## Worked example 1: Decide whether an Euler path exists
+## Reading Euler behavior from degree parity
 
 **Problem.** A connected graph has vertices $a,b,c,d,e$ with degrees
 
@@ -97,7 +97,7 @@ Does it have an Euler circuit? Does it have an Euler path?
 
 **Checked answer.** The graph has no Euler circuit, but it has an Euler path. Any Euler path must start at $a$ and end at $d$, or start at $d$ and end at $a$.
 
-## Worked example 2: Use Euler's inequality to prove nonplanarity
+## Proving $K_{3,3}$ nonplanar from its edge count
 
 **Problem.** Prove that $K_{3,3}$ is nonplanar using Euler's formula.
 
@@ -127,7 +127,7 @@ $$
 
 **Checked answer.** The inequality required of triangle-free planar simple graphs is violated, so $K_{3,3}$ is nonplanar.
 
-## Code
+## Degree diagnostics and greedy coloring
 
 ```python
 def euler_status(graph):
@@ -155,7 +155,7 @@ print(greedy_coloring(G))
 
 The Euler test is exact for connected undirected graphs. The greedy coloring algorithm is heuristic: it always produces a proper coloring, but not always one with the fewest colors.
 
-## Common pitfalls
+## Where the tests stop being decisive
 
 - Confusing Euler and Hamilton conditions. Euler uses edges; Hamilton uses vertices.
 - Applying the Euler degree test to a disconnected graph without checking connectivity.
@@ -178,10 +178,14 @@ For Euler questions, vertices of degree zero can be ignored for the edge travers
 
 For coloring problems, a greedy coloring should be followed by a lower-bound argument if the chromatic number is requested. A triangle proves at least three colors; a displayed three-coloring proves at most three. Together they prove exactly three. Without the lower bound, the coloring only gives an upper bound.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Graphs basics](/math/discrete/graphs-basics) supplies degree, complete graph, and bipartite graph definitions.
 - [Graph paths, connectivity, and shortest paths](/math/discrete/graph-paths-connectivity-shortest-paths) supplies path and connectivity language.
 - [Trees](/math/discrete/trees) are planar connected graphs with no cycles and satisfy $e=v-1$.
 - [Algorithms and complexity](/math/discrete/algorithms-and-complexity) studies the computational difficulty of Hamilton and coloring problems.
 - [Finite-state machines and computation](/math/discrete/finite-state-machines-and-computation) connects graph traversal to state-space search.
+
+</div>

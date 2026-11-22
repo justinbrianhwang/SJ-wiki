@@ -7,9 +7,9 @@ sidebar_position: 8
 
 MATLAB scripting is the most direct way to turn a mathematical model into a repeatable simulation experiment. A script can define parameters, compute equilibria, call an ODE solver, postprocess outputs, and generate plots. Compared with a hand-built block diagram, a script makes parameter sweeps, convergence checks, optimization loops, and unit tests easier to automate.
 
-A good simulation script is not just a sequence of commands that happens to make a plot. It should make assumptions visible, keep model equations in one place, label units, set solver tolerances intentionally, and preserve enough results to reproduce the run. This page focuses on the workflow that connects a state equation to MATLAB code and then to Simulink-compatible thinking.
+A good simulation script does more than produce a plot. It should state assumptions, keep model equations in one place, label units, set solver tolerances intentionally, and preserve enough results to reproduce the run. The workflow connects a state equation to MATLAB code and then to Simulink-compatible thinking.
 
-## Definitions
+## Anatomy of an ODE script
 
 A MATLAB ODE derivative function has the form
 
@@ -41,7 +41,7 @@ A reproducible script separates five concerns:
 4. Solver configuration and execution.
 5. Plotting and numerical checks.
 
-## Key results
+## Solver calls inside a reproducible experiment
 
 For a state equation
 
@@ -74,13 +74,11 @@ Scripts are also the natural place for reproducible studies. A single run answer
 
 When a script is paired with a Simulink model, MATLAB should act as the experiment driver. It can assign workspace parameters, call `sim`, collect logged signals, compute error metrics, and create final plots. That workflow reduces manual clicking and makes the block diagram part of a repeatable computational experiment rather than a one-off visual artifact.
 
-Versioned scripts should avoid dependence on interactive workspace state. A script that only runs after several manual commands is hard to validate. Start from `clear` only when appropriate, define all parameters inside the file or a documented setup function, and make random seeds explicit for Monte Carlo runs. Reproducibility is a simulation requirement, not just a coding style preference.
+Versioned scripts should avoid dependence on interactive workspace state. A script that only runs after several manual commands is hard to validate. Start from `clear` only when appropriate, define all parameters inside the file or a documented setup function, and make random seeds explicit for Monte Carlo runs. Reproducibility is a simulation requirement rather than a coding style preference.
 
 Good scripts fail loudly when assumptions are violated. Simple assertions for positive masses, nonnegative concentrations, increasing time vectors, and matching data lengths catch errors before the solver produces an attractive but meaningless plot.
 
 Those checks are cheap and usually worth keeping.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -103,7 +101,7 @@ flowchart TD
 
 This scripting diagram treats a MATLAB file as a reproducible experiment driver. Parameters, initial conditions, input timing, derivative function, assertions, solver settings, postprocessing, plotting, and saved artifacts are all separate blocks. The two feedback paths distinguish equation/input errors from solver-configuration errors.
 
-## Worked example 1: Script a first-order thermal model
+## Turning a thermal balance into a solver call
 
 Problem: A lumped object with thermal capacitance $C=500\ \mathrm{J/K}$ loses heat to ambient through resistance $R=2\ \mathrm{K/W}$. A heater supplies $Q=100\ \mathrm{W}$ starting at $t=0$. Ambient temperature is $T_\infty=20^\circ\mathrm{C}$ and $T(0)=20^\circ\mathrm{C}$. Derive the model and prepare a MATLAB script.
 
@@ -144,7 +142,7 @@ Checked answer: at one time constant, $T(1000)=220-200e^{-1}\approx146.4^\circ\m
 
 Simulink description: use a Constant block for heater power, a Constant for ambient temperature, a Sum block for $T-T_\infty$, a Gain $1/R$ for heat loss, a Sum block for $Q-\text{loss}$, a Gain $1/C$, and an Integrator for $T$ with initial condition $20$.
 
-## Worked example 2: Parameter sweep for damping ratio
+## Sweeping damping ratio without duplicating models
 
 Problem: Simulate
 
@@ -189,7 +187,7 @@ Checked answer: all three responses approach $q=1$, but their transients differ.
 
 Simulink description: put $\zeta$ in the MATLAB workspace and use it in Gain block expressions. Run the model repeatedly from a script with `sim`, changing the parameter each time and logging the output.
 
-## Code
+## A complete MATLAB experiment driver
 
 ```matlab
 clear; clc; close all;
@@ -231,7 +229,7 @@ title('Step response parameter sweep');
 
 The first plot should be monotone and slow because the thermal time constant is large. The second plot should clearly distinguish underdamped and critically damped behavior. A disciplined script records the parameters that produced each curve, which makes the figure interpretable later.
 
-## Common pitfalls
+## Script habits that corrupt comparisons
 
 - Hiding parameters inside derivative functions as unexplained numeric constants.
 - Passing row vectors and column vectors inconsistently. MATLAB solvers expect the derivative to match the shape of `x0`.
@@ -240,9 +238,8 @@ The first plot should be monotone and slow because the thermal time constant is 
 - Overwriting variables during parameter sweeps and losing the conditions for each run.
 - Comparing a MATLAB script and Simulink model without matching solver tolerances, initial conditions, and input timing.
 
-## Connections
+<div className="see-also">
 
-- [Numerical Integration Methods](/physics/simulation/numerical-integration-methods)
-- [Simulink Block Diagrams](/physics/simulation/simulink-block-diagrams)
-- [Step Size, Accuracy, and Stability](/physics/simulation/step-size-accuracy-stability)
-- [Linear Systems, Transfer Functions, and Modes](/physics/simulation/linear-systems-transfer-functions-modes)
+See also: [Numerical Integration Methods](/physics/simulation/numerical-integration-methods) · [Simulink Block Diagrams](/physics/simulation/simulink-block-diagrams) · [Step Size, Accuracy, and Stability](/physics/simulation/step-size-accuracy-stability) · [Linear Systems, Transfer Functions, and Modes](/physics/simulation/linear-systems-transfer-functions-modes)
+
+</div>

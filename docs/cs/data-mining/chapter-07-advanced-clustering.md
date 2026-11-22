@@ -11,9 +11,9 @@ Advanced clustering deals with cases where the clean numeric, moderate-size, low
 
 *Figure: K-means alternates assignments and centroid updates until the partition stops changing. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:K-means_convergence.gif), Chire, CC BY-SA 4.0.*
 
-This page extends the core clustering methods. It is especially important in data mining because real data often contain categorical attributes, millions of records, sparse text features, local subspace structure, partial labels, or multiple incompatible clusterings.
+Core clustering methods need substantial adaptation when data contain categorical attributes, millions of records, sparse text features, local subspace structure, partial labels, or multiple incompatible clusterings.
 
-## Definitions
+## Beyond numeric centroids and global distance
 
 **Categorical clustering** groups records whose attributes are symbols rather than numeric values. Since arithmetic means are not defined, algorithms use modes, medoids, matching similarity, entropy, or probabilistic categorical models.
 
@@ -29,7 +29,7 @@ This page extends the core clustering methods. It is especially important in dat
 
 A **cluster ensemble** combines multiple clusterings into a consensus clustering. The base clusterings may come from different algorithms, samples, parameters, or feature subsets.
 
-## Key results
+## How the objective changes with the data
 
 **Categorical representatives require different update rules.** For a cluster of categorical records, the mode in each attribute minimizes the number of mismatches within that attribute. This mirrors the way a mean minimizes squared numeric deviations.
 
@@ -45,13 +45,13 @@ A **cluster ensemble** combines multiple clusterings into a consensus clustering
 
 **Advanced clustering often separates search from explanation.** A scalable or high-dimensional method may use random projections, summaries, subspace scoring, or ensemble matrices to find candidate groups. Afterward, the groups still need explanations in original terms: which categories define a k-modes cluster, which dimensions are relevant to a projected cluster, which constraints were binding in a semi-supervised solution, or which base clusterings agree in an ensemble. Without this second step, advanced methods can produce technically valid partitions that are hard to use.
 
-**Categorical and mixed data deserve explicit distance design.** One-hot encoding lets numeric algorithms run, but it changes the geometry: a categorical attribute with many levels can dominate the distance simply because it creates many columns. Matching dissimilarity, Gower-style mixed measures, medoids, or separate treatment of numeric and categorical blocks may be more appropriate. The important test is whether the distance aligns with domain similarity, not whether it is convenient for a library call.
+**Categorical and mixed data need deliberate distance design.** One-hot encoding lets numeric algorithms run, but it changes the geometry: a categorical attribute with many levels can dominate the distance simply because it creates many columns. Matching dissimilarity, Gower-style mixed measures, medoids, or separate treatment of numeric and categorical blocks may be more appropriate. The important test is whether the distance aligns with domain similarity, not whether it is convenient for a library call.
 
-**Scalable clustering often gives approximate answers.** Sampling, summarization, and distributed updates reduce cost by discarding detail. That is acceptable when the approximation error is smaller than the noise or when the clusters are used for exploration, but it should be checked. Comparing summary-based clusters with a smaller exact run is a practical sanity test.
+**Scalable clustering often gives approximate answers.** Sampling, summarization, and distributed updates reduce cost by discarding detail. That is acceptable when the approximation error is smaller than the noise or when the clusters are used for exploration, but it should be checked. Comparing summary-based clusters with a smaller exact run is a useful sanity check.
 
 **Advanced clustering should preserve a route back to raw records.** Analysts usually need to inspect examples, diagnose errors, and explain why a group exists. Summary structures, subspace projections, and consensus matrices should therefore keep enough metadata to recover representative objects and important features for each discovered cluster.
 
-## Visual
+## Density expansion and its advanced adaptations
 
 ```mermaid
 flowchart TB
@@ -97,7 +97,9 @@ This DBSCAN-centered diagram makes density reachability explicit. A point become
 | Unstable results | Random starts produce different partitions | Ensembles and consensus clustering |
 | Analyst knowledge | Objective misses semantic structure | Interactive or visual supervision |
 
-## Worked example 1: One k-modes update
+## Two calculations beyond k-means
+
+### Updating a k-modes representative
 
 **Problem.** Cluster four categorical records by product preference and region:
 
@@ -133,7 +135,7 @@ Suppose cluster A contains objects 1, 2, and 4. Find its mode vector.
 
 **Checked answer.** The k-modes representative for cluster A is (phone, East). It minimizes the number of attribute mismatches within this cluster.
 
-## Worked example 2: Consensus from two clusterings
+### Building consensus from two partitions
 
 **Problem.** Four objects A, B, C, D have two base clusterings:
 
@@ -174,7 +176,7 @@ Build the pairwise co-association scores.
 
 **Checked answer.** AB is the most stable pair because it appears together in both base clusterings. Other positive pairs are less stable, and pairs involving A-D or B-D never co-occur.
 
-## Code
+## Computing a co-association matrix
 
 Pseudocode for a cluster ensemble:
 
@@ -220,7 +222,7 @@ print(np.round(coassoc, 2))
 print(consensus)
 ```
 
-## Common pitfalls
+## When the geometry or supervision misleads
 
 - Forcing categorical data into arbitrary integer codes and then using Euclidean distance.
 - Believing a scalable summary is lossless; summaries are approximations unless proven otherwise.
@@ -230,10 +232,8 @@ print(consensus)
 - Evaluating high-dimensional clusters only in full-dimensional distance.
 - Assuming the most compact clustering is the most interpretable or useful one.
 
-## Connections
+<div className="see-also">
 
-- [Cluster Analysis](/cs/data-mining/chapter-06-cluster-analysis)
-- [Feature Selection and Dimensionality Reduction](/cs/data-mining/chapter-02-feature-selection-dimensionality-reduction)
-- [Mining Data Streams and Big Data](/cs/data-mining/chapter-12-mining-data-streams)
-- [Mining Text Data](/cs/data-mining/chapter-13-mining-text-data)
-- [Social Network Analysis](/cs/data-mining/chapter-19-social-network-analysis)
+See also: [Cluster Analysis](/cs/data-mining/chapter-06-cluster-analysis) · [Feature Selection and Dimensionality Reduction](/cs/data-mining/chapter-02-feature-selection-dimensionality-reduction) · [Mining Data Streams and Big Data](/cs/data-mining/chapter-12-mining-data-streams) · [Mining Text Data](/cs/data-mining/chapter-13-mining-text-data) · [Social Network Analysis](/cs/data-mining/chapter-19-social-network-analysis)
+
+</div>

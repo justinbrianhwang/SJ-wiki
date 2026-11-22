@@ -7,13 +7,13 @@ sidebar_position: 18
 
 ![InstructGPT RLHF pipeline showing supervised fine-tuning, reward model training, and PPO optimization.](https://ar5iv.labs.arxiv.org/html/2203.02155/assets/x2.png)
 
-*Figure: InstructGPT aligns a pretrained language model through demonstrations, preference-ranked comparisons, reward modeling, and PPO. From [Ouyang et al., 2022](https://arxiv.org/abs/2203.02155) — embedded under educational fair use with attribution.*
+*Figure: InstructGPT aligns a pretrained language model through demonstrations, preference-ranked comparisons, reward modeling, and PPO. From [Ouyang et al., 2022](https://arxiv.org/abs/2203.02155), embedded under educational fair use with attribution.*
 
 Dialogue systems interact with users over multiple turns. Jurafsky and Martin cover properties of conversation, frame-based systems, dialogue acts, dialogue state, chatbots, and dialogue system design. Eisenstein discusses dialogue in the broader text generation chapter, including finite-state and agenda-based systems, Markov decision processes, POMDPs, neural encoder-decoder chatbots, and integration with task-oriented dialogue.
 
-Dialogue is not just text generation repeated turn by turn. A system must track user goals, slot values, grounding, corrections, initiative, persona, safety constraints, and sometimes speech recognition uncertainty. Chatbots range from scripted pattern systems like ELIZA to task-oriented assistants and open-domain LLM interfaces.
+Dialogue requires more than generating text one turn at a time. A system must track user goals, slot values, grounding, corrections, initiative, persona, safety constraints, and sometimes speech recognition uncertainty. Chatbots range from scripted pattern systems like ELIZA to task-oriented assistants and open-domain LLM interfaces.
 
-## Definitions
+## State, actions, and conversational turns
 
 A **dialogue system** maps a dialogue history to the next system action or utterance. A **turn** is one speaker contribution. A **dialogue act** labels the function of a turn, such as question, answer, request, confirmation, greeting, or backchannel.
 
@@ -37,7 +37,7 @@ In a partially observable MDP, the policy conditions on a belief state rather th
 
 A **chatbot** may be task-oriented, open-domain, retrieval-based, generative, or hybrid. Modern LLM chatbots use prompting, instruction tuning, retrieval augmentation, tools, and safety policies to shape behavior.
 
-## Key results
+## From fixed flows to tool-backed dialogue
 
 Finite-state dialogue is reliable for narrow tasks. It defines a fixed graph of states and transitions, so it is easy to test and control. Its weakness is inflexibility: users may provide information out of order, revise earlier answers, or combine multiple intents.
 
@@ -71,8 +71,6 @@ A good dialogue design includes graceful failure. The system should know when to
 
 Conversation logs should be reviewed as trajectories, not isolated turns. A response that looks reasonable alone may be wrong because it ignores a correction three turns earlier or contradicts a tool result. Multi-turn evaluation should therefore include state consistency.
 
-## Visual
-
 ```mermaid
 stateDiagram-v2
   [*] --> Greet
@@ -93,9 +91,11 @@ stateDiagram-v2
 | Retrieval chatbot | dialogue context vector | retrieved response | FAQ and support |
 | Generative LLM | prompt and hidden context | next-token generation | flexible mixed tasks |
 
-## Worked example 1: slot filling
+## Booking a table under uncertainty
 
-Problem: update a restaurant-booking frame from this user utterance:
+### Filling the restaurant frame
+
+Update a restaurant-booking frame from this user utterance:
 
 ```text
 I need a Korean place for four near Hongdae tomorrow at 7.
@@ -123,11 +123,11 @@ Frame slots: cuisine, party size, location, date, time.
 | date | tomorrow |
 | time | 7, needs AM/PM if domain requires |
 
-Checked answer: all slots are filled, but a robust system should confirm the ambiguous time.
+All slots are filled, but a robust system should confirm the ambiguous time.
 
-## Worked example 2: choosing a repair action
+### Repairing an uncertain cuisine hypothesis
 
-Problem: after ASR/NLU, the system has these beliefs for cuisine:
+After ASR/NLU, the system has these beliefs for cuisine:
 
 | cuisine | probability |
 |---|---:|
@@ -147,9 +147,9 @@ The confidence threshold for direct confirmation is $0.70$. Choose the next acti
 Did you want Korean or Italian food?
 ```
 
-Checked answer: ask a disambiguating question rather than silently choosing Korean.
+Ask a disambiguating question rather than silently choosing Korean.
 
-## Code
+## A small rule-based frame updater
 
 ```python
 import re
@@ -178,7 +178,7 @@ frame = {}
 print(update_frame(frame, "I need a Korean place for four near Hongdae tomorrow at 7."))
 ```
 
-## Common pitfalls
+## Failures that emerge across turns
 
 - Building a chatbot with no explicit state and expecting it to complete multi-turn tasks reliably.
 - Treating ASR or NLU one-best output as certain.
@@ -188,9 +188,8 @@ print(update_frame(frame, "I need a Korean place for four near Hongdae tomorrow 
 - Mixing long-term memory and sensitive user data without explicit policy.
 - Designing prompts instead of designing the whole dialogue workflow, including fallbacks and escalation.
 
-## Connections
+<div className="see-also">
 
-- [Pretrained language models](/cs/nlp/pretrained-language-models)
-- [Speech recognition and synthesis](/cs/nlp/speech-recognition-and-synthesis)
-- [Information extraction](/cs/nlp/information-extraction)
-- [Coreference resolution and entity linking](/cs/nlp/coreference-resolution-and-entity-linking)
+See also: [Pretrained language models](/cs/nlp/pretrained-language-models) · [Speech recognition and synthesis](/cs/nlp/speech-recognition-and-synthesis) · [Information extraction](/cs/nlp/information-extraction) · [Coreference resolution and entity linking](/cs/nlp/coreference-resolution-and-entity-linking)
+
+</div>

@@ -7,9 +7,9 @@ sidebar_position: 9
 
 K&R's pointer chapter ends with two topics that define advanced C style: pointers to functions and complicated declarations. Function pointers let algorithms accept behavior as an argument, as in a sort routine that can compare strings lexicographically or numerically. Complex declarations arise because C declaration syntax mirrors expression syntax; this is elegant for simple cases and difficult for nested arrays, pointers, and functions.
 
-The practical goal is not to write unreadable declarations. It is to understand the ones that appear in libraries, callbacks, signal handlers, sorting routines, and system interfaces. K&R's advice is still sound: build complex types in small steps, often with `typedef`, and verify declarations by reading from the identifier outward.
+The goal is not to write unreadable declarations. It is to understand the ones that appear in libraries, callbacks, signal handlers, sorting routines, and system interfaces. K&R's advice is still sound: build complex types in small steps, often with `typedef`, and verify declarations by reading from the identifier outward.
 
-## Definitions
+## Callback types and declarator precedence
 
 A function pointer stores the address of a function with a compatible type:
 
@@ -68,7 +68,7 @@ typedef int (*Compare)(const void *, const void *);
 Compare comp;
 ```
 
-## Key results
+## Treating a callback signature as a contract
 
 Function pointers separate policy from mechanism. K&R's `qsort` does not need to know whether two lines are compared as strings, numbers, folded case, or directory-order fields. It only needs a comparison function that returns negative, zero, or positive.
 
@@ -84,11 +84,11 @@ The safest way to design a callback interface is to write the function pointer t
 
 Complex declarations become less intimidating when separated into two questions: what object is being declared, and what expression involving that object has the base type? In `int (*pf)(void)`, the expression `(*pf)()` is an `int`; therefore `pf` is a pointer to a function returning `int`. In `char *argv[]`, the expression `*argv[i]` is a `char`; therefore `argv` is an array of pointers to `char`. This is the "declaration follows use" idea that K&R highlights repeatedly.
 
-There is also a design lesson in K&R's declaration parser. The grammar is small, but it is recursive, so the parser mirrors the grammar with mutually recursive functions. That style appears throughout C systems code: instead of flattening a nested concept into a large switch, write one function per grammar level or representation level. It makes the hard syntax manageable and gives each helper a narrow responsibility.
+There is also a design lesson in K&R's declaration parser. The grammar is small, but it is recursive, so the parser mirrors the grammar with mutually recursive functions. That style appears throughout C systems code: instead of flattening a nested concept into a large switch, write one function per grammar level or representation level. One function per grammar level gives each helper a narrow responsibility.
 
-When a declaration still feels unreadable, introduce names for stable concepts. A `typedef` for a callback type, a structure tag for a record, or a small wrapper function around a cast can turn a declaration from a puzzle into an interface. This is not a retreat from C's syntax; it is how experienced C code keeps the hard parts localized. K&R's own examples use `typedef` for tree pointers and allocator headers for this reason.
+When a declaration still feels unreadable, introduce names for stable concepts. A `typedef` for a callback type, a structure tag for a record, or a small wrapper function around a cast can turn a declaration from a puzzle into an interface. Experienced C code uses these names to keep the hard parts localized. K&R's own examples use `typedef` for tree pointers and allocator headers for this reason.
 
-## Visual
+The usual reading procedure can be written as a small precedence walk:
 
 ```mermaid
 flowchart TD
@@ -113,19 +113,15 @@ flowchart TD
 | `char **argv;` | pointer to pointer to `char` | `char *argv[]` as parameter equivalent |
 | `void (*signal(int, void (*)(int)))(int);` | function returning previous signal handler | best read with typedefs |
 
-## Worked example 1: Sorting numbers with a comparison callback
+## Switching a sort from lexical to numeric order
 
-Problem: sort pointers to strings as numbers rather than lexicographically. Compare `"10"` and `"2"`.
+Suppose pointers to the strings `"10"` and `"2"` must be sorted by numeric value. Lexicographic comparison checks the first characters:
 
-Method:
+- The first character of `"10"` is `'1'`.
+- The first character of `"2"` is `'2'`.
+- Since `'1' < '2'`, lexicographic order puts `"10"` before `"2"`.
 
-1. Lexicographic comparison checks characters:
-
-   - First character of `"10"` is `'1'`.
-   - First character of `"2"` is `'2'`.
-   - Since `'1' < '2'`, lexicographic order says `"10"` comes before `"2"`.
-
-2. Numeric comparison converts leading numeric values:
+Numeric comparison instead converts the leading values:
 
 $$
 \begin{aligned}
@@ -134,7 +130,7 @@ $$
    \end{aligned}
 $$
 
-3. Numeric comparison function:
+The comparison function can be written as:
 
    ```c
    int numcmp(const char *s1, const char *s2)
@@ -149,45 +145,27 @@ $$
    }
    ```
 
-4. Since `10.0 > 2.0`, `numcmp("10", "2")` returns positive.
+Since `10.0 > 2.0`, `numcmp("10", "2")` returns a positive value. Lexicographic order is `"10"`, `"2"`; numeric order is `"2"`, `"10"`. Passing `numcmp` as a function pointer changes the sort policy without changing the sorting algorithm.
 
-Checked answer: lexicographic order is `"10"`, `"2"`; numeric order is `"2"`, `"10"`. Passing `numcmp` as a function pointer changes the sort policy without changing the sorting algorithm.
+## Reading the two `daytab` declarations
 
-## Worked example 2: Reading `int (*daytab)[13]`
-
-Problem: explain why `int (*daytab)[13]` is a pointer to an array, while `int *daytab[13]` is an array of pointers.
-
-Method:
-
-1. Start with:
+The declarations `int (*daytab)[13]` and `int *daytab[13]` differ only in grouping, but describe different objects. Start with the parenthesized form:
 
    ```c
    int (*daytab)[13];
    ```
 
-2. Find identifier `daytab`.
-3. Parentheses force `*daytab` to group first: `daytab` is a pointer.
-4. To the right of the parenthesized group is `[13]`: the pointed-to object is an array of 13.
-5. Base type is `int`.
+Find the identifier `daytab`. Parentheses force `*daytab` to group first, so `daytab` is a pointer. The `[13]` to the right says that the pointed-to object is an array of 13, and the base type is `int`. The full reading is “pointer to an array of 13 `int`.”
 
-Checked reading: `daytab` is a pointer to an array of 13 `int`.
-
-Now compare:
-
-1. Declaration:
+Now remove the grouping parentheses:
 
    ```c
    int *daytab[13];
    ```
 
-2. `[]` binds before `*`, so `daytab[13]` groups first.
-3. `daytab` is an array of 13.
-4. The `*` says each element is a pointer.
-5. Base type is `int`.
+Here `[]` binds before `*`, so `daytab[13]` groups first. `daytab` is an array of 13, and each element is a pointer to the base type `int`.
 
-Checked reading: `daytab` is an array of 13 pointers to `int`.
-
-## Code
+## Passing an exact comparator to `qsort`
 
 ```c
 #include <stdio.h>
@@ -222,7 +200,7 @@ int main(void)
 }
 ```
 
-## Common pitfalls
+## Where declarators and callbacks go wrong
 
 - Dropping parentheses in function pointer declarations. `int (*pf)(void)` and `int *pf(void)` are entirely different.
 - Casting function pointers to incompatible types and then calling through them. Generic object pointers and function pointers are different categories.
@@ -232,10 +210,8 @@ int main(void)
 - Reading declarations strictly left to right. Start at the identifier and account for precedence.
 - Writing callback signatures that do not exactly match the library function's expected type.
 
-## Connections
+<div className="see-also">
 
-- [Pointers, Addresses, and Arrays](/cs/programming/c/pointers-addresses-arrays)
-- [Strings, Pointer Arrays, and Command-Line Arguments](/cs/programming/c/strings-pointer-arrays-command-line)
-- [Preprocessor and Separate Compilation](/cs/programming/c/preprocessor-separate-compilation)
-- [Standard Library Reference](/cs/programming/c/standard-library-reference)
-- [Modern C Considerations](/cs/programming/c/modern-c-considerations)
+See also: [Pointers, Addresses, and Arrays](/cs/programming/c/pointers-addresses-arrays) · [Strings, Pointer Arrays, and Command-Line Arguments](/cs/programming/c/strings-pointer-arrays-command-line) · [Preprocessor and Separate Compilation](/cs/programming/c/preprocessor-separate-compilation) · [Standard Library Reference](/cs/programming/c/standard-library-reference) · [Modern C Considerations](/cs/programming/c/modern-c-considerations)
+
+</div>

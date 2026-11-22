@@ -9,7 +9,7 @@ Semantics answers the question "what does this program mean?" Operational semant
 
 The two styles are complementary. Operational rules are close to abstract machines, debuggers, and interpreters. Denotational semantics is better for compositional reasoning, equivalence, recursion via least fixed points, and language-independent mathematical models. A serious PL account often proves that the two agree for a core language, then uses whichever style makes a theorem cleaner.
 
-## Definitions
+## Traces, judgments, and semantic functions
 
 A **configuration** packages the current program fragment with its runtime state. For a small imperative language, configurations might be $\langle c,\sigma\rangle$, where $c$ is a command and $\sigma$ is a store mapping variables to values. A **small-step** semantics is a transition relation:
 
@@ -54,7 +54,7 @@ This is the standard denotation of recursion and `while` loops.
 
 An **abstract machine** refines operational semantics by making evaluation contexts explicit. The SECD machine has Stack, Environment, Control, and Dump components; the CEK machine has Control, Environment, and Continuation. Both transform high-level evaluation into a state-transition system [2], [4].
 
-## Key results
+## When the semantic accounts agree
 
 **Small-step and big-step agreement for terminating programs.** For deterministic languages without abnormal control, $\langle c,\sigma\rangle \Downarrow \sigma'$ iff $\langle c,\sigma\rangle \to^* \langle \textsf{skip},\sigma'\rangle$. The proof goes in two directions. Big-step-to-small-step is by induction on the big-step derivation. Small-step-to-big-step is by induction on the length of the small-step sequence, with lemmas for sequencing and conditionals.
 
@@ -69,7 +69,7 @@ $$
 \mathcal{C}\llbracket c_2 \rrbracket \circ \mathcal{C}\llbracket c_1 \rrbracket.
 $$
 
-This is why denotational definitions are useful for equivalence reasoning: if two commands have the same denotation, replacing one with the other preserves program meaning in all contexts.
+Compositional denotations support equivalence reasoning: if two commands have the same denotation, replacing one with the other preserves program meaning in all contexts.
 
 **Least fixed points for loops.** The command `while b do c` denotes the least fixed point of a functional:
 
@@ -93,7 +93,7 @@ $$
 
 Proofs usually proceed by induction on syntax for nonrecursive constructs and by fixed-point induction for loops or recursive procedures.
 
-**Divergence requires care.** A naive big-step relation only records terminating evaluations, so an infinite loop and a stuck program may both have no derivation. There are several repairs. One can add a coinductive big-step relation for divergence, add explicit error results, or use small-step traces as the primary account of nontermination. This is why TAPL's type-safety theorem normally uses small-step semantics: "not stuck" is visible one transition at a time [1]. Denotational semantics handles divergence with $\bot$, but then adequacy must say exactly how $\bot$ corresponds to missing termination in the operational account.
+**Divergence requires care.** A naive big-step relation only records terminating evaluations, so an infinite loop and a stuck program may both have no derivation. There are several repairs. One can add a coinductive big-step relation for divergence, add explicit error results, or use small-step traces as the primary account of nontermination. TAPL's type-safety theorem normally uses small-step semantics because "not stuck" is observable one transition at a time [1]. Denotational semantics handles divergence with $\bot$, but then adequacy must say exactly how $\bot$ corresponds to missing termination in the operational account.
 
 **CEK and SECD as implementation bridges.** Reduction rules for lambda terms can leave evaluation contexts implicit. Abstract machines make them explicit. The CEK machine state $(C,E,K)$ stores the control expression, an environment for free variables, and a continuation describing what remains to do. The SECD machine state $(S,E,C,D)$ separates an operand stack, environment, control list, and dump for saved continuations. These machines are not merely implementation tricks: they can be derived from evaluators and used as semantic artifacts. They also explain why compilers introduce closures, environments, and continuations even when the source calculus only has substitution.
 
@@ -102,8 +102,6 @@ Proofs usually proceed by induction on syntax for nonrecursive constructs and by
 **Contextual equivalence.** Two phrases are contextually equivalent when no enclosing program context can distinguish them by any observation the language defines. Operationally, this is hard because it quantifies over all contexts. Denotational semantics can simplify the problem: if the denotations are equal and the semantics is compositional and adequate, then no context can distinguish the phrases. This is one reason denotational semantics remains valuable even when an implementation is operational.
 
 For students, the practical test is to ask what observation counts: final integer result, termination, printed output, exceptions, store contents, or communication trace. Changing the observation changes the equivalence.
-
-## Visual
 
 ```mermaid
 graph LR
@@ -126,7 +124,7 @@ graph LR
 | Denotational | $\llbracket t\rrbracket$ | equivalence, recursion, compositionality | requires semantic domains |
 | Abstract machine | machine state transition | implementation model | more administrative detail |
 
-## Worked example 1: deriving a small-step trace
+## Reducing an assignment sequence
 
 Problem: evaluate the command
 
@@ -177,7 +175,38 @@ $$
 
 where $\sigma_2=\sigma_1[y\mapsto 3]$. The checked final state is $x=1$, $y=3$.
 
-## Worked example 2: denotation of a loop by approximation
+## Executing the small-step rules
+
+```python
+def eval_expr(expr, store):
+    tag = expr[0]
+    if tag == "num":
+        return expr[1]
+    if tag == "var":
+        return store[expr[1]]
+    if tag == "add":
+        return eval_expr(expr[1], store) + eval_expr(expr[2], store)
+
+def step(config):
+    cmd, store = config
+    tag = cmd[0]
+    if tag == "skip":
+        return None
+    if tag == "assign":
+        _, name, expr = cmd
+        new_store = dict(store)
+        new_store[name] = eval_expr(expr, store)
+        return (("skip",), new_store)
+    if tag == "seq":
+        _, first, second = cmd
+        if first[0] == "skip":
+            return (second, store)
+        next_first, next_store = step((first, store))
+        return (("seq", next_first, second), next_store)
+    raise ValueError(f"unknown command {tag}")
+```
+
+## Approximating a loop denotation
 
 Problem: compute the effect of
 
@@ -225,38 +254,7 @@ $$
 
 Therefore the least fixed point maps the initial state $x=2$ to the final state $x=0$. The approximation index corresponds to the number of loop tests and unfoldings required to witness termination.
 
-## Code
-
-```python
-def eval_expr(expr, store):
-    tag = expr[0]
-    if tag == "num":
-        return expr[1]
-    if tag == "var":
-        return store[expr[1]]
-    if tag == "add":
-        return eval_expr(expr[1], store) + eval_expr(expr[2], store)
-
-def step(config):
-    cmd, store = config
-    tag = cmd[0]
-    if tag == "skip":
-        return None
-    if tag == "assign":
-        _, name, expr = cmd
-        new_store = dict(store)
-        new_store[name] = eval_expr(expr, store)
-        return (("skip",), new_store)
-    if tag == "seq":
-        _, first, second = cmd
-        if first[0] == "skip":
-            return (second, store)
-        next_first, next_store = step((first, store))
-        return (("seq", next_first, second), next_store)
-    raise ValueError(f"unknown command {tag}")
-```
-
-## Common pitfalls
+## Semantic distinctions that are easy to erase
 
 - Treating big-step semantics as if it automatically distinguishes divergence from stuckness.
 - Forgetting to include the store, environment, heap, or continuation in configurations.
@@ -271,15 +269,6 @@ def step(config):
 - Believing adequacy is automatic; it is a theorem connecting two definitions.
 - Trying to prove loop equivalence without an invariant or fixed-point principle.
 
-## Connections
-
-- [Untyped and Typed Lambda Calculus](/cs/programming-language-theory/untyped-and-typed-lambda-calculus) supplies the reduction model used in functional languages.
-- [Type Systems and Type Soundness](/cs/programming-language-theory/type-systems-and-type-soundness) uses small-step semantics to define progress and preservation.
-- [Axiomatic Semantics and Program Logic](/cs/programming-language-theory/axiomatic-semantics-and-program-logic) reasons about commands with assertions instead of traces.
-- [Dataflow Analysis and Abstract Interpretation](/cs/programming-language-theory/dataflow-and-abstract-interpretation) abstracts semantic traces into computable approximations.
-- [Compilers](/cs/compilers/intro) connects abstract machines to bytecode interpreters and IR execution.
-- [Theory of Computation](/cs/theory/intro), [Discrete Math](/math/discrete/intro), and [Cryptography](/cs/cryptography/intro) provide computability, relation, and verification context.
-
 ## References
 
 [1] B. C. Pierce, *Types and Programming Languages*. MIT Press, 2002.  
@@ -288,3 +277,16 @@ def step(config):
 [4] P. J. Landin, "The mechanical evaluation of expressions," *The Computer Journal*, 1964.  
 [5] G. D. Plotkin, "A structural approach to operational semantics," Aarhus University technical report, 1981.  
 [6] D. Scott and C. Strachey, "Toward a mathematical semantics for computer languages," 1971.
+
+<div className="see-also">
+
+See also:
+
+- [Untyped and Typed Lambda Calculus](/cs/programming-language-theory/untyped-and-typed-lambda-calculus) supplies the reduction model used in functional languages.
+- [Type Systems and Type Soundness](/cs/programming-language-theory/type-systems-and-type-soundness) uses small-step semantics to define progress and preservation.
+- [Axiomatic Semantics and Program Logic](/cs/programming-language-theory/axiomatic-semantics-and-program-logic) reasons about commands with assertions instead of traces.
+- [Dataflow Analysis and Abstract Interpretation](/cs/programming-language-theory/dataflow-and-abstract-interpretation) abstracts semantic traces into computable approximations.
+- [Compilers](/cs/compilers/intro) connects abstract machines to bytecode interpreters and IR execution.
+- [Theory of Computation](/cs/theory/intro), [Discrete Math](/math/discrete/intro), and [Cryptography](/cs/cryptography/intro) provide computability, relation, and verification context.
+
+</div>

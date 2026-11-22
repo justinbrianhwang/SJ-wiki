@@ -5,19 +5,46 @@ sidebar_position: 15
 
 # Probability Pitfalls and Intuition
 
-Probability is precise, but human intuition about uncertainty is often biased. We overreact to vivid evidence, neglect base rates, confuse one conditional probability with its reverse, and expect small samples to look more regular than they should. Good probability habits are not just formula habits; they are modeling habits.
+Probability is precise, but intuition about uncertainty is easily biased. Vivid evidence can crowd out base rates; one conditional probability is mistaken for its reverse; small samples are expected to look more regular than random samples usually do. Reliable reasoning begins with the sample space, the conditioning event, and the process that selected or revealed the observation.
 
 ![The Monty Hall problem is shown with three doors and one open door.](https://commons.wikimedia.org/wiki/Special:FilePath/Monty_open_door.svg)
 
-*Figure: The Monty Hall problem is a compact example of conditional probability and base-rate intuition. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Monty_open_door.svg), Cepheus, public domain.*
+*Figure: The Monty Hall problem turns on the host's rule for opening a door. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Monty_open_door.svg), Cepheus, public domain.*
 
-This page collects several recurring traps. The goal is not to memorize puzzle answers but to learn the diagnostic questions: What is the sample space? What is being conditioned on? What information did the selection process reveal? Are we confusing a probability of evidence with a probability of guilt, disease, or truth?
+## Diagnose the conditioning before calculating
 
-## Definitions
+The most common errors can be separated by asking three questions: what is conditioned on, how was the evidence selected, and are the trials independent?
 
-The **base-rate fallacy** occurs when someone underweights the prior probability of a condition or hypothesis and overweights a test result or other evidence.
+```mermaid
+flowchart TD
+  Evidence["Evidence observed"] --> Q1{"What is being conditioned on?"}
+  Q1 --> Bayes["Use Bayes theorem"]
+  Evidence --> Q2{"Was evidence selected or revealed by a rule?"}
+  Q2 --> Selection["Model selection mechanism"]
+  Evidence --> Q3{"Are trials independent?"}
+  Q3 --> Memory["No memory if independent"]
+  Bayes --> Base["Include base rates"]
+  Selection --> Monty["Monty Hall style update"]
+  Memory --> Gambler["Avoid gambler's fallacy"]
+```
 
-The **prosecutor's fallacy** occurs when someone confuses
+| Pitfall | Mistaken thought | Correction |
+|---|---|---|
+| Base-rate fallacy | "The test is accurate, so I probably have it" | include prevalence |
+| Prosecutor's fallacy | "Evidence is rare, so innocence is rare" | reverse conditioning with Bayes |
+| Gambler's fallacy | "Tails is due" | independent trials do not compensate |
+| Monty Hall | "Two doors remain, so $1/2$ each" | the host's reveal is informative |
+| Multiple comparisons | "This rare pattern is amazing" | count how many patterns were possible |
+
+The **base-rate fallacy** underweights the prior probability of a condition or hypothesis and overweights a test result or other evidence. Bayes' theorem restores the missing terms:
+
+$$
+P(H\mid E)=\frac{P(E\mid H)P(H)}{P(E)}.
+$$
+
+A small $P(E\mid H^c)$ can coexist with a modest $P(H\mid E)$ when $P(H)$ is very small or when many alternative hypotheses also explain the evidence.
+
+The **prosecutor's fallacy** confuses
 
 $$
 P(\text{evidence}\mid \text{innocent})
@@ -29,137 +56,86 @@ $$
 P(\text{innocent}\mid \text{evidence}).
 $$
 
-These are generally very different.
+The first is a likelihood under innocence; the second is a posterior probability that also depends on prior odds and the evidence-generating process.
 
-The **gambler's fallacy** is the belief that, after a streak in independent trials, the opposite outcome becomes more likely. For independent fair coin flips,
+## Base rates are easier to see as counts
+
+Natural frequencies replace nested percentages with counts. For a condition with prevalence $0.1\%$ and a test with a $1\%$ false-positive rate, imagine testing $100{,}000$ people. Count the true positives and false positives, then form the desired ratio from those counts.
+
+The reference class must match the available information. Risk measured in a broad population may not apply to a subgroup with different age, exposure, or symptoms. A preseason probability of a sports upset differs from the probability after injuries, weather, and opponent strength are known.
+
+## Independent trials do not settle their accounts
+
+The **gambler's fallacy** treats a streak in independent trials as if it increased the chance of the opposite result. For independent fair coin flips,
 
 $$
 P(\text{heads next}\mid \text{previous ten were tails})=\frac{1}{2}.
 $$
 
-The **Monty Hall problem** is a conditional probability puzzle in which a host's rule for revealing information changes the probabilities. The important point is that the host does not open a door at random from all doors; the host avoids the prize and avoids the player's chosen door.
+Independence fixes the next-trial probability; it does not require short runs to balance. Long-run frequency stabilization is compatible with substantial local irregularity.
 
-**Selection bias** occurs when the observed data are produced by a selection mechanism that changes the distribution. Conditioning on being observed can distort apparent probabilities.
+## Why switching wins in Monty Hall
 
-## Key results
+The Monty Hall problem is governed by an information policy. The host knows where the car is, does not open the player's chosen door, and always opens a goat door. Changing that rule can change the answer.
 
-**Conditioning direction matters.**
+Suppose one car and two goats are behind three doors. You choose Door 1, and the host opens a goat door among the other two.
 
-Bayes' theorem gives
-
-$$
-P(H\mid E)=\frac{P(E\mid H)P(H)}{P(E)}.
-$$
-
-A small $P(E\mid H^c)$ can still leave $P(H\mid E)$ modest if $P(H)$ is very small or if many alternative hypotheses could also explain the evidence.
-
-**Natural frequencies reduce errors.** Instead of saying "the false positive rate is $1\%$ and prevalence is $0.1\%$," imagine $100000$ people. Count true positives and false positives. Ratios among counts are often easier to reason about than nested percentages.
-
-**Independent trials have no memory.** If trials are independent, previous outcomes do not alter the next probability. Streaks may feel meaningful, but independence says the conditional probability is unchanged.
-
-**Information policies matter.** In Monty Hall, switching wins with probability $2/3$ under the standard host rule. If the host sometimes opens a random door or behaves strategically, the answer can change.
-
-**Rare events are not impossible.** A tiny probability can matter if the number of opportunities is huge. Conversely, a surprising event after many unreported attempts may not be strong evidence.
-
-Good probabilistic reasoning often starts by choosing the right reference class. If a medical study reports risk for a broad population, that risk may not apply to a subgroup with different age, exposure, or prior symptoms. If a model reports the probability of a sports upset before the season, that is different from the probability after injuries, weather, and opponent strength are known. The base rate should match the information actually available.
-
-Calibration is another useful habit. A forecaster who says "70% chance" many times should be right about $70\%$ of the time among those cases. One event cannot prove a probability wrong merely because the less likely outcome happened. Repeated performance against stated probabilities is the right scale for judging probabilistic forecasts.
-
-Finally, distinguish surprise from evidence. A specific lottery sequence is extremely unlikely, but some sequence must occur. An outcome becomes evidence against a model when it belongs to a class of outcomes that the model made collectively unlikely before the result was observed.
-
-## Visual
-
-```mermaid
-flowchart TD
-  Evidence[Evidence observed] --> Q1{"What is being conditioned on?"}
-  Q1 --> Bayes[Use Bayes theorem]
-  Evidence --> Q2{"Was evidence selected or revealed by a rule?"}
-  Q2 --> Selection[Model selection mechanism]
-  Evidence --> Q3{"Are trials independent?"}
-  Q3 --> Memory[No memory if independent]
-  Bayes --> Base[Include base rates]
-  Selection --> Monty[Monty Hall style update]
-  Memory --> Gambler["Avoid gambler's fallacy"]
-```
-
-| Pitfall | Mistaken thought | Correction |
-|---|---|---|
-| Base-rate fallacy | "The test is accurate, so I probably have it" | include prevalence |
-| Prosecutor's fallacy | "Evidence is rare, so innocence is rare" | reverse conditioning with Bayes |
-| Gambler's fallacy | "Tails is due" | independent trials do not compensate |
-| Monty Hall | "Two doors remain, so $1/2$ each" | host's reveal is informative |
-| Multiple comparisons | "This rare pattern is amazing" | count how many patterns were possible |
-
-## Worked example 1: Monty Hall
-
-**Problem.** There are three doors. One hides a car and two hide goats. You choose Door 1. The host, who knows where the car is, opens a goat door among the two doors you did not choose. You may stay with Door 1 or switch to the remaining unopened door. What strategy maximizes the chance of winning?
-
-**Method.**
-
-1. Your first choice is correct with probability
+Your first choice is correct with probability
 
 $$
-P(\text{initially correct})=\frac{1}{3}.
+P(\text{initially correct})=\frac{1}{3},
 $$
 
-2. Your first choice is wrong with probability
+and wrong with probability
 
 $$
 P(\text{initially wrong})=\frac{2}{3}.
 $$
 
-3. If your first choice is correct, the host opens one of the two goat doors. Switching moves you away from the car, so switching loses.
+When the first choice is correct, switching loses. When it is wrong, the host is forced to expose the only goat among the unchosen doors, so switching reaches the car. The cases are:
 
-4. If your first choice is wrong, the car is behind one of the two unchosen doors and the other unchosen door has a goat. The host must open the goat door. Switching moves you to the only remaining unopened unchosen door, which has the car.
+| Car location | Initial Door 1? | Host opens | Switch result |
+|---|---:|---|---|
+| Door 1 | correct | Door 2 or 3 | lose |
+| Door 2 | wrong | Door 3 | win |
+| Door 3 | wrong | Door 2 | win |
 
-5. Therefore:
+Therefore,
 
 $$
-P(\text{win by staying})=P(\text{initially correct})=\frac{1}{3},
+P(\text{win by staying})=\frac{1}{3},
 $$
 
 $$
-P(\text{win by switching})=P(\text{initially wrong})=\frac{2}{3}.
+P(\text{win by switching})=\frac{2}{3}.
 $$
 
-6. Check by cases:
+These values assume the standard host rule. A host who sometimes opens a random door or chooses strategically defines a different conditional-probability problem.
 
-   | Car location | Initial Door 1? | Host opens | Switch result |
-   |---|---:|---|---|
-   | Door 1 | correct | Door 2 or 3 | lose |
-   | Door 2 | wrong | Door 3 | win |
-   | Door 3 | wrong | Door 2 | win |
+## A database match is not a posterior verdict
 
-**Checked answer.** Switching wins with probability $2/3$, staying wins with probability $1/3$, under the standard host rule.
-
-## Worked example 2: prosecutor's fallacy with a database match
-
-**Problem.** A DNA-like profile has a random match probability of $1$ in $1,000,000$ among unrelated innocent people. A city has $5,000,000$ possible people who could have been searched. A suspect matches. Ignoring other evidence, explain why $P(\text{match}\mid \text{innocent})=10^{-6}$ is not the same as $P(\text{innocent}\mid \text{match})$.
-
-**Method.**
-
-1. The statement "random match probability is $10^{-6}$" means
+Suppose a profile has random match probability $1$ in $1{,}000{,}000$ among unrelated innocent people, and a search covers $5{,}000{,}000$ possible people. The reported number means
 
 $$
 P(\text{match}\mid \text{a specified innocent person})=10^{-6}.
 $$
 
-2. If $5,000,000$ innocent people are searched, the expected number of innocent matches is
+Across the database, the expected number of innocent matches is
 
 $$
-5,000,000\cdot 10^{-6}=5.
+5{,}000{,}000\cdot 10^{-6}=5.
 $$
 
-3. That does not prove there are exactly $5$ false matches, but it shows that a match somewhere in a large search is not as surprising as a match for one pre-specified person.
+The expectation does not assert that exactly five false matches occur. It shows that finding a match somewhere in a large search is less surprising than obtaining a match for one person specified in advance.
 
-4. To compute $P(\text{innocent}\mid \text{match})$, Bayes' theorem needs a prior probability that the suspect is the source and a model of the search process:
+Computing the posterior probability of innocence requires a prior probability that the suspect is the source and a model of the search:
 
 $$
 P(\text{innocent}\mid \text{match})
-=\frac{P(\text{match}\mid \text{innocent})P(\text{innocent})}{P(\text{match})}.
+=\frac{P(\text{match}\mid \text{innocent})P(\text{innocent})}{P(\text{match})},
 $$
 
-5. The denominator includes matches from the true source and matches from innocent people:
+where
 
 $$
 P(\text{match})=
@@ -167,11 +143,23 @@ P(\text{match}\mid \text{source})P(\text{source})
 +P(\text{match}\mid \text{innocent})P(\text{innocent}).
 $$
 
-6. If the suspect was found by searching a huge database, the selection process must be included. The evidence is not "this pre-specified suspect matched"; it is closer to "someone in a large database matched."
+If the suspect emerged from a database sweep, the evidence is closer to “someone in this database matched” than to “this prespecified person matched.” The number of search opportunities belongs in the analysis.
 
-**Checked answer.** The random match probability is a likelihood, not a posterior probability of innocence or guilt. The posterior depends on priors, the number of opportunities for false matches, and the search procedure.
+## Selection changes the distribution you observe
 
-## Code
+**Selection bias** arises when the mechanism determining which data are observed changes their distribution. Conditioning on inclusion can create associations or distort probabilities that were absent in the source population. The host's constrained choice in Monty Hall is one small example; publication filters, database searches, and symptom-driven testing have the same structural feature.
+
+Rare events also need an opportunity count. A tiny probability may matter when there are millions of chances for the event to occur. Conversely, one striking result after many unreported attempts may offer weak evidence.
+
+An individually specified lottery sequence has extremely low probability, yet some sequence must be drawn. A result counts against a model when it belongs to a class of outcomes that the model assigned low total probability before observing the result. Choosing the class afterward invites multiple-comparisons and pattern-selection errors.
+
+## Calibration is judged across forecasts
+
+A forecaster who repeatedly assigns $70\%$ probability should be correct about $70\%$ of the time within that group of forecasts. A single occurrence of the less likely outcome does not refute the stated probability. Calibration is a repeated-performance property, not a verdict on one event.
+
+Model probabilities also inherit their assumptions. Before interpreting a number as a claim about the world, check whether the sampling process, independence assumptions, reference class, and selection rule match the situation.
+
+## Simulating the host rule and database scale
 
 ```python
 import numpy as np
@@ -187,34 +175,31 @@ def simulate_monty_hall(n=100_000):
         possible_opens = [d for d in range(3) if d != choice and d != car]
         opened = rng.choice(possible_opens)
         remaining = [d for d in range(3) if d != choice and d != opened][0]
-        wins_stay += (choice == car)
-        wins_switch += (remaining == car)
+        wins_stay += choice == car
+        wins_switch += remaining == car
     return wins_stay / n, wins_switch / n
 
 stay, switch = simulate_monty_hall()
 print("stay:", stay)
 print("switch:", switch)
 
-# Expected false matches in a database search.
 database_size = 5_000_000
 random_match_probability = 1 / 1_000_000
 expected_false_matches = database_size * random_match_probability
 print("expected false matches:", expected_false_matches)
 ```
 
-## Common pitfalls
+## Questions to ask when intuition feels certain
 
-- Reversing conditional probabilities, especially in tests, legal evidence, and classification.
-- Ignoring base rates because the evidence feels strong.
-- Treating independent random trials as if they self-correct in the short run.
-- Forgetting that a revealed clue may be informative because of the rule used to reveal it.
-- Evaluating a surprising event after seeing it without accounting for all the other surprising events that could have been noticed.
-- Treating a model probability as a fact about the world without checking whether the model assumptions match the situation.
+- Which conditional probability is being stated, and which one is being requested?
+- What prior or base rate applies to the relevant population?
+- Did a rule select, reveal, or filter the observation?
+- Are repeated trials genuinely independent?
+- How many other patterns, comparisons, or search targets could have produced an apparently rare result?
+- Do the model assumptions describe the mechanism that produced the data?
 
-## Connections
+<div className="see-also">
 
-- [conditional probability and Bayes' theorem](/math/probability/conditional-probability-bayes)
-- [sample spaces, events, and axioms](/math/probability/sample-spaces-events-axioms)
-- [common discrete distributions](/math/probability/common-discrete-distributions)
-- [limit theorems](/math/probability/limit-theorems)
-- [statistical literacy and data](/math/statistics/statistical-literacy-and-data)
+See also: [conditional probability and Bayes' theorem](/math/probability/conditional-probability-bayes) · [sample spaces, events, and axioms](/math/probability/sample-spaces-events-axioms) · [common discrete distributions](/math/probability/common-discrete-distributions) · [limit theorems](/math/probability/limit-theorems) · [statistical literacy and data](/math/statistics/statistical-literacy-and-data)
+
+</div>

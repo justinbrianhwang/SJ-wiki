@@ -306,10 +306,8 @@ The DTW routine stores the full dynamic-programming matrix, although only the fi
 - Using a symmetric smoothing filter to create features for an online alert, thereby including future samples.
 - Interpreting a repeated motif as independent repetitions when adjacent matches heavily overlap.
 
-## Related pages
+<div className="see-also">
 
-- [Similarity and Distances](/cs/data-mining/chapter-03-similarity-distances)
-- [Mining Data Streams and Big Data](/cs/data-mining/chapter-12-mining-data-streams)
-- [Outlier Analysis](/cs/data-mining/chapter-08-outlier-analysis)
-- [Mining Discrete Sequences](/cs/data-mining/chapter-15-mining-discrete-sequences)
-- [Mining Spatial and Trajectory Data](/cs/data-mining/chapter-16-mining-spatial-data)
+See also: [Similarity and Distances](/cs/data-mining/chapter-03-similarity-distances) · [Mining Data Streams and Big Data](/cs/data-mining/chapter-12-mining-data-streams) · [Outlier Analysis](/cs/data-mining/chapter-08-outlier-analysis) · [Mining Discrete Sequences](/cs/data-mining/chapter-15-mining-discrete-sequences) · [Mining Spatial and Trajectory Data](/cs/data-mining/chapter-16-mining-spatial-data)
+
+</div>

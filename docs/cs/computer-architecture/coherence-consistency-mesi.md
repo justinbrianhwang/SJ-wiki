@@ -9,7 +9,7 @@ Private caches are essential for multicore performance, but they create a correc
 
 These two ideas are related but not identical. Coherence is about one address: all cores should agree on the order of writes to that address. Consistency is about the ordering of operations to different addresses: when a thread writes `data` and then writes `flag`, when may another thread see the flag and the data?
 
-## Definitions
+## Coherence, consistency, and line ownership
 
 A coherent memory system satisfies two key properties for each memory location:
 
@@ -31,7 +31,7 @@ False sharing occurs when independent variables occupy the same cache block and 
 
 A memory consistency model specifies legal orderings of memory operations. Sequential consistency requires the result to appear as if operations from all processors were interleaved in a single order, while preserving each processor's program order. Relaxed models allow more reordering but require synchronization instructions or fences.
 
-## Key results
+## Following MESI messages through the hierarchy
 
 Invalidate protocols are efficient when a core writes a block many times. Before writing, the core obtains exclusive ownership and invalidates other cached copies. Later writes can proceed locally until another core requests the block.
 
@@ -48,8 +48,6 @@ A coherence transaction is also a performance event. When a core obtains a block
 Directory protocols replace broadcast with tracked sharing state. A simple directory may store a bit vector saying which caches have a block. For many cores, a full bit vector per memory block can be expensive, so systems use compressed directories, limited pointers, or hierarchical organizations. These design choices trade storage overhead against extra messages when the directory's information is imprecise.
 
 Consistency models are programmer-visible, so they must be documented by the ISA. Sequential consistency is easy to reason about but can restrict performance because it limits reordering. Relaxed models allow store buffers, speculative loads, and reordering, but require synchronization operations to create happens-before relationships. Correct parallel programs use the synchronization rules rather than relying on accidental timing.
-
-## Visual
 
 ```mermaid
 flowchart TB
@@ -90,7 +88,7 @@ flowchart TB
   Core1 -. "coherence only serializes one address" .-> Consistency
 ```
 
-This coherence diagram distinguishes the per-line MESI protocol from the broader consistency rules. The cache-line state machine labels processor events, snoop messages, ownership transfers, invalidations, and dirty writeback/transfer behavior for one block. The consistency subgraph shows why fences and acquire/release operations are still required: coherence serializes writes to one address, but ordering across different addresses is a separate contract.
+The per-line MESI state machine handles processor events, snoop messages, ownership transfers, invalidations, and dirty data for one block. Fences and acquire/release operations remain necessary because coherence serializes writes to one address, while ordering across different addresses is a separate contract.
 
 | Concept | Scope | Example question | Mechanism |
 |---|---|---|---|
@@ -99,7 +97,7 @@ This coherence diagram distinguishes the per-line MESI protocol from the broader
 | Synchronization | Program-level coordination | Is lock acquire atomic? | Test-and-set, compare-and-swap |
 | False sharing | Cache-block granularity | Why do independent counters fight? | Padding and data layout |
 
-## Worked example 1: MESI state transitions for two cores
+## Tracing one block across two cores
 
 Problem: Two cores start with block `X` invalid. Core 0 reads `X`, then Core 1 reads `X`, then Core 0 writes `X`. Track MESI states.
 
@@ -133,7 +131,7 @@ $$
 
 Checked answer: The state sequence is `(I,I) -> (E,I) -> (S,S) -> (M,I)`. The Exclusive state avoided a bus upgrade on Core 0's first private read, but once Core 1 shared the block, Core 0's write required invalidation.
 
-## Worked example 2: False sharing cost
+## Counting false-sharing ownership transfers
 
 Problem: Core 0 increments counter `a` and Core 1 increments counter `b`. The two counters are different variables but lie in the same 64-byte cache block. Each core performs 1,000 increments, alternating one increment at a time. Estimate how many ownership transfers occur after both cores first have the block cached.
 
@@ -163,7 +161,7 @@ $$
 
 Checked answer: About 1,999 ownership transfers occur even though the cores update different variables. Padding the counters into separate cache blocks can remove the false-sharing traffic.
 
-## Code
+## Encoding the stable MESI states
 
 ```python
 def mesi_transition(state, event):
@@ -194,9 +192,9 @@ The transition function is deliberately local, so it hides the messages required
 
 The code also does not model transient states. Real protocols include states such as "issued read miss, waiting for data" or "sent invalidations, waiting for acknowledgments." Transient states are necessary because messages take time and can race with one another. They make protocol verification difficult, especially when combined with relaxed memory ordering and speculative cores.
 
-For software, the lesson is to separate correctness from performance. Coherence usually guarantees that writes to one location become visible consistently, but it does not make compound operations atomic. Incrementing a shared counter still needs synchronization, and good performance may require reducing how often the counter is shared at all.
+Correctness and performance remain separate concerns in software. Coherence usually guarantees that writes to one location become visible consistently, but it does not make compound operations atomic. Incrementing a shared counter still needs synchronization; reducing the sharing frequency may also be necessary for throughput.
 
-## Common pitfalls
+## Where protocol intuition breaks down
 
 - Using coherence and consistency as synonyms.
 - Thinking coherence operates on variables rather than cache blocks.
@@ -205,9 +203,8 @@ For software, the lesson is to separate correctness from performance. Coherence 
 - Forgetting that write-back caches need ownership and dirty-state handling.
 - Writing lock-free code without understanding the target memory model.
 
-## Connections
+<div className="see-also">
 
-- [Multicore, Synchronization, and NUMA](/cs/computer-architecture/multicore-synchronization-numa)
-- [Cache Organization and AMAT](/cs/computer-architecture/cache-organization-amat)
-- [Virtual Memory, TLBs, and VMs](/cs/computer-architecture/virtual-memory-tlb-vms)
-- [Storage, RAID, and SSDs](/cs/computer-architecture/storage-raid-ssds)
+See also: [Multicore, Synchronization, and NUMA](/cs/computer-architecture/multicore-synchronization-numa) · [Cache Organization and AMAT](/cs/computer-architecture/cache-organization-amat) · [Virtual Memory, TLBs, and VMs](/cs/computer-architecture/virtual-memory-tlb-vms) · [Storage, RAID, and SSDs](/cs/computer-architecture/storage-raid-ssds)
+
+</div>

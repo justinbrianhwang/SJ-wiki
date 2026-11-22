@@ -9,7 +9,7 @@ Project planning turns a desired software product into an organized body of work
 
 Planning is where software engineering becomes quantitative. The team decomposes work into tasks, estimates size and effort, finds dependency constraints, identifies the path that controls completion time, and checks whether the estimate is plausible. The resulting plan is still uncertain, but it is no longer a guess without structure.
 
-## Definitions
+## From work packages to cost models
 
 A **project plan** describes the tasks, ordering, effort, schedule, staffing, and assumptions needed to develop the software. It is a management artifact and an engineering artifact because bad technical decomposition causes bad schedules.
 
@@ -35,11 +35,11 @@ where $E$ is effort, $KLOC$ is thousands of delivered source lines, and $a$ and 
 
 **Productivity** is output per unit effort. In software, productivity must be interpreted carefully because output can be measured by LOC, function points, features, or delivered value, and each measure has biases.
 
-## Key results
+## What a credible estimate must expose
 
 The WBS is the foundation of planning. If work is decomposed poorly, then estimates and schedules inherit the error. A WBS should be complete enough to cover the work but not so detailed that the plan becomes unmaintainable. A useful work package has a clear outcome, owner, estimate, and completion criterion.
 
-PERT exposes dependency logic. Two tasks may each take five days, but if one depends on the other, the pair contributes ten days to the schedule path. If they are independent and can be staffed in parallel, they may contribute only five calendar days. This is why effort and duration are not the same thing.
+PERT exposes dependency logic. Two tasks may each take five days, but if one depends on the other, the pair contributes ten days to the schedule path. If they are independent and can be staffed in parallel, they may contribute only five calendar days. Effort and duration are therefore different quantities.
 
 The critical path is not necessarily the riskiest path or the path with the most important features. It is the path with no timing margin in the current network. However, tasks near the critical path can become critical if estimates change. Planning should therefore watch low-slack tasks, not only zero-slack tasks.
 
@@ -51,7 +51,7 @@ Estimate evaluation is part of the planning process. After the project, actual s
 
 Planning should also keep uncertainty visible. A single-point estimate such as "12 weeks" is easy to communicate but can hide the assumptions behind it. The WBS may show which work packages are understood and which are still speculative. PERT networks show dependency uncertainty because one underestimated task on the critical path affects the whole completion date. Size models such as LOC, COCOMO, and function points should therefore be treated as structured estimates, not as guarantees. A mature planning process records the basis of estimate, updates it when requirements or architecture change, and compares the final outcome with the original assumptions.
 
-## Visual
+### How the planning artifacts fit together
 
 ```mermaid
 flowchart LR
@@ -75,9 +75,9 @@ flowchart LR
 | Function points | user-visible functions | adjusted size | early size estimate |
 | COCOMO | KLOC and coefficients | effort | cost and staffing forecast |
 
-## Worked example 1: PERT critical path and slack
+## Finding the critical path in a five-task release
 
-**Problem.** A release has tasks A through E. Durations and dependencies are:
+A release has tasks A through E with these durations and dependencies:
 
 | Task | Duration | Depends on |
 |---|---:|---|
@@ -89,7 +89,7 @@ flowchart LR
 
 Find the earliest finish time and identify the critical path.
 
-**Method.** Compute earliest start and earliest finish in dependency order.
+Compute earliest start and finish times in dependency order.
 
 1. Task A has no predecessors.
 
@@ -131,13 +131,13 @@ $$
 Finish = \max(EF_D, EF_E) = \max(12, 7) = 12
 $$
 
-**Checked answer.** The earliest finish is 12 days. The controlling chain is A -> B -> D, with duration $3 + 4 + 5 = 12$. Chain A -> C -> D is $3 + 2 + 5 = 10$, and A -> C -> E is $3 + 2 + 2 = 7$, so they do not control completion under these estimates.
+The earliest finish is 12 days. The controlling chain is A -> B -> D, with duration $3 + 4 + 5 = 12$. Chain A -> C -> D is $3 + 2 + 5 = 10$, and A -> C -> E is $3 + 2 + 2 = 7$, so they do not control completion under these estimates.
 
-## Worked example 2: Basic COCOMO-style effort estimate
+## Converting a COCOMO estimate into calendar time
 
-**Problem.** A simple internal tool is estimated at 12 KLOC. Use a basic effort equation $E = 2.4KLOC^{1.05}$ to estimate effort in person-months. If one developer can supply 0.8 productive person-month per calendar month after meetings and support work, how many calendar months would one developer need?
+A simple internal tool is estimated at 12 KLOC. The basic equation $E = 2.4KLOC^{1.05}$ gives effort in person-months. One developer can supply 0.8 productive person-month per calendar month after meetings and support work, so the effort estimate also needs a capacity adjustment.
 
-**Method.** Substitute the size estimate, then adjust for available capacity.
+Substitute the size estimate, then adjust for available capacity.
 
 1. Compute the exponent term:
 
@@ -159,13 +159,11 @@ $$
 Duration = \frac{32.59}{0.8} \approx 40.74
 $$
 
-**Checked answer.** The estimate is about 32.6 person-months of effort, or about 40.7 calendar months for one developer at 0.8 productive capacity. This is not a recommendation to staff exactly one developer; it shows why effort, calendar time, and staffing must be considered separately. The answer is checked by noting that capacity below 1.0 person-month per calendar month increases duration.
+The estimate is about 32.6 person-months of effort, or about 40.7 calendar months for one developer at 0.8 productive capacity. It is not a recommendation to staff exactly one developer; it illustrates the difference between effort, calendar time, and staffing. Capacity below 1.0 person-month per calendar month increases the duration.
 
-## Code
+## Computing earliest task times
 
 ```python
-from collections import defaultdict, deque
-
 tasks = {
     "A": {"duration": 3, "deps": []},
     "B": {"duration": 4, "deps": ["A"]},
@@ -195,7 +193,7 @@ for task in sorted(tasks):
 print("project finish:", max(earliest_finish.values()))
 ```
 
-## Common pitfalls
+## Where plans become deceptive
 
 - Treating the WBS as an organization chart. It should decompose project work, not merely list departments.
 - Confusing effort with duration. Ten person-days can be one person for ten days or two people for five days only if the work can actually be parallelized.
@@ -205,10 +203,8 @@ print("project finish:", max(earliest_finish.values()))
 - Using function points casually without consistent counting rules.
 - Forgetting to evaluate estimates after actual data is available.
 
-## Connections
+<div className="see-also">
 
-- [Project management and process improvement](/cs/software-engineering/project-management-and-process-improvement)
-- [Software metrics](/cs/software-engineering/software-metrics)
-- [Risk analysis and management](/cs/software-engineering/risk-analysis-and-management)
-- [Software life cycle models](/cs/software-engineering/software-life-cycle-models)
-- [Software quality assurance](/cs/software-engineering/software-quality-assurance)
+See also: [Project management and process improvement](/cs/software-engineering/project-management-and-process-improvement) · [Software metrics](/cs/software-engineering/software-metrics) · [Risk analysis and management](/cs/software-engineering/risk-analysis-and-management) · [Software life cycle models](/cs/software-engineering/software-life-cycle-models) · [Software quality assurance](/cs/software-engineering/software-quality-assurance)
+
+</div>

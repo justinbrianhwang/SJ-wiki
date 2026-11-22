@@ -343,10 +343,8 @@ for time in [0.0, 0.7, 1.4]:
 - Under explicit driving, $f(H)$ need not be stationary even though the instantaneous Hamiltonian flow remains divergence-free.
 - A dense trajectory need not explore the whole energy surface; it may be dense only within a lower-dimensional invariant set.
 
-## Related pages
+<div className="see-also">
 
-- [Probability and density matrices](/physics/statistical-mechanics/probability-and-density-matrices)
-- [Microcanonical ensemble and entropy](/physics/statistical-mechanics/microcanonical-ensemble-and-entropy)
-- [Irreversibility, master equations, and finite-temperature field theory](/physics/statistical-mechanics/irreversibility-master-equations-and-finite-temperature-field-theory)
-- [Hamiltonian dynamics in quantum mechanics](/physics/quantum-mechanics/quantum-dynamics-pictures)
-- [Thermodynamics](/physics/thermodynamics/intro)
+See also: [Probability and density matrices](/physics/statistical-mechanics/probability-and-density-matrices) · [Microcanonical ensemble and entropy](/physics/statistical-mechanics/microcanonical-ensemble-and-entropy) · [Irreversibility, master equations, and finite-temperature field theory](/physics/statistical-mechanics/irreversibility-master-equations-and-finite-temperature-field-theory) · [Hamiltonian dynamics in quantum mechanics](/physics/quantum-mechanics/quantum-dynamics-pictures) · [Thermodynamics](/physics/thermodynamics/intro)
+
+</div>

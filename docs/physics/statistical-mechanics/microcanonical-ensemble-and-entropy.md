@@ -342,10 +342,8 @@ Energy is shared so that the mean number of quanta per oscillator agrees. Taking
 - Equal weight means equal weight in the invariant phase-space measure, not equal probability for a nonlinear coordinate or a coarse macrovariable.
 - Quantum microcanonical states use an energy-window projector. Replacing it by one arbitrary eigenstate requires an additional typicality or eigenstate-thermalization argument.
 
-## Related pages
+<div className="see-also">
 
-- [Phase space, Liouville theorem, and ergodicity](/physics/statistical-mechanics/phase-space-liouville-ergodicity)
-- [Canonical ensemble and fluctuations](/physics/statistical-mechanics/canonical-ensemble-and-fluctuations)
-- [Classical ideal gas and Maxwell distribution](/physics/statistical-mechanics/classical-ideal-gas-and-maxwell-distribution)
-- [Thermodynamics](/physics/thermodynamics/intro)
-- [Entropy and coding](/math/probability-and-random-variables/entropy-and-coding)
+See also: [Phase space, Liouville theorem, and ergodicity](/physics/statistical-mechanics/phase-space-liouville-ergodicity) · [Canonical ensemble and fluctuations](/physics/statistical-mechanics/canonical-ensemble-and-fluctuations) · [Classical ideal gas and Maxwell distribution](/physics/statistical-mechanics/classical-ideal-gas-and-maxwell-distribution) · [Thermodynamics](/physics/thermodynamics/intro) · [Entropy and coding](/math/probability-and-random-variables/entropy-and-coding)
+
+</div>

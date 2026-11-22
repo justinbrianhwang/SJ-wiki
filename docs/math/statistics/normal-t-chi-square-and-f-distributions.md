@@ -7,13 +7,13 @@ sidebar_position: 8
 
 Several continuous distributions appear repeatedly in introductory inference. The normal distribution models many measurements and approximates many sampling distributions. The $t$ distribution appears when estimating a mean with an unknown population standard deviation. The chi-square distribution appears in variance inference and categorical-data tests. The $F$ distribution appears in ANOVA and regression model comparisons. The Lane text treats these distributions across several chapters, but they form one connected family in practice.
 
-These distributions are not just named curves. Each one describes the behavior of a particular statistic under assumptions. Understanding the statistic behind the curve prevents mechanical table lookup. For example, a $t$ statistic compares an estimated effect to its estimated standard error, while an $F$ statistic compares variance explained by a model to variance left unexplained.
+Each curve describes the behavior of a particular statistic under assumptions. Following the statistic behind the curve prevents mechanical table lookup. A $t$ statistic compares an estimated effect to its estimated standard error, while an $F$ statistic compares variation between model components.
 
 ![Several Student t density curves are compared with the limiting normal curve.](https://commons.wikimedia.org/wiki/Special:FilePath/Student_t_pdf.svg)
 
 *Figure: Student $t$ density curves approaching the normal curve as degrees of freedom increase. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Student_t_pdf.svg), Skbkekas, CC BY 3.0.*
 
-## Definitions
+## Four reference curves and their statistics
 
 A **normal distribution** with mean $\mu$ and standard deviation $\sigma$ is written
 
@@ -53,7 +53,14 @@ $$
 
 has an $F_{\nu_1,\nu_2}$ distribution. It is nonnegative and right-skewed.
 
-## Key results
+| Distribution | Support | Shape | Key parameters | Common statistic |
+|---|---|---|---|---|
+| Normal | all real numbers | symmetric bell | $\mu,\sigma$ | $Z=(X-\mu)/\sigma$ |
+| $t$ | all real numbers | symmetric, heavy tails | degrees of freedom $\nu$ | $t=(\bar{X}-\mu_0)/(S/\sqrt{n})$ |
+| Chi-square | $[0,\infty)$ | right-skewed | degrees of freedom $\nu$ | $\sum (O-E)^2/E$ |
+| $F$ | $[0,\infty)$ | right-skewed | numerator and denominator df | ratio of mean squares |
+
+## How degrees of freedom and tails govern inference
 
 For a normal distribution, the empirical rule says that about 68% of values lie within one standard deviation of the mean, 95% within two, and 99.7% within three. Exact probabilities come from the standard normal cumulative distribution function $\Phi(z)=P(Z\le z)$.
 
@@ -89,16 +96,9 @@ Large chi-square or $F$ statistics often indicate evidence against a null model,
 
 These distributions also differ in how their tails are used. Normal and $t$ tests for means often use one or two tails depending on the alternative hypothesis. Chi-square goodness-of-fit and independence tests use the upper tail because larger squared discrepancies are more inconsistent with the null; a statistic near zero means observed counts are unusually close to expected counts, not evidence against the model in the usual test. ANOVA $F$ tests also use the upper tail because the statistic is a ratio of explained to unexplained variance. Remembering the statistic's construction is more reliable than memorizing tail directions.
 
-Degrees of freedom can be read as the amount of independent information left after estimating constraints. In a one-sample $t$ test, estimating the sample mean uses one constraint, leaving $n-1$ degrees of freedom for variability. In a chi-square table, fixed totals reduce how many cells can vary freely. This interpretation helps explain why larger samples make $t$ distributions look more normal and why changing the number of categories changes the chi-square reference curve.
+Degrees of freedom can be read as the amount of independent information left after estimating constraints. In a one-sample $t$ test, estimating the sample mean uses one constraint, leaving $n-1$ degrees of freedom for variability. In a chi-square table, fixed totals reduce how many cells can vary freely. This interpretation explains why larger samples make $t$ distributions look more normal and why changing the number of categories changes the chi-square reference curve.
 
-## Visual
-
-| Distribution | Support | Shape | Key parameters | Common statistic |
-|---|---|---|---|---|
-| Normal | all real numbers | symmetric bell | $\mu,\sigma$ | $Z=(X-\mu)/\sigma$ |
-| $t$ | all real numbers | symmetric, heavy tails | degrees of freedom $\nu$ | $t=(\bar{X}-\mu_0)/(S/\sqrt{n})$ |
-| Chi-square | $[0,\infty)$ | right-skewed | degrees of freedom $\nu$ | $\sum (O-E)^2/E$ |
-| $F$ | $[0,\infty)$ | right-skewed | numerator and denominator df | ratio of mean squares |
+The rough shapes separate the symmetric normal/$t$ family from the nonnegative chi-square/$F$ family:
 
 ```text
 Relative shape sketch
@@ -114,7 +114,7 @@ normal and t:              chi-square and F:
         0                            0
 ```
 
-## Worked example 1: Normal probability with standardization
+## Standardizing commute times and reversing the transform
 
 Problem: Suppose adult commute times in a region are approximately normal with mean $\mu=31$ minutes and standard deviation $\sigma=8$ minutes. What proportion of commuters take longer than 45 minutes? What commute time marks the 90th percentile?
 
@@ -147,9 +147,9 @@ $$
 
 Answer: About 4.0% of commuters take longer than 45 minutes. The 90th percentile is about 41.3 minutes.
 
-Checked answer: The 90th percentile should be above the mean, and 41.3 is about 1.28 standard deviations above 31, which matches the standard normal percentile.
+Check: The 90th percentile should be above the mean, and 41.3 is about 1.28 standard deviations above 31, which matches the standard normal percentile.
 
-## Worked example 2: Choosing $t$, chi-square, or $F$
+## Matching three study designs to reference distributions
 
 Problem: For each study, identify the appropriate reference distribution and degrees of freedom where possible.
 
@@ -191,9 +191,9 @@ $$
 
 Answer: The correct reference distributions are $t_{15}$ for the one-sample mean, $\chi^2_3$ for the four-category goodness-of-fit test, and $F_{2,27}$ for the one-way ANOVA.
 
-Checked answer: The chosen distributions match the statistic types: standardized mean with estimated standard error, squared categorical discrepancies, and ratio of between-group to within-group mean squares.
+Check: The chosen distributions match the statistic types: standardized mean with estimated standard error, squared categorical discrepancies, and ratio of between-group to within-group mean squares.
 
-## Code
+## Evaluating probabilities and critical values with SciPy
 
 ```python
 from scipy import stats
@@ -216,7 +216,7 @@ print("F critical:", stats.f.ppf(0.95, dfn=2, dfd=27))
 
 The code uses cumulative distribution functions for probabilities and percent point functions for percentiles or critical values. This is safer than copying table entries by hand, especially for nonstandard degrees of freedom.
 
-## Common pitfalls
+## Mismatches between statistic and reference curve
 
 - Using a normal critical value for a small-sample mean when the population standard deviation is unknown.
 - Forgetting that chi-square and $F$ statistics cannot be negative.
@@ -225,11 +225,8 @@ The code uses cumulative distribution functions for probabilities and percent po
 - Forgetting a continuity correction when a more accurate normal approximation to a discrete count is needed.
 - Comparing a statistic to the wrong tail of the reference distribution.
 
-## Connections
+<div className="see-also">
 
-- [Random variables and probability distributions](/math/statistics/random-variables-and-distributions)
-- [Sampling distributions and the central limit theorem](/math/statistics/sampling-distributions-and-clt)
-- [Estimation and confidence intervals](/math/statistics/estimation-and-confidence-intervals)
-- [Tests for means](/math/statistics/tests-for-means)
-- [ANOVA](/math/statistics/anova)
-- [Proportions and chi-square tests](/math/statistics/proportions-and-chi-square-tests)
+See also: [Random variables and probability distributions](/math/statistics/random-variables-and-distributions) · [Sampling distributions and the central limit theorem](/math/statistics/sampling-distributions-and-clt) · [Estimation and confidence intervals](/math/statistics/estimation-and-confidence-intervals) · [Tests for means](/math/statistics/tests-for-means) · [ANOVA](/math/statistics/anova) · [Proportions and chi-square tests](/math/statistics/proportions-and-chi-square-tests)
+
+</div>

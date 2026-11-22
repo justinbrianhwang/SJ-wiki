@@ -9,7 +9,7 @@ The relational model hides physical storage, but database systems live on real h
 
 This topic connects the logical world of relations to the implementation world of disks, flash storage, memory, and buffer managers. A database administrator can declare a table and write SQL without specifying exact record offsets, but a DBMS still chooses layouts and file organizations. Understanding those choices makes indexing, query processing, recovery, and transaction performance easier to reason about.
 
-## Definitions
+## Records, pages, and physical addresses
 
 A **record** is the physical representation of one tuple. Fixed-length records reserve the same amount of space for every record. Variable-length records support attributes such as strings, nullable columns, and repeated or optional fields. A record often contains a header, null bitmap, fixed-length fields, and pointers or offsets to variable-length fields.
 
@@ -21,25 +21,13 @@ A **record identifier (RID)** points to a physical record, often as `(page_id, s
 
 A **buffer manager** manages the in-memory cache of disk pages. It decides which pages to read, which dirty pages to write back, and which pages to evict when memory is full. Replacement policies such as LRU are useful starting points, but database systems often need policies aware of scans, indexes, and recovery.
 
-## Key results
+## Why page access dominates cost
 
 The cost of I/O dominates many traditional database operations. Reading one page can bring many records into memory, so clustering related records matters. If a query scans a table, page count is more important than tuple count. If a query fetches scattered records through an index, random I/O can dominate.
 
+## Slotted pages and free-space management
+
 Slotted pages solve variable-length record management. The page header stores the number of slots and free-space information. Records are placed from one end of the page, while the slot directory grows from the other. Deleting a record can mark a slot free; compacting the page can move records while keeping their slot numbers stable.
-
-Free-space management is required for efficient insertion. The DBMS needs to find pages with enough room without scanning the whole file. Common methods include free lists, bitmaps, and directory pages that summarize free space by page.
-
-Column-oriented storage stores values of the same attribute together, rather than storing all attributes of a tuple together. It is excellent for analytical scans over a few columns and for compression. Row-oriented storage is often better for transaction workloads that read or update whole records.
-
-Physical layout choices interact with the buffer manager. A table scan benefits from sequential prefetch and may intentionally avoid polluting the cache with pages that will not be reused. An index lookup benefits from keeping upper index levels hot in memory. A nested-loop join may repeatedly touch the same inner pages, making replacement policy important. The same page count can therefore have different observed costs depending on access order and cache reuse.
-
-Modern storage also changes, but does not remove, the need for careful design. Flash storage reduces random-read penalties compared with magnetic disks, yet write amplification, erase blocks, and endurance still matter. Main-memory databases avoid many disk I/O costs but still need cache-conscious layouts, logging, snapshots, and recovery. The abstraction of pages remains useful because data movement between storage layers is still a dominant systems concern.
-
-Record layout affects CPU work as well as I/O. Fixed-width fields are easy to address by offset, while variable-width fields require an offset table or length decoding. Null bitmaps let the system represent missing values compactly, but every expression that reads nullable columns must check visibility and null state. Compression can reduce I/O and memory bandwidth, but it adds decompression cost. Physical design is therefore a balance among page density, CPU cost, and update flexibility.
-
-Heap files are simple, but they still need organization around free space. If every insert scans pages looking for a gap, insertion becomes slow as the table grows. A free-space map lets the DBMS jump to a page likely to have enough room. When records grow after update, the system may relocate them, leave forwarding pointers, or reject the update if the layout cannot accommodate it efficiently.
-
-## Visual
 
 ```text
 +---------------- page ----------------+
@@ -53,6 +41,20 @@ Heap files are simple, but they still need organization around free space. If ev
 RID = (page_id, slot_number)
 ```
 
+Free-space management is required for efficient insertion. The DBMS needs to find pages with enough room without scanning the whole file. Common methods include free lists, bitmaps, and directory pages that summarize free space by page.
+
+Heap files are simple, but they still need organization around free space. If every insert scans pages looking for a gap, insertion becomes slow as the table grows. A free-space map lets the DBMS jump to a page likely to have enough room. When records grow after update, the system may relocate them, leave forwarding pointers, or reject the update if the layout cannot accommodate it efficiently.
+
+## Layout choices across the storage hierarchy
+
+Column-oriented storage stores values of the same attribute together, rather than storing all attributes of a tuple together. It is excellent for analytical scans over a few columns and for compression. Row-oriented storage is often better for transaction workloads that read or update whole records.
+
+Physical layout choices interact with the buffer manager. A table scan benefits from sequential prefetch and may intentionally avoid polluting the cache with pages that will not be reused. An index lookup benefits from keeping upper index levels hot in memory. A nested-loop join may repeatedly touch the same inner pages, making replacement policy important. The same page count can therefore have different observed costs depending on access order and cache reuse.
+
+Modern storage also changes, but does not remove, the need for careful design. Flash storage reduces random-read penalties compared with magnetic disks, yet write amplification, erase blocks, and endurance still matter. Main-memory databases avoid many disk I/O costs but still need cache-conscious layouts, logging, snapshots, and recovery. The abstraction of pages remains useful because data movement between storage layers is still a dominant systems concern.
+
+Record layout affects CPU work as well as I/O. Fixed-width fields are easy to address by offset, while variable-width fields require an offset table or length decoding. Null bitmaps let the system represent missing values compactly, but every expression that reads nullable columns must check visibility and null state. Compression can reduce I/O and memory bandwidth, but it adds decompression cost. Physical design is therefore a balance among page density, CPU cost, and update flexibility.
+
 | File organization | Strength | Weakness | Good fit |
 | --- | --- | --- | --- |
 | Heap | fast unordered inserts | slow search without index | staging tables, small tables |
@@ -61,11 +63,9 @@ RID = (page_id, slot_number)
 | Clustered | related rows near each other | expensive reorganization | joins and range-heavy tables |
 | Column store | scans few columns, compresses well | tuple reconstruction cost | analytics and warehouses |
 
-## Worked example 1: Estimate pages for fixed-length records
+## Estimating a fixed-length table’s page count
 
-Problem: A table has fixed-length records of 160 bytes. The DBMS uses 8 KiB pages, with 192 bytes of page overhead. Estimate how many pages are needed for 100,000 records.
-
-Method:
+Take a table with 100,000 fixed-length records of 160 bytes. The DBMS uses 8 KiB pages with 192 bytes of page overhead.
 
 1. Convert page size:
 
@@ -93,13 +93,11 @@ $$
 
 5. Interpret the result. A full table scan reads about 2000 pages, not 100,000 separate records. If the storage layer can read pages sequentially, the scan may be much faster than 100,000 random reads.
 
-Checked answer: 2,000 data pages are needed under these assumptions. The estimate ignores file headers, indexes, and partially filled pages, so it is a clean lower-level planning estimate rather than an exact storage bill.
+The table needs 2,000 data pages under these assumptions. The estimate ignores file headers, indexes, and partially filled pages, so it is a clean lower-level planning estimate rather than an exact storage bill.
 
-## Worked example 2: Slotted-page deletion and insertion
+## Reusing a slot after deletion
 
-Problem: A slotted page has three slots. Slot 0 points to record A, slot 1 points to record B, and slot 2 points to record C. Record B is deleted, then a new record D of the same size is inserted. Explain what happens to RIDs.
-
-Method:
+Consider a slotted page where slots 0, 1, and 2 point to records A, B, and C. Record B is deleted, then a same-sized record D is inserted.
 
 1. Before deletion:
 
@@ -127,9 +125,9 @@ Method:
 
 4. Check RIDs. A keeps `(page, 0)`. C keeps `(page, 2)`. D receives `(page, 1)`. The old RID for B should not be used by application code after deletion; if an index still points to it, that index entry must be removed or updated as part of the delete.
 
-Checked answer: the slot directory gives stable identifiers for surviving records even if compaction moves bytes inside the page. Deleted RIDs can be reused internally, but transactional visibility and index maintenance must prevent stale references.
+The slot directory gives stable identifiers for surviving records even if compaction moves bytes inside the page. Deleted RIDs can be reused internally, but transactional visibility and index maintenance must prevent stale references.
 
-## Code
+## Calculating page capacity
 
 ```python
 from math import ceil
@@ -145,7 +143,7 @@ pages, capacity = pages_needed(100_000, 160)
 print(f"records/page={capacity}, pages={pages}")
 ```
 
-## Common pitfalls
+## Costs that rough estimates often omit
 
 - Estimating scan cost by tuple count instead of page count.
 - Ignoring page overhead, slot directories, and free space when estimating capacity.
@@ -154,9 +152,8 @@ print(f"records/page={capacity}, pages={pages}")
 - Forgetting that indexes also consume pages and must be maintained on writes.
 - Treating the buffer manager as a generic operating-system cache. A DBMS has query and recovery knowledge that can guide replacement and flushing.
 
-## Connections
+<div className="see-also">
 
-- [Indexing with B+ Trees, Hashing, and Bitmaps](/cs/databases/indexing-bplus-hash-bitmap)
-- [Query Processing and Join Algorithms](/cs/databases/query-processing-join-algorithms)
-- [Recovery with WAL, ARIES, and Checkpoints](/cs/databases/recovery-wal-aries-checkpoints)
-- [Transactions, ACID, and Serializability](/cs/databases/transactions-acid-and-serializability)
+See also: [Indexing with B+ Trees, Hashing, and Bitmaps](/cs/databases/indexing-bplus-hash-bitmap) · [Query Processing and Join Algorithms](/cs/databases/query-processing-join-algorithms) · [Recovery with WAL, ARIES, and Checkpoints](/cs/databases/recovery-wal-aries-checkpoints) · [Transactions, ACID, and Serializability](/cs/databases/transactions-acid-and-serializability)
+
+</div>

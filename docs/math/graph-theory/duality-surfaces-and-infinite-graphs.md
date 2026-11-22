@@ -1,4 +1,4 @@
----
+﻿---
 title: Duality Surfaces and Infinite Graphs
 sidebar_position: 9
 ---
@@ -7,13 +7,9 @@ sidebar_position: 9
 
 Duality turns faces into vertices and cycles into cuts. For plane graphs this is a concrete geometric construction: put a new vertex in each face and draw a new edge crossing each original edge. The result often explains why statements about cycles have twin statements about cutsets.
 
-![A Klein bottle loops through itself as a non-orientable surface.](https://commons.wikimedia.org/wiki/Special:FilePath/Klein_bottle.svg)
-
-*Figure: A Klein bottle is a classic non-orientable surface used in topology and graph embeddings. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Klein_bottle.svg), Tttrung, CC BY-SA 3.0.*
-
 Graphs on surfaces and infinite graphs extend the planar story. On a torus or a surface with handles, Euler's formula changes by the Euler characteristic. In infinite graphs, even basic statements about paths need local finiteness or countability assumptions. Wilson's planarity chapter uses these extensions to show which planar ideas survive, which need modification, and which fail.
 
-## Definitions
+## Dual edges, handles, and rays
 
 For a connected plane graph $G$, the **geometric dual** $G^*$ is constructed by placing one vertex in each face of $G$ and drawing one dual edge $e^*$ crossing each edge $e$ of $G$. If an edge borders the same face on both sides, its dual is a loop. If two faces share several boundary edges, the dual may have parallel edges.
 
@@ -23,7 +19,7 @@ The **genus** $g$ of an orientable surface is the number of handles. The sphere 
 
 An **infinite graph** has infinitely many vertices or edges. It is **locally finite** if every vertex has finite degree. A **ray** is a one-way infinite path.
 
-## Key results
+## Which planar identities survive
 
 **Dual counting relations.** If $G$ is a connected plane graph with $n$ vertices, $m$ edges, and $f$ faces, and $G^*$ is its geometric dual, then
 
@@ -51,13 +47,11 @@ For $g=0$ this is the planar Euler formula.
 
 **Infinite graphs and compactness.** Many finite graph statements extend to infinite graphs only after adding a compactness or local finiteness hypothesis. For example, a connected graph in which each vertex has finite degree can be explored level by level from a root. If infinitely many vertices exist, some branch of this finite-branching exploration continues forever, giving a ray. Without finite branching, this argument breaks.
 
-**Abstract duals and planarity.** The definition of abstract duality avoids drawing the graph. It asks only for an edge correspondence that turns cycles into cutsets. Whitney's duality theorem says that this algebraic-looking property characterizes planar graphs: a graph has an abstract dual exactly when it is planar. This explains why duality is not just a drawing trick but a structural property.
+**Abstract duals and planarity.** The definition of abstract duality avoids drawing the graph. It asks only for an edge correspondence that turns cycles into cutsets. Whitney's duality theorem says that this algebraic-looking property characterizes planar graphs: a graph has an abstract dual exactly when it is planar. Duality is therefore a structural property, not merely a feature of a drawing.
 
 **Non-uniqueness warning.** A planar graph can have different plane embeddings. For highly connected planar graphs the embedding is often rigid, but in general different embeddings may produce nonisomorphic geometric duals. When a problem asks for "the" dual, check whether a particular plane drawing has been fixed.
 
 **Locally finite versus locally countable.** Local finiteness means every vertex has finite degree. Local countability allows countably many incident edges at each vertex. Some countability conclusions still hold under local countability and connectedness, but path-existence lemmas such as Konig's are strongest and cleanest under local finiteness.
-
-## Visual
 
 The triangle has two faces: the inside face and the outside face. Its dual has two vertices joined by three parallel dual edges, one crossing each side of the triangle.
 
@@ -84,11 +78,9 @@ graph LR
 | bridge | loop |
 | loop | bridge |
 
-## Worked example 1: Build the dual counts of a wheel
+## Dual counts for a wheel
 
-**Problem.** Let $G=W_5$, the wheel with four rim vertices and one center. Find the numbers of vertices, edges, and faces of $G^*$.
-
-**Method.**
+Let $G=W_5$, the wheel with four rim vertices and one center. Find the numbers of vertices, edges, and faces of $G^*$.
 
 1. Count $G$. It has $n=5$ vertices.
 2. It has $m=8$ edges: four rim edges and four spokes.
@@ -124,11 +116,9 @@ $$
 
 So the counts are consistent.
 
-## Worked example 2: Genus lower bound for $K_7$
+## A genus lower bound for $K_7$
 
-**Problem.** Use Euler's formula on surfaces to find a lower bound for the orientable genus of $K_7$.
-
-**Method.**
+Use Euler's formula on surfaces to find a lower bound for the orientable genus of $K_7$.
 
 1. For $K_7$,
 
@@ -172,11 +162,11 @@ $$
 g\ge 1.
 $$
 
-**Checked answer.** $K_7$ cannot be embedded on the sphere, but this counting argument allows genus $1$. In fact, $K_7$ embeds on the torus.
+$K_7$ cannot be embedded on the sphere, but this counting argument allows genus $1$. In fact, $K_7$ embeds on the torus.
 
 The same inequality gives only a lower bound. To prove the exact genus of a graph, one also needs a drawing on a surface of that genus. Counting can rule surfaces out; construction proves that a surface is sufficient.
 
-## Code
+## Computing dual counts and genus bounds
 
 ```python
 import math
@@ -203,13 +193,11 @@ For duality exercises, always record the chosen embedding before drawing the dua
 
 For surface exercises, separate lower and upper bounds. Euler-characteristic inequalities often prove that a sphere is impossible or that at least one handle is needed. They do not by themselves draw the graph. A matching embedding on the claimed surface is the companion certificate.
 
-The same lower-bound versus construction split appears throughout topological graph theory.
-
-Counting rules out; embeddings certify.
+The lower-bound versus construction split appears throughout topological graph theory: counting rules out a surface, while an embedding certifies that the surface is sufficient.
 
 Duality problems reward careful bookkeeping. Label each original edge and write the corresponding dual edge with the same label or a starred label. Then verify one cycle-cut correspondence explicitly. For surface problems, compute $n-m+f$ after the embedding is fixed; changing the drawing or the surface changes the face count, so the arithmetic is meaningful only relative to a stated embedding.
 
-## Common pitfalls
+## Hypotheses hidden in duality arguments
 
 - Assuming the dual of a planar graph is always simple. Bridges and repeated face adjacencies create loops and parallel edges.
 - Forgetting that geometric duals depend on a plane embedding. Nonisomorphic embeddings can have nonisomorphic duals.
@@ -218,9 +206,8 @@ Duality problems reward careful bookkeeping. Label each original edge and write 
 - Treating every infinite connected graph as countable. Local countability and connectedness give countability; without them, this may fail.
 - Omitting local finiteness in statements about rays and Konig's lemma.
 
-## Connections
+<div className="see-also">
 
-- [Planarity and Euler formula](/math/graph-theory/planarity-and-euler-formula)
-- [Matroids and graph duality](/math/graph-theory/matroids-and-graph-duality)
-- [Menger theorem and network flows](/math/graph-theory/menger-theorem-and-network-flows)
-- [Algebraic graph theory basics](/math/graph-theory/algebraic-graph-theory-basics)
+See also: [Planarity and Euler formula](/math/graph-theory/planarity-and-euler-formula) · [Matroids and graph duality](/math/graph-theory/matroids-and-graph-duality) · [Menger theorem and network flows](/math/graph-theory/menger-theorem-and-network-flows) · [Algebraic graph theory basics](/math/graph-theory/algebraic-graph-theory-basics)
+
+</div>

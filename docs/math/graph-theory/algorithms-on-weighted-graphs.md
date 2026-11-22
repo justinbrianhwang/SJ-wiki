@@ -1,4 +1,4 @@
----
+﻿---
 title: Algorithms on Weighted Graphs
 sidebar_position: 5
 ---
@@ -9,7 +9,7 @@ Weighted graphs attach numerical costs, lengths, capacities, or rewards to edges
 
 Two families of problems dominate the introductory theory. **Shortest path** algorithms minimize the total weight of a route between vertices. **Minimum spanning tree** algorithms connect all vertices with minimum total edge weight. Both are greedy in important cases, but the reason the greedy choice is valid is different in each setting.
 
-## Definitions
+## The optimization problem comes first
 
 A **weighted graph** is a graph $G$ together with a weight function
 
@@ -32,7 +32,7 @@ Common algorithms:
 | Minimum spanning tree | Kruskal | any real weights | $O(m\log m)$ |
 | Minimum spanning tree | Prim | any real weights | $O(m\log n)$ |
 
-## Key results
+## Why the greedy steps are safe
 
 **Dijkstra invariant.** In a graph with nonnegative edge weights, when Dijkstra's algorithm permanently selects an unsettled vertex $u$ of minimum tentative distance, that tentative distance is the true shortest distance from the source to $u$.
 
@@ -65,8 +65,6 @@ Dijkstra, Bellman-Ford, and many dynamic-programming shortest-path algorithms di
 **Tie handling.** When several edges have the same weight, Kruskal and Prim may return different MSTs. This is not a contradiction. The total weight is the invariant; the edge set need not be unique. A graph has a unique MST if every cut has a unique lightest crossing edge, and in particular if all edge weights are distinct.
 
 **Negative cycles.** A negative edge is not automatically a problem for shortest paths, but a reachable negative cycle is. Once a path can enter a cycle of negative total weight and later reach the target, looping around the cycle repeatedly makes the path weight arbitrarily small. In that case there is no well-defined shortest path. Bellman-Ford detects this by checking whether any edge can still be relaxed after $n-1$ full passes.
-
-## Visual
 
 ```mermaid
 flowchart TB
@@ -114,11 +112,9 @@ flowchart TB
 
 This weighted-graph diagram keeps the example graph as input while exposing the algorithmic building blocks. Dijkstra and Bellman-Ford share the relaxation primitive but differ in scheduling and negative-weight handling; Kruskal and Prim share MST cut logic but grow the tree through different data structures. For the listed example, the shortest path from $A$ to $E$ is $A-C-B-D-E$ with weight $10$, while $A-C-E$ has fewer edges but weight $12$.
 
-## Worked example 1: Dijkstra from a source
+## Dijkstra from a source
 
-**Problem.** In the weighted graph shown above, find shortest distances from $A$ to every vertex.
-
-**Method.**
+In the weighted graph shown above, find shortest distances from $A$ to every vertex.
 
 Initialize
 
@@ -160,8 +156,6 @@ $$
 
 5. Settle $E$ with distance $10$.
 
-**Checked answer.**
-
 $$
 d(A)=0,\quad d(C)=2,\quad d(B)=3,\quad d(D)=8,\quad d(E)=10.
 $$
@@ -170,11 +164,11 @@ A shortest $A$-$E$ path is $A-C-B-D-E$.
 
 Notice that the direct-looking edge $C-E$ is not used. Shortest-path algorithms do not minimize the number of hops; they minimize total weight. If each edge represented travel time, the path with four edges could still be faster than the path with two edges.
 
-## Worked example 2: Kruskal minimum spanning tree
+## Kruskal on the same weighted graph
 
-**Problem.** Find an MST of the same graph.
+Find an MST of the same graph.
 
-**Method.** Sort edges by increasing weight:
+Sort edges by increasing weight:
 
 $$
 CB(1),\ AC(2),\ DE(2),\ AB(4),\ BD(5),\ CD(8),\ CE(10).
@@ -203,7 +197,7 @@ $$
 
 **Check.** A spanning tree on $5$ vertices has exactly $4$ edges, and the selected four edges connect all vertices. Each rejection was justified by a cycle, so Kruskal's rule is satisfied.
 
-## Code
+## Dijkstra with predecessor pointers
 
 ```python
 import heapq
@@ -240,7 +234,7 @@ To reconstruct a path, follow the `parent` dictionary backward from the target t
 
 When comparing weighted-graph algorithms, keep the invariant visible. Dijkstra certifies settled shortest distances, Kruskal maintains an acyclic partial forest, Prim maintains a connected growing tree, and Bellman-Ford performs enough relaxations to account for paths with many edges. Remembering the invariant is more reliable than memorizing the implementation details alone.
 
-## Common pitfalls
+## Where weighted-graph algorithms go wrong
 
 - Using Dijkstra's algorithm when a negative edge is present. Nonnegative weights are part of the correctness proof.
 - Confusing shortest-path trees with minimum spanning trees. A shortest-path tree is source-based; an MST is global and source-free.
@@ -249,9 +243,8 @@ When comparing weighted-graph algorithms, keep the invariant visible. Dijkstra c
 - Treating equal-weight MST choices as errors. Multiple distinct MSTs may have the same total weight.
 - Ignoring negative cycles in shortest-path problems. If one is reachable and can reach the target, there is no finite minimum.
 
-## Connections
+<div className="see-also">
 
-- [Walks, paths, and connectedness](/math/graph-theory/walks-paths-and-connectedness)
-- [Trees and spanning trees](/math/graph-theory/trees-and-spanning-trees)
-- [Menger theorem and network flows](/math/graph-theory/menger-theorem-and-network-flows)
-- [Random graphs basics](/math/graph-theory/random-graphs-basics)
+See also: [Walks, paths, and connectedness](/math/graph-theory/walks-paths-and-connectedness) · [Trees and spanning trees](/math/graph-theory/trees-and-spanning-trees) · [Menger theorem and network flows](/math/graph-theory/menger-theorem-and-network-flows) · [Random graphs basics](/math/graph-theory/random-graphs-basics)
+
+</div>

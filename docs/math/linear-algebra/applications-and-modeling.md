@@ -7,13 +7,9 @@ sidebar_position: 20
 
 Linear algebra is a modeling language. A model becomes linear when unknown quantities combine by addition and scalar multiplication: flows through networks, currents in circuits, chemical reaction coefficients, input-output economics, Markov transitions, polynomial interpolation, curve fitting, and data compression.
 
-![A straight regression line is fitted through scattered data points.](https://commons.wikimedia.org/wiki/Special:FilePath/Linear_regression.svg)
-
-*Figure: Least squares turns geometric projection into a practical model-fitting method. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Linear_regression.svg), Sewaqu, public domain.*
-
 The common pattern is to translate a real constraint into an equation, collect unknowns in a vector, and let a matrix encode how those unknowns contribute. Once the model is written as $A\mathbf{x}=\mathbf{b}$, $\mathbf{x}_{k+1}=A\mathbf{x}_k$, or an optimization problem such as least squares, the theory of the previous pages becomes usable.
 
-## Definitions
+## Turning a situation into a matrix model
 
 A linear model has unknown vector $\mathbf{x}$ and equations of the form
 
@@ -39,7 +35,31 @@ Polynomial interpolation seeks a polynomial passing exactly through given data p
 
 A network-flow model assigns variables to edges and writes conservation equations at nodes: flow in equals flow out, adjusted for supply or demand.
 
-## Key results
+The modeling path is short, but each arrow carries a choice about variables, units, and conventions.
+
+```mermaid
+flowchart TD
+  A["Real situation"] --> B["Choose variables"]
+  B --> C["Write linear equations or updates"]
+  C --> D["Matrix model"]
+  D --> E{"Model type"}
+  E --> F["A x = b"]
+  E --> G["x_{k+1} = P x_k"]
+  E --> H["least squares"]
+  F --> I["solve or analyze consistency"]
+  G --> J["study powers and steady states"]
+  H --> K["fit parameters and inspect residuals"]
+```
+
+| Application | Matrix object | Typical question |
+|---|---|---|
+| Network flow | incidence-style system | which flows satisfy conservation? |
+| Leontief economics | $I-C$ | what production meets demand? |
+| Markov chains | stochastic matrix $P$ | what happens after many steps? |
+| Curve fitting | design matrix $A$ | which parameters best fit data? |
+| Data compression | singular values | which low-rank approximation preserves structure? |
+
+## What the standard models let us compute
 
 Linear systems model conservation laws. At each node of a flow network, "flow in equals flow out" produces a linear equation. In circuit analysis, Kirchhoff laws produce linear equations for currents or voltage drops.
 
@@ -73,31 +93,7 @@ $$
 
 passing through $n+1$ points gives a square linear system in the coefficients. For noisy or overdetermined data, least squares replaces exact fitting by minimizing total squared residual.
 
-## Visual
-
-```mermaid
-flowchart TD
-  A["Real situation"] --> B["Choose variables"]
-  B --> C["Write linear equations or updates"]
-  C --> D["Matrix model"]
-  D --> E{"Model type"}
-  E --> F["A x = b"]
-  E --> G["x_{k+1} = P x_k"]
-  E --> H["least squares"]
-  F --> I["solve or analyze consistency"]
-  G --> J["study powers and steady states"]
-  H --> K["fit parameters and inspect residuals"]
-```
-
-| Application | Matrix object | Typical question |
-|---|---|---|
-| Network flow | incidence-style system | which flows satisfy conservation? |
-| Leontief economics | $I-C$ | what production meets demand? |
-| Markov chains | stochastic matrix $P$ | what happens after many steps? |
-| Curve fitting | design matrix $A$ | which parameters best fit data? |
-| Data compression | singular values | which low-rank approximation preserves structure? |
-
-## Worked example 1: Leontief input-output model
+## Production required by a two-sector economy
 
 Problem: an economy has two sectors with consumption matrix
 
@@ -212,7 +208,7 @@ $$
 
 Both production levels are positive, so the result is at least numerically plausible.
 
-## Worked example 2: Markov steady state
+## Long-run behavior of a two-state chain
 
 Problem: a population moves between two states with column-stochastic transition matrix
 
@@ -286,7 +282,7 @@ $$
 
 Checked answer: the steady state is $\begin{bmatrix}2/5&3/5\end{bmatrix}^T$.
 
-## Code
+## Solving and iterating with NumPy
 
 ```python
 import numpy as np
@@ -308,7 +304,7 @@ print(state)
 
 The first computation solves a static input-output model. The second repeatedly applies a transition matrix to show convergence toward the steady distribution.
 
-## Common pitfalls
+## Reading a model critically
 
 - Building a model before defining variables clearly. A matrix equation is only meaningful when each entry has an interpretation.
 - Mixing row-stochastic and column-stochastic Markov conventions.
@@ -317,7 +313,7 @@ The first computation solves a static input-output model. The second repeatedly 
 - Using exact interpolation for noisy data where least squares is more appropriate.
 - Treating model outputs as predictions without checking assumptions, sensitivity, and residuals.
 
-A practical modeling workflow begins before any matrix is written. Name the unknowns, record their units, and decide what each equation represents. After solving, interpret each component of the solution in the original units. This prevents a common failure mode: producing a correct vector for the wrong question.
+A sound modeling workflow begins before any matrix is written. Name the unknowns, record their units, and decide what each equation represents. After solving, interpret each component of the solution in the original units. These steps prevent a correct vector from answering the wrong question.
 
 Linearity is a modeling assumption. It says effects add and scale. If doubling an input does not double its contribution, or if two inputs interact multiplicatively, then a linear model may be an approximation rather than an exact description. Many useful models are linearizations of nonlinear systems near an operating point. The algebra is linear, but the validity of the approximation depends on context.
 
@@ -327,7 +323,7 @@ Residuals are part of the model report. For exact conservation systems, a nonzer
 
 Model validation should include extreme or simple cases. If external demand is zero in a Leontief model, does the predicted production make sense? If a Markov transition matrix is the identity, does the state remain fixed? If every data point lies exactly on a line, does the least-squares fit recover that line with zero residual? These checks catch transposed matrices, wrong stochastic conventions, and misplaced variables.
 
-Many applications also require constraints beyond linear equations. Production cannot be negative, probabilities must sum to one, and physical quantities may have upper bounds. Introductory linear algebra often focuses on solving the equality model first. In practice, the equality solution may need to be combined with inequalities, optimization, or domain-specific feasibility checks.
+Many applications also require constraints beyond linear equations. Production cannot be negative, probabilities must sum to one, and physical quantities may have upper bounds. Introductory linear algebra often focuses on solving the equality model first. The equality solution may then need to be combined with inequalities, optimization, or domain-specific feasibility checks.
 
 A matrix model is valuable because it exposes structure. Invertibility asks whether demands determine productions uniquely. Eigenvectors ask which states persist under repeated transitions. Rank asks how many independent constraints or outputs are present. Singular values ask which directions are stable or fragile. The application changes, but the linear algebra questions repeat.
 
@@ -335,13 +331,10 @@ Good models are usually iterative. After solving once, inspect the solution, res
 
 Documentation is part of modeling. A reader should be able to tell what each variable means, why each equation is linear, what convention is used for rows and columns, and what the answer represents. Without that context, a matrix computation may be correct but unusable.
 
-A model should therefore end with interpretation, not only a vector or matrix printed from software.
+A model should end with interpretation, not only a vector or matrix printed from software: the final answer should say what decision, prediction, or constraint the numbers represent.
 
-The final answer should say what decision, prediction, or constraint the numbers represent.
+<div className="see-also">
 
-## Connections
+See also: [Systems of Linear Equations](/math/linear-algebra/systems-of-linear-equations) · [Eigenvalues and Eigenvectors](/math/linear-algebra/eigenvalues-and-eigenvectors) · [Least Squares](/math/linear-algebra/least-squares) · [Singular Value Decomposition](/math/linear-algebra/singular-value-decomposition)
 
-- [Systems of Linear Equations](/math/linear-algebra/systems-of-linear-equations)
-- [Eigenvalues and Eigenvectors](/math/linear-algebra/eigenvalues-and-eigenvectors)
-- [Least Squares](/math/linear-algebra/least-squares)
-- [Singular Value Decomposition](/math/linear-algebra/singular-value-decomposition)
+</div>

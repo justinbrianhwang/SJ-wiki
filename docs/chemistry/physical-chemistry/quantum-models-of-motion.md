@@ -5,11 +5,11 @@ sidebar_position: 14
 
 # Quantum Models of Motion
 
-Simple quantum models are not just textbook exercises. The particle in a box, harmonic oscillator, rigid rotor, and tunneling barrier are the reusable building blocks for electronic spectra, molecular vibrations, rotational spectroscopy, reaction rates, and nanoscience.
+The particle in a box, harmonic oscillator, rigid rotor, and tunneling barrier are reusable building blocks for electronic spectra, molecular vibrations, rotational spectroscopy, reaction rates, and nanoscience.
 
 Atkins uses these models to show how boundary conditions and potentials shape energy levels. Each model has a characteristic spacing pattern, and those spacing patterns explain observed spectra and thermal behavior.
 
-## Definitions
+## Four reusable models
 
 For a particle in a one-dimensional box of length $L$ with infinite walls, the allowed wavefunctions are
 
@@ -69,7 +69,36 @@ $$
 
 Tunneling is the penetration of a wavefunction into or through a region where classical kinetic energy would be negative.
 
-## Key results
+## Reading the energy-level patterns
+
+```text
+Energy patterns
+
+Particle in a box:     E_n proportional to n^2
+                       n=4  ----------------
+                       n=3  ---------
+                       n=2  ----
+                       n=1  -
+
+Harmonic oscillator:   equal spacing
+                       v=3  -----------
+                       v=2  -------
+                       v=1  ---
+                       v=0  -
+
+Rigid rotor:           E_J proportional to J(J+1)
+                       J=3  ----------------
+                       J=2  --------
+                       J=1  ---
+                       J=0  _
+```
+
+| Model | Energy formula | Spacing pattern | Chemical use |
+|---|---:|---|---|
+| Particle in a box | $n^2h^2/(8mL^2)$ | increases with $n$ | conjugated molecules, quantum dots |
+| Harmonic oscillator | $(v+1/2)h\nu$ | constant | vibrations, IR spectra, heat capacity |
+| Rigid rotor | $BhcJ(J+1)$ | increases linearly in transitions | microwave spectra, bond lengths |
+| Tunneling barrier | $T\sim e^{-2\kappa a}$ | not discrete by itself | reaction rates, STM, electron transfer |
 
 The particle-in-a-box model gives quantization from spatial confinement. The energy spacing increases with $n$:
 
@@ -130,7 +159,7 @@ V(x)\approx V(x_e)+\frac{1}{2}
 \left(\frac{d^2V}{dx^2}\right)_{x_e}(x-x_e)^2
 $$
 
-the second derivative acts as a force constant. This is why so many vibrations are approximately harmonic for low quantum numbers. The model predicts equal spacings and a zero-point energy. Real bonds are anharmonic: level spacings shrink as the bond stretches, and eventually the molecule dissociates.
+the second derivative acts as a force constant. Many vibrations are therefore approximately harmonic for low quantum numbers. The model predicts equal spacings and a zero-point energy. Real bonds are anharmonic: level spacings shrink as the bond stretches, and eventually the molecule dissociates.
 
 The rigid rotor model connects directly to molecular geometry. The moment of inertia $I=\mu r^2$ depends on bond length, so rotational spectra can provide precise structural information. Larger moments of inertia give smaller rotational constants and more closely spaced lines. Polyatomic molecules require principal moments of inertia, leading to linear, spherical top, symmetric top, and asymmetric top classifications.
 
@@ -142,40 +171,9 @@ Approximation methods become necessary quickly. Perturbation theory handles smal
 
 Selection rules arise from both model algebra and physical coupling. The harmonic oscillator has $\Delta v=\pm1$ in the ideal electric-dipole approximation, but anharmonicity allows overtones. The rigid rotor has $\Delta J=\pm1$ for microwave absorption, but only if the molecule has a permanent dipole. The particle in a box has transition restrictions based on parity-like integrals. In every case, an energy difference is necessary but not sufficient for spectral intensity.
 
-These models also feed statistical thermodynamics. The translational partition function comes from particle-in-a-box levels in the limit of extremely dense spacing. The vibrational partition function comes from harmonic oscillator spacings. Rotational partition functions come from rotor levels and degeneracies. Thus the simple quantum models are not isolated; they are the molecular foundation of heat capacities, entropies, and equilibrium constants.
+These models also feed statistical thermodynamics. The translational partition function comes from particle-in-a-box levels in the limit of extremely dense spacing. The vibrational partition function comes from harmonic oscillator spacings. Rotational partition functions come from rotor levels and degeneracies. Together they provide the molecular basis of heat capacities, entropies, and equilibrium constants.
 
-## Visual
-
-```text
-Energy patterns
-
-Particle in a box:     E_n proportional to n^2
-                       n=4  ----------------
-                       n=3  ---------
-                       n=2  ----
-                       n=1  -
-
-Harmonic oscillator:   equal spacing
-                       v=3  -----------
-                       v=2  -------
-                       v=1  ---
-                       v=0  -
-
-Rigid rotor:           E_J proportional to J(J+1)
-                       J=3  ----------------
-                       J=2  --------
-                       J=1  ---
-                       J=0  _
-```
-
-| Model | Energy formula | Spacing pattern | Chemical use |
-|---|---:|---|---|
-| Particle in a box | $n^2h^2/(8mL^2)$ | increases with $n$ | conjugated molecules, quantum dots |
-| Harmonic oscillator | $(v+1/2)h\nu$ | constant | vibrations, IR spectra, heat capacity |
-| Rigid rotor | $BhcJ(J+1)$ | increases linearly in transitions | microwave spectra, bond lengths |
-| Tunneling barrier | $T\sim e^{-2\kappa a}$ | not discrete by itself | reaction rates, STM, electron transfer |
-
-## Worked example 1: Particle-in-a-box transition energy
+## A particle-in-a-box transition energy
 
 **Problem.** Estimate the $n=1\to2$ transition wavelength for an electron in a one-dimensional box of length $1.00\ \mathrm{nm}$.
 
@@ -215,7 +213,7 @@ $$
 
 **Checked answer.** A nanometer-scale box gives near-infrared energy spacing. Shorter boxes would shift transitions to higher energy.
 
-## Worked example 2: Bond force constant from vibrational wavenumber
+## A bond force constant from vibrational wavenumber
 
 **Problem.** A diatomic molecule has reduced mass $\mu=1.63\times10^{-27}\ \mathrm{kg}$ and vibrational wavenumber $2886\ \mathrm{cm^{-1}}$. Estimate the force constant.
 
@@ -259,7 +257,7 @@ $$
 
 **Checked answer.** A force constant near $480\ \mathrm{N\ m^{-1}}$ is reasonable for a strong diatomic bond such as HCl.
 
-## Code
+## Calculating the two estimates
 
 ```python
 import numpy as np
@@ -280,7 +278,7 @@ print("box wavelength nm:", box_transition_wavelength(1e-9, 1, 2) * 1e9)
 print("force constant N/m:", force_constant(2886.0, 1.63e-27))
 ```
 
-## Common pitfalls
+## Where the ideal models stop
 
 - Forgetting that the particle in a box has no $n=0$ state.
 - Ignoring zero-point energy in the harmonic oscillator.
@@ -292,23 +290,16 @@ When using a model, identify what physical feature it preserves and what it disc
 
 Scaling relations are often more valuable than exact numbers. Box energies scale as $1/mL^2$, vibrational frequencies as $(k/\mu)^{1/2}$, and rotational constants as $1/I$. These scalings predict isotope effects, size effects, and bond-strength trends quickly. They also provide checks on numerical answers: heavier isotopes lower vibrational frequencies and rotational constants; stronger bonds raise vibrational frequencies.
 
-For tunneling, remember that probability depends exponentially on parameters. A small increase in barrier width or particle mass can reduce tunneling by orders of magnitude. This is why electron transfer can occur through barriers that would be impossible for heavy atoms, and why hydrogen-transfer reactions can show unusually large kinetic isotope effects at low temperature.
+For tunneling, remember that probability depends exponentially on parameters. A small increase in barrier width or particle mass can reduce tunneling by orders of magnitude. Electron transfer can therefore occur through barriers that would be impossible for heavy atoms, while hydrogen-transfer reactions can show unusually large kinetic isotope effects at low temperature.
 
-It is also worth checking the classical limit. At large quantum numbers, particle-in-a-box and rotor level spacings become small compared with the total energy, and quantum predictions begin to resemble classical continuous motion. At low quantum numbers, zero-point energy, nodes, and selection rules dominate. Many chemical phenomena sit between these limits, which is why simple models remain useful but need corrections.
+Check the classical limit as well. At large quantum numbers, particle-in-a-box and rotor level spacings become small compared with the total energy, and quantum predictions begin to resemble classical continuous motion. At low quantum numbers, zero-point energy, nodes, and selection rules dominate. Many chemical phenomena sit between these limits, so simple models remain useful but need corrections.
 
 In spectroscopy problems, connect each model parameter to an observable: $L$ to confinement energy, $k$ to vibrational frequency, $I$ to rotational spacing, and barrier width to tunneling probability. This keeps the model physical.
 
-When numerical answers are unreasonable, inspect powers of ten first. Nanometers, picometers, $\mathrm{cm^{-1}}$, and SI base units are frequently mixed in these models.
+When numerical answers are unreasonable, inspect powers of ten first. Nanometers, picometers, $\mathrm{cm^{-1}}$, and SI base units are frequently mixed in these models. Also verify whether a frequency is ordinary frequency $\nu$ or angular frequency $\omega=2\pi\nu$; the missing $2\pi$ is a common source of force-constant errors. Write the defining equation before substituting constants, then check units.
 
-Also verify whether a frequency is ordinary frequency $\nu$ or angular frequency $\omega=2\pi\nu$; the missing $2\pi$ is a common source of force-constant errors.
+<div className="see-also">
 
-Write the defining equation before substituting constants.
+See also: [Quantum foundations](/chemistry/physical-chemistry/quantum-foundations) · [Rotational, vibrational, and Raman spectroscopy](/chemistry/physical-chemistry/rotational-vibrational-and-raman-spectroscopy) · [Temperature dependence and reaction dynamics](/chemistry/physical-chemistry/temperature-dependence-and-reaction-dynamics) · [Physics quantum mechanics](/physics/quantum-mechanics/intro)
 
-Then check units.
-
-## Connections
-
-- [Quantum foundations](/chemistry/physical-chemistry/quantum-foundations)
-- [Rotational, vibrational, and Raman spectroscopy](/chemistry/physical-chemistry/rotational-vibrational-and-raman-spectroscopy)
-- [Temperature dependence and reaction dynamics](/chemistry/physical-chemistry/temperature-dependence-and-reaction-dynamics)
-- [Physics quantum mechanics](/physics/quantum-mechanics/)
+</div>

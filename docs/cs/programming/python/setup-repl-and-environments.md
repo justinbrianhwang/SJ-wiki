@@ -7,9 +7,9 @@ sidebar_position: 2
 
 Python is easiest to learn when the feedback loop is short: type a small expression, run it, inspect the result, and then save the parts worth keeping in a script. Hans-Petter Halvorsen's *Python Programming* begins with this practical route. It introduces Python as an interpreted, cross-platform language, then shows several ways to run it: the IDLE shell that comes with the basic installer, a system console, a script file, Spyder through Anaconda, and other editors such as Visual Studio Code.
 
-This page turns that first-contact material into a repeatable working model. The main idea is that "Python" is not just one executable. A useful Python setup has an interpreter, a place to edit code, a way to run scripts, and a package/environment strategy. Beginners can start with the official installer and IDLE. Larger projects usually need a virtual environment, a command-line workflow, and an editor that can lint, debug, and run tests.
+That first-contact material extends into a repeatable working model. "Python" can refer to several pieces of a setup: an interpreter, a place to edit code, a way to run scripts, and a package/environment strategy. Beginners can start with the official installer and IDLE. Larger projects usually need a virtual environment, a command-line workflow, and an editor that can lint, debug, and run tests.
 
-## Definitions
+## The pieces of a working Python setup
 
 An **interpreter** is the program that reads and executes Python code. In a console, it is usually started with `python`, `py`, or a full path to a Python executable. The interpreter can run in interactive mode, where each line is executed immediately, or in script mode, where it runs a `.py` file from top to bottom.
 
@@ -37,19 +37,19 @@ source .venv/bin/activate
 python -m pip install requests
 ```
 
-## Key results
+## Know which prompt and interpreter are active
 
-The first key result is operational: always know which prompt you are using. A system shell prompt runs operating-system commands such as `cd`, `dir`, `ls`, `python`, and `pip`. A Python prompt runs Python statements such as `print("Hello")`, `x = 3`, and `help(str)`. Many beginner errors come from typing Python into the shell or shell commands into Python.
+Always know which prompt you are using. A system shell prompt runs operating-system commands such as `cd`, `dir`, `ls`, `python`, and `pip`. A Python prompt runs Python statements such as `print("Hello")`, `x = 3`, and `help(str)`. Many beginner errors come from typing Python into the shell or shell commands into Python.
 
-The second key result is that Python can be used in two complementary modes. Interactive mode is ideal for exploration, numerical checks, and learning syntax. Script mode is ideal for repeatable programs. The textbook demonstrates both: single-line `print("Hello World!")` examples in the shell, then saved files executed from IDLE, a terminal, or Spyder.
+Python can be used in two complementary modes. Interactive mode is ideal for exploration, numerical checks, and learning syntax. Script mode is ideal for repeatable programs. The textbook demonstrates both: single-line `print("Hello World!")` examples in the shell, then saved files executed from IDLE, a terminal, or Spyder.
 
-The third result is that installation choices shape the rest of the workflow. The official Python distribution is small and clean. It includes the interpreter, IDLE, the standard library, and `pip`. Anaconda is larger but bundles a scientific environment, Spyder, Jupyter Notebook, NumPy, SciPy, Matplotlib, and related tools. For a student focused on basic programming, the official installer is enough. For a student focused on calculations, plotting, or data analysis, Anaconda removes a lot of setup friction.
+Installation choices shape the rest of the workflow. The official Python distribution is small and clean. It includes the interpreter, IDLE, the standard library, and `pip`. Anaconda is larger but bundles a scientific environment, Spyder, Jupyter Notebook, NumPy, SciPy, Matplotlib, and related tools. For a student focused on basic programming, the official installer is enough. For a student focused on calculations, plotting, or data analysis, Anaconda removes a lot of setup friction.
 
-The fourth result is reproducibility. A project should be able to say which packages it needs. With `pip`, that is often done with `requirements.txt`; with `conda`, an `environment.yml` file is common. The exact format matters less than the habit: do not rely on "whatever happens to be installed globally" when code is meant to be shared.
+Reproducibility matters. A project should be able to say which packages it needs. With `pip`, that is often done with `requirements.txt`; with `conda`, an `environment.yml` file is common. The exact format matters less than the habit: do not rely on "whatever happens to be installed globally" when code is meant to be shared.
 
 Finally, use `python -m pip` rather than bare `pip` when you are unsure which interpreter owns a package installation. The `-m` form asks the selected Python interpreter to run the `pip` module inside that interpreter's environment, reducing confusion when several Python installations are present.
 
-## Visual
+The usual workflow branches according to whether the immediate goal is exploration, a repeatable script, or an isolated project:
 
 ```mermaid
 flowchart TD
@@ -73,7 +73,7 @@ flowchart TD
 | VS Code | General project work | Extensions, debugger, terminal, Git integration | Needs interpreter selection |
 | Jupyter Notebook | Exploratory analysis and teaching | Code, output, plots, and prose together | Execution order can hide state problems |
 
-## Worked example 1: run one expression in the REPL
+## Checking a conversion at the REPL
 
 Problem: verify a Celsius-to-Fahrenheit calculation interactively before saving it in a script.
 
@@ -111,9 +111,9 @@ $$
 
 3. The REPL output `68.0` matches the manual calculation. The `.0` appears because division with `/` produces a floating-point result in Python.
 
-Conclusion: the expression is correct and can now be moved into a script or function.
+The matching results are enough to move the expression into a script or function.
 
-## Worked example 2: turn REPL work into a script
+## Turning the REPL calculation into a script
 
 Problem: save the same conversion so it can be run repeatedly for different input values.
 
@@ -163,9 +163,9 @@ $$
 
 4. The printed result matches the expected body-temperature conversion.
 
-Conclusion: the REPL helped validate the expression; the script made it reusable.
+The REPL validated the expression, while the script made the calculation repeatable.
 
-## Code
+## Identifying the runtime an editor actually uses
 
 ```python
 from pathlib import Path
@@ -191,7 +191,7 @@ This script is useful when an editor seems to run a different Python than the te
 
 Use the output as a baseline note when asking for help or debugging package problems. If two tools report different executable paths, treat them as different Python installations until proven otherwise. If a package imports in one place and fails in another, rerun this diagnostic in both places before reinstalling anything. That habit prevents random package changes and keeps environment work factual.
 
-## Common pitfalls
+## Setup mistakes that mimic code failures
 
 - Typing `python myfile.py` at the `>>>` prompt. That command belongs in the operating-system shell, not inside Python.
 - Typing `print("hello")` into PowerShell or Command Prompt without first starting Python. Shells do not understand Python syntax.
@@ -201,9 +201,8 @@ Use the output as a baseline note when asking for help or debugging package prob
 - Treating notebooks as if cells always run from top to bottom. Restart and run all cells before trusting notebook results.
 - Assuming Anaconda and official Python share packages. They are separate installations unless deliberately configured.
 
-## Connections
+<div className="see-also">
 
-- [Syntax, Variables, and Types](/cs/programming/python/syntax-variables-and-types)
-- [Modules, Packages, and Environments](/cs/programming/python/modules-packages-and-environments)
-- [Files and Context Managers](/cs/programming/python/files-and-context-managers)
-- [Testing and the Scientific Stack](/cs/programming/python/testing-and-scientific-stack)
+See also: [Syntax, Variables, and Types](/cs/programming/python/syntax-variables-and-types) · [Modules, Packages, and Environments](/cs/programming/python/modules-packages-and-environments) · [Files and Context Managers](/cs/programming/python/files-and-context-managers) · [Testing and the Scientific Stack](/cs/programming/python/testing-and-scientific-stack)
+
+</div>

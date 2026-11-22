@@ -9,7 +9,7 @@ Pure substances are the bridge between abstract balances and real fluids. Water,
 
 The central skill is locating the state. Once the phase region is identified, the table entries provide $v$, $u$, $h$, and $s$ values that can be inserted into energy and entropy balances. Cengel emphasizes saturation temperature-pressure dependence, quality in the two-phase region, ideal-gas limits, and the compressibility factor as a correction when ideal-gas behavior is questionable.
 
-## Definitions
+## Locating a state on the phase map
 
 - A **pure substance** has a fixed chemical composition throughout. It may be a single chemical species or a uniform mixture such as air treated as a mixture of gases, provided the composition does not vary spatially.
 - A **phase** is a physically distinct, homogeneous form of matter. Solid, liquid, and vapor are phases; liquid water and water vapor can coexist during boiling or condensation.
@@ -22,12 +22,36 @@ The central skill is locating the state. Once the phase region is identified, th
 - The **compressibility factor** is $Z=Pv/(RT)$. When $Z$ is close to 1, ideal-gas behavior is accurate; when it departs significantly, real-gas tables, charts, or equations of state should be used.
 - **Reduced properties** are $T_R=T/T_c$ and $P_R=P/P_c$. The corresponding-states idea uses them to estimate real-gas departures with generalized charts.
 
-The state-location sequence is: identify the substance, list known intensive properties, compare $T$ with $T_{\mathrm{sat}}(P)$ or $P$ with $P_{\mathrm{sat}}(T)$, then choose the correct table. If the state is saturated mixture, use quality formulas. If it is superheated or compressed, interpolate in the appropriate table or use a justified approximation.
-For this topic, a complete engineering model should state the boundary, the time basis, the property model, and the sign convention before any numbers are substituted. In pure substances and property tables, that habit is especially important because several formulas look similar while answering different physical questions. A closed-system expression, a steady-flow expression, an ideal-gas relation, and a property-table interpolation may all contain pressure, temperature, or enthalpy, but they do not have the same assumptions. The safest workflow is to write the general balance or defining relation first, cancel terms with a written reason, and only then insert table values or constants.
+The state-location sequence is: identify the substance, list known intensive properties, compare $T$ with $T_{\mathrm{sat}}(P)$ or $P$ with $P_{\mathrm{sat}}(T)$, then choose the correct table. If the state is a saturated mixture, use quality formulas. If it is superheated or compressed, interpolate in the appropriate table or use a justified approximation.
+
+Several formulas look similar while answering different physical questions. A closed-system expression, a steady-flow expression, an ideal-gas relation, and a property-table interpolation may all contain pressure, temperature, or enthalpy, but they do not have the same assumptions. State the boundary, time basis, property model, and sign convention; write the general balance or defining relation; then cancel terms with a stated reason before inserting table values.
 
 The second modeling habit is to keep the basis visible. Some calculations are per unit mass, some per mole, some per kg dry air, and some per unit time. A correct formula on the wrong basis is a common source of errors that look numerically plausible. When a table gives $\mathrm{kJ/kg}$, multiply by $\dot m$ to get $\mathrm{kW}$; when a reaction is balanced in kmol, convert to mass only after the element balance is complete; when a mixture property uses mole fraction, do not substitute mass fraction without conversion.
 
-## Key results
+The $T$-$v$ map shows where each property model applies:
+
+```text
+T
+|                                superheated vapor
+|                   critical *
+|                           / \
+|                          /   \
+| compressed              /     \
+| liquid                  /  two- \
+|                        /  phase  \
+|_______________________/___________\____________ v
+                    saturated     saturated
+                      liquid        vapor
+```
+
+| Region | How to identify | Main table or model | Typical unknown recovery |
+|---|---|---|---|
+| Compressed liquid | $T\lt T_{\mathrm{sat}}(P)$ | compressed-liquid table or saturated liquid approximation | use $y\approx y_f(T)$ |
+| Saturated mixture | $T=T_{\mathrm{sat}}(P)$ and $0\lt x\lt 1$ | saturation table | $y=y_f+xy_{fg}$ |
+| Superheated vapor | $T\gt T_{\mathrm{sat}}(P)$ | superheated table | interpolate in $P$ and $T$ |
+| Ideal gas | low density, far from dome | $Pv=RT$ | compute $v$, $P$, or $T$ directly |
+
+## Mixture properties inside the saturation dome
 
 For a saturated mixture, any specific property $y$ among $v$, $u$, $h$, or $s$ is
 
@@ -40,6 +64,10 @@ Quality can therefore be recovered from any mixture property:
 $$
 x=\frac{y-y_f}{y_{fg}}.
 $$
+
+Quality is defined only inside the saturation dome. At $x=0$ the state is saturated liquid, and at $x=1$ it is saturated vapor.
+
+## Choosing between liquid, ideal-gas, and real-gas models
 
 The ideal-gas equation is
 
@@ -66,36 +94,12 @@ h(T,P)\approx h_f(T)+v_f(T)\left[P-P_{\mathrm{sat}}(T)\right].
 $$
 
 This correction is small for many liquid-water problems but useful when pressures are high. Tables use arbitrary reference states for $u$, $h$, and $s$; absolute values matter less than differences within a consistent table set.
-These results should be read as a hierarchy rather than a list of isolated equations. Conservation of mass and energy set the allowed accounting; property relations supply the missing state data; the second law or equilibrium criterion decides direction, limits, and losses. A numerical answer is not finished until it passes three checks: the units reduce to the requested quantity, the sign matches the stated energy or entropy transfer direction, and the magnitude is reasonable compared with a limiting case. Useful limiting cases include zero heat transfer, reversible operation, incompressible behavior, ideal-gas behavior, saturated-liquid or saturated-vapor endpoints, and equal reservoir temperatures.
 
-Because the textbook often moves between exact laws and engineering approximations, the approximation should be named in the solution. Examples include constant specific heats, negligible kinetic energy, negligible pump work, adiabatic devices, isentropic turbomachinery, ideal-gas mixtures, dry-air approximations, and linear interpolation. Naming the approximation makes later refinement straightforward: replace the approximate property model or restore the neglected term without rebuilding the whole analysis.
+Conservation of mass and energy set the accounting; property relations supply the missing state data; the second law or equilibrium criterion decides direction, limits, and losses. A numerical answer still needs three checks: the units reduce to the requested quantity, the sign matches the stated energy or entropy transfer direction, and the magnitude agrees with a useful limiting case. Relevant limits include incompressible behavior, ideal-gas behavior, and the saturated-liquid or saturated-vapor endpoints.
 
-## Visual
+Because the textbook moves between exact laws and engineering approximations, name the approximation in the solution. Examples here include the saturated-liquid approximation, ideal-gas behavior, and linear interpolation. A later refinement can then replace the approximate property model without rebuilding the whole analysis.
 
-ASCII $T$-$v$ map of water-like phase behavior:
-
-```text
-T
-|                         superheated vapor
-|                        /
-|                       /
-|          critical *  /
-|                  ___/ 
-|                 /   \
-| compressed     /     \     saturated mixture
-| liquid        /       \    0 < x < 1
-|______________/_________\________________ v
-              sat. liq.  sat. vapor
-```
-
-| Region | How to identify | Main table or model | Typical unknown recovery |
-|---|---|---|---|
-| Compressed liquid | $T\lt T_{\mathrm{sat}}(P)$ | compressed-liquid table or saturated liquid approximation | use $y\approx y_f(T)$ |
-| Saturated mixture | $T=T_{\mathrm{sat}}(P)$ and $0\lt x\lt 1$ | saturation table | $y=y_f+xy_{fg}$ |
-| Superheated vapor | $T\gt T_{\mathrm{sat}}(P)$ | superheated table | interpolate in $P$ and $T$ |
-| Ideal gas | low density, far from dome | $Pv=RT$ | compute $v$, $P$, or $T$ directly |
-
-## Worked example 1: saturated water mixture at 200 kPa
+## Saturated water at 200 kPa
 
 **Problem.** Water is a saturated liquid-vapor mixture at $200\ \mathrm{kPa}$ with quality $x=0.80$. Estimate $v$, $u$, and $h$ using common saturated-water table values at $200\ \mathrm{kPa}$: $v_f=0.001061\ \mathrm{m^3/kg}$, $v_g=0.8857\ \mathrm{m^3/kg}$, $u_f=504.5\ \mathrm{kJ/kg}$, $u_{fg}=2024.6\ \mathrm{kJ/kg}$, $h_f=504.7\ \mathrm{kJ/kg}$, and $h_{fg}=2201.9\ \mathrm{kJ/kg}$.
 
@@ -126,7 +130,7 @@ $$
 
 **Checked answer.** The values lie between the saturated liquid and saturated vapor entries. The large specific volume shows that vapor dominates the volume even though liquid is $20\%$ of the mass.
 
-## Worked example 2: ideal-gas estimate and compressibility check
+## Correcting an ideal-gas estimate with $Z$
 
 **Problem.** Nitrogen is at $300\ \mathrm{K}$ and $2.0\ \mathrm{MPa}$. Estimate $v$ from the ideal-gas equation using $R=0.2968\ \mathrm{kJ/(kg\,K)}$. If a generalized compressibility chart suggested $Z=0.98$, correct the result.
 
@@ -160,7 +164,7 @@ $$
 
 **Checked answer.** The corrected specific volume is $0.0436\ \mathrm{m^3/kg}$. A $2\%$ departure is small for many engineering estimates, but not negligible for precision mass inventory.
 
-## Code
+## Checking the state calculations in Python
 
 ```python
 def saturated_mixture(y_f, y_g=None, y_fg=None, x=0.0):
@@ -179,28 +183,22 @@ print(v, u, h)
 print(v_ideal, v_real)
 ```
 
-## Common pitfalls
+## Failure modes in table work
 
 - Using quality outside the saturated liquid-vapor mixture region.
 - Interpolating in the wrong table after identifying only one property.
 - Treating saturated $T$ and saturated $P$ as independent properties.
 - Using ideal-gas behavior for steam near condensation or for dense gases near the critical region.
 - Mixing property values from tables with different reference states.
-- Starting from a special-case equation before checking that its assumptions actually hold. Write the general balance or definition first, then reduce it.
+- Starting from a special-case equation before checking its assumptions. Write the general balance or definition first, then reduce it.
 - Leaving property-table values unlabeled. Record the substance, phase region, pressure or temperature row, interpolation fraction, and units so the result can be audited.
 - Rounding intermediate states too aggressively. Keep extra digits through property lookup, quality calculation, and efficiency ratios, then round the final answer to justified precision.
 - Skipping a limiting-case check. Test the result against reversible operation, zero pressure drop, saturated endpoints, ideal-gas behavior, or equal-temperature reservoirs when those limits are meaningful.
 - Treating a numerical solver or chart as a substitute for physical reasoning. Software can return a precise-looking number even when the selected phase, reference state, or boundary model is wrong.
 - Forgetting to state whether the reported answer is specific, total, or rate based.
 
-## Connections
+<div className="see-also">
 
-- [property-table workflows and software](/physics/thermodynamics/property-table-workflows-and-software)
-- [closed-system energy analysis](/physics/thermodynamics/closed-system-energy-analysis)
-- [control-volume mass and energy analysis](/physics/thermodynamics/control-volume-mass-and-energy-analysis)
-- [microscopic foundations](/physics/statistical-mechanics/)
-- [basic thermal physics](/physics/general/)
-- [thermochemistry](/chemistry/general/thermochemistry)
-- [physical chemistry](/chemistry/physical-chemistry/)
-- [engineering mathematics](/math/engineering-math/)
-- [thermal systems control](/cs/control-engineering/)
+See also: [property-table workflows and software](/physics/thermodynamics/property-table-workflows-and-software) · [closed-system energy analysis](/physics/thermodynamics/closed-system-energy-analysis) · [control-volume mass and energy analysis](/physics/thermodynamics/control-volume-mass-and-energy-analysis) · [microscopic foundations](/physics/statistical-mechanics/intro) · [basic thermal physics](/physics/general/intro) · [thermochemistry](/chemistry/general/thermochemistry) · [physical chemistry](/chemistry/physical-chemistry/intro) · [engineering mathematics](/math/engineering-math/intro) · [thermal systems control](/cs/control-engineering/intro)
+
+</div>

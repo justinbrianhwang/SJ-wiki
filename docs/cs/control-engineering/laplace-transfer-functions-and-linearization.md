@@ -7,9 +7,9 @@ sidebar_position: 3
 
 Transfer functions are the main algebraic language of classical control. Nise introduces them after a Laplace-transform refresher because the transform converts constant-coefficient differential equations into polynomial equations in $s$. Once inputs and outputs are expressed in the same domain, subsystems can be multiplied, divided, and connected with block-diagram rules.
 
-This page combines the frequency-domain modeling foundation with the small-signal linearization step needed before transfer functions are valid. The unspoken discipline is important: a transfer function is not the physical system itself. It is a linear, time-invariant, zero-initial-condition input-output model that is useful only over the operating range where the assumptions are defensible.
+Small-signal linearization is the step that makes transfer-function analysis valid for many physical systems. A transfer function is a linear, time-invariant, zero-initial-condition input-output model, useful only over the operating range where its assumptions are defensible.
 
-## Definitions
+## What a transfer function represents
 
 The one-sided Laplace transform of a causal signal $x(t)$ is
 
@@ -48,7 +48,7 @@ $$
 \Delta f\approx \left.\frac{df}{dx}\right|_{x=x_0}\Delta x.
 $$
 
-## Key results
+## From differential equations to a scoped model
 
 The transform derivative property explains why Laplace methods simplify modeling. For zero initial conditions,
 
@@ -101,7 +101,7 @@ When using a transfer function in design, always keep three questions attached t
 
 A final check is dimensional consistency. The variable $s$ has units of inverse time, so polynomial coefficients carry units that make each term compatible. Normalizing a denominator into standard form is fine, but the resulting constants still represent time constants, natural frequencies, or gains with physical dimensions. Unit mistakes often show up as impossible pole locations or gains that cannot match measured hardware.
 
-## Visual
+### The modeling path from hardware to poles and zeros
 
 ```mermaid
 flowchart TD
@@ -122,7 +122,7 @@ flowchart TD
 | Trigonometric geometry | pendulum torque $mgL\sin\theta$ | use slope at the operating angle |
 | Product terms | fluid or aerodynamic force | linearize partial derivatives around nominal flow |
 
-## Worked example 1: transfer function from a differential equation
+## Transforming a second-order differential equation
 
 Problem: A system is governed by
 
@@ -168,7 +168,7 @@ $$
 
 Checked answer: the zero is at $s=-4$ and the poles are at $s=-2$ and $s=-3$. The poles are in the left half-plane, so this standalone transfer function is stable.
 
-## Worked example 2: linearizing a nonlinear spring
+## Linearizing a nonlinear spring about its load point
 
 Problem: A mass is attached to a nonlinear spring whose force is
 
@@ -206,7 +206,7 @@ $$
 
 Checked answer: the nonlinear spring behaves locally like an $8$ N/m spring around $x=1$ m. The total approximate force is $f_s(x)\approx 5+8(x-1)$, valid only for small excursions around $1$ m.
 
-## Code
+## Checking poles, zeros, and the Taylor approximation
 
 ```python
 import sympy as sp
@@ -225,7 +225,7 @@ print("small-signal stiffness:", k_small)
 print("linearized force:", sp.expand(linearized))
 ```
 
-## Common pitfalls
+## Assumptions that are easy to lose in the algebra
 
 - Forgetting the zero-initial-condition assumption. Nonzero initial energy appears as additional terms, not in the transfer function itself.
 - Treating $G(s)$ as valid for every amplitude. Transfer functions from linearization apply near the chosen operating point.
@@ -234,10 +234,14 @@ print("linearized force:", sp.expand(linearized))
 - Mixing one-sided and two-sided transform conventions without checking initial-condition terms.
 - Assuming all positive coefficients imply stability for high-order systems. Routh-Hurwitz is needed beyond simple cases.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Engineering math Laplace transform](/math/engineering-math/laplace-transform) gives the broader transform toolkit.
 - [Complex functions and analyticity](/math/engineering-math/complex-functions-and-analyticity) supports the $s$-plane viewpoint.
 - [Physical system modeling](/cs/control-engineering/physical-system-modeling-frequency-domain) applies these ideas to electrical, mechanical, and motor systems.
 - [State-space modeling](/cs/control-engineering/state-space-modeling-and-conversions) provides an alternative model form when internal variables matter.
-- [Signals and systems](/physics/signals-systems/) studies the same transforms with a signal-processing emphasis.
+- [Signals and systems](/physics/signals-systems/intro) studies the same transforms with a signal-processing emphasis.
+
+</div>

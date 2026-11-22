@@ -5,11 +5,11 @@ sidebar_position: 14
 
 # Psychology Connections
 
-Sutton and Barto connect reinforcement learning to psychology because many RL ideas were shaped by animal learning, conditioning, and theories of delayed reinforcement. The connection is not just metaphorical. Prediction errors, temporal credit assignment, habitual control, and model-based behavior all have psychological counterparts. RL provides formal tools for asking what a learner could infer from reward and stimulus sequences.
+Sutton and Barto connect reinforcement learning to psychology because many RL ideas were shaped by animal learning, conditioning, and theories of delayed reinforcement. The connection extends beyond metaphor: prediction errors, temporal credit assignment, habitual control, and model-based behavior all have psychological counterparts. RL provides formal tools for asking what a learner could infer from reward and stimulus sequences.
 
-The psychology chapter focuses on classical conditioning, instrumental conditioning, delayed reinforcement, cognitive maps, and the distinction between habitual and goal-directed behavior. These topics broaden the meaning of reinforcement learning: it is not only an engineering framework for agents, but also a mathematical language for learning from consequences.
+The psychology chapter focuses on classical conditioning, instrumental conditioning, delayed reinforcement, cognitive maps, and the distinction between habitual and goal-directed behavior. Together they treat reinforcement learning as both an engineering framework for agents and a mathematical language for learning from consequences.
 
-## Definitions
+## From conditioning to TD errors
 
 Classical conditioning studies how predictive relationships between stimuli and biologically significant outcomes are learned. A conditioned stimulus can come to predict an unconditioned stimulus. In RL notation, the learner estimates future reward or future outcome from present cues.
 
@@ -35,7 +35,7 @@ A cognitive map is an internal representation of relationships among states or p
 
 Habitual behavior is relatively automatic and stimulus-response-like. Goal-directed behavior is more sensitive to current outcome value and action-outcome knowledge. This resembles the distinction between cached value-based control and model-based planning, though the mapping is not exact.
 
-## Key results
+## What blocking and delay reveal
 
 Prediction error is a shared organizing idea. In Rescorla-Wagner learning, surprise is the difference between obtained outcome and predicted outcome. In TD learning, surprise is the difference between reward plus next value and current value. The TD version handles temporally extended predictions, making it better suited to delayed outcomes.
 
@@ -55,11 +55,9 @@ Delayed reinforcement is the point where simple stimulus-response accounts becom
 
 Cognitive maps emphasize that learned behavior need not be only cached action preference. If an organism knows something about the structure of a maze, it may adapt quickly when a goal location changes. In RL language, that flexibility suggests a model or representation that can support planning, not merely a table of past action returns.
 
-The psychology material also gives historical context for why reinforcement learning is not simply optimization with delayed labels. Many concepts in RL, including prediction errors and reinforcement, were influenced by attempts to explain behavior. The algorithms are mathematical, but the questions they answer are partly behavioral: what is learned, when is it expressed, and how do consequences alter future action?
+The psychology material also distinguishes reinforcement learning from optimization on delayed labels. Many concepts in RL, including prediction errors and reinforcement, were influenced by attempts to explain behavior. The algorithms are mathematical, but the questions they answer are partly behavioral: what is learned, when is it expressed, and how do consequences alter future action?
 
 That historical link helps explain the book's emphasis on online learning. Animals do not usually receive a finished dataset and then train offline; they act, observe, and adapt while consequences unfold. This is exactly the setting where TD learning and traces are most natural.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -81,7 +79,7 @@ flowchart TD
 | Habits | Cached values | Fast learned responses | Model-free control |
 | Goal-directed behavior | Planning with a model | Flexible consequence evaluation | Model-based control |
 
-## Worked example 1: Rescorla-Wagner blocking calculation
+## Calculating blocking in Rescorla-Wagner
 
 Problem: Cue A has already learned associative strength $V_A=0.9$. A new cue B has $V_B=0$. The outcome has $\lambda=1$. Let $\alpha_B\beta=0.2$. On a compound trial AB followed by the outcome, compute the change in $V_B$.
 
@@ -111,7 +109,7 @@ $$
 
 Check: B learns very little because A already predicted most of the outcome. If A had $V_A=0$, the same trial would give $\Delta V_B=0.2$, ten times larger.
 
-## Worked example 2: TD error moving value to an earlier cue
+## Moving value back to an earlier cue
 
 Problem: A two-state cue sequence has $S_0=\text{tone}$, $S_1=\text{food delivery}$, then reward $R_2=1$ and termination. Initially $V(\text{tone})=0$ and $V(\text{food delivery})=0.8$. Let reward after tone be $R_1=0$, $\gamma=1$, and $\alpha=0.1$. Compute the TD update at the tone.
 
@@ -141,7 +139,7 @@ $$
 
 Check: The tone gained predictive value even though no reward occurred immediately after it. TD learning moved value backward from the later food-predictive state.
 
-## Code
+## Simulating predictions before reward
 
 ```python
 import numpy as np
@@ -149,8 +147,6 @@ import numpy as np
 alpha = 0.1
 gamma = 1.0
 V = np.zeros(5)
-reward_time = 4
-
 history = []
 for trial in range(50):
     states = [0, 1, 2, 3, 4]
@@ -170,7 +166,7 @@ print("Learned predictions before reward:", np.round(V, 3))
 print("Last trial TD errors:", np.round(history[-1], 3))
 ```
 
-## Common pitfalls
+## Limits of the psychological analogy
 
 - Treating psychological terms as exact synonyms for RL terms. The analogies are useful, but experiments and algorithms are not identical.
 - Modeling conditioning as immediate reward only. Many conditioning effects depend on predictions over time.
@@ -179,10 +175,8 @@ print("Last trial TD errors:", np.round(history[-1], 3))
 - Ignoring state representation. A conditioning model's predictions depend on how cues and contexts are encoded as states or features.
 - Overclaiming biological or psychological realism from a simple TD equation. The formal match is informative but incomplete.
 
-## Connections
+<div className="see-also">
 
-- [Temporal-difference learning](/cs/reinforcement-learning/temporal-difference-learning)
-- [Eligibility traces](/cs/reinforcement-learning/eligibility-traces)
-- [Planning and learning with tabular methods](/cs/reinforcement-learning/planning-and-learning)
-- [Neuroscience connections](/cs/reinforcement-learning/neuroscience-connections)
-- [Machine learning](/cs/machine-learning/)
+See also: [Temporal-difference learning](/cs/reinforcement-learning/temporal-difference-learning) · [Eligibility traces](/cs/reinforcement-learning/eligibility-traces) · [Planning and learning with tabular methods](/cs/reinforcement-learning/planning-and-learning) · [Neuroscience connections](/cs/reinforcement-learning/neuroscience-connections) · [Machine learning](/cs/machine-learning/intro)
+
+</div>

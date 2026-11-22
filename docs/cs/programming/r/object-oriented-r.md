@@ -9,7 +9,7 @@ R's object-oriented systems are easy to miss at first because many examples look
 
 Base R has several object systems. The most common for everyday analysis is S3, a lightweight convention built around class attributes and generic functions. S4 is more formal, with declared classes, slots, and method signatures. A brief understanding is enough to explain why `summary()` works on vectors, data frames, hypothesis tests, and linear models while returning different structures for each.
 
-## Definitions
+## Attributes, classes, generics, and methods
 
 An **attribute** is metadata attached to an object. Names, dimensions, classes, and levels are attributes. `attributes(x)` displays them.
 
@@ -23,7 +23,7 @@ An **S4 object** belongs to a formally defined class created with `setClass`. It
 
 **Method dispatch** is the process of selecting a class-specific method for a generic function call.
 
-## Key results
+## Dispatch through familiar analysis objects
 
 S3 is visible through common modeling work:
 
@@ -43,8 +43,6 @@ print.summary.lm
 Many S3 objects are lists. A fitted `lm` object contains coefficients, residuals, fitted values, model frame information, QR decomposition details, and more. The class controls how generic functions present and use that list.
 
 S4 is stricter and useful for complex systems that need validation. Many Bioconductor packages use S4 because biological data structures can require formal slots and consistency checks. For introductory R, it is usually enough to recognize S4 syntax and avoid confusing `@` with list `$`.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -66,11 +64,9 @@ flowchart TD
 | S4 | Formal | `setClass()` | `setMethod()` | Large structured packages |
 | Reference classes/R6 | Mutable objects | Package/system dependent | Methods attached to objects | Stateful applications |
 
-## Worked example 1: Inspecting an S3 linear model
+## Following `summary()` to `summary.lm`
 
-Problem: fit a linear model and show that `summary(fit)` dispatches to an S3 method for class `"lm"`.
-
-Method:
+Fit a linear model and show that `summary(fit)` dispatches to an S3 method for class `"lm"`.
 
 1. Fit a model with `lm`.
 2. Check its class.
@@ -96,15 +92,13 @@ s$coefficients
 # wt          -5.344472   0.559101 -9.559044 1.293959e-10
 ```
 
-Checked answer: the fitted model has class `"lm"`, and the summary object has class `"summary.lm"`. The generic call `summary(fit)` uses the linear-model method, producing coefficient estimates, standard errors, t statistics, and p-values.
+The fitted model has class `"lm"`, and the summary object has class `"summary.lm"`. The generic call `summary(fit)` uses the linear-model method, producing coefficient estimates, standard errors, t statistics, and p-values.
 
 The same word `summary` means different things for different classes because R dispatches methods by class.
 
-## Worked example 2: Creating a small S3 class
+## Giving a list a class and print method
 
-Problem: create a simple S3 class for a quiz result and define a custom print method.
-
-Method:
+Create a simple S3 class for a quiz result and define a custom print method.
 
 1. Write a constructor that returns a list.
 2. Store score, total, and name.
@@ -114,7 +108,16 @@ Method:
 
 ```r
 new_quiz_result <- function(name, score, total) {
-  if (score > total) stop("score cannot exceed total")
+  if (!is.character(name) || length(name) != 1 || is.na(name)) {
+    stop("name must be one character value")
+  }
+  if (!is.numeric(score) || length(score) != 1 || is.na(score) ||
+      !is.numeric(total) || length(total) != 1 || is.na(total)) {
+    stop("score and total must be single numeric values")
+  }
+  if (score < 0 || total <= 0 || score > total) {
+    stop("score must be between zero and a positive total")
+  }
   x <- list(name = name, score = score, total = total)
   class(x) <- "quiz_result"
   x
@@ -136,11 +139,11 @@ result
 # Ana: 18/20 (90%)
 ```
 
-Checked answer: the object is a list with class `"quiz_result"`. When it is printed, R looks for `print.quiz_result` and uses the custom method. The percentage is `18 / 20 * 100 = 90`.
+The object is a list with class `"quiz_result"`. When it is printed, R looks for `print.quiz_result` and uses the custom method. The percentage is `18 / 20 * 100 = 90`.
 
 This demonstrates S3's lightweight nature. No formal class declaration was required, but the constructor and print method create a clear convention.
 
-## Code
+## Adding a summary object and formatter
 
 ```r
 # Minimal S3 summary method for the quiz_result class.
@@ -172,7 +175,7 @@ This small class demonstrates the same pattern used by many base R objects. A co
 
 The constructor is important because S3 itself does not prevent invalid objects. Without `new_quiz_result`, someone could create `list(name = "Ana", score = 30, total = 20)` and assign class `"quiz_result"`, producing an impossible score. A constructor centralizes validation and keeps methods simpler because methods can assume the object was built correctly.
 
-For analysis users, the practical value of object-oriented R is extraction discipline. Instead of digging through every list component of an `lm` object, use `coef`, `resid`, `fitted`, `predict`, `summary`, and `confint`. These functions express intent and let the class decide the correct method. Direct component access is still useful for learning and debugging, but documented extractors are more stable.
+For analysis users, object-oriented R mainly changes extraction discipline. Instead of digging through every list component of an `lm` object, use `coef`, `resid`, `fitted`, `predict`, `summary`, and `confint`. These functions express intent and let the class decide the correct method. Direct component access is still useful for learning and debugging, but documented extractors are more stable.
 
 S4 follows the same broad idea with stronger rules. It is less common in introductory examples, but when you see `object@slot`, read it as formal slot access rather than list extraction. The stricter structure is helpful in large package ecosystems where objects need validation and predictable components.
 
@@ -184,13 +187,9 @@ For everyday analysis, you do not need to design many classes, but you do need t
 
 This is especially important for objects returned by statistical functions. A hypothesis test, model, or clustering result may print only a few lines while storing estimates, data names, residuals, call information, or diagnostic quantities. Class-aware extractors preserve meaning and protect code from internal layout changes. Treat printed output as a view, not as the whole object.
 
-When in doubt, compare `print(x)` with `str(x)`; the contrast shows why classes are useful.
+When in doubt, compare `print(x)` with `str(x)`. The contrast shows what the class-specific view omits and which extractor functions are worth learning next.
 
-That comparison also teaches which extractor functions are worth learning next.
-
-It is a small habit with large payoff in debugging.
-
-## Common pitfalls
+## Breaking the contract behind a class
 
 - Thinking `summary()` is one fixed function rather than a generic with class-specific methods.
 - Editing an object's class attribute casually and breaking method assumptions.
@@ -199,9 +198,8 @@ It is a small habit with large payoff in debugging.
 - Writing S3 methods without a constructor, making invalid objects easy to create.
 - Assuming two objects with the same printed output have the same class or structure. Use `str()`.
 
-## Connections
+<div className="see-also">
 
-- [Special values, classes, and coercion](/cs/programming/r/special-values-classes-coercion)
-- [Lists and data frames](/cs/programming/r/lists-and-data-frames)
-- [Control flow, functions, and scoping](/cs/programming/r/control-flow-functions-scoping)
-- [Linear and generalized models](/cs/programming/r/linear-and-generalized-models)
+See also: [Special values, classes, and coercion](/cs/programming/r/special-values-classes-coercion) · [Lists and data frames](/cs/programming/r/lists-and-data-frames) · [Control flow, functions, and scoping](/cs/programming/r/control-flow-functions-scoping) · [Linear and generalized models](/cs/programming/r/linear-and-generalized-models)
+
+</div>

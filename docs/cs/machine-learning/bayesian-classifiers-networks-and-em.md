@@ -9,7 +9,7 @@ Mitchell's Bayesian chapter ranges from Bayes' theorem to practical probabilisti
 
 These methods are historically central. Naive Bayes became a baseline for text classification, Bayesian networks shaped probabilistic AI, and EM remains a standard algorithm for mixture models and latent-variable estimation.
 
-## Definitions
+## Three forms of probabilistic structure
 
 The Naive Bayes classifier predicts the target class $v_j$ that maximizes:
 
@@ -36,7 +36,7 @@ $$
 
 Expectation-maximization (EM) is an iterative method for maximum likelihood estimation with hidden variables. The E-step estimates expected values of hidden variables under current parameters. The M-step updates parameters to maximize expected complete-data likelihood.
 
-## Key results
+## What the assumptions buy
 
 Naive Bayes often works well even when the independence assumption is false. The reason is that classification only needs the largest posterior score, not perfectly calibrated probabilities. Correlated features can distort probability estimates, but the ranking of classes may remain useful.
 
@@ -50,7 +50,7 @@ EM monotonically increases the data likelihood under standard assumptions, thoug
 
 Naive Bayes is especially important in text classification because documents are naturally high-dimensional and sparse. A discriminative learner may need many examples to estimate interactions among words, while Naive Bayes collapses the problem into estimating word frequencies per class. This is a strong bias, but it is also a strong variance reduction. In Mitchell's era, this made Bayesian text classifiers attractive for practical document filtering.
 
-Bayesian networks make independence assumptions visible. Instead of assuming every attribute is independent given the class, the graph states which variables directly depend on which others. The absence of an edge is a modeling claim. For example, if fever and cough are independent given disease, their connection can be omitted; if allergy also causes cough, the graph should include that parent. This explicit structure is valuable for explanation and for incorporating expert knowledge.
+Bayesian networks state independence assumptions in the graph. Instead of assuming every attribute is independent given the class, the graph states which variables directly depend on which others. The absence of an edge is a modeling claim. For example, if fever and cough are independent given disease, their connection can be omitted; if allergy also causes cough, the graph should include that parent. This explicit structure is valuable for explanation and for incorporating expert knowledge.
 
 EM can be understood as soft completion of missing data. If the hidden assignments were known, maximum likelihood estimation would often be easy. Since they are not known, the E-step computes expected assignments using the current model, and the M-step acts as though those fractional assignments were observed. The procedure repeats because better parameters change the expected hidden assignments, and better assignments change the parameter estimates.
 
@@ -58,17 +58,15 @@ Parameter counting explains why network structure matters. If a node has many pa
 
 Learning Bayesian-network structure is harder than estimating parameters for a fixed structure. With a fixed graph and complete data, many conditional probability entries can be estimated by counting. When the graph is unknown, the learner searches over possible directed acyclic graphs, balancing fit to data against structural complexity. This connects Bayesian networks back to the book's recurring theme of hypothesis-space search.
 
-The three methods in this page also show three levels of probabilistic structure. Naive Bayes uses one simple global structure. Bayesian networks allow the designer or learner to express richer dependency structure. EM adds hidden structure when important variables are not directly observed. In all three cases, probability is not an after-the-fact confidence score; it defines the model, the learning objective, and the prediction rule.
+The three methods show three levels of probabilistic structure. Naive Bayes uses one simple global structure. Bayesian networks allow the designer or learner to express richer dependency structure. EM adds hidden structure when important variables are not directly observed. In all three cases, probability is not an after-the-fact confidence score; it defines the model, the learning objective, and the prediction rule.
 
-This is why probability estimates must be tied back to assumptions. A Naive Bayes posterior, a belief-network marginal, and an EM mixture responsibility are all conditional on the model structure and estimated parameters. They are not model-free facts about the world.
+Probability estimates therefore have to be read with their assumptions. A Naive Bayes posterior, a belief-network marginal, and an EM mixture responsibility are all conditional on the model structure and estimated parameters. They are not model-free facts about the world.
 
 | Method | Hidden assumptions | Strength | Risk |
 |---|---|---|---|
 | Naive Bayes | Attributes independent given class | Simple, fast, strong baseline | Miscalibrated probabilities |
 | Bayesian network | DAG captures dependencies | Interpretable probabilistic structure | Inference and structure learning can be hard |
 | EM | Hidden variables explain incomplete data | Handles latent assignments | Local optima and initialization sensitivity |
-
-## Visual
 
 ```mermaid
 flowchart TB
@@ -132,9 +130,9 @@ flowchart TB
 
 This probabilistic-model diagram combines the three structures on the page. Naive Bayes labels the class-to-feature conditional independence assumption and the log-posterior scoring path; the Bayesian-network subgraph shows a richer DAG with CPTs and joint factorization. The EM subgraph shows the hidden-variable learning loop, where responsibilities from the E-step become fractional complete data for the M-step until likelihood stops improving.
 
-## Worked example 1: Naive Bayes classification with smoothing
+### Classifying with smoothed word counts
 
-Problem: Classify a short document containing the words `win money` as `spam` or `ham`. Training counts are:
+Classify a short document containing the words `win money` as `spam` or `ham`. Training counts are:
 
 | Class | Prior | Total words | `win` count | `money` count | Vocabulary size |
 |---|---:|---:|---:|---:|---:|
@@ -142,8 +140,6 @@ Problem: Classify a short document containing the words `win money` as `spam` or
 | ham | 0.60 | 200 | 1 | 2 | 50 |
 
 Use plus-one smoothing and the multinomial Naive Bayes score.
-
-Method:
 
 1. Estimate word probabilities for spam.
 
@@ -183,13 +179,11 @@ $$
 0.001759 > 0.0000576.
 $$
 
-Answer: The document is classified as `spam`. The checked calculation shows that despite the lower spam prior, the two words are much more likely under the spam word model.
+The document is classified as `spam`. Despite the lower spam prior, the two words are much more likely under the spam word model.
 
-## Worked example 2: One EM step for a two-coin mixture
+### Computing one responsibility in a coin mixture
 
-Problem: A hidden coin is selected for each toss sequence. Coin A has current head probability $\theta_A=0.8$, coin B has $\theta_B=0.4$, and each coin is chosen with prior 0.5. One observed sequence has 3 heads and 1 tail. Compute the E-step responsibility that coin A generated it.
-
-Method:
+A hidden coin is selected for each toss sequence. Coin A has current head probability $\theta_A=0.8$, coin B has $\theta_B=0.4$, and each coin is chosen with prior 0.5. One observed sequence has 3 heads and 1 tail. Compute the E-step responsibility that coin A generated it.
 
 1. Compute likelihood under coin A.
 
@@ -229,9 +223,9 @@ $$
 
    This sequence contributes about $0.7273(3)$ expected heads and $0.7273(1)$ expected tails to coin A's parameter update.
 
-Answer: The E-step responsibility for coin A is approximately $0.7273$. The sequence is more likely to have come from A because it has a high fraction of heads.
+The E-step responsibility for coin A is approximately $0.7273$. The sequence is more likely to have come from A because it has a high fraction of heads.
 
-## Code
+### Reproducing both calculations
 
 ```python
 import numpy as np
@@ -261,7 +255,7 @@ score_b = 0.5 * theta_b**heads * (1 - theta_b)**tails
 print(score_a / (score_a + score_b))
 ```
 
-## Common pitfalls
+## Numerical and modeling traps
 
 - Multiplying many probabilities directly for long documents. Use log probabilities to avoid underflow.
 - Forgetting smoothing. A zero conditional probability can dominate the entire Naive Bayes product.
@@ -270,10 +264,8 @@ print(score_a / (score_a + score_b))
 - Treating missing values and hidden variables as the same thing in every context. EM handles both through latent quantities, but the modeling assumptions must be explicit.
 - Expecting EM to find the global optimum. It improves likelihood locally and is sensitive to initialization.
 
-## Connections
+<div className="see-also">
 
-- [Bayesian learning](/cs/machine-learning/bayesian-learning)
-- [Evaluating hypotheses](/cs/machine-learning/evaluating-hypotheses)
-- [Artificial neural networks](/cs/machine-learning/artificial-neural-networks)
-- [Probability](/math/probability/)
-- [Probability and random variables](/math/probability-and-random-variables/)
+See also: [Bayesian learning](/cs/machine-learning/bayesian-learning) · [Evaluating hypotheses](/cs/machine-learning/evaluating-hypotheses) · [Artificial neural networks](/cs/machine-learning/artificial-neural-networks) · [Probability](/math/probability/intro) · [Probability and random variables](/math/probability-and-random-variables/intro)
+
+</div>

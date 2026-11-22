@@ -9,7 +9,7 @@ Multiple integrals extend accumulation to regions in the plane and solids in spa
 
 These integrals compute volume, mass, charge, probability, average value, and moments. They also prepare for vector calculus, where flux and circulation compare integrals over regions, surfaces, and boundaries.
 
-## Definitions
+## Accumulation over regions and solids
 
 The double integral of $f(x,y)$ over a region $D$ is
 
@@ -63,7 +63,7 @@ $$
 dV=\rho^2\sin\phi\,d\rho\,d\phi\,d\theta.
 $$
 
-## Key results
+## Bounds, order, and coordinate choice
 
 Fubini's Theorem says that if $f$ is continuous on a rectangular region, then a double integral can be evaluated as an iterated integral in either order:
 
@@ -175,8 +175,6 @@ The extra squared distance factor weights mass farther from the axis more heavil
 
 Bounds should be checked by projecting the region. In a double integral, the outer bounds describe the shadow of the region on one axis. In a triple integral, one common approach is to project the solid onto a coordinate plane, describe that base region, and then give lower and upper bounds for the third variable.
 
-## Visual
-
 | Coordinates | Best for | Area/volume element |
 |---|---|---|
 | Cartesian $(x,y,z)$ | boxes, triangles, simple graphs | $dA=dx\,dy$, $dV=dx\,dy\,dz$ |
@@ -197,7 +195,7 @@ graph TD
   G --> H[Evaluate iterated integral]
 ```
 
-## Worked example 1: double integral over a triangle
+## Integrating over a triangular region
 
 **Problem.** Evaluate
 
@@ -252,7 +250,7 @@ $$
 
 **Checked answer.** The double integral is $1/2$.
 
-## Worked example 2: polar integral over a disk
+## A radial integrand over a disk
 
 **Problem.** Evaluate
 
@@ -333,11 +331,9 @@ $$
 m\,\operatorname{Volume}(E)\le\iiint_E f\,dV\le M\,\operatorname{Volume}(E).
 $$
 
-These estimates are not usually the final answer, but they catch errors such as missing Jacobian factors, reversed bounds, or impossible negative values for positive integrands before the calculation becomes too long to audit line by line with confidence later on.
+These estimates are rarely the final answer, but they can expose a missing Jacobian, reversed bounds, or an impossible negative result before a long calculation becomes difficult to audit. They also give a scale for comparing numerical approximations with exact values.
 
-They also help compare numerical approximations and exact answers reliably later too.
-
-## Code
+## Midpoint quadrature on a nonrectangular region
 
 ```python
 def midpoint_double(f, ax, bx, ay_func, by_func, nx=200, ny=200):
@@ -356,18 +352,22 @@ def midpoint_double(f, ax, bx, ay_func, by_func, nx=200, ny=200):
 print(midpoint_double(lambda x, y: x + 2*y, 0, 1, lambda x: 0, lambda x: 1 - x))
 ```
 
-## Common pitfalls
+## Geometric checks before calculating
 
-- Forgetting the Jacobian factor $r$ or $\rho^2\sin\phi$.
-- Reversing order of integration without rewriting bounds.
-- Describing a triangular or circular region as if it were a rectangle.
-- Integrating in polar coordinates but leaving $x^2+y^2$ unchanged instead of converting to $r^2$.
-- Using $\phi$ and $\theta$ inconsistently in spherical coordinates.
-- Treating average value as the integral instead of dividing by area or volume.
+- A coordinate change modifies the area or volume element as well as the formulas for the variables. Polar and spherical integrals therefore need the factors $r$ and $\rho^2\sin\phi$, respectively.
+- Reversing integration order means redescribing the same region with new bounds, not merely swapping $dx$ and $dy$.
+- A triangle or disk cannot usually be given independent constant bounds as though it were a rectangle; the inner limits must trace its boundary.
+- Once polar coordinates are chosen, expressions such as $x^2+y^2$ should become $r^2$ throughout the integrand and the bounds.
+- Spherical-coordinate conventions vary. The meanings and ranges of $\phi$ and $\theta$ must be fixed before using a memorized Jacobian.
+- Average value divides accumulated value by the region's area or the solid's volume.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Applications of Integrals](/math/calculus/applications-of-integrals): multiple integrals generalize area, volume, mass, and average value.
 - [Partial Derivatives and the Gradient](/math/calculus/partial-derivatives-and-gradient): surfaces integrated over regions are functions of several variables.
 - [Vector Calculus](/math/calculus/vector-calculus): Green's and Divergence Theorems connect multiple integrals to boundary integrals.
 - [Vectors and Geometry of Space](/math/calculus/vectors-and-geometry-of-space): coordinate geometry supports bounds and changes of variables.
+
+</div>

@@ -9,7 +9,7 @@ Bosons can pile into the same quantum state. That simple fact produces three maj
 
 This distinction is essential. A conserved Bose gas has a chemical potential set by $N$. A photon gas in thermal equilibrium has $\mu=0$ because photons can be created and absorbed by the walls. Phonons also have $\mu=0$ in ordinary equilibrium because lattice vibrations are quasiparticles, not conserved atoms.
 
-## Definitions
+## Three Bose systems, two particle-number rules
 
 The Bose-Einstein occupation is
 
@@ -48,7 +48,7 @@ $$
 
 For acoustic phonons in the Debye model, $\omega=c_s k$ up to a Debye cutoff chosen to give the correct number of modes.
 
-## Key results
+## Saturated states and low-temperature power laws
 
 Below $T_c$, the condensate fraction for a uniform ideal Bose gas is
 
@@ -119,8 +119,6 @@ The common mathematical reason for BEC, blackbody radiation, and Debye heat capa
 
 Finite systems smooth the condensation singularity. A trapped atomic gas can have a very sharp crossover and a macroscopically occupied lowest state, but the true nonanalyticity belongs to the thermodynamic limit. This mirrors the general phase-transition lesson developed later in the section.
 
-## Visual
-
 | System | Quasiparticle energy | Chemical potential | Signature result |
 |---|---:|---:|---|
 | Massive Bose gas | $p^2/(2m)$ | set by $N$, $\mu\le 0$ | Bose-Einstein condensation |
@@ -137,11 +135,9 @@ graph LR
   D --> G["mu = 0 and Debye heat capacity"]
 ```
 
-## Worked example 1: Condensate fraction below the critical temperature
+## Condensate fraction below the critical temperature
 
-Problem: An ideal Bose gas is at $T=0.40T_c$. Find the fraction of particles in the condensate.
-
-Method:
+Consider an ideal Bose gas at $T=0.40T_c$.
 
 1. Use the ideal uniform-gas result:
 
@@ -168,13 +164,11 @@ $$
 {N_0\over N}\approx 1-0.253=0.747.
 $$
 
-Checked answer: about $75\%$ of the particles occupy the ground state in this idealized model.
+About $75\%$ of the particles occupy the ground state in this idealized model.
 
-## Worked example 2: Low-temperature Debye heat capacity
+## Debye heat capacity at one tenth of the cutoff temperature
 
-Problem: A crystal has Debye temperature $\Theta_D=300\,\mathrm K$. Estimate $C_V/(Nk_B)$ at $T=30\,\mathrm K$ using the low-temperature Debye law.
-
-Method:
+A crystal has Debye temperature $\Theta_D=300\,\mathrm K$. At $T=30\,\mathrm K$, the low-temperature Debye law gives $C_V/(Nk_B)$ as follows.
 
 1. Use
 
@@ -207,28 +201,9 @@ $$
 {C_V\over Nk_B}\approx 233.8(0.001)=0.234.
 $$
 
-Checked answer: this is much smaller than the high-temperature value $3$, consistent with frozen-out short-wavelength phonons.
+The result is much smaller than the high-temperature value $3$, consistent with the freezing out of short-wavelength phonons.
 
-## Code
-
-```python
-import numpy as np
-
-def condensate_fraction(T_over_Tc):
-    x = np.asarray(T_over_Tc)
-    return np.where(x < 1.0, 1.0 - x**1.5, 0.0)
-
-def debye_low_cv(T, theta_D, N=1.0, kB=1.0):
-    return 12 * np.pi**4 / 5 * N * kB * (T / theta_D)**3
-
-for x in [0.2, 0.4, 0.8, 1.2]:
-    print(x, condensate_fraction(x))
-
-for T in [10, 30, 100]:
-    print(T, debye_low_cv(T, theta_D=300))
-```
-
-## Common pitfalls
+## Where the ideal-gas formulas stop applying
 
 - Assigning a nonzero conserved-particle chemical potential to equilibrium photons or phonons.
 - Forgetting to separate the Bose ground state when deriving condensation; the continuum integral counts only excited states well.
@@ -236,10 +211,8 @@ for T in [10, 30, 100]:
 - Applying the Debye $T^3$ law near or above $\Theta_D$ where the low-temperature approximation fails.
 - Missing polarization factors for photons and phonon branches when counting modes.
 
-## Connections
+<div className="see-also">
 
-- [Quantum statistics and ideal quantum gases](/physics/statistical-mechanics/quantum-statistics-and-ideal-quantum-gases)
-- [Degenerate Fermi gas](/physics/statistical-mechanics/degenerate-fermi-gas)
-- [Canonical ensemble and fluctuations](/physics/statistical-mechanics/canonical-ensemble-and-fluctuations)
-- [Harmonic oscillator](/physics/quantum-mechanics/harmonic-oscillator-ladder-operators)
-- [Finite-temperature field theory bridge](/physics/statistical-mechanics/irreversibility-master-equations-and-finite-temperature-field-theory)
+See also: [Quantum statistics and ideal quantum gases](/physics/statistical-mechanics/quantum-statistics-and-ideal-quantum-gases) · [Degenerate Fermi gas](/physics/statistical-mechanics/degenerate-fermi-gas) · [Canonical ensemble and fluctuations](/physics/statistical-mechanics/canonical-ensemble-and-fluctuations) · [Harmonic oscillator](/physics/quantum-mechanics/harmonic-oscillator-ladder-operators) · [Finite-temperature field theory bridge](/physics/statistical-mechanics/irreversibility-master-equations-and-finite-temperature-field-theory)
+
+</div>

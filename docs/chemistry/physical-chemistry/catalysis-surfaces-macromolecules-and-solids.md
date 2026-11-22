@@ -5,9 +5,9 @@ sidebar_position: 23
 
 # Catalysis, Surfaces, Macromolecules, and Solids
 
-The final scope of physical chemistry in Atkins moves from isolated molecules to complex matter: catalysts, surfaces, polymers, colloids, biological macromolecules, crystals, semiconductors, magnetic materials, and superconductors. These topics use the same thermodynamics, quantum mechanics, spectroscopy, and kinetics developed earlier, but applied to larger and more heterogeneous systems.
+Physical chemistry extends from isolated molecules to complex matter: catalysts, surfaces, polymers, colloids, biological macromolecules, crystals, semiconductors, magnetic materials, and superconductors. The same thermodynamics, quantum mechanics, spectroscopy, and kinetics now operate across larger and more heterogeneous systems.
 
-This page combines selected highlights: how catalysts change mechanisms, how adsorption controls surface chemistry, how macromolecular size and shape are measured, and how solid-state structure determines material properties.
+The common thread is scale: catalysts change mechanisms, adsorption controls surface chemistry, macromolecular measurements average over distributions, and solid-state structure constrains material properties.
 
 ![A rotating model shows the tetrahedral network of the diamond cubic crystal structure.](https://commons.wikimedia.org/wiki/Special:FilePath/Diamond_cubic_animation.gif)
 
@@ -17,7 +17,7 @@ This page combines selected highlights: how catalysts change mechanisms, how ads
 
 *Figure: Activation energy as the barrier a catalyst changes by altering the reaction pathway. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Activation_Energy.svg), Risibot based on Brazosport College, CC BY-SA 4.0.*
 
-## Definitions
+## Models and measurable quantities
 
 A **catalyst** increases the rate of a reaction without being consumed in the overall stoichiometric equation. It changes the mechanism and lowers the effective activation Gibbs energy:
 
@@ -59,7 +59,7 @@ $$
 n\lambda=2d\sin\theta
 $$
 
-## Key results
+## From catalytic cycles to electronic bands
 
 Catalysts do not change the thermodynamic equilibrium constant:
 
@@ -129,8 +129,6 @@ Crystalline solids are described by lattices plus bases. Diffraction measures re
 
 Electronic properties of solids follow from bands. Metals have partially filled bands or overlapping valence and conduction bands. Semiconductors have band gaps small enough for thermal or optical excitation to create carriers. Insulators have larger gaps. Doping introduces controlled carrier concentrations, while defects and surfaces can dominate real material behavior. Optical, magnetic, and superconducting properties all require quantum mechanics extended from molecules to periodic systems.
 
-## Visual
-
 ```mermaid
 graph TD
   A[Physical chemistry of complex matter] --> B[Catalysis]
@@ -155,7 +153,7 @@ graph TD
 | Crystals | lattice and basis | diffraction pattern, unit cell |
 | Semiconductors | electronic bands | band gap, conductivity |
 
-## Worked example 1: Langmuir coverage and surface rate
+## Pressure, coverage, and a saturating surface rate
 
 **Problem.** A gas adsorbs on a catalyst with $K=0.80\ \mathrm{bar^{-1}}$. Calculate $\theta$ at $p=0.50\ \mathrm{bar}$ and $p=10.0\ \mathrm{bar}$. If the surface reaction rate is $r=k\theta$ with $k=2.0\times10^{-3}\ \mathrm{mol\ m^{-2}\ s^{-1}}$, find $r$ at both pressures.
 
@@ -201,7 +199,7 @@ $$
 
 **Checked answer.** Raising pressure increases coverage, but saturation prevents a twentyfold pressure increase from giving a twentyfold rate increase.
 
-## Worked example 2: Bragg spacing from diffraction
+## Recovering a lattice spacing from a diffraction peak
 
 **Problem.** X-rays with wavelength $154\ \mathrm{pm}$ give a first-order diffraction peak at $\theta=20.0^\circ$. Find the plane spacing $d$.
 
@@ -239,26 +237,7 @@ $$
 
 **Checked answer.** A spacing of $225\ \mathrm{pm}$ is chemically reasonable for crystal lattice planes separated by atomic-scale distances.
 
-## Code
-
-```python
-import numpy as np
-
-def langmuir_theta(K, p):
-    return K * p / (1 + K * p)
-
-def bragg_spacing(lambda_pm, theta_deg, order=1):
-    theta = np.deg2rad(theta_deg)
-    return order * lambda_pm / (2 * np.sin(theta))
-
-for p in [0.1, 0.5, 1.0, 10.0]:
-    theta = langmuir_theta(0.80, p)
-    print(f"p={p:5.2f} bar theta={theta:6.3f}")
-
-print("d spacing pm:", bragg_spacing(154.0, 20.0))
-```
-
-## Common pitfalls
+## Where the simple models stop working
 
 - Saying a catalyst changes equilibrium. It changes rates and pathways, not the equilibrium constant of the overall reaction.
 - Treating Langmuir adsorption as universal. It assumes identical independent sites and monolayer coverage.
@@ -272,9 +251,8 @@ For adsorption, always state the site model. Langmuir behavior assumes one molec
 
 For materials and macromolecules, remember that structure is hierarchical. A polymer has repeat-unit chemistry, chain length distribution, conformation, morphology, and bulk processing history. A solid has local bonding, unit-cell structure, defects, surfaces, and grain boundaries. Physical properties often depend on the hierarchy level that controls the measurement. A diffraction pattern may show crystal structure while conductivity is dominated by defects or dopants.
 
-## Connections
+<div className="see-also">
 
-- [Rate laws and reaction mechanisms](/chemistry/physical-chemistry/rate-laws-and-reaction-mechanisms)
-- [Temperature dependence and reaction dynamics](/chemistry/physical-chemistry/temperature-dependence-and-reaction-dynamics)
-- [Phase transitions and phase diagrams](/chemistry/physical-chemistry/phase-transitions-and-phase-diagrams)
-- [Electrochemistry](/chemistry/physical-chemistry/electrochemistry)
+See also: [Rate laws and reaction mechanisms](/chemistry/physical-chemistry/rate-laws-and-reaction-mechanisms) · [Temperature dependence and reaction dynamics](/chemistry/physical-chemistry/temperature-dependence-and-reaction-dynamics) · [Phase transitions and phase diagrams](/chemistry/physical-chemistry/phase-transitions-and-phase-diagrams) · [Electrochemistry](/chemistry/physical-chemistry/electrochemistry)
+
+</div>

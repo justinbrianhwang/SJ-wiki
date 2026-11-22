@@ -9,7 +9,7 @@ Mitchell's chapter on combining inductive and analytical learning addresses a re
 
 The chapter presents several strategies: initialize the hypothesis with prior knowledge, alter the search objective using prior knowledge, and augment search with prior-knowledge-derived features or candidate rules. The examples include KBANN, TANGENTPROP, EBNN, and FOCL. These systems are historically specific, but the design pattern is modern: use prior knowledge as a bias, initialization, regularizer, feature generator, or constraint.
 
-## Definitions
+## Forms of imperfect prior knowledge
 
 An inductive-analytical learning problem includes ordinary labeled examples plus an approximate domain theory.
 
@@ -30,7 +30,7 @@ EBNN, explanation-based neural networks, uses explanations to derive training de
 
 FOCL extends FOIL-style rule learning by using prior knowledge to suggest useful rule refinements.
 
-## Key results
+## Where prior knowledge can enter the learner
 
 There are three broad ways to combine prior knowledge with data.
 
@@ -67,7 +67,7 @@ That counterfactual framing keeps the focus on learning value rather than on arc
 | Add search operators | FOCL | Theory suggests candidate literals | Rule scoring accepts or rejects them |
 | Explain examples | EBNN | Explanations supply derivative guidance | Network still trained on examples |
 
-## Visual
+The feedback loop treats prior knowledge as evidence whose influence can be adjusted against validation results.
 
 ```mermaid
 flowchart LR
@@ -80,19 +80,15 @@ flowchart LR
     Adjust --> Search
 ```
 
-Combined learning treats prior knowledge as useful evidence, not as an untouchable truth.
+### Encoding a rule as neural initialization
 
-## Worked example 1: Prior rule as neural initialization
-
-Problem: A domain theory says:
+A domain theory says:
 
 $$
 Safe(x) \leftarrow Light(x) \land Stable(x).
 $$
 
 Represent this rule as an initial neural unit that approximates logical AND. Inputs are binary: `Light` and `Stable`. Choose weights and threshold-style sigmoid bias so the output is high only when both inputs are 1.
-
-Method:
 
 1. Use a sigmoid unit:
 
@@ -127,17 +123,15 @@ $$
 
    The unit behaves like the rule but remains differentiable. If data show exceptions, backpropagation can adjust the weights.
 
-Answer: Weights $w_0=-7.5$, $w_1=5$, and $w_2=5$ encode a soft AND suitable for KBANN-style initialization.
+Weights $w_0=-7.5$, $w_1=5$, and $w_2=5$ encode a soft AND suitable for KBANN-style initialization.
 
-## Worked example 2: Tangent-style invariance penalty
+### Charging a model for violating an invariance
 
-Problem: A model $f(x)$ should be insensitive to a small transformation direction $v$. At a training point, the ordinary squared error is $0.04$. The derivative of the output along $v$ is $0.30$. Use a penalty weight $\lambda=2$ and compute the combined error:
+A model $f(x)$ should be insensitive to a small transformation direction $v$. At a training point, the ordinary squared error is $0.04$. The derivative of the output along $v$ is $0.30$. Use a penalty weight $\lambda=2$ and compute the combined error:
 
 $$
 E = E_{\text{data}} + \lambda\left(\frac{\partial f}{\partial v}\right)^2.
 $$
-
-Method:
 
 1. Record the data error.
 
@@ -167,9 +161,9 @@ $$
 
    Even though the prediction error is small, the model is too sensitive in a direction that prior knowledge says should not matter. The combined objective pushes training to reduce that sensitivity.
 
-Answer: The combined error is $0.22$. Most of the penalty comes from violating the invariance prior.
+The combined error is $0.22$. Most of the penalty comes from violating the invariance prior.
 
-## Code
+### Checking the rule encoding and penalty
 
 ```python
 import math
@@ -191,7 +185,7 @@ combined = data_error + lam * directional_derivative**2
 print(combined)
 ```
 
-## Common pitfalls
+## When prior knowledge becomes negative transfer
 
 - Treating prior knowledge as certainly correct when the chapter's premise is that it may be approximate.
 - Letting the data completely erase useful prior structure too quickly. Initialization helps only if training does not immediately destroy it through poor hyperparameters.
@@ -200,10 +194,8 @@ print(combined)
 - Comparing combined methods only to weak baselines. The value of prior knowledge should be tested against strong purely inductive alternatives.
 - Forgetting that prior knowledge affects bias. It can reduce sample needs when correct, but it can also introduce systematic error.
 
-## Connections
+<div className="see-also">
 
-- [Analytical learning](/cs/machine-learning/analytical-learning)
-- [Artificial neural networks](/cs/machine-learning/artificial-neural-networks)
-- [Rule learning and ILP](/cs/machine-learning/rule-learning-and-ilp)
-- [Bayesian learning](/cs/machine-learning/bayesian-learning)
-- [Modern deep learning](/cs/deep-learning/)
+See also: [Analytical learning](/cs/machine-learning/analytical-learning) · [Artificial neural networks](/cs/machine-learning/artificial-neural-networks) · [Rule learning and ILP](/cs/machine-learning/rule-learning-and-ilp) · [Bayesian learning](/cs/machine-learning/bayesian-learning) · [Modern deep learning](/cs/deep-learning/intro)
+
+</div>

@@ -5,11 +5,26 @@ sidebar_position: 6
 
 # Intermediate Representations and Optimization
 
-An intermediate representation, or IR, is the compiler's working language between source syntax and target code. Nystrom introduces IR from a practical angle: bytecode is a compact representation for a virtual machine, and the broad compiler pipeline may include richer forms before code generation [1]. The standard compiler texts go deeper, treating IR as the place where control flow, data flow, machine independence, and optimization meet [2]-[5].
+An intermediate representation, or IR, is the compiler's working language between source syntax and target code. Nystrom approaches IR through bytecode, a compact representation for a virtual machine, while noting that a broader compiler pipeline may include richer forms before code generation [1]. The standard compiler texts go deeper, treating IR as the place where control flow, data flow, machine independence, and optimization meet [2]-[5].
 
 Optimization is semantics-preserving program improvement. The compiler replaces a program with another program that has the same observable behavior under the language rules but runs faster, uses less memory, exposes more parallelism, or generates better machine code. The hard part is not inventing a faster-looking transformation; it is proving that the transformation is legal.
 
-## Definitions
+## Lowering into analysis-ready forms
+
+Each lowering step discards some source detail and exposes facts needed by the next group of passes:
+
+```mermaid
+flowchart TD
+  A["AST"] --> B["Three-address code"]
+  B --> C["Basic blocks"]
+  C --> D["Control-flow graph"]
+  D --> E["SSA construction with phi nodes"]
+  E --> F["Dataflow analyses"]
+  F --> G["Optimizations"]
+  G --> H["Register allocation"]
+  H --> I["Instruction selection and scheduling"]
+  I --> J["Target code"]
+```
 
 **Three-address code** (TAC) represents operations with at most three explicit addresses: two sources and one destination. For example, `t1 = b * c` and `a = t1 + d`. TAC is simple, close to assembly, and easy to analyze.
 
@@ -27,47 +42,7 @@ A **local optimization** works within a basic block. Examples include constant f
 
 **Instruction scheduling** reorders instructions to reduce stalls while preserving dependencies. It matters most for targets with pipelines, issue width, and memory latency constraints.
 
-## Key results
-
-The first result is that IR choice determines which analyses are easy. ASTs preserve source structure, but loops, jumps, and short-circuit conditions are awkward to analyze globally. TAC and CFGs expose control flow. SSA exposes def-use chains. Machine IR exposes registers, addressing modes, and instruction latencies.
-
-The second result is the basic dataflow equation form:
-
-$$
-\begin{aligned}
-out[B] &= \bigcup_{S \in succ[B]} in[S] \\
-in[B] &= use[B] \cup (out[B] - def[B])
-\end{aligned}
-$$
-
-These are the backward liveness equations for a basic block $B$. They are solved iteratively until reaching a fixed point. Similar equations exist for forward analyses such as reaching definitions.
-
-The third result is that SSA makes many optimizations sparse. If every value has one definition, the compiler can follow def-use chains directly. Constant propagation, dead code elimination, and common subexpression elimination become simpler because definitions are explicit. $\phi$ nodes make merges visible instead of hiding them behind repeated assignments.
-
-The fourth result is that optimization legality depends on side effects and undefined behavior. Replacing `x * 2` with `x << 1` may be wrong for signed overflow or non-integer types. Moving a load out of a loop may be wrong if another operation can write the same memory. Removing a function call is wrong if the call has observable side effects.
-
-The fifth result is that loop optimizations require loop structure. A natural loop has a header that dominates the loop body and a back edge into the header. Loop-invariant code motion moves computations that produce the same value each iteration to a preheader. Unrolling reduces branch overhead and exposes instruction-level parallelism. Vectorization packs independent scalar operations into SIMD instructions.
-
-The sixth result is that register allocation connects optimization to architecture. An optimizer may create many temporaries to expose facts. The allocator then maps them to finite registers, spilling some to memory when the interference graph cannot be colored with the available register count. Good allocation can dominate performance in tight code.
-
-The seventh result is that memory is harder than scalar SSA. Variables in SSA have explicit definitions, but loads and stores can refer to overlapping memory locations through pointers, object fields, array indexes, or aliases. Optimizers therefore need alias analysis, memory SSA, or conservative barriers before moving memory operations. This is where language semantics matter: Rust-like uniqueness, Java's memory model, C's undefined behavior rules, and dynamic-language object mutation all give different optimization freedoms.
-
-The eighth result is that optimization pipelines are staged. Early canonicalization makes later passes easier; mid-level passes use target-independent facts; late passes adapt to the target's registers, instruction set, and calling convention. LLVM's popularity comes partly from making these layers reusable across many source languages and targets, but each front end must still lower source semantics honestly into IR [8].
-
-## Visual
-
-```mermaid
-flowchart TD
-  A["AST"] --> B["Three-address code"]
-  B --> C["Basic blocks"]
-  C --> D["Control-flow graph"]
-  D --> E["SSA construction with phi nodes"]
-  E --> F["Dataflow analyses"]
-  F --> G["Optimizations"]
-  G --> H["Register allocation"]
-  H --> I["Instruction selection and scheduling"]
-  I --> J["Target code"]
-```
+The common transformations differ in scope but share the same obligation: the result must preserve source-language behavior.
 
 | Optimization | Scope | Example | Main safety question |
 |---|---|---|---|
@@ -78,7 +53,38 @@ flowchart TD
 | Loop-invariant code motion | Loop | Move `n * 4` before loop | Is it safe on all iterations and exceptions? |
 | Vectorization | Loop | Pack scalar adds | Are iterations independent and memory aligned enough? |
 
-## Worked example 1: SSA for an if expression
+## Why SSA changes the optimizer
+
+IR choice determines which analyses are easy. ASTs preserve source structure, but loops, jumps, and short-circuit conditions are awkward to analyze globally. TAC and CFGs expose control flow. SSA exposes def-use chains. Machine IR exposes registers, addressing modes, and instruction latencies.
+
+Backward liveness has the standard dataflow form:
+
+$$
+\begin{aligned}
+out[B] &= \bigcup_{S \in succ[B]} in[S] \\
+in[B] &= use[B] \cup (out[B] - def[B])
+\end{aligned}
+$$
+
+These are the backward liveness equations for a basic block $B$. They are solved iteratively until reaching a fixed point. Similar equations exist for forward analyses such as reaching definitions.
+
+SSA makes many optimizations sparse. If every value has one definition, the compiler can follow def-use chains directly. Constant propagation, dead code elimination, and common subexpression elimination become simpler because definitions are explicit. $\phi$ nodes expose merges instead of hiding them behind repeated assignments.
+
+## Legality before speed
+
+Optimization legality depends on side effects and undefined behavior. Replacing `x * 2` with `x << 1` may be wrong for signed overflow or non-integer types. Moving a load out of a loop may be wrong if another operation can write the same memory. Removing a function call is wrong if the call has observable side effects.
+
+Loop optimizations require loop structure. A natural loop has a header that dominates the loop body and a back edge into the header. Loop-invariant code motion moves computations that produce the same value each iteration to a preheader. Unrolling reduces branch overhead and exposes instruction-level parallelism. Vectorization packs independent scalar operations into SIMD instructions.
+
+## From unlimited temporaries to finite registers
+
+Register allocation connects optimization to architecture. An optimizer may create many temporaries to expose facts. The allocator then maps them to finite registers, spilling some to memory when the interference graph cannot be colored with the available register count. Good allocation can dominate performance in tight code.
+
+Memory is harder than scalar SSA. Variables in SSA have explicit definitions, but loads and stores can refer to overlapping memory locations through pointers, object fields, array indexes, or aliases. Optimizers therefore need alias analysis, memory SSA, or conservative barriers before moving memory operations. Language semantics matter here: Rust-like uniqueness, Java's memory model, C's undefined behavior rules, and dynamic-language object mutation all give different optimization freedoms.
+
+Optimization pipelines are staged. Early canonicalization makes later passes easier; mid-level passes use target-independent facts; late passes adapt to the target's registers, instruction set, and calling convention. LLVM's popularity comes partly from making these layers reusable across many source languages and targets, but each front end must still lower source semantics honestly into IR [8].
+
+## Placing a phi node after an `if`
 
 Problem: convert this pseudo-code to SSA:
 
@@ -138,7 +144,7 @@ B3:
 
 Every assigned name has exactly one definition, satisfying SSA.
 
-## Worked example 2: Liveness and an interference graph
+## Liveness and interference in a straight-line block
 
 Problem: compute liveness and register interferences for:
 
@@ -195,7 +201,7 @@ Checked answer:
 
 Interference edges are `(a,b)` and `(a,c)`. Thus two registers are enough: put `a` in `R1`, `b` in `R2`, `c` in `R2`, and `d` in either register after its operands are dead.
 
-## Code
+## Computing straight-line liveness
 
 ```python
 def liveness(block):
@@ -226,7 +232,7 @@ if __name__ == "__main__":
         print(f"{n}: {text:12} in={sorted(ins[n-1])} out={sorted(outs[n-1])}")
 ```
 
-## Common pitfalls
+## Transformations that look legal but are not
 
 - Calling bytecode an optimizing IR without checking whether it exposes CFG and dataflow.
 - Performing algebraic rewrites without considering overflow, exceptions, NaN, or language-defined order.
@@ -245,17 +251,6 @@ if __name__ == "__main__":
 - Optimizing through memory operations without alias information or a conservative fallback.
 - Forgetting that debug information and exception edges are part of the observable behavior in many toolchains.
 
-## Connections
-
-- [Bytecode Compilation and Virtual Machines](/cs/compilers/bytecode-compilation-and-virtual-machines) provides a compact executable representation that may feed or bypass deeper IR.
-- [Semantic Analysis and Type Checking](/cs/compilers/semantic-analysis-and-type-checking) supplies types, bindings, and effect facts useful for optimization.
-- [Garbage Collection and Runtime Systems](/cs/compilers/garbage-collection-and-runtime-systems) constrains optimization around safepoints, barriers, and roots.
-- [Parsing and Syntax Trees](/cs/compilers/parsing-and-syntax-trees) explains the ASTs that are lowered to IR.
-- [Computer Architecture](/cs/computer-architecture/intro) explains registers, pipelines, caches, SIMD, and instruction scheduling.
-- [Operating Systems](/cs/operating-systems/intro) matters for calling conventions, object files, virtual memory, and profiling.
-- [Programming Language Theory](/cs/programming-language-theory/intro) provides equivalence and semantics needed to justify transformations.
-- [Theory of Computation](/cs/theory/intro) connects fixed-point dataflow algorithms to lattice theory and decidability.
-
 ## References
 
 [1] R. Nystrom, *Crafting Interpreters*. Genever Benning, 2021.  
@@ -266,3 +261,18 @@ if __name__ == "__main__":
 [6] G. J. Chaitin, "Register allocation and spilling via graph coloring," *SIGPLAN Notices*, vol. 17, no. 6, pp. 98-105, 1982.  
 [7] R. Cytron, J. Ferrante, B. K. Rosen, M. N. Wegman, and F. K. Zadeck, "Efficiently computing static single assignment form and the control dependence graph," *ACM Transactions on Programming Languages and Systems*, vol. 13, no. 4, pp. 451-490, 1991.  
 [8] C. Lattner and V. Adve, "LLVM: A compilation framework for lifelong program analysis and transformation," in *CGO*, 2004.
+
+<div className="see-also">
+
+See also:
+
+- [Bytecode Compilation and Virtual Machines](/cs/compilers/bytecode-compilation-and-virtual-machines) provides a compact executable representation that may feed or bypass deeper IR.
+- [Semantic Analysis and Type Checking](/cs/compilers/semantic-analysis-and-type-checking) supplies types, bindings, and effect facts useful for optimization.
+- [Garbage Collection and Runtime Systems](/cs/compilers/garbage-collection-and-runtime-systems) constrains optimization around safepoints, barriers, and roots.
+- [Parsing and Syntax Trees](/cs/compilers/parsing-and-syntax-trees) explains the ASTs that are lowered to IR.
+- [Computer Architecture](/cs/computer-architecture/intro) explains registers, pipelines, caches, SIMD, and instruction scheduling.
+- [Operating Systems](/cs/operating-systems/intro) matters for calling conventions, object files, virtual memory, and profiling.
+- [Programming Language Theory](/cs/programming-language-theory/intro) provides equivalence and semantics needed to justify transformations.
+- [Theory of Computation](/cs/theory/intro) connects fixed-point dataflow algorithms to lattice theory and decidability.
+
+</div>

@@ -5,11 +5,11 @@ sidebar_position: 2
 
 # Heterogeneity and Federated Optimization
 
-FedAvg works surprisingly well when local objectives point in compatible directions, but federated systems are almost defined by incompatibility. Some clients have different labels, vocabularies, sensors, languages, disease prevalence, or user habits. Others have slow CPUs, unreliable networks, low battery, or short participation windows. This chapter studies how statistical and system heterogeneity distort the FedAvg update and why later methods add proximal terms, control variates, normalization, local batch-normalization rules, contrastive representation losses, fairness objectives, and asynchronous aggregation.
+FedAvg works surprisingly well when local objectives point in compatible directions, but federated systems are almost defined by incompatibility. Some clients have different labels, vocabularies, sensors, languages, disease prevalence, or user habits. Others have slow CPUs, unreliable networks, low battery, or short participation windows. Statistical and system heterogeneity distort the FedAvg update in different ways; later methods respond with proximal terms, control variates, normalization, local batch-normalization rules, contrastive representation losses, fairness objectives, and asynchronous aggregation.
 
 The supplied papers emphasize different failure modes. FedProx frames heterogeneity as both non-IID data and variable local work [2]. SCAFFOLD proves that FedAvg suffers from client drift and uses control variates to correct it [3]. FedNova shows that uneven local steps can make naive averaging converge to a mismatched objective, even when local updates are otherwise reasonable [4]. FedBN isolates feature shift and keeps batch-normalization statistics local [5]. MOON uses model-level contrastive learning to align local representations with the global model [6]. Together, they form the core optimization vocabulary for modern FL.
 
-## Definitions
+## From client drift to objective inconsistency
 
 **Statistical heterogeneity** means client data distributions differ. Formally, client $k$ samples from distribution $\mathcal{D}_k$, so
 
@@ -27,7 +27,7 @@ may have a different minimizer, curvature, gradient scale, or class support than
 
 ![A FedProx loss-curve figure shows that the proximal term stabilizes convergence under heterogeneous data and variable local work compared with vanilla FedAvg.](https://ar5iv.labs.arxiv.org/html/1812.06127/assets/x1.png)
 
-*Figure: FedProx demonstrated that adding a proximal regularizer at each client tames divergence on non-IID benchmarks where unmodified FedAvg becomes unstable. From [Li et al., 2020](https://arxiv.org/abs/1812.06127) — embedded under educational fair use with attribution.*
+*Figure: FedProx adds a proximal regularizer at each client and stabilizes non-IID benchmarks where unmodified FedAvg becomes unstable. From [Li et al., 2020](https://arxiv.org/abs/1812.06127), reproduced with attribution for discussion.*
 
 **FedProx** modifies client $k$'s local objective at round $t$:
 
@@ -39,7 +39,7 @@ The proximal term discourages local models from moving too far from the broadcas
 
 ![A SCAFFOLD diagram illustrates client drift in FedAvg and how control variates pull local updates back toward the global gradient direction.](https://ar5iv.labs.arxiv.org/html/1910.06378/assets/x1.png)
 
-*Figure: SCAFFOLD identifies client drift as the root cause of slow FedAvg convergence under non-IID data and corrects it with paired control variates. From [Karimireddy et al., 2020](https://arxiv.org/abs/1910.06378) — embedded under educational fair use with attribution.*
+*Figure: SCAFFOLD corrects client drift under non-IID data with paired server and client control variates. From [Karimireddy et al., 2020](https://arxiv.org/abs/1910.06378), reproduced with attribution for discussion.*
 
 **SCAFFOLD** maintains a server control variate $c$ and client control variates $c_k$. A local update uses
 
@@ -55,13 +55,13 @@ where $g_k(w)$ is a stochastic local gradient. The correction $-c_k+c$ estimates
 
 ![A MOON figure illustrates model-contrastive federated learning: the local representation is pulled toward the global model and away from the prior local model.](https://ar5iv.labs.arxiv.org/html/2103.16257/assets/x1.png)
 
-*Figure: MOON aligns local representations with the global model through a contrastive auxiliary loss, mitigating drift on heterogeneous clients. From [Li et al., 2021](https://arxiv.org/abs/2103.16257) — embedded under educational fair use with attribution.*
+*Figure: MOON aligns local representations with the global model through a contrastive auxiliary loss. From [Li et al., 2021](https://arxiv.org/abs/2103.16257), reproduced with attribution for discussion.*
 
 **MOON** adds a model-contrastive loss. For an input $x$, the current local model representation is encouraged to stay close to the global model representation and away from the previous local model representation when the previous local model reflects drift [6].
 
-## Key results
+## Matching the correction to the failure mode
 
-FedAvg's weakness under non-IID data is not just empirical inconvenience; it is a structural mismatch. In a centralized minibatch update, each minibatch gradient estimates $\nabla f(w_t)$ at the same point. In FedAvg, client $k$ computes gradients at $w_{t,0}^k,w_{t,1}^k,\ldots$, points that are increasingly shaped by $F_k$. If $F_k$ and $f$ have different curvature or minimizers, later local steps are biased toward client-specific directions.
+FedAvg's weakness under non-IID data is structural rather than an empirical inconvenience. In a centralized minibatch update, each minibatch gradient estimates $\nabla f(w_t)$ at the same point. In FedAvg, client $k$ computes gradients at $w_{t,0}^k,w_{t,1}^k,\ldots$, points that are increasingly shaped by $F_k$. If $F_k$ and $f$ have different curvature or minimizers, later local steps are biased toward client-specific directions.
 
 FedProx addresses this with a minimal local-objective change. The gradient of the FedProx local objective is
 
@@ -92,8 +92,6 @@ System heterogeneity creates algorithmic choices beyond the local objective. Par
 | MOON | Representation drift | Model-contrastive local loss | Previous local model | Align local features with global features |
 | q-FFL | Fairness under heterogeneous losses | Tilted client objective | Usually no | Increase influence of high-loss clients |
 
-## Visual
-
 ```mermaid
 flowchart LR
   H["Federated heterogeneity"] --> Stat["Statistical heterogeneity"]
@@ -119,7 +117,7 @@ flowchart LR
   Stale --> FedBuff["FedBuff asynchronous buffering"]
 ```
 
-## Worked example 1: FedProx update step on one client
+## Watching the FedProx penalty pull a client back
 
 **Problem.** At round $t$, the server sends scalar $w_t=4$. Client $k$ has a local quadratic loss
 
@@ -171,7 +169,7 @@ $$
 
 **Checked answer.** FedProx returns $2.98$ after two steps, slightly closer to the server model than plain local SGD's $2.92$. The gap is small here because there are only two steps, but it grows with $E$, $\eta$, and $\mu$.
 
-## Worked example 2: SCAFFOLD correction term
+## Computing one SCAFFOLD correction
 
 **Problem.** A client has scalar stochastic gradient $g_k(w)=6$ at the current local point. Its control variate is $c_k=4.5$, and the server control variate is $c=2.0$. The local learning rate is $\eta=0.1$, and the current local scalar model is $w=3.0$. Compute one SCAFFOLD step and compare with FedAvg's local SGD step.
 
@@ -201,7 +199,7 @@ The local client gradient is larger than the corrected global-like direction bec
 
 **Checked answer.** SCAFFOLD gives $w^+=2.65$, whereas plain FedAvg local SGD gives $2.4$. The correction can prevent the client from moving too far along its local objective.
 
-## Code
+## Comparing the two local update rules
 
 ```python
 import numpy as np
@@ -230,7 +228,7 @@ next_w = scaffold_client_step(
 print("SCAFFOLD one step:", next_w)
 ```
 
-## Common pitfalls
+## Diagnosing the wrong kind of heterogeneity
 
 - Calling all non-IID data the same; label skew, feature shift, and concept shift need different fixes.
 - Assuming larger local epochs always improve efficiency; under non-IID data they can worsen drift.
@@ -246,17 +244,6 @@ print("SCAFFOLD one step:", next_w)
 - Confusing proximal regularization toward $w_t$ with personalization toward a permanent local model.
 - Using MOON-style contrastive losses without checking representation dimension, temperature, and memory cost.
 - Assuming system heterogeneity is harmless if the data are IID; straggler handling still changes who contributes.
-
-## Connections
-
-- [Foundations and FedAvg](/cs/federated-learning/foundations-and-fedavg)
-- [Personalization in Federated Learning](/cs/federated-learning/personalization-in-federated-learning)
-- [Communication Efficiency and Robustness](/cs/federated-learning/communication-efficiency-and-robustness)
-- [Optimization algorithms](/cs/deep-learning/optimization-algorithms)
-- [Convolutional neural networks](/cs/deep-learning/convolutional-neural-networks)
-- [Computational performance](/cs/deep-learning/computational-performance)
-- [Evaluating hypotheses](/cs/machine-learning/evaluating-hypotheses)
-- [Data poisoning and backdoors](/cs/adversarial-attacks/data-poisoning-and-backdoors)
 
 ## References
 
@@ -291,3 +278,9 @@ print("SCAFFOLD one step:", next_w)
 [15] V. Smith, C.-K. Chiang, M. Sanjabi, and A. Talwalkar, "Federated Multi-Task Learning," NeurIPS, 2017. https://arxiv.org/abs/1705.10467
 
 [16] K. Bonawitz et al., "Towards Federated Learning at Scale: System Design," MLSys, 2019. https://arxiv.org/abs/1902.01046
+
+<div className="see-also">
+
+See also: [Foundations and FedAvg](/cs/federated-learning/foundations-and-fedavg) · [Personalization in Federated Learning](/cs/federated-learning/personalization-in-federated-learning) · [Communication Efficiency and Robustness](/cs/federated-learning/communication-efficiency-and-robustness) · [Optimization algorithms](/cs/deep-learning/optimization-algorithms) · [Convolutional neural networks](/cs/deep-learning/convolutional-neural-networks) · [Computational performance](/cs/deep-learning/computational-performance) · [Evaluating hypotheses](/cs/machine-learning/evaluating-hypotheses) · [Data poisoning and backdoors](/cs/adversarial-attacks/data-poisoning-and-backdoors)
+
+</div>

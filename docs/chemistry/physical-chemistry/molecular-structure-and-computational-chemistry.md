@@ -7,13 +7,13 @@ sidebar_position: 16
 
 Molecular structure arises when atomic nuclei and electrons are treated quantum mechanically but with useful approximations. The exact many-particle Schrodinger equation is too difficult for most molecules, so chemical bonding is understood through the Born-Oppenheimer approximation, valence-bond theory, molecular orbital theory, and computational methods.
 
-Atkins presents these models as complementary. Valence-bond language emphasizes localized bonds and resonance; molecular orbital language emphasizes delocalized orbitals and orbital energies; computational chemistry turns both into numerical predictions.
+The models answer different questions. Valence-bond language emphasizes localized bonds and resonance, molecular orbitals emphasize delocalization and orbital energies, and electronic-structure calculations turn those descriptions into numerical predictions.
 
 ![A ball-and-stick model shows benzene as a planar aromatic ring with delocalized bonding.](https://commons.wikimedia.org/wiki/Special:FilePath/Benzene-aromatic-3D-balls.png)
 
 *Figure: Benzene as a familiar molecule where structure, bonding models, and computation meet. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Benzene-aromatic-3D-balls.png), Benjah-bmm27, public domain.*
 
-## Definitions
+## Separating nuclei, electrons, and bonding pictures
 
 The **Born-Oppenheimer approximation** separates electronic and nuclear motion because nuclei are much heavier than electrons. The electronic Schrodinger equation is solved at fixed nuclear positions, giving an electronic energy that acts as a potential energy surface for nuclear motion.
 
@@ -51,7 +51,7 @@ $$
 
 The Hartree-Fock method approximates the many-electron wavefunction by a single Slater determinant and optimizes spin-orbitals self-consistently. Electron correlation is the part of electron-electron interaction not captured by the average-field Hartree-Fock picture.
 
-## Key results
+## From orbital overlap to electronic-structure methods
 
 The variational principle states that for any acceptable trial wavefunction $\psi$,
 
@@ -94,7 +94,7 @@ $$
 \mathrm{HF < MP2 < coupled\ cluster}
 $$
 
-in systematic wavefunction methods, while density functional theory often offers a practical balance for larger molecules.
+in systematic wavefunction methods, while density functional theory often offers a useful cost-accuracy balance for larger molecules.
 
 The Born-Oppenheimer approximation creates the potential energy surface concept. For each fixed nuclear geometry, the electronic energy is computed. Moving the nuclei maps out a surface whose minima correspond to stable structures, whose saddle points correspond to transition states, and whose curvature near a minimum gives vibrational frequencies. Reaction dynamics and spectroscopy both use this surface, so molecular structure is not only a static geometry but a landscape.
 
@@ -113,8 +113,6 @@ Density functional theory uses the electron density rather than the many-electro
 Computational predictions should be interpreted as model-dependent. Optimized geometries, vibrational frequencies, charges, orbital energies, and reaction barriers depend on level of theory, basis set, solvation model, and treatment of conformational sampling. Physical chemistry uses computation not as a black box but as an approximate solution of the quantum mechanical structure problem with known assumptions.
 
 Molecular structure also links to spectroscopy. Rotational constants test predicted geometries, vibrational frequencies test force constants, UV-visible spectra test electronic excited states, and NMR or EPR parameters test electronic environments. A good structural model should explain multiple kinds of data consistently.
-
-## Visual
 
 ```mermaid
 graph TD
@@ -138,7 +136,7 @@ graph TD
 | Hartree-Fock | average-field determinant | systematic orbital calculation | misses electron correlation |
 | DFT | density-based energy functional | useful for larger systems | functional choice matters |
 
-## Worked example 1: Bond order of $\mathrm{O_2}$
+## Why $\mathrm{O_2}$ has bond order two and unpaired electrons
 
 **Problem.** Use the MO electron count of $\mathrm{O_2}$ to find its bond order. The valence configuration has 8 bonding and 4 antibonding electrons.
 
@@ -172,7 +170,7 @@ $$
 
 **Checked answer.** MO theory predicts a double bond and paramagnetism for $\mathrm{O_2}$, matching experiment better than a simple Lewis structure alone.
 
-## Worked example 2: Normalization of bonding LCAO combination
+## Normalizing an overlapping LCAO pair
 
 **Problem.** Two normalized atomic orbitals have overlap $S=0.20$. Find the normalization constant for $\psi_+=N(\chi_A+\chi_B)$.
 
@@ -212,7 +210,7 @@ $$
 
 **Checked answer.** $N_+=0.645$. Positive overlap increases the unnormalized norm, so the normalization constant is smaller than $1/\sqrt2$.
 
-## Code
+## Checking bond order and LCAO normalization
 
 ```python
 import numpy as np
@@ -230,7 +228,7 @@ for S in [0.0, 0.2, 0.5]:
     print(S, lcao_norm(S, True), lcao_norm(S, False))
 ```
 
-## Common pitfalls
+## What a converged calculation does not guarantee
 
 - Treating the Born-Oppenheimer approximation as exact. Nonadiabatic effects matter in photochemistry and some electron-transfer processes.
 - Forgetting antibonding electrons when calculating bond order.
@@ -244,9 +242,8 @@ For computational results, convergence of the calculation is not the same as acc
 
 Orbital pictures should be used with humility. MOs are useful interpretive tools, but only the total wavefunction or density is directly tied to observables in a rigorous way. Orbital energies can guide ionization trends and reactivity, yet they should not be treated as exact measured quantities except in limited theorems and approximations. Always connect orbital arguments back to energy, symmetry, overlap, and electron occupancy.
 
-## Connections
+<div className="see-also">
 
-- [Atomic structure and spectra](/chemistry/physical-chemistry/atomic-structure-and-spectra)
-- [Molecular symmetry and group theory](/chemistry/physical-chemistry/molecular-symmetry-and-group-theory)
-- [Electronic, laser, and magnetic resonance spectroscopy](/chemistry/physical-chemistry/electronic-laser-and-magnetic-resonance-spectroscopy)
-- [Physics quantum mechanics](/physics/quantum-mechanics/)
+See also: [Atomic structure and spectra](/chemistry/physical-chemistry/atomic-structure-and-spectra) · [Molecular symmetry and group theory](/chemistry/physical-chemistry/molecular-symmetry-and-group-theory) · [Electronic, laser, and magnetic resonance spectroscopy](/chemistry/physical-chemistry/electronic-laser-and-magnetic-resonance-spectroscopy) · [Physics quantum mechanics](/physics/quantum-mechanics/intro)
+
+</div>

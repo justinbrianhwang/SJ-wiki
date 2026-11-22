@@ -5,132 +5,317 @@ sidebar_position: 23
 
 # Geometric Optics: Reflection and Refraction
 
-Geometric Optics: Reflection and Refraction covers ray optics, reflection, refraction, total internal reflection, mirrors, and thin lenses. The goal is to recognize the physical structure before choosing equations. In the HRW progression, this topic extends earlier mechanics and prepares later field, wave, or modern-physics reasoning by reusing the same habits: define the system, choose signs and variables, state assumptions, and check dimensions.
+Geometric optics replaces a wavefront by rays perpendicular to it. The replacement is accurate when lenses, mirrors, apertures, and variations in refractive index are large compared with the wavelength. It says where light travels and where an image forms, but it cannot predict diffraction fringes or resolve structure near the wavelength scale.
 
-The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
+The central approximation is local: over a short enough distance, a ray follows a straight line through a uniform medium. A boundary can redirect it by reflection or refraction. Curved boundaries then focus or spread families of rays.
 
-![A light ray refracts across an interface with incident and refracted angles labeled.](https://commons.wikimedia.org/wiki/Special:FilePath/Snells_law.svg)
+## Why reflection and refraction follow extremal paths
 
-*Figure: Snell's law turns an everyday refraction scene into a boundary-condition calculation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Snells_law.svg), Cristan and Sawims, public domain.*
+Fermat's principle states that the optical path between two points is stationary with respect to small changes of route. The optical path length is
 
-## Definitions
+$$
+\mathcal L=\int n\,ds,
+$$
 
-- **Scope:** ray optics, reflection, refraction, total internal reflection, mirrors, and thin lenses.
-- **Primary symbols:** $n$, $\theta$, $f$, $d_o$, $d_i$, $m$.
-- **Reference equations:** $\theta_r=\theta_i$, $n_1\sin\theta_1=n_2\sin\theta_2$, $1/f=1/d_o+1/d_i$, $m=-d_i/d_o$.
-- A **system** is the object, field region, circuit, gas, optical element, or particle collection being modeled.
-- A **state** is specified by the variables that determine the relevant energy, momentum, phase, field, or thermodynamic condition.
-- A **constraint** is a physical restriction such as no slip, fixed length, constant temperature, steady flow, fixed boundary, or symmetry.
-- A **limiting case** is a simplified parameter choice used to test whether the result behaves sensibly.
+and light travel time is $\mathcal L/c$. “Stationary” usually means a minimum in elementary examples, although more general optical systems can have stationary paths that are not strict minima.
 
-The definitions in this page are meant to be operational. A symbol is useful only after you know how it would be measured, what units it carries, what sign convention is being used, and which idealizations are being assumed. Before substituting numbers, identify the system boundary and the relevant state variables. For a particle problem the state variables might be position and velocity; for a circuit they might be charge, current, and potential difference; for a thermodynamic process they might be pressure, volume, temperature, and internal energy.
+For reflection from a plane surface, compare nearby routes from a source to a receiver by replacing the receiver with its mirror image behind the surface. The shortest broken path becomes a straight line to that image. The resulting geometry gives
 
-A second habit is to separate model statements from algebra. A model statement says something physical, such as "air resistance is negligible", "the string is massless", "the gas is ideal", "the process is quasistatic", or "the field is uniform". Algebra then follows from those statements. If the model changes, the algebra may still look familiar but the result can become invalid. Write the model assumptions as part of the solution, not as an afterthought.
+$$
+\theta_i=\theta_r,
+$$
 
-## Key results
+where both angles are measured from the surface normal. The incident ray, reflected ray, and normal lie in the same plane.
 
-The main relationships are
+For refraction at a flat boundary, let the ray cross the boundary at horizontal coordinate $x$. If the source and receiver lie vertical distances $a$ and $b$ from the boundary and have horizontal separation $D$, the travel time is
+
+$$
+t(x)=\frac{n_1}{c}\sqrt{x^2+a^2}
++\frac{n_2}{c}\sqrt{(D-x)^2+b^2}.
+$$
+
+The physical path satisfies $dt/dx=0$. Differentiating gives
+
+$$
+\frac{n_1}{c}\frac{x}{\sqrt{x^2+a^2}}
+=
+\frac{n_2}{c}\frac{D-x}{\sqrt{(D-x)^2+b^2}}.
+$$
+
+The two ratios are $\sin\theta_1$ and $\sin\theta_2$, so
+
+$$
+n_1\sin\theta_1=n_2\sin\theta_2.
+$$
+
+Snell's law follows. The refractive index $n=c/v$ measures the reduction of phase speed relative to vacuum. At a stationary boundary the frequency is continuous: wave crests cannot accumulate at the interface. Since $v=f\lambda$, the wavelength changes in the same ratio as the speed.
+
+## Reading Snell's law before calculating
+
+If $n_2\gt n_1$, then $\sin\theta_2\lt \sin\theta_1$ and the transmitted ray bends toward the normal. If $n_2\lt n_1$, it bends away. Normal incidence is the limiting case $\theta_1=0$, for which direction does not change even though speed and wavelength do.
+
+Consider light entering glass with $n_2=1.50$ from air with $n_1=1.00$ at $40.0^\circ$:
+
+$$
+\sin\theta_2=\frac{n_1}{n_2}\sin\theta_1
+=\frac{1.00}{1.50}\sin40.0^\circ
+=0.4285.
+$$
+
+Therefore
+
+$$
+\theta_2=\sin^{-1}(0.4285)=25.4^\circ.
+$$
+
+The smaller angle agrees with the expected bend toward the normal. If the stated $40.0^\circ$ had instead been measured from the surface, the angle for Snell's law would be $50.0^\circ$.
+
+Reflection normally accompanies refraction. The relative reflected and transmitted powers are set by the Fresnel equations and depend on polarization and angle. Snell's law alone determines directions, not brightness. Introductory ray drawings often omit the weak reflected ray at a transparent boundary, but that omission is a modeling choice.
+
+## Total internal reflection and the critical angle
+
+Suppose light moves from index $n_1$ into a lower index $n_2$. As $\theta_1$ grows, the refracted angle grows faster. At the critical angle, the transmitted ray is parallel to the boundary:
+
+$$
+n_1\sin\theta_c=n_2\sin90^\circ,
+$$
+
+so
+
+$$
+\sin\theta_c=\frac{n_2}{n_1},
+\qquad n_1>n_2.
+$$
+
+For glass with $n_1=1.50$ next to air with $n_2=1.00$,
+
+$$
+\theta_c=\sin^{-1}\left(\frac{1.00}{1.50}\right)=41.8^\circ.
+$$
+
+An internal incidence angle of $50^\circ$ therefore produces total internal reflection. No propagating ray carries energy into the air. An evanescent field still penetrates a short distance beyond the boundary; bringing another high-index material close enough can couple energy across the gap. The ray model suppresses that wave-level detail.
+
+There is no critical angle when light goes from lower to higher index. Substituting those indices would demand $\sin\theta_c\gt 1$. That result means the physical condition cannot occur, not that the calculator failed.
+
+Optical fibers use repeated total internal reflection in a high-index core surrounded by a lower-index cladding. Real fibers are described by guided modes rather than literal zigzags, but the ray picture gives the correct acceptance-angle intuition when the core is many wavelengths across.
+
+## Parallel faces shift a ray without changing its final direction
+
+A glass window or transparent slab has two parallel interfaces. The ray bends toward the normal on entering and away from it on leaving. Applying Snell's law at both faces gives
+
+$$
+n_1\sin\theta_1=n_2\sin\theta_2
+$$
+
+and
+
+$$
+n_2\sin\theta_2=n_1\sin\theta_3.
+$$
+
+Therefore $\theta_3=\theta_1$: the emerging ray is parallel to the incident ray. It is nevertheless displaced sideways. For slab thickness $t$, the perpendicular separation between the continued incident ray and the emerging ray is
+
+$$
+s=t\frac{\sin(\theta_1-\theta_2)}{\cos\theta_2}.
+$$
+
+Take a $4.00\,\mathrm{cm}$ glass plate of index $1.50$ in air, with incidence angle $45.0^\circ$. Refraction inside the plate gives
+
+$$
+\theta_2=\sin^{-1}\left(\frac{\sin45.0^\circ}{1.50}\right)=28.1^\circ.
+$$
+
+Then
 
 $$
 \begin{aligned}
-\text{core formulas} &: $\theta_r=\theta_i$, $n_1\sin\theta_1=n_2\sin\theta_2$, $1/f=1/d_o+1/d_i$, $m=-d_i/d_o$.
+s
+&=(4.00\,\mathrm{cm})
+\frac{\sin(45.0^\circ-28.1^\circ)}{\cos28.1^\circ}\\
+&=1.32\,\mathrm{cm}.
 \end{aligned}
 $$
 
-Use these relationships only after identifying which variables are known and which conditions are being assumed. Many problems can be solved by matching a physical phrase to a mathematical operation: balance forces or torques for equilibrium, integrate a rate for accumulated change, conserve a quantity when external transfer is absent, or apply a boundary condition when waves or fields must fit a geometry.
+The plate changes the ray's position and travel time even though its final direction is unchanged. That distinction matters when aligning optical systems.
 
-A useful solution pattern is: write the governing equation, substitute symbolic constraints, solve for the unknown, and only then insert numbers. This prevents units from becoming decorative and keeps the answer interpretable.
+Refraction also produces apparent depth. Looking nearly straight down into water, rays from a submerged object spread as they enter air. Backward extensions of those rays meet above the object, so it appears shallower. At small angles,
 
-These formulas are conditional statements. Each equation is powerful inside its domain and misleading outside it. Constant-acceleration kinematics requires constant acceleration. Conservation of mechanical energy requires either no nonconservative work or an explicit accounting of it. Gauss's law is always true, but it directly gives an electric field only when symmetry lets the flux integral simplify. Bernoulli's equation assumes steady, incompressible, nonviscous flow along a streamline. Keeping the conditions attached to the formula is part of the formula.
+$$
+d_{\text{apparent}}\approx d_{\text{real}}\frac{n_{\text{observer}}}{n_{\text{object medium}}}.
+$$
 
-For numerical work, solve symbolically before inserting values whenever possible. A symbolic expression exposes dimensions and limiting behavior. If a mass should cancel, it should cancel before arithmetic. If an answer should decrease when distance grows, the final expression should show that trend. If an answer becomes infinite in an unphysical limit, that usually marks the boundary where the model has stopped applying.
+A coin $12.0\,\mathrm{cm}$ below water of index $1.33$, viewed from air, appears at a depth
 
-## Visual
+$$
+d_{\text{apparent}}\approx(12.0\,\mathrm{cm})\frac{1.00}{1.33}
+=9.02\,\mathrm{cm}.
+$$
+
+This approximation loses accuracy far from normal viewing because the exact relation contains tangents as well as Snell's law.
+
+## From a curved surface to a thin lens
+
+A spherical refracting surface changes the direction of each paraxial ray by a slightly different amount. Combining two such surfaces gives a lens. Under the thin-lens and paraxial approximations, the image equation is
+
+$$
+\frac{1}{f}=\frac{1}{d_o}+\frac{1}{d_i},
+$$
+
+and transverse magnification is
+
+$$
+m=\frac{h_i}{h_o}=-\frac{d_i}{d_o}.
+$$
+
+The following real-is-positive convention is used:
+
+| Quantity | Positive | Negative |
+|---|---|---|
+| Focal length $f$ | converging lens | diverging lens |
+| Object distance $d_o$ | real object on incoming side | virtual object |
+| Image distance $d_i$ | real image on outgoing side | virtual image on incoming side |
+| Magnification $m$ | upright image | inverted image |
+
+Other conventions are valid, especially for mirrors, but equations and signs must come from one convention. A ray construction is useful before substitution:
 
 ```mermaid
 graph LR
-  A[Physical situation] --> B[Choose model]
-  B --> C[Define variables]
-  C --> D[Apply key law]
-  D --> E[Solve symbolically]
-  E --> F[Check units and limits]
+  A["Mark the axis, lens, and focal points"] --> B["Draw a ray parallel to the axis"]
+  B --> C["Refract it through the far focal point"]
+  C --> D["Draw a ray through the lens center"]
+  D --> E["Locate the intersection or backward extensions"]
+  E --> F["Check the algebra against the drawing"]
 ```
 
-| Quantity or idea | Use | Check |
-|---|---|---|
-| Main model | ray optics, reflection, refraction, total internal reflection, mirrors, and thin lenses | assumptions must match the formula |
-| Symbols | $n$, $\theta$, $f$, $d_o$, $d_i$, $m$ | define each before use |
-| Key formulas | $\theta_r=\theta_i$, $n_1\sin\theta_1=n_2\sin\theta_2$, $1/f=1/d_o+1/d_i$, $m=-d_i/d_o$ | check dimensions term by term |
-| Limiting case | simplify one parameter | result should match intuition |
+For a converging thin lens, a ray parallel to the principal axis emerges through the far focal point. A ray through the optical center continues approximately undeviated. A ray through the near focal point emerges parallel to the axis. Any two independent rays locate the image.
 
-## Worked example 1
+The lens equation can be obtained from similar triangles in a paraxial ray diagram. The small-angle approximation $\tan\theta\approx\theta$ allows the surface geometry to be summarized by a single focal length. Rays far from the axis violate that approximation and contribute spherical aberration. Dispersion adds chromatic aberration because $n$, and hence $f$, depends on wavelength.
 
-**Problem.** Light in air enters glass with $n=1.50$ at $40^\circ$ from the normal. Find refracted angle.
-
-**Method.** Select the listed governing relationship and solve symbolically before substituting numbers.
-
-1. Write the relevant relation.
-2. Substitute the known quantities with SI units or consistent derived units.
-3. Solve algebraically for the requested quantity.
-4. The calculation gives
+For a thin lens in air with surface radii $R_1$ and $R_2$, the lensmaker equation is
 
 $$
-$\sin\theta_2=(1.00/1.50)\sin40^\circ=0.4285$, so $\theta_2=25.4^\circ$..
+\frac{1}{f}=(n-1)\left(\frac{1}{R_1}-\frac{1}{R_2}\right).
 $$
 
-5. Interpret the magnitude and sign in the original physical situation.
+The signs of the radii depend on which side their centers of curvature lie. The equation explains two useful trends without detailed ray tracing: increasing the index strengthens the lens, and tighter curvature shortens the focal length. A biconvex lens has positive power under the usual radius convention; a biconcave lens has negative power.
 
-**Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
-
-## Worked example 2
-
-**Problem.** An object is $30\,\mathrm{cm}$ from a converging lens with $f=10\,\mathrm{cm}$. Find image distance and magnification.
-
-**Method.** Use the same modeling routine with a different unknown so the equation is not memorized in only one direction.
-
-1. Identify the system and the applicable approximation.
-2. Start from the governing equation.
-3. Rearrange before substituting values.
-4. The numerical work is
+Optometrists often use optical power
 
 $$
-$1/d_i=1/10-1/30=1/15$, so $d_i=15\,\mathrm{cm}$ and $m=-15/30=-0.50$..
+P=\frac{1}{f},
 $$
 
-5. Compare with a nearby limiting case or a familiar scale.
+with $f$ in meters and $P$ in diopters. Thin lenses in contact have powers that add:
 
-**Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
+$$
+P_{\text{eq}}=P_1+P_2.
+$$
 
-## Code
+A $+2.0\,\mathrm D$ lens combined with a $-0.50\,\mathrm D$ lens gives $+1.5\,\mathrm D$, corresponding to
 
-```python
-import math
-theta=math.degrees(math.asin(math.sin(math.radians(40))/1.5))
-di=1/(1/10-1/30)
-print(theta,di,-di/30)
-```
+$$
+f_{\text{eq}}=\frac{1}{1.5\,\mathrm{m^{-1}}}=0.67\,\mathrm m.
+$$
 
-## Common pitfalls
+Separated lenses require an additional spacing term, so the contact rule should not be applied to an arbitrary two-lens instrument.
 
-- Measuring angles from the surface instead of normal.
-- Using total internal reflection from low to high index.
-- Applying lens signs without a ray diagram.
-- Confusing real or virtual with upright or inverted.
-- Always check units, signs, and limiting cases before treating a numerical result as finished.
+## What an optical instrument changes
 
-A final check is to perturb one input mentally. Doubling a distance, mass, charge, stiffness, frequency, or temperature should change the answer in a way that matches the physical story. If the algebra says the opposite, revisit the setup before blaming arithmetic. Also remember that a negative answer is often information: it may indicate direction opposite to the chosen axis, work done by a system rather than on it, or a potential change that lowers the energy of a positive or negative charge differently.
+A camera places a real image on a sensor. Focusing changes the lens-to-sensor distance or the effective focal length until the sensor coincides with the image plane. For a distant subject, $d_o$ is much larger than $f$, so the lens equation gives $d_i\approx f$. A nearby subject requires $d_i\gt f$. The aperture controls the cone of accepted rays: closing it reduces aberration and increases depth of field, but admits less light and eventually strengthens diffraction.
 
-When a problem feels difficult, the hidden issue is often not the last algebraic step but the first modeling decision. Re-read the words and mark what is being idealized: frictionless surface, ideal string, point charge, thin lens, small angle, steady flow, reversible process, nonrelativistic particle, or uniform field. Then mark what is conserved, if anything. Energy conservation, momentum conservation, angular momentum conservation, charge conservation, and entropy constraints are not interchangeable; each one has a system boundary and a transfer condition. If an external impulse acts, momentum may not be conserved for the chosen system. If friction acts within a block-floor system, mechanical energy is not conserved even though total energy is. If a Gaussian surface encloses no net charge, flux is zero, but the field at points on the surface need not be zero.
+The eye also forms a real inverted image, on the retina. Accommodation changes the crystalline lens's optical power while the retina stays at nearly fixed distance. A magnifier does something different: it forms an enlarged virtual image that the eye then focuses. Telescopes and microscopes use an objective to create an intermediate image and an eyepiece to increase its angular size. Their useful measure is usually angular magnification, not the transverse magnification of one lens alone.
 
-Another common pitfall is using a memorized equation in only its most familiar direction. A formula is a relationship, so practice solving it for different unknowns. In kinematics, solve for time, acceleration, or displacement depending on what the data support. In circuits, solve Ohm's law for voltage, current, or resistance and then check power. In optics, solve the thin-lens equation for image distance, object distance, or focal length and compare the sign with a ray diagram. In thermodynamics, rearrange the first law only after deciding whether work is done by the system or on the system. This flexibility prevents formula matching from replacing reasoning.
+Ray tracing predicts these image locations without describing resolution or brightness completely. Aperture size, diffraction, transmission losses, detector response, and aberrations determine how much detail survives after the geometric image has been located.
 
-Finally, keep scale awareness. Introductory physics problems often use idealized numbers, but the answers should still sit on recognizable scales: walking speeds are meters per second, orbital speeds are kilometers per second, visible wavelengths are hundreds of nanometers, household currents are often amperes or less, and thermal energies per molecule at room temperature are small in joules but meaningful in electron-volts. When an answer is many orders of magnitude away from these anchors, check unit conversions first. Prefix errors such as nano versus micro, centimeters versus meters, and milliseconds versus seconds are among the fastest ways to turn correct physics into a wrong result.
+## Worked image: object beyond twice the focal length
 
-For exam preparation, make the worked examples bidirectional. After solving a forward problem, change the target: ask what initial speed, resistance, angle, charge, temperature change, or wavelength would have produced the stated answer. This exposes whether you understand the structure or only followed the arithmetic once. Then make one assumption false and describe what would change. If air resistance is no longer negligible, projectile motion no longer separates into a constant horizontal speed. If a pulley has rotational inertia, the two string tensions need not match. If a lens is not thin, the thin-lens equation becomes an approximation. If a gas process is not reversible, entropy must be found from a reversible path connecting the same states, not from the literal irreversible path. These small variations turn a page of notes into a usable problem-solving tool.
+An object $4.0\,\mathrm{cm}$ tall is $30.0\,\mathrm{cm}$ from a converging lens of focal length $10.0\,\mathrm{cm}$. The object lies beyond $2f$, so the image should be real, inverted, and reduced, between $f$ and $2f$ on the far side.
 
-Before leaving the problem, write one complete sentence that states the result in physical language. That sentence should name the object or system, the direction or sign when relevant, and the assumption under which the answer was obtained.
+Solve for image distance:
 
-## Connections
+$$
+\begin{aligned}
+\frac{1}{d_i}
+&=\frac{1}{f}-\frac{1}{d_o}\\
+&=\frac{1}{10.0\,\mathrm{cm}}-\frac{1}{30.0\,\mathrm{cm}}\\
+&=\frac{2}{30.0\,\mathrm{cm}}.
+\end{aligned}
+$$
 
-- [AC Circuits and EM Waves](/physics/general/ac-circuits-and-electromagnetic-waves)
-- [Interference and Diffraction](/physics/general/interference-diffraction-and-gratings)
+Thus
+
+$$
+d_i=15.0\,\mathrm{cm}.
+$$
+
+The magnification and height are
+
+$$
+m=-\frac{15.0}{30.0}=-0.500,
+\qquad
+h_i=mh_o=(-0.500)(4.0\,\mathrm{cm})=-2.0\,\mathrm{cm}.
+$$
+
+The signs reproduce the prediction. A screen placed $15.0\,\mathrm{cm}$ behind the lens would capture the image.
+
+## Worked image: object inside the focal length
+
+Move the same object to $6.0\,\mathrm{cm}$ from the lens. Rays leaving the lens diverge, so the eye traces them backward to a virtual image. Algebra gives
+
+$$
+\begin{aligned}
+\frac{1}{d_i}
+&=\frac{1}{10.0}-\frac{1}{6.0}\\
+&=\frac{3-5}{30}\\
+&=-\frac{1}{15},
+\end{aligned}
+$$
+
+with distances in centimeters. Hence
+
+$$
+d_i=-15.0\,\mathrm{cm}.
+$$
+
+Then
+
+$$
+m=-\frac{-15.0}{6.0}=+2.50,
+\qquad
+h_i=(2.50)(4.0\,\mathrm{cm})=10.0\,\mathrm{cm}.
+$$
+
+The virtual image is on the object's side, upright, and enlarged. It cannot be projected onto a screen because rays do not actually converge there. A magnifying glass operates in this regime.
+
+## Mirrors and the origin of focal length
+
+For a spherical mirror in the paraxial limit,
+
+$$
+f=\frac{R}{2},
+$$
+
+where $R$ is the radius of curvature. A concave mirror is converging and a convex mirror is diverging. The same formal image equation applies under a consistent mirror sign convention. Reflection reverses the propagation direction, so importing lens signs without checking the convention often causes mistakes.
+
+The focal point is exact only for rays close to the principal axis. Marginal rays on a spherical concave mirror focus closer to the mirror than paraxial rays. A parabolic mirror removes spherical aberration for incoming rays parallel to its axis, which is why reflecting telescopes and radio dishes use paraboloidal surfaces.
+
+Plane mirrors are a useful limiting case: their radius and focal length are infinite. An object a distance $d$ in front of a plane mirror produces a virtual image the same distance behind it, with magnification $+1$. The image is commonly called “laterally inverted,” but the geometry is better described as front-to-back reversal. The mirror does not exchange left and right axes on the object; it reverses the coordinate perpendicular to its surface.
+
+Two plane mirrors also show how repeated image formation works. With mirrors at right angles, each mirror forms an image of the object and one mirror forms an image of the other's image, giving three images for a generic object position. At special angles and placements, images can overlap. Counting reflected paths is more reliable than memorizing a formula without its symmetry conditions.
+
+## Limits and checks
+
+- Angles in reflection and refraction are measured from the normal. An angle from the surface must be replaced by its complement.
+- Frequency remains fixed at a stationary interface; speed and wavelength change.
+- Real and virtual describe whether rays actually meet. Upright and inverted describe orientation. Neither term determines the other.
+- A negative image distance has a geometric meaning under the chosen convention; discarding the sign loses that information.
+- The thin-lens equation assumes negligible thickness and small ray angles. Thick lenses require principal planes, and large apertures expose aberrations.
+- Ray optics does not set the ultimate resolution. Diffraction limits how finely even a perfect lens can distinguish nearby points.
+
+Whenever the calculated image contradicts the preliminary ray sketch, check the sign convention and object location before accepting the numerical result.
+
+<div className="see-also">
+
+See also: [Interference, Diffraction, and Gratings](/physics/general/interference-diffraction-and-gratings) · [AC Circuits and Electromagnetic Waves](/physics/general/ac-circuits-and-electromagnetic-waves) · [Measurement, Units, and Vectors](/physics/general/measurement-units-and-vectors)
+
+</div>

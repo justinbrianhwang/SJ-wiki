@@ -9,7 +9,7 @@ Branches are small instructions with large architectural consequences. A pipelin
 
 Branch prediction is one of the clearest examples of quantitative design. The hardware is useful only because real programs have patterns: loops are usually taken until the final iteration, error paths are rarely taken, and branches often correlate with recent control flow. The value of a predictor depends on branch frequency, prediction accuracy, and misprediction penalty.
 
-## Definitions
+## What the front end must predict
 
 A control hazard occurs when the next instruction address is uncertain. Conditional branches, indirect jumps, returns, and exceptions all affect instruction flow. A branch predictor guesses one or more of:
 
@@ -37,7 +37,7 @@ $$
 
 where $f_{branch}$ is branch frequency among executed instructions.
 
-## Key results
+## From bimodal counters to correlated history
 
 The two-bit predictor is a small finite-state machine. Let counter values $0,1,2,3$ represent strongly not taken through strongly taken. Predict taken when the counter is at least 2. On a taken branch, increment the counter up to 3. On a not-taken branch, decrement it down to 0.
 
@@ -51,21 +51,19 @@ repeated many times. A one-bit predictor that ends a loop in state not taken wil
 
 More advanced predictors use local history, global history, tournament selection, or tagged predictor tables. Local history captures patterns specific to one branch. Global history captures correlations between branches, such as an `if` condition making a later branch likely. Tournament predictors choose between component predictors based on past success.
 
-Speculation must be paired with recovery. When the processor predicts a branch, it may fetch, decode, issue, and even execute instructions from the predicted path. If the prediction is wrong, instructions on the wrong path must be squashed, and the architectural state must appear as if they never happened. This is why branch prediction is tightly connected to reorder buffers and precise exceptions in out-of-order cores.
+Speculation must be paired with recovery. When the processor predicts a branch, it may fetch, decode, issue, and even execute instructions from the predicted path. If the prediction is wrong, instructions on the wrong path must be squashed, and the architectural state must appear as if they never happened. Branch prediction is therefore tightly connected to reorder buffers and precise exceptions in out-of-order cores.
 
 Predictor accuracy is workload-dependent. A predictor that performs well on loop-heavy numeric code can struggle with input-dependent branches in interpreters, parsers, virtual machines, and compressed-data routines. Aliasing also matters: finite predictor tables mean unrelated branches may share entries and interfere. Larger tables reduce some aliasing but increase access energy and may lengthen the fetch path, so front-end timing constrains predictor design.
 
 Target prediction is separate from direction prediction. A conditional branch may be predicted taken, but the fetch unit still needs the target address early enough to avoid a bubble. Direct branches can store targets in a BTB. Returns are better predicted with a return-address stack because the same return instruction can return to many different call sites. Indirect branches, such as virtual function calls or jump tables, are harder because one static branch can have many dynamic targets.
 
-The performance effect grows with pipeline depth and issue width. A wide processor loses more potential work each cycle after a wrong prediction because more fetch and issue slots are wasted. A deep processor usually resolves the branch later, increasing the number of wrong-path instructions that must be flushed. This is one reason branch prediction became more important as scalar pipelines evolved into deep, speculative, multiple-issue machines.
-
-## Visual
+The performance effect grows with pipeline depth and issue width. A wide processor loses more potential work each cycle after a wrong prediction because more fetch and issue slots are wasted. A deep processor usually resolves the branch later, increasing the number of wrong-path instructions that must be flushed. Branch prediction consequently became more important as scalar pipelines evolved into deep, speculative, multiple-issue machines.
 
 ```mermaid
 flowchart TB
   PC["Fetch PC"] --> BTB{"BTB hit for PC?"}
-  PC --> GHR["Global history register: recent taken/not-taken bits"]
-  GHR --> XOR["gshare index = PC bits xor GHR"]
+  GHR["Global history register: recent taken/not-taken bits"] --> XOR
+  PC --> XOR["gshare index = PC bits xor GHR"]
   XOR --> PHT["Pattern history table entry: 2-bit saturating counter"]
   PHT --> Dir{"Predict direction"}
   BTB -- "hit and predicted taken" --> Target["Predicted target PC"]
@@ -97,7 +95,7 @@ flowchart TB
   Resolve -. "actual outcome trains predictor after branch resolves" .-> CounterFSM
 ```
 
-This branch-prediction diagram includes the direction predictor, target predictor, history register, update path, and recovery path. The gshare index combines PC bits with global history to select a 2-bit counter, while the BTB supplies a target early enough for fetch redirection. The embedded counter FSM shows why loops usually need two contrary outcomes to flip direction, and the flush edge shows the cost paid when speculation chooses the wrong path.
+The gshare index combines PC bits with global history to select a two-bit counter, while the BTB supplies a target early enough for fetch redirection. The embedded counter FSM shows why loops usually need two contrary outcomes to flip direction; the flush edge records the work discarded after a wrong prediction.
 
 | Predictor | State per branch | Strength | Weakness |
 |---|---:|---|---|
@@ -107,7 +105,7 @@ This branch-prediction diagram includes the direction predictor, target predicto
 | Two-bit counter | 2 bits | Stable on repeated loops | Still weak on alternating branches |
 | Correlating/global | Many bits | Captures inter-branch patterns | Aliasing and complexity |
 
-## Worked example 1: CPI cost of branch misses
+## Pricing mispredictions in CPI
 
 Problem: A pipeline has base CPI 1. Branches are 18% of instructions. The branch predictor has a 7% misprediction rate, and each miss costs 12 cycles. Compute effective CPI.
 
@@ -153,7 +151,7 @@ One million base cycles plus 151,200 stall cycles gives CPI $1.1512$.
 
 Checked answer: Effective CPI is about $1.15$. Even a fairly accurate predictor has visible cost when branches are frequent and the miss penalty is large.
 
-## Worked example 2: Two-bit predictor on a loop
+## Following a loop through the counter states
 
 Problem: A loop branch has outcomes `T T T N` for each execution of a four-iteration loop body pattern, and this pattern repeats twice. Start the two-bit counter in strongly taken state. Count mispredictions.
 
@@ -192,7 +190,7 @@ $$
 
 Checked answer: There are 2 mispredictions, both on loop exits. A one-bit predictor starting taken would also miss each exit, but if the loop repeats, it would usually also miss the first taken branch after each exit.
 
-## Code
+## Simulating the two-bit counter
 
 ```python
 class TwoBitPredictor:
@@ -222,9 +220,9 @@ print(f"mispredictions={misses}, accuracy={(len(outcomes)-misses)/len(outcomes):
 
 The code models only direction prediction for one static branch. A real predictor indexes a table using some bits of the program counter and possibly global history, so two unrelated branches can collide in the same entry. That collision can be constructive if the branches behave similarly, or destructive if one branch is mostly taken and the other is mostly not taken.
 
-The simplified model also leaves out target prediction and speculative update policy. Some processors update predictor state when a branch is fetched or decoded, then repair it on a squash; others update when the branch resolves. Early update can improve timeliness but increases recovery complexity. These details are why predictor evaluation normally uses instruction traces or cycle-level simulation instead of isolated formulas alone.
+The simplified model also leaves out target prediction and speculative update policy. Some processors update predictor state when a branch is fetched or decoded, then repair it on a squash; others update when the branch resolves. Early update can improve timeliness but increases recovery complexity. Predictor evaluation therefore normally uses instruction traces or cycle-level simulation instead of isolated formulas alone.
 
-## Common pitfalls
+## What predictor statistics can hide
 
 - Measuring predictor accuracy without multiplying by branch frequency and miss penalty.
 - Assuming a branch target buffer predicts direction; it mainly supplies target addresses.
@@ -233,9 +231,8 @@ The simplified model also leaves out target prediction and speculative update po
 - Evaluating branch behavior on tiny inputs that do not represent real loop and call patterns.
 - Allowing wrong-path instructions to update architectural state before recovery is guaranteed.
 
-## Connections
+<div className="see-also">
 
-- [Pipelining and Hazards](/cs/computer-architecture/pipelining-hazards)
-- [Speculation, Renaming, and Multiple Issue](/cs/computer-architecture/speculation-renaming-multiple-issue)
-- [Quantitative Design and Performance](/cs/computer-architecture/quantitative-design-and-performance)
-- [Cache Optimization and Prefetching](/cs/computer-architecture/cache-optimization-and-prefetching)
+See also: [Pipelining and Hazards](/cs/computer-architecture/pipelining-hazards) · [Speculation, Renaming, and Multiple Issue](/cs/computer-architecture/speculation-renaming-multiple-issue) · [Quantitative Design and Performance](/cs/computer-architecture/quantitative-design-and-performance) · [Cache Optimization and Prefetching](/cs/computer-architecture/cache-optimization-and-prefetching)
+
+</div>

@@ -9,7 +9,7 @@ Gaussian elimination is the disciplined version of substitution. Instead of solv
 
 The method matters because it separates the conceptual question from the bookkeeping. Conceptually, we want an equivalent system whose solution set is easier to read. Operationally, we choose pivot positions, clear entries below those pivots, and then solve from the bottom upward. That simple pattern becomes one of the most reusable algorithms in mathematics and scientific computing.
 
-## Definitions
+## Echelon forms, pivots, and free variables
 
 A leading entry of a nonzero row is its first nonzero entry from the left. A matrix is in row echelon form if:
 
@@ -29,7 +29,7 @@ $$
 n-\operatorname{rank}(A).
 $$
 
-## Key results
+## Why elimination leaves a readable system
 
 Every matrix is row equivalent to a unique reduced row echelon form. Row echelon forms are not unique because different legal row operations can produce different intermediate triangular forms, but the final reduced form is unique.
 
@@ -62,8 +62,6 @@ $$
 
 has $U$ upper triangular with nonzero diagonal entries, the last equation determines $x_n$, the previous equation determines $x_{n-1}$, and so on. Elimination tries to convert a general system into this triangular form.
 
-## Visual
-
 ```mermaid
 flowchart LR
   A["Original augmented matrix"] --> B["Choose pivot column"]
@@ -89,7 +87,7 @@ Before elimination          After forward elimination
 p = pivot, entries below pivots have been cleared
 ```
 
-## Worked example 1: Solve by forward elimination
+## Forward elimination followed by back-substitution
 
 Problem: solve
 
@@ -159,7 +157,7 @@ $$
 
 Checked answer: $(x,y,z)=(5,0,2)$. Substitution gives $5+0-2=3$, $10+0+2=12$, and $-5+0+4=-1$.
 
-## Worked example 2: Free variable and parametric form
+## Reading a free variable from echelon form
 
 Problem: solve the system represented by
 
@@ -217,7 +215,7 @@ $$
 
 Both identities hold for every real $t$, so the solution set is a line.
 
-## Code
+## Following the pivot loop in Python
 
 ```python
 import numpy as np
@@ -249,7 +247,7 @@ print(rref(aug))
 
 This toy implementation is useful for study because it exposes the pivot loop. Production numerical linear algebra usually avoids full reduced row echelon form when factorizations such as LU or QR give better stability and speed.
 
-## Common pitfalls
+## Arithmetic, parameters, and pivot choice
 
 - Normalizing pivots too early and creating fractions that obscure the arithmetic. Forward elimination can often use integer row replacements until back-substitution.
 - Forgetting to apply a row operation to the augmented column.
@@ -262,19 +260,18 @@ One useful habit is to write the row operation next to the row it changes. This 
 
 Another diagnostic is pivot counting. Before solving, count the pivot columns. If a system has three variables but only two pivots and no inconsistency row, the answer must contain one parameter. If your final answer has no parameter, something has been lost. If a homogeneous system in five variables has rank three, its solution set must have two parameters. Rank-nullity gives an immediate consistency check on the shape of the answer.
 
-Gaussian elimination is exact algebra, but numerical elimination requires additional care. In hand work, choosing the first nonzero pivot is fine. In floating-point computation, a very small pivot can magnify roundoff error. This is why numerical algorithms use pivoting strategies, usually swapping a row with a larger entry into the pivot position. The symbolic method and the numerical method share the same structure, but numerical stability affects implementation.
+Gaussian elimination is exact algebra, but numerical elimination requires additional care. In hand work, choosing the first nonzero pivot is fine. In floating-point computation, a very small pivot can magnify roundoff error. Numerical algorithms therefore use pivoting strategies, usually swapping a row with a larger entry into the pivot position. The symbolic method and the numerical method share the same structure, but numerical stability affects implementation.
 
 Finally, remember that row reduction changes the rows, not the underlying solution set. It does not preserve the original columns, lengths, angles, or determinant without tracking row-operation effects. This distinction becomes important when using echelon forms to find bases: row-space bases can come from the echelon rows, but column-space bases must use pivot columns from the original matrix.
 
 The choice between echelon form and reduced echelon form depends on the goal. For solving a single system, ordinary echelon form plus back-substitution is usually enough. For reading the full parametric solution directly, reduced echelon form is convenient because each pivot column has zeros above and below its pivot. For computing inverses, Gauss-Jordan reduction to the identity is natural. For numerical solving, full reduction is often unnecessary work.
 
-Elimination also reveals hidden dependence among equations. A zero row in the coefficient part means one equation was a consequence of others, unless the augmented entry creates a contradiction. This is why row reduction can simplify a system without changing its solution set: it separates independent constraints from redundant or inconsistent ones.
+Elimination also reveals hidden dependence among equations. A zero row in the coefficient part means one equation was a consequence of others, unless the augmented entry creates a contradiction. Row reduction can simplify a system without changing its solution set because it separates independent constraints from redundant or inconsistent ones.
 
 In matrix factorization language, each elimination step records a multiplier. Storing those multipliers instead of discarding them leads to LU decomposition. Thus Gaussian elimination is both a classroom solving method and the conceptual source of important computational algorithms.
 
-## Connections
+<div className="see-also">
 
-- [Systems of Linear Equations](/math/linear-algebra/systems-of-linear-equations)
-- [Matrix Inverses and Elementary Matrices](/math/linear-algebra/matrix-inverses-and-elementary-matrices)
-- [Determinants](/math/linear-algebra/determinants)
-- [Numerical Linear Algebra](/math/linear-algebra/numerical-linear-algebra)
+See also: [Systems of Linear Equations](/math/linear-algebra/systems-of-linear-equations) · [Matrix Inverses and Elementary Matrices](/math/linear-algebra/matrix-inverses-and-elementary-matrices) · [Determinants](/math/linear-algebra/determinants) · [Numerical Linear Algebra](/math/linear-algebra/numerical-linear-algebra)
+
+</div>

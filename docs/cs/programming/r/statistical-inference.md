@@ -5,52 +5,11 @@ sidebar_position: 16
 
 # Statistical Inference
 
-Statistical inference uses sample data to make statements about a broader population or data-generating process. The book's inference chapters cover sampling distributions, confidence intervals, hypothesis tests, proportions, categorical tests, errors, power, and ANOVA. R supplies many standard tests as functions, but the function call is only the final step. The analyst must know the question, assumptions, null hypothesis, alternative hypothesis, test statistic, p-value, and interpretation.
+Statistical inference uses sample data to make statements about a population or data-generating process. R supplies standard tests as functions, but the call comes after the study question, descriptive checks, assumptions, null and alternative hypotheses, and choice of statistic. Interpretation should return to the scale of the data rather than stop at "significant" or "not significant."
 
-The danger in R is that tests are easy to run before the problem is clear. A good inference workflow starts with a study question and descriptive checks, then chooses a method whose assumptions are defensible. The output is interpreted in the scale of the data, not just as "significant" or "not significant."
+## Matching the question to a procedure
 
-## Definitions
-
-A **parameter** is a population quantity, such as a population mean $\mu$, proportion $p$, or regression slope $\beta_1$.
-
-An **estimator** is a sample-based rule for estimating a parameter, such as the sample mean $\bar{x}$.
-
-A **confidence interval** is a range of plausible parameter values produced by a method that has a long-run coverage rate. A 95 percent confidence interval procedure captures the true parameter in about 95 percent of repeated samples under its assumptions.
-
-A **null hypothesis** $H_0$ is the default claim tested, often "no difference" or "no association." An **alternative hypothesis** $H_A$ is the competing claim.
-
-A **p-value** is the probability, assuming $H_0$ and model assumptions, of observing a test statistic at least as extreme as the one observed. It is not the probability that $H_0$ is true.
-
-**Type I error** means rejecting a true null hypothesis. **Type II error** means failing to reject a false null hypothesis. **Power** is the probability of rejecting a false null.
-
-## Key results
-
-Standard R inference functions include:
-
-| Question | Function | Typical formula or arguments |
-|---|---|---|
-| One mean | `t.test(x, mu = ...)` | Numeric vector |
-| Two means | `t.test(y ~ group, data = ...)` | Numeric response, two groups |
-| Paired mean difference | `t.test(before, after, paired = TRUE)` | Matched vectors |
-| One or two proportions | `prop.test(x, n)` | Success counts and trial counts |
-| Categorical goodness of fit | `chisq.test(table)` | One-way count table |
-| Categorical association | `chisq.test(table(a, b))` | Two-way table |
-| One-way ANOVA | `aov(y ~ group, data = ...)` | Numeric response, factor group |
-| Nonparametric group comparison | `kruskal.test(y ~ group, data = ...)` | Rank-based alternative |
-
-For a one-sample t confidence interval:
-
-$$
-\begin{aligned}
-\bar{x} \pm t_{\alpha/2, n - 1}\frac{s}{\sqrt{n}}.
-\end{aligned}
-$$
-
-The t test assumes independent observations and, for small samples, roughly normal data or at least no severe outliers. Two-sample t tests add assumptions about group independence and use Welch's unequal-variance version by default in R.
-
-ANOVA compares means across more than two groups by partitioning variation into between-group and within-group components. A significant ANOVA result says at least one group mean differs, not which specific pair differs. Follow-up comparisons require additional procedures.
-
-## Visual
+A **parameter** is a population quantity such as a mean $\mu$, proportion $p$, or regression slope $\beta_1$. An **estimator** is a sample-based rule for estimating it, such as the sample mean $\bar{x}$. The outcome type, number of groups, and study design narrow the choice of procedure:
 
 ```mermaid
 flowchart TD
@@ -67,6 +26,19 @@ flowchart TD
   H --> I
 ```
 
+| Question | Function | Typical formula or arguments |
+|---|---|---|
+| One mean | `t.test(x, mu = ...)` | Numeric vector |
+| Two means | `t.test(y ~ group, data = ...)` | Numeric response, two groups |
+| Paired mean difference | `t.test(before, after, paired = TRUE)` | Matched vectors |
+| One or two proportions | `prop.test(x, n)` | Success counts and trial counts |
+| Categorical goodness of fit | `chisq.test(table)` | One-way count table |
+| Categorical association | `chisq.test(table(a, b))` | Two-way table |
+| One-way ANOVA | `aov(y ~ group, data = ...)` | Numeric response, factor group |
+| Nonparametric group comparison | `kruskal.test(y ~ group, data = ...)` | Rank-based alternative |
+
+The same output terms recur across procedures:
+
 | Output item | Meaning | Bad interpretation |
 |---|---|---|
 | Estimate | Sample-based effect size | Proof of population value |
@@ -74,17 +46,21 @@ flowchart TD
 | p-value | Tail probability under null | Probability null is true |
 | Test statistic | Standardized evidence measure | Effect size by itself |
 
-## Worked example 1: One-sample t interval and test
+A **confidence interval** comes from a procedure with a long-run coverage rate. Under its assumptions, a 95 percent procedure captures the true parameter in about 95 percent of repeated samples. A **p-value** is the probability, assuming the null hypothesis and model assumptions, of obtaining a test statistic at least as extreme as the observed one. It is not the probability that the null hypothesis is true.
 
-Problem: a lab measures reaction times in seconds: `0.48`, `0.52`, `0.51`, `0.49`, `0.55`, `0.50`. Test whether the mean differs from 0.50 seconds and compute a 95 percent confidence interval.
+## Estimating and testing one mean
 
-Method:
+For a one-sample t interval,
 
-1. State hypotheses: $H_0: \mu = 0.50$, $H_A: \mu \ne 0.50$.
-2. Compute sample mean and standard deviation.
-3. Run `t.test(x, mu = 0.50)`.
-4. Interpret estimate, interval, and p-value.
-5. Check the mean manually.
+$$
+\begin{aligned}
+\bar{x} \pm t_{\alpha/2, n - 1}\frac{s}{\sqrt{n}}.
+\end{aligned}
+$$
+
+The procedure assumes independent observations and, for a small sample, roughly normal data or at least no severe outliers. A two-sample t test also requires independent groups unless it is explicitly paired. R uses Welch's unequal-variance version by default.
+
+Consider six reaction times in seconds: `0.48`, `0.52`, `0.51`, `0.49`, `0.55`, and `0.50`. The hypotheses are $H_0: \mu = 0.50$ and $H_A: \mu \ne 0.50$.
 
 ```r
 rt <- c(0.48, 0.52, 0.51, 0.49, 0.55, 0.50)
@@ -105,21 +81,13 @@ t.test(rt, mu = 0.50)
 # 0.5083333
 ```
 
-Checked answer: the sample mean is `(0.48 + 0.52 + 0.51 + 0.49 + 0.55 + 0.50) / 6 = 3.05 / 6 = 0.5083333`. The confidence interval includes 0.50, and the p-value is large, so this small sample does not provide strong evidence that the population mean differs from 0.50 seconds.
+The sample mean is $3.05 / 6 = 0.5083333$. The confidence interval includes 0.50 and the p-value is about 0.449, so this small sample supplies little evidence that the population mean differs from 0.50 seconds. The result does not establish that the mean equals 0.50; the observations are compatible with that value under the model and sample size.
 
-The correct conclusion is not "the mean is exactly 0.50." It is that the data are compatible with 0.50 under this model and sample size.
+## Testing association in a count table
 
-## Worked example 2: Chi-square test of association
+A **null hypothesis** $H_0$ is the default claim under test, while an **alternative hypothesis** $H_A$ is the competing claim. For a chi-square association test, the null says that the two categorical variables are independent.
 
-Problem: a survey records preferred interface theme by user type. Test whether theme preference is associated with user type.
-
-Method:
-
-1. Create a two-way count table.
-2. State hypotheses: independence versus association.
-3. Run `chisq.test`.
-4. Inspect expected counts.
-5. Interpret the p-value and residual pattern.
+Suppose a survey records interface theme preference by user type:
 
 ```r
 theme_counts <- matrix(
@@ -150,15 +118,15 @@ test$p.value
 # [1] 0.002699796
 ```
 
-Checked answer: if user type and theme were independent, the beginner row would be expected to split 27.5 and 27.5. Instead, beginners choose light more often than expected and advanced users choose dark more often than expected. The p-value is about 0.0027, giving evidence of association.
+Under independence, each row would be expected to split 27.5 and 27.5. Instead, beginners choose light more often than expected and advanced users choose dark more often than expected. The p-value of about 0.0027 is evidence of association, but the test does not explain its cause.
 
-The test does not prove why the association exists. It only shows that the observed count pattern is unlikely under independence.
+Expected counts and dependence in the study design matter. The chi-square approximation can be poor with small expected counts, and repeated observations from the same person are not independent. Warnings about approximation quality are part of the result.
 
-## Code
+## Comparing two groups without hiding the descriptives
+
+The following helper returns group summaries alongside a Welch two-sample t test:
 
 ```r
-# Inference helper: report group means and Welch two-sample t test.
-
 compare_two_groups <- function(df, response, group) {
   y <- df[[response]]
   g <- factor(df[[group]])
@@ -183,31 +151,34 @@ iris2 <- subset(iris, Species != "virginica")
 print(compare_two_groups(iris2, "Sepal.Length", "Species"))
 ```
 
-The helper returns both descriptive and inferential output because a test without context is incomplete. The group means, standard deviations, and counts tell the reader what the sample looks like. The t test adds an interval and p-value for a specific comparison. If the descriptive output showed a severe imbalance in sample sizes or obvious outliers, the test result would need more caution.
+The group counts, means, and standard deviations describe the sample; the test adds an interval and p-value for the comparison. A severe sample-size imbalance or outlier in the descriptive output would call for closer scrutiny before interpreting the test.
 
-The formula `y ~ g` inside `t.test` is a compact interface: numeric response on the left, two-level group on the right. The function uses Welch's two-sample t test by default, which does not assume equal variances. That default is often safer than the equal-variance pooled test, but it still assumes independent observations and a response scale where comparing means is meaningful.
+In the formula `y ~ g`, the numeric response is on the left and a two-level group is on the right. Welch's default does not assume equal variances, but it still assumes independent observations and a response scale on which comparing means is meaningful. The helper also expects complete values; missing-data handling should be made explicit before calling it.
 
-Inference code should be paired with a written claim. A good result statement includes the estimate, interval, p-value when relevant, and the population or process being discussed. For example: "In this sample, setosa had a lower mean sepal length than versicolor; the Welch interval for the difference excludes zero." That is more informative than "the result was significant."
+## Writing the claim the output supports
 
-For categorical tests, inspect expected counts and the study design. A chi-square test of association is not appropriate for every table, especially with small expected counts or dependent observations. R will often warn about approximation quality, and those warnings should be treated as part of the result, not console noise.
+An inference statement should identify the population or process, estimate, interval, and p-value when relevant. For example: "In this sample, setosa had a lower mean sepal length than versicolor; the Welch interval for the difference excludes zero." That says more than reporting significance alone.
 
-A useful inference checklist is: parameter, estimate, uncertainty, assumptions, and conclusion. The parameter says what population quantity is being discussed. The estimate says what the sample suggests. The interval or test statistic describes uncertainty. Assumptions define when the procedure is trustworthy. The conclusion translates the output back into the original question.
+A useful reading order is parameter, estimate, uncertainty, assumptions, and conclusion. The parameter identifies the population quantity. The estimate records what the sample suggests. An interval or test statistic describes uncertainty. The assumptions set the conditions under which the procedure is trustworthy. The conclusion translates those pieces into the original question.
 
-Power and error concepts belong in planning, not only after a test. A tiny study may fail to detect an important effect. A huge study may detect a negligible effect. R can compute or simulate power for many designs, but the analyst must decide what effect size is practically meaningful. Statistical significance and practical importance should be reported separately.
+ANOVA follows the same discipline for more than two group means. It partitions variation into between-group and within-group components. A significant result indicates that at least one group mean differs; identifying particular pairs requires follow-up comparisons and attention to multiplicity.
 
-## Common pitfalls
+## Error rates, power, and overclaiming
 
-- Treating p-values as the probability that the null hypothesis is true.
-- Running a test before plotting or summarizing the data.
-- Ignoring assumptions such as independence, paired structure, or expected cell counts.
-- Reporting only "significant" without an effect size or confidence interval.
-- Using multiple tests without considering multiplicity.
-- Interpreting a nonsignificant result as proof of no effect, especially with small samples.
-- Forgetting that ANOVA significance does not identify which groups differ.
+**Type I error** is rejection of a true null hypothesis. **Type II error** is failure to reject a false null hypothesis. **Power** is the probability of rejecting a false null. These concepts matter during study planning: a small study may miss an important effect, while a very large one may detect a negligible effect. Effect size and practical importance should therefore be reported separately from statistical significance.
 
-## Connections
+Common overclaims have recognizable forms:
 
-- [Descriptive statistics](/cs/programming/r/descriptive-statistics)
-- [Probability distributions](/cs/programming/r/probability-distributions)
-- [Base graphics](/cs/programming/r/base-graphics)
-- [Linear and generalized models](/cs/programming/r/linear-and-generalized-models)
+- A p-value is treated as the probability that the null hypothesis is true.
+- A test is run before the data are plotted or summarized.
+- Independence, paired structure, outliers, or expected cell counts are ignored.
+- Only "significant" or "not significant" is reported, without an effect size or interval.
+- Multiple tests are interpreted without considering multiplicity.
+- A nonsignificant result, especially from a small sample, is presented as proof of no effect.
+- A significant ANOVA is described as if it identified the differing groups.
+
+<div className="see-also">
+
+See also: [Descriptive statistics](/cs/programming/r/descriptive-statistics) · [Probability distributions](/cs/programming/r/probability-distributions) · [Base graphics](/cs/programming/r/base-graphics) · [Linear and generalized models](/cs/programming/r/linear-and-generalized-models)
+
+</div>

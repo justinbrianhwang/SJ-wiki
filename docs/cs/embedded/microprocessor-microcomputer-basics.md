@@ -5,11 +5,11 @@ sidebar_position: 2
 
 # Microprocessor and Microcomputer Basics
 
-A microprocessor is a programmable digital processing unit: it fetches instructions from memory, interprets them, performs arithmetic or logic, and controls data movement through buses. The source text begins with this foundation before moving into the 8085, because every later topic - timing, interrupts, memory interfacing, I/O ports, and microcontrollers - is easier when the processor is seen as a small set of cooperating blocks rather than as a black box.
+A microprocessor is a programmable digital processing unit: it fetches instructions from memory, interprets them, performs arithmetic or logic, and controls data movement through buses. This foundation comes before the 8085 because timing, interrupts, memory interfacing, I/O ports, and microcontrollers are easier to follow when the processor is seen as a small set of cooperating blocks rather than as a black box.
 
 A microcomputer is the useful system built around the microprocessor. It includes memory, input/output circuits, clocks, reset circuitry, bus drivers, and the program that coordinates them. The important distinction is that a microprocessor such as the 8085 is mainly a CPU chip, while a microcontroller such as the 8051 also places RAM, ROM, timers, ports, and serial hardware on the same chip. The whole subject is about learning where each function lives and how software makes the hardware move in the required order.
 
-## Definitions
+## The CPU, its buses, and the surrounding system
 
 A **microprocessor** is an integrated circuit that contains the arithmetic logic unit, control unit, internal registers, and bus interface needed to execute instructions. It does not, by itself, include a complete user system. The classic 8085 is an 8-bit microprocessor: its main data operations are 8 bits wide, while its address bus is 16 bits wide.
 
@@ -29,25 +29,25 @@ A **decoder** activates exactly one output line for a selected binary input patt
 
 The **fetch-decode-execute cycle** is the repeated sequence by which a CPU runs a program. Fetch reads the next opcode from memory, decode identifies the required operation, and execute performs register transfers, ALU work, memory access, or control transfer.
 
-## Key results
+## From an address width to a running program
 
-The first key result is that address width determines maximum directly addressable locations. If a processor has $n$ address lines and each address names one byte, the address space is:
+Address width determines the maximum number of directly addressable locations. If a processor has $n$ address lines and each address names one byte, the address space is:
 
 $$
 \text{addressable bytes} = 2^n
 $$
 
-For the 8085, $n = 16$, so the processor can address $2^{16} = 65536$ byte locations, usually written as 64 KiB. This is why 8085 memory maps are commonly drawn from `0000H` through `FFFFH`.
+For the 8085, $n = 16$, so the processor can address $2^{16} = 65536$ byte locations, usually written as 64 KiB. Its memory maps therefore run from `0000H` through `FFFFH`.
 
-The second key result is that data width and address width solve different problems. An 8-bit data bus does not limit the system to 256 bytes of memory; it means the CPU normally transfers one byte per bus transaction. A 16-bit address bus is what selects among 65536 byte positions. Larger values are handled by multiple instructions, multiple bytes, or register pairs.
+Data width and address width solve different problems. An 8-bit data bus does not limit the system to 256 bytes of memory; it means the CPU normally transfers one byte per bus transaction. A 16-bit address bus is what selects among 65536 byte positions. Larger values are handled by multiple instructions, multiple bytes, or register pairs.
 
-The third key result is that a microprocessor is synchronous at the instruction level. A clock divides actions into states. A machine cycle is one bus operation such as opcode fetch, memory read, memory write, I/O read, or I/O write. An instruction cycle contains one or more machine cycles. This vocabulary is needed later when timing diagrams show `ALE`, `RD`, `WR`, and the multiplexed 8085 address/data lines.
+The microprocessor's operation is clocked. A clock divides actions into states. A machine cycle is one bus operation such as opcode fetch, memory read, memory write, I/O read, or I/O write. An instruction cycle contains one or more machine cycles. This vocabulary is needed later when timing diagrams show `ALE`, `RD`, `WR`, and the multiplexed 8085 address/data lines.
 
-The fourth key result is that program order is normally controlled by the program counter. After fetching an instruction, the CPU increments the program counter to the next byte. Branch, call, return, interrupt, and reset operations change this ordinary sequence. That single idea connects simple loops, subroutines, interrupt service routines, and booting.
+Program order is normally controlled by the program counter. After fetching an instruction, the CPU increments the program counter to the next byte. Branch, call, return, interrupt, and reset operations change this ordinary sequence. That single idea connects simple loops, subroutines, interrupt service routines, and booting.
 
 Finally, the stored-program idea is central: instructions and data are both binary values in memory. Whether a byte is interpreted as an opcode, an address, a literal constant, or a variable depends on the current control state of the CPU and the program counter.
 
-## Visual
+### One fetch-decode-execute path through the hardware
 
 ```mermaid
 flowchart TB
@@ -86,8 +86,6 @@ flowchart TB
   IO --> Devices["Switches, LEDs, ADC/DAC, keyboard, display"]
 ```
 
-This microcomputer diagram expands the stored-program cycle into CPU blocks and external system buses. The PC, instruction register, decoder, register file, ALU, flags, and bus interface cooperate on every fetch-decode-execute cycle, while address, data, and control buses connect the chip to ROM, RAM, and I/O. The decoder and control signals make clear why a microprocessor alone is not a complete embedded system.
-
 | Concept | 8085-style microprocessor system | 8051-style microcontroller system |
 |---|---|---|
 | CPU location | One CPU chip | CPU inside MCU chip |
@@ -97,7 +95,7 @@ This microcomputer diagram expands the stored-program cycle into CPU blocks and 
 | Timing study | External buses and control signals are visible | Many bus cycles are internal, peripheral timing matters |
 | Typical learning focus | Address decoding, bus cycles, 8085 assembly | SFRs, ports, timers, serial communication, interrupts |
 
-## Worked example 1: Address space from bus width
+## Deriving the 8085 address range
 
 Problem: An 8085-based trainer has 16 address lines and byte-addressed memory. Determine the lowest address, highest address, and total byte capacity that can be selected without bank switching.
 
@@ -133,7 +131,7 @@ Answer: the address range is `0000H` through `FFFFH`, and the maximum directly a
 
 Check: The count of addresses from `0000H` to `FFFFH` is not `FFFFH`; it is `FFFFH + 1 = 10000H = 65536`, because zero is included.
 
-## Worked example 2: Tracing a simple accumulator operation
+## Tracing `ADD B` through the accumulator
 
 Problem: Suppose register `A` contains `25H` and register `B` contains `19H`. The next instruction is 8085 `ADD B`. Find the new accumulator value and the carry flag.
 
@@ -172,7 +170,7 @@ Answer: `A = 3EH`, and the carry flag `CY = 0`.
 
 Check: In decimal, `25H = 37` and `19H = 25`. Their sum is `62`, which is `3EH`, confirming the hexadecimal result.
 
-## Code
+## Adding two memory bytes on the 8085
 
 ```asm
 ; 8085: add two bytes stored in memory and save result plus carry.
@@ -192,7 +190,7 @@ STORE_CY:
         HLT
 ```
 
-## Common pitfalls
+## Distinctions that prevent early design mistakes
 
 - Confusing data width with address space. An 8-bit CPU may still address much more than 256 bytes if it has more address lines.
 - Forgetting that zero is an address. A range ending at `FFFFH` contains `10000H` locations, not `FFFFH` locations.
@@ -201,10 +199,8 @@ STORE_CY:
 - Thinking of microcontrollers as merely "small microprocessors." The decisive difference is integration of memory and peripherals on the same chip.
 - Assuming every byte in memory is data. During fetch, a byte is an opcode; during an operand read, a byte may be data or an address part.
 
-## Connections
+<div className="see-also">
 
-- [8085 architecture, buses, and timing](/cs/embedded/intel-8085-architecture-buses-timing)
-- [8085 instruction set and addressing](/cs/embedded/8085-instruction-set-addressing)
-- [8051 architecture, memory, and ports](/cs/embedded/8051-architecture-memory-ports)
-- [8255 programmable peripheral interface](/cs/embedded/8255-programmable-peripheral-interface)
+See also: [8085 architecture, buses, and timing](/cs/embedded/intel-8085-architecture-buses-timing) · [8085 instruction set and addressing](/cs/embedded/instruction-set-addressing) · [8051 architecture, memory, and ports](/cs/embedded/architecture-memory-ports) · [8255 programmable peripheral interface](/cs/embedded/programmable-peripheral-interface)
 
+</div>

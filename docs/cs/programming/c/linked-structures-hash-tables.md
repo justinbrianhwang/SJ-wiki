@@ -9,7 +9,7 @@ After introducing structures, K&R immediately applies them to dynamic data struc
 
 The examples are small versions of real compiler and text-processing machinery. A tree stores sorted words with counts. A hash table stores names and replacement text for something like a macro processor. Both show why structures are more than grouped variables: a structure can point to another structure of the same type, creating a graph of objects.
 
-## Definitions
+## Nodes, links, and ownership
 
 A self-referential structure contains pointers to the same structure type:
 
@@ -58,7 +58,7 @@ unsigned hash(char *s)
 
 Dynamic allocation uses `malloc` to obtain storage and `free` to release it. The allocated object must be large enough for the structure, commonly expressed as `sizeof *p` or `sizeof(struct tnode)`.
 
-## Key results
+## Choosing between ordered trees and hashed buckets
 
 Recursive definitions often lead to recursive functions. K&R's `addtree` inserts by comparing a new word with the current node, then recursively descending left or right. `treeprint` performs an in-order traversal: print left subtree, current node, right subtree. That traversal prints keys in sorted order.
 
@@ -78,7 +78,7 @@ The examples also show why C programmers often write small allocation wrappers. 
 
 Deletion is harder than insertion in both trees and hash lists because it must preserve the surrounding links. Removing a hash-table node requires remembering the previous node or using a pointer-to-pointer technique. Removing a tree node may require replacing it with a child or successor. K&R leaves some of this as exercises, which is appropriate: deletion tests whether the representation invariant is really understood.
 
-## Visual
+The shapes explain the different traversal and lookup behavior. An in-order walk of a search tree visits smaller keys before the node and larger keys after it:
 
 ```mermaid
 flowchart TD
@@ -106,11 +106,9 @@ hashtab[3] -> [name="MAXLINE"] -> NULL
 | Hash table | array of lists | hash then scan bucket | no | expected near constant with good distribution |
 | Array of pointers | contiguous pointer table | index directly | by index only | constant for index |
 
-## Worked example 1: Inserting words into a binary search tree
+## Building the word-count tree
 
-Problem: insert the words `dog`, `cat`, `eel`, and `dog` into an initially empty word-count tree.
-
-Method:
+Insert `dog`, `cat`, `eel`, and `dog` into an initially empty tree.
 
 1. Insert `dog`.
    The root is `NULL`, so allocate a node:
@@ -146,20 +144,16 @@ Method:
    cat:1   eel:1
    ```
 
-Checked answer: the root word is `dog` with count `2`; `cat` is left child; `eel` is right child. In-order traversal prints `cat`, `dog`, `eel`.
+The root is `dog` with count `2`; `cat` is its left child and `eel` its right child. In-order traversal prints `cat`, `dog`, `eel`.
 
-## Worked example 2: Installing and replacing a hash-table definition
+## Replacing a definition without duplicating its name
 
-Problem: process two definitions:
+Consider two definitions processed in sequence:
 
 ```text
 IN -> 1
 IN -> inside
 ```
-
-Show what happens in K&R's `install` logic.
-
-Method:
 
 1. First `install("IN", "1")` calls `lookup("IN")`.
 2. The bucket for `hash("IN")` is empty, so lookup returns `NULL`.
@@ -173,17 +167,17 @@ Method:
 
 6. Duplicate `"1"` into `np->defn`.
 
-Now install replacement:
+On the replacement call:
 
 1. `install("IN", "inside")` calls `lookup("IN")`.
 2. Lookup scans bucket `h` and finds the node whose name compares equal.
 3. No new node is allocated.
-4. Free the old `defn`.
-5. Duplicate `"inside"` and assign it to `np->defn`.
+4. Duplicate `"inside"` into temporary storage.
+5. If that allocation succeeds, free the old `defn` and assign the temporary pointer to `np->defn`.
 
-Checked answer: the table still has one node for `IN`, and its replacement text is now `"inside"`. Replacing the definition avoids duplicate names in the same table.
+The table still has one node for `IN`, and its replacement text is now `"inside"`. K&R's compact version frees the old definition before duplicating the new one; allocating first preserves the old value if allocation fails.
 
-## Code
+## Recursive insertion with checked allocation
 
 ```c
 #include <stdio.h>
@@ -212,6 +206,10 @@ static struct tnode *talloc(const char *word)
         return NULL;
 
     p->word = xstrdup(word);
+    if (p->word == NULL) {
+        free(p);
+        return NULL;
+    }
     p->count = 1;
     p->left = NULL;
     p->right = NULL;
@@ -259,7 +257,7 @@ int main(void)
 }
 ```
 
-## Common pitfalls
+## Broken invariants and dangling links
 
 - Defining a self-referential structure with an embedded member of its own type instead of a pointer.
 - Forgetting to initialize child pointers to `NULL` after allocation.
@@ -269,10 +267,8 @@ int main(void)
 - Losing the rest of a linked list when inserting because `next` was not set before replacing the head pointer.
 - Freeing a node's memory while some table or tree still contains a pointer to it.
 
-## Connections
+<div className="see-also">
 
-- [Structures, Typedef, Unions, and Bit Fields](/cs/programming/c/structures-typedef-unions-bitfields)
-- [Pointers, Addresses, and Arrays](/cs/programming/c/pointers-addresses-arrays)
-- [Storage Allocation](/cs/programming/c/storage-allocation)
-- [Preprocessor and Separate Compilation](/cs/programming/c/preprocessor-separate-compilation)
-- [Standard Library Reference](/cs/programming/c/standard-library-reference)
+See also: [Structures, Typedef, Unions, and Bit Fields](/cs/programming/c/structures-typedef-unions-bitfields) · [Pointers, Addresses, and Arrays](/cs/programming/c/pointers-addresses-arrays) · [Storage Allocation](/cs/programming/c/storage-allocation) · [Preprocessor and Separate Compilation](/cs/programming/c/preprocessor-separate-compilation) · [Standard Library Reference](/cs/programming/c/standard-library-reference)
+
+</div>

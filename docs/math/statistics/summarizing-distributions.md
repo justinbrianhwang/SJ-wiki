@@ -5,7 +5,7 @@ sidebar_position: 4
 
 # Summarizing Distributions
 
-Numerical summaries compress a distribution into a few interpretable quantities. The Lane text treats central tendency, variability, percentiles, and shapes of distributions as foundational because later inference depends on them. A confidence interval for a mean uses $\bar{x}$ and $s$; a z-score uses a mean and a standard deviation; an ANOVA partitions variability; regression measures how much variability is explained by a line.
+Numerical summaries compress a distribution into a few interpretable quantities. Later inference depends on the same quantities: a confidence interval for a mean uses $\bar{x}$ and $s$; a z-score uses a mean and a standard deviation; ANOVA partitions variability; regression measures how much variability is explained by a line.
 
 Compression always loses information. A mean does not show skewness, a standard deviation does not show outliers, and a percentile does not show whether nearby values are common or rare. Good summary work therefore pairs numbers with a graph and chooses statistics whose meanings fit the distribution shape and measurement level.
 
@@ -13,7 +13,7 @@ Compression always loses information. A mean does not show skewness, a standard 
 
 *Figure: Components of a boxplot for summarizing a distribution. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Boxplot.svg), Jumanbar, CC BY-SA 3.0.*
 
-## Definitions
+## Center, spread, and relative position
 
 The **mean** of $n$ observations $x_1,\dots,x_n$ is
 
@@ -45,9 +45,9 @@ $$
 
 when using sample summaries descriptively. Positive z-scores are above the mean; negative z-scores are below.
 
-**Skewness** describes asymmetry. A right-skewed distribution has a long right tail and often has mean greater than median. A left-skewed distribution has a long left tail and often has mean less than median. **Kurtosis** describes tail heaviness or peakedness relative to a reference distribution, though in introductory work it is more important to recognize outliers and tail behavior visually than to memorize a single kurtosis rule.
+**Skewness** describes asymmetry. A right-skewed distribution has a long right tail and often has mean greater than median. A left-skewed distribution has a long left tail and often has mean less than median. **Kurtosis** is based on the fourth standardized moment and is often used to describe tail propensity relative to a reference distribution; it should not be read as a simple measure of peakedness.
 
-## Key results
+## What shifting and rescaling preserve
 
 The mean is sensitive to linear transformations. If every observation is transformed by $y_i=a+bx_i$, then
 
@@ -71,6 +71,8 @@ $$
 
 This identity explains why squared deviations are used: simple deviations always cancel around the mean. Squaring makes distances positive and gives larger penalties to observations far from the center.
 
+## Choosing summaries from shape and purpose
+
 For symmetric unimodal data without strong outliers, mean and standard deviation are usually informative. For skewed data or data with outliers, the median and $IQR$ often describe typical values better. For nominal categorical data, the mode and proportions are meaningful, while means and standard deviations of arbitrary category codes are not.
 
 The empirical rule applies approximately to bell-shaped distributions:
@@ -85,11 +87,9 @@ $$
 
 This rule is descriptive and approximate. It should not be applied blindly to strongly skewed, bounded, discrete, or multimodal distributions.
 
-Summary choice should also follow the decision being made. If a city reports household income to describe the "typical" resident, the median is often preferred because a few very high incomes can pull the mean upward. If a factory monitors fill weights from a stable machine, the mean and standard deviation are often more useful because symmetric random variation around a target is expected. If a teacher reports class performance, the median, quartiles, and score distribution may be more informative than the mean alone. The right summary is the one that preserves the feature of the data most relevant to the question while making its limitations visible.
+Summary choice should also follow the decision being made. If a city reports household income to describe the "typical" resident, the median is often preferred because a few very high incomes can pull the mean upward. If a factory monitors fill weights from a stable machine, the mean and standard deviation are often more useful because symmetric random variation around a target is expected. If a teacher reports class performance, the median, quartiles, and score distribution may be more informative than the mean alone. Choose a summary that preserves the feature relevant to the question, and state what it omits.
 
 For any numerical summary, attach units and sample context. A standard deviation of 4 means very different things if the unit is seconds, dollars, kilograms, or points on a 5-point scale. Likewise, a median computed from 12 observations should be presented more cautiously than a median computed from 12,000 observations collected by a careful sampling design.
-
-## Visual
 
 | Summary | Formula or rule | Resistant to outliers? | Best use |
 |---|---|---:|---|
@@ -100,6 +100,8 @@ For any numerical summary, attach units and sample context. A standard deviation
 | IQR | $Q_3-Q_1$ | Yes | Middle spread, box plots |
 | Standard deviation | $s=\sqrt{\sum(x_i-\bar{x})^2/(n-1)}$ | No | Typical distance for roughly symmetric data |
 | z-score | $(x-\bar{x})/s$ | No | Relative standing on a common scale |
+
+The separation between mean and median indicates the direction of skew in this schematic example:
 
 ```text
 Mean vs median in a right-skewed distribution
@@ -117,7 +119,7 @@ frequency
           median   mean
 ```
 
-## Worked example 1: Mean, median, variance, and standard deviation
+## How one long processing time changes the summaries
 
 Problem: A small lab records the number of minutes needed to process seven samples:
 
@@ -179,9 +181,9 @@ $$
 
 Answer: The mean is 12 minutes, the median is 11 minutes, the sample variance is about 11.33 square minutes, and the sample standard deviation is about 3.37 minutes. The value 19 pulls the mean above the median and contributes $49$ of the $68$ squared-deviation total, so it strongly affects the standard deviation.
 
-Checked answer: The deviations add to $-3-2-2-1+0+1+7=0$, which confirms the mean arithmetic.
+Check: The deviations add to $-3-2-2-1+0+1+7=0$, which confirms the mean arithmetic.
 
-## Worked example 2: Percentiles and z-scores
+## Comparing exam scores on different scales
 
 Problem: A student scored 86 on an exam. The class mean was 74 and the sample standard deviation was 8. Another exam in a different course had mean 62 and standard deviation 12, and the same student scored 80. On which exam was the student farther above the class average?
 
@@ -203,9 +205,9 @@ $$
 
 Answer: The student was equally far above average on both exams: 1.5 standard deviations above the mean. The first raw difference was 12 points and the second was 18 points, but the second course had more spread, so the standardized standing is the same.
 
-Checked answer: Both standardized differences reduce to $1.50$. If the distributions are roughly bell-shaped, a score 1.5 standard deviations above the mean is around the upper tail but not extremely rare.
+Check: Both standardized differences reduce to $1.50$. If the distributions are roughly bell-shaped, a score 1.5 standard deviations above the mean is around the upper tail but not extremely rare.
 
-## Code
+## Checking the summaries and sample denominator
 
 ```python
 import numpy as np
@@ -227,19 +229,17 @@ print("kurtosis excess:", stats.kurtosis(x, bias=False))
 
 The argument `ddof=1` requests the sample variance denominator $n-1$. Without it, NumPy uses the population denominator $n$, which is appropriate only when the data are the whole population being summarized.
 
-## Common pitfalls
+## Interpretive errors that survive correct arithmetic
 
 - Reporting only the mean for a skewed distribution where the median better represents a typical case.
 - Forgetting that variance is in squared units while standard deviation is in the original units.
 - Mixing population and sample formulas without thinking about whether the data are a full population or a sample.
-- Treating percentiles as percentages correct. A percentile is a location in a distribution, not a test score scale.
+- Treating a percentile as a percentage correct. A percentile is a location in a distribution, not a test score scale.
 - Applying the empirical rule to a strongly skewed or multimodal distribution.
 - Deleting high or low observations because they affect the mean, instead of investigating whether they are valid.
 
-## Connections
+<div className="see-also">
 
-- [Graphing distributions](/math/statistics/graphing-distributions)
-- [Sampling distributions and the central limit theorem](/math/statistics/sampling-distributions-and-clt)
-- [Estimation and confidence intervals](/math/statistics/estimation-and-confidence-intervals)
-- [Tests for means](/math/statistics/tests-for-means)
-- [Linear regression inference](/math/statistics/linear-regression-inference)
+See also: [Graphing distributions](/math/statistics/graphing-distributions) · [Sampling distributions and the central limit theorem](/math/statistics/sampling-distributions-and-clt) · [Estimation and confidence intervals](/math/statistics/estimation-and-confidence-intervals) · [Tests for means](/math/statistics/tests-for-means) · [Linear regression inference](/math/statistics/linear-regression-inference)
+
+</div>

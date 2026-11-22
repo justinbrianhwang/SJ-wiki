@@ -7,9 +7,9 @@ sidebar_position: 9
 
 Processors are much faster than main memory, so modern computers rely on a hierarchy of storage technologies. Small memories close to the processor are fast and expensive per byte. Larger memories farther away are slower and cheaper per byte. Caches exploit locality so that most accesses hit in a fast level while the full address space remains backed by larger memory.
 
-The central cache question is quantitative: how much does a design reduce execution time, not just miss rate? A larger block may reduce compulsory misses but increase miss penalty. Higher associativity may reduce conflict misses but lengthen hit time. A bigger cache may reduce capacity misses while increasing power and access latency. Average memory access time, AMAT, is the first-order model that keeps these trade-offs visible.
+The central cache question is quantitative: how much does a design reduce execution time rather than miss rate alone? A larger block may reduce compulsory misses but increase miss penalty. Higher associativity may reduce conflict misses but lengthen hit time. A bigger cache may reduce capacity misses while increasing power and access latency. Average memory access time, AMAT, is the first-order model for comparing these trade-offs.
 
-## Definitions
+## Address mapping and the three Cs
 
 A cache block, or line, is the unit transferred between adjacent hierarchy levels. If a processor requests an address and the corresponding block is present in the cache, the access is a hit. Otherwise it is a miss, and a lower level must supply the block.
 
@@ -58,7 +58,7 @@ $$
 
 Here $MR_{L2}$ is the local L2 miss rate among accesses that reach L2, unless explicitly stated as a global miss rate.
 
-## Key results
+## Trade-offs from L1 to the last-level cache
 
 Locality is the reason caches work. Temporal locality says recently used data is likely to be used again. Spatial locality says nearby data is likely to be used soon. Instruction streams often have strong spatial locality; loops add temporal locality. Data locality depends heavily on layout and access order.
 
@@ -70,13 +70,11 @@ Write allocation controls what happens on a store miss. Write-allocate brings th
 
 AMAT is not the final performance metric. Out-of-order cores can overlap some misses with other work. Multithreading can hide latency. Memory bandwidth can dominate when many cores miss at once. Still, AMAT is the basic language for reasoning about cache organization.
 
-Address mapping deserves special care because a cache is not just a small memory; it is a small memory with rules about where each block may reside. Two arrays whose addresses differ by a multiple of the cache size can repeatedly map to the same direct-mapped line, creating conflict misses even when the cache has enough total capacity. Padding or changing layout can fix such conflicts without changing hardware.
+Address mapping deserves special care because a cache is a small memory with placement rules. Two arrays whose addresses differ by a multiple of the cache size can repeatedly map to the same direct-mapped line, creating conflict misses even when the cache has enough total capacity. Padding or changing layout can fix such conflicts without changing hardware.
 
 Replacement policy matters most when associativity is limited and the working set is near the cache capacity. Least recently used, LRU, is intuitive but expensive to implement exactly for high associativity. Many caches use approximations such as pseudo-LRU or random replacement. The performance difference is workload-dependent, and the energy and timing cost of exact tracking may not be justified.
 
 Inclusive, exclusive, and non-inclusive multilevel caches also change behavior. An inclusive lower-level cache contains copies of blocks in upper levels, which can simplify coherence because the shared last-level cache knows which blocks may be private. The cost is duplication and possible back-invalidation when the lower level evicts a block. Exclusive caches avoid duplication but make lookup and movement policies more complex.
-
-## Visual
 
 ```mermaid
 flowchart TB
@@ -110,7 +108,7 @@ flowchart TB
   Fill --> Set
 ```
 
-This cache-organization diagram expands the address fields into the actual tag-compare and way-select datapath. The index chooses one set, all ways in that set compare their tags in parallel, and the offset selects the requested bytes from the winning cache line. The miss path labels replacement, lower-level fill, valid/tag update, and dirty-state handling, which are the structures behind AMAT terms.
+The index chooses one set, all ways in that set compare their tags in parallel, and the offset selects the requested bytes from the winning cache line. On a miss, replacement, lower-level fill, valid/tag update, and dirty-state handling determine the penalty represented in AMAT.
 
 | Organization | Placement | Hit lookup | Main advantage | Main drawback |
 |---|---|---|---|---|
@@ -119,7 +117,7 @@ This cache-organization diagram expands the address fields into the actual tag-c
 | 8-way set associative | Eight ways | Many compares | Good for lower levels | Longer hit path |
 | Fully associative | Anywhere | Search all entries | Minimal conflicts | Expensive for large caches |
 
-## Worked example 1: Cache fields and number of sets
+## Decoding tag, index, and offset bits
 
 Problem: A 32 KiB L1 data cache is 4-way set associative with 64-byte blocks and byte addressing. Addresses are 32 bits. Find the number of sets and the number of offset, index, and tag bits.
 
@@ -166,7 +164,7 @@ $$
 
 Checked answer: The cache has 128 sets, 6 offset bits, 7 index bits, and 19 tag bits. The fields add to 32 bits, so the decomposition is consistent.
 
-## Worked example 2: AMAT for a two-level hierarchy
+## Computing two-level AMAT
 
 Problem: An L1 cache has hit time 1 cycle and miss rate 4%. The L2 cache has hit time 10 cycles and local miss rate 20%. Main-memory penalty after an L2 miss is 100 cycles. Compute AMAT.
 
@@ -219,7 +217,7 @@ $$
 
 Checked answer: AMAT is 2.2 cycles per memory reference. The reference-count check matches the formula.
 
-## Code
+## Checking cache fields and AMAT
 
 ```python
 def cache_fields(address_bits, cache_bytes, block_bytes, ways):
@@ -244,7 +242,7 @@ This code treats every memory reference as if it pays the same average cost. Tha
 
 The field calculation also assumes power-of-two sizes and a conventional indexed cache. Some specialized memories use banking, hashing, skewed associativity, or victim buffers that complicate the simple tag-index-offset picture. The simple picture remains the foundation because it explains why alignment, stride, and address bits can have visible performance effects.
 
-## Common pitfalls
+## Where the AMAT model needs care
 
 - Confusing local and global miss rates in multilevel caches.
 - Optimizing miss rate while increasing hit time enough to lose performance.
@@ -253,9 +251,8 @@ The field calculation also assumes power-of-two sizes and a conventional indexed
 - Ignoring write-buffer stalls and dirty write-backs in write-back caches.
 - Treating AMAT as exact execution time on processors that overlap misses.
 
-## Connections
+<div className="see-also">
 
-- [Cache Optimization and Prefetching](/cs/computer-architecture/cache-optimization-and-prefetching)
-- [Virtual Memory, TLBs, and VMs](/cs/computer-architecture/virtual-memory-tlb-vms)
-- [Coherence, Consistency, and MESI](/cs/computer-architecture/coherence-consistency-mesi)
-- [Quantitative Design and Performance](/cs/computer-architecture/quantitative-design-and-performance)
+See also: [Cache Optimization and Prefetching](/cs/computer-architecture/cache-optimization-and-prefetching) · [Virtual Memory, TLBs, and VMs](/cs/computer-architecture/virtual-memory-tlb-vms) · [Coherence, Consistency, and MESI](/cs/computer-architecture/coherence-consistency-mesi) · [Quantitative Design and Performance](/cs/computer-architecture/quantitative-design-and-performance)
+
+</div>

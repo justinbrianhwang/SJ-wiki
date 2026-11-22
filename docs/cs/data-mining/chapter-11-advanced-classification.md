@@ -7,9 +7,9 @@ sidebar_position: 13
 
 Advanced classification covers supervised learning cases that go beyond a balanced, moderate-size, fully labeled two-class table. Aggarwal's advanced classification chapter includes multiclass learning, rare class learning, scalable classification, regression with numeric targets, semi-supervised learning, active learning, and ensemble methods. These topics matter because real data sets rarely arrive with abundant clean labels and equal class frequencies.
 
-This page extends the core classifiers. The unifying question is how to adapt a predictive model when labels are many, rare, expensive, partially missing, numeric, streaming, or noisy.
+The unifying question is how to adapt a predictive model when labels are many, rare, expensive, partially missing, numeric, streaming, or noisy.
 
-## Definitions
+## Forms of supervision beyond balanced binary labels
 
 **Multiclass classification** predicts one of more than two labels. Common reductions include one-vs-rest and one-vs-one binary classifiers.
 
@@ -27,7 +27,7 @@ This page extends the core classifiers. The unifying question is how to adapt a 
 
 An **ensemble** combines multiple models. Bagging averages models trained on bootstrap samples; boosting trains models sequentially to focus on previously misclassified examples; random forests combine tree bagging with random feature subsets.
 
-## Key results
+## Choosing the learner from the label and loss constraints
 
 **Multiclass reductions change the decision surface.** One-vs-rest trains one classifier per class against all others. One-vs-one trains a classifier for each pair of classes and uses voting. The best reduction depends on class count, imbalance, and base classifier.
 
@@ -49,9 +49,9 @@ An **ensemble** combines multiple models. Bagging averages models trained on boo
 
 **Semi-supervised and active learning change the data distribution.** When the learner selects examples for labeling, the labeled set is no longer a random sample. Metrics computed on actively selected labels can be biased unless evaluated on an independent test set. Similarly, pseudo-labeling unlabeled data can reinforce early model mistakes if confidence thresholds are too loose.
 
-**Regression deserves residual checks.** When numeric targets are modeled, inspect residuals by segment, time, and predicted value range. A low average error can hide systematic underprediction for the cases that matter.
+**Regression requires residual checks.** When numeric targets are modeled, inspect residuals by segment, time, and predicted value range. A low average error can hide systematic underprediction for the cases that matter.
 
-## Visual
+## Matching the method to the bottleneck
 
 ```mermaid
 flowchart TD
@@ -82,7 +82,9 @@ flowchart TD
 | Active learning | Query informative labels | Expensive annotation | Sampling bias |
 | Regression | Predict numeric target | Continuous outcomes | Different metrics needed |
 
-## Worked example 1: Cost-sensitive threshold
+## Decision rules after training
+
+### Deriving a cost-sensitive fraud threshold
 
 **Problem.** A fraud model outputs probability $p=P(fraud\mid X)$. A false negative costs 100 dollars; a false positive costs 5 dollars. When should the model flag a transaction?
 
@@ -114,7 +116,7 @@ $$
 
 **Checked answer.** The threshold is about 4.8 percent, much lower than 50 percent, because missing fraud is far more expensive than investigating a normal case.
 
-## Worked example 2: One-vs-rest multiclass scores
+### Resolving one-vs-rest scores
 
 **Problem.** A one-vs-rest classifier for classes A, B, and C produces these decision scores for one test object:
 
@@ -141,7 +143,7 @@ $$
 
 **Checked answer.** Predict A, but score calibration should be checked if these scores are used as probabilities or for ranking.
 
-## Code
+## Selective labeling and imbalanced ensembles
 
 Pseudocode for active learning with uncertainty sampling:
 
@@ -192,7 +194,7 @@ for name, model in models.items():
     print(classification_report(y_test, pred, digits=3))
 ```
 
-## Common pitfalls
+## Evaluation failures that look like model gains
 
 - Using accuracy for rare class problems where recall and precision matter more.
 - Oversampling before train-test splitting, which duplicates information across splits.
@@ -202,10 +204,8 @@ for name, model in models.items():
 - Boosting heavily mislabeled data without noise control.
 - Comparing regression and classification models with incompatible metrics.
 
-## Connections
+<div className="see-also">
 
-- [Data Classification](/cs/data-mining/chapter-10-data-classification)
-- [Outlier Analysis](/cs/data-mining/chapter-08-outlier-analysis)
-- [Mining Data Streams and Big Data](/cs/data-mining/chapter-12-mining-data-streams)
-- [Mining Text Data](/cs/data-mining/chapter-13-mining-text-data)
-- [Mining Graph Data](/cs/data-mining/chapter-17-mining-graph-data)
+See also: [Data Classification](/cs/data-mining/chapter-10-data-classification) · [Outlier Analysis](/cs/data-mining/chapter-08-outlier-analysis) · [Mining Data Streams and Big Data](/cs/data-mining/chapter-12-mining-data-streams) · [Mining Text Data](/cs/data-mining/chapter-13-mining-text-data) · [Mining Graph Data](/cs/data-mining/chapter-17-mining-graph-data)
+
+</div>

@@ -7,9 +7,9 @@ sidebar_position: 15
 
 Phase transitions are nonanalytic changes in macroscopic behavior that emerge only in the thermodynamic limit. A finite partition function is an analytic sum, but as $N\to\infty$ its zeros or singular features can accumulate into sharp transitions. Schwabl treats phase transitions as a unifying subject across fluids, magnets, mixtures, superfluids, percolation, and other many-body systems.
 
-The practical language is order parameters, symmetry, and response. A phase is characterized not just by an equation of state but by which symmetries are realized and which are broken. Critical points then reveal universal behavior that does not depend strongly on microscopic details.
+Order parameters, symmetry, and response give the useful language. An equation of state alone does not characterize a phase; the realized and broken symmetries also matter. Critical points then reveal behavior that depends weakly on microscopic details.
 
-## Definitions
+## Order parameters and singular thermodynamics
 
 An order parameter is a macroscopic quantity that distinguishes phases. Examples include:
 
@@ -53,7 +53,7 @@ $$
 \xi\sim |t|^{-\nu}.
 $$
 
-## Key results
+## Symmetry breaking, coexistence, and finite size
 
 The thermodynamic limit is essential. For finite $N$,
 
@@ -85,19 +85,17 @@ $$
 
 in the appropriate ensemble. Compressibility similarly measures density fluctuations, and heat capacity measures energy fluctuations. Diverging response is therefore a direct statement that fluctuations occur on all length scales.
 
-Finite-size rounding is unavoidable in simulations and experiments on small samples. Instead of a true divergence, one observes a peak whose height and location depend on system size. Finite-size scaling uses this dependence to estimate thermodynamic critical exponents. This is why Monte Carlo studies of Ising and percolation models usually simulate several lattice sizes rather than a single large one.
+Finite-size rounding is unavoidable in simulations and experiments on small samples. Instead of a true divergence, one observes a peak whose height and location depend on system size. Finite-size scaling uses this dependence to estimate thermodynamic critical exponents, so Monte Carlo studies of Ising and percolation models usually simulate several lattice sizes rather than a single large one.
 
-The language of symmetry also distinguishes explicit and spontaneous breaking. A nonzero magnetic field explicitly breaks Ising spin-flip symmetry, so the magnetization changes smoothly as temperature crosses the zero-field critical temperature. At exactly zero field, the Hamiltonian has the symmetry and the system can break it spontaneously below $T_c$. This is why phase diagrams often show a critical line or point only on a symmetry-preserving subspace.
+The language of symmetry also distinguishes explicit and spontaneous breaking. A nonzero magnetic field explicitly breaks Ising spin-flip symmetry, so the magnetization changes smoothly as temperature crosses the zero-field critical temperature. At exactly zero field, the Hamiltonian has the symmetry and the system can break it spontaneously below $T_c$. Critical lines or points therefore often lie only on a symmetry-preserving subspace of the phase diagram.
 
 Not every transition is well described by a local scalar order parameter. Topological transitions, glass transitions, and some quantum phase transitions require additional concepts. Schwabl's core examples are conventional thermal transitions, but the careful reader should treat the order-parameter framework as a powerful starting point rather than a universal final vocabulary.
 
-The thermodynamic path matters. Crossing a first-order coexistence line at fixed pressure may show latent heat, while moving around the critical point can continuously transform gas into liquid without crossing any singularity. This is why phase diagrams, not isolated equations of state, are the natural representation of phase behavior.
+The thermodynamic path matters. Crossing a first-order coexistence line at fixed pressure may show latent heat, while moving around the critical point can continuously transform gas into liquid without crossing any singularity. Phase diagrams record this path dependence more clearly than isolated equations of state.
 
 For continuous transitions, the correlation length is the organizing scale. When $\xi$ is large, microscopic lengths such as lattice spacing or molecular diameter become irrelevant to leading singular behavior. This is the physical content behind the later RG treatment.
 
-This is also why the same page links naturally to both thermodynamics and field theory: singular free energies are macroscopic, but their long-distance descriptions are often field theories of order-parameter fluctuations.
-
-## Visual
+Singular free energies are macroscopic, but their long-distance descriptions are often field theories of order-parameter fluctuations.
 
 ```mermaid
 flowchart TD
@@ -116,23 +114,21 @@ flowchart TD
 | Critical point | end of coexistence line | scale invariance | liquid-gas critical point |
 | Crossover | no singularity | smooth change | finite systems, nonzero field |
 
-## Worked example 1: Order of a transition from free energy
+## Diagnosing a first-order free-energy crossing
 
-Problem: A model has equilibrium free energy
+A model has equilibrium free energy
 
 $$
 F(T)=
 \begin{cases}
-F_0-aT, & T<T_0,\\
-F_0-bT, & T>T_0,
+F_0-a(T-T_0), & T<T_0,\\
+F_0-b(T-T_0), & T>T_0,
 \end{cases}
 $$
 
-with $a\ne b$. Classify the transition at $T_0$.
+with $a\ne b$. Its behavior at $T_0$ follows from the first derivative.
 
-Method:
-
-1. The free energy itself is continuous at $T_0$ because both branches give $F_0$ if written relative to the crossing point.
+1. The free energy is continuous at $T_0$ because both branches give $F_0$.
 2. Entropy is
 
 $$
@@ -163,19 +159,17 @@ $$
 L=T_0\Delta S.
 $$
 
-Checked answer: this is a first-order transition because a first derivative of free energy is discontinuous.
+The transition is first-order because a first derivative of the free energy is discontinuous.
 
-## Worked example 2: Symmetry breaking limit in an Ising magnet
+## Why the symmetry-breaking limits do not commute
 
-Problem: Explain why the order parameter is defined as
+The order parameter is defined as
 
 $$
 m=\lim_{h\to 0^+}\lim_{N\to\infty}\langle M\rangle/N
 $$
 
-rather than simply $\langle M\rangle/N$ at $h=0$ for a finite system.
-
-Method:
+rather than as $\langle M\rangle/N$ at $h=0$ for a finite system. The order of limits selects a broken-symmetry state.
 
 1. At $h=0$, the finite Ising Hamiltonian is invariant under all spins flipping sign.
 2. For every configuration with magnetization $M$, there is a configuration with magnetization $-M$ and the same energy.
@@ -189,24 +183,9 @@ $$
 5. Take $N\to\infty$ first. The free-energy difference between the two magnetized phases is extensive, so the positive phase is selected.
 6. Then send $h\to 0^+$. The selected phase remains magnetized below $T_c$.
 
-Checked answer: the order of limits distinguishes true spontaneous symmetry breaking from finite-size symmetry averaging.
+The order of limits distinguishes spontaneous symmetry breaking from finite-size symmetry averaging.
 
-## Code
-
-```python
-import numpy as np
-
-def landau_minima(a, b=1.0, h=0.0):
-    m = np.linspace(-2.0, 2.0, 20001)
-    f = 0.5 * a * m**2 + 0.25 * b * m**4 - h * m
-    idx = np.argmin(f)
-    return m[idx], f[idx]
-
-for a in [1.0, 0.2, -0.2, -1.0]:
-    print(a, landau_minima(a, b=1.0, h=1e-4))
-```
-
-## Common pitfalls
+## Sharp crossovers that are not phase transitions
 
 - Looking for true nonanalytic phase transitions in small finite systems.
 - Using Ehrenfest classification as if it were the modern complete taxonomy; fluctuations and scaling are more informative for continuous transitions.
@@ -214,10 +193,8 @@ for a in [1.0, 0.2, -0.2, -1.0]:
 - Treating every sharp-looking numerical crossover as a thermodynamic transition.
 - Assuming the order parameter must be a scalar. It can be vector, tensor, complex, or topological depending on the phase.
 
-## Connections
+<div className="see-also">
 
-- [Thermodynamic potentials and phase equilibrium](/physics/statistical-mechanics/thermodynamic-potentials-and-phase-equilibrium)
-- [Mean-field and Landau theory](/physics/statistical-mechanics/mean-field-and-landau-theory)
-- [Scaling, universality, and renormalization group](/physics/statistical-mechanics/scaling-universality-and-renormalization-group)
-- [Magnetism, lattice gases, and binary alloys](/physics/statistical-mechanics/magnetism-lattice-gases-and-binary-alloys)
-- [Symmetry breaking in QFT](/physics/quantum-field-theory/symmetry-breaking-goldstone-higgs)
+See also: [Thermodynamic potentials and phase equilibrium](/physics/statistical-mechanics/thermodynamic-potentials-and-phase-equilibrium) · [Mean-field and Landau theory](/physics/statistical-mechanics/mean-field-and-landau-theory) · [Scaling, universality, and renormalization group](/physics/statistical-mechanics/scaling-universality-and-renormalization-group) · [Magnetism, lattice gases, and binary alloys](/physics/statistical-mechanics/magnetism-lattice-gases-and-binary-alloys) · [Symmetry breaking in QFT](/physics/quantum-field-theory/symmetry-breaking-goldstone-higgs)
+
+</div>

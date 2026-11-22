@@ -9,7 +9,7 @@ Fourier series represent periodic functions as sums of sines and cosines. The en
 
 The same idea solves boundary-value PDEs. If the boundary conditions match sine or cosine modes, the initial shape can be expanded in that basis and each mode evolves independently. Fourier series therefore connect approximation, signal analysis, heat flow, wave motion, and Sturm-Liouville theory.
 
-## Definitions
+## Projecting a periodic function onto harmonics
 
 For a $2\pi$-periodic function,
 
@@ -44,7 +44,7 @@ $$
 
 A half-range sine series on $0\lt x\lt L$ uses odd extension. A half-range cosine series uses even extension.
 
-## Key results
+## Orthogonality, symmetry, and convergence
 
 Orthogonality is the source of the coefficient formulas. On $[-\pi,\pi]$,
 
@@ -68,11 +68,15 @@ Fourier coefficients also measure smoothness. Smooth periodic functions usually 
 
 The partial Fourier sum is the best approximation in the mean-square sense among trigonometric polynomials of the same degree. This does not guarantee uniform accuracy near discontinuities, but it explains why Fourier series are so useful for energy and least-squares approximations.
 
+## Matching the basis to boundary conditions
+
 Boundary conditions determine which family of modes is natural. Fixed-end string or zero-temperature boundary conditions use sine modes because they vanish at endpoints. Insulated-end heat problems use cosine modes because their derivatives vanish at endpoints. Choosing modes that already satisfy the boundary conditions leaves only the initial data to expand.
 
 The coefficient $a_0/2$ is the average value of the function over one period. In signal language it is the DC component. Removing the mean before analyzing oscillations is often useful because it separates the constant offset from the dynamic harmonic content. In heat problems, the average temperature may be the steady mode while higher modes decay.
 
 Fourier series are periodic by construction. A function given only on an interval must be extended periodically once a full-range or half-range choice is made. Discontinuities can appear at the endpoints of the periodic extension even if the original function is smooth inside the interval. These endpoint jumps are responsible for many surprising plots of partial sums.
+
+## Real coefficients, complex coefficients, and energy
 
 The sine-cosine form can also be written in amplitude-phase form. A combination
 
@@ -108,7 +112,7 @@ $$
 
 This says that mean-square size in physical space equals size in coefficient space. It justifies interpreting coefficient magnitudes as modal energy.
 
-## Visual
+## Choosing the extension and following its consequences
 
 ```mermaid
 flowchart TB
@@ -133,7 +137,7 @@ flowchart TB
   Convergence -- "near jump" --> Gibbs["Gibbs overshoot and slow coefficient decay"]
 ```
 
-The Fourier-series architecture starts by choosing the periodic contract: full range, odd half-range, or even half-range. The coefficient sublayers use orthogonality to analyze the input, while the synthesis layer reconstructs partial sums and exposes spectra or PDE modes. The convergence branch shows why the same pipeline produces accurate smooth regions but Gibbs behavior near jumps.
+The first choice is the periodic extension: full range, odd half-range, or even half-range. Orthogonality then determines the coefficients, and finite partial sums feed spectral analysis or independent PDE modes. Smooth regions converge cleanly; jumps produce midpoint limits and Gibbs oscillations.
 
 | Function feature | Coefficient effect | Practical meaning |
 |---|---|---|
@@ -143,31 +147,27 @@ The Fourier-series architecture starts by choosing the periodic contract: full r
 | Smooth periodic data | Fast decay | Few modes may suffice |
 | Endpoint boundary condition | Select sine or cosine | Built-in PDE constraints |
 
-## Worked example 1: Sine series for $f(x)=x$
+## The odd extension of $f(x)=x$
 
-Problem. Find the sine series of $f(x)=x$ on $0\lt x\lt \pi$.
-
-Method.
-
-1. Use a half-range sine series:
+On $0\lt x\lt \pi$, a half-range sine expansion has the form
 
 $$
 x\sim \sum_{n=1}^{\infty}b_n\sin nx.
 $$
 
-2. Coefficients are
+with coefficients
 
 $$
 b_n=\frac{2}{\pi}\int_0^\pi x\sin nx\,dx.
 $$
 
-3. Integrate by parts with $u=x$ and $dv=\sin nx\,dx$:
+Integrating by parts with $u=x$ and $dv=\sin nx\,dx$ gives
 
 $$
 du=dx,\qquad v=-\frac{\cos nx}{n}.
 $$
 
-4. Then
+and therefore
 
 $$
 \begin{aligned}
@@ -178,75 +178,65 @@ $$
 \end{aligned}
 $$
 
-5. Therefore
+Thus
 
 $$
 b_n=\frac{2}{\pi}\left(-\frac{\pi(-1)^n}{n}\right)=\frac{2(-1)^{n+1}}{n}.
 $$
 
-Answer.
-
 $$
 x\sim 2\sum_{n=1}^{\infty}\frac{(-1)^{n+1}}{n}\sin nx,\qquad 0<x<\pi.
 $$
 
-Check. The sine series vanishes at the endpoints in the periodic odd extension, so at $x=\pi$ it converges to the midpoint of the jump, not to $\pi$.
+The sine series vanishes at the endpoints of its periodic odd extension, so at $x=\pi$ it converges to the midpoint of the jump rather than to $\pi$.
 
-This example is a useful warning about endpoint interpretation. The original problem asks only for $0\lt x\lt \pi$, where the series represents $x$ at interior points. The sine expansion implicitly creates an odd $2\pi$-periodic extension, which jumps from $\pi$ to $-\pi$ at the endpoint. The formula is correct, but the periodic extension must be remembered when evaluating limits at the boundary.
+At interior points the series represents $x$. Outside the original interval it represents the odd $2\pi$-periodic extension, which jumps from $\pi$ to $-\pi$ at the endpoint. Boundary limits must be read from that extension.
 
-## Worked example 2: Cosine series for $f(x)=1$
+## Why the constant cosine series has only one term
 
-Problem. Find the half-range cosine series of $f(x)=1$ on $0\lt x\lt L$.
-
-Method.
-
-1. Write
+For $f(x)=1$ on $0\lt x\lt L$, write
 
 $$
 1\sim \frac{a_0}{2}+\sum_{n=1}^{\infty}a_n\cos\frac{n\pi x}{L}.
 $$
 
-2. Compute
+The constant coefficient is
 
 $$
 a_0=\frac{2}{L}\int_0^L1\,dx=2.
 $$
 
-3. For $n\ge 1$,
+while, for $n\ge1$,
 
 $$
 a_n=\frac{2}{L}\int_0^L\cos\frac{n\pi x}{L}\,dx.
 $$
 
-4. Integrate:
+Integration gives
 
 $$
 a_n=\frac{2}{L}\left[\frac{L}{n\pi}\sin\frac{n\pi x}{L}\right]_0^L.
 $$
 
-5. Evaluate endpoints:
+Both endpoint terms vanish because
 
 $$
 \sin n\pi=0,\qquad \sin 0=0.
 $$
 
-Thus
+Hence
 
 $$
 a_n=0\quad (n\ge 1).
 $$
 
-Answer.
-
 $$
 1=\frac{2}{2}+0+0+\cdots.
 $$
 
-Check. A constant function is already the zero-frequency cosine mode.
+A constant function is already the zero-frequency cosine mode. Here $a_0=2$, but the series contains $a_0/2$, so its constant term is $1$. The factor of two at zero frequency is easy to lose.
 
-This example looks trivial, but it explains the normalization. The coefficient $a_0$ is $2$, yet the series uses $a_0/2$, so the constant term is $1$. Many coefficient mistakes are off by a factor of two precisely at the zero-frequency term.
-
-## Code
+## Inspecting endpoint error in a partial sum
 
 ```python
 import numpy as np
@@ -265,7 +255,7 @@ The error is largest near endpoints because the odd periodic extension jumps the
 
 For a fair numerical test, avoid evaluating exactly at discontinuities of the periodic extension unless the midpoint value is intended. A grid that includes endpoints may show a large error even though the series is behaving correctly according to the convergence theorem.
 
-## Common pitfalls
+## Bookkeeping that changes the answer
 
 - Using full-range coefficient formulas for a half-range problem.
 - Forgetting the factor $L$ or $\pi$ in arbitrary-period formulas.
@@ -284,9 +274,8 @@ For a fair numerical test, avoid evaluating exactly at discontinuities of the pe
 - Ignoring phase information in sine-cosine pairs.
 - Overrounding coefficients.
 
-## Connections
+<div className="see-also">
 
-- [Orthogonal Functions and Sturm-Liouville Problems](/math/engineering-math/orthogonal-functions-and-sturm-liouville)
-- [Fourier Integrals and Transforms](/math/engineering-math/fourier-integrals-and-transforms)
-- [PDEs by Separation of Variables](/math/engineering-math/pdes-separation-of-variables)
-- [Wave and Heat Equations](/math/engineering-math/wave-and-heat-equations)
+See also: [Orthogonal Functions and Sturm-Liouville Problems](/math/engineering-math/orthogonal-functions-and-sturm-liouville) · [Fourier Integrals and Transforms](/math/engineering-math/fourier-integrals-and-transforms) · [PDEs by Separation of Variables](/math/engineering-math/pdes-separation-of-variables) · [Wave and Heat Equations](/math/engineering-math/wave-and-heat-equations)
+
+</div>

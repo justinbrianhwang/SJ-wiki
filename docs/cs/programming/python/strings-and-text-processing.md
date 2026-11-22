@@ -9,7 +9,7 @@ Strings appear early in Python because the first program usually prints text. Th
 
 Python strings are more than arrays of characters. They are immutable Unicode text objects with a rich method library. Once you understand immutability, indexing, slicing, formatting, and the difference between text and bytes, string processing becomes predictable. The goal is not to memorize every method; it is to recognize the small set of transformations that show up repeatedly.
 
-## Definitions
+## Python's text model: immutable Unicode strings
 
 A **string** is an instance of `str`, written with single quotes, double quotes, or triple quotes:
 
@@ -56,9 +56,9 @@ print(f"{temperature:.1f} C")
 
 The expression inside braces is evaluated, and format specifiers control presentation.
 
-## Key results
+## Transformation, formatting, and encoding boundaries
 
-The first key result is that string operations return new values. If you write:
+String operations return new values. If you write:
 
 ```python
 text = " Hello "
@@ -71,7 +71,7 @@ text.strip()
 text = text.strip()
 ```
 
-The second result is that splitting and joining are inverse patterns. `.split()` turns one string into a list of pieces. `.join()` turns many strings into one string:
+Splitting and joining are inverse patterns. `.split()` turns one string into a list of pieces. `.join()` turns many strings into one string:
 
 ```python
 fields = "a,b,c".split(",")
@@ -80,23 +80,23 @@ line = ",".join(fields)
 
 This pair is central to simple file processing.
 
-The third result is that formatting should be separated from calculation. Keep numbers as numbers while computing, then format them at the output boundary. A value such as `"3.14"` is text; it cannot be used safely in numeric formulas until converted.
+Formatting should be separated from calculation. Keep numbers as numbers while computing, then format them at the output boundary. A value such as `"3.14"` is text; it cannot be used safely in numeric formulas until converted.
 
-The fourth result is that text matching has levels. Use `in`, `.startswith()`, and `.endswith()` for simple checks. Use `.split()` for simple delimiters. Use the `csv` module for comma-separated data with quoting rules. Use `re` only when a real pattern language is needed.
+Text matching has levels. Use `in`, `.startswith()`, and `.endswith()` for simple checks. Use `.split()` for simple delimiters. Use the `csv` module for comma-separated data with quoting rules. Use `re` only when a real pattern language is needed.
 
-The fifth result is that `str` and `bytes` are different. Files opened in text mode return strings. Files opened in binary mode return bytes. Encoding, usually UTF-8, is the mapping between them. Most beginner scripts should open text files with an explicit encoding:
+`str` and `bytes` are different. Files opened in text mode return strings. Files opened in binary mode return bytes. Encoding, usually UTF-8, is the mapping between them. Most beginner scripts should open text files with an explicit encoding:
 
 ```python
 open("data.txt", encoding="utf-8")
 ```
 
-A sixth result is that text processing should state its assumptions. If a line is expected to have exactly three comma-separated fields, check that it does. If a label is expected to be uppercase, either normalize it with `.upper()` or reject invalid input. Silent string cleanup can be useful for user convenience, but it can also hide bad data. Decide whether the program is accepting flexible human input or enforcing a machine-readable format.
+Text processing should state its assumptions. If a line is expected to have exactly three comma-separated fields, check that it does. If a label is expected to be uppercase, either normalize it with `.upper()` or reject invalid input. Silent string cleanup can be useful for user convenience, but it can also hide bad data. Decide whether the program is accepting flexible human input or enforcing a machine-readable format.
 
-A seventh result is that formatting is a separate concern from storage. A temperature may be stored as the float `21.4567`, displayed as `"21.5 C"`, and written to JSON as `21.4567`. If the program stores the displayed text, later calculations must parse it again and may lose precision. Keep raw values in appropriate types, then format at the boundary where a human reads the output.
+Formatting is a separate concern from storage. A temperature may be stored as the float `21.4567`, displayed as `"21.5 C"`, and written to JSON as `21.4567`. If the program stores the displayed text, later calculations must parse it again and may lose precision. Keep raw values in appropriate types, then format at the boundary where a human reads the output.
 
 Finally, regular expressions should have names when they encode a rule. A line such as `if re.match(r"^[A-Z]\d{3}$", code):` is acceptable in a short script, but a named compiled pattern such as `SAMPLE_CODE_RE` tells future readers that the expression represents a domain rule. When a pattern becomes difficult to read, use verbose mode or split the problem into simpler string operations.
 
-## Visual
+Indexing and slicing use the same half-open interval convention as other Python sequences:
 
 ```text
 String:  P  y  t  h  o  n
@@ -118,7 +118,7 @@ P [y  t  h] o  n  -> "yth"
 | `.find(sub)` | Return index or `-1` | `"abc".find("b")` | `1` |
 | `.startswith(prefix)` | Prefix test | `"data.csv".startswith("data")` | `True` |
 
-## Worked example 1: parse a simple sensor line
+## Parsing a controlled sensor record
 
 Problem: parse the line `"time=10,temp=22.5,status=OK"` into useful values.
 
@@ -164,7 +164,7 @@ status == "OK"
 
 This is a simple format. If the format allowed quoted commas, use the `csv` module instead of manual splitting.
 
-## Worked example 2: format a report line
+## Aligning numeric output without changing stored values
 
 Problem: print a table of temperatures with aligned names and one decimal place.
 
@@ -205,7 +205,7 @@ Cairo        30.1 C
 
 The numbers are still stored as floats in `rows`; only the printed representation is rounded.
 
-## Code
+## A deliberately small key-value parser
 
 ```python
 def normalize_name(text):
@@ -236,7 +236,7 @@ For human names, capitalization rules are culturally complex; the function here 
 
 For text-processing exercises, keep a short list of sample inputs beside the parser: a normal case, an empty case, a case with extra whitespace, and one invalid case. These examples document the contract better than prose alone and can later become tests.
 
-## Common pitfalls
+## Where simple string handling stops
 
 - Expecting string methods to modify the original string. Assign the returned value.
 - Forgetting that indexes start at zero and that slice stop positions are excluded.
@@ -246,9 +246,8 @@ For text-processing exercises, keep a short list of sample inputs beside the par
 - Forgetting explicit encodings when reading and writing text files across machines.
 - Overusing regular expressions for simple prefix, suffix, or delimiter problems.
 
-## Connections
+<div className="see-also">
 
-- [Syntax, Variables, and Types](/cs/programming/python/syntax-variables-and-types)
-- [Operators and Expressions](/cs/programming/python/operators-and-expressions)
-- [Files and Context Managers](/cs/programming/python/files-and-context-managers)
-- [Standard Library Highlights](/cs/programming/python/standard-library-highlights)
+See also: [Syntax, Variables, and Types](/cs/programming/python/syntax-variables-and-types) · [Operators and Expressions](/cs/programming/python/operators-and-expressions) · [Files and Context Managers](/cs/programming/python/files-and-context-managers) · [Standard Library Highlights](/cs/programming/python/standard-library-highlights)
+
+</div>

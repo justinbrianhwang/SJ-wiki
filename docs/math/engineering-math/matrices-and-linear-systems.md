@@ -9,7 +9,7 @@ Matrices organize linear relationships. In engineering mathematics they represen
 
 Solving $A\mathbf{x}=\mathbf{b}$ is one of the core tasks in applied mathematics. Exact row reduction teaches structure, while numerical factorization teaches reliability and cost. The same ideas support eigenvalue problems, finite-difference PDE solvers, regression, optimization, and control.
 
-## Definitions
+## The geometry behind $A\mathbf{x}=\mathbf{b}$
 
 A matrix $A\in\mathbb{R}^{m\times n}$ maps vectors in $\mathbb{R}^n$ to vectors in $\mathbb{R}^m$ by
 
@@ -49,7 +49,7 @@ $$
 PA=LU.
 $$
 
-## Key results
+## Pivots, rank, and invertibility
 
 For a square matrix $A\in\mathbb{R}^{n\times n}$, the following are equivalent: $A$ is invertible, $\det A\ne 0$, $\operatorname{rank}A=n$, the nullspace contains only $\mathbf{0}$, the columns form a basis of $\mathbb{R}^n$, and $A\mathbf{x}=\mathbf{b}$ has a unique solution for every $\mathbf{b}$.
 
@@ -65,7 +65,11 @@ Gaussian elimination is systematic. Row swaps improve pivoting, scaling is optio
 
 The determinant measures signed volume scaling for a square linear map. It is useful for invertibility tests and theoretical formulas, but it is usually not the best numerical way to solve systems. Computing an inverse explicitly is also often unnecessary. To solve $A\mathbf{x}=\mathbf{b}$, factor $A$ and use triangular solves.
 
+## Stable solves are more than row reduction
+
 Conditioning measures sensitivity. A matrix with large condition number can turn small perturbations in data into large changes in the solution. The residual $\mathbf{r}=\mathbf{b}-A\hat{\mathbf{x}}$ may be small even when the error $\hat{\mathbf{x}}-\mathbf{x}$ is large if $A$ is ill-conditioned. This is a major theme in numerical linear algebra and engineering computation.
+
+## Inconsistent data and least squares
 
 Least-squares problems solve inconsistent systems approximately. If $A$ has more rows than columns and measurements are noisy, one minimizes
 
@@ -95,7 +99,7 @@ Scaling can improve numerical behavior. If one equation is measured in millions 
 
 In large systems, algorithmic cost matters. Dense Gaussian elimination for an $n\times n$ matrix costs on the order of $n^3$ operations, while triangular solves cost on the order of $n^2$. If the same matrix is used with many right-hand sides, factoring once and solving many times is efficient. Sparse direct solvers and iterative methods can reduce cost dramatically when the matrix structure permits.
 
-## Visual
+## Classifying a system from its pivots
 
 ```mermaid
 flowchart TD
@@ -116,9 +120,9 @@ flowchart TD
 | Determinant | Volume scaling for square maps | Poor tool for large numerical solves |
 | Condition number | Sensitivity measure | Large values warn of unreliable solutions |
 
-## Worked example 1: Gaussian elimination
+## Elimination with three pivots
 
-Problem. Solve
+Consider
 
 $$
 \begin{aligned}
@@ -128,9 +132,7 @@ x-y+2z&=0.
 \end{aligned}
 $$
 
-Method.
-
-1. Write the augmented matrix:
+The augmented matrix is
 
 $$
 \left[
@@ -142,13 +144,13 @@ $$
 \right].
 $$
 
-2. Eliminate below the first pivot:
+Eliminate below the first pivot with
 
 $$
 R_2\leftarrow R_2-2R_1,\qquad R_3\leftarrow R_3-R_1.
 $$
 
-This gives
+to obtain
 
 $$
 \left[
@@ -160,13 +162,13 @@ $$
 \right].
 $$
 
-3. Eliminate below the second pivot:
+Next use
 
 $$
 R_3\leftarrow R_3-3R_2.
 $$
 
-Then
+which gives
 
 $$
 \left[
@@ -178,41 +180,35 @@ $$
 \right].
 $$
 
-4. Back substitute:
+Back substitution starts with
 
 $$
 -6z=-6,\qquad z=1.
 $$
 
-5. Use row 2:
+The second row then gives
 
 $$
 -y+3z=1,\qquad -y+3=1,\qquad y=2.
 $$
 
-6. Use row 1:
+and the first row gives
 
 $$
 x+2(2)-1=3,\qquad x=0.
 $$
 
-Answer.
-
 $$
 \mathbf{x}=(0,2,1)^T.
 $$
 
-Check. Substitution gives $3$, $7$, and $0$ in the three equations.
+Substitution returns $3$, $7$, and $0$ in the three equations.
 
 The pivot pattern shows that all three variables are basic. There are no free variables and no inconsistent row, so the solution is unique. If the last row had become $0=5$, the system would have been inconsistent. If the last row had become all zeros, one variable would have remained free.
 
-## Worked example 2: Least-squares line fit
+## Fitting a line to inconsistent measurements
 
-Problem. Fit $y=a+bt$ to the points $(0,1)$, $(1,2)$, and $(2,2)$ by least squares.
-
-Method.
-
-1. Build the design matrix:
+Fit $y=a+bt$ to $(0,1)$, $(1,2)$, and $(2,2)$ by least squares. The design system is
 
 $$
 A=
@@ -228,7 +224,7 @@ A=
 \end{bmatrix}.
 $$
 
-2. Compute
+The normal equations use
 
 $$
 A^TA=
@@ -243,7 +239,7 @@ A^T\mathbf{b}=
 \end{bmatrix}.
 $$
 
-3. Solve normal equations:
+and therefore
 
 $$
 \begin{aligned}
@@ -252,29 +248,27 @@ $$
 \end{aligned}
 $$
 
-4. Subtract the first equation from the second:
+Subtracting the first equation from the second gives
 
 $$
 2b=1,\qquad b=\frac{1}{2}.
 $$
 
-5. Substitute:
+Back substitution gives
 
 $$
 3a+\frac{3}{2}=5,\qquad 3a=\frac{7}{2},\qquad a=\frac{7}{6}.
 $$
 
-Answer.
-
 $$
 y=\frac{7}{6}+\frac{1}{2}t.
 $$
 
-Check. The residuals are $1/6$, $-1/3$, and $1/6$, whose sum is zero, consistent with fitting an intercept.
+With the convention $\mathbf{r}=\mathbf{b}-A\hat{\mathbf{x}}$, the residuals are $-1/6$, $1/3$, and $-1/6$. Their sum is zero, as expected when an intercept is included.
 
 The residual vector is orthogonal to the columns of $A$. That is the geometric meaning of the normal equations: the error is perpendicular to every direction in the model space. The fitted line is therefore the closest line in the least-squares sense among all lines of the form $a+bt$.
 
-## Code
+## Solving and checking conditioning in NumPy
 
 ```python
 import numpy as np
@@ -293,7 +287,7 @@ print(np.linalg.cond(A))
 
 The code solves the exact system and reports a condition number. In a real measurement problem, the condition number helps decide how much trust to place in computed digits. A residual near machine precision is good, but it is not a complete accuracy certificate for an ill-conditioned system.
 
-## Common pitfalls
+## Numerical habits that prevent false confidence
 
 - Computing $A^{-1}$ just to solve one system when a factorization or direct solve is better.
 - Confusing row space, column space, and nullspace.
@@ -304,9 +298,8 @@ The code solves the exact system and reports a condition number. In a real measu
 - Treating determinant formulas as practical algorithms for large systems.
 - Destroying sparsity by using dense operations on sparse engineering matrices.
 
-## Connections
+<div className="see-also">
 
-- [Eigenvalues and Diagonalization](/math/engineering-math/eigenvalues-and-diagonalization)
-- [Numerical Methods Overview](/math/engineering-math/numerical-methods-overview)
-- [Systems of ODEs and Phase Planes](/math/engineering-math/systems-of-odes-and-phase-plane)
-- [Vector Differential Calculus](/math/engineering-math/vector-differential-calculus)
+See also: [Eigenvalues and Diagonalization](/math/engineering-math/eigenvalues-and-diagonalization) · [Numerical Methods Overview](/math/engineering-math/numerical-methods-overview) · [Systems of ODEs and Phase Planes](/math/engineering-math/systems-of-odes-and-phase-plane) · [Vector Differential Calculus](/math/engineering-math/vector-differential-calculus)
+
+</div>

@@ -309,9 +309,8 @@ Evaluation mode matters. Dropout must stop sampling masks, and modules that main
 
 Gradient norms can distinguish saturation from disconnection. A parameter with `None` gradient is absent from the graph; a tensor of zeros is connected but received zero local derivative. The remedies differ. Automatic differentiation reports the symptom faithfully, but it cannot say whether the intended computation was built.
 
-## Related pages
+<div className="see-also">
 
-- [Logistic regression for text](/cs/nlp/logistic-regression-for-text)
-- [RNNs and LSTMs for sequence modeling](/cs/nlp/rnns-lstms-sequence-modeling)
-- [Transformers and self-attention](/cs/nlp/transformers-self-attention)
-- [Vector semantics and embeddings](/cs/nlp/vector-semantics-and-embeddings)
+See also: [Logistic regression for text](/cs/nlp/logistic-regression-for-text) · [RNNs and LSTMs for sequence modeling](/cs/nlp/rnns-lstms-sequence-modeling) · [Transformers and self-attention](/cs/nlp/transformers-self-attention) · [Vector semantics and embeddings](/cs/nlp/vector-semantics-and-embeddings)
+
+</div>

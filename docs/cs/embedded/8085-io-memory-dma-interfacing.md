@@ -7,9 +7,9 @@ sidebar_position: 6
 
 The 8085 becomes useful only when it is connected to memory and real-world devices. The source chapter on I/O and memory interfacing follows the programming chapters because the same instructions now have electrical meaning: `LDA` reads a selected memory chip, `STA` writes one byte to a decoded address, `IN` samples a port, and `OUT` drives a port. The programmer's model and the hardware map must agree.
 
-This page ties together programmed I/O, interrupt-driven I/O, direct memory access, I/O-mapped addressing, memory-mapped addressing, and memory decoding. These ideas are not unique to the 8085, but the 8085 exposes them cleanly through `IO/M`, `RD`, `WR`, `IN`, `OUT`, `HOLD`, and `HLDA`.
+Programmed I/O, interrupt-driven I/O, DMA, and address decoding meet at the 8085 bus. The signals `IO/M`, `RD`, `WR`, `HOLD`, and `HLDA`, together with `IN` and `OUT`, expose each transfer directly.
 
-## Definitions
+## Three ways to move data beyond the CPU
 
 **Programmed I/O** is data transfer under direct CPU control. The program repeatedly checks a device status bit or assumes the device is ready, then executes input or output instructions.
 
@@ -27,21 +27,19 @@ An **I/O port** is a hardware register or latch visible to the CPU. An input por
 
 **Address decoding** converts address-line patterns into device-select signals. Full decoding uses all relevant high-order address bits; partial decoding uses fewer bits and creates mirrored addresses.
 
-## Key results
+## Bus ownership and address decoding
 
-The first key result is that programmed I/O is simple but can waste CPU time. A polling loop is easy to write, but the processor may spend many cycles waiting for a status bit. It is suitable when the device is always ready, the transfer is short, or the system has no better work to do.
+Programmed I/O is simple but can waste CPU time. A polling loop is easy to write, but the processor may spend many cycles waiting for a status bit. It suits a device that is always ready, a short transfer, or a system with no other work to do.
 
-The second key result is that interrupt-driven I/O improves CPU utilization but requires careful shared-state design. An interrupt may occur between two main-program instructions, so variables shared with the service routine must be updated in a safe order.
+Interrupt-driven I/O improves CPU utilization but requires careful shared-state design. An interrupt may occur between two main-program instructions, so variables shared with the service routine must be updated in a safe order.
 
-The third key result is that DMA improves bulk transfer speed by removing the CPU from the byte-by-byte data path. In the 8085 bus handshake, an external DMA controller asserts `HOLD`; the 8085 completes the current bus cycle, floats the bus, and asserts `HLDA`. After the DMA transfer, `HOLD` is removed and the CPU resumes bus ownership.
+DMA improves bulk transfer speed by removing the CPU from the byte-by-byte data path. In the 8085 bus handshake, an external DMA controller asserts `HOLD`; the 8085 completes the current bus cycle, floats the bus, and asserts `HLDA`. After the DMA transfer, `HOLD` is removed and the CPU resumes bus ownership.
 
-The fourth key result is that I/O-mapped and memory-mapped I/O differ in address space, instruction choice, and decoding. I/O-mapped ports do not consume memory addresses and use compact `IN`/`OUT` instructions. Memory-mapped devices can use the full memory instruction set and 16-bit addresses, but they reduce the memory address range available for RAM and ROM.
+I/O-mapped and memory-mapped I/O differ in address space, instruction choice, and decoding. I/O-mapped ports do not consume memory addresses and use compact `IN`/`OUT` instructions. Memory-mapped devices can use the full memory instruction set and 16-bit addresses, but they reduce the range available for RAM and ROM.
 
-The fifth key result is that memory interfacing requires size alignment. A memory chip with $k$ address pins contains $2^k$ addressable locations. If an 8 KiB RAM has 13 address inputs, it consumes an address block of `2000H` bytes. The decoder must select it for exactly the intended high-address range.
+Memory interfacing requires size alignment. A memory chip with $k$ address pins contains $2^k$ addressable locations. An 8 KiB RAM with 13 address inputs consumes a block of `2000H` bytes. The decoder must select exactly the intended high-address range.
 
-The sixth key result is that address decoding must avoid bus contention. During a read cycle, only one enabled device may drive the data bus. During a write cycle, only the selected device should store the byte.
-
-## Visual
+Address decoding must avoid bus contention. During a read cycle, only one enabled device may drive the data bus. During a write cycle, only the selected device should store the byte.
 
 ```mermaid
 flowchart LR
@@ -64,7 +62,7 @@ flowchart LR
 | Memory-mapped I/O | CPU uses memory instructions | Address decoder and device registers | Rich addressing and bit operations | Consumes memory address space |
 | I/O-mapped I/O | CPU uses `IN` and `OUT` | 8-bit port decoder | Classic 8085 peripherals | Limited port address range |
 
-## Worked example 1: Selecting an 8 KiB RAM block
+### Decoding an 8 KiB RAM block
 
 Problem: Interface an 8 KiB RAM chip to an 8085 so that it occupies addresses `4000H` through `5FFFH`. Determine which address lines go to the RAM and which high address pattern selects the chip.
 
@@ -103,7 +101,7 @@ Answer: connect `A0`-`A12` to the RAM address pins and assert the RAM chip selec
 
 Check: The next 8 KiB block, `6000H` to `7FFFH`, has high pattern `011`, so it will not select this RAM if all three high bits are decoded.
 
-## Worked example 2: Choosing I/O-mapped versus memory-mapped access
+### Mapping an LED latch two ways
 
 Problem: A design needs one 8-bit output latch for LEDs. Compare the 8085 code if the latch is mapped as I/O port `20H` versus memory location `8000H`.
 
@@ -131,7 +129,7 @@ Answer: use `OUT 20H` for I/O-mapped hardware and `STA 8000H` for memory-mapped 
 
 Check: If the program uses `OUT 20H` but the decoder expects memory address `8000H`, the latch will never be selected.
 
-## Code
+## Polling a ready bit before output
 
 ```asm
 ; 8085: poll an input port until bit 0 becomes 1, then output a pattern.
@@ -148,20 +146,18 @@ WAIT_READY:
         HLT
 ```
 
-## Common pitfalls
+## When the software map and bus wiring disagree
 
 - Decoding an I/O port but using memory instructions in software, or decoding memory but using `IN` and `OUT`.
-- Allowing two devices to drive the data bus during the same read cycle. This can damage hardware or produce invalid data.
+- If two devices drive the data bus during the same read cycle, the result may be invalid and the hardware may be damaged.
 - Forgetting that the low 8085 address bits must be latched before memory or I/O decoding uses them.
-- Assuming polling is always slow or interrupts are always better. For a single ready device, polling may be the simplest correct design.
+- Polling is not automatically inferior to interrupts. For one ready device, it may be the simplest correct design.
 - Forgetting to save registers inside interrupt service routines that modify registers used by the main program.
 - Placing memory-mapped I/O inside an address range also used by RAM.
 - Ignoring DMA bus ownership. The CPU and DMA controller must not drive address and control buses at the same time.
 
-## Connections
+<div className="see-also">
 
-- [8085 architecture, buses, and timing](/cs/embedded/intel-8085-architecture-buses-timing)
-- [8085 assembly programming patterns](/cs/embedded/8085-assembly-programming-patterns)
-- [8255 programmable peripheral interface](/cs/embedded/8255-programmable-peripheral-interface)
-- [8051 external-world interfacing](/cs/embedded/8051-external-world-interfacing)
+See also: [8085 architecture, buses, and timing](/cs/embedded/intel-8085-architecture-buses-timing) · [8085 assembly programming patterns](/cs/embedded/assembly-programming-patterns) · [8255 programmable peripheral interface](/cs/embedded/programmable-peripheral-interface) · [8051 external-world interfacing](/cs/embedded/external-world-interfacing)
 
+</div>

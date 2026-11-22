@@ -9,7 +9,7 @@ Process synchronization is the part of operating systems where concurrency becom
 
 The textbook develops synchronization from the critical-section problem through hardware support, mutex locks, semaphores, monitors, classic synchronization problems, and deadlocks. The common theme is controlled access: the OS and programs need ways to express "only one at a time," "wait until a condition is true," and "wake the right waiters without losing events."
 
-## Definitions
+## Races, invariants, and synchronization primitives
 
 A **race condition** occurs when the correctness of a result depends on the relative timing of concurrent operations. The simplest example is two threads executing `counter = counter + 1` at the same time. The statement looks atomic in source code, but it compiles into multiple load, add, and store operations.
 
@@ -23,7 +23,7 @@ A **monitor** is a higher-level synchronization construct that combines shared d
 
 **Atomic hardware instructions** such as test-and-set and compare-and-swap support synchronization by making a read-modify-write operation indivisible with respect to other CPUs.
 
-## Key results
+## From a lost update to an ordering guarantee
 
 The first key result is that source-level statements are not atomic unless the language and memory model say they are. A counter increment can interleave as follows:
 
@@ -48,13 +48,15 @@ Monitors reduce accidental misuse by grouping the lock with the data it protects
 
 Hardware support matters because synchronization has to work across CPUs, compiler optimizations, caches, and interrupts. An atomic compare-and-swap can implement a lock by changing a memory word only if it still contains the expected old value. Memory barriers or acquire/release semantics prevent the compiler and CPU from reordering memory operations across synchronization boundaries in ways that would break the protected invariant. Without these ordering rules, two processors might agree on who owns a lock but still observe stale protected data.
 
+## Lock duration and granularity
+
 Blocking locks and spinlocks serve different situations. A blocking mutex puts the caller to sleep when the lock is unavailable, allowing the CPU to run another thread. This is appropriate when the critical section may be long. A spinlock repeatedly checks the lock and is appropriate only when the wait is expected to be very short or when sleeping is illegal, such as certain kernel interrupt contexts. The wrong choice can waste CPU time or introduce invalid blocking in low-level code.
 
 Synchronization design also requires choosing the granularity of locks. One global lock is easy to reason about but limits parallelism. Fine-grained locks allow more concurrency but increase the risk of deadlock and make invariants harder to understand. Production kernels and runtimes often combine strategies: coarse locks for rare administrative paths, fine-grained locks for hot data structures, lock-free or per-CPU structures for very frequent operations, and higher-level monitors or condition variables where clarity matters more than raw speed.
 
 Correct synchronization usually protects an invariant, not a line of code. For a bounded buffer, the invariant might be that `0 <= count <= capacity` and that producer and consumer indexes identify valid slots. For a file table, the invariant might be that reference counts match open handles. Naming the invariant makes it easier to choose the lock, decide the critical-section boundaries, and review whether every path preserves the same rule.
 
-## Visual
+## The bounded buffer as a semaphore protocol
 
 ```mermaid
 flowchart TB
@@ -109,9 +111,11 @@ flowchart TB
 
 This bounded-buffer diagram shows every synchronization object instead of only the call order. `empty` and `full` are counting semaphores that reserve capacity before either thread touches the buffer, while `mutex` protects the circular-buffer fields `in`, `out`, and `count`. The dotted arrows mark which shared object each operation modifies or waits on, making the invariant `0 <= count <= N` the center of the design.
 
-## Worked example 1: lost update on a shared counter
+## Tracing two synchronization states
 
-Problem: `counter` starts at 10. Two threads each execute `counter = counter + 1` once. Show how the final value can be 11 instead of 12.
+### Reconstructing a lost counter update
+
+`counter` starts at 10. Two threads each execute `counter = counter + 1` once. Show how the final value can be 11 instead of 12.
 
 1. Break the statement into machine-like steps:
    - load `counter` into a register
@@ -126,11 +130,11 @@ Problem: `counter` starts at 10. Two threads each execute `counter = counter + 1
 8. Thread A adds 1 to its old register value, so `rA = 11`.
 9. Thread A stores 11 into `counter`, overwriting B's update with the same value.
 
-Checked answer: The final value is 11 because both threads read the same original value. A mutex around the entire read-add-store sequence would force the second thread to read 11 and store 12.
+The final value is 11 because both threads read the same original value. A mutex around the entire read-add-store sequence would force the second thread to read 11 and store 12.
 
-## Worked example 2: bounded buffer semaphore counts
+### Accounting for full and empty buffer slots
 
-Problem: A circular buffer has capacity 5. Initially it contains 2 items. Set the initial semaphore values for the producer-consumer solution, then trace one producer insert and one consumer remove.
+A circular buffer has capacity 5. Initially it contains 2 items. Set the initial semaphore values for the producer-consumer solution, then trace one producer insert and one consumer remove.
 
 1. The `full` semaphore counts filled slots, so initially:
 
@@ -163,9 +167,9 @@ $$
    - `signal(mutex)` changes `mutex` from 0 to 1.
    - `signal(empty)` changes `empty` from 2 to 3.
 
-Checked answer: The system returns to the original counts after one insert and one remove: `full = 2`, `empty = 3`, `mutex = 1`. The intermediate counts prevent overflow and underflow.
+The system returns to the original counts after one insert and one remove: `full = 2`, `empty = 3`, `mutex = 1`. The intermediate counts prevent overflow and underflow.
 
-## Code
+## A condition-variable bounded buffer
 
 ```python
 from threading import Condition, Thread
@@ -199,7 +203,7 @@ Thread(target=lambda: print(buffer.get())).start()
 
 This monitor-style Python example uses a condition variable. The `while` loops are intentional: a thread rechecks the predicate after waking before it touches the buffer.
 
-## Common pitfalls
+## Synchronization mistakes that survive code review
 
 - Assuming a high-level statement is atomic. Most useful updates are multiple lower-level operations.
 - Protecting the write but not the read. Shared mutable state needs a consistent rule for every access.
@@ -208,10 +212,8 @@ This monitor-style Python example uses a condition variable. The `while` loops a
 - Holding a lock during slow I/O. That expands the critical section and can block unrelated work.
 - Forgetting starvation. Mutual exclusion prevents simultaneous access, but it does not automatically guarantee fairness.
 
-## Connections
+<div className="see-also">
 
-- [Threads](/cs/operating-systems/threads)
-- [CPU Scheduling](/cs/operating-systems/cpu-scheduling)
-- [Deadlocks](/cs/operating-systems/deadlocks)
-- [Main Memory](/cs/operating-systems/main-memory)
-- [Protection and Access Control](/cs/operating-systems/protection-access-control)
+See also: [Threads](/cs/operating-systems/threads) · [CPU Scheduling](/cs/operating-systems/cpu-scheduling) · [Deadlocks](/cs/operating-systems/deadlocks) · [Main Memory](/cs/operating-systems/main-memory) · [Protection and Access Control](/cs/operating-systems/protection-access-control)
+
+</div>

@@ -9,7 +9,7 @@ K&R's pointer chapter moves from single pointers to arrays of pointers, strings,
 
 The central lesson is representation. A two-dimensional character array stores fixed-width rows. An array of `char *` stores pointers to strings that may have different lengths. Both can be indexed with two subscripts in some cases, but their storage and flexibility differ dramatically.
 
-## Definitions
+## Strings at two levels of indirection
 
 A C string is a sequence of characters terminated by `'\0'`. A string literal creates an array with this terminator:
 
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 
 Pointer arrays are often sorted by swapping pointers instead of moving the strings they point to. This is the idea behind K&R's line-sorting example.
 
-## Key results
+## Keeping counts, terminators, and pointers consistent
 
 `char *s` and `char s[]` are equivalent as function parameters, but not as object definitions. As a parameter, both mean "pointer to char." As definitions, `char s[] = "abc";` creates an array, while `char *s = "abc";` creates a pointer to a string literal.
 
@@ -71,7 +71,7 @@ String functions rely on the terminator, not on separately stored length. That g
 
 Pointer arrays are also a memory-management technique. In the line-sorting program, the text of each line is stored once, while an array of pointers records the order. Sorting swaps pointers rather than moving entire lines. This is faster, but it also means the pointers must remain valid for the whole sort. If the lines were stored in a single temporary buffer reused for every input line, all pointers would end up pointing at the same overwritten storage.
 
-For command-line arguments, remember that the environment owns the original strings. A program may inspect them and often can modify them on hosted systems, but portable code should not depend on modifying `argv` strings unless the standard and target environment permit the intended use. It is always fine to copy an argument into program-owned storage when mutation is needed.
+For a hosted C program, the standard requires the strings in `argv` to be modifiable and to retain the values written by the program. Their storage still belongs to the execution environment, so the program must not free them. Copy an argument when ownership must transfer or when the original spelling is still needed.
 
 A useful mental model is that `argv` is already an array of strings in the same style K&R builds manually for sorted input lines. `argv` itself is a pointer to the first element of an array of `char *`; each element points at a null-terminated string. Incrementing `argv` walks the vector, while incrementing `argv[0]` walks characters inside one string. K&R shows both moves, and confusing them changes the level of traversal.
 
@@ -79,7 +79,7 @@ When parsing options, keep the remaining argument count and pointer position con
 
 The same invariant applies to arrays of line pointers: the count says how many entries are valid, and the pointer array stores only those entries. Never sort or print uninitialized pointer slots beyond the count.
 
-## Visual
+## Fixed rows or variable-length strings
 
 ```text
 Array of pointers:
@@ -103,17 +103,15 @@ aname[2]  F e b \0 padding...
 | Pointer array | `char *a[12]` | pointers inline, strings elsewhere | variable-length rows | pointers must be valid |
 | Argument vector | `char *argv[]` | array of pointers from environment | natural command input | option parsing can get dense |
 
-## Worked example 1: Echoing command-line arguments by pointer movement
+## Walking `argv` in the pointer style
 
-Problem: for a program invoked as
+For a program invoked as
 
 ```text
 echo hello world
 ```
 
-show how K&R's pointer version prints `hello world`.
-
-Method:
+K&R's pointer version prints `hello world` by moving the vector pointer itself.
 
 Initial state:
 
@@ -142,13 +140,11 @@ while (--argc > 0)
 8. Since `argc > 1` is false, print no trailing space.
 9. Third test decrements `argc` from `1` to `0`; stop.
 
-Checked answer: output is exactly `hello world`.
+The output is exactly `hello world`.
 
-## Worked example 2: Choosing pointer array over two-dimensional array
+## Storing three month names two ways
 
-Problem: store the month names `May`, `September`, and `December`. Compare storage if a fixed row width of 10 characters is used.
-
-Method:
+Compare a fixed row width of 10 characters with a pointer array for `May`, `September`, and `December`.
 
 1. Two-dimensional array:
 
@@ -158,7 +154,9 @@ Method:
 
    Storage is:
 
-   $$3 \times 10 = 30\text{ chars}.$$
+$$
+3 \times 10 = 30\text{ chars}.
+$$
 
 2. Actual characters needed including terminators:
 
@@ -168,7 +166,9 @@ Method:
 
    Total:
 
-   $$4 + 10 + 9 = 23\text{ chars}.$$
+$$
+4 + 10 + 9 = 23\text{ chars}.
+$$
 
 3. Pointer array:
 
@@ -180,13 +180,14 @@ Method:
 
 4. Interpretation: the pointer array may use more total memory on a machine with large pointers, but it avoids fixed row limits and represents variable-length strings naturally.
 
-Checked answer: the two-dimensional array reserves exactly 30 character slots and can modify each row. The pointer array represents variable strings naturally but should treat literals as read-only.
+The two-dimensional array reserves exactly 30 character slots and can modify each row. The pointer array represents variable-length strings naturally but should treat its literals as read-only.
 
-## Code
+## Parsing month arguments without pointer tricks
 
 ```c
+#include <errno.h>
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
 
 static const char *month_name(int n)
 {
@@ -209,20 +210,23 @@ int main(int argc, char *argv[])
     }
 
     while (--argc > 0) {
-        int n = 0;
+        char *end;
         const char *s = *++argv;
+        errno = 0;
+        long n = strtol(s, &end, 10);
 
-        while (*s >= '0' && *s <= '9')
-            n = 10 * n + (*s++ - '0');
-
-        puts(month_name(n));
+        if (end != s && *end == '\0' && errno != ERANGE &&
+            n >= 1 && n <= 12)
+            puts(month_name((int)n));
+        else
+            puts(month_name(0));
     }
 
     return 0;
 }
 ```
 
-## Common pitfalls
+## Mixing layouts or losing the owning pointer
 
 - Trying to modify a string literal through `char *`. Modern compilers may warn; the behavior is undefined.
 - Assuming `char **` is interchangeable with `char a[][N]`. A pointer to pointer and a pointer to an array are different types and layouts.
@@ -232,10 +236,8 @@ int main(int argc, char *argv[])
 - Copying strings without room for the terminating `'\0'`.
 - Sorting full lines when swapping pointers would be simpler and cheaper.
 
-## Connections
+<div className="see-also">
 
-- [Pointers, Addresses, and Arrays](/cs/programming/c/pointers-addresses-arrays)
-- [Function Pointers and Complex Declarations](/cs/programming/c/function-pointers-complex-declarations)
-- [Standard I/O and Formatted I/O](/cs/programming/c/standard-io-formatted-io)
-- [Storage Allocation](/cs/programming/c/storage-allocation)
-- [Unix System Interface](/cs/programming/c/unix-system-interface)
+See also: [Pointers, Addresses, and Arrays](/cs/programming/c/pointers-addresses-arrays) · [Function Pointers and Complex Declarations](/cs/programming/c/function-pointers-complex-declarations) · [Standard I/O and Formatted I/O](/cs/programming/c/standard-io-formatted-io) · [Storage Allocation](/cs/programming/c/storage-allocation) · [Unix System Interface](/cs/programming/c/unix-system-interface)
+
+</div>

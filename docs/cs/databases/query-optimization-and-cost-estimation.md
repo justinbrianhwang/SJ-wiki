@@ -9,7 +9,7 @@ Query optimization is the process of choosing an efficient execution plan among 
 
 Optimization is difficult because the number of possible plans grows quickly. A query with several joins can be evaluated in many join orders, with different join algorithms and indexes at each step. The optimizer therefore relies on statistics, heuristics, and dynamic programming rather than exhaustive physical experimentation. A good plan can be thousands of times faster than a bad one.
 
-## Definitions
+## Logical plans, physical plans, and statistics
 
 A **logical plan** represents relational operations such as selection, projection, join, grouping, and sorting. A **physical plan** chooses concrete algorithms such as index scan, hash join, sort-merge join, or hash aggregation.
 
@@ -21,7 +21,7 @@ An **equivalence rule** says two relational expressions always produce the same 
 
 A **left-deep join tree** is a join plan where the right input of each join is a base relation. Many optimizers search left-deep trees because they support pipelined execution and reduce search complexity. Bushy trees allow both inputs to be intermediate results and can be better for some queries.
 
-## Key results
+## Rewriting first, estimating second
 
 Selection pushdown is one of the most important transformations:
 
@@ -67,7 +67,7 @@ These formulas rely on uniformity and independence assumptions that can be wrong
 
 Cost models usually combine I/O, CPU, memory, and sometimes network cost. In older disk-centered models, page I/O dominated. In memory-resident or columnar systems, CPU cost, decompression, cache behavior, and vectorized execution can dominate. Distributed systems must also estimate data movement. The exact model varies by DBMS, but the central idea is stable: compare alternative plans using estimated resource consumption before executing the query.
 
-Cardinality estimation errors multiply through a plan. If the optimizer underestimates one join result by a factor of 100, it may choose a nested-loop plan that looks cheap on paper but performs huge numbers of probes at runtime. This is why histograms, multi-column statistics, and feedback from actual execution can matter. Query tuning often starts by comparing estimated rows with actual rows at each plan node.
+Cardinality estimation errors multiply through a plan. If the optimizer underestimates one join result by a factor of 100, it may choose a nested-loop plan that looks cheap on paper but performs huge numbers of probes at runtime. Histograms, multi-column statistics, and feedback from actual execution reduce that risk. Query tuning often starts by comparing estimated rows with actual rows at each plan node.
 
 Heuristics still matter even in cost-based optimizers. Pushing selections, removing unused columns, avoiding Cartesian products, and simplifying predicates reduce the search space and improve the quality of later cost decisions. The best optimizers combine algebraic rewriting, statistics, dynamic programming, and practical limits on how many alternatives they explore.
 
@@ -78,8 +78,6 @@ Subquery decorrelation is a major advanced rewrite. A nested `EXISTS` query may 
 Prepared statements and parameterized queries introduce another estimation challenge. The optimizer may choose a generic plan that works reasonably for many parameter values, or a custom plan for a specific value. If one department has 10 students and another has 20,000, the best plan for `dept_name = ?` may depend heavily on the parameter. This is one reason skew and bind parameters can make performance diagnosis surprising.
 
 Optimization time is itself a cost. For short queries, spending seconds searching for a perfect plan would be worse than executing a good plan immediately. Real optimizers use time limits, search-space pruning, and heuristics because planning must be fast enough for interactive workloads.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -120,7 +118,7 @@ flowchart TD
   Runtime -. "stale-statistics detection" .-> CostInputs
 ```
 
-This optimizer diagram opens the black box between SQL and the final plan. Rule rewrites reduce the logical tree, then dynamic programming builds the best plans for base relations, pairs, and larger join subsets while tracking cost and physical properties such as ordering. The cost-input subgraph names the statistics that drive the choice, and the feedback edge highlights why comparing estimated and actual rows is central to query tuning.
+The diagram follows a query from rule rewrites through dynamic-programming search. Candidate plans for base relations, pairs, and larger join subsets carry both estimated cost and physical properties such as ordering. The cost-input subgraph lists the statistics behind those estimates, while the feedback edge connects runtime row counts to later planning.
 
 | Statistic | Used for | Risk when stale or missing |
 | --- | --- | --- |
@@ -131,11 +129,9 @@ This optimizer diagram opens the black box between SQL and the final plan. Rule 
 | index height | index lookup cost | wrong access-path choice |
 | clustering factor | random versus sequential fetch cost | index scan chosen when table scan is cheaper |
 
-## Worked example 1: Estimate selection cardinality
+### Estimating the cardinality of one selection
 
-Problem: `student` has 50,000 rows. Statistics say `V(student, dept_name) = 25`. Estimate the number of rows for `dept_name = 'Comp. Sci.'` using uniformity.
-
-Method:
+`student` has 50,000 rows, and statistics say `V(student, dept_name) = 25`. Under a uniformity assumption, the estimate for `dept_name = 'Comp. Sci.'` is straightforward.
 
 1. Use the equality selectivity estimate:
 
@@ -157,13 +153,11 @@ $$
 
 4. Interpret the assumption. The estimate says each department has about 2,000 students. This may be false if departments are skewed; a histogram would improve the estimate.
 
-Checked answer: the optimizer estimates 2,000 rows. The number is not a guarantee; it is a cost-model input.
+The optimizer estimates 2,000 rows. The number is not a guarantee; it is a cost-model input.
 
-## Worked example 2: Choose a join order by estimated size
+### Choosing a join order from intermediate sizes
 
-Problem: Relations `Student`, `Takes`, and `Course` have cardinalities 50,000, 500,000, and 2,000. A query filters `Course.dept_name = 'Comp. Sci.'`. Suppose the filter leaves 200 courses. Should the optimizer join `Takes` with filtered `Course` before joining `Student`, or join `Student` with `Takes` first?
-
-Method:
+Relations `Student`, `Takes`, and `Course` have cardinalities 50,000, 500,000, and 2,000. A query filters `Course.dept_name = 'Comp. Sci.'`, leaving 200 courses. Compare joining `Takes` with filtered `Course` first against joining `Student` with `Takes` first.
 
 1. Estimate `Takes join filtered Course`. If each course appears in about:
 
@@ -187,9 +181,9 @@ $$
 
 4. Then join the smaller intermediate with `Student` by `ID`.
 
-Checked answer: it is likely better to push the course filter and join `Takes` with filtered `Course` first. This reduces the intermediate result by about a factor of ten before adding student attributes.
+It is likely better to push the course filter and join `Takes` with filtered `Course` first. This reduces the intermediate result by about a factor of ten before adding student attributes.
 
-## Code
+### Recomputing the estimates and inspecting a plan
 
 ```python
 def equality_selection_rows(row_count, distinct_values):
@@ -219,7 +213,7 @@ JOIN course AS c ON c.course_id = t.course_id
 WHERE c.dept_name = 'Comp. Sci.';
 ```
 
-## Common pitfalls
+## Where optimizer intuition fails
 
 - Assuming the optimizer knows exact data distributions. It usually works from approximate statistics.
 - Forgetting that stale statistics can make a correct query slow.
@@ -228,7 +222,7 @@ WHERE c.dept_name = 'Comp. Sci.';
 - Ignoring tuple width. A plan with the same row count can be cheaper if projection pushdown removes large attributes.
 - Reading estimated plans as truth. Compare estimated and actual row counts when diagnosing performance.
 
-## Connections
+## Notes behind the cost model
 
 - [Relational Model and Relational Algebra](/cs/databases/relational-model-and-algebra)
 - [Query Processing and Join Algorithms](/cs/databases/query-processing-join-algorithms)

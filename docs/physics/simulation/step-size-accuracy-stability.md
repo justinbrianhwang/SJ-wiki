@@ -11,13 +11,13 @@ The central lesson is that a simulation result is a numerical experiment, not a 
 
 ![Euler's method advances along tangent-line steps compared with the exact curve.](https://commons.wikimedia.org/wiki/Special:FilePath/Euler_method.svg)
 
-*Figure: Euler stepping makes local truncation error visible as the gap between a tangent advance and the true trajectory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Euler_method.svg), Oleg Alexandrov, public domain.*
+*Figure: In Euler stepping, local truncation error appears as the gap between a tangent advance and the true trajectory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Euler_method.svg), Oleg Alexandrov, public domain.*
 
 ![Several one-step numerical methods are compared against an exact solution curve.](https://commons.wikimedia.org/wiki/Special:FilePath/Runge-kutta.svg)
 
 *Figure: Runge-Kutta comparisons show how staged slopes improve simulated trajectories over simple Euler steps. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Runge-kutta.svg), T.gauster, CC BY-SA 3.0.*
 
-## Definitions
+## Error order, stability regions, and stiffness
 
 For a fixed-step simulation, the time grid is
 
@@ -47,7 +47,7 @@ Stiffness is present when the model has fast stable dynamics that force small ex
 
 An adaptive solver changes step size during the simulation. It estimates error, accepts the step if the error is below tolerance, and rejects or repeats the step with a smaller $h$ if the error is too large.
 
-## Key results
+## Choosing a step from the dynamics
 
 For the scalar stable system $\dot{x}=-ax$ with $a\gt 0$, explicit Euler is stable only if
 
@@ -69,7 +69,7 @@ $$
 T_d=\frac{2\pi}{\omega_d}.
 $$
 
-Using only a few points per period causes wrong amplitude, wrong phase, and missed peaks. A common practical target is at least $20$ to $50$ points per period for clean plots and phase-sensitive comparisons.
+Using only a few points per period causes wrong amplitude, wrong phase, and missed peaks. At least $20$ to $50$ points per period is a useful initial target for clean plots and phase-sensitive comparisons.
 
 Step-size convergence is one of the simplest verification checks. Run the same model with $h$, $h/2$, and possibly $h/4$. If the output of interest changes negligibly between the smaller two steps, the step is probably adequate for that output. This does not validate the physical model, but it tests numerical resolution.
 
@@ -84,8 +84,6 @@ $$
 There is also a distinction between resolution and stability. Resolution asks whether the computed points are close enough to the true curve for the output being studied. Stability asks whether the numerical recurrence damps or amplifies modes in a way that is compatible with the differential equation. A step can be stable but inaccurate, especially for oscillatory systems where phase error accumulates slowly. A step can also be accurate for a slow output while an unobserved fast state is poorly resolved, which matters if that fast state later couples back through a nonlinear event.
 
 For Simulink models, step-size selection must account for block behavior. Discontinuity blocks, relay thresholds, saturation limits, lookup tables, and triggered subsystems can introduce sharp changes that are not obvious from the continuous equations alone. A variable-step solver may reduce the step near such features, but only if the event is represented in a way the solver can detect. Fixed-step simulations should place sample times and event logic deliberately so that switching is not an accident of the chosen grid.
-
-## Visual
 
 ```mermaid
 flowchart TB
@@ -114,7 +112,7 @@ The step-size diagram expands solver choice into a repeatable verification loop.
 | Stiff dynamics | Very slow simulation or solver failure | Separated time scales | Use `ode15s` or simplify fast modes |
 | Bad state scaling | Tiny steps for one state | Tolerance weights mismatched | Rescale states or set vector tolerances |
 
-## Worked example 1: Stability limit for explicit Euler
+## Finding Euler's stability boundary
 
 Problem: The stable differential equation
 
@@ -182,7 +180,7 @@ Checked answer: the continuous system always decays, but explicit Euler is safe 
 
 Simulink description: with a fixed-step Euler solver, set the step size to each value and scope $x$. The `h=0.01` run decays; the `h=0.04` run alternates near $\pm1$; the `h=0.05` run diverges.
 
-## Worked example 2: Convergence check for a forced oscillator
+## Refining the grid for a forced oscillator
 
 Problem: A mass-spring-damper system satisfies
 
@@ -246,7 +244,7 @@ Checked answer: these steps resolve the oscillation. The time-response plot shou
 
 Simulink description: use a fixed-step RK4 solver for each step size, scope $q$, and compare logged outputs on the same axes. A variable-step solver can be used as a reference if tolerances are tightened.
 
-## Code
+## Reproducing instability and convergence in MATLAB
 
 ```matlab
 clear; clc; close all;
@@ -292,9 +290,9 @@ xlabel('Time (s)'); ylabel('q(t)');
 title('Step-size convergence for forced oscillator');
 ```
 
-The first figure should make the stability boundary visible. The second should show the three RK4 curves nearly overlapping if the steps are adequate. If the curves separate, refine the step or compare with a tight-tolerance adaptive solution.
+The first figure should show the change at the stability boundary. The second should show the three RK4 curves nearly overlapping if the steps are adequate. If the curves separate, refine the step or compare with a tight-tolerance adaptive solution.
 
-## Common pitfalls
+## False confidence from a clean plot
 
 - Calling a result validated because two coarse step sizes agree. Use at least one additional refinement when the output matters.
 - Confusing solver output times with internal time steps in adaptive solvers.
@@ -303,9 +301,8 @@ The first figure should make the stability boundary visible. The second should s
 - Assuming a stable solver produces an accurate result. Stability only prevents numerical growth; it does not guarantee small phase or amplitude error.
 - Changing solver and model parameters at the same time during debugging. Vary one factor at a time.
 
-## Connections
+<div className="see-also">
 
-- [Numerical Integration Methods](/physics/simulation/numerical-integration-methods)
-- [Hybrid Systems and Event Handling](/physics/simulation/hybrid-systems-event-handling)
-- [Validation and Multi-Domain Simulation Examples](/physics/simulation/validation-multi-domain-examples)
-- [Sampling, Aliasing, and Reconstruction](/physics/signals-systems/sampling-aliasing-reconstruction)
+See also: [Numerical Integration Methods](/physics/simulation/numerical-integration-methods) · [Hybrid Systems and Event Handling](/physics/simulation/hybrid-systems-event-handling) · [Validation and Multi-Domain Simulation Examples](/physics/simulation/validation-multi-domain-examples) · [Sampling, Aliasing, and Reconstruction](/physics/signals-systems/sampling-aliasing-reconstruction)
+
+</div>

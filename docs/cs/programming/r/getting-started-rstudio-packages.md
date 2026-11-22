@@ -7,9 +7,9 @@ sidebar_position: 2
 
 R is both a programming language and an interactive statistical environment. The first chapters of *The Book of R* treat R as a place to work: you type an expression, R evaluates it, prints a result, and keeps any assigned objects in memory for later use. That immediate feedback loop is the reason R is friendly for statistics. You can compute a number, inspect a vector, draw a plot, change the code, and rerun the same command without compiling a whole program.
 
-The practical goal at the beginning is not to memorize every command. It is to build a repeatable workflow: use the console for exploration, save durable work in scripts, ask help pages for exact argument names, and install packages only when base R does not already provide the tool you need. RStudio, described in the book's appendix, wraps that workflow with editor, console, environment, files, plots, and help panes, but the same ideas apply in any R editor.
+The initial goal is not to memorize every command. It is to build a repeatable workflow: use the console for exploration, save durable work in scripts, ask help pages for exact argument names, and install packages only when base R does not already provide the tool you need. RStudio, described in the book's appendix, wraps that workflow with editor, console, environment, files, plots, and help panes, but the same ideas apply in any R editor.
 
-## Definitions
+## Console, scripts, projects, and packages
 
 An **R expression** is a piece of code that R can evaluate, such as `2 + 3`, `sqrt(16)`, or `mean(c(4, 7, 9))`. The console prompt, usually `>`, waits for an expression. If the expression is complete, R evaluates it. If the expression is incomplete, for example an unmatched parenthesis, R changes to a continuation prompt, often `+`, until the expression can be parsed.
 
@@ -23,7 +23,7 @@ A **package** is an installable collection of functions, data, documentation, an
 
 The **help system** is available through `?name`, `help("name")`, `??keyword`, and `example(name)`. A help page normally describes usage, arguments, return value, details, examples, and cross-references.
 
-## Key results
+## From an interactive session to a reproducible script
 
 The central startup pattern is explore, record, rerun. Use the console to test tiny expressions, but move anything important into a script as soon as it becomes part of the analysis. A script should run from top to bottom in a fresh session, creating objects, loading packages, importing data, transforming variables, analyzing, and plotting without depending on hidden console state.
 
@@ -39,8 +39,6 @@ Package management has two separate steps:
 | Check installed packages | `installed.packages()` | As needed | Console |
 
 R's help pages are executable learning material. The examples at the bottom of a help page are usually small enough to run directly. They also reveal conventions for argument order, object classes, and return values. When a function surprises you, inspect both `?function_name` and `str(result)`; the first explains the contract, and the second shows the actual object you received.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -63,11 +61,11 @@ flowchart TD
 | Ask for help early | Prevents argument guessing | `?read.csv`, `args(read.csv)` |
 | Comment intent, not every line | Helps future readers | `# compute group medians` |
 
-## Worked example 1: Building a tiny reproducible session
+## Two checks for a reproducible session
 
-Problem: create a small vector of quiz scores, compute a percentage summary, and write the code so it can be rerun later.
+### A five-score analysis that survives a restart
 
-Method:
+Create a small vector of quiz scores, compute a percentage summary, and write the code so it can be rerun later.
 
 1. Start with raw values. Suppose the scores are `8`, `9`, `6`, `10`, and `7` out of 10.
 2. Store them in an object using assignment.
@@ -89,15 +87,13 @@ range(percent)
 # [1]  60 100
 ```
 
-Checked answer: the average is 80 percent, and the observed range is 60 to 100 percent. The check is direct: the five percentages sum to `80 + 90 + 60 + 100 + 70 = 400`, and `400 / 5 = 80`.
+The average is 80 percent, and the observed range is 60 to 100 percent. The check is direct: the five percentages sum to `80 + 90 + 60 + 100 + 70 = 400`, and `400 / 5 = 80`.
 
 The important workflow lesson is that each object depends only on earlier script lines. If the script is run in a fresh R session, `scores` is created before `percent`, and `percent` is created before the summaries. There is no invisible dependency on a value typed yesterday.
 
-## Worked example 2: Using help to resolve an argument
+### Checking an argument name at the source
 
-Problem: round a set of measurements to one decimal place, but verify the argument name rather than guessing it.
-
-Method:
+Round a set of measurements to one decimal place, but verify the argument name rather than guessing it.
 
 1. Look up the help page for `round`.
 2. Check the usage line.
@@ -114,11 +110,11 @@ round(measurements, digits = 1)
 # [1] 3.1 2.7 1.4
 ```
 
-Checked answer: `3.14159` rounds to `3.1` when one digit after the decimal point is requested; `2.71828` rounds to `2.7`; `1.41421` rounds to `1.4`. The `args(round)` output confirms that the second argument is named `digits`, so the call is explicit and readable.
+`3.14159` rounds to `3.1` when one digit after the decimal point is requested; `2.71828` rounds to `2.7`; `1.41421` rounds to `1.4`. The `args(round)` output confirms that the second argument is named `digits`, so the call is explicit and readable.
 
 This style scales. For `read.table`, `plot`, `lm`, and many other functions, the help page gives the argument names that make a script self-documenting. Reading the usage line is faster than trial and error.
 
-## Code
+## A minimal analysis startup script
 
 ```r
 # Minimal startup script for a small analysis.
@@ -155,7 +151,7 @@ Read this startup script as a miniature version of a full analysis. The package 
 
 A useful self-check is to restart R and run the script from the first line. If it succeeds, the script is not relying on hidden objects in the global environment. If it fails, the error usually points to a missing package, a wrong working directory, an object created only in the console, or a line that needs to appear earlier. This restart-and-run habit is one of the fastest ways to move from interactive exploration to reproducible work.
 
-## Common pitfalls
+## Session state that a script cannot recover
 
 - Treating the console as the only record. Console work is useful for discovery, but a script is the durable record.
 - Installing a package inside every script run. Put `library(pkg)` in the script; reserve `install.packages()` for setup instructions or an explicit installer script.
@@ -164,9 +160,8 @@ A useful self-check is to restart R and run the script from the first line. If i
 - Ignoring the continuation prompt. If R shows `+`, finish the expression or press Escape before typing a new command.
 - Saving and restoring the entire workspace as the main reproducibility strategy. Reproducible work should come from scripts and source data, not from a hidden `.RData` image.
 
-## Connections
+<div className="see-also">
 
-- [Vectors, arithmetic, and comparison](/cs/programming/r/vectors-arithmetic-comparison)
-- [Indexing, names, and recycling](/cs/programming/r/indexing-names-recycling)
-- [Reading and writing data](/cs/programming/r/reading-and-writing-data)
-- [Control flow, functions, and scoping](/cs/programming/r/control-flow-functions-scoping)
+See also: [Vectors, arithmetic, and comparison](/cs/programming/r/vectors-arithmetic-comparison) · [Indexing, names, and recycling](/cs/programming/r/indexing-names-recycling) · [Reading and writing data](/cs/programming/r/reading-and-writing-data) · [Control flow, functions, and scoping](/cs/programming/r/control-flow-functions-scoping)
+
+</div>

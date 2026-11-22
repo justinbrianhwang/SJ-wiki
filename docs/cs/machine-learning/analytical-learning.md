@@ -9,7 +9,7 @@ Analytical learning uses prior knowledge and deduction to generalize from exampl
 
 The historical setting matters. Before massive datasets became common, a central question was how to use hand-built domain theories to reduce data requirements. Analytical learning is strongest when the theory is correct and operationally useful; it is weakest when the theory is wrong, incomplete, or too expensive to apply.
 
-## Definitions
+## The ingredients of an explanation
 
 An analytical learning problem includes:
 
@@ -31,7 +31,7 @@ Operationality describes whether a learned rule is expressed in terms that the p
 
 Regression in EBL means tracing backward from the target proof through rules to identify the weakest conditions on the example that would still allow the proof to succeed.
 
-## Key results
+## From a proof to an operational rule
 
 In purely inductive learning, the main evidence is empirical regularity. In analytical learning, the main evidence is the domain theory. A single positive example can be enough if the theory proves why the example is positive and the proof can be generalized.
 
@@ -52,7 +52,7 @@ The operationality criterion is what keeps EBL from merely restating the origina
 
 EBL also explains why a single example can be enough without violating the need for bias. The single example does not identify the concept by itself. The domain theory supplies the missing information. If two different generalizations are both consistent with the example, the proof chooses the one supported by the theory. This makes the learner's assumptions explicit, unlike a purely inductive learner whose bias may be hidden in a search heuristic.
 
-There is a practical tension between explanation completeness and robustness. A complete proof may include details that are logically necessary under the current theory but brittle in the real world. If the theory contains irrelevant intermediate predicates or overly strict preconditions, the learned rule can become too narrow. This motivates the combined methods in the next chapter, where examples are allowed to revise or soften analytical conclusions.
+Explanation completeness and robustness can pull in opposite directions. A complete proof may include details that are logically necessary under the current theory but brittle in the real world. If the theory contains irrelevant intermediate predicates or overly strict preconditions, the learned rule can become too narrow. This motivates combined methods in which examples can revise or soften analytical conclusions.
 
 Mitchell also discusses analytical learning for search control. In many problem solvers, the available operators are known, but choosing among them is expensive. Explanation-based methods can analyze successful problem-solving traces and learn rules that recommend useful operators in similar future states. The learned knowledge does not define the domain itself; it controls the search process through the domain.
 
@@ -68,8 +68,6 @@ A good EBL result should be checked in two ways. It should be sound relative to 
 | Analytical | Domain theory and proof | Sometimes one example | Incorrect or incomplete theory |
 | Explanation-based | Proof of one example | One explained example | Nonoperational or overspecific rule |
 
-## Visual
-
 ```mermaid
 flowchart TD
     Ex[Training example] --> Proof[Explain using domain theory]
@@ -82,9 +80,9 @@ flowchart TD
 
 The learned rule is justified by the proof, not merely by statistical repetition.
 
-## Worked example 1: Generalize a safe-stacking rule
+### Generalizing a safe-stacking proof
 
-Problem: Suppose the target concept is `SafeToStack(x,y)`, meaning object $x$ can safely be stacked on object $y$. The domain theory says:
+Suppose the target concept is `SafeToStack(x,y)`, meaning object $x$ can safely be stacked on object $y$. The domain theory says:
 
 $$
 SafeToStack(x,y) \leftarrow Lighter(x,y).
@@ -95,8 +93,6 @@ Lighter(x,y) \leftarrow Weight(x,w_x) \land Weight(y,w_y) \land w_x < w_y.
 $$
 
 Training facts include `Weight(Box1,2)` and `Weight(Box2,5)`. Explain and generalize `SafeToStack(Box1,Box2)`.
-
-Method:
 
 1. State the target proof goal.
 
@@ -132,13 +128,11 @@ $$
 SafeToStack(x,y) \leftarrow Weight(x,w_x) \land Weight(y,w_y) \land w_x<w_y.
 $$
 
-Answer: The learned operational rule says an object can be stacked on another if its weight is smaller. The proof checks out because the original example satisfies $2\lt 5$.
+The learned operational rule says an object can be stacked on another if its weight is smaller. The original example satisfies the rule because $2\lt 5$.
 
-## Worked example 2: Distinguish relevant from irrelevant facts
+### Leaving irrelevant facts out of the rule
 
-Problem: In the same safe-stacking domain, the example also contains `Color(Box1,Red)` and `Shape(Box2,Cube)`. Should these appear in the learned rule?
-
-Method:
+In the same safe-stacking domain, the example also contains `Color(Box1,Red)` and `Shape(Box2,Cube)`. Should these appear in the learned rule?
 
 1. Reconstruct the explanation for `SafeToStack(Box1,Box2)`.
 
@@ -174,9 +168,9 @@ $$
 SafeToStack(x,y) \leftarrow Weight(x,w_x)\land Weight(y,w_y)\land w_x<w_y.
 $$
 
-Answer: Color and shape should not appear in the learned rule because they are absent from the explanation. The checked proof still succeeds without them.
+Color and shape should not appear in the learned rule because they are absent from the explanation. The proof still succeeds without them.
 
-## Code
+### Running the compiled rule
 
 ```python
 def safe_to_stack(x, y, weights):
@@ -194,7 +188,7 @@ for pair in [("Box1", "Box2"), ("Box3", "Box2"), ("Box2", "Box3")]:
     print(pair, safe_to_stack(*pair, weights=weights))
 ```
 
-## Common pitfalls
+## Where explanation-based learning goes wrong
 
 - Treating EBL as statistical induction. The generalization comes from the explanation and domain theory.
 - Including every observed feature of the example in the learned rule. EBL keeps proof-relevant conditions, not incidental facts.
@@ -203,10 +197,8 @@ for pair in [("Box1", "Box2"), ("Box3", "Box2"), ("Box2", "Box3")]:
 - Trusting an imperfect domain theory too much. If the theory proves the wrong thing, EBL can confidently learn a wrong rule.
 - Forgetting that EBL can improve speed rather than accuracy. It often compiles knowledge into a form easier to use.
 
-## Connections
+<div className="see-also">
 
-- [Rule learning and ILP](/cs/machine-learning/rule-learning-and-ilp)
-- [Combining inductive and analytical learning](/cs/machine-learning/combining-inductive-and-analytical-learning)
-- [Concept learning](/cs/machine-learning/concept-learning-and-version-spaces)
-- [Reinforcement learning](/cs/machine-learning/reinforcement-learning)
-- [Modern deep learning](/cs/deep-learning/)
+See also: [Rule learning and ILP](/cs/machine-learning/rule-learning-and-ilp) · [Combining inductive and analytical learning](/cs/machine-learning/combining-inductive-and-analytical-learning) · [Concept learning](/cs/machine-learning/concept-learning-and-version-spaces) · [Reinforcement learning](/cs/machine-learning/reinforcement-learning) · [Modern deep learning](/cs/deep-learning/intro)
+
+</div>

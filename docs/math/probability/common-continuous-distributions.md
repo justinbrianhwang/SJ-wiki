@@ -410,11 +410,8 @@ Use survival functions such as `sf` for far-right-tail probabilities. Computing 
 - Means and variances do not always exist. Low-degree $t$ and $F$ distributions are standard examples, so a software-reported location should not be mistaken for a finite expectation.
 - For a skewed distribution, a symmetric mean-plus-or-minus-standard-deviation interval can extend beyond the support or represent unequal tail areas. Quantiles usually communicate the uncertainty more faithfully.
 
-## Related pages
+<div className="see-also">
 
-- [random variables and distributions](/math/probability/random-variables-distributions)
-- [expectation, variance, and moments](/math/probability/expectation-variance-moments)
-- [transformations of random variables](/math/probability/transformations-random-variables)
-- [limit theorems](/math/probability/limit-theorems)
-- [normal, t, chi-square, and F distributions](/math/statistics/normal-t-chi-square-and-f-distributions)
-- [sampling distributions and CLT](/math/statistics/sampling-distributions-and-clt)
+See also: [random variables and distributions](/math/probability/random-variables-distributions) · [expectation, variance, and moments](/math/probability/expectation-variance-moments) · [transformations of random variables](/math/probability/transformations-random-variables) · [limit theorems](/math/probability/limit-theorems) · [normal, t, chi-square, and F distributions](/math/statistics/normal-t-chi-square-and-f-distributions) · [sampling distributions and CLT](/math/statistics/sampling-distributions-and-clt)
+
+</div>

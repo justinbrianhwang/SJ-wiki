@@ -7,9 +7,9 @@ sidebar_position: 4
 
 Perception turns raw sensor data into scene understanding: vehicles, pedestrians, cyclists, lanes, drivable space, traffic lights, signs, cones, barriers, and free space. It is the gateway between sensing and action, but it is not a single neural network. Production stacks usually combine 2D image models, 3D lidar or radar models, tracking, map priors, temporal smoothing, uncertainty estimates, and safety monitors.
 
-This page introduces the core perception tasks and metrics that later pages on [sensor fusion](/cs/autonomous-driving/sensor-fusion), [prediction](/cs/autonomous-driving/prediction-and-motion-forecasting), [planning](/cs/autonomous-driving/motion-planning), and [adversarial attacks](/cs/autonomous-driving/adversarial-and-physical-attacks-on-av) build on. The main engineering theme is that perception outputs are not just labels; they are uncertain, delayed, partially observed state estimates used by downstream planners.
+Perception outputs are uncertain, delayed, partially observed state estimates. A planner needs their frame, timestamp, confidence, and lifecycle along with the nominal label or geometry.
 
-## Definitions
+## Outputs a planner can consume
 
 **Object detection** localizes and classifies objects. In 2D detection, the output is usually an image bounding box and class label. In 3D detection, the output is a metric box with position, size, heading, class, and confidence in a vehicle, lidar, camera, or global coordinate frame.
 
@@ -31,7 +31,7 @@ $$
 
 **Average precision** summarizes the precision-recall curve for a class. **mAP** averages AP across classes and often across IoU thresholds. AV benchmarks may add center-distance thresholds, heading error, velocity error, tracking metrics, or planning-aware scores.
 
-## Key results
+## From image pixels and point clouds to BEV
 
 ![BEVFormer architecture with BEV queries, temporal self-attention, and spatial cross-attention over multi-camera features.](https://ar5iv.labs.arxiv.org/html/2203.17270/assets/x2.png)
 
@@ -93,7 +93,7 @@ The main tradeoff is vertical compression. Pillars are fast and well matched to 
 
 *Figure: CenterPoint reframes 3D detection and tracking around object centers instead of anchor boxes. From [Yin et al., 2020](https://arxiv.org/abs/2006.11275) — embedded under educational fair use with attribution.*
 
-Anchor-based 3D detectors tile BEV space with many candidate boxes, sizes, and yaw priors. Center-based detectors instead predict object-center heatmaps and regress box attributes only at likely centers. CenterPoint [2] made this idea practical for LiDAR 3D detection and short-term tracking.
+Anchor-based 3D detectors tile BEV space with many candidate boxes, sizes, and yaw priors. Center-based detectors instead predict object-center heatmaps and regress box attributes only at likely centers. CenterPoint [2] implemented this idea effectively for LiDAR 3D detection and short-term tracking.
 
 For each class $k$, the detector predicts a heatmap:
 
@@ -143,11 +143,11 @@ Temporal perception reduces flicker. A single frame may miss an occluded cyclist
 
 Lane and drivable-area perception are not solved by local image edges alone. Intersections, faded markings, snow, construction, reversible lanes, temporary traffic control, and emergency worker gestures often require map context, semantics, traffic rules, and behavioral reasoning.
 
-Open-set perception is a practical requirement. The road contains objects outside a fixed label taxonomy: fallen cargo, unusual trailers, temporary barriers, animals, hand signals, flooded lanes, and damaged infrastructure. A detector may not know the exact class, but the stack still needs to represent occupancy, motion, size, and risk. Unknown-object handling is one reason occupancy and free-space estimation remain important alongside named-object detection.
+Open-set perception is an operational requirement. The road contains objects outside a fixed label taxonomy: fallen cargo, unusual trailers, temporary barriers, animals, hand signals, flooded lanes, and damaged infrastructure. A detector may not know the exact class, but the stack still needs to represent occupancy, motion, size, and risk. Unknown-object handling is one reason occupancy and free-space estimation remain important alongside named-object detection.
 
 Perception outputs also need lifecycle management. A detection becomes a track, a track accumulates history, and stale tracks must be deleted when evidence disappears. Deleting too aggressively causes flicker; deleting too slowly leaves phantom obstacles. This tradeoff is central to usable AV perception.
 
-## Visual
+### From sensor tensors to tracked scene state
 
 ```mermaid
 flowchart TB
@@ -213,7 +213,7 @@ flowchart TB
 
 This diagram expands perception into the standard camera, PointPillars/CenterPoint, VoxelNet, and radar branches. The key shape transition is from unordered lidar points to voxels/pillars and then to a BEV tensor, while the downstream association block turns raw detections into tracked objects and uncertainty for prediction and planning.
 
-## Worked example 1: Computing IoU for two boxes
+## Measuring overlap between two detections
 
 Problem: A ground-truth 2D box spans $x = 10$ to $50$ and $y = 20$ to $60$. A detector predicts $x = 30$ to $70$ and $y = 40$ to $80$. Compute IoU.
 
@@ -260,7 +260,7 @@ $$
 
 Answer: IoU is about 0.143. At a 0.5 IoU threshold this prediction is not a true positive, even though the boxes overlap visually.
 
-## Worked example 2: Precision and recall for pedestrian detection
+## Choosing an operating point for pedestrians
 
 Problem: In a validation slice, there are 20 labeled pedestrians. A detector reports 25 pedestrian boxes. Of those, 15 match true pedestrians at the required IoU threshold. Compute precision and recall.
 
@@ -298,7 +298,7 @@ Answer: precision is 60 percent and recall is 75 percent.
 
 Check: The detector found three quarters of real pedestrians but produced many extra detections. A downstream planner might tolerate extra detections at low speed but not repeated phantom braking at highway speed.
 
-## Code
+## Matching detections by IoU
 
 ```python
 import numpy as np
@@ -333,7 +333,7 @@ gt = np.array([[10, 20, 50, 60], [98, 96, 132, 161]])
 print(greedy_match(pred, gt, threshold=0.5))
 ```
 
-## Common pitfalls
+## Metrics that hide operational failures
 
 - Reporting mAP without showing operating points. A planner needs thresholded behavior, not only benchmark summaries.
 - Ignoring calibration of confidence scores. A detector that says 0.9 confidence should be right roughly 90 percent of the time in comparable conditions if downstream modules treat confidence probabilistically.
@@ -342,17 +342,13 @@ print(greedy_match(pred, gt, threshold=0.5))
 - Forgetting temporal latency. A high-quality detection that arrives too late can be worse than a noisier but timely estimate.
 - Overfitting to benchmark taxonomies. Real roads contain objects outside the training label set, such as fallen cargo, temporary signs, animals, and hand gestures.
 
-## Connections
-
-- [Sensors, cameras, lidar, radar, and IMU](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu)
-- [Depth estimation and stereo vision](/cs/autonomous-driving/depth-estimation-and-stereo-vision)
-- [Sensor fusion](/cs/autonomous-driving/sensor-fusion)
-- [Prediction and motion forecasting](/cs/autonomous-driving/prediction-and-motion-forecasting)
-- [Deep learning](/cs/deep-learning/)
-- [Adversarial attacks on AV perception](/cs/autonomous-driving/adversarial-and-physical-attacks-on-av)
-- Further reading: YOLO, RetinaNet, DETR, PointPillars, CenterPoint, Mask R-CNN, Panoptic FPN, and nuScenes or Waymo Open Dataset benchmark papers.
-
-## References
+## Sources cited
 
 [1] A. H. Lang, S. Vora, H. Caesar, L. Zhou, J. Yang, O. Beijbom. *PointPillars: Fast Encoders for Object Detection from Point Clouds*. CVPR 2019.
 [2] T. Yin, X. Zhou, P. Krahenbuhl. *Center-based 3D Object Detection and Tracking*. CVPR 2021.
+
+<div className="see-also">
+
+See also: [Sensors, cameras, lidar, radar, and IMU](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu) · [Depth estimation and stereo vision](/cs/autonomous-driving/depth-estimation-and-stereo-vision) · [Sensor fusion](/cs/autonomous-driving/sensor-fusion) · [Prediction and motion forecasting](/cs/autonomous-driving/prediction-and-motion-forecasting) · [Deep learning](/cs/deep-learning/intro) · [Adversarial attacks on AV perception](/cs/autonomous-driving/adversarial-and-physical-attacks-on-av)
+
+</div>

@@ -5,329 +5,521 @@ sidebar_position: 8
 
 # Orthogonality in Rn
 
-Orthogonality turns vector algebra into geometry. Length, angle, distance, projection, and perpendicularity can all be expressed with the dot product. This is why systems, approximation, and decompositions become geometric: the best answer is often the one whose error is perpendicular to the space of allowable answers.
+The dot product adds measurement to vector-space algebra. It defines length, angle, distance, and perpendicularity, then turns approximation into a geometric condition: the closest allowed vector is the one whose error is perpendicular to every allowed direction. That condition leads directly to projection, least squares, QR factorization, and orthogonal decompositions.
 
-The dot product is the bridge between coordinates and measurement. Without it, vectors can be added and scaled; with it, one can ask how long a vector is, whether two directions are perpendicular, and how much of one vector lies in another direction. Projection is the key operation that later becomes least squares and QR factorization.
+## Measurement from the dot product
 
-## Definitions
-
-The dot product of $\mathbf{u},\mathbf{v}\in\mathbb{R}^n$ is
+For $\mathbf u,\mathbf v\in\mathbb R^n$, the standard dot product is
 
 $$
-\mathbf{u}\cdot\mathbf{v}
-=u_1v_1+\cdots+u_nv_n.
+\mathbf u\cdot\mathbf v
+=u_1v_1+\cdots+u_nv_n
+=\mathbf u^T\mathbf v.
 $$
 
-The Euclidean norm is
+It is symmetric, linear in each argument when the other is fixed, and positive definite:
 
 $$
-\|\mathbf{v}\|=\sqrt{\mathbf{v}\cdot\mathbf{v}},
+\mathbf v\cdot\mathbf v\ge0,
 $$
 
-and the distance between points $\mathbf{u}$ and $\mathbf{v}$ is
+with equality only for $\mathbf v=\mathbf0$. These properties allow the definitions
 
 $$
-d(\mathbf{u},\mathbf{v})=\|\mathbf{u}-\mathbf{v}\|.
-$$
-
-Nonzero vectors form angle $\theta$ satisfying
-
-$$
-\cos\theta=\frac{\mathbf{u}\cdot\mathbf{v}}{\|\mathbf{u}\|\|\mathbf{v}\|}.
-$$
-
-Vectors are orthogonal if $\mathbf{u}\cdot\mathbf{v}=0$. The projection of $\mathbf{u}$ onto a nonzero vector $\mathbf{a}$ is
-
-$$
-\operatorname{proj}_{\mathbf{a}}(\mathbf{u})
-=
-\frac{\mathbf{u}\cdot\mathbf{a}}{\mathbf{a}\cdot\mathbf{a}}\mathbf{a}.
-$$
-
-An orthogonal set is a set whose distinct vectors are mutually orthogonal. An orthonormal set is orthogonal and each vector has norm $1$.
-
-## Key results
-
-The Cauchy-Schwarz inequality states
-
-$$
-|\mathbf{u}\cdot\mathbf{v}|\leq \|\mathbf{u}\|\,\|\mathbf{v}\|.
-$$
-
-This guarantees that the cosine formula is valid because the quotient lies between $-1$ and $1$.
-
-The triangle inequality states
-
-$$
-\|\mathbf{u}+\mathbf{v}\|\leq \|\mathbf{u}\|+\|\mathbf{v}\|.
-$$
-
-The Pythagorean theorem generalizes: if $\mathbf{u}\cdot\mathbf{v}=0$, then
-
-$$
-\|\mathbf{u}+\mathbf{v}\|^2=\|\mathbf{u}\|^2+\|\mathbf{v}\|^2.
-$$
-
-Projection decomposes a vector into parallel and orthogonal parts:
-
-$$
-\mathbf{u}
-=
-\operatorname{proj}_{\mathbf{a}}(\mathbf{u})
-+
-\left(\mathbf{u}-\operatorname{proj}_{\mathbf{a}}(\mathbf{u})\right),
-$$
-
-and the second part is orthogonal to $\mathbf{a}$. To verify, compute
-
-$$
-\left(\mathbf{u}-\frac{\mathbf{u}\cdot\mathbf{a}}{\mathbf{a}\cdot\mathbf{a}}\mathbf{a}\right)\cdot\mathbf{a}
-=
-\mathbf{u}\cdot\mathbf{a}
--
-\frac{\mathbf{u}\cdot\mathbf{a}}{\mathbf{a}\cdot\mathbf{a}}(\mathbf{a}\cdot\mathbf{a})
-=0.
-$$
-
-If nonzero vectors are mutually orthogonal, then they are linearly independent. A linear combination equal to zero can be dotted with each vector in turn, forcing each coefficient to be zero.
-
-Orthogonality is also the cleanest language for decomposing information. If a vector is written as a sum of perpendicular pieces, then the squared length of the whole vector is the sum of the squared lengths of the pieces. This is why projection formulas are so useful: they separate "the part explained by a direction" from "the part left over." In a data setting, the explained part might be the component along a trend vector, while the orthogonal error is the part not captured by that trend. In geometry, the same decomposition gives the shortest distance from a point to a line or plane.
-
-For a line $L=\operatorname{span}\{\mathbf{a}\}$ through the origin, the projection $\operatorname{proj}_{\mathbf{a}}(\mathbf{u})$ is the closest point of $L$ to $\mathbf{u}$. To see this, write any vector on the line as $t\mathbf{a}$. The squared distance from $\mathbf{u}$ to $t\mathbf{a}$ is
-
-$$
-f(t)=\|\mathbf{u}-t\mathbf{a}\|^2.
-$$
-
-Expanding with dot products gives
-
-$$
-f(t)=\mathbf{u}\cdot\mathbf{u}-2t(\mathbf{u}\cdot\mathbf{a})+t^2(\mathbf{a}\cdot\mathbf{a}).
-$$
-
-This quadratic in $t$ is minimized when
-
-$$
-t=\frac{\mathbf{u}\cdot\mathbf{a}}{\mathbf{a}\cdot\mathbf{a}},
-$$
-
-which is exactly the projection coefficient. The algebraic minimizer and the geometric perpendicular-error condition are the same fact in two languages.
-
-The dot product also encodes orientation information. A positive dot product means the angle is acute and the vectors point partly in the same direction. A negative dot product means the angle is obtuse and the vectors point partly against each other. A zero dot product means neither vector has a component in the direction of the other. This interpretation is often faster than computing the actual angle.
-
-Orthogonal matrices preserve this entire geometry. If $Q^TQ=I$, then
-
-$$
-(Q\mathbf{u})\cdot(Q\mathbf{v})
-=
-\mathbf{u}^TQ^TQ\mathbf{v}
-=
-\mathbf{u}\cdot\mathbf{v}.
-$$
-
-Therefore orthogonal transformations preserve lengths, distances, angles, and projections. Rotations and reflections are the standard examples. This fact becomes essential in QR factorization, the spectral theorem, and the singular value decomposition, where orthogonal changes of coordinates are preferred because they do not distort measurement.
-
-## Visual
-
-ASCII projection picture:
-
-```text
-                 u
-                *
-               /|
-              / |
-             /  | orthogonal error
-            /   |
------------*----*----------------> span{a}
-          0   proj_a(u)
-```
-
-| Quantity | Formula | Meaning |
-|---|---|---|
-| Dot product | $\mathbf{u}\cdot\mathbf{v}$ | signed alignment |
-| Norm | $\sqrt{\mathbf{v}\cdot\mathbf{v}}$ | length |
-| Distance | $\|\mathbf{u}-\mathbf{v}\|$ | length of displacement |
-| Projection onto $\mathbf{a}$ | $\frac{\mathbf{u}\cdot\mathbf{a}}{\mathbf{a}\cdot\mathbf{a}}\mathbf{a}$ | closest vector on the line through $\mathbf{a}$ |
-| Orthogonality | $\mathbf{u}\cdot\mathbf{v}=0$ | perpendicular directions |
-
-## Worked example 1: Angle, norm, and orthogonality
-
-Problem: for
-
-$$
-\mathbf{u}=
-\begin{bmatrix}
-2\\-1\\2
-\end{bmatrix},
+\lVert\mathbf v\rVert=\sqrt{\mathbf v\cdot\mathbf v},
 \qquad
-\mathbf{v}=
-\begin{bmatrix}
-1\\4\\1
-\end{bmatrix},
+d(\mathbf u,\mathbf v)=\lVert\mathbf u-\mathbf v\rVert.
 $$
 
-compute the dot product, norms, and angle.
-
-Step 1: compute the dot product.
+For nonzero vectors, their angle $0\le\theta\le\pi$ is determined by
 
 $$
-\mathbf{u}\cdot\mathbf{v}
-=2(1)+(-1)(4)+2(1)=2-4+2=0.
+\cos\theta=\frac{\mathbf u\cdot\mathbf v}
+{\lVert\mathbf u\rVert\lVert\mathbf v\rVert}.
 $$
 
-Step 2: compute norms.
+The Cauchy–Schwarz inequality
 
 $$
-\|\mathbf{u}\|=\sqrt{2^2+(-1)^2+2^2}=\sqrt9=3,
+|\mathbf u\cdot\mathbf v|
+\le\lVert\mathbf u\rVert\lVert\mathbf v\rVert
 $$
 
-and
+ensures that the quotient lies in $[-1,1]$. Equality holds exactly when the vectors are linearly dependent.
+
+One proof already contains the projection idea. For $\mathbf v\ne0$, nonnegativity of
 
 $$
-\|\mathbf{v}\|=\sqrt{1^2+4^2+1^2}=\sqrt{18}=3\sqrt2.
+\left\lVert
+\mathbf u-\frac{\mathbf u\cdot\mathbf v}{\mathbf v\cdot\mathbf v}\mathbf v
+\right\rVert^2
 $$
 
-Step 3: compute the angle.
+expands to
 
 $$
-\cos\theta=\frac{0}{3(3\sqrt2)}=0.
+\lVert\mathbf u\rVert^2
+-\frac{(\mathbf u\cdot\mathbf v)^2}{\lVert\mathbf v\rVert^2}
+\ge0.
 $$
 
-Thus $\theta=\pi/2$. Checked answer: the vectors are orthogonal.
+Multiplication by $\lVert\mathbf v\rVert^2$ gives Cauchy–Schwarz after taking square roots. The vector subtracted from $\mathbf u$ is precisely its component along $\mathbf v$.
 
-## Worked example 2: Projection onto a vector
-
-Problem: project
+The inequality also proves the triangle inequality:
 
 $$
-\mathbf{u}=
-\begin{bmatrix}
-3\\4
-\end{bmatrix}
+\begin{aligned}
+\lVert\mathbf u+\mathbf v\rVert^2
+&=\lVert\mathbf u\rVert^2
++2\mathbf u\cdot\mathbf v
++\lVert\mathbf v\rVert^2\\
+&\le(\lVert\mathbf u\rVert+\lVert\mathbf v\rVert)^2.
+\end{aligned}
 $$
 
-onto
+Taking nonnegative square roots yields
 
 $$
-\mathbf{a}=
-\begin{bmatrix}
-1\\2
-\end{bmatrix}.
+\lVert\mathbf u+\mathbf v\rVert
+\le\lVert\mathbf u\rVert+\lVert\mathbf v\rVert.
 $$
 
-Step 1: compute the dot products.
+## Orthogonal and orthonormal sets
+
+Vectors are orthogonal when their dot product is zero. A set is orthogonal if every distinct pair is orthogonal; it is orthonormal if, in addition, every vector has norm $1$.
+
+Any orthogonal set of nonzero vectors is linearly independent. If
 
 $$
-\mathbf{u}\cdot\mathbf{a}=3(1)+4(2)=11,
+c_1\mathbf v_1+\cdots+c_k\mathbf v_k=\mathbf0,
+$$
+
+dotting with $\mathbf v_j$ removes every cross term:
+
+$$
+c_j\lVert\mathbf v_j\rVert^2=0.
+$$
+
+Since $\mathbf v_j\ne0$, $c_j=0$. This works for each $j$.
+
+The same cancellation gives the Pythagorean identity. If $\mathbf u\cdot\mathbf v=0$, then
+
+$$
+\lVert\mathbf u+\mathbf v\rVert^2
+=\lVert\mathbf u\rVert^2+\lVert\mathbf v\rVert^2.
+$$
+
+For a sum of mutually orthogonal vectors, squared norm is the sum of their squared norms. In an orthonormal basis $\mathbf q_1,\ldots,\mathbf q_n$, the coordinate of $\mathbf x$ along $\mathbf q_j$ is simply $\mathbf x\cdot\mathbf q_j$, and
+
+$$
+\mathbf x=\sum_{j=1}^n(\mathbf x\cdot\mathbf q_j)\mathbf q_j.
+$$
+
+Taking squared norms gives Parseval's identity in finite dimensions:
+
+$$
+\lVert\mathbf x\rVert^2
+=\sum_{j=1}^n|\mathbf x\cdot\mathbf q_j|^2.
+$$
+
+For an orthonormal list that spans only a subspace, the corresponding sum is at most $\lVert\mathbf x\rVert^2$; the missing amount is the squared norm of the perpendicular residual.
+
+## Projection onto a line
+
+Let $L=\operatorname{span}\{\mathbf a\}$ with $\mathbf a\ne0$. Seek a multiple $c\mathbf a$ such that the residual $\mathbf u-c\mathbf a$ is perpendicular to the line. The condition is
+
+$$
+(\mathbf u-c\mathbf a)\cdot\mathbf a=0.
+$$
+
+Solving for $c$ gives
+
+$$
+c=\frac{\mathbf u\cdot\mathbf a}{\mathbf a\cdot\mathbf a}.
+$$
+
+Therefore
+
+$$
+\operatorname{proj}_{\mathbf a}\mathbf u
+=\frac{\mathbf u\cdot\mathbf a}{\mathbf a\cdot\mathbf a}\mathbf a.
+$$
+
+The scalar component in the unit direction of $\mathbf a$ is
+
+$$
+\operatorname{comp}_{\mathbf a}\mathbf u
+=\frac{\mathbf u\cdot\mathbf a}{\lVert\mathbf a\rVert}.
+$$
+
+Do not confuse the scalar component with the projection vector, and do not replace the projection denominator by $\lVert\mathbf a\rVert$.
+
+The perpendicular condition also proves closest-point optimality. Any other point on the line is $c\mathbf a+t\mathbf a$, where $c\mathbf a$ is the projection. Then
+
+$$
+\mathbf u-(c+t)\mathbf a
+=\underbrace{(\mathbf u-c\mathbf a)}_{\perp\mathbf a}
+-t\mathbf a.
+$$
+
+By Pythagoras,
+
+$$
+\lVert\mathbf u-(c+t)\mathbf a\rVert^2
+=\lVert\mathbf u-c\mathbf a\rVert^2
++t^2\lVert\mathbf a\rVert^2.
+$$
+
+The second term is nonnegative and vanishes only at $t=0$. The perpendicular projection is the unique closest point.
+
+### Worked example: projection and residual
+
+Project
+
+$$
+\mathbf u=\begin{bmatrix}3\\4\\1\end{bmatrix}
+$$
+
+onto the line through
+
+$$
+\mathbf a=\begin{bmatrix}1\\2\\-1\end{bmatrix}.
+$$
+
+First compute
+
+$$
+\mathbf u\cdot\mathbf a=3+8-1=10,
+$$
+
+$$
+\mathbf a\cdot\mathbf a=1+4+1=6.
+$$
+
+Hence
+
+$$
+\mathbf p=\operatorname{proj}_{\mathbf a}\mathbf u
+=\frac{10}{6}\mathbf a
+=\begin{bmatrix}5/3\\10/3\\-5/3\end{bmatrix}.
+$$
+
+The residual is
+
+$$
+\mathbf e=\mathbf u-\mathbf p
+=\begin{bmatrix}4/3\\2/3\\8/3\end{bmatrix}.
+$$
+
+Check orthogonality:
+
+$$
+\mathbf e\cdot\mathbf a
+=\frac43+\frac43-\frac83=0.
+$$
+
+The distance from $\mathbf u$ to the line is
+
+$$
+\lVert\mathbf e\rVert
+=\sqrt{\frac{16+4+64}{9}}
+=\frac{2\sqrt{21}}{3}.
+$$
+
+Finally,
+
+$$
+\lVert\mathbf u\rVert^2=26,
 \qquad
-\mathbf{a}\cdot\mathbf{a}=1^2+2^2=5.
+\lVert\mathbf p\rVert^2=\frac{50}{3},
+\qquad
+\lVert\mathbf e\rVert^2=\frac{28}{3},
 $$
 
-Step 2: apply the projection formula.
+and $50/3+28/3=26$, confirming the Pythagorean decomposition.
+
+## Projection onto a subspace
+
+If $W$ has an orthonormal basis $\mathbf q_1,\ldots,\mathbf q_k$, then
 
 $$
-\operatorname{proj}_{\mathbf{a}}(\mathbf{u})
-=
-\frac{11}{5}
-\begin{bmatrix}
-1\\2
-\end{bmatrix}
-=
-\begin{bmatrix}
-11/5\\22/5
-\end{bmatrix}.
+\operatorname{proj}_W\mathbf b
+=\sum_{j=1}^k(\mathbf b\cdot\mathbf q_j)\mathbf q_j.
 $$
 
-Step 3: compute the error vector.
+Each coefficient is independent because the basis directions are orthonormal. The residual
 
 $$
-\mathbf{e}
-=
-\mathbf{u}-\operatorname{proj}_{\mathbf{a}}(\mathbf{u})
-=
-\begin{bmatrix}
-3\\4
-\end{bmatrix}
--
-\begin{bmatrix}
-11/5\\22/5
-\end{bmatrix}
-=
-\begin{bmatrix}
-4/5\\-2/5
-\end{bmatrix}.
+\mathbf r=\mathbf b-\operatorname{proj}_W\mathbf b
 $$
 
-Step 4: check orthogonality.
+is perpendicular to every $\mathbf q_j$, and therefore to every vector in $W$.
+
+If the basis columns form $Q$ with $Q^TQ=I$, projection has matrix form
 
 $$
-\mathbf{e}\cdot\mathbf{a}
-=
-\frac45(1)+\left(-\frac25\right)(2)
-=\frac45-\frac45=0.
+\mathbf p=QQ^T\mathbf b.
 $$
 
-Checked answer: the projection is $\begin{bmatrix}11/5&22/5\end{bmatrix}^T$, and the error is perpendicular to $\mathbf{a}$.
-
-## Code
-
-```python
-import numpy as np
-
-u = np.array([3, 4], dtype=float)
-a = np.array([1, 2], dtype=float)
-
-proj = (u @ a) / (a @ a) * a
-error = u - proj
-
-print(proj)
-print(error)
-print(error @ a)
-print(np.linalg.norm(u) ** 2, np.linalg.norm(proj) ** 2 + np.linalg.norm(error) ** 2)
-```
-
-The final line checks the Pythagorean decomposition $\|\mathbf{u}\|^2=\|\operatorname{proj}_{\mathbf{a}}(\mathbf{u})\|^2+\|\mathbf{e}\|^2$.
-
-## Common pitfalls
-
-- Forgetting that projection onto $\mathbf{a}$ requires $\mathbf{a}\neq\mathbf{0}$.
-- Using $\|\mathbf{a}\|$ instead of $\mathbf{a}\cdot\mathbf{a}$ in the projection denominator.
-- Assuming a zero dot product means one vector must be zero. Nonzero perpendicular vectors have zero dot product.
-- Mixing degrees and radians when interpreting angles.
-- Treating orthogonal and orthonormal as the same. Orthonormal also requires unit length.
-- Believing projection preserves the original vector's length. Projection usually shortens it.
-
-A dependable projection check is to compute the error and dot it with the target direction or subspace basis. If the projection is correct, the error should be orthogonal to every direction in the subspace. This check is often easier and more meaningful than recomputing the projection formula. It also prepares for least squares, where the residual must be orthogonal to every column of the design matrix.
-
-When working with angles, avoid computing inverse cosine unless the angle itself is required. The dot product already tells much of the story. Positive means acute, negative means obtuse, and zero means right angle. The magnitude of the dot product relative to the product of norms tells how strongly aligned the vectors are. This interpretation is common in data analysis, where cosine similarity compares directions rather than lengths.
-
-Orthogonality is not the same as independence, but nonzero orthogonal vectors are automatically independent. The converse is false: independent vectors need not be perpendicular. This distinction matters in basis work. Any basis can express vectors, but an orthonormal basis makes coordinates especially easy because coordinates are dot products.
-
-In numerical work, exact zero dot products are rare when data are measured or computed with floating-point arithmetic. Instead of testing whether $\mathbf{u}\cdot\mathbf{v}=0$ exactly, one usually checks whether its absolute value is small relative to the norms involved. The mathematical definition is exact; the computational test must account for rounding and noise.
-
-Orthogonal complements give another organizing idea. If $W$ is a subspace of $\mathbb{R}^n$, then
+The projection matrix $P=QQ^T$ is symmetric and idempotent:
 
 $$
-W^\perp=\{\mathbf{z}:\mathbf{z}\cdot\mathbf{w}=0\text{ for every }\mathbf{w}\in W\}
+P^T=P,
+\qquad
+P^2=P.
 $$
 
-is the set of all vectors perpendicular to $W$. Projection decomposes a vector into a part in $W$ and a part in $W^\perp$. This is the geometric form of many algebraic decompositions.
+Idempotence says that projecting a vector already in the subspace changes nothing. The complementary projection $I-P$ maps onto $W^\perp$.
 
-For a matrix $A$, the null space of $A^T$ is orthogonal to the column space of $A$. This is exactly what least squares uses: the residual $\mathbf{b}-A\hat{\mathbf{x}}$ lies in the orthogonal complement of the column space. A fact that begins as perpendicular arrows in $\mathbb{R}^2$ becomes the core condition for regression and approximation.
+For a full-column-rank matrix $A$ whose columns are not orthonormal, the same projection is
 
-When studying orthogonality, draw both the vector and its projection whenever possible. The picture reinforces which vector is being projected, which direction or subspace receives the projection, and which error is perpendicular. Most formula errors come from mixing up those roles.
+$$
+P=A(A^TA)^{-1}A^T.
+$$
 
-The same dot product can represent physical work, statistical similarity, or geometric alignment depending on context. In physics, force dotted with displacement measures work. In data analysis, normalized dot products compare direction patterns. In geometry, dot products measure angles and projections. The formula is the same, but the interpretation comes from the modeled quantities.
+This formula comes from requiring $A^T(\mathbf b-A\widehat{\mathbf x})=0$. QR factorization is usually a better computational route because it avoids explicitly forming $A^TA$.
 
-Orthogonality also gives a way to simplify calculations. If vectors are orthogonal, many cross terms vanish when norms are squared. This is why orthogonal bases, QR factorization, and spectral decompositions are so valuable: they turn coupled calculations into sums of independent contributions.
+### Worked example: projection onto a plane in $\mathbb R^3$
 
-This simplification is the recurring payoff of perpendicular coordinates.
+Let
 
-Whenever a calculation becomes messy, look for an orthogonal basis or projection that separates the components.
+$$
+W=\operatorname{span}\left\{
+\mathbf q_1=\frac1{\sqrt2}\begin{bmatrix}1\\1\\0\end{bmatrix},
+\mathbf q_2=\frac1{\sqrt6}\begin{bmatrix}1\\-1\\2\end{bmatrix}
+\right\}
+$$
 
-## Connections
+and project $\mathbf b=[2,1,3]^T$. The basis is orthonormal because each vector has norm $1$ and
 
-- [Vectors in Rn](/math/linear-algebra/vectors)
-- [Orthogonality, Gram-Schmidt, and QR](/math/linear-algebra/orthogonality-qr-gram-schmidt)
-- [Least Squares](/math/linear-algebra/least-squares)
-- [Inner Product Spaces](/math/linear-algebra/inner-product-spaces)
+$$
+\mathbf q_1\cdot\mathbf q_2
+=\frac{1-1+0}{\sqrt{12}}=0.
+$$
+
+The coordinates are
+
+$$
+c_1=\mathbf b\cdot\mathbf q_1=\frac3{\sqrt2},
+$$
+
+$$
+c_2=\mathbf b\cdot\mathbf q_2
+=\frac{2-1+6}{\sqrt6}=\frac7{\sqrt6}.
+$$
+
+Therefore
+
+$$
+\begin{aligned}
+\mathbf p
+&=c_1\mathbf q_1+c_2\mathbf q_2\\
+&=\frac32\begin{bmatrix}1\\1\\0\end{bmatrix}
++\frac76\begin{bmatrix}1\\-1\\2\end{bmatrix}\\
+&=\begin{bmatrix}8/3\\1/3\\7/3\end{bmatrix}.
+\end{aligned}
+$$
+
+The residual is
+
+$$
+\mathbf r=\mathbf b-\mathbf p
+=\begin{bmatrix}-2/3\\2/3\\2/3\end{bmatrix}.
+$$
+
+Checking against both basis directions gives
+
+$$
+\mathbf r\cdot\mathbf q_1=0,
+\qquad
+\mathbf r\cdot\mathbf q_2=0.
+$$
+
+Thus $\mathbf r\in W^\perp$, as required.
+
+## Affine sets: projecting when the target misses the origin
+
+A linear subspace contains the origin, but many geometric constraints are translated subspaces. An affine set has form
+
+$$
+\mathbf p_0+W
+=\{\mathbf p_0+\mathbf w:\mathbf w\in W\}.
+$$
+
+To project $\mathbf b$ onto it, first translate by $-\mathbf p_0$, project the displacement onto $W$, and translate back:
+
+$$
+\operatorname{proj}_{\mathbf p_0+W}(\mathbf b)
+=\mathbf p_0+\operatorname{proj}_W(\mathbf b-\mathbf p_0).
+$$
+
+The residual remains perpendicular to $W$, the set of allowable directions. It need not be perpendicular to the position vector of the closest point, since that point is generally not in $W$.
+
+For a hyperplane
+
+$$
+H=\{\mathbf x:\mathbf n\cdot\mathbf x=d\},
+\qquad \mathbf n\ne0,
+$$
+
+the correction from $\mathbf b$ must lie along the normal. Write the closest point as $\mathbf p=\mathbf b-c\mathbf n$ and impose the plane equation:
+
+$$
+\mathbf n\cdot(\mathbf b-c\mathbf n)=d.
+$$
+
+Solving,
+
+$$
+c=\frac{\mathbf n\cdot\mathbf b-d}{\lVert\mathbf n\rVert^2},
+$$
+
+so
+
+$$
+\mathbf p=\mathbf b-
+\frac{\mathbf n\cdot\mathbf b-d}{\lVert\mathbf n\rVert^2}\mathbf n.
+$$
+
+The point-to-hyperplane distance is the correction length,
+
+$$
+\frac{|\mathbf n\cdot\mathbf b-d|}{\lVert\mathbf n\rVert}.
+$$
+
+This is the same projection geometry used for a plane in three dimensions, now stated for $\mathbb R^n$.
+
+## Orthogonal complements and the four fundamental subspaces
+
+For a subspace $W\subseteq\mathbb R^n$, define
+
+$$
+W^\perp=\{\mathbf z:\mathbf z\cdot\mathbf w=0
+\text{ for every }\mathbf w\in W\}.
+$$
+
+The complement is itself a subspace, and finite-dimensional Euclidean space decomposes as
+
+$$
+\mathbb R^n=W\oplus W^\perp.
+$$
+
+Every vector has a unique sum of one vector in $W$ and one in $W^\perp$. Their dimensions satisfy
+
+$$
+\dim W+\dim W^\perp=n.
+$$
+
+For an $m\times n$ matrix $A$, orthogonality links its fundamental subspaces:
+
+$$
+\operatorname{Null}(A)=\operatorname{Row}(A)^\perp,
+$$
+
+$$
+\operatorname{Null}(A^T)=\operatorname{Col}(A)^\perp.
+$$
+
+The second identity explains least-squares residuals. If $A\widehat{\mathbf x}$ is the closest vector in the column space to $\mathbf b$, then
+
+$$
+\mathbf b-A\widehat{\mathbf x}\in\operatorname{Null}(A^T),
+$$
+
+which is equivalent to the normal equations
+
+$$
+A^TA\widehat{\mathbf x}=A^T\mathbf b.
+$$
+
+## Orthogonal matrices preserve Euclidean geometry
+
+A square matrix $Q$ is orthogonal when
+
+$$
+Q^TQ=I.
+$$
+
+Its columns and rows are orthonormal, and $Q^{-1}=Q^T$. For any vectors,
+
+$$
+(Q\mathbf u)\cdot(Q\mathbf v)
+=\mathbf u^TQ^TQ\mathbf v
+=\mathbf u\cdot\mathbf v.
+$$
+
+Lengths, distances, angles, and orthogonality are preserved. The determinant is $1$ or $-1$: rotations have determinant $1$, while reflections and orientation-reversing combinations have determinant $-1$.
+
+Orthogonal coordinate changes are numerically attractive because they do not magnify the Euclidean norm. QR factorization, the symmetric spectral theorem, and the singular value decomposition all rely on them.
+
+## Floating-point orthogonality
+
+Measured or computed vectors rarely have dot product exactly zero. A scale-aware test compares
+
+$$
+|\mathbf u\cdot\mathbf v|
+$$
+
+with a tolerance times $\lVert\mathbf u\rVert\lVert\mathbf v\rVert$. An absolute tolerance alone behaves poorly when vector magnitudes vary widely. For a computed basis matrix $Q$, inspect
+
+$$
+\lVert Q^TQ-I\rVert
+$$
+
+rather than comparing every entry for exact equality.
+
+Near-zero input vectors also need care: normalization amplifies relative error and may divide by a number below the meaningful scale of the data. Numerical rank and “orthogonal enough” always depend on a tolerance tied to the matrix scale and intended use.
+
+## Beyond the standard dot product
+
+Orthogonality depends on the chosen inner product. The standard dot product treats coordinate axes as perpendicular and weights every coordinate equally. A positive-definite matrix can define a weighted inner product in which directions or units carry different importance. Length, projection, and perpendicularity then change with that choice.
+
+This matters when coordinates use different physical units or have unequal uncertainty. Raw Euclidean distance between a temperature and a pressure coordinate has no clear meaning until scaling is chosen. Standardizing variables, weighting by measurement precision, or using an energy matrix states what discrepancies count as large. The algebra of projection remains the same after replacing the dot product consistently.
+
+Changing the inner product midway through a calculation is invalid. A basis orthonormal under one weighting may not be orthogonal under another, and a residual perpendicular in the Euclidean sense may not minimize the weighted error. The metric belongs with the model, not merely with the final numerical method.
+
+The familiar function-space inner products follow the same pattern. Dot-product sums become integrals, and orthogonal vectors become orthogonal functions. Fourier coefficients are projections onto sine and cosine directions. Finite-dimensional formulas therefore serve as prototypes for approximation in much larger spaces.
+
+## Projection operators as linear maps
+
+Projection onto a fixed subspace is linear even though finding the subspace or a basis may require substantial work. Its matrix has eigenvalue one on the target subspace and eigenvalue zero on the orthogonal complement. Applying it twice changes nothing, which is the geometric content of idempotence.
+
+An orthogonal projection is symmetric. An idempotent matrix that is not symmetric still projects onto a subspace, but generally along a nonperpendicular complementary direction. Such an oblique projection can magnify lengths and does not give the nearest Euclidean point. Symmetry distinguishes closest-point projection from projection in a broader algebraic sense.
+
+The trace of an orthogonal projection equals the dimension of its range because its eigenvalues consist of ones and zeros. This supplies a useful check on an explicitly formed projection matrix. Its rank, trace, and number of unit eigenvalues agree.
+
+Projection matrices should often remain implicit in computation. If an orthonormal basis is available, applying the projection as two matrix-vector multiplications avoids storing a dense square matrix. In least squares, QR applies the same idea while preserving numerical accuracy. Explicit formulas are valuable for reasoning but can be an inefficient implementation.
+
+## Distance, approximation, and information loss
+
+Projection keeps the component representable by the target subspace and discards the orthogonal component. The squared residual quantifies the lost Euclidean information. Enlarging the target subspace cannot increase the best approximation error, because every old candidate remains available in the larger set.
+
+Equality can occur when every newly added direction is orthogonal to the residual's useful component. A smaller error therefore measures whether new directions explain something previously missing, not merely whether the model has more columns. This observation underlies nested least-squares models and incremental basis construction.
+
+In data analysis, cosine similarity compares direction after ignoring overall magnitude. It is undefined for a zero vector and can be misleading when a common offset dominates every coordinate. Centering or otherwise preprocessing data changes the geometry and should be reported. A high cosine similarity says vectors point similarly under the chosen coordinate weighting; it does not by itself mean their entries are close in absolute size.
+
+The nearest-point theorem relies on the target being a closed subspace. Every subspace of finite-dimensional Euclidean space is closed, so no qualification is needed here. In infinite-dimensional settings, a nonclosed subspace may have an infimum distance without containing a closest point. The finite-dimensional theory hides that topological complication.
+
+## Dimension checks and constructive complements
+
+To compute an orthogonal complement from spanning vectors, place those vectors as rows and solve the homogeneous system requiring zero dot products. To find vectors perpendicular to a column space, solve the transpose system. Row reduction gives a basis, and Gram–Schmidt can make it orthonormal afterward.
+
+Dimension provides a strong check. If a subspace of the ambient space has dimension equal to the ambient dimension, its orthogonal complement contains only zero. If the subspace has codimension one, its complement is a line generated by a normal vector. More generally, the number of independent perpendicular directions equals the codimension.
+
+Taking the orthogonal complement twice returns the original subspace in finite dimensions. One inclusion is immediate because every vector in the subspace is perpendicular to every vector in its complement. The dimension formula forces equality. This identity lets a subspace be represented either by spanning directions or by homogeneous constraints, whichever is more convenient.
+
+For a matrix, the row-space/nullspace pair and column-space/left-nullspace pair express the same duality. Rank-nullity and orthogonal-complement dimensions agree. These relations are useful diagnostic tools: a computed residual claimed to lie in the left nullspace should be checked against the columns, and a proposed null vector should be checked against every row.
+
+## Geometry under finite precision
+
+Near orthogonality is scale dependent. An absolute dot product of one may be negligible for vectors of length a million and decisive for unit vectors. Normalizing before comparison or using a relative criterion gives a dimensionless measure. The angle itself can be unstable near parallel or antiparallel configurations because inverse cosine changes rapidly there.
+
+Forming a difference of nearly parallel vectors can lose relative accuracy. Projection residuals in Gram–Schmidt encounter exactly this situation. Stable algorithms reorganize operations or use orthogonal reflections to reduce the damage. The underlying theorem is exact; the route used to evaluate it determines how well finite precision preserves the geometry.
+
+Checks should match the claimed property. A small reconstruction error does not imply that a basis is orthogonal, and a nearly orthogonal basis does not imply it spans the intended data accurately. Projection work should inspect both the residual's orthogonality and the reconstruction of the original vector as projected part plus residual.
+
+<div className="see-also">
+
+See also: [Vectors in Rn](/math/linear-algebra/vectors) · [Orthogonality, Gram–Schmidt, and QR](/math/linear-algebra/orthogonality-qr-gram-schmidt) · [Least squares](/math/linear-algebra/least-squares) · [Inner product spaces](/math/linear-algebra/inner-product-spaces)
+
+</div>

@@ -5,144 +5,282 @@ sidebar_position: 15
 
 # Threads, Synchronization, and the Memory Model
 
-A thread is a sequence of execution within a program. Most simple programs run one step at a time, but Java supports multiple threads that may execute concurrently and interact through shared objects. The source book introduces threads with a concrete race: two operations on shared state can interleave unless the program uses synchronization to define a safe order.
+A thread is a path of execution within one process. Java threads share the heap, so two threads can reach the same object while keeping separate stacks and local variables. That combination is useful and dangerous: communication can be as cheap as assigning a field, but correctness can depend on an interleaving that almost never appears during a casual test run.
 
-Threading is difficult because correctness depends on more than individual statements. Visibility, atomicity, ordering, locks, waiting, notification, deadlock, and termination all matter. The Java memory model gives meaning to synchronization and `volatile`, while the object monitor mechanism provides `synchronized`, `wait`, `notify`, and `notifyAll`.
+Concurrency bugs fall into several different categories. **Atomicity** asks whether an operation can be observed halfway through. **Visibility** asks whether one thread is required to see another thread's write. **Ordering** asks which apparent reorderings the compiler, runtime, and processor may expose. **Liveness** asks whether useful work eventually continues. A lock can help with all four, but only when every access follows one coherent locking policy.
 
-## Definitions
+## A task is not a thread
 
-The source basis for this page is Chapter 14 on creating threads, `Runnable`, synchronization, `wait`, `notifyAll`, scheduling, deadlocks, ending threads, application exit, synchronization and `volatile`, thread groups, exceptions, `ThreadLocal`, and debugging. The terms below are written as contracts: each one tells you what the compiler can check, what the runtime must preserve, and what a reader of the program may rely on.
-
-**Thread.** A thread is an independent path of execution represented by a `Thread` object and scheduled by the runtime and operating system. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
-
-**`Runnable`.** `Runnable` is an interface whose `run` method represents a unit of work. A `Thread` can be constructed with a `Runnable`. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
-
-**Race condition.** A race condition occurs when correctness depends on timing or interleaving among threads rather than on enforced ordering. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
-
-**Monitor lock.** Every object has a monitor lock used by `synchronized` methods and blocks. A thread must hold the relevant lock to enter synchronized code for that object. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
-
-**`synchronized`.** `synchronized` enforces mutual exclusion and also participates in memory visibility guarantees. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
-
-**`wait`.** `wait` makes the current thread release the object's monitor and suspend until notified, interrupted, or timed out. It must be called while holding the monitor. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
-
-**`notifyAll` and `notify`.** Notification wakes waiting threads associated with an object's monitor. `notifyAll` wakes all; `notify` wakes one chosen by the runtime. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
-
-**`volatile`.** A volatile variable has special visibility and ordering rules. It is not a replacement for synchronized compound actions. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
-
-## Key results
-
-**Shared mutable state requires a synchronization policy.** If multiple threads read and write the same object state, the class needs a clear rule for which lock protects which fields or which variables are volatile. Without that policy, apparently simple operations such as increment can lose updates. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
-
-**Synchronization protects atomicity and visibility.** A synchronized block prevents two threads from executing protected code for the same monitor at once. It also establishes memory effects so changes made by one synchronized action become visible in the right order to another synchronized action using the same monitor. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
-
-**Wait conditions must be tested in loops.** A waiting thread should test the condition it needs, call `wait` while the condition is false, and retest after waking. Notification is not the same as proof that the condition is true; another thread may have changed the state first, or a wakeup may occur for other reasons. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
-
-**Deadlock is a design failure the runtime may not fix.** If two threads hold locks while waiting for each other's locks, both can stop forever. The source emphasizes avoiding deadlocks through design, such as consistent resource ordering, instead of hoping the runtime detects and resolves them. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
-
-**Thread termination should be cooperative.** Abruptly stopping threads can leave shared objects inconsistent. Better designs arrange for a thread to notice a shutdown condition, finish current work safely, release resources, and return from `run`. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
-
-To reason about threaded code, annotate every shared field with its guard. For example, `balance guarded by this` means all access to `balance` must occur while holding the receiver's monitor. Then check every method. If a method reads or writes `balance` without the guard, the policy is broken. For wait/notify code, annotate the condition predicate, such as `queue not empty`, and make sure wait occurs in a loop testing that predicate. This discipline is more reliable than visually scanning for the word `synchronized` because synchronization is about a consistent policy, not decoration.
-
-## Visual
-
-```mermaid
-sequenceDiagram
-  participant Producer
-  participant Queue
-  participant Consumer
-  Consumer->>Queue: synchronized take()
-  Queue-->>Consumer: while empty, wait()
-  Producer->>Queue: synchronized put(item)
-  Producer->>Queue: notifyAll()
-  Consumer->>Queue: wakes and retests condition
-  Queue-->>Consumer: returns item
-```
-
-| Problem | Source-era tool | Essential rule |
-|---|---|---|
-| Lost update | `synchronized` block or method | Guard read-modify-write as one action |
-| Visibility of stop flag | `volatile` or synchronization | Reader must see writer's update |
-| Condition waiting | `wait` and `notifyAll` | Hold monitor and wait in a loop |
-| Deadlock | Lock ordering design | Acquire multiple locks consistently |
-| Per-thread state | `ThreadLocal` | Avoid accidental sharing |
-
-## Worked example 1: fixing a lost deposit
-
-Problem: Two threads call `deposit(100)` on an account whose balance starts at `0`. Explain how the final balance can incorrectly be `100`.
-
-Method:
-
-1. Without synchronization, thread A reads balance `0`.
-2. Before A writes, thread B also reads balance `0`.
-3. Thread A computes `0 + 100` and writes `100`.
-4. Thread B computes from its stale read `0 + 100` and writes `100`.
-5. Both deposits returned, but one update was overwritten.
-6. Make the read-modify-write operation synchronized on the same monitor so one deposit completes before the other begins.
-
-Checked answer: The incorrect final balance is possible because incrementing is not atomic. A synchronized `deposit` method makes the final balance `200` for these two calls.
-
-## Worked example 2: using wait in a bounded buffer
-
-Problem: A consumer should take an item only when a queue is nonempty. Show the correct wait pattern.
-
-Method:
-
-1. Enter a synchronized method or block for the queue object so the condition and queue state are protected by the same monitor.
-2. Test the condition `queue.isEmpty()`.
-3. While it is empty, call `wait()`. The call releases the monitor and suspends the thread.
-4. When awakened, reacquire the monitor and retest the condition in the loop.
-5. Only remove and return an item after the loop proves the queue is nonempty.
-
-Checked answer: The checked pattern is `while (empty) wait();` followed by removal under the same lock. Notification is a hint to retest, not a guarantee that the item is available.
-
-## Code
+`Runnable` describes work through its `run` method. `Thread` is an execution mechanism that can run that work and is scheduled by the JVM and operating system.
 
 ```java
-public class SynchronizedCounterDemo {
-    static class Counter {
-        private int value;
+Runnable work = () -> System.out.println(Thread.currentThread().getName());
 
-        public synchronized void increment() {
-            value++;
-        }
+Thread worker = new Thread(work, "worker-1");
+worker.start();
+```
 
-        public synchronized int value() {
-            return value;
+Calling `start()` arranges for a new thread to execute `run()`. Calling `worker.run()` directly is an ordinary method call on the current thread. The distinction is observable:
+
+```java
+Thread worker = new Thread(
+    () -> System.out.println(Thread.currentThread().getName()),
+    "worker-1"
+);
+
+worker.run();   // prints the caller's thread name, usually "main"
+worker.start(); // prints "worker-1"
+```
+
+A `Thread` can be started only once. A second call to `start()` throws `IllegalThreadStateException`, even if the first execution has already finished. Code that needs to submit many independent tasks normally uses an executor rather than repeatedly constructing and coordinating raw threads.
+
+Thread scheduling supplies no useful default order. Starting thread A before thread B does not guarantee that A finishes first, reaches a particular statement first, or receives more CPU time. Any required order must be expressed by synchronization, `join`, a queue, a latch, or another concurrency abstraction.
+
+## Worked race: where the missing hundred goes
+
+Suppose an account begins with balance `0`, and two threads each execute `balance += 100`. That statement looks indivisible in source, but it is a read-modify-write operation:
+
+1. Thread A reads `balance`, obtaining `0`.
+2. A is paused before storing its result.
+3. Thread B reads the same field, also obtaining `0`.
+4. B adds `100` and writes `100`.
+5. A resumes, adds `100` to its earlier value, and writes `100`.
+
+Both calls returned, yet one update was lost. Declaring `balance` as `volatile` would not repair the algorithm. Each read and write would gain visibility guarantees, but the pair could still interleave exactly as above.
+
+Every Java object has an associated monitor. A synchronized instance method locks the receiver; a synchronized static method locks the corresponding `Class` object. A synchronized block locks the object named by its expression. The account can use its own monitor as the guard:
+
+```java
+final class Account {
+    private int balance; // guarded by this
+
+    public synchronized void deposit(int amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("negative deposit");
         }
+        balance += amount;
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        final Counter counter = new Counter();
-        Runnable work = new Runnable() {
-            public void run() {
-                for (int i = 0; i < 10000; i++) {
-                    counter.increment();
-                }
-            }
-        };
-
-        Thread a = new Thread(work);
-        Thread b = new Thread(work);
-        a.start();
-        b.start();
-        a.join();
-        b.join();
-        System.out.println(counter.value());
+    public synchronized int balance() {
+        return balance;
     }
 }
 ```
 
-## Common pitfalls
+Now the two deposits proceed as follows:
 
-- Do not synchronize different methods on different locks if they protect the same state.
-- Do not call `wait`, `notify`, or `notifyAll` without holding the object's monitor.
-- Do not use `if` instead of `while` around a wait condition.
-- Do not assume `volatile` makes compound actions atomic. It mainly addresses visibility and ordering for the variable.
-- Do not design code that acquires locks in inconsistent orders. Deadlock prevention is a design responsibility.
+1. A acquires the account monitor.
+2. A reads `0`, computes `100`, and writes `100` while B cannot enter `deposit`.
+3. A releases the monitor on method exit.
+4. B acquires that same monitor, reads `100`, computes `200`, and writes `200`.
+5. B releases the monitor. A later synchronized call to `balance()` reads `200`.
 
-## Connections
+The lock covers the invariant, not merely a suspicious line. If a withdrawal must check that funds are sufficient and then subtract, the check and subtraction belong in one critical section. Splitting them into separately synchronized methods would allow another operation between the check and update.
 
-- [Interfaces, Nested Classes, and Enums](/cs/programming/java/interfaces-nested-classes-enums): covers `Runnable` as an interface contract.
-- [Concurrent Utilities and Executors](/cs/programming/java/concurrent-utilities-executors): introduces higher-level concurrency utilities from the standard package survey.
-- [Classes, Objects, and Encapsulation](/cs/programming/java/classes-objects-encapsulation): connects private state to synchronization policies.
-- [Exceptions and Assertions](/cs/programming/java/exceptions-assertions): explains interruption and exceptions around threaded operations.
+```java
+public synchronized boolean withdraw(int amount) {
+    if (amount < 0) {
+        throw new IllegalArgumentException("negative withdrawal");
+    }
+    if (balance < amount) {
+        return false;
+    }
+    balance -= amount;
+    return true;
+}
+```
+
+Synchronized methods are reentrant. If a thread holding an object's monitor calls another synchronized method on the same object, it may acquire the monitor again and must release it the corresponding number of times. Reentrancy permits synchronized methods to compose without self-deadlock, though deadlock involving several different locks remains possible.
+
+## The memory model's ordering contract
+
+Source order alone does not define what another thread may observe. Compilers and processors may reorder operations when that reordering preserves the behavior of a single thread. Hardware caches and store buffers also mean that a write need not become promptly observable everywhere. The Java Memory Model describes allowed observations through the **happens-before** relation.
+
+If action A happens-before action B, then A's effects are visible to B and A is ordered before B. The relation is transitive. Several rules matter frequently:
+
+| Earlier action | Later action that it happens-before |
+|---|---|
+| Unlock monitor M | A subsequent lock of M |
+| Write volatile variable V | A subsequent read of V |
+| Call `thread.start()` | Actions performed by the started thread |
+| Every action in a thread | Another thread successfully returns from `join()` on it |
+| Initialization of an object | Use of that object after correct publication |
+
+Within one thread, each action also happens-before later actions according to program order. Combining rules explains the synchronized counter result:
+
+```java
+final class Counter {
+    private int value;
+
+    synchronized void increment() {
+        value++;
+    }
+
+    synchronized int get() {
+        return value;
+    }
+}
+
+Counter counter = new Counter();
+Runnable addTenThousand = () -> {
+    for (int i = 0; i < 10_000; i++) {
+        counter.increment();
+    }
+};
+
+Thread a = new Thread(addTenThousand);
+Thread b = new Thread(addTenThousand);
+a.start();
+b.start();
+a.join();
+b.join();
+System.out.println(counter.get()); // 20000
+```
+
+Each increment excludes competing increments, so no update is lost. Returning from `a.join()` and `b.join()` also places both workers' actions before the main thread continues. The final synchronized getter is consistent with the counter's guard, but `join` itself already establishes visibility of completed worker actions.
+
+A **data race** exists when two conflicting accesses to the same variable are not ordered by happens-before and at least one access is a write. Race-free programs using the synchronization rules have sequentially consistent behavior: their executions can be understood as some interleaving that respects each thread's program order. Racy programs do not earn that simple model.
+
+Happens-before is stronger and more precise than elapsed time. A thread may write a field several seconds before another thread reads it, yet the read still lacks a visibility guarantee if no ordering edge connects them. Conversely, a volatile handoff can order ordinary field writes that precede the volatile write. A producer may fill an object, assign it to an ordinary field, and then write `ready = true` to a volatile field. A consumer that reads `ready` as true is then entitled to observe the producer's earlier writes. The volatile variable acts as the publication edge; making every field volatile would add noise without improving that protocol.
+
+The guarantee also runs through transitivity. If A releases a monitor after preparing data, B acquires that monitor and later starts thread C, then A's preparation happens-before C's actions. Reasoning in terms of edges scales better than trying to predict cache flushes or instruction schedules, which are implementation details rather than the language contract.
+
+## Choosing between a monitor, `volatile`, and atomics
+
+`volatile` fits a value that can be read and written independently, with no multi-field invariant and no compound update. A shutdown flag is the standard case:
+
+```java
+final class Worker implements Runnable {
+    private volatile boolean stopRequested;
+
+    public void requestStop() {
+        stopRequested = true;
+    }
+
+    @Override
+    public void run() {
+        while (!stopRequested) {
+            doOneUnitOfWork();
+        }
+    }
+
+    private void doOneUnitOfWork() {
+        // bounded work: the loop must regain a chance to inspect the flag
+    }
+}
+```
+
+Without `volatile` or another happens-before edge, the worker is not required to observe the new value. With it, the write to `stopRequested` happens-before the read that observes `true`. Volatile access does not provide mutual exclusion, and `count++` remains a read followed by a calculation followed by a write.
+
+Atomic classes such as `AtomicInteger` provide indivisible operations including `incrementAndGet` and compare-and-set. They are suitable for a counter or reference updated independently. A monitor is usually clearer when one operation must preserve a relationship among several fields, such as `balance`, an overdraft limit, and an audit sequence number.
+
+| Requirement | Typical mechanism |
+|---|---|
+| One independently assigned flag or reference | `volatile` |
+| Atomic update of one number or reference | `AtomicInteger`, `AtomicLong`, or `AtomicReference` |
+| Invariant spanning several values | `synchronized` or `Lock` |
+| Passing work or data between threads | Blocking queue or executor |
+| Waiting for a count or phase | Latch, barrier, or phaser |
+
+Safe publication matters even when an object is intended to be read-only. Publishing through a static initializer, a volatile field, a lock, a concurrent collection, or a thread-safe queue gives other threads a defined view of the initialized state. Final fields have additional initialization guarantees when the constructor does not leak `this`; they do not make referenced mutable objects immutable.
+
+## Waiting for a condition, step by step
+
+Monitors also support condition waiting. `wait()` suspends the current thread and releases the target object's monitor atomically. Before it returns, the thread must reacquire that monitor. `notify()` wakes one arbitrary waiter; `notifyAll()` wakes all waiters. The notifier keeps the lock until it leaves the synchronized region.
+
+Consider a one-slot mailbox. A producer must wait while the slot is full, and a consumer must wait while it is empty:
+
+```java
+final class Mailbox<T> {
+    private T item;
+    private boolean full;
+
+    public synchronized void put(T value) throws InterruptedException {
+        while (full) {
+            wait();
+        }
+        item = value;
+        full = true;
+        notifyAll();
+    }
+
+    public synchronized T take() throws InterruptedException {
+        while (!full) {
+            wait();
+        }
+        T value = item;
+        item = null;
+        full = false;
+        notifyAll();
+        return value;
+    }
+}
+```
+
+For a consumer arriving first, the sequence is:
+
+1. The consumer acquires the mailbox monitor and finds `full == false`.
+2. `wait()` releases the monitor and suspends the consumer.
+3. The producer acquires the monitor, stores the item, sets `full` to `true`, and calls `notifyAll()`.
+4. The producer still owns the monitor until `put` returns.
+5. The consumer competes to reacquire the monitor, then evaluates `!full` again.
+6. With the predicate now false, it removes the item and restores the empty-state invariant.
+
+```mermaid
+sequenceDiagram
+  participant Producer
+  participant Mailbox
+  participant Consumer
+  Consumer->>Mailbox: "take() acquires monitor"
+  Mailbox-->>Consumer: "empty: wait and release monitor"
+  Producer->>Mailbox: "put(item) acquires monitor"
+  Producer->>Mailbox: "store item; notifyAll()"
+  Note over Producer,Mailbox: Producer releases monitor on return
+  Consumer->>Mailbox: "reacquire and retest predicate"
+  Mailbox-->>Consumer: "remove and return item"
+```
+
+The test must be a `while`, not an `if`. A wakeup is permission to compete for the lock, not evidence that the predicate is true. Another consumer may take the item first, unrelated conditions may share the wait set, and spurious wakeups are permitted. Both the predicate and the state changes that can satisfy it must use the same monitor.
+
+`wait`, `notify`, and `notifyAll` throw `IllegalMonitorStateException` when called without owning the target monitor. Calling `other.wait()` while synchronized on `this` is therefore wrong unless `other` and `this` are the same object.
+
+## Interruption and orderly shutdown
+
+Interruption is a cooperative request, not forced termination. Blocking methods such as `sleep`, `wait`, and `join` respond by throwing `InterruptedException` and clearing the interrupted status. Code that cannot complete the requested operation should normally propagate the exception. Code at a boundary that cannot throw it should restore the status so an outer layer can observe it:
+
+```java
+try {
+    queue.put(result);
+} catch (InterruptedException e) {
+    Thread.currentThread().interrupt();
+    return;
+}
+```
+
+For nonblocking loops, `Thread.currentThread().isInterrupted()` checks the status without clearing it. `Thread.interrupted()` checks and clears the current thread's status, a difference that can silently consume a cancellation request.
+
+Deprecated abrupt termination operations are unsafe because a thread can be stopped while it owns locks or while an invariant is temporarily broken. A worker should finish or roll back its current consistency-preserving unit, release resources, and return from `run`.
+
+## Deadlock is a design error, not a slow lock
+
+Two transfers can deadlock if each thread locks its source account and then tries to lock its destination. One holds A and waits for B; the other holds B and waits for A. Neither can proceed.
+
+The usual repair is a global lock order. Assign each account a stable ordering key, acquire the lower one first, then the higher one. Equal keys need a tie-breaking lock or a key guaranteed to be unique. Keeping critical sections bounded and avoiding calls into unknown code while holding a monitor also limits lock dependencies.
+
+Deadlock differs from starvation, where a runnable thread repeatedly loses access to a needed resource, and livelock, where threads keep reacting to each other but make no progress. Adding retries may replace a deadlock with livelock unless backoff or ownership rules ensure progress. Thread dumps are the first useful artifact for a suspected deadlock because they show monitor ownership and waiting relationships.
+
+## Review notes for shared state
+
+- Write down which lock guards each mutable field. All reads count, including `toString`, logging, and diagnostic getters.
+- Do not synchronize writers while leaving readers unsynchronized. The reader needs the same happens-before relation.
+- Keep check-then-act sequences under one lock, or use a single atomic library operation designed for them.
+- Never assume a wakeup means a condition is satisfied. Retest under the lock.
+- Avoid holding a lock during blocking I/O or callbacks unless the ownership design specifically requires it.
+- Define cancellation and failure handling along with startup. A thread that cannot stop can keep the JVM or a service shutdown hanging.
+- Prefer higher-level concurrency utilities once the problem resembles task scheduling, message passing, or phase coordination. Their contracts encode policies that are easy to get subtly wrong with raw monitors.
+
+<div className="see-also">
+
+See also: [Concurrent Utilities and Executors](/cs/programming/java/concurrent-utilities-executors) · [Interfaces, Nested Classes, and Enums](/cs/programming/java/interfaces-nested-classes-enums) · [Classes, Objects, and Encapsulation](/cs/programming/java/classes-objects-encapsulation) · [Exceptions and Assertions](/cs/programming/java/exceptions-assertions)
+
+</div>

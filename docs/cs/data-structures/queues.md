@@ -261,10 +261,8 @@ Modulo by zero is undefined, so capacity must be positive before any index updat
 
 Ordinary queue code is not automatically thread-safe. In a producer-consumer program, updating an index and the size is a multi-step state change. Locks, condition variables, atomics, and memory-order rules belong to the concurrent queue design; adding `volatile` does not make the operations atomic or establish inter-thread ordering.
 
-## Related pages
+<div className="see-also">
 
-- [stacks](/cs/data-structures/stacks)
-- [arrays and array operations](/cs/data-structures/arrays)
-- [linked lists](/cs/data-structures/linked-lists)
-- [graph traversals](/cs/data-structures/graph-traversals)
-- [shortest paths](/cs/data-structures/shortest-paths)
+See also: [stacks](/cs/data-structures/stacks) · [arrays and array operations](/cs/data-structures/arrays) · [linked lists](/cs/data-structures/linked-lists) · [graph traversals](/cs/data-structures/graph-traversals) · [shortest paths](/cs/data-structures/shortest-paths)
+
+</div>

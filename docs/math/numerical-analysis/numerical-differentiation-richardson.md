@@ -379,9 +379,8 @@ print(centered_second(math.exp, 0.0, 0.01), "exact", 1.0)
 - Forgetting that one-sided formulas are lower order unless specially designed.
 - Using a derivative estimate without checking sensitivity to several nearby step sizes.
 
-## Related pages
+<div className="see-also">
 
-- [mathematical preliminaries and error analysis](/math/numerical-analysis/mathematical-preliminaries-error-analysis)
-- [floating point conditioning and stability](/math/numerical-analysis/floating-point-conditioning-stability)
-- [Newton Secant and polynomial roots](/math/numerical-analysis/newton-secant-polynomial-roots)
-- [Newton Cotes and Romberg integration](/math/numerical-analysis/newton-cotes-romberg-integration)
+See also: [mathematical preliminaries and error analysis](/math/numerical-analysis/mathematical-preliminaries-error-analysis) · [floating point conditioning and stability](/math/numerical-analysis/floating-point-conditioning-stability) · [Newton Secant and polynomial roots](/math/numerical-analysis/newton-secant-polynomial-roots) · [Newton Cotes and Romberg integration](/math/numerical-analysis/newton-cotes-romberg-integration)
+
+</div>

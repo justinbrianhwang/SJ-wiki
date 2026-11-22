@@ -7,9 +7,9 @@ sidebar_position: 5
 
 Fault tolerance is the discipline of building systems that keep delivering acceptable service when parts misbehave. Distributed systems make this harder because the system may not know whether a component crashed, the network is slow, the disk is stuck, or a dependency is overloaded. Kleppmann frames this as reliability in the face of partial failure and operator reality; Lynch gives precise failure models and lower bounds; van Steen and Tanenbaum organize redundancy, process groups, failure detection, commit, and recovery [1], [2], [3].
 
-This page connects failure detectors, recovery techniques, and state-machine replication. The key theme is that detection is not truth. A failure detector is a protocol component that converts missing evidence into suspicion. Fault-tolerant design must then decide how to act on suspicion without violating safety.
+Failure detectors, recovery techniques, and state-machine replication all rely on one distinction: detection is not truth. A failure detector converts missing evidence into suspicion. Fault-tolerant design must then decide how to act on suspicion without violating safety.
 
-## Definitions
+## Faults, failures, and suspicion
 
 A **fault** is a defect or abnormal condition in a component. A **failure** is externally visible inability to provide the specified service. A disk fault may be masked by replication; an unmasked data loss is a failure. **Fault tolerance** is the ability to prevent faults from becoming service failures, usually through redundancy, isolation, detection, recovery, and repair.
 
@@ -35,15 +35,15 @@ Fault tolerance also depends on **fault containment**. A process crash is easier
 
 An **idempotent operation** can be retried without changing the result beyond the first successful execution. Idempotence is not the same as read-only behavior: `put(key, value)` can be idempotent, while `increment(counter)` is not unless guarded by a unique request identifier. Retry loops, leader failover, and message replay make idempotence a fault-tolerance primitive. When an operation cannot be naturally idempotent, systems often record a request ID in durable state and return the prior response on duplicate delivery.
 
-## Key results
+## What timing assumptions permit
 
-The first key result is that reliable failure detection is model-dependent. Perfect detection is impossible in a purely asynchronous system with crash failures because delay is unbounded. Eventually perfect detection can be implemented under partial synchrony: after the system stabilizes and timeout estimates become large enough, correct processes are no longer falsely suspected while failed processes remain silent [4].
+Reliable failure detection is model-dependent. Perfect detection is impossible in a purely asynchronous system with crash failures because delay is unbounded. Eventually perfect detection can be implemented under partial synchrony: after the system stabilizes and timeout estimates become large enough, correct processes are no longer falsely suspected while failed processes remain silent [4].
 
-The second result is that suspicion must be separated from authority. A node suspected by one peer should not automatically be deleted from membership if that action can break quorum intersection. Consensus systems usually require membership changes to go through the replicated log precisely because local failure detection can be wrong.
+Suspicion must be separated from authority. A node suspected by one peer should not automatically be deleted from membership if that action can break quorum intersection. Consensus systems usually require membership changes to go through the replicated log precisely because local failure detection can be wrong.
 
-The third result is the state-machine replication theorem. If replicas are deterministic, begin in equivalent states, and execute the same sequence of commands, then their states remain equivalent after every command. Proof is by induction. The base case is the equal initial state. For the step, determinism means applying command $c_i$ to equal states produces equal next states and equal outputs. Therefore a replicated log plus deterministic application code gives fault masking for crash failures, assuming enough replicas and durable logs [6].
+The state-machine replication theorem says that deterministic replicas beginning in equivalent states remain equivalent when they execute the same command sequence. Proof is by induction. The base case is the equal initial state. For the step, determinism means applying command $c_i$ to equal states produces equal next states and equal outputs. A replicated log plus deterministic application code therefore masks crash failures, assuming enough replicas and durable logs [6].
 
-The fourth result is that recovery is a protocol, not just a backup file. Crash recovery must answer: which operations were committed, which were only tentative, which messages may be replayed, and which external side effects were already performed? Write-ahead logging solves the storage ordering piece. Idempotent operations, unique request IDs, and transactional outboxes solve many external-effect pieces.
+Recovery is a protocol rather than a backup file. Crash recovery must answer: which operations were committed, which were only tentative, which messages may be replayed, and which external side effects were already performed? Write-ahead logging solves the storage ordering piece. Idempotent operations, unique request IDs, and transactional outboxes solve many external-effect pieces.
 
 The engineering trade-off is between fast detection and false suspicion. Short timeouts improve RTO for real crashes but can trigger failovers during pauses or congestion. Long timeouts reduce false positives but prolong outages. Phi-accrual detectors make this trade-off explicit by returning suspicion strength rather than a hard decision.
 
@@ -51,7 +51,7 @@ Checkpointing has a similar trade-off. Frequent checkpoints reduce replay time a
 
 Failure masking must also be paired with failure disclosure. A user-facing service might continue operating after losing one replica, but operators still need alerts, degraded-mode indicators, and repair automation. Silent redundancy exhaustion is dangerous: after one replica fails unnoticed, the next ordinary fault can become a data-loss event. Good fault-tolerant systems therefore expose both service-level health and redundancy-level health.
 
-## Visual
+## From suspicion to recovery
 
 ```mermaid
 stateDiagram-v2
@@ -66,6 +66,10 @@ stateDiagram-v2
   Recovering --> Failed: durable state invalid
 ```
 
+The `Suspected` state is deliberately reversible. Only a stronger authority, such as quorum confirmation or lease expiry, moves the process into recovery; a late heartbeat can still clear an early suspicion.
+
+## Matching mechanisms to failure modes
+
 | Technique | Masks which problem | Main cost | Common failure if misused |
 | --- | --- | --- | --- |
 | Heartbeats | crash suspicion | network traffic and timeout tuning | false failure during pauses |
@@ -75,11 +79,11 @@ stateDiagram-v2
 | State-machine replication | replica crash | consensus latency and deterministic code | nondeterministic handlers diverge |
 | Message logging | lost volatile execution | log volume | replaying external side effects twice |
 
-## Worked example 1: Choose a phi-accrual threshold
+## Interpreting a phi-accrual score
 
-Problem: A service receives heartbeats from a peer. Historical inter-arrival times are approximately exponential with mean $1$ second. No heartbeat has arrived for $5$ seconds. Estimate $\phi$ and decide whether thresholds `3` and `8` suspect the peer.
+A service receives heartbeats from a peer. Historical inter-arrival times are approximately exponential with mean $1$ second. No heartbeat has arrived for $5$ seconds. Estimate $\phi$ and decide whether thresholds `3` and `8` suspect the peer.
 
-Method:
+Using the exponential model:
 
 1. For an exponential distribution with mean $1$, the survival probability is:
 
@@ -113,13 +117,13 @@ $$
 
 5. Compare thresholds. Threshold `3` requires $\phi \ge 3$, and threshold `8` requires $\phi \ge 8$.
 
-Checked answer: with this simple distribution, $\phi \approx 2.17$, so neither threshold suspects yet. A system using threshold `3` would suspect after a silence where the tail probability drops below $10^{-3}$.
+Here $\phi \approx 2.17$, so neither threshold suspects yet. A threshold of `3` fires once the tail probability falls below $10^{-3}$.
 
-## Worked example 2: Determine RTO and RPO from backup policy
+## Deriving RTO and RPO from a recovery policy
 
-Problem: A metadata service checkpoints every 10 minutes, streams its WAL to another zone every 30 seconds, and takes 4 minutes to provision a replacement plus 3 minutes to replay logs after the latest checkpoint. What are the approximate RTO and RPO after losing the primary zone?
+A metadata service checkpoints every 10 minutes, streams its WAL to another zone every 30 seconds, and takes 4 minutes to provision a replacement plus 3 minutes to replay logs after the latest checkpoint. What are the approximate RTO and RPO after losing the primary zone?
 
-Method:
+From the stated timings:
 
 1. RPO measures possible data loss. If WAL is streamed every 30 seconds, the latest 30 seconds of acknowledged updates may be missing if acknowledgments did not wait for remote replication.
 
@@ -141,9 +145,9 @@ $$
 
 6. If failure detection takes 2 additional minutes, operational RTO becomes about 9 minutes.
 
-Checked answer: technical RPO is about 30 seconds and technical RTO is about 7 minutes, plus detection and traffic-shift time. If the service promises zero data loss, acknowledgments must wait for remote durable replication or consensus.
+Technical RPO is about 30 seconds and technical RTO is about 7 minutes, plus detection and traffic-shift time. A zero-data-loss promise would require acknowledgments to wait for remote durable replication or consensus.
 
-## Code
+## A minimal phi-accrual detector
 
 ```python
 import math
@@ -176,7 +180,7 @@ for now in [6.0, 8.0, 12.0]:
     print(now, round(score, 2), "suspect:", score >= 3.0)
 ```
 
-## Common pitfalls
+## Recovery assumptions that fail under load
 
 - Treating a missing heartbeat as proof of failure in an asynchronous or overloaded system.
 - Making membership changes based on one node's suspicion rather than a replicated decision.
@@ -191,18 +195,6 @@ for now in [6.0, 8.0, 12.0]:
 - Building failover that works for crashes but not for slow or partitioned primaries.
 - Treating Byzantine tolerance as a substitute for ordinary operational controls.
 
-## Connections
-
-- [Foundations and System Models](/cs/distributed-systems/foundations-and-system-models)
-- [Consensus: Paxos and Raft](/cs/distributed-systems/consensus-paxos-and-raft)
-- [Replication and Consistency](/cs/distributed-systems/replication-and-consistency)
-- [Transactions and Isolation Levels](/cs/distributed-systems/transactions-and-isolation-levels)
-- [Distributed Storage and CAP](/cs/distributed-systems/distributed-storage-and-cap)
-- [Computer Networks](/cs/computer-networks/intro)
-- [Operating Systems](/cs/operating-systems/intro)
-- [Databases](/cs/databases/intro)
-- [Cryptography](/cs/cryptography/intro)
-
 ## References
 
 [1] M. Kleppmann, *Designing Data-Intensive Applications*. Sebastopol, CA: O'Reilly, 2017.  
@@ -212,3 +204,9 @@ for now in [6.0, 8.0, 12.0]:
 [5] N. Hayashibara, X. Defago, R. Yared, and T. Katayama, "The phi accrual failure detector," in *SRDS*, 2004.  
 [6] F. B. Schneider, "Implementing fault-tolerant services using the state machine approach: a tutorial," *ACM Computing Surveys*, vol. 22, no. 4, pp. 299-319, 1990.  
 [7] K. M. Chandy and L. Lamport, "Distributed snapshots: determining global states of distributed systems," *ACM Transactions on Computer Systems*, vol. 3, no. 1, pp. 63-75, 1985.
+
+<div className="see-also">
+
+See also: [Foundations and System Models](/cs/distributed-systems/foundations-and-system-models) · [Consensus: Paxos and Raft](/cs/distributed-systems/consensus-paxos-and-raft) · [Replication and Consistency](/cs/distributed-systems/replication-and-consistency) · [Transactions and Isolation Levels](/cs/distributed-systems/transactions-and-isolation-levels) · [Distributed Storage and CAP](/cs/distributed-systems/distributed-storage-and-cap) · [Computer Networks](/cs/computer-networks/intro) · [Operating Systems](/cs/operating-systems/intro) · [Databases](/cs/databases/intro) · [Cryptography](/cs/cryptography/intro)
+
+</div>

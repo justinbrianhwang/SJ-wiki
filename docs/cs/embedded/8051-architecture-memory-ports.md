@@ -9,7 +9,7 @@ The book turns from the 8085 microprocessor to the 8051 microcontroller because 
 
 The 8051 is still small enough to understand at the register level. It is also different enough from the 8085 to teach microcontroller thinking: software configures hardware by writing SFRs, port pins may serve alternate functions, internal data memory has multiple regions, and bit-addressable storage makes single-bit control efficient.
 
-## Definitions
+## The core registers and control surface
 
 The **8051** is the original member of Intel's MCS-51 microcontroller family. The book's 8051 chapters cover the core CPU, internal memory, ports, timers, serial port, interrupts, and system connections. Later chapters discuss derivatives such as 89C51 devices.
 
@@ -27,25 +27,23 @@ The **program counter `PC`** is 16 bits and addresses program memory. The **stac
 
 **Ports `P0` to `P3`** are 8-bit parallel I/O ports. Many pins have alternate functions. For example, `P3` pins serve serial, interrupt, timer, and external memory control roles.
 
-## Key results
+## Reading the 8051 memory map
 
-The first key result is that the 8051 has distinct memory spaces. Program memory, internal data memory, external data memory, and SFRs are not all accessed by the same instructions. `MOV` handles internal RAM and SFRs; `MOVX` handles external data memory; `MOVC` reads constants from program memory.
+The 8051 has distinct memory spaces. Program memory, internal data memory, external data memory, and SFRs are not all accessed by the same instructions. `MOV` handles internal RAM and SFRs; `MOVX` handles external data memory; `MOVC` reads constants from program memory.
 
-The second key result is that register banks are a speed feature. The addresses `00H` to `1FH` hold four banks of `R0` through `R7`. The active bank is selected by `PSW.RS1:RS0`. Interrupt routines can switch banks instead of pushing many registers, but this must be planned globally.
+The addresses `00H` to `1FH` hold four banks of `R0` through `R7`. The active bank is selected by `PSW.RS1:RS0`. Interrupt routines can switch banks instead of pushing many registers, but bank allocation must be planned across the whole program.
 
-The third key result is that internal RAM addresses `20H` through `2FH` are bit-addressable. Each bit has its own bit address, making instructions such as `SETB`, `CLR`, `JB`, and `JNB` useful for flags and I/O-style control.
+Internal RAM addresses `20H` through `2FH` are bit-addressable. Each bit has its own bit address, making instructions such as `SETB`, `CLR`, `JB`, and `JNB` useful for flags and I/O-style control.
 
-The fourth key result is that SFRs are the control surface of the microcontroller. Writing `TMOD` changes timer modes; writing `SCON` changes serial behavior; setting bits in `IE` enables interrupts. This is the microcontroller equivalent of wiring external control logic in an 8085 system.
+SFRs are the control surface of the microcontroller. Writing `TMOD` changes timer modes; writing `SCON` changes serial behavior; setting bits in `IE` enables interrupts. They take the role that external control logic often plays in an 8085 system.
 
-The fifth key result is that ports are not all identical. Port 0 is open-drain style in many classic 8051 designs and needs external pull-ups for general I/O. Ports 0 and 2 also become multiplexed address/data and high-address buses when external memory is used.
+Ports are not interchangeable. Port 0 is open-drain style in many classic 8051 designs and needs external pull-ups for general I/O. Ports 0 and 2 also become multiplexed address/data and high-address buses when external memory is used.
 
-The sixth key result is that stack placement matters. On reset, the classic 8051 stack pointer is commonly initialized to `07H`, so the first push goes to `08H`, which overlaps register bank 1 if that bank is used. Many programs explicitly move `SP` to a safer general RAM area.
+Stack placement matters. On reset, the classic 8051 stack pointer is initialized to `07H`, so the first push goes to `08H`, which overlaps register bank 1 if that bank is used. Programs that need more than bank 0 usually move `SP` to a safer general-RAM area.
 
-A seventh key result is that direct and indirect addressing do not mean the same thing in the upper half of the data-address range. Direct addresses `80H` through `FFH` select SFRs. Indirect addresses through `@R0` or `@R1` do not select those same SFRs; on devices with expanded internal RAM they may reach extra RAM, while on simpler parts the behavior may be unavailable or device-specific. This is why portable 8051 code treats SFR names and ordinary variables differently instead of assuming one flat RAM space.
+Direct and indirect addressing do not mean the same thing in the upper half of the data-address range. Direct addresses `80H` through `FFH` select SFRs. Indirect addresses through `@R0` or `@R1` do not select those SFRs; on devices with expanded internal RAM they may reach extra RAM, while on simpler parts the behavior may be unavailable or device-specific. Portable 8051 code therefore treats SFR names and ordinary variables differently instead of assuming one flat RAM space.
 
-An eighth key result is that alternate pin functions are part of the architecture, not optional decoration. Port 3 pins are also serial pins, external interrupt pins, timer inputs, and external memory control pins. A board that connects a switch to `P3.2` is also connecting to `INT0`; a board that uses `P3.0` and `P3.1` for LEDs may lose the hardware serial port. Good 8051 design starts with a pin-function table before software assigns port bits.
-
-## Visual
+Alternate pin functions constrain the board design. Port 3 pins are also serial pins, external interrupt pins, timer inputs, and external memory control pins. A switch on `P3.2` is also connected to `INT0`; using `P3.0` and `P3.1` for LEDs may take away the hardware serial port. Pin allocation should be settled before software assigns port bits.
 
 ```mermaid
 flowchart TB
@@ -98,7 +96,7 @@ flowchart TB
   Interrupts --> CPU
 ```
 
-This 8051 diagram shows the CPU registers, internal RAM map, SFR control surface, separate memory spaces, and port alternate functions in one view. The four register banks, bit-addressable RAM, general RAM/stack region, and direct-only SFR range are labeled with their standard address ranges. The memory-space branch explains why `MOV`, `MOVC`, and `MOVX` are not interchangeable, while the port branch shows how peripheral functions share physical pins.
+The map puts the CPU registers, internal RAM, SFR control surface, separate memory spaces, and port alternate functions in one view. The memory-space branch distinguishes the targets of `MOV`, `MOVC`, and `MOVX`; the port branch records which peripheral functions share physical pins.
 
 | Resource | Classic 8051 role | Programming note |
 |---|---|---|
@@ -110,7 +108,7 @@ This 8051 diagram shows the CPU registers, internal RAM map, SFR control surface
 | `P2` | Port 2 or A8-A15 | Used for external memory high address |
 | `P3` | Port 3 with alternate functions | Serial, interrupts, timers, read/write controls |
 
-## Worked example 1: Placing the stack safely
+### Placing the stack above live data
 
 Problem: An 8051 program uses register bank 0, bit-addressable flags at `20H` to `2FH`, and general variables starting at `30H`. Choose a safer initial stack pointer and explain the first push address.
 
@@ -140,7 +138,7 @@ Answer: initialize `SP` to `4FH` if RAM `50H` and above is available for stack. 
 
 Check: The choice must be revisited if many nested calls or interrupts occur, because the stack grows upward in internal RAM.
 
-## Worked example 2: Selecting a register bank
+### Selecting register bank 2
 
 Problem: Configure the 8051 to use register bank 2. What should bits `RS1` and `RS0` in `PSW` be, and which internal RAM addresses become `R0` and `R7`?
 
@@ -175,7 +173,7 @@ Answer: set `RS1:RS0 = 10`. `R0` maps to internal RAM `10H`, and `R7` maps to `1
 
 Check: If an interrupt routine changes `PSW` and does not restore it, the main program may suddenly refer to a different physical register bank.
 
-## Code
+## Initializing the stack and toggling a port bit
 
 ```asm
 ; 8051: initialize stack, configure P1 as output by writing values,
@@ -198,7 +196,7 @@ D2:     DJNZ R6,D2
         RET
 ```
 
-## Common pitfalls
+## Where memory and pin assignments collide
 
 - Treating SFR addresses as ordinary RAM. The direct address range above `7FH` names SFRs, while indirect access above `7FH` is different on expanded variants.
 - Forgetting to initialize `SP` before nested calls or interrupts.
@@ -208,9 +206,8 @@ D2:     DJNZ R6,D2
 - Assuming every SFR is bit-addressable. Only selected SFRs at bit-addressable addresses support direct bit operations.
 - Overlapping bit flags, variables, and stack space in the small internal RAM.
 
-## Connections
+<div className="see-also">
 
-- [8051 instruction set and programming](/cs/embedded/8051-instruction-set-programming)
-- [8051 timers, serial port, and interrupts](/cs/embedded/8051-timers-serial-interrupts)
-- [8051 external-world interfacing](/cs/embedded/8051-external-world-interfacing)
-- [Microcontroller derivatives, AVR, and PIC](/cs/embedded/microcontroller-derivatives-avr-pic)
+See also: [8051 instruction set and programming](/cs/embedded/instruction-set-programming) · [8051 timers, serial port, and interrupts](/cs/embedded/timers-serial-interrupts) · [8051 external-world interfacing](/cs/embedded/external-world-interfacing) · [Microcontroller derivatives, AVR, and PIC](/cs/embedded/microcontroller-derivatives-avr-pic)
+
+</div>

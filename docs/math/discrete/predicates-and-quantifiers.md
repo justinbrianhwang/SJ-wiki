@@ -9,11 +9,11 @@ Propositional logic cannot express statements such as "every prime greater than 
 
 This is the language used for definitions, theorems, loop invariants, database queries, and specifications. Universal quantifiers support claims about all objects in a domain. Existential quantifiers support claims that at least one object exists. Much of proof writing is the disciplined process of introducing, transforming, and eliminating these quantifiers.
 
-## Definitions
+## Predicates acquire truth values over a domain
 
 A **predicate** or **propositional function** is a statement containing variables. For example, $P(x)$: "$x^2\ge 0$" is not a proposition until the domain of $x$ is known and $x$ is given a value or quantified. Over the real numbers, $P(3)$ is true. Over the same domain, $Q(x)$: "$x^2=2$" is true for some values but not all.
 
-The **domain of discourse** is the set of objects a variable is allowed to represent. Changing the domain can change the truth value. The statement $\forall x(x^2\ge x)$ is false over the real numbers, false over the integers, but true over the nonnegative integers only for $x=0$ or $x\ge1$; if the domain is $\{0,1,2,\dots\}$, it is true.
+The **domain of discourse** is the set of objects a variable is allowed to represent. Changing the domain can change the truth value. The statement $\forall x(x^2\ge x)$ is false over the real numbers because $0\lt x\lt1$ gives counterexamples. It is true over the integers: every integer satisfies either $x\le0$ or $x\ge1$, so $x(x-1)\ge0$. It is therefore also true over the nonnegative integers $\{0,1,2,\dots\}$.
 
 The two basic quantifiers are:
 
@@ -28,7 +28,7 @@ $$
 
 Variables inside a quantifier's scope are **bound**. Variables not bound by a quantifier are **free**. A formula with free variables is not a complete proposition until those variables are assigned or quantified.
 
-## Key results
+## Negation and the order of quantifiers
 
 Negating quantified statements reverses the quantifier and negates the predicate:
 
@@ -63,9 +63,7 @@ $$
 \forall x(P(x)\to Q(x))
 $$
 
-does not assert that any object satisfies $P(x)$. It asserts that every object that satisfies $P$ also satisfies $Q$. This is why mathematical definitions often have the form "for all $x$, if $x$ has the hypotheses, then $x$ has the conclusion."
-
-## Visual
+does not assert that any object satisfies $P(x)$. It asserts that every object that satisfies $P$ also satisfies $Q$. Mathematical definitions therefore often have the form "for all $x$, if $x$ has the hypotheses, then $x$ has the conclusion."
 
 | Claim form | Meaning | How to prove | How to disprove |
 | --- | --- | --- | --- |
@@ -85,7 +83,7 @@ graph TD
   G --> H[Flip quantifier and negate predicate]
 ```
 
-## Worked example 1: Negate a nested statement
+## Negating “every integer has a larger even integer”
 
 **Problem.** Let the domain be the integers. Negate the statement
 
@@ -94,8 +92,6 @@ $$
 $$
 
 Then decide whether the original statement is true.
-
-**Method.**
 
 1. Start with the negation:
 
@@ -121,9 +117,9 @@ $$
 \exists x\forall y\,(y\le x \lor y \text{ is not even}).
 $$
 
-**Checked answer.** The negation says: "There is an integer $x$ such that every integer $y$ is either not greater than $x$ or is not even." The original statement is true. Given any integer $x$, choose $y=2x+2$ if $x\ge0$ and choose $y=0$ if $x\lt 0$. In both cases $y$ is even and $y\gt x$. The chosen $y$ is allowed to depend on $x$, which is exactly what $\forall x\exists y$ permits.
+The negation says: "There is an integer $x$ such that every integer $y$ is either not greater than $x$ or is not even." The original statement is true. Given any integer $x$, choose $y=2x+2$ if $x\ge0$ and choose $y=0$ if $x\lt 0$. In both cases $y$ is even and $y\gt x$. The chosen $y$ is allowed to depend on $x$, which is exactly what $\forall x\exists y$ permits.
 
-## Worked example 2: Compare quantifier orders
+## One witness per input versus one witness for all inputs
 
 **Problem.** Over the real numbers, compare the truth values of:
 
@@ -137,8 +133,6 @@ $$
 \exists y\forall x\,(x+y=0).
 $$
 
-**Method.**
-
 1. For $\forall x\exists y(x+y=0)$, choose an arbitrary real number $x$.
 2. We need a real number $y$ satisfying $x+y=0$.
 3. The equation gives $y=-x$, which is a real number.
@@ -148,9 +142,9 @@ $$
 7. Taking $x=1$ gives $1+y=0$, so $y=-1$.
 8. No single $y$ can be both $0$ and $-1$.
 
-**Checked answer.** The first statement is true and the second is false. The only difference is quantifier order. In the first, $y$ may depend on $x$; in the second, one fixed $y$ must work for all $x$.
+The first statement is true and the second is false. The only difference is quantifier order. In the first, $y$ may depend on $x$; in the second, one fixed $y$ must work for all $x$.
 
-## Code
+## Executable quantifiers on a finite domain
 
 ```python
 def forall(domain, predicate):
@@ -177,7 +171,7 @@ print(statement2)
 
 On the finite sample domain $\{-5,\dots,5\}$, the output is `True` and `False`. Finite testing is not a proof over all real numbers, but it reflects the same quantifier-order difference that the proof establishes.
 
-## Common pitfalls
+## Domains, dependencies, and counterexamples
 
 - Forgetting to state the domain. A quantified formula can change truth value when the domain changes.
 - Reversing quantifier order. $\forall x\exists y$ usually means "a custom response for each input"; $\exists y\forall x$ means "one response fits all inputs."
@@ -196,9 +190,13 @@ A useful translation check is to negate the formula and see whether the result m
 
 When a statement contains several variables, specify whether they share a domain. In $\forall x\exists y(x\lt y)$ over integers, both variables are integers. In applied settings, $x$ might range over users while $y$ ranges over permissions or files. Mixed-domain predicates should make each variable's type explicit.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Propositional logic](/math/discrete/propositional-logic) supplies the connectives inside quantified formulas.
 - [Proof techniques](/math/discrete/proof-techniques) explains arbitrary-element proofs, counterexamples, and existence proofs.
 - [Sets and set operations](/math/discrete/sets-and-set-operations) provides domains, membership, and subset language.
 - [Relations](/math/discrete/relations) expresses properties such as reflexive and transitive with quantified statements.
+
+</div>

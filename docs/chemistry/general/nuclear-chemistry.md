@@ -5,137 +5,200 @@ sidebar_position: 21
 
 # Nuclear Chemistry
 
-Nuclear chemistry studies changes in atomic nuclei rather than changes in electron arrangements. Radioactive decay, nuclear bombardment, fission, and fusion involve changes in proton and neutron counts, often accompanied by large energy changes because nuclear binding energies are enormous compared with chemical bond energies.
+Chemical reactions rearrange valence electrons while leaving nuclei intact. Nuclear reactions change proton or neutron counts and can turn one element into another. Their energy scale is much larger because nuclear binding changes a measurable amount of rest mass. The governing bookkeeping is still compact: conserve charge, nucleon number, energy, and momentum.
 
-In the Ebbing and Gammon sequence this topic sits near radioactivity, nuclear bombardment reactions, radiation detection and biological effects, radioactive decay rates, isotope applications, mass-energy calculations, fission, and fusion. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
+## Nuclides and the valley of stability
 
-![A nuclear fission diagram shows a neutron splitting uranium into smaller nuclei and additional neutrons.](https://commons.wikimedia.org/wiki/Special:FilePath/Nuclear_fission.svg)
+A nuclide is written $^A_Z\mathrm{X}$, where $Z$ is the proton count and identifies the element, $A$ is the mass number, and $A-Z$ is the neutron count. Isotopes have the same $Z$ but different $A$. The notation records the nucleus; an ionic charge, if relevant, belongs at the upper right and does not alter $A$ or $Z$.
 
-*Figure: Nuclear fission as a change in nuclei rather than electron arrangements. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Nuclear_fission.svg), Fastfission, public domain.*
+Nuclear stability reflects a competition. The strong nuclear force attracts nearby nucleons over a short range, while electrostatic repulsion acts between every pair of protons. Light stable nuclei tend to have roughly equal proton and neutron counts. Heavier stable nuclei need a growing neutron excess: neutrons contribute strong-force attraction without adding proton–proton repulsion. Very large nuclei remain vulnerable despite that excess.
 
-## Definitions
+Even–even nuclei are especially common among stable nuclides, while odd–odd stable combinations are rare. Such patterns guide expectations but do not replace measured nuclear data. “Stable” also means no decay has been observed on the relevant timescale, not that a nucleus has no internal energy.
 
-The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.
+## Decay modes repair different imbalances
 
-- Radioactivity is spontaneous emission of particles or radiation from unstable nuclei.
-- Alpha particle is a $^4_2\mathrm{He}$ nucleus.
-- Beta minus particle is an electron emitted when a neutron changes to a proton.
-- Positron is a positive electron emitted when a proton changes to a neutron.
-- Gamma radiation is high-energy electromagnetic radiation from nuclear relaxation.
-- Half-life is time required for half a radioactive sample to decay.
-- Nuclear binding energy is energy associated with holding nucleons together.
-- Fission splits heavy nuclei; fusion combines light nuclei.
+| Process | Emitted or captured particle | Change in $A$ | Change in $Z$ |
+|---|---|---:|---:|
+| alpha emission | $^4_2\mathrm{He}$ | $-4$ | $-2$ |
+| beta-minus emission | $^0_{-1}\mathrm{e}$ | $0$ | $+1$ |
+| positron emission | $^0_{+1}\mathrm{e}$ | $0$ | $-1$ |
+| electron capture | $^0_{-1}\mathrm{e}$ on reactant side | $0$ | $-1$ |
+| gamma emission | $\gamma$ | $0$ | $0$ |
 
-Definitions in chemistry often connect a symbolic representation to a physical sample. A formula such as $\mathrm{H_2O}$ names a substance, gives the atomic ratio inside one molecule, and supplies the molar mass used in a macroscopic calculation. A state symbol such as $\mathrm{(aq)}$ is not cosmetic; it says the species is dispersed in water and may be treated as ions when writing a net ionic equation. In the same way, constants such as $R$, $K_w$, $F$, or $N_A$ are compact definitions of the measurement system being used.
+Alpha decay is common for very heavy nuclei. It reduces both nuclear size and charge, producing a daughter two places to the left in the periodic table. In beta-minus decay, a neutron becomes a proton while an electron and antineutrino are emitted. The daughter therefore has the same mass number and atomic number one larger. Positron emission converts a proton to a neutron and emits a positron plus a neutrino. Electron capture has the same effect on $A$ and $Z$: a nuclear proton captures an inner electron and becomes a neutron.
 
-## Key results
+Gamma emission changes neither proton nor neutron count. An excited nucleus releases a high-energy photon and moves to a lower nuclear energy level. Gamma radiation often follows another decay that leaves the daughter excited.
 
-The central results are:
+Neutrinos are needed for energy, momentum, and angular-momentum conservation in beta processes, even though elementary balancing exercises often omit them. Nuclear equations that balance only $A$ and $Z$ are necessary bookkeeping, not a complete reaction description.
 
-- Nuclear equations conserve mass number $A$ and atomic number $Z$.
-- First-order decay: $N_t=N_0e^{-kt}$.
-- Half-life relation: $t_{1/2}=0.693/k$.
-- Mass-energy relation: $E=\Delta mc^2$.
-- Activity is proportional to number of radioactive nuclei present.
-- Fission and fusion can release energy when products have greater binding energy per nucleon.
+### Worked example: identifying a decay product
 
-Nuclear equations are balanced by nucleon count and nuclear charge, not by chemical valence. Half-life calculations resemble first-order kinetics because each nucleus has a constant probability of decaying per unit time. The energy scale is different: small mass defects correspond to large energies through $c^2$.
+Suppose $^{238}_{92}\mathrm{U}$ undergoes alpha decay. Subtract the alpha particle's mass and atomic numbers:
 
-A good way to use these results is to state the chemical model first, then substitute numbers second. For nuclear chemistry, the model usually answers questions such as what particles are present, what is conserved, which process is idealized, and which measurement is being interpreted. Once that sentence is clear, the algebra becomes a bookkeeping problem rather than a search for a memorized pattern.
+$$
+A_d=238-4=234,
+$$
 
-Units are part of the result, not decoration. Whenever a formula contains an empirical constant, a tabulated value, or a ratio of measured quantities, the units tell you whether the expression has been used in the intended form. This is especially important in general chemistry because several equations have nearly identical algebra but different meanings: pressure can be a measured state variable, an equilibrium correction, or a colligative effect; energy can be heat flow, enthalpy, internal energy, or free energy.
+$$
+Z_d=92-2=90.
+$$
 
-The strongest check is an independent chemical interpretation. Ask whether the sign agrees with direction, whether a concentration can be negative, whether a mole ratio follows the balanced equation, whether an equilibrium shift opposes the stress, and whether a microscopic description explains the macroscopic number. These checks connect nuclear chemistry to neighboring topics instead of leaving it as an isolated technique.
+Element 90 is thorium, so
 
-A second check is to compare the limiting cases. If a reactant amount goes to zero, a product amount cannot remain large. If temperature rises in a gas sample at fixed volume, pressure should not fall in an ideal model. If an acid is diluted, hydronium concentration should normally decrease unless a coupled equilibrium supplies more. Limiting cases often reveal algebra that has been rearranged correctly but applied to the wrong chemical situation.
+$$
+^{238}_{92}\mathrm{U}\rightarrow{}^{234}_{90}\mathrm{Th}+{}^4_2\mathrm{He}.
+$$
 
-Finally, keep symbolic and particulate representations side by side. A balanced equation, an equilibrium expression, an orbital diagram, or a polymer repeat unit is a compact symbol for a population of particles. Translating that symbol into words forces you to say what is reacting, what is being counted, and what is being held constant. That translation is usually the difference between a calculation that can be adapted to a new problem and one that only imitates a worked example.
+Both sides total 238 nucleons and charge number 92. If the thorium nucleus is produced excited, a later gamma photon may appear without changing its nuclide label.
 
-## Visual
+### Worked example: completing a bombardment equation
 
-| Radiation | Symbol | Penetration | Nuclear change |
-|---|---|---|---|
-| Alpha | $^4_2\mathrm{He}$ | low | $A$ decreases by 4, $Z$ decreases by 2 |
-| Beta minus | $^0_{-1}\mathrm{e}$ | moderate | $Z$ increases by 1 |
-| Positron | $^0_{+1}\mathrm{e}$ | moderate | $Z$ decreases by 1 |
-| Gamma | $\gamma$ | high | no change in $A$ or $Z$ |
+Consider
 
-```mermaid
-flowchart LR
-  A[Unstable nucleus] --> B{Decay mode}
-  B --> C[Alpha]
-  B --> D[Beta minus]
-  B --> E[Positron]
-  B --> F[Gamma]
-  C --> G[New nucleus + radiation]
-  D --> G
-  E --> G
-  F --> G
-```
+$$
+^{14}_7\mathrm{N}+{}^4_2\mathrm{He}\rightarrow{}^{17}_8\mathrm{O}+{}^A_Z\mathrm{X}.
+$$
 
-## Worked example 1: Radioactive decay fraction remaining
+The reactants total $A=18$ and $Z=9$. The known oxygen product accounts for 17 and 8, leaving
 
-Problem. A radioisotope has half-life 12.0 h. What fraction remains after 36.0 h?
+$$
+A=18-17=1,\qquad Z=9-8=1.
+$$
 
-    Method.
+The missing particle is a proton:
 
-    1. Find number of half-lives: $36.0/12.0=3.00$.
-2. After one half-life, fraction is $1/2$.
-3. After three half-lives, fraction is $(1/2)^3=1/8$.
-4. Convert to decimal: $1/8=0.125$.
-5. Therefore 12.5 percent remains.
+$$
+^{14}_7\mathrm{N}+{}^4_2\mathrm{He}\rightarrow{}^{17}_8\mathrm{O}+{}^1_1\mathrm{p}.
+$$
 
-    Checked answer. Fraction remaining is 0.125, or 12.5 percent. Three half-lives should reduce the sample by repeated halving: 100 to 50 to 25 to 12.5 percent.
+Matching only mass numbers would not distinguish a proton from a neutron; charge balance supplies the identity.
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+## Why radioactive decay is exponential
 
-## Worked example 2: Balancing a nuclear equation
+An unstable nucleus has a constant probability per unit time of decaying. For a large population, the expected rate of loss is proportional to the number still present:
 
-Problem. Complete $^{14}_7\mathrm{N}+^4_2\mathrm{He}\to ^{17}_8\mathrm{O}+?$.
+$$
+\frac{dN}{dt}=-\lambda N.
+$$
 
-    Method.
+Separating variables and integrating from $N_0$ at time zero to $N$ at time $t$ gives
 
-    1. Conserve mass number: left $A=14+4=18$.
-2. Known product oxygen has $A=17$, so missing particle has $A=1$.
-3. Conserve atomic number: left $Z=7+2=9$.
-4. Known oxygen has $Z=8$, so missing particle has $Z=1$.
-5. A particle with $A=1$ and $Z=1$ is a proton, $^1_1\mathrm{p}$.
+$$
+\int_{N_0}^{N}\frac{dN'}{N'}=-\lambda\int_0^t dt',
+$$
 
-    Checked answer. The missing particle is $^1_1\mathrm{p}$. Both total mass number and total atomic number balance to 18 and 9.
+and hence
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+$$
+N=N_0e^{-\lambda t}.
+$$
 
-## Code
+At the half-life, $N/N_0=1/2$:
 
-```python
-from math import log, exp
+$$
+t_{1/2}=\frac{\ln 2}{\lambda}.
+$$
 
-def fraction_remaining(time, half_life):
-    return 0.5 ** (time / half_life)
+Equal time intervals remove equal fractions, not equal numbers. Individual nuclear decays remain unpredictable; the exponential law describes a population.
 
-def decay_constant(half_life):
-    return log(2) / half_life
+Activity is the decay rate magnitude,
 
-def missing_particle(left_A, left_Z, known_A, known_Z):
-    return left_A - known_A, left_Z - known_Z
+$$
+\mathcal A=\lambda N.
+$$
 
-print(fraction_remaining(36.0, 12.0))
-print(decay_constant(12.0))
-print(missing_particle(14 + 4, 7 + 2, 17, 8))
-```
+Its SI unit, the becquerel, is one decay per second. Because $\lambda$ is constant for a given nuclide, activity and number of parent nuclei fall by the same fractional factor. Count rate from a detector is related to activity but also depends on geometry, detection efficiency, shielding, and background.
 
-## Common pitfalls
+### Worked example: elapsed time from a remaining fraction
 
-- Balancing nuclear equations by chemical formulas. Avoid it by conserving mass number and atomic number instead.
-- Assuming half-life depends on sample size. Avoid it by remembering each half-life removes the same fraction.
-- Confusing beta minus with positron emission. Avoid it by tracking whether atomic number increases or decreases.
-- Using grams directly in decay law without proportionality reasoning. Avoid it by noting mass, atoms, and activity are proportional for one isotope.
-- Ignoring radiation shielding differences. Avoid it by distinguishing alpha, beta, gamma, and neutron penetration.
-- Comparing nuclear and chemical energies on the same scale. Avoid it by remembering nuclear mass-energy changes are much larger.
+A sample has half-life $12.0\ \mathrm{h}$. After $36.0\ \mathrm{h}$, three half-lives have passed, so
 
-## Connections
+$$
+\frac{N}{N_0}=\left(\frac12\right)^3=0.125.
+$$
 
-- [quantum theory of atoms](/chemistry/general/quantum-theory-of-atoms)
-- [chemical kinetics](/chemistry/general/chemical-kinetics)
-- [thermodynamics and free energy](/chemistry/general/thermodynamics-and-free-energy)
-- [main-group elements](/chemistry/general/main-group-elements)
+Thus 12.5 percent remains. For a noninteger number of half-lives, use logarithms. If 30.0 percent remains,
+
+$$
+\lambda=\frac{0.693}{12.0\ \mathrm{h}}=0.0578\ \mathrm{h^{-1}},
+$$
+
+then
+
+$$
+t=-\frac{\ln(0.300)}{0.0578\ \mathrm{h^{-1}}}=20.8\ \mathrm{h}.
+$$
+
+The half-life is independent of starting mass. A larger sample has greater initial activity because it contains more nuclei, not because its nuclei decay faster.
+
+## Mass defect and binding energy
+
+A bound nucleus has less mass than its separated protons and neutrons. Define the mass defect as
+
+$$
+\Delta m=Zm_p+(A-Z)m_n-m_{\text{nucleus}}.
+$$
+
+The corresponding binding energy is
+
+$$
+E_b=\Delta mc^2.
+$$
+
+When atomic masses are used, electron masses must be handled consistently. A convenient conversion is that one atomic mass unit of mass difference corresponds to about $931.5\ \mathrm{MeV}$ of energy. Binding energy per nucleon, $E_b/A$, allows nuclei of different sizes to be compared.
+
+The curve of binding energy per nucleon rises steeply among light nuclei, reaches a broad maximum near the iron–nickel region, and then declines slowly for heavy nuclei. Reactions release energy when products are more tightly bound overall. Light nuclei can move upward by fusion; very heavy nuclei can move upward by fission.
+
+For any nuclear reaction, one may calculate a $Q$ value:
+
+$$
+Q=(m_{\text{reactants}}-m_{\text{products}})c^2.
+$$
+
+A positive $Q$ means rest-mass energy is released as kinetic energy or radiation. A negative $Q$ means at least that much energy must be supplied, with momentum conservation sometimes raising the projectile threshold above $\vert Q\vert $.
+
+## Fission, fusion, and chain behavior
+
+Fission splits a heavy nucleus into medium-mass fragments, usually with neutrons and gamma radiation. Neutron-induced fission can release additional neutrons, producing a chain reaction. Whether the neutron population shrinks, remains steady, or grows depends on leakage and absorption as well as neutron production. A reactor maintains controlled criticality; a rapidly supercritical assembly behaves very differently.
+
+Fusion joins light nuclei. The products may be more tightly bound, but positively charged reactants must approach closely enough for the strong force to act. Their Coulomb repulsion creates a large barrier. High temperature supplies kinetic energy, while quantum tunneling allows some collisions to react even below the classical barrier. Favorable reaction energy does not imply an easy laboratory rate.
+
+Chemical combustion and nuclear energy both obey energy conservation, but their sources differ. Combustion changes electronic binding. Fission and fusion change nuclear binding and thus release far more energy per reacting particle.
+
+## Radiation, shielding, and dose
+
+Activity alone is not a hazard measure. Alpha particles lose energy over short distances and are stopped by outer dead skin, yet an alpha emitter taken into the body can deposit energy intensely in nearby tissue. Beta particles travel farther and may require low-atomic-number shielding to limit secondary radiation. Gamma rays are penetrating photons and require substantial dense shielding. Neutrons are uncharged and are slowed effectively by collisions with light nuclei, often using hydrogen-rich materials.
+
+Absorbed dose measures energy deposited per unit mass; equivalent and effective dose apply weighting for radiation type and tissue sensitivity. Exposure time, distance, shielding, chemical form, and biological retention all matter. A short half-life can mean high activity for a fixed number of atoms, but it may also mean the material disappears rapidly. No single half-life ranking gives total risk.
+
+## Common bookkeeping failures
+
+- Balance $A$ and $Z$ independently. Chemical coefficients or ionic charges cannot substitute for either nuclear total.
+- Put electron capture on the reactant side. Beta-minus and positron particles belong on the product side.
+- Do not interpret half-life as the time when every atom has decayed. Exponential decay approaches zero continuously in the population model.
+- Keep mass units consistent before applying $E=mc^2$. Atomic mass units pair naturally with the MeV conversion; kilograms give joules.
+- Separate thermodynamic permission from reaction rate. Fusion can release energy while still requiring extreme conditions to overcome its kinetic barrier.
+
+## Decay chains and secular equilibrium
+
+A radioactive daughter may itself be unstable, producing a decay chain rather than one isolated step. Each link has its own decay constant. The daughter population initially grows from parent decay while simultaneously being depleted by its own decay. If the parent half-life is much longer than the daughter's, the daughter can approach secular equilibrium: its activity becomes approximately equal to the parent's even though their atom counts differ greatly. Removing the daughter breaks that balance; it grows back as the parent continues to decay.
+
+Branching complicates the chain when one nuclide has several decay modes. Branching fractions specify the probability of each route and sum to one. A partial half-life for a branch is not the same as the nuclide's total half-life; decay constants for independent routes add. These ideas matter when predicting daughter yields or radiation spectra.
+
+Radioactive dating compares a parent, a daughter, or an isotope ratio with an assumed initial condition. The clock starts when the system becomes closed to the relevant species. Heating, weathering, or biological exchange can reset or disturb it. The exponential calculation may be precise while the age is wrong if closure and initial composition are poorly justified.
+
+Nuclear reactions must also conserve momentum. A single excited nucleus cannot generally emit all its energy as one massive particle without recoil. Gamma emission gives the daughter a small recoil momentum, so photon energy is slightly below the full level spacing. Such corrections are usually negligible in introductory bookkeeping but explain why energy conservation involves the complete set of products.
+
+Artificial transmutation uses projectiles to create nuclides absent or rare in nature. Charged projectiles face a Coulomb barrier, while neutrons can enter nuclei without electrostatic repulsion. The product may immediately emit particles or gamma rays, and its identity follows from the same $A$ and $Z$ balances. Cross section describes reaction probability for a specified projectile energy; it is an effective area, not a geometric nuclear size. Resonances can make the probability vary sharply with energy.
+
+## Interpreting nuclear data
+
+Atomic masses already include electron masses, whereas nuclear masses do not. Reaction calculations must use one convention consistently. When neutral atomic masses are used for beta decay, electron bookkeeping is often implicitly included; mixing them with bare-particle masses can add or omit an electron mass. Significant figures matter because the energy comes from subtracting nearly equal masses.
+
+Nuclear stability and chemical toxicity are separate. An isotope's chemistry controls where it travels in an organism or environment, while its nuclear properties control radiation and decay rate. Isotopes of one element undergo nearly identical ordinary chemistry but can differ greatly in radiological behavior.
+
+<div className="see-also">
+
+See also: [quantum theory of atoms](/chemistry/general/quantum-theory-of-atoms) · [chemical kinetics](/chemistry/general/chemical-kinetics) · [thermodynamics and free energy](/chemistry/general/thermodynamics-and-free-energy) · [main-group elements](/chemistry/general/main-group-elements)
+
+</div>

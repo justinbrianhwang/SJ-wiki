@@ -7,13 +7,9 @@ sidebar_position: 9
 
 Gradient masking is the classic failure mode of adversarial defenses. A defense appears robust because common gradient attacks fail, but the model has not actually become robust inside the threat set. The gradients are missing, misleading, noisy, shattered, saturated, or hidden behind nondifferentiable operations. Once the attack is adapted, robustness collapses.
 
-![A visually similar adversarial panda image is classified as a gibbon by an ImageNet model.](https://ar5iv.labs.arxiv.org/html/1412.6572/assets/gibbon_993.png)
+Broken defenses can look strong when the evaluator trusts an unusable gradient. BPDA and EOT adapt the attack to nondifferentiable or randomized pipelines, and the resulting checks belong in any serious robustness evaluation.
 
-*Figure: The FGSM panda example shows that imperceptible perturbations can change model decisions. Image: [ar5iv](https://arxiv.org/abs/1412.6572), Goodfellow, Shlens, and Szegedy, educational use with attribution.*
-
-This page explains why broken defenses can look strong, how to recognize the symptoms, and how adaptive attacks such as BPDA and EOT change the evaluation. It is the bridge between attack algorithms and benchmark discipline: every robustness claim should be checked for gradient masking before it is trusted.
-
-## Definitions
+## How gradients become uninformative
 
 **Gradient masking** is any situation where the gradient available to an attack does not provide useful information about adversarial directions, even though adversarial examples still exist. It can be accidental or intentionally caused by a defense.
 
@@ -48,7 +44,7 @@ $$
 \nabla_x \mathbb{E}_{\omega}[\mathcal{L}(F(x,\omega),y)].
 $$
 
-## Key results
+## Symptoms and adaptive responses
 
 A basic warning sign is when weak attacks outperform strong ones. For example, if FGSM finds more adversarial examples than multi-step PGD, the PGD configuration may be broken or the defense may induce gradient masking. Stronger optimization should not generally make an attack worse when tuned correctly.
 
@@ -68,7 +64,7 @@ The practical attitude is to debug attacks the same way one debugs training. Ins
 
 This does not mean every unusual gradient is malicious or useless. Quantization, randomized smoothing, discrete tokenization, and safety filters can all be legitimate system components. The requirement is that the evaluation account for them honestly and attack the actual defended system with methods suited to those components.
 
-## Visual
+### A diagnostic path for suspicious robustness
 
 ```mermaid
 flowchart TD
@@ -95,9 +91,9 @@ flowchart TD
 | Randomized defense resists single-sample PGD | Gradient estimate has high variance | Average gradients with EOT |
 | Detector catches naive attacks only | Objective ignores detector evasion | Optimize classifier and detector losses jointly |
 
-## Worked example 1: Diagnosing PGD weaker than FGSM
+## When PGD appears weaker than FGSM
 
-Problem: A defense reports the following robust accuracies at $\epsilon=8/255$: clean accuracy $88\%$, FGSM robust accuracy $42\%$, PGD-20 robust accuracy $70\%$. Is this a reliable sign that PGD is weaker than FGSM for this model?
+Suppose a defense reports clean accuracy of $88\%$, FGSM robust accuracy of $42\%$, and PGD-20 robust accuracy of $70\%$ at $\epsilon=8/255$. Is PGD genuinely weaker than FGSM here?
 
 1. Robust accuracy is the fraction still classified correctly after attack. Lower robust accuracy means a stronger attack.
 
@@ -123,11 +119,11 @@ $$
 \text{step size},\ \text{random starts},\ \text{projection},\ \text{model eval mode},\ \text{loss curve},\ \text{gradient norms}.
 $$
 
-Checked answer: this is a gradient-masking or attack-configuration warning, not evidence that the defense is robust. The evaluation should be repeated with tuned PGD, restarts, and adaptive attacks.
+The ordering is a gradient-masking or attack-configuration warning, not evidence that the defense is robust. The evaluation needs tuned PGD, restarts, and adaptive attacks.
 
-## Worked example 2: EOT gradient averaging for a randomized defense
+## Averaging away stochastic gradient noise
 
-Problem: A randomized defense applies one of four random transformations. A single-sample attack sees gradients:
+A randomized defense applies one of four transformations. Across four draws, the attack sees gradients:
 
 $$
 g_1=(1,0),\quad g_2=(0,1),\quad g_3=(1,1),\quad g_4=(-1,1).
@@ -167,9 +163,9 @@ $$
 \bar{g}=(0.25,0.75).
 $$
 
-Checked answer: the EOT gradient estimate is $(0.25,0.75)$. Attacking with one random draw may look noisy, but averaging reveals a consistent ascent direction.
+The EOT gradient estimate is $(0.25,0.75)$. One random draw looks noisy; the average reveals a consistent ascent direction.
 
-## Code
+## EOT-PGD against a randomized transform
 
 ```python
 import torch
@@ -198,7 +194,7 @@ def eot_pgd_linf(model, defense_transform, x, y, epsilon, step_size, steps, eot_
 
 This is an EOT attack skeleton. If `defense_transform` is nondifferentiable, a BPDA implementation would use the true transform in the forward pass and a differentiable approximation in the backward pass.
 
-## Common pitfalls
+## Failures in the evaluation itself
 
 - Treating failed vanilla PGD as a robustness proof.
 - Evaluating only against attacks that do not include the defense preprocessing.
@@ -208,7 +204,17 @@ This is an EOT attack skeleton. If `defense_transform` is nondifferentiable, a B
 - Using hard labels or argmax inside the model path during gradient attacks, which destroys useful gradients.
 - Confusing gradient masking with regularization. Smooth gradients can help robustness, but unusable gradients alone do not prove robustness.
 
-## Connections
+## Papers that exposed obfuscated gradients
+
+- Athalye, Carlini, and Wagner, "Obfuscated Gradients Give a False Sense of Security."
+- Carlini and Wagner, "Towards Evaluating the Robustness of Neural Networks."
+- Tramer et al., "Ensemble Adversarial Training: Attacks and Defenses."
+- Uesato et al., work on adversarial risk and evaluation under black-box attacks.
+- Croce and Hein, "Reliable Evaluation of Adversarial Robustness with an Ensemble of Diverse Parameter-free Attacks."
+
+<div className="see-also">
+
+See also:
 
 - [White-box attacks](/cs/adversarial-attacks/white-box-attacks) gives the baseline gradient methods that masking disrupts.
 - [Black-box and transfer attacks](/cs/adversarial-attacks/black-box-and-transfer-attacks) are important diagnostics when white-box gradients fail suspiciously.
@@ -216,10 +222,4 @@ This is an EOT attack skeleton. If `defense_transform` is nondifferentiable, a B
 - [Evaluation and benchmarks](/cs/adversarial-attacks/evaluation-and-benchmarks) turns these diagnostics into an evaluation protocol.
 - [Adversarial training](/cs/adversarial-attacks/adversarial-training) should be evaluated for masking, especially fast one-step variants.
 
-## Further reading
-
-- Athalye, Carlini, and Wagner, "Obfuscated Gradients Give a False Sense of Security."
-- Carlini and Wagner, "Towards Evaluating the Robustness of Neural Networks."
-- Tramer et al., "Ensemble Adversarial Training: Attacks and Defenses."
-- Uesato et al., work on adversarial risk and evaluation under black-box attacks.
-- Croce and Hein, "Reliable Evaluation of Adversarial Robustness with an Ensemble of Diverse Parameter-free Attacks."
+</div>

@@ -7,63 +7,65 @@ sidebar_position: 17
 
 Ramsey theory says that complete disorder is impossible in a sufficiently large structure. If every edge of a large complete graph is coloured red or blue, then some large one-colour pattern must appear. The simplest famous result is $R(3,3)=6$: every red-blue colouring of the edges of $K_6$ contains a monochromatic triangle.
 
-![A two-colour complete graph diagram illustrates a Ramsey theorem proof.](https://commons.wikimedia.org/wiki/Special:FilePath/Ramsey_theorem_visual_proof.svg)
+Instead of asking how to avoid conflicts with few colours, Ramsey theory asks how large a graph must be before a specified one-colour configuration becomes unavoidable. It sits between graph colouring, extremal graph theory, and combinatorics.
 
-*Figure: A visual proof of a small Ramsey theorem shows why large enough networks force ordered substructure. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Ramsey_theorem_visual_proof.svg), Cmglee, CC BY-SA 4.0.*
+## What a Ramsey number measures
 
-This topic sits between graph colouring, extremal graph theory, and combinatorics. Instead of asking how to avoid conflicts with few colours, Ramsey theory asks how large a graph must be before a specified one-colour configuration becomes unavoidable.
+For positive integers $s$ and $t$, the **Ramsey number** $R(s,t)$ is the smallest integer $n$ such that every red-blue colouring of the edges of $K_n$ contains either a red $K_s$ or a blue $K_t$. The diagonal number $R(k,k)$ asks for a monochromatic $K_k$.
 
-## Definitions
+A **monochromatic triangle** is a set of three vertices whose three connecting edges all have the same colour. More generally, multicolour Ramsey numbers and graph Ramsey numbers allow more than two colours or targets other than complete graphs, but the underlying question is unchanged: when does a monochromatic subgraph become unavoidable?
 
-For positive integers $s$ and $t$, the **Ramsey number** $R(s,t)$ is the smallest integer $n$ such that every red-blue colouring of the edges of $K_n$ contains either a red $K_s$ or a blue $K_t$.
+A two-colouring can also be represented by a single graph $G$. Take its edges to be red and the edges of its complement $\overline{G}$ to be blue. A red clique of order $s$ is a clique in $G$, while a blue clique of order $t$ is an independent set of order $t$ in $G$. Thus $n\ge R(s,t)$ exactly when every graph on $n$ vertices contains either a clique of order $s$ or an independent set of order $t$.
 
-The diagonal number $R(k,k)$ asks for a monochromatic $K_k$ in any two-colouring of a sufficiently large complete graph.
+## Recursion from one chosen vertex
 
-More generally, multicolour Ramsey numbers and graph Ramsey numbers replace two colours or complete target graphs with broader choices, but the core idea remains the same: sufficiently large complete graphs force structured monochromatic subgraphs.
-
-A **monochromatic triangle** is a set of three vertices whose three connecting edges all have the same colour.
-
-## Key results
-
-**Ramsey recursion.** For $s,t\ge 2$,
+For $s,t\ge 2$,
 
 $$
 R(s,t)\le R(s-1,t)+R(s,t-1).
 $$
 
-Proof sketch: choose a vertex $v$ in a large red-blue complete graph. Split the other vertices into red-neighbors of $v$ and blue-neighbors of $v$. If the red-neighbor set has size at least $R(s-1,t)$, it contains either a red $K_{s-1}$, which with $v$ gives a red $K_s$, or a blue $K_t$. The blue-neighbor case is symmetric.
+Choose a vertex $v$ and partition the other vertices into its red-neighbours and blue-neighbours. If the red-neighbour set has size at least $R(s-1,t)$, it contains either a red $K_{s-1}$, which joins $v$ to form a red $K_s$, or a blue $K_t$. The blue-neighbour case is symmetric.
 
-**Base values.**
-
-$$
-R(1,t)=1,\quad R(2,t)=t.
-$$
-
-A red $K_2$ is just one red edge; avoiding it forces all edges blue.
-
-**Classical theorem.**
+The recursion starts from
 
 $$
-R(3,3)=6.
+R(1,t)=1,\qquad R(2,t)=t.
 $$
 
-Every red-blue edge-colouring of $K_6$ contains a monochromatic triangle, and there is a colouring of $K_5$ with no monochromatic triangle.
+A red $K_2$ is a single red edge, so avoiding one forces every edge to be blue. Repeated pigeonhole arguments prove that every $R(s,t)$ is finite, although the resulting upper bounds are usually far from exact.
 
-**Complement viewpoint.** A red-blue colouring of the edges of $K_n$ can be viewed as choosing a red graph $G$ on $n$ vertices; the blue graph is then the complement $\overline{G}$. A red triangle is a triangle in $G$, while a blue triangle is an independent set of size $3$ in $G$. Thus $R(3,3)=6$ is equivalent to saying that every graph on $6$ vertices has either a triangle or an independent set of size $3$.
+## Pinning down $R(3,3)$
 
-**Ramsey numbers grow quickly.** Even small exact values can be difficult. The recursion proves finiteness but often gives weak upper bounds. Lower bounds usually require explicit colourings with no forbidden monochromatic subgraph, while upper bounds require proving all colourings fail. This two-sided nature is why Ramsey theory has many open numerical problems.
+The classical calculation has two logically different halves: every colouring of $K_6$ must contain a monochromatic triangle, while one colouring of $K_5$ avoids them. The first is a universal upper-bound proof; the second is a constructive lower-bound certificate.
 
-**Pigeonhole principle as the engine.** The proof of $R(3,3)\le 6$ is short because one vertex has five incident edges and two colours. The conclusion "at least three edges have the same colour" is the crucial compression step. Higher Ramsey arguments repeat this idea recursively with larger target structures.
+![A two-colour complete graph diagram illustrates a Ramsey theorem proof.](https://commons.wikimedia.org/wiki/Special:FilePath/Ramsey_theorem_visual_proof.svg)
 
-**Graph reformulation of $R(s,t)$.** Saying $n\ge R(s,t)$ is equivalent to saying that every graph on $n$ vertices contains either a clique of size $s$ or an independent set of size $t$. The red graph supplies the clique condition, and the blue complement supplies the independent-set condition. This reformulation is often easier for students who are used to ordinary graph language rather than edge-colouring language.
+*Figure: A visual proof of the small Ramsey theorem. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Ramsey_theorem_visual_proof.svg), Cmglee, CC BY-SA 4.0.*
 
-**Upper versus lower proofs.** Ramsey calculations always have two directions. To prove $R(s,t)\le n$, prove that every colouring of $K_n$ forces the desired structure. To prove $R(s,t)\gt n-1$, exhibit one colouring of $K_{n-1}$ that avoids it. The first task is universal; the second is constructive. Mixing these quantifiers is the most common logical error in Ramsey proofs.
+### The upper bound $R(3,3)\le 6$
 
-**Why finite does not mean small.** Ramsey's theorem guarantees that $R(s,t)$ exists for every $s,t$, but the numbers grow rapidly. Even when exact values are unknown, bounds can still be meaningful. A lower-bound colouring is a certificate of possibility; an upper-bound argument is a certificate of inevitability.
+Pick any vertex $v$ of a red-blue $K_6$. It is incident with five edges, so at least three have the same colour. Suppose $va$, $vb$, and $vc$ are red; the blue case is symmetric.
 
-## Visual
+If any of $ab$, $bc$, or $ca$ is red, that edge and $v$ form a red triangle. If none is red, then all three are blue and $a,b,c$ form a blue triangle. Every two-colouring of $K_6$ therefore contains a monochromatic triangle.
 
-One extremal colouring of $K_5$ uses a red $5$-cycle and blue complementary diagonals. It avoids monochromatic triangles.
+Notice that the forced triangle need not contain the initially chosen vertex. When the three neighbours do not complete a red triangle with $v$, they form a blue triangle among themselves.
+
+### The five-vertex colouring that meets the bound
+
+Label five vertices cyclically. Colour the cycle edges
+
+$$
+12,\ 23,\ 34,\ 45,\ 51
+$$
+
+red, and colour the remaining edges
+
+$$
+13,\ 14,\ 24,\ 25,\ 35
+$$
+
+blue.
 
 ```mermaid
 graph LR
@@ -79,74 +81,27 @@ graph LR
   C ---|blue| E
 ```
 
+The red graph is a $5$-cycle and has no triangle. Its complement, the blue graph, is the other $5$-cycle,
+
+$$
+13,\ 35,\ 52,\ 24,\ 41,
+$$
+
+so it has no triangle either. Hence $R(3,3)\gt 5$. Together with the upper bound, this gives $R(3,3)=6$.
+
+Some small values show how quickly the easy cases give way to difficult ones:
+
 | Quantity | Value or bound | Meaning |
 |---|---:|---|
-| $R(2,t)$ | $t$ | force red edge or blue $K_t$ |
+| $R(2,t)$ | $t$ | force a red edge or a blue $K_t$ |
 | $R(3,3)$ | $6$ | force a monochromatic triangle |
-| $R(3,4)$ | $9$ | force red triangle or blue $K_4$ |
-| $R(4,4)$ | $18$ | first harder diagonal case |
+| $R(3,4)$ | $9$ | force a red triangle or a blue $K_4$ |
+| $R(4,4)$ | $18$ | the first harder diagonal case |
 | $R(s,t)$ | finite | Ramsey's theorem |
 
-## Worked example 1: Prove the upper bound $R(3,3)\le 6$
+## Checking proposed colourings by search
 
-**Problem.** Show that every red-blue colouring of $K_6$ contains a monochromatic triangle.
-
-**Method.**
-
-1. Pick any vertex $v$.
-2. Vertex $v$ is incident with $5$ edges.
-3. By the pigeonhole principle, at least $3$ of those $5$ edges have the same colour. Suppose they are red; the blue case is symmetric.
-4. Let the three red-neighbors be $a,b,c$. Thus
-
-$$
-va,\ vb,\ vc
-$$
-
-are all red.
-
-5. If any one of $ab,bc,ca$ is red, then together with $v$ it forms a red triangle.
-6. If none of $ab,bc,ca$ is red, then all three are blue.
-7. In that case $a,b,c$ form a blue triangle.
-
-Either way, a monochromatic triangle appears.
-
-**Checked answer.** Every two-colouring of $K_6$ has a monochromatic triangle, so $R(3,3)\le 6$.
-
-## Worked example 2: Show that $R(3,3)\gt 5$
-
-**Problem.** Construct a red-blue colouring of $K_5$ with no monochromatic triangle.
-
-**Method.**
-
-1. Label the vertices $1,2,3,4,5$ around a cycle.
-2. Colour the cycle edges red:
-
-$$
-12,\ 23,\ 34,\ 45,\ 51.
-$$
-
-3. Colour the remaining five edges blue:
-
-$$
-13,\ 14,\ 24,\ 25,\ 35.
-$$
-
-4. Check red triangles. The red graph is a $5$-cycle, and a cycle of length $5$ contains no triangle.
-5. Check blue triangles. The blue edges are exactly the complementary $5$-cycle:
-
-$$
-13,\ 35,\ 52,\ 24,\ 41.
-$$
-
-This is also a $5$-cycle, so it contains no triangle.
-
-**Checked answer.** There is a colouring of $K_5$ with no monochromatic triangle, so $R(3,3)\gt 5$. Combined with the previous example, $R(3,3)=6$.
-
-The construction is tight. Adding a sixth vertex to this colouring cannot avoid a monochromatic triangle, no matter how the five new incident edges are coloured. That is exactly what the upper-bound proof establishes from the viewpoint of the new vertex.
-
-## Code
-
-The code below checks whether a red-blue colouring contains a monochromatic triangle.
+For small lower-bound constructions, a direct program can check whether either colour contains a triangle.
 
 ```python
 from itertools import combinations
@@ -169,28 +124,20 @@ for e in combinations(V, 2):
 print(has_mono_triangle(V, colouring))
 ```
 
-The same brute-force idea can test small proposed lower-bound colourings. It should not be mistaken for a proof of an upper bound unless it checks every colouring, and the number of colourings of $K_n$ is $2^{\binom n2}$. Exhaustive search grows too quickly to replace mathematical arguments except at very small values.
+This check certifies the displayed $K_5$ colouring, but it is not an upper-bound proof unless every colouring is examined. There are $2^{\binom n2}$ red-blue colourings of $K_n$, so exhaustive search becomes expensive even for modest $n$.
 
-When writing Ramsey proofs, mark the forced object clearly. In the $K_6$ proof, the forced object is not necessarily connected to the first chosen vertex; if the three same-colour neighbors do not create a red triangle with it, they create a blue triangle among themselves.
+## Quantifiers and colour classes
 
-For lower-bound colourings, draw both colour classes. It is easy to check the red graph and forget that the blue graph, as the complement, may contain the forbidden structure. The $K_5$ construction works because both colour classes are $5$-cycles.
+Ramsey calculations are especially sensitive to quantifiers. To prove $R(s,t)\le n$, every colouring of $K_n$ must be covered. To prove $R(s,t)\gt n-1$, one counterexample on $K_{n-1}$ is enough. Verifying a single colouring cannot establish an upper bound, and an upper-bound argument alone cannot establish an exact value.
 
-A valid Ramsey lower-bound example must avoid the forbidden pattern in every colour simultaneously.
+Both colour classes also need checking in a lower-bound construction. Looking only at the red graph can miss a forbidden clique in its blue complement. Switching freely between colouring language and graph-complement language often shortens the check: a blue clique is an independent set in the red graph.
 
-Ramsey arguments often become clearer when written in both colour language and graph-complement language. A red clique is a clique in the red graph; a blue clique is an independent set in the red graph. Moving between these views can make the same proof look like a colouring argument, a clique argument, or an independence argument.
+The colours in $R(s,t)$ belong to edges, not vertices. Here “monochromatic” means that every edge of the target clique has the same colour. Swapping red with blue exchanges $R(s,t)$ with $R(t,s)$, and using that symmetry can remove duplicate cases from a proof.
 
-## Common pitfalls
+The recursion supplies upper bounds, not usually exact values. Exact Ramsey numbers require matching lower constructions, and many small-looking cases remain open because the numbers grow rapidly and the two bounds are hard to close.
 
-- Confusing vertex colouring with Ramsey edge colouring. In $R(s,t)$ the edges of a complete graph are coloured.
-- Proving only that a particular colouring has a monochromatic triangle. Ramsey upper bounds require every colouring.
-- Forgetting the lower-bound construction. To prove $R(3,3)=6$, one must show both $K_6$ forces a triangle and $K_5$ does not.
-- Assuming the recursion always gives exact values. It usually gives upper bounds.
-- Treating "monochromatic" as meaning "all vertices same colour." The colour is on edges here.
-- Ignoring symmetry. Many Ramsey arguments become simpler after swapping red and blue.
+<div className="see-also">
 
-## Connections
+See also: [Vertex and map colouring](/math/graph-theory/vertex-and-map-colouring) · [Edge colouring and chromatic polynomials](/math/graph-theory/edge-colouring-and-chromatic-polynomials) · [Random graphs basics](/math/graph-theory/random-graphs-basics) · [Definitions and examples](/math/graph-theory/definitions-and-examples)
 
-- [Vertex and map colouring](/math/graph-theory/vertex-and-map-colouring)
-- [Edge colouring and chromatic polynomials](/math/graph-theory/edge-colouring-and-chromatic-polynomials)
-- [Random graphs basics](/math/graph-theory/random-graphs-basics)
-- [Definitions and examples](/math/graph-theory/definitions-and-examples)
+</div>

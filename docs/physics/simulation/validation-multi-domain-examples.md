@@ -9,7 +9,7 @@ Simulation is useful only when the model is credible for its intended question. 
 
 Dynamic-system simulation is powerful because the same mathematical structures appear in mechanical, electrical, thermal, chemical, and biological domains. Storage elements create states; resistive elements create dissipation; sources drive the system; nonlinearities and constraints shape the response. A validation mindset uses these analogies while still respecting the units, data, and mechanisms of each domain.
 
-## Definitions
+## Verification, validation, and calibration answer different questions
 
 Verification is the process of checking that the model implementation correctly solves the specified mathematical model. Examples include code reviews, unit tests, solver convergence studies, comparison with analytical solutions, and consistency between MATLAB and Simulink implementations.
 
@@ -21,9 +21,9 @@ A quantity of interest is the output used to make a decision. A simulation for p
 
 Uncertainty analysis studies how parameter, input, and initial-condition uncertainty affect outputs. Sensitivity analysis studies which uncertain factors matter most.
 
-## Key results
+## Evidence needed before trusting a run
 
-A practical verification and validation workflow has four layers:
+A verification and validation workflow has four layers:
 
 | Layer | Question | Example check |
 |---|---|---|
@@ -48,7 +48,7 @@ $$
 
 A closed chemical mass-balance model should not create or destroy total material unless reactions or flows explicitly do so.
 
-Residuals between measured and simulated outputs should be inspected over time, not just summarized by one number:
+Residuals between measured and simulated outputs should be inspected over time rather than reduced to one number:
 
 $$
 r_i=y_\text{meas}(t_i)-y_\text{sim}(t_i).
@@ -62,9 +62,7 @@ Multi-domain analogy helps with derivation, but validation must return to the ph
 
 Documentation is part of validation. Future readers need to know which data set was used, which parameters were estimated, which solver settings were used, and which outputs were judged acceptable. Without that record, a matching plot is hard to reproduce and easy to overstate. The limitations section of a simulation report should be as concrete as the equations.
 
-A final validation check is prediction under changed conditions. After calibration, change an input, initial condition, or operating point and compare the model with data that were not used to tune it. This is where many plausible models fail. Passing that test does not prove universal truth, but it gives stronger evidence that the model captures a mechanism rather than only fitting one curve.
-
-## Visual
+A final validation check is prediction under changed conditions. After calibration, change an input, initial condition, or operating point and compare the model with data that were not used to tune it. Many plausible models fail here. Passing that test does not prove universal truth, but it gives stronger evidence that the model captures a mechanism rather than only fitting one curve.
 
 ```mermaid
 flowchart TD
@@ -92,7 +90,9 @@ This validation diagram distinguishes verification, calibration, validation, res
 | Chemical reactor | concentration | reaction and inlet/outlet flows | approach to steady concentration |
 | Biological population | population size | birth, death, interaction rates | growth, saturation, oscillation |
 
-## Worked example 1: Verify a thermal model against analytical response
+## Checks within one domain and across domains
+
+### Verifying a thermal implementation analytically
 
 Problem: A small heated object follows
 
@@ -141,7 +141,7 @@ Checked answer: the time-response plot should be monotone from $25$ toward $35^\
 
 Simulink description: build the thermal balance with Sum, Gain, and Integrator blocks. Log temperature and compare the logged value at $100\ \mathrm{s}$ with the analytical value. This is verification of the implementation, not validation against a real object.
 
-## Worked example 2: Multi-domain first-order analogy
+### One first-order structure in two physical domains
 
 Problem: Show that an RC circuit and a continuous stirred tank with first-order washout share the same mathematical form, then compute their steady states.
 
@@ -199,7 +199,7 @@ Checked answer: for $R_e=10\ \Omega$, $C_e=0.2\ \mathrm{F}$, $\tau_e=2\ \mathrm{
 
 Simulink description: both models can use the same subsystem pattern: subtract state from input, apply gain $1/\tau$, integrate. The subsystem should be parameterized with domain-specific units and labels so the analogy does not erase physical meaning.
 
-## Code
+## Recording analytical error and normalized response
 
 ```matlab
 clear; clc; close all;
@@ -236,9 +236,9 @@ legend('RC circuit', 'Mixing tank', 'Location', 'southeast');
 title('Same first-order form across domains');
 ```
 
-The first output should show a very small numerical error when using tight tolerances. The second plot should show the electrical and chemical responses lying on the same normalized curve. This is a useful modeling insight, but validation must still use domain-specific measurements: voltage probes for the circuit, concentration samples for the tank, temperature sensors for thermal models, and population or assay data for biological models.
+The first output should show a very small numerical error when using tight tolerances. The second plot should show the electrical and chemical responses lying on the same normalized curve. Validation still requires domain-specific measurements: voltage probes for the circuit, concentration samples for the tank, temperature sensors for thermal models, and population or assay data for biological models.
 
-## Common pitfalls
+## Ways a convincing fit can still fail
 
 - Treating verification and validation as the same activity.
 - Calibrating parameters on the same data later claimed as independent validation.
@@ -247,10 +247,8 @@ The first output should show a very small numerical error when using tight toler
 - Trusting a model outside the operating range used for derivation or calibration.
 - Forgetting that analogous equations do not imply analogous parameter uncertainty or measurement quality.
 
-## Connections
+<div className="see-also">
 
-- [Mathematical Modeling of Continuous-Time Systems](/physics/simulation/mathematical-modeling-continuous-time)
-- [MATLAB Scripting for Simulation](/physics/simulation/matlab-scripting-for-simulation)
-- [Step Size, Accuracy, and Stability](/physics/simulation/step-size-accuracy-stability)
-- [Current, Resistance, and DC Circuits](/physics/general/current-resistance-and-dc-circuits)
-- [Temperature, Heat, and Kinetic Theory](/physics/general/temperature-heat-and-kinetic-theory)
+See also: [Mathematical Modeling of Continuous-Time Systems](/physics/simulation/mathematical-modeling-continuous-time) · [MATLAB Scripting for Simulation](/physics/simulation/matlab-scripting-for-simulation) · [Step Size, Accuracy, and Stability](/physics/simulation/step-size-accuracy-stability) · [Current, Resistance, and DC Circuits](/physics/general/current-resistance-and-dc-circuits) · [Temperature, Heat, and Kinetic Theory](/physics/general/temperature-heat-and-kinetic-theory)
+
+</div>

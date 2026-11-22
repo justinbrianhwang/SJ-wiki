@@ -377,9 +377,8 @@ Energy checks remain valuable. For a passive direct impact with $0\le e\le1$, th
 - Check the post-impact relative velocity. For passive impact it must represent separation and have magnitude $e$ times the approach speed.
 - Treat average force as an impulse-equivalent number. Peak force needs a contact model or a measured force-time curve.
 
-## Related pages
+<div className="see-also">
 
-- [Particle kinetics with Newton's second law](/physics/mechanics/particle-kinetics-newton)
-- [Work-energy methods](/physics/mechanics/work-energy-methods)
-- [Planar rigid-body motion](/physics/mechanics/planar-rigid-body-motion)
-- [Linear momentum and collisions](/physics/general/linear-momentum-and-collisions)
+See also: [Particle kinetics with Newton's second law](/physics/mechanics/particle-kinetics-newton) · [Work-energy methods](/physics/mechanics/work-energy-methods) · [Planar rigid-body motion](/physics/mechanics/planar-rigid-body-motion) · [Linear momentum and collisions](/physics/general/linear-momentum-and-collisions)
+
+</div>

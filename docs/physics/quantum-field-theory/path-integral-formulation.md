@@ -557,11 +557,8 @@ Boundary conditions deserve the same attention as the integrand. A transition ke
 
 Using an in--out effective action for a real-time response problem can produce equations that are neither causal nor real. The contour must match the question: scattering amplitudes, thermal equilibrium, and nonequilibrium evolution use related path integrals with different boundary data.
 
-## Related pages
+<div className="see-also">
 
-- [Motivation, Fields, and Quanta](/physics/quantum-field-theory/motivation-fields-and-quanta)
-- [Perturbation Theory and Feynman Diagrams](/physics/quantum-field-theory/perturbation-and-feynman-diagrams)
-- [Scalar Phi-Four Theory](/physics/quantum-field-theory/scalar-phi-four-theory)
-- [Gauge Invariance and QED](/physics/quantum-field-theory/gauge-invariance-and-qed)
-- [Chiral Anomalies](/physics/quantum-field-theory/chiral-anomalies)
+See also: [Motivation, Fields, and Quanta](/physics/quantum-field-theory/motivation-fields-and-quanta) · [Perturbation Theory and Feynman Diagrams](/physics/quantum-field-theory/perturbation-and-feynman-diagrams) · [Scalar Phi-Four Theory](/physics/quantum-field-theory/scalar-phi-four-theory) · [Gauge Invariance and QED](/physics/quantum-field-theory/gauge-invariance-and-qed) · [Chiral Anomalies](/physics/quantum-field-theory/chiral-anomalies)
 
+</div>

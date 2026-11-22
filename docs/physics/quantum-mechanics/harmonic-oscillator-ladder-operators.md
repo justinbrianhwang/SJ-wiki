@@ -150,7 +150,7 @@ Their position and momentum expectation values trace the classical sinusoidal or
 
 ```mermaid
 graph TD
-  N0["|0>, E0 = hbar omega / 2"] -->"|a dagger|" N1["|1>, E1 = 3 hbar omega / 2"]
+  N0["|0>, E0 = hbar omega / 2#rsqb; -->|a dagger| N1#lsqb;|1>, E1 = 3 hbar omega / 2"]
   N1 -->|a dagger| N2["|2>, E2 = 5 hbar omega / 2"]
   N2 -->|a dagger| N3["|3>, E3 = 7 hbar omega / 2"]
   N3 -->|a| N2
@@ -386,10 +386,8 @@ Truncated numerical bases need an additional convergence check. Increasing the c
 
 That tradeoff is why the oscillator remains central in quantum optics.
 
-## Related pages
+<div className="see-also">
 
-- [One-dimensional Schrodinger systems](/physics/quantum-mechanics/one-dimensional-schrodinger-systems)
-- [Quantum dynamics and pictures](/physics/quantum-mechanics/quantum-dynamics-pictures)
-- [Time-independent perturbation theory](/physics/quantum-mechanics/time-independent-perturbation-theory)
-- [Path integral formulation](/physics/quantum-mechanics/path-integral-formulation)
-- [Density operator, entanglement, and decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence)
+See also: [One-dimensional Schrodinger systems](/physics/quantum-mechanics/one-dimensional-schrodinger-systems) · [Quantum dynamics and pictures](/physics/quantum-mechanics/quantum-dynamics-pictures) · [Time-independent perturbation theory](/physics/quantum-mechanics/time-independent-perturbation-theory) · [Path integral formulation](/physics/quantum-mechanics/path-integral-formulation) · [Density operator, entanglement, and decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence)
+
+</div>

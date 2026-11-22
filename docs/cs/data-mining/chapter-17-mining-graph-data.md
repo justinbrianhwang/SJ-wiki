@@ -7,9 +7,9 @@ sidebar_position: 19
 
 Graph mining studies data whose structure is expressed through nodes and edges. Aggarwal's graph chapter covers graph matching and distance computation, transformation-based graph distances, frequent substructure mining, graph clustering, and graph classification. Graphs appear in chemistry, social networks, web links, communication networks, biological interactions, fraud rings, and knowledge bases.
 
-This page covers core graph mining ideas for both single large graphs and collections of many graphs. The main challenge is that topology matters: two objects may have identical attributes but different neighborhoods, and two graphs may be similar even when their node labels do not align exactly.
+Graph mining operates on both single large graphs and collections of many graphs. Topology matters: two objects may have identical attributes but different neighborhoods, and two graphs may be similar even when their node labels do not align exactly.
 
-## Definitions
+## What topology adds to the data model
 
 A **graph** is $G=(V,E)$, where $V$ is a set of vertices and $E$ is a set of edges. Graphs may be directed or undirected, weighted or unweighted, labeled or unlabeled.
 
@@ -27,7 +27,7 @@ A **frequent subgraph** is a substructure appearing in many graphs or many place
 
 **Graph classification** predicts a label for a node, edge, or entire graph using attributes and topology.
 
-## Key results
+## Matching, transformation, and structural pruning
 
 **Exact graph matching is hard.** Subgraph isomorphism is computationally difficult in general. Practical graph mining uses pruning, canonical labels, approximate matching, kernels, embeddings, or domain constraints.
 
@@ -59,7 +59,7 @@ A **frequent subgraph** is a substructure appearing in many graphs or many place
 
 **Edge weights should be normalized by meaning.** Ten messages, ten dollars, and ten citations are not comparable weights. Before weighted graph mining, define whether weights represent intensity, cost, capacity, trust, distance, or frequency, because algorithms interpret larger weights differently.
 
-## Visual
+## One graph, several possible mining tasks
 
 ```mermaid
 graph LR
@@ -80,7 +80,7 @@ graph LR
 | Node clustering | One graph | Communities | Cuts, modularity, spectral methods |
 | Graph classification | Graphs with labels | Predictive model | Graph features or kernels |
 
-## Worked example 1: Adjacency and degree features
+## Reading adjacency and degree from a small graph
 
 **Problem.** For undirected graph with edges
 
@@ -120,7 +120,7 @@ $$
 
 **Checked answer.** C is the highest-degree node with degree 3; D is a leaf with degree 1. These simple features can feed node classification or graph summaries.
 
-## Worked example 2: Frequent subgraph pruning
+## Pruning infrequent supergraphs
 
 **Problem.** A graph database has 5 graphs. Subgraph $g$ appears in 2 graphs. Minimum support is 3. Can any supergraph of $g$ be frequent?
 
@@ -139,7 +139,7 @@ $$
 
 **Checked answer.** No supergraph of $g$ can be frequent. This is the graph analogue of Apriori pruning, although graph candidate generation is much harder.
 
-## Code
+## Extracting whole-graph features
 
 Pseudocode for graph feature extraction:
 
@@ -181,7 +181,7 @@ print(X)
 print(clf.predict(X))
 ```
 
-## Common pitfalls
+## Structural details that cannot be discarded
 
 - Treating graph node IDs as meaningful numeric features.
 - Comparing adjacency matrices without aligning node order.
@@ -191,10 +191,8 @@ print(clf.predict(X))
 - Applying homophily-based classification when links connect opposites or competitors.
 - Evaluating graph models with random edge or node splits that leak neighborhood information.
 
-## Connections
+<div className="see-also">
 
-- [Similarity and Distances](/cs/data-mining/chapter-03-similarity-distances)
-- [Advanced Association Patterns](/cs/data-mining/chapter-05-advanced-association-patterns)
-- [Cluster Analysis](/cs/data-mining/chapter-06-cluster-analysis)
-- [Data Classification](/cs/data-mining/chapter-10-data-classification)
-- [Social Network Analysis](/cs/data-mining/chapter-19-social-network-analysis)
+See also: [Similarity and Distances](/cs/data-mining/chapter-03-similarity-distances) · [Advanced Association Patterns](/cs/data-mining/chapter-05-advanced-association-patterns) · [Cluster Analysis](/cs/data-mining/chapter-06-cluster-analysis) · [Data Classification](/cs/data-mining/chapter-10-data-classification) · [Social Network Analysis](/cs/data-mining/chapter-19-social-network-analysis)
+
+</div>

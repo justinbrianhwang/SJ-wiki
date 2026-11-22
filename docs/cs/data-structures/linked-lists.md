@@ -5,13 +5,13 @@ sidebar_position: 5
 
 # Linked Lists
 
-Linked lists (연결 리스트) replace the array's contiguous storage with nodes connected by pointers. This single change alters the tradeoffs: insertion and deletion near a known node can be constant time, but random access by index is no longer constant because the list must be traversed link by link. In C, linked lists also force careful handling of allocation, pointer updates, and ownership.
+Linked lists replace an array's contiguous storage with nodes connected by pointers. Insertion or deletion near a known node can be constant time, but indexed access requires following links from the head. In C, the representation also exposes allocation, pointer-update order, and ownership decisions.
 
-The source textbook introduces lists after stacks and queues, then uses them to implement linked stacks, linked queues, polynomial lists, sparse matrices, circular lists, and doubly linked lists. That order is natural. Once a node can point to another node, the same idea can represent many structures: a chain, a ring, a two-way sequence, a sparse row, or an adjacency list in a graph.
+The same link pattern supports several structures: a one-way chain, a ring, a two-way sequence, a linked stack or queue, a sparse row, or an adjacency list.
 
-## Definitions
+## A sequence assembled from nodes
 
-A **node** is a record containing a data field and one or more links. In C:
+A **node** contains a data field and one or more links. A singly linked node in C can be written as
 
 ```c
 typedef struct Node {
@@ -20,39 +20,33 @@ typedef struct Node {
 } Node;
 ```
 
-A **singly linked list** stores one link per node, usually named `next`. The list is reached through a head pointer. Traversal is one-way.
+A **singly linked list** has one link per node and is usually reached through a head pointer. Traversal goes only forward.
 
-A **doubly linked list** stores `prev` and `next`, allowing traversal in both directions and $O(1)$ deletion when a pointer to the node is known.
+```mermaid
+flowchart LR
+  H[head] --> A["node: 10"]
+  A --> B["node: 20"]
+  B --> C["node: 30"]
+  C --> N[NULL]
+```
 
-A **circular linked list** makes the last node point back to the first, or uses a header node whose link eventually returns to the header. Circular lists are useful when operations repeatedly cycle through items or when a sentinel header simplifies edge cases.
+A **doubly linked list** stores `prev` and `next`, allowing traversal in both directions and $O(1)$ deletion when a pointer to the node is already available.
 
-The **list ADT** commonly includes:
+```text
+NULL <- [prev|10|next] <-> [prev|20|next] <-> [prev|30|next] -> NULL
+```
 
-- **`insert_front(L, x)`**: insert at the beginning.
-- **`insert_after(p, x)`**: insert after a known node `p`.
-- **`delete_after(p)`**: remove the node after `p`.
-- **`find(L, key)`**: return a pointer to the first matching node.
-- **`traverse(L, visit)`**: apply a function or action to each element in order.
-- **`is_empty(L)`**: report whether the head is `NULL` or the sentinel points to itself.
+A **circular linked list** makes the final node point back to the first, or uses a header node whose links eventually return to that header. It suits repeated cycling and can remove boundary cases from insertion and deletion.
 
-The phrase "known node" is important. Linked lists do not make searching free. If you only know an index or a key, you must first traverse to the position.
+The list ADT commonly offers `insert_front(L, x)`, `insert_after(p, x)`, `delete_after(p)`, `find(L, key)`, `traverse(L, visit)`, and `is_empty(L)`. Their costs depend on which node pointers the caller already has.
 
-## Key results
+The representation invariant is simple enough to state and important enough to check: starting at the head and repeatedly following `next` must visit every live node exactly once and then reach `NULL`, unless the type is explicitly circular. For a doubly linked list, every adjacent pair must also satisfy `p->next->prev == p`. If a stored size is present, it must equal the number of reachable data nodes. A broken invariant may leave nodes unreachable, create a cycle, or retain a pointer to freed storage.
 
-For a singly linked list with only a head pointer, inserting at the front is $O(1)$, deleting the front is $O(1)$, searching is $O(n)$, and accessing the $i$th element is $O(i)$. If a tail pointer is also maintained, appending at the rear is $O(1)$; otherwise appending requires traversal and costs $O(n)$.
+## Count the traversal as well as the splice
 
-Deleting a specific node from a singly linked list requires access to the previous node, because the previous node's `next` field must be redirected. Doubly linked lists store that previous link explicitly, trading memory for simpler deletion.
+With only a head pointer, a singly linked list supports insertion and deletion at the front in $O(1)$ time. Searching costs $O(n)$, and reaching item $i$ costs $O(i)$. A tail pointer reduces append from $O(n)$ to $O(1)$.
 
-Pointer update order is a correctness issue. To insert a new node after `p`, set the new node's link first:
-
-$$
-\begin{aligned}
-\text{new->next} &= \text{p->next} \\
-\text{p->next} &= \text{new}
-\end{aligned}
-$$
-
-If `p->next` is overwritten before being saved, the suffix of the list can be lost.
+Deleting a particular node from a singly linked list requires its predecessor because that predecessor's `next` field must change. A doubly linked list stores the predecessor link explicitly, paying extra memory for simpler deletion.
 
 | Operation | Singly list with head | Singly list with head+tail | Doubly linked list |
 |---|---:|---:|---:|
@@ -63,39 +57,26 @@ If `p->next` is overwritten before being saved, the suffix of the list can be lo
 | Delete known node | needs previous node | needs previous node | $O(1)$ |
 | Access by index | $O(n)$ | $O(n)$ | $O(n)$ |
 
-Many list implementations use a **header** or **sentinel** node. A sentinel does not store a real user value; it marks the boundary of the list. With a sentinel, insertion and deletion near the front can avoid special cases because there is always a node before the first real element. Circular lists often use a sentinel whose `next` points to itself when the list is empty. The invariant becomes "starting at the sentinel and following `next` eventually returns to the sentinel."
+The phrase “known node” carries the important qualification. Inserting after a pointer already in hand is $O(1)$; inserting in sorted position remains $O(n)$ because finding that position dominates.
 
-Another important C technique is passing a pointer to the head pointer, written as `Node **head`. This lets a function update the caller's head when insertion or deletion changes the first node. Without that, deleting the first node would only change a local copy of the head pointer. This is not a linked-list concept mathematically, but it is a central implementation detail in C.
+Arrays and lists also behave differently on real hardware. Nodes consume pointer space, are often scattered across the heap, and have poor cache locality. Lists pay off when pointer splicing avoids repeated array shifts or the structure naturally grows in small pieces.
 
-Linked lists are not automatically better than arrays. They use extra memory for pointers, scatter nodes across the heap, and have poor cache locality. Their advantage appears when pointer splicing avoids large shifts or when the structure naturally grows and shrinks in many small pieces.
+For many workloads, a dynamic array wins even when its worst-case operation looks less attractive. Sequential traversal of contiguous elements uses cache lines and hardware prefetching well, whereas each list link may trigger a cache miss. A list is compelling when nodes must keep stable addresses, when frequent splices occur at already-known positions, or when another structure naturally embeds links in its records. It is a poor default merely because the number of elements changes.
 
-A useful performance rule is to count both traversal and update. Inserting after a pointer you already have is $O(1)$, but inserting at sorted position is $O(n)$ because finding that position dominates. Many incorrect comparisons between arrays and lists forget this search cost.
+## Splicing a singly linked list without losing its suffix
 
-This distinction is why list questions often state whether the node pointer is already available.
+To insert a node after `p`, connect the new node to the old successor before redirecting `p`:
 
-## Visual
+$$
+\begin{aligned}
+\text{new->next} &= \text{p->next} \\
+\text{p->next} &= \text{new}
+\end{aligned}
+$$
 
-```mermaid
-flowchart LR
-  H[head] --> A["node: 10"]
-  A --> B["node: 20"]
-  B --> C["node: 30"]
-  C --> N[NULL]
-```
+Reversing those assignments overwrites the only link to the suffix.
 
-Doubly linked nodes carry links in both directions:
-
-```text
-NULL <- [prev|10|next] <-> [prev|20|next] <-> [prev|30|next] -> NULL
-```
-
-## Worked example 1: inserting after a node in a singly linked list
-
-Problem: A list contains `10 -> 30 -> 40 -> NULL`. A pointer `p` points to the node containing `10`. Insert `20` after `p`.
-
-Method: allocate a new node, connect it to the old successor, then connect `p` to the new node.
-
-1. Initial state:
+For example, let `p` point to `10` in
 
 ```text
 p
@@ -103,42 +84,122 @@ p
 10 -> 30 -> 40 -> NULL
 ```
 
-2. Allocate `new` with `new->value = 20`.
-3. Save the suffix by setting `new->next = p->next`. Since `p->next` points to `30`, the new node now points to `30`.
-4. Link `p` to the new node by setting `p->next = new`.
-
-Final state:
+After allocating a node containing `20`, set `new->next = p->next`, then `p->next = new`:
 
 ```text
 10 -> 20 -> 30 -> 40 -> NULL
 ```
 
-Checked answer: no node was lost. Starting from head and following `next` fields visits `10`, then `20`, then `30`, then `40`, then `NULL`. The two pointer assignments were enough because insertion happened after a known node.
+Traversal from the head still reaches `10`, `20`, `30`, and `40`; no separate scan was needed because `p` was supplied.
 
-## Worked example 2: deleting a node from a doubly linked list
+## Unlinking a node in both directions
 
-Problem: A doubly linked list contains `A <-> B <-> C <-> D`. A pointer `p` points to `C`. Delete `C`.
+Consider `A <-> B <-> C <-> D` with `p` pointing to `C`. Deletion redirects both neighbors before freeing `p`:
 
-Method: redirect the neighboring links around `C`, then free `C`.
-
-1. Identify neighbors:
-   - `p->prev` is `B`.
-   - `p->next` is `D`.
-2. Since `p->prev` exists, set `p->prev->next = p->next`. Now `B->next` points to `D`.
-3. Since `p->next` exists, set `p->next->prev = p->prev`. Now `D->prev` points to `B`.
-4. Free `p`.
-
-Final state:
+1. Set `p->prev->next = p->next`, so `B->next` points to `D`.
+2. Set `p->next->prev = p->prev`, so `D->prev` points to `B`.
+3. Free `p`.
 
 ```text
 A <-> B <-> D
 ```
 
-Checked answer: forward traversal gives `A, B, D`, and backward traversal from `D` gives `D, B, A`. Both directions agree that `C` has been removed. If `C` had been the head or tail, one of the neighbor checks would update the external head or tail pointer instead.
+Forward traversal gives `A, B, D`, and backward traversal gives `D, B, A`. At the head or tail, one missing neighbor is replaced by an update to the external head or tail pointer.
 
-## Code
+The order around `free` is non-negotiable. Both replacement links must be obtained and installed while `p` is still alive. After `free(p)`, even reading `p->next` to find the successor has undefined behavior. Setting the local variable `p = NULL` afterward may prevent accidental reuse through that variable, but it cannot clear other aliases that still point to the freed node.
 
-This program implements a sorted singly linked list. Insertions allocate nodes and maintain ascending order; deletion removes the first matching value.
+## Sentinels, circular lists, and the head pointer
+
+A **sentinel** node marks a boundary but stores no user value. Because there is always a node before the first real element, front insertion and deletion need fewer special cases. A circular sentinel can point to itself when the list is empty; following `next` from the sentinel eventually returns to it.
+
+Circular traversal cannot use `while (p != NULL)`. The stopping condition must detect the sentinel or a return to the starting node.
+
+Functions that may replace the first node often receive `Node **head`. The extra indirection lets them change the caller's head. Passing only `Node *head` would update a local copy when the first node is inserted or removed.
+
+Another useful style is to keep a pointer to the link that names the current node. Initially that link is `&head`; after advancing, it is `&cur->next`. Deletion then has no separate head case:
+
+```c
+static int delete_first(Node **head, int value) {
+    Node **link = head;
+    while (*link != NULL && (*link)->value != value) {
+        link = &(*link)->next;
+    }
+    if (*link == NULL) return 0;
+
+    Node *victim = *link;
+    *link = victim->next;
+    free(victim);
+    return 1;
+}
+```
+
+`link` always points to the field that must change if the current node is removed. At the first node it names the caller's head pointer; later it names a preceding node's `next` field.
+
+## Worked example: reversing in place
+
+A singly linked list can be reversed in $O(n)$ time and $O(1)$ auxiliary space. Three pointers are needed because changing the current node's link would otherwise lose the unprocessed suffix.
+
+Start with
+
+```text
+prev = NULL, cur = 10
+10 -> 20 -> 30 -> NULL
+```
+
+At each iteration, save `cur->next` as `next`, redirect `cur->next` to `prev`, then advance both working pointers:
+
+```c
+static Node *reverse(Node *head) {
+    Node *prev = NULL;
+    Node *cur = head;
+    while (cur != NULL) {
+        Node *next = cur->next;
+        cur->next = prev;
+        prev = cur;
+        cur = next;
+    }
+    return prev;
+}
+```
+
+The states are
+
+```text
+after 10: NULL <- 10    20 -> 30 -> NULL
+after 20: NULL <- 10 <- 20    30 -> NULL
+after 30: NULL <- 10 <- 20 <- 30
+```
+
+When `cur` reaches `NULL`, `prev` points to `30`, the new head. The loop invariant is that `prev` heads the reversed prefix and `cur` heads the untouched suffix. Every original node remains in exactly one of those parts.
+
+## Detecting an accidental cycle
+
+A corrupted or deliberately circular list never reaches `NULL`, so an ordinary traversal can hang. Floyd's tortoise-and-hare algorithm advances one pointer by one link and another by two. If a cycle exists, the faster pointer eventually laps the slower pointer inside it; if there is no cycle, the fast pointer reaches the end.
+
+```c
+static int has_cycle(const Node *head) {
+    const Node *slow = head;
+    const Node *fast = head;
+    while (fast != NULL && fast->next != NULL) {
+        slow = slow->next;
+        fast = fast->next->next;
+        if (slow == fast) return 1;
+    }
+    return 0;
+}
+```
+
+For `A -> B -> C -> D -> B`, after one iteration `slow` is at `B` and `fast` at `C`; after two they are at `C` and `B`; after three both are at `D`. The method uses constant extra space. Keeping a set of visited node addresses also detects the cycle, but requires $O(n)$ additional memory.
+
+## Splicing and merging without copying values
+
+Links allow whole runs of nodes to move without moving their payloads. Concatenating two singly linked lists is $O(1)$ if the first list stores a tail pointer: set `first.tail->next = second.head`, then update the combined tail. Without a tail pointer, finding the last node of the first list costs $O(n)$.
+
+Merging two already-sorted lists takes $O(n+m)$ time. At each step, detach the smaller front node and append it to the result. A dummy head keeps the first append identical to later ones; after the loop, attach whichever input suffix remains. No node allocation is required, but the operation consumes the original list structure. A non-destructive merge would need new nodes or a different ownership model.
+
+## Maintaining a sorted singly linked list in C
+
+This implementation inserts in ascending order, deletes the first matching value, and releases the remaining nodes at shutdown.
 
 ```c
 #include <stdio.h>
@@ -220,20 +281,43 @@ int main(void) {
 }
 ```
 
-## Common pitfalls
+## Ownership and iterator validity
 
-- Losing the rest of the list by overwriting `p->next` before saving it during insertion.
-- Deleting from a singly linked list without tracking the previous node.
-- Forgetting to update the head pointer when inserting or deleting at the front.
-- Forgetting to update the tail pointer when deleting the last node in a list that maintains one.
-- Traversing a circular list with `while (p != NULL)`. Circular lists do not end with `NULL`; they need a sentinel or a stop condition based on returning to the start.
-- Leaking memory by removing nodes from the chain without calling `free`.
-- Freeing a node and then reading its fields. Store needed links before `free`.
+A node contains an integer here, so freeing the node finishes deletion. A node that owns a heap-allocated string must free that string first. A node that merely borrows a pointer must not free the pointed-to object. Mixing those policies across operations leads to leaks or double frees; the list API should choose one and document it.
 
-## Connections
+Returning raw node pointers also creates an invalidation rule. Insertion does not invalidate pointers to existing nodes, one advantage over a growing array. Deleting a node immediately invalidates every pointer to it, however, and destroying the list invalidates all outstanding node pointers. A traversal that deletes its current node must save the successor before deletion.
 
-- [stacks](/cs/data-structures/stacks)
-- [queues](/cs/data-structures/queues)
-- [hashing](/cs/data-structures/hashing)
-- [graph representation](/cs/data-structures/graph-representation)
-- [binary trees](/cs/data-structures/binary-trees)
+Concurrent mutation needs synchronization beyond the link algorithm itself. Two threads can each perform locally sensible pointer writes and still lose an insertion or expose a half-updated doubly linked pair. Coarse locking around each operation is the simplest safe design. Lock-free lists require atomic operations, memory-order reasoning, and a reclamation scheme that prevents one thread from freeing a node another thread may still read.
+
+## Finding structure with two moving pointers
+
+The slow-and-fast pattern does more than detect cycles. To find a middle node, advance `slow` by one link and `fast` by two until `fast` reaches the end. On `10 -> 20 -> 30 -> 40 -> 50`, the pointer pairs begin at `(10, 10)`, then become `(20, 30)` and `(30, 50)`. The loop stops because `fast->next` is null, leaving `slow` at 30.
+
+For an even-length list, the stopping convention decides which middle is returned. Starting both pointers at the head and looping while `fast != NULL && fast->next != NULL` returns the second middle of `10 -> 20 -> 30 -> 40`. A merge-sort split often wants the first middle instead, so it starts `fast` one link ahead or changes the condition. The edge cases should be chosen from the caller's needs rather than treated as an incidental detail.
+
+The same idea finds the node $k$ positions from the end in one traversal. Advance a lead pointer $k$ links, then advance lead and follow together until lead reaches null. Their fixed separation leaves follow at the target. If the lead cannot advance $k$ times, the list is shorter than requested. Defining whether the final node is position zero or one avoids an off-by-one disagreement.
+
+## Memory cost and intrusive links
+
+A list node carrying a four-byte integer may occupy far more than four bytes. On a machine with eight-byte pointers, a singly linked node commonly needs a pointer plus the integer and alignment padding; a doubly linked node needs two pointers. The allocator may add metadata and round allocations to size classes. For millions of small values, pointer and allocation overhead can dominate payload size.
+
+Allocating nodes from an arena or pool can improve locality and make bulk destruction cheap. It also changes lifetime rules: an individual node may be returned to the pool rather than the general allocator, and pointers become invalid when the arena is reset. The API must not mix pool-owned and separately allocated nodes without a way to distinguish them.
+
+An **intrusive list** stores the link fields inside an object that exists for another reason. It avoids a wrapper-node allocation and can give one object membership in several lists through separate link fields. The list no longer owns a uniform standalone node, so container recovery, object lifetime, and removal-before-destruction become the caller's responsibility. Operating-system kernels use this pattern where allocation control and stable object identity matter.
+
+## Checking a mutation locally
+
+After a singly linked insertion, verify that the predecessor reaches the new node and the new node reaches the saved successor. After doubly linked deletion, verify both directions across the repaired gap. A debug build can occasionally walk the entire list, count nodes, compare the stored size, and check backward links. Full validation costs linear time, so it belongs in tests or assertions rather than every production splice.
+
+## Pointer failures that corrupt a list
+
+- Overwriting `p->next` before saving it disconnects the rest of a singly linked list.
+- Front and rear operations must update any external head and tail pointers they invalidate.
+- Removing a node from the chain without `free` leaks memory; reading its fields after `free` is undefined behavior. Save required links first.
+- A singly linked deletion needs either the predecessor or a pointer to the link that names the target node.
+
+<div className="see-also">
+
+See also: [stacks](/cs/data-structures/stacks) · [queues](/cs/data-structures/queues) · [hashing](/cs/data-structures/hashing) · [graph representation](/cs/data-structures/graph-representation) · [binary trees](/cs/data-structures/binary-trees)
+
+</div>

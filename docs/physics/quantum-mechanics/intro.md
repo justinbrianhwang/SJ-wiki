@@ -7,9 +7,9 @@ sidebar_position: 1
 
 Quantum mechanics is the framework for physical systems whose states are probability amplitudes rather than points in phase space. It replaces the classical idea of a fully specified trajectory with Hilbert-space states, operators for observables, unitary time evolution, and measurement probabilities computed from inner products or density operators.
 
-This section synthesizes four requested sources into one wiki sequence. Sakurai's *Modern Quantum Mechanics* supplies the primary structure: Stern-Gerlach motivation, Dirac notation, dynamics, angular momentum, symmetries, approximation methods, scattering, and identical particles. Ballentine supplies mathematical care, ensemble interpretation, density-operator emphasis, and scattering depth. The file named for Gottfried in the local source set extracts as graduate lecture notes that cite Gottfried/Yan and is used where it cleanly reinforces postulates, spin, dynamics, angular momentum, symmetries, and perturbation theory. Schiff is included as the classic wave-mechanics contrast where the topic naturally matches the older coordinate-representation style; this local copy is scanned/image-only through `pdftotext`, so no precise extracted page quotations are used from it.
+The sequence synthesizes four sources. Sakurai's *Modern Quantum Mechanics* supplies the main structure: Stern-Gerlach motivation, Dirac notation, dynamics, angular momentum, symmetries, approximation methods, scattering, and identical particles. Ballentine adds mathematical care, ensemble interpretation, density operators, and deeper scattering coverage. The file named for Gottfried in the local source set extracts as graduate lecture notes that cite Gottfried/Yan; it reinforces postulates, spin, dynamics, angular momentum, symmetries, and perturbation theory. Schiff provides the classic wave-mechanics contrast where the older coordinate representation is useful. The local copy is image-only when processed with `pdftotext`, so these notes make no page-specific claims from its text.
 
-## Definitions
+## States, observables, and evolution
 
 A **state** is represented by a ray in Hilbert space for a pure preparation, or by a density operator for a general preparation. A **ket** $\vert \psi\rangle$ is the abstract state vector; a **wave function** $\psi(x)=\langle x\vert \psi\rangle$ is one representation of that vector. A **bra** $\langle\psi\vert $ is the corresponding dual object.
 
@@ -43,7 +43,7 @@ A **symmetry** is a transformation preserving physical transition probabilities.
 
 The section is organized as a graduate-level path through nonrelativistic quantum mechanics. It starts with the formal postulates and two-state systems, moves through wave mechanics and solvable models, builds the angular-momentum machinery needed for atoms, then develops approximation, scattering, many-particle, density-matrix, path-integral, and interpretation topics.
 
-## Key results
+## The calculational backbone
 
 The central computational rules are:
 
@@ -126,7 +126,7 @@ $$
 K(b,a)=\int\mathcal D[x(t)]e^{iS[x]/\hbar}.
 $$
 
-The chapter list is:
+The chapter order builds from the postulates to exact systems, approximation methods, and interpretation:
 
 1. [Postulates of quantum mechanics](/physics/quantum-mechanics/postulates-of-quantum-mechanics)
 2. [Dirac notation and Hilbert spaces](/physics/quantum-mechanics/dirac-notation-hilbert-spaces)
@@ -147,7 +147,7 @@ The chapter list is:
 17. [Path integral formulation](/physics/quantum-mechanics/path-integral-formulation)
 18. [Measurement and interpretation](/physics/quantum-mechanics/measurement-interpretation)
 
-## Visual
+### The state–measurement–evolution loop
 
 ```mermaid
 flowchart TD
@@ -164,16 +164,16 @@ flowchart TD
   Next -. "new preparation context" .-> Prep
 ```
 
-This overview diagram presents the quantum-mechanics postulate pipeline rather than a chapter roadmap. The flow shows how a preparation becomes a Hilbert-space state, how an observable supplies projectors, how the Born rule produces probabilities, and how selected outcomes update the state before unitary time evolution resumes. The dotted return arrow emphasizes the experimental I/O contract: later predictions start from the state produced by the previous preparation or measurement.
+The flow follows one experiment: a preparation determines a Hilbert-space state, an observable supplies projectors, the Born rule assigns probabilities, and a selected outcome updates the state before unitary evolution resumes. The dotted return arrow marks the experimental input-output contract: a later prediction begins with the state produced by the preceding preparation or measurement.
 
-| Source | Role in this wiki | Distinct emphasis |
+| Source | Role in these notes | Distinct emphasis |
 |---|---|---|
 | Sakurai | primary sequence and notation | Dirac notation, spin-first motivation, symmetry and angular momentum |
 | Ballentine | rigorous cross-check | ensembles, probability, density operators, scattering, interpretation care |
 | Gottfried-named local notes | supporting structure where extracted | postulates, spin, dynamics, angular momentum, symmetries, perturbation theory |
 | Schiff | classic contrast | wave mechanics, coordinate-space solutions, older spectroscopic notation |
 
-## Worked example 1: Choosing the right page for a Stern-Gerlach question
+## A Stern–Gerlach sequence in two bases
 
 **Problem.** A beam prepared as $\vert +z\rangle$ passes through an $S_x$ analyzer. The $+x$ output is kept and then measured again along $z$. Which pages contain the needed tools, and what is the result?
 
@@ -209,9 +209,9 @@ $$
 P(+z)=P(-z)={1\over2}.
 $$
 
-**Checked answer.** The intermediate incompatible measurement changes the state description; the result is not guaranteed to remain $+z$.
+The intermediate incompatible measurement changes the state: after the $S_x$ selection, the final result is no longer guaranteed to be $+z$.
 
-## Worked example 2: Choosing an approximation method
+## A quartic correction to the oscillator ground state
 
 **Problem.** You need the ground-state energy of a particle in a potential that is close to a harmonic oscillator but includes a small term $\lambda x^4$. Which page should you use first, and what is the first-order correction?
 
@@ -247,56 +247,24 @@ $$
 
 7. If $\lambda$ is not small or no exactly solvable $H_0$ is available, compare with [variational principle and WKB](/physics/quantum-mechanics/variational-principle-wkb).
 
-**Checked answer.** The positive quartic term raises the ground energy, as expected for a stiffer confining potential.
+The positive quartic term raises the ground energy, as expected for a stiffer confining potential.
 
-## Code
-
-```python
-pages = [
-    "postulates-of-quantum-mechanics",
-    "dirac-notation-hilbert-spaces",
-    "spin-one-half-systems",
-    "quantum-dynamics-pictures",
-    "one-dimensional-schrodinger-systems",
-    "harmonic-oscillator-ladder-operators",
-    "angular-momentum-algebra",
-    "addition-of-angular-momentum",
-    "central-potentials-hydrogen-atom",
-    "identical-particles-symmetrization",
-    "time-independent-perturbation-theory",
-    "time-dependent-perturbation-theory",
-    "variational-principle-wkb",
-    "scattering-theory",
-    "density-operator-entanglement-decoherence",
-    "symmetries-conservation-laws",
-    "path-integral-formulation",
-    "measurement-interpretation",
-]
-
-for i, slug in enumerate(pages, start=1):
-    print(f"{i:02d}. /physics/quantum-mechanics/{slug}")
-```
-
-## Common pitfalls
+## Choosing the right language and approximation
 
 - Starting with wave functions when a two-state Dirac calculation is simpler. Sakurai's sequence is designed to prevent that habit.
-- Treating the four books as four separate courses. The wiki merges them into one concept map, using differences only where they clarify.
+- Treating the four books as separate courses obscures their common structure. Differences matter where they clarify a method or interpretation.
 - Forgetting representation dependence. $\psi(x)$, a spinor column, and momentum amplitudes may describe the same abstract ket in different bases.
 - Using perturbation theory when the real issue is degeneracy. Degenerate perturbation theory requires diagonalizing the perturbation inside the degenerate subspace first.
 - Treating interpretation language as if it changed standard probabilities. Copenhagen, ensemble, and many-worlds readings disagree conceptually but not on the Born-rule calculations in these pages.
-- Ignoring source limitations. The local Schiff PDF is not text-searchable through the available extraction tool, so this wiki avoids fabricated Schiff page-specific claims.
+- The local Schiff PDF is not text-searchable through the available extraction tool, so no page-specific claims are attributed to it.
 - Reading formulas without conditions. Every formula here has a domain: closed systems for unitary evolution, weak coupling for perturbation theory, slow variation for WKB, central potentials for partial waves, and so on.
 
 Use the sequence as a dependency graph, not as a pile of isolated notes. The postulates define the rules, Dirac notation gives the language, spin makes the rules concrete, and dynamics shows how amplitudes evolve. The one-dimensional systems and oscillator provide exactly solved laboratories. Angular momentum then supplies the representation theory needed for atoms, spin coupling, symmetry, and partial waves. Approximation methods and scattering are where the machinery becomes broadly useful.
 
 The source differences are pedagogically useful. Sakurai is concise and modern, but sometimes assumes comfort with formal manipulations. Ballentine is more explicit about probability, domains, ensembles, and interpretation. The Gottfried-named lecture notes are useful as a bridge between postulate lists and worked graduate-course calculations. Schiff's older coordinate style remains valuable because many students still first meet quantum mechanics through differential equations. Reading across these styles helps prevent over-identifying quantum mechanics with any single notation.
 
-When adding future pages, keep the same pattern: physical motivation first, then formal definitions, key formulas with conditions, at least two worked examples, one visual anchor, code for computational checking, pitfalls, and absolute wiki links. This makes the section usable as both a reading path and a reference. It also keeps the notes honest: a formula without a condition, an example without a check, or an interpretation without a calculation is incomplete.
+<div className="see-also">
 
-## Connections
+See also: [Postulates of quantum mechanics](/physics/quantum-mechanics/postulates-of-quantum-mechanics) · [Dirac notation and Hilbert spaces](/physics/quantum-mechanics/dirac-notation-hilbert-spaces) · [Quantum dynamics and pictures](/physics/quantum-mechanics/quantum-dynamics-pictures) · [Angular momentum algebra](/physics/quantum-mechanics/angular-momentum-algebra) · [Measurement and interpretation](/physics/quantum-mechanics/measurement-interpretation)
 
-- [Postulates of quantum mechanics](/physics/quantum-mechanics/postulates-of-quantum-mechanics)
-- [Dirac notation and Hilbert spaces](/physics/quantum-mechanics/dirac-notation-hilbert-spaces)
-- [Quantum dynamics and pictures](/physics/quantum-mechanics/quantum-dynamics-pictures)
-- [Angular momentum algebra](/physics/quantum-mechanics/angular-momentum-algebra)
-- [Measurement and interpretation](/physics/quantum-mechanics/measurement-interpretation)
+</div>

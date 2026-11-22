@@ -9,7 +9,7 @@ Distributed storage systems turn disks, SSDs, memory, and networks into durable 
 
 The main synthesis is that storage systems are distributed protocols with physical consequences. A quorum decision is also a disk write. A CAP trade-off becomes a user-visible error, stale read, or blocked request. A compaction strategy affects tail latency. A lakehouse table commit is a metadata consistency problem.
 
-## Definitions
+## Storage layers and failure semantics
 
 The **CAP theorem** states that when a network partition occurs, a replicated service cannot simultaneously guarantee linearizable consistency and availability for every request to a non-failing node [4]. In practical terms, a CP storage system may reject or block operations outside a majority; an AP storage system may accept operations on multiple sides and reconcile later.
 
@@ -29,23 +29,23 @@ A **placement policy** maps replicas or fragments to failure domains. A good pol
 
 A **metadata service** stores names, object locations, lease state, file chunk maps, table snapshots, or placement-group assignments. Metadata often has stronger consistency requirements than bulk data. For example, an object payload may be erasure-coded across many nodes, while the object name and version pointer must be updated atomically to avoid readers observing a half-written object. This split between control plane and data plane appears in GFS, HDFS, object stores, and lakehouse table formats.
 
-## Key results
+## Trade-offs that dominate the design
 
-The first key result is the formal CAP conflict. Suppose a write succeeds on one side of a partition. A later read on the other side cannot know the write occurred. Returning the old value violates linearizability; waiting violates availability. This is not a product limitation, but a consequence of the model [4].
+CAP creates a formal conflict. Suppose a write succeeds on one side of a partition. A later read on the other side cannot know the write occurred. Returning the old value violates linearizability; waiting violates availability. The conflict follows from the model rather than a product limitation [4].
 
-The second result is that PACELC captures normal-operation trade-offs. A database can choose CP under partition and still choose lower consistency for lower latency when healthy, or choose strong cross-region consistency and pay WAN latency. Systems should document both the partition behavior and the no-partition latency consistency trade-off.
+PACELC captures normal-operation trade-offs. A database can choose CP under partition and still choose lower consistency for lower latency when healthy, or choose strong cross-region consistency and pay WAN latency. Systems should document both the partition behavior and the no-partition latency consistency trade-off.
 
-The third result is that storage engine structure shapes distributed behavior. LSM-trees make writes sequential and fast, but compaction consumes I/O and can affect read amplification. B-trees support point updates and range scans with in-place page changes, but random writes and page splits are costly. Distributed storage design must combine partitioning and replication with local engine behavior.
+Storage engine structure shapes distributed behavior. LSM-trees make writes sequential and fast, but compaction consumes I/O and can affect read amplification. B-trees support point updates and range scans with in-place page changes, but random writes and page splits are costly. Distributed storage design must combine partitioning and replication with local engine behavior.
 
-The fourth result is that erasure coding trades storage overhead against recovery cost. Three-way replication stores $3S$ bytes for data size $S$ and can tolerate two replica losses if placed correctly. A $(k=6,m=3)$ erasure code stores $9/6=1.5S$ bytes and tolerates any three fragment losses, but reading degraded data or repairing a fragment may require contacting several nodes.
+Erasure coding trades storage overhead against recovery cost. Three-way replication stores $3S$ bytes for data size $S$ and can tolerate two replica losses if placed correctly. A $(k=6,m=3)$ erasure code stores $9/6=1.5S$ bytes and tolerates any three fragment losses, but reading degraded data or repairing a fragment may require contacting several nodes.
 
-The fifth result is that analytical lakehouse systems move transactions into metadata. Data files are immutable; commit means publishing a new table snapshot or manifest pointer. Correctness depends on atomic metadata update, conflict detection, and readers choosing a consistent snapshot.
+Analytical lakehouse systems move transactions into metadata. Data files are immutable; commit means publishing a new table snapshot or manifest pointer. Correctness depends on atomic metadata update, conflict detection, and readers choosing a consistent snapshot.
 
-The sixth result is that deletion and overwrite semantics are harder than appends. Appending a new immutable object can be retried with a content hash or unique ID. Overwriting a name requires deciding which version is current, what readers in progress may see, and how old versions are garbage-collected. Deleting a replicated object requires preventing stale replicas from reintroducing it. Systems solve this with version IDs, generation numbers, tombstones, leases, or strongly consistent metadata transactions.
+Deletion and overwrite semantics are harder than appends. Appending a new immutable object can be retried with a content hash or unique ID. Overwriting a name requires deciding which version is current, what readers in progress may see, and how old versions are garbage-collected. Deleting a replicated object requires preventing stale replicas from reintroducing it. Systems solve this with version IDs, generation numbers, tombstones, leases, or strongly consistent metadata transactions.
 
-The seventh result is that "durability" has layers. A client acknowledgment might mean the data reached one kernel buffer, one local disk, a quorum of disks, multiple zones, or a remote region. Each layer has a different probability of loss and a different latency cost. Serious storage APIs document the acknowledgment point, and serious applications choose it based on RPO. For example, a telemetry pipeline may accept regional asynchronous replication, while a financial ledger may require quorum or synchronous multi-zone durability before success.
+"Durability" has layers. A client acknowledgment might mean the data reached one kernel buffer, one local disk, a quorum of disks, multiple zones, or a remote region. Each layer has a different probability of loss and a different latency cost. Storage APIs should document the acknowledgment point so applications can choose it based on RPO. A telemetry pipeline may accept regional asynchronous replication, while a financial ledger may require quorum or synchronous multi-zone durability before success.
 
-## Visual
+## Separating metadata, placement, and repair
 
 ```mermaid
 flowchart TD
@@ -65,6 +65,10 @@ flowchart TD
   Repair --> Meta
 ```
 
+The metadata partition selects a placement policy; the data path then fans out across independent failure domains. Scrubbing closes the loop by reporting and repairing damaged fragments rather than waiting for a foreground read to discover them.
+
+## Comparing storage families
+
 | System family | Data unit | Metadata pattern | Consistency tendency | Typical workload |
 | --- | --- | --- | --- | --- |
 | GFS/HDFS | large blocks | master or namenode | strong metadata, pipeline writes | batch analytics |
@@ -73,11 +77,11 @@ flowchart TD
 | S3-like object store | objects | partitioned object metadata | strong or eventual by operation and era | durable blobs |
 | Iceberg/Delta/Hudi | immutable files plus manifests | snapshot metadata commits | snapshot isolation for tables | lakehouse analytics |
 
-## Worked example 1: Apply CAP to a shopping-cart store
+## A partitioned shopping cart cannot promise both answers
 
-Problem: A shopping-cart service replicates cart `C` in regions East and West. A partition separates the regions. East receives `add item A`; West receives `add item B`. The product manager wants both regions to accept writes and every read to show the one true latest cart. Is that possible?
+A shopping-cart service replicates cart `C` in regions East and West. A partition separates the regions. East receives `add item A`; West receives `add item B`. The product manager wants both regions to accept writes and every read to show the one true latest cart. Is that possible?
 
-Method:
+During the partition:
 
 1. Accepting writes in both regions during the partition is an availability requirement.
 
@@ -85,19 +89,19 @@ Method:
 
 3. East cannot send `A` to West during the partition. West cannot send `B` to East.
 
-4. If East reads after its local write, it sees at least `{A}`. If West reads after its local write, it sees at least `{B}`.
+4. If East reads after its local write, it sees at least $\{A\}$. If West reads after its local write, it sees at least $\{B\}$.
 
-5. A single linearizable order could be `{A}` then `{A,B}` or `{B}` then `{A,B}`, but neither side can know the other write before communication resumes.
+5. A single linearizable order could be $\{A\}$ then $\{A,B\}$ or $\{B\}$ then $\{A,B\}$, but neither side can know the other write before communication resumes.
 
 6. The system must choose: reject or block one side for CP behavior, or accept both and merge later for AP behavior.
 
-Checked answer: the exact requirement is impossible under partition. A cart is often a good AP candidate if the merge operation is a set or multiset union with clear duplicate rules.
+The exact requirement is impossible under partition. A cart is often a good AP candidate if the merge operation is a set or multiset union with clear duplicate rules.
 
-## Worked example 2: Compare replication and erasure-coding overhead
+## Replication versus erasure-coding overhead
 
-Problem: Store 600 TB of logical data. Compare three-way replication with Reed-Solomon style $(k=6,m=3)$ erasure coding. How much raw storage is required, ignoring metadata and reserve capacity?
+Store 600 TB of logical data using either three-way replication or Reed-Solomon style $(k=6,m=3)$ erasure coding. How much raw storage is required, ignoring metadata and reserve capacity?
 
-Method:
+The storage arithmetic:
 
 1. Three-way replication stores three full copies:
 
@@ -129,9 +133,9 @@ $$
 \frac{900}{1800}=0.5=50\%.
 $$
 
-Checked answer: three-way replication needs about 1800 TB; $(6,3)$ erasure coding needs about 900 TB. The savings are large, but repair reads and degraded reads become more expensive.
+Three-way replication needs about 1800 TB; $(6,3)$ erasure coding needs about 900 TB. The savings are large, but repair reads and degraded reads become more expensive.
 
-## Code
+## Calculating CAP choices and coding overhead
 
 ```python
 def cap_decision(partitioned: bool, need_linearizable: bool, need_available: bool) -> str:
@@ -151,7 +155,7 @@ print("3x replication:", 600 * 3, "TB")
 print("RS(6,3):", erasure_overhead(600, 6, 3), "TB")
 ```
 
-## Common pitfalls
+## Storage claims that need qualification
 
 - Using CAP to avoid specifying the actual consistency model.
 - Forgetting that CAP's availability is a formal property, not merely "high uptime."
@@ -165,18 +169,6 @@ print("RS(6,3):", erasure_overhead(600, 6, 3), "TB")
 - Confusing backup, replication, snapshots, and versioning. They protect against different failures.
 - Ignoring read amplification from tombstones, wide partitions, and too many sorted runs.
 - Treating checksums as optional; storage corruption is a distributed-systems fault too.
-
-## Connections
-
-- [Replication and Consistency](/cs/distributed-systems/replication-and-consistency)
-- [Partitioning and Sharding](/cs/distributed-systems/partitioning-and-sharding)
-- [Fault Tolerance and Failure Detection](/cs/distributed-systems/fault-tolerance-and-failure-detection)
-- [Transactions and Isolation Levels](/cs/distributed-systems/transactions-and-isolation-levels)
-- [Security and Byzantine Fault Tolerance](/cs/distributed-systems/security-and-byzantine-fault-tolerance)
-- [Computer Networks](/cs/computer-networks/intro)
-- [Operating Systems](/cs/operating-systems/intro)
-- [Databases](/cs/databases/intro)
-- [Cryptography](/cs/cryptography/intro)
 
 ## References
 
@@ -194,3 +186,9 @@ print("RS(6,3):", erasure_overhead(600, 6, 3), "TB")
 [12] R. S. Xin et al., "Lakehouse: a new generation of open platforms that unify data warehousing and advanced analytics," in *CIDR*, 2021.  
 [13] Apache Software Foundation, "Apache Iceberg table format specification," project documentation.  
 [14] M. Armbrust et al., "Delta Lake: high-performance ACID table storage over cloud object stores," *PVLDB*, vol. 13, no. 12, pp. 3411-3424, 2020.
+
+<div className="see-also">
+
+See also: [Replication and Consistency](/cs/distributed-systems/replication-and-consistency) · [Partitioning and Sharding](/cs/distributed-systems/partitioning-and-sharding) · [Fault Tolerance and Failure Detection](/cs/distributed-systems/fault-tolerance-and-failure-detection) · [Transactions and Isolation Levels](/cs/distributed-systems/transactions-and-isolation-levels) · [Security and Byzantine Fault Tolerance](/cs/distributed-systems/security-and-byzantine-fault-tolerance) · [Computer Networks](/cs/computer-networks/intro) · [Operating Systems](/cs/operating-systems/intro) · [Databases](/cs/databases/intro) · [Cryptography](/cs/cryptography/intro)
+
+</div>

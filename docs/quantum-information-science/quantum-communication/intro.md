@@ -5,21 +5,17 @@ sidebar_position: 1
 
 # Quantum Communication
 
-Quantum communication studies how quantum states, classical authenticated discussion, and physical channels can be combined to move information with security or functionality that classical communication alone cannot provide. In this area of SJ Wiki, the first emphasis is quantum key distribution (QKD): Alice and Bob use quantum signals only to create shared random key material, then use ordinary symmetric cryptography to protect later data. The quantum channel does not magically encrypt arbitrary messages by itself; it supplies evidence about eavesdropping because unknown quantum states cannot be copied or measured without consequences.
+Quantum communication studies how quantum states, authenticated classical discussion, and physical channels can be combined to move information with security or functionality that classical communication alone cannot provide. The first emphasis here is quantum key distribution (QKD): Alice and Bob use quantum signals to create shared random key material, then use ordinary symmetric cryptography to protect later data. The quantum channel does not encrypt arbitrary messages by itself; it supplies evidence about eavesdropping because unknown quantum states cannot be copied or measured without consequences.
 
 The neighboring areas matter. [Quantum computing](/quantum-information-science/quantum-computing/intro) supplies the qubit, measurement, and no-cloning language. [Quantum security](/quantum-information-science/quantum-security/intro) covers the post-quantum-cryptography path, where algorithms are changed so that classical networks remain safe against quantum computers. [Quantum internet](/quantum-information-science/quantum-internet/intro) pushes beyond key distribution toward entanglement distribution, teleportation, repeaters, and networked quantum processors.
 
-Primary textbook reference for this section: Nielsen and Chuang, *Quantum Computation and Quantum Information*, especially Chapter 12 for quantum information theory, Holevo's theorem, privacy amplification, and BB84 security, and Chapter 8 for quantum noise and channel modeling. The pages in this folder synthesize that textbook foundation with existing practical QKD and network material rather than duplicating separate textbook-specific pages.
-
-![A glowing single-mode optical fiber illustrates the lossy physical channel that carries photons in many QKD systems.](https://commons.wikimedia.org/wiki/Special:FilePath/Fiber_Optical_Cable.jpg)
-
-*Figure: Optical fiber is the everyday hardware behind many terrestrial quantum links, but quantum states cannot be copied and optically amplified like classical signals. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fiber_Optical_Cable.jpg), Bquast, CC0 1.0.*
+The primary textbook reference is Nielsen and Chuang, *Quantum Computation and Quantum Information*: Chapter 12 for quantum information theory, Holevo's theorem, privacy amplification, and BB84 security, and Chapter 8 for quantum noise and channel modeling. These notes combine that foundation with QKD engineering and network material.
 
 ![A BB84 network diagram shows Alice sending polarized light across an insecure quantum channel to Bob while Eve listens.](https://commons.wikimedia.org/wiki/Special:FilePath/BB84-network_setup.svg)
 
 *Figure: BB84 turns the Alice-Bob-Eve setting into a physical experiment with a source, quantum channel, receiver, and eavesdropping model. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:BB84-network_setup.svg), Andy Spencer, CC BY-SA 3.0.*
 
-## Definitions
+## The pieces of a quantum link
 
 **Quantum communication** is any communication protocol in which at least one transmitted system must be modeled as a quantum state. The payload may be a single photon polarization, a time-bin qubit, a phase-encoded weak optical pulse, an entangled pair shared between nodes, or a more complex encoded state.
 
@@ -53,7 +49,7 @@ $$
 
 It mixes ordinary channel noise, device imperfections, and possible adversarial disturbance.
 
-## Key results
+## What nonorthogonal states buy you
 
 The core result behind this area is not that quantum states are secret in every situation. Orthogonal states can be distinguished perfectly, and badly engineered devices can leak information. The useful result is narrower and stronger: if a protocol encodes key bits into nonorthogonal states, then an adversary cannot learn the full raw key while leaving all protocol statistics unchanged.
 
@@ -79,11 +75,11 @@ $$
 Q_{\text{intercept}} = \frac{1}{2}\cdot\frac{1}{2}=\frac{1}{4}.
 $$
 
-Real QKD does not simply reject every nonzero QBER. It estimates whether the observed error and finite-sample confidence bounds are compatible with a positive secret key after error correction and privacy amplification. Security proofs are more delicate than the intercept-resend calculation, but the operational workflow remains recognizable: distribute quantum signals, sift by basis or detection pattern, estimate parameters, reconcile errors, compress away Eve's possible information, and authenticate the transcript.
+Real QKD tolerates some nonzero QBER. It tests whether the observed error and finite-sample confidence bounds permit a positive secret key after error correction and privacy amplification. Security proofs are more delicate than the intercept-resend calculation, but the operational workflow remains recognizable: distribute quantum signals, sift by basis or detection pattern, estimate parameters, reconcile errors, compress away Eve's possible information, and authenticate the transcript.
 
 Quantum communication has three different scopes that should not be confused. First, **QKD links** create keys between two endpoints or between neighboring trusted nodes. Second, **QKD networks** route key material across multiple links, often with trusted intermediate nodes. Third, a **quantum internet** aims to distribute quantum states or entanglement between remote nodes; it may support QKD but is not limited to QKD.
 
-## Visual
+### Link keys, Bell pairs, and the classical control plane
 
 ```mermaid
 flowchart TD
@@ -122,7 +118,7 @@ flowchart TD
   Consume --> Apps
 ```
 
-The diagram separates the two main communication architectures: prepare-and-measure QKD creates hop keys from transmitted states, while entanglement distribution creates Bell-pair resources for teleportation, E91-style QKD, and networked quantum operations. The shape labels identify where qubits become classical records, where QBER or fidelity is estimated, and where reconciliation and privacy amplification enter. Dotted arrows emphasize that authenticated classical communication is part of the protocol, not an optional management channel.
+Prepare-and-measure QKD creates hop keys from transmitted states, while entanglement distribution creates Bell-pair resources for teleportation, E91-style QKD, and networked quantum operations. The labels mark where qubits become classical records, where QBER or fidelity is estimated, and where reconciliation and privacy amplification enter. The dotted arrows show authenticated classical communication as part of the protocol rather than a separate management channel.
 
 | Concept | Main resource | Classical channel needed? | Typical output | Main caveat |
 |---|---:|---:|---|---|
@@ -132,7 +128,7 @@ The diagram separates the two main communication architectures: prepare-and-meas
 | Quantum internet | Entanglement and qubit transmission | Yes, often heavy classical control | Keys, teleportation, distributed quantum tasks | Requires memories, repeaters, and network control |
 | PQC over classical internet | Hard mathematical problems | Yes | Public-key encryption or signatures | Security is computational, not physical |
 
-## Worked example 1: Why the wrong BB84 basis creates a random bit
+## Why the wrong BB84 basis gives a random bit
 
 **Problem.** Alice sends $\lvert +\rangle$. Bob measures in the computational basis $\{\lvert 0\rangle,\lvert 1\rangle\}$. Compute Bob's outcome probabilities and explain why this matters for QKD.
 
@@ -158,9 +154,9 @@ $$
 
 4. If Bob obtains $0$, the post-measurement state is $\lvert 0\rangle$; if he obtains $1$, it is $\lvert 1\rangle$. The original phase relation that defined $\lvert +\rangle$ has been lost.
 
-**Checked answer.** Bob gets a uniformly random bit. The probabilities add to $1/2+1/2=1$, so the distribution is normalized. This is exactly why a wrong-basis measurement by Eve is visible statistically: after Eve's measurement, she cannot resend the original unknown state with certainty.
+Bob gets a uniformly random bit. The probabilities add to $1/2+1/2=1$, so the distribution is normalized. After a wrong-basis measurement, Eve cannot resend the original unknown state with certainty; repeated rounds therefore change the observed statistics.
 
-## Worked example 2: Expected QBER from intercept-resend
+## Intercept-resend produces a 25% QBER
 
 **Problem.** In ideal BB84, suppose Eve intercepts every photon, chooses the computational or diagonal basis uniformly at random, measures, and resends the state corresponding to her result. Alice and Bob keep only rounds where their bases match. What QBER do they expect in the sifted key?
 
@@ -182,9 +178,9 @@ Q = \Pr(\text{Eve wrong basis})\Pr(\text{Bob error}\mid\text{Eve wrong basis})
 = \frac{1}{4}.
 $$
 
-**Checked answer.** The expected QBER is $25\%$. If Alice and Bob publicly compare a sufficiently large random test sample and see an error rate near this value, they abort. If the rate is much lower, a security proof plus finite-size statistics decides whether privacy amplification can still produce a secret key.
+The expected QBER is $25\%$. If Alice and Bob publicly compare a sufficiently large random test sample and see an error rate near this value, they abort. At lower rates, a security proof plus finite-size statistics determines whether privacy amplification can still produce a secret key.
 
-## Code
+## A Monte Carlo check of basis sifting
 
 ```python
 import random
@@ -230,7 +226,7 @@ for attacked in [False, True]:
 
 This deliberately omits loss, dark counts, finite-key confidence intervals, and reconciliation leakage. Its purpose is to isolate the basis-sifting logic and the $25\%$ intercept-resend signal.
 
-## Common pitfalls
+## Security assumptions that cannot be skipped
 
 - Treating QKD as direct message encryption. QKD creates keys; messages are still encrypted with classical symmetric methods such as one-time pads or authenticated encryption.
 - Forgetting authentication. An unauthenticated classical channel permits man-in-the-middle attacks even if the quantum optics are perfect.
@@ -239,7 +235,9 @@ This deliberately omits loss, dark counts, finite-key confidence intervals, and 
 - Ignoring finite statistics. A small test sample can miss errors; real systems need confidence bounds and composable security parameters.
 - Assuming hardware automatically matches the proof model. Source flaws, detector behavior, timing, and optical back-reflections can invalidate a naive proof.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [BB84 Protocol](/quantum-information-science/quantum-communication/bb84) for the step-by-step prepare-and-measure protocol.
 - [Quantum Key Distribution](/quantum-information-science/quantum-communication/qkd) for protocol families, security models, side channels, and practical variants.
@@ -248,4 +246,5 @@ This deliberately omits loss, dark counts, finite-key confidence intervals, and 
 - [Quantum-Safe Cryptography](/quantum-information-science/quantum-security/quantum-safe-crypto) and [Post-Quantum Cryptography](/quantum-information-science/quantum-security/pqc) for the classical migration path.
 - [Classical Cryptography](/cs/cryptography/intro) for symmetric encryption, authentication, public-key assumptions, and protocol design baselines.
 - [Postulates of Quantum Mechanics](/physics/quantum-mechanics/postulates-of-quantum-mechanics), [Measurement and Interpretation](/physics/quantum-mechanics/measurement-interpretation), and [Dirac Notation and Hilbert Spaces](/physics/quantum-mechanics/dirac-notation-hilbert-spaces) for the physics used by the security intuition.
-- Nielsen and Chuang, *Quantum Computation and Quantum Information*, Chapters 8 and 12, for the canonical textbook treatment of quantum channels, accessible information, Holevo bounds, and BB84 security.
+
+</div>

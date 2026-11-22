@@ -13,7 +13,7 @@ Atkins builds kinetics from empirical rate laws, integrated forms, elementary re
 
 *Figure: Activation energy barrier connecting mechanism hypotheses to measured rates. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Activation_Energy.svg), Risibot based on Brazosport College, CC BY-SA 4.0.*
 
-## Definitions
+## Rates, orders, and integrated laws
 
 For a reaction
 
@@ -68,7 +68,7 @@ $$
 
 An elementary reaction is a single molecular event. Its molecularity can be unimolecular, bimolecular, or rarely termolecular. A mechanism is a sequence of elementary steps.
 
-## Key results
+## Reading concentration-time data
 
 Integrated rate laws allow rate constants to be obtained by linear plots:
 
@@ -89,6 +89,8 @@ with forward rate constant $k_f$ and reverse rate constant $k_r$, the relaxation
 $$
 k_{\mathrm{obs}}=k_f+k_r
 $$
+
+## From an empirical law to a mechanism
 
 The steady-state approximation sets the concentration derivative of a reactive intermediate nearly to zero:
 
@@ -145,25 +147,25 @@ Reactions approaching equilibrium require both forward and reverse rates. Near e
 
 Kinetic isotope effects provide mechanistic clues because isotopic substitution changes vibrational zero-point energies and sometimes tunneling probabilities. A large primary hydrogen/deuterium isotope effect suggests H transfer in or before the rate-determining step. Smaller secondary effects can report hybridization changes. These effects connect kinetics back to quantum vibrational structure.
 
-## Visual
+The two common routes for eliminating an unobserved intermediate are:
 
 ```mermaid
 flowchart TB
-  Data["Measured concentration profile<br/>#lsqb;A"](t), [B](t), product signal"] --> RateLaw["Empirical differential law<br/>rate = k#lsqb;A"]^m[B]^n"]
-  RateLaw --> Mechanism["Candidate elementary mechanism<br/>steps sum to overall reaction"]
+  Data["Measured concentration profiles: #lsqb;A"](t), [B](t), product signal"] --> RateLaw["Empirical law: rate = k#lsqb;A"]^m[B]^n"]
+  RateLaw --> Mechanism["Candidate elementary mechanism: steps sum to overall reaction"]
 
   subgraph SSA["Steady-state approximation path"]
     direction TB
-    Step1["Write elementary step rates<br/>formation and consumption terms"] --> Inter["Choose reactive intermediate I<br/>low concentration after induction"]
-    Inter --> Balance["Set d#lsqb;I"]/dt approximately 0<br/>formation rate = consumption rate"]
-    Balance --> SolveI["Solve algebraically for #lsqb;I"]<br/>in terms of stable reactants"]
+    Step1["Write elementary step rates: formation and consumption terms"] --> Inter["Choose reactive intermediate I: low concentration after induction"]
+    Inter --> Balance["Set d#lsqb;I"]/dt approximately 0: formation rate = consumption rate"]
+    Balance --> SolveI["Solve algebraically for #lsqb;I"] in terms of stable reactants"]
     SolveI --> Substitute["Substitute into product rate<br/>remove unobserved intermediate"]
   end
 
   subgraph PreEq["Pre-equilibrium path"]
     direction TB
-    Fast["Fast reversible step<br/>A + B reversible I"] --> Keq["Use K = #lsqb;I"]/([A][B])"]
-    Keq --> Slow["Slow product-forming step<br/>rate = k_slow#lsqb;I"]"]
+    Fast["Fast reversible step: A + B reversible I"] --> Keq["Use K = #lsqb;I"]/([A][B])"]
+    Keq --> Slow["Slow product-forming step: rate = k_slow#lsqb;I"]"]
     Slow --> Substitute2["Substitute #lsqb;I"] from equilibrium"]
   end
 
@@ -179,9 +181,9 @@ flowchart TB
   Plausible --> Extra["Seek independent evidence<br/>isotope effects, intermediates, catalysis, products"]
 ```
 
-The mechanism diagram separates empirical rate-law fitting from two derivation architectures: steady-state and pre-equilibrium. Each subgraph shows the algebraic handoff that removes an unobserved intermediate from the final observable rate law. The feedback loop is explicit because agreement with the measured law is necessary but not enough; mechanisms still need independent chemical evidence.
+The diagram separates empirical rate-law fitting from the steady-state and pre-equilibrium derivations. Each route removes an unobserved intermediate from the observable rate law. Agreement with the measured law is necessary but not enough; mechanisms still need independent chemical evidence.
 
-## Worked example 1: First-order rate constant from half-life
+## Extracting a first-order rate constant from half-life
 
 **Problem.** A first-order decomposition has half-life $35.0\ \mathrm{min}$. Find $k$ in $\mathrm{s^{-1}}$ and the fraction remaining after $2.00\ \mathrm{h}$.
 
@@ -216,7 +218,7 @@ $$
 
 **Checked answer.** Two hours is 3.43 half-lives, and $(1/2)^{3.43}=0.093$, matching the exponential result.
 
-## Worked example 2: Steady-state mechanism
+## Eliminating an intermediate by steady state
 
 **Problem.** For the mechanism
 
@@ -268,7 +270,7 @@ $$
 
 **Checked answer.** At high $[B]$, $v_P\to k_1[A]$ because every intermediate is captured by $B$. At low $[B]$, $v_P\approx(k_1k_2/k_3)[A][B]$.
 
-## Code
+## Fitting first-order data without linearization
 
 ```python
 import numpy as np
@@ -287,7 +289,7 @@ print("k s^-1:", k_fit)
 print("half-life s:", np.log(2) / k_fit)
 ```
 
-## Common pitfalls
+## What can invalidate a kinetic interpretation
 
 - Reading reaction orders from stoichiometric coefficients. Orders are experimental unless the step is elementary.
 - Using linearized plots without checking residuals; nonlinear fitting is often better.
@@ -297,7 +299,7 @@ print("half-life s:", np.log(2) / k_fit)
 
 Before deriving a rate law from a mechanism, write every elementary step with its own rate expression. Only elementary steps allow stoichiometric exponents to become rate-law exponents directly. Then identify intermediates, catalysts, and stable species. Intermediates must be eliminated from the final rate law because they are usually not controlled experimental concentrations. Catalysts may remain if their total concentration affects the rate.
 
-Check limiting behavior after deriving any complicated expression. If a reactant concentration goes to zero, the rate should usually go to zero. If a capturing reagent becomes very large, a branching mechanism may approach a maximum rate. These limits often reveal algebra mistakes and also give chemical interpretation. The steady-state example on this page illustrates how low- and high-$[B]$ limits produce different apparent orders.
+Check limiting behavior after deriving any complicated expression. If a reactant concentration goes to zero, the rate should usually go to zero. If a capturing reagent becomes very large, a branching mechanism may approach a maximum rate. These limits often reveal algebra mistakes and also give chemical interpretation. In the steady-state example above, the low- and high-$[B]$ limits produce different apparent orders.
 
 For enzyme or chain mechanisms, remember that observed orders can change with concentration range. Michaelis-Menten kinetics is first order in substrate at low $[S]$ and zero order at high $[S]$. Radical chains can show half-order dependences when termination is bimolecular. Apparent orders are therefore properties of a regime, not necessarily universal constants for the reaction.
 
@@ -309,9 +311,8 @@ A rate-determining step is a useful phrase only when one step clearly controls t
 
 Use the derived rate law, not intuition alone, to identify that control.
 
-## Connections
+<div className="see-also">
 
-- [Chemical equilibrium](/chemistry/physical-chemistry/chemical-equilibrium)
-- [Temperature dependence and reaction dynamics](/chemistry/physical-chemistry/temperature-dependence-and-reaction-dynamics)
-- [Catalysis, surfaces, macromolecules, and solids](/chemistry/physical-chemistry/catalysis-surfaces-macromolecules-and-solids)
-- [General chemistry kinetics](/chemistry/general/)
+See also: [Chemical equilibrium](/chemistry/physical-chemistry/chemical-equilibrium) · [Temperature dependence and reaction dynamics](/chemistry/physical-chemistry/temperature-dependence-and-reaction-dynamics) · [Catalysis, surfaces, macromolecules, and solids](/chemistry/physical-chemistry/catalysis-surfaces-macromolecules-and-solids) · [General chemistry kinetics](/chemistry/general/intro)
+
+</div>

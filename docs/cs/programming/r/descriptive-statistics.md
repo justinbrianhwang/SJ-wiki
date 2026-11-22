@@ -9,7 +9,7 @@ Descriptive statistics summarize what is in a sample before moving to formal inf
 
 In R, descriptive statistics are mostly vector operations plus grouping. You compute a summary for one vector, then repeat it across columns, groups, or subsets. The same ideas support plots, confidence intervals, hypothesis tests, and models. If a summary is wrong because of missing values, bad classes, or accidental subsetting, later inference will also be wrong.
 
-## Definitions
+## Centers, spreads, and counts
 
 The **mean** is the arithmetic average:
 
@@ -35,7 +35,7 @@ The **interquartile range (IQR)** is $Q_3 - Q_1$, the distance between the 75th 
 
 A **frequency table** counts category occurrences. `table()` is the base R tool for one-way and two-way counts.
 
-## Key results
+## Matching the summary to the question
 
 Different summaries answer different questions:
 
@@ -55,8 +55,6 @@ Missing values require explicit treatment. `mean(c(1, NA, 3))` returns `NA`; `me
 
 A descriptive statistic should be interpreted with sample size. A group mean based on 2 observations is much less stable than a group mean based on 200 observations. Include counts beside group summaries.
 
-## Visual
-
 ```text
 Sorted data:  3   4   5   7   8   9   20
               |       |       |       |
@@ -74,11 +72,11 @@ Median stays at the middle value 7.
 | Data frame formula | `aggregate(mpg ~ cyl, mtcars, mean)` | Data frame |
 | Two-way categories | `table(df$a, df$b)` | Contingency table |
 
-## Worked example 1: Manual mean and standard deviation
+## Verifying summaries by hand and by group
 
-Problem: compute the mean and sample standard deviation of `x <- c(4, 6, 8, 10)` manually and verify with R.
+### Recovering sample standard deviation by hand
 
-Method:
+Compute the mean and sample standard deviation of `x <- c(4, 6, 8, 10)` manually and verify with R.
 
 1. Sum the values and divide by sample size.
 2. Compute deviations from the mean.
@@ -111,13 +109,11 @@ sd(x)
 # [1] 2.581989
 ```
 
-Checked answer: R's `var(x)` returns `6.666667`, which is `20 / 3`, and `sd(x)` returns the square root of that value. This confirms that R uses sample variance with denominator `n - 1`.
+R's `var(x)` returns `6.666667`, which is `20 / 3`, and `sd(x)` returns the square root of that value. This confirms that R uses sample variance with denominator `n - 1`.
 
-## Worked example 2: Grouped summaries for `iris`
+### Comparing sepal length across species
 
-Problem: summarize sepal length by species in the `iris` data set, reporting count, mean, median, and standard deviation.
-
-Method:
+Summarize sepal length by species in the `iris` data set, reporting count, mean, median, and standard deviation.
 
 1. Split `Sepal.Length` by `Species`.
 2. Write a function that returns named summaries.
@@ -144,11 +140,11 @@ round(result, 3)
 # virginica    50 6.588    6.5 0.636
 ```
 
-Checked answer: each iris species has 50 rows, so the `n` column should be 50 for all three groups. The means increase from setosa to versicolor to virginica, matching the known pattern that virginica plants tend to have larger sepal length in this data set.
+Each iris species has 50 rows, so the `n` column should be 50 for all three groups. The means increase from setosa to versicolor to virginica, matching the known pattern that virginica plants tend to have larger sepal length in this data set.
 
 This example includes counts with summaries. Without counts, a reader cannot judge how much data supports each group statistic.
 
-## Code
+## A grouped descriptive report
 
 ```r
 # Compact descriptive report for numeric columns and one grouping variable.
@@ -192,11 +188,9 @@ Descriptive statistics also guide model choice. Strong skew may suggest a transf
 
 In coursework, show at least one manual calculation for a summary before relying on R output. Computing one mean, one variance, or one table count by hand builds trust in the function and clarifies the denominator or counting rule. After that, R can scale the same idea across groups and columns.
 
-After summaries are computed, preserve units in labels or table names. A mean of `3.2` is ambiguous; a mean weight of `3.2 thousand pounds` is interpretable.
+After summaries are computed, preserve units in labels or table names. A mean of `3.2` is ambiguous; a mean weight of `3.2 thousand pounds` is interpretable, and the unit prevents incompatible measurements from being mixed in later comparisons.
 
-Clear units also prevent mixing incompatible measurements in later comparisons.
-
-## Common pitfalls
+## Summaries that conceal the data
 
 - Reporting a mean without checking for skew or outliers. Compare mean and median.
 - Forgetting `na.rm = TRUE` or using it without reporting missing counts.
@@ -205,9 +199,8 @@ Clear units also prevent mixing incompatible measurements in later comparisons.
 - Omitting group sample sizes from grouped summaries.
 - Treating correlation or group differences from descriptive summaries as causal evidence.
 
-## Connections
+<div className="see-also">
 
-- [Probability distributions](/cs/programming/r/probability-distributions)
-- [Base graphics](/cs/programming/r/base-graphics)
-- [Statistical inference](/cs/programming/r/statistical-inference)
-- [Linear and generalized models](/cs/programming/r/linear-and-generalized-models)
+See also: [Probability distributions](/cs/programming/r/probability-distributions) · [Base graphics](/cs/programming/r/base-graphics) · [Statistical inference](/cs/programming/r/statistical-inference) · [Linear and generalized models](/cs/programming/r/linear-and-generalized-models)
+
+</div>

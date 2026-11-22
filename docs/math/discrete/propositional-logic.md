@@ -9,7 +9,7 @@ Propositional logic is the grammar of precise yes-or-no statements. A propositio
 
 This topic sits at the entrance to proof, set theory, circuit design, program specification, and Boolean search. Its power is that complicated statements can be reduced to small truth tables and algebraic laws. Its limitation is also important: propositional logic treats each simple sentence as atomic, so it cannot express "for every integer" or "there exists a vertex" until predicates and quantifiers are introduced.
 
-## Definitions
+## Statements, connectives, and truth values
 
 A **proposition** is a declarative sentence that is either true or false, but not both. "Seven is prime" is a proposition. "Close the door" is not, because it is a command. "$x+2=5$" is not a proposition until $x$ has a value or the statement is quantified.
 
@@ -24,11 +24,11 @@ Compound propositions are built from simpler propositions using connectives.
 | Conditional | $p \to q$ | if $p$, then $q$ | not the case that $p$ is true and $q$ is false |
 | Biconditional | $p \leftrightarrow q$ | $p$ iff $q$ | $p$ and $q$ have the same truth value |
 
-The conditional is often the first conceptual hurdle. In mathematics, $p \to q$ does not assert that $p$ causes $q$. It asserts that the failure pattern $p$ true and $q$ false never occurs. This is why a conditional with a false hypothesis is true: it has not been contradicted.
+The conditional is often the first conceptual hurdle. In mathematics, $p \to q$ does not assert that $p$ causes $q$. It asserts that the failure pattern $p$ true and $q$ false never occurs. A conditional with a false hypothesis is therefore true: it has not been contradicted.
 
 A compound proposition is a **tautology** if it is true for every assignment of truth values, a **contradiction** if it is false for every assignment, and a **contingency** otherwise. Two propositions $P$ and $Q$ are **logically equivalent**, written $P \equiv Q$, when $P \leftrightarrow Q$ is a tautology. An argument form is **valid** if the conclusion is true in every row in which all premises are true.
 
-## Key results
+## Equivalences, counterexamples, and inference rules
 
 The most useful equivalences are the ones that remove conditionals, move negations inward, or rewrite a statement into a form that is easier to test.
 
@@ -61,8 +61,6 @@ This matters because it gives the exact shape of a counterexample. To disprove "
 
 Rules of inference preserve truth. **Modus ponens** has the form $p$, $p \to q$, therefore $q$. **Modus tollens** has the form $\neg q$, $p \to q$, therefore $\neg p$. **Hypothetical syllogism** chains implications: from $p \to q$ and $q \to r$, infer $p \to r$. **Disjunctive syllogism** says that from $p \lor q$ and $\neg p$, infer $q$.
 
-## Visual
-
 | $p$ | $q$ | $p \to q$ | $\neg(p \to q)$ | $p \land \neg q$ |
 | --- | --- | --- | --- | --- |
 | T | T | T | F | F |
@@ -81,11 +79,9 @@ graph LR
   MT --> NotP[not p]
 ```
 
-## Worked example 1: Translate and negate an access rule
+## Translating “only if” in an access rule
 
 **Problem.** Translate "A user can log in only if the password is correct and the account is active." Then negate the statement in plain English. Let $p$ mean "the user can log in," $q$ mean "the password is correct," and $r$ mean "the account is active."
-
-**Method.**
 
 1. The phrase "only if" introduces a necessary condition. If the user can log in, then the necessary condition must hold.
 2. "The password is correct and the account is active" is $q\land r$.
@@ -105,9 +101,9 @@ $$
 \end{aligned}
 $$
 
-**Checked answer.** The negation is: "The user can log in, and either the password is not correct or the account is not active." This is the only kind of observation that would refute the original rule. Merely finding an inactive account that cannot log in would not refute it, because the original statement only constrains users who can log in.
+The negation is: "The user can log in, and either the password is not correct or the account is not active." This is the only kind of observation that would refute the original rule. Merely finding an inactive account that cannot log in would not refute it, because the original statement only constrains users who can log in.
 
-## Worked example 2: Test an argument form
+## Chaining implications in a build rule
 
 **Problem.** Determine whether this argument is valid:
 
@@ -117,8 +113,6 @@ $$
 - Therefore, the build did not pass.
 
 Let $p$ mean "the build passes," $q$ mean "the tests ran," and $r$ mean "the deployment is allowed."
-
-**Method.**
 
 1. The premises are $p\to q$, $q\to r$, and $\neg r$.
 2. From $p\to q$ and $q\to r$, hypothetical syllogism gives
@@ -135,9 +129,9 @@ $$
 
 4. This is exactly the proposed conclusion.
 
-**Checked answer.** The argument is valid. A truth-table check reaches the same result: every row satisfying all three premises has $p=F$. For example, if $p$ were true, then $q$ would be true by the first premise, $r$ would be true by the second premise, contradicting $\neg r$.
+The argument is valid. A truth-table check reaches the same result: every row satisfying all three premises has $p=F$. For example, if $p$ were true, then $q$ would be true by the first premise, $r$ would be true by the second premise, contradicting $\neg r$.
 
-## Code
+## Exhausting finite truth assignments in Python
 
 ```python
 from itertools import product
@@ -164,7 +158,7 @@ print(counterexample)
 
 The program exhausts all truth assignments. It prints `True` and no counterexample, confirming the equivalence used in the first worked example.
 
-## Common pitfalls
+## Translation traps and limits of truth tables
 
 - Reading $p\to q$ as causation. In logic, it only rules out the row $p=T,q=F$.
 - Reversing "if" and "only if." "$p$ if $q$" is $q\to p$; "$p$ only if $q$" is $p\to q$.
@@ -178,9 +172,13 @@ When translating requirements, mark each English connective. "Unless" often tran
 
 Validity and satisfiability answer different questions. An argument is valid when there is no truth assignment making all premises true and the conclusion false. A formula is satisfiable when at least one assignment makes it true. A set of specifications is consistent when their conjunction is satisfiable. Mixing these notions can make a correct truth table support the wrong claim.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Predicates and quantifiers](/math/discrete/predicates-and-quantifiers) extends propositions with variables and domains.
 - [Proof techniques](/math/discrete/proof-techniques) uses implication, contraposition, contradiction, and counterexamples.
 - [Sets and set operations](/math/discrete/sets-and-set-operations) mirrors De Morgan's laws with complements of unions and intersections.
 - [Boolean algebra and logic circuits](/math/discrete/boolean-algebra-and-logic-circuits) implements propositions using gates.
+
+</div>

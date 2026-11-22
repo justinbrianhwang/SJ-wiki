@@ -329,10 +329,8 @@ Bound states and scattering states belong to one spectral problem. Bound states 
 
 Boundary conditions also determine whether the Hamiltonian is self-adjoint. Vanishing wavefunctions at hard walls are one choice, but periodic or phase-twisted conditions describe a ring. Different self-adjoint boundary conditions define different physical systems even when the differential expression inside the interval is identical.
 
-## Related pages
+<div className="see-also">
 
-- [Dirac notation and Hilbert spaces](/physics/quantum-mechanics/dirac-notation-hilbert-spaces)
-- [Quantum dynamics and pictures](/physics/quantum-mechanics/quantum-dynamics-pictures)
-- [Harmonic oscillator with ladder operators](/physics/quantum-mechanics/harmonic-oscillator-ladder-operators)
-- [Variational principle and WKB](/physics/quantum-mechanics/variational-principle-wkb)
-- [Scattering theory](/physics/quantum-mechanics/scattering-theory)
+See also: [Dirac notation and Hilbert spaces](/physics/quantum-mechanics/dirac-notation-hilbert-spaces) · [Quantum dynamics and pictures](/physics/quantum-mechanics/quantum-dynamics-pictures) · [Harmonic oscillator with ladder operators](/physics/quantum-mechanics/harmonic-oscillator-ladder-operators) · [Variational principle and WKB](/physics/quantum-mechanics/variational-principle-wkb) · [Scattering theory](/physics/quantum-mechanics/scattering-theory)
+
+</div>

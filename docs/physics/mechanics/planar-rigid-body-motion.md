@@ -546,9 +546,8 @@ Below that value the no-slip solution is inconsistent.
 - A rolling constraint needs a declared angular sign. Mixing counterclockwise-positive kinetics with clockwise-positive constraint equations changes a sign silently.
 - $I_G$ belongs with moments about $G$. Fixed-axis equations about $O$ use $I_O$, while moments about a general point need the mass-center acceleration term.
 
-## Related pages
+<div className="see-also">
 
-- [Particle kinematics](/physics/mechanics/particle-kinematics)
-- [Particle kinetics with Newton's second law](/physics/mechanics/particle-kinetics-newton)
-- [Work-energy methods](/physics/mechanics/work-energy-methods)
-- [Centroids and second moments](/physics/mechanics/centroids-second-moments)
+See also: [Particle kinematics](/physics/mechanics/particle-kinematics) · [Particle kinetics with Newton's second law](/physics/mechanics/particle-kinetics-newton) · [Work-energy methods](/physics/mechanics/work-energy-methods) · [Centroids and second moments](/physics/mechanics/centroids-second-moments)
+
+</div>

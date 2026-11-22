@@ -9,7 +9,7 @@ Fourier transforms extend Fourier series from periodic functions to signals on t
 
 The transform trades localization in time or space for frequency information. Smoothness, decay, shifts, modulation, and convolution all have clean frequency-domain interpretations. Compared with the Laplace transform, the Fourier transform is usually two-sided and emphasizes steady spectral content rather than initial-value algebra.
 
-## Definitions
+## Fixing the transform convention
 
 One common convention for the Fourier transform is
 
@@ -55,7 +55,7 @@ $$
 \mathcal{F}\{f*g\}=\hat f(\omega)\hat g(\omega).
 $$
 
-## Key results
+## From Fourier series to a continuous spectrum
 
 The Fourier integral can be viewed as a limiting form of Fourier series as the period tends to infinity. Discrete frequencies become continuously spaced, sums become integrals, and coefficients become a spectral density. This connection explains why the same sine-cosine intuition remains useful.
 
@@ -98,7 +98,9 @@ The transform of a Gaussian is another Gaussian, up to convention-dependent cons
 
 Smoothness and decay trade places. If $f$ has many derivatives that decay well, then $\hat f$ tends to decay rapidly. If $f$ is sharply cut off or discontinuous, the transform decays more slowly and often has oscillatory side lobes. The rectangular pulse example produces a sinc-shaped transform precisely because the pulse has jump discontinuities at its endpoints.
 
-Frequency-domain phase is as important as magnitude. The magnitude $\vert \hat f(\omega)\vert $ tells how much of a frequency is present, but the phase tells how components align in space or time. A shift in the original signal changes phase but not magnitude. Therefore two signals can have the same magnitude spectrum and still look different because their phases differ.
+Frequency-domain phase is as important as magnitude. The magnitude $\vert \hat f(\omega)\vert $ tells how much of a frequency is present, but the phase tells how components align in space or time. A shift in the original signal changes phase but not magnitude. Two signals can therefore have the same magnitude spectrum and still look different because their phases differ.
+
+## Turning infinite-domain PDEs into frequency equations
 
 The Fourier transform is often used to solve linear PDEs on infinite domains. For the heat equation $u_t=ku_{xx}$, transforming in $x$ gives
 
@@ -124,13 +126,15 @@ $$
 
 Thus each frequency oscillates with angular frequency $c\vert \omega\vert $. This is the infinite-domain counterpart of Fourier-series mode evolution on a finite interval.
 
-In numerical work, the discrete Fourier transform assumes periodic data over the sampled window. If the first and last sample do not match smoothly, the periodic extension has artificial jumps, which create high-frequency content. Windowing, padding, or choosing a better sampling interval can reduce leakage, but each choice changes the interpretation of the spectrum.
+## Conventions, units, and sampled data
+
+The discrete Fourier transform assumes periodic data over the sampled window. If the first and last sample do not match smoothly, the periodic extension has artificial jumps, which create high-frequency content. Windowing, padding, or choosing a better sampling interval can reduce leakage, but each choice changes the interpretation of the spectrum.
 
 Conventions must be tracked carefully. Some fields put $1/\sqrt{2\pi}$ in both transform and inverse. Some use frequency $\xi$ in cycles per unit rather than angular frequency $\omega$ in radians per unit. Then exponentials use $e^{-2\pi i\xi x}$ instead of $e^{-i\omega x}$. The mathematics is equivalent, but formulas change.
 
 Dimensional units help catch convention mistakes. If $x$ is measured in meters, angular frequency $\omega$ has units of radians per meter, and the transform integral includes a factor of meters from $dx$. Scaling constants are not arbitrary decorations; they preserve the dimensions of inverse reconstruction.
 
-## Visual
+## The analysis–synthesis pipeline
 
 ```mermaid
 flowchart LR
@@ -156,11 +160,11 @@ flowchart LR
   Verify -- "mismatch" --> Analysis
 ```
 
-This transform diagram makes the analysis/synthesis contract explicit: an aperiodic signal becomes a continuous spectrum, operations are performed as algebraic multipliers or phase factors, and the inverse integral reconstructs the result. The operations subgraph covers the common architecture behind filtering, convolution, differentiation, and PDE evolution. The verification branch is necessary because Fourier conventions and units change the constants even when the structural pipeline is the same.
+An aperiodic signal becomes a continuous spectrum, operations become algebraic multipliers or phase factors, and the inverse integral reconstructs the result. The same architecture covers filtering, convolution, differentiation, and PDE evolution. The final convention check catches constant and unit mismatches.
 
 The expanded tables below use the angular-frequency convention $\hat f(\omega)=\int_{-\infty}^{\infty}f(x)e^{-i\omega x}\,dx$. The constants for the cycles-per-unit convention $\xi=\omega/(2\pi)$ are listed in a separate row when they differ.
 
-### Operational rules
+### Operations worth keeping at hand
 
 | Time or space operation on $f(x)$ | Frequency-domain effect on $\hat f(\omega)$ |
 |---|---|
@@ -178,7 +182,7 @@ The expanded tables below use the angular-frequency convention $\hat f(\omega)=\
 | Parseval / Plancherel | $\displaystyle\int\lvert f\rvert ^2\,dx=\dfrac{1}{2\pi}\int\lvert \hat f\rvert ^2\,d\omega$ |
 | Duality | $\mathcal{F}\{\hat f\}(\omega)=2\pi\,f(-\omega)$ |
 
-### Transform pairs (angular-frequency convention)
+### Transform pairs in the angular-frequency convention
 
 | $f(x)$ | $\hat f(\omega)$ | Notes |
 |---|---|---|
@@ -200,7 +204,7 @@ The expanded tables below use the angular-frequency convention $\hat f(\omega)=\
 | Sinc $\dfrac{\sin(\Omega x)}{\pi x}$ | $\mathbf{1}_{\lvert \omega\rvert \le \Omega}$ | Ideal lowpass kernel |
 | $x\,e^{-a x^2}$, $a\gt 0$ | $-\dfrac{i\omega}{2a}\sqrt{\dfrac{\pi}{a}}\,e^{-\omega^2/(4a)}$ | Derivative of Gaussian |
 
-### Convention factor cheatsheet
+### Converting between angular frequency and cycles per unit
 
 The convention $\hat f(\xi)=\int f(x)e^{-2\pi i\xi x}\,dx$ (cycles per unit) replaces $\omega$ by $2\pi\xi$ everywhere. The effect on common rules:
 
@@ -211,9 +215,9 @@ The convention $\hat f(\xi)=\int f(x)e^{-2\pi i\xi x}\,dx$ (cycles per unit) rep
 | Inversion constant | $\dfrac{1}{2\pi}$ in front | $1$ in front |
 | Parseval | $\int\lvert f\rvert ^2=\dfrac{1}{2\pi}\int\lvert \hat f\rvert ^2$ | $\int\lvert f\rvert ^2=\int\lvert \hat f\rvert ^2$ |
 
-## Worked example 1: Transform of a rectangular pulse
+## Deriving the rectangular-pulse spectrum
 
-Problem. Find the Fourier transform of
+Consider
 
 $$
 f(x)=
@@ -223,100 +227,94 @@ f(x)=
 \end{cases}
 $$
 
-Method.
-
-1. Use the definition:
+The definition gives
 
 $$
 \hat f(\omega)=\int_{-\infty}^{\infty}f(x)e^{-i\omega x}\,dx.
 $$
 
-2. Since $f=1$ only on $[-a,a]$,
+Since $f=1$ only on $[-a,a]$,
 
 $$
 \hat f(\omega)=\int_{-a}^{a}e^{-i\omega x}\,dx.
 $$
 
-3. Integrate for $\omega\ne 0$:
+For $\omega\ne0$,
 
 $$
 \hat f(\omega)=\left[\frac{e^{-i\omega x}}{-i\omega}\right]_{-a}^{a}
 =\frac{e^{-i\omega a}-e^{i\omega a}}{-i\omega}.
 $$
 
-4. Use $e^{i\theta}-e^{-i\theta}=2i\sin\theta$:
+and $e^{i\theta}-e^{-i\theta}=2i\sin\theta$ reduces this to
 
 $$
 \hat f(\omega)=\frac{2\sin(\omega a)}{\omega}.
 $$
 
-5. At $\omega=0$, compute by continuity:
+At $\omega=0$, continuity gives
 
 $$
 \hat f(0)=\int_{-a}^{a}1\,dx=2a.
 $$
 
-Answer.
-
 $$
 \hat f(\omega)=\frac{2\sin(\omega a)}{\omega},\qquad \hat f(0)=2a.
 $$
 
-Check. The transform is real and even because the original pulse is real and even.
+The transform is real and even, as required by the symmetry of the pulse.
 
-The zeros occur when $\omega a$ is a nonzero multiple of $\pi$. Widening the pulse increases $a$, which moves the zeros closer together in frequency. This is the width tradeoff in a concrete form: a wider object in space has a narrower central spectral lobe, while a narrower object has a broader spectrum.
+The zeros occur when $\omega a$ is a nonzero multiple of $\pi$. Increasing $a$ moves them closer together: a wider object in space has a narrower central spectral lobe, while a narrower object has a broader spectrum.
 
-## Worked example 2: Solving a transformed differential equation
+## Solving $-u''+u=f$ by a multiplier
 
-Problem. Solve on the real line, formally,
+On the real line, consider
 
 $$
 -u''+u=f(x).
 $$
 
-Method.
-
-1. Take Fourier transforms:
+Taking Fourier transforms gives
 
 $$
 \mathcal{F}\{-u''\}+\mathcal{F}\{u\}=\hat f(\omega).
 $$
 
-2. Since $\mathcal{F}\{u''\}=(i\omega)^2\hat u=-\omega^2\hat u$,
+Since $\mathcal{F}\{u''\}=(i\omega)^2\hat u=-\omega^2\hat u$,
 
 $$
 \mathcal{F}\{-u''\}=\omega^2\hat u.
 $$
 
-3. The transformed equation is
+the transformed equation is
 
 $$
 \omega^2\hat u+\hat u=\hat f.
 $$
 
-4. Factor:
+Factoring,
 
 $$
 (1+\omega^2)\hat u=\hat f.
 $$
 
-5. Solve:
+and hence
 
 $$
 \hat u(\omega)=\frac{\hat f(\omega)}{1+\omega^2}.
 $$
 
-Answer. The solution is obtained by inverse transform:
+The inverse transform gives
 
 $$
 u=\mathcal{F}^{-1}\left\{\frac{\hat f(\omega)}{1+\omega^2}\right\}.
 $$
 
-Check. The factor $1/(1+\omega^2)$ damps high frequencies, so the solution is smoother than the input.
+The factor $1/(1+\omega^2)$ damps high frequencies, so the solution is smoother than the input.
 
 This algebraic multiplier is the transfer function of the operator $-d^2/dx^2+1$ on the real line. Because the denominator never vanishes, every frequency can be solved for. If the denominator had zeros on the real axis, solvability and resonance would require more careful interpretation.
 
-## Code
+## Testing the multiplier with an FFT
 
 ```python
 import numpy as np
@@ -339,7 +337,7 @@ The discrete FFT uses a finite periodic grid, so scaling and endpoint assumption
 
 The variable `omega` is arranged in FFT order, with nonnegative frequencies followed by negative frequencies. Plotting often requires `fftshift` to center zero frequency. Scaling by `dx` is included to make the discrete sum resemble the continuous integral under this convention.
 
-## Common pitfalls
+## Reading FFT output without fooling yourself
 
 - Mixing Fourier transform conventions and losing factors of $2\pi$.
 - Forgetting that the transform is usually two-sided, unlike the one-sided Laplace transform used for IVPs.
@@ -356,9 +354,8 @@ The variable `omega` is arranged in FFT order, with nonnegative frequencies foll
 - Comparing FFT amplitudes across different sample spacings without rescaling.
 - Overinterpreting noisy spectral peaks.
 
-## Connections
+<div className="see-also">
 
-- [Fourier Series](/math/engineering-math/fourier-series)
-- [Laplace Transform](/math/engineering-math/laplace-transform)
-- [PDEs by Separation of Variables](/math/engineering-math/pdes-separation-of-variables)
-- [Numerical Methods Overview](/math/engineering-math/numerical-methods-overview)
+See also: [Fourier Series](/math/engineering-math/fourier-series) · [Laplace Transform](/math/engineering-math/laplace-transform) · [PDEs by Separation of Variables](/math/engineering-math/pdes-separation-of-variables) · [Numerical Methods Overview](/math/engineering-math/numerical-methods-overview)
+
+</div>

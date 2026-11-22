@@ -9,7 +9,7 @@ Matrices organize linear information. A matrix can be a table of data, a coeffic
 
 The main surprise is that matrix arithmetic resembles ordinary arithmetic only partly. Addition behaves as expected, but multiplication is order-sensitive and dimension-sensitive. This is not a defect. It records the fact that applying one linear process after another depends on which process happens first and whether the output size of the first matches the input size of the second.
 
-## Definitions
+## Products, transposes, and special matrices
 
 An $m\times n$ matrix $A=[a_{ij}]$ has $m$ rows and $n$ columns. Two matrices are equal if they have the same size and the same corresponding entries.
 
@@ -42,7 +42,7 @@ $$
 
 The transpose $A^T$ is formed by interchanging rows and columns. A square matrix has a main diagonal. Important square matrices include the identity matrix $I$, diagonal matrices, triangular matrices, and symmetric matrices satisfying $A^T=A$.
 
-## Key results
+## Algebraic rules that survive—and those that do not
 
 Matrix addition is commutative and associative. Matrix multiplication is associative and distributes over addition:
 
@@ -114,8 +114,6 @@ It satisfies $\operatorname{tr}(A+B)=\operatorname{tr}(A)+\operatorname{tr}(B)$ 
 
 Dimension discipline is a major part of matrix algebra. Before performing any calculation, identify the shape of each matrix and the shape of the result. This habit prevents many errors and also clarifies meaning: an $m\times n$ matrix maps coordinate vectors in $\mathbb{R}^n$ to coordinate vectors in $\mathbb{R}^m$.
 
-## Visual
-
 | Operation | Condition | Result size | Key warning |
 |---|---:|---:|---|
 | $A+B$ | same size | same as $A$ and $B$ | entrywise only |
@@ -132,7 +130,7 @@ flowchart LR
   A --> Z["Output A(Bx) = (AB)x"]
 ```
 
-## Worked example 1: Compute a product and interpret columns
+## Multiplication by rows and by columns
 
 Problem: let
 
@@ -186,7 +184,7 @@ $$
 
 which matches the first column of $AB$.
 
-## Worked example 2: Show multiplication is not commutative
+## What changes when the factors are reversed
 
 Problem: compare $AB$ and $BA$ for
 
@@ -250,7 +248,7 @@ $$
 
 the products are not equal. Checked answer: both products exist, but $AB\neq BA$.
 
-## Code
+## Checking product and transpose rules in NumPy
 
 ```python
 import numpy as np
@@ -269,7 +267,7 @@ print(np.allclose((A @ B).T, B.T @ A.T))
 
 The `@` operator performs matrix multiplication in NumPy. The final line checks the transpose product rule $(AB)^T=B^TA^T$.
 
-## Common pitfalls
+## Shape checks and structural shortcuts
 
 - Multiplying corresponding entries and calling the result $AB$. Entrywise multiplication is a different operation.
 - Forgetting the dimension check before multiplying.
@@ -278,7 +276,7 @@ The `@` operator performs matrix multiplication in NumPy. The final line checks 
 - Distributing transpose without reversing order.
 - Treating the identity matrix as one fixed size. The size of $I$ depends on context.
 
-A practical way to avoid multiplication mistakes is to annotate shapes before multiplying. If $A$ is $2\times3$ and $B$ is $3\times4$, then $AB$ is $2\times4$ because the inner dimensions match and disappear, while the outer dimensions remain. If the inner dimensions do not match, the product is not defined. This simple check should happen before any entry arithmetic begins.
+Annotating shapes before multiplying prevents many errors. If $A$ is $2\times3$ and $B$ is $3\times4$, then $AB$ is $2\times4$ because the inner dimensions match and disappear, while the outer dimensions remain. If the inner dimensions do not match, the product is not defined. This check should happen before any entry arithmetic begins.
 
 When a product represents composition, read it from right to left as an action on vectors. The expression $AB\mathbf{x}$ means first compute $B\mathbf{x}$, then apply $A$. This convention explains both the order of matrix multiplication and the transpose rule. It also prevents a common modeling error: writing transformations in the order they are described verbally rather than in the order they act on the vector.
 
@@ -292,9 +290,8 @@ The identity and zero matrices play different algebraic roles. The identity matr
 
 Transpose connects row and column viewpoints. The columns of $A$ become the rows of $A^T$, and symmetric matrices are exactly those where these viewpoints match across the diagonal. This simple operation becomes important in dot products, normal equations, orthogonal matrices, and quadratic forms.
 
-## Connections
+<div className="see-also">
 
-- [Systems of Linear Equations](/math/linear-algebra/systems-of-linear-equations)
-- [Matrix Inverses and Elementary Matrices](/math/linear-algebra/matrix-inverses-and-elementary-matrices)
-- [Linear Transformations](/math/linear-algebra/linear-transformations)
-- [Numerical Linear Algebra](/math/linear-algebra/numerical-linear-algebra)
+See also: [Systems of Linear Equations](/math/linear-algebra/systems-of-linear-equations) · [Matrix Inverses and Elementary Matrices](/math/linear-algebra/matrix-inverses-and-elementary-matrices) · [Linear Transformations](/math/linear-algebra/linear-transformations) · [Numerical Linear Algebra](/math/linear-algebra/numerical-linear-algebra)
+
+</div>

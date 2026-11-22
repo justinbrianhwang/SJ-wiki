@@ -7,13 +7,9 @@ sidebar_position: 19
 
 Electronic spectroscopy probes changes in electronic state, laser chemistry exploits controlled stimulated emission, and magnetic resonance detects spin energy levels in magnetic fields. Together they extend spectroscopy from rotational and vibrational motion to excited electronic surfaces and spin-dependent structure.
 
-Atkins treats these topics as connected by transition energies, selection rules, populations, and relaxation. Whether the transition is UV-visible absorption, fluorescence, NMR, or EPR, the same physical questions recur: what are the energy levels, what couples them to radiation, and what happens after excitation?
+Transition energies, selection rules, populations, and relaxation connect the methods. For UV-visible absorption, fluorescence, NMR, and EPR alike, the useful questions are: which levels participate, what couples them to radiation, and how does the excited state relax?
 
-![A tall Bruker NMR spectrometer stands in a museum gallery.](https://commons.wikimedia.org/wiki/Special:FilePath/NMR_spectrometer.jpg)
-
-*Figure: NMR spectrometer as magnetic-resonance apparatus for spin-dependent structure. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:NMR_spectrometer.jpg), Tiia Monto, CC BY-SA 3.0.*
-
-## Definitions
+## Optical transitions and spin resonances
 
 For electronic absorption,
 
@@ -67,7 +63,7 @@ $$
 \Delta E=g\mu_BB_0
 $$
 
-## Key results
+## What happens after excitation
 
 Electronic spectra often show vibronic structure because electronic transitions change both electronic and vibrational states. The intensity pattern depends on vibrational overlap integrals:
 
@@ -115,8 +111,6 @@ EPR is analogous to NMR but electron magnetic moments are much larger, so EPR fr
 
 Magnetic resonance and optical spectroscopy often complement one another. UV-visible spectra report electronic energy gaps, fluorescence reports excited-state relaxation, NMR reports closed-shell structure and dynamics, and EPR reports radicals or paramagnetic centers. A physical chemist often combines these methods to build a consistent picture of molecular structure and change.
 
-## Visual
-
 ```mermaid
 stateDiagram-v2
   [*] --> S0
@@ -136,7 +130,7 @@ stateDiagram-v2
 | NMR | nuclear spin transitions | structure, connectivity, dynamics |
 | EPR | electron spin transitions | radicals, metal centers, hyperfine couplings |
 
-## Worked example 1: Photon energy in visible absorption
+## Energy carried by a 450 nm photon
 
 **Problem.** A molecule absorbs at $\lambda=450\ \mathrm{nm}$. Calculate the photon energy in joules and the molar excitation energy in $\mathrm{kJ\ mol^{-1}}$.
 
@@ -171,7 +165,7 @@ $$
 
 **Checked answer.** Visible photons have energies of a few hundred $\mathrm{kJ\ mol^{-1}}$, comparable with chemical bond energies.
 
-## Worked example 2: NMR frequency and chemical shift
+## Converting an NMR offset from hertz to ppm
 
 **Problem.** In a $400.000\ \mathrm{MHz}$ proton NMR spectrometer, a signal appears $1200\ \mathrm{Hz}$ downfield from TMS. What is its chemical shift?
 
@@ -208,30 +202,7 @@ $$
 
 **Checked answer.** The ppm value is independent of field strength for the same chemical environment, which is why shifts are reported in ppm.
 
-## Code
-
-```python
-import numpy as np
-
-h = 6.62607015e-34
-c = 2.99792458e8
-NA = 6.02214076e23
-
-def photon_energy(lambda_nm):
-    E = h * c / (lambda_nm * 1e-9)
-    return E, E * NA / 1000
-
-def chemical_shift(offset_hz, spectrometer_mhz):
-    return offset_hz / (spectrometer_mhz * 1e6) * 1e6
-
-for lam in [300, 450, 600]:
-    E, Em = photon_energy(lam)
-    print(f"{lam} nm: {E:.3e} J photon, {Em:.1f} kJ/mol")
-
-print("shift ppm:", chemical_shift(1200, 400.000))
-```
-
-## Common pitfalls
+## Reading spectra without overinterpreting them
 
 - Confusing absorption wavelength with fluorescence wavelength. Emission is often red-shifted after relaxation.
 - Ignoring spin selection rules when comparing fluorescence and phosphorescence.
@@ -251,9 +222,8 @@ In optical spectroscopy, concentration matters through absorbance and reabsorpti
 
 Baseline correction and calibration matter because small frequency or phase errors can be mistaken for chemical effects.
 
-## Connections
+<div className="see-also">
 
-- [Atomic structure and spectra](/chemistry/physical-chemistry/atomic-structure-and-spectra)
-- [Molecular symmetry and group theory](/chemistry/physical-chemistry/molecular-symmetry-and-group-theory)
-- [Rate laws and reaction mechanisms](/chemistry/physical-chemistry/rate-laws-and-reaction-mechanisms)
-- [Physics quantum mechanics](/physics/quantum-mechanics/)
+See also: [Atomic structure and spectra](/chemistry/physical-chemistry/atomic-structure-and-spectra) · [Molecular symmetry and group theory](/chemistry/physical-chemistry/molecular-symmetry-and-group-theory) · [Rate laws and reaction mechanisms](/chemistry/physical-chemistry/rate-laws-and-reaction-mechanisms) · [Physics quantum mechanics](/physics/quantum-mechanics/intro)
+
+</div>

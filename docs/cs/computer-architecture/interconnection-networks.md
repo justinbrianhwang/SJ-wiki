@@ -17,11 +17,11 @@ sidebar_position: 16
 
 *Figure: A crossbar switch is the canonical non-blocking router fabric. Router microarchitecture inherits the crossbar as the switch-traversal stage between virtual-channel and switch allocators. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Crossbar.svg), public domain.*
 
-Interconnection networks are the communication substrate inside and between computers. They move cache-line requests between cores, packets between router ports, DMA traffic between devices and memory, and gradient updates between accelerators. Dally and Towles organize the subject around a practical separation: choose a topology, choose routes through it, then choose flow control so packets can share links and buffers without wasting bandwidth or deadlocking [1].
+Interconnection networks are the communication substrate inside and between computers. They move cache-line requests between cores, packets between router ports, DMA traffic between devices and memory, and gradient updates between accelerators. Dally and Towles separate the design into topology, routing, and flow control so packets can share links and buffers without wasting bandwidth or deadlocking [1].
 
-This page fills the gap between single-machine architecture and warehouse-scale networking. It connects on-chip networks, off-chip fabrics such as PCIe, CXL, InfiniBand, RoCE, and NVLink, and AI-cluster fabrics. The vocabulary is shared, but constraints shift from wire energy and router area to cable cost, switch radix, fault isolation, congestion control, and collective efficiency.
+The same vocabulary connects on-chip networks, off-chip fabrics such as PCIe, CXL, InfiniBand, RoCE, and NVLink, and AI-cluster fabrics. The constraints shift from wire energy and router area to cable cost, switch radix, fault isolation, congestion control, and collective efficiency.
 
-## Definitions
+## From flits and channels to full fabrics
 
 An interconnection network is a programmable communication system that transports data between terminals. A terminal may be a core, cache slice, memory controller, I/O device, NIC, GPU, switch port, or server. The same channels and switches carry different source-destination pairs at different times [1].
 
@@ -45,7 +45,7 @@ Off-chip fabrics cover board, rack, supercomputer, and datacenter scales. PCIe i
 
 Traffic pattern matters as much as topology. Uniform random, bit-reverse, transpose, complement, nearest-neighbor, and hot-spot patterns stress different cuts and routes. Synthetic patterns expose weaknesses; trace-driven studies are needed before claiming an application will perform well. BookSim, Garnet inside gem5, and SST-style frameworks evaluate routing, flow control, and microarchitecture before hardware exists [9], [10].
 
-## Key results
+## Topology, routing, and flow control as coupled choices
 
 Topology metrics give lower bounds and feasibility checks. In a $k \times k$ mesh, $N=k^2$, degree is at most $4$, diameter is $2(k-1)$, and the narrowest straight bisection crosses $k$ links. A 2D torus adds wraparound links, keeps degree $4$, reduces diameter to $2\lfloor k/2 \rfloor$, and improves bisection. A $d$-dimensional hypercube has $N=2^d$, degree $d$, diameter $d$, and bisection width $N/2$. A $k$-ary $n$-cube trades lower distance for higher degree [1].
 
@@ -70,8 +70,6 @@ Head-of-line blocking occurs when the front packet in an input queue waits for o
 A canonical wormhole router pipeline has route computation, virtual-channel allocation, switch allocation, switch traversal, and link traversal. Body flits skip route computation and virtual-channel allocation after the head establishes state. Lookahead routing computes the next hop one router early. Speculation overlaps virtual-channel and switch allocation. Bypass paths let an arriving flit traverse a router without being written into a buffer when the output is free. These techniques trade control complexity for lower per-hop latency [1].
 
 The latency-throughput curve has a knee. At low load, latency is close to unloaded hop and serialization cost. As load rises, contention creates queueing delay; near saturation, small traffic increases cause large latency increases. Compare designs at the application load they must sustain, not only by peak link bandwidth. AI clusters add collective pressure: tensor parallelism, pipeline parallelism, and data-parallel reductions need predictable bisection bandwidth. Ring AllReduce is bandwidth-efficient on rings but takes many phases; tree and hierarchical AllReduce reduce step count but stress upper links. Topology-aware scheduling places frequent collective partners near each other and avoids overloading the same global links.
-
-## Visual
 
 ```mermaid
 flowchart TB
@@ -111,7 +109,9 @@ flowchart LR
 | Fat-tree or Clos | $O(\log N)$ stages | Can match full injection | High bisection and multipathing | Switch and cable count |
 | Dragonfly | Often small constant group hops | High if global links are balanced | Low diameter with fewer global cables | Global-link congestion sensitivity |
 
-## Worked example 1: bisection bandwidth and diameter
+The router pipeline sits beneath the topology choice. Wormhole flow control holds a virtual channel from the head flit until the tail releases it, with returned credits limiting upstream transmission to available buffer space.
+
+## Comparing bisection bandwidth and diameter
 
 Problem: Compare a $4 \times 4$ mesh, a 16-node hypercube, and a 16-terminal full-bisection fat-tree. Assume every physical link has bandwidth $B$ in each direction. Report one-way bisection bandwidth, because traffic from one half to the other is usually the limiting direction; bidirectional aggregate would be twice these values.
 
@@ -181,7 +181,7 @@ Checked answer:
 
 The mesh is cheapest and most layout-friendly, but its bisection is half the hypercube or full fat-tree here. The hypercube improves diameter and bisection at degree $4$. The fat-tree can match full injection bandwidth, but pays in switches, links, and route control.
 
-## Worked example 2: wormhole latency for a short packet
+## Timing a short wormhole packet
 
 Problem: A packet has 4 flits and travels 6 hops. Each hop has a 1-cycle router traversal and a 1-cycle link traversal. There is no contention, credit stall, clock crossing, or retransmission. What is the end-to-end wormhole latency from the head flit entering the first router to the tail flit arriving at the destination?
 
@@ -218,7 +218,7 @@ $$
 
 Checked answer: The wormhole packet latency is 15 cycles under this convention. A simulator that counts the source injection cycle separately may report 16 cycles. The architectural point is that wormhole latency adds packet serialization once, not once per hop as in naive store-and-forward movement.
 
-## Code
+## Building XY routes and measuring a cut
 
 ```python
 def node_id(x, y, width):
@@ -291,7 +291,7 @@ print("cut edges:", sorted(cut_edges))
 
 The routing table stores the next hop for every source-destination pair under deterministic XY routing. The bisection checker takes one side of a cut, counts crossing links, and multiplies by per-link bandwidth.
 
-## Common pitfalls
+## Failure modes in network comparisons
 
 - Comparing topologies by diameter alone while ignoring bisection bandwidth and traffic pattern.
 - Counting bidirectional bisection bandwidth in one network and one-way bandwidth in another.
@@ -306,17 +306,6 @@ The routing table stores the next hop for every source-destination pair under de
 - Assuming non-minimal routing improves every workload; it can waste bandwidth at low load.
 - Placing AI training workers without considering collective partners and global-link contention.
 - Treating PCIe, CXL, InfiniBand, RoCE, and NVLink as interchangeable because all move bytes.
-
-## Connections
-
-- [Cache Coherence](/cs/computer-architecture/coherence-consistency-mesi)
-- [Multicore Synchronization](/cs/computer-architecture/multicore-synchronization-numa)
-- [Vector, SIMD, and GPU Architectures](/cs/computer-architecture/vector-simd-gpu)
-- [Domain-Specific Accelerators](/cs/computer-architecture/domain-specific-accelerators)
-- [Warehouse-Scale Computers](/cs/computer-architecture/warehouse-scale-computers)
-- [Quantitative Design and Performance](/cs/computer-architecture/quantitative-design-and-performance)
-- [Computer Networks](/cs/computer-networks/intro)
-- [Distributed Systems](/cs/distributed-systems/intro)
 
 ## References
 
@@ -349,3 +338,9 @@ The routing table stores the next hop for every source-destination pair under de
 [14] A. Singh et al., "Jupiter rising: A decade of Clos topologies and centralized control in Google's datacenter network," in *Proc. ACM SIGCOMM*, 2015, pp. 183-197.
 
 [15] CXL Consortium, *Compute Express Link Specification*, Rev. 3.0, 2022.
+
+<div className="see-also">
+
+See also: [Cache Coherence](/cs/computer-architecture/coherence-consistency-mesi) · [Multicore Synchronization](/cs/computer-architecture/multicore-synchronization-numa) · [Vector, SIMD, and GPU Architectures](/cs/computer-architecture/vector-simd-gpu) · [Domain-Specific Accelerators](/cs/computer-architecture/domain-specific-accelerators) · [Warehouse-Scale Computers](/cs/computer-architecture/warehouse-scale-computers) · [Quantitative Design and Performance](/cs/computer-architecture/quantitative-design-and-performance) · [Computer Networks](/cs/computer-networks/intro) · [Distributed Systems](/cs/distributed-systems/intro)
+
+</div>

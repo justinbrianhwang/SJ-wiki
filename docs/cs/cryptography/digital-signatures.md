@@ -7,9 +7,9 @@ sidebar_position: 14
 
 Digital signatures are the public-key analogue of message authentication, but with a crucial difference: verification uses a public key. Anyone can check a valid signature, while only the signer should be able to create one. This gives integrity, origin authentication, and transferability in settings where a shared MAC key would not be enough.
 
-Katz and Lindell present signatures through formal unforgeability definitions, hash-and-sign, RSA-FDH, Schnorr, DSA, ECDSA, certificate infrastructure, and TLS. Smart adds concrete public-key signature algorithms, implementation concerns, and the connection between signatures and authentic public keys. The modern view is that a signature scheme is not just a trapdoor operation; it is a randomized or carefully encoded protocol with a security proof target.
+Katz and Lindell present signatures through formal unforgeability definitions, hash-and-sign, RSA-FDH, Schnorr, DSA, ECDSA, certificate infrastructure, and TLS. Smart adds concrete public-key signature algorithms, implementation concerns, and the connection between signatures and authentic public keys. The modern view treats a signature scheme as a randomized or carefully encoded protocol with a security proof target, rather than a bare trapdoor operation.
 
-## Definitions
+## The signing interface and its adversary
 
 A **digital signature scheme** has three algorithms:
 
@@ -51,7 +51,7 @@ $$
 
 DSA and ECDSA are standardized discrete-log-style signatures. They are widely deployed but highly sensitive to nonce generation.
 
-## Key results
+## Why “encrypt with the private key” fails
 
 Signatures require stronger care than "encrypt with the private key." Plain RSA signing $\sigma=m^d\bmod N$ is algebraically forgeable. For example, if an attacker chooses $\sigma$ first and sets $m=\sigma^e\bmod N$, then $\sigma$ verifies as a signature on $m$. Real RSA signatures use encodings such as RSA-PSS or full-domain hashing models.
 
@@ -91,16 +91,16 @@ Batch verification and aggregate signatures add more engineering tradeoffs. They
 
 A verifier should therefore treat the published verification algorithm as a complete specification, not as a suggestion that can be partially implemented.
 
-## Visual
+## Signing and public verification
 
 ```mermaid
 sequenceDiagram
-  participant S as Signer
-  participant V as Verifier
-  S->>S: sigma = Sign_sk(m)
-  S->>V: m, sigma, pk
-  V->>V: Vrfy_pk("m, sigma")
-  V-->>S: accept or reject
+  participant S as "Signer"
+  participant V as "Verifier"
+  S->>S: "sigma = Sign_sk(m)"
+  S->>V: "send m, sigma, pk"
+  V->>V: "evaluate Vrfy_pk("m, sigma")"
+  V-->>S: "accept or reject"
 ```
 
 | Scheme | Assumption family | Random nonce? | Main warning |
@@ -111,11 +111,9 @@ sequenceDiagram
 | DSA/ECDSA | discrete log | yes | biased or repeated nonce is fatal |
 | Hash-based signatures | hash assumptions | varies | larger signatures/state tradeoffs |
 
-## Worked example 1: toy RSA-FDH verification
+## RSA-FDH arithmetic with toy parameters
 
-Problem: use toy RSA key $N=55$, $e=3$, $d=27$. Suppose a hash-to-domain function gives $H(m)=12$. Compute the RSA-FDH signature and verify it.
-
-Method:
+Use the toy RSA key $N=55$, $e=3$, $d=27$, with hash-to-domain output $H(m)=12$.
 
 1. Sign:
 
@@ -152,13 +150,11 @@ $$
 
 5. Since $\sigma^e\equiv H(m)$, verification accepts.
 
-Checked answer: signature $\sigma=23$ verifies for digest $12$. Toy parameters are insecure.
+The signature $\sigma=23$ verifies for digest $12$. These parameters are far too small for security.
 
-## Worked example 2: Schnorr signature and verification
+## A complete Schnorr verification
 
-Problem: use $p=23$, subgroup order $q=11$, generator $g=2$, secret $x=4$, public key $y=g^x\bmod p=16$. Let nonce $r=3$ and challenge hash value $e=7$. Compute a Schnorr-style signature and verify it.
-
-Method:
+Use $p=23$, subgroup order $q=11$, generator $g=2$, secret $x=4$, public key $y=g^x\bmod p=16$, nonce $r=3$, and challenge hash value $e=7$.
 
 1. Commitment:
 
@@ -204,9 +200,9 @@ $$
 R\cdot y^e\equiv8\cdot18=144\equiv6.
 $$
 
-Checked answer: both sides equal $6$, so the signature verifies.
+Both sides equal $6$, so the signature verifies.
 
-## Code
+## Executing the Schnorr equations
 
 ```python
 import hashlib
@@ -232,7 +228,7 @@ sig = schnorr_sign(p, q, g, x, b"pay bob", r=3)
 print(sig, schnorr_verify(p, q, g, y, b"pay bob", sig))
 ```
 
-## Common pitfalls
+## What verification does not prove
 
 - Describing signatures as "private-key encryption." That analogy hides important security requirements.
 - Using raw RSA signatures without encoding.
@@ -241,9 +237,8 @@ print(sig, schnorr_verify(p, q, g, y, b"pay bob", sig))
 - Hashing messages without domain separation across protocols.
 - Treating signature verification success as proof that the signer intended every surrounding context.
 
-## Connections
+<div className="see-also">
 
-- [RSA and OAEP](/cs/cryptography/rsa-and-oaep)
-- [Discrete logarithms and Diffie-Hellman](/cs/cryptography/discrete-log-diffie-hellman)
-- [TLS protocol overview](/cs/cryptography/tls-protocol-overview)
-- [Post-quantum cryptography](/cs/cryptography/post-quantum-cryptography)
+See also: [RSA and OAEP](/cs/cryptography/rsa-and-oaep) · [Discrete logarithms and Diffie-Hellman](/cs/cryptography/discrete-log-diffie-hellman) · [TLS protocol overview](/cs/cryptography/tls-protocol-overview) · [Post-quantum cryptography](/cs/cryptography/post-quantum-cryptography)
+
+</div>

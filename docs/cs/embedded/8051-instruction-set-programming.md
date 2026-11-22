@@ -5,11 +5,11 @@ sidebar_position: 8
 
 # 8051 Instruction Set and Programming
 
-The 8051 programming chapter follows the hardware chapter because the instruction set reflects the chip's memory organization. Unlike the 8085, the 8051 has explicit support for bit operations, separate program and data spaces, special function registers, register banks, and external memory access. A correct 8051 program is therefore not just a sequence of mnemonics; it is a sequence of accesses to the correct memory space.
+The 8051 programming chapter follows the hardware chapter because the instruction set reflects the chip's memory organization. Unlike the 8085, the 8051 has explicit support for bit operations, separate program and data spaces, special function registers, register banks, and external memory access. A correct program must pair each mnemonic with the intended memory space.
 
 The programmer's goal is to choose the shortest clear instruction that matches the target: internal RAM, SFR, program-memory table, external RAM, single bit, or port pin. When that choice is right, 8051 assembly is compact and expressive.
 
-## Definitions
+## Addressing modes and the three move families
 
 The **8051 instruction set** includes data transfer, arithmetic, logical, Boolean bit, branch, call/return, and machine-control instructions.
 
@@ -29,11 +29,11 @@ The **8051 instruction set** includes data transfer, arithmetic, logical, Boolea
 
 The **carry flag `C`** is both an arithmetic flag and a Boolean accumulator for bit instructions. Many bit operations move values through `C`.
 
-## Key results
+## Instruction behavior beyond data movement
 
-The first key result is that the 8051 is strong at bit manipulation. A single instruction can set, clear, complement, test, or branch on a bit. This makes port control, status flags, and interrupt flags efficient.
+The 8051 is strong at bit manipulation. A single instruction can set, clear, complement, test, or branch on a bit, so port control, status flags, and interrupt flags need little scaffolding.
 
-The second key result is that `DJNZ` combines decrement and branch. It is the standard counted-loop instruction:
+`DJNZ` combines decrement and branch. It is the standard counted-loop instruction:
 
 ```asm
 DJNZ R7,LOOP
@@ -41,23 +41,21 @@ DJNZ R7,LOOP
 
 It decrements `R7` and jumps if the result is not zero. This avoids a separate compare in many loops.
 
-The third key result is that multiplication and division use `A` and `B`. `MUL AB` produces a 16-bit product with the low byte in `A` and high byte in `B`. `DIV AB` divides `A` by `B`, leaving quotient in `A` and remainder in `B`.
+Multiplication and division use `A` and `B`. `MUL AB` produces a 16-bit product with the low byte in `A` and high byte in `B`. `DIV AB` divides `A` by `B`, leaving quotient in `A` and remainder in `B`.
 
-The fourth key result is that code-memory tables are read by `MOVC`, not by ordinary `MOV`. If `DPTR` points to a table and `A` holds an index, then `MOVC A,@A+DPTR` loads the table byte into `A`.
+Code-memory tables are read by `MOVC`, not by ordinary `MOV`. If `DPTR` points to a table and `A` holds an index, then `MOVC A,@A+DPTR` loads the table byte into `A`.
 
-The fifth key result is that external memory access is explicit. `MOVX A,@DPTR` reads external data memory at the 16-bit address in `DPTR`; `MOVX @DPTR,A` writes it. This causes external bus activity on ports 0 and 2 in classic external-memory systems.
+External memory access is explicit. `MOVX A,@DPTR` reads external data memory at the 16-bit address in `DPTR`; `MOVX @DPTR,A` writes it. The instruction causes external bus activity on ports 0 and 2 in classic external-memory systems.
 
-The sixth key result is that branches have range limits. `SJMP` and many conditional branches are relative and compact, but they only reach nearby labels. `LJMP` and `LCALL` use full 16-bit program addresses.
+Branches have range limits. `SJMP` and many conditional branches are relative and compact, but they only reach nearby labels. `LJMP` and `LCALL` use full 16-bit program addresses.
 
-The seventh key result is that 8051 Boolean instructions are not merely conveniences; they are a separate programming style. The carry flag can hold a bit value, combine it with another bit, and write it back. For example, a program can move `P3.2` into `C`, AND it with a software enable flag, and branch or drive an output bit. This is much more direct than reading a full byte, masking it, shifting it, and writing it back. The price is that carry becomes shared state, so arithmetic code and bit-control code must not accidentally overwrite each other's condition.
+Boolean instructions form a separate programming style. The carry flag can hold a bit value, combine it with another bit, and write it back. For example, a program can move `P3.2` into `C`, AND it with a software enable flag, and branch or drive an output bit. That is more direct than reading a full byte, masking it, shifting it, and writing it back. The price is that carry becomes shared state, so arithmetic code and bit-control code must not accidentally overwrite each other's condition.
 
-The eighth key result is that calls and interrupts interact with the stack just as on larger machines. `ACALL` and `LCALL` push a return address, and `RET` pops it. Interrupt entry also saves a return address, while the ISR must save any ordinary registers it changes. Because classic internal RAM is small, stack depth should be estimated. A program with nested calls, serial interrupts, and timer interrupts can consume more stack than a simple foreground loop.
+Calls and interrupts share the small internal stack. `ACALL` and `LCALL` push a return address, and `RET` pops it. Interrupt entry also saves a return address, while the ISR must save any ordinary registers it changes. Estimate the maximum depth: nested calls plus serial and timer interrupts can consume much more stack than a simple foreground loop.
 
-The ninth key result is that instruction choice communicates intent. `CLR P1.0` says "clear this bit." `ANL P1,#0FEH` may produce the same external level, but it performs a read-modify-write operation on the whole port latch. On quasi-bidirectional 8051 ports, read-modify-write behavior is significant. Prefer bit instructions for independent control bits and byte instructions when the whole port value is deliberately managed.
+Instruction choice also communicates intent. `CLR P1.0` says "clear this bit." `ANL P1,#0FEH` may produce the same external level, but it performs a read-modify-write operation on the whole port latch. On quasi-bidirectional 8051 ports, that behavior matters. Prefer bit instructions for independent control bits and byte instructions when the whole port value is deliberately managed.
 
-The tenth key result is that external lookup tables and internal variables should be kept conceptually separate. A display font stored after a `DB` directive in program memory is not modified at run time and is fetched with `MOVC`. A changing counter in internal RAM is modified with `MOV`. A buffer in external RAM is moved with `MOVX`. Writing comments that name the memory space beside each symbol prevents a common class of bugs where the right address is accessed with the wrong instruction family.
-
-## Visual
+Keep lookup tables and mutable variables conceptually separate. A display font stored after a `DB` directive in program memory is constant and is fetched with `MOVC`. A changing counter in internal RAM is modified with `MOV`. A buffer in external RAM is moved with `MOVX`. Comments that name the memory space beside each symbol prevent bugs where the right address is accessed with the wrong instruction family.
 
 ```mermaid
 flowchart TD
@@ -83,7 +81,7 @@ flowchart TD
 | `MUL AB` | Unsigned multiply | `B:A` | Product is 16 bits |
 | `DIV AB` | Unsigned divide | `A` quotient, `B` remainder | Overflow if divide by zero |
 
-## Worked example 1: Table lookup for seven-segment display
+## Looking up a seven-segment pattern
 
 Problem: A digit from 0 to 9 is in `A`. Use a program-memory lookup table to replace it with a seven-segment code.
 
@@ -118,7 +116,7 @@ SEG_TAB:
 
 Check: The table has exactly ten entries. If `A` is greater than 9, `MOVC` will read beyond the intended table, so the caller must validate the digit.
 
-## Worked example 2: Adding two 16-bit values
+## Propagating carry through a 16-bit addition
 
 Problem: Add the 16-bit number in `31H:30H` to the 16-bit number in `33H:32H`. Store the result in `35H:34H`, low byte first. Use 8051 assembly.
 
@@ -146,7 +144,7 @@ Answer:
 
 Check: If `ADDC` were replaced by `ADD`, a carry from the low byte would be lost. Multi-byte arithmetic must propagate carry upward.
 
-## Code
+## Copying external RAM into internal RAM
 
 ```asm
 ; 8051: copy 16 bytes from external RAM 2000H to internal RAM 30H.
@@ -165,7 +163,7 @@ COPY:   MOVX A,@DPTR     ; read external data memory
         SJMP $
 ```
 
-## Common pitfalls
+## Mnemonics that look deceptively similar
 
 - Omitting `#` for immediate data. `MOV A,#30H` loads value `30H`; `MOV A,30H` loads from internal address `30H`.
 - Using `MOV` when external data memory requires `MOVX`.
@@ -175,9 +173,8 @@ COPY:   MOVX A,@DPTR     ; read external data memory
 - Assuming `SJMP` can reach any label. Use long jumps or reorganize code when the target is out of range.
 - Ignoring the `B` register after `MUL AB` or `DIV AB`; it holds part of the result.
 
-## Connections
+<div className="see-also">
 
-- [8051 architecture, memory, and ports](/cs/embedded/8051-architecture-memory-ports)
-- [8051 timers, serial port, and interrupts](/cs/embedded/8051-timers-serial-interrupts)
-- [8051 external-world interfacing](/cs/embedded/8051-external-world-interfacing)
-- [Serial buses and embedded protocols](/cs/embedded/serial-buses-embedded-protocols)
+See also: [8051 architecture, memory, and ports](/cs/embedded/architecture-memory-ports) · [8051 timers, serial port, and interrupts](/cs/embedded/timers-serial-interrupts) · [8051 external-world interfacing](/cs/embedded/external-world-interfacing) · [Serial buses and embedded protocols](/cs/embedded/serial-buses-embedded-protocols)
+
+</div>

@@ -393,9 +393,8 @@ print(laplace_jacobi(100.0, 0.0, 0.0, 0.0, n=1))
 - Using centered differences for advection-dominated hyperbolic problems without stabilization.
 - Refining space without refining time consistently for transient problems.
 
-## Related pages
+<div className="see-also">
 
-- [boundary value problems](/math/numerical-analysis/boundary-value-problems)
-- [matrix factorizations and special systems](/math/numerical-analysis/matrix-factorizations-special-systems)
-- [iterative linear systems](/math/numerical-analysis/iterative-linear-systems)
-- [ODE stability stiffness and systems](/math/numerical-analysis/ode-stability-stiffness-systems)
+See also: [boundary value problems](/math/numerical-analysis/boundary-value-problems) · [matrix factorizations and special systems](/math/numerical-analysis/matrix-factorizations-special-systems) · [iterative linear systems](/math/numerical-analysis/iterative-linear-systems) · [ODE stability stiffness and systems](/math/numerical-analysis/ode-stability-stiffness-systems)
+
+</div>

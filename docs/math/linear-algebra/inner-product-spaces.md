@@ -7,13 +7,9 @@ sidebar_position: 13
 
 An inner product space is a vector space with a generalized dot product. Once an inner product is specified, abstract vectors can have length, angle, distance, projection, and orthogonality. This lets the geometry of $\mathbb{R}^n$ apply to polynomials, functions, matrices, and other vector spaces.
 
-![David Hilbert is shown wearing a hat in a historical photograph.](https://commons.wikimedia.org/wiki/Special:FilePath/Hilbert.jpg)
-
-*Figure: David Hilbert's work frames modern foundations, geometry, and infinite-dimensional thinking. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hilbert.jpg), Unknown author, public domain.*
-
 The important shift is that geometry is not tied to columns of numbers. A polynomial can be orthogonal to another polynomial, a function can have a norm, and a matrix can have a length. The inner product is the extra structure that tells us how to measure these objects.
 
-## Definitions
+## Choosing geometry on a vector space
 
 An inner product on a real vector space $V$ assigns a scalar $\langle \mathbf{u},\mathbf{v}\rangle$ to each pair of vectors and satisfies:
 
@@ -42,7 +38,7 @@ $$
 \langle A,B\rangle=\operatorname{tr}(B^TA)=\sum_{i,j}a_{ij}b_{ij}.
 $$
 
-## Key results
+## Inequalities, projections, and orthonormal coordinates
 
 The Cauchy-Schwarz inequality holds in every real inner product space:
 
@@ -102,7 +98,7 @@ $$
 \frac14\left(\|\mathbf{u}+\mathbf{v}\|^2-\|\mathbf{u}-\mathbf{v}\|^2\right).
 $$
 
-So once the inner product is chosen, lengths determine angles; and once lengths and angles are known, projection and approximation follow. This is why inner products are the correct abstraction for Euclidean geometry.
+Once the inner product is chosen, lengths determine angles; once lengths and angles are known, projection and approximation follow. Inner products are therefore the appropriate abstraction for Euclidean geometry.
 
 Orthogonal sets behave especially well. If $\mathbf{v}_1,\ldots,\mathbf{v}_k$ are nonzero and mutually orthogonal, then they are linearly independent. Suppose
 
@@ -126,8 +122,6 @@ $$
 
 This is the abstract version of resolving a vector into perpendicular coordinate axes. Fourier series use the same principle in infinite-dimensional function spaces: coefficients are inner products with orthogonal basis functions.
 
-## Visual
-
 | Space | Vectors look like | Example inner product | Norm |
 |---|---|---|---|
 | $\mathbb{R}^n$ | columns | $\mathbf{u}^T\mathbf{v}$ | Euclidean length |
@@ -145,7 +139,7 @@ flowchart TD
   D --> G["Orthonormal bases"]
 ```
 
-## Worked example 1: Orthogonal polynomials on an interval
+## Orthogonal polynomials under an integral inner product
 
 Problem: in $P_2$ with
 
@@ -196,7 +190,7 @@ $$
 
 Checked answer: $\langle 1,x\rangle=0$ and $\|x\|=\sqrt{2/3}$.
 
-## Worked example 2: Project a polynomial onto a subspace
+## The best constant approximation to a quadratic
 
 Problem: project $f(x)=x^2$ onto the subspace $W=\operatorname{span}\{1\}$ in $P_2$ using the inner product
 
@@ -253,7 +247,7 @@ $$
 
 Checked answer: the best constant approximation to $x^2$ on $[-1,1]$ in this inner product is $1/3$.
 
-## Code
+## Verifying the projection symbolically
 
 ```python
 import sympy as sp
@@ -275,7 +269,7 @@ print(sp.sqrt(inner(x, x)))
 
 The function `inner` encodes the chosen geometry. Changing the interval or adding a weight function changes lengths, angles, and projections.
 
-## Common pitfalls
+## What changes with the space, weight, and scalar field
 
 - Assuming there is only one possible inner product on a vector space.
 - Forgetting positive definiteness: $\langle \mathbf{v},\mathbf{v}\rangle$ must be positive for every nonzero vector.
@@ -290,9 +284,9 @@ Projection in an inner product space should always be followed by an orthogonali
 
 The choice of inner product can change what "best" means. The constant function that best approximates $x^2$ on $[-1,1]$ under the ordinary integral inner product is its average value over that interval. With a weighted inner product, the best constant would emphasize some parts of the interval more than others. Thus approximation results are always relative to the chosen geometry.
 
-In complex vector spaces, the inner product axioms are adjusted with conjugation: symmetry becomes conjugate symmetry, and linearity is usually placed in one argument with conjugate linearity in the other. This page uses real inner products, but the complex convention is essential in Fourier analysis, quantum mechanics, and many numerical algorithms.
+In complex vector spaces, the inner product axioms are adjusted with conjugation: symmetry becomes conjugate symmetry, and linearity is usually placed in one argument with conjugate linearity in the other. The formulas above use real inner products, but the complex convention is essential in Fourier analysis, quantum mechanics, and many numerical algorithms.
 
-Finite-dimensional inner product spaces are especially close to $\mathbb{R}^n$ once an orthonormal basis is chosen. The coordinates of a vector in that basis behave exactly like ordinary Euclidean coordinates, and the inner product becomes a dot product of coordinate vectors. This is why orthonormal bases are so valuable: they convert abstract geometry into familiar arithmetic.
+Finite-dimensional inner product spaces are especially close to $\mathbb{R}^n$ once an orthonormal basis is chosen. The coordinates of a vector in that basis behave exactly like ordinary Euclidean coordinates, and the inner product becomes a dot product of coordinate vectors. Orthonormal bases convert abstract geometry into familiar arithmetic.
 
 For function spaces, orthogonality often expresses cancellation rather than pointwise separation. The functions $1$ and $x$ on $[-1,1]$ are orthogonal because the positive area on one side cancels the negative area on the other side in the integral of their product. They are not perpendicular at each point. This integral viewpoint is essential for Fourier series and polynomial approximation.
 
@@ -308,11 +302,10 @@ Not every norm comes from an inner product. This identity is one way to recogniz
 
 Inner product spaces are the natural setting for approximation because "closest" requires a notion of distance. Without an inner product or at least a norm, the phrase "best approximation" is incomplete. Once an inner product is chosen, projection gives a precise and computable answer.
 
-This is also why orthogonality is more than a visual idea. In polynomial and function spaces, perpendicularity means zero inner product, often an integral cancellation. The same projection theorem that works for arrows then supports Fourier coefficients, least-squares fits, and orthogonal polynomial expansions.
+Orthogonality is therefore more than a visual idea. In polynomial and function spaces, perpendicularity means zero inner product, often an integral cancellation. The same projection theorem that works for arrows then supports Fourier coefficients, least-squares fits, and orthogonal polynomial expansions.
 
-## Connections
+<div className="see-also">
 
-- [Orthogonality in Rn](/math/linear-algebra/orthogonality-in-rn)
-- [Orthogonality, Gram-Schmidt, and QR](/math/linear-algebra/orthogonality-qr-gram-schmidt)
-- [Least Squares](/math/linear-algebra/least-squares)
-- [General Vector Spaces](/math/linear-algebra/vector-spaces)
+See also: [Orthogonality in Rn](/math/linear-algebra/orthogonality-in-rn) · [Orthogonality, Gram-Schmidt, and QR](/math/linear-algebra/orthogonality-qr-gram-schmidt) · [Least Squares](/math/linear-algebra/least-squares) · [General Vector Spaces](/math/linear-algebra/vector-spaces)
+
+</div>

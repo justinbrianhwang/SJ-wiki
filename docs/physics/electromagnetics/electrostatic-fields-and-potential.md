@@ -396,9 +396,8 @@ The uniform field points from the high-potential plate toward the low-potential 
 - The formula $\vec D=\epsilon\vec E$ assumes a linear isotropic material. Anisotropic media require a permittivity tensor, and nonlinear media require a constitutive relation rather than one constant.
 - A zero field at a point says the local slope of $V$ is zero. It says nothing by itself about the numerical value of $V$ or whether the equilibrium is stable.
 
-## Related pages
+<div className="see-also">
 
-- [Vector algebra and coordinate systems](/physics/electromagnetics/vector-algebra-coordinate-systems)
-- [Gradient, divergence, curl, and integral theorems](/physics/electromagnetics/gradient-divergence-curl-integral-theorems)
-- [Gauss law, dielectrics, and boundaries](/physics/electromagnetics/gauss-law-dielectrics-and-boundaries)
-- [Capacitance, energy, and image method](/physics/electromagnetics/capacitance-energy-and-image-method)
+See also: [Vector algebra and coordinate systems](/physics/electromagnetics/vector-algebra-coordinate-systems) · [Gradient, divergence, curl, and integral theorems](/physics/electromagnetics/gradient-divergence-curl-integral-theorems) · [Gauss law, dielectrics, and boundaries](/physics/electromagnetics/gauss-law-dielectrics-and-boundaries) · [Capacitance, energy, and image method](/physics/electromagnetics/capacitance-energy-and-image-method)
+
+</div>

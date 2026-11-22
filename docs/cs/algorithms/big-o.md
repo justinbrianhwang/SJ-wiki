@@ -291,10 +291,8 @@ Amortized time has no probability distribution. It bounds the total cost of any 
 - Hash-table lookup is commonly $O(1)$ expected and $O(n)$ worst case. Writing only $O(1)$ loses the qualification that makes the claim accurate.
 - If $n$ is small or capped by the domain, asymptotics alone may not decide the implementation. Memory traffic and constant factors can dominate.
 
-## Related pages
+<div className="see-also">
 
-- [Algorithms and complexity](/math/discrete/algorithms-and-complexity)
-- [Recurrence relations](/math/discrete/recurrence-relations)
-- [Divide and conquer](/cs/algorithms/divide-and-conquer)
-- [Sorting algorithms](/cs/algorithms/sorting-algorithms)
-- [Time complexity, P, and NP](/cs/theory/time-complexity-p-and-np)
+See also: [Algorithms and complexity](/math/discrete/algorithms-and-complexity) · [Recurrence relations](/math/discrete/recurrence-relations) · [Divide and conquer](/cs/algorithms/divide-and-conquer) · [Sorting algorithms](/cs/algorithms/sorting-algorithms) · [Time complexity, P, and NP](/cs/theory/time-complexity-p-and-np)
+
+</div>

@@ -7,9 +7,9 @@ sidebar_position: 2
 
 Control systems engineering studies how to make a dynamic system behave in a desired way despite uncertainty, disturbances, and imperfect components. Nise's opening chapter frames the subject as a design loop: translate requirements into a physical system, draw the functional block diagram, derive a mathematical model, reduce interconnected subsystems, then analyze and redesign until transient response, steady-state error, and stability meet specifications.
 
-The central idea is feedback. In an open-loop system the command passes forward to the plant without measuring the result. In a closed-loop system the output is sensed and compared with the reference, producing an error signal that drives correction. The price of feedback is extra hardware, modeling effort, and possible instability; the benefit is accuracy, disturbance rejection, and tunable dynamics. This page sets the vocabulary used by the modeling, response, stability, and design pages that follow.
+The central idea is feedback. In an open-loop system the command passes forward to the plant without measuring the result. In a closed-loop system the output is sensed and compared with the reference, producing an error signal that drives correction. The price of feedback is extra hardware, modeling effort, and possible instability; the benefit is accuracy, disturbance rejection, and tunable dynamics.
 
-## Definitions
+## The signals and components in a feedback loop
 
 A **control system** is an interconnection of components whose purpose is to cause an output, often called the controlled variable, to follow or regulate against an input, often called the reference or command. A **plant** or **process** is the physical subsystem being controlled: a motor-load assembly, furnace, aircraft attitude channel, chemical reactor, disk-drive head, or antenna. A **controller** produces the actuator signal that drives the plant.
 
@@ -33,7 +33,7 @@ Nise emphasizes three major performance objectives. **Transient response** descr
 
 Standard test inputs include the impulse $\delta(t)$, step $u(t)$, ramp $t u(t)$, parabolic input $\frac{1}{2}t^2u(t)$, and sinusoid $\sin \omega t$. They are not arbitrary classroom choices: they expose different control properties. A step reveals transient behavior and position accuracy, a ramp reveals velocity tracking error, and sinusoids support frequency-response analysis.
 
-## Key results
+## From loop equations to a design cycle
 
 The basic negative-feedback relation follows from the summing junction and block equations. Let the forward path be $G(s)=G_c(s)G_p(s)$ and the feedback path be $H(s)$. Then
 
@@ -52,7 +52,7 @@ $$
 T(s)=\frac{G(s)}{1+G(s)H(s)}.
 $$
 
-This formula already shows why feedback can be helpful and dangerous. Large loop gain $G(s)H(s)$ can reduce sensitivity to plant gain changes and disturbances entering after the controller, but the same denominator $1+G(s)H(s)$ determines closed-loop poles. If those poles move into the right half of the $s$-plane, the controlled system becomes unstable even when the open-loop plant is individually stable.
+The same formula contains both the benefit and the risk of feedback. Large loop gain $G(s)H(s)$ can reduce sensitivity to plant gain changes and disturbances entering after the controller, but the denominator $1+G(s)H(s)$ determines closed-loop poles. If those poles move into the right half of the $s$-plane, the controlled system becomes unstable even when the open-loop plant is individually stable.
 
 For unity feedback, the error transfer function is
 
@@ -83,7 +83,7 @@ Feedback also changes the economics of a design. A higher-quality sensor may red
 
 Finally, a control diagram should be read as a hypothesis. The arrows and transfer functions assert what affects what, which effects are linear, and which dynamics are negligible. Simulation and laboratory testing are not afterthoughts; they are the checks that decide whether the hypothesis is good enough. When the measured response disagrees with the model, the right response is not to force the data into the old block diagram, but to revisit assumptions such as friction, saturation, sensor delay, backlash, and parameter uncertainty.
 
-## Visual
+### The complete loop, including disturbances and sensor noise
 
 ```mermaid
 flowchart LR
@@ -117,7 +117,7 @@ This diagram shows the classical feedback architecture with explicit reference `
 | Typical examples | toaster timer, fixed motor drive | thermostat, antenna positioning, cruise control |
 | Main design variables | calibration and feedforward command | gain, compensator dynamics, sensor dynamics |
 
-## Worked example 1: closed-loop transfer function
+## Closing a proportional-control loop
 
 Problem: A unity-feedback system has controller $G_c(s)=K$ and plant
 
@@ -160,7 +160,7 @@ $$
 
 Checked answer: $T(s)=10K/(s^2+2s+10K)$. For $K\gt 0$, the second-order denominator has positive coefficients, but later Routh-Hurwitz analysis will give the more general stability test. Here the roots have real part $-1$ for all positive $K$, so the system is stable for $K\gt 0$.
 
-## Worked example 2: disturbance rejection comparison
+## Comparing open- and closed-loop disturbance rejection
 
 Problem: A plant output is affected by an additive constant disturbance $D(s)$ after the plant. The forward path is $G(s)=20/(s+4)$ with unity feedback. Compare the output due to a unit-step disturbance for open-loop and closed-loop operation when the reference is zero.
 
@@ -220,7 +220,7 @@ $$
 
 Checked answer: feedback reduces the steady disturbance effect from $1$ to $1/6$. The disturbance is not eliminated because the loop has finite dc gain $G(0)=5$.
 
-## Code
+## Inspecting the closed-loop step response
 
 ```python
 import numpy as np
@@ -241,7 +241,7 @@ print(f"percent overshoot approx: {overshoot:.1f}")
 print(f"closed-loop poles: {np.roots(den)}")
 ```
 
-## Common pitfalls
+## Misreadings of the basic feedback diagram
 
 - Treating feedback as automatically beneficial. Feedback changes the denominator of the closed-loop transfer function; it can create instability.
 - Calling every summing-junction output an error. It is exactly the physical error only when the reference and feedback signals are in comparable units and sensor scaling is unity.
@@ -249,10 +249,14 @@ print(f"closed-loop poles: {np.roots(den)}")
 - Confusing transient response with natural response. The visible transient is the portion of the total response before steady behavior dominates; the natural response is the system-dependent homogeneous component.
 - Using only a step input. Different specifications require different tests: ramps for velocity error, sinusoids for frequency response, and impulses for natural dynamics.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Laplace transfer functions](/cs/control-engineering/laplace-transfer-functions-and-linearization) develop the algebra behind block diagrams.
 - [Time response](/cs/control-engineering/time-response-first-and-second-order) defines the transient specifications used in design.
 - [Routh-Hurwitz stability](/cs/control-engineering/routh-hurwitz-stability) tests whether the feedback denominator is stable.
 - [Steady-state error](/cs/control-engineering/steady-state-errors-and-sensitivity) quantifies the final tracking mismatch.
 - [Applied vehicle control](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley) uses the same feedback ideas in path tracking.
+
+</div>

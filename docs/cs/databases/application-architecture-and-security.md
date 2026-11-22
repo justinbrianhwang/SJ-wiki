@@ -9,7 +9,7 @@ Database systems rarely stand alone. Applications connect to them through driver
 
 Security is not a separate final step. It begins with schema design, least-privilege accounts, parameterized queries, authorization checks, and careful transaction boundaries. A database-backed application that is functionally correct under friendly inputs can still fail badly if it concatenates SQL strings, leaks data through overbroad queries, or grants write privileges where read privileges would suffice.
 
-## Definitions
+## The layers between a client and its data
 
 A **database application architecture** describes how clients, application servers, and database servers communicate. A two-tier architecture lets clients connect directly to the database. A three-tier architecture places application servers between clients and the database, centralizing business logic, authentication, and connection management.
 
@@ -21,7 +21,7 @@ A **prepared statement** is a SQL statement parsed with parameter placeholders. 
 
 **SQL injection** occurs when untrusted input is interpreted as SQL syntax. **Encryption in transit** protects network traffic. **Encryption at rest** protects stored files or backups. **Auditing** records relevant access and changes for accountability.
 
-## Key results
+## Where application design meets database guarantees
 
 Parameterized SQL separates code from data. If a user enters `x' OR '1'='1`, a prepared statement treats the entire string as a value. String concatenation may turn that input into executable predicate logic. This is one of the clearest cases where the correct programming interface matters more than manual escaping.
 
@@ -41,11 +41,9 @@ Performance bugs often come from application query patterns rather than single b
 
 Migrations should be compatible with running application versions. A common safe pattern is expand, migrate, contract: add new nullable structures, deploy code that writes both old and new forms or reads both, backfill data, switch reads, then remove the old structure later. This reduces downtime and avoids breaking rolling deployments where old and new application instances run at the same time.
 
-Observability closes the loop between design and operation. Slow-query logs, execution plans, pool metrics, lock-wait metrics, and error rates show whether the application is using the database as intended. Without those signals, teams tend to guess: they add indexes blindly, raise pool sizes until the database is saturated, or cache stale data without understanding the original bottleneck. A production database application should make its data access patterns visible.
+Observability closes the loop between design and operation. Slow-query logs, execution plans, pool metrics, lock-wait metrics, and error rates show whether the application is using the database as intended. Without those signals, teams tend to guess: they add indexes blindly, raise pool sizes until the database is saturated, or cache stale data without understanding the original bottleneck. A production database application should expose its data-access patterns through operational metrics.
 
 Caching should be treated as a consistency decision. A cache can reduce database load, but it creates another copy of data with its own expiration and invalidation rules. Cache keys, time-to-live settings, and write-through or write-around behavior should be documented next to the queries they protect.
-
-## Visual
 
 ```mermaid
 flowchart LR
@@ -66,17 +64,15 @@ flowchart LR
 | Duplicate side effects | retry sends external action twice | idempotency keys or outbox pattern |
 | Pool exhaustion | unbounded connections | bounded pool with timeouts and metrics |
 
-## Worked example 1: Replace unsafe SQL with parameters
+## Replacing unsafe SQL with parameters
 
-Problem: An application searches students by name. The unsafe implementation builds:
+Consider an application that searches students by name. The unsafe implementation builds:
 
 ```text
 "SELECT ID, name FROM student WHERE name = '" + user_input + "'"
 ```
 
 Show how an injection works and how a prepared statement fixes it.
-
-Method:
 
 1. Suppose the input is:
 
@@ -104,13 +100,11 @@ Method:
 
 5. The driver sends the user input as a value for the placeholder. The database compares `name` to the literal string containing quotes and spaces; it does not treat the input as syntax.
 
-Checked answer: prepared statements prevent this value from changing the query structure. Authorization should still limit what the application account can read.
+Prepared statements prevent this value from changing the query structure. Authorization should still limit what the application account can read.
 
-## Worked example 2: Choose transaction boundaries for enrollment
+## Drawing the enrollment transaction boundary
 
-Problem: A student enrolls in a section. The application must check capacity, insert a `takes` row, and decrement available seats. Decide the transaction boundary.
-
-Method:
+When a student enrolls in a section, the application must check capacity, insert a `takes` row, and decrement available seats. The transaction boundary follows that entire business operation.
 
 1. The invariant is:
 
@@ -142,9 +136,9 @@ Method:
 
 5. If any step fails, roll back the transaction so the enrollment row and seat count do not diverge.
 
-Checked answer: the transaction boundary is the whole enrollment operation, not each individual SQL statement. Correctness depends on isolation as well as atomicity.
+The transaction boundary is the whole enrollment operation, not each individual SQL statement. Correctness depends on isolation as well as atomicity.
 
-## Code
+### Parameterized access and least-privilege views
 
 ```python
 import sqlite3
@@ -179,7 +173,7 @@ GRANT SELECT ON public_student_directory TO app_readonly;
 REVOKE SELECT ON student FROM app_readonly;
 ```
 
-## Common pitfalls
+## Security and reliability checks before deployment
 
 - Escaping strings manually instead of using parameters.
 - Giving the application database owner privileges for ordinary requests.
@@ -188,7 +182,7 @@ REVOKE SELECT ON student FROM app_readonly;
 - Logging sensitive query parameters without redaction.
 - Assuming application authorization and database authorization are interchangeable; robust systems use both.
 
-## Connections
+## Notes that complete the application picture
 
 - [SQL DDL, DML, and Basic Queries](/cs/databases/sql-ddl-dml-and-basic-queries)
 - [Transactions, ACID, and Serializability](/cs/databases/transactions-acid-and-serializability)

@@ -9,7 +9,7 @@ Laplace's equation describes equilibrium fields with no internal sources. It app
 
 Potential theory connects scalar potentials with vector fields. A field such as electric field or velocity can be derived from a potential, and Laplace's equation expresses source-free behavior. In two dimensions, harmonic functions are also tied to analytic complex functions through the Cauchy-Riemann equations.
 
-## Definitions
+## Source-free fields and their boundary data
 
 Laplace's equation in two variables is
 
@@ -47,13 +47,15 @@ or $\mathbf{F}=\nabla\phi$ depending on convention. The sign is determined by th
 
 Boundary conditions are essential. Dirichlet conditions prescribe $u$ on the boundary. Neumann conditions prescribe normal derivative $\partial u/\partial n$. Robin conditions combine both.
 
-## Key results
+## Why the boundary controls a harmonic field
 
 The maximum principle says that a nonconstant harmonic function on a bounded connected region cannot attain a strict maximum or minimum in the interior. Extremes occur on the boundary. This matches physical intuition: a steady source-free temperature cannot have an isolated hot spot inside the material.
 
 Uniqueness for Dirichlet problems follows from the maximum principle. If two harmonic functions have the same boundary values, their difference is harmonic and zero on the boundary. The maximum principle forces the difference to be zero everywhere.
 
 For Neumann problems, solutions are unique only up to an additive constant because normal derivatives do not determine the absolute potential level. A compatibility condition is also needed: total prescribed flux through the boundary must match total source strength. For pure Laplace Neumann problems with no sources, net boundary flux must be zero.
+
+## Geometry chooses the separated modes
 
 In rectangular domains, separation of variables gives sine, cosine, and hyperbolic functions. In disks, polar coordinates lead to powers $r^n$ and trigonometric angular modes, or to logarithmic terms if singularities are included. In three-dimensional spherical problems, spherical harmonics appear.
 
@@ -63,7 +65,7 @@ Potential fields often satisfy both differential and integral laws. If $\mathbf{
 
 Numerical Laplace solvers often rely on finite differences. On a square grid, the equation $u_{xx}+u_{yy}=0$ leads to the update that a grid value is approximately the average of its four nearest neighbors. This discrete averaging mirrors the continuous mean-value property.
 
-Dirichlet boundary data can be interpreted as controlling the entire interior from the boundary. This is why electrostatic shielding and steady temperature problems are boundary-dominated. If the boundary is held at a fixed potential, the source-free interior cannot invent a new extreme value. The shape of the solution is constrained by geometry and boundary values.
+Dirichlet boundary data control the entire interior from the boundary, so electrostatic shielding and steady temperature problems are boundary-dominated. If the boundary is held at a fixed potential, the source-free interior cannot create a new extreme value. Geometry and boundary values constrain the shape of the solution.
 
 Neumann data describe flux rather than potential. In heat conduction, specifying $\partial u/\partial n$ prescribes heat flow through the boundary up to material constants. If every boundary is insulated, the steady temperature can be any constant, so the absolute level is not determined. Only differences or an added normalization such as average temperature fix a unique solution.
 
@@ -71,13 +73,15 @@ The maximum principle is also a stability statement. If boundary measurements ar
 
 Corners reduce regularity. A harmonic function in a polygon can have derivative singularities near reentrant corners even when boundary data are smooth. The function remains harmonic inside, but numerical methods may converge more slowly unless the mesh is refined near the corner. Geometry is therefore part of the analysis, not just a drawing.
 
-In two dimensions, harmonic conjugates connect potential and stream functions. If $u$ is harmonic on a simply connected region, one may often find $v$ such that $u+iv$ is analytic. Curves $u=\text{constant}$ and $v=\text{constant}$ form orthogonal families where the gradient is nonzero. This is useful in ideal fluid flow and electrostatic field visualization.
+## Harmonic conjugates and point sources
+
+In two dimensions, harmonic conjugates connect potential and stream functions. If $u$ is harmonic on a simply connected region, one may find $v$ such that $u+iv$ is analytic. Curves $u=\text{constant}$ and $v=\text{constant}$ form orthogonal families where the gradient is nonzero. This is useful in ideal fluid flow and electrostatic field visualization.
 
 Poisson's equation modifies the picture by adding sources. For steady heat, an internal heat generation term produces $\nabla^2u=f$ after constants are absorbed. Interior maxima may then occur because heat is being produced inside. Distinguishing Laplace from Poisson equations is essential before applying maximum-principle or source-free flux reasoning.
 
 The fundamental solution viewpoint treats point sources as singular potentials. In three dimensions, a potential proportional to $1/r$ is harmonic away from the origin but has a singular source at the origin. This explains why flux through spheres centered at the origin can be nonzero even though the divergence is zero everywhere except the singular point.
 
-## Visual
+## Consequences of a vanishing Laplacian
 
 ```mermaid
 flowchart TD
@@ -97,45 +101,31 @@ flowchart TD
 | Robin | Linear combination of value and derivative | Often unique with suitable signs |
 | Mixed | Different types on boundary pieces | Problem-dependent |
 
-## Worked example 1: Checking harmonicity
+## Checking a polynomial potential
 
-Problem. Determine whether
+For
 
 $$
 u(x,y)=x^2-y^2+3x
 $$
 
-is harmonic.
-
-Method.
-
-1. Compute first and second derivatives in $x$:
+the second derivatives are
 
 $$
-u_x=2x+3,\qquad u_{xx}=2.
+u_{xx}=2,\qquad u_{yy}=-2.
 $$
-
-2. Compute first and second derivatives in $y$:
-
-$$
-u_y=-2y,\qquad u_{yy}=-2.
-$$
-
-3. Add:
 
 $$
 u_{xx}+u_{yy}=2+(-2)=0.
 $$
 
-Answer. The function is harmonic on all of $\mathbb{R}^2$.
-
-Check. It is the real part of the analytic function $z^2+3z$, which is another reason it is harmonic.
+The function is harmonic on all of $\mathbb{R}^2$. It is also the real part of the analytic function $z^2+3z$.
 
 The gradient $\nabla u=\langle 2x+3,-2y\rangle$ would define a potential field up to sign convention. Since $u$ is harmonic, the divergence of this gradient is zero. That is the vector-calculus form of the same computation: $\nabla\cdot\nabla u=\nabla^2u=0$.
 
-## Worked example 2: Steady heat in a rectangle with one sine boundary
+## One boundary mode in a heated rectangle
 
-Problem. Solve
+Consider
 
 $$
 u_{xx}+u_{yy}=0,\quad 0<x<L,\quad 0<y<H,
@@ -147,39 +137,35 @@ $$
 u(0,y)=u(L,y)=u(x,0)=0,\qquad u(x,H)=\sin\frac{\pi x}{L}.
 $$
 
-Method.
-
-1. From separation for the rectangle, a single top sine mode extends as
+Separation in the rectangle extends the single top sine mode as
 
 $$
 u(x,y)=A\sinh\frac{\pi y}{L}\sin\frac{\pi x}{L}.
 $$
 
-2. Apply the top boundary condition:
+At the top boundary,
 
 $$
 u(x,H)=A\sinh\frac{\pi H}{L}\sin\frac{\pi x}{L}.
 $$
 
-3. Match this to
+and matching this with
 
 $$
 \sin\frac{\pi x}{L}.
 $$
 
-4. Therefore
+requires
 
 $$
 A\sinh\frac{\pi H}{L}=1,
 $$
 
-so
+Therefore
 
 $$
 A=\frac{1}{\sinh(\pi H/L)}.
 $$
-
-Answer.
 
 $$
 u(x,y)=
@@ -187,11 +173,11 @@ u(x,y)=
 \sin\frac{\pi x}{L}.
 $$
 
-Check. At $y=0$, the hyperbolic sine is zero. At $y=H$, the quotient is one. At $x=0$ and $x=L$, the sine vanishes.
+At $y=0$, the hyperbolic sine vanishes; at $y=H$, the quotient is one; and at $x=0,L$, the sine vanishes.
 
 The solution also respects the maximum principle. The top boundary ranges between $0$ and $1$, while the other boundaries are zero. Inside the rectangle, the harmonic solution stays between these boundary extremes. If a computed approximation overshoots far beyond this range, the discretization or boundary indexing should be checked.
 
-## Code
+## Evaluating the rectangular mode on a grid
 
 ```python
 import numpy as np
@@ -212,7 +198,7 @@ The code evaluates the single-mode rectangle solution and checks the top boundar
 
 For a general top boundary, the code would sum several sine modes, each with its own hyperbolic-sine factor. High-frequency boundary modes decay rapidly away from the boundary, which is why harmonic functions smooth boundary oscillations in the interior.
 
-## Common pitfalls
+## Boundary and source checks
 
 - Forgetting that Laplace's equation is source-free; sources lead to Poisson's equation.
 - Expecting interior maxima or minima for nonconstant harmonic functions.
@@ -227,9 +213,8 @@ For a general top boundary, the code would sum several sine modes, each with its
 - Forgetting that adding a constant to a Neumann solution leaves normal derivatives unchanged.
 - Overrounding boundary Fourier coefficients.
 
-## Connections
+<div className="see-also">
 
-- [Vector Differential Calculus](/math/engineering-math/vector-differential-calculus)
-- [Vector Integral Calculus](/math/engineering-math/vector-integral-calculus)
-- [PDEs by Separation of Variables](/math/engineering-math/pdes-separation-of-variables)
-- [Complex Functions and Analyticity](/math/engineering-math/complex-functions-and-analyticity)
+See also: [Vector Differential Calculus](/math/engineering-math/vector-differential-calculus) · [Vector Integral Calculus](/math/engineering-math/vector-integral-calculus) · [PDEs by Separation of Variables](/math/engineering-math/pdes-separation-of-variables) · [Complex Functions and Analyticity](/math/engineering-math/complex-functions-and-analyticity)
+
+</div>

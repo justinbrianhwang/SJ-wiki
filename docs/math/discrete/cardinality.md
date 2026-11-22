@@ -7,13 +7,9 @@ sidebar_position: 7
 
 Cardinality measures the size of a set. For finite sets, this is just counting elements. Infinite sets require a deeper idea: two sets have the same size when their elements can be paired perfectly by a bijection. This makes it possible to compare infinities without treating all infinite sets as the same.
 
-![David Hilbert is shown wearing a hat in a historical photograph.](https://commons.wikimedia.org/wiki/Special:FilePath/Hilbert.jpg)
-
-*Figure: David Hilbert's work frames modern foundations, geometry, and infinite-dimensional thinking. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hilbert.jpg), Unknown author, public domain.*
-
 The topic is surprising because infinite sets can behave unlike finite sets. A proper subset of an infinite set can have the same cardinality as the whole set, as the even positive integers do with the positive integers. At the same time, Cantor's diagonal argument shows that some infinite sets are strictly larger than countable ones.
 
-## Definitions
+## Comparing sizes by bijection
 
 Sets $A$ and $B$ have the same cardinality, written $\vert A\vert =\vert B\vert $, if there is a bijection $f:A\to B$. For finite sets, this agrees with ordinary counting. For infinite sets, bijections replace subtraction or division as the reliable comparison tool.
 
@@ -32,7 +28,7 @@ For finite sets, $\vert A\cup B\vert =\vert A\vert +\vert B\vert -\vert A\cap B\
 
 An **enumeration** of a set is a list $a_1,a_2,a_3,\dots$ that contains every element of the set at least once. A countably infinite set can be enumerated without omission. If repetitions occur, they can usually be skipped to form a bijective listing.
 
-## Key results
+## Enumerations and diagonal arguments
 
 The integers are countable. One enumeration is
 
@@ -60,7 +56,7 @@ $$
 
 Since $D\subseteq S$, surjectivity would require $D=f(d)$ for some $d\in S$. But then $d\in D$ iff $d\notin f(d)=D$, a contradiction. Hence no function from $S$ to $\mathcal{P}(S)$ can be onto.
 
-## Visual
+The two standard countable enumerations can be laid out explicitly:
 
 ```text
 Counting the integers by zigzag:
@@ -89,7 +85,7 @@ Skip duplicates such as 2/2 because 2/2 = 1/1.
 | real numbers in $(0,1)$ | uncountable | Cantor diagonal argument |
 | $\mathcal{P}(\mathbb{N})$ | uncountable | Cantor's theorem |
 
-## Worked example 1: Build a bijection from natural numbers to integers
+## An explicit bijection from natural numbers to integers
 
 **Problem.** Give an explicit bijection $f:\mathbb{N}\to\mathbb{Z}$, where $\mathbb{N}=\{0,1,2,\dots\}$.
 
@@ -101,7 +97,7 @@ $$
 0,1,-1,2,-2,3,-3,\dots
 $$
 
-2. Even indices should map to nonpositive integers; odd indices should map to positive integers.
+2. Even indices should map to nonnegative integers; odd indices should map to negative integers.
 3. One compact formula is
 
 $$
@@ -119,7 +115,7 @@ This gives $f(0)=0$, $f(1)=-1$, $f(2)=1$, $f(3)=-2$, and $f(4)=2$. That is a zig
 
 **Checked answer.** The function is a bijection. Therefore $\mathbb{Z}$ is countably infinite.
 
-## Worked example 2: Use diagonalization on infinite bit strings
+## Diagonalizing against infinite bit strings
 
 **Problem.** Show that the set of infinite bit strings is uncountable.
 
@@ -156,37 +152,7 @@ $$
 
 **Checked answer.** The constructed $t$ is not equal to any listed string, contradicting the claim that the list was complete. Therefore the set of infinite bit strings is uncountable.
 
-## Code
-
-```python
-from math import gcd
-
-def integers():
-    yield 0
-    n = 1
-    while True:
-        yield n
-        yield -n
-        n += 1
-
-def rationals(limit_sum):
-    yield (0, 1)
-    for s in range(2, limit_sum + 1):
-        for p in range(1, s):
-            q = s - p
-            if gcd(p, q) == 1:
-                yield (p, q)
-                yield (-p, q)
-
-print([next(integers()) for _ in range(1)])  # starts a generator
-g = integers()
-print([next(g) for _ in range(10)])
-print(list(rationals(6)))
-```
-
-The rational generator follows diagonal layers $p+q=s$ and skips duplicate rational representations.
-
-## Common pitfalls
+## What a countability proof must establish
 
 - Assuming every infinite set has the same size. Countable and uncountable infinities differ.
 - Saying a proper subset must be smaller. That is true for finite sets but not for infinite sets.
@@ -209,9 +175,13 @@ A countability proof should say how long one waits before an object appears. In 
 
 For uncountability proofs, be clear about the contradiction. The diagonal object is not merely absent from the first several rows; it differs from row $n$ in position $n$ for every $n$. Therefore it is absent from the entire proposed list. That universal disagreement is the heart of the argument.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Functions, sequences, and sums](/math/discrete/functions-sequences-sums) supplies bijections and sequences.
 - [Sets and set operations](/math/discrete/sets-and-set-operations) introduces power sets and subsets.
 - [Proof techniques](/math/discrete/proof-techniques) covers contradiction and diagonal-style arguments.
 - [Finite-state machines and computation](/math/discrete/finite-state-machines-and-computation) uses countability to compare programs and languages.
+
+</div>

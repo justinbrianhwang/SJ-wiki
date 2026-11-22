@@ -5,11 +5,11 @@ sidebar_position: 17
 
 # Scaling, Universality, and Renormalization Group
 
-Near a continuous phase transition, the correlation length becomes much larger than microscopic scales. This is why very different systems can share the same critical exponents: they flow toward the same long-distance description. Schwabl treats this through scaling hypotheses, real-space renormalization ideas, Ginzburg-Landau functionals, percolation, and Ising-model examples.
+Near a continuous phase transition, the correlation length becomes much larger than microscopic scales. Very different systems can then share critical exponents because they flow toward the same long-distance description. Schwabl treats this through scaling hypotheses, real-space renormalization ideas, Ginzburg-Landau functionals, percolation, and Ising-model examples.
 
 The renormalization group is a controlled way to ask what changes when short-distance degrees of freedom are averaged out. Parameters that grow under coarse-graining are relevant, parameters that shrink are irrelevant, and fixed points classify universal critical behavior.
 
-## Definitions
+## Scaling fields and fixed points
 
 The reduced temperature is
 
@@ -44,7 +44,7 @@ $$
 K^\star=R_b(K^\star).
 $$
 
-## Key results
+## What survives coarse-graining
 
 Scaling relations connect critical exponents. Common examples include
 
@@ -66,11 +66,11 @@ $$
 \gamma=(2-\eta)\nu.
 $$
 
-The last two include hyperscaling assumptions and can fail above the upper critical dimension or when dangerous irrelevant variables matter.
+The relation $2-\alpha=d\nu$ is the hyperscaling identity. It can fail above the upper critical dimension or when dangerous irrelevant variables matter; $\gamma=(2-\eta)\nu$ is the Fisher scaling relation and does not require hyperscaling.
 
 For the one-dimensional Ising model with nearest-neighbor coupling, the transfer matrix gives no finite-temperature phase transition. The correlation length is finite for every $T\gt 0$ and diverges only as $T\to 0$. This result is a warning against overusing mean-field theory.
 
-The two-dimensional Ising model is exactly soluble at zero field. Onsager's solution shows a finite-temperature transition with non-mean-field exponents such as
+The two-dimensional Ising model is exactly solvable at zero field. Onsager's solution shows a finite-temperature transition with non-mean-field exponents such as
 
 $$
 \beta={1\over 8},\qquad
@@ -107,13 +107,13 @@ Monte Carlo simulations provide numerical access when exact solutions and pertur
 
 Percolation reinforces the geometric side of scaling. The order parameter is the probability that a site belongs to the spanning cluster, the susceptibility is related to the mean finite-cluster size, and the correlation length measures typical cluster radius. There is no Boltzmann factor, but the same fixed-point vocabulary applies.
 
-Critical exponents are universal, but critical temperatures usually are not. The value of $T_c$ depends on lattice type, coupling strength, density, pressure, and microscopic interactions. Exponents and scaling functions survive because they are controlled by the fixed point, while nonuniversal metric factors translate microscopic units into scaling variables. This is why two materials can have different Curie temperatures but the same asymptotic exponent ratios.
+Critical exponents are universal, but critical temperatures usually are not. The value of $T_c$ depends on lattice type, coupling strength, density, pressure, and microscopic interactions. Exponents and scaling functions survive because they are controlled by the fixed point, while nonuniversal metric factors translate microscopic units into scaling variables. Two materials can therefore have different Curie temperatures but the same asymptotic exponent ratios.
 
 Relevant perturbations move a system away from the fixed point. Temperature deviation $t$ and ordering field $h$ are the standard relevant directions for the Ising universality class. Irrelevant perturbations, such as many microscopic lattice details, decay under coarse-graining. Marginal perturbations require special care because they can produce logarithms or continuously varying exponents.
 
 The RG viewpoint also clarifies why mean-field theory becomes exact above an upper critical dimension. Fluctuations become less effective at destabilizing the saddle-point solution, and the Gaussian fixed point controls the transition. Below that dimension, interactions among fluctuations change the exponents.
 
-Finite-size scaling converts the divergence of $\xi$ into a practical numerical method. In a finite box of linear size $L$, the correlation length cannot exceed $L$, so singular quantities become functions of $L/\xi$. At criticality one expects, for example,
+Finite-size scaling turns the divergence of $\xi$ into a useful numerical method. In a finite box of linear size $L$, the correlation length cannot exceed $L$, so singular quantities become functions of $L/\xi$. At criticality one expects, for example,
 
 $$
 \chi(L,T_c)\sim L^{\gamma/\nu}.
@@ -122,8 +122,6 @@ $$
 Crossings of dimensionless ratios, such as Binder cumulants, help locate $T_c$ without relying only on rounded peaks.
 
 This finite-size viewpoint is also useful experimentally whenever samples, grains, or domains limit the largest correlated length. The thermodynamic singularity is then cut off, but scaling can still reveal the underlying universality class.
-
-## Visual
 
 ```mermaid
 flowchart LR
@@ -137,22 +135,20 @@ flowchart LR
 
 | Universality class | Dimension | Representative system | Selected exponents |
 |---|---:|---|---|
-| Mean-field Ising | $d\ge 4$ | Landau theory | $\beta=1/2$, $\gamma=1$, $\nu=1/2$ |
+| Mean-field Ising | $d\gt 4$; logarithmic corrections at $d=4$ | Landau theory | $\beta=1/2$, $\gamma=1$, $\nu=1/2$ |
 | 2D Ising | $2$ | square-lattice Ising | $\beta=1/8$, $\gamma=7/4$, $\nu=1$ |
 | 1D Ising | $1$ | nearest-neighbor chain | no finite-$T$ transition |
 | Percolation | model-dependent | random clusters | geometric order parameter |
 
-## Worked example 1: Scaling relation check for 2D Ising exponents
+## Checking the 2D Ising exponent identities
 
-Problem: Check the Rushbrooke scaling relation
+The Rushbrooke scaling relation
 
 $$
 \alpha+2\beta+\gamma=2
 $$
 
-for the two-dimensional Ising exponents $\alpha=0$, $\beta=1/8$, and $\gamma=7/4$.
-
-Method:
+can be checked directly for the two-dimensional Ising exponents $\alpha=0$, $\beta=1/8$, and $\gamma=7/4$.
 
 1. Substitute:
 
@@ -175,19 +171,17 @@ $$
 
 4. The relation is satisfied exactly.
 
-Checked answer: scaling relations are consistency conditions among exponents, not independent microscopic calculations.
+Scaling relations are consistency conditions among exponents, not independent microscopic calculations.
 
-## Worked example 2: One-dimensional Ising correlation length
+## Correlation length of the one-dimensional Ising chain
 
-Problem: The 1D Ising correlation function at zero field behaves as
+At zero field, the one-dimensional Ising correlation function behaves as
 
 $$
 \langle s_0s_r\rangle=(\tanh\beta J)^r.
 $$
 
-Find the correlation length $\xi$.
-
-Method:
+Matching this result to exponential decay determines $\xi$.
 
 1. Write exponential decay in the form
 
@@ -213,9 +207,9 @@ $$
 \xi=-{1\over \ln(\tanh\beta J)}.
 $$
 
-Checked answer: $\xi$ is finite for every finite temperature and diverges only as $T\to 0$, so there is no finite-$T$ transition in the nearest-neighbor 1D model.
+The correlation length is finite for every finite temperature and diverges only as $T\to 0$, so the nearest-neighbor chain has no finite-$T$ transition.
 
-## Code
+## A Metropolis update for the square-lattice Ising model
 
 ```python
 import numpy as np
@@ -239,7 +233,7 @@ for _ in range(50_000):
 print("magnetization", spins.mean())
 ```
 
-## Common pitfalls
+## Where scaling assumptions fail
 
 - Assuming all critical exponents are mean-field because Landau theory is simple.
 - Treating finite-size Monte Carlo rounding as a true singularity.
@@ -247,10 +241,8 @@ print("magnetization", spins.mean())
 - Applying hyperscaling above the upper critical dimension without checking its assumptions.
 - Mixing geometric percolation exponents with thermal Ising exponents without identifying the universality class.
 
-## Connections
+<div className="see-also">
 
-- [Phase transitions and order parameters](/physics/statistical-mechanics/phase-transitions-and-order-parameters)
-- [Mean-field and Landau theory](/physics/statistical-mechanics/mean-field-and-landau-theory)
-- [Magnetism, lattice gases, and binary alloys](/physics/statistical-mechanics/magnetism-lattice-gases-and-binary-alloys)
-- [Renormalization group in QFT](/physics/quantum-field-theory/renormalization-group)
-- [Scalar phi-four theory](/physics/quantum-field-theory/scalar-phi-four-theory)
+See also: [Phase transitions and order parameters](/physics/statistical-mechanics/phase-transitions-and-order-parameters) · [Mean-field and Landau theory](/physics/statistical-mechanics/mean-field-and-landau-theory) · [Magnetism, lattice gases, and binary alloys](/physics/statistical-mechanics/magnetism-lattice-gases-and-binary-alloys) · [Renormalization group in QFT](/physics/quantum-field-theory/renormalization-group) · [Scalar phi-four theory](/physics/quantum-field-theory/scalar-phi-four-theory)
+
+</div>

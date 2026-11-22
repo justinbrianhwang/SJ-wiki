@@ -5,15 +5,11 @@ sidebar_position: 11
 
 # Robustness-Accuracy Tradeoff
 
-Robust models often lose clean accuracy compared with standard models. This is not just an implementation inconvenience; in many settings robustness changes the classification problem. A classifier that must be correct on every point in an $\epsilon$-ball needs larger margins, smoother decision boundaries, different features, and often more data or compute.
+Robust models often lose clean accuracy compared with standard models. In many settings, robustness changes the classification problem: a classifier that must be correct on every point in an $\epsilon$-ball needs larger margins, smoother decision boundaries, different features, and often more data or compute.
 
-![A visually similar adversarial panda image is classified as a gibbon by an ImageNet model.](https://ar5iv.labs.arxiv.org/html/1412.6572/assets/gibbon_993.png)
+The tradeoff is not an absolute law for every dataset and architecture. Better data, architectures, training methods, and scale can improve both clean and robust accuracy. The tension is still strong enough that every robustness result should report both metrics and name the threat model.
 
-*Figure: The FGSM panda example shows that imperceptible perturbations can change model decisions. Image: [ar5iv](https://arxiv.org/abs/1412.6572), Goodfellow, Shlens, and Szegedy, educational use with attribution.*
-
-The tradeoff should not be oversold as an absolute law for every dataset and architecture. Better data, architectures, training methods, and scale can improve both clean and robust accuracy. But the tension is real enough that every robustness result should report both metrics and name the threat model. This page explains the formal decomposition, geometric intuition, and practical consequences.
-
-## Definitions
+## Decomposing natural and boundary error
 
 The **natural risk** of classifier $h$ under distribution $\mathcal{D}$ is:
 
@@ -50,7 +46,7 @@ TRADES-style analysis uses this decomposition to motivate objectives that balanc
 
 The **robust Bayes classifier** is the classifier that minimizes robust risk for a given perturbation set. It may differ from the ordinary Bayes classifier, especially when class distributions overlap after being expanded by $\epsilon$-balls.
 
-## Key results
+## The geometry of a robust margin
 
 The first basic inequality is:
 
@@ -80,13 +76,13 @@ Data scale can reduce the tradeoff. Robust learning asks for more information be
 
 Feature learning is another lens. Standard models may use highly predictive but nonrobust features that humans do not notice. Robust training discourages features that change too much under the threat model, often producing gradients and saliency maps that appear more human-aligned. This does not mean robust models are universally interpretable or secure; it means the threat model influences which features are useful.
 
-In practice, the tradeoff should be read as a design frontier rather than a single number. One model might improve clean accuracy at fixed robust accuracy by using more data; another might improve robust accuracy at fixed clean accuracy by using a better architecture or longer training; a third might move along the frontier by changing $\epsilon$ or the TRADES parameter $\beta$. The fair comparison is always under the same dataset, preprocessing, perturbation set, and evaluation protocol. When those conditions differ, a clean-accuracy drop or robust-accuracy gain may be caused by the experimental setup rather than a deeper property of robustness.
+The tradeoff is better read as a design frontier than as a single number. One model might improve clean accuracy at fixed robust accuracy by using more data; another might improve robust accuracy at fixed clean accuracy by using a better architecture or longer training; a third might move along the frontier by changing $\epsilon$ or the TRADES parameter $\beta$. The fair comparison is always under the same dataset, preprocessing, perturbation set, and evaluation protocol. When those conditions differ, a clean-accuracy drop or robust-accuracy gain may be caused by the experimental setup rather than a deeper property of robustness.
 
 The tradeoff is also user-facing. In a medical, driving, or moderation system, a small clean-accuracy loss may be acceptable if robustness improves against a realistic threat. In a benign image-tagging tool, the same loss may not be worth the cost. The technical curve must therefore be paired with an application-level risk decision.
 
-This is why robustness papers should avoid single-metric storytelling. A useful result shows the frontier: clean accuracy, robust accuracy, compute, data scale, and the exact threat model that produced the curve.
+A useful result reports the full frontier: clean accuracy, robust accuracy, compute, data scale, and the exact threat model that produced the curve.
 
-## Visual
+### Reading the tradeoff as a frontier
 
 ```mermaid
 flowchart LR
@@ -109,9 +105,9 @@ flowchart LR
 | Robust overfitting | Robust test accuracy drops late in training | Track checkpoints and robust validation |
 | Data scaling | More data improves robust learning | Compare under fixed threat model |
 
-## Worked example 1: Natural risk versus robust risk
+## Separating natural error from boundary error
 
-Problem: A classifier is tested on 10 examples. It misclassifies 1 clean example. Among the 9 clean-correct examples, 3 can be flipped by an allowed perturbation. Compute natural risk, robust risk, and boundary error.
+A classifier misses 1 of 10 clean examples. Among the 9 clean-correct examples, 3 can be flipped by an allowed perturbation. Compute natural risk, robust risk, and boundary error.
 
 1. Natural errors:
 
@@ -149,11 +145,11 @@ $$
 R_{\mathrm{boundary}}=R_{\mathrm{rob}}-R_{\mathrm{nat}}=0.40-0.10=0.30.
 $$
 
-Checked answer: natural risk is $10\%$, robust risk is $40\%$, and boundary error is $30\%$. The classifier is mostly clean-correct but has a large vulnerable boundary region.
+Natural risk is $10\%$, robust risk is $40\%$, and boundary error is $30\%$. Most inputs are clean-correct, but three lie in a vulnerable boundary region.
 
-## Worked example 2: Robust margin for a linear classifier
+## Checking an $\ell_2$ margin condition
 
-Problem: A binary linear classifier has $w=(6,8)$, $b=-3$, input $x=(1,1)$, and label $y=+1$. Determine whether it is clean-correct and whether it is robust to $\ell_2$ radius $\epsilon=0.25$.
+For a binary linear classifier, let $w=(6,8)$, $b=-3$, $x=(1,1)$, and $y=+1$. Determine whether the prediction is clean-correct and robust to $\ell_2$ radius $\epsilon=0.25$.
 
 1. Compute the score:
 
@@ -185,22 +181,23 @@ $$
 y(w^\top x+b)=11>2.5.
 $$
 
-Checked answer: the point is clean-correct and certified robust to $\ell_2$ radius $0.25$ for this linear classifier. If the score had been $1.5$, it would still be clean-correct but not robust at this radius.
+The point is clean-correct and certified robust to $\ell_2$ radius $0.25$ for this linear classifier. A score of $1.5$ would remain clean-correct but would fail the robust-margin condition.
 
-## Code
+## Measuring boundary error and linear certificates
 
 ```python
 import torch
 
-@torch.no_grad()
 def clean_and_robust_accuracy(model, attack_fn, x, y):
     model.eval()
-    clean_pred = model(x).argmax(dim=1)
-    clean_correct = clean_pred.eq(y)
+    with torch.no_grad():
+        clean_pred = model(x).argmax(dim=1)
+        clean_correct = clean_pred.eq(y)
 
     x_adv = attack_fn(model, x, y)
-    adv_pred = model(x_adv).argmax(dim=1)
-    robust_correct = adv_pred.eq(y)
+    with torch.no_grad():
+        adv_pred = model(x_adv).argmax(dim=1)
+        robust_correct = clean_correct & adv_pred.eq(y)
 
     boundary_error = clean_correct.logical_and(~robust_correct)
     return {
@@ -215,9 +212,9 @@ def linear_l2_certified(masked_scores, weight_norm, epsilon):
     return masked_scores > required_margin
 ```
 
-The first function separates clean accuracy, robust accuracy, and the clean-correct examples that become wrong after attack. The second shows the robust-margin condition for a binary linear model under an $\ell_2$ threat.
+The first function leaves gradients enabled while constructing adversarial inputs, then separates clean accuracy, robust accuracy, and the clean-correct examples that become wrong after attack. The second shows the robust-margin condition for a binary linear model under an $\ell_2$ threat.
 
-## Common pitfalls
+## Claims that overstate the frontier
 
 - Reporting robust accuracy without clean accuracy, hiding a model that is robust only because it predicts poorly.
 - Treating the tradeoff as identical for every dataset, architecture, training method, and perturbation set.
@@ -227,7 +224,17 @@ The first function separates clean accuracy, robust accuracy, and the clean-corr
 - Concluding that human-aligned gradients imply full interpretability or safety.
 - Forgetting that certified accuracy and empirical robust accuracy are different metrics.
 
-## Connections
+## Theory and data-scaling results
+
+- Tsipras et al., "Robustness May Be at Odds with Accuracy."
+- Zhang et al., "Theoretically Principled Trade-off between Robustness and Accuracy."
+- Madry et al., "Towards Deep Learning Models Resistant to Adversarial Attacks."
+- Rice, Wong, and Kolter, work on overfitting in adversarially robust deep learning.
+- Schmidt et al., work on the sample complexity of adversarially robust generalization.
+
+<div className="see-also">
+
+See also:
 
 - [Adversarial training](/cs/adversarial-attacks/adversarial-training) is where the tradeoff appears most visibly in practice.
 - [Mathematical formulation](/cs/adversarial-attacks/mathematical-formulation) defines robust risk and perturbation sets.
@@ -235,10 +242,4 @@ The first function separates clean accuracy, robust accuracy, and the clean-corr
 - [Evaluation and benchmarks](/cs/adversarial-attacks/evaluation-and-benchmarks) explains why both clean and robust metrics are required.
 - [Machine learning](/cs/machine-learning/intro) provides the risk-minimization background.
 
-## Further reading
-
-- Tsipras et al., "Robustness May Be at Odds with Accuracy."
-- Zhang et al., "Theoretically Principled Trade-off between Robustness and Accuracy."
-- Madry et al., "Towards Deep Learning Models Resistant to Adversarial Attacks."
-- Rice, Wong, and Kolter, work on overfitting in adversarially robust deep learning.
-- Schmidt et al., work on the sample complexity of adversarially robust generalization.
+</div>

@@ -9,7 +9,7 @@ A tree-walking interpreter executes a program by recursively visiting its abstra
 
 Tree walking is not the fastest execution strategy, but it is one of the clearest. It exposes the essential runtime ideas that every later implementation must still respect: environments, lexical scope, closures, statement execution, expression evaluation, native functions, and runtime error reporting.
 
-## Definitions
+## The AST as executable form
 
 An **interpreter** is a program that executes another program directly. In a tree-walking interpreter, the executable form is an AST. Each node type has an evaluation rule. For example, a literal evaluates to its stored value, a variable expression looks up a name, and a block statement executes a list of statements in a new environment.
 
@@ -25,43 +25,7 @@ A **resolver** is a static pass that records which declaration each variable use
 
 A **native function** is implemented by the host language but exposed as a function in the interpreted language. Examples include `clock`, file I/O, random numbers, or printing. Host interop is useful but dangerous because native code can break the sandbox, type assumptions, or deterministic behavior of the interpreted language.
 
-## Key results
-
-The first result is the big-step evaluation pattern. Each AST form has a rule:
-
-$$
-\frac{e_1 \Downarrow v_1 \quad e_2 \Downarrow v_2 \quad v = v_1 + v_2}
-{e_1 + e_2 \Downarrow v}
-$$
-
-Read this as: if the left expression evaluates to $v_1$, the right expression evaluates to $v_2$, and the plus operation produces $v$, then the whole binary expression evaluates to $v$. A tree-walker implements these rules as methods or functions.
-
-The second result is environment chaining. If a block introduces `{ var x = 2; print x; }`, lookup for `x` should find the inner binding. After the block exits, that environment can be discarded unless a closure captured it. Function calls similarly create activation environments for parameters and local variables. In a tree-walker, these are heap objects in the host language, not CPU stack frames.
-
-The third result is closure capture. Consider:
-
-```text
-fun makeCounter() {
-  var i = 0;
-  fun count() {
-    i = i + 1;
-    return i;
-  }
-  return count;
-}
-```
-
-The returned function must keep the environment containing `i`. This is not an implementation trick; it is the language's lexical-scoping rule. A compiler may later implement the same idea with upvalues, heap-allocated frames, closure conversion, or lambda lifting, but the semantic obligation is identical [3], [4].
-
-The fourth result is that a resolver prevents a subtle binding bug. If variable lookup simply walks the live environment chain, then a closure may observe a later declaration in the same environment when the textual binding should already have been fixed. Nystrom's resolver marks variables as declared, defined, and used at known depths before interpretation, so the runtime lookup can go directly to the right environment distance [1].
-
-The fifth result is that control flow can be represented either as return values from evaluator functions or as host-language exceptions. Nystrom throws a special internal exception for `return`, not because user code is exceptional, but because it unwinds multiple nested visitor calls cleanly [1]. The same technique can model `break` and `continue`, though production interpreters often use explicit control-flow results for predictability.
-
-Finally, tree-walking interpreters trade speed for clarity. Each AST visit uses host dispatch, object allocation, pointer chasing, and recursive calls. A bytecode VM compresses the program into dense instructions and reduces per-node overhead. Still, a tree-walker is excellent for language design, testing semantic rules, writing teaching interpreters, and bootstrapping a later compiler.
-
-A practical tree-walker also defines the language's order of evaluation. If function arguments evaluate left to right, the interpreter's call-expression visitor must evaluate the callee and arguments in that order before invoking the function. If assignment expressions return the assigned value, the assignment visitor must both update the environment and return the value. These details become observable when expressions call functions, mutate variables, or throw runtime errors. A later bytecode compiler should be checked against the tree-walker on such cases because the tree-walker often acts as the clearest executable specification.
-
-## Visual
+The evaluator routes each AST node toward expression evaluation, an environment update, or an explicit control-flow result:
 
 ```mermaid
 flowchart TD
@@ -77,6 +41,40 @@ flowchart TD
   F --> K["Return, break, continue, or normal"]
 ```
 
+## Evaluation rules become visitor methods
+
+Each AST form has a big-step evaluation rule:
+
+$$
+\frac{e_1 \Downarrow v_1 \quad e_2 \Downarrow v_2 \quad v = v_1 + v_2}
+{e_1 + e_2 \Downarrow v}
+$$
+
+Read this as: if the left expression evaluates to $v_1$, the right expression evaluates to $v_2$, and the plus operation produces $v$, then the whole binary expression evaluates to $v$. A tree-walker implements these rules as methods or functions.
+
+## Environments outlive calls when closures capture them
+
+If a block introduces `var x = 2; print x;` inside braces, lookup for `x` should find the inner binding. After the block exits, that environment can be discarded unless a closure captured it. Function calls similarly create activation environments for parameters and local variables. In a tree-walker, these are heap objects in the host language, not CPU stack frames.
+
+Consider:
+
+```text
+fun makeCounter() {
+  var i = 0;
+  fun count() {
+    i = i + 1;
+    return i;
+  }
+  return count;
+}
+```
+
+The returned function must keep the environment containing `i`. This is not an implementation trick; it is the language's lexical-scoping rule. A compiler may later implement the same idea with upvalues, heap-allocated frames, closure conversion, or lambda lifting, but the semantic obligation is identical [3], [4].
+
+A resolver prevents a subtle binding bug. If variable lookup simply walks the live environment chain, then a closure may observe a later declaration in the same environment when the textual binding should already have been fixed. Nystrom's resolver marks variables as declared, defined, and used at known depths before interpretation, so the runtime lookup can go directly to the right environment distance [1].
+
+The runtime objects and their lifetimes line up as follows:
+
 | Runtime object | Stored information | Lifetime driver |
 |---|---|---|
 | Environment | Name-to-value map and enclosing pointer | Block or function activation; extended by closures |
@@ -85,7 +83,15 @@ flowchart TD
 | Instance or object | Fields, class, methods, runtime metadata | Reachability and garbage collection |
 | Runtime error | Message, token/span, stack context | Raised during evaluation |
 
-## Worked example 1: Scope and shadowing
+## Unwinding `return`, `break`, and runtime errors
+
+Control flow can be represented either as return values from evaluator functions or as host-language exceptions. Nystrom throws a special internal exception for `return`, not because user code is exceptional, but because it unwinds multiple nested visitor calls cleanly [1]. The same technique can model `break` and `continue`, though production interpreters often use explicit control-flow results for predictability.
+
+Tree-walking interpreters trade speed for clarity. Each AST visit uses host dispatch, object allocation, pointer chasing, and recursive calls. A bytecode VM compresses the program into dense instructions and reduces per-node overhead. A tree-walker remains useful for language design, testing semantic rules, teaching, and bootstrapping a later compiler.
+
+The tree-walker also defines evaluation order. If function arguments evaluate left to right, the call-expression visitor must evaluate the callee and arguments in that order before invoking the function. If assignment expressions return the assigned value, the assignment visitor must both update the environment and return the value. These details become observable when expressions call functions, mutate variables, or throw runtime errors. A later bytecode compiler should be checked against the tree-walker on such cases because the tree-walker often acts as the clearest executable specification.
+
+## Shadowing a global inside a block
 
 Problem: evaluate this program and identify which binding each `print` uses.
 
@@ -132,7 +138,7 @@ global
 
 The inner declaration shadows the outer one only inside the block.
 
-## Worked example 2: Closure capture
+## Keeping `a` alive in `makeAdder`
 
 Problem: determine the output of:
 
@@ -161,7 +167,7 @@ Method:
 
 Checked answer: the program prints `17`. If the interpreter used dynamic scoping, it would look for `a` in the caller's environment and likely fail. Lexical closure capture is what makes `makeAdder` work.
 
-## Code
+## Evaluating assignments and binary expressions
 
 ```python
 from dataclasses import dataclass
@@ -231,7 +237,7 @@ if __name__ == "__main__":
     print(global_env["x"])
 ```
 
-## Common pitfalls
+## Where host behavior leaks into the language
 
 - Implementing variable lookup dynamically when the language promises lexical scope.
 - Forgetting that closures must preserve environments after the defining call returns.
@@ -250,7 +256,19 @@ if __name__ == "__main__":
 - Forgetting that evaluation order is part of the language semantics.
 - Implementing equality, truthiness, and numeric conversion by accidentally inheriting host-language rules.
 
-## Connections
+## References
+
+[1] R. Nystrom, *Crafting Interpreters*. Genever Benning, 2021.  
+[2] A. V. Aho, M. S. Lam, R. Sethi, and J. D. Ullman, *Compilers: Principles, Techniques, and Tools*, 2nd ed. Pearson, 2006.  
+[3] A. W. Appel, *Modern Compiler Implementation in ML*. Cambridge University Press, 1998.  
+[4] K. D. Cooper and L. Torczon, *Engineering a Compiler*, 2nd ed. Morgan Kaufmann, 2012.  
+[5] S. S. Muchnick, *Advanced Compiler Design and Implementation*. Morgan Kaufmann, 1997.  
+[6] G. D. Plotkin, "A structural approach to operational semantics," Aarhus University, Tech. Rep., 1981.  
+[7] R. Milner, "A theory of type polymorphism in programming," *Journal of Computer and System Sciences*, vol. 17, no. 3, pp. 348-375, 1978.
+
+<div className="see-also">
+
+See also:
 
 - [Parsing and Syntax Trees](/cs/compilers/parsing-and-syntax-trees) produces the AST that a tree-walker executes.
 - [Semantic Analysis and Type Checking](/cs/compilers/semantic-analysis-and-type-checking) explains resolving, binding, and static checks before execution.
@@ -261,12 +279,4 @@ if __name__ == "__main__":
 - [Computer Architecture](/cs/computer-architecture/intro) explains why bytecode and native code can run much faster than tree walking.
 - [Theory of Computation](/cs/theory/intro) provides the formal machinery behind syntax and computability.
 
-## References
-
-[1] R. Nystrom, *Crafting Interpreters*. Genever Benning, 2021.  
-[2] A. V. Aho, M. S. Lam, R. Sethi, and J. D. Ullman, *Compilers: Principles, Techniques, and Tools*, 2nd ed. Pearson, 2006.  
-[3] A. W. Appel, *Modern Compiler Implementation in ML*. Cambridge University Press, 1998.  
-[4] K. D. Cooper and L. Torczon, *Engineering a Compiler*, 2nd ed. Morgan Kaufmann, 2012.  
-[5] S. S. Muchnick, *Advanced Compiler Design and Implementation*. Morgan Kaufmann, 1997.  
-[6] G. D. Plotkin, "A structural approach to operational semantics," Aarhus University, Tech. Rep., 1981.  
-[7] R. Milner, "A theory of type polymorphism in programming," *Journal of Computer and System Sciences*, vol. 17, no. 3, pp. 348-375, 1978.
+</div>

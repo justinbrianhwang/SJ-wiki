@@ -7,9 +7,9 @@ sidebar_position: 8
 
 Network security starts from an uncomfortable assumption: packets cross machines, links, operators, software stacks, and administrative domains that may be buggy, compromised, curious, or malicious. Peterson-Davie introduce cryptographic building blocks, authentication, TLS, IPsec, SSH, and firewalls as system components, not as decorative add-ons [1].
 
-This page covers network threat models, symmetric and public-key cryptography, AEAD, TLS 1.2, TLS 1.3, PKI, certificates, OCSP, IPsec, IKEv2, WireGuard, VPNs, firewalls, IDS/IPS, Zero Trust, DDoS mitigation, BGP hijacking, and RPKI. It cross-links naturally to [Cryptography](/cs/cryptography/intro), but the emphasis here is protocol placement and operational failure modes.
+The cryptographic details connect to [Cryptography](/cs/cryptography/intro); the focus here is where protections sit in the stack and how they fail operationally. TLS, IPsec, WireGuard, firewalls, Zero Trust controls, and RPKI defend different boundaries and cannot substitute for one another.
 
-## Definitions
+## Threats, keys, and enforcement points
 
 An **eavesdropper** reads traffic. A **spoofing attacker** sends packets with forged addresses or identities. A **man-in-the-middle (MITM)** intercepts and modifies communication while impersonating each side to the other. A **denial-of-service (DoS)** attacker exhausts a resource. A **distributed denial-of-service (DDoS)** attack uses many sources to overwhelm capacity or state.
 
@@ -23,29 +23,31 @@ An **eavesdropper** reads traffic. A **spoofing attacker** sends packets with fo
 
 **RPKI** is Resource Public Key Infrastructure, used to authorize which autonomous systems may originate IP prefixes. Route origin validation can reduce accidental leaks and some BGP hijacks [7].
 
-## Key results
+## Security properties that fail independently
 
-The first result is that security properties must be named precisely. Encryption without authentication permits active modification. Authentication without freshness permits replay. Integrity without authorization still lets a valid but unauthorized principal act. Network protocols should define confidentiality, integrity, endpoint authentication, replay protection, downgrade protection, and denial-of-service assumptions separately.
+Security properties must be named precisely. Encryption without authentication permits active modification. Authentication without freshness permits replay. Integrity without authorization still lets a valid but unauthorized principal act. Network protocols should define confidentiality, integrity, endpoint authentication, replay protection, downgrade protection, and denial-of-service assumptions separately.
 
-The second result is that TLS 1.3 is not merely a stronger TLS 1.2 cipher list. TLS 1.3 redesigns the handshake around ephemeral Diffie-Hellman, removes static RSA key exchange, removes many obsolete algorithms, encrypts most handshake messages after ServerHello, and supports 1-RTT handshakes with optional 0-RTT resumption. The 0-RTT mode improves latency but does not provide replay protection by itself, so applications must restrict it to replay-safe operations [3].
+TLS 1.3 changes more than the TLS 1.2 cipher list. It redesigns the handshake around ephemeral Diffie-Hellman, removes static RSA key exchange and many obsolete algorithms, encrypts most handshake messages after ServerHello, and supports 1-RTT handshakes with optional 0-RTT resumption. The 0-RTT mode improves latency but does not provide replay protection by itself, so applications must restrict it to replay-safe operations [3].
 
-The third result is that certificate validation is path validation plus name validation plus time and policy checks. A client verifies signatures from the leaf certificate through intermediates to a trusted root, checks validity intervals, key usage and extended key usage, certificate transparency or platform policy where required, revocation signals where used, and hostname match against Subject Alternative Name entries.
+Certificate validation combines path, name, time, and policy checks. A client verifies signatures from the leaf certificate through intermediates to a trusted root, checks validity intervals, key usage and extended key usage, certificate transparency or platform policy where required, revocation signals where used, and hostname match against Subject Alternative Name entries.
 
-The fourth result is that VPN placement changes what is protected. TLS protects application data between endpoints such as browser and origin or edge. IPsec tunnel mode protects IP packets between gateways or hosts. WireGuard creates encrypted network interfaces and routes selected prefixes through peers. A VPN does not automatically secure compromised endpoints, malicious applications, or traffic after it exits the tunnel.
+VPN placement changes what is protected. TLS protects application data between endpoints such as browser and origin or edge. IPsec tunnel mode protects IP packets between gateways or hosts. WireGuard creates encrypted network interfaces and routes selected prefixes through peers. A VPN does not automatically secure compromised endpoints, malicious applications, or traffic after it exits the tunnel.
 
-The fifth result is that firewalls are necessary but incomplete. They reduce exposed attack surface and enforce segmentation. They cannot prove application correctness, stop attacks over allowed ports by themselves, or replace identity-aware authorization. Zero Trust designs combine device posture, user identity, service identity, least privilege, continuous evaluation, and encrypted transport.
+Firewalls are necessary but incomplete. They reduce exposed attack surface and enforce segmentation. They cannot prove application correctness, stop attacks over allowed ports by themselves, or replace identity-aware authorization. Zero Trust designs combine device posture, user identity, service identity, least privilege, continuous evaluation, and encrypted transport.
 
-The sixth result is that routing security is part of network security. A BGP hijack can redirect or blackhole traffic before TLS even begins. TLS can detect many MITM attempts when certificates fail, but traffic interception can still cause outages, downgrade attempts, or metadata exposure. RPKI route origin validation helps reject unauthorized origin announcements, though it does not solve every path manipulation problem.
+Routing security is part of network security. A BGP hijack can redirect or blackhole traffic before TLS even begins. TLS can detect many MITM attempts when certificates fail, but traffic interception can still cause outages, downgrade attempts, or metadata exposure. RPKI route origin validation helps reject unauthorized origin announcements, though it does not solve every path manipulation problem.
 
-A seventh result is that security protocols need downgrade resistance. If a client and server support several versions or cipher suites, an active attacker may try to force both sides onto the weakest mutually accepted option. Modern TLS handshakes authenticate the negotiated parameters as part of the transcript, and TLS 1.3 includes compatibility mechanisms designed to prevent silent rollback. Operators still need to disable obsolete protocol versions and monitor unexpected negotiation patterns.
+Security protocols need downgrade resistance. If a client and server support several versions or cipher suites, an active attacker may try to force both sides onto the weakest mutually accepted option. Modern TLS handshakes authenticate the negotiated parameters as part of the transcript, and TLS 1.3 includes compatibility mechanisms designed to prevent silent rollback. Operators still need to disable obsolete protocol versions and monitor unexpected negotiation patterns.
 
-An eighth result is that metadata is difficult to hide. TLS protects application bytes, but observers may still see IP addresses, packet sizes, timing, DNS queries unless encrypted, and sometimes server names depending on deployment. VPNs hide traffic from the local network but reveal aggregate traffic to the VPN endpoint. Privacy-sensitive systems therefore combine encryption with traffic analysis resistance, careful DNS choices, padding where useful, and minimization of exposed identifiers.
+Metadata is difficult to hide. TLS protects application bytes, but observers may still see IP addresses, packet sizes, timing, DNS queries unless encrypted, and sometimes server names depending on deployment. VPNs hide traffic from the local network but reveal aggregate traffic to the VPN endpoint. Privacy-sensitive systems therefore combine encryption with traffic analysis resistance, careful DNS choices, padding where useful, and minimization of exposed identifiers.
 
-Finally, key management is often the real system. Strong algorithms fail when private keys are copied widely, certificates expire unnoticed, random number generators are weak, secrets are logged, or emergency rotation is untested. Production security depends on inventory, automation, hardware-backed storage where appropriate, short-lived credentials, revocation plans, and clear ownership.
+Key management is often the real system. Strong algorithms fail when private keys are copied widely, certificates expire unnoticed, random number generators are weak, secrets are logged, or emergency rotation is untested. Production security depends on inventory, automation, hardware-backed storage where appropriate, short-lived credentials, revocation plans, and clear ownership.
 
 Security monitoring closes the loop. Logs from certificate issuance, TLS termination, VPN peers, firewall decisions, DNS changes, route announcements, and identity providers let operators distinguish attack, outage, and misconfiguration. Without that evidence, even a well-designed protocol stack is difficult to defend in production.
 
-## Visual
+## TLS as one concrete protection
+
+### Reading a TLS 1.3 handshake
 
 ```mermaid
 sequenceDiagram
@@ -72,7 +74,7 @@ sequenceDiagram
 | Route hijack | False BGP origin | RPKI ROV, monitoring | Path attacks beyond origin remain hard |
 | Lateral movement | Compromised internal host | Segmentation, Zero Trust, least privilege | Identity systems become critical |
 
-## Worked example 1: TLS 1.3 handshake flight count
+### Counting the flights before an HTTPS request
 
 Problem: A client connects to a server for the first time using TLS 1.3 over TCP. Count the network round trips before encrypted application data can be sent, ignoring DNS and TCP Fast Open.
 
@@ -108,7 +110,7 @@ Client -> Server: Finished
 
 Answer: first contact usually costs one TCP RTT plus one TLS 1.3 RTT before normal encrypted application data, so about two RTTs before the first protected request if DNS is already done. QUIC combines transport and TLS handshakes, reducing this layering cost.
 
-## Worked example 2: Certificate chain validation
+### Validating a server certificate chain
 
 Problem: A browser connects to `www.example.com` and receives a leaf certificate, one intermediate certificate, and a root name. Outline the validation checks.
 
@@ -138,7 +140,7 @@ notBefore <= current time <= notAfter
 
 Answer: the connection is authenticated only if the chain signatures, trust anchor, time, hostname, key usage, and relevant policy checks all pass. A valid signature alone is not enough.
 
-## Code
+### Inspecting a live TLS connection
 
 ```python
 import socket
@@ -161,7 +163,7 @@ for key, value in tls_summary("example.com").items():
     print(key, value)
 ```
 
-## Common pitfalls
+## Failures that survive strong cryptography
 
 - Saying "encrypted" when the protocol also needs authentication and integrity.
 - Reusing AEAD nonces with the same key. This can destroy confidentiality and integrity.
@@ -177,17 +179,6 @@ for key, value in tls_summary("example.com").items():
 - Treating IDS alerts as proof of compromise without context and packet capture.
 - Assuming RPKI prevents all BGP attacks. It mainly validates route origin authorization.
 - Forgetting DDoS economics. The defense needs capacity, filtering, and operational playbooks.
-
-## Connections
-
-- [Application Layer and Naming](/cs/computer-networks/application-layer-and-naming) covers HTTPS, DNS, DoH, CDNs, and application-level authentication choices.
-- [Transport Layer: TCP and UDP](/cs/computer-networks/transport-layer-tcp-udp) explains TLS over TCP and QUIC over UDP.
-- [Internetworking and IP Routing](/cs/computer-networks/internetworking-and-ip-routing) provides IPsec, BGP, and routing context for hijack defenses.
-- [Modern Data Center Networks and SDN](/cs/computer-networks/modern-data-center-and-sdn) connects segmentation, service mesh mTLS, and programmable policy.
-- [Cryptography](/cs/cryptography/intro) gives the mathematical details of AEAD, signatures, key exchange, and hash functions.
-- [Distributed Systems](/cs/distributed-systems/intro) relies on identity, secure channels, secret distribution, and authorization.
-- [Operating Systems](/cs/operating-systems/intro) covers kernel packet filters, process isolation, key storage, and TLS libraries.
-- [Computer Architecture](/cs/computer-architecture/intro) affects AES acceleration, random number generation, trusted execution, and NIC offload.
 
 ## References
 
@@ -206,3 +197,18 @@ for key, value in tls_summary("example.com").items():
 [7] M. Lepinski and S. Kent, "An Infrastructure to Support Secure Internet Routing," RFC 6480, Feb. 2012.
 
 [8] P. Ferguson and D. Senie, "Network Ingress Filtering," RFC 2827, May 2000.
+
+<div className="see-also">
+
+See also:
+
+- [Application Layer and Naming](/cs/computer-networks/application-layer-and-naming) covers HTTPS, DNS, DoH, CDNs, and application-level authentication choices.
+- [Transport Layer: TCP and UDP](/cs/computer-networks/transport-layer-tcp-udp) explains TLS over TCP and QUIC over UDP.
+- [Internetworking and IP Routing](/cs/computer-networks/internetworking-and-ip-routing) provides IPsec, BGP, and routing context for hijack defenses.
+- [Modern Data Center Networks and SDN](/cs/computer-networks/modern-data-center-and-sdn) connects segmentation, service mesh mTLS, and programmable policy.
+- [Cryptography](/cs/cryptography/intro) gives the mathematical details of AEAD, signatures, key exchange, and hash functions.
+- [Distributed Systems](/cs/distributed-systems/intro) relies on identity, secure channels, secret distribution, and authorization.
+- [Operating Systems](/cs/operating-systems/intro) covers kernel packet filters, process isolation, key storage, and TLS libraries.
+- [Computer Architecture](/cs/computer-architecture/intro) affects AES acceleration, random number generation, trusted execution, and NIC offload.
+
+</div>

@@ -13,7 +13,7 @@ Implicit differentiation handles curves described by equations that do not solve
 
 The same idea drives related rates and linearization. In related rates, several quantities change with time and are tied together by an equation. In linearization, a differentiable curve is replaced near a point by its tangent line. Both topics ask for careful attention to variables, units, and the moment at which the information is evaluated.
 
-## Definitions
+## One chain rule, three uses
 
 An implicit equation has the form
 
@@ -61,11 +61,11 @@ $$
 \Delta y=f(x+dx)-f(x).
 $$
 
-Usually $dy$ and $\Delta y$ are close but not identical. Linearization keeps only the tangent-line behavior and ignores curvature. This is why the approximation is strongest near the base point and weaker farther away.
+Usually $dy$ and $\Delta y$ are close but not identical. Linearization keeps only the tangent-line behavior and ignores curvature. The approximation is strongest near the base point and weakens as the neglected curvature accumulates.
 
 Implicit equations can describe more than one branch. The circle $x^2+y^2=25$ is not globally the graph of one function $y=f(x)$, but near most points it splits into an upper branch and a lower branch. Implicit differentiation finds the slope of whichever local branch passes through the point being studied.
 
-## Key results
+## Local slopes, moving quantities, and tangent estimates
 
 Implicit differentiation works because ordinary differentiation follows the chain rule. If $F(x,y)=0$ and $y=y(x)$, then the composite function $F(x,y(x))$ is constantly zero. Differentiating gives
 
@@ -110,7 +110,7 @@ for some $c$ between $a$ and $x$. The last term is the error in the linear appro
 
 The formula $\frac{dy}{dx}=-F_x/F_y$ also reveals vertical and horizontal tangent candidates. If $F_y=0$ and $F_x\ne 0$, then solving for $dy/dx$ breaks down and the tangent may be vertical. If $F_x=0$ and $F_y\ne 0$, then $dy/dx=0$ and the tangent is horizontal. If both partial derivatives vanish, the point may be singular and needs a separate local analysis.
 
-Linearization is also a practical estimation tool. To approximate $\sqrt{4.1}$, use $f(x)=\sqrt{x}$ at $a=4$. Since $f(4)=2$ and $f'(x)=1/(2\sqrt{x})$, we have $f'(4)=1/4$. Thus
+Linearization is also a useful estimation tool. To approximate $\sqrt{4.1}$, use $f(x)=\sqrt{x}$ at $a=4$. Since $f(4)=2$ and $f'(x)=1/(2\sqrt{x})$, we have $f'(4)=1/4$. Thus
 
 $$
 L(4.1)=2+\frac14(0.1)=2.025.
@@ -123,8 +123,6 @@ In related rates, signs should be assigned from the actual motion, not from a me
 A final check is reasonableness. If an answer says the top of a ladder is moving upward while the bottom slides away, the sign is probably wrong. If a linear approximation is requested near $a=4$ but the estimate uses a tangent at $a=9$, the base point is probably wrong. These checks are quick and often catch errors before algebra is reviewed line by line in homework, labs, or exams.
 
 They also force the final number back into the original situation.
-
-## Visual
 
 ```mermaid
 graph TD
@@ -146,7 +144,7 @@ graph TD
 | Linearization | Explicit function near $a$ | Tangent line | Approximate value |
 | Differentials | Small input change $dx$ | $dy=f'(x)dx$ | Approximate change |
 
-## Worked example 1: tangent slope on an implicit curve
+## Tangent line to an implicit curve
 
 **Problem.** Find $dy/dx$ for
 
@@ -208,7 +206,7 @@ $$
 
 **Checked answer.** The slope is $-4/5$, and the tangent line is $y-2=-\frac45(x-1)$.
 
-## Worked example 2: related rates for a sliding ladder
+## The sliding-ladder rate at one instant
 
 **Problem.** A $10$ ft ladder leans against a wall. The bottom slides away from the wall at $2$ ft/s. How fast is the top sliding down when the bottom is $6$ ft from the wall?
 
@@ -275,39 +273,24 @@ $$
 
 The negative sign also fits the geometry: as the bottom distance $x$ increases, the top height $y$ must decrease because the ladder length is fixed.
 
-## Code
+## Keeping the dependencies straight
 
-```python
-def tangent_line_implicit(x0, y0):
-    slope = -(2*x0 + y0) / (x0 + 2*y0)
-    intercept = y0 - slope * x0
-    return slope, intercept
+- A term containing $y$ is a composition with $y(x)$, so differentiating it introduces $dy/dx$.
+- Values that hold only at the requested instant belong after differentiation. Substituting them earlier can turn a changing quantity into a false constant.
+- Rate signs carry physical meaning: a negative height rate says the height is decreasing. Constants such as the ladder length, by contrast, really do have zero time derivative.
+- In a related-rates problem, every derivative is with respect to time. The notation should remain $dx/dt$, $dy/dt$, or $dV/dt$, not $dy/dx$.
+- The denominator in an implicit-slope formula can vanish. That signals a possible vertical tangent or singular point, not an infinite ordinary derivative to manipulate casually.
+- A geometric sketch is often where the governing equation comes from; right triangles, circles, and cones are much easier to model once the changing lengths are labeled.
+- Linearization is local. Its accuracy deteriorates away from the base point, especially where curvature is large.
+- A reported rate needs units and direction. “Down at $3/2$ ft/s” carries more information than the bare number $-3/2$.
 
-def ladder_top_rate(x, dx_dt, length=10):
-    y = (length**2 - x**2) ** 0.5
-    dy_dt = -(x * dx_dt) / y
-    return y, dy_dt
+<div className="see-also">
 
-print(tangent_line_implicit(1, 2))
-print(ladder_top_rate(6, 2))
-```
-
-## Common pitfalls
-
-- Forgetting to multiply by $dy/dx$ when differentiating a term containing $y$.
-- Substituting instant values before differentiating in a related rates problem.
-- Losing the sign of a rate. A negative value often has a physical meaning, such as height decreasing.
-- Using the ladder length as a variable even though it is constant in the problem.
-- Treating linearization as exact. It is an approximation that improves near the base point.
-- Forgetting that implicit slopes may fail where the denominator in $dy/dx$ is zero.
-- Using $dy/dx$ in a related rates problem when the requested rates are with respect to time. Write $dx/dt$, $dy/dt$, or $dV/dt$ as appropriate.
-- Not drawing a diagram for geometric problems. The equation often comes directly from a right triangle, circle, cone, or similar figure.
-- Reporting a rate without units or direction. "Down at $3/2$ ft/s" is clearer than just $-3/2$.
-- Applying linearization far from the base point without checking curvature or error.
-
-## Connections
+See also:
 
 - [Differentiation Rules](/math/calculus/differentiation-rules): implicit work depends heavily on product and chain rules.
 - [Applications of Derivatives](/math/calculus/applications-of-derivatives): tangent lines and rates support graph analysis and applied problems.
 - [Optimization Newton and Antiderivatives](/math/calculus/optimization-newton-antiderivatives): linearization leads naturally to Newton's method.
 - [Partial Derivatives and the Gradient](/math/calculus/partial-derivatives-and-gradient): the formula $dy/dx=-F_x/F_y$ previews multivariable derivatives.
+
+</div>

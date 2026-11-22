@@ -377,10 +377,8 @@ The summary includes slope, intercept, standard errors, p-values, and $R^2$. The
 - Reading a statistically significant slope as proof of causation.
 - Confusing confidence intervals for the mean response with prediction intervals for individuals.
 
-## Related pages
+<div className="see-also">
 
-- [Bivariate data and correlation](/math/statistics/bivariate-data-and-correlation)
-- [Summarizing distributions](/math/statistics/summarizing-distributions)
-- [Hypothesis testing logic](/math/statistics/hypothesis-testing-logic)
-- [ANOVA](/math/statistics/anova)
-- [Effect size, nonparametric methods, and resampling](/math/statistics/effect-size-nonparametric-and-resampling)
+See also: [Bivariate data and correlation](/math/statistics/bivariate-data-and-correlation) · [Summarizing distributions](/math/statistics/summarizing-distributions) · [Hypothesis testing logic](/math/statistics/hypothesis-testing-logic) · [ANOVA](/math/statistics/anova) · [Effect size, nonparametric methods, and resampling](/math/statistics/effect-size-nonparametric-and-resampling)
+
+</div>

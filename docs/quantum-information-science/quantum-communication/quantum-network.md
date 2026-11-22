@@ -5,21 +5,17 @@ sidebar_position: 4
 
 # Quantum Network
 
-A quantum network connects quantum-capable nodes through physical channels, classical control, and protocols for producing keys, distributing entanglement, teleporting states, or coordinating distributed quantum tasks. In the quantum communication area, the near-term network usually means QKD links and trusted-node key relay. In the quantum internet area, the long-term network means entanglement distribution with memories, repeaters, and eventually networked quantum processors.
+A quantum network connects quantum-capable nodes through physical channels, classical control, and protocols for producing keys, distributing entanglement, teleporting states, or coordinating distributed quantum tasks. Near-term networks usually mean QKD links and trusted-node key relay. Longer-term designs add entanglement distribution, memories, repeaters, and eventually networked quantum processors.
 
 The distinction matters because "network" can hide very different trust assumptions. A metropolitan QKD network can be valuable even if every relay is trusted. A quantum internet aims for stronger primitives: Alice and Bob should be able to share entanglement or transmit unknown qubits without trusting every intermediate station with their final secret. That stronger goal is exactly why [quantum repeaters](/quantum-information-science/quantum-internet/quantum-repeater), memories, and entanglement swapping are central.
 
-Nielsen and Chuang are not primarily a quantum-networking reference, but their channel and cryptography chapters fix the foundations used here: quantum noise is modeled by quantum operations, unknown states cannot be amplified by copying, and QKD security depends on authenticated classical communication plus postprocessing. The networking layer below should therefore be read as a system-level extension of the [BB84](/quantum-information-science/quantum-communication/bb84) and [QKD](/quantum-information-science/quantum-communication/qkd) pages, not as a separate security proof.
-
-![A single-mode fiber optic cable carries light through a bend, illustrating an optical quantum-network link.](https://commons.wikimedia.org/wiki/Special:FilePath/Fiber_Optical_Cable.jpg)
-
-*Figure: Quantum networks still run through ordinary physical infrastructure, but unknown qubits make loss, buffering, and routing fundamentally different from classical packet forwarding. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fiber_Optical_Cable.jpg), Bquast, CC0 1.0.*
+Nielsen and Chuang are not primarily a quantum-networking reference, but their channel and cryptography chapters fix the foundations: quantum noise is modeled by quantum operations, unknown states cannot be amplified by copying, and QKD security depends on authenticated classical communication plus postprocessing. Network design extends the [BB84](/quantum-information-science/quantum-communication/bb84) and [QKD](/quantum-information-science/quantum-communication/qkd) link protocols; it does not supply a separate security proof.
 
 ![A quantum buffer diagram shows entangled optical images delayed by a rubidium vapor cell.](https://commons.wikimedia.org/wiki/Special:FilePath/Quantum_buffer_%285940501733%29.jpg)
 
 *Figure: Buffering and memory are network-level problems because one successful quantum link may need to wait for another link and a heralding message. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quantum_buffer_%285940501733%29.jpg), National Institute of Standards and Technology / A. Marino, public domain.*
 
-## Definitions
+## Nodes, links, and trust boundaries
 
 **Quantum node** is a device that can prepare, measure, store, or process quantum states. A simple QKD transmitter or receiver is a node. A more advanced repeater node may contain quantum memories, Bell-state measurement hardware, and local gates.
 
@@ -37,9 +33,9 @@ Nielsen and Chuang are not primarily a quantum-networking reference, but their c
 
 **Network stack** is the separation of responsibilities into layers. Quantum networks are still an active research area, so the exact stack is not as settled as TCP/IP, but the analogy is useful for engineering.
 
-## Key results
+## Distance, capability, and deployment
 
-A practical quantum network needs both a physical quantum service and a classical network service. The physical layer handles photons, wavelengths, timing, coupling, attenuation, detector noise, and calibration. The link layer decides whether adjacent nodes successfully produced a raw key block or an elementary entangled pair. The network layer chooses paths, schedules resources, and composes links. The transport layer hides loss, retries, buffering, and service quality from applications. The application layer asks for keys, Bell pairs, remote-state preparation, secure identification, or distributed quantum-computing operations.
+A functioning quantum network needs both a physical quantum service and a classical network service. The physical layer handles photons, wavelengths, timing, coupling, attenuation, detector noise, and calibration. The link layer decides whether adjacent nodes successfully produced a raw key block or an elementary entangled pair. The network layer chooses paths, schedules resources, and composes links. The transport layer hides loss, retries, buffering, and service quality from applications. The application layer asks for keys, Bell pairs, remote-state preparation, secure identification, or distributed quantum-computing operations.
 
 Loss is the central scaling obstacle. In fiber with attenuation $\alpha$ dB/km, transmittance over length $L$ is
 
@@ -103,7 +99,7 @@ for each switching epoch:
 
 As a scale check, a 500 kB sifted block accumulated in about six minutes corresponds to roughly $500\cdot1024\cdot8/360\approx11.4$ kbps of sifted detections. A 32-byte MACsec rekey each minute needs only $256/60\approx4.3$ bits/s of key material before accounting for reserves and policy overhead. The deployment result in [1] is therefore best read as evidence that, on short metropolitan spans, orchestration and integration can dominate the engineering story once the raw optical link is stable.
 
-## Visual
+### The stack around a trusted-node route
 
 ```mermaid
 flowchart TB
@@ -158,7 +154,7 @@ The topology block shows a trusted-node network as a chain of independently secu
 | Entanglement-swapping network | No, if implemented correctly | Usually yes for scalability | Research testbeds, future repeaters | Memory quality and heralding rates |
 | Fault-tolerant quantum internet | No by design goal | Yes, encoded | Long-term distributed quantum computing | Far beyond ordinary QKD deployment |
 
-## Worked example 1: Trusted-node key relay on a three-hop chain
+## Relaying a key across two trusted nodes
 
 **Problem.** Alice wants an 8-bit session key with Bob through two trusted relays $R_1$ and $R_2$. Neighboring QKD links have already produced hop keys:
 
@@ -216,11 +212,11 @@ $$
 C_3\oplus K_{2B}=11110100\oplus11001001=00111101.
 $$
 
-**Checked answer.** Bob obtains $K=00111101$. The relays $R_1$ and $R_2$ also learned $K$ while decrypting and re-encrypting. This is why the architecture is called trusted-node networking. It can extend QKD service across a backbone, but it is not end-to-end secrecy against relay compromise.
+**Checked answer.** Bob obtains $K=00111101$. The relays $R_1$ and $R_2$ also learned $K$ while decrypting and re-encrypting, hence the name *trusted-node networking*. The chain can extend QKD service across a backbone, but it does not protect the key from relay compromise.
 
-## Worked example 2: Expected entanglement-swapping rate
+## Synchronized entanglement-swapping rate
 
-**Problem.** Alice and Bob are connected through one repeater node $R$. In each attempt, Alice-$R$ entanglement succeeds with probability $p_1=0.20$, $R$-Bob entanglement succeeds with probability $p_2=0.30$, and the Bell-state measurement at $R$ succeeds with probability $p_{\mathrm{BSM}}=0.50$ once both links are ready. If attempts run at $1000$ per second and memories are ideal for this toy calculation, estimate the end-to-end Bell-pair rate.
+**Problem.** Alice and Bob are connected through one repeater node $R$. In each synchronized attempt, Alice-$R$ entanglement succeeds with probability $p_1=0.20$, $R$-Bob entanglement succeeds with probability $p_2=0.30$, and the Bell-state measurement at $R$ succeeds with probability $p_{\mathrm{BSM}}=0.50$ if both links succeed. If attempts run at $1000$ per second and successful elementary links are not carried over between attempts, estimate the end-to-end Bell-pair rate.
 
 **Method.**
 
@@ -257,9 +253,9 @@ $$
 
    end-to-end Bell pairs per second.
 
-**Checked answer.** The toy rate is 30 Bell pairs per second. Real repeaters need memory waiting time, decoherence, purification or error correction overhead, classical signal delays, multiplexing, and scheduling. The simple multiplication is still useful because it shows why every elementary-link probability and swapping probability matters.
+**Checked answer.** The synchronized-attempt model gives 30 Bell pairs per second. A repeater that stores one successful elementary link while retrying the other has different waiting-time statistics and can exceed this rate with ideal memories. Decoherence, purification or error-correction overhead, classical signal delays, multiplexing, and scheduling then determine the usable rate.
 
-## Code
+## Routing by multiplicative link success
 
 ```python
 import heapq
@@ -299,17 +295,25 @@ for trusted_only in [False, True]:
 
 The graph marks whether an edge is acceptable for a trusted-node QKD service. A real network scheduler would also track key-buffer inventory, wavelength availability, memory lifetimes, fidelity, and policy constraints.
 
-## Common pitfalls
+## What network claims often leave out
 
-- Calling every QKD deployment a quantum internet. A trusted-node QKD backbone is a quantum communication network, but it does not provide arbitrary qubit transmission or end-to-end entanglement.
-- Ignoring the classical control plane. Quantum links need authenticated messages, timing, heralding, routing, reconciliation, and application signaling.
-- Assuming repeaters are optical amplifiers. Unknown quantum states cannot be copied and amplified; repeaters need entanglement, memory, swapping, and error management.
-- Comparing distances without trust models. A long trusted-relay QKD network and a shorter entanglement-distribution testbed demonstrate different capabilities.
-- Forgetting that entanglement rate is not enough. Fidelity, heralding latency, memory lifetime, and application requirements determine whether the entanglement is useful.
-- Treating the roadmap stages as strict calendar predictions. They are capability classes, not guaranteed deployment dates.
-- Neglecting key management. QKD links generate key material, but applications need buffering, access control, auditing, expiration, and integration with classical cryptographic protocols.
+- A trusted-node QKD backbone is a quantum communication network, but it does not provide arbitrary qubit transmission or end-to-end entanglement.
+- Quantum links depend on authenticated messages, timing, heralding, routing, reconciliation, and application signaling in the classical control plane.
+- Repeaters are not optical amplifiers. They need entanglement, memory, swapping, and error management because unknown quantum states cannot be copied and amplified.
+- Distance records mean little without the trust model. A long trusted-relay QKD network and a shorter entanglement-distribution testbed demonstrate different capabilities.
+- Entanglement rate alone omits fidelity, heralding latency, memory lifetime, and the consuming application's requirements.
+- The roadmap stages are capability classes rather than deployment dates.
+- QKD links generate key material; applications still need buffering, access control, auditing, expiration, and integration with classical cryptographic protocols.
 
-## Connections
+## References
+
+[1] A. De Toni, E. Bortolozzo, A. Emanuele, M. Venturini, L. Calderaro, M. Avesani, G. Vallone, P. Villoresi. *Long-term analysis of efficient-BB84 4-node network with optical switches in metropolitan environment*. arXiv:2510.16867v1, 2025.
+
+Nielsen and Chuang, *Quantum Computation and Quantum Information*, Chapters 8 and 12, for the quantum-channel and QKD foundations behind the network abstractions.
+
+<div className="see-also">
+
+See also:
 
 - [Quantum Communication](/quantum-information-science/quantum-communication/intro) for the area overview and distinction between QKD networks and quantum internet goals.
 - [BB84 Protocol](/quantum-information-science/quantum-communication/bb84) and [Quantum Key Distribution](/quantum-information-science/quantum-communication/qkd) for the link-layer protocols used in many near-term networks.
@@ -317,8 +321,5 @@ The graph marks whether an edge is acceptable for a trusted-node QKD service. A 
 - [Entanglement](/quantum-information-science/quantum-internet/entanglement), [Quantum Teleportation](/quantum-information-science/quantum-internet/teleportation), and [Quantum Repeater](/quantum-information-science/quantum-internet/quantum-repeater) for the core primitives beyond trusted-node QKD.
 - [Quantum Computing Hardware](/quantum-information-science/quantum-computing/hardware) and [Quantum Error Correction](/quantum-information-science/quantum-computing/error-correction) for memories, gates, and fault-tolerant ingredients.
 - [TLS Protocol Overview](/cs/cryptography/tls-protocol-overview), [Authenticated Encryption GCM](/cs/cryptography/authenticated-encryption-gcm), and [Message Authentication Codes](/cs/cryptography/message-authentication-codes) for the classical network-security mechanisms that still surround QKD.
-- Nielsen and Chuang, *Quantum Computation and Quantum Information*, Chapters 8 and 12, for the quantum-channel and QKD foundations behind the network abstractions.
 
-## References
-
-[1] A. De Toni, E. Bortolozzo, A. Emanuele, M. Venturini, L. Calderaro, M. Avesani, G. Vallone, P. Villoresi. *Long-term analysis of efficient-BB84 4-node network with optical switches in metropolitan environment*. arXiv:2510.16867v1, 2025.
+</div>

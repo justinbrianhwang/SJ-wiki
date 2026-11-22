@@ -379,10 +379,8 @@ One more distinction matters when choosing an interface:
 
 `std::array` has essentially the same contiguous fixed-size storage model as a built-in array but participates in assignment, return-by-value, and standard algorithms more smoothly. `std::span` is useful for parameters because it can refer to an array, an `std::array`, or a `std::vector` without owning any of them. Its lifetime cannot exceed the storage it views.
 
-## Related pages
+<div className="see-also">
 
-- [C++ basics and control flow](/cs/programming/cpp/cpp-basics-and-control-flow)
-- [functions and parameters](/cs/programming/cpp/functions-parameters-and-scope)
-- [strings](/cs/programming/cpp/strings)
-- [pointers and dynamic memory](/cs/programming/cpp/pointers-and-dynamic-memory)
-- [STL containers](/cs/programming/cpp/stl-containers)
+See also: [C++ basics and control flow](/cs/programming/cpp/cpp-basics-and-control-flow) · [functions and parameters](/cs/programming/cpp/functions-parameters-and-scope) · [strings](/cs/programming/cpp/strings) · [pointers and dynamic memory](/cs/programming/cpp/pointers-and-dynamic-memory) · [STL containers](/cs/programming/cpp/stl-containers)
+
+</div>

@@ -9,7 +9,7 @@ Control flow is how a program decides what to do next. Halvorsen's textbook intr
 
 Python's control flow is deliberately small. Conditions choose branches. Loops repeat work. `break` exits a loop. `continue` skips to the next iteration. Comprehensions build collections from existing iterables. Once these pieces are clear, many programs become combinations of filtering, transforming, accumulating, and stopping at the right time.
 
-## Definitions
+## Branching, looping, and building collections
 
 An **`if` statement** selects a block based on a condition:
 
@@ -49,11 +49,11 @@ even_squares = [x * x for x in range(10) if x % 2 == 0]
 
 Python has list, set, dictionary, and generator comprehensions. The general order is: output expression, `for` clause, optional `if` filter.
 
-## Key results
+## Choosing between branches, loops, and comprehensions
 
-The first key result is that conditions should say the real decision. Instead of writing `if len(items) > 0:`, Python usually favors `if items:`. Instead of `if valid == True:`, write `if valid:`.
+Conditions should say the real decision. Instead of writing `if len(items) > 0:`, Python usually favors `if items:`. Instead of `if valid == True:`, write `if valid:`.
 
-The second result is that `for` loops are usually preferred over index-based loops when the index itself is not needed. Compare:
+`for` loops are usually preferred over index-based loops when the index itself is not needed. Compare:
 
 ```python
 for item in items:
@@ -69,21 +69,21 @@ for i in range(len(items)):
 
 The first version is shorter and avoids off-by-one errors. When both index and value are needed, use `enumerate(items)`.
 
-The third result is that `range()` represents a sequence of integers without storing all of them in memory. `range(5)` produces `0, 1, 2, 3, 4`. `range(2, 10, 3)` produces `2, 5, 8`. This is the usual tool for counted loops.
+`range()` represents a sequence of integers without storing all of them in memory. `range(5)` produces `0, 1, 2, 3, 4`. `range(2, 10, 3)` produces `2, 5, 8`. This is the usual tool for counted loops.
 
-The fourth result is that `while` loops are best when the number of iterations is not known in advance: reading until end-of-file, retrying until valid input, or simulating until a threshold is reached. If the iteration is over known data, use `for`.
+`while` loops are best when the number of iterations is not known in advance: reading until end-of-file, retrying until valid input, or simulating until a threshold is reached. If the iteration is over known data, use `for`.
 
-The fifth result is that comprehensions are expressions, not a replacement for every loop. They are excellent for clear transformations and filters. Use a normal loop when the body needs several statements, error handling, logging, or mutation of multiple outputs.
+Comprehensions are expressions, not a replacement for every loop. They are excellent for clear transformations and filters. Use a normal loop when the body needs several statements, error handling, logging, or mutation of multiple outputs.
 
-The sixth result is that loop `else` exists in Python. A loop's `else` block runs only if the loop finishes without `break`. It is useful for search problems, but many teams use it sparingly because it is unfamiliar.
+Loop `else` exists in Python. A loop's `else` block runs only if the loop finishes without `break`. It is useful for search problems, but many teams use it sparingly because it is unfamiliar.
 
-A seventh result is that control flow should make the normal path obvious. If a function rejects invalid input, it is often clearer to return or raise early, then leave the main logic unindented. For example, a function can start with `if window <= 0: raise ValueError(...)` and then proceed with the algorithm. This keeps the successful path from being buried under several levels of nested `if` statements.
+Control flow should make the normal path obvious. If a function rejects invalid input, it is often clearer to return or raise early, then leave the main logic unindented. For example, a function can start with `if window <= 0: raise ValueError(...)` and then proceed with the algorithm. This keeps the successful path from being buried under several levels of nested `if` statements.
 
-An eighth result is that loops usually combine one of a few patterns: transform each item, filter items, accumulate a summary, search for one item, or coordinate side effects such as writing lines to a file. Naming the pattern helps choose the construct. Transformation and filtering often fit comprehensions. Accumulation often fits `sum`, `min`, `max`, `Counter`, or a direct loop. Searching often fits a loop with `break`, `next(...)`, or a helper function that returns as soon as the target is found.
+Loops usually combine one of a few patterns: transform each item, filter items, accumulate a summary, search for one item, or coordinate side effects such as writing lines to a file. Naming the pattern helps choose the construct. Transformation and filtering often fit comprehensions. Accumulation often fits `sum`, `min`, `max`, `Counter`, or a direct loop. Searching often fits a loop with `break`, `next(...)`, or a helper function that returns as soon as the target is found.
 
-A final practical result is to keep loop bodies small enough that the iteration variable remains meaningful. When a loop body grows into several conceptual stages, extract a function. A loop such as `for row in rows: process_row(row)` is not less serious than a long inlined body; it is usually easier to test and debug. This style also improves error handling because the helper function can validate one row at a time and report which row failed.
+Keep loop bodies small enough that the iteration variable remains meaningful. When a loop body grows into several conceptual stages, extract a function. A loop such as `for row in rows: process_row(row)` is not less serious than a long inlined body; it is usually easier to test and debug. This style also improves error handling because the helper function can validate one row at a time and report which row failed.
 
-## Visual
+The branch diagram and comparison table show where each construct hands control next:
 
 ```mermaid
 flowchart TD
@@ -106,7 +106,7 @@ flowchart TD
 | `continue` | Skip current item | ignore invalid row | Next iteration |
 | comprehension | Build a new collection | filter and map | Iterable exhausted |
 
-## Worked example 1: classify measurements
+## Classifying a series of measurements
 
 Problem: given temperatures in Celsius, classify each as `freezing`, `cool`, `comfortable`, or `hot`, and count how many values fall in each category.
 
@@ -157,7 +157,7 @@ Checked answer:
 
 The counts sum to `6`, which equals `len(readings)`.
 
-## Worked example 2: replace a loop with a comprehension
+## Cleaning data before using a comprehension
 
 Problem: from a list of raw sensor strings, keep valid numeric readings and convert them to floats.
 
@@ -208,7 +208,7 @@ readings == [22.5, 19.0, 25.25]
 
 Checked answer: the resulting list contains three floats, and each came from a string that successfully passed the conversion test.
 
-## Code
+## A moving average with explicit control flow
 
 ```python
 def moving_average(values, window):
@@ -230,9 +230,9 @@ print([value for value in temperatures if value >= 23])
 
 The function uses `if` for validation, `range()` for controlled indexing, slicing to extract each window, and a comprehension to filter high readings.
 
-The example also shows a useful split between loop logic and one-line filtering. The moving average needs several steps, so a normal loop is easier to inspect. The high-temperature filter is a direct "keep values meeting this condition" operation, so the comprehension is clear. This is a good rule of thumb: use the construct that makes the shape of the work visible. If a comprehension starts needing comments, temporary variables, or exception handling, promote it back to a loop.
+The example also shows a useful split between loop logic and one-line filtering. The moving average needs several steps, so a normal loop is easier to inspect. The high-temperature filter is a direct "keep values meeting this condition" operation, so the comprehension is clear. Use the construct that exposes the shape of the work. If a comprehension starts needing comments, temporary variables, or exception handling, promote it back to a loop.
 
-## Common pitfalls
+## Control-flow bugs to watch for
 
 - Writing `if x = 3:` instead of `if x == 3:`. Assignment and comparison are different.
 - Forgetting the colon after `if`, `elif`, `else`, `for`, or `while`.
@@ -242,9 +242,8 @@ The example also shows a useful split between loop logic and one-line filtering.
 - Making comprehensions too clever. If the expression needs explanation, use a normal loop.
 - Putting conditions in the wrong order. In an `elif` chain, the first true branch wins.
 
-## Connections
+<div className="see-also">
 
-- [Operators and Expressions](/cs/programming/python/operators-and-expressions)
-- [Containers and Idioms](/cs/programming/python/containers-and-idioms)
-- [Functions, Arguments, and Decorators](/cs/programming/python/functions-arguments-and-decorators)
-- [Iterators, Generators, and Functional Tools](/cs/programming/python/iterators-generators-and-functional-tools)
+See also: [Operators and Expressions](/cs/programming/python/operators-and-expressions) · [Containers and Idioms](/cs/programming/python/containers-and-idioms) · [Functions, Arguments, and Decorators](/cs/programming/python/functions-arguments-and-decorators) · [Iterators, Generators, and Functional Tools](/cs/programming/python/iterators-generators-and-functional-tools)
+
+</div>

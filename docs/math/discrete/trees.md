@@ -9,7 +9,7 @@ Trees are connected graphs with no cycles. They are minimal connected structures
 
 Tree arguments are often simpler than general graph arguments because there is exactly one simple path between any two vertices. That uniqueness supports recursive definitions, induction proofs, traversal algorithms, and greedy optimization methods such as minimum spanning trees.
 
-## Definitions
+## Rooted, binary, and spanning trees
 
 A **tree** is a connected undirected graph with no simple circuits. A graph with no simple circuits but possibly several components is a **forest**. Each connected component of a forest is a tree.
 
@@ -19,7 +19,7 @@ An **ordered rooted tree** gives an order to the children of each vertex. A **bi
 
 A **spanning tree** of a connected graph $G$ is a subgraph that includes every vertex of $G$ and is a tree. For a weighted connected graph, a **minimum spanning tree** is a spanning tree whose total edge weight is as small as possible.
 
-## Key results
+## Six equivalent ways to recognize a tree
 
 For a tree with $n$ vertices, the number of edges is $n-1$.
 
@@ -40,7 +40,7 @@ Kruskal's and Prim's algorithms find minimum spanning trees in weighted connecte
 
 In a full binary tree with $i$ internal vertices, the number of leaves is $i+1$. Counting edges gives one proof: the tree has $i+\ell$ vertices and therefore $i+\ell-1$ edges. It also has $2i$ child edges because each internal vertex has two children. Hence $2i=i+\ell-1$, so $\ell=i+1$.
 
-## Visual
+## Traversal order and spanning structure
 
 ```mermaid
 graph TD
@@ -61,11 +61,9 @@ graph TD
 | DFS spanning tree | depth-first exploration | components, cycle analysis |
 | MST algorithms | add safe edges | minimum-cost connected network |
 
-## Worked example 1: Use tree edge counts
+## Recovering a missing degree from the edge count
 
 **Problem.** A tree has $18$ vertices. How many edges does it have? If the sum of degrees of $17$ vertices is $31$, what is the degree of the remaining vertex?
-
-**Method.**
 
 1. A tree with $n$ vertices has $n-1$ edges.
 2. With $n=18$:
@@ -86,17 +84,15 @@ $$
 34-31=3.
 $$
 
-**Checked answer.** The tree has $17$ edges, and the remaining vertex has degree $3$. The answer uses both the tree edge formula and the graph handshaking theorem.
+The tree has $17$ edges, and the remaining vertex has degree $3$. The answer uses both the tree edge formula and the graph handshaking theorem.
 
-## Worked example 2: Run Kruskal's algorithm
+## Kruskal's algorithm on four vertices
 
 **Problem.** Find a minimum spanning tree for vertices $A,B,C,D$ with weighted edges:
 
 $$
 AB:1,\quad AC:4,\quad AD:3,\quad BC:2,\quad BD:5,\quad CD:6.
 $$
-
-**Method.**
 
 1. Sort edges by weight:
 
@@ -114,9 +110,9 @@ $$
 1+2+3=6.
 $$
 
-**Checked answer.** One MST is $\{AB,BC,AD\}$ with total weight $6$. Edges $AC,BD,CD$ are skipped because a spanning tree on $4$ vertices needs exactly $3$ edges, and adding any further edge would create a cycle.
+One MST is $\{AB,BC,AD\}$ with total weight $6$. Edges $AC,BD,CD$ are skipped because a spanning tree on $4$ vertices needs exactly $3$ edges, and adding any further edge would create a cycle.
 
-## Code
+## Recursive traversal and cycle-safe edge selection
 
 ```python
 def preorder(tree, root):
@@ -149,7 +145,7 @@ print(kruskal({"A", "B", "C", "D"}, edges))
 
 The traversal function is recursive because a rooted tree is recursively made of a root and its subtrees. Kruskal's algorithm uses disjoint-set representatives to avoid cycles.
 
-## Common pitfalls
+## Choosing the right tree characterization
 
 - Forgetting that a tree must be connected and acyclic. A forest is acyclic but may be disconnected.
 - Using $n-1$ edges as the only tree test without checking connectedness or acyclicity.
@@ -160,7 +156,7 @@ The traversal function is recursive because a rooted tree is recursively made of
 
 Tree proofs often become easy after choosing the right characterization. If a graph is connected and has $n-1$ edges, it is a tree; if it is acyclic and has $n-1$ edges, it is also a tree. If every pair of vertices has a unique simple path, it is a tree. Switching between these forms can turn a difficult cycle argument into a simple edge-count argument.
 
-Leaves are the engine behind many induction proofs on trees. Every finite tree with at least two vertices has at least two leaves. Removing a leaf preserves the tree property for the remaining graph, while adding a leaf to a smaller tree preserves connectedness and acyclicity. This is why induction on the number of vertices works so naturally for trees.
+Leaves are the engine behind many induction proofs on trees. Every finite tree with at least two vertices has at least two leaves. Removing a leaf preserves the tree property for the remaining graph, while adding a leaf to a smaller tree preserves connectedness and acyclicity. Induction on the number of vertices follows this construction directly.
 
 Rooted-tree terminology depends on the chosen root. The same unrooted tree can produce different parent-child relationships if a different root is selected. Ancestor, descendant, level, and height are therefore not properties of the unrooted graph alone. In algorithms, the root is often determined by a search start vertex or by a data-structure invariant.
 
@@ -172,10 +168,14 @@ For spanning tree problems, check the result has exactly $n-1$ edges and is conn
 
 In rooted trees, traversal order is a convention with consequences. Preorder lists a parent before descendants, postorder lists descendants before the parent, and inorder is special to binary trees. When reconstructing a tree from traversals, state which traversal conventions are being used; otherwise the same sequence can be interpreted differently.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Graphs basics](/math/discrete/graphs-basics) supplies graph, degree, connectedness, and handshaking definitions.
 - [Graph paths, connectivity, and shortest paths](/math/discrete/graph-paths-connectivity-shortest-paths) supplies paths, BFS trees, and DFS trees.
 - [Induction and recursion](/math/discrete/induction-and-recursion) supports tree proofs and recursive traversals.
 - [Algorithms and complexity](/math/discrete/algorithms-and-complexity) analyzes Kruskal, Prim, and tree traversal costs.
 - [Equivalence relations and partial orders](/math/discrete/equivalence-relations-and-partial-orders) connects trees to Hasse diagrams and hierarchies.
+
+</div>

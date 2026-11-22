@@ -318,10 +318,8 @@ Iterator adaptors encode destination behavior. A back inserter appends, a front 
 
 Projection is another useful separation in modern ranges. Instead of writing a comparator that repeatedly extracts `employee.name()`, an algorithm can compare by a projected member or accessor. Classic algorithms express the same idea with a lambda. Either form keeps the ordering rule beside the call rather than embedding it in the stored type.
 
-## Related pages
+<div className="see-also">
 
-- [stl containers](/cs/programming/cpp/stl-containers)
-- [templates](/cs/programming/cpp/templates)
-- [arrays](/cs/programming/cpp/arrays)
-- [strings](/cs/programming/cpp/strings)
-- [linked data structures](/cs/programming/cpp/linked-data-structures)
+See also: [stl containers](/cs/programming/cpp/stl-containers) · [templates](/cs/programming/cpp/templates) · [arrays](/cs/programming/cpp/arrays) · [strings](/cs/programming/cpp/strings) · [linked data structures](/cs/programming/cpp/linked-data-structures)
+
+</div>

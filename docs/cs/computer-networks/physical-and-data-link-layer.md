@@ -7,9 +7,9 @@ sidebar_position: 2
 
 The physical and data link layers turn a raw medium into a usable local communication service. The physical side decides how bits are represented as voltage, light, or radio symbols. The data link side decides where frames start and end, how receivers detect damaged frames, and when a sender should retransmit. Peterson-Davie present these mechanisms early because every higher protocol quietly depends on them [1].
 
-This page focuses on the common design pattern: encode bits so the receiver can recover clock and data, frame a byte or bit stream into packets, detect errors with redundancy, and optionally recover from loss with automatic repeat request (ARQ). These ideas reappear in Ethernet, Wi-Fi, PPP, TCP, QUIC, storage protocols, and distributed log replication.
+The recurring design pattern is to encode bits so the receiver can recover clock and data, frame a byte or bit stream into packets, detect errors with redundancy, and optionally recover from loss with automatic repeat request (ARQ). The same ideas reappear in Ethernet, Wi-Fi, PPP, TCP, QUIC, storage protocols, and distributed log replication.
 
-## Definitions
+## From physical symbols to acknowledged frames
 
 **Encoding** maps data bits to physical signals. **NRZ** sends one signal level for 1 and another for 0, but long runs make clock recovery hard. **NRZI** changes level for a 1 and keeps the level for a 0, which helps when transitions are frequent. **Manchester encoding** places a transition in every bit period, improving clock recovery at the cost of bandwidth efficiency. **4B/5B** maps each 4-bit nibble to a 5-bit code with enough transitions and reserved control symbols.
 
@@ -19,15 +19,15 @@ An **error-detecting code** adds redundant bits so the receiver can detect likel
 
 **ARQ** is automatic repeat request: a sender retransmits data that is not acknowledged. **Stop-and-wait** allows one outstanding frame. **Sliding window** allows multiple outstanding frames. **Go-Back-N** retransmits from the first missing frame onward. **Selective Repeat** retransmits only the missing frames, requiring a receiver buffer and enough sequence number space.
 
-## Key results
+## What redundancy and windowing buy
 
-The first result is that clock recovery is a protocol problem, not just an electrical problem. If the receiver samples at the wrong instant, perfectly transmitted voltage levels become wrong bits. Encodings such as Manchester or 4B/5B spend extra signal changes to keep sender and receiver synchronized.
+Clock recovery is a protocol problem as well as an electrical one. If the receiver samples at the wrong instant, perfectly transmitted voltage levels become wrong bits. Encodings such as Manchester or 4B/5B spend extra signal changes to keep sender and receiver synchronized.
 
-The second result is that transparent framing needs an escape rule. If a sentinel byte marks frame boundaries, that same byte may appear inside the payload. Byte stuffing solves this by inserting an escape byte before data bytes that would otherwise be misread as control bytes. At the receiver, the escape is removed. Bit stuffing is the same idea at bit granularity: after five consecutive 1 bits in HDLC-style framing, the sender inserts a 0 so the flag pattern cannot appear accidentally [1].
+Transparent framing needs an escape rule. If a sentinel byte marks frame boundaries, that same byte may appear inside the payload. Byte stuffing solves this by inserting an escape byte before data bytes that would otherwise be misread as control bytes. At the receiver, the escape is removed. Bit stuffing is the same idea at bit granularity: after five consecutive 1 bits in HDLC-style framing, the sender inserts a 0 so the flag pattern cannot appear accidentally [1].
 
-The third result is that CRCs detect burst errors much better than simple checksums for link frames. With generator $G(x)$ of degree $r$, the sender appends $r$ check bits so the transmitted polynomial is divisible by $G(x)$. The receiver divides the whole received frame by $G(x)$. A nonzero remainder indicates an error. Good generator polynomials detect all single-bit errors, many multi-bit errors, and all burst errors shorter than or equal to $r$ bits under standard assumptions.
+CRCs detect burst errors much better than simple checksums for link frames. With generator $G(x)$ of degree $r$, the sender appends $r$ check bits so the transmitted polynomial is divisible by $G(x)$. The receiver divides the whole received frame by $G(x)$. A nonzero remainder indicates an error. Good generator polynomials detect all single-bit errors, many multi-bit errors, and all burst errors shorter than or equal to $r$ bits under standard assumptions.
 
-The fourth result is the stop-and-wait utilization bound. If the sender transmits a frame of $L$ bits at rate $R$ over RTT $T$, and acknowledgments are small, maximum utilization is approximately:
+For stop-and-wait, a frame of $L$ bits sent at rate $R$ over RTT $T$ has maximum utilization of approximately:
 
 $$
 U_{\mathrm{stop-wait}} \approx \frac{L/R}{T + L/R}
@@ -35,19 +35,19 @@ $$
 
 On long-delay paths this is terrible. Sliding windows improve utilization by keeping multiple frames in flight. To fill a path, the sender window in bits must be at least the BDP.
 
-The fifth result is the sequence number rule for Selective Repeat. If the sequence number space has size $S$, the sender and receiver windows should be no larger than $S/2$. Otherwise, an old delayed frame can be confused with a new frame after sequence numbers wrap.
+Selective Repeat imposes a sequence-number rule. If the sequence number space has size $S$, the sender and receiver windows should be no larger than $S/2$. Otherwise, an old delayed frame can be confused with a new frame after sequence numbers wrap.
 
-The sixth result is that link reliability and end-to-end reliability solve different problems. Link ARQ can hide local wireless or copper errors from IP and improve throughput. It cannot prove that an application transaction completed correctly after routing changes, host crashes, NAT timeouts, or storage errors. This is the end-to-end argument in a concrete link-layer setting.
+Link reliability and end-to-end reliability solve different problems. Link ARQ can hide local wireless or copper errors from IP and improve throughput. It cannot prove that an application transaction completed correctly after routing changes, host crashes, NAT timeouts, or storage errors. The distinction is the end-to-end argument in a concrete link-layer setting.
 
-A seventh result is that framing choices influence recovery after corruption. Length-based framing is compact, but a corrupted length field can make the receiver skip too far or too little unless the protocol has an outer check, a maximum frame size, or a resynchronization marker. Sentinel-based framing spends escape bytes but gives the receiver a recognizable boundary to search for after an error. Synchronous systems such as SONET spend fixed overhead continuously so receivers can lock onto a repeated structure. These tradeoffs matter whenever data is streamed from a serial source, including UARTs, tunnels, storage links, and packet capture formats.
+Framing choices influence recovery after corruption. Length-based framing is compact, but a corrupted length field can make the receiver skip too far or too little unless the protocol has an outer check, a maximum frame size, or a resynchronization marker. Sentinel-based framing spends escape bytes but gives the receiver a recognizable boundary to search for after an error. Synchronous systems such as SONET spend fixed overhead continuously so receivers can lock onto a repeated structure. These tradeoffs matter whenever data is streamed from a serial source, including UARTs, tunnels, storage links, and packet capture formats.
 
-An eighth result is that error detection should match the fault model. Independent random bit errors, burst errors from noise, dropped frames from buffer pressure, and adversarial modification require different tools. CRCs are excellent for accidental link corruption, but they are linear and unauthenticated. A malicious sender can deliberately alter data and recompute the CRC. That is why secure transports and VPNs use MACs or AEAD constructions from cryptography rather than relying on frame check sequences.
+Error detection should match the fault model. Independent random bit errors, burst errors from noise, dropped frames from buffer pressure, and adversarial modification require different tools. CRCs are excellent for accidental link corruption, but they are linear and unauthenticated. A malicious sender can deliberately alter data and recompute the CRC. Secure transports and VPNs therefore use MACs or AEAD constructions from cryptography rather than relying on frame check sequences.
 
-Finally, ARQ changes latency as well as reliability. A single local retransmission may hide a wireless loss and improve TCP throughput. Many link retries in a row can create a sudden delay spike that arrives at the transport as jitter. Real systems therefore tune retry limits, aggregation, interleaving, and rate adaptation according to whether the traffic is bulk data, voice, control, or interactive video.
+ARQ changes latency as well as reliability. A single local retransmission may hide a wireless loss and improve TCP throughput. Many link retries in a row can create a sudden delay spike that arrives at the transport as jitter. Real systems therefore tune retry limits, aggregation, interleaving, and rate adaptation according to whether the traffic is bulk data, voice, control, or interactive video.
 
 These mechanisms also influence hardware design. A NIC, modem, or radio often performs encoding, CRC verification, frame filtering, and retransmission assistance before the host CPU sees the packet. Offload improves throughput and power use, but it can hide details from packet captures taken above the device. When debugging link problems, it matters whether the observation point is on the wire, in the driver, after checksum offload, or inside the application.
 
-## Visual
+## The send and receive path for one frame
 
 ```mermaid
 flowchart LR
@@ -72,7 +72,9 @@ flowchart LR
 | CRC | Error detection | Strong burst detection | Detection only, not correction |
 | Sliding window ARQ | Reliability and utilization | Keeps pipe full | Needs sequence numbers and buffers |
 
-## Worked example 1: CRC remainder by polynomial division
+## Checking integrity and window size
+
+### Dividing a CRC polynomial by hand
 
 Problem: Compute the CRC for data `1011` using generator `1101`. The generator has degree 3, so the CRC has 3 bits.
 
@@ -118,7 +120,7 @@ transmitted codeword = 1011 100
 
 Answer: the CRC bits are `100`, and the transmitted bit string is `1011100`.
 
-## Worked example 2: Sliding window size on a long link
+### Filling a 50 Mb/s path with a sliding window
 
 Problem: A 50 Mb/s link has RTT 40 ms. Frames carry 1000 bytes of payload. How many frames must a sliding-window sender keep in flight to fully utilize the link, ignoring headers and ACK transmission time?
 
@@ -143,9 +145,9 @@ $$
 
 4. Interpret the result. A stop-and-wait sender has only one frame in flight, so its utilization is roughly $1/250 = 0.4$ percent before overhead. A sliding window of at least 250 frames is needed to keep the link busy.
 
-Answer: the sender window must be at least 250 frames. In practice it should be larger enough to absorb ACK compression, timer granularity, and implementation overhead.
+Answer: the sender window must be at least 250 frames. A real implementation should make it large enough to absorb ACK compression, timer granularity, and other overhead.
 
-## Code
+### Verifying a CRC and Internet checksum
 
 ```python
 def crc_remainder(data: str, generator: str) -> str:
@@ -169,7 +171,7 @@ print(crc_remainder("1011", "1101"))
 print(hex(internet_checksum([0x4500, 0x003c, 0x1c46, 0x4000])))
 ```
 
-## Common pitfalls
+## Boundary and retransmission mistakes
 
 - Thinking physical encoding and character encoding are the same thing. Line codes represent bits on media; UTF-8 represents text as bytes.
 - Forgetting that a receiver needs timing information, not only signal levels.
@@ -185,17 +187,6 @@ print(hex(internet_checksum([0x4500, 0x003c, 0x1c46, 0x4000])))
 - Ignoring ACK loss. Data and acknowledgments both need sequence/timer logic in real protocols.
 - Letting link-layer retransmission hide congestion for too long. Excessive local retry can create latency spikes for upper layers.
 
-## Connections
-
-- [Foundations and Layered Architecture](/cs/computer-networks/foundations-and-layered-architecture) explains how link functions fit into layered design.
-- [MAC and Local Area Networks](/cs/computer-networks/mac-and-local-area-networks) builds shared-medium access, Ethernet, switching, Wi-Fi, and VLANs on top of framing.
-- [Transport Layer: TCP and UDP](/cs/computer-networks/transport-layer-tcp-udp) reuses sliding-window ideas at end-to-end scope.
-- [Congestion Control and Queue Management](/cs/computer-networks/congestion-control-and-queue-management) explains why retransmission must be separated from congestion response.
-- [Cryptography](/cs/cryptography/intro) contrasts error detection with authentication and integrity.
-- [Distributed Systems](/cs/distributed-systems/intro) uses checksums, framing, and retransmission inside RPC and replication logs.
-- [Operating Systems](/cs/operating-systems/intro) covers device drivers, interrupts, DMA rings, and kernel buffer management.
-- [Computer Architecture](/cs/computer-architecture/intro) connects signal representation to buses, memory bandwidth, and NIC offload.
-
 ## References
 
 [1] L. L. Peterson and B. S. Davie, *Computer Networks: A Systems Approach*, supplied edition, ch. 2.
@@ -209,3 +200,18 @@ print(hex(internet_checksum([0x4500, 0x003c, 0x1c46, 0x4000])))
 [5] IEEE, "IEEE Standard for Ethernet," IEEE Std 802.3.
 
 [6] A. Tanenbaum and D. Wetherall, *Computer Networks*, 5th ed., Pearson, 2011, data link layer sections.
+
+<div className="see-also">
+
+See also:
+
+- [Foundations and Layered Architecture](/cs/computer-networks/foundations-and-layered-architecture) explains how link functions fit into layered design.
+- [MAC and Local Area Networks](/cs/computer-networks/mac-and-local-area-networks) builds shared-medium access, Ethernet, switching, Wi-Fi, and VLANs on top of framing.
+- [Transport Layer: TCP and UDP](/cs/computer-networks/transport-layer-tcp-udp) reuses sliding-window ideas at end-to-end scope.
+- [Congestion Control and Queue Management](/cs/computer-networks/congestion-control-and-queue-management) explains why retransmission must be separated from congestion response.
+- [Cryptography](/cs/cryptography/intro) contrasts error detection with authentication and integrity.
+- [Distributed Systems](/cs/distributed-systems/intro) uses checksums, framing, and retransmission inside RPC and replication logs.
+- [Operating Systems](/cs/operating-systems/intro) covers device drivers, interrupts, DMA rings, and kernel buffer management.
+- [Computer Architecture](/cs/computer-architecture/intro) connects signal representation to buses, memory bandwidth, and NIC offload.
+
+</div>

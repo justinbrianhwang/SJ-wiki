@@ -5,11 +5,11 @@ sidebar_position: 11.5
 
 # LSTM Variants
 
-The vanilla LSTM cell with input / forget / output gates is the most commonly taught form, but a long series of papers explored variants that adjust gating, memory pathways, or topology. This page surveys the variants most likely to appear in production code, in papers, or in interview questions, and explains when each is actually worth using.
+The vanilla LSTM cell with input, forget, and output gates is the most commonly taught form, but a long series of papers explored variants that adjust gating, memory pathways, or topology. The useful distinctions are whether a model needs future context, spatial state, a cheaper recurrent projection, a tree topology, or enough depth to require skip connections.
 
 For the baseline LSTM definition (cell state $C_t$, gates $i_t$, $f_t$, $o_t$, additive memory path), see [Gated RNNs and Sequence-to-Sequence](/cs/deep-learning/gated-rnns-seq2seq).
 
-## Quick reference
+## Variant map
 
 | Variant | Year | Modification | When to use |
 | --- | --- | --- | --- |
@@ -193,7 +193,7 @@ In 2024 Beck et al. revived LSTM with two new cells designed to compete with Tra
 
 Empirically xLSTM matches or beats some modern linear-time sequence models on selected language-modeling benchmarks at similar scale. See [Efficient Sequence Modeling](/cs/deep-learning/efficient-sequence-modeling) for the broader linear-attention, recurrent, and state-space context.
 
-## Choosing a variant in practice
+## Routing by causality, state shape, and cost
 
 ```mermaid
 flowchart TB
@@ -212,14 +212,14 @@ flowchart TB
 
 This decision diagram is a routing view rather than a cell schematic. It makes the architectural constraints explicit: bidirectionality requires full-sequence access, ConvLSTM preserves spatial tensors inside gates, stacked and residual variants address depth, and LSTMP addresses large recurrent-state cost. The leaf labels identify which hidden or cell-state contract changes compared with a vanilla LSTM.
 
-Or — and this is the honest 2025 recommendation — **consider whether you should be using an LSTM at all**. For most sequence problems the practical choice is a Transformer (see [Attention and Transformers](/cs/deep-learning/attention-transformers)) or a modern linear-time alternative (see [Efficient Sequence Modeling](/cs/deep-learning/efficient-sequence-modeling)). LSTMs remain useful for:
+For many sequence problems, a Transformer (see [Attention and Transformers](/cs/deep-learning/attention-transformers)) or a modern linear-time alternative (see [Efficient Sequence Modeling](/cs/deep-learning/efficient-sequence-modeling)) is the stronger baseline. LSTMs remain useful for:
 
 - Online / streaming inference where the model truly cannot look ahead and a tiny constant-memory state matters
 - Edge devices where Transformer key-value cache memory is unaffordable
 - Reinforcement-learning policies that need a small hidden state passed across episodes
 - Time-series forecasting at small scale where data is insufficient to train attention
 
-## Common pitfalls
+## API mismatches and causality traps
 
 - **Treating GRU and LSTM as drop-in replacements**. GRU exposes one state; LSTM exposes two ($h_t$, $C_t$). When passing initial states or saving checkpoints, the API differs.
 - **Forgetting that BiLSTM is non-causal**. Cannot be used in next-token language modeling. A common bug: training a BiLSTM language model and seeing miraculous perplexity that does not survive inference.
@@ -227,7 +227,7 @@ Or — and this is the honest 2025 recommendation — **consider whether you sho
 - **Stacking too deep without skip connections**. 4 layers is usually the sweet spot for vanilla stacked LSTM. Beyond 6 you need residual or highway connections.
 - **Confusing ConvLSTM with running a regular LSTM after a CNN**. ConvLSTM keeps spatial dims **inside** the recurrence; a CNN-then-LSTM pipeline collapses spatial information before recurrence.
 
-## Code: forget-gate bias init and BiLSTM in PyTorch
+## Initializing forget gates in a BiLSTM tagger
 
 ```python
 import torch
@@ -263,9 +263,13 @@ class BiLSTMTagger(nn.Module):
 
 This module is a standard sequence tagger: BiLSTM with forget-bias init at 1.0, dropout between layers, linear head over the bidirectional hidden states.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Gated RNNs and Sequence-to-Sequence](/cs/deep-learning/gated-rnns-seq2seq) — vanilla LSTM + GRU intro
 - [Sequence Modeling and RNNs](/cs/deep-learning/sequence-modeling-rnns) — base RNN before gates
 - [Attention and Transformers](/cs/deep-learning/attention-transformers) — the architecture family that displaced LSTM for most tasks
 - [Efficient Sequence Modeling](/cs/deep-learning/efficient-sequence-modeling) — modern linear-time and hybrid sequence models that revisit RNN ideas
+
+</div>

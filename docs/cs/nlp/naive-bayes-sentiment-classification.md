@@ -327,9 +327,8 @@ The model's simplicity is an advantage during these checks. Every prediction can
 
 A useful final sanity check is to shuffle the training labels. Performance should fall to chance apart from ordinary sampling noise. If it remains high, the pipeline is leaking labels through filenames, preprocessing, split construction, or cached features. Training on a deliberately tiny subset should also be easy to overfit. Together, the shuffle and overfit checks distinguish a suspiciously informative dataset from a classifier that never receives the intended inputs.
 
-## Related pages
+<div className="see-also">
 
-- [Logistic regression for text](/cs/nlp/logistic-regression-for-text)
-- [Vector semantics and embeddings](/cs/nlp/vector-semantics-and-embeddings)
-- [Information extraction](/cs/nlp/information-extraction)
-- [Regular expressions, normalization, and edit distance](/cs/nlp/regular-expressions-normalization-edit-distance)
+See also: [Logistic regression for text](/cs/nlp/logistic-regression-for-text) · [Vector semantics and embeddings](/cs/nlp/vector-semantics-and-embeddings) · [Information extraction](/cs/nlp/information-extraction) · [Regular expressions, normalization, and edit distance](/cs/nlp/regular-expressions-normalization-edit-distance)
+
+</div>

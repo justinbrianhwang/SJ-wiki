@@ -564,11 +564,8 @@ These local operators create superpositions of every physical state sharing thei
 
 An isolated quark field is gauge covariant and cannot create a physical color-singlet asymptotic state by itself. Gauge fixing permits quark and gluon propagators as useful intermediate quantities, while the observable spectrum is extracted from gauge-invariant operators and scattering involving hadrons or infrared-safe jets.
 
-## Related pages
+<div className="see-also">
 
-- [Gauge Invariance and QED](/physics/quantum-field-theory/gauge-invariance-and-qed)
-- [Renormalization Group](/physics/quantum-field-theory/renormalization-group)
-- [Chiral Anomalies](/physics/quantum-field-theory/chiral-anomalies)
-- [Electroweak Theory and Grand Unification](/physics/quantum-field-theory/electroweak-theory-and-grand-unification)
-- [Effective Field Theory](/physics/quantum-field-theory/effective-field-theory)
+See also: [Gauge Invariance and QED](/physics/quantum-field-theory/gauge-invariance-and-qed) · [Renormalization Group](/physics/quantum-field-theory/renormalization-group) · [Chiral Anomalies](/physics/quantum-field-theory/chiral-anomalies) · [Electroweak Theory and Grand Unification](/physics/quantum-field-theory/electroweak-theory-and-grand-unification) · [Effective Field Theory](/physics/quantum-field-theory/effective-field-theory)
 
+</div>

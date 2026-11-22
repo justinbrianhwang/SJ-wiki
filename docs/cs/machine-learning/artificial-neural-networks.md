@@ -9,7 +9,7 @@ Mitchell's neural-network chapter predates the modern deep learning era, but man
 
 The chapter connects neural networks to the earlier checkers learner. Both use parameterized functions and error gradients. A perceptron is a linear threshold hypothesis; a multilayer network composes many differentiable units to represent nonlinear decision surfaces.
 
-## Definitions
+## Units, activations, and the training objective
 
 A perceptron computes a weighted sum and passes it through a threshold:
 
@@ -57,7 +57,7 @@ The formula looks the same, but the convergence guarantees differ because the ou
 
 Backpropagation computes gradients for multilayer networks by propagating error terms from output units backward to hidden units.
 
-## Key results
+## From linear thresholds to hidden representations
 
 Perceptrons can represent linearly separable boolean functions such as AND and OR, but not XOR. This representational limit is historically important because it shows why hidden units matter. A two-layer network with nonlinear hidden units can represent decision regions that a single linear threshold cannot.
 
@@ -108,8 +108,6 @@ This search view prevents a common misconception: adding hidden units is not aut
 | Multilayer sigmoid net | Nonlinear composition | Backpropagated gradient | Nonconvex optimization |
 | Modern deep net | Many-layer composition | Backprop plus large-scale engineering | Beyond Mitchell's main scope |
 
-## Visual
-
 ```mermaid
 flowchart TB
     subgraph Forward["Forward pass"]
@@ -146,11 +144,9 @@ flowchart TB
 
 This neural-network diagram exposes the computation graph used by backpropagation. The forward pass labels affine transforms, sigmoid activations, output, and squared-error loss; the backward pass labels output deltas, hidden deltas, gradients, and parameter updates. The dotted update edges show why each training step changes the next forward pass, and the capacity controls connect hidden-unit count, early stopping, and regularization to generalization.
 
-## Worked example 1: Design a perceptron for AND
+### Designing a perceptron for AND
 
-Problem: Find weights for a two-input perceptron that computes $x_1 \land x_2$, where inputs are 0 or 1 and the output is 1 only when both inputs are 1.
-
-Method:
+Find weights for a two-input perceptron that computes $x_1 \land x_2$, where inputs are 0 or 1 and the output is 1 only when both inputs are 1.
 
 1. Use the perceptron rule:
 
@@ -179,13 +175,11 @@ $$
    | 1 | 0 | $-0.5$ | 0 |
    | 1 | 1 | $0.5$ | 1 |
 
-Answer: $w_0=-1.5$, $w_1=1$, and $w_2=1$ implement AND. The truth table check confirms that only $(1,1)$ crosses the threshold.
+$w_0=-1.5$, $w_1=1$, and $w_2=1$ implement AND. The truth table confirms that only $(1,1)$ crosses the threshold.
 
-## Worked example 2: One backpropagation update
+## Following one backpropagation update
 
-Problem: A sigmoid output unit receives two inputs $x_1=1$ and $x_2=0.5$. Its weights are $w_0=0$, $w_1=0.4$, and $w_2=-0.2$. The target is $t=1$ and $\eta=0.5$. Compute one output-layer update using squared error.
-
-Method:
+A sigmoid output unit receives two inputs $x_1=1$ and $x_2=0.5$. Its weights are $w_0=0$, $w_1=0.4$, and $w_2=-0.2$. The target is $t=1$ and $\eta=0.5$. Compute one output-layer update using squared error.
 
 1. Compute net input.
 
@@ -229,9 +223,9 @@ $$
 w_2'=-0.2+0.5(0.1040)(0.5)=-0.2+0.0260=-0.1740.
 $$
 
-Answer: The updated weights are approximately $(0.0520,0.4520,-0.1740)$. Because the target is larger than the output, the update increases the net input for this example.
+The updated weights are approximately $(0.0520,0.4520,-0.1740)$. Because the target is larger than the output, the update increases the net input for this example.
 
-## Code
+### Checking the sigmoid update in NumPy
 
 ```python
 import numpy as np
@@ -256,7 +250,7 @@ print(delta)
 print(w_new)
 ```
 
-## Common pitfalls
+## Failure modes in representation and training
 
 - Assuming a perceptron can learn any boolean function. It cannot represent XOR without additional features or hidden units.
 - Confusing the perceptron training rule with backpropagation. Backpropagation requires differentiable units and propagates gradients through layers.
@@ -265,10 +259,8 @@ print(w_new)
 - Judging neural networks only by final training error. Validation error and stopping criteria are needed to detect overfitting.
 - Reading Mitchell's small networks as a statement about modern scale. The core algorithm survives, but modern deep learning adds depth, GPUs, regularization, normalization, large datasets, and many architectural ideas outside this chapter.
 
-## Connections
+<div className="see-also">
 
-- [Learning problems and system design](/cs/machine-learning/learning-problems-and-system-design)
-- [Evaluating hypotheses](/cs/machine-learning/evaluating-hypotheses)
-- [Bayesian learning](/cs/machine-learning/bayesian-learning)
-- [Computational learning theory](/cs/machine-learning/computational-learning-theory)
-- [Modern deep learning](/cs/deep-learning/)
+See also: [Learning problems and system design](/cs/machine-learning/learning-problems-and-system-design) · [Evaluating hypotheses](/cs/machine-learning/evaluating-hypotheses) · [Bayesian learning](/cs/machine-learning/bayesian-learning) · [Computational learning theory](/cs/machine-learning/computational-learning-theory) · [Modern deep learning](/cs/deep-learning/intro)
+
+</div>

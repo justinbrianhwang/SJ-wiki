@@ -9,7 +9,7 @@ Refrigeration cycles move heat from a low-temperature region to a higher-tempera
 
 Cengel compares reversed Carnot refrigeration, ideal and actual vapor-compression cycles, refrigerant selection, heat pumps, cascade and multistage systems, gas refrigeration, and absorption refrigeration. The central design measure is coefficient of performance, but real decisions also involve pressure levels, compressor discharge temperature, toxicity, flammability, environmental impact, and matching evaporator and condenser temperatures to the application.
 
-## Definitions
+## Four devices and four state changes
 
 - A **refrigerator** removes heat from a low-temperature space. A **heat pump** delivers heat to a warm space; the hardware may be similar, but the desired effect differs.
 - The **ideal vapor-compression refrigeration cycle** has four processes: isentropic compression, constant-pressure heat rejection, throttling, and constant-pressure heat absorption.
@@ -22,12 +22,30 @@ Cengel compares reversed Carnot refrigeration, ideal and actual vapor-compressio
 - **Multistage compression with intercooling** reduces compressor work and discharge temperature.
 - **Absorption refrigeration** replaces much of the mechanical compressor work with heat-driven desorption and absorption processes.
 
-Actual vapor-compression cycles deviate from the ideal because compression is not isentropic, pressure drops occur in heat exchangers and lines, refrigerant leaves the evaporator superheated, and liquid leaving the condenser may be subcooled. Some deviations protect equipment even if they reduce idealized COP.
-For this topic, a complete engineering model should state the boundary, the time basis, the property model, and the sign convention before any numbers are substituted. In refrigeration cycles, that habit is especially important because several formulas look similar while answering different physical questions. A closed-system expression, a steady-flow expression, an ideal-gas relation, and a property-table interpolation may all contain pressure, temperature, or enthalpy, but they do not have the same assumptions. The safest workflow is to write the general balance or defining relation first, cancel terms with a written reason, and only then insert table values or constants.
+```mermaid
+flowchart LR
+  A["1 low-pressure vapor"] --> B["Compressor"]
+  B --> C["2 high-pressure vapor"]
+  C --> D["Condenser"]
+  D --> E["3 high-pressure liquid"]
+  E --> F["Expansion valve"]
+  F --> G["4 low-pressure mixture"]
+  G --> H["Evaporator"]
+  H --> A
+```
+
+| Component | Ideal model | Main property change |
+|---|---|---|
+| Compressor | isentropic, adiabatic | $h$ and $P$ rise |
+| Condenser | constant pressure heat rejection | vapor becomes liquid |
+| Expansion valve | throttling | $h$ constant, $P$ drops |
+| Evaporator | constant pressure heat absorption | mixture becomes vapor |
+
+State the boundary, time basis, property model, and sign convention before substituting values. A steady-flow device balance and a property-table lookup may contain the same enthalpies, but they answer different questions. Write the device balance first, cancel terms with a stated reason, and then insert the state properties.
 
 The second modeling habit is to keep the basis visible. Some calculations are per unit mass, some per mole, some per kg dry air, and some per unit time. A correct formula on the wrong basis is a common source of errors that look numerically plausible. When a table gives $\mathrm{kJ/kg}$, multiply by $\dot m$ to get $\mathrm{kW}$; when a reaction is balanced in kmol, convert to mass only after the element balance is complete; when a mixture property uses mole fraction, do not substitute mass fraction without conversion.
 
-## Key results
+## Enthalpy bookkeeping and COP
 
 For the ideal vapor-compression cycle, with states 1 compressor inlet, 2 compressor exit, 3 condenser exit, and 4 evaporator inlet,
 
@@ -57,35 +75,19 @@ $$
 COP_{R,\mathrm{Carnot}}=\frac{T_L}{T_H-T_L}.
 $$
 
+## What changes in an actual plant
+
 The ideal cycle is improved by raising evaporator temperature or lowering condenser temperature because both reduce the required pressure ratio and compressor work. However, the evaporator must remain colder than the refrigerated space, and the condenser must remain hotter than the heat sink, so finite heat-transfer differences impose practical limits.
 
+Actual vapor-compression cycles deviate from the ideal because compression is not isentropic, pressure drops occur in heat exchangers and lines, refrigerant leaves the evaporator superheated, and liquid leaving the condenser may be subcooled. Some deviations protect equipment even if they reduce idealized COP.
+
 Refrigerant selection balances thermodynamics with safety and environmental constraints. A favorable refrigerant has suitable saturation pressures, high latent heat, moderate discharge temperature, chemical stability, compatibility with lubricants and materials, low toxicity, low flammability, and acceptable ozone-depletion and global-warming impacts.
-These results should be read as a hierarchy rather than a list of isolated equations. Conservation of mass and energy set the allowed accounting; property relations supply the missing state data; the second law or equilibrium criterion decides direction, limits, and losses. A numerical answer is not finished until it passes three checks: the units reduce to the requested quantity, the sign matches the stated energy or entropy transfer direction, and the magnitude is reasonable compared with a limiting case. Useful limiting cases include zero heat transfer, reversible operation, incompressible behavior, ideal-gas behavior, saturated-liquid or saturated-vapor endpoints, and equal reservoir temperatures.
 
-Because the textbook often moves between exact laws and engineering approximations, the approximation should be named in the solution. Examples include constant specific heats, negligible kinetic energy, negligible pump work, adiabatic devices, isentropic turbomachinery, ideal-gas mixtures, dry-air approximations, and linear interpolation. Naming the approximation makes later refinement straightforward: replace the approximate property model or restore the neglected term without rebuilding the whole analysis.
+Conservation of mass and energy set the accounting; refrigerant properties supply the state data; the second law sets the reversible COP limit and identifies losses. Check that the units reduce to the requested quantity, the heat and work directions match the stated convention, and the result behaves sensibly as $T_H-T_L$ changes.
 
-## Visual
+Name each approximation: an adiabatic compressor, isentropic compression, negligible kinetic and potential energy changes, and constant-pressure evaporation or condensation. Later refinements can restore pressure drop, heat leakage, or compressor inefficiency one at a time.
 
-```mermaid
-flowchart LR
-  A["1 low-pressure vapor"] --> B["Compressor"]
-  B --> C["2 high-pressure vapor"]
-  C --> D["Condenser"]
-  D --> E["3 high-pressure liquid"]
-  E --> F["Expansion valve"]
-  F --> G["4 low-pressure mixture"]
-  G --> H["Evaporator"]
-  H --> A
-```
-
-| Component | Ideal model | Main property change |
-|---|---|---|
-| Compressor | isentropic, adiabatic | $h$ and $P$ rise |
-| Condenser | constant pressure heat rejection | vapor becomes liquid |
-| Expansion valve | throttling | $h$ constant, $P$ drops |
-| Evaporator | constant pressure heat absorption | mixture becomes vapor |
-
-## Worked example 1: ideal vapor-compression COP
+## Closing the enthalpy balance for an ideal cycle
 
 **Problem.** An ideal vapor-compression refrigerator has refrigerant enthalpies $h_1=398\ \mathrm{kJ/kg}$, $h_2=430\ \mathrm{kJ/kg}$, $h_3=250\ \mathrm{kJ/kg}$, and $h_4=250\ \mathrm{kJ/kg}$. Find $q_L$, compressor work, heat rejection, and COP.
 
@@ -123,7 +125,7 @@ $$
 
 **Checked answer.** The COP is $4.63$, and the heat rejection check closes exactly with the given enthalpies.
 
-## Worked example 2: cooling-load mass flow rate
+## Sizing refrigerant flow from the cooling load
 
 **Problem.** A refrigeration system must remove $12\ \mathrm{kW}$ from a cold room. The refrigerant effect in the evaporator is $q_L=148\ \mathrm{kJ/kg}$ from the previous example. Find the required mass flow rate and compressor power if $w_{in}=32\ \mathrm{kJ/kg}$.
 
@@ -158,7 +160,7 @@ $$
 
 **Checked answer.** The required refrigerant mass flow is $0.081\ \mathrm{kg/s}$ and the compressor power is about $2.6\ \mathrm{kW}$.
 
-## Code
+## Calculating cycle performance in Python
 
 ```python
 def vapor_compression(h1, h2, h3, h4):
@@ -176,28 +178,22 @@ print(qL, win, qH, cop)
 print(mass_flow_for_load(12.0, qL, win))
 ```
 
-## Common pitfalls
+## Where refrigeration calculations go wrong
 
 - Forgetting that throttling is approximately constant enthalpy, not isentropic.
 - Comparing COP to thermal efficiency as if both must be below 1.
 - Ignoring pressure drops and superheat/subcooling when moving from ideal to actual cycles.
 - Choosing a refrigerant using COP alone without safety and environmental constraints.
 - Making condenser temperature too close to ambient in calculations without allowing finite heat-transfer area.
-- Starting from a special-case equation before checking that its assumptions actually hold. Write the general balance or definition first, then reduce it.
+- Starting from a special-case equation before checking its assumptions. Write the general balance or definition first, then reduce it.
 - Leaving property-table values unlabeled. Record the substance, phase region, pressure or temperature row, interpolation fraction, and units so the result can be audited.
 - Rounding intermediate states too aggressively. Keep extra digits through property lookup, quality calculation, and efficiency ratios, then round the final answer to justified precision.
 - Skipping a limiting-case check. Test the result against reversible operation, zero pressure drop, saturated endpoints, ideal-gas behavior, or equal-temperature reservoirs when those limits are meaningful.
 - Treating a numerical solver or chart as a substitute for physical reasoning. Software can return a precise-looking number even when the selected phase, reference state, or boundary model is wrong.
 - Forgetting to state whether the reported answer is specific, total, or rate based.
 
-## Connections
+<div className="see-also">
 
-- [second-law heat engines and refrigerators](/physics/thermodynamics/second-law-heat-engines-and-refrigerators)
-- [gas-vapor mixtures and air conditioning](/physics/thermodynamics/gas-vapor-mixtures-and-air-conditioning)
-- [pure substances and property tables](/physics/thermodynamics/pure-substances-and-property-tables)
-- [microscopic foundations](/physics/statistical-mechanics/)
-- [basic thermal physics](/physics/general/)
-- [thermochemistry](/chemistry/general/thermochemistry)
-- [physical chemistry](/chemistry/physical-chemistry/)
-- [engineering mathematics](/math/engineering-math/)
-- [thermal systems control](/cs/control-engineering/)
+See also: [second-law heat engines and refrigerators](/physics/thermodynamics/second-law-heat-engines-and-refrigerators) · [gas-vapor mixtures and air conditioning](/physics/thermodynamics/gas-vapor-mixtures-and-air-conditioning) · [pure substances and property tables](/physics/thermodynamics/pure-substances-and-property-tables) · [microscopic foundations](/physics/statistical-mechanics/intro) · [basic thermal physics](/physics/general/intro) · [thermochemistry](/chemistry/general/thermochemistry) · [physical chemistry](/chemistry/physical-chemistry/intro) · [engineering mathematics](/math/engineering-math/intro) · [thermal systems control](/cs/control-engineering/intro)
+
+</div>

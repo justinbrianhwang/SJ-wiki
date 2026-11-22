@@ -1,4 +1,4 @@
----
+﻿---
 title: Eulerian and Hamiltonian Graphs
 sidebar_position: 4
 ---
@@ -13,7 +13,7 @@ Eulerian and Hamiltonian problems both ask for tours through a graph, but they c
 
 Historically, Eulerian graph theory begins with the Konigsberg bridges problem, where the impossibility of an edge-using tour follows from vertex degrees. Hamiltonian graph theory is closer to the travelling salesperson problem: it is easy to state, rich in sufficient conditions, and computationally difficult in general.
 
-## Definitions
+## Edges once versus vertices once
 
 An **Eulerian trail** is a trail using every edge of a graph. An **Eulerian circuit** is a closed Eulerian trail. A connected graph with an Eulerian circuit is often called **Eulerian**.
 
@@ -21,9 +21,9 @@ A **Hamiltonian path** is a path that visits every vertex exactly once. A **Hami
 
 Eulerian terminology is edge-based: vertices may repeat, but edges may not. Hamiltonian terminology is vertex-based: edges need not all be used, but vertices must appear exactly once in the path or cycle.
 
-For directed graphs, an Eulerian directed circuit must respect edge directions, and the relevant degree counts are indegree and outdegree. This page focuses mainly on undirected graphs; directed versions are treated with digraphs.
+For directed graphs, an Eulerian directed circuit must respect edge directions, and the relevant degree counts are indegree and outdegree. The discussion below stays with undirected graphs; directed versions use the corresponding digraph conditions.
 
-## Key results
+## Parity characterizes one tour, not the other
 
 **Euler circuit theorem.** A finite connected graph has an Eulerian circuit if and only if every vertex has even degree.
 
@@ -41,9 +41,7 @@ Dirac's and Ore's theorems are sufficient conditions, not necessary conditions. 
 
 **Useful Hamiltonian obstructions.** If a graph has a cut vertex, it cannot have a Hamiltonian cycle. Removing a vertex from a Hamiltonian cycle leaves a path, which is connected; therefore removing any vertex from a Hamiltonian graph cannot split the graph into multiple components. This obstruction is often faster than trying to search for a cycle. Similarly, if a vertex has degree $1$, the graph cannot have a Hamiltonian cycle because a cycle would need to enter and leave that vertex by two distinct incident edges.
 
-**Algorithmic contrast.** Hierholzer's algorithm finds an Eulerian circuit in linear time once the degree condition is met. Hamiltonian cycle search is fundamentally harder: the decision problem is NP-complete. This is why introductory graph theory gives complete Eulerian characterizations but only sufficient Hamiltonian theorems and special-case techniques.
-
-## Visual
+**Algorithmic contrast.** Hierholzer's algorithm finds an Eulerian circuit in linear time once the degree condition is met. Hamiltonian cycle search is fundamentally harder: the decision problem is NP-complete. Introductory graph theory therefore gives complete Eulerian characterizations but only sufficient Hamiltonian theorems and special-case techniques.
 
 The left four vertices form a square, and the diagonal connection through $E$ changes the Eulerian degree count. The Hamiltonian cycle $A-B-C-D-E-A$ visits all vertices once, but the graph is not Eulerian because $A$ and $D$ have odd degree.
 
@@ -64,17 +62,15 @@ graph LR
 | Hamiltonian cycle | Vertices | No simple full test | Dirac and Ore give sufficient tests |
 | Hamiltonian path | Vertices | No simple full test | brute force or special structure |
 
-## Worked example 1: Decide whether an Eulerian trail exists
+## Locating the endpoints of an Eulerian trail
 
-**Problem.** Let $G$ have vertices $\{A,B,C,D,E,F\}$ and edges
+Let $G$ have vertices $\{A,B,C,D,E,F\}$ and edges
 
 $$
 AB,\ BC,\ CD,\ DA,\ AC,\ CE,\ EF,\ FC.
 $$
 
 Does $G$ have an Eulerian circuit, an Eulerian trail, or neither?
-
-**Method.**
 
 1. Compute degrees:
    - $\deg(A)=3$ from $AB,DA,AC$.
@@ -101,11 +97,11 @@ $$
 
 appears exactly once.
 
-**Checked answer.** $G$ has an Eulerian trail from $A$ to $C$, but no Eulerian circuit.
+$G$ has an Eulerian trail from $A$ to $C$, but no Eulerian circuit.
 
-## Worked example 2: Apply Dirac's theorem and compare with an exact cycle
+## Dirac's condition and an explicit cycle
 
-**Problem.** Let $G$ be a simple graph on vertices $\{1,2,3,4,5,6\}$ with all edges except $14$ and $25$. Prove that $G$ is Hamiltonian.
+Let $G$ be a simple graph on vertices $\{1,2,3,4,5,6\}$ with all edges except $14$ and $25$. Prove that $G$ is Hamiltonian.
 
 **Method 1: Dirac.**
 
@@ -137,11 +133,11 @@ $$
 
 uses edges $12,24,45,53,36,61$. None of these is one of the missing edges $14$ or $25$.
 
-**Checked answer.** $G$ is Hamiltonian. Dirac proves existence, and the displayed cycle verifies it constructively.
+$G$ is Hamiltonian. Dirac proves existence, and the displayed cycle verifies it constructively.
 
 The displayed cycle is more informative than the theorem alone. Dirac's theorem gives a quick certificate that some Hamiltonian cycle exists, but in applications such as routing or scheduling the actual cyclic order is usually needed. A good habit is to use degree theorems to justify existence, then still write down a concrete cycle when the graph is small.
 
-## Code
+## Fast Eulerian tests and small Hamiltonian searches
 
 The Eulerian test is fast. The Hamiltonian test below is brute force and intended only for small graphs.
 
@@ -182,7 +178,7 @@ The Hamiltonian routine fixes one start vertex to avoid checking the same cycle 
 
 For tour problems, first decide whether the tour is required to use edges or vertices. Then write the relevant necessary conditions before searching. Eulerian work starts with connectedness and parity. Hamiltonian work starts with degree-one vertices, cut vertices, and obvious forced edges. This triage prevents a long search for an object that a short obstruction already rules out.
 
-## Common pitfalls
+### Before searching for a tour
 
 - Mixing up "use every edge" with "visit every vertex." Eulerian and Hamiltonian conditions are about different objects.
 - Forgetting connectedness in Eulerian tests. A graph with all degrees even but multiple nontrivial components has no single Eulerian circuit.
@@ -191,9 +187,8 @@ For tour problems, first decide whether the tour is required to use edges or ver
 - Believing a Hamiltonian path automatically gives a Hamiltonian cycle. The final vertex must also be adjacent to the start.
 - Running brute-force Hamiltonian code on large graphs. The search is factorial in the number of vertices.
 
-## Connections
+<div className="see-also">
 
-- [Walks, paths, and connectedness](/math/graph-theory/walks-paths-and-connectedness)
-- [Algorithms on weighted graphs](/math/graph-theory/algorithms-on-weighted-graphs)
-- [Digraphs tournaments and Markov chains](/math/graph-theory/digraphs-tournaments-and-markov-chains)
-- [Random graphs basics](/math/graph-theory/random-graphs-basics)
+See also: [Walks, paths, and connectedness](/math/graph-theory/walks-paths-and-connectedness) · [Algorithms on weighted graphs](/math/graph-theory/algorithms-on-weighted-graphs) · [Digraphs tournaments and Markov chains](/math/graph-theory/digraphs-tournaments-and-markov-chains) · [Random graphs basics](/math/graph-theory/random-graphs-basics)
+
+</div>

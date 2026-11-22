@@ -308,9 +308,8 @@ Clipping should be logged. If almost every step hits the threshold, the nominal 
 
 Checkpoint selection should use the metric and sequence regime that matter at deployment. Validation loss can improve while exact-match generation quality stalls, and token accuracy can hide catastrophic errors on long sequences. Save optimizer state with model state if training will resume; recurrent optimization depends on momentum and learning-rate history as well as weights. Hidden states from training batches should not be serialized as model parameters unless the application explicitly defines a persistent stream.
 
-## Related pages
+<div className="see-also">
 
-- [N-gram language models](/cs/nlp/n-gram-language-models)
-- [Transformers and self-attention](/cs/nlp/transformers-self-attention)
-- [Machine translation](/cs/nlp/machine-translation)
-- [Speech recognition and synthesis](/cs/nlp/speech-recognition-and-synthesis)
+See also: [N-gram language models](/cs/nlp/n-gram-language-models) · [Transformers and self-attention](/cs/nlp/transformers-self-attention) · [Machine translation](/cs/nlp/machine-translation) · [Speech recognition and synthesis](/cs/nlp/speech-recognition-and-synthesis)
+
+</div>

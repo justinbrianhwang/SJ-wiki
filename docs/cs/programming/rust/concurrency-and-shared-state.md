@@ -5,197 +5,289 @@ sidebar_position: 17
 
 # Concurrency and Shared State
 
-Rust's concurrency chapter shows how ownership and types prevent many classic threaded-programming mistakes. The language does not remove the hard parts of concurrency, but it makes data sharing explicit. Threads can take ownership of captured values. Channels transfer messages between threads. Mutexes protect shared state. Marker traits such as `Send` and `Sync` determine which types may safely cross or be shared across thread boundaries.
+Rust cannot decide a scheduling policy or prove that every concurrent protocol makes progress. It can enforce who owns data crossing a thread boundary and whether a shared type permits safe access. Spawned closures, channels, `Arc`, locks, atomics, and the marker traits `Send` and `Sync` express different parts of that contract.
 
-This page builds directly on [ownership](/cs/programming/rust/ownership-references-slices), [closures](/cs/programming/rust/closures-and-iterators), and [smart pointers](/cs/programming/rust/smart-pointers). The final [multithreaded web server](/cs/programming/rust/multithreaded-web-server) project uses these ideas to build a small thread pool.
+Memory safety is only the first threshold. A program can be free of data races and still deadlock, starve a worker, process messages in an unintended order, or spend all its time contending for one lock. The ownership model narrows the failure space; protocol design still matters.
 
-## Definitions
+## A spawned thread owns a unit of work
 
-A thread is an independent path of execution within a process. Rust creates a new thread with `std::thread::spawn`, passing a closure to run on that thread.
-
-A `JoinHandle` represents a spawned thread. Calling `join` waits for the thread to finish and returns a `Result`.
-
-The `move` keyword on a thread closure transfers ownership of captured values into the new thread. This is often required because the spawned thread may outlive the current function.
-
-A channel is a message-passing mechanism. `std::sync::mpsc::channel()` returns a transmitter and receiver. Values sent through the transmitter are moved into the channel and then received by the receiver.
-
-A mutex protects shared data by allowing only one thread at a time to access it. `Mutex<T>` wraps a value and returns a guard from `lock`. The guard dereferences to the inner value and releases the lock when dropped.
-
-`Arc<T>` is an atomically reference-counted pointer. It is the thread-safe counterpart to `Rc<T>` for shared ownership across threads.
-
-`Send` means ownership of a value can be transferred to another thread. `Sync` means references to a value can be shared between threads. These traits are implemented automatically for many types when their contents are safe.
-
-## Key results
-
-The first key result is that a spawned thread cannot borrow local data unless Rust can prove the data outlives the thread. In practice, `move` closures are common because ownership transfer is clear and safe.
-
-The second key result is that message passing moves ownership. Once a `String` is sent through a channel, the sender should not keep using it unless it cloned the data first.
-
-The third key result is that shared-state concurrency needs both shared ownership and mutual exclusion. `Mutex<T>` alone does not let multiple threads own the same mutex. `Arc<Mutex<T>>` is the common combination.
-
-The fourth key result is that poisoning is part of mutex error handling. If a thread panics while holding a lock, later `lock` calls return an error to signal that the protected data may be inconsistent.
-
-Proof sketch for `Arc<Mutex<T>>`: each thread needs ownership of a pointer to the same mutex, so `Arc` provides thread-safe reference counting. Each thread needs mutable access to the inner value, so `Mutex` serializes that access. The type `Arc<Mutex<T>>` says both facts explicitly.
-
-The concurrency chapter's larger result is that Rust makes sharing decisions visible in types. A channel-based design says values move from sender to receiver, so ownership travels with the message. A shared-state design says many threads can reach the same value, so the code must show both shared ownership and synchronization. This does not make every concurrent algorithm easy, but it removes many implicit assumptions. When a type does not implement `Send`, Rust will not let it move to another thread. When a type does not implement `Sync`, Rust will not let references to it be shared freely. Those refusals are not arbitrary; they are the same memory-safety story at thread scale.
-
-A second practical result is that lock scope should be designed intentionally. A `MutexGuard` releases the lock when dropped, so braces or helper functions can shorten the critical section. Holding a lock while doing slow work, printing, sleeping, or waiting on another lock can reduce concurrency or create deadlock risks. Rust guarantees the guard is released, but it does not decide how much work belongs inside the protected region. That remains a program-design responsibility.
-
-Message passing has a similar design question. A channel can carry owned data, commands, or closures representing work. Sending smaller messages can keep ownership clear, while sending large cloned data can waste memory. The type of the channel documents the protocol between threads. If the receiver handles `Job` values, the program is building a worker queue. If it handles domain events, the program is building a message-driven design. Rust checks transfer safety, but the message vocabulary is still a design choice.
-
-The best concurrency examples therefore name the protocol as carefully as they name the data structure.
-
-The compiler can guarantee transfer and sharing safety, but it cannot guarantee that a concurrent design is fair, fast, or free of higher-level deadlocks. Those properties still require review, tests, and measurement.
-
-Rust removes many memory hazards; it does not remove the need to reason about scheduling and workload.
-
-Measure the design under realistic contention before trusting its performance.
-
-Correctness comes first; throughput comes next.
-
-Always.
-
-## Visual
-
-```mermaid
-sequenceDiagram
-  participant Main
-  participant Worker1
-  participant Worker2
-  participant Counter as "Arc<Mutex<i32>>"
-  Main->>Worker1: spawn(move clone)
-  Main->>Worker2: spawn(move clone)
-  Worker1->>Counter: lock()
-  Counter-->>Worker1: MutexGuard
-  Worker1->>Counter: increment, drop guard
-  Worker2->>Counter: lock()
-  Counter-->>Worker2: MutexGuard
-  Worker2->>Counter: increment, drop guard
-  Main->>Worker1: join()
-  Main->>Worker2: join()
-```
-
-| Pattern | Main types | Ownership shape | Best for |
-|---|---|---|---|
-| Spawn and join | `thread::spawn`, `JoinHandle` | closure owns captured data | Parallel work units |
-| Message passing | `mpsc::Sender`, `Receiver` | send moves values | Producer-consumer pipelines |
-| Shared state | `Arc<Mutex<T>>` | many owners, one mutable access at a time | Shared counters, shared queues |
-| Read-only sharing | `Arc<T>` | many owners, no mutation | Configuration, lookup data |
-| Trait safety | `Send`, `Sync` | compiler-enforced thread transfer/sharing | Type-level concurrency checks |
-
-## Worked example 1: sending strings through a channel
-
-Problem: spawn a worker thread that sends two messages to the main thread.
-
-1. Create the channel:
+`std::thread::spawn` starts a new thread and returns a `JoinHandle<T>`, where `T` is the closure's return type. Calling `join` waits for completion and returns `std::thread::Result<T>`. The error side carries the payload of a worker panic.
 
 ```rust
-let (tx, rx) = mpsc::channel();
-```
+use std::thread;
 
-2. Move the transmitter into a thread:
-
-```rust
-thread::spawn(move || {
-    tx.send(String::from("hello")).unwrap();
-    tx.send(String::from("done")).unwrap();
+let handle = thread::spawn(|| {
+    let mut total = 0;
+    for n in 1..=4 {
+        total += n;
+    }
+    total
 });
+
+let total = handle.join().expect("worker panicked");
+assert_eq!(total, 10);
 ```
 
-The `move` keyword is important because the spawned thread owns `tx`.
+The worker computes $1+2+3+4=10$ and returns the integer. `join` does two jobs: it prevents the caller from continuing past that point before the worker finishes, and it transfers the return value or panic outcome back to the caller.
 
-3. Receive messages:
+Dropping a `JoinHandle` detaches the thread; it does not cancel or join it. A short-lived process may exit before detached work finishes, and a detached panic can be easy to miss. Retain and join handles when completion is part of correctness.
+
+### Why unscoped threads often need `move`
+
+The closure passed to `spawn` may outlive the stack frame that created it. A borrow of an ordinary local therefore cannot satisfy the required `'static` bound:
 
 ```rust
-for received in rx {
-    println!("{received}");
+use std::thread;
+
+let values = vec![1, 2, 3];
+let handle = thread::spawn(move || values.iter().sum::<i32>());
+let sum = handle.join().unwrap();
+
+assert_eq!(sum, 6);
+// `values` was moved into the closure
+```
+
+`move` transfers the vector into the closure object, so the worker owns valid data for its entire lifetime. The keyword does not necessarily make the closure callable only once; here the thread API itself consumes and calls the closure once.
+
+`thread::scope` provides another shape. Scoped threads are guaranteed to join before the scope returns, so they may borrow local data whose lifetime covers the scope:
+
+```rust
+use std::thread;
+
+let values = [2, 4, 6, 8];
+let (left, right) = values.split_at(2);
+
+let total = thread::scope(|scope| {
+    let a = scope.spawn(|| left.iter().sum::<i32>());
+    let b = scope.spawn(|| right.iter().sum::<i32>());
+    a.join().unwrap() + b.join().unwrap()
+});
+
+assert_eq!(total, 20);
+```
+
+The two immutable slices borrow disjoint parts of `values`. The scope cannot finish while either child remains running, which proves that both borrows end before the array leaves scope.
+
+## Channels transfer ownership with a protocol
+
+`std::sync::mpsc::channel` creates a multi-producer, single-consumer channel. `Sender<T>` values can be cloned; one `Receiver<T>` owns the receiving side. Sending moves a non-`Copy` value into the channel, and receiving moves it out.
+
+```rust
+use std::sync::mpsc;
+use std::thread;
+
+let (tx, rx) = mpsc::channel();
+
+let worker = thread::spawn(move || {
+    let message = String::from("finished");
+    tx.send(message).expect("receiver dropped");
+    // `message` has moved into the channel
+});
+
+assert_eq!(rx.recv().unwrap(), "finished");
+worker.join().unwrap();
+```
+
+An unbounded channel's `send` queues without waiting for capacity, though allocation can still fail by aborting the process. `sync_channel(capacity)` creates a bounded channel whose sends can block until space is available. A zero-capacity synchronous channel forms a rendezvous: sender and receiver meet for each message.
+
+`recv` blocks until a value arrives or every sender is dropped. `try_recv` returns immediately. Iterating a receiver repeatedly calls `recv` and ends only after disconnection, so retaining an unused sender can make the loop wait forever.
+
+### Worked fan-in: two producers, one receiver
+
+Two workers can calculate squares and send `(input, square)` pairs to one receiver:
+
+```rust
+use std::sync::mpsc;
+use std::thread;
+
+let (tx, rx) = mpsc::channel();
+let mut handles = Vec::new();
+
+for inputs in [vec![1, 3, 5], vec![2, 4, 6]] {
+    let tx = tx.clone();
+    handles.push(thread::spawn(move || {
+        for input in inputs {
+            tx.send((input, input * input)).unwrap();
+        }
+    }));
 }
+
+drop(tx);
+
+let mut results: Vec<_> = rx.into_iter().collect();
+results.sort_unstable_by_key(|(input, _)| *input);
+
+for handle in handles {
+    handle.join().unwrap();
+}
+
+assert_eq!(
+    results,
+    vec![(1, 1), (2, 4), (3, 9), (4, 16), (5, 25), (6, 36)]
+);
 ```
 
-The loop ends when all transmitters are dropped.
+The ownership and termination steps are:
 
-4. Trace ownership. Each `String` is moved into `send`. The receiving side becomes the owner of each message. The worker cannot use a sent string afterward unless it cloned it before sending.
+1. Each loop iteration moves one input vector and one cloned transmitter into a worker.
+2. A tuple is created for each number and moved into the channel.
+3. Messages from one sender preserve that sender's order, but scheduling can interleave the two producers differently on each run.
+4. The original transmitter is dropped in main. When both workers finish, their transmitter clones also drop.
+5. Only then can receiver iteration observe disconnection and end.
+6. Sorting makes the final assertion independent of cross-producer arrival order.
 
-5. Check the answer. Main prints `hello` and `done`, then exits the loop after the sender is dropped.
+The message type describes the protocol. A domain enum can make several message variants explicit and require the receiver to handle each. Channels avoid shared mutable payload state, but they do not remove backpressure, shutdown, error propagation, or ordering decisions.
 
-This pattern avoids shared mutable state entirely. Threads communicate by transferring values.
+## Shared mutation needs ownership and exclusion
 
-## Worked example 2: counting with `Arc<Mutex<i32>>`
-
-Problem: spawn ten threads, each incrementing one shared counter.
-
-1. Create the counter:
-
-```rust
-let counter = Arc::new(Mutex::new(0));
-```
-
-2. For each thread, clone the `Arc`:
-
-```rust
-let counter = Arc::clone(&counter);
-```
-
-This increments the atomic reference count. It does not clone the integer.
-
-3. Lock and mutate:
-
-```rust
-let mut num = counter.lock().unwrap();
-*num += 1;
-```
-
-The guard `num` ensures exclusive access until it is dropped.
-
-4. Join all threads. Without joining, main might print before workers finish.
-
-5. Check the answer. After ten successful increments, the protected value is `10`.
-
-If this used `Rc<Mutex<i32>>`, the compiler would reject sending it to threads because `Rc<T>` is not `Send`. That rejection is the type system preventing unsynchronized reference-count updates.
-
-## Code
+`Mutex<T>` protects a value by allowing one guard at a time. It does not provide multiple ownership. `Arc<T>` provides atomic reference-counted ownership across threads. It does not allow arbitrary mutation through shared references. `Arc<Mutex<T>>` combines the two independent requirements.
 
 ```rust
 use std::sync::{Arc, Mutex};
 use std::thread;
 
-fn main() {
-    let counter = Arc::new(Mutex::new(0));
-    let mut handles = Vec::new();
+let counter = Arc::new(Mutex::new(0u64));
+let mut handles = Vec::new();
 
-    for _ in 0..10 {
-        let counter = Arc::clone(&counter);
-        let handle = thread::spawn(move || {
-            let mut value = counter.lock().expect("mutex poisoned");
-            *value += 1;
-        });
-        handles.push(handle);
-    }
+for _ in 0..10 {
+    let counter = Arc::clone(&counter);
+    handles.push(thread::spawn(move || {
+        let mut value = counter.lock().expect("counter mutex poisoned");
+        *value += 1;
+    }));
+}
 
-    for handle in handles {
-        handle.join().expect("thread panicked");
-    }
+for handle in handles {
+    handle.join().expect("worker panicked");
+}
 
-    println!("result: {}", *counter.lock().expect("mutex poisoned"));
+assert_eq!(*counter.lock().unwrap(), 10);
+```
+
+Trace one iteration and the final read:
+
+1. `Arc::clone` creates another owning pointer to the same mutex; it does not copy the integer.
+2. The cloned pointer moves into the worker closure.
+3. `lock` waits until it can return a `MutexGuard<u64>`.
+4. Dereferencing the guard reaches the protected counter, and `+= 1` performs the update while exclusion is held.
+5. The guard drops at the end of the closure and unlocks the mutex.
+6. The worker's `Arc` clone drops. The allocation remains because main and other workers still own clones.
+7. After all joins, every successful increment has completed, so main reads 10 under the lock.
+
+Replacing `Arc` with `Rc` fails to compile because `Rc` updates a non-atomic reference count and is not `Send`. Replacing the mutex with `RefCell` also fails across threads; its borrow checks are run-time checks for single-threaded interior mutability, not cross-thread synchronization.
+
+## The guard's scope is the critical section
+
+A mutex unlocks when its guard is dropped. Keep the guard only while protected invariants are being read or changed:
+
+```rust
+let snapshot = {
+    let mut state = shared.lock().unwrap();
+    state.update();
+    state.clone_for_report()
+}; // guard drops here
+
+write_slow_report(snapshot);
+```
+
+The slow operation runs after unlocking. Holding a guard during file I/O, sleep, user callbacks, or channel communication can serialize unrelated work and create dependency cycles. A narrow critical section should still be logically complete: reading, checking, and updating a shared invariant may need one uninterrupted lock acquisition.
+
+Standard-library mutexes are poisoned when a thread panics while holding the guard. A later `lock` returns `PoisonError` because the protected value may have been left between invariant-preserving steps. Calling `unwrap` or `expect` chooses to propagate failure as another panic. Recovery can call `into_inner` on the poison error, but only code that understands and repairs the invariant should do so.
+
+Poisoning is advisory, not a universal proof that state is corrupt or sound. Some panic paths occur before mutation; some invariant violations may occur without a panic. The application still defines what recovery means.
+
+## Picking a synchronization primitive
+
+| Need | Standard tool | Main constraint |
+|---|---|---|
+| One owner sends values to one receiver | `mpsc` channel | Receiver is single; ordering across producers is unspecified |
+| Shared mutable compound state | `Mutex<T>` | One guard at a time |
+| Many readers or one writer | `RwLock<T>` | Workload and implementation determine whether it beats a mutex |
+| Wait until a protected predicate changes | `Condvar` with `Mutex<T>` | Predicate must be checked in a loop |
+| Atomic counter or flag | `Atomic*` types | Memory ordering and single-value invariants |
+| Shared read-only data | `Arc<T>` | Inner type must be safe to share |
+
+`RwLock` permits several readers or one writer. It helps when read sections are frequent and long enough to offset its overhead; it can perform worse than a mutex for tiny sections or write-heavy workloads. It also does not guarantee a particular fairness policy.
+
+A condition variable lets a thread sleep while a mutex-protected predicate is false. Waiting atomically releases the mutex and later reacquires it. The predicate belongs in a `while` loop because notifications can be spurious and another thread may change state before the awakened thread gets the lock.
+
+Atomics are appropriate when the invariant fits one atomic value or a carefully designed lock-free protocol. A simple statistics counter can use `AtomicUsize`:
+
+```rust
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::Arc;
+use std::thread;
+
+let count = Arc::new(AtomicUsize::new(0));
+let mut handles = Vec::new();
+
+for _ in 0..10 {
+    let count = Arc::clone(&count);
+    handles.push(thread::spawn(move || {
+        count.fetch_add(1, Ordering::Relaxed);
+    }));
+}
+
+for handle in handles {
+    handle.join().unwrap();
+}
+
+assert_eq!(count.load(Ordering::Relaxed), 10);
+```
+
+Relaxed ordering is sufficient here because only atomicity of the counter updates is needed, and `join` separately establishes that workers have completed before the final observation. If the counter publishes or guards access to other memory, stronger ordering or a lock may be required. Guessing at atomic orderings is unsafe design even when the code type-checks.
+
+## Deadlock remains possible in safe Rust
+
+Two threads can deadlock if each holds one mutex and waits for the other. The type system prevents unsynchronized access, not cyclic waiting. Establish a global lock order and acquire multiple locks only in that order. Avoid calling unknown code while holding a lock because the callback may try to acquire another lock or re-enter the same state.
+
+Channels can deadlock too. Two workers using bounded channels may each block sending while neither reaches its receive. A coordinator can wait forever because an extra sender was never dropped. Liveness analysis must include blocking sends, receives, joins, locks, and shutdown signals as one protocol.
+
+Lock-free does not mean wait-free, fair, or fast. Under contention, repeated compare-and-swap retries can starve. Conversely, a well-scoped mutex may be easier to audit and faster than a complicated atomic design.
+
+## `Send` and `Sync` express thread-safety composition
+
+`Send` means ownership of a value may be transferred to another thread. `Sync` means a shared reference `&T` may be used from several threads; equivalently, `&T` is `Send`. Most standard and user-defined types receive these marker traits automatically when their components permit it.
+
+`Rc<T>` is not `Send` or `Sync`; `Arc<T>` uses atomic count updates and can cross threads when its inner type satisfies the required bounds. A raw pointer does not gain a thread-safety story merely because it sits inside a struct.
+
+Manual `unsafe impl Send` or `unsafe impl Sync` asserts that all hidden invariants make cross-thread use sound. The compiler cannot verify that assertion. Such implementations need the same audit as other unsafe code and should never be added solely to silence a trait-bound error.
+
+These traits concern memory safety, not application semantics. A type can be `Send + Sync` while its methods permit deadlock or a logically inconsistent sequence of calls. Document protocol constraints separately.
+
+## Shutdown is part of the protocol
+
+Threads have no safe general-purpose “kill” operation. Cancellation is cooperative: a worker receives a stop message, observes an atomic flag, notices channel disconnection, or reaches another defined cancellation point. It then leaves its current invariant valid, drops guards and resources, and returns.
+
+Channel ownership often supplies a clean shutdown signal. A worker looping over `Receiver<T>` exits when every sender has been dropped. The coordinator must therefore drop its own sender before joining the worker; joining first can deadlock because the worker is still waiting for a message from a sender held by the joining thread.
+
+An explicit message enum can distinguish work from orderly shutdown:
+
+```rust
+enum Command {
+    Run(Job),
+    Stop,
 }
 ```
 
-The code uses a vector of join handles so main waits for every worker. The final lock reads the completed counter.
+One `Stop` message is enough only for a single receiver that owns the work loop. A pool with several workers needs a protocol that wakes each worker or closes the shared queue. The design must also decide whether queued jobs finish, are returned, or are abandoned after cancellation.
 
-## Common pitfalls
+Error paths need the same lifecycle. If one worker fails, the coordinator may have to stop producing, notify peers, drain or close channels, and still join every handle so panics and resources are accounted for. Returning early with live handles and senders can leave background work running longer than the caller expects.
 
-- Spawning a thread that borrows local data without proving the borrow outlives the thread.
-- Forgetting `move` on thread closures that need ownership.
-- Using `Rc<T>` across threads instead of `Arc<T>`.
-- Assuming `Mutex<T>` alone gives shared ownership. It must be owned by something shareable, often `Arc<T>`.
-- Holding a mutex guard longer than necessary, reducing concurrency or risking deadlock.
-- Ignoring `join`, which can hide panics or let main exit early.
-- Treating `Send` and `Sync` as traits to manually implement casually. Unsafe manual implementations require deep invariants.
+Timeouts bound waiting but do not repair the underlying operation. `recv_timeout` can let a coordinator recheck cancellation or health, while a timed lock can avoid an indefinite wait in APIs that provide one. Repeated short timeouts create polling overhead and still require a rule for what happens when the deadline expires.
 
-## Connections
+## Questions to settle before adding threads
 
-- [Ownership, references, and slices](/cs/programming/rust/ownership-references-slices)
-- [Closures and iterators](/cs/programming/rust/closures-and-iterators)
-- [Smart pointers](/cs/programming/rust/smart-pointers)
-- [Macros and unsafe Rust](/cs/programming/rust/macros-and-unsafe-rust)
-- [Multithreaded web server](/cs/programming/rust/multithreaded-web-server)
+- Is the workload large enough to offset thread creation, coordination, and cache costs?
+- Can ownership be transferred through tasks or messages instead of shared mutation?
+- How are worker errors and panics returned to the coordinator?
+- What closes the protocol, drops senders, and joins workers during normal shutdown and early error paths?
+- Which invariant does each lock protect, and in what order may locks be acquired?
+- Does any critical section perform blocking I/O, wait on a channel, or call user code?
+- Are result order and message order specified, or should tests normalize them?
+
+<div className="see-also">
+
+See also: [Ownership, References, and Slices](/cs/programming/rust/ownership-references-slices) · [Closures and Iterators](/cs/programming/rust/closures-and-iterators) · [Smart Pointers](/cs/programming/rust/smart-pointers) · [Multithreaded Web Server](/cs/programming/rust/multithreaded-web-server)
+
+</div>

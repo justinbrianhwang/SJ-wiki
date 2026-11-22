@@ -7,9 +7,9 @@ sidebar_position: 14
 
 The later source chapters broaden the subject beyond the original 8051. They discuss conceptual derivatives of microcontrollers, an 89C51-family derivative such as the 89C51RD, AVR microcontrollers with the AT90S2313 as the example, and PIC microcontrollers in the PIC16CXX family. The point is not that these devices are identical; it is that the same embedded questions repeat with different answers: where is program memory, where are registers, how are interrupts controlled, what timers exist, and how is nonvolatile memory handled?
 
-This page is a comparative map. It keeps the 8051 as the reference point, then highlights derivative features, AVR organization, and PIC organization. The goal is to help a reader transfer the mental model from earlier pages without assuming that instruction sets, register files, memory maps, or interrupt rules are interchangeable.
+The 8051 serves as the reference point for comparing derivative features, AVR organization, and PIC organization. The same mental model transfers only so far: instruction sets, register files, memory maps, and interrupt rules are not interchangeable.
 
-## Definitions
+## The families and the features being compared
 
 A **microcontroller derivative** is a device based on an established core but with added or modified features. In the MCS-51 world, derivatives may add Flash or OTP program memory, more RAM, dual data pointers, enhanced UART behavior, power-saving modes, watchdog timers, programmable counter arrays, or supervisory functions.
 
@@ -25,25 +25,25 @@ The **89C51** family is a Flash or EPROM-style MCS-51 derivative family. The sou
 
 A **watchdog timer** resets or interrupts the system if software fails to service it in time. It is a supervisory feature for fault recovery.
 
-## Key results
+## What transfers across families, and what does not
 
-The first key result is that family names do not define exact peripheral sets. "8051-compatible" may still mean different timer counts, memory sizes, UART options, and SFR additions. "PIC16CXX" and "AVR" similarly cover multiple devices. Always read the exact device data sheet after learning the family pattern.
+Family names do not define exact peripheral sets. "8051-compatible" may still mean different timer counts, memory sizes, UART options, and SFR additions. "PIC16CXX" and "AVR" similarly cover multiple devices. Always read the exact device data sheet after learning the family pattern.
 
-The second key result is that derivative features often remove common bottlenecks. A dual DPTR speeds block moves, enhanced UART features reduce address-filtering overhead, and on-chip Flash simplifies development compared with external EPROM or OTP-only parts.
+Derivative features often remove common bottlenecks. A dual DPTR speeds block moves, enhanced UART features reduce address-filtering overhead, and on-chip Flash simplifies development compared with external EPROM or OTP-only parts.
 
-The third key result is that AVR's register-rich design changes programming style. Instead of an accumulator-centered model, AVR has many working registers and efficient register-to-register operations. I/O registers are mapped into an I/O space that can be accessed by special instructions.
+AVR's register-rich design changes programming style. Instead of an accumulator-centered model, AVR has many working registers and efficient register-to-register operations. I/O registers are mapped into an I/O space that can be accessed by special instructions.
 
-The fourth key result is that PIC16 devices use a different execution and memory model. They have a working register often called `W`, file registers, banked data memory, and instruction words in program memory. Code that looks natural on 8051 or AVR is not mechanically portable to PIC assembly.
+PIC16 devices use a different execution and memory model. They have a working register often called `W`, file registers, banked data memory, and instruction words in program memory. Code that looks natural on 8051 or AVR is not mechanically portable to PIC assembly.
 
-The fifth key result is that watchdogs and power modes are system design features, not afterthoughts. Idle, power-down, stop-clock, or sleep modes affect clocks and peripherals. Watchdog servicing must be placed so that it proves the main control loop is healthy rather than merely proving one timer interrupt is still running.
+Watchdogs and power modes are system design features, not afterthoughts. Idle, power-down, stop-clock, or sleep modes affect clocks and peripherals. Watchdog servicing must be placed so that it proves the main control loop is healthy rather than merely proving one timer interrupt is still running.
 
-The sixth key result is that interrupt handling must be relearned for each family. Vector addresses, priority rules, flag clearing, context saving, and return instructions differ. A transferable concept is "save state, identify source, clear or acknowledge source, do short work, restore state"; the exact mechanism is family-specific.
+Interrupt handling must be relearned for each family. Vector addresses, priority rules, flag clearing, context saving, and return instructions differ. A transferable concept is "save state, identify source, clear or acknowledge source, do short work, restore state"; the exact mechanism is family-specific.
 
-The seventh key result is that development workflow changes with memory technology. OTP parts encourage simulation and careful verification before programming because mistakes are permanent for that chip. Flash derivatives support faster edit-program-test cycles. Devices with EEPROM allow field settings or calibration data to survive reset, but EEPROM should not be used as scratch RAM because of write time and endurance limits.
+Development workflow changes with memory technology. OTP parts encourage simulation and careful verification before programming because mistakes are permanent for that chip. Flash derivatives support faster edit-program-test cycles. Devices with EEPROM allow field settings or calibration data to survive reset, but EEPROM should not be used as scratch RAM because of write time and endurance limits.
 
-The eighth key result is that compiler support does not erase architectural differences. A C compiler can hide many assembly details, but the header files still expose device-specific registers, interrupt names, memory qualifiers, and bit definitions. Portable application logic is possible; low-level initialization and ISR code remain tied to the exact device family.
+Compiler support does not erase architectural differences. A C compiler can hide many assembly details, but the header files still expose device-specific registers, interrupt names, memory qualifiers, and bit definitions. Portable application logic is possible; low-level initialization and ISR code remain tied to the exact device family.
 
-## Visual
+### Three family patterns
 
 | Feature area | 8051/MCS-51 reference | 89C51-style derivative | AVR AT90S2313-style view | PIC16CXX-style view |
 |---|---|---|---|---|
@@ -100,9 +100,7 @@ flowchart TB
   Checklist --> Datasheet(("Read the exact data sheet before wiring or coding"))
 ```
 
-This derivative-comparison diagram shows that 8051 derivatives, AVR devices, and PIC16 devices answer the same architectural questions with different register models and memory maps. The MCS-51 branch labels SFR-centered extensions, the AVR branch labels its larger working-register file and I/O register space, and the PIC branch labels the W register plus banked file-register model. The final checklist explains why concepts transfer across families but low-level code and wiring must follow the exact part data sheet.
-
-## Worked example 1: Choosing between idle and power-down thinking
+## Choosing a sleep mode around the wake source
 
 Problem: A battery system must wake quickly every 10 ms to sample a digital input and must keep its timer running. Should the firmware use a mode that stops most clocks including the timer, or a lighter idle mode that leaves timer hardware active?
 
@@ -122,7 +120,7 @@ Answer: use an idle-style mode if the on-chip timer must remain the 10 ms wake s
 
 Check: The correct answer is device-specific. On any 89C51, AVR, or PIC derivative, confirm which clocks run in the chosen sleep mode.
 
-## Worked example 2: Avoiding a watchdog design mistake
+## Placing the watchdog service point
 
 Problem: A firmware design services the watchdog inside a timer interrupt that fires every 1 ms. The main loop can hang forever, but interrupts continue. Is the watchdog protecting the application?
 
@@ -142,7 +140,7 @@ Answer: no, the watchdog is not protecting the full application. It should be se
 
 Check: If interrupts stop too, the watchdog may still reset the system. The flaw is that one class of failure, a hung main loop with active interrupts, is hidden.
 
-## Code
+### Requiring progress before clearing the watchdog
 
 ```c
 /* Portable-style watchdog policy skeleton.
@@ -167,7 +165,7 @@ void main_loop_iteration(void) {
 }
 ```
 
-## Common pitfalls
+## Porting assumptions that fail on another part
 
 - Assuming an 8051 derivative has exactly the same SFRs and reset values as the original 8051.
 - Treating AVR, PIC, and 8051 assembly as syntactic variants. Their register and memory models are fundamentally different.
@@ -177,9 +175,8 @@ void main_loop_iteration(void) {
 - Assuming on-chip nonvolatile memory has unlimited write endurance.
 - Porting delay loops between families without recalculating instruction timing and clock division.
 
-## Connections
+<div className="see-also">
 
-- [8051 architecture, memory, and ports](/cs/embedded/8051-architecture-memory-ports)
-- [8051 timers, serial port, and interrupts](/cs/embedded/8051-timers-serial-interrupts)
-- [Serial EEPROM and DS1307 RTC interfacing](/cs/embedded/serial-eeprom-rtc-ds1307)
-- [Serial buses and embedded protocols](/cs/embedded/serial-buses-embedded-protocols)
+See also: [8051 architecture, memory, and ports](/cs/embedded/architecture-memory-ports) · [8051 timers, serial port, and interrupts](/cs/embedded/timers-serial-interrupts) · [Serial EEPROM and DS1307 RTC interfacing](/cs/embedded/serial-eeprom-rtc-ds1307) · [Serial buses and embedded protocols](/cs/embedded/serial-buses-embedded-protocols)
+
+</div>

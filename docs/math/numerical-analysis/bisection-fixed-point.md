@@ -13,7 +13,7 @@ Bisection and fixed-point iteration are the first two root-finding methods worth
 
 The pair also introduces a pattern that appears throughout numerical analysis. A robust method usually has a theorem that protects it from bad initial guesses, while a fast method usually needs local assumptions. Good practical solvers often combine both ideas: first locate a safe region, then switch to a faster local iteration.
 
-## Definitions
+## Bisection preserves a sign-changing bracket
 
 A **root** of $f$ is a number $p$ such that $f(p)=0$. A **bracket** for a scalar root is an interval $[a,b]$ with $f(a)f(b)\lt 0$. If $f$ is continuous, the Intermediate Value Theorem guarantees at least one root in $(a,b)$. The guarantee is existential: it does not say the root is unique, and it does not say the graph behaves nicely inside the interval.
 
@@ -25,6 +25,8 @@ $$
 
 and keeps the half interval on which the sign change remains. The method does not estimate the slope or curvature of $f$; it only asks which subinterval still contains a guaranteed sign change. That is why it is slow but difficult to break.
 
+## Fixed-point iteration depends on the rearrangement
+
 A **fixed point** of a function $g$ is a number $p$ such that $g(p)=p$. To solve $f(x)=0$, one may rewrite the equation as $x=g(x)$ and iterate
 
 $$
@@ -33,7 +35,7 @@ $$
 
 The rearrangement matters. The same equation can produce a convergent fixed-point map, a divergent map, or an oscillating map depending on how $g$ is chosen. Fixed-point iteration is therefore a method for a pair consisting of the equation and a map, not merely for the equation alone.
 
-## Key results
+## Error bounds and contraction tests
 
 For bisection, after $n$ iterations the root is contained in an interval of length
 
@@ -53,7 +55,7 @@ $$
 \frac{b_0-a_0}{2^{n+1}}\le \varepsilon.
 $$
 
-Taking logarithms gives a practical iteration estimate,
+Taking logarithms gives the iteration estimate
 
 $$
 n\ge \log_2\left(\frac{b_0-a_0}{\varepsilon}\right)-1.
@@ -69,17 +71,9 @@ $$
 
 then $g$ has a unique fixed point in $[a,b]$, and iteration from any starting value in the interval converges to it. A local version says that if $\vert g'(p)\vert \lt 1$, convergence is expected near $p$; if $\vert g'(p)\vert \gt 1$, the fixed point is locally repelling. When $g'(p)=0$, fixed-point iteration can be faster than linear, which is one way to understand why Newton's method has quadratic convergence at simple roots.
 
-A reliable way to use these results is to keep the analysis tied to the actual numerical question rather than to the formula alone. For bisection and fixed-point iteration, the input record should include the bracket or fixed-point map, the starting value, and the stopping rule. Without that record, two computations that look similar on paper may have different numerical meanings. The same formula can be a safe production tool in one scaling and a fragile experiment in another. This is why the examples on this page show the intermediate arithmetic: the goal is not only to reach a number, but to expose what assumptions made that number meaningful.
+The input record should contain the bracket or fixed-point map, starting value, and stopping rule. Useful diagnostics are interval width, residual size, iterate change, and a derivative or contraction estimate. Bisection's interval gives a certified geometric bound; fixed-point iteration needs both a small step and a small residual before its result is convincing.
 
-The next record is the verification record. Useful diagnostics for this topic include interval width, residual size, iterate change, and derivative or contraction estimates. A diagnostic should be chosen before the computation is trusted, not after a pleasing answer appears. When an exact answer is unavailable, compare two independent approximations, refine the mesh or tolerance, check a residual, or test the method on a neighboring problem with known behavior. If several diagnostics disagree, treat the disagreement as information about conditioning, stability, or implementation rather than as a nuisance to be averaged away.
-
-The cost record matters as well. In this topic the dominant costs are usually function evaluations and guaranteed digits gained per iteration. Numerical analysis is full of methods that are mathematically attractive but computationally mismatched to the problem size. A dense factorization may be acceptable for a classroom matrix and impossible for a PDE grid. A high-order rule may use fewer steps but more expensive stages. A guaranteed method may take many iterations but provide a bound that a faster method cannot. The right comparison is therefore cost to reach a verified tolerance, not order or elegance in isolation.
-
-Finally, every method here has a recognizable failure mode: missing sign changes, noncontractive maps, and domain violations in the rearranged function. These failures are not edge cases to memorize; they are signals that the hypotheses behind the result have been violated or that a different numerical model is needed. A good implementation makes such failures visible through exceptions, warnings, residual reports, or conservative stopping rules. A good hand solution does the same thing in prose by naming the assumption being used and checking it at the point where it matters.
-
-For study purposes, the most useful habit is to separate four layers: the continuous mathematical problem, the discrete approximation, the algebraic or iterative algorithm used to compute it, and the diagnostic used to judge the result. Many mistakes come from mixing these layers. A small algebraic residual may not mean a small modeling error. A small step-to-step change may not mean the discrete equations are solved. A high-order truncation formula may not help when the data are noisy or the arithmetic is unstable. Keeping the layers separate makes the results on this page portable to larger examples.
-
-## Visual
+## Two loops with different guarantees
 
 ```mermaid
 flowchart TB
@@ -115,7 +109,7 @@ flowchart TB
   Check --> Root(("root or fixed point"))
 ```
 
-This algorithm diagram shows the two related iteration architectures side by side. Bisection keeps an explicit sign-changing interval and returns an error bound, while fixed-point iteration depends on the contraction behavior of the chosen map $g$. The final diagnostic node is shared because both methods need a residual or interval-based check before the numerical answer is trusted.
+Bisection keeps an explicit sign-changing interval and returns an error bound. Fixed-point iteration depends on the contraction behavior of the chosen map $g$. Both routes end with a residual or interval-based check.
 
 | Method | Required input | Guarantee | Typical rate | Main weakness |
 |---|---|---|---|---|
@@ -123,7 +117,7 @@ This algorithm diagram shows the two related iteration architectures side by sid
 | Fixed point | map $g$ and starting value | contraction gives convergence | linear unless special structure | bad rearrangements diverge |
 | Hybrid use | bracket plus local iteration | safety plus speed | method-dependent | more implementation logic |
 
-## Worked example 1: bisection for a cubic
+## Bracketing a cubic to a prescribed width
 
 **Problem.** Solve
 
@@ -177,7 +171,7 @@ Keep $[1.25,1.375]$.
 
 **Checked answer.** The interval width is $0.125=1/8$, so the root is in $[1.25,1.375]$ and the midpoint $1.3125$ has error at most $1/16=0.0625$. Continuing the same process gives the more accurate root $p\approx 1.365230013$.
 
-## Worked example 2: choosing a fixed-point map
+## Testing a rearrangement near the same root
 
 **Problem.** Use a fixed-point map for the same cubic and check whether convergence is plausible near the root.
 
@@ -215,7 +209,7 @@ $$
 
 **Checked answer.** The derivative magnitude is below $1$ near the solution, so local convergence is plausible. It will be linear and slower than Newton's method, but it is a valid fixed-point rearrangement near this root.
 
-## Code
+## Implementations with explicit stopping rules
 
 ```python
 import math
@@ -251,7 +245,7 @@ print(bisection(f, 1.0, 2.0))
 print(fixed_point(g, 1.5))
 ```
 
-## Common pitfalls
+## What the stopping tests do not guarantee
 
 - Starting bisection without a sign change. Continuity plus opposite signs is the guarantee.
 - Assuming bisection finds every root in the interval. If there are multiple roots, it only guarantees at least one sign-changing root.
@@ -260,9 +254,8 @@ print(fixed_point(g, 1.5))
 - Forgetting that a repeated root may not create a sign change, so bisection may not apply even when a root is present.
 - Ignoring domain restrictions in $g$. A square-root rearrangement, for example, can become undefined even when the original polynomial is defined.
 
-## Connections
+<div className="see-also">
 
-- [Newton Secant and polynomial roots](/math/numerical-analysis/newton-secant-polynomial-roots)
-- [mathematical preliminaries and error analysis](/math/numerical-analysis/mathematical-preliminaries-error-analysis)
-- [nonlinear systems](/math/numerical-analysis/nonlinear-systems)
-- [floating point conditioning and stability](/math/numerical-analysis/floating-point-conditioning-stability)
+See also: [Newton Secant and polynomial roots](/math/numerical-analysis/newton-secant-polynomial-roots) · [mathematical preliminaries and error analysis](/math/numerical-analysis/mathematical-preliminaries-error-analysis) · [nonlinear systems](/math/numerical-analysis/nonlinear-systems) · [floating point conditioning and stability](/math/numerical-analysis/floating-point-conditioning-stability)
+
+</div>

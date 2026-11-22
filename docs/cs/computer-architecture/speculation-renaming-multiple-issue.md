@@ -9,7 +9,7 @@ High-performance processors combine several ideas: they fetch and decode multipl
 
 This machinery is expensive. It consumes power, area, design effort, and verification effort. H&P emphasizes that ILP techniques eventually hit diminishing returns because branch prediction, memory dependence uncertainty, finite windows, and true data dependencies limit how many useful instructions can be kept in flight.
 
-## Definitions
+## The state needed to run ahead
 
 Multiple issue means the processor can start more than one instruction per cycle. A two-issue machine can ideally complete up to two instructions per cycle, so its ideal CPI is $0.5$. A four-issue machine has ideal CPI $0.25$. Real CPI is higher because of dependencies, branch misses, cache misses, and unavailable functional units.
 
@@ -21,7 +21,7 @@ Register renaming maps architectural registers to physical registers. The archit
 
 A reorder buffer, ROB, keeps instructions in program order for commit. Results can finish out of order, but they update architectural state only when all older instructions are known safe. This supports precise exceptions: if an exception occurs, the machine can report a state corresponding to a clean boundary between completed and uncompleted instructions.
 
-## Key results
+## Rename, issue, recover, commit
 
 The basic out-of-order speculative loop is:
 
@@ -41,17 +41,15 @@ $$
 
 This cost adds to the ideal CPI of $0.25$, nearly doubling CPI before considering cache misses or dependencies.
 
-Speculation increases effective ILP only when predictions are accurate and recovery is cheap enough. A speculative instruction that is squashed consumes front-end bandwidth, issue slots, energy, and cache/TLB bandwidth without contributing useful work. This is one reason energy efficiency became a strong limit on ever-wider speculative cores.
+Speculation increases effective ILP only when predictions are accurate and recovery is cheap enough. A speculative instruction that is squashed consumes front-end bandwidth, issue slots, energy, and cache/TLB bandwidth without contributing useful work. Wrong-path energy consequently limits ever-wider speculative cores.
 
 Hardware speculation also interacts with memory consistency and security. The ISA may promise one ordering model, while the microarchitecture executes more aggressively underneath and inserts checks or fences to preserve the architectural contract.
 
-Rename checkpoints are a practical detail behind fast branch recovery. When the processor fetches past a predicted branch, it can save a copy of the rename map. If the branch is later wrong, the map is restored and younger physical-register allocations are reclaimed. Without checkpointing, recovery may require walking the ROB, which is simpler but slower. The number of unresolved branches therefore affects both speculation depth and storage cost.
+Rename checkpoints provide fast branch recovery. When the processor fetches past a predicted branch, it can save a copy of the rename map. If the branch is later wrong, the map is restored and younger physical-register allocations are reclaimed. Without checkpointing, recovery may require walking the ROB, which is simpler but slower. The number of unresolved branches therefore affects both speculation depth and storage cost.
 
-Commit bandwidth can become a bottleneck even when execution bandwidth is high. If a processor can execute six operations per cycle but retire only four, the ROB eventually fills during sustained high-throughput regions. Stores are often committed carefully because they update memory, and memory is visible to other cores and devices. This is why store queues hold speculative stores until commit conditions are satisfied.
+Commit bandwidth can become a bottleneck even when execution bandwidth is high. If a processor can execute six operations per cycle but retire only four, the ROB eventually fills during sustained high-throughput regions. Stores are committed carefully because they update memory visible to other cores and devices, so store queues hold them until commit conditions are satisfied.
 
 The limits of ILP are not only hardware limits. Programs contain pointer chains, unpredictable branches, serial algorithms, and cache misses whose addresses depend on earlier misses. Compilers can unroll loops and schedule instructions, and hardware can speculate, but dependency graphs still have critical paths. Once the cost of finding more ILP exceeds the benefit, architects often shift transistors toward caches, SIMD, more cores, or accelerators.
-
-## Visual
 
 ```mermaid
 flowchart TB
@@ -88,7 +86,7 @@ flowchart TB
     MemCheck -- "no" --> ROBReady
 ```
 
-This speculative superscalar diagram labels the structures that let a wide core run ahead while still committing in order. Rename allocates physical registers and ROB entries, issue queues wake and select ready operations, the load/store queue enforces memory ordering, and completion tags update the physical register file and ROB readiness. The branch and memory-replay paths show how speculation is repaired without exposing wrong-path or prematurely executed state to the ISA.
+Rename allocates physical registers and ROB entries, issue queues wake and select ready operations, the load/store queue enforces memory ordering, and completion tags update the physical register file and ROB readiness. Branch recovery and memory replay repair speculation without exposing wrong-path or prematurely executed state to the ISA.
 
 | Technique | Main benefit | Required support | Main cost |
 |---|---|---|---|
@@ -98,7 +96,7 @@ This speculative superscalar diagram labels the structures that let a wide core 
 | Multiple issue | More IPC | Wide fetch/decode/issue/execute | Complexity grows quickly |
 | Memory speculation | Hides store-address delays | Load/store queue and replay | Violation recovery |
 
-## Worked example 1: Ideal versus actual CPI on a four-issue core
+## Budgeting CPI on a four-issue core
 
 Problem: A four-issue processor has ideal CPI $0.25$. In a workload, 20% of instructions are branches, branch prediction accuracy is 95%, and each misprediction costs 10 cycles. Data-cache misses add 0.12 CPI. Compute effective CPI and IPC.
 
@@ -138,7 +136,7 @@ $$
 
 Checked answer: Effective CPI is $0.47$, and IPC is about $2.13$. The four-issue machine sustains only a little over half of peak issue width under these assumptions.
 
-## Worked example 2: ROB recovery after a branch miss
+## Walking the ROB after a branch miss
 
 Problem: A processor has these ROB entries in order. Entries 1 and 2 are committed. Entry 3 is a branch predicted taken. Entries 4, 5, and 6 are younger wrong-path instructions. The branch resolves not taken. Which entries remain, and what happens to architectural state?
 
@@ -165,7 +163,7 @@ Method:
 
 Checked answer: Entries 4 through 6 are discarded, architectural state includes only effects through entry 3, and fetch restarts at the not-taken fall-through PC.
 
-## Code
+## Modeling penalty and squash
 
 ```python
 def effective_cpi(issue_width, branch_freq, accuracy, penalty, cache_cpi):
@@ -198,18 +196,17 @@ The ROB example treats every younger instruction as easy to remove. In real hard
 
 The CPI function also assumes independent penalty terms. In a real out-of-order core, a cache miss and a branch miss may overlap, or one may prevent the other from being observed. Cycle-level simulation, hardware performance counters, and careful experiments are needed when features interact. The formula is still useful because it gives a first-order budget and reveals which terms are large enough to justify deeper study.
 
-## Common pitfalls
+## Where width turns into wasted work
 
 - Confusing issue width with guaranteed IPC.
 - Letting speculative stores update memory before commit.
 - Assuming register renaming removes true data dependencies.
-- Forgeting that branch predictor misses waste energy as well as cycles.
+- Forgetting that branch predictor misses waste energy as well as cycles.
 - Ignoring the finite instruction window when estimating exploitable ILP.
 - Treating precise exceptions as automatic in an out-of-order machine.
 
-## Connections
+<div className="see-also">
 
-- [Dynamic Scheduling and Tomasulo](/cs/computer-architecture/dynamic-scheduling-tomasulo)
-- [Branch Prediction and Control Hazards](/cs/computer-architecture/branch-prediction)
-- [Cache Organization and AMAT](/cs/computer-architecture/cache-organization-amat)
-- [Multicore, Synchronization, and NUMA](/cs/computer-architecture/multicore-synchronization-numa)
+See also: [Dynamic Scheduling and Tomasulo](/cs/computer-architecture/dynamic-scheduling-tomasulo) · [Branch Prediction and Control Hazards](/cs/computer-architecture/branch-prediction) · [Cache Organization and AMAT](/cs/computer-architecture/cache-organization-amat) · [Multicore, Synchronization, and NUMA](/cs/computer-architecture/multicore-synchronization-numa)
+
+</div>

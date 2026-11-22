@@ -7,9 +7,9 @@ sidebar_position: 3
 
 The single global model is an attractive abstraction, but it is often the wrong product. A keyboard model should adapt to a user's language habits, a hospital model may need scanner- or population-specific calibration, and a bank fraud model may face institution-specific transaction patterns. Personalization asks whether federated learning should produce one global model, many local models, or a structured family of models sharing some information but not all parameters.
 
-Personalized FL is not merely overfitting on each client after global training. It is a design space of objectives and systems: local fine-tuning, meta-learning, Moreau-envelope regularization, shared representation learning, clustering, multi-task learning, model selection, and robustness-aware personalization. pFedMe uses Moreau envelopes to decouple local personalized models from the global reference [3]. Ditto learns a personalized model regularized toward a global model and shows that this simple structure can improve accuracy, fairness, and robustness under attacks [4]. FedBN also has a personalization flavor because local batch-normalization state acts as client-specific representation calibration under feature shift [5].
+Personalized FL covers more than local fine-tuning after global training. Its objectives and systems include meta-learning, Moreau-envelope regularization, shared representation learning, clustering, multi-task learning, model selection, and robustness-aware personalization. pFedMe uses Moreau envelopes to decouple local personalized models from the global reference [3]. Ditto learns a personalized model regularized toward a global model and shows that this simple structure can improve accuracy, fairness, and robustness under attacks [4]. FedBN also has a personalization flavor because local batch-normalization state acts as client-specific representation calibration under feature shift [5].
 
-## Definitions
+## One reference model, many client models
 
 Let client $k$ have local objective $F_k(w)$. Standard FL seeks one model
 
@@ -34,7 +34,7 @@ pFedMe optimizes the global variable $\theta$ through these smoothed client obje
 
 ![A pFedMe diagram shows the two-level personalization structure: each client maintains a personalized model coupled to a shared reference via a Moreau envelope.](https://ar5iv.labs.arxiv.org/html/2006.08848/assets/x1.png)
 
-*Figure: pFedMe decouples per-client personalized weights from the global reference using a Moreau envelope, enabling stronger personalization than vanilla FedAvg fine-tuning. From [Dinh et al., 2020](https://arxiv.org/abs/2006.08848) — embedded under educational fair use with attribution.*
+*Figure: pFedMe couples each client's personalized weights to a global reference through a Moreau envelope. From [Dinh et al., 2020](https://arxiv.org/abs/2006.08848), reproduced with attribution for discussion.*
 
 **Ditto** solves a global FL objective for $w$ and, for each client, a regularized local objective
 
@@ -46,7 +46,7 @@ The global model gives shared information; the regularizer prevents the local mo
 
 ![A Ditto diagram illustrates the dual-objective structure: a robust global model plus per-client personalized models regularized toward the global reference.](https://ar5iv.labs.arxiv.org/html/2012.04221/assets/x3.png)
 
-*Figure: Ditto shows that the same regularized personalization mechanism that improves accuracy on heterogeneous clients also provides robustness against training-time attacks and fairer per-client performance. From [Li et al., 2021](https://arxiv.org/abs/2012.04221) — embedded under educational fair use with attribution.*
+*Figure: Ditto pairs a global model with client models regularized toward that shared reference. From [Li et al., 2021](https://arxiv.org/abs/2012.04221), reproduced with attribution for discussion.*
 
 **Representation-head personalization** splits a neural network into shared representation $\phi$ and local head $h_k$. FedRep and FedPer-style methods share lower layers or representations while personalizing final layers [9], [10]. FedBABU trains the body globally and adapts heads after training [11].
 
@@ -56,7 +56,7 @@ The global model gives shared information; the regularizer prevents the local mo
 
 **Multi-task FL** treats each client as a related task. MOCHA formulates a federated multi-task objective with a relationship matrix across tasks and solves it with distributed optimization [13].
 
-## Key results
+## Deciding what to share and what to keep local
 
 Personalization helps when client distributions differ enough that a single $w$ is a compromise. It can hurt when client data are small, noisy, adversarial, or too sparse to support local adaptation. A useful rule is to compare three baselines: global-only, local-only, and global-plus-fine-tuning. If local-only is terrible because clients lack data, personalization should borrow strongly from the global model. If global-only is terrible because client tasks are incompatible, personalization should allow more local freedom.
 
@@ -90,8 +90,6 @@ Evaluation must be client-aware. Mean accuracy can improve while worst-client ac
 | Ditto | Local model regularized to global | Low-medium | Global plus personalized model | Accuracy, fairness, and robustness tradeoffs |
 | FedFomo | Weighted model mixture | Medium-high | Model weights or candidates | Clients benefit from selected peers |
 
-## Visual
-
 ```mermaid
 flowchart TD
   Start["Heterogeneous clients"] --> Need["Need more than one final predictor"]
@@ -116,7 +114,7 @@ flowchart TD
   CModel --> Eval
 ```
 
-## Worked example 1: pFedMe inner-loop update
+## Tracking a pFedMe inner loop
 
 **Problem.** A client has scalar local loss
 
@@ -168,7 +166,7 @@ $$
 
 **Checked answer.** Two inner steps give $w^{(2)}=2.48$, moving from the global reference $2$ toward the exact personalized proximal solution $2.75$, not all the way to the local-only optimum $5$.
 
-## Worked example 2: Clustered FL from gradient similarity
+## Recovering client clusters from update directions
 
 **Problem.** Four clients send normalized gradient directions in two dimensions:
 
@@ -214,7 +212,7 @@ Clients $1$ and $2$ have high positive similarity, and clients $3$ and $4$ have 
 
 **Checked answer.** A two-cluster assignment is $\{1,2\}$ and $\{3,4\}$. Averaging all four gradients would nearly cancel; clustered FL preserves two meaningful update directions.
 
-## Code
+## Inspecting proximal updates and cosine similarity
 
 ```python
 import numpy as np
@@ -236,7 +234,7 @@ similarity = normed @ normed.T
 print(np.round(similarity, 3))
 ```
 
-## Common pitfalls
+## When personalization overfits or hides disparity
 
 - Assuming personalization always improves every client; small local datasets can overfit quickly.
 - Comparing personalized methods only by global accuracy instead of personalized per-client metrics.
@@ -252,17 +250,6 @@ print(np.round(similarity, 3))
 - Personalizing on adversarial or corrupted client data without robust validation.
 - Confusing local batch-normalization state with a complete personalized model.
 - Forgetting that privacy constraints may limit server-side inspection of personalized updates.
-
-## Connections
-
-- [Heterogeneity and Federated Optimization](/cs/federated-learning/heterogeneity-and-optimization)
-- [Communication Efficiency and Robustness](/cs/federated-learning/communication-efficiency-and-robustness)
-- [Recommender systems](/cs/deep-learning/recommender-systems)
-- [Softmax classification and generalization](/cs/deep-learning/softmax-classification-generalization)
-- [Evaluating hypotheses](/cs/machine-learning/evaluating-hypotheses)
-- [Data poisoning and backdoors](/cs/adversarial-attacks/data-poisoning-and-backdoors)
-- [Robustness accuracy tradeoff](/cs/adversarial-attacks/robustness-accuracy-tradeoff)
-- [Applications and Systems](/cs/federated-learning/applications-and-systems)
 
 ## References
 
@@ -293,6 +280,17 @@ print(np.round(similarity, 3))
 [13] V. Smith, C.-K. Chiang, M. Sanjabi, and A. Talwalkar, "Federated Multi-Task Learning," NeurIPS, 2017. https://arxiv.org/abs/1705.10467
 
 [14] Y. Mansour, M. Mohri, J. Ro, and A. T. Suresh, "Three Approaches for Personalization with Applications to Federated Learning," 2020. https://arxiv.org/abs/2002.10619
+
+## Related pages
+
+- [Heterogeneity and Federated Optimization](/cs/federated-learning/heterogeneity-and-optimization)
+- [Communication Efficiency and Robustness](/cs/federated-learning/communication-efficiency-and-robustness)
+- [Recommender systems](/cs/deep-learning/recommender-systems)
+- [Softmax classification and generalization](/cs/deep-learning/softmax-classification-generalization)
+- [Evaluating hypotheses](/cs/machine-learning/evaluating-hypotheses)
+- [Data poisoning and backdoors](/cs/adversarial-attacks/data-poisoning-and-backdoors)
+- [Robustness accuracy tradeoff](/cs/adversarial-attacks/robustness-accuracy-tradeoff)
+- [Applications and Systems](/cs/federated-learning/applications-and-systems)
 
 [15] Y. Deng, M. M. Kamani, and M. Mahdavi, "Adaptive Personalized Federated Learning," 2020. https://arxiv.org/abs/2003.13461
 

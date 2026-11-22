@@ -7,9 +7,9 @@ sidebar_position: 6
 
 Axiomatic semantics describes programs by the assertions that hold before and after execution. Instead of computing a trace or a denotation, it proves contracts such as "if the input is nonnegative, this loop returns the factorial." The formal-semantics source treats Hoare-style reasoning as one of the major semantic methods; Software Foundations mechanizes the same style for small imperative languages; modern tools such as Dafny, Frama-C, F*, and Why3 automate large parts of the verification workflow [1], [2], [3].
 
-This page emphasizes partial correctness, weakest preconditions, loop invariants, and separation logic. These are not replacements for operational semantics. They are reasoning systems whose soundness is usually proved with respect to an operational or denotational semantics.
+The central ideas are partial correctness, weakest preconditions, loop invariants, and separation logic. They are reasoning systems whose soundness is usually proved with respect to an operational or denotational semantics, not replacements for either one.
 
-## Definitions
+## Triples, predicate transformers, and heap ownership
 
 A **Hoare triple**
 
@@ -61,7 +61,7 @@ when $c$ does not modify variables free in $R$. It enables local reasoning about
 
 A **variant** or ranking function proves termination by mapping loop states to a well-founded order and decreasing on every iteration.
 
-## Key results
+## How proof obligations are generated
 
 **Soundness of Hoare logic.** If a triple is derivable in the proof system, it is semantically valid: every terminating execution from a state satisfying $P$ ends in a state satisfying $Q$. Proof is by induction on the derivation of the triple, using the operational or denotational meaning of each command [1], [3].
 
@@ -75,11 +75,11 @@ $$
 wp(c_1;c_2,Q)=wp(c_1,wp(c_2,Q)).
 $$
 
-This is why verification-condition generators work backward from the desired postcondition, producing proof obligations for branches and loops.
+Verification-condition generators therefore work backward from the desired postcondition, producing proof obligations for branches and loops.
 
 **Separation logic localizes heap reasoning.** Ordinary Hoare logic can reason about heaps, but specifications become cluttered with "and the rest of the heap is unchanged." The frame rule factors this into reusable local triples. This is foundational for verification of pointer programs, data structures, and concurrent resource protocols.
 
-**Concurrent separation logic.** CSL extends the ownership idea to concurrency: threads can reason independently about disjoint resources, while shared invariants are protected by synchronization. This page only sketches CSL as supplementary modern context; it is beyond the supplied introductory semantics material.
+**Concurrent separation logic.** CSL extends the ownership idea to concurrency: threads can reason independently about disjoint resources, while shared invariants are protected by synchronization. A full treatment also needs resource invariants and the rules governing synchronization.
 
 **Verification-condition generation.** Most practical tools do not ask users to manually build Hoare derivation trees. They translate annotated programs into verification conditions. Assignments become substitutions, sequencing becomes predicate transformation, branches split obligations, and loops require user-supplied or inferred invariants. The resulting formulas are sent to SMT solvers or proof assistants. This explains the feel of Dafny, Why3, and Frama-C: the programmer writes code plus specifications, and the tool reports which logical obligations remain unproved.
 
@@ -91,13 +91,11 @@ This is why verification-condition generators work backward from the desired pos
 
 **Aliasing is the hard case.** Scalar examples make Hoare logic look like algebra. Heap programs add aliasing: writing through one pointer may change what another pointer observes. Separation logic addresses this by tying assertions to ownership of heap fragments. If a procedure requires ownership of a list segment, its specification can say it may rearrange that segment while preserving a framed heap outside it. Without such locality, a proof about an update to `p.next` must mention every other pointer that might alias `p`, which destroys modularity.
 
-**Invariants are discovered, not guessed blindly.** A practical invariant often records what has been processed, what remains, and what quantity is preserved. For a counting loop, $y+x=n$ preserves the total. For array traversal, an invariant may say all indices below $i$ satisfy a property and indices from $i$ onward are untouched. For linked lists, a separation-logic invariant may split the heap into a processed prefix and an unprocessed suffix. When a proof fails, the right response is usually to inspect the failed verification condition and strengthen the invariant with the missing relationship.
+**Invariants are discovered, not guessed blindly.** Useful invariants often record what has been processed, what remains, and what quantity is preserved. For a counting loop, $y+x=n$ preserves the total. For array traversal, an invariant may say all indices below $i$ satisfy a property and indices from $i$ onward are untouched. For linked lists, a separation-logic invariant may split the heap into a processed prefix and an unprocessed suffix. When a proof fails, inspect the failed verification condition and strengthen the invariant with the missing relationship.
 
 **Partial and total correctness should be documented.** Many textbook derivations quietly prove only partial correctness. In production verification, this distinction affects user trust: a sorting procedure that preserves sortedness only when it terminates is not enough if nontermination is possible. Termination arguments may use simple numeric variants, lexicographic tuples, multiset orders, or well-founded relations supplied to a proof assistant. When termination is outside the scope, the specification should say so directly.
 
 The same documentation rule applies to overflow, allocation failure, and undefined behavior: either model them, rule them out with preconditions, or state that the proof assumes they cannot occur in the verified execution model.
-
-## Visual
 
 ```mermaid
 graph TD
@@ -121,7 +119,7 @@ graph TD
 | Total correctness | add variant | prove well-founded decrease |
 | Heap update | use separating conjunction | prove ownership of modified cell |
 
-## Worked example 1: verifying an assignment sequence
+## Backward reasoning through two assignments
 
 Problem: prove
 
@@ -165,7 +163,7 @@ $$
 
 Step 5: by the consequence rule, strengthen the assignment precondition from $(x+2)*2=10$ to $x=3$. The sequence rule combines the two triples. The checked postcondition is $x=10$.
 
-## Worked example 2: proving a loop invariant
+## Preserving a countdown invariant
 
 Problem: verify partial correctness of
 
@@ -220,7 +218,7 @@ $$
 
 means $y+x=n$, $x\ge0$, and $x\le0$. Hence $x=0$ and $y=n$. The proof establishes partial correctness. Termination follows with variant $x$, which decreases and is bounded below by $0$.
 
-## Code
+## The countdown proof in Dafny
 
 ```dafny
 method CountDown(n: nat) returns (y: nat)
@@ -239,7 +237,7 @@ method CountDown(n: nat) returns (y: nat)
 }
 ```
 
-## Common pitfalls
+## Where proofs usually go wrong
 
 - Reading Hoare triples as guaranteeing termination; ordinary triples are partial correctness unless stated otherwise.
 - Applying the assignment rule forward instead of substituting backward.
@@ -254,14 +252,6 @@ method CountDown(n: nat) returns (y: nat)
 - Trusting automated verification failures as program bugs; they may indicate missing annotations.
 - Treating refinement types as full Hoare logic; they usually encode a decidable or restricted assertion fragment.
 
-## Connections
-
-- [Operational and Denotational Semantics](/cs/programming-language-theory/operational-and-denotational-semantics) supplies the semantic validity relation for Hoare triples.
-- [Dependent Types and Proof Assistants](/cs/programming-language-theory/dependent-types-and-proof-assistants) explains proof assistants used to mechanize program logic.
-- [Dataflow Analysis and Abstract Interpretation](/cs/programming-language-theory/dataflow-and-abstract-interpretation) automates invariant discovery approximately.
-- [Effects, Monads, and Concurrency Models](/cs/programming-language-theory/effects-monads-and-concurrency-models) connects separation logic to concurrent effects.
-- [Cryptography](/cs/cryptography/intro), [Compilers](/cs/compilers/intro), [Theory of Computation](/cs/theory/intro), and [Discrete Math](/math/discrete/intro) link verification to protocols, tools, decidability, and proof methods.
-
 ## References
 
 [1] K. Slonneger and B. L. Kurtz, *Formal Syntax and Semantics of Programming Languages*. Addison-Wesley, 1995.  
@@ -270,3 +260,15 @@ method CountDown(n: nat) returns (y: nat)
 [4] E. W. Dijkstra, "Guarded commands, nondeterminacy and formal derivation of programs," *Communications of the ACM*, 1975.  
 [5] J. C. Reynolds, "Separation logic: A logic for shared mutable data structures," LICS, 2002.  
 [6] P. W. O'Hearn, "Resources, concurrency, and local reasoning," *Theoretical Computer Science*, 2007.
+
+<div className="see-also">
+
+See also:
+
+- [Operational and Denotational Semantics](/cs/programming-language-theory/operational-and-denotational-semantics) supplies the semantic validity relation for Hoare triples.
+- [Dependent Types and Proof Assistants](/cs/programming-language-theory/dependent-types-and-proof-assistants) explains proof assistants used to mechanize program logic.
+- [Dataflow Analysis and Abstract Interpretation](/cs/programming-language-theory/dataflow-and-abstract-interpretation) automates invariant discovery approximately.
+- [Effects, Monads, and Concurrency Models](/cs/programming-language-theory/effects-monads-and-concurrency-models) connects separation logic to concurrent effects.
+- [Cryptography](/cs/cryptography/intro), [Compilers](/cs/compilers/intro), [Theory of Computation](/cs/theory/intro), and [Discrete Math](/math/discrete/intro) link verification to protocols, tools, decidability, and proof methods.
+
+</div>

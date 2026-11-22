@@ -9,53 +9,9 @@ Bytecode compilation is the step from a high-level representation, often an AST,
 
 A virtual machine is a software processor. Its instruction set is not x86, ARM, or RISC-V, but a language-specific design that makes common operations easy to encode. A VM may be deliberately simple, as in clox, or industrially sophisticated, as in the JVM, .NET CLR, Lua, CPython, or JavaScript engines that combine bytecode with just-in-time compilation.
 
-## Definitions
+## From source to dispatch
 
-**Bytecode** is a dense instruction sequence for a virtual architecture. Each instruction has an **opcode** and may have **immediate operands**. In clox, an `OP_CONSTANT` instruction is followed by a byte that indexes a constant pool [1].
-
-A **constant pool** stores literals and other compile-time constants separately from the instruction stream. This avoids embedding arbitrary-size strings or numbers inline. It also lets instructions use compact indexes.
-
-A **chunk** is Nystrom's term for a bytecode object containing code bytes, constants, and line information [1]. Other VMs call similar objects code objects, methods, functions, or basic blocks.
-
-A **stack-based VM** stores intermediate values on an operand stack. An instruction such as `ADD` pops two values and pushes the result. A **register-based VM** names virtual registers explicitly; `ADD r3, r1, r2` reads two registers and writes another. Stack bytecode is compact and easy to generate. Register bytecode often uses fewer dispatches but wider instructions [1], [4].
-
-The **instruction pointer** points to the next bytecode instruction. A **dispatch loop** fetches the opcode, decodes operands, executes the operation, and repeats. Common dispatch styles include `switch` dispatch, computed goto, direct threading, and inline threaded code. Computed goto can reduce branch overhead in C compilers that support labels as values.
-
-A **compiler pass** from AST to bytecode traverses source constructs and emits instructions. It must preserve expression evaluation order, stack discipline, control flow, local-variable lifetimes, and source-location mapping.
-
-A **JIT compiler** translates bytecode or an internal IR to native machine code at runtime. A **template JIT** expands bytecodes into prebuilt machine-code snippets, a **method JIT** compiles whole functions or methods, and a **tracing JIT** records hot loops or paths and compiles those traces [5].
-
-## Key results
-
-The first result is stack effect accounting. Each bytecode instruction has a stack effect. For example:
-
-| Instruction | Stack before | Stack after | Effect |
-|---|---|---|---|
-| `CONSTANT k` | `...` | `..., const[k]` | +1 |
-| `ADD` | `..., a, b` | `..., a+b` | -1 |
-| `NEGATE` | `..., a` | `..., -a` | 0 |
-| `POP` | `..., a` | `...` | -1 |
-| `RETURN` | `..., a` | exits | depends |
-
-A correct compiler guarantees that every instruction sees the values it expects. This replaces the tree-walker's implicit host call stack with an explicit operand stack.
-
-The second result is that compilation order follows evaluation order. For `1 + 2 * 3`, compile `1`, compile `2`, compile `3`, multiply the last two values, then add. The emitted bytecode is postorder traversal for pure expressions. Statements add control-flow and stack-cleanup obligations.
-
-The third result is that local variables can be stack slots. In clox, locals are not stored in a hash table; the compiler tracks local declarations and emits slot accesses. This is much faster than environment lookup. Closures complicate the story because captured locals must survive after the declaring function returns. clox handles this with **upvalues**, open upvalue lists, and closing operations [1].
-
-The fourth result is that control flow is encoded with jumps. A compiler emits placeholder offsets for forward jumps and patches them once the target location is known. For loops, it emits a backward jump. Offset width becomes a real design limit: one byte is compact but too small for large functions; two or four bytes are more flexible.
-
-The fifth result is that dispatch dominates simple interpreter performance. In a `switch` loop, each bytecode often costs an indirect branch plus C control-flow overhead. Direct threading can improve branch prediction by jumping directly to the next opcode handler, but it is less portable. Superinstructions combine common sequences, and quickening rewrites generic bytecodes to specialized bytecodes after runtime information is known.
-
-The sixth result is that bytecode is not the same as an optimizing IR. Bytecode is usually compact and executable; an optimizer often wants explicit control-flow graphs, SSA, and typed operations. Many systems therefore parse to AST, lower to bytecode for baseline execution, and also lower hot code to richer IR for JIT optimization.
-
-The seventh result is that call frames are the VM's replacement for host recursion. A frame records the function or closure being executed, the instruction pointer for that function, and the base slot where its locals begin. Calls push frames; returns pop them and leave a result for the caller. This is how clox supports recursion without recursively calling C for every Lox call [1]. Frame layout also determines how stack traces, debugging, tail calls, and exception unwinding can be implemented.
-
-The eighth result is that VM verification can be a separate safety layer. A bytecode loader may check that every jump lands on an instruction boundary, every stack access is valid, every local slot is initialized, and every function returns with a consistent stack height. Small educational VMs often trust their own compiler, but distributed bytecode formats such as JVM class files need validation because bytecode can come from outside the current compiler pipeline.
-
-The ninth result is that globals, locals, and captured variables deserve different bytecodes. A global lookup often goes through a hash table because names can be resolved late or exposed across modules. A local access can be a direct stack-slot read. A captured variable may be an upvalue that points either to an open stack slot or to a closed heap cell after the declaring function returns. Treating all three cases as one generic name lookup is simple but loses most of the performance benefit that bytecode compilation is meant to provide.
-
-## Visual
+The pipeline separates front-end analysis from the execution machinery. The bytecode chunk sits at the boundary: the compiler writes it, while the VM reads it and owns the operand stack, call frames, and heap references.
 
 ```mermaid
 flowchart LR
@@ -72,6 +28,22 @@ flowchart LR
   J --> K["Native code"]
 ```
 
+**Bytecode** is a dense instruction sequence for a virtual architecture. Each instruction has an **opcode** and may have **immediate operands**. In clox, an `OP_CONSTANT` instruction is followed by a byte that indexes a constant pool [1].
+
+A **constant pool** stores literals and other compile-time constants separately from the instruction stream. This avoids embedding arbitrary-size strings or numbers inline. It also lets instructions use compact indexes.
+
+A **chunk** is Nystrom's term for a bytecode object containing code bytes, constants, and line information [1]. Other VMs call similar objects code objects, methods, functions, or basic blocks.
+
+A **stack-based VM** stores intermediate values on an operand stack. An instruction such as `ADD` pops two values and pushes the result. A **register-based VM** names virtual registers explicitly; `ADD r3, r1, r2` reads two registers and writes another. Stack bytecode is compact and easy to generate. Register bytecode often uses fewer dispatches but wider instructions [1], [4].
+
+The **instruction pointer** points to the next bytecode instruction. A **dispatch loop** fetches the opcode, decodes operands, executes the operation, and repeats. Common dispatch styles include `switch` dispatch, computed goto, direct threading, and inline threaded code. Computed goto can reduce branch overhead in C compilers that support labels as values.
+
+A **compiler pass** from AST to bytecode traverses source constructs and emits instructions. It must preserve expression evaluation order, stack discipline, control flow, local-variable lifetimes, and source-location mapping.
+
+A **JIT compiler** translates bytecode or an internal IR to native machine code at runtime. A **template JIT** expands bytecodes into prebuilt machine-code snippets, a **method JIT** compiles whole functions or methods, and a **tracing JIT** records hot loops or paths and compiles those traces [5].
+
+The main execution models make different tradeoffs:
+
 | VM design | Instruction example | Strength | Cost |
 |---|---|---|---|
 | Stack VM | `PUSH 1; PUSH 2; ADD` | Compact code, simple compiler | More dispatches, implicit operands |
@@ -79,7 +51,41 @@ flowchart LR
 | AST interpreter | `Binary(Literal(1), "+", Literal(2))` | Clear semantics | Pointer-heavy execution |
 | Native code | `add rax, rbx` | Fastest steady state | Complex code generation and portability work |
 
-## Worked example 1: Compiling and running an expression
+## Stack discipline and evaluation order
+
+Each bytecode instruction has a stack effect:
+
+| Instruction | Stack before | Stack after | Effect |
+|---|---|---|---|
+| `CONSTANT k` | `...` | `..., const[k]` | +1 |
+| `ADD` | `..., a, b` | `..., a+b` | -1 |
+| `NEGATE` | `..., a` | `..., -a` | 0 |
+| `POP` | `..., a` | `...` | -1 |
+| `RETURN` | `..., a` | exits | depends |
+
+A correct compiler guarantees that every instruction sees the values it expects. This replaces the tree-walker's implicit host call stack with an explicit operand stack.
+
+Compilation order follows evaluation order. For `1 + 2 * 3`, compile `1`, compile `2`, compile `3`, multiply the last two values, then add. The emitted bytecode is postorder traversal for pure expressions. Statements add control-flow and stack-cleanup obligations.
+
+## Slots, frames, and captured variables
+
+Local variables can be stack slots. In clox, locals are not stored in a hash table; the compiler tracks local declarations and emits slot accesses. This is much faster than environment lookup. Closures complicate the story because captured locals must survive after the declaring function returns. clox handles this with **upvalues**, open upvalue lists, and closing operations [1].
+
+Call frames replace host recursion. A frame records the function or closure being executed, the instruction pointer for that function, and the base slot where its locals begin. Calls push frames; returns pop them and leave a result for the caller. clox can therefore support recursion without recursively calling C for every Lox call [1]. Frame layout also determines how stack traces, debugging, tail calls, and exception unwinding can be implemented.
+
+Globals, locals, and captured variables need different bytecodes. A global lookup often goes through a hash table because names can be resolved late or exposed across modules. A local access can be a direct stack-slot read. A captured variable may be an upvalue that points either to an open stack slot or to a closed heap cell after the declaring function returns. Treating all three cases as one generic name lookup is simple but loses most of the performance benefit of bytecode compilation.
+
+## Jumps, dispatch, and optimization
+
+Control flow is encoded with jumps. A compiler emits placeholder offsets for forward jumps and patches them once the target location is known. For loops, it emits a backward jump. Offset width becomes a real design limit: one byte is compact but too small for large functions; two or four bytes are more flexible.
+
+Dispatch dominates simple interpreter performance. In a `switch` loop, each bytecode often costs an indirect branch plus C control-flow overhead. Direct threading can improve branch prediction by jumping directly to the next opcode handler, but it is less portable. Superinstructions combine common sequences, and quickening rewrites generic bytecodes to specialized bytecodes after runtime information is known.
+
+Bytecode is not the same as an optimizing IR. Bytecode is usually compact and executable; an optimizer often wants explicit control-flow graphs, SSA, and typed operations. Many systems therefore parse to AST, lower to bytecode for baseline execution, and also lower hot code to richer IR for JIT optimization.
+
+VM verification can be a separate safety layer. A bytecode loader may check that every jump lands on an instruction boundary, every stack access is valid, every local slot is initialized, and every function returns with a consistent stack height. Small educational VMs often trust their own compiler, but distributed bytecode formats such as JVM class files need validation because bytecode can come from outside the current compiler pipeline.
+
+## Compiling and running `1 + 2 * 3`
 
 Problem: compile and execute:
 
@@ -121,7 +127,7 @@ Checked bytecode:
 
 The output is `7`, proving that compile order preserved precedence.
 
-## Worked example 2: Patching a forward jump
+## Patching the two branches of an `if`
 
 Problem: compile:
 
@@ -160,7 +166,7 @@ Checked layout:
 
 The exact offsets depend on operand width, but the invariant is fixed: both paths clean the condition, and only one branch prints.
 
-## Code
+## A minimal stack VM
 
 ```python
 from enum import IntEnum
@@ -217,7 +223,7 @@ if __name__ == "__main__":
     VM(code, constants).run()
 ```
 
-## Common pitfalls
+## Failure modes in a bytecode engine
 
 - Emitting bytecode before defining a precise stack effect for every instruction.
 - Forgetting to pop temporary values after expression statements or branches.
@@ -236,7 +242,19 @@ if __name__ == "__main__":
 - Treating bytecode as portable without specifying versioning, operand widths, and endianness for serialized chunks.
 - Forgetting to validate stack height at branch merge points when bytecode can be loaded from untrusted sources.
 
-## Connections
+## References
+
+[1] R. Nystrom, *Crafting Interpreters*. Genever Benning, 2021.  
+[2] A. V. Aho, M. S. Lam, R. Sethi, and J. D. Ullman, *Compilers: Principles, Techniques, and Tools*, 2nd ed. Pearson, 2006.  
+[3] A. W. Appel, *Modern Compiler Implementation in ML*. Cambridge University Press, 1998.  
+[4] K. D. Cooper and L. Torczon, *Engineering a Compiler*, 2nd ed. Morgan Kaufmann, 2012.  
+[5] S. S. Muchnick, *Advanced Compiler Design and Implementation*. Morgan Kaufmann, 1997.  
+[6] M. Anton Ertl and D. Gregg, "The structure and performance of efficient interpreters," *Journal of Instruction-Level Parallelism*, vol. 5, 2003.  
+[7] J. Aycock, "A brief history of just-in-time," *ACM Computing Surveys*, vol. 35, no. 2, pp. 97-113, 2003.
+
+<div className="see-also">
+
+See also:
 
 - [Tree-Walking Interpreters](/cs/compilers/tree-walking-interpreters) provide the direct semantic model that bytecode preserves more efficiently.
 - [Intermediate Representations and Optimization](/cs/compilers/intermediate-representations-and-optimization) explains why optimizing compilers often lower bytecode to CFG or SSA.
@@ -247,12 +265,4 @@ if __name__ == "__main__":
 - [Programming Language Theory](/cs/programming-language-theory/intro) provides semantics that bytecode execution must implement.
 - [Theory of Computation](/cs/theory/intro) supplies formal models of computation underlying virtual machines.
 
-## References
-
-[1] R. Nystrom, *Crafting Interpreters*. Genever Benning, 2021.  
-[2] A. V. Aho, M. S. Lam, R. Sethi, and J. D. Ullman, *Compilers: Principles, Techniques, and Tools*, 2nd ed. Pearson, 2006.  
-[3] A. W. Appel, *Modern Compiler Implementation in ML*. Cambridge University Press, 1998.  
-[4] K. D. Cooper and L. Torczon, *Engineering a Compiler*, 2nd ed. Morgan Kaufmann, 2012.  
-[5] S. S. Muchnick, *Advanced Compiler Design and Implementation*. Morgan Kaufmann, 1997.  
-[6] M. Anton Ertl and D. Gregg, "The structure and performance of efficient interpreters," *Journal of Instruction-Level Parallelism*, vol. 5, 2003.  
-[7] J. Aycock, "A brief history of just-in-time," *ACM Computing Surveys*, vol. 35, no. 2, pp. 97-113, 2003.
+</div>

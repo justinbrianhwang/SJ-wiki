@@ -9,7 +9,7 @@ Federated learning is constrained by communication before it is constrained by f
 
 Robustness asks a different but connected question: what if some clients are malicious, compromised, or simply broken? Bagdasaryan et al. show that a malicious participant can use model replacement to inject backdoor behavior into a federated model, and that secure aggregation can make update-level anomaly detection difficult because individual updates are hidden [10]. Byzantine-robust aggregation methods such as coordinate-wise median, trimmed mean, Krum, Multi-Krum, Bulyan, FoolsGold, and FLTrust try to reduce the influence of bad updates, but their assumptions often conflict with non-IID federated data and privacy constraints [11], [12], [13], [14].
 
-## Definitions
+## The bandwidth and threat models
 
 Let a model update be $\Delta_k\in\mathbb{R}^d$. The uplink cost of uncompressed float32 communication is approximately $32d$ bits per selected client per round. If $m$ clients participate for $T$ rounds, uncompressed uplink is $32d mT$ bits, before protocol overhead.
 
@@ -21,7 +21,7 @@ Let a model update be $\Delta_k\in\mathbb{R}^d$. The uplink cost of uncompressed
 
 **Lazy or event-triggered communication** sends updates only when they are large or informative enough. This can save bandwidth but may bias training toward volatile clients.
 
-**Byzantine client** means a client may send arbitrary updates, not just noisy gradients. A malicious client can poison labels, send random vectors, scale updates, or optimize for a backdoor.
+**Byzantine client** means a client may send arbitrary updates rather than merely noisy gradients. A malicious client can poison labels, send random vectors, scale updates, or optimize for a backdoor.
 
 **Coordinate-wise median** aggregates each coordinate by taking the median across clients. **Trimmed mean** removes the largest and smallest $f$ values per coordinate and averages the rest [12].
 
@@ -35,7 +35,7 @@ where $\mathcal{N}(i)$ contains the $K-f-2$ nearest other updates. The selected 
 
 ![A backdoor federated learning figure shows a malicious client crafting a scaled update that overrides the aggregation to inject backdoor behavior into the global model.](https://ar5iv.labs.arxiv.org/html/1807.00459/assets/x1.png)
 
-*Figure: Bagdasaryan et al.'s model-replacement attack shows that a single malicious participant can implant backdoors that evade anomaly detection under secure aggregation. From [Bagdasaryan et al., 2020](https://arxiv.org/abs/1807.00459) — embedded under educational fair use with attribution.*
+*Figure: Bagdasaryan et al.'s model-replacement attack shows how one malicious participant can implant a backdoor that evades anomaly detection under secure aggregation. From [Bagdasaryan et al., 2020](https://arxiv.org/abs/1807.00459), reproduced with attribution for discussion.*
 
 **Model replacement** is a backdoor attack where the attacker trains a malicious model $X$ and scales its submitted update so FedAvg moves the global model close to $X$ [10]. If $m$ clients are averaged uniformly in the round, an attacker can submit roughly
 
@@ -45,9 +45,9 @@ $$
 
 with $\gamma$ near $m$, so the aggregate is dominated by the backdoored model.
 
-## Key results
+## Trading rounds, bits, and trust
 
-Communication efficiency has two levers: reduce the number of rounds or reduce bytes per round. FedAvg reduces rounds by using local computation [1]. Compression reduces bytes per round. These levers interact: aggressive local epochs may increase drift, and aggressive compression may add error that slows convergence. Good systems measure time-to-quality, not just bits or rounds.
+Communication efficiency has two levers: reduce the number of rounds or reduce bytes per round. FedAvg reduces rounds by using local computation [1]. Compression reduces bytes per round. These levers interact: aggressive local epochs may increase drift, and aggressive compression may add error that slows convergence. Good systems measure time-to-quality alongside bits and rounds.
 
 Top-$k$ sparsification can be effective when gradients are heavy-tailed. A client sends indices and values for the largest $k$ coordinates. If $k/d=0.01$, the values are $1\%$ of the dense update, but index cost matters. For large $d$, each index may require $\lceil \log_2 d\rceil$ bits. Error feedback is usually necessary because dropping coordinates forever biases the update.
 
@@ -57,7 +57,7 @@ Model compression changes what is trainable. Pruning can reduce payload if the s
 
 Federated distillation can avoid sending full model weights. Clients exchange logits on a public dataset, prototypes, or teacher predictions. This helps when clients use heterogeneous architectures or when model weights are too large. The cost is that the public/proxy data or shared representation must be meaningful for all clients.
 
-Robustness methods face the non-IID problem. Coordinate-wise median and trimmed mean assume that benign updates cluster coordinate-wise. Krum assumes benign updates are closer to one another than to Byzantine updates. In federated learning, benign updates may naturally point in different directions because client data differ. A rare but legitimate hospital, language group, or device distribution can look like an outlier. This is why robust aggregation can harm fairness and personalization, and why Ditto studies fairness and robustness together [15].
+Robustness methods face the non-IID problem. Coordinate-wise median and trimmed mean assume that benign updates cluster coordinate-wise. Krum assumes benign updates are closer to one another than to Byzantine updates. In federated learning, benign updates may naturally point in different directions because client data differ. A rare but legitimate hospital, language group, or device distribution can look like an outlier. Robust aggregation can therefore harm fairness and personalization; Ditto studies the two concerns together [15].
 
 Backdoor attacks are particularly dangerous because they preserve main-task accuracy. Bagdasaryan et al. show semantic backdoors in image classification and word prediction, including a constrain-and-scale technique that incorporates evasion into the attacker's training objective [10]. The attacker does not need to make the global model fail overall; it only needs the model to behave maliciously on trigger inputs.
 
@@ -73,8 +73,6 @@ Secure aggregation changes the defense surface. It is useful for privacy because
 | Median/trimmed mean | Byzantine influence | Coordinate-wise assumptions | Can reject rare benign clients |
 | Krum/Multi-Krum | Arbitrary bad vectors | Distance assumptions | Non-IID benign updates may look malicious |
 | FLTrust | Untrusted clients | Requires trusted server data | Trust anchor may be biased |
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -106,7 +104,7 @@ flowchart TD
   Krum --> Privacy
 ```
 
-## Worked example 1: Bandwidth under top-k compression
+## Counting the real cost of top-$k$
 
 **Problem.** A model update has $d=10{,}000{,}000$ coordinates. Dense float32 upload sends $32d$ bits. A top-$k$ method sends $k=100{,}000$ coordinates, each with a float32 value and a coordinate index. Assume each index uses $24$ bits because $2^{24}\gt 10{,}000{,}000$. There are $m=1{,}000$ clients per round and $T=500$ rounds. Compare total uplink.
 
@@ -161,7 +159,7 @@ $$
 
 **Checked answer.** Top-$k$ reduces the uplink by about $57$ times in this setup, not $100$ times, because indices are not free.
 
-## Worked example 2: Applying Krum to five client updates
+## Applying Krum to five updates
 
 **Problem.** Five clients send scalar updates
 
@@ -213,7 +211,7 @@ $$
 
 **Checked answer.** Krum selects either $g_1=1.0$ or $g_4=1.1$ depending on tie-breaking. It rejects the obvious malicious update $8.0$. In high-dimensional non-IID FL, the benign cluster may be less clean than this toy example.
 
-## Code
+## Testing a compressor and Krum scorer
 
 ```python
 import numpy as np
@@ -243,7 +241,7 @@ print("Krum scores:", np.round(scores, 3))
 print("Selected update:", updates[winner, 0])
 ```
 
-## Common pitfalls
+## What bandwidth and robustness benchmarks miss
 
 - Reporting compression ratio without including index, scale, mask, or protocol overhead.
 - Dropping coordinates without error feedback and then blaming FedAvg for biased convergence.
@@ -259,17 +257,6 @@ print("Selected update:", updates[winner, 0])
 - Evaluating only main-task accuracy and missing targeted backdoor success.
 - Assuming norm clipping alone prevents model replacement; attackers can train within constraints.
 - Ignoring adaptive attackers who know the defense and optimize around it.
-
-## Connections
-
-- [Privacy: Differential Privacy and Secure Aggregation](/cs/federated-learning/privacy-differential-and-secure-aggregation)
-- [Heterogeneity and Federated Optimization](/cs/federated-learning/heterogeneity-and-optimization)
-- [Personalization in Federated Learning](/cs/federated-learning/personalization-in-federated-learning)
-- [Data poisoning and backdoors](/cs/adversarial-attacks/data-poisoning-and-backdoors)
-- [Certified defenses and randomized smoothing](/cs/adversarial-attacks/certified-defenses-and-randomized-smoothing)
-- [Gradient masking and obfuscation](/cs/adversarial-attacks/gradient-masking-and-obfuscation)
-- [Computational performance](/cs/deep-learning/computational-performance)
-- [Pretrained transformers for NLP](/cs/deep-learning/pretrained-transformers-nlp)
 
 ## References
 
@@ -310,3 +297,9 @@ print("Selected update:", updates[winner, 0])
 [18] P. Kairouz et al., "Advances and Open Problems in Federated Learning," Foundations and Trends in Machine Learning, 2021. https://arxiv.org/abs/1912.04977
 
 [19] C. Xie, K. Huang, P.-Y. Chen, and B. Li, "DBA: Distributed Backdoor Attacks Against Federated Learning," ICLR, 2020. https://arxiv.org/abs/1905.10447
+
+<div className="see-also">
+
+See also: [Privacy: Differential Privacy and Secure Aggregation](/cs/federated-learning/privacy-differential-and-secure-aggregation) · [Heterogeneity and Federated Optimization](/cs/federated-learning/heterogeneity-and-optimization) · [Personalization in Federated Learning](/cs/federated-learning/personalization-in-federated-learning) · [Data poisoning and backdoors](/cs/adversarial-attacks/data-poisoning-and-backdoors) · [Certified defenses and randomized smoothing](/cs/adversarial-attacks/certified-defenses-and-randomized-smoothing) · [Gradient masking and obfuscation](/cs/adversarial-attacks/gradient-masking-and-obfuscation) · [Computational performance](/cs/deep-learning/computational-performance) · [Pretrained transformers for NLP](/cs/deep-learning/pretrained-transformers-nlp)
+
+</div>

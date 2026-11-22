@@ -7,9 +7,9 @@ sidebar_position: 11
 
 Control turns a planned trajectory into steering, throttle, and braking commands. It is where elegant trajectories meet tire friction, actuator delay, sensor noise, slopes, load transfer, and imperfect vehicle models. In autonomous driving, longitudinal control manages speed and headway, while lateral control manages path tracking. A good controller is stable, smooth, robust, and honest about the limits of the plan it is asked to follow.
 
-This page introduces PID, pure pursuit, Stanley control, model predictive control, and the kinematic and dynamic bicycle models. It connects [motion planning](/cs/autonomous-driving/motion-planning) to [embedded implementation](/cs/embedded/) and [engineering math](/math/engineering-math/), because control is both mathematical and deeply physical.
+PID, pure pursuit, Stanley control, and model predictive control offer different compromises between simplicity, model dependence, constraint handling, and compute cost.
 
-## Definitions
+## Controllers and vehicle models
 
 **Longitudinal control** regulates speed, acceleration, and spacing using throttle and brakes. Adaptive cruise control and stop-and-go traffic control are longitudinal problems.
 
@@ -41,7 +41,7 @@ where $\psi_e$ is heading error, $e_c$ cross-track error, $v$ speed, $k$ gain, a
 
 The **kinematic bicycle model** assumes no tire slip and is useful at low to moderate speeds. The **dynamic bicycle model** includes tire forces and slip angles, which matter near handling limits, high speed, or low-friction surfaces.
 
-## Key results
+## Matching the controller to dynamics and constraints
 
 Ackermann steering geometry relates steering angle and turn radius:
 
@@ -94,7 +94,7 @@ Controller evaluation should separate steady-state accuracy, transient response,
 
 Control handoff also matters. When a planner replans, cancels a lane change, or enters fallback, the controller should transition references smoothly. Discontinuous reference trajectories can create command spikes even when each individual trajectory is feasible.
 
-## Visual
+### The closed loop around every controller
 
 ```mermaid
 flowchart TB
@@ -164,7 +164,7 @@ flowchart TB
 
 This diagram shows the control stack as a closed loop rather than a list of controller names. PID handles scalar longitudinal errors, pure pursuit and Stanley compute steering from geometric path errors, MPC solves a constrained horizon problem, and all branches pass through arbitration, actuator limits, vehicle dynamics, and sensor feedback.
 
-## Worked example 1: Pure-pursuit steering
+## Computing a pure-pursuit command
 
 Problem: A vehicle has wheelbase $L=2.8$ m. The lookahead point is at distance $\ell_d=10$ m and angle $\alpha=8^\circ$ relative to the vehicle heading. Compute the pure-pursuit steering command.
 
@@ -210,7 +210,7 @@ Answer: pure pursuit commands about $4.5^\circ$ of steering.
 
 Check: The lookahead angle is 8 degrees, but steering is smaller because the lookahead point is 10 m away and the wheelbase is 2.8 m.
 
-## Worked example 2: Stanley steering on a curve
+## Correcting cross-track error with Stanley control
 
 Problem: A vehicle travels at $v=12$ m/s. Heading error to the path is $\psi_e=2^\circ$. Cross-track error is $e_c=0.5$ m to the left of the path, gain $k=1.2$, and $\epsilon=0.1$. Compute the Stanley steering correction assuming positive error requires positive steering.
 
@@ -250,7 +250,7 @@ Answer: Stanley control commands about $4.8^\circ$.
 
 Check: At higher speed, the cross-track term would shrink. At lower speed, the same lateral error would produce stronger steering, which is why $\epsilon$ and saturation matter.
 
-## Code
+## Reference implementations for geometric control
 
 ```python
 import numpy as np
@@ -273,11 +273,11 @@ print("pure pursuit deg:", np.rad2deg(delta_pp))
 print("stanley deg:", np.rad2deg(delta_st))
 ```
 
-## Recent systems and papers
+## Soft constraints in receding-horizon MPC
 
 Vu et al. study receding-horizon MPC for autonomous-vehicle trajectory tracking, using a bicycle-like vehicle model to turn a planned reference from [motion planning](/cs/autonomous-driving/motion-planning) into speed and steering-rate commands under constraints [1]. Their state is position, body heading, and steering angle, with controls for vehicle speed and steering angular velocity; the nonlinear model is locally linearized around the reference trajectory, discretized, and stacked into a finite-horizon quadratic program with tracking-error, control-effort, input-bound, input-increment, and output-bound terms [1]. As in practical MPC, only the first optimized control action is applied, then the state is measured again and the horizon is shifted, so solver timing and warm starts matter as much as the optimization equation [1]. The paper's most useful control lesson is that making every output constraint hard can make the online problem infeasible when the vehicle starts outside a bound or the reference demands more than the horizon can achieve [1]. Softened constraints add nonnegative slack variables and heavy penalties, letting the optimizer return a recovery action while still preferring zero violation whenever a hard-feasible solution exists [1]. In simulation, softened constraints improve feasibility and transient recovery but increase CPU time, while horizon length, sampling interval, and $Q/R$ weights change smoothness, tracking error, sensitivity, and real-time cost, reinforcing that MPC is a constrained control framework rather than an automatic safety guarantee [1].
 
-## Common pitfalls
+## Failure modes in tuning and deployment
 
 - Mixing sign conventions for cross-track error. A controller can steer away from the path if the coordinate convention is inconsistent.
 - Tuning at one speed and deploying at another. Lookahead, gains, and delay effects all change with speed.
@@ -286,16 +286,12 @@ Vu et al. study receding-horizon MPC for autonomous-vehicle trajectory tracking,
 - Using a kinematic model near tire limits. Wet roads, snow, high curvature, and high speed require stronger dynamic awareness.
 - Validating only in open-loop logs. Control must be tested closed-loop because small tracking errors change future states.
 
-## Connections
-
-- [Motion planning](/cs/autonomous-driving/motion-planning)
-- [Decision making and behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning)
-- [Simulation and data](/cs/autonomous-driving/simulation-and-data)
-- [Embedded systems](/cs/embedded/)
-- [Engineering math for controls and ODEs](/math/engineering-math/)
-- [Physics of signals and systems](/physics/signals-systems/)
-- Further reading: Stanley controller from the DARPA Grand Challenge, pure pursuit robotics literature, Rajamani's vehicle dynamics, MPC texts, and PID control references.
-
-## References
+## Source cited
 
 [1] T. M. Vu, R. Moezzi, J. Cyrus, and J. Hlava, "Model Predictive Control for Autonomous Driving Vehicles," Electronics, vol. 10, no. 21, article 2593, 2021.
+
+<div className="see-also">
+
+See also: [Motion planning](/cs/autonomous-driving/motion-planning) · [Decision making and behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning) · [Simulation and data](/cs/autonomous-driving/simulation-and-data) · [Embedded systems](/cs/embedded/intro) · [Engineering math for controls and ODEs](/math/engineering-math/intro) · [Physics of signals and systems](/physics/signals-systems/intro)
+
+</div>

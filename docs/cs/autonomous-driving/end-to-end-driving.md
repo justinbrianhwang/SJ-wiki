@@ -7,9 +7,9 @@ sidebar_position: 12
 
 End-to-end driving uses learning to map sensor inputs, route commands, and context directly to driving actions or trajectories. The idea is old: ALVINN learned steering from camera images in the late 1980s, and modern systems have revived the approach with deep networks, large datasets, imitation learning, transformers, world models, and closed-loop simulation. The attraction is that the model can learn interactions that are hard to hand-code. The risk is that validation, interpretability, rare-event coverage, and safety arguments become much harder.
 
-This page introduces imitation learning, conditional imitation learning, PilotNet-style models, world-model approaches, Tesla FSD as a public example of a heavily learned driving stack, and the distinction between pure end-to-end and modular learned systems. It complements the modular stack pages on [perception](/cs/autonomous-driving/perception-object-detection-and-segmentation), [prediction](/cs/autonomous-driving/prediction-and-motion-forecasting), [planning](/cs/autonomous-driving/motion-planning), and [safety](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing).
+The category spans direct-control policies, waypoint predictors, unified perception-planning models, and action-conditioned world models. Those designs expose very different interfaces for validation and safety constraints.
 
-## Definitions
+## What counts as end-to-end
 
 **End-to-end driving** usually means training a model to map observations directly to low-level controls or planned trajectories. The input may be camera images, lidar, radar, map context, navigation commands, ego state, and previous frames. The output may be steering, acceleration, waypoints, occupancy, cost maps, or a full trajectory.
 
@@ -29,7 +29,7 @@ $$
 
 **Closed-loop evaluation** tests a policy by letting it act and affect future states. **Open-loop evaluation** scores predictions or actions on logged data without changing the scene. End-to-end policies can look good open-loop and fail closed-loop because their own errors move them out of the expert data distribution.
 
-## Key results
+## Distribution shift, output contracts, and safety wrappers
 
 The classic behavior-cloning problem is covariate shift. Training data contains expert observations $o \sim d_{\mathrm{expert}}$, but deployment observations come from the learned policy distribution $d_{\pi}$. Small mistakes lead to states the expert rarely visited, and the model has little training signal there. Dataset aggregation methods such as DAgger address this by collecting expert labels on states induced by the learned policy.
 
@@ -177,7 +177,7 @@ The practical tradeoff is complexity. Unified models can improve task coordinati
 
 ![DriveDreamer overview showing controllable driving video generation from text, structure, and action conditions.](https://ar5iv.labs.arxiv.org/html/2309.09777/assets/x1.png)
 
-*Figure: DriveDreamer grounds a driving world model in structured traffic constraints and action-conditioned future video. From [Wang et al., 2023](https://arxiv.org/abs/2309.09777) — embedded under educational fair use with attribution.*
+*Figure: DriveDreamer conditions a driving world model on structured traffic constraints and actions. From [Wang et al., 2023](https://arxiv.org/abs/2309.09777) — embedded under educational fair use with attribution.*
 
 ![GAIA-1 multimodal generation figure showing video, text, and action-conditioned driving rollouts.](https://ar5iv.labs.arxiv.org/html/2309.17080/assets/x1.png)
 
@@ -207,7 +207,7 @@ $$
 
 Three steps take 49 ms, seven take 85 ms, and ten take 112 ms. Under a 100 ms planning budget, the ten-step version is not deployable no matter how good it looks offline. A diffusion planner needs candidate scoring, constraint checks, and a fallback when no sampled trajectory is safe or the solver overruns.
 
-## Visual
+## Comparing learned-stack interfaces
 
 ```mermaid
 flowchart TB
@@ -288,7 +288,7 @@ flowchart TB
 
 This diagram compares end-to-end driving families by their internal contracts. ChauffeurNet uses rasterized top-down inputs and imitation losses, TransFuser fuses camera and lidar features with attention, UniAD exposes tracking/map/motion/planning queries, and world-model or VLA systems route tokens through memory and rollout before a safety wrapper turns outputs into vehicle motion.
 
-## Worked example 1: Why route conditioning matters
+## Why route commands prevent action averaging
 
 Problem: At a T-intersection, a training set has two equally common expert actions from visually similar observations: steering $-10^\circ$ for left turns and $+10^\circ$ for right turns. A behavior-cloning model without route command minimizes mean squared steering error by predicting one value. What steering does it learn?
 
@@ -317,7 +317,7 @@ Answer: the model predicts $0^\circ$, which means straight, even though neither 
 
 Check: This is the averaging problem. With route command, the model can learn separate outputs for left and right.
 
-## Worked example 2: Open-loop error compounding
+## How small errors consume lane margin
 
 Problem: A learned steering policy has an average lateral deviation growth of 0.10 m per second after small mistakes. If it starts centered in a 3.6 m lane and no correction occurs for 8 s, estimate lateral deviation and remaining margin to the lane boundary.
 
@@ -343,7 +343,7 @@ Answer: the vehicle is 0.8 m off center with about 1.0 m margin to the lane boun
 
 Check: The policy may still be inside the lane, but this simple calculation ignores curvature, other traffic, and recovery dynamics. Closed-loop testing is needed because errors can grow nonlinearly.
 
-## Code
+## A command-conditioned policy skeleton
 
 ```python
 import torch
@@ -379,7 +379,7 @@ ego = torch.tensor([[12.0, 0.01], [8.0, -0.02]])
 print(model(image, command, ego).shape)
 ```
 
-## Common pitfalls
+## Claims that closed-loop tests must settle
 
 - Treating open-loop imitation accuracy as proof of driving competence. Closed-loop distribution shift is the central problem.
 - Outputting raw controls when waypoints or trajectories would be easier to constrain and inspect.
@@ -388,17 +388,7 @@ print(model(image, command, ego).shape)
 - Using end-to-end as a reason to skip requirements, monitors, or fallback design. Learned policies still need safety envelopes.
 - Overclaiming from company demos or public talks. Public architecture descriptions are incomplete and should not be treated as full internal designs.
 
-## Connections
-
-- [Perception, object detection, and segmentation](/cs/autonomous-driving/perception-object-detection-and-segmentation)
-- [Prediction and motion forecasting](/cs/autonomous-driving/prediction-and-motion-forecasting)
-- [Motion planning](/cs/autonomous-driving/motion-planning)
-- [Safety, ISO 26262, SOTIF, and scenario testing](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing)
-- [Deep learning](/cs/deep-learning/)
-- [Reinforcement learning](/cs/reinforcement-learning/)
-- Further reading: Pomerleau's ALVINN, NVIDIA PilotNet, conditional imitation learning for driving, DAgger, Dreamer world models, and public technical talks from major AV developers.
-
-## References
+## Sources cited
 
 [1] J. Patz et al. *A Practical Approach to Robotic Design for the DARPA Urban Challenge*. Journal of Field Robotics, 2008.
 [2] M. Bansal, A. Krizhevsky, A. Ogale. *ChauffeurNet: Learning to Drive by Imitating the Best and Synthesizing the Worst*. arXiv, 2018.
@@ -413,3 +403,9 @@ print(model(image, command, ego).shape)
 [11] Z. Li, K. Li, S. Wang, S. Lan, Z. Yu, Y. Ji, Z. Li, Z. Zhu, J. Kautz, Z. Wu, Y.-G. Jiang, J. M. Alvarez. *Hydra-MDP: End-to-end Multimodal Planning with Multi-target Hydra-Distillation*. arXiv, 2024.
 [12] A. Jiang, Y. Gao, Z. Sun, Y. Wang, J. Wang, J. Chai, Q. Cao, Y. Heng, H. Jiang, Y. Dong, Z. Zhang, X. Guo, H. Sun, H. Zhao. *DiffVLA: Vision-Language Guided Diffusion Planning for Autonomous Driving*. arXiv, 2025.
 [13] Y. Li, S. Thompson, Y. Zhang, E. Javanmardi, M. Tsukada. *An Open-Source Modular Benchmark for Diffusion-Based Motion Planning in Closed-Loop Autonomous Driving*. arXiv, 2026.
+
+<div className="see-also">
+
+See also: [Perception, object detection, and segmentation](/cs/autonomous-driving/perception-object-detection-and-segmentation) · [Prediction and motion forecasting](/cs/autonomous-driving/prediction-and-motion-forecasting) · [Motion planning](/cs/autonomous-driving/motion-planning) · [Safety, ISO 26262, SOTIF, and scenario testing](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing) · [Deep learning](/cs/deep-learning/intro) · [Reinforcement learning](/cs/reinforcement-learning/intro)
+
+</div>

@@ -5,15 +5,11 @@ sidebar_position: 2
 
 # Properties of Gases
 
-Gases are the simplest macroscopic systems in physical chemistry because their pressure, volume, temperature, and amount of substance are tightly connected by equations of state. Atkins begins equilibrium thermodynamics with gases because a gas lets us see how empirical laws, molecular pictures, and calculus-based thermodynamics support one another.
+Gases are unusually clean macroscopic systems because pressure, volume, temperature, and amount are tied together by equations of state. They provide a direct bridge between empirical gas laws, molecular motion, and thermodynamic derivatives.
 
 The perfect gas is the reference model: molecules are treated as point particles with negligible intermolecular forces except during collisions. Real gases depart from that model when attractions, repulsions, and finite molecular size become important, especially at high pressure and near condensation.
 
-![An animation shows a large particle jostled by many smaller particles in Brownian motion.](https://commons.wikimedia.org/wiki/Special:FilePath/Brownian_motion_large.gif)
-
-*Figure: Brownian motion as direct visual context for molecular collisions and thermal motion. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Brownian_motion_large.gif), Lookang with model by Francisco Esquembre and Fu-Kwun, CC BY-SA 3.0.*
-
-## Definitions
+## Describing a gas state
 
 A **state variable** is a property that describes the present condition of the system. For a simple pure gas, the usual variables are pressure $p$, volume $V$, temperature $T$, and amount $n$. An **equation of state** relates them:
 
@@ -65,7 +61,7 @@ $$
 
 where $a$ represents attractive interactions and $b$ represents excluded volume.
 
-## Key results
+## The dilute-gas limit
 
 Boyle's law, Charles's law, and Avogadro's principle combine into the perfect gas law in the low-pressure limit:
 
@@ -119,7 +115,89 @@ The principle of corresponding states says that many gases have similar reduced 
 
 The pressure of a gas also has a mechanical interpretation that is useful throughout the subject. A gas exerts pressure because molecules transfer momentum to the container walls. Higher temperature increases the average kinetic energy and therefore increases the rate and severity of wall collisions. Larger volume lowers the collision frequency at the walls. This molecular picture is not needed to use the perfect gas equation, but it explains why the equation has the structure it does and why it fails when molecules are close enough for attractions and repulsions to matter.
 
-The distinction between a limiting law and an exact law is important. The perfect gas law is approached as $p\to0$ because the average separation between molecules grows large. In that limit, potential-energy contributions from intermolecular forces become negligible compared with translational kinetic energy. A real gas at ordinary laboratory pressure may be close enough to ideal for rough stoichiometry, but precision thermodynamics uses fugacity or measured equations of state. The virial equation is especially valuable because each coefficient carries information about molecular interactions: the second virial coefficient reflects pair interactions, the third virial coefficient reflects three-body effects, and so on.
+Kinetic theory makes that picture quantitative. For $N$ molecules of mass $m$ in a cubic container, an elastic collision reverses the velocity component normal to a wall. Summing the momentum transfer over many randomly directed molecules gives
+
+$$
+pV=\frac{1}{3}Nm\langle c^2\rangle,
+$$
+
+where $\langle c^2\rangle$ is the mean squared molecular speed. Comparing this result with $pV=Nk_BT$ gives the mean translational kinetic energy
+
+$$
+\frac{1}{2}m\langle c^2\rangle=\frac{3}{2}k_BT.
+$$
+
+Temperature therefore fixes the average translational kinetic energy, not a single molecular speed. Molecules retain a broad Maxwell speed distribution. Three characteristic speeds are
+
+$$
+c_{mp}=\sqrt{\frac{2RT}{M}},
+\qquad
+\bar c=\sqrt{\frac{8RT}{\pi M}},
+\qquad
+c_{rms}=\sqrt{\frac{3RT}{M}},
+$$
+
+with $c_{mp}\lt \bar c\lt c_{rms}$. Here $M$ must be in $\mathrm{kg\,mol^{-1}}$ when SI units are used. Raising $T$ shifts the distribution toward higher speeds and broadens it; increasing molar mass shifts it toward lower speeds.
+
+### Worked example: comparing molecular speeds
+
+For nitrogen at $300\ \mathrm{K}$, take $M=28.0\ \mathrm{g\,mol^{-1}}=0.0280\ \mathrm{kg\,mol^{-1}}$. The root-mean-square speed is
+
+$$
+\begin{aligned}
+c_{rms}
+&=\sqrt{\frac{3RT}{M}}\\
+&=\sqrt{\frac{3(8.314)(300)}{0.0280}}\\
+&=517\ \mathrm{m\,s^{-1}}.
+\end{aligned}
+$$
+
+For helium at the same temperature, $M=0.00400\ \mathrm{kg\,mol^{-1}}$:
+
+$$
+c_{rms}=\sqrt{\frac{3(8.314)(300)}{0.00400}}=1.37\times10^3\ \mathrm{m\,s^{-1}}.
+$$
+
+The ratio can be checked without repeating the constants:
+
+$$
+\frac{c_{rms}(\mathrm{He})}{c_{rms}(\mathrm{N_2})}
+=\sqrt{\frac{M_{N_2}}{M_{He}}}
+=\sqrt{7}=2.65.
+$$
+
+At equal temperature both gases have the same mean translational kinetic energy per molecule. Helium moves faster because the same average energy is carried by less mass.
+
+## Collisions, mean free path, and transport
+
+Molecules in a gas do not normally fly from one wall to the opposite wall without interruption. They collide with other molecules after a **mean free path**, the average distance between successive collisions. In a simple hard-sphere model, mean free path grows as pressure falls because number density falls. It also depends on collision diameter: larger molecules sweep out more collision area and collide more often.
+
+Collision frequency links microscopic motion to chemical rate and transport. A reaction between two gas molecules requires encounters, although only a fraction have a suitable energy and orientation. Diffusion carries molecules down concentration gradients through many collisions. Viscosity carries momentum between neighboring layers. Thermal conductivity carries molecular energy. These transport processes need nonequilibrium gradients and are not determined by the equilibrium equation of state alone.
+
+**Effusion** is escape through a hole small compared with the mean free path, so molecules pass through without a flow pattern developing in the aperture. For ideal gases at the same temperature, Graham's law gives an effusion rate inversely proportional to the square root of molar mass. The result follows because molecular flux to the hole is proportional to number density times mean speed, and mean speed varies as the inverse square root of mass.
+
+Consider equal-pressure samples of methane and sulfur hexafluoride at the same temperature. Their molar masses are approximately 16.0 and 146.1 grams per mole. The rate ratio is
+
+$$
+\frac{r_{CH_4}}{r_{SF_6}}
+=\sqrt{\frac{M_{SF_6}}{M_{CH_4}}}
+=\sqrt{\frac{146.1}{16.0}}
+=3.02.
+$$
+
+Methane effuses about three times as fast under the model. The calculation compares initial rates at equal pressure and temperature. It does not say that a methane sample takes exactly one third as long to empty, because pressure and rate change as a finite container empties.
+
+Diffusion through another gas is more complicated than effusion into a vacuum. The diffusing molecule repeatedly collides with the background, and both molecular sizes and interaction forces matter. Applying Graham's square-root rule indiscriminately to liquid diffusion or high-pressure flow discards the assumptions that produced it.
+
+## Partial pressure is a molecular count
+
+In an ideal mixture, each species contributes pressure according to how many of its molecules occupy the common volume. Summing the species equations gives Dalton's law. The mole fraction relation then follows by dividing a component equation by the total equation. Partial pressure is therefore more than a bookkeeping definition; it is the pressure that component would exert alone at the mixture temperature and volume under ideal behavior.
+
+Suppose a dry gas contains 2.0 moles of nitrogen, 0.50 moles of oxygen, and 0.10 moles of carbon dioxide at a total pressure of 1.04 bar. The total amount is 2.60 moles. Carbon dioxide has mole fraction $0.10/2.60=0.0385$, so its partial pressure is $0.0385\times1.04=0.0400$ bar. Nitrogen and oxygen partial pressures are found the same way, and all three must sum to 1.04 bar.
+
+Gas collected over water needs another component in that sum. The measured total pressure contains water vapor at its equilibrium vapor pressure, so the dry gas pressure is total pressure minus water vapor pressure at the collection temperature. Forgetting that subtraction makes the inferred dry-gas amount too large.
+
+The perfect gas law is approached as $p\to0$ because the average separation between molecules grows large. Potential-energy contributions from intermolecular forces then become negligible compared with translational kinetic energy. A real gas at ordinary laboratory pressure may be close enough to ideal for rough stoichiometry, but precision thermodynamics uses fugacity or measured equations of state. The virial equation is especially valuable because each coefficient carries information about molecular interactions: the second virial coefficient reflects pair interactions, the third includes three-body effects, and so on.
 
 The sign of the second virial coefficient is physically meaningful. If attractions dominate at a given temperature, $B(T)$ is negative and $Z\lt 1$ at sufficiently low density: the gas pressure is lower than the perfect-gas value because molecules are pulled slightly back from the wall by neighboring molecules. If repulsions dominate, $B(T)$ is positive and $Z\gt 1$: finite molecular size and short-range repulsion raise the pressure. The Boyle temperature is the temperature at which $B(T)=0$, so a real gas obeys the perfect gas law unusually well over a wider low-pressure range, even though higher virial terms still remain.
 
@@ -129,9 +207,9 @@ Critical phenomena matter because above $T_c$ a gas cannot be liquefied by press
 
 Gas mixtures introduce another layer of idealization. Dalton's law assumes each gas contributes to the total pressure as if it occupied the container alone at the same temperature. This is reliable for low-pressure mixtures because molecular identity barely affects translational pressure. In real mixtures, unlike interactions can be different from like interactions, so activity or fugacity replaces partial pressure in accurate equilibrium work. Even then, the perfect-gas partial pressure remains the reference concept for defining standard states and reaction quotients.
 
-A final practical theme is dimensional discipline. The same equation can look different depending on whether $R$ is expressed in $\mathrm{J\ K^{-1}\ mol^{-1}}$, $\mathrm{L\ bar\ K^{-1}\ mol^{-1}}$, or $\mathrm{L\ atm\ K^{-1}\ mol^{-1}}$. Real-gas constants $a$ and $b$ are also unit-dependent. Many numerical errors in gas calculations are not conceptual errors but unit mismatches, especially when pressure is converted between pascals, bar, atmospheres, torr, and millimeters of mercury.
+The same equation can look different depending on whether $R$ is expressed in $\mathrm{J\ K^{-1}\ mol^{-1}}$, $\mathrm{L\ bar\ K^{-1}\ mol^{-1}}$, or $\mathrm{L\ atm\ K^{-1}\ mol^{-1}}$. Real-gas constants $a$ and $b$ are also unit-dependent. Many numerical errors are unit mismatches, especially when pressure is converted between pascals, bar, atmospheres, torr, and millimeters of mercury.
 
-## Visual
+## Choosing an equation of state
 
 | Model or quantity | Main equation | Best use | Limitation |
 |---|---:|---|---|
@@ -143,27 +221,25 @@ A final practical theme is dimensional discipline. The same equation can look di
 
 ```mermaid
 graph LR
-  A[Gas state variables] --> B[Perfect gas law]
-  B --> C[Partial pressures]
-  B --> D[Reference for real gases]
-  D --> E[Compressibility factor Z]
-  E --> F[Virial equation]
-  E --> G[van der Waals model]
-  G --> H[Critical constants]
-  H --> I[Reduced variables]
+  A["Gas state variables"] --> B["Perfect gas law"]
+  B --> C["Partial pressures"]
+  B --> D["Reference for real gases"]
+  D --> E["Compressibility factor Z"]
+  E --> F["Virial equation"]
+  E --> G["van der Waals model"]
+  G --> H["Critical constants"]
+  H --> I["Reduced variables"]
 ```
 
-## Worked example 1: Pressure from a column of liquid
+## Worked example: pressure from a liquid column
 
-**Problem.** A mercury barometer has a mercury column of height $760.0\ \mathrm{mm}$ at a place where $g=9.80665\ \mathrm{m\ s^{-2}}$. Mercury has density $13.595\ \mathrm{g\ cm^{-3}}$. Calculate the pressure in pascals and atmospheres.
+A mercury barometer has a column of height $760.0\ \mathrm{mm}$ at a place where $g=9.80665\ \mathrm{m\ s^{-2}}$. Mercury has density $13.595\ \mathrm{g\ cm^{-3}}$. Calculate the pressure in pascals and atmospheres.
 
-**Method.** The pressure at the base of a liquid column is the weight per area:
+The pressure at the base of a liquid column is its weight per area:
 
 $$
 p=\rho gh
 $$
-
-**Steps.**
 
 1. Convert density:
 
@@ -196,13 +272,13 @@ $$
 =0.9999\ \mathrm{atm}
 $$
 
-**Checked answer.** The pressure is essentially $1.013\times 10^5\ \mathrm{Pa}=1.000\ \mathrm{atm}$. The check is that $760\ \mathrm{mmHg}$ is the conventional atmospheric-pressure height.
+The pressure is essentially $1.013\times 10^5\ \mathrm{Pa}=1.000\ \mathrm{atm}$. This agrees with the conventional relation between $760\ \mathrm{mmHg}$ and one atmosphere; the small numerical difference comes from the stated mercury density.
 
-## Worked example 2: Real-gas pressure with van der Waals corrections
+## Worked example: real-gas pressure with van der Waals corrections
 
-**Problem.** Estimate the pressure of $1.000\ \mathrm{mol}$ of $\mathrm{CO_2}$ in a $1.000\ \mathrm{L}$ vessel at $300.0\ \mathrm{K}$ using the perfect gas equation and the van der Waals equation. Use $a=3.592\ \mathrm{L^2\ bar\ mol^{-2}}$ and $b=0.04267\ \mathrm{L\ mol^{-1}}$.
+Estimate the pressure of $1.000\ \mathrm{mol}$ of $\mathrm{CO_2}$ in a $1.000\ \mathrm{L}$ vessel at $300.0\ \mathrm{K}$ using the perfect gas equation and the van der Waals equation. Use $a=3.592\ \mathrm{L^2\ bar\ mol^{-2}}$ and $b=0.04267\ \mathrm{L\ mol^{-1}}$.
 
-**Method.** For $n=1$, $V_m=1.000\ \mathrm{L\ mol^{-1}}$. Use $R=0.08314\ \mathrm{L\ bar\ K^{-1}\ mol^{-1}}$.
+For $n=1$, $V_m=1.000\ \mathrm{L\ mol^{-1}}$. Use $R=0.08314\ \mathrm{L\ bar\ K^{-1}\ mol^{-1}}$.
 
 1. Perfect gas pressure:
 
@@ -246,9 +322,11 @@ Z=\frac{pV_m}{RT}
 =0.901
 $$
 
-**Checked answer.** The real-gas estimate is $22.5\ \mathrm{bar}$, lower than the ideal value because attractions dominate at this state. The result $Z\lt 1$ confirms that interpretation.
+The real-gas estimate is $22.5\ \mathrm{bar}$, lower than the ideal value because attractions dominate at this state. The result $Z\lt 1$ confirms that interpretation. At still smaller volume, the excluded-volume term grows sharply and can instead make $Z\gt 1$.
 
-## Code
+## Sampling an isotherm numerically
+
+The van der Waals terms compete as volume changes, so a short calculation is more informative than evaluating only one state. Values near or below $b$ are excluded because the model's available volume vanishes there.
 
 ```python
 import numpy as np
@@ -269,7 +347,7 @@ for volume in [0.5, 1.0, 2.0, 5.0]:
     print(f"Vm={volume:4.1f} L/mol  p={p:7.2f} bar  Z={z:6.3f}")
 ```
 
-## Common pitfalls
+## Limits and unit checks
 
 - Treating $pV=nRT$ as exact for all gases. It is a limiting model; check pressure, temperature, and phase proximity.
 - Forgetting that $V_m$ in van der Waals equations is molar volume. If using total volume, use the $n$-dependent form.
@@ -277,9 +355,8 @@ for volume in [0.5, 1.0, 2.0, 5.0]:
 - Interpreting $a$ and $b$ as universal constants. They depend on the gas.
 - Assuming $Z\lt 1$ always means a gas is "more ideal." It means attractions reduce pressure relative to the perfect-gas value at that state.
 
-## Connections
+<div className="see-also">
 
-- [General chemistry gases](/chemistry/general/gases)
-- [First law and thermochemistry](/chemistry/physical-chemistry/first-law-and-thermochemistry)
-- [Phase transitions and phase diagrams](/chemistry/physical-chemistry/phase-transitions-and-phase-diagrams)
-- [Physics thermodynamics](/physics/general/thermodynamics)
+See also: [General chemistry gases](/chemistry/general/gases) · [First law and thermochemistry](/chemistry/physical-chemistry/first-law-and-thermochemistry) · [Phase transitions and phase diagrams](/chemistry/physical-chemistry/phase-transitions-and-phase-diagrams) · [molecular interactions and transport](/chemistry/physical-chemistry/molecular-interactions-and-transport)
+
+</div>

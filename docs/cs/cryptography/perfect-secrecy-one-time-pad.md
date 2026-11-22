@@ -9,7 +9,7 @@ Perfect secrecy is the cleanest possible confidentiality definition: after seein
 
 The one-time pad is the central construction. Katz and Lindell present it as the canonical perfectly secret encryption scheme and use Shannon's theorem to explain its cost: the secret key must be at least as long as the message. Smart adds information-theoretic language such as entropy, equivocation, and unicity distance, which helps connect perfect secrecy to statistical leakage in classical systems.
 
-## Definitions
+## Identical ciphertext distributions
 
 Let $\Pi=(\mathrm{Gen},\mathrm{Enc},\mathrm{Dec})$ be a private-key encryption scheme with message space $\mathcal M$, key space $\mathcal K$, and ciphertext space $\mathcal C$.
 
@@ -26,6 +26,8 @@ $$
 $$
 
 where $K$ is sampled by $\mathrm{Gen}$. This equivalent condition says that the ciphertext distribution is the same no matter which message was encrypted.
+
+## The one-time pad construction
 
 The **one-time pad** over $n$-bit strings has:
 
@@ -48,7 +50,17 @@ $$
 
 The phrase **one-time** is essential. Reusing the pad destroys perfect secrecy.
 
-## Key results
+```mermaid
+flowchart LR
+  M["Message m"] --> X["XOR"]
+  K["Uniform one-time key k"] --> X
+  X --> C["Ciphertext c = m xor k"]
+  C --> Y["XOR"]
+  K --> Y
+  Y --> R["Recovered m"]
+```
+
+## Why the pad is perfectly secret
 
 The one-time pad is perfectly secret. For any fixed $m$ and $c$, exactly one key makes $m$ encrypt to $c$, namely $k=m\oplus c$. Since all keys are equally likely,
 
@@ -102,27 +114,15 @@ for a correct deterministic decryption scheme.
 
 The one-time pad also shows that information-theoretic security and usability can conflict. To send a gigabyte with perfect secrecy, the parties must already share a gigabyte of fresh uniform secret key. If they can securely share that much key in advance, they might also be able to share the message itself. This does not make the one-time pad irrelevant; it is useful in special high-assurance settings and as a conceptual benchmark. It tells us exactly what true secrecy costs.
 
-Computational encryption can be understood as replacing the uniform pad with a pseudorandom pad and replacing equality of distributions with computational indistinguishability. That replacement is enormous. It gives practical communication from short keys, but the guarantee now depends on efficient attackers, assumptions, nonce discipline, and implementation behavior. Perfect secrecy remains the comparison point that makes those compromises visible.
+Computational encryption can be understood as replacing the uniform pad with a pseudorandom pad and equality of distributions with computational indistinguishability. That replacement gives communication from short keys, but the guarantee now depends on efficient attackers, assumptions, nonce discipline, and implementation behavior. Perfect secrecy is the comparison point for those compromises.
 
-Perfect secrecy also says nothing about authenticity. An attacker can flip any bit of a one-time-pad ciphertext, and the receiver's decrypted plaintext will have the corresponding bit flipped. The receiver has no way to tell from the pad alone whether the ciphertext was modified. This is why information-theoretic encryption still needs an authentication mechanism if active attacks are possible.
+Perfect secrecy also says nothing about authenticity. An attacker can flip any bit of a one-time-pad ciphertext, and the receiver's decrypted plaintext will have the corresponding bit flipped. The receiver has no way to tell from the pad alone whether the ciphertext was modified. Information-theoretic encryption still needs authentication when active attacks are possible.
 
 The key distribution problem is the main practical obstacle. If two parties share fresh secret pads through a physically secure courier, then the pad can protect later radio messages. If the parties are ordinary web clients and servers meeting for the first time, they need public-key key exchange or a KEM to establish shorter session keys. Perfect secrecy solves message leakage after the key exists; it does not solve how the key was delivered.
 
-The definition is also all-or-nothing. A scheme that leaks the length of a variable-length message is not perfectly secret over a message space containing different lengths, unless length is excluded from the secret. Modern systems often accept length leakage, but perfect secrecy forces the designer to say exactly what the message space contains.
+The definition is also all-or-nothing. A scheme that leaks the length of a variable-length message is not perfectly secret over a message space containing different lengths, unless length is excluded from the secret. Modern systems often accept length leakage, so the message space and allowable leakage must be explicit.
 
-That precision is the enduring value of the definition.
-
-## Visual
-
-```mermaid
-flowchart LR
-  M[Message m] --> X[XOR]
-  K[Uniform one-time key k] --> X
-  X --> C["Ciphertext c = m xor k"]
-  C --> Y[XOR]
-  K --> Y
-  Y --> R[Recovered m]
-```
+## Comparing a true pad with a stream cipher
 
 | Property | One-time pad | Ordinary stream cipher |
 |---|---|---|
@@ -132,11 +132,9 @@ flowchart LR
 | Main proof idea | ciphertext uniform for every message | keystream indistinguishable from random |
 | Main failure | reused pad leaks $m_1\oplus m_2$ | nonce reuse can imitate pad reuse |
 
-## Worked example 1: encrypting and decrypting a one-time pad
+## XORing one byte by hand
 
-Problem: encrypt $m=10110010$ with one-time key $k=01101100$, then decrypt.
-
-Method:
+Encrypt $m=10110010$ with one-time key $k=01101100$, then decrypt.
 
 1. XOR bit by bit:
 
@@ -164,19 +162,17 @@ $$
 c\oplus k=(m\oplus k)\oplus k=m\oplus (k\oplus k)=m.
 $$
 
-The checked answer is ciphertext $11011110$ and recovered plaintext $10110010$.
+The ciphertext is $11011110$, and decryption recovers $10110010$.
 
-## Worked example 2: seeing why pad reuse leaks information
+## A crib against a reused pad
 
-Problem: two 8-bit messages are encrypted with the same one-time pad:
+Two 8-bit messages are encrypted with the same one-time pad:
 
 $$
 c_1=00110111,\qquad c_2=01010110.
 $$
 
-Assume the attacker guesses that $m_1=01100001$, the ASCII byte for lowercase `a`. Recover $m_2$.
-
-Method:
+Assume the attacker guesses that $m_1=01100001$, the ASCII byte for lowercase `a`.
 
 1. Compute the XOR of ciphertexts:
 
@@ -209,9 +205,9 @@ $$
 
    Then $m_2=c_2\oplus k=01010110\oplus01010110=00000000$.
 
-The checked answer is $m_2=00000000$. The example is artificial, but the lesson is real: a single plaintext guess can expose another message when a pad is reused.
+The recovered value is $m_2=00000000$. Although the values are artificial, the attack pattern is real: one plaintext guess can expose another message under a reused pad.
 
-## Code
+## Enforcing the equal-length invariant
 
 ```python
 import secrets
@@ -230,7 +226,7 @@ print(ciphertext.hex())
 print(recovered.decode())
 ```
 
-## Common pitfalls
+## Ways to lose the information-theoretic guarantee
 
 - Reusing a one-time pad. This is the classic catastrophic error.
 - Generating the pad with a predictable pseudorandom source and still calling it perfect secrecy.
@@ -239,9 +235,8 @@ print(recovered.decode())
 - Using a key shorter than the message and cycling it, which recreates the Vigenere problem in binary form.
 - Confusing "the attacker cannot read this one example" with a proof that the ciphertext distributions are identical.
 
-## Connections
+<div className="see-also">
 
-- [Classical ciphers and cryptanalysis](/cs/cryptography/classical-ciphers-and-cryptanalysis)
-- [Computational security definitions](/cs/cryptography/computational-security-definitions)
-- [Pseudorandom generators and functions](/cs/cryptography/pseudorandom-generators-functions)
-- [Symmetric encryption modes](/cs/cryptography/symmetric-encryption-modes)
+See also: [Classical ciphers and cryptanalysis](/cs/cryptography/classical-ciphers-and-cryptanalysis) · [Computational security definitions](/cs/cryptography/computational-security-definitions) · [Pseudorandom generators and functions](/cs/cryptography/pseudorandom-generators-functions) · [Symmetric encryption modes](/cs/cryptography/symmetric-encryption-modes)
+
+</div>

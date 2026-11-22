@@ -7,9 +7,9 @@ sidebar_position: 6
 
 Symmetric encryption is the workhorse of secure communication. Once two parties share a secret key, they need to encrypt many messages of many lengths without leaking equality patterns, block structure, or relations between plaintexts. The core mathematical object may be a PRF, PRP, stream cipher, or block cipher, but the mode of operation determines whether that object is used safely.
 
-Katz and Lindell emphasize security definitions such as eavesdropping security, multiple-message security, CPA security, and CCA security. Smart complements this with a practical tour of stream ciphers, DES, Rijndael/AES, and block-cipher modes. The combined lesson is that AES by itself is not an encryption scheme for arbitrary messages. The scheme is AES plus a mode, nonce or IV rules, padding rules, and an integrity plan.
+Katz and Lindell emphasize security definitions such as eavesdropping security, multiple-message security, CPA security, and CCA security. Smart complements this with an implementation-oriented tour of stream ciphers, DES, Rijndael/AES, and block-cipher modes. The combined lesson is that AES by itself is not an encryption scheme for arbitrary messages. The scheme is AES plus a mode, nonce or IV rules, padding rules, and an integrity plan.
 
-## Definitions
+## From a block cipher to a message-encryption scheme
 
 A **symmetric encryption scheme** is a triple $\Pi=(\mathrm{Gen},\mathrm{Enc},\mathrm{Dec})$ where the same secret key is used for encryption and decryption.
 
@@ -33,7 +33,7 @@ Important mode vocabulary:
 
 The main security target for encryption alone is usually **CPA security**: even with access to an encryption oracle, the adversary cannot distinguish encryptions of chosen equal-length messages.
 
-## Key results
+## What ECB, CBC, and CTR expose
 
 ECB mode is not CPA secure. It encrypts each block independently:
 
@@ -67,9 +67,13 @@ It supports parallel encryption and decryption, random access, and no padding fo
 
 Security reductions for modes usually compare the real mode using $E_k$ to an ideal mode using a random function or random permutation. If the inputs to the primitive do not repeat and the primitive is pseudorandom, then the pads look random. If inputs repeat, no reduction can save the construction because the mode itself has exposed a relation.
 
+## Authentication and padding oracles
+
 Encryption alone does not provide integrity. CTR, CBC, and stream-cipher encryption are malleable: flipping selected ciphertext bits causes predictable changes to plaintext bits or blocks. Modern protocols therefore use authenticated encryption, such as AES-GCM or ChaCha20-Poly1305, rather than bare encryption modes.
 
-Padding deserves its own warning. CBC mode needs messages to be split into full blocks, so schemes often append bytes that say how much padding was added. If a receiver reports padding errors differently from MAC errors, an attacker can submit modified ciphertexts and learn whether the decrypted last block has valid padding. Repeating this query can recover plaintext bytes. The block cipher remains strong; the mode and error channel create the vulnerability.
+CBC mode needs messages to be split into full blocks, so schemes often append bytes that say how much padding was added. If a receiver reports padding errors differently from MAC errors, an attacker can submit modified ciphertexts and learn whether the decrypted last block has valid padding. Repeating this query can recover plaintext bytes. The block cipher remains strong; the mode and error channel create the vulnerability.
+
+## Nonces, parallelism, and state rollback
 
 IV and nonce requirements differ by mode. CBC needs an IV that is fresh and unpredictable before the adversary chooses its plaintext. CTR needs a nonce/counter input that is unique; unpredictability is not the point, non-repetition is. Confusing these rules leads to designs that look random but are not secure in the required experiment. A random 32-bit nonce, for example, may repeat quickly under the birthday bound, while a deterministic 96-bit counter may be safer if it is never reused.
 
@@ -79,17 +83,17 @@ State management is a security property. A device that resets its counter after 
 
 Finally, modes are not interchangeable at the ciphertext level. A CBC ciphertext cannot be decrypted with CTR, and an IV format from one protocol may be invalid in another. Algorithm identifiers, versioning, and associated data prevent accidental cross-mode interpretation.
 
+## Why application APIs expose AEAD
+
 Chosen-plaintext security is the right minimum target for ordinary encryption APIs because attackers often influence plaintext. Web requests, email templates, file formats, and protocol greetings contain attacker-controlled fields next to secrets. If the mode leaks equality or lets an attacker predict the pad for a chosen block, that influence becomes an attack. CPA security is therefore not an academic luxury; it models routine interaction with encrypted systems.
 
-Chosen-ciphertext security requires integrity. A mode like CTR can be CPA secure under nonce uniqueness, but it is still malleable. If an attacker flips a ciphertext bit, the corresponding plaintext bit flips after decryption. Without a MAC or AEAD tag, the receiver may process attacker-modified commands. This is why modern guidance points applications to AEAD rather than asking them to pair a bare mode with a separate MAC themselves.
+Chosen-ciphertext security requires integrity. A mode like CTR can be CPA secure under nonce uniqueness, but it is still malleable. If an attacker flips a ciphertext bit, the corresponding plaintext bit flips after decryption. Without a MAC or AEAD tag, the receiver may process attacker-modified commands. Modern guidance therefore points applications to AEAD rather than asking them to pair a bare mode with a separate MAC themselves.
 
 The safest application-level interface is therefore not "AES" but an AEAD construction with explicit nonce and associated-data parameters. If a library exposes only low-level modes, the caller inherits proof obligations that are easy to miss: padding, uniqueness, authentication, key separation, and error handling. High-level APIs exist to remove those choices from ordinary application code.
 
-Low-level modes are best reserved for protocol designers who can state and test those obligations.
+Low-level modes are best reserved for protocol designers who can state and test those obligations; most applications should use the high-level interface.
 
-Most applications should not.
-
-## Visual
+## Comparing the block-level data paths
 
 ```mermaid
 flowchart TB
@@ -145,9 +149,9 @@ This diagram compares the data dependencies of ECB, CBC, CTR, and GCM at the blo
 | CTR | yes | no | nonce/counter never repeats | reuse leaks XOR of plaintexts |
 | Stream cipher | yes after keystream | no | nonce/state never repeats | weak generators are predictable |
 
-## Worked example 1: detecting ECB leakage
+## Reading an ECB equality pattern
 
-Problem: a block cipher has 4-byte blocks for a toy example. The plaintext blocks are:
+Suppose a toy block cipher has 4-byte blocks. The plaintext blocks are:
 
 ```text
 PAY1 PAY1 DUE9 PAY1
@@ -159,9 +163,7 @@ ECB encryption under an unknown key gives:
 9A7C 9A7C 031F 9A7C
 ```
 
-What can an eavesdropper learn?
-
-Method:
+The repeated ciphertext values already tell an eavesdropper something about the plaintext structure.
 
 1. ECB is deterministic per block:
 
@@ -185,19 +187,17 @@ $$
 
 4. The attacker may not know that the repeated value is `PAY1`, but it knows that the same field or phrase occurred three times.
 
-Checked answer: ECB leaks that blocks 1, 2, and 4 are identical. This violates CPA-style privacy for structured data.
+ECB leaks that blocks 1, 2, and 4 are identical, violating CPA-style privacy for structured data.
 
-## Worked example 2: CTR nonce reuse
+## Recovering plaintext after CTR nonce reuse
 
-Problem: two messages are encrypted in CTR mode using the same key and nonce:
+Two messages are encrypted in CTR mode using the same key and nonce:
 
 $$
 c_1=10110100,\qquad c_2=11000110.
 $$
 
-If the attacker knows $m_1=01100001$, find $m_2$.
-
-Method:
+Given $m_1=01100001$, the attacker can recover $m_2$.
 
 1. CTR encryption is XOR with a keystream $s$:
 
@@ -229,9 +229,9 @@ $$
 m_2\oplus s=00010011\oplus11010101=11000110=c_2.
 $$
 
-Checked answer: $m_2=00010011$. The failure is nonce reuse, not a weakness in the block cipher.
+The recovered value is $m_2=00010011$. The failure is nonce reuse, not a weakness in the block cipher.
 
-## Code
+## Modeling CTR's keystream structure
 
 ```python
 import hashlib
@@ -259,18 +259,17 @@ print(ciphertext.hex())
 print(recovered)
 ```
 
-## Common pitfalls
+## Rules that belong in the API contract
 
-- Using ECB because "AES is secure." AES is a block cipher; ECB is an unsafe mode for messages.
-- Reusing a CTR nonce with the same key.
-- Treating a CBC IV as a secret. It may be public, but it must satisfy the required freshness/unpredictability rule.
-- Reporting detailed padding errors before authentication.
-- Assuming encryption provides integrity. It does not.
-- Designing a custom mode when standard authenticated encryption is available.
+- AES is a secure block cipher, but ECB remains an unsafe mode for messages.
+- A CTR nonce must never repeat under the same key.
+- A CBC IV may be public, but it still must satisfy the required freshness and unpredictability rule.
+- Detailed padding errors must not be exposed before authentication.
+- Encryption alone provides no integrity.
+- Standard authenticated encryption is preferable to a custom mode.
 
-## Connections
+<div className="see-also">
 
-- [Pseudorandom generators and functions](/cs/cryptography/pseudorandom-generators-functions)
-- [Message authentication codes](/cs/cryptography/message-authentication-codes)
-- [Authenticated encryption and GCM](/cs/cryptography/authenticated-encryption-gcm)
-- [TLS protocol overview](/cs/cryptography/tls-protocol-overview)
+See also: [Pseudorandom generators and functions](/cs/cryptography/pseudorandom-generators-functions) · [Message authentication codes](/cs/cryptography/message-authentication-codes) · [Authenticated encryption and GCM](/cs/cryptography/authenticated-encryption-gcm) · [TLS protocol overview](/cs/cryptography/tls-protocol-overview)
+
+</div>

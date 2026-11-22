@@ -5,53 +5,13 @@ sidebar_position: 18
 
 # Object-Oriented and Advanced Features
 
-Rust does not copy class-based object-oriented programming directly, but it supports several object-oriented goals: encapsulation, polymorphism, and state-dependent behavior. The book uses this comparison to show where Rust's design differs from inheritance-heavy languages. Later, the advanced-features chapter deepens the same theme with associated types, operator overloading, fully qualified syntax, supertraits, newtype wrappers, type aliases, and function pointers.
+Rust supports encapsulation, polymorphism, and state-dependent behavior without adopting class inheritance. Private fields and modules protect invariants; traits define shared behavior; composition supplies reuse. The advanced trait and type features extend the same approach by letting APIs state more of their relationships explicitly.
 
-This page combines the object-oriented chapter with the advanced trait and type material most closely related to it. It builds on [traits and lifetimes](/cs/programming/rust/generics-traits-lifetimes), [modules and privacy](/cs/programming/rust/packages-crates-modules), and [smart pointers](/cs/programming/rust/smart-pointers). It prepares for [macros and unsafe Rust](/cs/programming/rust/macros-and-unsafe-rust), where the language allows even more explicit control.
+## Encapsulation and two forms of dispatch
 
-## Definitions
+A public struct may keep its fields private and expose only constructors and methods. This is Rust's ordinary form of encapsulation: callers depend on the interface, while the module retains control of the representation.
 
-Encapsulation means hiding implementation details behind a public interface. Rust achieves this with module privacy, private fields, and public methods. A public struct can keep fields private so invariants are enforced by constructors and methods.
-
-Polymorphism means code can operate on multiple concrete types through a shared interface. Rust primarily uses traits for this. With generics, the concrete type is known at compile time. With trait objects such as `Box<dyn Draw>`, the concrete type is selected at runtime through dynamic dispatch.
-
-A trait object combines a pointer to a value with a pointer to a vtable for the implemented trait. Trait objects require object-safe traits. Methods that return `Self` or have generic parameters are common reasons a trait is not object safe.
-
-Inheritance is not Rust's main reuse mechanism. Rust uses composition, traits, default trait methods, and generic bounds instead of subclassing.
-
-An associated type is a placeholder type declared inside a trait. The implementor specifies the concrete type once. `Iterator::Item` is the standard example.
-
-A default generic type parameter gives a generic parameter a default type. The `Add` trait uses this so `Rhs` defaults to `Self`.
-
-Fully qualified syntax disambiguates methods or associated functions when multiple traits or inherent impls use the same name.
-
-A supertrait is a trait that requires another trait. If `trait OutlinePrint: Display`, implementors of `OutlinePrint` must also implement `Display`.
-
-The newtype pattern wraps a type in a tuple struct to create a distinct local type, often to implement an external trait or enforce domain meaning.
-
-## Key results
-
-The first key result is that Rust supports object-oriented design goals without classes. Private data plus public methods gives encapsulation. Traits give interface-based polymorphism. Composition replaces many inheritance use cases.
-
-The second key result is that trait objects trade static dispatch for runtime flexibility. A `Vec<Box<dyn Draw>>` can hold buttons, text fields, and other drawable components together, but calls go through dynamic dispatch.
-
-The third key result is that Rust's state-pattern example can be written with trait objects, but Rust's type system can often encode states more strongly. For example, a draft post type can expose `request_review`, which consumes a draft and returns a pending-review type, making invalid transitions unrepresentable.
-
-The fourth key result is that advanced trait features resolve ambiguity and improve API expression. Associated types avoid repeating generic parameters everywhere. Fully qualified syntax says exactly which implementation is meant.
-
-Proof sketch for trait-object screens: if a trait `Draw` has method `draw(&self)`, then any type implementing `Draw` can be placed behind `Box<dyn Draw>`. A screen can store a vector of those boxes and call `draw` on each item. The screen does not know concrete types, but the vtable for each object points to the correct method implementation.
-
-The state-pattern discussion adds an important design comparison. A classic object-oriented version stores a `state: Option<Box<dyn State>>` inside one `Post` type and delegates behavior to state objects. That demonstrates trait objects and encapsulation, but it still allows some invalid calls to exist and do nothing. A more Rust-oriented version can use separate types such as `DraftPost`, `PendingReviewPost`, and `Post`, with transition methods that consume one state and return the next. In that design, code cannot call `content` on a draft because the method does not exist for that type. The type system carries the state machine.
-
-Advanced traits extend this same idea: put the rule where the compiler can check it. A supertrait says one behavior depends on another. An associated type says an implementation chooses a related type once. A newtype wrapper says this value has a distinct meaning even if its runtime representation is the same as an existing type.
-
-Function pointers and closures round out the advanced material. A function item can be passed where `fn` is expected, and closures may satisfy `Fn`, `FnMut`, or `FnOnce` bounds. In practice, generic closure bounds are more flexible than bare function pointers, but function pointers are useful when an API must accept only functions that do not capture environment. This is another example of Rust making a capability explicit in the type.
-
-The same theme explains why Rust prefers explicit conversions over implicit subtype relationships. Interfaces are shared through traits, not hidden inheritance chains.
-
-When an advanced feature feels necessary, ask what invariant it communicates to the compiler or to readers. If it communicates neither, it is probably ornament.
-
-## Visual
+Traits provide polymorphism in two distinct forms. Generic bounds use static dispatch: the compiler knows the concrete type and monomorphizes the code. Trait objects such as `Box<dyn Draw>` use dynamic dispatch: a pointer to the value is paired with a vtable that selects the implementation at runtime.
 
 ```mermaid
 classDiagram
@@ -78,41 +38,25 @@ classDiagram
   Screen o--> Draw
 ```
 
-| Feature | Static or dynamic? | Main benefit | Cost or constraint |
+| Feature | Dispatch | Main benefit | Cost or constraint |
 |---|---|---|---|
-| Generic trait bound | static | Fast, monomorphized | One concrete type per instantiation |
-| Trait object | dynamic | Heterogeneous collections | Object safety and vtable call |
-| Associated type | static | Cleaner trait signatures | One concrete associated type per impl |
-| Newtype | static | Local distinct wrapper | Must forward desired methods |
-| Supertrait | static or dynamic | Express trait dependency | Implementors need all required traits |
+| Generic trait bound | static | Fast, monomorphized calls | One concrete type per instantiation |
+| Trait object | dynamic | Heterogeneous collections | Dyn compatibility and a vtable call |
+| Associated type | static | Cleaner trait signatures | One concrete associated type per implementation |
+| Newtype | static | A local, distinct wrapper | Desired methods must be forwarded |
+| Supertrait | either | Express a trait dependency | Implementors need every required trait |
 
-## Worked example 1: heterogeneous UI components
-
-Problem: store a button and a select box in one screen and call `draw` on both.
-
-1. Define the shared behavior:
+A heterogeneous UI illustrates the dynamic case:
 
 ```rust
 trait Draw {
     fn draw(&self);
 }
-```
 
-This trait is object safe because `draw` does not use generic parameters and does not return `Self`.
-
-2. Define the screen:
-
-```rust
 struct Screen {
     components: Vec<Box<dyn Draw>>,
 }
-```
 
-The vector stores boxes because trait objects have dynamically sized concrete values. The box gives each component a known pointer size.
-
-3. Run the screen:
-
-```rust
 impl Screen {
     fn run(&self) {
         for component in &self.components {
@@ -122,71 +66,25 @@ impl Screen {
 }
 ```
 
-4. Add types such as `Button` and `SelectBox`, each implementing `Draw`.
+`Button`, `SelectBox`, and other types can implement `Draw` and share one vector. The box gives the dynamically sized trait object a known pointer size, and each call uses the object's vtable. The trait must be dyn-compatible: generic methods and methods that return `Self` without a `Self: Sized` restriction are common obstacles.
 
-5. Check the answer. The screen can hold different concrete component types in one vector. At runtime, each `draw` call dispatches to the implementation for the actual component.
+No component subclasses a base class. Composition, trait implementations, default methods, and generic bounds cover the reuse patterns that inheritance often serves elsewhere.
 
-This is Rust polymorphism through trait objects, not inheritance. No component subclasses a base class.
+## Encoding a post's state
 
-## Worked example 2: disambiguating methods with fully qualified syntax
+The book's classic state-pattern version stores `state: Option<Box<dyn State>>` inside one `Post` type and delegates behavior to state objects. It demonstrates encapsulation and trait objects, but calls that are invalid for the current state may still exist and merely do nothing.
 
-Problem: a type has an inherent method named `fly`, and two traits also define `fly`. Call each one explicitly.
+A type-state version can instead define `DraftPost`, `PendingReviewPost`, and `Post`. A transition method consumes one state and returns the next. `DraftPost::request_review`, for example, can return `PendingReviewPost`; only the published `Post` exposes `content`. Invalid transitions then fail to compile because the relevant method is absent.
 
-1. Define two traits:
+The two versions make different tradeoffs. Trait objects allow the state to vary behind one stable outer type. Separate state types give the compiler a stronger account of valid transitions, at the cost of changing the value's type as it moves through the workflow.
 
-```rust
-trait Pilot {
-    fn fly(&self);
-}
+## Associated types, supertraits, and newtypes
 
-trait Wizard {
-    fn fly(&self);
-}
-```
+An associated type is a placeholder declared inside a trait and selected once by each implementation. `Iterator::Item` is the standard example. A generic type parameter, by contrast, can permit multiple implementations of the same trait for different parameter choices.
 
-2. Define the type and implementations:
+A default generic type parameter supplies a type when the caller or implementation does not specify one. `Add<Rhs = Self>` uses this technique so ordinary addition defaults the right-hand side to the left-hand type while still allowing mixed-type implementations. Implementing operator traits such as `Add` is Rust's form of operator overloading; implementations remain subject to the usual trait coherence rules.
 
-```rust
-struct Human;
-
-impl Pilot for Human {
-    fn fly(&self) {
-        println!("This is your captain speaking.");
-    }
-}
-
-impl Wizard for Human {
-    fn fly(&self) {
-        println!("Up!");
-    }
-}
-
-impl Human {
-    fn fly(&self) {
-        println!("waving arms");
-    }
-}
-```
-
-3. Call the inherent method:
-
-```rust
-let person = Human;
-person.fly();
-```
-
-4. Call trait methods explicitly:
-
-```rust
-Pilot::fly(&person);
-Wizard::fly(&person);
-```
-
-5. Check the answer. Rust chooses the inherent method for `person.fly()`. Fully qualified trait calls remove ambiguity and invoke the desired trait implementation.
-
-For associated functions without `self`, the syntax may need the implementing type too, such as `<Dog as Animal>::baby_name()`.
-
-## Code
+A supertrait records a dependency between behaviors. If `OutlinePrint: Display`, every `OutlinePrint` implementor must also implement `Display`, and the default method may rely on `to_string`:
 
 ```rust
 use std::fmt::{self, Display};
@@ -222,22 +120,210 @@ fn main() {
 }
 ```
 
-`OutlinePrint` is a supertrait of `Display`, so it can rely on `to_string`. `Point` must implement `Display` before it can implement `OutlinePrint`.
+The newtype pattern wraps an existing type in a tuple struct. The wrapper has a distinct local type even when its runtime representation is unchanged. It can enforce domain meaning, prevent accidental mixing, or make an external trait implementable for an external wrapped type under Rust's coherence rules. The wrapper does not automatically inherit the inner type's methods or trait implementations.
 
-## Common pitfalls
+A type alias, such as `type Kilometers = i32`, only introduces another name for the same type. It can shorten a long signature but cannot prevent kilometers from being mixed with other `i32` values. A newtype creates that separation; an alias does not.
 
-- Looking for class inheritance when a trait plus composition is the Rust design.
-- Using trait objects when a generic type parameter would be simpler and faster.
-- Forgetting that trait objects require object-safe traits.
-- Making fields public and losing the encapsulation that methods were supposed to protect.
-- Confusing associated types with generic type parameters. Associated types are chosen by the implementor.
-- Forgetting fully qualified syntax when method names collide.
-- Using newtype wrappers but not implementing or forwarding the traits the wrapper needs.
+## Resolving names when methods collide
 
-## Connections
+An inherent method and several trait methods may share a name:
 
-- [Generics, traits, and lifetimes](/cs/programming/rust/generics-traits-lifetimes)
-- [Packages, crates, and modules](/cs/programming/rust/packages-crates-modules)
-- [Smart pointers](/cs/programming/rust/smart-pointers)
-- [Macros and unsafe Rust](/cs/programming/rust/macros-and-unsafe-rust)
-- [Multithreaded web server](/cs/programming/rust/multithreaded-web-server)
+```rust
+trait Pilot {
+    fn fly(&self);
+}
+
+trait Wizard {
+    fn fly(&self);
+}
+
+struct Human;
+
+impl Pilot for Human {
+    fn fly(&self) {
+        println!("This is your captain speaking.");
+    }
+}
+
+impl Wizard for Human {
+    fn fly(&self) {
+        println!("Up!");
+    }
+}
+
+impl Human {
+    fn fly(&self) {
+        println!("waving arms");
+    }
+}
+```
+
+`person.fly()` chooses the inherent method. Trait-qualified calls select the others:
+
+```rust
+let person = Human;
+person.fly();
+Pilot::fly(&person);
+Wizard::fly(&person);
+```
+
+Associated functions without a `self` receiver may need fully qualified syntax that also names the implementing type:
+
+```rust
+<Dog as Animal>::baby_name()
+```
+
+Function pointers complete this part of the type system. A function item can be passed where `fn` is expected, while closures may implement `Fn`, `FnMut`, or `FnOnce` depending on how they capture and use their environment. Generic closure bounds accept more callables; a bare function pointer is appropriate when captured state must be excluded.
+
+## Choosing only the machinery the API needs
+
+Trait objects are useful when concrete types must coexist at runtime. When all values have one concrete type per call, a generic bound is usually simpler and avoids dynamic dispatch. Private fields matter only if the public methods preserve the intended invariant, and `pub` fields can quietly undo that boundary.
+
+Other recurring problems are mechanical but significant:
+
+- a trait used behind `dyn` must satisfy the language's dyn-compatibility rules;
+- associated types are chosen by the implementor, unlike freely supplied generic arguments;
+- colliding method names need trait qualification or fully qualified syntax;
+- a newtype must forward the operations its public API promises;
+- advanced syntax that communicates no invariant or capability is usually ornament.
+
+## Worked example: compare runtime state with type state
+
+A compact runtime-state model stores an enum inside one stable type:
+
+```rust
+enum Status {
+    Draft,
+    Review,
+    Published,
+}
+
+struct Article {
+    text: String,
+    status: Status,
+}
+
+impl Article {
+    fn request_review(&mut self) {
+        if matches!(self.status, Status::Draft) {
+            self.status = Status::Review;
+        }
+    }
+
+    fn approve(&mut self) {
+        if matches!(self.status, Status::Review) {
+            self.status = Status::Published;
+        }
+    }
+
+    fn content(&self) -> &str {
+        if matches!(self.status, Status::Published) { &self.text } else { "" }
+    }
+}
+```
+
+Starting in `Draft`, `request_review` changes the field to `Review`. `approve` then changes it to `Published`, and `content` exposes the text. Calling `approve` on a draft compiles but leaves the state unchanged. The method set stays the same at every stage; validity is checked at runtime.
+
+Type state moves that rule into method availability:
+
+```rust
+struct Draft { text: String }
+struct Review { text: String }
+struct Published { text: String }
+
+impl Draft {
+    fn new() -> Self { Self { text: String::new() } }
+    fn add_text(&mut self, text: &str) { self.text.push_str(text); }
+    fn request_review(self) -> Review { Review { text: self.text } }
+}
+
+impl Review {
+    fn reject(self) -> Draft { Draft { text: self.text } }
+    fn approve(self) -> Published { Published { text: self.text } }
+}
+
+impl Published {
+    fn content(&self) -> &str { &self.text }
+}
+```
+
+`Draft::new` creates the only state with `add_text`. `request_review` consumes the draft, moves its string into `Review`, and makes the old binding unusable. Review can move back to draft or forward to publication. Only `Published` has `content`, so exposing a draft is a compile error rather than an empty result.
+
+The stronger model is not automatically better. A collection containing articles in arbitrary states is easy with the enum or trait-object representation and awkward with three unrelated concrete types. Persistence and network decoding also begin with runtime data that must be validated. Type state fits workflows whose transitions occur within typed code and whose changing types do not burden storage or callers.
+
+## Worked example: a newtype protects units and controls formatting
+
+Aliases do not separate values:
+
+```rust
+type Meters = u32;
+let distance: Meters = 5;
+let seconds: u32 = 3;
+let mistaken = distance + seconds;
+```
+
+The addition compiles because both names mean `u32`. Tuple newtypes create distinct types:
+
+```rust
+use std::fmt;
+
+struct Meters(u32);
+struct Seconds(u32);
+
+impl Meters {
+    fn checked_add(self, other: Meters) -> Option<Meters> {
+        self.0.checked_add(other.0).map(Meters)
+    }
+}
+
+impl fmt::Display for Meters {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} m", self.0)
+    }
+}
+
+let total = Meters(120).checked_add(Meters(30)).unwrap();
+assert_eq!(total.to_string(), "150 m");
+```
+
+The first `Meters` is consumed by `checked_add`; the inner integers use checked arithmetic; `map(Meters)` wraps a successful sum. Passing `Seconds(30)` fails at compile time. Because `Meters` is local, it may implement the external `Display` trait even though its inner `u32` and `Display` are external. This satisfies the orphan rule through the local wrapper.
+
+Newtypes can also restrict construction by keeping the tuple field private and exposing a validating constructor. `Deref` can forward a broad set of inner behavior, but it may erase the conceptual boundary. Explicit methods are often preferable for units, identifiers, and validated strings.
+
+## Why some traits cannot become trait objects
+
+A trait object erases the concrete implementor, so a call through `dyn Trait` must be describable by a common vtable entry. A method such as `fn clone_value(&self) -> Self` cannot produce an unknown-sized concrete `Self` for a caller that knows only the trait object. A method with its own generic parameter would require an open-ended family of monomorphized vtable entries.
+
+Methods unavailable through a trait object can be restricted with `where Self: Sized`. They remain callable on concrete implementors while the rest of the trait stays usable through `dyn`. Associated types must be specified when constructing the object when callers need to know them, as in `dyn Iterator<Item = String>`.
+
+Dynamic dispatch has two separate costs: the value usually needs pointer indirection, and the call cannot be selected statically at the call site. The more important design cost is erased concrete behavior. A `Screen` should ask only for `Draw`; code that repeatedly downcasts components probably chose too narrow a trait or the wrong representation.
+
+## Sized types, slices, and the never type
+
+Most generic parameters have an implicit `Sized` bound because stack variables and by-value arguments need a compile-time size. Slices and trait objects are dynamically sized types. They appear behind pointers such as `&[T]`, `&str`, and `Box<dyn Draw>`, where the pointer carries enough metadata to use the value. A bound written `T: ?Sized` relaxes the implicit requirement and lets a generic abstraction accept both sized and dynamically sized referents.
+
+The never type `!` represents computation that does not return normally. `panic!`, `process::exit`, and an endless loop have this character. It can coerce into other types, which explains why a match arm containing `continue` can coexist with an arm yielding a number: the continuing arm never produces a conflicting value.
+
+These features solve concrete typing problems. `?Sized` belongs on APIs that genuinely accept unsized referents, and `!` usually emerges from control flow rather than being chosen for decoration.
+
+## Method lookup and forwarding need deliberate boundaries
+
+Rust considers inherent methods before trait methods in ordinary method-call syntax, then uses receiver types and traits in scope to resolve candidates. Fully qualified syntax removes ambiguity and is also useful in generic code when the intended implementation should be unmistakable.
+
+Composition does not forward methods automatically. A newtype or containing struct must expose the subset that fits its own contract. That apparent inconvenience protects representation changes: callers cannot accidentally become dependent on every method of an inner collection. Forwarding dozens of methods is evidence that the wrapper may be adding little, unless it also enforces an invariant at construction and mutation points.
+
+## Operator traits should preserve domain expectations
+
+Implementing `Add`, `Index`, or another operator trait gives familiar syntax to a local type. It does not grant permission to assign surprising meaning to the symbol. Addition should normally behave like a stable domain notion of combination and should document overflow or failure policy. If an operation can fail for ordinary inputs, a named method returning `Result` or `Option` often communicates better than an operator that panics.
+
+The default parameter in `Add<Rhs = Self>` permits both common and mixed-type cases. A duration type might add another duration and produce a duration. A point plus a displacement might use a different right-hand type while still producing a point. The associated `Output` type states the result independently of either input.
+
+Indexing is especially strict because `Index::index` returns a reference and has no error channel. Missing keys therefore usually panic. Collection APIs commonly pair indexing with a `get` method returning `Option`; callers choose whether absence is a bug or an expected state. Operator syntax should not erase that policy distinction.
+
+Advanced trait features work best when the resulting call reads like the domain and the implementation maintains the same invariants as an ordinary named method.
+
+<div className="see-also">
+
+See also: [Generics, traits, and lifetimes](/cs/programming/rust/generics-traits-lifetimes) · [Packages, crates, and modules](/cs/programming/rust/packages-crates-modules) · [Smart pointers](/cs/programming/rust/smart-pointers) · [Macros and unsafe Rust](/cs/programming/rust/macros-and-unsafe-rust) · [Multithreaded web server](/cs/programming/rust/multithreaded-web-server)
+
+</div>

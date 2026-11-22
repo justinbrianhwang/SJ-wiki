@@ -5,11 +5,11 @@ sidebar_position: 16
 
 # State-Space Controller and Observer Design
 
-State-space design moves beyond shaping transfer-function plots and directly assigns the dynamics of internal state equations. Nise's state-space design chapter develops controllability, pole placement, Ackermann's formula, observer design, observability, and integral control for steady-state error. This page also adds a short supplementary LQR overview because it is the standard modern extension of the same framework.
+State-space design moves beyond shaping transfer-function plots and directly assigns the dynamics of internal state equations. Nise's state-space design chapter develops controllability, pole placement, Ackermann's formula, observer design, observability, and integral control for steady-state error. A short supplementary LQR overview gives the standard modern extension of the same framework.
 
 The state-space viewpoint is powerful because it separates what can be controlled from what can be measured. A plant may have states that are not directly sensed, so an observer estimates them. A plant may have modes that an input cannot influence, so pole placement cannot move them. These structural questions must be answered before choosing gains.
 
-## Definitions
+## Structural tests before gain selection
 
 For a single-input system
 
@@ -69,7 +69,7 @@ $$
 \dot{\mathbf e}=(A-LC)\mathbf e.
 $$
 
-## Key results
+## Assigning controller and observer dynamics
 
 If $(A,B)$ is controllable, state feedback can assign the eigenvalues of $A-BK$ arbitrarily, within real-coefficient conjugate-pair constraints. Ackermann's formula gives a direct single-input gain:
 
@@ -103,7 +103,7 @@ $$
 
 where $Q\succeq0$ penalizes state deviation and $R\succ0$ penalizes control effort. LQR does not place poles manually; it finds a gain from a trade-off. This is beyond Nise's main undergraduate development but is the standard next step after pole placement.
 
-Pole placement provides exact algebraic control over eigenvalues, but it does not directly specify control effort or sensitivity. Placing poles very far left makes the nominal response fast, yet it can require large actuator commands and amplify measurement noise when implemented with an observer. The resulting system may saturate, excite neglected dynamics, or become fragile under parameter uncertainty. This is why pole locations are design variables, not trophies.
+Pole placement provides exact algebraic control over eigenvalues, but it does not directly specify control effort or sensitivity. Placing poles very far left makes the nominal response fast, yet it can require large actuator commands and amplify measurement noise when implemented with an observer. The resulting system may saturate, excite neglected dynamics, or become fragile under parameter uncertainty. Pole locations remain design variables constrained by the actuator, sensors, and model.
 
 Reference tracking with state feedback usually needs an additional feedforward gain. The law $u=-Kx$ drives the state to the origin. If the desired output is a nonzero constant reference, one may use $u=-Kx+N_rr$ and choose $N_r$ so the steady output equals $r$. Integral augmentation is another approach, and it is more robust to constant disturbances or plant gain errors because it drives accumulated error toward zero.
 
@@ -119,16 +119,14 @@ Observer-based control should be validated with model error. If $A$, $B$, or $C$
 
 State-space design is also sensitive to scaling. A state measured in millimeters and another measured in radians per second may have very different numerical magnitudes. Poor scaling can make rank tests, pole placement, and LQR calculations ill-conditioned. Before blaming an algorithm, check units and consider nondimensionalization or physically meaningful scaling.
 
-Simulation should include both the true state and the estimated state when observers are used. Plotting the estimation error directly reveals whether poor output response is caused by controller poles, observer transients, measurement noise, or model mismatch.
+Simulation should include both the true state and the estimated state when observers are used. Plotting the estimation error directly often reveals whether poor output response is caused by controller poles, observer transients, measurement noise, or model mismatch.
 
-This plot is often the fastest diagnostic.
-
-## Visual
+### Signal flow in observer-based feedback
 
 ```mermaid
 flowchart LR
   R["Reference r"] --> Pref["Prefilter / reference gain Nbar"]
-  Pref --> SumU(("Σ"))
+  Pref --> SumU(("sum"))
   XHat["Estimated state x_hat"] --> K["State feedback gain K"]
   K --> NegK["-K x_hat"]
   NegK --> SumU
@@ -145,7 +143,7 @@ flowchart LR
     direction TB
     Model["Model prediction: A x_hat + B u"]
     Yhat["Predicted output y_hat = C x_hat + D u"]
-    Innov(("Σ"))
+    Innov(("innovation"))
     GainL["Observer injection L(y - y_hat)"]
     XhatDot["x_hat_dot = A x_hat + B u + L(y - y_hat)"]
     Model --> XhatDot
@@ -175,9 +173,9 @@ This diagram shows the separation-principle architecture: the controller places 
 | observer | eigenvalues of $A-LC$ | controls estimation error |
 | integral augmentation | add error-integral state | improves tracking accuracy |
 
-## Worked example 1: controllability and pole placement
+## Placing two controller poles by coefficient matching
 
-Problem: For
+For
 
 $$
 A=\begin{bmatrix}0&1\\-2&-3\end{bmatrix},
@@ -186,8 +184,6 @@ B=\begin{bmatrix}0\\1\end{bmatrix},
 $$
 
 find $K=\begin{bmatrix}k_1&k_2\end{bmatrix}$ so the closed-loop poles are at $-4$ and $-5$.
-
-Method:
 
 1. Check controllability:
 
@@ -252,19 +248,17 @@ $$
 2+k_1=20\Rightarrow k_1=18.
 $$
 
-Checked answer: $K=\begin{bmatrix}18&6\end{bmatrix}$.
+The required gain is $K=\begin{bmatrix}18&6\end{bmatrix}$.
 
-## Worked example 2: observability and observer gain
+## Placing the observer poles for the same plant
 
-Problem: For the same $A$ but with
+For the same $A$ but with
 
 $$
 C=\begin{bmatrix}1&0\end{bmatrix},
 $$
 
 find $L=\begin{bmatrix}l_1\\l_2\end{bmatrix}$ so observer error poles are at $-6$ and $-7$.
-
-Method:
 
 1. Observability matrix:
 
@@ -332,9 +326,9 @@ $$
 3l_1+2+l_2=42\Rightarrow 30+2+l_2=42\Rightarrow l_2=10.
 $$
 
-Checked answer: $L=\begin{bmatrix}10\\10\end{bmatrix}$.
+The required observer gain is $L=\begin{bmatrix}10\\10\end{bmatrix}$.
 
-## Code
+## Verifying pole placement with SciPy
 
 ```python
 import numpy as np
@@ -357,7 +351,7 @@ print("L:", L)
 print("observer poles:", np.linalg.eigvals(A - L @ C))
 ```
 
-## Common pitfalls
+## Limits that the rank tests do not catch
 
 - Attempting pole placement before checking controllability.
 - Designing an observer before checking observability.
@@ -366,10 +360,14 @@ print("observer poles:", np.linalg.eigvals(A - L @ C))
 - Assuming all states are measured. If only output is available, use observer-based feedback.
 - Treating LQR weights as magic tuning knobs without checking actuator limits and response.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [State-space modeling](/cs/control-engineering/state-space-modeling-and-conversions) introduces $A$, $B$, $C$, and $D$.
 - [Routh-Hurwitz stability](/cs/control-engineering/routh-hurwitz-stability) tests desired characteristic polynomials.
 - [Steady-state errors](/cs/control-engineering/steady-state-errors-and-sensitivity) motivates integral augmentation.
 - [Digital control](/cs/control-engineering/digital-control-sampling-and-z-transform) extends state feedback to sampled implementations.
 - [Autonomous driving control](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley) uses state feedback and observer ideas in applied systems.
+
+</div>

@@ -9,7 +9,7 @@ C itself does not define input and output statements. K&R therefore treats I/O a
 
 The first I/O model is a text stream: a sequence of characters, often organized as lines ending in newline. The next layer is formatted conversion, where `printf` turns internal values into text and `scanf` turns text into internal values. These functions are powerful, but because they use variable argument lists, the compiler cannot always protect you from mismatched formats and arguments.
 
-## Definitions
+## Streams, characters, and conversions
 
 `<stdio.h>` declares standard I/O types, macros, and functions. A stream is represented by a `FILE *`. At program start, three streams are already open:
 
@@ -61,7 +61,7 @@ scanf("%99s", word);
 
 `sprintf` and `sscanf` perform formatted conversion to or from strings. Modern C also provides `snprintf`, which is safer because it takes a buffer size.
 
-## Key results
+## Format strings are runtime contracts
 
 Always store `getchar` in an `int`. `EOF` must be distinguishable from every possible character. Using `char` can break the classic loop.
 
@@ -87,9 +87,11 @@ Buffering is another reason to understand streams as objects. Output to a termin
 
 Finally, formatted I/O is not a parser generator. `scanf` is useful for simple, regular input, but it is awkward for diagnostics, optional fields, and recovery after errors. K&R's more careful examples often use character input or line input when the program needs control. That is a good rule: use `scanf` when the input format is genuinely simple; otherwise read text explicitly and parse it in smaller steps.
 
-This is why many robust C tools use a layered pattern: get a line, validate the line, convert fields, then act. Each layer has one failure mode to report.
+Many robust C tools therefore get a line, validate it, convert its fields, and only then act. Each stage has a distinct failure to report.
 
-## Visual
+## Following text through a filter
+
+The standard streams keep a filter independent of whether its input and output are terminals, files, or pipes:
 
 ```mermaid
 sequenceDiagram
@@ -104,6 +106,8 @@ sequenceDiagram
   stdout-->>User: text output
 ```
 
+## Keeping `printf` and `scanf` types aligned
+
 | Conversion | Expected `printf` argument | Expected `scanf` argument | Notes |
 |---|---|---|---|
 | `%d` | `int` | `int *` | signed decimal |
@@ -115,73 +119,71 @@ sequenceDiagram
 | `%f` | `double` | `float *` | `printf` receives promoted `double` |
 | `%lf` | `double` | `double *` | important difference in `scanf` |
 
-## Worked example 1: Reading numbers with `scanf` return values
+## Stopping a numeric scan at the first bad token
 
-Problem: sum input numbers from the text:
+Consider summing numbers from:
 
 ```text
 1.5 2.0 x 4.0
 ```
 
-using `scanf("%lf", &v)`.
-
-Method:
+with `scanf("%lf", &v)`.
 
 1. Initialize:
 
-   $$sum = 0.0.$$
+$$
+sum = 0.0.
+$$
 
 2. First call reads `1.5`, assigns it to `v`, and returns `1`.
 
-   $$sum = 0.0 + 1.5 = 1.5.$$
+$$
+sum = 0.0 + 1.5 = 1.5.
+$$
 
 3. Second call reads `2.0`, returns `1`.
 
-   $$sum = 1.5 + 2.0 = 3.5.$$
+$$
+sum = 1.5 + 2.0 = 3.5.
+$$
 
 4. Third call sees `x`, which does not match a floating number. It returns `0`, not `EOF`, because input exists but conversion failed.
 
 5. The loop should stop or consume the bad character.
 
-Checked answer: the sum before the invalid token is `3.5`; the return value `0` signals a matching failure, different from end-of-file.
+The sum before the invalid token is `3.5`. A return value of `0` signals a matching failure, not end-of-file.
 
-## Worked example 2: Formatting a string field
+## Width and precision on `"hello, world"`
 
-Problem: print the string `"hello, world"` in several fields and predict the output widths.
+The string `"hello, world"` has length 12. Its formatting changes as follows:
 
-Method:
-
-1. The string length is:
-
-   $$12.$$
-
-2. `%s` prints all characters:
+1. `%s` prints all characters:
 
    ```text
    hello, world
    ```
 
-3. `%15s` prints in a field at least 15 wide. Since the string has 12 characters, add 3 leading spaces.
+2. `%15s` prints in a field at least 15 wide. Since the string has 12 characters, add 3 leading spaces.
 
    ```text
       hello, world
    ```
 
-4. `%.5s` prints at most 5 characters:
+3. `%.5s` prints at most 5 characters:
 
    ```text
    hello
    ```
 
-5. `%-15.5s` prints at most 5 characters, left-adjusted in a 15-wide field:
+4. `%-15.5s` prints at most 5 characters, left-adjusted in a 15-wide field:
 
    ```text
    hello          
    ```
 
-Checked answer: width controls the minimum field size; precision controls maximum characters for strings.
+Width controls the minimum field size; precision limits the number of string characters written.
 
-## Code
+## A word-count filter over `stdin`
 
 ```c
 #include <ctype.h>
@@ -213,7 +215,7 @@ int main(void)
 }
 ```
 
-## Common pitfalls
+## Conversion failures and mismatched arguments
 
 - Passing a non-pointer to `scanf`, such as `scanf("%d", n)` instead of `scanf("%d", &n)`.
 - Using `%f` with `scanf` for a `double *`; use `%lf` for `double *`.
@@ -223,10 +225,8 @@ int main(void)
 - Forgetting that most `scanf` conversions skip whitespace and may read across lines.
 - Storing `getchar` in `char` instead of `int`.
 
-## Connections
+<div className="see-also">
 
-- [Tutorial Introduction](/cs/programming/c/tutorial-introduction)
-- [File Access and Error Handling](/cs/programming/c/file-access-error-handling)
-- [Standard Library Reference](/cs/programming/c/standard-library-reference)
-- [Unix System Interface](/cs/programming/c/unix-system-interface)
-- [Modern C Considerations](/cs/programming/c/modern-c-considerations)
+See also: [Tutorial Introduction](/cs/programming/c/tutorial-introduction) · [File Access and Error Handling](/cs/programming/c/file-access-error-handling) · [Standard Library Reference](/cs/programming/c/standard-library-reference) · [Unix System Interface](/cs/programming/c/unix-system-interface) · [Modern C Considerations](/cs/programming/c/modern-c-considerations)
+
+</div>

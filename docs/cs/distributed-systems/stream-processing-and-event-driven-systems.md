@@ -5,15 +5,11 @@ sidebar_position: 9
 
 # Stream Processing and Event-Driven Systems
 
-![The Apache Kafka logo identifies the canonical distributed-log platform used as a reference point throughout this chapter.](https://commons.wikimedia.org/wiki/Special:FilePath/Apache_Kafka_logo.svg)
-
-*Figure: Apache Kafka is the canonical distributed log used for partitioned topics, consumer groups, and exactly-once stream processing. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Apache_Kafka_logo.svg), Apache Software Foundation, Apache 2.0.*
-
 Stream processing treats data as a continuing sequence of events rather than as a static table. It is the distributed-systems home of logs, pub/sub, consumer groups, offsets, windows, watermarks, stateful operators, event sourcing, and exactly-once claims. Kleppmann's DDIA gives this topic its strongest source coverage, especially logs, event sourcing, derived data, and stream joins; van Steen and Tanenbaum provide communication and publish-subscribe context; Lynch's models help clarify ordering, snapshots, and failure recovery [1], [2], [3].
 
 The engineering challenge is to make an always-moving computation recoverable and understandable. A batch job can restart from input files. A stream processor must know which events were consumed, which outputs were produced, what state was checkpointed, and how late events should affect prior results.
 
-## Definitions
+## Logs, offsets, and processing time
 
 A **stream** is an ordered or partially ordered sequence of records. An **event** records something that happened, usually with an event-time timestamp and a processing-time arrival. A **topic** is a named stream in a broker such as Kafka, Pulsar, or Kinesis. A **partition** is an ordered sub-log of a topic. Ordering is usually guaranteed only within a partition, not across the whole topic.
 
@@ -31,25 +27,25 @@ A **dead-letter queue** stores records that cannot be processed after validation
 
 A **backpressure** mechanism slows producers or upstream operators when downstream stages cannot keep up. Without backpressure, queues grow until latency, memory, or retention limits fail. With too much backpressure, an online request path can become coupled to an analytical sink. Many systems therefore separate ingestion durability from processing speed: the broker absorbs bursts, consumers expose lag, and autoscaling or load shedding handles sustained overload.
 
-## Key results
+## Where stream-processing guarantees begin and end
 
-The first key result is that a durable log decouples producers from consumers. Producers append once, and many consumers maintain independent offsets. This supports replay, backfill, multiple derived views, and failure recovery. It also means retention policy becomes part of correctness: if the log expires before a consumer catches up, replay is impossible.
+A durable log decouples producers from consumers. Producers append once, and many consumers maintain independent offsets. This supports replay, backfill, multiple derived views, and failure recovery. Retention policy becomes part of correctness: if the log expires before a consumer catches up, replay is impossible.
 
-The second result is that ordering is scoped. Kafka-style systems give a total order per partition, not per topic. If all events for a key go to the same partition, per-key order is preserved. If a workflow needs order across keys, it needs a different partitioning strategy or an explicit coordination layer.
+Ordering is scoped. Kafka-style systems give a total order per partition, not per topic. If all events for a key go to the same partition, per-key order is preserved. If a workflow needs order across keys, it needs a different partitioning strategy or an explicit coordination layer.
 
-The third result is the checkpoint alignment idea. A stream processor can create a consistent snapshot of distributed operator state by injecting barriers into input streams. Operators snapshot state after receiving barriers on all inputs, then forward the barrier. This resembles Chandy-Lamport snapshots adapted to dataflow [4].
+Checkpoint alignment adapts distributed snapshots to dataflow. A stream processor injects barriers into input streams; operators snapshot state after receiving barriers on all inputs, then forward the barrier [4].
 
-The fourth result is that exactly-once is a composition property. If input offsets, state changes, and output records are committed atomically, a recovered job can avoid duplicated logical results. If the sink is an email service, payment API, or plain HTTP endpoint without idempotency, duplicates can still escape the processing system.
+Exactly-once is a composition property. If input offsets, state changes, and output records are committed atomically, a recovered job can avoid duplicated logical results. If the sink is an email service, payment API, or plain HTTP endpoint without idempotency, duplicates can still escape the processing system.
 
-The fifth result is that event time and processing time answer different questions. Event time supports correct historical windows despite delays. Processing time supports operational responsiveness. Watermarks are a policy bridge, not an oracle.
+Event time and processing time answer different questions. Event time supports correct historical windows despite delays. Processing time supports operational responsiveness. Watermarks are a policy bridge, not an oracle.
 
-The sixth result is that stream joins are state-management problems. A stream-table join needs a versioned table or changelog so an event can be joined against the correct reference state. A stream-stream join needs to retain events from both sides for the join window, then evict them when watermarks prove they are no longer needed. If the retention is too short, valid late matches are missed. If it is too long, state grows without bound. This is why join definitions must include time bounds and lateness policies, not just key equality.
+Stream joins are state-management problems. A stream-table join needs a versioned table or changelog so an event can be joined against the correct reference state. A stream-stream join needs to retain events from both sides for the join window, then evict them when watermarks prove they are no longer needed. If the retention is too short, valid late matches are missed. If it is too long, state grows without bound. Join definitions therefore need time bounds and lateness policies alongside key equality.
 
-The seventh result is that event sourcing makes replay a feature and a liability. Replaying events can rebuild read models, audit behavior, and recover from derived-data bugs. But replay also reruns old assumptions. Event schemas, command meanings, privacy deletion requirements, and external side effects all complicate replay. Mature event-sourced systems distinguish immutable historical facts from derived projections and keep projection code versioned enough to interpret old events.
+Event sourcing makes replay both a feature and a liability. Replaying events can rebuild read models, audit behavior, and recover from derived-data bugs, but it also reruns old assumptions. Event schemas, command meanings, privacy deletion requirements, and external side effects all complicate replay. Mature event-sourced systems distinguish immutable historical facts from derived projections and keep projection code versioned enough to interpret old events.
 
-The eighth result is that partitioning controls parallelism. Adding consumers to a group increases throughput only up to the number of assigned partitions. A topic with three partitions cannot keep ten consumers busy in one group. Increasing partitions later may change key-to-partition mapping unless a stable custom partitioner is used, so partition count is both a scalability choice and an ordering contract.
+Partitioning controls parallelism. Adding consumers to a group increases throughput only up to the number of assigned partitions. A topic with three partitions cannot keep ten consumers busy in one group. Increasing partitions later may change key-to-partition mapping unless a stable custom partitioner is used, so partition count is both a scalability choice and an ordering contract.
 
-## Visual
+## Partitioned input, state, and atomic output
 
 ```mermaid
 flowchart LR
@@ -70,6 +66,10 @@ flowchart LR
   Sink --> Offsets["Offsets and output committed together"]
 ```
 
+Each partition has one active consumer in the group, so its input order and state shard advance together. The final commit must cover both produced output and the next input offsets; committing either side alone creates loss or duplication after recovery.
+
+## Checkpoints and time semantics
+
 | Concept | Defined by | Main risk |
 | --- | --- | --- |
 | Offset | broker partition position | committing before output loses data |
@@ -79,11 +79,11 @@ flowchart LR
 | Checkpoint | state plus input positions | inconsistent sink commits |
 | Savepoint | operator-controlled checkpoint | incompatible state schema after upgrade |
 
-## Worked example 1: Assign Kafka partitions and offsets
+## Assigning partitions without inventing a global order
 
-Problem: A topic has 3 partitions. Events are partitioned by `hash(user_id) mod 3`. A consumer group has two consumers, `C1` and `C2`. The coordinator assigns partitions 0 and 1 to `C1`, partition 2 to `C2`. Events arrive: `(u7,e1)`, `(u8,e2)`, `(u7,e3)`. Suppose `hash(u7) mod 3 = 1` and `hash(u8) mod 3 = 2`. Determine per-partition order and consumer processing.
+A topic has 3 partitions. Events are partitioned by `hash(user_id) mod 3`. A consumer group has two consumers, `C1` and `C2`. The coordinator assigns partitions 0 and 1 to `C1`, partition 2 to `C2`. Events arrive: `(u7,e1)`, `(u8,e2)`, `(u7,e3)`. Suppose `hash(u7) mod 3 = 1` and `hash(u8) mod 3 = 2`.
 
-Method:
+Route each event first:
 
 1. Event `e1` for `u7` goes to partition 1.
 
@@ -105,13 +105,13 @@ $$
 
 6. `C1` processes partition 1, so it sees `e1` before `e3`. `C2` processes partition 2, so it sees `e2`. There is no defined global order between `e2` and the events in partition 1.
 
-Checked answer: per-user order for `u7` is preserved because both events use the same key and partition. The topic as a whole has no single total order across partitions.
+Per-user order for `u7` is preserved because both events use the same key and partition. The topic as a whole has no single total order across partitions.
 
-## Worked example 2: Compute a tumbling window with late data
+## Closing a tumbling window with late data
 
-Problem: A stream processor counts purchases in 10-minute tumbling event-time windows. Allowed lateness is 2 minutes. The watermark reaches `10:12`. Events for window `[10:00,10:10)` are: `10:01`, `10:04`, `10:09`, and a late event with event time `10:08` arriving when the watermark is `10:11`. Another event with event time `10:07` arrives when the watermark is `10:13`. Which events count?
+A stream processor counts purchases in 10-minute tumbling event-time windows. Allowed lateness is 2 minutes. The watermark reaches `10:12`. Events for window `[10:00,10:10)` are: `10:01`, `10:04`, `10:09`, and a late event with event time `10:08` arriving when the watermark is `10:11`. Another event with event time `10:07` arrives when the watermark is `10:13`. Which events count?
 
-Method:
+Compare each arrival with the cleanup threshold:
 
 1. Window end is `10:10`.
 
@@ -129,9 +129,9 @@ $$
 
 6. Under this policy, the `10:07` event is dropped or sent to a late-data side output.
 
-Checked answer: the final normal count is 4. The fifth event is beyond allowed lateness and requires a side-output, correction workflow, or discard policy.
+The final normal count is 4. The fifth event is beyond allowed lateness and requires a side output, correction workflow, or discard policy.
 
-## Code
+## Tracking state and offsets as one transaction
 
 ```python
 from collections import defaultdict
@@ -162,7 +162,7 @@ print(dict(tracker.state))
 print(dict(tracker.committed_offsets))
 ```
 
-## Common pitfalls
+## Guarantees that stop at the system boundary
 
 - Claiming exactly-once without specifying the source, state store, sink, and failure boundary.
 - Committing offsets before output is durable, which can lose processed events after a crash.
@@ -177,18 +177,6 @@ print(dict(tracker.committed_offsets))
 - Letting consumer lag exceed log retention.
 - Treating event sourcing as a free audit log while allowing destructive or ambiguous event definitions.
 
-## Connections
-
-- [Time, Clocks, and Event Ordering](/cs/distributed-systems/time-clocks-and-event-ordering)
-- [Replication and Consistency](/cs/distributed-systems/replication-and-consistency)
-- [Transactions and Isolation Levels](/cs/distributed-systems/transactions-and-isolation-levels)
-- [Partitioning and Sharding](/cs/distributed-systems/partitioning-and-sharding)
-- [Distributed Storage and CAP](/cs/distributed-systems/distributed-storage-and-cap)
-- [Computer Networks](/cs/computer-networks/intro)
-- [Operating Systems](/cs/operating-systems/intro)
-- [Databases](/cs/databases/intro)
-- [Cryptography](/cs/cryptography/intro)
-
 ## References
 
 [1] M. Kleppmann, *Designing Data-Intensive Applications*. Sebastopol, CA: O'Reilly, 2017.  
@@ -200,3 +188,9 @@ print(dict(tracker.committed_offsets))
 [7] T. Akidau et al., "The dataflow model: a practical approach to balancing correctness, latency, and cost in massive-scale, unbounded, out-of-order data processing," *PVLDB*, vol. 8, no. 12, pp. 1792-1803, 2015.  
 [8] M. Armbrust et al., "Structured Streaming: a declarative API for real-time applications in Apache Spark," in *SIGMOD*, 2018.  
 [9] M. Kleppmann and J. Kreps, "Kafka, Samza and the Unix philosophy of distributed data," *IEEE Data Engineering Bulletin*, vol. 38, no. 4, pp. 4-14, 2015.
+
+<div className="see-also">
+
+See also: [Time, Clocks, and Event Ordering](/cs/distributed-systems/time-clocks-and-event-ordering) · [Replication and Consistency](/cs/distributed-systems/replication-and-consistency) · [Transactions and Isolation Levels](/cs/distributed-systems/transactions-and-isolation-levels) · [Partitioning and Sharding](/cs/distributed-systems/partitioning-and-sharding) · [Distributed Storage and CAP](/cs/distributed-systems/distributed-storage-and-cap) · [Computer Networks](/cs/computer-networks/intro) · [Operating Systems](/cs/operating-systems/intro) · [Databases](/cs/databases/intro) · [Cryptography](/cs/cryptography/intro)
+
+</div>

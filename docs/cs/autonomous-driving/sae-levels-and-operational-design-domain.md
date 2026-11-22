@@ -7,9 +7,9 @@ sidebar_position: 2
 
 The SAE J3016 levels are the common vocabulary for describing how much of the driving task is automated, but the levels are often misread as a ladder of product quality. They are really a responsibility map: who performs the dynamic driving task, who monitors the driving environment, and who must respond when the automation reaches its limits. Operational design domain, usually shortened to ODD, is the other half of the vocabulary because a system is never simply "self-driving" in the abstract; it is automated under stated roads, speeds, weather, geography, lighting, traffic rules, and vehicle states.
 
-This page gives the foundational taxonomy used throughout the autonomous-driving section. Later pages on [sensors](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu), [prediction](/cs/autonomous-driving/prediction-and-motion-forecasting), [planning](/cs/autonomous-driving/motion-planning), [control](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley), and [safety](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing) assume this distinction between capability, domain, fallback responsibility, and legal permission.
+The distinction between capability, domain, fallback responsibility, and legal permission carries through the notes on [sensors](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu), [prediction](/cs/autonomous-driving/prediction-and-motion-forecasting), [planning](/cs/autonomous-driving/motion-planning), [control](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley), and [safety](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing).
 
-## Definitions
+## Terms that fix responsibility
 
 The **dynamic driving task** is the real-time operational and tactical work of driving: lateral control, longitudinal control, object and event detection, response planning, maneuver execution, and compliance with road rules. It excludes trip planning choices such as choosing to go to the airport, but it includes the driving actions needed to execute the trip.
 
@@ -25,7 +25,7 @@ A **minimal risk condition** is a stable state intended to reduce danger after a
 
 A **regulatory authorization** is separate from SAE level. A jurisdiction may approve a particular deployment, require a safety driver, restrict operation to certain roads, impose reporting duties, or suspend a permit. SAE terminology helps describe capability, but it does not by itself grant legal permission to operate.
 
-## Key results
+## Reading SAE levels as responsibility allocation
 
 The most useful way to read SAE levels is as a table of responsibility rather than a marketing scale.
 
@@ -57,7 +57,7 @@ Regulatory mapping should be handled carefully. Some jurisdictions write rules a
 
 The levels also do not specify architecture. A Level 4 system might use camera-only perception, lidar-rich sensor fusion, map-heavy localization, map-light learning, hand-coded behavior rules, or a large learned planner. The level says who is responsible for the driving task, not which algorithmic stack is used.
 
-## Visual
+### ODD gates and fallback paths
 
 ```mermaid
 flowchart TB
@@ -111,9 +111,9 @@ flowchart TB
 
 This diagram separates SAE responsibility from architecture: the same perception, fusion, prediction, planning, and control stack can sit behind different fallback rules. The ODD validity vector feeds the running stack through dotted constraint paths, and the exit branch shows how Level 2, Level 3, and Level 4/5 differ when the domain is no longer valid.
 
-## Worked example 1: Classifying a highway assistant
+## Classifying a supervised highway assistant
 
-Problem: A production vehicle can keep its lane and maintain headway on a highway. It requires the driver to keep eyes on the road, issues escalating warnings if the driver looks away, and disengages if lane markings disappear. What SAE level is this feature?
+Consider a production vehicle that keeps its lane and maintains headway on a highway. It requires the driver to watch the road, issues escalating warnings if the driver looks away, and disengages if lane markings disappear. What SAE level is this feature?
 
 1. Identify who controls lateral motion. The system provides steering assistance, so lateral control is automated while active.
 2. Identify who controls longitudinal motion. Adaptive cruise controls acceleration and braking, so longitudinal control is also automated while active.
@@ -121,13 +121,13 @@ Problem: A production vehicle can keep its lane and maintain headway on a highwa
 4. Identify fallback responsibility. If the feature reaches a limit, the human must immediately take over.
 5. Compare to the SAE table. Both control axes are assisted, but monitoring and fallback remain human responsibilities.
 
-Answer: this is Level 2 partial automation, not Level 3. The system may perform a large fraction of continuous control, but the human still supervises and remains responsible for fallback.
+The feature is Level 2 partial automation, not Level 3. The system may perform a large fraction of continuous control, but the human still supervises and remains responsible for fallback.
 
-Check: If the vehicle instead watched the environment, drove in a traffic-jam ODD, and gave the user a takeover request only when leaving that ODD, the classification could move to Level 3. The difference is not the smoothness of steering; it is monitoring and fallback responsibility.
+If the vehicle instead monitored the environment, drove in a traffic-jam ODD, and issued a takeover request only when leaving that ODD, the classification could move to Level 3. Smooth steering is irrelevant to the distinction; monitoring and fallback responsibility decide it.
 
-## Worked example 2: Writing a precise ODD statement
+## Writing a campus-shuttle ODD
 
-Problem: A campus shuttle drives at low speed between fixed stops. It uses lidar, cameras, GNSS, and a prebuilt map. It is intended for private campus roads, daylight operation, no heavy rain or snow, and speeds up to 25 km/h. Write an ODD statement and identify two ODD exit triggers.
+Now take a campus shuttle that drives at low speed between fixed stops. It uses lidar, cameras, GNSS, and a prebuilt map. Its intended domain is private campus roads, daylight operation, no heavy rain or snow, and speeds up to 25 km/h. The task is to state that ODD and identify two exit triggers.
 
 1. Start with geography. The route is private campus roads between fixed stops, so the geographic ODD is route-bound rather than citywide.
 2. Add road users and road type. The shuttle may encounter pedestrians, cyclists, maintenance vehicles, and low-speed mixed traffic.
@@ -144,9 +144,9 @@ Two ODD exit triggers are:
 - Lidar visibility degrades because of heavy rain, making obstacle detection unreliable.
 - Localization covariance grows above the threshold because GNSS and map matching disagree near a construction detour.
 
-Checked answer: the ODD statement includes where, when, speed, weather, map dependency, and sensor health. It does not claim generic autonomy outside those conditions.
+The statement covers where, when, speed, weather, map dependency, and sensor health without claiming autonomy outside those conditions.
 
-## Code
+## Encoding the ODD as a runtime check
 
 ```python
 from dataclasses import dataclass
@@ -189,7 +189,7 @@ inside, exit_reasons = campus_shuttle_odd(state)
 print("inside ODD:", inside, "reasons:", exit_reasons)
 ```
 
-## Common pitfalls
+## Where SAE claims go wrong
 
 - Treating SAE levels as a linear maturity score. A constrained Level 4 robotaxi can have a narrower ODD than a broad Level 2 driver-assistance feature.
 - Calling a Level 2 system "self-driving" because it steers well. If the human monitors and performs fallback, it is still driver support.
@@ -198,12 +198,12 @@ print("inside ODD:", inside, "reasons:", exit_reasons)
 - Assuming regulations map cleanly to SAE levels. Legal permissions depend on jurisdiction, deployment type, reporting, insurance, vehicle class, and operational constraints.
 - Forgetting ODD exit handling. Detecting an unsupported condition is only half the problem; the system also needs a validated fallback maneuver.
 
-## Connections
+## Standards to consult
 
-- [Sensors and sensor failure modes](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu)
-- [Safety, ISO 26262, SOTIF, and scenario testing](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing)
-- [Decision making and behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning)
-- [Simulation and data](/cs/autonomous-driving/simulation-and-data)
-- [Embedded systems](/cs/embedded/)
-- [Engineering math for state estimation and control](/math/engineering-math/)
-- Further reading: SAE J3016 terminology, NHTSA automated vehicle guidance, ISO 26262, ISO 21448, and Mobileye's Responsibility-Sensitive Safety papers.
+Useful primary sources include SAE J3016 terminology, NHTSA automated-vehicle guidance, ISO 26262, ISO 21448, and Mobileye's Responsibility-Sensitive Safety papers.
+
+<div className="see-also">
+
+See also: [Sensors and sensor failure modes](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu) · [Safety, ISO 26262, SOTIF, and scenario testing](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing) · [Decision making and behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning) · [Simulation and data](/cs/autonomous-driving/simulation-and-data) · [Embedded systems](/cs/embedded/intro) · [Engineering math for state estimation and control](/math/engineering-math/intro)
+
+</div>

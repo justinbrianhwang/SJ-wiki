@@ -5,17 +5,13 @@ sidebar_position: 3
 
 # Quantum Teleportation
 
-Quantum teleportation is the primitive that lets a quantum network move an unknown qubit without copying it or physically forwarding that same qubit through every intermediate device. It consumes one shared Bell pair and two classical bits. The input state disappears from the sender's laboratory, and the same state is reconstructed at the receiver after a Pauli correction. This is why teleportation is a routing primitive for the [quantum internet](/quantum-information-science/quantum-internet/intro): the network can focus on distributing entanglement, then applications can spend that entanglement to transfer quantum states.
+Quantum teleportation is the primitive that lets a quantum network move an unknown qubit without copying it or physically forwarding that same qubit through every intermediate device. It consumes one shared Bell pair and two classical bits. The input state disappears from the sender's laboratory, and the same state is reconstructed at the receiver after a Pauli correction. As a routing primitive for the [quantum internet](/quantum-information-science/quantum-internet/intro), teleportation lets the network distribute entanglement first and lets applications spend it later to transfer quantum states.
 
 The standard protocol was introduced by Bennett, Brassard, Crepeau, Jozsa, Peres, and Wootters in 1993. It is not science-fiction matter transport and it is not faster-than-light signaling. It is a precise circuit identity: a Bell-basis measurement plus two classical correction bits implements the identity channel from Alice's input qubit to Bob's output qubit, provided Alice and Bob initially share a high-quality entangled pair.
 
-Nielsen and Chuang Section 1.3.7 is the primary reference for the circuit derivation used on this page. Their emphasis is useful for networking: teleportation converts resources. One pre-shared EPR pair plus two classical bits can substitute for one use of an ideal qubit channel, while the original input is consumed by measurement.
+Nielsen and Chuang Section 1.3.7 is the primary reference for the circuit derivation used below. Their emphasis is useful for networking: teleportation converts resources. One pre-shared EPR pair plus two classical bits can substitute for one use of an ideal qubit channel, while the original input is consumed by measurement.
 
-![An optical entanglement experiment uses spontaneous parametric down-conversion to create correlated photon pairs.](https://commons.wikimedia.org/wiki/Special:FilePath/Quantum_Entanglement_Experiment_via_Spontaneous_Parametric_Down-Conversion_%28SPDC%29.jpg)
-
-*Figure: Teleportation consumes a pre-shared entangled pair, which in photonic demonstrations often begins with an optical entanglement source rather than a circuit diagram. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quantum_Entanglement_Experiment_via_Spontaneous_Parametric_Down-Conversion_%28SPDC%29.jpg), Farbodk, CC BY-SA 4.0.*
-
-## Definitions
+## Resources and correction conventions
 
 Let Alice hold an unknown input qubit $A$,
 
@@ -65,7 +61,7 @@ $$
 
 Ideal teleportation has $F=1$. For unknown qubits drawn uniformly from the Bloch sphere, purely classical measure-and-prepare strategies cannot exceed average fidelity $2/3$, so demonstrations often compare against that benchmark when the assumptions match the benchmark.
 
-## Key results
+## Deriving the correction branches
 
 The full three-qubit input state is
 
@@ -90,11 +86,11 @@ $$
 \lvert\psi_1\rangle
 &=\frac{1}{\sqrt{2}}\left[
 \alpha\lvert0\rangle_A(\lvert00\rangle+\lvert11\rangle)_{BC}
-\beta\lvert1\rangle_A(\lvert10\rangle+\lvert01\rangle)_{BC}
++\beta\lvert1\rangle_A(\lvert10\rangle+\lvert01\rangle)_{BC}
 \right]\\
 &=\frac{1}{\sqrt{2}}\left(
 \alpha\lvert000\rangle+\alpha\lvert011\rangle
-\beta\lvert110\rangle+\beta\lvert101\rangle
++\beta\lvert110\rangle+\beta\lvert101\rangle
 \right).
 \end{aligned}
 $$
@@ -171,7 +167,7 @@ The usual classical benchmark is $F_{\mathrm{avg}}\le 2/3$ for an unknown unifor
 
 Experimental teleportation has been demonstrated in many physical settings. Early photonic demonstrations appeared in 1997, including the Innsbruck experiment and a related Rome experiment. Satellite-scale work by Jian-Wei Pan's group demonstrated ground-to-satellite teleportation of independent single-photon qubits over distances up to about 1400 km using the Micius satellite. These experiments should be read conservatively: they validate essential primitives under specific assumptions and loss budgets, not yet a general-purpose global quantum internet.
 
-## Visual
+### Circuit and resource ledger
 
 ```mermaid
 flowchart LR
@@ -218,7 +214,7 @@ The circuit shows all three resources in the teleportation identity: Alice's unk
 | Alice's input qubit | 1 | Destroyed by the Bell measurement |
 | Quantum channel during correction | 0 | The quantum resource was pre-distributed |
 
-## Worked example 1: Expanding the protocol for a concrete input
+## Example: Expanding the protocol for a concrete input
 
 **Problem.** Alice wants to teleport
 
@@ -295,7 +291,7 @@ which is the target up to a global phase $-1$.
 
 **Checked answer.** Each Bell outcome leaves Bob with a Pauli-transformed state. The listed correction recovers the original qubit in all four cases, with the $\Psi^-$ branch differing only by an unobservable global phase.
 
-## Worked example 2: Fidelity from a noisy entangled pair
+## Example: Fidelity from a noisy entangled pair
 
 **Problem.** A network link delivers isotropic Bell pairs with Bell fidelity $F_e=0.88$ relative to $\lvert\Phi^+\rangle$. Estimate the average teleportation fidelity and compare it with the classical benchmark $2/3$.
 
@@ -344,7 +340,7 @@ The delivered Bell fidelity $0.88$ is well above this threshold.
 
 **Checked answer.** The predicted average teleportation fidelity is $0.92$, comfortably above $2/3$ under the assumptions of the isotropic-noise model and the usual unknown-qubit benchmark.
 
-## Code
+## Checking the branches in NumPy and Qiskit
 
 ```python
 import numpy as np
@@ -398,7 +394,7 @@ with qc.if_test((c[0], 1)):
 print(qc)
 ```
 
-## Common pitfalls
+## What the protocol does—and does not—send
 
 - Saying teleportation sends the quantum state through the classical channel. The two classical bits only identify the correction; they do not encode $\alpha$ and $\beta$.
 - Forgetting that Alice's input is destroyed. The Bell measurement consumes the input qubit and Alice's half of the shared pair.
@@ -408,12 +404,8 @@ print(qc)
 - Equating a laboratory teleportation demonstration with a deployed internet. A network also needs entanglement scheduling, memories, heralding, loss management, and application-level service definitions.
 - Using the fidelity formula outside its assumptions. $F_{\mathrm{avg}}=(2F_e+1)/3$ is for the standard qubit protocol with an isotropic Bell resource.
 
-## Connections
+<div className="see-also">
 
-- [Quantum Internet](/quantum-information-science/quantum-internet/intro)
-- [Entanglement as a Network Resource](/quantum-information-science/quantum-internet/entanglement)
-- [Quantum Repeater](/quantum-information-science/quantum-internet/quantum-repeater)
-- [Quantum Communication](/quantum-information-science/quantum-communication/intro)
-- [Quantum Network](/quantum-information-science/quantum-communication/quantum-network)
-- [Density Operator, Entanglement, and Decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence)
-- [Inner Product Spaces](/math/linear-algebra/inner-product-spaces)
+See also: [Quantum Internet](/quantum-information-science/quantum-internet/intro) · [Entanglement as a Network Resource](/quantum-information-science/quantum-internet/entanglement) · [Quantum Repeater](/quantum-information-science/quantum-internet/quantum-repeater) · [Quantum Communication](/quantum-information-science/quantum-communication/intro) · [Quantum Network](/quantum-information-science/quantum-communication/quantum-network) · [Density Operator, Entanglement, and Decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence) · [Inner Product Spaces](/math/linear-algebra/inner-product-spaces)
+
+</div>

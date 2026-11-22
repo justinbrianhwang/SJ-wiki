@@ -403,10 +403,8 @@ print("purity", np.trace(rho @ rho))
 - A probability density carries units inverse to its variable. Normalization and Jacobians cannot be dropped when changing coordinates.
 - Stationarity $[H,\rho]=0$ permits many density matrices. Reservoir conditions or entropy constraints select a particular equilibrium ensemble.
 
-## Related pages
+<div className="see-also">
 
-- [Phase space, Liouville theorem, and ergodicity](/physics/statistical-mechanics/phase-space-liouville-ergodicity)
-- [Canonical ensemble and fluctuations](/physics/statistical-mechanics/canonical-ensemble-and-fluctuations)
-- [Density operators in quantum mechanics](/physics/quantum-mechanics/density-operator-entanglement-decoherence)
-- [Characteristic functions and moments](/math/probability-and-random-variables/moment-and-characteristic-functions)
-- [Central limit theorem](/math/probability-and-random-variables/weak-law-concentration-central-limit-theorem)
+See also: [Phase space, Liouville theorem, and ergodicity](/physics/statistical-mechanics/phase-space-liouville-ergodicity) · [Canonical ensemble and fluctuations](/physics/statistical-mechanics/canonical-ensemble-and-fluctuations) · [Density operators in quantum mechanics](/physics/quantum-mechanics/density-operator-entanglement-decoherence) · [Characteristic functions and moments](/math/probability-and-random-variables/moment-and-characteristic-functions) · [Central limit theorem](/math/probability-and-random-variables/weak-law-concentration-central-limit-theorem)
+
+</div>

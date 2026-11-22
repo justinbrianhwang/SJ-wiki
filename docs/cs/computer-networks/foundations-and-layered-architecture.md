@@ -9,11 +9,11 @@ sidebar_position: 1
 
 *Figure: The OSI seven-layer model. TCP/IP collapses several of these layers but the layering principle (each layer offers a service to the one above and uses the one below) is shared. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:OSI-model-Communication.svg), Offnfopt, public domain.*
 
-Computer networks are engineered systems for moving information between processes that may be separated by a room, a continent, or many administrative domains. Peterson and Davie frame the subject as a systems problem: the Internet is not only a collection of links and routers, but also a set of abstractions that let application writers, network operators, and protocol designers reason about scale without seeing every detail at once [1].
+Computer networks are engineered systems for moving information between processes that may be separated by a room, a continent, or many administrative domains. Peterson and Davie frame the subject as a systems problem: the Internet combines links and routers with abstractions that let application writers, network operators, and protocol designers reason about scale without seeing every detail at once [1].
 
-This page sets the vocabulary used by the rest of the Computer Networks section. It explains why layers exist, why they are useful but imperfect, and how the basic performance quantities of bandwidth, latency, throughput, jitter, packet loss, and bandwidth-delay product shape protocol design. It also introduces the end-to-end argument, which is the main design principle behind much of TCP/IP and a useful bridge to [distributed systems](/cs/distributed-systems/intro) and [operating systems](/cs/operating-systems/intro).
+Layers make the system tractable, though the boundaries are imperfect. The core vocabulary—bandwidth, latency, throughput, jitter, packet loss, and bandwidth-delay product—describes the constraints that every protocol inherits. The end-to-end argument then gives a useful test for deciding which functions belong inside the network and which must remain at the endpoints.
 
-## Definitions
+## The contracts between layers
 
 A **network** is a collection of nodes connected by links, where a node may be an end host, switch, router, access point, firewall, load balancer, or virtual network function. A **link** is the communication medium between adjacent nodes. Links may be point-to-point, such as a fiber between two routers, or shared, such as a Wi-Fi channel.
 
@@ -33,13 +33,13 @@ $$
 
 A **header** contains metadata interpreted by a protocol: addresses, ports, sequence numbers, length fields, checksums, flags, hop limits, and options. A **payload** is the data being carried for the next higher layer. The distinction is relative: a TCP header and application bytes are both IP payload.
 
-## Key results
+## What abstraction buys and hides
 
-The first architectural result is that layering trades performance and flexibility for modularity. A layer hides details below it, allowing application code to use sockets without knowing whether the path includes Ethernet, Wi-Fi, fiber, LTE, MPLS, VXLAN, or satellite. The cost is that a strict layer may hide information that would improve behavior. For example, TCP interprets packet loss as congestion, but wireless loss may be caused by interference. Modern stacks often keep the layered interface while adding careful cross-layer hints, such as explicit congestion notification, path MTU discovery, and link-layer retransmission.
+Layering trades performance and flexibility for modularity. A layer hides details below it, allowing application code to use sockets without knowing whether the path includes Ethernet, Wi-Fi, fiber, LTE, MPLS, VXLAN, or satellite. The cost is that a strict layer may hide information that would improve behavior. For example, TCP interprets packet loss as congestion, but wireless loss may be caused by interference. Modern stacks often keep the layered interface while adding careful cross-layer hints, such as explicit congestion notification, path MTU discovery, and link-layer retransmission.
 
-The second result is the **end-to-end argument**. Saltzer, Reed, and Clark argued that functions should be placed in the network only when they can be completely and correctly implemented there; otherwise the function belongs at the endpoints, perhaps with network support for performance [3]. Reliable file transfer is the standard example. Even if every link checks frames, the application still needs an end-to-end check that the correct file reached the correct destination and storage. Link checks help performance by catching local corruption early, but they do not remove the endpoint's responsibility.
+The **end-to-end argument** supplies a placement rule. Saltzer, Reed, and Clark argued that functions should be placed in the network only when they can be completely and correctly implemented there; otherwise the function belongs at the endpoints, perhaps with network support for performance [3]. Reliable file transfer is the standard example. Even if every link checks frames, the application still needs an end-to-end check that the correct file reached the correct destination and storage. Link checks help performance by catching local corruption early, but they do not remove the endpoint's responsibility.
 
-The third result is the basic delay decomposition for a packet of length $L$ bits over one hop:
+For a packet of length $L$ bits, the basic one-hop delay decomposition is:
 
 $$
 \begin{aligned}
@@ -55,13 +55,13 @@ $$
 
 Here $R$ is the link rate, $d$ is distance, and $s$ is signal propagation speed in the medium. In fiber, $s$ is roughly $2 \times 10^8$ m/s. On a multi-hop store-and-forward path, transmission delay is paid at each hop for a full packet unless cut-through switching or segmentation changes the model.
 
-The fourth result is that throughput is limited by the narrowest resource and by protocol windows. A TCP sender with a congestion window or receive window of $W$ bytes cannot sustain more than approximately $W/\mathrm{RTT}$ bytes per second. This is why high-speed long-distance networks need large windows and accurate congestion control. A 10 Gb/s path with 80 ms RTT has an 800 Mb BDP, so a sender must keep about 100 MB in flight to fully utilize the path.
+Throughput is limited by the narrowest resource and by protocol windows. A TCP sender with a congestion window or receive window of $W$ bytes cannot sustain more than approximately $W/\mathrm{RTT}$ bytes per second. High-speed long-distance networks therefore need large windows and accurate congestion control. A 10 Gb/s path with 80 ms RTT has an 800 Mb BDP, so a sender must keep about 100 MB in flight to fully utilize the path.
 
-The fifth result is that packetization creates both efficiency and overhead. Smaller packets reduce serialization delay, improve fairness, and reduce head-of-line blocking on a shared link. Larger packets reduce header overhead and per-packet processing. This tension appears in Ethernet MTU choices, TCP maximum segment size, QUIC packetization, and data-center jumbo frames.
+Packetization creates both efficiency and overhead. Smaller packets reduce serialization delay, improve fairness, and reduce head-of-line blocking on a shared link. Larger packets reduce header overhead and per-packet processing. This tension appears in Ethernet MTU choices, TCP maximum segment size, QUIC packetization, and data-center jumbo frames.
 
-Finally, the Internet architecture separates global reachability from application semantics. IP names interfaces and forwards datagrams. TCP and UDP identify transport endpoints with ports. DNS maps human-meaningful names to addresses and service records. Applications create their own names, sessions, authorization rules, and recovery behavior above these lower-level services.
+The Internet architecture also separates global reachability from application semantics. IP names interfaces and forwards datagrams. TCP and UDP identify transport endpoints with ports. DNS maps human-meaningful names to addresses and service records. Applications create their own names, sessions, authorization rules, and recovery behavior above these lower-level services.
 
-## Visual
+## Encapsulation across two hosts
 
 ```mermaid
 graph TD
@@ -84,7 +84,9 @@ graph TD
 | Goodput | useful application bytes/sec | Excludes retransmissions and headers |
 | Jitter | variation in delay | Critical for voice, video, games, and control loops |
 
-## Worked example 1: Bandwidth-delay product for a transcontinental path
+## Two delay budgets
+
+### Filling a transcontinental path
 
 Problem: A client sends data over a 10 Gb/s path with an 80 ms round-trip time. Estimate the BDP in bits, bytes, and 1460-byte TCP segments. Then decide whether a 16 MB receive window can fill the path.
 
@@ -126,7 +128,7 @@ $$
 
 Answer: a 16 MB window supports only about 1.6 Gb/s on this path, before considering congestion control and losses. To approach 10 Gb/s, the transport needs a window near 100 MB and enough congestion window to match it.
 
-## Worked example 2: One-hop delay budget
+### Separating transmission from propagation
 
 Problem: A 1500-byte packet crosses one 1 Gb/s Ethernet link between routers 600 km apart over fiber. Ignore queuing and processing. Estimate one-way delay.
 
@@ -168,7 +170,7 @@ $$
 
 Answer: propagation dominates. Upgrading from 1 Gb/s to 10 Gb/s reduces the 12 microseconds of serialization to 1.2 microseconds, but it cannot remove the 3 ms physical delay.
 
-## Code
+### Calculating link delay and BDP
 
 ```python
 from dataclasses import dataclass
@@ -192,7 +194,7 @@ print(f"one-way delay: {wan.delay_seconds(1500) * 1000:.3f} ms")
 print(f"10 Gb/s, 80 ms BDP: {bdp_bytes(10e9, 0.080) / 1e6:.1f} MB")
 ```
 
-## Common pitfalls
+## Layering mistakes that distort measurements
 
 - Treating the OSI model as an implementation rule instead of a teaching model. Real Internet systems often combine, bypass, or tunnel layers.
 - Confusing bandwidth with latency. A high-bandwidth satellite link can still feel slow because RTT is high.
@@ -207,17 +209,6 @@ print(f"10 Gb/s, 80 ms BDP: {bdp_bytes(10e9, 0.080) / 1e6:.1f} MB")
 - Treating cost and manageability as afterthoughts. Network designs that are elegant on paper often fail operationally if addressing, monitoring, and upgrades are awkward.
 - Assuming all applications prefer reliability over timeliness. Voice, live video, and games often prefer a late packet to be discarded.
 
-## Connections
-
-- [Physical and Data Link Layer](/cs/computer-networks/physical-and-data-link-layer) adds the first concrete mechanisms for bits, frames, errors, and retransmission.
-- [Transport Layer: TCP and UDP](/cs/computer-networks/transport-layer-tcp-udp) shows how end-to-end reliability and flow control are built over IP.
-- [Congestion Control and Queue Management](/cs/computer-networks/congestion-control-and-queue-management) develops the performance consequences of shared resources.
-- [Application Layer and Naming](/cs/computer-networks/application-layer-and-naming) connects network services to DNS, HTTP, email, and CDNs.
-- [Cryptography](/cs/cryptography/intro) supplies the primitives used by TLS, QUIC, DNSSEC, VPNs, and secure routing.
-- [Distributed Systems](/cs/distributed-systems/intro) uses networking assumptions for replication, consensus, RPC, and failure detection.
-- [Operating Systems](/cs/operating-systems/intro) explains sockets, buffers, interrupts, timers, and kernel networking paths.
-- [Computer Architecture](/cs/computer-architecture/intro) matters for NICs, DMA, cache behavior, offload, and router forwarding performance.
-
 ## References
 
 [1] L. L. Peterson and B. S. Davie, *Computer Networks: A Systems Approach*, supplied edition, ch. 1.
@@ -231,3 +222,18 @@ print(f"10 Gb/s, 80 ms BDP: {bdp_bytes(10e9, 0.080) / 1e6:.1f} MB")
 [5] J. Postel, "User Datagram Protocol," RFC 768, Aug. 1980.
 
 [6] R. Braden, Ed., "Requirements for Internet Hosts - Communication Layers," RFC 1122, Oct. 1989.
+
+<div className="see-also">
+
+See also:
+
+- [Physical and Data Link Layer](/cs/computer-networks/physical-and-data-link-layer) adds the first concrete mechanisms for bits, frames, errors, and retransmission.
+- [Transport Layer: TCP and UDP](/cs/computer-networks/transport-layer-tcp-udp) shows how end-to-end reliability and flow control are built over IP.
+- [Congestion Control and Queue Management](/cs/computer-networks/congestion-control-and-queue-management) develops the performance consequences of shared resources.
+- [Application Layer and Naming](/cs/computer-networks/application-layer-and-naming) connects network services to DNS, HTTP, email, and CDNs.
+- [Cryptography](/cs/cryptography/intro) supplies the primitives used by TLS, QUIC, DNSSEC, VPNs, and secure routing.
+- [Distributed Systems](/cs/distributed-systems/intro) uses networking assumptions for replication, consensus, RPC, and failure detection.
+- [Operating Systems](/cs/operating-systems/intro) explains sockets, buffers, interrupts, timers, and kernel networking paths.
+- [Computer Architecture](/cs/computer-architecture/intro) matters for NICs, DMA, cache behavior, offload, and router forwarding performance.
+
+</div>

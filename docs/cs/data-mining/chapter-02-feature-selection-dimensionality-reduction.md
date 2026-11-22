@@ -327,10 +327,8 @@ Rank choice depends on the loss one cares about. A scree plot looks for an elbow
 
 Computational limits matter too. A full decomposition of a large sparse term-document matrix can be unnecessary and may densify intermediate results. Iterative truncated methods compute only leading directions. Randomized SVD adds approximation error but is often accurate when singular values decay and is much cheaper for large matrices.
 
-## Related pages
+<div className="see-also">
 
-- [Data Preparation](/cs/data-mining/chapter-02-data-preparation)
-- [Similarity and Distances](/cs/data-mining/chapter-03-similarity-distances)
-- [Cluster Analysis](/cs/data-mining/chapter-06-cluster-analysis)
-- [Advanced Clustering Concepts](/cs/data-mining/chapter-07-advanced-clustering)
-- [Mining Text Data](/cs/data-mining/chapter-13-mining-text-data)
+See also: [Data Preparation](/cs/data-mining/chapter-02-data-preparation) · [Similarity and Distances](/cs/data-mining/chapter-03-similarity-distances) · [Cluster Analysis](/cs/data-mining/chapter-06-cluster-analysis) · [Advanced Clustering Concepts](/cs/data-mining/chapter-07-advanced-clustering) · [Mining Text Data](/cs/data-mining/chapter-13-mining-text-data)
+
+</div>

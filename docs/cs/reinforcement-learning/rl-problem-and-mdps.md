@@ -351,9 +351,8 @@ Multi-agent environments can violate stationarity from one agent's perspective b
 
 Reward uncertainty and model uncertainty are distinct from transition randomness. An MDP's stochastic kernel can be known exactly while outcomes remain random. In learning, the kernel is also unknown. Confidence about an estimate is epistemic; randomness remaining under a known model is aleatoric. Exploration is valuable for the former, not the latter by itself.
 
-## Related pages
+<div className="see-also">
 
-- [Multi-armed bandits](/cs/reinforcement-learning/multi-armed-bandits)
-- [Dynamic programming](/cs/reinforcement-learning/dynamic-programming)
-- [Monte Carlo methods](/cs/reinforcement-learning/monte-carlo-methods)
-- [Temporal-difference learning](/cs/reinforcement-learning/temporal-difference-learning)
+See also: [Multi-armed bandits](/cs/reinforcement-learning/multi-armed-bandits) · [Dynamic programming](/cs/reinforcement-learning/dynamic-programming) · [Monte Carlo methods](/cs/reinforcement-learning/monte-carlo-methods) · [Temporal-difference learning](/cs/reinforcement-learning/temporal-difference-learning)
+
+</div>

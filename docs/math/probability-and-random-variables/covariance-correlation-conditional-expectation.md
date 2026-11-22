@@ -5,15 +5,11 @@ sidebar_position: 12
 
 # Covariance, Correlation, and Conditional Expectation
 
-Variance measures how one random variable spreads around its mean. Covariance measures how two variables move together. Conditional expectation measures the best average prediction after observing information. These ideas are conceptually different, but they meet in formulas such as the law of total variance and in examples where one random variable is used to predict another.
+Variance measures how one random variable spreads around its mean. Covariance measures how two variables move together. Conditional expectation gives the best average prediction after observing information. The ideas meet in the law of total variance and in problems where one random variable is used to predict another.
 
-![Scatterplots show several patterns and Pearson correlation coefficients.](https://commons.wikimedia.org/wiki/Special:FilePath/Correlation_examples2.svg)
+MIT 18.440 develops covariance and correlation before conditional expectation. Two warnings recur: independence implies zero covariance, but zero covariance does not imply independence; conditional expectation can behave counterintuitively when the relevant expectations are infinite or the conditioning information is misunderstood.
 
-*Figure: Correlation examples show how association strength and visual pattern are related but not identical. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Correlation_examples2.svg), DenisBoigelot and Imagecreator, public domain.*
-
-MIT 18.440 develops covariance and correlation before moving to conditional expectation. The lectures emphasize two warnings: independence implies zero covariance, but zero covariance does not imply independence; and conditional expectation can behave counterintuitively when expectations are infinite or when the conditioning information is misunderstood.
-
-## Definitions
+## What covariance and correlation record
 
 For random variables $X,Y$ with finite second moments, the **covariance** is
 
@@ -28,6 +24,23 @@ $$
 \operatorname{Cov}(X,Y)=E[XY]-E[X]E[Y].
 $$
 
+Covariance is bilinear:
+
+$$
+\operatorname{Cov}(aX+bY,Z)
+=a\operatorname{Cov}(X,Z)+b\operatorname{Cov}(Y,Z),
+$$
+
+and similarly in the second argument. It follows that
+
+$$
+\operatorname{Var}(X+Y)
+=
+\operatorname{Var}(X)+\operatorname{Var}(Y)+2\operatorname{Cov}(X,Y).
+$$
+
+Positive covariance increases the variance of a sum, while negative covariance decreases it. Negatively correlated assets can therefore reduce portfolio variance. In probability calculations, covariance terms account for indicator variables that are not independent.
+
 The **correlation coefficient** is
 
 $$
@@ -36,7 +49,36 @@ $$
 {\sqrt{\operatorname{Var}(X)}\sqrt{\operatorname{Var}(Y)}},
 $$
 
-provided both variances are positive and finite.
+provided both variances are positive and finite. Covariance depends on units: changing height from meters to centimeters multiplies its covariance with another variable by $100$. Correlation divides by the standard deviations, so it is unitless and lies between $-1$ and $1$.
+
+Values near $1$ or $-1$ indicate strong linear association. A value near $0$ indicates little linear association, not the absence of every relationship. If $X$ and $Y$ are independent, then $E[XY]=E[X]E[Y]$ and their covariance is zero; the converse fails. Correlation is undefined when either variance is zero.
+
+The bound $\vert \rho\vert \leq1$ is Cauchy--Schwarz applied to the centered variables:
+
+$$
+|E[(X-E[X])(Y-E[Y])]|^2
+\leq E[(X-E[X])^2]E[(Y-E[Y])^2].
+$$
+
+Equality holds exactly when the centered variables are linearly dependent almost surely. Thus $\rho=1$ means $Y=aX+b$ almost surely with $a\gt 0$, and $\rho=-1$ means the slope is negative. A high correlation need not mean equality of values or equality of distributions.
+
+For a direct counterexample to the converse of independence, let $X$ be uniform on $\{-1,0,1\}$ and set $Y=X^2$. The variables are dependent because $Y$ is determined by $X$. Symmetry gives $E[X]=0$ and $E[XY]=E[X^3]=0$, so
+
+$$
+\operatorname{Cov}(X,Y)=0-E[X]E[Y]=0.
+$$
+
+The relationship is entirely nonlinear and Pearson correlation does not record it.
+
+For a random vector $X=(X_1,\ldots,X_d)^T$, the covariance matrix has entries $\Sigma_{ij}=\operatorname{Cov}(X_i,X_j)$. It is symmetric and positive semidefinite because for every vector $a$,
+
+$$
+a^T\Sigma a=\operatorname{Var}(a^TX)\geq0.
+$$
+
+Diagonal entries are variances; off-diagonal entries determine how linear combinations co-vary. A singular covariance matrix means some nonzero linear combination has zero variance and is therefore constant almost surely.
+
+## Conditioning selects a new distribution
 
 For jointly discrete random variables, the **conditional mass function** of $X$ given $Y=y$ is
 
@@ -46,38 +88,39 @@ p_{X\mid Y}(x\mid y)
 \frac{p_{X,Y}(x,y)}{p_Y(y)},
 $$
 
-when $p_Y(y)\gt 0$. The conditional expectation is
+when $p_Y(y)\gt 0$. Its mean is
 
 $$
 E[X\mid Y=y]=\sum_x x\,p_{X\mid Y}(x\mid y).
 $$
 
-The expression $E[X\mid Y]$ is itself a random variable: it is the function of $Y$ that takes value $E[X\mid Y=y]$ when $Y=y$.
+The direction of conditioning matters: $E[X\mid Y=y]$ and $E[Y\mid X=x]$ generally answer different questions.
 
-## Key results
+As $y$ varies, the conditional means form a function. Evaluating that function at the random value $Y$ gives $E[X\mid Y]$, which is itself a random variable rather than a single number. It can be read as averaging $X$ under the probability law selected by the observed value of $Y$.
 
-Covariance is bilinear:
-
-$$
-\operatorname{Cov}(aX+bY,Z)
-=a\operatorname{Cov}(X,Z)+b\operatorname{Cov}(Y,Z),
-$$
-
-and similarly in the second argument. Variance of a sum satisfies
+The broader definition conditions on information represented by a sigma-algebra $\mathcal G$. The random variable $E[X\mid\mathcal G]$ must be $\mathcal G$-measurable and satisfy
 
 $$
-\operatorname{Var}(X+Y)
-=
-\operatorname{Var}(X)+\operatorname{Var}(Y)+2\operatorname{Cov}(X,Y).
+E[X\mathbf1_G]=E[E[X\mid\mathcal G]\mathbf1_G]
 $$
 
-If $X$ and $Y$ are independent, then
+for every event $G\in\mathcal G$. It is unique up to events of probability zero. Conditioning on $Y$ means taking $\mathcal G=\sigma(Y)$, the information revealed by knowing $Y$.
+
+Several calculation rules follow. Constants and known quantities can be pulled out:
 
 $$
-E[XY]=E[X]E[Y],
+E[Z X\mid\mathcal G]=Z E[X\mid\mathcal G]
 $$
 
-so $\operatorname{Cov}(X,Y)=0$. The converse is false.
+when $Z$ is $\mathcal G$-measurable and integrability holds. If $X$ is independent of $\mathcal G$, then $E[X\mid\mathcal G]=E[X]$. For nested information $\mathcal H\subseteq\mathcal G$, the tower property says
+
+$$
+E[E[X\mid\mathcal G]\mid\mathcal H]=E[X\mid\mathcal H].
+$$
+
+Conditioning in the reverse order generally cannot be simplified unless the sigma-algebras are nested.
+
+## Splitting variation across conditional slices
 
 The **law of total expectation** is
 
@@ -85,7 +128,7 @@ $$
 E[E[X\mid Y]]=E[X].
 $$
 
-It says that averaging the conditional averages over the distribution of $Y$ returns the original average.
+There are two equivalent ways to average: directly, or first within each conditional slice and then across the slice means. A class average computed from section averages needs the same weighting by section size.
 
 The **law of total variance** is
 
@@ -96,42 +139,33 @@ $$
 +E[\operatorname{Var}(X\mid Y)].
 $$
 
-Interpretation: uncertainty in $X$ can be decomposed into uncertainty explained by $Y$ and average uncertainty remaining after $Y$ is known.
+The first term measures variation in the conditional means; the second is the average variation remaining within a slice.
 
-Conditional expectation is also the best mean-square predictor among functions of the observed variable:
-
-$$
-E[(X-g(Y))^2]
-$$
-
-is minimized by $g(Y)=E[X\mid Y]$.
-
-Covariance is sensitive to units. If height is measured in centimeters rather than meters, covariance with another variable is multiplied by $100$. Correlation removes this dependence by dividing by standard deviations, so it always lies between $-1$ and $1$. Values near $1$ or $-1$ indicate strong linear association, while values near $0$ indicate little linear association, not necessarily no relationship at all.
-
-The identity
+To derive it, write $m(Y)=E[X\mid Y]$ and decompose
 
 $$
-\operatorname{Var}(X+Y)
-=\operatorname{Var}(X)+\operatorname{Var}(Y)+2\operatorname{Cov}(X,Y)
+X-E[X]=(X-m(Y))+(m(Y)-E[X]).
 $$
 
-explains why dependence matters for sums. Positive covariance increases the variance of a sum; negative covariance decreases it. In portfolio language, negatively correlated assets can reduce total risk. In probability computations, covariance terms are the price one pays when indicator variables are not independent.
+After squaring and taking expectations, the cross term vanishes:
 
-Conditional expectation should be read as an averaging operation under a revised probability law. If $Y=y$ is observed, the distribution of $X$ changes to the conditional distribution, and $E[X\mid Y=y]$ is the mean under that new distribution. As $y$ varies, these means form a function. Evaluating that function at the random value $Y$ gives the random variable $E[X\mid Y]$.
+$$
+\begin{aligned}
+E[(X-m(Y))(m(Y)-E[X])]
+&=E\left[(m(Y)-E[X])E[X-m(Y)\mid Y]\right]\\
+&=0.
+\end{aligned}
+$$
 
-The total expectation formula says that there are two equivalent ways to average: average directly, or first average within each conditional slice and then average the slice means. This is the probability version of computing a class average by first computing section averages and then weighting by section sizes. The law of total variance adds that total spread splits into spread of the slice means plus average spread within slices.
-
-The best-predictor property is one reason conditional expectation is central in stochastic processes and statistics. If squared error is the loss function and the available information is $Y$, then no other function of $Y$ beats $E[X\mid Y]$ on average. This interpretation leads naturally to martingales, where successive conditional expectations are revised best guesses as information arrives.
-
-## Visual
+The squared first term averages to $E[\operatorname{Var}(X\mid Y)]$; the second is $\operatorname{Var}(E[X\mid Y])$. The identity is an orthogonal decomposition of centered variation.
 
 ```mermaid
 graph TD
   A["Observe Y"] --> B["Conditional distribution of X"]
-  B --> C["Conditional mean E X given Y"]
-  B --> D["Conditional variance Var X given Y"]
-  C --> E["Explained variation"]
-  D --> F["Remaining variation"]
+  B --> C["Conditional mean: E#lsqb;X | Y"]"]
+  B --> D["Conditional variance: Var(X | Y)"]
+  C --> E["Variation between slice means"]
+  D --> F["Variation remaining within slices"]
   E --> G["Total variance"]
   F --> G
 ```
@@ -142,42 +176,63 @@ graph TD
 | Correlation | covariance divided by standard deviations | unitless linear association |
 | Conditional mean | $E[X\mid Y=y]$ | average after observing $Y=y$ |
 | Total expectation | $E[E[X\mid Y]]=E[X]$ | average the conditional averages |
-| Total variance | $\operatorname{Var}(E[X\mid Y])+E[\operatorname{Var}(X\mid Y)]$ | explained plus residual spread |
+| Total variance | $\operatorname{Var}(E[X\mid Y])+E[\operatorname{Var}(X\mid Y)]$ | between-slice plus within-slice spread |
 
-The diagram should be read as a two-stage experiment. First $Y$ is observed, which selects a conditional distribution for $X$. That conditional distribution has its own mean and variance. Across repeated experiments, the conditional mean changes because $Y$ changes; that changing mean accounts for the explained part of the variance. The conditional variance accounts for the randomness left after $Y$ is known. This is the same decomposition used informally when analysts say that some predictors explain part, but not all, of the variation in an outcome.
+Covariance and conditional expectation answer related but distinct questions. Covariance gives one number for linear co-movement. Conditional expectation gives a function describing the average of $X$ at each observed value of $Y$. The views align closely when that function is linear; a nonlinear conditional mean can carry structure that covariance misses.
 
-Covariance and conditional expectation answer related but distinct questions. Covariance asks for one number summarizing linear co-movement. Conditional expectation asks for an entire function describing the average of $X$ at each observed value of $Y$. When the conditional expectation is linear in $Y$, the two viewpoints are closely aligned. When it is nonlinear, covariance may miss important structure.
+## Conditional expectation as a least-squares predictor
 
-This perspective is also the bridge to regression in statistics: a regression curve estimates a conditional mean, while residual variance measures what remains unexplained after conditioning on the predictors.
-
-## Worked example 1: covariance with a noisy sum
-
-Problem: Let $X$ and $Y$ be independent random variables with $E[X]=E[Y]=0$, variances $\sigma_X^2$ and $\sigma_Y^2$, and define $Z=X+Y$. Compute $\operatorname{Cov}(X,Z)$ and $\rho(X,Z)$.
-
-Method:
-
-1. Use bilinearity:
+For square-integrable $X$, the mean-square error
 
 $$
+E[(X-g(Y))^2]
+$$
+
+is minimized over functions of $Y$ by $g(Y)=E[X\mid Y]$. With squared-error loss and information $Y$, no other function of $Y$ has lower average loss. A regression curve estimates such a conditional mean, while residual variance measures what remains after conditioning on the predictors.
+
+The proof mirrors least squares in Euclidean space. Put $m(Y)=E[X\mid Y]$. For any square-integrable $g(Y)$,
+
+$$
+\begin{aligned}
+E[(X-g(Y))^2]
+&=E[(X-m(Y)+m(Y)-g(Y))^2]\\
+&=E[(X-m(Y))^2]+E[(m(Y)-g(Y))^2],
+\end{aligned}
+$$
+
+because the cross term has conditional expectation zero. The first term does not depend on $g$, and the second is nonnegative. Conditional expectation is therefore the orthogonal projection of $X$ onto the square-integrable functions of the observed information.
+
+Restricting predictors to affine functions $a+bY$ gives the best linear predictor instead. When $\operatorname{Var}(Y)\gt 0$, differentiation yields
+
+$$
+b=\frac{\operatorname{Cov}(X,Y)}{\operatorname{Var}(Y)},
+\qquad a=E[X]-bE[Y].
+$$
+
+This equals the full conditional expectation only when $E[X\mid Y]$ is affine. Jointly Gaussian variables have that property, but general distributions do not. The earlier example $Y=X^2$ has zero linear slope in predicting $Y$ from $X$, despite perfect nonlinear predictability.
+
+The same interpretation leads to martingales: successive conditional expectations are revised best guesses as information arrives. Finiteness assumptions matter throughout; identities involving conditional expectations may be meaningless when the required expectations do not exist.
+
+## A signal plus independent noise
+
+Let $X$ and $Y$ be independent with $E[X]=E[Y]=0$, variances $\sigma_X^2$ and $\sigma_Y^2$, and set $Z=X+Y$. Bilinearity gives
+
+$$
+\begin{aligned}
 \operatorname{Cov}(X,Z)
-=\operatorname{Cov}(X,X+Y)
-=\operatorname{Cov}(X,X)+\operatorname{Cov}(X,Y).
+&=\operatorname{Cov}(X,X+Y) \\
+&=\operatorname{Cov}(X,X)+\operatorname{Cov}(X,Y) \\
+&=\sigma_X^2.
+\end{aligned}
 $$
 
-2. Since $\operatorname{Cov}(X,X)=\operatorname{Var}(X)=\sigma_X^2$ and independence gives $\operatorname{Cov}(X,Y)=0$,
+Independence also gives
 
 $$
-\operatorname{Cov}(X,Z)=\sigma_X^2.
+\operatorname{Var}(Z)=\sigma_X^2+\sigma_Y^2,
 $$
 
-3. The variance of $Z$ is
-
-$$
-\operatorname{Var}(Z)=\operatorname{Var}(X)+\operatorname{Var}(Y)
-=\sigma_X^2+\sigma_Y^2.
-$$
-
-4. Therefore
+so
 
 $$
 \rho(X,Z)
@@ -188,34 +243,58 @@ $$
 \frac{\sigma_X}{\sqrt{\sigma_X^2+\sigma_Y^2}}.
 $$
 
-Checked answer: if $\sigma_Y^2$ is large, $Z$ contains much noise unrelated to $X$, so the correlation is small. If $\sigma_Y^2=0$, then $Z=X$ and the correlation is $1$.
+Large $\sigma_Y^2$ means that $Z$ contains substantial noise unrelated to $X$, reducing the correlation. At $\sigma_Y^2=0$, $Z=X$ and the correlation is $1$.
 
-## Worked example 2: conditional expectation from a dice sum
+## Reading one die from the observed sum
 
-Problem: Roll two fair dice. Let $X$ be the first die, $Y$ the second die, and $Z=X+Y$. Find $E[X\mid Z=5]$.
-
-Method:
-
-1. The event $Z=5$ consists of outcomes
+Roll two fair dice. Let $X$ be the first die, $Y$ the second, and $Z=X+Y$. Conditional on $Z=5$, the possible outcomes are
 
 $$
 (1,4),(2,3),(3,2),(4,1).
 $$
 
-2. Under the fair dice model, these four outcomes are equally likely after conditioning on $Z=5$.
-3. Therefore the conditional distribution of $X$ given $Z=5$ is uniform on $\{1,2,3,4\}$.
-4. Compute the conditional expectation:
+They remain equally likely, so $X$ is conditionally uniform on $\{1,2,3,4\}$ and
 
 $$
 E[X\mid Z=5]
 =\frac{1+2+3+4}{4}
-=\frac{10}{4}
 =\frac52.
 $$
 
-Checked answer: by symmetry, if the sum is $5$, each die has the same conditional expectation, and the two conditional expectations must add to $5$. Thus each is $5/2$.
+Symmetry gives a quick check: the two dice have equal conditional expectations, and those expectations add to $5$.
 
-## Code
+The symmetry works for every attainable sum. Because $X$ and $Y$ are exchangeable and $X+Y=Z$,
+
+$$
+E[X\mid Z]+E[Y\mid Z]=E[Z\mid Z]=Z,
+$$
+
+while exchangeability gives $E[X\mid Z]=E[Y\mid Z]$. Hence
+
+$$
+E[X\mid Z]=\frac Z2.
+$$
+
+The result is linear even though the conditional distribution changes shape near sums $2$ and $12$.
+
+It also gives a total-variance check. Since $\operatorname{Var}(X)=35/12$ and $\operatorname{Var}(Z)=35/6$ for two independent fair dice,
+
+$$
+\operatorname{Var}(E[X\mid Z])
+=\operatorname{Var}(Z/2)=\frac{35}{24}.
+$$
+
+Therefore
+
+$$
+E[\operatorname{Var}(X\mid Z)]
+=\frac{35}{12}-\frac{35}{24}
+=\frac{35}{24}.
+$$
+
+Exactly half the variance of one die is explained, in mean-square terms, by observing the sum.
+
+## Enumerating the examples
 
 ```python
 from collections import defaultdict
@@ -239,18 +318,92 @@ print("Cov(X,Z):", cov_xz)
 print("Corr(X,Z):", corr_xz)
 ```
 
-## Common pitfalls
+## Total covariance
 
-- Concluding independence from zero covariance. Zero covariance only rules out linear association in a second-moment sense.
-- Forgetting that correlation is undefined if a variance is zero.
-- Treating $E[X\mid Y]$ as a number rather than a random variable depending on $Y$.
-- Confusing $E[X\mid Y=y]$ with $E[Y\mid X=x]$. Conditioning direction matters.
-- Applying conditional-expectation paradoxes without checking whether the relevant expectations are finite.
+Conditioning also decomposes covariance. Add and subtract conditional means, then use the same vanishing cross-term argument as for total variance:
 
-## Connections
+$$
+\operatorname{Cov}(X,Z)
+=E[\operatorname{Cov}(X,Z\mid Y)]
++\operatorname{Cov}(E[X\mid Y],E[Z\mid Y]).
+$$
 
-- [Discrete random variables, expectation, and variance](/math/probability-and-random-variables/discrete-random-variables-expectation-variance)
-- [Joint distributions, transformations, and independence](/math/probability-and-random-variables/joint-distributions-transformations-independence)
-- [Sums, convolutions, and order statistics](/math/probability-and-random-variables/sums-convolutions-order-statistics)
-- [Martingales, risk-neutral probability, and Black-Scholes](/math/probability-and-random-variables/martingales-risk-neutral-probability-black-scholes)
-- [Covariance, correlation, and independence](/math/probability/covariance-correlation-independence)
+The first term is average within-slice co-movement; the second is co-movement of slice means. Setting $Z=X$ recovers total variance. The identity is useful when dependence is induced by a shared group. Two measurements may be conditionally independent given a group label and still be positively correlated marginally because groups have different means.
+
+For example, suppose $Y$ selects one of two populations with equal probability. Conditional on $Y=0$, let independent $X$ and $Z$ each have mean $0$; conditional on $Y=1$, let them be independent with mean $10$. Their conditional covariance is zero in both groups. Yet the covariance of their conditional means is the variance of $10Y$, equal to $25$. Pooling the groups creates strong association without within-group association. Reversals of this kind underlie Simpson-type effects.
+
+## Sample covariance is an estimator
+
+Given paired observations $(x_i,y_i)$, the usual sample covariance is
+
+$$
+s_{xy}=\frac1{n-1}\sum_{i=1}^n(x_i-\bar x)(y_i-\bar y).
+$$
+
+The divisor $n-1$ makes it unbiased for population covariance under independent identical sampling with finite second moments. Dividing by $n$ gives the empirical-distribution covariance and is also the maximum-likelihood convention in some Gaussian calculations. The chosen denominator should be stated when small samples matter.
+
+Sample correlation is a ratio of random quantities. It can be noisy, especially with few observations or heavy tails, and one outlying pair can dominate both covariance and standard deviations. A scatterplot or residual analysis remains necessary even though a decorative plot is not needed for the definition.
+
+Serial data require more care. Treating dependent time points as independent pairs understates uncertainty. Lag-$k$ autocovariance compares $X_t$ with $X_{t+k}$ and describes persistence; effective sample size depends on the whole dependence pattern rather than the number of rows alone.
+
+## Conditioning a mixture
+
+Let $Y$ be Bernoulli with $P(Y=1)=p$. Conditional on $Y$, suppose $X$ has mean $\mu_Y$ and variance $\sigma_Y^2$. Total expectation gives
+
+$$
+E[X]=(1-p)\mu_0+p\mu_1.
+$$
+
+Total variance gives
+
+$$
+\operatorname{Var}(X)
+=(1-p)\sigma_0^2+p\sigma_1^2
++p(1-p)(\mu_1-\mu_0)^2.
+$$
+
+The first two terms average within-group spread. The final term is between-group spread and remains even if both conditional variances are zero. For $p=1/2$, $\mu_0=0$, $\mu_1=4$, and both conditional variances equal $1$, the total variance is $1+4=5$. Directly, the mixture mean is $2$ and each component mean lies two units from it, confirming the calculation.
+
+This decomposition also warns against replacing a mixture by a single distribution having only the averaged conditional variance. Variation of the conditional mean is part of the marginal uncertainty.
+
+## Interpretive checks
+
+- Correlation has no meaning when a variance is zero, and it can be unstable when a variance is merely tiny. Report the scale and sample size beside an estimated correlation.
+- Pairwise zero covariance does not imply joint independence. The implication does hold for jointly Gaussian vectors, a special structural fact rather than a general rule.
+- $E[X\mid Y]$ is a function of the random variable $Y$; $E[X\mid Y=y]$ is a number for a specified value. Confusing them often leads to missing an outer expectation.
+- Events with probability zero require a regular conditional distribution or another measure-theoretic construction. The elementary ratio formula cannot condition on $P(Y=y)=0$ for a continuous $Y$.
+- The tower property needs nested information. Expressions such as $E[E[X\mid Y]\mid Z]$ do not collapse to $E[X\mid Z]$ without an inclusion relation or additional assumptions.
+
+## Conditional expectation with continuous variables
+
+If $(X,Y)$ has a joint density and $f_Y(y)\gt 0$, then
+
+$$
+f_{X\mid Y}(x\mid y)=\frac{f_{X,Y}(x,y)}{f_Y(y)},
+\qquad
+E[X\mid Y=y]=\int x f_{X\mid Y}(x\mid y)\,dx.
+$$
+
+The event $Y=y$ has probability zero, so this is not the elementary ratio of event probabilities. A conditional density is a version defined for almost every $y$; changing it on a zero-probability set does not change $E[X\mid Y]$ as a random variable.
+
+For independent standard normal $X$ and $N$, let $Y=X+N$. The pair $(X,Y)$ is jointly Gaussian, with covariance $1$ and $\operatorname{Var}(Y)=2$. The best linear predictor is therefore
+
+$$
+E[X\mid Y]=\frac12Y.
+$$
+
+Joint Gaussianity makes the conditional mean exactly linear, not merely the best linear approximation. Its explained variance is $\operatorname{Var}(Y/2)=1/2$, and total variance leaves conditional variance $1/2$. Observing a noisy sum cuts the mean-square uncertainty in half in this equal-variance case.
+
+If the noise variance were $\tau^2$ and signal variance $\sigma^2$, the coefficient would become $\sigma^2/(\sigma^2+\tau^2)$. The predictor shrinks a noisy observation toward the prior mean; larger noise produces stronger shrinkage.
+
+## Existence assumptions
+
+Covariance requires integrability of the product, usually guaranteed by finite second moments. Correlation additionally requires positive finite variances. Conditional expectation $E[X\mid\mathcal G]$ needs $E\vert X\vert \lt \infty$ in the standard definition. Heavy-tailed variables can violate these assumptions even when simulated samples look ordinary.
+
+For nonnegative $X$, an extended conditional expectation can be defined even when the mean is infinite, but subtraction identities may then involve undefined expressions such as infinity minus infinity. Checking finiteness before applying covariance or total-variance algebra is part of the calculation, not a technical afterthought.
+
+<div className="see-also">
+
+See also: [Discrete random variables, expectation, and variance](/math/probability-and-random-variables/discrete-random-variables-expectation-variance) · [Joint distributions, transformations, and independence](/math/probability-and-random-variables/joint-distributions-transformations-independence) · [Sums, convolutions, and order statistics](/math/probability-and-random-variables/sums-convolutions-order-statistics) · [Martingales, risk-neutral probability, and Black-Scholes](/math/probability-and-random-variables/martingales-risk-neutral-probability-black-scholes) · [Covariance, correlation, and independence](/math/probability/covariance-correlation-independence)
+
+</div>

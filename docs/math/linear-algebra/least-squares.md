@@ -13,7 +13,7 @@ This is one of the most important applied ideas in linear algebra. Data rarely f
 
 *Figure: Least-squares line fitted to scattered data. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Linear_regression.svg), Sewaqu, public domain.*
 
-## Definitions
+## Projection, residual, and the normal equations
 
 For an $m\times n$ matrix $A$ and vector $\mathbf{b}\in\mathbb{R}^m$, a least-squares solution is a vector $\hat{\mathbf{x}}$ minimizing
 
@@ -41,7 +41,7 @@ $$
 
 The fitted vector is $\hat{\mathbf{b}}=A\hat{\mathbf{x}}$, which lies in the column space of $A$. The residual is the part of $\mathbf{b}$ that the model cannot explain.
 
-## Key results
+## Why orthogonality characterizes the fit
 
 Projection theorem: if $W$ is a finite-dimensional subspace of an inner product space and $\mathbf{b}$ is any vector, then there is a unique vector $\mathbf{p}\in W$ closest to $\mathbf{b}$. The error $\mathbf{b}-\mathbf{p}$ is orthogonal to $W$.
 
@@ -101,8 +101,6 @@ Residual analysis is part of the method. A small residual norm means the fitted 
 
 Rank deficiency changes the solution story. If the columns of $A$ are dependent, there may be infinitely many parameter vectors that give the same fitted vector. The fitted vector in the column space is still unique, but the coefficient vector may not be. The SVD and pseudoinverse are the standard tools for choosing the minimum-norm least-squares solution in that case.
 
-## Visual
-
 ```mermaid
 flowchart TD
   B["target b"] --> P["project onto Col(A)"]
@@ -118,7 +116,7 @@ flowchart TD
 | QR | $R\hat{x}=Q^Tb$ | stable and efficient | requires factorization |
 | SVD | uses singular values | best for rank-deficient problems | more expensive |
 
-## Worked example 1: Solve a least-squares system
+## Fitting a line to three measurements
 
 Problem: find the least-squares solution of
 
@@ -229,7 +227,7 @@ $$
 y=\frac23+\frac12x.
 $$
 
-## Worked example 2: Check residual orthogonality
+## Using the residual to certify the projection
 
 Use the fitted line from the previous example.
 
@@ -290,7 +288,7 @@ $$
 
 Checked answer: the residual is orthogonal to the column space, confirming the least-squares condition.
 
-## Code
+## Solving the fit with `numpy.linalg.lstsq`
 
 ```python
 import numpy as np
@@ -309,7 +307,7 @@ print(A.T @ (y_data - A @ coef))
 
 The last line checks the normal-equation condition $A^T\mathbf{r}=0$. In practical regression, one should also inspect residual patterns, not only minimize their squared length.
 
-## Common pitfalls
+## Conditioning, rank, and model interpretation
 
 - Trying to solve an inconsistent system exactly instead of minimizing the residual.
 - Forgetting that the residual is $\mathbf{b}-A\hat{\mathbf{x}}$, not $A\hat{\mathbf{x}}-\mathbf{b}$; the norm is the same, but orthogonality formulas should be used consistently.
@@ -320,7 +318,7 @@ The last line checks the normal-equation condition $A^T\mathbf{r}=0$. In practic
 
 A dependable least-squares solution should pass three checks. First, the dimensions must match: $A\hat{\mathbf{x}}$ must live in the same space as $\mathbf{b}$. Second, the residual should be orthogonal to the columns of $A$, so $A^T(\mathbf{b}-A\hat{\mathbf{x}})$ should be zero in exact arithmetic. Third, the fitted vector should lie in the column space of $A$ because it is a linear combination of the columns.
 
-Normal equations are attractive because they produce a square system, but they can be numerically fragile. The matrix $A^TA$ can be much more ill-conditioned than $A$. This is why serious numerical least squares often uses QR or SVD. The normal equations are still valuable for theory and for small exact problems, but they should not be treated as the only method.
+Normal equations are attractive because they produce a square system, but they can be numerically fragile. The matrix $A^TA$ can be much more ill-conditioned than $A$, so serious numerical least squares often uses QR or SVD. The normal equations are still valuable for theory and for small exact problems, but they should not be treated as the only method.
 
 Interpretation matters as much as computation. A least-squares line gives the best line within the chosen model class, not proof that the relationship is linear. Residual plots, units, outliers, and domain knowledge should be checked. Linear algebra can identify the best parameters for a model; it cannot decide by itself whether the model is scientifically appropriate.
 
@@ -338,9 +336,8 @@ The normal-equation matrix $A^TA$ is symmetric and positive semidefinite. It is 
 
 In regression language, adding a column to $A$ expands the model space. The residual norm cannot increase when the model space gets larger, because the old fitted vector is still available. But a smaller training residual does not automatically mean a better model; extra columns can fit noise. That modeling issue sits beyond the linear algebra calculation but depends on understanding column spaces.
 
-## Connections
+<div className="see-also">
 
-- [Orthogonality in Rn](/math/linear-algebra/orthogonality-in-rn)
-- [Orthogonality, Gram-Schmidt, and QR](/math/linear-algebra/orthogonality-qr-gram-schmidt)
-- [Singular Value Decomposition](/math/linear-algebra/singular-value-decomposition)
-- [Applications and Modeling](/math/linear-algebra/applications-and-modeling)
+See also: [Orthogonality in Rn](/math/linear-algebra/orthogonality-in-rn) · [Orthogonality, Gram-Schmidt, and QR](/math/linear-algebra/orthogonality-qr-gram-schmidt) · [Singular Value Decomposition](/math/linear-algebra/singular-value-decomposition) · [Applications and Modeling](/math/linear-algebra/applications-and-modeling)
+
+</div>

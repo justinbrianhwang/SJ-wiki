@@ -5,11 +5,11 @@ sidebar_position: 18
 
 # Advanced Graphics and 3D Plots
 
-The later graphics chapters of *The Book of R* move beyond first plots into devices, margins, annotations, colors, palettes, higher-dimensional displays, contours, surfaces, and interactive 3D graphics. These topics are not separate from statistics: visualization choices determine whether patterns, residual structure, clusters, and model surfaces can be understood.
+The later graphics chapters of *The Book of R* move beyond first plots into devices, margins, annotations, colors, palettes, higher-dimensional displays, contours, surfaces, and interactive 3D graphics. Visualization choices determine whether patterns, residual structure, clusters, and model surfaces can be understood.
 
-Advanced plotting in R has two sides. One side is control over a two-dimensional figure: devices, margins, axes, clipping, legends, mathematical labels, and color. The other side is representing more than two variables: color scales, facets, contours, perspective surfaces, and interactive rotation. The goal is not decoration. It is to make structure visible without misleading the reader.
+Advanced plotting in R has two sides. One side is control over a two-dimensional figure: devices, margins, axes, clipping, legends, mathematical labels, and color. The other side is representing more than two variables: color scales, facets, contours, perspective surfaces, and interactive rotation. The aim is to expose structure without misleading the reader.
 
-## Definitions
+## Devices, palettes, and surfaces
 
 A **graphics device** is an output target such as an on-screen window, PDF, or PNG. Managing devices matters when a script writes multiple figures.
 
@@ -23,7 +23,7 @@ A **perspective plot** draws a 3D-looking surface in 2D using `persp`.
 
 An **interactive 3D plot** allows rotation, zooming, or other user-driven changes. The book discusses packages for interactive 3D work; exact package choices may vary by R installation and era.
 
-## Key results
+## Choosing a representation
 
 Higher-dimensional plotting requires explicit mapping:
 
@@ -45,8 +45,6 @@ For surfaces, the usual base R setup is:
 4. Plot with `contour`, `image`, `filled.contour`, or `persp`.
 
 The z-matrix orientation matters. Rows and columns must align with the x and y vectors expected by the plotting function. Small test grids help catch transposition errors.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -72,11 +70,11 @@ x4      z41    z42    z43
 Contour lines connect equal z values across the grid.
 ```
 
-## Worked example 1: Contour plot of a bivariate function
+## Reading scalar fields and model surfaces
 
-Problem: plot contours of $z = \sin(x)\cos(y)$ over $-\pi \le x \le \pi$ and $-\pi \le y \le \pi$.
+### Contours of a bivariate function
 
-Method:
+Plot contours of $z = \sin(x)\cos(y)$ over $-\pi \le x \le \pi$ and $-\pi \le y \le \pi$.
 
 1. Create x and y coordinate sequences.
 2. Use `outer` to evaluate the function over the grid.
@@ -100,15 +98,13 @@ contour(
 )
 ```
 
-Checked answer: at `x = 0`, `sin(0) = 0`, so `z = 0` for every `y`. The contour plot should include a zero contour through the vertical line at x = 0. At `x = pi / 2` and `y = 0`, `z = 1 * 1 = 1`, so the surface reaches a high value near that coordinate.
+At `x = 0`, `sin(0) = 0`, so `z = 0` for every `y`. The contour plot should include a zero contour through the vertical line at x = 0. At `x = pi / 2` and `y = 0`, `z = 1 * 1 = 1`, so the surface reaches a high value near that coordinate.
 
 The `outer` call is concise because it evaluates all x-y combinations without a hand-written nested loop.
 
-## Worked example 2: Color-coded residual surface
+### Mapping a fitted response surface
 
-Problem: fit `mpg ~ wt + hp` in `mtcars`, compute predicted mpg over a grid of weight and horsepower values, and display the fitted surface as a filled contour.
-
-Method:
+Fit `mpg ~ wt + hp` in `mtcars`, compute predicted mpg over a grid of weight and horsepower values, and display the fitted surface as a filled contour.
 
 1. Fit the linear model.
 2. Create grid sequences for `wt` and `hp`.
@@ -138,11 +134,11 @@ filled.contour(
 )
 ```
 
-Checked answer: the fitted model has negative coefficients for weight and horsepower in this data set, so predicted mpg should generally decrease as either axis increases. The contour colors should reflect higher mpg in the low-weight, low-horsepower corner and lower mpg in the high-weight, high-horsepower corner.
+The fitted model has negative coefficients for weight and horsepower in this data set, so predicted mpg should generally decrease as either axis increases. The contour colors should reflect higher mpg in the low-weight, low-horsepower corner and lower mpg in the high-weight, high-horsepower corner.
 
 This plot visualizes a model surface. It should be interpreted inside the observed data range; empty corners of the grid may represent combinations not well supported by actual cars.
 
-## Code
+## A reusable two-predictor surface plot
 
 ```r
 # Build a reusable surface plot for any two-predictor lm object.
@@ -179,7 +175,7 @@ Interactive 3D plots are useful for exploration, but static notes need a stable 
 
 For surfaces and contours, always state what the z-value represents. It might be a mathematical function, a fitted response, a density estimate, a residual, or an error surface. The same visual form can mean very different things depending on that definition, so captions and axis labels are part of the analysis.
 
-## Common pitfalls
+## Where higher-dimensional plots go wrong
 
 - Using color palettes that imply order for unordered categories.
 - Forgetting legends or scales when color encodes numeric values.
@@ -189,9 +185,8 @@ For surfaces and contours, always state what the z-value represents. It might be
 - Making margins too small for labels, especially when exporting to file devices.
 - Changing global graphical parameters and not restoring them.
 
-## Connections
+<div className="see-also">
 
-- [Base graphics](/cs/programming/r/base-graphics)
-- [ggplot2 graphics](/cs/programming/r/ggplot2-graphics)
-- [Linear and generalized models](/cs/programming/r/linear-and-generalized-models)
-- [Matrices and arrays](/cs/programming/r/matrices-and-arrays)
+See also: [Base graphics](/cs/programming/r/base-graphics) · [ggplot2 graphics](/cs/programming/r/ggplot2-graphics) · [Linear and generalized models](/cs/programming/r/linear-and-generalized-models) · [Matrices and arrays](/cs/programming/r/matrices-and-arrays)
+
+</div>

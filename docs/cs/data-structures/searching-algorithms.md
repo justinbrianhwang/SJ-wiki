@@ -259,10 +259,8 @@ Integer types need attention. The overflow-safe midpoint expression assumes `hi 
 
 Search cost also includes the key comparison. Comparing fixed-size integers is reasonably modeled as $O(1)$. Comparing long strings may examine many characters, so a binary search can cost $O(L\log n)$ character inspections for maximum key length $L$. Quoting only the number of array probes can hide the dominant work.
 
-## Related pages
+<div className="see-also">
 
-- [arrays and array operations](/cs/data-structures/arrays)
-- [sorting algorithms](/cs/data-structures/sorting-algorithms)
-- [binary search trees](/cs/data-structures/binary-search-trees)
-- [hashing](/cs/data-structures/hashing)
-- [linked lists](/cs/data-structures/linked-lists)
+See also: [arrays and array operations](/cs/data-structures/arrays) · [sorting algorithms](/cs/data-structures/sorting-algorithms) · [binary search trees](/cs/data-structures/binary-search-trees) · [hashing](/cs/data-structures/hashing) · [linked lists](/cs/data-structures/linked-lists)
+
+</div>

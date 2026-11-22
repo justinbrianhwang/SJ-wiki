@@ -7,13 +7,13 @@ sidebar_position: 4
 
 Quantum error correction is the mechanism that makes large quantum computations plausible despite fragile physical qubits. It encodes a small logical Hilbert space into a larger physical Hilbert space, repeatedly extracts error syndromes without measuring the protected quantum data, and uses classical decoding to choose a correction or Pauli-frame update. It is the bridge between noisy [hardware](/quantum-information-science/quantum-computing/hardware) and deep [algorithms](/quantum-information-science/quantum-computing/algorithms) such as Shor's algorithm.
 
-*This page synthesizes the wiki's earlier QEC draft with Chapters 8 and 10 of Nielsen and Chuang. The N&C treatment is canonical for the operator-sum model of noise, the Knill-Laflamme error-correction conditions, Pauli error discretization, stabilizer codes, normalizers, encoded operations, and the threshold theorem.*
+Chapters 8 and 10 of Nielsen and Chuang provide the operator-sum model of noise, the Knill-Laflamme conditions, Pauli error discretization, stabilizer codes, normalizers, encoded operations, and the threshold theorem used here.
 
 ![A three-qubit bit-flip error-correction circuit encodes one qubit, passes through a noisy channel, and decodes to correct one bit flip.](https://commons.wikimedia.org/wiki/Special:FilePath/Quantum_error_correction_of_bit_flip_using_three_qubits.svg)
 
 *Figure: The three-qubit repetition code is the simplest place to see the QEC pattern: encode, expose to noise, measure syndrome information, and recover. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quantum_error_correction_of_bit_flip_using_three_qubits.svg), Bender2k14, CC BY-SA 3.0.*
 
-## Definitions
+## Channels, codes, and syndromes
 
 A **quantum operation** or **channel** maps density operators to density operators. In N&C notation, a trace-preserving channel has an operator-sum representation
 
@@ -73,7 +73,7 @@ logical qubits.
 
 The **normalizer** $N(S)$ is the set of Pauli operators that map $S$ to itself by conjugation. For the Pauli stabilizers used here, this equals the centralizer: the Pauli operators commuting with every element of $S$. Operators in $S$ act trivially on the codespace; elements of $N(S)\setminus S$ act as logical Pauli operators. A **syndrome** is the list of $\pm 1$ outcomes obtained by measuring stabilizer generators.
 
-## Key results
+## From repetition codes to fault tolerance
 
 The first lesson of N&C's QEC chapter is that the apparent obstacles are real but surmountable. Quantum states cannot be cloned, errors are continuous, and measurement can destroy superpositions. The solution is not to copy the state or learn the amplitudes; it is to measure only operators whose eigenvalues reveal the error class while preserving the encoded logical subspace.
 
@@ -117,7 +117,7 @@ $$
 E=aI+bX+cY+dZ.
 $$
 
-The syndrome measurement collapses the error component into a discrete Pauli error class, and the recovery inverts that class. This is the key digital feature of quantum error correction.
+The syndrome measurement collapses the error component into a discrete Pauli error class, and the recovery inverts that class. Syndrome extraction thereby turns a continuous error model into a discrete recovery decision.
 
 The stabilizer formalism makes larger codes manageable. If $S=\langle g_1,\dots,g_{n-k}\rangle$, error detection measures the generators. If an error $E$ anticommutes with a generator $g_j$, the corresponding syndrome bit flips sign. If $E\in S$, it does not harm the logical information. If $E\in N(S)\setminus S$, it is a logical Pauli error and cannot be detected by the stabilizers. Therefore the distance of a stabilizer code is the minimum weight of an operator in $N(S)\setminus S$.
 
@@ -155,7 +155,7 @@ $$
 \epsilon_L(d)\approx A\left(\frac{p}{p_{\mathrm{thr}}}\right)^{(d+1)/2},
 $$
 
-where $\epsilon_L(d)$ is the logical error per cycle, $p$ is a physical error proxy, and $p_{\mathrm{thr}}$ is the threshold. A practical distance-step figure of merit is
+where $\epsilon_L(d)$ is the logical error per cycle, $p$ is a physical error proxy, and $p_{\mathrm{thr}}$ is the threshold. One useful distance-step figure of merit is
 
 $$
 \Lambda_{d,d+2}=\frac{\epsilon_L(d)}{\epsilon_L(d+2)}.
@@ -350,9 +350,9 @@ But a logical gate driven by repeated stabilizer measurements can fail even when
 | Stability experiment | Time-like measurement-error chains | Better mid-circuit measurement and enough repetitions |
 | Lattice surgery | Both together | Balance code distance $d$ and measurement rounds $t$ |
 
-The practical lesson is that "a good logical memory" is not the same statement as "a good fault-tolerant logical gate." Mid-circuit measurement time, assignment error, reset noise, and decoder timing enter the gate budget directly.
+A good logical memory does not guarantee a good fault-tolerant logical gate. Mid-circuit measurement time, assignment error, reset noise, and decoder timing enter the gate budget directly.
 
-## Visual
+## How syndrome information moves through a code
 
 ```mermaid
 flowchart TB
@@ -444,7 +444,7 @@ The diagram shows QEC at four scales: a full 3-qubit bit-flip encoding/syndrome/
 | Normalizer | $N(S)$ | Pauli operators preserving the codespace | Confusing stabilizers with logical Paulis |
 | Syndrome | $\pm 1$ outcomes | Identifies an error class | Assuming syndrome reveals amplitudes |
 
-## Worked example 1: Syndrome table for the 3-qubit bit-flip code
+## Decoding a single bit flip
 
 **Problem.** For the code $\vert 0_L\rangle=\vert 000\rangle$, $\vert 1_L\rangle=\vert 111\rangle$, compute the syndrome for no error and for $X_1$, $X_2$, and $X_3$ using stabilizers $g_1=Z_1Z_2$ and $g_2=Z_2Z_3$.
 
@@ -493,7 +493,7 @@ $$
 
 Each allowed single-bit-flip error has a unique syndrome, and the syndrome measurement does not distinguish $\alpha\vert 000\rangle+\beta\vert 111\rangle$ from another state in the same logical qubit.
 
-## Worked example 2: Checking Knill-Laflamme for the bit-flip error set
+## Checking Knill-Laflamme for the bit-flip error set
 
 **Problem.** Let $P=\vert 000\rangle\langle000\vert +\vert 111\rangle\langle111\vert $ be the projector for the 3-qubit bit-flip code. Verify the Knill-Laflamme condition for the restricted error set $\{I,X_1,X_2,X_3\}$.
 
@@ -549,7 +549,7 @@ for $E_a,E_b\in\{I,X_1,X_2,X_3\}$.
 
 **Answer.** The restricted bit-flip code satisfies the Knill-Laflamme conditions for no error and one $X$ error. The check also explains what the code does not do: $Z_1$ commutes with the $Z$-parity stabilizers and acts as a logical phase error, so this 3-qubit code is not a full arbitrary-error code.
 
-## Code
+## Computing Pauli syndromes
 
 This small script computes stabilizer syndromes for Pauli-string errors. It mirrors N&C's stabilizer rule: a syndrome bit is $-1$ exactly when the error anticommutes with the measured generator.
 
@@ -585,7 +585,7 @@ for name, pauli in errors.items():
     print(f"{name:2s} {pauli} syndrome={syndrome(pauli, generators)}")
 ```
 
-## Common pitfalls
+## What a syndrome does—and does not—tell you
 
 - Measuring the data instead of the syndrome. Stabilizer checks must reveal error information without revealing the logical amplitudes.
 - Assuming the 3-qubit repetition code corrects arbitrary quantum errors. It corrects one Pauli type unless combined with phase protection.
@@ -594,19 +594,9 @@ for name, pauli in errors.items():
 - Treating every distinct physical error as needing a distinct syndrome. Degenerate codes allow different errors to act identically on the codespace.
 - Ignoring measurement errors. Surface-code and fault-tolerant protocols require repeated syndrome rounds because the syndrome record is noisy.
 - Applying a correction physically when a Pauli-frame update would suffice. Tracking corrections classically often avoids extra gates.
-- Treating the threshold theorem as a practical qubit-count estimate. It is an asymptotic statement whose constants depend on architecture and noise.
+- Treating the threshold theorem as a hardware qubit-count estimate. It is an asymptotic statement whose constants depend on architecture and noise.
 - Ignoring leakage and correlated noise. Pauli error models are analytically powerful, but hardware can leave the computational subspace or produce correlated faults.
 - Assuming transversal gates are universal for one fixed stabilizer code. Non-Clifford operations require additional machinery such as magic states or code switching.
-
-## Connections
-
-- [Quantum hardware](/quantum-information-science/quantum-computing/hardware) determines the physical noise channel, measurement cycle, reset method, and geometry.
-- [Quantum algorithms](/quantum-information-science/quantum-computing/algorithms) determines the logical gate counts and target failure probabilities that QEC must support.
-- [Quantum machine learning](/quantum-information-science/quantum-computing/quantum-ml) mostly studies NISQ circuits today, but fault-tolerant QML would need these tools.
-- [Quantum communication](/quantum-information-science/quantum-communication/) shares ideas with entanglement purification, quantum repeaters, and channel correction.
-- [Quantum internet](/quantum-information-science/quantum-internet/) uses error correction and purification to protect distributed entanglement.
-- [Linear algebra](/math/linear-algebra/) supplies projectors, eigenspaces, tensor products, matrix algebras, and operator decompositions.
-- [Quantum mechanics](/physics/quantum-mechanics/) supplies measurement, spin operators, open systems, and the density-operator formalism.
 
 ## Further reading
 
@@ -624,4 +614,18 @@ for name, pauli in errors.items():
 [2] H. Putterman, K. Noh, C. T. Hann, et al. *Hardware-efficient quantum error correction via concatenated bosonic qubits*. Nature 638, 927-934 (2025).
 [3] B. L. Brock, S. Singh, A. Eickbusch, V. V. Sivak, A. Z. Ding, L. Frunzio, S. M. Girvin, M. H. Devoret. *Quantum error correction of qudits beyond break-even*. Nature 641, 612-617 (2025).
 [4] P. Zhang. *Correcting a noisy quantum computer using a quantum computer*. arXiv:2506.08331 (2025).
-[5] R. Harper, C. Laine, E. T. Hockings, C. McLauchlan, G. M. Nixon, B. J. Brown, S. D. Bartlett. *Characterising the failure mechanisms of error-corrected quantum logic gates*. Nature Communications (2026).
+[5] R. Harper, C. Lainé, E. T. Hockings, C. McLauchlan, G. M. Nixon, B. J. Brown, S. D. Bartlett. *Characterising the failure mechanisms of error-corrected quantum logic gates*. Nature Communications 17, 5039 (2026).
+
+<div className="see-also">
+
+See also:
+
+- [Quantum hardware](/quantum-information-science/quantum-computing/hardware) determines the physical noise channel, measurement cycle, reset method, and geometry.
+- [Quantum algorithms](/quantum-information-science/quantum-computing/algorithms) determines the logical gate counts and target failure probabilities that QEC must support.
+- [Quantum machine learning](/quantum-information-science/quantum-computing/quantum-ml) mostly studies NISQ circuits today, but fault-tolerant QML would need these tools.
+- [Quantum communication](/quantum-information-science/quantum-communication/intro) shares ideas with entanglement purification, quantum repeaters, and channel correction.
+- [Quantum internet](/quantum-information-science/quantum-internet/intro) uses error correction and purification to protect distributed entanglement.
+- [Linear algebra](/math/linear-algebra/intro) supplies projectors, eigenspaces, tensor products, matrix algebras, and operator decompositions.
+- [Quantum mechanics](/physics/quantum-mechanics/intro) supplies measurement, spin operators, open systems, and the density-operator formalism.
+
+</div>

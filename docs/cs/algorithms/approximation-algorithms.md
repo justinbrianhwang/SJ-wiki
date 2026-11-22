@@ -7,13 +7,13 @@ sidebar_position: 15
 
 Approximation algorithms address optimization problems where exact polynomial-time algorithms are unlikely, usually because the problem is NP-hard. Instead of insisting on optimality, they guarantee a solution within a provable factor of optimal. The goal is not "good in experiments"; it is a worst-case mathematical promise connecting algorithm value to optimum [3], [6].
 
-The field combines greedy choices, relaxations, rounding, primal-dual methods, local search, randomized rounding, and hardness theory. This page covers vertex cover, metric TSP, set cover, knapsack FPTAS, Max-3SAT, Steiner tree, k-center, and the PCP theorem as context for why some approximation ratios are difficult or impossible to improve [6], [12].
+The field combines greedy choices, relaxations, rounding, primal-dual methods, local search, randomized rounding, and hardness theory. The examples below cover vertex cover, metric TSP, set cover, knapsack FPTAS, Max-3SAT, Steiner tree, k-center, and the PCP theorem as context for why some approximation ratios are difficult or impossible to improve [6], [12].
 
 ![TSP tour over German cities.](https://commons.wikimedia.org/wiki/Special:FilePath/TSP_Deutschland_3.png)
 
 *Figure: A traveling-salesman tour illustrates why exact optimization can be hard even when the objective is easy to state. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:TSP_Deutschland_3.png), public domain or CC-BY-SA via Wikimedia Commons.*
 
-## Definitions
+## Ratios, schemes, and comparison bounds
 
 For a minimization problem, an algorithm has approximation ratio $\rho\ge1$ if for every instance $I$,
 
@@ -31,7 +31,7 @@ A **relaxation** enlarges the feasible region so the optimum becomes easier to c
 
 Every approximation proof needs a lower bound for minimization or an upper bound for maximization. Sometimes the bound is obvious, such as $MST\le OPT$ for metric TSP after deleting one edge from an optimal tour. Sometimes it is a relaxation, such as a fractional LP optimum. Sometimes it is a packing argument, such as the matching lower bound for vertex cover. The algorithm is only half the story; the comparison certificate is what turns a heuristic into an approximation algorithm.
 
-## Key results
+## What the standard guarantees rest on
 
 Vertex cover asks for a minimum set of vertices touching every edge. A simple 2-approximation repeatedly chooses an uncovered edge $(u,v)$, adds both endpoints, and deletes all covered edges. The chosen edges form a matching, so any vertex cover must include at least one endpoint from each chosen edge. If the algorithm chooses $k$ edges, it returns $2k$ vertices while optimum is at least $k$. LP relaxation gives another 2-approximation: solve the fractional cover LP and choose every vertex with $x_v\ge1/2$ [6].
 
@@ -48,8 +48,6 @@ Steiner tree asks for the cheapest tree connecting required terminals, possibly 
 The PCP theorem states, roughly, that every NP statement has proofs checkable with constant randomness and a constant number of queried bits, with a gap between yes and no instances [12]. Its algorithmic consequence is hardness of approximation: for many problems, improving a ratio beyond a threshold is NP-hard. This does not make approximation pessimistic; it tells us which guarantees are meaningful targets.
 
 Approximation schemes are especially sensitive to input encoding. A pseudo-polynomial algorithm may look polynomial in a numeric value like capacity $W$, but the input length contains only $\log W$ bits for that number. An FPTAS must be polynomial in $1/\epsilon$ and the encoded input size, which is why scaling values rather than capacities is the standard route for knapsack when values are the DP dimension.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -76,7 +74,7 @@ flowchart TD
 | Max-3SAT | random assignment | $7/8$ expected | clause satisfaction probability |
 | k-center | farthest-first | 2-approx | packing lower bound |
 
-## Worked example 1: MST-doubling TSP on four metric nodes
+## Tracing MST doubling on four metric nodes
 
 **Problem.** Four nodes have metric distances:
 
@@ -107,7 +105,7 @@ $$A\to B\to C\to D\to A.$$
 
 **Checked answer.** The algorithm returns a tour of cost $6$. Since any TSP tour contains a spanning connected structure, $OPT\ge MST=4$, so the 2-approx bound allows cost up to $8$. The produced tour is within that guarantee.
 
-## Worked example 2: greedy set cover analysis
+## Charging a greedy set cover
 
 **Problem.** Universe $U=\{1,2,3,4,5,6\}$ and sets
 
@@ -124,7 +122,7 @@ Run greedy set cover.
 
 **Checked answer.** The greedy cover has size 2, and it is optimal because no single set covers all six elements. The general analysis would charge the first three elements at price $1/3$ each and the last three at price $1/3$ each in this instance, totaling 2. On worse instances, the same charging style yields the harmonic bound $H_n$.
 
-## Code
+## Reference implementations
 
 ```python
 def vertex_cover_2approx(edges):
@@ -192,7 +190,7 @@ def tsp_mst_doubling(nodes, dist):
     return tour, cost
 ```
 
-## Common pitfalls
+## Where an approximation claim can fail
 
 - Reporting empirical solution quality as an approximation ratio without a proof.
 - Mixing minimization and maximization ratio conventions.
@@ -206,16 +204,6 @@ def tsp_mst_doubling(nodes, dist):
 - Assuming a randomized expected guarantee automatically holds for every run.
 - Ignoring hardness results when promising better ratios for standard NP-hard problems.
 - Confusing approximation algorithms with heuristics; heuristics may work well but lack worst-case guarantees.
-
-## Connections
-
-- [Greedy Algorithms](/cs/algorithms/greedy-algorithms) for set cover, interval ideas, and local-choice proofs.
-- [Dynamic Programming](/cs/algorithms/dynamic-programming) for knapsack pseudo-polynomial DP and FPTAS construction.
-- [Graph Algorithms](/cs/algorithms/graph-algorithms) for MSTs, matchings, cuts, TSP, and k-center metrics.
-- [Network Flow and Matching](/cs/algorithms/network-flow-and-matching) for LP relaxations, vertex cover in bipartite graphs, and matching lower bounds.
-- [Randomized Algorithms](/cs/algorithms/randomized-algorithms) for random assignment, randomized rounding, and probability amplification.
-- [Theory of Computation](/cs/theory/intro) for NP-hardness and PCP-based hardness of approximation.
-- [Discrete Math](/math/discrete/intro) for graphs, set systems, and linear-programming intuition.
 
 ## References
 
@@ -246,3 +234,17 @@ def tsp_mst_doubling(nodes, dist):
 [13] P. Raghavan and C. D. Thompson, "Randomized rounding: A technique for provably good algorithms and algorithmic proofs," *Combinatorica*, vol. 7, pp. 365-374, 1987.
 
 [14] M. H. Hajiaghayi and K. Jain, "The prize-collecting generalized Steiner tree problem via a new approach of primal-dual schema," *SODA*, pp. 631-640, 2006.
+
+<div className="see-also">
+
+See also:
+
+- [Greedy Algorithms](/cs/algorithms/greedy-algorithms) for set cover, interval ideas, and local-choice proofs.
+- [Dynamic Programming](/cs/algorithms/dynamic-programming) for knapsack pseudo-polynomial DP and FPTAS construction.
+- [Graph Algorithms](/cs/algorithms/graph-algorithms) for MSTs, matchings, cuts, TSP, and k-center metrics.
+- [Network Flow and Matching](/cs/algorithms/network-flow-and-matching) for LP relaxations, vertex cover in bipartite graphs, and matching lower bounds.
+- [Randomized Algorithms](/cs/algorithms/randomized-algorithms) for random assignment, randomized rounding, and probability amplification.
+- [Theory of Computation](/cs/theory/intro) for NP-hardness and PCP-based hardness of approximation.
+- [Discrete Math](/math/discrete/intro) for graphs, set systems, and linear-programming intuition.
+
+</div>

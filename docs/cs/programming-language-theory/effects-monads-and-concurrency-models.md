@@ -9,7 +9,7 @@ Pure lambda calculus isolates computation as substitution, but real programs all
 
 The unifying question is how to expose effects without losing reasoning principles. One answer is to sequence effects explicitly with monads. Another is to track them in types. Another is to give concurrent processes an algebra of communication and equivalence. These approaches often meet in modern language design.
 
-## Definitions
+## Three ways to account for effects
 
 A **side effect** is an observable interaction beyond returning a value: state update, exception, nondeterminism, I/O, control transfer, or communication. A pure expression can be replaced by its value without changing behavior; an effectful expression often cannot.
 
@@ -57,7 +57,7 @@ Concurrency models include:
 
 **Linear types** ensure a value is used exactly once or according to a controlled discipline. **Session types** describe communication protocols as types, such as "send an integer, then receive a boolean, then close." **Memory models** define which reads may observe which writes in concurrent shared-memory programs. **Software transactional memory** (STM) executes memory operations speculatively and commits them atomically.
 
-## Key results
+## Sequencing, handling, and protocol safety
 
 **Monads restore equational structure for effects.** Rather than pretending effects are pure, a monadic type distinguishes values from computations. The monad laws justify refactoring nested effectful code. Haskell's `IO A` does not mean "an `A` with side effects already performed"; it means a description of an action that, when run by the runtime, may perform effects and produce an `A`.
 
@@ -77,7 +77,7 @@ This mirrors denotational semantics for commands and expressions with stores. Mu
 
 **Session types turn protocols into typechecking problems.** If one endpoint has type "send `Int`; receive `Bool`; close," the peer should have the dual type "receive `Int`; send `Bool`; close." Typechecking can rule out many deadlocks, arity mismatches, and protocol-order errors, though full deadlock freedom requires stronger disciplines.
 
-**Memory models constrain reasoning.** Sequential consistency says execution behaves like some interleaving of thread steps. Modern hardware and optimizing compilers often allow weaker behaviors for performance, constrained by fences, atomics, and language-level rules. A PL memory model specifies the allowed observations so programmers and compilers can reason consistently. This is why concurrency is not just an operating-systems topic: the language definition must say what a read can see, what counts as a data race, and which transformations preserve meaning.
+**Memory models constrain reasoning.** Sequential consistency says execution behaves like some interleaving of thread steps. Modern hardware and optimizing compilers often allow weaker behaviors for performance, constrained by fences, atomics, and language-level rules. A PL memory model specifies the allowed observations so programmers and compilers can reason consistently. Concurrency therefore belongs in the language definition as well as the operating system: the definition must say what a read can see, what counts as a data race, and which transformations preserve meaning.
 
 **STM and composability.** Locks protect critical sections but compose poorly: two correct lock-based operations can deadlock or violate ordering when combined. Software transactional memory offers `atomically` blocks that either commit as a unit or retry. In typed functional settings, STM is often exposed through a monad so transactional effects are separated from arbitrary `IO`. The restriction matters because irreversible I/O cannot be rolled back if a transaction aborts.
 
@@ -90,8 +90,6 @@ This mirrors denotational semantics for commands and expressions with stores. Mu
 **Typed effects remain an active design space.** Some languages expose effects mostly through libraries, as Haskell does with monads. Some infer row-polymorphic effect sets. Some use capability passing, region systems, or uniqueness types. The common theme is that effect information becomes part of the interface. A function type can say not only what value is returned, but also which resources may be touched and which control behaviors may occur.
 
 This interface-level view is what links effects to security and verification: authority can be represented as a capability, protocol state as a session type, and interference as an effect to be ruled out or contained.
-
-## Visual
 
 ```mermaid
 graph TD
@@ -120,7 +118,7 @@ graph TD
 | Memory model | allowed shared-memory observations | atomics, data-race rules |
 | STM | optimistic atomic transactions | composable concurrent updates |
 
-## Worked example 1: state monad calculation
+## Store passing in the state monad
 
 Problem: model a computation that increments an integer state and returns the old value.
 
@@ -173,9 +171,37 @@ $$
 return(10)(11)=(10,11).
 $$
 
-Checked result: the computation returns $10$ and leaves state $11$. The apparent mutation was just explicit store threading, which is why the state monad matches denotational accounts of imperative commands.
+Checked result: the computation returns $10$ and leaves state $11$. The apparent mutation is explicit store threading, matching denotational accounts of imperative commands.
 
-## Worked example 2: dual session type check
+## Building the state monad in Haskell
+
+```haskell
+newtype State s a = State { runState :: s -> (a, s) }
+
+instance Functor (State s) where
+  fmap f (State act) = State $ \s ->
+    let (a, s') = act s in (f a, s')
+
+instance Applicative (State s) where
+  pure a = State $ \s -> (a, s)
+  State ff <*> State fa = State $ \s ->
+    let (f, s1) = ff s
+        (a, s2) = fa s1
+    in (f a, s2)
+
+instance Monad (State s) where
+  State act >>= k = State $ \s ->
+    let (a, s1) = act s
+    in runState (k a) s1
+
+get :: State s s
+get = State $ \s -> (s, s)
+
+put :: s -> State s ()
+put s = State $ \_ -> ((), s)
+```
+
+## Checking dual channel endpoints
 
 Problem: check whether two channel endpoints can communicate safely.
 
@@ -228,35 +254,7 @@ Step 4: since $B=dual(A)$, the endpoints agree on order and payload types. If B 
 
 Checked conclusion: this two-party protocol is locally type-correct. Additional global checks may still be needed for multiparty deadlock freedom.
 
-## Code
-
-```haskell
-newtype State s a = State { runState :: s -> (a, s) }
-
-instance Functor (State s) where
-  fmap f (State act) = State $ \s ->
-    let (a, s') = act s in (f a, s')
-
-instance Applicative (State s) where
-  pure a = State $ \s -> (a, s)
-  State ff <*> State fa = State $ \s ->
-    let (f, s1) = ff s
-        (a, s2) = fa s1
-    in (f a, s2)
-
-instance Monad (State s) where
-  State act >>= k = State $ \s ->
-    let (a, s1) = act s
-    in runState (k a) s1
-
-get :: State s s
-get = State $ \s -> (s, s)
-
-put :: s -> State s ()
-put s = State $ \_ -> ((), s)
-```
-
-## Common pitfalls
+## Where the abstractions stop helping
 
 - Treating monads as just containers; many monads represent computations, not stored collections.
 - Ignoring monad laws when defining custom monads.
@@ -271,15 +269,6 @@ put s = State $ \_ -> ((), s)
 - Treating data-race freedom as a performance detail rather than a semantic boundary in many languages.
 - Assuming STM composes with arbitrary I/O; transactions generally require rollback-safe effects.
 
-## Connections
-
-- [Untyped and Typed Lambda Calculus](/cs/programming-language-theory/untyped-and-typed-lambda-calculus) gives the pure core that effects extend.
-- [Operational and Denotational Semantics](/cs/programming-language-theory/operational-and-denotational-semantics) models stores, continuations, and process steps.
-- [Axiomatic Semantics and Program Logic](/cs/programming-language-theory/axiomatic-semantics-and-program-logic) connects effects to separation logic and concurrent reasoning.
-- [Dataflow Analysis and Abstract Interpretation](/cs/programming-language-theory/dataflow-and-abstract-interpretation) analyzes effects, aliases, and information flow.
-- [Operating Systems](/cs/operating-systems/intro) and [Computer Architecture](/cs/computer-architecture/intro) connect memory models to real execution.
-- [Compilers](/cs/compilers/intro), [Theory of Computation](/cs/theory/intro), [Discrete Math](/math/discrete/intro), and [Cryptography](/cs/cryptography/intro) connect implementation, process equivalence, coinduction, and verified protocols.
-
 ## References
 
 [1] B. C. Pierce, *Types and Programming Languages*. MIT Press, 2002.  
@@ -290,3 +279,16 @@ put s = State $ \_ -> ((), s)
 [6] R. Milner, *Communication and Concurrency*. Prentice Hall, 1989.  
 [7] C. A. R. Hoare, *Communicating Sequential Processes*. Prentice Hall, 1985.  
 [8] R. Milner, J. Parrow, and D. Walker, "A calculus of mobile processes," *Information and Computation*, 1992.
+
+<div className="see-also">
+
+See also:
+
+- [Untyped and Typed Lambda Calculus](/cs/programming-language-theory/untyped-and-typed-lambda-calculus) gives the pure core that effects extend.
+- [Operational and Denotational Semantics](/cs/programming-language-theory/operational-and-denotational-semantics) models stores, continuations, and process steps.
+- [Axiomatic Semantics and Program Logic](/cs/programming-language-theory/axiomatic-semantics-and-program-logic) connects effects to separation logic and concurrent reasoning.
+- [Dataflow Analysis and Abstract Interpretation](/cs/programming-language-theory/dataflow-and-abstract-interpretation) analyzes effects, aliases, and information flow.
+- [Operating Systems](/cs/operating-systems/intro) and [Computer Architecture](/cs/computer-architecture/intro) connect memory models to real execution.
+- [Compilers](/cs/compilers/intro), [Theory of Computation](/cs/theory/intro), [Discrete Math](/math/discrete/intro), and [Cryptography](/cs/cryptography/intro) connect implementation, process equivalence, coinduction, and verified protocols.
+
+</div>

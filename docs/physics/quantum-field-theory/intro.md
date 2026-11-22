@@ -5,17 +5,13 @@ sidebar_position: 1
 
 # Quantum Field Theory in a Nutshell
 
-These notes are an original study guide to the scope of A. Zee's *Quantum Field Theory in a Nutshell*. The organizing idea is that quantum field theory is the common language of relativistic particles, gauge forces, collective phenomena, and low-energy approximations to deeper physics. The pages follow Zee's broad arc: motivation and foundations, path integrals, diagrams, spinors, gauge theory, renormalization, symmetry breaking, anomalies, condensed matter, unification, and gravity.
+These notes follow the scope of A. Zee's *Quantum Field Theory in a Nutshell*. Quantum field theory supplies a common language for relativistic particles, gauge forces, collective phenomena, and low-energy approximations to deeper physics. The sequence follows Zee's broad arc: motivation and foundations, path integrals, diagrams, spinors, gauge theory, renormalization, symmetry breaking, anomalies, condensed matter, unification, and gravity.
 
-The goal is not to replace the book. It is to provide a structured wiki path through the main concepts with formulas, derivation sketches, visual anchors, worked examples, code snippets, and cross-links. The table of contents extracted from the first pages of the PDF shows Zee's sequence: Part I introduces motivation, path integrals, fields, particles, diagrams, canonical quantization, symmetry, and curved spacetime; Part II develops Dirac spinors and QED scattering; Part III covers renormalization and gauge invariance; Part IV covers symmetry breaking, nonabelian gauge theory, Higgs physics, and anomalies; Parts V and VI connect field theory with collective and condensed-matter phenomena; Part VII treats Yang-Mills, electroweak theory, QCD, large $N$, and grand unification; Part VIII and Part N look toward gravity, cosmology, EFT, supersymmetry, string theory, gravitational waves, and modern gauge-gravity connections.
+The notes are a route through the main concepts rather than a replacement for the book. Zee's sequence begins with motivation, path integrals, fields, particles, diagrams, canonical quantization, symmetry, and curved spacetime. It then develops Dirac spinors and QED scattering; renormalization and gauge invariance; symmetry breaking, nonabelian gauge theory, Higgs physics, and anomalies; collective and condensed-matter phenomena; Yang-Mills theory, electroweak theory, QCD, large $N$, and grand unification; and finally gravity, cosmology, effective field theory, supersymmetry, string theory, gravitational waves, and gauge-gravity connections.
 
-Use the pages as a map rather than a linear substitute for a course. A first pass can follow the sidebar order and focus on definitions and worked examples. A second pass should connect recurring structures: Gaussian integrals reappear as propagators, symmetries reappear as Ward identities, and scale dependence reappears as both renormalization and effective field theory.
+The sidebar order works for a first pass. On a second pass, track the structures that recur in different settings: Gaussian integrals become propagators, symmetries become Ward identities, and scale dependence appears in both renormalization and effective field theory.
 
-![A Mexican-hat potential surface has a central peak surrounded by a circular valley.](https://commons.wikimedia.org/wiki/Special:FilePath/Mexican_hat_potential_polar.svg)
-
-*Figure: The Mexican-hat potential visualizes spontaneous symmetry breaking as a choice among degenerate minima. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mexican_hat_potential_polar.svg), Rupert Millard, public domain.*
-
-## Definitions
+## Fields, actions, and particles
 
 The central object of QFT is a field on spacetime. A scalar example is
 
@@ -54,9 +50,9 @@ $$
 
 where $a_{\mathbf{p}}^\dagger$ creates a quantum of momentum $\mathbf{p}$.
 
-The notes use natural units $c=\hbar=1$, metric signature $(+,-,-,-)$ where needed, and absolute wiki links under `/physics/quantum-field-theory/...`.
+The convention here is $c=\hbar=1$, with metric signature $(+,-,-,-)$ where needed.
 
-## Key results
+## The structures that recur across QFT
 
 QFT is built from a few recurring results:
 
@@ -68,7 +64,11 @@ QFT is built from a few recurring results:
 6. Gauge invariance removes redundant degrees of freedom and enforces Ward identities.
 7. Spontaneous symmetry breaking reorganizes the spectrum.
 8. The renormalization group explains scale dependence and universality.
-9. Effective field theory makes finite-domain theories predictive.
+9. Effective field theory makes theories with a stated domain of validity predictive.
+
+![A Mexican-hat potential surface has a central peak surrounded by a circular valley.](https://commons.wikimedia.org/wiki/Special:FilePath/Mexican_hat_potential_polar.svg)
+
+*Figure: The Mexican-hat potential represents spontaneous symmetry breaking as a choice among degenerate minima. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mexican_hat_potential_polar.svg), Rupert Millard, public domain.*
 
 The generated chapter list is:
 
@@ -89,8 +89,6 @@ The generated chapter list is:
 | 14 | [Electroweak Theory and Grand Unification](/physics/quantum-field-theory/electroweak-theory-and-grand-unification) | electroweak breaking, GUT scaling ideas |
 | 15 | [Collective and Condensed Matter Field Theory](/physics/quantum-field-theory/collective-and-condensed-matter-field-theory) | superfluids, criticality, superconductors, Hall fluids |
 | 16 | [Gravity, Cosmology, and Beyond](/physics/quantum-field-theory/gravity-cosmology-and-beyond) | curved spacetime, gravitational EFT, cosmological constant |
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -117,9 +115,9 @@ flowchart TD
 | Matter systems | condensed matter, symmetry breaking, RG | Euclidean path integrals and order parameters |
 | Beyond the Standard Model | Yang-Mills, electroweak/GUT, gravity | gauge groups and EFT power counting |
 
-## Worked example 1: From action to propagator
+## From a quadratic action to a propagator
 
-Problem: Explain how a quadratic scalar action determines the propagator.
+For a free scalar field, the quadratic part of the action already determines the propagator.
 
 Step 1: Start with the free action in a compact quadratic notation:
 
@@ -167,11 +165,11 @@ $$
 \tilde{\Delta}_F(p)=\frac{i}{p^2-m^2+i\epsilon}.
 $$
 
-The checked answer is that the propagator is the inverse of the quadratic operator in the action, with the $i\epsilon$ prescription specifying the vacuum boundary condition.
+Thus the propagator is the inverse of the quadratic operator in the action, while the $i\epsilon$ prescription selects the vacuum boundary condition.
 
-## Worked example 2: Choosing a reading path for a calculation
+## Following one-loop scalar scattering through the notes
 
-Problem: A student wants to compute the first loop correction to $2\to2$ scalar scattering and understand why the answer depends on a scale. Which pages should they read and what are the intermediate checkpoints?
+To compute the first loop correction to $2\to2$ scalar scattering and understand its scale dependence, follow the calculation through six chapters.
 
 Step 1: Begin with [Motivation, Fields, and Quanta](/physics/quantum-field-theory/motivation-fields-and-quanta) to identify the scalar field, the action, and why particles are excitations.
 
@@ -207,47 +205,18 @@ $$
 \beta(\lambda)=\mu\frac{d\lambda}{d\mu}.
 $$
 
-The checked reading path turns a single loop diagram into the linked ideas of propagators, vertices, divergence, counterterm, renormalization condition, and running coupling.
+This route connects one loop diagram to propagators, vertices, divergences, counterterms, renormalization conditions, and a running coupling.
 
-## Code
-
-```python
-pages = [
-    ("motivation-fields-and-quanta", "fields and particles"),
-    ("path-integral-formulation", "generating functional"),
-    ("perturbation-and-feynman-diagrams", "diagram rules"),
-    ("scalar-phi-four-theory", "scalar test model"),
-    ("renormalization-and-counterterms", "remove cutoff dependence"),
-    ("renormalization-group", "scale flow"),
-]
-
-for index, (slug, purpose) in enumerate(pages, start=1):
-    url = f"/physics/quantum-field-theory/{slug}"
-    print(f"{index}. {purpose}: {url}")
-```
-
-## Common pitfalls
+## Where the formalism is easy to misread
 
 - Reading QFT as a list of unrelated tricks. The same few ideas repeat: locality, symmetry, Gaussian integrals, perturbative expansion, and scale dependence.
 - Skipping the scalar model too quickly. $\phi^4$ theory is where most of the machinery can be learned without spin or gauge redundancy.
 - Treating gauge invariance as a force law rather than a redundancy that constrains force laws.
 - Thinking renormalization only removes infinities. Its deeper content is how measured parameters change with scale.
-- Treating condensed matter and gravity pages as side topics. They show why QFT is a general framework, not merely a particle-physics technique.
+- Treating condensed matter and gravity as side topics misses the reach of the framework beyond particle physics.
 
-## Connections
+<div className="see-also">
 
-- [Motivation, Fields, and Quanta](/physics/quantum-field-theory/motivation-fields-and-quanta)
-- [Path Integral Formulation](/physics/quantum-field-theory/path-integral-formulation)
-- [Perturbation Theory and Feynman Diagrams](/physics/quantum-field-theory/perturbation-and-feynman-diagrams)
-- [Scalar Phi-Four Theory](/physics/quantum-field-theory/scalar-phi-four-theory)
-- [Dirac Fields and Spinors](/physics/quantum-field-theory/dirac-fields-and-spinors)
-- [Gauge Invariance and QED](/physics/quantum-field-theory/gauge-invariance-and-qed)
-- [Renormalization and Counterterms](/physics/quantum-field-theory/renormalization-and-counterterms)
-- [Renormalization Group](/physics/quantum-field-theory/renormalization-group)
-- [Symmetry Breaking, Goldstone Bosons, and Higgs Physics](/physics/quantum-field-theory/symmetry-breaking-goldstone-higgs)
-- [Yang-Mills Theory and QCD](/physics/quantum-field-theory/yang-mills-theory-and-qcd)
-- [Chiral Anomalies](/physics/quantum-field-theory/chiral-anomalies)
-- [Effective Field Theory](/physics/quantum-field-theory/effective-field-theory)
-- [Electroweak Theory and Grand Unification](/physics/quantum-field-theory/electroweak-theory-and-grand-unification)
-- [Collective and Condensed Matter Field Theory](/physics/quantum-field-theory/collective-and-condensed-matter-field-theory)
-- [Gravity, Cosmology, and Beyond](/physics/quantum-field-theory/gravity-cosmology-and-beyond)
+See also: [Motivation, Fields, and Quanta](/physics/quantum-field-theory/motivation-fields-and-quanta) · [Path Integral Formulation](/physics/quantum-field-theory/path-integral-formulation) · [Perturbation Theory and Feynman Diagrams](/physics/quantum-field-theory/perturbation-and-feynman-diagrams) · [Scalar Phi-Four Theory](/physics/quantum-field-theory/scalar-phi-four-theory) · [Dirac Fields and Spinors](/physics/quantum-field-theory/dirac-fields-and-spinors) · [Gauge Invariance and QED](/physics/quantum-field-theory/gauge-invariance-and-qed) · [Renormalization and Counterterms](/physics/quantum-field-theory/renormalization-and-counterterms) · [Renormalization Group](/physics/quantum-field-theory/renormalization-group) · [Symmetry Breaking, Goldstone Bosons, and Higgs Physics](/physics/quantum-field-theory/symmetry-breaking-goldstone-higgs) · [Yang-Mills Theory and QCD](/physics/quantum-field-theory/yang-mills-theory-and-qcd) · [Chiral Anomalies](/physics/quantum-field-theory/chiral-anomalies) · [Effective Field Theory](/physics/quantum-field-theory/effective-field-theory) · [Electroweak Theory and Grand Unification](/physics/quantum-field-theory/electroweak-theory-and-grand-unification) · [Collective and Condensed Matter Field Theory](/physics/quantum-field-theory/collective-and-condensed-matter-field-theory) · [Gravity, Cosmology, and Beyond](/physics/quantum-field-theory/gravity-cosmology-and-beyond)
+
+</div>

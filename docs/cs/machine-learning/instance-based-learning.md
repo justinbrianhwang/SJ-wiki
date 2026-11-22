@@ -9,7 +9,7 @@ Instance-based learning postpones generalization until a query arrives. Instead 
 
 The central idea is locality. If similar instances tend to have similar target values, then nearby training examples are useful evidence. This is simple and powerful, but it makes the choice of distance metric, feature scaling, and local weighting extremely important.
 
-## Definitions
+## Neighbors, weights, and local models
 
 The k-nearest neighbor algorithm stores all training examples. To classify a query $x_q$, it finds the $k$ training examples closest to $x_q$ and predicts by majority vote:
 
@@ -50,7 +50,7 @@ $$
 
 The prediction is a weighted combination of these basis functions.
 
-## Key results
+## The consequences of delaying generalization
 
 Instance-based methods can approximate complex target functions by combining simple local decisions. k-NN has almost no training cost beyond storing examples, but prediction can be expensive because distances to many stored examples must be computed. This is the classic lazy-learning tradeoff.
 
@@ -78,9 +78,7 @@ Tie-breaking and class imbalance are small details that can change predictions. 
 
 The chapter's terminology of lazy and eager learning is also a reminder that there is no free generalization. A lazy learner may look assumption-light because it stores examples, but its distance metric and weighting rule are strong assumptions about the target function. It generalizes by saying nearby points should behave similarly. That assumption is powerful when the feature space is meaningful and weak when similarity has been poorly encoded.
 
-For this reason, instance-based learning often benefits from careful preprocessing. Normalization, removal of irrelevant attributes, and domain-specific distance functions can matter more than the choice between several neighbor-voting variants.
-
-When the distance notion is wrong, storing more examples can simply make the learner confidently localize around the wrong neighbors.
+For this reason, instance-based learning often benefits from careful preprocessing. Normalization, removal of irrelevant attributes, and domain-specific distance functions can matter more than the choice between several neighbor-voting variants. When the distance notion is wrong, storing more examples can simply make the learner confidently localize around the wrong neighbors.
 
 | Method | Training time | Prediction time | Main design choice | Output type |
 |---|---:|---:|---|---|
@@ -89,8 +87,6 @@ When the distance notion is wrong, storing more examples can simply make the lea
 | Locally weighted regression | Low to moderate | High | Kernel and local model | Regression |
 | RBF network | Moderate | Moderate | Centers and widths | Classification or regression |
 | Case-based reasoning | Domain dependent | Domain dependent | Retrieval and adaptation rules | Structured solutions |
-
-## Visual
 
 ```mermaid
 flowchart TB
@@ -127,9 +123,9 @@ flowchart TB
 
 This lazy-learning diagram shows the runtime path from stored training examples through query scaling, distance computation, neighbor selection, and the final vote or local regression. The dotted capacity branch makes the bias-variance tradeoff explicit: `k`, bandwidth, feature scaling, and metric choice determine which points are treated as local evidence for `x_q`.
 
-## Worked example 1: k-NN classification
+### Classifying a point from its three nearest neighbors
 
-Problem: A query point is $x_q=(2,2)$. Four labeled training examples are:
+A query point is $x_q=(2,2)$. Four labeled training examples are:
 
 | Point | Class |
 |---|---|
@@ -139,8 +135,6 @@ Problem: A query point is $x_q=(2,2)$. Four labeled training examples are:
 | $(2,3)$ | B |
 
 Use Euclidean distance and $k=3$.
-
-Method:
 
 1. Compute distance to $(1,1)$.
 
@@ -177,11 +171,11 @@ $$
 
 6. Take the three nearest neighbors: A, B, A.
 
-Answer: The majority vote is class A, with two votes out of three. The checked distances show that the more distant B point is excluded.
+The majority vote is class A, with two votes out of three. The more distant B point is excluded.
 
-## Worked example 2: Distance-weighted regression
+### Down-weighting a distant regression case
 
-Problem: Estimate a real target at query $x_q=3$ from three examples:
+Estimate a real target at query $x_q=3$ from three examples:
 
 | $x_i$ | $f(x_i)$ |
 |---:|---:|
@@ -190,8 +184,6 @@ Problem: Estimate a real target at query $x_q=3$ from three examples:
 | 7 | 30 |
 
 Use weights $w_i=1/d_i^2$, where $d_i=\vert x_q-x_i\vert $.
-
-Method:
 
 1. Compute distances.
 
@@ -223,9 +215,9 @@ $$
 \hat{f}(3)=25.875/2.0625\approx 12.545.
 $$
 
-Answer: The distance-weighted estimate is approximately $12.55$. The far point at $x=7$ influences the answer only weakly.
+The distance-weighted estimate is approximately $12.55$. The far point at $x=7$ influences the answer only weakly.
 
-## Code
+### Computing a k-NN vote with NumPy
 
 ```python
 import numpy as np
@@ -245,7 +237,7 @@ print(label)
 print(distances)
 ```
 
-## Common pitfalls
+## When the neighborhood is misleading
 
 - Forgetting to scale features. A feature measured in thousands can dominate one measured in decimals.
 - Choosing $k=1$ without considering noise. One noisy neighbor can control the prediction.
@@ -254,10 +246,8 @@ print(distances)
 - Ignoring prediction-time cost. Lazy learning can be expensive when many queries or many stored examples are present.
 - Using distance-weighted formulas without handling zero distance. If the query exactly matches a training point, return that target or add a small stabilizer.
 
-## Connections
+<div className="see-also">
 
-- [Learning problems and system design](/cs/machine-learning/learning-problems-and-system-design)
-- [Evaluating hypotheses](/cs/machine-learning/evaluating-hypotheses)
-- [Artificial neural networks](/cs/machine-learning/artificial-neural-networks)
-- [Data mining](/cs/data-mining/)
-- [Probability](/math/probability/)
+See also: [Learning problems and system design](/cs/machine-learning/learning-problems-and-system-design) · [Evaluating hypotheses](/cs/machine-learning/evaluating-hypotheses) · [Artificial neural networks](/cs/machine-learning/artificial-neural-networks) · [Data mining](/cs/data-mining/intro) · [Probability](/math/probability/intro)
+
+</div>

@@ -9,7 +9,7 @@ Continuous dynamics is the part of embedded-systems modeling where variables evo
 
 Lee and Seshia use this topic to connect classical engineering models, especially ordinary differential equations, with actor models used in tools such as Simulink and LabVIEW. The key lesson is not that every physical process is perfectly smooth. It is that smooth models are often the right first abstraction, and that their assumptions must be made explicit before they are composed with software, sensors, actuators, and schedulers.
 
-## Definitions
+## Signals, integrators, and system properties
 
 A **continuous-time signal** is a function whose domain is time, commonly $x : \mathbb{R} \to \mathbb{R}$ or $x : \mathbb{R}_{\ge 0} \to \mathbb{R}$. A scalar signal might represent angular velocity; a vector-valued signal might represent three-dimensional position.
 
@@ -37,7 +37,7 @@ $$
 
 A system is **time invariant** when delaying the input delays the output by the same amount. A system that is both linear and time invariant is called **LTI**. A system is **bounded-input bounded-output stable** if every bounded input produces a bounded output.
 
-## Key results
+## From torque balance to closed-loop decay
 
 Newton's laws lead naturally to differential equations. For a rotating body, torque is related to angular acceleration:
 
@@ -96,8 +96,6 @@ When possible, engineers prefer LTI approximations because they support a mature
 
 The model should also record units. A gain that converts radians per second of error into newton-meters of torque has physical dimensions, and unit mistakes can survive code review if every quantity is stored as a plain number.
 
-## Visual
-
 ```mermaid
 flowchart LR
   R["Desired signal r(t)"] --> SUM((error))
@@ -115,7 +113,7 @@ flowchart LR
 | Time invariant | Delay in input gives delay in output | Same model applies regardless of start time |
 | BIBO stable | Bounded input gives bounded output | Prevents physically dangerous unbounded response |
 
-## Worked example 1: Torque step without feedback
+### A torque step through the open-loop integrator
 
 Problem: A simplified rotor has $I_{yy}=2\,\mathrm{kg\,m^2}$ and initial angular velocity $\omega(0)=0$. At $t=0$, a constant torque $T_y(t)=4u(t)$ is applied. Find $\omega(t)$ for $t \ge 0$ and decide whether the system is BIBO stable.
 
@@ -149,7 +147,7 @@ $$
 
 Answer: $\omega(t)=2t$ for $t \ge 0$. The open-loop integrator model is not BIBO stable.
 
-## Worked example 2: Proportional stabilization
+### Stabilizing the rotor with proportional feedback
 
 Problem: Use proportional feedback on the same rotor with $I_{yy}=2$, $K=6$, reference $r(t)=0$, and initial angular velocity $\omega(0)=10$. Find the response and the time at which the magnitude first drops below $1$.
 
@@ -197,15 +195,15 @@ $$
 t > \frac{\ln(10)}{3}\approx 0.7675.
 $$
 
-Answer: $\omega(t)=10e^{-3t}$, and the angular velocity magnitude falls below $1$ after about $0.768$ seconds. The positive feedback gain has stabilized the integrator.
+Answer: $\omega(t)=10e^{-3t}$, and the angular velocity magnitude falls below $1$ after about $0.768$ seconds. Negative feedback with positive gain has stabilized the integrator.
 
-## Code
+### Comparing forward Euler with the exact response
 
 ```python
 import math
 
 def simulate_rotor(Iyy=2.0, K=6.0, omega0=10.0, dt=0.01, steps=120):
-    """Forward-Euler simulation of dω/dt = -(K/Iyy)ω."""
+    """Simulate d(omega)/dt = -(K/Iyy) omega with forward Euler."""
     omega = omega0
     values = []
     for k in range(steps + 1):
@@ -219,7 +217,7 @@ for t, numerical, exact in simulate_rotor()[::20]:
     print(f"t={t:4.2f}  euler={numerical:8.4f}  exact={exact:8.4f}")
 ```
 
-## Common pitfalls
+## Where the continuous model stops being enough
 
 - Treating a model as the physical system itself. The equations are abstractions; friction, saturation, sensor delay, and actuator limits may matter in the real system.
 - Forgetting initial conditions. An integrator with a nonzero initial value may fail linearity even when its rate equation looks linear.
@@ -227,11 +225,8 @@ for t, numerical, exact in simulate_rotor()[::20]:
 - Ignoring strict causality in feedback. Algebraic cycles require special semantics or must be redesigned with delay, integration, or another strictly causal element.
 - Sampling a continuous controller without checking timing. A continuous-time stability argument does not automatically prove that a sampled software implementation is stable.
 
-## Connections
+<div className="see-also">
 
-- [first-order ODEs](/math/engineering-math/first-order-odes)
-- [Laplace transform](/math/engineering-math/laplace-transform)
-- [signals and systems](/physics/signals-systems/)
-- [continuous-time simulation](/physics/simulation/)
-- [sensors and actuators](/cs/embedded/sensors-and-actuators)
-- [scheduling and real time](/cs/embedded/scheduling-and-real-time)
+See also: [first-order ODEs](/math/engineering-math/first-order-odes) · [Laplace transform](/math/engineering-math/laplace-transform) · [signals and systems](/physics/signals-systems/intro) · [continuous-time simulation](/physics/simulation/intro) · [sensors and actuators](/cs/embedded/sensors-and-actuators) · [scheduling and real time](/cs/embedded/scheduling-and-real-time)
+
+</div>

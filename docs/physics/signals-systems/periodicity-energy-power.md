@@ -420,9 +420,8 @@ Random signals are usually classified using expected power or autocorrelation ra
 - Averaging a periodic signal over a non-integer piece of a period and treating that as the long-term power.
 - Assuming a finite number of nonzero samples has nonzero average power. Its energy may be finite, but its average power is zero.
 
-## Related pages
+<div className="see-also">
 
-- [Signals and Time Transformations](/physics/signals-systems/signals-time-transformations)
-- [Fourier Series for Periodic Signals](/physics/signals-systems/fourier-series-periodic-signals)
-- [Continuous-Time Fourier Transform](/physics/signals-systems/continuous-time-fourier-transform)
-- [Discrete-Time Fourier Transform](/physics/signals-systems/discrete-time-fourier-transform)
+See also: [Signals and Time Transformations](/physics/signals-systems/signals-time-transformations) · [Fourier Series for Periodic Signals](/physics/signals-systems/fourier-series-periodic-signals) · [Continuous-Time Fourier Transform](/physics/signals-systems/continuous-time-fourier-transform) · [Discrete-Time Fourier Transform](/physics/signals-systems/discrete-time-fourier-transform)
+
+</div>

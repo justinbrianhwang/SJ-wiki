@@ -459,10 +459,8 @@ The function $D$ is nonnegative and vanishes only at $x=p$. This Chernoff method
 
 The optimizing operation has a probabilistic interpretation. Multiplying a density by $e^{tx}$ and renormalizing creates an exponentially tilted law under which the rare value $a$ is closer to typical. The normalizing constant is $M_X(t)$. Large-deviation calculations formalize this relation, but the elementary Markov step already contains the essential idea.
 
-## Related pages
+<div className="see-also">
 
-- [Sums, convolutions, and order statistics](/math/probability-and-random-variables/sums-convolutions-order-statistics)
-- [Poisson random variables and Poisson processes](/math/probability-and-random-variables/poisson-random-variables-and-processes)
-- [Weak law, concentration, and the central limit theorem](/math/probability-and-random-variables/weak-law-concentration-central-limit-theorem)
-- [Strong law and Jensen's inequality](/math/probability-and-random-variables/strong-law-and-jensens-inequality)
-- [Generating functions](/math/probability/generating-functions)
+See also: [Sums, convolutions, and order statistics](/math/probability-and-random-variables/sums-convolutions-order-statistics) · [Poisson random variables and Poisson processes](/math/probability-and-random-variables/poisson-random-variables-and-processes) · [Weak law, concentration, and the central limit theorem](/math/probability-and-random-variables/weak-law-concentration-central-limit-theorem) · [Strong law and Jensen's inequality](/math/probability-and-random-variables/strong-law-and-jensens-inequality) · [Generating functions](/math/probability/generating-functions)
+
+</div>

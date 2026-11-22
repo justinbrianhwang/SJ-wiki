@@ -5,141 +5,152 @@ sidebar_position: 24
 
 # Organic Chemistry
 
-Organic chemistry is the chemistry of carbon compounds, especially those with C-H, C-C, C-O, C-N, and related covalent bonds. Carbon's tetravalency, ability to catenate, and capacity for single, double, triple, and aromatic bonding create enormous structural variety.
+Organic chemistry organizes carbon compounds by skeleton, unsaturation, and functional group. Carbon's tetravalency supports chains, rings, branching, multiple bonds, and aromatic systems; changing any one of those features can change a compound's identity and properties.
 
-In the Ebbing and Gammon sequence this topic sits near bonding of carbon, alkanes, cycloalkanes, alkenes, alkynes, aromatic hydrocarbons, hydrocarbon naming, and oxygen- and nitrogen-containing derivatives. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
+## Reading the carbon skeleton
 
-![A ball-and-stick model shows benzene as a planar aromatic ring.](https://commons.wikimedia.org/wiki/Special:FilePath/Benzene-aromatic-3D-balls.png)
+A hydrocarbon contains only carbon and hydrogen. Alkanes are saturated, alkenes contain at least one carbon-carbon double bond, and alkynes contain at least one carbon-carbon triple bond. For acyclic compounds with one type of unsaturation,
 
-*Figure: Benzene as a compact example of carbon bonding, delocalization, and aromatic structure. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Benzene-aromatic-3D-balls.png), Benjah-bmm27, public domain.*
+- alkanes follow $\mathrm{C_nH_{2n+2}}$;
+- an alkene with one double bond follows $\mathrm{C_nH_{2n}}$;
+- an alkyne with one triple bond follows $\mathrm{C_nH_{2n-2}}$.
 
-## Definitions
+A cycloalkane also follows $\mathrm{C_nH_{2n}}$ because closing the ring removes two hydrogens relative to an acyclic alkane. These formulas are checks, not complete structures: constitutional isomers share a molecular formula but differ in connectivity, and stereoisomers share connectivity but differ in spatial arrangement.
 
-The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.
+Carbon with four sigma bonds is usually described as $sp^3$, a carbon in a double bond as $sp^2$, and a carbon in a triple bond as $sp$. Aromatic compounds such as benzene contain a cyclic, delocalized pi system and should not be treated as ordinary isolated alkenes.
 
-- Hydrocarbon contains only carbon and hydrogen.
-- Alkane is a saturated hydrocarbon with single bonds.
-- Alkene contains at least one carbon-carbon double bond.
-- Alkyne contains at least one carbon-carbon triple bond.
-- Aromatic compound contains a benzene-like delocalized pi system.
-- Functional group is a characteristic atom or group that controls reactivity.
-- Isomers have the same molecular formula but different structures.
-- Polymer is a large molecule built from repeating monomer units.
+The degree of unsaturation turns a molecular formula into a structural constraint. For a formula containing carbon, hydrogen, nitrogen, and halogens, with oxygen and sulfur ignored in the count,
 
-Definitions in chemistry often connect a symbolic representation to a physical sample. A formula such as $\mathrm{H_2O}$ names a substance, gives the atomic ratio inside one molecule, and supplies the molar mass used in a macroscopic calculation. A state symbol such as $\mathrm{(aq)}$ is not cosmetic; it says the species is dispersed in water and may be treated as ions when writing a net ionic equation. In the same way, constants such as $R$, $K_w$, $F$, or $N_A$ are compact definitions of the measurement system being used.
+$$
+\mathrm{DBE}=\frac{2C+2+N-H-X}{2}.
+$$
 
-## Key results
+Each ring or double bond contributes one degree; a triple bond contributes two. Benzene, $\mathrm{C_6H_6}$, has $(14-6)/2=4$: one ring and three pi-bond equivalents. The count does not reveal their arrangement, but it quickly rejects structures with the wrong total unsaturation.
 
-The central results are:
+## Naming as an unambiguous structural description
 
-- Acyclic alkane formula: $\mathrm{C_nH_{2n+2}}$.
-- Acyclic alkene with one double bond or cycloalkane formula: $\mathrm{C_nH_{2n}}$.
-- Acyclic alkyne with one triple bond formula: $\mathrm{C_nH_{2n-2}}$.
-- Combustion of hydrocarbons forms $\mathrm{CO_2}$ and $\mathrm{H_2O}$ when oxygen is sufficient.
-- Carbon with four sigma bonds is typically $sp^3$; with one double bond $sp^2$; with one triple bond $sp$.
-- Functional groups organize organic nomenclature and reaction patterns.
+Systematic naming begins by choosing the parent containing the highest-priority functional group and, where required, the maximum number of multiple bonds. Number from the end that gives the principal suffix the lowest locant, then locate unsaturation and substituents. Alphabetize substituent names while ignoring multiplicative prefixes such as di- and tri-. A name is checked by reconstructing the structure from it; if two connectivities fit, the name is incomplete.
 
-Introductory organic chemistry in general chemistry focuses on recognition: identify the carbon skeleton, unsaturation, aromatic rings, and functional groups. Those structural features explain boiling points, solubility, acidity, and likely reactions. The goal is not full mechanism mastery but a reliable map from structure to properties.
+For $\mathrm{CH_3CH(CH_3)CH_2OH}$, the longest chain containing the alcohol carbon has three atoms. Numbering from the OH end gives propan-1-ol, with a methyl substituent on carbon 2: 2-methylpropan-1-ol. Choosing a four-carbon path would fail because no continuous four-carbon chain exists. Numbering from the opposite end would incorrectly give the alcohol locant 3.
 
-A good way to use these results is to state the chemical model first, then substitute numbers second. For organic chemistry, the model usually answers questions such as what particles are present, what is conserved, which process is idealized, and which measurement is being interpreted. Once that sentence is clear, the algebra becomes a bookkeeping problem rather than a search for a memorized pattern.
+Condensed and skeletal formulas omit information by convention, not by changing valence. Every unlabeled vertex or line end in a skeletal drawing is carbon, and enough hydrogens are implied to give neutral carbon four bonds. Heteroatoms and hydrogens attached to them are normally shown. A carbonyl line counts as two bonds when completing the carbon's valence.
 
-Units are part of the result, not decoration. Whenever a formula contains an empirical constant, a tabulated value, or a ratio of measured quantities, the units tell you whether the expression has been used in the intended form. This is especially important in general chemistry because several equations have nearly identical algebra but different meanings: pressure can be a measured state variable, an equilibrium correction, or a colligative effect; energy can be heat flow, enthalpy, internal energy, or free energy.
+## Functional groups set the first chemical expectations
 
-The strongest check is an independent chemical interpretation. Ask whether the sign agrees with direction, whether a concentration can be negative, whether a mole ratio follows the balanced equation, whether an equilibrium shift opposes the stress, and whether a microscopic description explains the macroscopic number. These checks connect organic chemistry to neighboring topics instead of leaving it as an isolated technique.
+A functional group is the local group of atoms that controls much of a molecule's reactivity and intermolecular behavior. The carbon skeleton still matters, but identifying heteroatoms and carbonyl groups is usually the fastest first pass.
 
-A second check is to compare the limiting cases. If a reactant amount goes to zero, a product amount cannot remain large. If temperature rises in a gas sample at fixed volume, pressure should not fall in an ideal model. If an acid is diluted, hydronium concentration should normally decrease unless a coupled equilibrium supplies more. Limiting cases often reveal algebra that has been rearranged correctly but applied to the wrong chemical situation.
-
-Finally, keep symbolic and particulate representations side by side. A balanced equation, an equilibrium expression, an orbital diagram, or a polymer repeat unit is a compact symbol for a population of particles. Translating that symbol into words forces you to say what is reacting, what is being counted, and what is being held constant. That translation is usually the difference between a calculation that can be adapted to a new problem and one that only imitates a worked example.
-
-## Visual
-
-| Functional group | General form | Example property clue |
+| Functional group | General form | Property clue |
 |---|---|---|
-| Alcohol | $\mathrm{R-OH}$ | hydrogen bonding, polar |
-| Ether | $\mathrm{R-O-R'}$ | polar acceptor, no O-H donation |
-| Aldehyde | $\mathrm{R-CHO}$ | carbonyl, oxidizable |
+| Alcohol | $\mathrm{R-OH}$ | hydrogen-bond donor and acceptor; polar |
+| Ether | $\mathrm{R-O-R'}$ | hydrogen-bond acceptor but not donor |
+| Aldehyde | $\mathrm{R-CHO}$ | polar carbonyl; readily oxidized in common tests |
 | Ketone | $\mathrm{R-CO-R'}$ | polar carbonyl |
-| Carboxylic acid | $\mathrm{R-COOH}$ | acidic, hydrogen bonding |
-| Amine | $\mathrm{R-NH_2}$ | basic, hydrogen bonding |
+| Carboxylic acid | $\mathrm{R-COOH}$ | acidic; strong hydrogen bonding |
+| Amine | $\mathrm{R-NH_2}$ | commonly basic; can hydrogen-bond |
 
 ```mermaid
 graph TD
   A[Carbon skeleton] --> B{"Multiple bond?"}
-  B -->|none| C[alkane or cycloalkane]
-  B -->|"C=C"| D[alkene]
-  B -->|C#C| E[alkyne]
+  B -->|none| C[Alkane or cycloalkane]
+  B -->|"C=C"| D[Alkene]
+  B -->|C#C| E[Alkyne]
   A --> F{"Functional group?"}
-  F --> G["alcohol, amine, carbonyl, acid, etc."]
+  F --> G["Alcohol, amine, carbonyl, acid, or another family"]
 ```
 
-## Worked example 1: Formula and isomers of pentane
+Polymers extend the same structure-property reasoning to large molecules assembled from repeating monomer units. The repeat unit records connectivity, but chain length, branching, cross-linking, and intermolecular forces also determine the material properties.
 
-Problem. Give the molecular formula for pentane and state how many constitutional alkane isomers it has.
+Carbonyl compounds deserve a closer comparison. Aldehydes and ketones contain a polarized C=O bond; the carbon is electrophilic and oxygen is electron-rich. Carboxylic acids, esters, and amides attach a heteroatom to the carbonyl carbon, allowing resonance donation that changes reactivity. Amides are much less basic at nitrogen than amines because the lone pair is delocalized into the carbonyl group. Functional-group labels therefore encode an electronic pattern, not merely an atom inventory.
 
-    Method.
+Solubility is a contest between the polar group and hydrocarbon surface. Methanol mixes with water because its OH group hydrogen-bonds strongly and the nonpolar part is small. As an alcohol's carbon chain length grows, water solubility generally falls. Branching can alter boiling point by changing surface contact even when molecular formula and functional group remain fixed.
 
-    1. Pentane is an acyclic alkane with $n=5$ carbons.
-2. Use alkane formula $\mathrm{C_nH_{2n+2}}$.
-3. Hydrogen count is $2(5)+2=12$, so formula is $\mathrm{C_5H_{12}}$.
-4. List carbon skeletons: straight chain n-pentane.
-5. Move one methyl branch to carbon 2 of butane skeleton: 2-methylbutane.
-6. Use a central carbon attached to four methyl-like directions for 2,2-dimethylpropane.
-7. No other unique skeleton avoids duplicate naming.
+## Reaction families and the electron-flow view
 
-    Checked answer. Pentane has formula $\mathrm{C_5H_{12}}$ and three constitutional isomers. All isomers have five carbons and twelve hydrogens but different connectivities.
+Organic reactions become easier to organize by bond changes than by memorizing named examples. Addition consumes a pi bond and forms two sigma bonds. Elimination removes groups from neighboring atoms and forms a pi bond. Substitution replaces one group with another. Oxidation commonly increases carbon's bonding to oxygen or decreases its bonding to hydrogen; reduction does the reverse.
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+Curved-arrow mechanisms track electron pairs. An arrow begins at a lone pair or bond and ends where a new bond or lone pair will appear. It never begins at a positive charge. Nucleophiles donate an electron pair; electrophiles accept one. These roles depend on the reaction environment: water can act as a nucleophile, base, or leaving-group precursor in different steps.
 
-## Worked example 2: Combustion stoichiometry of ethanol
+For addition of bromine to ethene, the net equation is
 
-Problem. Balance combustion of ethanol, $\mathrm{C_2H_6O}$, and find moles $\mathrm{O_2}$ needed for 3.00 mol ethanol.
+$$
+\mathrm{CH_2{=}CH_2+Br_2\rightarrow BrCH_2CH_2Br}.
+$$
 
-    Method.
+The C=C pi bond and Br–Br bond are replaced by two C–Br sigma bonds while the C–C sigma bond remains. Atom balance alone would not show which bonds changed; classifying the transformation as addition does.
 
-    1. Write unbalanced reaction: $\mathrm{C_2H_6O+O_2\to CO_2+H_2O}$.
-2. Balance carbon: two carbons give $2\mathrm{CO_2}$.
-3. Balance hydrogen: six hydrogens give $3\mathrm{H_2O}$.
-4. Count oxygen on products: $2\mathrm{CO_2}$ has 4 O atoms and $3\mathrm{H_2O}$ has 3 O atoms, total 7.
-5. Ethanol supplies 1 oxygen atom, so oxygen gas must supply 6 more O atoms, or $3\mathrm{O_2}$.
-6. Balanced equation: $\mathrm{C_2H_6O+3O_2\to2CO_2+3H_2O}$.
-7. Use mole ratio: $3.00\ \mathrm{mol\ ethanol}\times3=9.00\ \mathrm{mol\ O_2}$.
+Elimination gives the reverse connectivity pattern. Removing H and a leaving group from adjacent saturated carbons can form an alkene. Competing substitution and elimination depend on substrate structure, nucleophile or base strength, solvent, and temperature. A reaction-family label predicts the skeletal change but not by itself the rate or favored mechanism.
 
-    Checked answer. $9.00\ \mathrm{mol\ O_2}$ are required. The balanced equation conserves C, H, and O atoms.
+## Stereochemistry: same connections, different molecules
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+Constitutional isomers differ in connectivity. Stereoisomers retain connectivity but differ in spatial arrangement. A tetrahedral carbon bonded to four different groups is a common stereogenic center. Its two nonsuperimposable mirror-image arrangements are enantiomers. Enantiomers share many bulk physical properties in an achiral environment but interact differently with other chiral molecules.
 
-## Code
+Double bonds create another source of stereoisomerism because the pi bond prevents free rotation. If each alkene carbon has two different substituents, distinct arrangements can exist. The $E/Z$ system compares priorities on each carbon: higher-priority groups on the same side give $Z$, and on opposite sides give $E$. Merely saying cis or trans becomes ambiguous for more highly substituted alkenes.
 
-```python
-def alkane_formula(n):
-    return f"C{n}H{2*n + 2}"
+Conformations are arrangements connected by rotation about single bonds and usually interconvert without breaking bonds. Staggered ethane is lower in energy than eclipsed ethane because its bonding electron pairs interact less strongly. In cyclohexane, the chair conformation avoids angle and torsional strain; bulky substituents usually prefer equatorial positions because axial placement creates unfavorable close contacts. Conformers and configurational stereoisomers should not be counted together.
 
-def combustion_o2_for_ethanol(mol_ethanol):
-    return 3.0 * mol_ethanol
+## Counting the constitutional isomers of pentane
 
-functional_groups = {
-    "ethanol": "alcohol",
-    "acetone": "ketone",
-    "acetic acid": "carboxylic acid",
-}
+Pentane is an acyclic alkane with five carbons, so
 
-print(alkane_formula(5))
-print(combustion_o2_for_ethanol(3.00))
-print(functional_groups["ethanol"])
-```
+$$
+\mathrm{C_nH_{2n+2}}\rightarrow\mathrm{C_5H_{12}}.
+$$
 
-## Common pitfalls
+There are three distinct carbon skeletons:
 
-- Assuming same formula means same compound. Avoid it by checking connectivity and stereochemistry.
-- Forgetting hydrogens implied by line structures. Avoid it by using carbon valence of four to count missing hydrogens.
-- Naming the longest visible chain rather than longest continuous chain. Avoid it by systematically finding the parent chain.
-- Ignoring functional groups when predicting properties. Avoid it by identifying heteroatoms and carbonyls first.
-- Balancing combustion without counting oxygen last. Avoid it by balancing C, then H, then O.
-- Calling aromatic rings ordinary alkenes. Avoid it by recognizing delocalized aromatic bonding.
+1. a straight chain, n-pentane;
+2. a four-carbon parent chain with one methyl branch, 2-methylbutane;
+3. a central carbon bonded to four methyl groups, 2,2-dimethylpropane.
 
-## Connections
+Moving the branch to an equivalent position or redrawing the same connectivity does not create another isomer. All three compounds have the same formula, but their shapes and intermolecular contact areas differ.
 
-- [ionic and covalent bonding](/chemistry/general/ionic-and-covalent-bonding)
-- [molecular geometry and bonding theory](/chemistry/general/molecular-geometry-and-bonding-theory)
-- [thermochemistry](/chemistry/general/thermochemistry)
-- [biochemistry and polymer materials](/chemistry/general/biochemistry-and-polymer-materials)
+## Ethanol combustion and oxygen demand
+
+Complete combustion of ethanol forms carbon dioxide and water. Balance carbon, then hydrogen, and oxygen last:
+
+$$
+\mathrm{C_2H_6O + 3O_2 \to 2CO_2 + 3H_2O}.
+$$
+
+The coefficient ratio requires 3 mol $\mathrm{O_2}$ per mole of ethanol. Burning 3.00 mol ethanol therefore requires
+
+$$
+(3.00\ \mathrm{mol\ ethanol})\left(\frac{3\ \mathrm{mol\ O_2}}{1\ \mathrm{mol\ ethanol}}\right)
+=9.00\ \mathrm{mol\ O_2}.
+$$
+
+The balanced equation conserves two carbon atoms, six hydrogen atoms, and seven oxygen atoms on each side.
+
+## Structural checks before naming or predicting properties
+
+- Count the hydrogens omitted from a line structure by enforcing carbon's valence of four.
+- Find the longest continuous parent chain systematically; the longest segment drawn horizontally may not be the parent.
+- Check connectivity before deciding that two drawings represent different compounds.
+- Identify functional groups before estimating solubility, boiling point, acidity, or basicity.
+- Treat aromatic rings as delocalized systems, not as three independent alkene bonds.
+
+## Acidity follows stability of the conjugate base
+
+Organic acid strength is best compared by drawing the species left after proton loss. A carboxylic acid is far more acidic than a typical alcohol because its carboxylate conjugate base delocalizes negative charge over two oxygens. An alkoxide localizes most charge on one oxygen. Electron-withdrawing substituents can further stabilize a nearby negative charge through induction, with the effect weakening as distance increases.
+
+Hybridization affects C–H acidity. An $sp$ carbon holds electron density closer to the nucleus than an $sp^3$ carbon because its hybrid orbital has greater s character. A terminal alkyne is therefore more acidic than an alkene or alkane, though it remains much weaker than common mineral acids. The same argument helps order basicity only after resonance and electronegativity are considered.
+
+Aromaticity adds an unusually strong stabilization condition. A planar cyclic conjugated system with $4n+2$ pi electrons is aromatic in the elementary Hückel model. Benzene has six pi electrons and equalized C–C bonding. A planar conjugated $4n$ system is antiaromatic and often distorts or reacts to avoid that destabilization. Merely drawing a ring with alternating double bonds does not establish aromaticity; continuous overlap, planarity, and electron count must all be checked.
+
+Spectroscopic data eventually replace formula guessing. Infrared absorption identifies bond vibrations such as carbonyl or O–H features. Nuclear magnetic resonance reports chemically distinct nuclei and their local environments. Mass spectrometry constrains molecular mass and fragmentation. No single spectrum normally proves a structure, but agreement among formula, unsaturation, functional groups, and spectra can make an assignment compelling.
+
+Reaction conditions belong beside every reagent. Acidic or basic medium changes protonation and therefore nucleophilicity, electrophilicity, and leaving-group ability. Heating can favor elimination through entropy, while a catalyst changes rate without changing the reaction's equilibrium constant. Writing only an arrow and product hides assumptions that determine whether the transformation occurs.
+
+Chemoselectivity asks which functional group reacts, regioselectivity asks which position reacts, and stereoselectivity asks which spatial product predominates. A balanced equation records neither preference. Mechanism, substrate shape, and conditions supply them, and a minor product need not be absent merely because one structure is drawn.
+
+## Structure–property comparisons
+
+Boiling point usually rises with stronger intermolecular attraction and larger contact area, while melting point is more sensitive to crystal packing and symmetry. A branched isomer may boil lower yet melt higher than a straight-chain comparison if it packs more symmetrically. Solubility must compare the energy and entropy of mixing with both solute and solvent cohesion.
+
+Oxidation-state language can check organic redox without assigning ionic bonds. Carbon is treated as owning electrons in C–H bonds and losing them in bonds to more electronegative atoms. Converting an alcohol to a carbonyl increases carbon's oxidation state; hydrogenation of an alkene reduces the two carbons.
+
+<div className="see-also">
+
+See also: [ionic and covalent bonding](/chemistry/general/ionic-and-covalent-bonding) · [molecular geometry and bonding theory](/chemistry/general/molecular-geometry-and-bonding-theory) · [thermochemistry](/chemistry/general/thermochemistry) · [biochemistry and polymer materials](/chemistry/general/biochemistry-and-polymer-materials)
+
+</div>

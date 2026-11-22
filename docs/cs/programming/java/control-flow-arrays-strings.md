@@ -9,41 +9,39 @@ Control flow determines which statements run, how often they run, and when a met
 
 Arrays and strings are the first compound data structures many Java programs use. An array is an object with a fixed length and indexed components. A `String` is an object representing a sequence of characters, and string operations create or use objects rather than changing a primitive value. Together, loops, arrays, and strings form the base of searching, counting, formatting, parsing, and many examples in later chapters.
 
-## Definitions
+## Branches, loops, and sequence types
 
-The source basis for this page is Chapter 10 on statements and control flow, Chapter 7 on array variables, and Chapter 13 on strings and character sequences. The terms below are written as contracts: each one tells you what the compiler can check, what the runtime must preserve, and what a reader of the program may rely on.
+The source combines Chapter 10 on statements and control flow, Chapter 7 on array variables, and Chapter 13 on strings and character sequences. Each construct fixes a scope, transfer rule, index range, or mutation model.
 
-**Block.** A block is a sequence of statements and local declarations enclosed in braces. It is a single statement syntactically and also creates a scope for local variables declared inside it. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Block.** A sequence of statements and local declarations enclosed in braces. It counts as one statement syntactically and creates a scope for its local variables.
 
-**`if` statement.** An `if` chooses between a true branch and an optional false branch based on a boolean expression. Java does not use integers as boolean conditions. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**`if` statement.** A choice between a true branch and an optional false branch based on a boolean expression. Java does not use integers as boolean conditions.
 
-**`switch` statement.** A `switch` selects among case labels based on a compatible expression value. In the source-era language, cases fall through unless a `break`, `return`, or other transfer interrupts them. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**`switch` statement.** A selection among case labels based on a compatible expression value. In the source-era language, cases fall through unless `break`, `return`, or another transfer interrupts them.
 
-**Loop.** A loop repeats a statement. `while` tests before the body, `do` tests after the body, and `for` groups initialization, test, and update in one header. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Loop.** A repeated statement. `while` tests before the body, `do` tests after it, and `for` groups initialization, test, and update in one header.
 
-**Enhanced `for`.** The enhanced `for` loop introduced by Java 5 iterates over arrays and `Iterable` objects. It is useful when the index itself is not part of the algorithm. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Enhanced `for`.** A Java 5 loop over arrays and `Iterable` objects, useful when the index is not part of the algorithm.
 
-**Array.** An array is an object whose length is fixed at creation and whose components are accessed by zero-based integer index. Every array has a `length` field. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Array.** An object whose length is fixed at creation and whose components use zero-based integer indices. Every array has a `length` field.
 
-**String.** A `String` object represents an immutable character sequence. Operations such as concatenation or replacement produce new string values rather than changing the original object. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**String.** An immutable character sequence. Concatenation and replacement produce new string values rather than changing the original object.
 
-**`StringBuilder`.** `StringBuilder` is a mutable builder for constructing strings efficiently when repeated appending would create many intermediate `String` objects. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**`StringBuilder`.** A mutable builder for cases where repeated appending would create many intermediate `String` objects.
 
-## Key results
+## Making termination and boundaries explicit
 
-**Every loop needs a visible invariant.** A loop should make clear what remains true before and after each iteration. For an array scan, the invariant might be that all elements before index `i` have already been examined. Naming the invariant helps place updates, `break`, and `continue` correctly. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Every loop needs a visible invariant.** A loop should make clear what remains true before and after each iteration. For an array scan, the invariant might be that all elements before index `i` have already been examined. Naming it helps place updates, `break`, and `continue` correctly.
 
-**Fall-through is both feature and hazard.** `switch` fall-through can intentionally share code among cases, but an omitted `break` can silently run the next case. Because the source-era `switch` uses statement labels rather than isolated arms, the programmer must make every fall-through obvious. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Fall-through is both feature and hazard.** `switch` fall-through can intentionally share code among cases, but an omitted `break` can silently run the next case. The source-era `switch` uses statement labels rather than isolated arms, so every fall-through should be obvious.
 
-**Arrays are objects with fixed length.** Assigning an array variable copies a reference, not the array contents. The length cannot change after creation. To grow a sequence, use a collection such as `ArrayList` or create a new array and copy components. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Arrays are objects with fixed length.** Assigning an array variable copies a reference, not the contents. The length cannot change after creation. To grow a sequence, use a collection such as `ArrayList` or create a new array and copy components.
 
-**Index boundaries are half-open in idiomatic loops.** The common loop `for (int i = 0; i < a.length; i++)` visits valid indices from `0` through `a.length - 1`. The condition uses `<`, not `<=`, because the first invalid index is exactly `a.length`. This half-open habit also appears in substring and range thinking. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Index boundaries are half-open in idiomatic loops.** The loop `for (int i = 0; i < a.length; i++)` visits indices `0` through `a.length - 1`. The first invalid index is exactly `a.length`. The same half-open convention appears in substrings and ranges.
 
-**String immutability changes update strategy.** A statement such as `s = s + part` does not mutate the original string object. It creates or computes a new string value and stores a reference in `s`. For many repeated appends, `StringBuilder` communicates the intent and avoids unnecessary intermediate strings. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**String immutability changes update strategy.** `s = s + part` computes a new string value and stores its reference in `s`; it does not mutate the original object. For repeated appends, `StringBuilder` states the intent and avoids unnecessary intermediate strings.
 
 When debugging control flow, write down the exact transfer target of each `break`, `continue`, and `return`. An unlabeled `break` exits the nearest loop or `switch`; an unlabeled `continue` continues the nearest loop; a labeled form targets the labeled statement allowed by the language. When debugging arrays, write down the valid index interval `[0, length)`. When debugging strings, ask whether the operation returns a new string or mutates a builder. These habits turn vague runtime symptoms such as off-by-one errors, missing cases, and unexpected unchanged strings into concrete rule checks.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -64,9 +62,9 @@ flowchart TD
 | Classic `for` | Index or counter loop | Off-by-one condition |
 | Enhanced `for` | Visit each element | Cannot naturally replace elements by index |
 
-## Worked example 1: finding the maximum array element
+## Proving a maximum scan with an invariant
 
-Problem: Given `int[] values = {4, 9, 2, 9, 5};`, find the maximum and show the loop invariant.
+Problem: Given `int[] values = \{4, 9, 2, 9, 5\};`, find the maximum and show the loop invariant.
 
 Method:
 
@@ -79,9 +77,9 @@ Method:
 
 Checked answer: The maximum is `9`. The invariant proves the answer because the loop ends only after every valid index has been examined.
 
-## Worked example 2: building a comma-separated string
+## Separators without a trailing comma
 
-Problem: Build `red, green, blue` from `String[] names = {"red", "green", "blue"};` without leaving an extra comma.
+Problem: Build `red, green, blue` from `String[] names = \{"red", "green", "blue"\};` without leaving an extra comma.
 
 Method:
 
@@ -93,7 +91,7 @@ Method:
 
 Checked answer: The result is `red, green, blue`. The separator rule is checked before each element after the first, so no leading or trailing comma appears.
 
-## Code
+## Scanning an array and assembling text
 
 ```java
 public class ArrayStringDemo {
@@ -121,7 +119,7 @@ public class ArrayStringDemo {
 }
 ```
 
-## Common pitfalls
+## Off-by-one and mutation mistakes
 
 - Do not use `<= array.length` in an index loop. The valid index range ends at `array.length - 1`.
 - Do not assume `switch` cases stop automatically. Add `break` unless fall-through is deliberate and obvious.
@@ -129,9 +127,13 @@ public class ArrayStringDemo {
 - Do not expect `String` methods or concatenation to mutate an existing string object.
 - Do not hide loop termination. A loop whose stopping condition is far from its update is harder to verify.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Tokens, Values, and Variables](/cs/programming/java/tokens-values-variables): explains local variables, references, and array variables.
 - [Primitives, Operators, and Conversions](/cs/programming/java/primitives-operators-conversions): explains boolean conditions and arithmetic updates.
 - [Strings, Regular Expressions, Formatter, and Scanner](/cs/programming/java/strings-regex-formatter-scanner): develops string processing in detail.
 - [Collections, Iteration, and Maps](/cs/programming/java/collections-iteration-maps): introduces growable collection alternatives to arrays.
+
+</div>

@@ -430,11 +430,8 @@ The microscopic variables need not resemble the low-energy fields. In a crystal,
 
 Integrating out high-energy modes changes coefficients and generates additional interactions, but it preserves locality as a derivative expansion when there is a separation of scales. The low-energy observer can work with the fields that create the accessible excitations and include every symmetry-allowed operator to the needed order. Whether a field is “fundamental” cannot usually be decided from low-energy equations alone.
 
-## Related pages
+<div className="see-also">
 
-- [Scalar Phi-Four Theory](/physics/quantum-field-theory/scalar-phi-four-theory)
-- [Dirac Fields and Spinors](/physics/quantum-field-theory/dirac-fields-and-spinors)
-- [Path Integral Formulation](/physics/quantum-field-theory/path-integral-formulation)
-- [Perturbation Theory and Feynman Diagrams](/physics/quantum-field-theory/perturbation-and-feynman-diagrams)
-- [Effective Field Theory](/physics/quantum-field-theory/effective-field-theory)
+See also: [Scalar Phi-Four Theory](/physics/quantum-field-theory/scalar-phi-four-theory) · [Dirac Fields and Spinors](/physics/quantum-field-theory/dirac-fields-and-spinors) · [Path Integral Formulation](/physics/quantum-field-theory/path-integral-formulation) · [Perturbation Theory and Feynman Diagrams](/physics/quantum-field-theory/perturbation-and-feynman-diagrams) · [Effective Field Theory](/physics/quantum-field-theory/effective-field-theory)
 
+</div>

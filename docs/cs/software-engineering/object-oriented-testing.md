@@ -9,7 +9,7 @@ Object-oriented testing keeps the usual goals of software testing but adds crite
 
 The chapter does not replace functional, statement, branch, or data-flow testing. It adds OO-specific coverage ideas. Functional testing still checks specified behavior. Statement coverage remains a minimal expectation. Method-message testing ensures that method calls are actually exercised. Function pair coverage then checks adjacent method-call sequences, often using a state machine or regular expression to define legal behavior.
 
-## Definitions
+## Coverage criteria for object collaborations
 
 **Object-oriented testing** is testing of class-based software with attention to object state, method calls, inheritance, polymorphism, and collaborations among objects.
 
@@ -29,7 +29,7 @@ A **regular expression model** describes legal sequences of method calls. A loop
 
 A **state-machine model** describes legal object states and method-triggered transitions. It is especially useful for stateful objects such as stacks, files, iterators, transactions, reservations, and network sessions.
 
-## Key results
+## Layering functional, message, and state tests
 
 OO testing should be layered. Start with functional tests from the requirements. Add class-level tests for methods and state changes. Add interaction tests for collaborations among classes. Then apply coverage criteria such as statement, branch, MM, and function pair coverage to find holes.
 
@@ -43,11 +43,11 @@ Regular expressions provide another way to reason about method pairs. For a list
 
 Inheritance and polymorphism complicate testing because the method invoked by a call can depend on runtime type. A test suite should exercise overridden methods through base-class references when that is how the system uses them. Otherwise, the dynamic dispatch behavior may remain untested.
 
-Constructors and setup methods deserve attention in OO coverage. Many collaborations are established before the method under test runs: dependencies are created, list nodes are linked, observers are registered, and initial state is chosen. If tests bypass normal construction with unrealistic fixtures, they may miss method-message calls that occur in real object creation. Conversely, if every test relies only on full integration construction, failures can be hard to localize. A practical suite uses focused unit tests for class behavior and a smaller set of interaction tests that exercise real construction and message chains.
+Constructors and setup methods deserve attention in OO coverage. Many collaborations are established before the method under test runs: dependencies are created, list nodes are linked, observers are registered, and initial state is chosen. If tests bypass normal construction with unrealistic fixtures, they may miss method-message calls that occur in real object creation. Conversely, if every test relies only on full integration construction, failures can be hard to localize. A balanced suite uses focused unit tests for class behavior and a smaller set of interaction tests that exercise real construction and message chains.
 
 Function pair coverage is strongest when paired with a state model. Adjacent method pairs mean different things in different states: `push -> pop` from a one-element stack is not the same as `push -> pop` from a full stack. The state model gives those pairs their interpretation.
 
-## Visual
+### A finite stack as a state-based test model
 
 ```mermaid
 stateDiagram-v2
@@ -70,11 +70,11 @@ stateDiagram-v2
 | Function pair | every adjacent method pair executes | stronger | may still miss longer histories |
 | State transition | every modeled transition executes | strong for stateful classes | depends on model completeness |
 
-## Worked example 1: MM testing for an order service
+## Covering every message from an order service
 
-**Problem.** An `OrderService.placeOrder` method calls `Inventory.reserve`, `Payment.authorize`, `OrderRepository.save`, and `Email.sendConfirmation`. The `cancelOrder` method calls `OrderRepository.find`, `Payment.refund`, `Inventory.release`, and `OrderRepository.save`. Identify an MM coverage test set.
+An `OrderService.placeOrder` method calls `Inventory.reserve`, `Payment.authorize`, `OrderRepository.save`, and `Email.sendConfirmation`. The `cancelOrder` method calls `OrderRepository.find`, `Payment.refund`, `Inventory.release`, and `OrderRepository.save`. An MM coverage set must exercise every one of these call sites.
 
-**Method.** List method call sites and choose tests that execute all of them.
+List the call sites, then choose scenarios whose union executes all of them.
 
 1. Call sites in `placeOrder`:
 
@@ -90,7 +90,7 @@ stateDiagram-v2
 
 5. If failure branches include additional method calls, such as `Inventory.release` after failed payment, they must be included too. The problem statement does not list them, so the minimal MM set has two scenarios.
 
-**Checked answer.**
+The resulting MM set is:
 
 | Test | Setup | Expected MM calls covered |
 |---|---|---|
@@ -99,11 +99,11 @@ stateDiagram-v2
 
 The answer is checked by comparing the union of calls covered by T1 and T2 with the full call-site list. Every listed call appears at least once.
 
-## Worked example 2: Function pair coverage for a finite stack
+## Building function-pair sequences for the stack
 
-**Problem.** A finite stack has methods `new`, `push`, and `pop`. States are Empty, Normal, and Full. `pop` on Empty is an error; `push` on Full is an error. Give a compact function-pair test set that covers important adjacent pairs.
+A finite stack has methods `new`, `push`, and `pop`, with states Empty, Normal, and Full. `pop` on Empty is an error; `push` on Full is an error. A compact test set should cover the important adjacent function pairs.
 
-**Method.** Use the state machine and build sequences that include adjacent method pairs in different states.
+Use the state machine to build sequences that include adjacent method pairs in distinct states.
 
 1. Start with empty error:
 
@@ -125,7 +125,7 @@ The answer is checked by comparing the union of calls covered by T1 and T2 with 
 
    The sequence in step 4 can be extended to `push` after the stack becomes empty, or use `new, push, pop, push`.
 
-**Checked answer.** A compact suite is:
+A compact suite is:
 
 1. `new, pop`
 2. `new, push, pop, push`
@@ -134,7 +134,7 @@ The answer is checked by comparing the union of calls covered by T1 and T2 with 
 
 The suite is checked by mapping adjacent pairs to the state machine. It covers errors on empty pop and full push, normal push/pop combinations, and state-changing pairs around empty, normal, and full states.
 
-## Code
+## Enumerating adjacent calls in the suite
 
 ```python
 def adjacent_pairs(sequence):
@@ -156,7 +156,7 @@ for pair in sorted(covered):
     print(pair)
 ```
 
-## Common pitfalls
+## Coverage claims that overreach
 
 - Assuming functional tests automatically cover OO method interactions.
 - Treating statement coverage as enough when behavior depends on object collaborations.
@@ -166,10 +166,8 @@ for pair in sorted(covered):
 - Testing subclasses only directly and not through base-class references where polymorphism occurs.
 - Building function pair coverage from an incomplete state model.
 
-## Connections
+<div className="see-also">
 
-- [Software testing](/cs/software-engineering/software-testing)
-- [Object-oriented development](/cs/software-engineering/object-oriented-development)
-- [Object-oriented metrics](/cs/software-engineering/object-oriented-metrics)
-- [Software design](/cs/software-engineering/software-design)
-- [Formal specifications and OCL](/cs/software-engineering/formal-specifications-and-ocl)
+See also: [Software testing](/cs/software-engineering/software-testing) · [Object-oriented development](/cs/software-engineering/object-oriented-development) · [Object-oriented metrics](/cs/software-engineering/object-oriented-metrics) · [Software design](/cs/software-engineering/software-design) · [Formal specifications and OCL](/cs/software-engineering/formal-specifications-and-ocl)
+
+</div>

@@ -438,10 +438,8 @@ For very large values, direct factorials may be needlessly expensive or overflow
 - Treating categories as distinguishable when they are not, or indistinguishable when labels matter.
 - Forgetting that probabilities require both a count and an equally likely sample space. Counting alone does not justify a probability model.
 
-## Related pages
+<div className="see-also">
 
-- [discrete probability](/math/discrete/discrete-probability)
-- [common discrete distributions](/math/probability/common-discrete-distributions)
-- [sample spaces, events, and axioms](/math/probability/sample-spaces-events-axioms)
-- [conditional probability and Bayes' theorem](/math/probability/conditional-probability-bayes)
-- [permutations and combinations](/math/discrete/permutations-and-combinations)
+See also: [discrete probability](/math/discrete/discrete-probability) · [common discrete distributions](/math/probability/common-discrete-distributions) · [sample spaces, events, and axioms](/math/probability/sample-spaces-events-axioms) · [conditional probability and Bayes' theorem](/math/probability/conditional-probability-bayes) · [permutations and combinations](/math/discrete/permutations-and-combinations)
+
+</div>

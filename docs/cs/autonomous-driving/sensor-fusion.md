@@ -11,9 +11,9 @@ Sensor fusion combines measurements from cameras, lidar, radar, IMU, GNSS, maps,
 
 *Figure: PointPillars shows how sparse LiDAR becomes convolution-friendly perception input. Image: [ar5iv](https://arxiv.org/abs/1812.05784), Lang et al., educational use with attribution.*
 
-This page sits between [sensors](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu), [perception](/cs/autonomous-driving/perception-object-detection-and-segmentation), [localization](/cs/autonomous-driving/localization-and-hd-maps), and [prediction](/cs/autonomous-driving/prediction-and-motion-forecasting). It introduces early, mid, and late fusion; bird's-eye-view representations; occupancy networks; and calibration. The practical lesson is that fusion is a systems problem as much as a model-design problem.
+Fusion sits between [sensors](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu), [perception](/cs/autonomous-driving/perception-object-detection-and-segmentation), [localization](/cs/autonomous-driving/localization-and-hd-maps), and [prediction](/cs/autonomous-driving/prediction-and-motion-forecasting). Early, mid-level, and late fusion make different commitments about calibration, information loss, modularity, and failure isolation.
 
-## Definitions
+## Fusion levels, shared frames, and occupancy
 
 **Early fusion** combines raw or lightly processed sensor data before high-level perception. Examples include projecting lidar points into camera images, painting point clouds with image features, or concatenating radar and lidar features in a common voxel grid.
 
@@ -29,7 +29,7 @@ An **occupancy grid** stores whether each cell in space is free, occupied, or un
 
 **Extrinsic calibration** is the rigid transform between sensors, such as $T_{\mathrm{camera}\leftarrow\mathrm{lidar}}$. **Time synchronization** aligns measurements taken at different times. **Ego-motion compensation** transforms old measurements into a common reference time using vehicle motion estimates.
 
-## Key results
+## Alignment before combination
 
 ![Lift-Splat-Shoot diagram contrasting image-plane perception with bird's-eye-view planning coordinates.](https://ar5iv.labs.arxiv.org/html/2008.05711/assets/x2.png)
 
@@ -76,7 +76,7 @@ Fusion interfaces should expose disagreement. If lidar sees an obstacle, camera 
 
 The best fusion design is often observable in logs. Engineers should be able to inspect which sensors contributed to an object, how old each measurement was, and why a track was created, merged, split, or deleted.
 
-## Visual
+### Three places to fuse evidence
 
 ```mermaid
 flowchart TB
@@ -153,9 +153,9 @@ flowchart TB
 
 This diagram shows early, mid-level, and late fusion as distinct architectural choices rather than synonyms. The mid-level BEV path makes the main shape transition explicit: camera, lidar, radar, and map features are transformed into aligned BEV tensors, with spatial cross-attention and temporal memory providing the shared representation used by detection, occupancy, and lane heads.
 
-## Worked example 1: Projecting a lidar point into a camera
+## Projecting a lidar point into a camera
 
-Problem: A lidar point in camera coordinates is $P=(X,Y,Z)=(2.0,0.5,10.0)$ m after extrinsic transformation. The camera intrinsics are $f_x=f_y=800$ px, $c_x=640$, and $c_y=360$. Compute pixel coordinates.
+Take a lidar point at $P=(X,Y,Z)=(2.0,0.5,10.0)$ m in camera coordinates after the extrinsic transformation. The camera intrinsics are $f_x=f_y=800$ px, $c_x=640$, and $c_y=360$.
 
 1. Use the pinhole projection:
 
@@ -178,13 +178,13 @@ $$
 v = 800(0.05)+360 = 40+360=400.
 $$
 
-Answer: the point projects to pixel $(800,400)$.
+The point projects to pixel $(800,400)$.
 
-Check: The point is to the right and slightly below the optical center, matching $X\gt 0$ and $Y\gt 0$ under the chosen coordinate convention.
+Its position to the right and slightly below the optical center agrees with $X\gt 0$ and $Y\gt 0$ under the chosen coordinate convention.
 
-## Worked example 2: Updating occupancy log odds
+## Updating occupancy log odds
 
-Problem: A grid cell has prior occupancy probability $p_0 = 0.20$. A radar measurement gives likelihood ratio $p(z \mid \mathrm{occ}) / p(z \mid \mathrm{free}) = 3$. Compute the updated probability using log odds.
+A grid cell has prior occupancy probability $p_0 = 0.20$. A radar measurement supplies likelihood ratio $p(z \mid \mathrm{occ}) / p(z \mid \mathrm{free}) = 3$; update the cell in log-odds form.
 
 1. Convert prior probability to log odds:
 
@@ -206,11 +206,11 @@ p_1 = \frac{1}{1+\exp(-\ell_1)}
 \approx 0.429.
 $$
 
-Answer: the occupancy probability rises from 0.20 to about 0.43.
+The occupancy probability rises from 0.20 to about 0.43.
 
-Check: The measurement favors occupancy, so the probability increases, but it remains below 0.5 because the prior was strongly biased toward free.
+The probability increases because the measurement favors occupancy, but it remains below 0.5 because the prior favored free space strongly.
 
-## Code
+## Coordinate transforms and log-odds updates
 
 ```python
 import numpy as np
@@ -236,7 +236,7 @@ print(points_vehicle)
 print("updated occupancy:", prob)
 ```
 
-## Recent BEV LiDAR–camera fusion systems
+## Recent LiDAR-camera and radar-camera BEV systems
 
 Modern BEV fusion systems usually share a top-down representation, but they differ in what they trust, where they align modalities, and how they handle degraded sensors. The [MIT BEVFusion](/cs/autonomous-driving/bevfusion-mit) and [CenterPoint](/cs/autonomous-driving/centerpoint) pages remain useful standalone background for optimized BEV pooling, multi-task BEV perception, and center-based detection heads. The papers below are best read as a compact family of BEV-fusion design patterns rather than as mutually exclusive recipes.
 
@@ -258,7 +258,7 @@ Modern BEV fusion systems usually share a top-down representation, but they diff
 
 **Weather-occlusion robustness study.** Kumar et al. do not propose a new detector; they evaluate BEVFusion under inference-time camera soiling masks and LiDAR point dropout on nuScenes [7]. The clean fused detector performs best, but that does not imply equal tolerance to all sensor failures. Camera occlusion heavily damages camera-only inference, yet when clean LiDAR remains available the fused model stays close to clean performance. Severe LiDAR dropout is much more damaging: clean cameras recover some detections, but they do not replace the lost geometric point structure needed for 3D localization. The study addresses an evaluation gap by making modality dependence explicit and motivating occlusion-aware training, temporal aggregation, reliability estimation, and sensor-health monitoring.
 
-## Common pitfalls
+## Failure modes that fused confidence can hide
 
 - Fusing measurements with mismatched timestamps. At city speeds, tens of milliseconds can move objects enough to corrupt associations.
 - Assuming all sensors are conditionally independent. Camera and lidar may both fail under the same weather or occlusion.
@@ -267,17 +267,9 @@ Modern BEV fusion systems usually share a top-down representation, but they diff
 - Letting a dominant sensor silence others. Fusion should preserve redundancy and flag disagreement rather than hide it.
 - Ignoring unknown space. Free, occupied, and unknown are different; a planner should not treat unobserved space as guaranteed free.
 
-## Connections
+## Papers behind the BEV comparison
 
-- [Sensors, cameras, lidar, radar, and IMU](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu)
-- [Perception, object detection, and segmentation](/cs/autonomous-driving/perception-object-detection-and-segmentation)
-- [Localization and HD maps](/cs/autonomous-driving/localization-and-hd-maps)
-- [Prediction and motion forecasting](/cs/autonomous-driving/prediction-and-motion-forecasting)
-- [Deep learning](/cs/deep-learning/)
-- [Engineering math for Bayesian filtering](/math/engineering-math/)
-- Further reading: Kalman filtering texts, occupancy grid mapping, BEVFormer, BEVFusion, CenterPoint, and multi-sensor calibration literature.
-
-## References
+The surrounding literature includes Kalman filtering, occupancy grid mapping, BEVFormer, BEVFusion, CenterPoint, and multi-sensor calibration.
 
 [1] T. Liang, H. Xie, K. Yu, Z. Xia, Z. Lin, Y. Wang, T. Tang, B. Wang, and Z. Tang, "BEVFusion: A Simple and Robust LiDAR-Camera Fusion Framework," in Advances in Neural Information Processing Systems (NeurIPS), 2022.
 
@@ -292,3 +284,9 @@ Modern BEV fusion systems usually share a top-down representation, but they diff
 [6] M. Mayank, B. Duraisamy, F. Geiss, and A. Valada, "Multi-Modal Sensor Fusion using Hybrid Attention for Autonomous Driving," arXiv:2604.04797, 2026.
 
 [7] S. Kumar, T. Brophy, E. M. Grua, G. Sistu, V. Donzella, and C. Eising, "Evaluating the Impact of Weather-Induced Sensor Occlusion on BEVFusion for 3D Object Detection," arXiv:2511.04347, 2025.
+
+<div className="see-also">
+
+See also: [Sensors, cameras, lidar, radar, and IMU](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu) · [Perception, object detection, and segmentation](/cs/autonomous-driving/perception-object-detection-and-segmentation) · [Localization and HD maps](/cs/autonomous-driving/localization-and-hd-maps) · [Prediction and motion forecasting](/cs/autonomous-driving/prediction-and-motion-forecasting) · [Deep learning](/cs/deep-learning/intro) · [Engineering math for Bayesian filtering](/math/engineering-math/intro)
+
+</div>

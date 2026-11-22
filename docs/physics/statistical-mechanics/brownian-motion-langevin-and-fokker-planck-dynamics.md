@@ -437,10 +437,8 @@ print("ensemble estimate needs many paths; theory final <x^2>", 2 * D * times[-1
 - White noise is a distribution, not an ordinary rapidly fluctuating function. Expressions involving its square require a discretization or stochastic-calculus convention.
 - For position-dependent noise, stating only a symbolic equation such as $dx=b(x)\,dW_t$ is incomplete. Ito and Stratonovich readings differ by a drift term.
 
-## Related pages
+<div className="see-also">
 
-- [Linear response, fluctuation-dissipation, and Onsager theory](/physics/statistical-mechanics/linear-response-fluctuation-dissipation-and-onsager-theory)
-- [Boltzmann equation and transport](/physics/statistical-mechanics/boltzmann-equation-and-transport)
-- [Irreversibility, master equations, and finite-temperature field theory](/physics/statistical-mechanics/irreversibility-master-equations-and-finite-temperature-field-theory)
-- [Markov chains](/math/probability-and-random-variables/markov-chains)
-- [Poisson processes](/math/probability-and-random-variables/poisson-random-variables-and-processes)
+See also: [Linear response, fluctuation-dissipation, and Onsager theory](/physics/statistical-mechanics/linear-response-fluctuation-dissipation-and-onsager-theory) · [Boltzmann equation and transport](/physics/statistical-mechanics/boltzmann-equation-and-transport) · [Irreversibility, master equations, and finite-temperature field theory](/physics/statistical-mechanics/irreversibility-master-equations-and-finite-temperature-field-theory) · [Markov chains](/math/probability-and-random-variables/markov-chains) · [Poisson processes](/math/probability-and-random-variables/poisson-random-variables-and-processes)
+
+</div>

@@ -290,9 +290,8 @@ print(geometric_mean([1.25, 0.8, 2, 1]))   # 1.189207...
 
 The functions encode formulas, not experimental method. They cannot decide whether fractions overlap, whether an input is representative, or whether elapsed time includes the relevant system costs.
 
-## Related pages
+<div className="see-also">
 
-- [Power, Energy, Cost, and Dependability](/cs/computer-architecture/power-energy-cost-dependability)
-- [Cache Organization and AMAT](/cs/computer-architecture/cache-organization-amat)
-- [Branch Prediction and Control Hazards](/cs/computer-architecture/branch-prediction)
-- [Warehouse-Scale Computers](/cs/computer-architecture/warehouse-scale-computers)
+See also: [Power, Energy, Cost, and Dependability](/cs/computer-architecture/power-energy-cost-dependability) · [Cache Organization and AMAT](/cs/computer-architecture/cache-organization-amat) · [Branch Prediction and Control Hazards](/cs/computer-architecture/branch-prediction) · [Warehouse-Scale Computers](/cs/computer-architecture/warehouse-scale-computers)
+
+</div>

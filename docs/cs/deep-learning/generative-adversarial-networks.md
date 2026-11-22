@@ -9,7 +9,7 @@ Generative adversarial networks are D2L's introduction to adversarial generative
 
 GANs are important because they separate sample generation from explicit likelihood calculation. They can produce sharp images, and DCGANs show how convolutional design principles apply to generation. They are also notoriously delicate: loss curves can be hard to interpret, training can collapse to few modes, and the balance between generator and discriminator matters.
 
-## Definitions
+## The generator-discriminator game
 
 A **generator** $G(z)$ maps latent noise $z$ to a synthetic sample. The noise is usually drawn from a simple distribution such as a standard normal or uniform distribution.
 
@@ -24,7 +24,7 @@ $$
 \mathbb{E}_{z \sim p_z}[\log(1-D(G(z)))].
 $$
 
-In practice, the generator is often trained with the non-saturating loss
+The generator is often trained with the non-saturating loss
 
 $$
 L_G = -\mathbb{E}_{z \sim p_z}[\log D(G(z))],
@@ -38,7 +38,7 @@ which gives stronger gradients when the discriminator confidently rejects genera
 
 **Latent space** is the input space of $z$ vectors. Interpolating between latent vectors often produces smooth changes in generated samples when training succeeds.
 
-## Key results
+## What alternates during training
 
 GAN training alternates two optimization problems. For a discriminator step, real samples should be labeled $1$ and generated samples should be labeled $0$. For a generator step, generated samples are passed through the discriminator but optimized with labels $1$ so the generator learns to make them look real.
 
@@ -72,13 +72,13 @@ GAN examples in D2L are deliberately small enough to inspect. That inspection is
 
 Conditional GANs extend the same game by giving class labels or other conditions to both networks. The generator then learns $G(z,c)$ and the discriminator judges whether a sample is real and consistent with condition $c$. This is a common way to control generated content.
 
-## Visual
+## The training loop and the DCGAN shape path
 
 ```mermaid
 flowchart TB
-  Real["Real batch x ~ p_data: (N, C, H, W"] --> DReal["Discriminator D(x) -> real logits"]
-  Z["Latent noise z ~ p_z: (N, d_z"] --> G["Generator G(z)"]
-  G --> Fake["Generated batch x_fake: (N, C, H, W"]
+  Real["Real batch x ~ p_data: (N, C, H, W)"] --> DReal["Discriminator D(x) -> real logits"]
+  Z["Latent noise z ~ p_z: (N, d_z)"] --> G["Generator G(z)"]
+  G --> Fake["Generated batch x_fake: (N, C, H, W)"]
   Fake --> Detach["Detach fake batch for discriminator step"]
   Detach --> DFake["Discriminator D(x_fake.detach()) -> fake logits"]
   DReal --> DLoss["D loss: BCE(real, 1) + BCE(fake, 0)"]
@@ -100,29 +100,29 @@ The adversarial loop makes the detach boundary explicit: discriminator training 
 flowchart TB
   subgraph DCGANG["DCGAN generator for 64 x 64 RGB"]
     direction TB
-    Z["z: (N, 100, 1, 1"] --> T1["ConvTranspose 4 x 4, 1024, stride 1 -> (N, 1024, 4, 4"]
+    Z["z: (N, 100, 1, 1)"] --> T1["ConvTranspose 4 x 4, 1024, stride 1 -> (N, 1024, 4, 4)"]
     T1 --> B1["BatchNorm + ReLU"]
-    B1 --> T2["ConvTranspose 4 x 4, 512, stride 2, pad 1 -> (N, 512, 8, 8"]
+    B1 --> T2["ConvTranspose 4 x 4, 512, stride 2, pad 1 -> (N, 512, 8, 8)"]
     T2 --> B2["BatchNorm + ReLU"]
-    B2 --> T3["ConvTranspose 4 x 4, 256, stride 2, pad 1 -> (N, 256, 16, 16"]
+    B2 --> T3["ConvTranspose 4 x 4, 256, stride 2, pad 1 -> (N, 256, 16, 16)"]
     T3 --> B3["BatchNorm + ReLU"]
-    B3 --> T4["ConvTranspose 4 x 4, 128, stride 2, pad 1 -> (N, 128, 32, 32"]
+    B3 --> T4["ConvTranspose 4 x 4, 128, stride 2, pad 1 -> (N, 128, 32, 32)"]
     T4 --> B4["BatchNorm + ReLU"]
-    B4 --> T5["ConvTranspose 4 x 4, 3, stride 2, pad 1 -> (N, 3, 64, 64"]
+    B4 --> T5["ConvTranspose 4 x 4, 3, stride 2, pad 1 -> (N, 3, 64, 64)"]
     T5 --> Tanh["Tanh image output"]
   end
 
   subgraph DCGAND["DCGAN discriminator"]
     direction TB
-    Img["Image: (N, 3, 64, 64"] --> C1["Conv 4 x 4, 128, stride 2, pad 1 -> (N, 128, 32, 32"]
+    Img["Image: (N, 3, 64, 64)"] --> C1["Conv 4 x 4, 128, stride 2, pad 1 -> (N, 128, 32, 32)"]
     C1 --> L1["LeakyReLU 0.2"]
-    L1 --> C2["Conv 4 x 4, 256, stride 2, pad 1 -> (N, 256, 16, 16"]
+    L1 --> C2["Conv 4 x 4, 256, stride 2, pad 1 -> (N, 256, 16, 16)"]
     C2 --> D2["BatchNorm + LeakyReLU"]
-    D2 --> C3["Conv 4 x 4, 512, stride 2, pad 1 -> (N, 512, 8, 8"]
+    D2 --> C3["Conv 4 x 4, 512, stride 2, pad 1 -> (N, 512, 8, 8)"]
     C3 --> D3["BatchNorm + LeakyReLU"]
-    D3 --> C4["Conv 4 x 4, 1024, stride 2, pad 1 -> (N, 1024, 4, 4"]
+    D3 --> C4["Conv 4 x 4, 1024, stride 2, pad 1 -> (N, 1024, 4, 4)"]
     C4 --> D4["BatchNorm + LeakyReLU"]
-    D4 --> C5["Conv 4 x 4, 1, stride 1 -> (N, 1, 1, 1"]
+    D4 --> C5["Conv 4 x 4, 1, stride 1 -> (N, 1, 1, 1)"]
     C5 --> Logit(("Real/fake logit"))
   end
 ```
@@ -141,7 +141,7 @@ The DCGAN generator progressively upsamples a latent 1 x 1 tensor to a 64 x 64 R
 | DCGAN discriminator | Image tensor | Real/fake logit | Binary cross-entropy |
 | Latent interpolation | Two noise vectors | Sample path | Qualitative smoothness |
 
-## Worked example 1: discriminator binary loss
+## Reading the discriminator's binary loss
 
 Problem: a discriminator outputs probabilities $D(x_{\mathrm{real}})=0.8$ and $D(G(z))=0.3$. Compute the discriminator loss
 
@@ -169,9 +169,9 @@ $$
 L_D \approx 0.223 + 0.357 = 0.580.
 $$
 
-Checked answer: the discriminator loss is about $0.580$. The discriminator is rewarded for assigning high probability to real samples and low probability to generated samples.
+The discriminator loss is about $0.580$. The discriminator is rewarded for assigning high probability to real samples and low probability to generated samples.
 
-## Worked example 2: non-saturating generator loss
+## Reading the non-saturating generator loss
 
 Problem: the discriminator assigns $D(G(z))=0.1$ to a generated sample. Compute the non-saturating generator loss and compare it with the value when $D(G(z))=0.7$.
 
@@ -197,9 +197,9 @@ $$
 
 4. Interpret: lower loss means the generator is fooling the discriminator more successfully.
 
-Checked answer: the generator loss drops from about $2.303$ to $0.357$ when the discriminator score on fake samples rises from $0.1$ to $0.7$.
+The generator loss drops from about $2.303$ to $0.357$ when the discriminator score on fake samples rises from $0.1$ to $0.7$.
 
-## Code
+## Preserving the gradient boundary in PyTorch
 
 ```python
 import torch
@@ -250,7 +250,7 @@ print("discriminator loss:", d_loss.item())
 print("generator loss:", g_loss.item())
 ```
 
-## Common pitfalls
+## How adversarial training silently fails
 
 - Training the generator through a fake batch that was detached for the discriminator step.
 - Reading GAN losses as if they should decrease monotonically like supervised losses.
@@ -259,10 +259,8 @@ print("generator loss:", g_loss.item())
 - Using batch normalization carelessly in the discriminator when batch composition leaks information.
 - Confusing transposed convolution with a literal inverse of convolution.
 
-## Connections
+<div className="see-also">
 
-- [Modern CNNs](/cs/deep-learning/modern-cnns)
-- [Computer vision applications](/cs/deep-learning/computer-vision-applications)
-- [Optimization algorithms](/cs/deep-learning/optimization-algorithms)
-- [Probability and random variables](/math/probability-and-random-variables/)
-- [Machine learning](/cs/machine-learning/)
+See also: [Modern CNNs](/cs/deep-learning/modern-cnns) · [Computer vision applications](/cs/deep-learning/computer-vision-applications) · [Optimization algorithms](/cs/deep-learning/optimization-algorithms) · [Probability and random variables](/math/probability-and-random-variables/intro) · [Machine learning](/cs/machine-learning/intro)
+
+</div>

@@ -184,7 +184,7 @@ The algebra fixes the allowed $\ell$ and $m$ before any central-potential radial
 
 ```mermaid
 graph TD
-  A["|j,j>"] -->"|J-|" B["|j,j-1>"]
+  A["|j,j>#rsqb; -->|J-| B#lsqb;|j,j-1>"]
   B -->|J-| C["..."]
   C -->|J-| D["|j,-j+1>"]
   D -->|J-| E["|j,-j>"]
@@ -379,10 +379,8 @@ For hand calculations, it helps to separate three questions. First determine the
 
 Angular-momentum coherent states provide one final bridge to classical geometry. They are obtained by rotating a highest-weight state and have the smallest transverse uncertainty allowed for their mean angular momentum. For large quantum number, their relative fluctuations shrink and the expectation value behaves like a directed classical vector. Generic eigenstates of one projection do not share that localization; the classical-vector picture is a property of a selected family of states, not of the algebra alone.
 
-## Related pages
+<div className="see-also">
 
-- [Spin-1/2 systems](/physics/quantum-mechanics/spin-one-half-systems)
-- [Addition of angular momentum](/physics/quantum-mechanics/addition-of-angular-momentum)
-- [Central potentials and the hydrogen atom](/physics/quantum-mechanics/central-potentials-hydrogen-atom)
-- [Symmetries and conservation laws](/physics/quantum-mechanics/symmetries-conservation-laws)
-- [Scattering theory](/physics/quantum-mechanics/scattering-theory)
+See also: [Spin-1/2 systems](/physics/quantum-mechanics/spin-one-half-systems) · [Addition of angular momentum](/physics/quantum-mechanics/addition-of-angular-momentum) · [Central potentials and the hydrogen atom](/physics/quantum-mechanics/central-potentials-hydrogen-atom) · [Symmetries and conservation laws](/physics/quantum-mechanics/symmetries-conservation-laws) · [Scattering theory](/physics/quantum-mechanics/scattering-theory)
+
+</div>

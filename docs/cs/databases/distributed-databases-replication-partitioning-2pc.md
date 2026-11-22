@@ -9,7 +9,7 @@ A distributed database stores data across multiple machines, sites, or regions w
 
 The central design choices are partitioning, replication, distributed query processing, and distributed transaction management. Partitioning divides data so work can be spread out. Replication copies data so reads can be local and failures can be survived. Commit protocols coordinate atomic decisions across sites. Consistency models define what users can safely assume when operations touch more than one copy or partition.
 
-## Definitions
+## The pieces that distribution adds
 
 **Data partitioning** divides a relation or key space across nodes. Horizontal partitioning assigns different rows to different partitions. Vertical partitioning assigns different columns to different partitions, usually keeping a key to reconstruct full rows. Common horizontal methods include range partitioning, hash partitioning, and list partitioning.
 
@@ -27,7 +27,7 @@ A **distributed transaction** accesses data at more than one site. It requires a
 
 The **CAP theorem** is often summarized as a trade-off among consistency, availability, and partition tolerance. In the presence of a network partition, a distributed system that must continue responding on both sides may have to relax strong consistency. CAP is not a full design guide, but it names a real tension during partitions.
 
-## Key results
+## Partitioning, replication, and coordination costs
 
 Partitioning improves scale only when workload follows the partitioning. Hash partitioning balances point lookups but is poor for range queries. Range partitioning supports range scans but can create skew if many rows fall into one hot range. Repartitioning is expensive, so partition keys should be chosen from stable, frequent access patterns.
 
@@ -47,15 +47,13 @@ Global secondary indexes are a common hidden cost. If a table is partitioned by 
 
 Clock assumptions must be explicit. Some distributed systems use loosely synchronized physical clocks for timestamps, leases, or snapshot reads. Clock skew can break correctness if the protocol assumes more precision than the infrastructure provides. Other systems avoid this by using logical clocks, hybrid clocks, or consensus to order critical events. Time is a data-management concern once replicas can make decisions independently.
 
-## Visual
-
 ```mermaid
 sequenceDiagram
   participant C as Coordinator
   participant P1 as "Participant 1"
   participant P2 as "Participant 2"
-  C->>P1: prepare?
-  C->>P2: prepare?
+  C->>P1: "prepare?"
+  C->>P2: "prepare?"
   P1-->>C: vote yes
   P2-->>C: vote yes
   C->>C: log commit decision
@@ -74,11 +72,9 @@ sequenceDiagram
 | 2PC | atomic distributed commit | blocking under coordinator failure |
 | Consensus replication | fault-tolerant agreement | more messages and coordination cost |
 
-## Worked example 1: Choose a partitioning strategy
+## Partitioning transcripts around the dominant lookup
 
-Problem: A university system stores `takes(ID, course_id, semester, year, grade)`. Most queries ask for one student's transcript by `ID`, but administrators also run reports by semester. Choose a partitioning key.
-
-Method:
+A university system stores `takes(ID, course_id, semester, year, grade)`. Most queries ask for one student's transcript by `ID`, while administrators also run reports by semester. The dominant point lookup should determine the operational partition key.
 
 1. Identify the dominant high-frequency query:
 
@@ -106,13 +102,11 @@ $$
 
 5. Since transcript lookup is the dominant operational query, choose hash partitioning on `ID`, and support semester reports with a separate analytical index, materialized summary, or warehouse pipeline.
 
-Checked answer: hash partitioning on `ID` optimizes the frequent point-access workload and balances students across nodes. It sacrifices single-partition semester reports, which should be handled by a separate reporting design if they are heavy.
+Hash partitioning on `ID` optimizes the frequent point-access workload and balances students across nodes. It sacrifices single-partition semester reports, which should be handled by a separate reporting design if they are heavy.
 
-## Worked example 2: Trace two-phase commit
+## Following a two-phase commit decision
 
-Problem: Transaction `T` updates accounts at sites `S1` and `S2`. Both participants can commit. Show the 2PC log decisions and final outcome.
-
-Method:
+Transaction `T` updates accounts at sites `S1` and `S2`, and both participants can commit. Its durable records and messages proceed as follows.
 
 1. Coordinator sends prepare:
 
@@ -155,13 +149,16 @@ Method:
    S2 log: commit T
    ```
 
-Checked answer: the final outcome is commit at both sites. Atomicity depends on durable prepared and decision records; after a crash, each site can recover its state and learn or enforce the same final decision.
+The final outcome is commit at both sites. Atomicity depends on durable prepared and decision records; after a crash, each site can recover its state and learn or enforce the same final decision.
 
-## Code
+## Partition routing and declarative ranges
 
 ```python
+import hashlib
+
 def choose_partition(key, partition_count):
-    return hash(key) % partition_count
+    digest = hashlib.sha256(key.encode("utf-8")).digest()
+    return int.from_bytes(digest[:8], "big") % partition_count
 
 students = ["00128", "12345", "54321", "76543"]
 for student_id in students:
@@ -169,9 +166,9 @@ for student_id in students:
 ```
 
 ```sql
--- Example of declarative range partitioning syntax in systems that support it.
-CREATE TABLE takes_2026_spring PARTITION OF takes
-FOR VALUES FROM ('Spring', 2026) TO ('Summer', 2026);
+-- Example of declarative range partitioning by year.
+CREATE TABLE takes_2026 PARTITION OF takes
+FOR VALUES FROM (2026) TO (2027);
 
 -- Operational lookup that benefits from partitioning or an index on ID.
 SELECT course_id, semester, year, grade
@@ -180,7 +177,7 @@ WHERE ID = '00128'
 ORDER BY year, semester, course_id;
 ```
 
-## Common pitfalls
+## Distribution claims to question
 
 - Treating distribution as automatic speedup. Cross-partition joins and coordination can dominate.
 - Choosing a partition key from data shape alone instead of workload.
@@ -189,7 +186,7 @@ ORDER BY year, semester, course_id;
 - Describing CAP as "choose any two" without specifying behavior during partitions.
 - Forgetting 2PC blocking. Prepared participants cannot safely decide alone if the coordinator's decision is unknown.
 
-## Connections
+## Related notes on distributed correctness
 
 - [Transactions, ACID, and Serializability](/cs/databases/transactions-acid-and-serializability)
 - [Concurrency Control with Locks, Deadlocks, and Timestamps](/cs/databases/concurrency-control-locks-deadlocks-timestamps)

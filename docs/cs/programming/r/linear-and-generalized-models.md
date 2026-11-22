@@ -9,7 +9,7 @@ Linear models are the modeling core of *The Book of R*. The regression chapters 
 
 The key idea is that a model is an explicit approximation. In simple linear regression, R estimates an intercept and slope so a line summarizes the average relationship between a numeric predictor and numeric response. In multiple regression, each coefficient is interpreted while holding other predictors fixed. Diagnostics then ask whether the approximation is adequate for the intended use.
 
-## Definitions
+## From least squares to linked response means
 
 A **linear model** represents a numeric response as a linear combination of predictors plus error:
 
@@ -29,7 +29,7 @@ An **interaction** allows the effect of one predictor to depend on another. In f
 
 A **generalized linear model (GLM)** extends linear modeling to non-normal responses using a distribution family and link function. `glm()` fits these models. Logistic regression is a GLM for binary responses with `family = binomial`.
 
-## Key results
+## Fitting, inspecting, and revising a model
 
 Important model functions:
 
@@ -57,8 +57,6 @@ For simple regression, the slope estimates the average change in response for a 
 
 Diagnostics are not optional. A small p-value for a coefficient does not guarantee a useful model if residuals show curvature, strong outliers, nonconstant variance, or influential points. Model selection should balance fit and complexity; adding variables always can increase apparent fit but may reduce interpretability and out-of-sample performance.
 
-## Visual
-
 ```mermaid
 flowchart TD
   A[Research question and data] --> B[Choose response and predictors]
@@ -80,11 +78,9 @@ flowchart TD
 | `y ~ poly(x, 2)` | orthogonal polynomial | Curved relationship |
 | `y ~ 0 + group` | no intercept | One coefficient per group |
 
-## Worked example 1: Simple linear regression with prediction
+## Reading a slope and checking a prediction
 
-Problem: fit a model predicting `mpg` from `wt` in `mtcars`, interpret the slope, and predict mpg for a car weighing 3.0 thousand pounds.
-
-Method:
+Fit a model predicting `mpg` from `wt` in `mtcars`, interpret the slope, and predict mpg for a car weighing 3.0 thousand pounds.
 
 1. Fit `lm(mpg ~ wt, data = mtcars)`.
 2. Extract coefficients.
@@ -114,15 +110,13 @@ $$
 \end{aligned}
 $$
 
-Checked answer: the prediction is about 21.25 mpg. The slope means that, in this fitted simple linear model, each additional 1000 pounds of weight is associated with about 5.34 fewer miles per gallon on average.
+The prediction is about 21.25 mpg. The slope means that, in this fitted simple linear model, each additional 1000 pounds of weight is associated with about 5.34 fewer miles per gallon on average.
 
 This is an association in the `mtcars` data, not a controlled causal estimate. Other variables, such as horsepower and cylinders, are related to weight.
 
-## Worked example 2: Logistic regression with `glm`
+## Moving from log-odds to probabilities
 
-Problem: model whether a car has manual transmission (`am = 1`) using weight and horsepower in `mtcars`.
-
-Method:
+Model whether a car has manual transmission (`am = 1`) using weight and horsepower in `mtcars`.
 
 1. Confirm the response is coded 0/1.
 2. Fit `glm(am ~ wt + hp, family = binomial, data = mtcars)`.
@@ -146,11 +140,11 @@ predict(logit_fit, newdata = new_cars, type = "response")
 # 0.9895829 0.0014460
 ```
 
-Checked answer: `type = "response"` returns estimated probabilities, not log-odds. The lighter, lower-horsepower car is predicted to have high probability of manual transmission in this model, while the heavier, higher-horsepower car is predicted to have low probability. These estimates reflect a tiny data set and should be treated as demonstration, not a production classifier.
+`type = "response"` returns estimated probabilities, not log-odds. The lighter, lower-horsepower car is predicted to have high probability of manual transmission in this model, while the heavier, higher-horsepower car is predicted to have low probability. These estimates reflect a tiny data set and should be treated as demonstration, not a production classifier.
 
 The GLM workflow resembles `lm`: formula, data, fit, summary, diagnostics, prediction. The interpretation changes because the link function maps linear predictors to response-scale means.
 
-## Code
+## Turning linear-model diagnostics into data
 
 ```r
 # Linear model diagnostic summary.
@@ -174,9 +168,10 @@ fit <- lm(mpg ~ wt + hp + factor(cyl), data = mtcars)
 diag_table <- diagnose_lm(fit)
 print(head(diag_table[order(-diag_table$cooks_distance), ], 6))
 
+old_par <- par(no.readonly = TRUE)
 par(mfrow = c(2, 2))
 plot(fit)
-par(mfrow = c(1, 1))
+par(old_par)
 ```
 
 The diagnostic table turns model diagnostics into data, which makes them easier to sort, filter, and report. `standardized_residual` helps identify observations whose residuals are large relative to the model's estimated error scale. `leverage` identifies observations with unusual predictor combinations. `cooks_distance` combines residual size and leverage to flag points that strongly influence fitted coefficients.
@@ -191,11 +186,9 @@ A strong regression report usually includes the model formula, data source, fitt
 
 For prediction, distinguish confidence intervals for the mean response from prediction intervals for a new observation. In `predict.lm`, `interval = "confidence"` and `interval = "prediction"` answer different questions. The prediction interval is wider because it includes individual observation variability in addition to uncertainty about the fitted mean.
 
-Always connect coefficient interpretation to the formula actually fitted. A slope in `mpg ~ wt` is marginal with respect to that one predictor. A slope in `mpg ~ wt + hp` is conditional on horsepower. A slope inside an interaction depends on the other interacting variable. The same variable name can therefore carry different interpretations across models.
+Always connect coefficient interpretation to the formula actually fitted. A slope in `mpg ~ wt` is marginal with respect to that one predictor. A slope in `mpg ~ wt + hp` is conditional on horsepower. A slope inside an interaction depends on the other interacting variable. The same variable name can therefore carry different interpretations across models. Keep the fitted object rather than only its printed summary because later prediction, diagnostics, intervals, and plots use information stored in that object.
 
-Keep the fitted object, not only the printed summary. The object stores what later functions need for prediction, diagnostics, intervals, and plots.
-
-## Common pitfalls
+## Interpretations the fitted model cannot support
 
 - Interpreting regression coefficients causally without design or assumptions that support causality.
 - Ignoring categorical predictor reference levels.
@@ -205,9 +198,8 @@ Keep the fitted object, not only the printed summary. The object stores what lat
 - Forgetting that interactions change main-effect interpretation.
 - Reporting $R^2$ without residual checks or an explanation of prediction error.
 
-## Connections
+<div className="see-also">
 
-- [Factors and categorical data](/cs/programming/r/factors-and-categorical-data)
-- [Statistical inference](/cs/programming/r/statistical-inference)
-- [Base graphics](/cs/programming/r/base-graphics)
-- [Object-oriented R](/cs/programming/r/object-oriented-r)
+See also: [Factors and categorical data](/cs/programming/r/factors-and-categorical-data) · [Statistical inference](/cs/programming/r/statistical-inference) · [Base graphics](/cs/programming/r/base-graphics) · [Object-oriented R](/cs/programming/r/object-oriented-r)
+
+</div>

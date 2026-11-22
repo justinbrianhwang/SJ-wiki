@@ -5,140 +5,130 @@ sidebar_position: 11
 
 # Work-Energy Methods
 
-Work-energy methods replace a time-by-time force analysis with a balance between work and changes in kinetic and potential energy. They are especially useful when the path is known, forces depend on position, or the final speed is wanted without needing the full time history. Energy is scalar, so it often reduces vector dynamics to a compact equation.
+Work-energy methods replace a time-resolved force analysis with a balance between work and changes in kinetic and potential energy. They are well suited to finding speed, displacement, spring compression, stopping distance, or required work when the path is known.
 
-The method does not eliminate modeling. You still need a free-body diagram to identify forces and a kinematic description to write displacements or speeds. The advantage is that constraint forces that do no work, such as ideal normal reactions or pin reactions at fixed points, can often be ignored in the energy equation.
+The scalar energy equation does not remove the mechanics model. A free-body diagram is still needed to identify forces, and the path determines which forces do work. Ideal constraint forces often disappear from the calculation because their points of application have no velocity component along the force.
 
-![A simple pendulum diagram shows a mass suspended from a pivot with its angular displacement marked.](https://commons.wikimedia.org/wiki/Special:FilePath/Simple_pendulum.svg)
+## When an endpoint balance is the right tool
 
-*Figure: A pendulum makes the links among gravity, constraint forces, energy exchange, and small-oscillation models concrete. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Simple_pendulum.svg), Chris-martin, after Unc.hbar, public domain.*
+For a particle, the work-energy principle is
 
-## Definitions
+$$
+T_1+U_{1\to2}=T_2,
+$$
 
-The **work** done by a force $\mathbf{F}$ over a displacement path from position $1$ to position $2$ is
+where
+
+$$
+T=\frac{1}{2}mv^2
+$$
+
+and the work of a force along the path is
 
 $$
 U_{1\to2}=\int_1^2 \mathbf{F}\cdot d\mathbf{r}.
 $$
 
-If the force is constant and the displacement is straight,
+For a constant force and straight displacement,
 
 $$
 U=Fs\cos\theta,
 $$
 
-where $\theta$ is the angle between force and displacement.
+with $\theta$ the angle between force and displacement.
 
-The **kinetic energy** of a particle is
-
-$$
-T=\frac{1}{2}mv^2.
-$$
-
-For a rigid body in planar motion,
+The particle theorem follows directly from Newton's second law. Dotting $\sum\mathbf F=m\mathbf a$ with an incremental displacement $d\mathbf r$ gives
 
 $$
-T=\frac{1}{2}mv_G^2+\frac{1}{2}I_G\omega^2,
+\sum\mathbf F\cdot d\mathbf r
+=m\frac{d\mathbf v}{dt}\cdot\mathbf v\,dt
+=m\mathbf v\cdot d\mathbf v.
 $$
 
-where $G$ is the mass center.
-
-The **work-energy principle** for a particle is
+Integration between states gives
 
 $$
-T_1+U_{1\to2}=T_2.
+\int_1^2\sum\mathbf F\cdot d\mathbf r
+=\int_{v_1}^{v_2}mv\,dv
+=\frac12mv_2^2-\frac12mv_1^2.
 $$
 
-A force is **conservative** if its work depends only on endpoints, not on the path. Gravity near Earth's surface and ideal spring forces are standard conservative forces. Conservative forces can be represented by potential energy $V$:
+Work is therefore the accumulated effect of the force component along displacement. A large perpendicular force may produce no work while still changing the velocity direction.
+
+For a planar rigid body,
+
+$$
+T=\frac{1}{2}mv_G^2+\frac{1}{2}I_G\omega^2.
+$$
+
+The first term describes translation of the mass center; the second describes rotation about it.
+
+Energy relates two states and usually does not give the elapsed time or the acceleration at an intermediate point. Newton's second law is more direct for instantaneous forces and accelerations, while impulse-momentum is often better for short-duration interactions.
+
+For a rigid body rotating about a fixed axis $O$, the work of a moment is
+
+$$
+U_{1\to2}=\int_{\theta_1}^{\theta_2}M_O\,d\theta,
+$$
+
+and kinetic energy is $T=\frac12I_O\omega^2$. For general planar motion, the center-of-mass expression already listed separates translation and rotation. Choosing the correct moment of inertia and including both pieces prevents a rolling body from being treated as a particle.
+
+## Conservative forces as stored energy
+
+A conservative force has path-independent work and can be represented by potential energy $V$:
 
 $$
 U_{1\to2}=V_1-V_2.
 $$
 
-Gravitational potential energy near Earth is
+Near Earth's surface,
 
 $$
 V_g=mgy,
 $$
 
-where $y$ is vertical height. Spring potential energy is
+and an ideal linear spring stores
 
 $$
-V_s=\frac{1}{2}kx^2
+V_s=\frac{1}{2}kx^2,
 $$
 
-for spring stretch or compression $x$ from its unstretched length.
+where $x$ is measured from the unstretched length.
 
-The **conservation of mechanical energy** is
+If only conservative forces do work,
 
 $$
-T_1+V_1=T_2+V_2
+T_1+V_1=T_2+V_2.
 $$
 
-when only conservative forces do work.
-
-## Key results
-
-The work-energy method is often selected when the desired unknown is speed, distance, spring compression, stopping distance, or required work. It is less direct when the desired unknown is time or acceleration at an instant. If time matters, Newton's second law or impulse-momentum may be better.
-
-For nonconservative forces, include their work explicitly:
+When nonconservative forces are present, keep their work explicit:
 
 $$
 T_1+V_1+U_{\text{nc}}=T_2+V_2.
 $$
 
-Kinetic friction is a common nonconservative force. If a body slides distance $s$ under kinetic friction $\mu_kN$, the work of friction is
+Potential energy is defined only up to an additive constant. Replacing $V$ by $V+C$ does not affect a difference, so the gravitational datum can be chosen for convenience. What must remain fixed is the datum throughout one calculation.
+
+In one dimension, conservative force and potential are related by
 
 $$
-U_f=-\mu_kNs
+F_x=-\frac{dV}{dx}.
 $$
 
-when $N$ is constant and friction opposes motion. The negative sign matters because friction removes mechanical energy.
-
-Power is the rate of doing work:
+Equilibrium points occur where $dV/dx=0$. A local minimum of $V$ is stable because a small displacement produces a restoring force; a local maximum is unstable. At total mechanical energy $E$, motion is allowed only where $E\ge V(x)$, since
 
 $$
-P=\frac{dU}{dt}=\mathbf{F}\cdot\mathbf{v}
+T=E-V(x)\ge0.
 $$
 
-for a force, and
-
-$$
-P=M\omega
-$$
-
-for a couple moment or torque rotating at angular speed $\omega$. Power methods are useful for engines, motors, brakes, and steady-rate devices.
-
-For a spring with force magnitude $kx$, the work done by the spring as it changes from extension $x_1$ to $x_2$ is
-
-$$
-U_s=\frac{1}{2}kx_1^2-\frac{1}{2}kx_2^2.
-$$
-
-This sign convention follows the potential-energy relation. If the spring is being stretched farther, the spring does negative work on the moving body.
-
-Constraint forces can do zero work, but only if their point of application has no displacement in the force direction. A normal force on a particle constrained to a smooth fixed surface does no work because displacement is tangent and normal force is perpendicular. A normal force on a rolling wheel can be subtler; static friction at a no-slip contact may do no work at the contact point, but the point and surface idealization must be clear.
-
-Work-energy equations are endpoint equations. They relate state 1 to state 2 and do not describe what happens at every intermediate instant unless additional information is supplied. This is why the method can find a final speed after a block slides down a track, but it cannot by itself tell the time required. It also means that the path matters for nonconservative work. Gravity can be handled by height change alone, but kinetic friction generally requires the actual sliding distance.
-
-For variable forces, use the integral definition rather than forcing a constant-force formula. A spring force, for example, changes with deformation:
-
-$$
-U_s=\int_{x_1}^{x_2}(-kx)\,dx.
-$$
-
-The result depends on the squares of the endpoint deformations, not on an average guessed from the final force unless that average is derived correctly. Similarly, if a force acts at an angle that changes along a path, the dot product $\mathbf{F}\cdot d\mathbf{r}$ is the safe expression.
-
-Energy methods can also expose impossible assumptions. If an equation predicts negative kinetic energy, the selected final state cannot be reached under the assumed forces and path. If a normal force is needed to compute friction but is not known, energy alone may not be enough; a force balance normal to the path may have to be solved first.
-
-## Visual
+Points where $E=V$ are turning points with instantaneous speed zero. This graphical view often identifies accessible regions before any differential equation is solved.
 
 ```mermaid
 flowchart LR
-  A[Known positions 1 and 2] --> B[Draw FBD and identify doing-work forces]
+  A["Known positions 1 and 2"] --> B["Draw FBD and identify forces that do work"]
   B --> C{"Conservative?"}
-  C -->|yes| D[Use potential energy V]
-  C -->|no| E[Compute explicit work U_nc]
+  C -->|yes| D["Use potential energy V"]
+  C -->|no| E["Compute explicit work U_nc"]
   D --> F["T1 + V1 + U_nc = T2 + V2"]
   E --> F
   F --> G["Solve for speed, distance, compression, or work"]
@@ -149,199 +139,337 @@ flowchart LR
 | Particle kinetic energy | $T=\frac12 mv^2$ | Always nonnegative |
 | Translational plus rotational kinetic energy | $T=\frac12 mv_G^2+\frac12I_G\omega^2$ | Planar rigid body |
 | Work of constant force | $U=Fs\cos\theta$ | Positive if force aids motion |
-| Gravity potential | $V_g=mgy$ | Higher means more potential |
-| Spring potential | $V_s=\frac12kx^2$ | Depends on deformation from natural length |
-| Power | $P=\mathbf{F}\cdot\mathbf{v}$ | Work rate |
+| Gravity potential | $V_g=mgy$ | Higher datum means more potential |
+| Spring potential | $V_s=\frac12kx^2$ | Deformation is from natural length |
+| Power | $P=\mathbf{F}\cdot\mathbf{v}$ | Rate of doing work |
 
-## Worked example 1: Sliding block with friction and a spring
+## Friction and variable forces stay in the work term
+
+Kinetic friction is nonconservative. If a body slides a distance $s$ under constant normal force $N$,
+
+$$
+U_f=-\mu_kNs.
+$$
+
+The negative sign records mechanical energy dissipated by the contact. Gravity depends only on height change, but friction generally depends on the actual sliding distance.
+
+For variable forces, use the integral rather than a constant-force expression. A spring changing from deformation $x_1$ to $x_2$ does work
+
+$$
+U_s=\int_{x_1}^{x_2}(-kx)\,dx
+=\frac{1}{2}kx_1^2-\frac{1}{2}kx_2^2.
+$$
+
+If the spring is stretched farther, its work on the body is negative. A force whose angle changes along a path is handled safely through $\mathbf{F}\cdot d\mathbf{r}$.
+
+Energy may need a force calculation as an input. When friction depends on an unknown normal reaction, solve the normal equation of motion or equilibrium first, then insert $N$ into the work term.
+
+## Deciding whether a constraint force does work
+
+A force does zero work only when its point of application has no displacement in the force direction. The normal force on a particle moving along a smooth fixed surface is perpendicular to the path and therefore does no work. A fixed ideal pin also has no displacement at its point of application.
+
+Rolling contact requires more care. For ideal rolling without slip on a fixed surface, the instantaneous contact point has zero velocity, so static friction may do zero work there. That conclusion depends on the no-slip and rigid-surface assumptions; it should not be transferred automatically to sliding or deforming contacts.
+
+Power records the rate of energy transfer. For a force,
+
+$$
+P=\frac{dU}{dt}=\mathbf{F}\cdot\mathbf{v},
+$$
+
+and for a couple moment,
+
+$$
+P=M\omega.
+$$
+
+These relations are useful for motors, engines, brakes, and steady-rate devices even when an endpoint energy balance is also used.
+
+Power also connects directly to acceleration. For translation,
+
+$$
+P=\mathbf F\cdot\mathbf v,
+$$
+
+and for fixed-axis rotation,
+
+$$
+P=M\omega.
+$$
+
+When a machine delivers constant power rather than constant force, its available driving force is $F=P/v$. It is large at low speed in the ideal formula and decreases as speed rises. Real machines have torque and current limits that remove the unphysical divergence at $v=0$.
+
+## Maximum compression with friction
 
 **Problem.** A $10$ kg block moves on a horizontal rough surface with initial speed $6$ m/s. It compresses a spring of stiffness $k=800$ N/m. The coefficient of kinetic friction is $\mu_k=0.20$. Find the maximum spring compression.
 
-**Method.** Initial kinetic energy is spent on spring potential energy and negative work by friction. At maximum compression, the block's speed is zero.
-
-1. Initial kinetic energy:
+At maximum compression the block is momentarily at rest. Its initial kinetic energy is
 
 $$
-T_1=\frac{1}{2}mv_1^2=\frac{1}{2}(10)(6^2)=180\ \text{J}.
+T_1=\frac{1}{2}mv_1^2
+=\frac{1}{2}(10)(6^2)
+=180\ \text{J},
 $$
 
-2. Final kinetic energy:
+and $T_2=0$.
+
+On the horizontal surface,
 
 $$
-T_2=0.
+N=mg=10(9.81)=98.1\ \text{N},
 $$
 
-3. Normal force on a horizontal surface:
-
-$$
-N=mg=10(9.81)=98.1\ \text{N}.
-$$
-
-4. Kinetic friction magnitude:
+so the kinetic-friction magnitude is
 
 $$
 F_k=\mu_kN=0.20(98.1)=19.62\ \text{N}.
 $$
 
-5. If maximum compression is $x$, friction acts over distance $x$, so
+If the maximum compression is $x$, friction does work
 
 $$
-U_f=-19.62x.
+U_f=-19.62x,
 $$
 
-6. Spring potential at maximum compression:
+and the spring stores
 
 $$
-V_s=\frac{1}{2}kx^2=\frac{1}{2}(800)x^2=400x^2.
+V_s=\frac{1}{2}kx^2=400x^2.
 $$
 
-7. Energy equation:
+The endpoint balance is
 
 $$
-T_1+U_f=V_s.
+180-19.62x=400x^2,
 $$
 
-Equivalently,
-
-$$
-180-19.62x=400x^2.
-$$
-
-8. Rearrange:
+or
 
 $$
 400x^2+19.62x-180=0.
 $$
 
-9. Solve the quadratic:
+The positive root is
 
 $$
-x=\frac{-19.62+\sqrt{19.62^2+4(400)(180)}}{2(400)}.
+x=\frac{-19.62+\sqrt{19.62^2+4(400)(180)}}{800},
 $$
-
-$$
-x=\frac{-19.62+\sqrt{384.94+288000}}{800}.
-$$
-
-$$
-x=\frac{-19.62+536.97}{800}=0.6467\ \text{m}.
-$$
-
-The negative root is physically meaningless for compression distance. The checked answer is
 
 $$
 \boxed{x_{\max}=0.647\ \text{m}.}
 $$
 
-Without friction, the compression would satisfy $180=400x^2$, giving $x=0.671$ m, so the smaller value is plausible.
+The other root is negative and does not describe a compression distance. With no friction, $180=400x^2$ would give $x=0.671$ m, so dissipation has reduced the travel.
 
-## Worked example 2: Speed of a particle on a smooth circular track
+## Speed at the bottom of a smooth track
 
-**Problem.** A $2$ kg bead slides without friction on a fixed circular track. It starts from rest at height $1.5$ m above the lowest point. Find its speed at the lowest point.
+**Problem.** A $2$ kg bead slides without friction on a fixed circular track. It starts from rest $1.5$ m above the lowest point. Find its speed at the lowest point.
 
-**Method.** The normal force does no work because it is perpendicular to the bead's motion. Use conservation of mechanical energy.
-
-1. Choose the lowest point as $y=0$. Initial height:
+The normal force is perpendicular to the bead's displacement and does no work. Choose the lowest point as $y=0$. Initially,
 
 $$
-y_1=1.5\ \text{m}.
+T_1=0,
 $$
-
-Final height:
-
-$$
-y_2=0.
-$$
-
-2. Initial kinetic energy:
-
-$$
-T_1=0
-$$
-
-because the bead starts from rest.
-
-3. Initial potential energy:
 
 $$
 V_1=mgy_1=2(9.81)(1.5)=29.43\ \text{J}.
 $$
 
-4. Final potential energy:
-
-$$
-V_2=0.
-$$
-
-5. Final kinetic energy:
+At the bottom, $V_2=0$ and
 
 $$
 T_2=\frac{1}{2}mv_2^2.
 $$
 
-6. Conservation of energy:
+Conservation of mechanical energy gives
 
 $$
-T_1+V_1=T_2+V_2.
+29.43=\frac{1}{2}(2)v_2^2,
 $$
 
-$$
-0+29.43=\frac{1}{2}(2)v_2^2+0.
-$$
-
-7. Solve:
-
-$$
-29.43=v_2^2,
-$$
-
-$$
-v_2=5.425\ \text{m/s}.
-$$
-
-The checked answer is
+so
 
 $$
 \boxed{v_2=5.43\ \text{m/s}.}
 $$
 
-The mass cancels from the calculation, as expected for frictionless gravitational motion.
+The mass cancels for frictionless motion under uniform gravity.
 
-## Code
+## Rolling down an incline
 
-```python
-import math
+**Problem.** A solid sphere of mass $3$ kg and radius $0.20$ m rolls without slipping from rest down a vertical drop of $2.0$ m. Find its speed at the bottom and the fraction of its kinetic energy that is rotational.
 
-def max_spring_compression(mass, speed, k, mu_k, g=9.81):
-    T1 = 0.5 * mass * speed**2
-    friction = mu_k * mass * g
-    # Solve 0.5*k*x^2 + friction*x - T1 = 0.
-    a = 0.5 * k
-    b = friction
-    c = -T1
-    return (-b + math.sqrt(b*b - 4*a*c)) / (2*a)
+For a solid sphere,
 
-x = max_spring_compression(10.0, 6.0, 800.0, 0.20)
-print(f"maximum compression = {x:.4f} m")
+$$
+I_G=\frac25mR^2.
+$$
 
-height = 1.5
-speed_bottom = math.sqrt(2.0 * 9.81 * height)
-print(f"speed at bottom = {speed_bottom:.3f} m/s")
-```
+Pure rolling imposes $\omega=v_G/R$. Static friction at an ideal fixed surface does no work because the instantaneous contact point has zero velocity. Conservation of energy gives
 
-## Common pitfalls
+$$
+mgh=\frac12mv_G^2+\frac12I_G\omega^2.
+$$
 
-- Using work-energy to find time directly.
-- Including normal reactions or fixed-pin reactions that do no work in the energy equation.
-- Forgetting negative work by kinetic friction.
-- Treating static friction as always doing work; in ideal rolling without slip the contact point may have zero velocity.
-- Using spring deformation from an arbitrary coordinate instead of from the spring's unstretched length.
-- Mixing gravitational potential signs by changing the vertical datum mid-problem.
-- Applying conservation of mechanical energy when nonconservative work is present.
+Substitute the inertia and rolling constraint:
 
-## Connections
+$$
+mgh=\frac12mv_G^2
++\frac12\left(\frac25mR^2\right)\left(\frac{v_G}{R}\right)^2.
+$$
 
-- [Particle kinetics with Newton's second law](/physics/mechanics/particle-kinetics-newton)
-- [Particle kinematics](/physics/mechanics/particle-kinematics)
-- [Impulse, momentum, and impact](/physics/mechanics/impulse-momentum-impact)
-- [Planar rigid-body motion](/physics/mechanics/planar-rigid-body-motion)
+After cancellation,
+
+$$
+gh=\left(\frac12+\frac15\right)v_G^2
+=\frac7{10}v_G^2.
+$$
+
+Thus
+
+$$
+v_G=\sqrt{\frac{10gh}{7}}
+=\sqrt{\frac{10(9.81)(2.0)}7}
+=5.29\ \text{m/s}.
+$$
+
+The rotational energy fraction is
+
+$$
+\frac{T_{rot}}{T}
+=\frac{\frac15mv^2}{\frac7{10}mv^2}
+=\frac27=0.286.
+$$
+
+The radius and mass cancel from the speed. They would still matter for contact stress and rotational inertia separately.
+
+## Motor power during lifting
+
+**Problem.** A hoist raises a $600$ kg load vertically at a steady $1.5$ m/s. The overall efficiency from motor input to mechanical output is $80\%$. Find the required motor input power. Then find the input power while the load accelerates upward at $0.40$ m/s$^2$ at the same instantaneous speed.
+
+At steady speed, the cable force equals the weight:
+
+$$
+F=mg=(600)(9.81)=5886\ \text{N}.
+$$
+
+Mechanical output power is
+
+$$
+P_{out}=Fv=(5886)(1.5)=8829\ \text{W}.
+$$
+
+With efficiency $\eta=P_{out}/P_{in}$,
+
+$$
+P_{in}=\frac{8829}{0.80}=11.0\ \text{kW}.
+$$
+
+During upward acceleration,
+
+$$
+F-mg=ma,
+$$
+
+so
+
+$$
+F=m(g+a)=600(9.81+0.40)=6126\ \text{N}.
+$$
+
+At the stated instantaneous speed,
+
+$$
+P_{in}=\frac{Fv}{\eta}
+=\frac{(6126)(1.5)}{0.80}
+=11.5\ \text{kW}.
+$$
+
+Power depends on both force and instantaneous velocity. At the start from rest, $Fv$ is zero even though a nonzero force and motor torque are required.
+
+## Work from force-displacement data
+
+When force varies along a straight path, work is the signed area under the force-position curve:
+
+$$
+U_{1\to2}=\int_{x_1}^{x_2}F_x(x)\,dx.
+$$
+
+Area above the axis is positive for increasing $x$; area below is negative. A force graph can therefore supply work even when no compact force law is given. The average force over the interval is $F_{avg}=U/\Delta x$, which is an energy-equivalent value and need not equal the arithmetic mean of endpoint forces.
+
+**Problem.** A $4$ kg cart starts from rest. Along the first $3$ m, a forward force rises linearly from zero to $12$ N. Along the next $2$ m it remains $12$ N. A constant $4$ N resistance acts over all $5$ m. Find the final speed.
+
+The applied-force work is the area of a triangle plus a rectangle:
+
+$$
+U_P=\frac12(3)(12)+(2)(12)=18+24=42\ \text{J}.
+$$
+
+Resistance does
+
+$$
+U_R=-(4)(5)=-20\ \text{J}.
+$$
+
+Net work is $22$ J. Since the cart starts from rest,
+
+$$
+22=\frac12(4)v_2^2,
+$$
+
+so
+
+$$
+v_2=\sqrt{11}=3.32\ \text{m/s}.
+$$
+
+Replacing the rising force by its final value over all $5$ m would overestimate work because it would replace the triangular part by a rectangle.
+
+## Path dependence and mechanical-energy loss
+
+Gravity and ideal spring work depend only on endpoint state. Kinetic-friction work normally depends on distance traveled, so two paths between the same elevations can give different final speeds. The statement “friction turns mechanical energy into heat” is useful but incomplete when thermal energy is tracked: some energy can enter internal deformation, sound, wear, or the surroundings. The mechanical balance groups these effects as nonconservative work unless a more detailed thermal system is defined.
+
+Consider sliding down an incline of length $s$ and angle $\theta$ with constant kinetic coefficient. The gravitational potential decrease is $mgs\sin\theta$, while friction removes $\mu_kmgs\cos\theta$. Starting from rest,
+
+$$
+\frac12mv^2=mgs(\sin\theta-\mu_k\cos\theta).
+$$
+
+The mass cancels. If the expression in parentheses is negative, the assumed spontaneous downhill slide from rest is impossible under the kinetic model; static friction and initial conditions need examination. If an external push starts uphill or downhill motion, friction direction must follow that actual sliding direction.
+
+## Efficiency does not alter energy conservation
+
+Efficiency compares desired output with required input:
+
+$$
+\eta=\frac{E_{useful,out}}{E_{in}}
+=\frac{P_{useful,out}}{P_{in}}.
+$$
+
+For a cyclic machine, efficiency below one records energy transferred into unwanted channels, not destroyed energy. A motor with $90\%$ efficiency delivering $9$ kW mechanically draws $10$ kW electrically; the remaining $1$ kW becomes heat and other losses at that operating point.
+
+Efficiencies cannot always be multiplied without checking boundaries and definitions. A motor efficiency, gearbox efficiency, and lifting efficiency may be multiplied when each output is the next device's input under the same operating condition. Regenerative devices reverse energy flow, and their efficiencies may differ by direction. Peak catalog efficiency should not be assumed across every speed and load.
+
+## Energy methods and force recovery
+
+Energy can find speed as a function of position, after which Newton's law can recover a reaction. For a bead on a smooth circular track, energy gives $v$ at the bottom from height loss. The normal equation then gives $N-mg=mv^2/R$. Trying to find $N$ from energy alone fails because the normal force does no work and therefore does not appear in the energy balance.
+
+This two-stage strategy is common in loops, pendulums, and roller-coaster problems: use energy for speed, then use a normal-direction force equation for tension or contact force. The contact result must be checked for physical sign. If a string tension or normal reaction would be negative, the assumed constrained path ends before the calculated point.
+
+## Consistency checks for an energy balance
+
+- Use work-energy for endpoint quantities, not directly for elapsed time.
+- Include only forces whose points of application move in the force direction; ideal normals and fixed-pin reactions often contribute zero work.
+- Give kinetic friction negative work when it opposes sliding.
+- Measure spring deformation from the spring's natural length.
+- Keep one gravitational datum throughout the calculation.
+- Add nonconservative work explicitly instead of claiming mechanical-energy conservation.
+- A negative value for $T_2$ means the proposed final state cannot be reached under the assumed path and forces.
+- Do not assign potential energy to kinetic friction. Its work depends on path length and removes recoverable mechanical energy.
+- Static friction can do zero work in ideal rolling, but it can transfer energy when the supporting surface moves or the contacting bodies deform.
+- Energy alone cannot normally determine a direction. A speed obtained from $v^2$ must be combined with the known or separately solved direction of motion.
+
+<div className="see-also">
+
+See also: [Particle kinetics with Newton's second law](/physics/mechanics/particle-kinetics-newton) · [Particle kinematics](/physics/mechanics/particle-kinematics) · [Impulse, momentum, and impact](/physics/mechanics/impulse-momentum-impact) · [Planar rigid-body motion](/physics/mechanics/planar-rigid-body-motion)
+
+</div>

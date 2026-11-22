@@ -11,9 +11,9 @@ Autonomous vehicles are cyber-physical systems, so attacks can target neural per
 
 *Figure: RP2 connects adversarial optimization to physical-world traffic-sign attacks. Image: [ar5iv](https://arxiv.org/abs/1707.08945), Eykholt et al., educational use with attribution.*
 
-This page gives a foundational overview of adversarial patches on signs, lidar spoofing, projector attacks, sensor jamming, GNSS spoofing, V2X attacks, and defense considerations. It cross-links to the broader [adversarial attacks](/cs/adversarial-attacks/) section and to AV-specific pages on [sensors](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu), [fusion](/cs/autonomous-driving/sensor-fusion), [V2X](/cs/autonomous-driving/v2x-and-connected-vehicles), and [safety](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing).
+The relevant question is not only whether an attacker can corrupt a model output, but whether the corruption survives the full driving stack and changes the vehicle's behavior.
 
-## Definitions
+## The attack vocabulary
 
 An **adversarial example** is an input intentionally perturbed to cause a model error. In AVs, perturbations may be digital, such as modified pixels in a dataset, or physical, such as stickers, projected light, or manipulated objects.
 
@@ -31,7 +31,7 @@ An **adversarial patch** is a visible pattern designed to cause misclassificatio
 
 **Defense in depth** means using multiple independent mitigations so one failed defense does not immediately create a hazard.
 
-## Key results
+## Threats, access, and system impact
 
 Attacks differ by required access and operational impact.
 
@@ -49,7 +49,7 @@ Physical robustness is harder than digital robustness because the attack passes 
 
 Fusion helps but can also spread errors. If a camera sees a fake sign and a map expects a sign there, the stack may become more confident. If lidar and radar disagree, the fusion system must preserve disagreement as uncertainty rather than forcing a single answer.
 
-Adversarial risk belongs in the safety case. A SOTIF analysis may cover performance limits without malicious intent, while cybersecurity analysis covers intentional attacks. In practice, the same hazardous behavior can arise from either, so safety and security teams need shared scenarios and mitigations.
+Adversarial risk belongs in the safety case. A SOTIF analysis may cover performance limits without malicious intent, while cybersecurity analysis covers intentional attacks. The same hazardous behavior can arise from either, so safety and security teams need shared scenarios and mitigations.
 
 A useful risk model separates threat, vulnerability, exposure, and consequence:
 
@@ -72,7 +72,7 @@ The operational response should be proportional to confidence and context. A sus
 
 Logging is part of defense. If a system flags spoofing, jamming, or sensor tampering, the event should be preserved with raw evidence, timing, vehicle state, and software version. That record supports incident response, patch development, fleet-wide detection, and safety-case updates.
 
-## Visual
+### How compromised inputs reach planning
 
 ```mermaid
 flowchart TD
@@ -92,7 +92,7 @@ flowchart TD
   L --> M["Safety monitors and fallback"]
 ```
 
-## Worked example 1: Attack latency and stopping distance
+## Six metres of blind travel
 
 Problem: A camera attack causes a pedestrian detector to miss a pedestrian for 0.4 s. The vehicle travels at 15 m/s. How much distance passes before the missed detection can be corrected, ignoring braking?
 
@@ -112,7 +112,7 @@ Answer: the vehicle travels 6 m during the missed-detection interval.
 
 Check: Six meters is a large distance in urban driving. Even temporary perception failures can be safety critical if they occur near crosswalks or stopped traffic.
 
-## Worked example 2: Plausibility-checking a spoofed GNSS jump
+## Rejecting an implausible GNSS jump
 
 Problem: A vehicle's GNSS position jumps 12 m sideways within 0.2 s, while wheel odometry and IMU indicate lateral velocity below 0.5 m/s. Compute the implied lateral velocity from GNSS and decide whether to flag it.
 
@@ -134,7 +134,7 @@ Answer: the GNSS jump should be flagged as implausible and rejected or heavily d
 
 Check: This does not prove spoofing; it could be multipath or receiver fault. The safe response is to isolate the measurement and rely on other localization sources while uncertainty grows.
 
-## Code
+## A minimal GNSS plausibility gate
 
 ```python
 from dataclasses import dataclass
@@ -163,7 +163,7 @@ cur = GnssMeasurement(0.0, 12.0, 10.2)
 print(gnss_plausible(prev, cur))
 ```
 
-## Common pitfalls
+## Where security analyses go wrong
 
 - Treating adversarial attacks as only image-classifier problems. AV attacks can target lidar, radar, GNSS, maps, V2X, data, and compute.
 - Assuming sensor fusion automatically defeats attacks. Fusion can amplify a bad input if priors and sensors fail in correlated ways.
@@ -172,12 +172,8 @@ print(gnss_plausible(prev, cur))
 - Designing defenses without operational response. Detection must connect to degraded mode, fallback, or service restriction.
 - Separating safety and security too sharply. Malicious attacks and non-malicious performance limits can produce the same hazardous event.
 
-## Connections
+<div className="see-also">
 
-- [Adversarial attacks](/cs/adversarial-attacks/)
-- [Sensors, cameras, lidar, radar, and IMU](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu)
-- [Sensor fusion](/cs/autonomous-driving/sensor-fusion)
-- [V2X and connected vehicles](/cs/autonomous-driving/v2x-and-connected-vehicles)
-- [Safety, ISO 26262, SOTIF, and scenario testing](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing)
-- [Deep learning](/cs/deep-learning/)
-- Further reading: adversarial examples for traffic signs, physical adversarial patches, lidar spoofing research, GNSS spoofing literature, vehicular cybersecurity standards, and robust perception surveys.
+See also: [Adversarial attacks](/cs/adversarial-attacks/intro) · [Sensors, cameras, lidar, radar, and IMU](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu) · [Sensor fusion](/cs/autonomous-driving/sensor-fusion) · [V2X and connected vehicles](/cs/autonomous-driving/v2x-and-connected-vehicles) · [Safety, ISO 26262, SOTIF, and scenario testing](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing) · [Deep learning](/cs/deep-learning/intro)
+
+</div>

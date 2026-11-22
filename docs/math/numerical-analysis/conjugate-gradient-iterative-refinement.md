@@ -7,13 +7,9 @@ sidebar_position: 18
 
 Conjugate gradient is an iterative method designed for symmetric positive definite linear systems. It improves on stationary iterations by choosing search directions that are conjugate with respect to the matrix $A$, which prevents the method from repeatedly correcting the same error component. For large sparse SPD systems, CG is often the first serious method to try.
 
-![A matrix transforms two vectors into new positions in the plane.](https://commons.wikimedia.org/wiki/Special:FilePath/Matrix_multiplication.svg)
-
-*Figure: Matrix multiplication can be read geometrically as a transformation of vectors. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Matrix_multiplication.svg), Jakob.scholbach and Pbroks13, CC BY-SA 3.0.*
-
 Iterative refinement is a different idea: compute a solution, form the residual, solve for a correction, and update the solution. It can improve the accuracy of a direct solve when the residual is computed accurately enough and the original problem is not too ill-conditioned.
 
-## Definitions
+## CG as quadratic minimization
 
 For an SPD matrix $A$, solving $Ax=b$ is equivalent to minimizing the quadratic function
 
@@ -26,6 +22,14 @@ The residual is
 $$
 r^{(k)}=b-Ax^{(k)}.
 $$
+
+The gradient is
+
+$$
+\nabla\phi(x)=Ax-b=-r.
+$$
+
+Thus the residual points in the steepest-descent direction. Ordinary steepest descent repeatedly searches along the current residual, but its directions can undo part of earlier progress and zigzag across elongated level ellipses. CG modifies each new residual by a multiple of the previous search direction so that the resulting directions are $A$-orthogonal.
 
 CG starts from $x^{(0)}$, sets $r^{(0)}=b-Ax^{(0)}$, and chooses the first search direction $p^{(0)}=r^{(0)}$. The basic recurrences are
 
@@ -45,9 +49,31 @@ $$
 p^{(k+1)}=r^{(k+1)}+\beta_kp^{(k)}.
 $$
 
-Iterative refinement computes $r=b-A\hat{x}$, solves $Ad=r$, and replaces $\hat{x}$ by $\hat{x}+d$.
+The step length $\alpha_k$ is an exact line minimizer. Put $x(\alpha)=x^{(k)}+\alpha p^{(k)}$. Differentiating gives
 
-## Key results
+$$
+\frac{d}{d\alpha}\phi(x(\alpha))
+=(p^{(k)})^T(Ax^{(k)}+\alpha Ap^{(k)}-b).
+$$
+
+Setting this to zero yields
+
+$$
+\alpha_k
+=\frac{(p^{(k)})^Tr^{(k)}}{(p^{(k)})^TAp^{(k)}}.
+$$
+
+CG's orthogonality relations imply $(p^{(k)})^Tr^{(k)}=(r^{(k)})^Tr^{(k)}$, giving the stated formula. The denominator is positive for every nonzero search direction because $A$ is positive definite.
+
+The coefficient $\beta_k$ is chosen so that
+
+$$
+(p^{(k+1)})^TAp^{(k)}=0.
+$$
+
+Substituting $p^{(k+1)}=r^{(k+1)}+\beta_kp^{(k)}$ and using the residual update leads, after applying residual orthogonality, to the Fletcher--Reeves ratio shown above. These short recurrences are special to the symmetric positive definite structure.
+
+## Why the spectrum controls convergence
 
 In exact arithmetic, CG terminates in at most $n$ steps for an $n\times n$ SPD matrix. In floating-point arithmetic it is used as an iterative method, and convergence depends strongly on the eigenvalue distribution of $A$. A standard bound is
 
@@ -60,27 +86,90 @@ $$
 
 The $A$-norm is defined by $\|v\|_A=\sqrt{v^TAv}$. The bound shows why preconditioning matters: reducing the effective condition number can dramatically reduce iteration count.
 
+The deeper description uses Krylov subspaces:
+
+$$
+\mathcal{K}_k(A,r^{(0)})
+=\operatorname{span}\{r^{(0)},Ar^{(0)},\ldots,A^{k-1}r^{(0)}\}.
+$$
+
+After $k$ steps, CG chooses the vector in $x^{(0)}+\mathcal{K}_k$ with the smallest $A$-norm error. Equivalently, the error has the form
+
+$$
+e^{(k)}=p_k(A)e^{(0)},
+$$
+
+where $p_k$ is a degree-$k$ polynomial satisfying $p_k(0)=1$. CG implicitly chooses a polynomial that is small on the eigenvalues of $A$. If the spectrum forms a few tight clusters, a low-degree polynomial can be small there even when the extreme-eigenvalue condition number is pessimistic. CG often converges faster than the standard bound predicts.
+
+Exact termination follows from the same view. A polynomial that vanishes at every distinct eigenvalue present in the initial error annihilates that error. Therefore termination may occur in fewer than $n$ steps when $A$ has few distinct eigenvalues.
+
 CG search directions satisfy $p_i^TAp_j=0$ for $i\ne j$ in exact arithmetic, and residuals are mutually orthogonal. These properties explain the method's efficiency. They also explain why roundoff can eventually slow progress; finite precision gradually erodes exact orthogonality.
 
-Iterative refinement improves a computed solution when the correction equation is solved accurately enough relative to the conditioning. It is especially useful when factorization is done once and corrections are cheap triangular solves.
+The work per CG iteration is dominated by a sparse matrix-vector product and, when present, a preconditioner solve. Residual norms and iteration counts should be reported together; a small iterate change alone is weak evidence of convergence.
 
-A reliable way to use these results is to keep the analysis tied to the actual numerical question rather than to the formula alone. For conjugate gradient and iterative refinement, the input record should include SPD structure, residual norm, preconditioner choice, and correction precision. Without that record, two computations that look similar on paper may have different numerical meanings. The same formula can be a safe production tool in one scaling and a fragile experiment in another. This is why the examples on this page show the intermediate arithmetic: the goal is not only to reach a number, but to expose what assumptions made that number meaningful.
+For a residual-based stop, scale matters. A common test is
 
-The next record is the verification record. Useful diagnostics for this topic include residual norm, A-norm error estimates, and improvement after refinement. A diagnostic should be chosen before the computation is trusted, not after a pleasing answer appears. When an exact answer is unavailable, compare two independent approximations, refine the mesh or tolerance, check a residual, or test the method on a neighboring problem with known behavior. If several diagnostics disagree, treat the disagreement as information about conditioning, stability, or implementation rather than as a nuisance to be averaged away.
+$$
+\|r^{(k)}\|_2
+\le \mathrm{atol}+\mathrm{rtol}\,\|b\|_2.
+$$
 
-The cost record matters as well. In this topic the dominant costs are usually sparse matrix-vector products, preconditioner solves, and residual recomputation. Numerical analysis is full of methods that are mathematically attractive but computationally mismatched to the problem size. A dense factorization may be acceptable for a classroom matrix and impossible for a PDE grid. A high-order rule may use fewer steps but more expensive stages. A guaranteed method may take many iterations but provide a bound that a faster method cannot. The right comparison is therefore cost to reach a verified tolerance, not order or elegance in isolation.
+The residual and error satisfy
 
-Finally, every method here has a recognizable failure mode: loss of conjugacy, poor conditioning, and refinement residuals computed too inaccurately. These failures are not edge cases to memorize; they are signals that the hypotheses behind the result have been violated or that a different numerical model is needed. A good implementation makes such failures visible through exceptions, warnings, residual reports, or conservative stopping rules. A good hand solution does the same thing in prose by naming the assumption being used and checking it at the point where it matters.
+$$
+e^{(k)}=A^{-1}r^{(k)}.
+$$
 
-For study purposes, the most useful habit is to separate four layers: the continuous mathematical problem, the discrete approximation, the algebraic or iterative algorithm used to compute it, and the diagnostic used to judge the result. Many mistakes come from mixing these layers. A small algebraic residual may not mean a small modeling error. A small step-to-step change may not mean the discrete equations are solved. A high-order truncation formula may not help when the data are noisy or the arithmetic is unstable. Keeping the layers separate makes the results on this page portable to larger examples.
+Consequently a small residual can coexist with a larger error when $A^{-1}$ has a large norm. Energy-norm error bounds can be formed if spectral estimates are available, but most implementations report the residual and rely on conditioning knowledge from the application.
 
-## Visual
+Recursive residual updates gradually drift from the true residual $b-Ax^{(k)}$ in floating point. Recomputing the true residual occasionally can detect false convergence. Restarting from it may restore accuracy, although frequent replacement disturbs the ideal Krylov recurrence.
+
+### What a preconditioner must preserve
+
+A preconditioner $M$ approximates $A$ while being much cheaper to solve with. One can view preconditioned CG as applying ordinary CG to the symmetrically transformed system
+
+$$
+M^{-1/2}AM^{-1/2}\mathbf{y}
+=M^{-1/2}\mathbf{b},
+\qquad
+\mathbf{x}=M^{-1/2}\mathbf{y}.
+$$
+
+Both $A$ and $M$ should be symmetric positive definite so the transformed matrix remains SPD. Implementations avoid forming square roots: they solve $M\mathbf{z}_k=\mathbf{r}_k$ and use $\mathbf{r}_k^T\mathbf{z}_k$ in the recurrence.
+
+The aim is not to make $M^{-1}A$ entrywise close to the identity. The useful target is a clustered spectrum at low application cost. Jacobi preconditioning uses the diagonal of $A$ and is cheap but limited. Incomplete Cholesky captures more coupling at greater setup and solve cost. For a sequence of systems with the same matrix, setup can be amortized over many right-hand sides.
+
+A preconditioner can reduce iteration count while increasing total time if its triangular solves, communication, or memory traffic are expensive. Iterations, matrix-vector products, setup time, and solve time should be reported separately.
+
+## Refinement as a correction equation
+
+Iterative refinement computes $r=b-A\hat{x}$, solves $Ad=r$, and replaces $\hat{x}$ by $\hat{x}+d$. It improves a computed solution when the residual and correction are accurate enough relative to the conditioning. It is especially useful when factorization is done once and corrections are cheap triangular solves.
+
+To see the mechanism, let $x$ be the exact solution and $e=x-\widehat{x}$. In exact arithmetic,
+
+$$
+r=b-A\widehat{x}=A(x-\widehat{x})=Ae.
+$$
+
+Solving $Ad=r$ gives $d=e$, so one correction recovers $x$. Real refinement is interesting only because residual formation and correction solves contain rounding errors. If the factorization solve returns an approximate correction
+
+$$
+\widehat d=(I+E)e+\boldsymbol{\eta},
+$$
+
+then the new error is roughly $-Ee-\boldsymbol{\eta}$. Refinement contracts when the solve error is small enough relative to the condition number and the residual is formed accurately enough.
+
+Mixed precision exploits this asymmetry. One may factor $A$ in a lower precision, reuse that inexpensive factorization for every correction, form the residual in a higher precision, and accumulate the solution in the higher precision. Success depends roughly on the product of the matrix condition number and the lower-precision unit roundoff being below one. The exact bound depends on the solver and error model, so failure should be detected through residual and correction histories rather than assumed away.
+
+Refinement can stagnate for several reasons. The residual may round to zero even though the solution still has error, the correction solve may be too inaccurate, or the matrix may be too ill-conditioned for the available precisions. Componentwise scaling matters too: normwise backward stability can hide poor relative accuracy in a tiny solution component.
+
+The two workflows carry different state:
 
 ```mermaid
 flowchart TB
   Input["SPD linear system<br/>A x = b, optional preconditioner M"] --> Init["choose x0<br/>r0 = b - A x0"]
   Init --> Prec{"preconditioned?"}
-  Prec -- "no" --> P0["p0 = r0"]
+  Prec -- "no" --> P0["z0 = r0<br/>p0 = z0"]
   Prec -- "yes" --> Z0["solve M z0 = r0<br/>p0 = z0"]
 
   subgraph CG["Conjugate-gradient loop"]
@@ -114,7 +203,7 @@ flowchart TB
   RefOut --> Done
 ```
 
-The CG loop shows the full state carried between iterations: residuals, optional preconditioned residuals, search directions, matrix-vector products, step lengths, and conjugacy updates. The separate refinement subgraph covers the direct-solve correction workflow, where a high-quality residual drives a correction equation. Both paths end with explicit residual reporting because convergence is a numerical claim, not just a loop exit.
+The CG loop carries residuals, optional preconditioned residuals, search directions, matrix-vector products, step lengths, and conjugacy updates. The refinement branch starts from a direct solve and uses a high-quality residual to drive a correction equation. Both paths end with an explicit residual report.
 
 | Method | Matrix class | Main cost | Strength | Limitation |
 |---|---|---|---|---|
@@ -123,7 +212,39 @@ The CG loop shows the full state carried between iterations: residuals, optional
 | Iterative refinement | already factored systems | residual plus correction solves | improves direct solution | limited by conditioning and residual precision |
 | Preconditioned CG | SPD with preconditioner | solve with $M$ plus matvec | reduces effective condition number | preconditioner design is problem-specific |
 
-## Worked example 1: two CG steps solve a 2 by 2 system
+## Checking whether CG is the right Krylov method
+
+Symmetry and positive definiteness are mathematical requirements, not optional hints. A matrix may look symmetric in a printed sample while small assembly errors make $A-A^T$ nonzero. Testing a few random quadratic forms for positivity can reveal an obvious failure but does not prove positive definiteness. A successful Cholesky factorization is a stronger numerical check for an explicitly stored matrix.
+
+When $A$ is symmetric indefinite, the denominator $p^TAp$ can vanish or change sign and the minimization interpretation fails. MINRES is designed for symmetric indefinite systems. Nonsymmetric systems call for methods such as GMRES or BiCGSTAB. Applying CG anyway may appear to work on one right-hand side and then break on another.
+
+Normal equations turn a rectangular least-squares problem into the SPD system $A^TAx=A^Tb$, but they square the condition number. CG on the normal equations is therefore sensitive to ill-conditioning. Methods based on LSQR or LSMR use products with $A$ and $A^T$ while avoiding explicit formation of $A^TA$ and usually give more reliable stopping information.
+
+## Storage and cost on sparse problems
+
+CG's appeal comes from its memory footprint. Apart from the sparse matrix or matrix-vector operator, it keeps only a few vectors of length $n$. There is no growing basis as in unrestarted GMRES. A matrix-free implementation needs a routine that computes $A\mathbf{p}$ and a preconditioner application; it need not store matrix entries if the operator can be evaluated from the model.
+
+One iteration includes a matrix-vector product, several vector updates, and inner products. On a distributed machine, inner products require global synchronization and can dominate even when the arithmetic count is low. Communication-avoiding variants reorganize recurrences to reduce synchronization, at some cost in numerical robustness.
+
+The initial guess can matter. If a sequence of nearby systems is solved, the previous solution may remove much of the new error before the first iteration. Only eigencomponents present in the initial error need to be reduced. Reusing a guess does not alter the exact solution and is often cheaper than constructing a more elaborate preconditioner for every solve.
+
+## Backward error and refinement stopping
+
+The normwise relative backward error asks how much the data must change to make a computed vector exact. A common estimate is
+
+$$
+\eta
+=\frac{\|b-A\widehat{x}\|}
+{\|A\|\,\|\widehat{x}\|+\|b\|}.
+$$
+
+A small $\eta$ says the computed solution exactly solves a nearby system. Forward accuracy then depends on conditioning. Iterative refinement is often stopped when backward error reaches the level expected from the residual precision, when corrections cease to decrease, or when an iteration limit is reached.
+
+Correction size alone can mislead. A tiny correction may mean the solution is accurate, but it can also mean the low-precision factorization cannot resolve the remaining error. Residual, correction, and backward-error histories together distinguish contraction from stagnation.
+
+Refinement reuses a direct factorization, so its cost model differs from CG. It is attractive when a factorization already exists or when many right-hand sides justify the setup. CG avoids fill-in and can be superior for a single huge sparse SPD problem. The two ideas can also be combined: an iterative Krylov solve may serve as the correction equation solver when an exact triangular solve is unavailable, provided each correction is accurate enough to reduce the outer error.
+
+## Exact termination on a two-dimensional SPD system
 
 **Problem.** Use CG from $x^{(0)}=(0,0)^T$ for
 
@@ -165,11 +286,52 @@ p^{(1)}=r^{(1)}+0.0625p^{(0)}
 =\begin{bmatrix}-0.4375\\0.375\end{bmatrix}.
 $$
 
-5. The second step gives $x^{(2)}=(0.090909,0.636364)^T$.
+5. Compute the second matrix-vector product and step length:
+
+$$
+Ap^{(1)}
+=\begin{bmatrix}-11/8\\11/16\end{bmatrix},
+$$
+
+$$
+(p^{(1)})^TAp^{(1)}
+=\frac{77}{128}+\frac{33}{128}
+=\frac{55}{64}.
+$$
+
+Since $(r^{(1)})^Tr^{(1)}=5/16$,
+
+$$
+\alpha_1
+=\frac{5/16}{55/64}
+=\frac4{11}.
+$$
+
+6. Update the iterate:
+
+$$
+\begin{aligned}
+x^{(2)}
+&=\begin{bmatrix}1/4\\1/2\end{bmatrix}
++\frac4{11}
+\begin{bmatrix}-7/16\\3/8\end{bmatrix}\\
+&=\begin{bmatrix}1/11\\7/11\end{bmatrix}.
+\end{aligned}
+$$
+
+The new residual is
+
+$$
+r^{(2)}
+=\begin{bmatrix}-1/2\\1/4\end{bmatrix}
+-\frac4{11}
+\begin{bmatrix}-11/8\\11/16\end{bmatrix}
+=\begin{bmatrix}0\\0\end{bmatrix}.
+$$
 
 **Checked answer.** Direct solution gives $(1/11,7/11)^T$, matching the CG result after two steps in exact arithmetic.
 
-## Worked example 2: one iterative refinement correction
+## One residual-driven correction
 
 **Problem.** For the same matrix and right-hand side, suppose
 
@@ -210,7 +372,7 @@ $$
 
 **Checked answer.** One correction recovers the exact solution to the displayed precision.
 
-## Code
+## Minimal CG and refinement routines
 
 ```python
 import numpy as np
@@ -252,7 +414,7 @@ print(conjugate_gradient(A, b, max_iter=2))
 print(iterative_refinement(A, b, np.array([0.09, 0.64])))
 ```
 
-## Common pitfalls
+## Requirements that are easy to violate
 
 - Using CG on a nonsymmetric or indefinite matrix. The standard method requires SPD structure.
 - Monitoring only iterate changes instead of residual norms.
@@ -260,9 +422,14 @@ print(iterative_refinement(A, b, np.array([0.09, 0.64])))
 - Ignoring preconditioning for ill-conditioned SPD systems.
 - Performing refinement with a residual computed at the same low precision that caused the original error.
 
-## Connections
+Loss of symmetry can enter through the preconditioner as well as the matrix. An approximate solve whose action changes from one iteration to the next does not fit ordinary preconditioned CG. Flexible Krylov variants are designed for variable preconditioners. Likewise, applying a nonsymmetric triangular preconditioner on only one side can destroy the self-adjoint structure on which CG relies.
 
-- [Jacobi Gauss Seidel and SOR](/math/numerical-analysis/iterative-linear-systems)
-- [matrix factorizations and special systems](/math/numerical-analysis/matrix-factorizations-special-systems)
-- [Gaussian elimination pivoting and LU](/math/numerical-analysis/gaussian-elimination-pivoting-lu)
-- [finite difference methods for PDEs](/math/numerical-analysis/finite-difference-pdes)
+Reproducibility is another numerical detail. Parallel reductions may sum inner products in different orders, changing low bits and eventually the iteration path. Two runs can have slightly different residual histories while both satisfy the tolerance. Exact agreement is a poor regression criterion for large parallel solves; residual bounds and problem-level quantities are more robust checks.
+
+A zero right-hand side needs a scale-independent branch in the stopping test. If $b=0$, a purely relative criterion based on $\|b\|$ requests a zero residual, which floating-point iteration may never reach. An absolute tolerance or an immediate return for a zero initial residual handles the case. The same issue appears when the true solution is zero but the initial guess is not.
+
+<div className="see-also">
+
+See also: [Jacobi Gauss Seidel and SOR](/math/numerical-analysis/iterative-linear-systems) · [matrix factorizations and special systems](/math/numerical-analysis/matrix-factorizations-special-systems) · [Gaussian elimination pivoting and LU](/math/numerical-analysis/gaussian-elimination-pivoting-lu) · [finite difference methods for PDEs](/math/numerical-analysis/finite-difference-pdes)
+
+</div>

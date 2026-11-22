@@ -480,10 +480,8 @@ Real-time and offline filtering have different causality constraints. An offline
 - Assuming poles near the unit circle are always bad. They can be useful for resonance, but they reduce stability margin in causal IIR filters.
 - Mixing continuous-time cutoff $\omega_c$ in rad/s with discrete-time cutoff $\Omega_c$ in rad/sample.
 
-## Related pages
+<div className="see-also">
 
-- [Continuous-Time Fourier Transform](/physics/signals-systems/continuous-time-fourier-transform)
-- [Discrete-Time Fourier Transform](/physics/signals-systems/discrete-time-fourier-transform)
-- [Laplace Transform and ROC](/physics/signals-systems/laplace-transform-roc)
-- [Z-Transform and ROC](/physics/signals-systems/z-transform-roc)
-- [Sampling, Aliasing, and Reconstruction](/physics/signals-systems/sampling-aliasing-reconstruction)
+See also: [Continuous-Time Fourier Transform](/physics/signals-systems/continuous-time-fourier-transform) · [Discrete-Time Fourier Transform](/physics/signals-systems/discrete-time-fourier-transform) · [Laplace Transform and ROC](/physics/signals-systems/laplace-transform-roc) · [Z-Transform and ROC](/physics/signals-systems/z-transform-roc) · [Sampling, Aliasing, and Reconstruction](/physics/signals-systems/sampling-aliasing-reconstruction)
+
+</div>

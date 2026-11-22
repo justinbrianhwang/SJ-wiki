@@ -9,7 +9,7 @@ Generating functions turn sequences into algebraic objects. Instead of studying 
 
 The main idea is that the exponent tracks size while the coefficient tracks how many objects have that size. Once a counting problem is translated into a generating function, multiplication, coefficient extraction, and algebraic simplification do the bookkeeping that would otherwise require many cases.
 
-## Definitions
+## Coefficients as an encoding of a sequence
 
 The **ordinary generating function** for a sequence $\{a_n\}_{n\ge0}$ is
 
@@ -38,9 +38,9 @@ $$
 =\sum_{n\ge0}\left(\sum_{k=0}^{n}a_kb_{n-k}\right)x^n.
 $$
 
-This is why products of generating functions model independent contributions whose sizes add.
+Products of generating functions therefore model independent contributions whose sizes add.
 
-## Key results
+## Recurrences, identities, and constrained choices
 
 Generating functions solve linear recurrences. For the Fibonacci sequence $F_0=0$, $F_1=1$, and $F_n=F_{n-1}+F_{n-2}$, let
 
@@ -83,7 +83,7 @@ $$
 
 For restricted integer solutions, each variable contributes a factor whose terms represent its allowed values. If $x_i$ can be $0,1,2$, its factor is $1+x+x^2$. If it can be any nonnegative integer, its factor is $1/(1-x)$.
 
-## Visual
+The translation from choices to a coefficient follows a fixed chain:
 
 ```mermaid
 flowchart LR
@@ -102,7 +102,7 @@ flowchart LR
 | one coin of value $d$ or none | $1+x^d$ | at most one coin |
 | unlimited coins of value $d$ | $\frac1{1-x^d}$ | any number of that coin |
 
-## Worked example 1: Count restricted solutions
+## Bounded solutions to $x_1+x_2+x_3=5$
 
 **Problem.** Count nonnegative integer solutions to
 
@@ -147,7 +147,7 @@ $$
 
 **Checked answer.** There are $3$ solutions: $(1,2,2)$, $(2,1,2)$, and $(2,2,1)$.
 
-## Worked example 2: Solve a recurrence with a generating function
+## Solving $a_n=2a_{n-1}+1$ algebraically
 
 **Problem.** Solve $a_0=1$ and $a_n=2a_{n-1}+1$ for $n\ge1$.
 
@@ -207,7 +207,7 @@ $$
 
 **Checked answer.** $a_n=2^{n+1}-1$. Check: $a_0=1$, and $2a_{n-1}+1=2(2^n-1)+1=2^{n+1}-1$.
 
-## Code
+## Polynomial convolution with coefficient dictionaries
 
 ```python
 from collections import Counter
@@ -232,7 +232,7 @@ print("coefficient of x^5:", restricted[5])
 
 The dictionary key is the exponent, and the value is the coefficient. Multiplication implements convolution.
 
-## Common pitfalls
+## Keeping the algebra tied to the counting model
 
 - Forgetting that ordinary generating functions usually track size by exponent and count by coefficient.
 - Multiplying factors when the modeled choices are not independent components.
@@ -257,21 +257,21 @@ Generating functions can also encode choices with signs or weights. If an object
 
 As a final verification, translate a coefficient back into a combinatorial statement. If $[x^5](1+x+x^2)^3=3$, explain that the three contributions correspond to placing one variable at $1$ and the other two at $2$. This reverse translation is the best evidence that the algebra and the original counting problem still match.
 
-A practical workflow is: define the coefficient meaning, build one factor per independent component, multiply or simplify, extract the coefficient, and then interpret the coefficient back in the original language. Skipping the final interpretation is risky because the algebra may have counted a related but different object, such as ordered selections instead of unordered selections.
+One reliable workflow is to define the coefficient meaning, build one factor per independent component, multiply or simplify, extract the coefficient, and interpret it back in the original language. Skipping the final interpretation is risky because the algebra may have counted a related but different object, such as ordered selections instead of unordered selections.
 
 For difficult coefficient extractions, compute the first few terms before seeking a closed form. Expanding through degree $5$ or $6$ often reveals whether the generating function has the right initial behavior. These low-degree coefficients also provide test data for recurrence solutions derived from rational generating functions.
 
 If a generating function has a product of factors, annotate each factor in the margin. For example, in $\frac{1}{(1-x)(1-x^5)(1-x^{10})}$, the factors represent pennies, nickels, and dimes. This annotation keeps the algebra tied to the counting model and makes it easier to modify the expression when supplies become limited.
 
-When the same problem can be solved by stars and bars, a recurrence, and a generating function, compare the answers. Agreement across methods is a strong validation, and disagreement usually reveals whether order, repetition, or a boundary constraint was modeled differently.
+When the same problem can be solved by stars and bars, a recurrence, and a generating function, compare the answers. Agreement across methods is a strong validation, and disagreement usually reveals whether order, repetition, or a boundary constraint was modeled differently. The comparison also indicates which method exposes the constraint most directly.
 
-This comparison also helps decide which method gives the clearest explanation for the audience.
+<div className="see-also">
 
-Prefer the method that exposes the constraint most directly.
-
-## Connections
+See also:
 
 - [Recurrence relations](/math/discrete/recurrence-relations) gives the recurrences generating functions often solve.
 - [Permutations and combinations](/math/discrete/permutations-and-combinations) supplies binomial coefficients and stars-and-bars counts.
 - [Counting principles](/math/discrete/counting-principles) supplies product-rule reasoning for multiplying factors.
 - [Discrete probability](/math/discrete/discrete-probability) uses generating functions for distributions in more advanced work.
+
+</div>

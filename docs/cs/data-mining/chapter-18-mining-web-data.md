@@ -305,10 +305,8 @@ The PageRank call includes dangling-node handling internally. Library defaults c
 - Letting URL parameters generate an unbounded crawler frontier.
 - Treating PageRank as a substitute for query-dependent relevance.
 
-## Related pages
+<div className="see-also">
 
-- [Mining Text Data](/cs/data-mining/chapter-13-mining-text-data)
-- [Mining Graph Data](/cs/data-mining/chapter-17-mining-graph-data)
-- [Mining Discrete Sequences](/cs/data-mining/chapter-15-mining-discrete-sequences)
-- [Association Pattern Mining](/cs/data-mining/chapter-04-association-pattern-mining)
-- [Social Network Analysis](/cs/data-mining/chapter-19-social-network-analysis)
+See also: [Mining Text Data](/cs/data-mining/chapter-13-mining-text-data) · [Mining Graph Data](/cs/data-mining/chapter-17-mining-graph-data) · [Mining Discrete Sequences](/cs/data-mining/chapter-15-mining-discrete-sequences) · [Association Pattern Mining](/cs/data-mining/chapter-04-association-pattern-mining) · [Social Network Analysis](/cs/data-mining/chapter-19-social-network-analysis)
+
+</div>

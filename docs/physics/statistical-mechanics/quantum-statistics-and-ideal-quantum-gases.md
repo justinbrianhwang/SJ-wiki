@@ -412,10 +412,8 @@ At equal density and temperature, exchange raises the ideal Fermi pressure and l
 - Replacing a sum by an integral can erase a macroscopically occupied ground state or discrete finite-size structure.
 - Spin degeneracy changes the density per momentum state. A quoted degeneracy parameter should specify whether $n$ is total density and which $g$ is used.
 
-## Related pages
+<div className="see-also">
 
-- [Grand canonical ensemble and particle exchange](/physics/statistical-mechanics/grand-canonical-ensemble-and-particle-exchange)
-- [Degenerate Fermi gas](/physics/statistical-mechanics/degenerate-fermi-gas)
-- [Bose gases, photons, and phonons](/physics/statistical-mechanics/bose-gases-photons-and-phonons)
-- [Identical particles and symmetrization](/physics/quantum-mechanics/identical-particles-symmetrization)
-- [Quantum field theory motivation](/physics/quantum-field-theory/motivation-fields-and-quanta)
+See also: [Grand canonical ensemble and particle exchange](/physics/statistical-mechanics/grand-canonical-ensemble-and-particle-exchange) · [Degenerate Fermi gas](/physics/statistical-mechanics/degenerate-fermi-gas) · [Bose gases, photons, and phonons](/physics/statistical-mechanics/bose-gases-photons-and-phonons) · [Identical particles and symmetrization](/physics/quantum-mechanics/identical-particles-symmetrization) · [Quantum field theory motivation](/physics/quantum-field-theory/motivation-fields-and-quanta)
+
+</div>

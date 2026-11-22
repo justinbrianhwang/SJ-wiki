@@ -5,60 +5,31 @@ sidebar_position: 8
 
 # Quantum Theory of Atoms
 
-Quantum theory explains why atoms have discrete spectra and why electrons occupy orbitals rather than arbitrary classical paths. The chapter begins with light and photons because atomic structure was revealed through radiation: atoms absorb and emit only particular energies.
+Atomic spectra forced a departure from classical models. Atoms absorb and emit only particular photon energies, and electrons occupy orbitals described by quantum numbers rather than arbitrary planetary paths.
 
-In the Ebbing and Gammon sequence this topic sits near light waves, photons, Bohr theory, quantum mechanics, quantum numbers, and atomic orbitals. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
+## Light, photons, and the evidence for quantization
 
-![A diagram shows electrons emitted from a surface when incident light exceeds the photoelectric threshold.](https://commons.wikimedia.org/wiki/Special:FilePath/Photoelectric-effect.svg)
+Wavelength $\lambda$ is the distance between repeating points of a wave, while frequency $\nu$ is the number of cycles per second. For electromagnetic radiation in vacuum,
 
-*Figure: Photoelectric effect as evidence for quantized light. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Photoelectric-effect.svg), MikeRun, CC BY-SA 4.0.*
+$$
+c=\lambda\nu.
+$$
 
-## Definitions
+Planck's relation assigns one photon the energy
 
-The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.
+$$
+E=h\nu=\frac{hc}{\lambda}.
+$$
 
-- Wavelength $\lambda$ is the distance between repeating points on a wave.
-- Frequency $\nu$ is cycles per second and has unit $\mathrm{s^{-1}}$.
-- Photon is a quantum of electromagnetic radiation.
-- Quantization means only certain energy values are allowed.
-- An orbital is a wavefunction region associated with a probability distribution for an electron.
-- Principal quantum number $n$ labels shell size and energy level.
-- Angular momentum quantum number $l$ labels subshell shape.
-- Magnetic quantum number $m_l$ labels orbital orientation; spin quantum number $m_s$ labels electron spin.
+Shorter wavelengths therefore correspond to higher frequencies and higher photon energies.
 
-Definitions in chemistry often connect a symbolic representation to a physical sample. A formula such as $\mathrm{H_2O}$ names a substance, gives the atomic ratio inside one molecule, and supplies the molar mass used in a macroscopic calculation. A state symbol such as $\mathrm{(aq)}$ is not cosmetic; it says the species is dispersed in water and may be treated as ions when writing a net ionic equation. In the same way, constants such as $R$, $K_w$, $F$, or $N_A$ are compact definitions of the measurement system being used.
+Classical wave theory could distribute light energy continuously, but the photoelectric effect showed a threshold frequency below which no electrons are ejected, regardless of intensity. Above threshold,
 
-## Key results
+$$
+K_{\max}=h\nu-\Phi,
+$$
 
-The central results are:
-
-- Wave relation: $c=\lambda\nu$.
-- Photon energy: $E=h\nu=hc/\lambda$.
-- Bohr hydrogen energy: $E_n=-2.18\times10^{-18}\ \mathrm{J}/n^2$.
-- Hydrogen transition: $\Delta E=E_f-E_i$ and emitted photon energy is $\vert \Delta E\vert $.
-- Allowed $l$ values are $0$ to $n-1$; subshell letters are $s,p,d,f$ for $l=0,1,2,3$.
-- Number of orbitals in a subshell is $2l+1$.
-
-Bohr's model works best as a historical stepping stone: it explains the hydrogen spectrum but fails for multi-electron atoms. Quantum mechanics replaces fixed circular orbits with orbitals and probability. This change is not merely philosophical; it explains periodicity, bonding direction, and spectroscopy.
-
-A good way to use these results is to state the chemical model first, then substitute numbers second. For quantum theory of atoms, the model usually answers questions such as what particles are present, what is conserved, which process is idealized, and which measurement is being interpreted. Once that sentence is clear, the algebra becomes a bookkeeping problem rather than a search for a memorized pattern.
-
-Units are part of the result, not decoration. Whenever a formula contains an empirical constant, a tabulated value, or a ratio of measured quantities, the units tell you whether the expression has been used in the intended form. This is especially important in general chemistry because several equations have nearly identical algebra but different meanings: pressure can be a measured state variable, an equilibrium correction, or a colligative effect; energy can be heat flow, enthalpy, internal energy, or free energy.
-
-The strongest check is an independent chemical interpretation. Ask whether the sign agrees with direction, whether a concentration can be negative, whether a mole ratio follows the balanced equation, whether an equilibrium shift opposes the stress, and whether a microscopic description explains the macroscopic number. These checks connect quantum theory of atoms to neighboring topics instead of leaving it as an isolated technique.
-
-A second check is to compare the limiting cases. If a reactant amount goes to zero, a product amount cannot remain large. If temperature rises in a gas sample at fixed volume, pressure should not fall in an ideal model. If an acid is diluted, hydronium concentration should normally decrease unless a coupled equilibrium supplies more. Limiting cases often reveal algebra that has been rearranged correctly but applied to the wrong chemical situation.
-
-Finally, keep symbolic and particulate representations side by side. A balanced equation, an equilibrium expression, an orbital diagram, or a polymer repeat unit is a compact symbol for a population of particles. Translating that symbol into words forces you to say what is reacting, what is being counted, and what is being held constant. That translation is usually the difference between a calculation that can be adapted to a new problem and one that only imitates a worked example.
-
-## Visual
-
-| Quantum number | Allowed values | Meaning | Example |
-|---|---|---|---|
-| $n$ | $1,2,3,\dots$ | shell size and energy | $n=3$ |
-| $l$ | $0$ to $n-1$ | subshell shape | $l=1$ means p |
-| $m_l$ | $-l$ to $+l$ | orbital orientation | $-1,0,+1$ for p |
-| $m_s$ | $+1/2$ or $-1/2$ | spin state | paired electrons differ |
+where $\Phi$ is the work function. Raising frequency raises the maximum electron kinetic energy; raising intensity mainly increases the number of photons and emitted electrons. The blackbody spectrum and atomic line spectra supplied independent evidence that energy exchange is quantized.
 
 ```mermaid
 graph TD
@@ -66,72 +37,185 @@ graph TD
   B --> C[Photon energy]
   C --> D[Atomic transition]
   D --> E[Line spectrum]
-  E --> F[Evidence for quantized energy]
+  E --> F[Discrete atomic energies]
 ```
 
-## Worked example 1: Photon energy from wavelength
+For a 450 nm photon,
 
-Problem. Find the energy of one photon of blue light with wavelength 450 nm.
+$$
+E=\frac{(6.626\times10^{-34}\ \mathrm{J\,s})(2.998\times10^8\ \mathrm{m\,s^{-1}})}{450\times10^{-9}\ \mathrm{m}}
+=4.41\times10^{-19}\ \mathrm{J}.
+$$
 
-    Method.
+Writing the nanometer-to-meter conversion in the substitution prevents the most common unit error.
 
-    1. Convert wavelength to meters: $450\ \mathrm{nm}=450\times10^{-9}\ \mathrm{m}$.
-2. Use $E=hc/\lambda$.
-3. Substitute $h=6.626\times10^{-34}\ \mathrm{J\ s}$ and $c=2.998\times10^8\ \mathrm{m\ s^{-1}}$.
-4. Calculate numerator: $hc=1.986\times10^{-25}\ \mathrm{J\ m}$.
-5. Divide by wavelength: $E=(1.986\times10^{-25})/(4.50\times10^{-7})=4.41\times10^{-19}\ \mathrm{J}$.
+## What the Bohr model gets right—and where it stops
 
-    Checked answer. $4.41\times10^{-19}\ \mathrm{J}$ per photon. Visible photons commonly have energies near $10^{-19}$ J.
+For hydrogen,
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+$$
+E_n=-\frac{2.18\times10^{-18}\ \mathrm{J}}{n^2}.
+$$
 
-## Worked example 2: Hydrogen emission energy
+The energy change of the atom is $\Delta E=E_f-E_i$. An emitted photon carries the positive magnitude $\vert \Delta E\vert $ when the atom moves to a lower level; absorption requires a positive atomic $\Delta E$.
 
-Problem. An electron in hydrogen falls from $n=3$ to $n=2$. Find the emitted photon energy and wavelength.
+For the hydrogen transition $n=3\to n=2$,
 
-    Method.
+$$
+E_3=-2.42\times10^{-19}\ \mathrm{J},\qquad
+E_2=-5.45\times10^{-19}\ \mathrm{J}.
+$$
 
-    1. Use $E_n=-2.18\times10^{-18}/n^2\ \mathrm{J}$.
-2. Compute $E_3=-2.18\times10^{-18}/9=-2.42\times10^{-19}\ \mathrm{J}$.
-3. Compute $E_2=-2.18\times10^{-18}/4=-5.45\times10^{-19}\ \mathrm{J}$.
-4. Change for the atom: $\Delta E=E_2-E_3=-3.03\times10^{-19}\ \mathrm{J}$.
-5. The emitted photon has positive energy $3.03\times10^{-19}\ \mathrm{J}$.
-6. Find wavelength: $\lambda=hc/E=(1.986\times10^{-25})/(3.03\times10^{-19})=6.56\times10^{-7}\ \mathrm{m}=656\ \mathrm{nm}$.
+Thus the atom has $\Delta E=-3.03\times10^{-19}\ \mathrm{J}$ and the photon has energy $3.03\times10^{-19}\ \mathrm{J}$. Its wavelength is
 
-    Checked answer. The photon energy is $3.03\times10^{-19}\ \mathrm{J}$ and wavelength is about 656 nm. A 656 nm wavelength is in the visible red region, matching the Balmer series.
+$$
+\lambda=\frac{hc}{E}=6.56\times10^{-7}\ \mathrm{m}=656\ \mathrm{nm},
+$$
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+the red Balmer line. The Bohr model explains hydrogen's level pattern but does not describe multi-electron atoms adequately. Quantum mechanics replaces fixed circular orbits with wavefunctions.
 
-## Code
+## Orbitals and their quantum numbers
 
-```python
-h = 6.626e-34
-c = 2.998e8
+An atomic orbital is a one-electron wavefunction; its squared magnitude gives a probability density. The quantum numbers label its shell, shape, orientation, and the electron spin state.
 
-def photon_energy_from_nm(wavelength_nm):
-    return h * c / (wavelength_nm * 1e-9)
+| Quantum number | Allowed values | Meaning | Example |
+|---|---|---|---|
+| $n$ | $1,2,3,\dots$ | principal shell and radial scale | $n=3$ |
+| $l$ | $0$ through $n-1$ | subshell or orbital angular momentum | $l=1$ means p |
+| $m_l$ | $-l$ through $+l$ | orbital orientation | $-1,0,+1$ for p |
+| $m_s$ | $+1/2$ or $-1/2$ | spin projection | paired electrons have opposite values |
 
-def hydrogen_level(n):
-    return -2.18e-18 / (n * n)
+The subshell letters $s,p,d,f$ correspond to $l=0,1,2,3$. A subshell contains $2l+1$ orbitals, and each orbital can contain at most two electrons with opposite spin projections.
 
-E_blue = photon_energy_from_nm(450)
-E_emit = abs(hydrogen_level(2) - hydrogen_level(3))
-lambda_emit_nm = h * c / E_emit * 1e9
-print(E_blue, lambda_emit_nm)
-```
+Orbitals are probability amplitudes, not sharply bounded containers. Drawn orbital surfaces usually represent a chosen probability contour, so an electron is not forbidden from being outside the illustrated boundary.
 
-## Common pitfalls
+## Matter waves and uncertain trajectories
 
-- Treating orbitals as fixed planetary paths. Avoid it by describing them as probability distributions.
-- Forgetting to convert nanometers to meters. Avoid it by writing the conversion in the equation line.
-- Using the sign of atomic $\Delta E$ as photon energy. Avoid it by taking photon energy as positive and interpreting sign as emission or absorption.
-- Applying Bohr energy levels to all atoms without caution. Avoid it by limiting the simple formula to hydrogen-like species.
-- Allowing impossible quantum numbers. Avoid it by checking $l\lt n$ and $-l\le m_l\le l$.
-- Confusing frequency and wavelength trends. Avoid it by remembering $E$ increases with frequency and decreases with wavelength.
+De Broglie's relation assigns wavelength to a particle of momentum $p$:
 
-## Connections
+$$
+\lambda=\frac{h}{p}.
+$$
 
-- [electron configurations and periodic trends](/chemistry/general/electron-configurations-and-periodic-trends)
-- [ionic and covalent bonding](/chemistry/general/ionic-and-covalent-bonding)
-- [molecular geometry and bonding theory](/chemistry/general/molecular-geometry-and-bonding-theory)
-- [nuclear chemistry](/chemistry/general/nuclear-chemistry)
+For a nonrelativistic electron moving at $2.00\times10^6\ \mathrm{m\,s^{-1}}$,
+
+$$
+p=m_ev=(9.109\times10^{-31})(2.00\times10^6)
+=1.82\times10^{-24}\ \mathrm{kg\,m\,s^{-1}},
+$$
+
+and
+
+$$
+\lambda=\frac{6.626\times10^{-34}}{1.82\times10^{-24}}
+=3.64\times10^{-10}\ \mathrm{m}.
+$$
+
+This is comparable to atomic spacings, so electron diffraction is measurable. The wavelength of an everyday object is too small to resolve under ordinary conditions.
+
+Wave behavior rules out an exact classical path. Heisenberg's relation,
+
+$$
+\Delta x\,\Delta p_x\geq\frac{\hbar}{2},
+$$
+
+is a property of quantum states rather than an avoidable instrument defect. A sharply localized wave requires many wavelengths and therefore a broad momentum distribution.
+
+## The Schrödinger picture and nodes
+
+The time-independent equation is
+
+$$
+\hat H\psi=E\psi.
+$$
+
+Only wavefunctions satisfying the boundary and normalization conditions are allowed, producing discrete energy eigenvalues. The probability density is $\vert \psi\vert ^2$, yet the sign of $\psi$ still controls constructive and destructive interference.
+
+Hydrogen orbitals have radial and angular nodes where $\psi=0$. An orbital has $n-1$ total nodes, of which $l$ are angular and $n-l-1$ are radial. A $2p$ orbital has one angular node and no radial nodes; a $3s$ orbital has two radial nodes. The lobes of a p orbital mark opposite phases of one wavefunction, not separate electron containers.
+
+The negative Bohr energy indicates a bound state relative to a separated electron and nucleus at zero energy. As $n$ increases, levels converge toward ionization. For a one-electron ion,
+
+$$
+E_n=-\frac{Z^2(2.18\times10^{-18}\ \mathrm{J})}{n^2}.
+$$
+
+The formula fails for many-electron atoms because electron repulsion and shielding destroy the simple one-particle Coulomb result.
+
+## Counting states and testing quantum numbers
+
+Shell $n$ contains $n^2$ orbitals and can hold $2n^2$ electrons. For $n=3$, the 3s, 3p, and 3d subshells contain $1+3+5=9$ orbitals and at most 18 electrons.
+
+The set $(n,l,m_l,m_s)=(3,2,-2,+1/2)$ is allowed: $l$ may be 0, 1, or 2; a d subshell permits $m_l=-2$ through $+2$; and either spin projection is possible. $(3,3,0,+1/2)$ is forbidden because $l\lt n$. $(2,1,2,-1/2)$ is forbidden because a p orbital permits only $m_l=-1,0,+1$.
+
+In multi-electron atoms, penetration and shielding split subshell energies. An s orbital penetrates closer to the nucleus than p, d, or f orbitals of the same shell and generally experiences a larger effective nuclear charge. Pauli exclusion allows at most two opposite-spin electrons per orbital. Hund's rule fills degenerate orbitals singly with parallel spins before pairing. These are occupation rules for quantum states, not miniature paths chosen by particles.
+
+### A second photon calculation
+
+The energy above for a 450 nm photon is per photon. Per mole,
+
+$$
+(4.41\times10^{-19}\ \mathrm{J})(6.022\times10^{23}\ \mathrm{mol^{-1}})
+=2.66\times10^5\ \mathrm{J\,mol^{-1}}.
+$$
+
+If a transition instead releases $3.03\times10^{-19}\ \mathrm{J}$, its frequency is
+
+$$
+\nu=\frac{E}{h}=4.57\times10^{14}\ \mathrm{s^{-1}},
+$$
+
+and $c/\nu=6.56\times10^{-7}\ \mathrm{m}$. Energy, frequency, and wavelength are three descriptions of the same photon; their significant figures should agree with the least precise input.
+
+## Sign and model checks
+
+- Photon energy is positive; the sign of the atom's $\Delta E$ distinguishes emission from absorption.
+- The simple Bohr energy formula above applies to hydrogen. Hydrogen-like ions require the nuclear-charge factor $Z^2$.
+- A proposed set of quantum numbers must satisfy $0\le l\lt n$ and $-l\le m_l\le l$.
+- Frequency rises as wavelength falls, and photon energy follows frequency.
+- Classical orbit language can describe the historical model but not the modern meaning of an orbital.
+
+## Spectra as fingerprints of energy differences
+
+An atom does not emit every photon compatible with the difference between any two named levels. Transition probabilities are controlled by selection rules arising from symmetry and angular momentum. Some transitions are strongly allowed, others weakly allowed, and some effectively forbidden on ordinary timescales. A line spectrum therefore records both level spacings and the coupling of states to electromagnetic radiation.
+
+Line width is finite. Natural lifetime broadening follows from the energy–time uncertainty relation; thermal motion gives Doppler broadening; collisions perturb energy levels and broaden lines further. High-resolution spectra can also show fine structure from spin–orbit coupling and splitting in electric or magnetic fields. The simple Bohr line is the center of a richer experimental feature.
+
+Absorption requires an initial population in the lower state and photons of matching energy. Emission requires atoms in excited states, often prepared by heating, electrical discharge, or prior absorption. At thermal equilibrium, level populations follow a Boltzmann distribution, so high-energy states are less populated at modest temperature.
+
+## Probability, measurement, and expectation values
+
+Normalization requires the integral of $\vert \psi\vert ^2$ over all space to equal one. Probability in a region is the integral over that region, not the value of the wavefunction at a point. An expectation value is the average result from many identically prepared measurements. It need not equal any single observed value.
+
+Operators represent observables. A state that is an eigenfunction of an operator has a definite value for that observable. Noncommuting operators, such as position and momentum, lack simultaneous exact eigenstates and lead to uncertainty relations. The uncertainty is the statistical spread of repeated measurements on identically prepared systems.
+
+Electron spin is intrinsic angular momentum, not a literal sphere rotating in space. Its two projections supply the $m_s=\pm1/2$ labels. Combining spin with orbital occupation explains magnetic behavior: unpaired electrons give paramagnetism, while fully paired configurations are usually diamagnetic.
+
+## Radial probability and penetration
+
+Probability density at a point and probability within a spherical shell are different. Radial probability includes the shell volume factor, which grows as $r^2$. The hydrogen 1s density is largest at the nucleus, but the most probable radial distance lies away from it because a shell at finite radius contains much more volume.
+
+An s orbital has nonzero density at the nucleus and penetrates inner shells strongly. A p orbital vanishes at the nucleus, and higher-$l$ orbitals are excluded still more strongly by their angular behavior. Penetration changes shielding and subshell energy in many-electron atoms. It helps explain why 4s is occupied before 3d in neutral atoms, while ion formation and electron repulsion can reverse their relative energies.
+
+## The scope of orbital language
+
+An orbital is obtained within a model of electrons moving in an effective potential. In a many-electron atom, assigning each electron to one orbital is an approximation to a correlated wavefunction. It remains exceptionally useful for configurations and bonding, but electrons do not carry permanent name tags linking them to particular orbitals.
+
+Exact analytic solutions exist for hydrogen-like one-electron species. Multi-electron atoms require approximation: central-field models, variational methods, and numerical calculations. Experimental agreement decides whether the approximation is adequate for a requested property.
+
+Classical language survives where it is harmless. One may speak of an electron “transitioning between orbitals,” but the statement denotes a change of quantum state, not a bead jumping between drawn lobes. Keeping that distinction prevents orbital diagrams from being mistaken for microscopic photographs.
+
+The correspondence principle explains why classical mechanics works for large-scale motion. Quantum predictions approach classical behavior when quantum numbers are large and phase information is washed out by interaction with the environment. Decoherence suppresses observable interference between macroscopically distinct alternatives, though it does not turn the underlying theory into Newtonian trajectories.
+
+Energy quantization is not imposed by a rule that all quantities must be discrete. It emerges from boundary conditions for bound states. A free particle can have a continuous range of kinetic energies, while an electron confined by an atomic potential has discrete bound energies and a continuum above ionization. The physical constraint determines the spectrum.
+
+## Scale checks
+
+Visible photons carry energies of a few electronvolts, comparable to valence electronic changes. Vibrational and rotational spacings are generally smaller, while core-electron and nuclear changes are larger. These scales help detect unit errors: an ordinary visible transition should not emerge with a molar energy of only a few joules or a nuclear-scale result.
+
+The electronvolt is an energy unit, not a voltage. One electronvolt is the energy gained by one elementary charge across one volt. Conversion to joules or kilojoules per mole must distinguish a single particle from an amount of particles.
+
+<div className="see-also">
+
+See also: [electron configurations and periodic trends](/chemistry/general/electron-configurations-and-periodic-trends) · [ionic and covalent bonding](/chemistry/general/ionic-and-covalent-bonding) · [molecular geometry and bonding theory](/chemistry/general/molecular-geometry-and-bonding-theory) · [nuclear chemistry](/chemistry/general/nuclear-chemistry)
+
+</div>

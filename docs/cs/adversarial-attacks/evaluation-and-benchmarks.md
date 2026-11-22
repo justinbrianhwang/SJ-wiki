@@ -7,13 +7,9 @@ sidebar_position: 10
 
 Adversarial robustness evaluation is unusually easy to get wrong. A model can look robust because the attack is weak, the threat model is underspecified, the preprocessing scale is inconsistent, gradients are masked, the query budget is too low, or the benchmark excludes failed examples. Good evaluation is therefore a core technical topic, not an administrative afterthought.
 
-![A visually similar adversarial panda image is classified as a gibbon by an ImageNet model.](https://ar5iv.labs.arxiv.org/html/1412.6572/assets/gibbon_993.png)
+Reliable evaluation needs a checklist: robust accuracy, adaptive attacks, AutoAttack, RobustBench-style reporting, certified metrics, and the methodological errors that inflate results. No benchmark is final; the aim is a reproducible claim tied to one threat model.
 
-*Figure: The FGSM panda example shows that imperceptible perturbations can change model decisions. Image: [ar5iv](https://arxiv.org/abs/1412.6572), Goodfellow, Shlens, and Szegedy, educational use with attribution.*
-
-This page gives a practical checklist for evaluating adversarial defenses. It covers robust accuracy, adaptive attacks, AutoAttack, RobustBench-style reporting, certified metrics, and common methodological errors. The goal is not to crown one benchmark as final, but to make robustness claims reproducible and threat-model-specific.
-
-## Definitions
+## Metrics before the attack suite
 
 **Clean accuracy** is accuracy on unmodified test examples:
 
@@ -59,7 +55,7 @@ An **adaptive attack** is designed with knowledge of the defense. It attacks the
 
 **AutoAttack** is an ensemble-style evaluation protocol combining diverse attacks with minimal manual tuning. **RobustBench** is a benchmark and leaderboard ecosystem that standardizes datasets, threat models, and evaluation protocols for adversarial and corruption robustness.
 
-## Key results
+## Evidence strengthens as attacks improve
 
 The main evaluation principle is monotonic skepticism: a robustness number is an upper bound until stronger or better-adapted attacks fail. Empirical robust accuracy can only decrease as attacks improve. Therefore, a defense paper should welcome stronger attacks; if the number changes dramatically under a reasonable adaptive attack, the original claim was too broad.
 
@@ -83,7 +79,7 @@ Subsets require caution. Evaluating on 1000 examples can be reasonable for expen
 
 A useful habit is to phrase every table caption as a threat-model statement. If the caption cannot fit the norm, radius, access model, attack suite, and data split, the table is probably underspecified.
 
-## Adaptive attack suites
+## Building an attack suite around the defense
 
 ### Ensemble baselines for empirical robustness
 
@@ -146,7 +142,7 @@ Worked micro-example: on $1000$ images, if an adaptive attack finds adversarial 
 
 Adaptive discarding must be reported carefully. A fair comparison specifies the discard rule, total iteration or gradient budget, active-set accounting, and how failed, discarded, and already-successful examples are counted.
 
-## Visual
+### From a robustness claim to an auditable result
 
 ```mermaid
 flowchart TB
@@ -197,7 +193,7 @@ flowchart TB
   RobustAcc --> ASR --> Curves --> Cert
 ```
 
-This diagram expands evaluation into the fixed AutoAttack ensemble and the adaptive path needed for unusual defenses. The outputs distinguish empirical robust accuracy from certified accuracy, and the failure-audit blocks make preprocessing, randomness, skipped examples, and gradient masking visible rather than hidden in a single score.
+The fixed AutoAttack ensemble covers standard threat models; unusual defenses need the adaptive path. The outputs distinguish empirical robust accuracy from certified accuracy, while the failure audit records preprocessing, randomness, skipped examples, and gradient masking separately from the final score.
 
 | Question | Bad answer | Better answer |
 |---|---|---|
@@ -208,9 +204,9 @@ This diagram expands evaluation into the fixed AutoAttack ensemble and the adapt
 | Is this certified? | "No attack found examples" | "Verifier proves radius $r$ with stated assumptions" |
 | Can results be compared? | "Different datasets and epsilons" | "Same dataset, preprocessing, norm, radius, and evaluation code" |
 
-## Worked example 1: Robust accuracy and attack success rate
+## Robust accuracy and attack success rate answer different questions
 
-Problem: A classifier is evaluated on 1000 examples. It correctly classifies 900 clean examples. An untargeted attack changes the prediction on 360 of those 900 initially correct examples. Compute robust accuracy on the full test set and attack success rate on initially correct examples.
+On a 1000-example test set, a classifier gets 900 clean examples right. An untargeted attack flips 360 of those initially correct predictions. Compute robust accuracy on the full set and attack success rate on initially correct examples.
 
 1. Initially correct examples:
 
@@ -242,11 +238,11 @@ $$
 \mathrm{ASR}=\frac{360}{900}=0.40=40\%.
 $$
 
-Checked answer: robust accuracy is $54\%$ on the full test set, while attack success rate is $40\%$ among initially correct examples. Both numbers are useful, but they answer different questions.
+Robust accuracy is $54\%$ on the full test set, while attack success rate is $40\%$ among initially correct examples. The denominators—and therefore the questions—differ.
 
-## Worked example 2: Detecting an unfair benchmark comparison
+## Why two benchmark numbers are not comparable
 
-Problem: Model A reports $48\%$ robust accuracy on CIFAR-10 at $\ell_\infty$, $\epsilon=8/255$, evaluated with AutoAttack. Model B reports $55\%$ robust accuracy on CIFAR-10 at $\ell_\infty$, $\epsilon=4/255$, evaluated with PGD-10 and one restart. Can we conclude B is more robust?
+Model A reports $48\%$ robust accuracy on CIFAR-10 at $\ell_\infty$, $\epsilon=8/255$, evaluated with AutoAttack. Model B reports $55\%$ at $\epsilon=4/255$, evaluated with PGD-10 and one restart. Can B be called more robust from these numbers?
 
 1. Compare datasets:
 
@@ -278,9 +274,9 @@ $$
 
 5. Since both $\epsilon$ and attack suite differ, the numbers are not directly comparable.
 
-Checked answer: no, we cannot conclude B is more robust. A fair comparison needs the same preprocessing, radius, norm, and evaluation protocol.
+No direct comparison is possible. The preprocessing, radius, norm, and evaluation protocol must match.
 
-## Code
+## Separating clean, robust, and attack-success metrics
 
 ```python
 import torch
@@ -299,7 +295,7 @@ def evaluate_attack(model, attack_fn, x, y):
     with torch.no_grad():
         adv_pred = model(x_adv).argmax(dim=1)
 
-    robust_correct = adv_pred.eq(y)
+    robust_correct = initially_correct & adv_pred.eq(y)
     robust_acc = robust_correct.float().mean().item()
     if initially_correct.any():
         asr = adv_pred[initially_correct].ne(y[initially_correct]).float().mean().item()
@@ -315,7 +311,7 @@ def evaluate_attack(model, attack_fn, x, y):
 
 This code separates clean accuracy, robust accuracy over the full batch, and attack success rate on initially correct examples. A real benchmark should also record threat-model parameters, attack hyperparameters, random seeds, and query counts.
 
-## Common pitfalls
+## Benchmark comparisons that do not survive scrutiny
 
 - Reporting only the best-looking metric: clean accuracy without robust accuracy, or robust accuracy without clean accuracy.
 - Evaluating with a weaker attack than the one used in training.
@@ -326,15 +322,7 @@ This code separates clean accuracy, robust accuracy over the full batch, and att
 - Ignoring confidence intervals or variance when evaluation uses sampling or small test subsets.
 - Reporting certified numbers and empirical numbers in the same table without labeling them clearly.
 
-## Connections
-
-- [Threat models and attack taxonomy](/cs/adversarial-attacks/threat-models-and-attack-taxonomy) is the starting point for every evaluation.
-- [White-box attacks](/cs/adversarial-attacks/white-box-attacks) and [black-box and transfer attacks](/cs/adversarial-attacks/black-box-and-transfer-attacks) define attack suites.
-- [Gradient masking and obfuscation](/cs/adversarial-attacks/gradient-masking-and-obfuscation) gives diagnostics for suspicious robustness.
-- [Certified defenses and randomized smoothing](/cs/adversarial-attacks/certified-defenses-and-randomized-smoothing) explains certified accuracy.
-- [Adversarial training](/cs/adversarial-attacks/adversarial-training) is the defense most commonly evaluated in robustness benchmarks.
-
-## Further reading
+## Evaluation papers and protocols
 
 - Croce and Hein, "Reliable Evaluation of Adversarial Robustness with an Ensemble of Diverse Parameter-free Attacks."
 - RobustBench benchmark documentation and leaderboard.
@@ -342,7 +330,19 @@ This code separates clean accuracy, robust accuracy over the full batch, and att
 - Athalye, Carlini, and Wagner, "Obfuscated Gradients Give a False Sense of Security."
 - Tramer et al., work on adaptive attacks against defenses.
 
-## References
+## Cited evaluation work
 
 [1] F. Croce, M. Hein. *Reliable Evaluation of Adversarial Robustness with an Ensemble of Diverse Parameter-free Attacks*. ICML 2020.
 [2] Y. Liu, Y. Cheng, L. Gao, X. Liu, Q. Zhang, J. Song. *Practical Evaluation of Adversarial Robustness via Adaptive Auto Attack*. CVPR 2022.
+
+<div className="see-also">
+
+See also:
+
+- [Threat models and attack taxonomy](/cs/adversarial-attacks/threat-models-and-attack-taxonomy) is the starting point for every evaluation.
+- [White-box attacks](/cs/adversarial-attacks/white-box-attacks) and [black-box and transfer attacks](/cs/adversarial-attacks/black-box-and-transfer-attacks) define attack suites.
+- [Gradient masking and obfuscation](/cs/adversarial-attacks/gradient-masking-and-obfuscation) gives diagnostics for suspicious robustness.
+- [Certified defenses and randomized smoothing](/cs/adversarial-attacks/certified-defenses-and-randomized-smoothing) explains certified accuracy.
+- [Adversarial training](/cs/adversarial-attacks/adversarial-training) is the defense most commonly evaluated in robustness benchmarks.
+
+</div>

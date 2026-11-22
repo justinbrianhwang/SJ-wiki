@@ -9,7 +9,7 @@ Concept learning is Mitchell's cleanest introduction to machine learning as sear
 
 This treatment feels different from modern large-scale statistical learning, but it remains useful because it exposes assumptions that are often hidden. Every learner has a bias. Every hypothesis language excludes some possible target concepts. Every generalization from observed examples to unseen examples requires an assumption beyond the data itself.
 
-## Definitions
+## Hypotheses ordered from specific to general
 
 An instance $x$ is an object described by attributes. In the classic EnjoySport example, attributes include sky, air temperature, humidity, wind, water, and forecast.
 
@@ -47,7 +47,7 @@ $$
 
 The specific boundary $S$ contains the maximally specific hypotheses in the version space. The general boundary $G$ contains the maximally general hypotheses in the version space. Together, $S$ and $G$ compactly represent all consistent hypotheses between them.
 
-## Key results
+## Maintaining the surviving hypotheses
 
 Concept learning can be formulated as search through $H$. The training examples do not merely score hypotheses; in the noiseless formulation they eliminate inconsistent hypotheses. Positive examples remove hypotheses that are too specific to cover them. Negative examples remove hypotheses that are too general because they cover an instance they should reject.
 
@@ -79,8 +79,6 @@ Noise is the main practical fracture in the clean theory. A single mislabeled po
 
 The chapter is therefore best read as a conceptual laboratory. The EnjoySport hypothesis language is small, the labels are clean, and the ordering is easy to inspect. Those simplifications make it possible to see the deeper structure of supervised learning: examples rule out hypotheses, representation controls what can be ruled in, and bias is what permits any prediction beyond the observed sample.
 
-## Visual
-
 ```mermaid
 flowchart TD
     G["G boundary: most general consistent hypotheses"]
@@ -97,17 +95,15 @@ flowchart TD
 
 The diagram shows the version space as a band in the hypothesis lattice. The boundaries move inward as evidence accumulates.
 
-## Worked example 1: Run FIND-S on simple weather data
+### Running FIND-S on two weather attributes
 
-Problem: Learn the concept `PlayTennis` from attributes `(Sky, Wind)`. Hypotheses use specific values, `?`, and the empty hypothesis `0`. Use the following examples:
+Learn the concept `PlayTennis` from attributes `(Sky, Wind)`. Hypotheses use specific values, `?`, and the empty hypothesis `0`. Use the following examples:
 
 | Example | Instance | Label |
 |---|---|---|
 | 1 | `(Sunny, Weak)` | positive |
 | 2 | `(Sunny, Strong)` | positive |
 | 3 | `(Rainy, Weak)` | negative |
-
-Method:
 
 1. Initialize with the most specific hypothesis.
 
@@ -146,13 +142,11 @@ $$
 
    because `Rainy` does not satisfy `Sunny`.
 
-Answer: FIND-S returns $(\text{Sunny}, ?)$. The checked answer is consistent with all examples: both positive sunny instances are covered, and the rainy negative instance is rejected.
+FIND-S returns $(\text{Sunny}, ?)$. It is consistent with all examples: both positive sunny instances are covered, and the rainy negative instance is rejected.
 
-## Worked example 2: One candidate-elimination update
+### Specializing the general boundary
 
-Problem: Same attributes `(Sky, Wind)` with domains `Sky={Sunny,Rainy}` and `Wind={Weak,Strong}`. Start after one positive example `(Sunny, Weak)`. Then process a negative example `(Sunny, Strong)`. What happens to $S$ and $G$?
-
-Method:
+Use the same attributes `(Sky, Wind)` with domains `Sky=\{Sunny,Rainy\}` and `Wind=\{Weak,Strong\}`. Start after one positive example `(Sunny, Weak)`, then process a negative example `(Sunny, Strong)`. What happens to $S$ and $G$?
 
 1. After the positive example, the specific boundary is:
 
@@ -186,8 +180,6 @@ $$
    - `(Rainy, ?)` does not cover `(Sunny, Weak)`, so it is not more general than $S$.
    - `(?, Weak)` covers `(Sunny, Weak)`, so it remains.
 
-Answer:
-
 $$
 S'=\{(\text{Sunny},\text{Weak})\}, \qquad
 G'=\{(?,\text{Weak})\}.
@@ -195,7 +187,7 @@ $$
 
 The version space now contains only hypotheses that require weak wind and still cover the positive example.
 
-## Code
+### A compact FIND-S implementation
 
 ```python
 def covers(h, x):
@@ -225,7 +217,7 @@ print(covers(h, ("Sunny", "Weak")))
 print(covers(h, ("Rainy", "Weak")))
 ```
 
-## Common pitfalls
+## Where the clean version-space model breaks
 
 - Treating FIND-S as a general-purpose classifier. It is fragile when there is noise, when the target concept is not in $H$, or when negative examples are essential.
 - Forgetting that `?` means "any value", not "unknown value". It is a constraint in the hypothesis language.
@@ -234,10 +226,8 @@ print(covers(h, ("Rainy", "Weak")))
 - Ignoring inductive bias. Without restrictions on $H$ or preferences among hypotheses, no learner can justify predictions on unseen cases.
 - Applying the version-space theorem after changing the representation to one without a clean general-to-specific partial order.
 
-## Connections
+<div className="see-also">
 
-- [Learning problems and system design](/cs/machine-learning/learning-problems-and-system-design)
-- [Decision tree learning](/cs/machine-learning/decision-tree-learning)
-- [Bayesian learning](/cs/machine-learning/bayesian-learning)
-- [Computational learning theory](/cs/machine-learning/computational-learning-theory)
-- [Rule learning and ILP](/cs/machine-learning/rule-learning-and-ilp)
+See also: [Learning problems and system design](/cs/machine-learning/learning-problems-and-system-design) · [Decision tree learning](/cs/machine-learning/decision-tree-learning) · [Bayesian learning](/cs/machine-learning/bayesian-learning) · [Computational learning theory](/cs/machine-learning/computational-learning-theory) · [Rule learning and ILP](/cs/machine-learning/rule-learning-and-ilp)
+
+</div>

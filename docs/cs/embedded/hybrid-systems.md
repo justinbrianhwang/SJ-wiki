@@ -9,7 +9,7 @@ Hybrid systems combine discrete mode changes with continuous-time dynamics. They
 
 The main idea is hierarchy. The outer state machine chooses a mode. Each mode is refined by a time-based system, often an ODE or a clock. Transitions between modes are controlled by guards that may mention continuous variables, and transition actions may reset or modify continuous state.
 
-## Definitions
+## Modes, guards, and resets
 
 A **hybrid system** is a modal model in which a discrete state machine controls a collection of continuous-time refinements. The control states are commonly called **modes** to avoid confusion with continuous state variables.
 
@@ -29,7 +29,26 @@ within a mode, usually with $a=1$, and transitions reset it with assignments suc
 
 A **Zeno behavior** is an execution with infinitely many discrete transitions in a finite amount of time. Such behavior can occur in idealized hybrid models, for example a bouncing ball with decreasing bounce intervals, even though the physical system eventually stops bouncing.
 
-## Key results
+The same pieces appear in very different physical systems:
+
+```mermaid
+stateDiagram-v2
+  [*] --> Cooling: "s := Tc"
+  Cooling --> Heating: "temp <= 20 and s >= Tc / heatOn, s := 0"
+  Heating --> Cooling: "temp >= 20 and s >= Th / heatOff, s := 0"
+  Cooling: "refinement: h(t)=0, ds/dt=1"
+  Heating: "refinement: h(t)=1, ds/dt=1"
+```
+
+| Hybrid-system part | Thermostat example | Bouncing-ball example | AGV example |
+|---|---|---|---|
+| Modes | heating, cooling | free | stop, left, right, straight |
+| Continuous state | elapsed clock $s$ | height $y$, velocity $v$ | position, heading |
+| Guard | temperature and minimum time | ground contact | track error thresholds |
+| Set action | reset clock | reverse/dampen velocity | initialize or change mode state |
+| Output | heater command | position, bump event | vehicle position |
+
+## Where discrete logic meets continuous dynamics
 
 Hybrid models bridge two analysis styles. Discrete-mode logic can be inspected with FSM reasoning, while each refinement can be inspected with time-based analysis. The model is valuable because it keeps both views visible.
 
@@ -67,26 +86,7 @@ The same physical system may admit several hybrid abstractions. A thermostat can
 
 Hybrid modeling is also a design communication tool. Control engineers, software engineers, and verification engineers can point to the same modes, guards, and resets while discussing different concerns. That shared structure reduces the chance that a software mode switch, a physical threshold, and a verification assumption refer to subtly different events.
 
-## Visual
-
-```mermaid
-stateDiagram-v2
-  [*] --> Cooling: s := Tc
-  Cooling --> Heating: temp <= 20 and s >= Tc / heatOn, s := 0
-  Heating --> Cooling: temp >= 20 and s >= Th / heatOff, s := 0
-  Cooling: refinement: h(t)=0, ds/dt=1
-  Heating: refinement: h(t)=1, ds/dt=1
-```
-
-| Hybrid-system part | Thermostat example | Bouncing-ball example | AGV example |
-|---|---|---|---|
-| Modes | heating, cooling | free | stop, left, right, straight |
-| Continuous state | elapsed clock $s$ | height $y$, velocity $v$ | position, heading |
-| Guard | temperature and minimum time | ground contact | track error thresholds |
-| Set action | reset clock | reverse/dampen velocity | initialize or change mode state |
-| Output | heater command | position, bump event | vehicle position |
-
-## Worked example 1: Timed thermostat execution
+## Following a timed thermostat execution
 
 Problem: A thermostat uses one threshold, $20^\circ$C, with minimum cooling time $T_c=3$ minutes and minimum heating time $T_h=2$ minutes. The clock $s$ is reset to $0$ on every mode transition. It starts in `cooling` with $s=3$. The temperature reaches $20^\circ$C after $1$ minute, then while heating reaches $20^\circ$C again after another $1.5$ minutes. Determine mode transitions.
 
@@ -126,7 +126,7 @@ $$
 
 Answer: The thermostat switches to `heating` at $t=1$ minute. It cannot switch back at $t=2.5$ minutes because the minimum heating time has not elapsed; the earliest switch back is at $t=3$ minutes.
 
-## Worked example 2: Bouncing ball reset
+## Computing a bouncing-ball reset
 
 Problem: A ball is dropped from height $y(0)=5$ meters with $v(0)=0$, gravity $g=9.8$, and restitution $a=0.8$. Find the impact time and the velocity immediately after impact.
 
@@ -164,7 +164,7 @@ $$
 
 Answer: The ball hits the ground at about $1.01$ seconds. Its velocity immediately before impact is about $-9.90$ m/s, and immediately after impact is about $7.92$ m/s upward.
 
-## Code
+### Simulating several impacts
 
 ```python
 def bouncing_ball(height=5.0, restitution=0.8, dt=0.001, g=9.8, bounces=3):
@@ -185,7 +185,7 @@ for t, before, after in bouncing_ball():
     print(f"impact at {t:.3f}s: v-={before:.3f}, v+={after:.3f}")
 ```
 
-## Common pitfalls
+## Modeling choices that change the behavior
 
 - Using a discrete FSM when event timing is central. If the model assumes "one reaction per second," write that assumption explicitly or use a timed automaton.
 - Confusing modes with the full hybrid state. The full state includes both the current mode and continuous state variables.
@@ -193,10 +193,8 @@ for t, before, after in bouncing_ball():
 - Treating guards as sampled conditions when the intended model is continuous. A solver may need to detect threshold crossings between sample points.
 - Ignoring Zeno behavior. Infinite transitions in finite time often signal that the idealized model needs a stopping rule or a different physical abstraction.
 
-## Connections
+<div className="see-also">
 
-- [continuous dynamics](/cs/embedded/continuous-dynamics)
-- [discrete dynamics](/cs/embedded/discrete-dynamics)
-- [continuous-time simulation](/physics/simulation/)
-- [first-order ODEs](/math/engineering-math/first-order-odes)
-- [scheduling and real time](/cs/embedded/scheduling-and-real-time)
+See also: [continuous dynamics](/cs/embedded/continuous-dynamics) · [discrete dynamics](/cs/embedded/discrete-dynamics) · [continuous-time simulation](/physics/simulation/intro) · [first-order ODEs](/math/engineering-math/first-order-odes) · [scheduling and real time](/cs/embedded/scheduling-and-real-time)
+
+</div>

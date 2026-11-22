@@ -7,13 +7,9 @@ sidebar_position: 18
 
 Once a system is represented in the $z$-domain, many classical design ideas reappear with new geometry. Nise shows block-diagram reduction, stability, steady-state error, root locus, gain design, cascade compensation via the $s$-plane, and digital compensator implementation. The central translation is simple: the unit circle replaces the imaginary axis as the stability boundary.
 
-![A compact PID controller block shows proportional, integral, and derivative action.](https://commons.wikimedia.org/wiki/Special:FilePath/PID_Controller.png)
-
-*Figure: PID control turns error history into a practical actuator command. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PID_Controller.png), Hew, public domain.*
-
 Digital design has two common routes. One route discretizes an already designed analog compensator, often with the Tustin transformation. Another route designs directly in the $z$-plane using root locus and transient-response grids. In either case, the final controller must be converted into a difference equation that can run on a processor.
 
-## Definitions
+## Mapping continuous dynamics into the unit disk
 
 The exact pole mapping is
 
@@ -67,7 +63,7 @@ $$
 x[n]+a_1x[n-1]=b_0e[n]+b_1e[n-1].
 $$
 
-## Key results
+## Designing and realizing the compensator
 
 Digital root locus uses the same angle and magnitude conditions as continuous root locus, but on the $z$-plane:
 
@@ -125,17 +121,9 @@ When discretizing analog compensators, compare frequency response before trustin
 
 Finally, digital compensators should be tested under finite precision. Floating-point desktop simulations may hide overflow, rounding, and limit-cycle behavior that appears on a microcontroller. Fixed-point scaling, saturation arithmetic, and coefficient quantization can be as important as the nominal transfer function.
 
-A controller update should be written as code-like pseudocode before deployment: read inputs, compute error, update stored states, apply saturation and anti-windup, write output, and save histories. This order determines the realized transfer function and any extra delay.
+A controller update should be written as code-like pseudocode before deployment: read inputs, compute error, update stored states, apply saturation and anti-windup, write output, and save histories. This order determines the realized transfer function and any extra delay. Reviewing and versioning the pseudocode alongside its tests catches many implementation mistakes before hardware testing and records the exact controller semantics.
 
-Reviewing this pseudocode catches many implementation mistakes before hardware testing.
-
-It also documents the exact controller semantics.
-
-That documentation should accompany tests.
-
-Keep it versioned.
-
-## Visual
+### One sample through the control loop
 
 ```mermaid
 sequenceDiagram
@@ -157,9 +145,9 @@ sequenceDiagram
 | emulation with fast sampling | implement analog-like controller | simple for slow plants | delay and quantization still matter |
 | discrete redesign | identify pulse transfer function | accurate sampled model | depends on good sampling assumptions |
 
-## Worked example 1: Tustin discretization of a PI controller
+## Discretizing a PI controller with Tustin
 
-Problem: Discretize
+Discretize
 
 $$
 G_c(s)=2+\frac{4}{s}
@@ -170,8 +158,6 @@ with sampling period $T=0.1$ s using Tustin,
 $$
 s=\frac{2}{T}\frac{z-1}{z+1}.
 $$
-
-Method:
 
 1. Rewrite the controller:
 
@@ -210,19 +196,17 @@ $$
 G_c(z)=\frac{2.2-1.8z^{-1}}{1-z^{-1}}.
 $$
 
-Checked answer: $G_c(z)=(2.2-1.8z^{-1})/(1-z^{-1})$.
+The resulting compensator is $G_c(z)=(2.2-1.8z^{-1})/(1-z^{-1})$.
 
-## Worked example 2: difference equation implementation
+## Turning the compensator into an update law
 
-Problem: Implement
+Implement
 
 $$
 G_c(z)=\frac{2.2-1.8z^{-1}}{1-z^{-1}}
 $$
 
 as a difference equation from error $e[n]$ to controller output $u[n]$.
-
-Method:
 
 1. Write
 
@@ -254,9 +238,9 @@ $$
 u[n]=u[n-1]+2.2e[n]-1.8e[n-1].
 $$
 
-Checked answer: the update law is $u[n]=u[n-1]+2.2e[n]-1.8e[n-1]$.
+The update law is $u[n]=u[n-1]+2.2e[n]-1.8e[n-1]$.
 
-## Code
+## Simulating the sample-by-sample update
 
 ```python
 import numpy as np
@@ -278,7 +262,7 @@ z_poles = np.roots([1, -1])
 print("controller pole:", z_poles)
 ```
 
-## Common pitfalls
+## Implementation details that change the controller
 
 - Designing stable analog poles but discretizing with too slow a sampling period.
 - Forgetting that a pole on $z=1$ is an integrator and must be handled carefully with saturation.
@@ -287,10 +271,14 @@ print("controller pole:", z_poles)
 - Assuming the zero-order hold output equals a smooth analog control signal.
 - Failing to test timing jitter. Digital control assumes consistent sampling.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Digital sampling and z-transform](/cs/control-engineering/digital-control-sampling-and-z-transform) introduces the transform and unit-circle stability.
 - [PID and compensators](/cs/control-engineering/pid-lead-lag-and-lag-lead-compensators) gives the analog PI/PID forms discretized here.
 - [Frequency-response design](/cs/control-engineering/frequency-response-compensator-design) is often used before digital emulation.
-- [Embedded systems](/cs/embedded/) covers timers, ADCs, DACs, and fixed-point implementation concerns.
-- [Simulation](/physics/simulation/) helps compare continuous, sampled, and held responses.
+- [Embedded systems](/cs/embedded/intro) covers timers, ADCs, DACs, and fixed-point implementation concerns.
+- [Simulation](/physics/simulation/intro) helps compare continuous, sampled, and held responses.
+
+</div>

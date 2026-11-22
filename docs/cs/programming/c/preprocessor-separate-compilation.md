@@ -9,7 +9,7 @@ K&R treats the preprocessor as part of practical C programming, even though it r
 
 Separate compilation is the other half of the same story. Real C programs are not one long file. They are sets of source files connected by headers, external definitions, and linker-visible names. The discipline is simple but strict: headers declare shared interfaces, source files define storage and behavior, and file-private details are hidden with `static`.
 
-## Definitions
+## Token substitution and translation units
 
 The preprocessor handles directives beginning with `#`. The most common are:
 
@@ -67,7 +67,7 @@ and declarations elsewhere:
 extern int lineno;
 ```
 
-## Key results
+## Keeping the header boundary narrow
 
 Headers prevent interface drift. If several source files need the same function prototype or external declaration, putting it in one header ensures the compiler sees the same contract everywhere. K&R's calculator example uses a header to share stack operations and input helpers among source files.
 
@@ -83,15 +83,15 @@ A useful header is small, stable, and free of surprising storage allocation. It 
 
 Conditional compilation should isolate real variation, not create many hidden programs in one file. It is appropriate for include guards, feature availability, debug-only checks, and small platform differences. It becomes dangerous when large unrelated branches are selected by macros because only one branch may be regularly compiled. The preprocessor can hide syntax errors from the compiler until a rarely used configuration is enabled.
 
-Macros that behave like statements need special care. A multi-statement macro should usually be wrapped in `do { ... } while (0)` so it behaves like one statement in an `if` or `else` context. K&R's macro chapter focuses on expression macros, but the same principle applies: macro expansion must preserve the syntax expected by the caller.
+Macros that behave like statements need special care. A multi-statement macro should usually use a `do`/`while (0)` wrapper so it behaves like one statement in an `if` or `else` context. K&R's macro chapter focuses on expression macros, but the same principle applies: macro expansion must preserve the syntax expected by the caller.
 
 The preprocessor is also the first phase where portability decisions appear. A header may choose one system header on BSD-like systems and another on System V-like systems, or it may expose a common typedef that hides those differences from the rest of the program. K&R's conditional-inclusion examples are small, but the same method is used in real libraries to keep platform-specific details from leaking everywhere.
 
 At the same time, preprocessing can make debugging harder because the compiler sees the expanded program, not the source as written. When a macro produces confusing errors, inspect the expansion or temporarily replace the macro with a function. Good macro design minimizes the distance between the source expression and the expanded meaning.
 
-Separate compilation also affects build dependencies. If a public header changes, every source file that includes it may need recompilation. If a private helper in one `.c` file changes, only that file should need recompilation. Keeping interfaces narrow is therefore both a design improvement and a practical build-time improvement.
+Separate compilation also affects build dependencies. If a public header changes, every source file that includes it may need recompilation. If a private helper in one `.c` file changes, only that file should need recompilation. Narrow interfaces improve the design and reduce rebuild time.
 
-## Visual
+## From three source files to one executable
 
 ```mermaid
 flowchart TD
@@ -150,11 +150,9 @@ This C build diagram expands separate compilation into preprocessing, compiling,
 | Linker | object files and external symbols | limited | missing or duplicate definition |
 | Header | declarations and macro definitions | seen by compiler after inclusion | inconsistent guard or definitions in header |
 
-## Worked example 1: Why macro parentheses matter
+## Why every layer of `square` needs parentheses
 
-Problem: compare a bad square macro with a parenthesized one for the expression `square(a + 1)` when `a = 3`.
-
-Method:
+Compare two square macros for `square(a + 1)` when `a = 3`. The first omits all grouping:
 
 1. Bad macro:
 
@@ -205,13 +203,11 @@ $$
    \end{aligned}
 $$
 
-Checked answer: the unparenthesized macro produces `7`; the parenthesized macro produces `16`.
+The unparenthesized macro produces `7`; the parenthesized macro produces `16`.
 
-## Worked example 2: Macro argument evaluated twice
+## Following the side effects in `max(i++, j++)`
 
-Problem: evaluate `max(i++, j++)` with a typical macro when `i = 4` and `j = 3`.
-
-Method:
+Take the usual macro with `i = 4` and `j = 3`:
 
 ```c
 #define max(A, B) ((A) > (B) ? (A) : (B))
@@ -235,9 +231,9 @@ Method:
 
 4. The false branch `j++` is not evaluated because `?:` evaluates only the selected branch.
 
-Checked answer: the macro result is `5`, final `i` is `6`, and final `j` is `4`. This is usually not what a caller expects from a maximum operation. A real function would evaluate each argument exactly once before the call.
+The macro result is `5`, final `i` is `6`, and final `j` is `4`. A caller rarely expects a maximum operation to increment one argument twice. A real function evaluates each argument exactly once before the call.
 
-## Code
+## A three-file calculator boundary
 
 ```c
 /* calc.h */
@@ -293,7 +289,7 @@ int main(void)
 }
 ```
 
-## Common pitfalls
+## When preprocessing leaks across the interface
 
 - Putting definitions of external variables in headers, causing duplicate definitions when several source files include the header.
 - Writing macros that evaluate arguments more than once, then calling them with `i++`, input functions, or other side effects.
@@ -303,10 +299,8 @@ int main(void)
 - Omitting include guards in headers that may be included through multiple paths.
 - Exposing helper functions globally when they should be `static` inside one source file.
 
-## Connections
+<div className="see-also">
 
-- [Functions and Program Structure](/cs/programming/c/functions-program-structure)
-- [Types, Operators, and Expressions](/cs/programming/c/types-operators-expressions)
-- [Function Pointers and Complex Declarations](/cs/programming/c/function-pointers-complex-declarations)
-- [Standard Library Reference](/cs/programming/c/standard-library-reference)
-- [Modern C Considerations](/cs/programming/c/modern-c-considerations)
+See also: [Functions and Program Structure](/cs/programming/c/functions-program-structure) · [Types, Operators, and Expressions](/cs/programming/c/types-operators-expressions) · [Function Pointers and Complex Declarations](/cs/programming/c/function-pointers-complex-declarations) · [Standard Library Reference](/cs/programming/c/standard-library-reference) · [Modern C Considerations](/cs/programming/c/modern-c-considerations)
+
+</div>

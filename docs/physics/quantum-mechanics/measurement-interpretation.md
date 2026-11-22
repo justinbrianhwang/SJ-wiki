@@ -9,7 +9,7 @@ Measurement is where the formal rules meet the question of what quantum states m
 
 Sakurai discusses measurements from the start through Stern-Gerlach experiments and later through spin correlations and Bell inequalities. Ballentine is the major contrast source here: he strongly emphasizes an ensemble interpretation and resists reading the state vector as the complete physical condition of one individual system. The Gottfried-named notes include postulates, spin measurement, density matrices, and interpretation remarks. Schiff's older treatment is closer to traditional Copenhagen language.
 
-## Definitions
+## Projectors, measurement operators, and conditional states
 
 For a projective measurement of an observable
 
@@ -63,7 +63,7 @@ $$
 
 A **pointer basis** is the set of apparatus states that become robustly correlated with outcomes after environmental decoherence.
 
-## Key results
+## What a measurement changes
 
 The projection rule is repeatable for ideal sharp measurements. If the system is projected into the eigenspace of $a$, an immediate repetition of the same measurement gives the same result with probability one:
 
@@ -95,8 +95,6 @@ Interpretation sketches:
 
 These interpretations agree on standard laboratory probabilities in the domain covered here. They differ on what the mathematical state is saying about reality.
 
-## Visual
-
 ```mermaid
 sequenceDiagram
   participant S as System
@@ -115,7 +113,7 @@ sequenceDiagram
 | Ensemble | statistical description of preparations | update of selected ensemble | emphasizes operational probabilities |
 | Decoherence program | reduced states become effectively diagonal | explains classical appearance, not selection alone | physically models apparatus/environment |
 
-## Worked example 1: Projective measurement with density matrices
+## Discarding the detector record
 
 **Problem.** A spin-1/2 system has
 
@@ -169,7 +167,7 @@ $$
 
 **Checked answer.** The $S_z$ measurement removes coherence between $\vert +z\rangle$ and $\vert -z\rangle$ in the nonselective description, while leaving the $S_z$ probabilities unchanged.
 
-## Worked example 2: Bell singlet correlation
+## Singlet correlations at two analyzer settings
 
 **Problem.** For the singlet state
 
@@ -219,21 +217,7 @@ $$
 
 **Checked answer.** The result matches the same-axis singlet property and gives the cosine dependence used in Bell-inequality tests.
 
-## Code
-
-```python
-import numpy as np
-
-rho = 0.5 * np.array([[1, 0.6], [0.6, 1]], dtype=complex)
-p_plus = np.array([[1, 0], [0, 0]], dtype=complex)
-p_minus = np.array([[0, 0], [0, 1]], dtype=complex)
-
-rho_after = p_plus @ rho @ p_plus + p_minus @ rho @ p_minus
-print("probabilities:", np.trace(rho @ p_plus).real, np.trace(rho @ p_minus).real)
-print(rho_after)
-```
-
-## Common pitfalls
+## Keeping prediction and interpretation separate
 
 - Treating collapse as the only possible interpretation of the update rule. The calculation is shared; the ontology is debated.
 - Ignoring unconditioned measurement. If the outcome is not selected, use the sum over outcomes, not a single projected state.
@@ -245,11 +229,11 @@ print(rho_after)
 
 A disciplined measurement analysis starts with the actual record. If a detector distinguishes two outcomes, the probabilities must be assigned to those outcomes. If several microscopic alternatives lead to the same unresolved record, add the corresponding amplitudes before squaring when coherence is preserved; add probabilities when decoherence or recorded which-path information makes the alternatives distinguishable. Many apparent paradoxes come from switching between these two rules mid-problem.
 
-Projection is an idealization. It is appropriate for sharp, repeatable measurements of observables with well-defined eigenspaces. Real measurements may be weak, noisy, inefficient, or destructive, and generalized measurement operators model those cases more flexibly. The projective postulate remains central because it is simple, experimentally relevant in many limits, and sufficient for the core Stern-Gerlach and spectral examples used throughout this wiki.
+Projection is an idealization. It is appropriate for sharp, repeatable measurements of observables with well-defined eigenspaces. Real measurements may be weak, noisy, inefficient, or destructive, and generalized measurement operators model those cases more flexibly. The projective postulate remains central because it is simple, experimentally relevant in many limits, and sufficient for the standard Stern-Gerlach and spectral examples.
 
 Interpretation should not be used to patch a calculation. Copenhagen-style language, many-worlds branching, and ensemble updating all reproduce the same Born probabilities for the standard examples here. If two interpretations appear to give different numerical predictions for an ordinary spin measurement, the setup has likely been described differently. First settle the Hilbert space, Hamiltonian, measurement operators, and conditioning. Then discuss what the state update means.
 
-Decoherence explains why macroscopic measurement records are stable in practice. When apparatus pointer states become entangled with many environmental degrees of freedom, interference between macroscopically distinct records becomes inaccessible locally. This supports the emergence of classical-looking alternatives, but by itself it does not answer every interpretive question about why a particular outcome is experienced. That is why measurement remains both a technical topic and a conceptual one.
+Decoherence explains why macroscopic measurement records are stable. When apparatus pointer states become entangled with many environmental degrees of freedom, interference between macroscopically distinct records becomes inaccessible locally. This supports the emergence of classical-looking alternatives, but by itself it does not answer every interpretive question about why a particular outcome is experienced. Measurement therefore remains both a technical topic and a conceptual one.
 
 For practical calculations, write the measurement as a map before interpreting it. A selective projective measurement uses $P_a\rho P_a/\mathrm{Tr}(\rho P_a)$. A nonselective projective measurement uses $\sum_a P_a\rho P_a$. A generalized measurement uses $M_k\rho M_k^\dagger$ with $\sum_kM_k^\dagger M_k=I$. These maps answer different laboratory questions. Once the map is clear, interpretation can be discussed without changing the arithmetic.
 
@@ -257,10 +241,8 @@ Bell experiments are a useful guardrail against overly classical pictures. The s
 
 The best habit is to label interpretive sentences separately from predictive equations. The equations say what probabilities a preparation and measurement imply. The interpretation says what those equations mean. Keeping the layers separate makes disagreements clearer and prevents philosophical language from hiding a missing projector, trace, or normalization.
 
-## Connections
+<div className="see-also">
 
-- [Postulates of quantum mechanics](/physics/quantum-mechanics/postulates-of-quantum-mechanics)
-- [Density operator, entanglement, and decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence)
-- [Spin-1/2 systems](/physics/quantum-mechanics/spin-one-half-systems)
-- [Symmetries and conservation laws](/physics/quantum-mechanics/symmetries-conservation-laws)
-- [Identical particles and symmetrization](/physics/quantum-mechanics/identical-particles-symmetrization)
+See also: [Postulates of quantum mechanics](/physics/quantum-mechanics/postulates-of-quantum-mechanics) · [Density operator, entanglement, and decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence) · [Spin-1/2 systems](/physics/quantum-mechanics/spin-one-half-systems) · [Symmetries and conservation laws](/physics/quantum-mechanics/symmetries-conservation-laws) · [Identical particles and symmetrization](/physics/quantum-mechanics/identical-particles-symmetrization)
+
+</div>

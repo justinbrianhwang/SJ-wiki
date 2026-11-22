@@ -5,15 +5,11 @@ sidebar_position: 5
 
 # Differentiation Rules
 
-Differentiation rules turn the derivative from a limit that must be recomputed every time into a practical calculus tool. The rules are shortcuts, but they are not arbitrary tricks. Each one follows from the limit definition and the algebra of functions.
-
-![Gottfried Wilhelm Leibniz is shown in a historical portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Gottfried_Wilhelm_von_Leibniz.jpg)
-
-*Figure: Gottfried Wilhelm Leibniz's notation shaped differential and integral calculus. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Gottfried_Wilhelm_von_Leibniz.jpg), Bernhard Christoph Francke, public domain.*
+Differentiation rules turn the derivative from a limit that must be recomputed every time into a working calculus tool. The rules are shortcuts, but they are not arbitrary tricks. Each one follows from the limit definition and the algebra of functions.
 
 The main task is to recognize structure. A complicated expression may be a sum, product, quotient, or composition of simpler functions. Once that structure is clear, the derivative is found by applying the appropriate rule in the correct order, while keeping domain restrictions and units in mind.
 
-## Definitions
+## The rule set and its domains
 
 The derivative of $f$ is
 
@@ -80,7 +76,7 @@ $$
 
 These formulas are valid on their natural domains. The absolute value in the derivative of $\operatorname{arcsec} x$ is a reminder that inverse-function derivatives often carry domain choices.
 
-## Key results
+## Why the rules work—and which one comes first
 
 The power rule for positive integers follows from expanding $(x+h)^n$:
 
@@ -108,7 +104,7 @@ $$
 \end{aligned}
 $$
 
-Taking the limit gives $f(x)g'(x)+g(x)f'(x)$. This proof also explains why the derivative of a product is not simply $f'g'$.
+Taking the limit gives $f(x)g'(x)+g(x)f'(x)$. The derivative of a product is therefore $f'g+fg'$, rather than $f'g'$.
 
 The quotient rule can be obtained by writing $f/g=f\cdot g^{-1}$ and using the product and chain rules. The denominator $[g(x)]^2$ appears because differentiating $g^{-1}$ gives $-g^{-2}g'$.
 
@@ -187,8 +183,6 @@ When answers will be used for graphing or optimization, leave factors visible wh
 
 Clean form is part of correctness because it supports the next mathematical decision clearly afterward.
 
-## Visual
-
 | Rule | Pattern | Derivative | Common cue |
 |---|---|---|---|
 | Constant multiple | $cf$ | $cf'$ | Number times a function |
@@ -208,7 +202,7 @@ graph TD
   G --> H[Multiply by inside derivative]
 ```
 
-## Worked example 1: product and chain rules together
+## A product with a nested factor
 
 **Problem.** Differentiate
 
@@ -256,7 +250,7 @@ $$
 
 Both forms are correct.
 
-## Worked example 2: quotient rule with simplification
+## Checking the quotient rule by division
 
 **Problem.** Differentiate
 
@@ -328,7 +322,7 @@ $$
 
 which matches the quotient-rule result.
 
-## Code
+## Comparing a symbolic derivative with finite differences
 
 ```python
 def central_difference(f, x, h=1e-6):
@@ -344,21 +338,24 @@ for x in [2, 3, 5]:
     print(x, central_difference(f, x), f_prime_formula(x))
 ```
 
-## Common pitfalls
+## Notation and structure traps
 
-- Applying the power rule to a sum, such as treating $(x^2+1)^5$ as $5x^4$. Use the chain rule.
-- Forgetting the second term in the product rule. The derivative of $fg$ is not $f'g'$.
-- Reversing signs in the quotient rule. Keep the order as denominator times derivative of numerator minus numerator times derivative of denominator.
-- Dropping the inner derivative in the chain rule.
-- Simplifying the original function across a restricted point and then forgetting the original domain.
-- Mixing radians and degrees. The standard trigonometric derivatives assume radian measure.
-- Applying a formula outside its domain. For example, $\ln x$ requires $x\gt 0$, and $\sqrt{x}$ has a one-sided derivative issue at $0$.
-- Expanding everything automatically. Factored derivatives often reveal zeros and signs more clearly in applications.
-- Confusing $\frac{d}{dx}(\sin^2 x)$ with $\frac{d}{dx}(\sin x^2)$. The first is $(\sin x)^2$; the second is $\sin(x^2)$.
+- The power rule alone does not differentiate $(x^2+1)^5$; the fifth power is wrapped around a nontrivial inner function, so the chain rule contributes a factor of $2x$.
+- Both factors change in a product. Accordingly, $(fg)'=f'g+fg'$, not $f'g'$.
+- In the quotient rule, the numerator order is $gf'-fg'$. Writing that pattern before substituting helps preserve the minus sign.
+- Simplification may hide a hole. Even if an algebraic factor cancels, the derivative inherits the original function's excluded points.
+- The standard trigonometric derivative formulas assume radian measure.
+- Formulas retain their domain restrictions: $\ln x$ requires $x\gt 0$, and $\sqrt{x}$ has only a one-sided, infinite slope at $0$ rather than a finite derivative there.
+- Expansion is not always progress. A factored derivative usually makes its zeros and signs easier to read.
+- The expressions $\sin^2 x$ and $\sin(x^2)$ have different nesting: the first means $(\sin x)^2$, while the second applies sine after squaring $x$.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Derivatives and Rates](/math/calculus/derivatives-and-rates): rules compute the derivative defined by a limit.
 - [Implicit Differentiation and Linearization](/math/calculus/implicit-related-rates-linearization): chain rule thinking supports implicit differentiation.
 - [Exponential Log and Inverse Functions](/math/calculus/exponential-log-inverse-functions): exponential, logarithmic, and inverse derivatives extend the rule set.
 - [Applications of Derivatives](/math/calculus/applications-of-derivatives): derivative computations become graph and optimization tools.
+
+</div>

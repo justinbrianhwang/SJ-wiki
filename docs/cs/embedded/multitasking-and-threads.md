@@ -9,7 +9,7 @@ Multitasking is the mid-level machinery that lets multiple imperative computatio
 
 The difficulty is that threads expose concurrency through shared memory and interleavings of sequential code. Lee and Seshia treat threads as powerful but hazardous. Race conditions, deadlock, memory-consistency surprises, and missed timing properties can lurk for years because the bad interleaving may be rare.
 
-## Definitions
+## Threads, processes, and synchronization objects
 
 An **imperative program** expresses computation as a sequence of operations. C is an imperative language.
 
@@ -29,7 +29,7 @@ A **condition variable** lets one thread block until a condition on shared state
 
 A **semaphore** is a synchronization object whose value controls whether a task proceeds or blocks. Counting semaphores generalize the idea of a resource count.
 
-## Key results
+## Where interleavings become observable
 
 Threads are easy to create but hard to reason about. A thread may be suspended between atomic operations. At the C level, a statement is not necessarily atomic. At the machine level, even some instructions may not be atomic.
 
@@ -57,7 +57,7 @@ Processes are useful when fault isolation matters. A process crash can be contai
 
 A useful rule for embedded application code is to make concurrency visible in interfaces. A function that may block, acquire a lock, run in ISR context, or call back into user code should say so in its contract. Otherwise, callers can accidentally create deadlocks, priority inversions, or illegal ISR operations while using an apparently ordinary API.
 
-## Visual
+### Shared memory and message paths
 
 ```mermaid
 flowchart LR
@@ -77,7 +77,7 @@ flowchart LR
 | Message passing | Shared only inside library/kernel | Structured communication | Buffer growth and blocking cycles |
 | Higher-level MoC | Model-specific | Stronger semantics | Implementation complexity |
 
-## Worked example 1: Race in a non-atomic increment
+## Losing an increment to an interleaving
 
 Problem: Two threads each execute `x = x + 1` once. The initial value is $x=0$. Assume the statement compiles into three atomic actions: read `x`, add one locally, write `x`. Show an interleaving where the final value is $1$ instead of $2$.
 
@@ -117,7 +117,7 @@ $$
 
 Answer: The final value can be $1$. The operation is not atomic, so one increment is lost.
 
-## Worked example 2: Deadlock by lock ordering
+## Reading a deadlock from the wait-for cycle
 
 Problem: Thread A locks $L_1$ then tries to lock $L_2$. Thread B locks $L_2$ then tries to lock $L_1$. Show the deadlock state and a simple lock-ordering fix.
 
@@ -151,35 +151,23 @@ $$
 
 Answer: The original code can deadlock. A fixed lock acquisition order removes this two-lock cycle.
 
-## Code
+### Bounding a producer-consumer queue
 
 ```python
-from collections import deque
+from queue import Full, Queue
 
-class BoundedQueue:
-    def __init__(self, capacity):
-        self.capacity = capacity
-        self.items = deque()
+samples = Queue(maxsize=2)  # Queue supplies the required thread synchronization
 
-    def send(self, item):
-        if len(self.items) >= self.capacity:
-            return False
-        self.items.append(item)
-        return True
+for sample in ("sensor:10", "sensor:11", "sensor:12"):
+    try:
+        samples.put_nowait(sample)
+    except Full:
+        print("dropped:", sample)  # a real system must choose its overflow policy
 
-    def get(self):
-        if not self.items:
-            return None
-        return self.items.popleft()
-
-queue = BoundedQueue(capacity=2)
-print(queue.send("sensor:10"))
-print(queue.send("sensor:11"))
-print(queue.send("sensor:12"))  # would block or fail in a real design
-print(queue.get())
+print("received:", samples.get())
 ```
 
-## Common pitfalls
+## Habits that hide races and deadlocks
 
 - Protecting only some accesses to a shared resource. A mutex discipline must cover all reads and writes that depend on consistency.
 - Calling unknown callbacks while holding a lock. The callback may acquire another lock and create deadlock.
@@ -188,10 +176,8 @@ print(queue.get())
 - Using unbounded message queues in long-running embedded systems.
 - Forgetting that memory consistency depends on compiler, hardware, and synchronization primitives.
 
-## Connections
+<div className="see-also">
 
-- [process synchronization](/cs/operating-systems/process-synchronization)
-- [CPU scheduling](/cs/operating-systems/cpu-scheduling)
-- [input and output interfacing](/cs/embedded/input-output-interfacing)
-- [concurrent models of computation](/cs/embedded/concurrent-models-of-computation)
-- [scheduling and real time](/cs/embedded/scheduling-and-real-time)
+See also: [process synchronization](/cs/operating-systems/process-synchronization) · [CPU scheduling](/cs/operating-systems/cpu-scheduling) · [input and output interfacing](/cs/embedded/input-output-interfacing) · [concurrent models of computation](/cs/embedded/concurrent-models-of-computation) · [scheduling and real time](/cs/embedded/scheduling-and-real-time)
+
+</div>

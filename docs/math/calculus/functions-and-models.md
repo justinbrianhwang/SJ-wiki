@@ -13,7 +13,7 @@ Models matter because real problems rarely arrive as polished formulas. A fallin
 
 *Figure: Sine and cosine as standard function models. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sine_and_Cosine.svg), Inductiveload, public domain.*
 
-## Definitions
+## What a model commits us to
 
 A function $f$ from a domain $D$ to a codomain is a rule assigning exactly one output $f(x)$ to each input $x \in D$. The graph is the set of ordered pairs
 
@@ -52,7 +52,7 @@ Two modeling distinctions are worth making early. A discrete model uses inputs s
 
 Another distinction is exact description versus approximation. The formula $C=2\pi r$ exactly describes the circumference of an ideal circle. A least-squares line through experimental data is an approximation, and its slope should be interpreted with uncertainty. Calculus uses both kinds of formulas, but a model built from data should always be checked against the scale and scatter of that data.
 
-## Key results
+## From function families to modeling choices
 
 For a line through two distinct points $(x_1,y_1)$ and $(x_2,y_2)$, the constant rate of change is
 
@@ -102,8 +102,6 @@ Units provide a strong consistency check. If $x$ is measured in seconds and $f(x
 
 Graphical features also carry mathematical information. Intercepts identify where a quantity is zero. Increasing and decreasing intervals describe the sign of average or instantaneous change. Concavity suggests whether growth is accelerating or slowing. Asymptotes often encode physical limits, such as saturation or forbidden input values. Even before formal calculus, reading those features prepares the later derivative and integral interpretations.
 
-## Visual
-
 | Description | Typical model | Signature behavior | Calculus role |
 |---|---:|---|---|
 | Constant rate | $mx+b$ | Equal input changes give equal output changes | Slope is constant |
@@ -125,7 +123,7 @@ graph LR
   F --> G[Interpret in original units]
 ```
 
-## Worked example 1: build and interpret a linear model
+## Calibrating a temperature scale
 
 **Problem.** Suppose Fahrenheit temperature $F$ depends linearly on Celsius temperature $C$. The calibration points are $(0,32)$ and $(100,212)$. Find the model, interpret the slope, and compute the Celsius temperature corresponding to $68^\circ$F.
 
@@ -168,7 +166,7 @@ $$
 \frac95(20)+32=36+32=68.
 $$
 
-## Worked example 2: composition, domain, and symmetry
+## Composition changes the allowable inputs
 
 **Problem.** Let $f(x)=\sqrt{x}$ and $g(x)=x^2-4$. Find $(f\circ g)(x)$ and its domain. Then determine whether $h(x)=x^4-3x^2+1$ is even, odd, or neither.
 
@@ -222,39 +220,22 @@ $$
 
 **Checked answer.** $(f\circ g)(x)=\sqrt{x^2-4}$ with domain $(-\infty,-2]\cup[2,\infty)$. The function $h$ is even, so its graph is symmetric about the $y$-axis.
 
-## Code
+## Questions to ask before trusting the model
 
-```python
-from math import sqrt
+- The application domain may be narrower than the algebraic domain. A formula can accept negative inputs even when time, radius, or population cannot.
+- In $f(x-c)$, a feature originally at $x=0$ reappears at $x=c$, so the graph shifts right rather than left.
+- Composition order carries meaning: $f(g(x))$ applies $g$ first, and it need not have the same formula or domain as $g(f(x))$.
+- A few symmetric-looking sample values do not prove parity. The identities $f(-x)=f(x)$ and $f(-x)=-f(x)$ do.
+- A slope includes output units per input unit; stripping those units also strips its interpretation.
+- Extrapolation assumes the same mechanism continues beyond the observed data. That assumption should be stated and tested against the setting.
 
-def celsius_to_fahrenheit(c):
-    return (9 / 5) * c + 32
+<div className="see-also">
 
-def compose_domain_sample(x):
-    radicand = x * x - 4
-    if radicand < 0:
-        return None
-    return sqrt(radicand)
-
-for c in [0, 20, 100]:
-    print(c, celsius_to_fahrenheit(c))
-
-for x in [-3, -1, 0, 2, 5]:
-    print(x, compose_domain_sample(x))
-```
-
-## Common pitfalls
-
-- Treating the algebraic domain as the application domain. A formula may allow negative inputs while the model does not.
-- Forgetting that $f(x-c)$ shifts right by $c$, not left by $c$.
-- Composing functions in the wrong order. $f(g(x))$ means apply $g$ first, then $f$.
-- Checking symmetry by looking only at a few values. Use $f(-x)=f(x)$ or $f(-x)=-f(x)$ algebraically.
-- Ignoring units. A slope is not just a number; it has output units per input unit.
-- Extrapolating a model far beyond its data without checking whether the behavior remains realistic.
-
-## Connections
+See also:
 
 - [Limits and Continuity](/math/calculus/limits-and-continuity): functions are the objects whose limiting behavior is studied.
 - [Derivatives and Rates](/math/calculus/derivatives-and-rates): the slope idea from linear models becomes instantaneous rate of change.
 - [Exponential Log and Inverse Functions](/math/calculus/exponential-log-inverse-functions): inverse and growth models become central function families.
 - [Applications of Derivatives](/math/calculus/applications-of-derivatives): graphs and transformations support monotonicity, concavity, and optimization.
+
+</div>

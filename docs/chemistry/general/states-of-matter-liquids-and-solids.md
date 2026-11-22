@@ -5,57 +5,30 @@ sidebar_position: 12
 
 # States of Matter, Liquids, and Solids
 
-States of matter connect molecular attractions to macroscopic properties. Gases are compressible and disordered, liquids have fixed volume but flow, and solids retain shape through strong organized or networked attractions. Phase changes show how energy changes particle arrangement without necessarily changing chemical identity.
+Macroscopic phase behavior follows from particle motion, intermolecular attraction, and packing. Gases are highly compressible, liquids retain volume while flowing, and solids resist changes in shape through ordered lattices, networks, or other strong cohesive structures.
 
-In the Ebbing and Gammon sequence this topic sits near gases, liquids, solids, phase transitions, phase diagrams, surface tension, viscosity, intermolecular forces, crystalline solids, unit cells, and x-ray diffraction. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
+## Attractions behind liquid properties
 
-![A phase diagram of water maps solid, liquid, vapor, triple-point, and critical-point regions.](https://commons.wikimedia.org/wiki/Special:FilePath/Phase_diagram_of_water.svg)
+Intermolecular forces act between particles; covalent and ionic bonds hold atoms together within a molecular or formula-unit description. Mixing those levels leads to bad boiling-point and phase-change arguments.
 
-*Figure: Water phase diagram connecting pressure and temperature to state of matter. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Phase_diagram_of_water.svg), Cmglee, CC BY-SA 3.0.*
+| Interaction | Where it appears | Main comparison |
+|---|---|---|
+| London dispersion | all atoms and molecules | grows with polarizability and contact area |
+| Dipole-dipole | polar molecules | depends on molecular dipole and orientation |
+| Hydrogen bonding | systems with suitable H-N, H-O, or H-F donors and lone-pair acceptors | a strong, directional dipole interaction |
+| Ion-dipole | ions in polar solvents | central to solvation of many salts |
 
-## Definitions
+Stronger attractions generally raise boiling point, viscosity, and surface tension while lowering vapor pressure at a fixed temperature. Molecular shape matters because it changes how closely and over how much area molecules can approach one another.
 
-The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.
+## Reading a phase diagram
 
-- Intermolecular forces are attractions between particles, including dispersion, dipole-dipole, and hydrogen bonding.
-- Phase transition is a physical change between solid, liquid, and gas.
-- Vapor pressure is the pressure exerted by vapor in equilibrium with liquid or solid.
-- Boiling occurs when vapor pressure equals external pressure.
-- Surface tension is resistance of a liquid surface to expansion.
-- Viscosity is resistance to flow.
-- Unit cell is the repeating structural unit of a crystal lattice.
-- Coordination number is the number of nearest neighbors around a particle in a crystal.
+A phase diagram maps the stable phase at each pressure and temperature. Lines mark conditions where two phases coexist, the triple point joins all three coexistence lines, and the liquid-vapor boundary ends at the critical point. Water's solid-liquid line slopes negatively because ordinary ice is less dense than liquid water.
 
-Definitions in chemistry often connect a symbolic representation to a physical sample. A formula such as $\mathrm{H_2O}$ names a substance, gives the atomic ratio inside one molecule, and supplies the molar mass used in a macroscopic calculation. A state symbol such as $\mathrm{(aq)}$ is not cosmetic; it says the species is dispersed in water and may be treated as ions when writing a net ionic equation. In the same way, constants such as $R$, $K_w$, $F$, or $N_A$ are compact definitions of the measurement system being used.
+Boiling occurs when a liquid's vapor pressure equals the external pressure. It is therefore not fixed at $100^\circ\mathrm{C}$ for every substance or even for water at every pressure.
 
-## Key results
-
-The central results are:
-
-- Clausius-Clapeyron form: $\ln(P_2/P_1)=-\Delta H_{vap}/R(1/T_2-1/T_1)$.
-- Heating curve plateaus correspond to phase change at constant temperature.
-- Density from unit cell: $\rho=Z M/(N_A a^3)$ for cubic cell edge $a$.
-- Stronger intermolecular forces generally increase boiling point, viscosity, and surface tension.
-- Hydrogen bonding requires H bonded to N, O, or F and an acceptor lone pair.
-- A phase diagram maps stable phase as a function of pressure and temperature.
-
-Phase behavior is an energy competition. Temperature measures kinetic energy tendency to disperse particles; intermolecular forces stabilize condensed phases. Crystal structures add geometry to that competition: a solid's density and properties depend on how particles pack in a repeating lattice.
-
-A good way to use these results is to state the chemical model first, then substitute numbers second. For states of matter, the model usually answers questions such as what particles are present, what is conserved, which process is idealized, and which measurement is being interpreted. Once that sentence is clear, the algebra becomes a bookkeeping problem rather than a search for a memorized pattern.
-
-Units are part of the result, not decoration. Whenever a formula contains an empirical constant, a tabulated value, or a ratio of measured quantities, the units tell you whether the expression has been used in the intended form. This is especially important in general chemistry because several equations have nearly identical algebra but different meanings: pressure can be a measured state variable, an equilibrium correction, or a colligative effect; energy can be heat flow, enthalpy, internal energy, or free energy.
-
-The strongest check is an independent chemical interpretation. Ask whether the sign agrees with direction, whether a concentration can be negative, whether a mole ratio follows the balanced equation, whether an equilibrium shift opposes the stress, and whether a microscopic description explains the macroscopic number. These checks connect states of matter to neighboring topics instead of leaving it as an isolated technique.
-
-A second check is to compare the limiting cases. If a reactant amount goes to zero, a product amount cannot remain large. If temperature rises in a gas sample at fixed volume, pressure should not fall in an ideal model. If an acid is diluted, hydronium concentration should normally decrease unless a coupled equilibrium supplies more. Limiting cases often reveal algebra that has been rearranged correctly but applied to the wrong chemical situation.
-
-Finally, keep symbolic and particulate representations side by side. A balanced equation, an equilibrium expression, an orbital diagram, or a polymer repeat unit is a compact symbol for a population of particles. Translating that symbol into words forces you to say what is reacting, what is being counted, and what is being held constant. That translation is usually the difference between a calculation that can be adapted to a new problem and one that only imitates a worked example.
-
-## Visual
+## Heating through a phase transition
 
 ```text
-Rough heating curve:
-
 T
 |                gas warming
 |              /
@@ -67,78 +40,150 @@ T
 +------------------------ heat added
 ```
 
-| Force | Where it appears | Relative importance |
-|---|---|---|
-| London dispersion | all particles | grows with size and polarizability |
-| Dipole-dipole | polar molecules | depends on molecular polarity |
-| Hydrogen bonding | H-N, H-O, H-F systems | strong special dipole interaction |
-| Ion-dipole | ions in polar solvents | important in dissolving salts |
+Within a single phase, added heat raises temperature according to the relevant heat capacity. Along an idealized plateau, energy changes the phase while temperature remains constant. A phase transition changes particle arrangement without changing chemical identity.
 
-## Worked example 1: Vapor pressure from Clausius-Clapeyron
+The flat segments should not be read as “no energy change.” The energy is latent heat used to overcome or establish intermolecular attractions rather than to raise the average kinetic energy.
 
-Problem. A liquid has vapor pressure 100.0 mmHg at 300 K and $\Delta H_{vap}=35.0\ \mathrm{kJ\ mol^{-1}}$. Estimate vapor pressure at 320 K.
+## Estimating vapor pressure at a second temperature
 
-    Method.
+For a liquid over a modest temperature range, the integrated Clausius-Clapeyron equation is
 
-    1. Use $\ln(P_2/P_1)=-\Delta H_{vap}/R(1/T_2-1/T_1)$.
-2. Convert enthalpy to joules: $35.0\ \mathrm{kJ\ mol^{-1}}=35000\ \mathrm{J\ mol^{-1}}$.
-3. Compute reciprocal difference: $1/320-1/300=-0.0002083\ \mathrm{K^{-1}}$.
-4. Compute right side: $-(35000/8.314)(-0.0002083)=0.877$.
-5. Exponentiate: $P_2/P_1=e^{0.877}=2.40$.
-6. Find $P_2=2.40(100.0)=240\ \mathrm{mmHg}$.
+$$
+\ln\left(\frac{P_2}{P_1}\right)
+=-\frac{\Delta H_{vap}}{R}\left(\frac{1}{T_2}-\frac{1}{T_1}\right).
+$$
 
-    Checked answer. $P_2\approx 240\ \mathrm{mmHg}$. Vapor pressure increases with temperature, so the result should be greater than 100 mmHg.
+Suppose $P_1=100.0\ \mathrm{mmHg}$ at 300 K and $\Delta H_{vap}=35.0\ \mathrm{kJ\,mol^{-1}}$. At 320 K,
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+$$
+\ln\left(\frac{P_2}{100.0}\right)
+=-\frac{35000}{8.314}\left(\frac{1}{320}-\frac{1}{300}\right)
+=0.877.
+$$
 
-## Worked example 2: Density of a cubic unit cell
+Therefore $P_2/P_1=e^{0.877}=2.40$ and $P_2\approx240\ \mathrm{mmHg}$. The increased vapor pressure agrees with the higher temperature.
 
-Problem. A metal has face-centered cubic unit cells with edge length 408 pm and molar mass $107.9\ \mathrm{g\ mol^{-1}}$. Find density.
+## From a unit cell to bulk density
 
-    Method.
+A unit cell is the repeating unit of a crystal lattice, and the coordination number counts nearest neighbors around a lattice site. For a cubic unit cell,
 
-    1. Face-centered cubic has $Z=4$ atoms per unit cell.
-2. Convert edge length: $408\ \mathrm{pm}=4.08\times10^{-8}\ \mathrm{cm}$.
-3. Cell volume: $a^3=(4.08\times10^{-8})^3=6.79\times10^{-23}\ \mathrm{cm^3}$.
-4. Mass per cell: $4(107.9\ \mathrm{g\ mol^{-1}})/(6.022\times10^{23})=7.17\times10^{-22}\ \mathrm{g}$.
-5. Density: $7.17\times10^{-22}/6.79\times10^{-23}=10.6\ \mathrm{g\ cm^{-3}}$.
+$$
+\rho=\frac{ZM}{N_Aa^3},
+$$
 
-    Checked answer. $10.6\ \mathrm{g\ cm^{-3}}$. A dense metal value near 10 g/cm3 is plausible for a heavy noble metal.
+where $Z$ is the number of formula units or atoms per cell, $M$ is molar mass, and $a$ is the cell edge.
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+For a face-centered cubic metal, $Z=4$. With $a=408\ \mathrm{pm}=4.08\times10^{-8}\ \mathrm{cm}$ and $M=107.9\ \mathrm{g\,mol^{-1}}$,
 
-## Code
+$$
+V_{cell}=a^3=6.79\times10^{-23}\ \mathrm{cm^3},
+$$
 
-```python
-from math import exp, log
+$$
+m_{cell}=\frac{4(107.9)}{6.022\times10^{23}}
+=7.17\times10^{-22}\ \mathrm{g},
+$$
 
-R = 8.314
-def vapor_pressure(P1, T1, T2, delta_h_vap_J):
-    ln_ratio = -delta_h_vap_J / R * (1 / T2 - 1 / T1)
-    return P1 * exp(ln_ratio)
+so
 
-def cubic_density(Z, molar_mass_g, edge_pm):
-    NA = 6.022e23
-    edge_cm = edge_pm * 1e-10
-    mass_cell = Z * molar_mass_g / NA
-    volume_cell = edge_cm ** 3
-    return mass_cell / volume_cell
+$$
+\rho=10.6\ \mathrm{g\,cm^{-3}}.
+$$
 
-print(vapor_pressure(100.0, 300.0, 320.0, 35000.0), cubic_density(4, 107.9, 408))
-```
+The length conversion must occur before cubing. An error of ten in the edge becomes an error of one thousand in the volume.
 
-## Common pitfalls
+## Vapor pressure is a dynamic equilibrium
 
-- Calling intramolecular covalent bonds intermolecular forces. Avoid it by separating bonds within particles from attractions between particles.
-- Assuming boiling always occurs at 100C. Avoid it by checking external pressure and substance identity.
-- Forgetting phase-change plateaus in heating curves. Avoid it by distinguishing heat that raises temperature from heat that changes phase.
-- Using pm directly as cm in unit-cell density. Avoid it by converting length units before cubing.
-- Assuming stronger intermolecular forces always mean higher vapor pressure. Avoid it by remembering stronger attractions lower vapor pressure.
-- Ignoring defect or crystal type when comparing solids. Avoid it by identifying molecular, ionic, metallic, covalent-network, or atomic solids.
+Molecules in a liquid have a distribution of kinetic energies. Some surface molecules have enough energy and a favorable direction to escape. In a closed container, vapor molecules also collide with the surface and condense. Equilibrium vapor pressure is reached when evaporation and condensation rates are equal, not when molecular motion stops.
 
-## Connections
+Raising temperature shifts the energy distribution so that more molecules can escape, increasing vapor pressure. Stronger intermolecular attraction raises the energy cost of escape and lowers vapor pressure at the same temperature. A liquid with high vapor pressure is described as volatile and normally has a lower normal boiling point than a less volatile liquid under the same comparison.
 
-- [gases](/chemistry/general/gases)
-- [solutions and colligative properties](/chemistry/general/solutions-and-colligative-properties)
-- [molecular geometry and bonding theory](/chemistry/general/molecular-geometry-and-bonding-theory)
-- [main-group elements](/chemistry/general/main-group-elements)
+Surface area changes the rate at which equilibrium is approached but not the equilibrium vapor pressure at a fixed temperature. An open container may never establish equilibrium because vapor is continually removed. Evaporation then cools the remaining liquid because escaping molecules carry above-average kinetic energy.
+
+### Comparing boiling points without a single-factor slogan
+
+Compare propane, dimethyl ether, and ethanol, which have similar molar masses. Propane is nonpolar and relies on dispersion forces. Dimethyl ether is polar, so it adds dipole–dipole attraction. Ethanol can both donate and accept hydrogen bonds, producing the strongest cohesive interactions of the three and the highest boiling point. Similar size makes the interaction-type comparison informative.
+
+Within a homologous nonpolar series, polarizability and contact area become more important. A longer electron cloud is more easily distorted, strengthening dispersion. Branching often lowers boiling point among isomers by reducing surface contact. Molecular mass alone is therefore an incomplete explanation.
+
+Hydrogen bonding requires a donor hydrogen directly attached to N, O, or F and a suitable acceptor. An ether oxygen accepts hydrogen bonds from water but an ether molecule has no O–H bond and cannot donate one to another ether. Merely containing hydrogen and an electronegative atom elsewhere in the formula is insufficient.
+
+## Reading phase boundaries thermodynamically
+
+Crossing a coexistence line changes the stable phase. Moving horizontally changes temperature at fixed pressure; moving vertically changes pressure at fixed temperature. Below the triple-point pressure, a liquid phase is unavailable and heating a solid produces sublimation. Beyond the critical point, liquid and gas merge continuously into a supercritical fluid, so there is no liquid–vapor boundary to cross.
+
+The slope of a coexistence line follows the Clapeyron relation
+
+$$
+\frac{dP}{dT}=\frac{\Delta H}{T\Delta V}.
+$$
+
+For melting, $\Delta H$ is positive. Most substances expand on melting, giving a positive solid–liquid slope. Ice Ih contracts on melting, so $\Delta V$ is negative and the line slopes downward. Increasing pressure near the ordinary melting point then favors the denser liquid and lowers the melting temperature slightly.
+
+The integrated Clausius–Clapeyron expression assumes $\Delta H_{vap}$ is roughly constant and vapor behaves ideally over the interval. It is best used over modest temperature ranges. Temperatures must be absolute because reciprocals of Celsius temperatures have no thermodynamic meaning.
+
+## What added heat does
+
+Within one phase,
+
+$$
+q=mc\Delta T.
+$$
+
+At a transition,
+
+$$
+q=n\Delta H_{trans}.
+$$
+
+To heat ice below zero to steam above $100^\circ\mathrm{C}$ at one atmosphere, split the path into warming ice, melting, warming liquid, vaporizing, and warming vapor. Each segment uses its own heat capacity or transition enthalpy. Combining the whole temperature change with one heat capacity omits the latent heat terms, commonly the largest contribution.
+
+During an ideal constant-pressure transition, temperature remains fixed while potential energy and molecular arrangement change. The original text's flat segments represent energy absorption, not “no energy change.” Real heating curves can slope or broaden because of heat loss, mixtures, or nonuniform temperature.
+
+## Solid structure and the forces that hold it
+
+| Solid type | Structural particles | Dominant cohesion | Typical behavior |
+|---|---|---|---|
+| molecular | molecules | intermolecular forces | often soft with relatively low melting point |
+| ionic | cations and anions | electrostatic attraction | brittle, high-melting, conducting when ions move |
+| metallic | metal atoms/ions and delocalized electrons | metallic bonding | conducting, malleable, ductile |
+| covalent network | atoms joined throughout a network | covalent bonds | hard or high-melting; properties vary with topology |
+| atomic | individual atoms | usually dispersion | low melting for noble-gas solids |
+
+The categories predict broad behavior, not exact rankings. Graphite is a covalent-network solid that conducts along its sheets and cleaves readily between them. Some molecular solids have extensive hydrogen bonding. Crystal defects also matter: vacancies, substituted atoms, and dislocations can control conductivity and mechanical strength without changing the ideal lattice name.
+
+## Counting particles in cubic cells
+
+An atom at a cube corner is shared by eight cells and contributes $1/8$; a face-centered atom is shared by two and contributes $1/2$; a body-centered atom lies wholly inside one cell. Simple cubic, body-centered cubic, and face-centered cubic cells therefore contain 1, 2, and 4 net atoms respectively.
+
+Their coordination numbers are 6, 8, and 12. Coordination and packing efficiency rise from simple cubic to the close-packed FCC structure, but a material's actual structure depends on electronic energetics as well as geometrical density. The unit-cell edge also relates to atomic radius differently in each lattice, so a formula must be derived from the direction along which atoms touch rather than memorized without its geometry.
+
+Crystalline solids possess long-range repeating order. Amorphous solids lack that periodic order over long distances, though they can retain local structure. Glass softens over a range rather than melting sharply like an ideal pure crystal; calling it a very slow room-temperature liquid is misleading.
+
+## Comparisons that need a stated model
+
+- Identify molecular, ionic, metallic, covalent-network, or atomic solids before comparing their properties.
+- Do not infer a higher vapor pressure from stronger intermolecular forces; the direction is lower at fixed temperature.
+- Distinguish heat that changes temperature from latent heat that changes phase.
+- Include the external pressure when discussing boiling.
+- Real crystals contain defects, and measured densities may differ slightly from an ideal unit-cell calculation.
+
+## Metastable phases and nucleation
+
+A phase diagram identifies the lowest-free-energy bulk phase, but a system can remain metastable when conversion requires forming a new interface. Supercooled water remains liquid below its freezing point until a sufficiently large ice nucleus forms. Once nucleation begins, growth can be rapid. Scratching a container, adding a seed crystal, or introducing dust can lower the nucleation barrier without changing the equilibrium melting temperature.
+
+The same distinction appears in vapor condensation and crystal polymorphs. A less stable crystal form may appear first because it nucleates more easily, then transform later. Cooling rate affects particle size and order: rapid cooling can trap an amorphous structure, while slow cooling gives particles time to arrange into a crystal. Equilibrium and kinetics must therefore be stated separately when discussing observed phase.
+
+Capillary action combines adhesion to a surface, cohesion within a liquid, and surface tension. Water rises in clean glass when attraction to the wall favors wetting; mercury is depressed because cohesion dominates. The curved meniscus creates a pressure difference whose magnitude grows as radius decreases, explaining why narrow pores show stronger capillary effects.
+
+Pressure has little effect on condensed-phase volume because liquids and solids are far less compressible than gases. It can still shift phase equilibria when the competing phases have different molar volumes. The denser phase is favored by increased pressure, as expressed by the $P\Delta V$ contribution to free energy.
+
+Viscosity measures resistance to flow and generally falls as a liquid is heated because molecules escape local attractive cages more readily. Surface tension measures the free-energy cost of creating surface area. Both respond to intermolecular forces, but they are distinct properties and need not rank every substance identically.
+
+At the critical point, the liquid and vapor densities converge and the surface between them disappears. Above it, “gas” and “liquid” are no longer separate equilibrium phases. A supercritical fluid can combine gas-like transport with liquid-like density, with properties tuned continuously by pressure and temperature.
+
+<div className="see-also">
+
+See also: [gases](/chemistry/general/gases) · [solutions and colligative properties](/chemistry/general/solutions-and-colligative-properties) · [molecular geometry and bonding theory](/chemistry/general/molecular-geometry-and-bonding-theory) · [main-group elements](/chemistry/general/main-group-elements)
+
+</div>

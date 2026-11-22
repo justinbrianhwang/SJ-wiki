@@ -7,13 +7,13 @@ sidebar_position: 20
 
 Molecular interactions explain why real gases, liquids, surfaces, and condensed phases deviate from ideal models. Transport properties then describe how molecules, momentum, energy, and charge move when a system is not at uniform equilibrium.
 
-Atkins connects these ideas across gases, liquids, electrolyte solutions, diffusion, and molecular beams. The same microscopic forces that produce virial coefficients and liquid structure also influence viscosity, diffusion, conductivity, and rates of encounters.
+The same microscopic forces that produce virial coefficients and liquid structure also influence viscosity, diffusion, conductivity, and encounter rates. Gas kinetic theory supplies the cleanest starting point; liquids and electrolytes add collective motion and correlated forces.
 
 ![A ball-and-stick water dimer model shows two water molecules joined by a hydrogen bond.](https://commons.wikimedia.org/wiki/Special:FilePath/Water-dimer-3D-balls.png)
 
 *Figure: Water dimer as a small-molecule picture of hydrogen bonding and intermolecular attraction. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Water-dimer-3D-balls.png), Hoa112008, public domain.*
 
-## Definitions
+## Pair forces and transport coefficients
 
 An electric dipole moment is
 
@@ -69,7 +69,7 @@ $$
 
 where $\kappa$ is conductivity.
 
-## Key results
+## From molecular collisions to macroscopic flux
 
 The Maxwell speed distribution for gases explains why molecular speeds spread broadly even at fixed temperature. Lighter molecules and higher temperatures give higher speeds.
 
@@ -138,8 +138,6 @@ Molecular beams provide a way to study collision dynamics under controlled condi
 
 In all transport problems, a flux is paired with a thermodynamic force. Concentration gradients, temperature gradients, velocity gradients, and electric potential gradients drive matter, heat, momentum, and charge flow. Linear laws such as Fick's law hold near equilibrium; far from equilibrium, nonlinear behavior and coupling between flows can become important.
 
-## Visual
-
 ```mermaid
 flowchart TD
   A[Molecular interactions] --> B[real gas deviations]
@@ -162,7 +160,7 @@ flowchart TD
 | Ionic conductivity | charge | electric potential | current from ion mobility |
 | Effusion | gas molecules | pressure/density | rate $\propto M^{-1/2}$ |
 
-## Worked example 1: RMS speed of nitrogen
+## Thermal speed of nitrogen at room temperature
 
 **Problem.** Calculate the root-mean-square speed of $\mathrm{N_2}$ at $298.15\ \mathrm{K}$. Use $M=28.0134\ \mathrm{g\ mol^{-1}}$.
 
@@ -202,7 +200,7 @@ $$
 
 **Checked answer.** A few hundred meters per second is the expected thermal speed for light gas molecules at room temperature.
 
-## Worked example 2: Diffusion distance
+## How far a molecule diffuses in ten seconds
 
 **Problem.** A small molecule has diffusion coefficient $D=1.0\times10^{-9}\ \mathrm{m^2\ s^{-1}}$ in water. Estimate the root-mean-square displacement in three dimensions after $10.0\ \mathrm{s}$.
 
@@ -234,7 +232,7 @@ $$
 
 **Checked answer.** Molecular diffusion is effective over micrometer to submillimeter distances but slow over centimeters without convection.
 
-## Code
+## Numerical scale checks for motion and diffusion
 
 ```python
 import numpy as np
@@ -253,7 +251,7 @@ for t in [0.01, 1.0, 10.0, 100.0]:
     print(t, rms_diffusion_distance(1e-9, t), "m")
 ```
 
-## Common pitfalls
+## Geometry, state dependence, and model limits
 
 - Using molar mass in grams inside SI kinetic-energy formulas.
 - Treating diffusion as directed motion. Mean displacement is zero; mean square displacement grows with time.
@@ -273,13 +271,10 @@ At interfaces, transport and thermodynamics meet. Adsorption can deplete bulk co
 
 For dimensional estimates, compare the observation length with $\sqrt{2Dt}$ or $\sqrt{6Dt}$ before assuming diffusion is fast enough. This quick check often explains why stirring, flow, or active transport is required in real systems.
 
-State whether diffusion is one-dimensional, radial, or three-dimensional.
+State whether diffusion is one-dimensional, radial, or three-dimensional, since geometry changes the answer.
 
-Geometry changes the answer.
+<div className="see-also">
 
-## Connections
+See also: [Properties of gases](/chemistry/physical-chemistry/properties-of-gases) · [Mixtures, solutions, and activities](/chemistry/physical-chemistry/mixtures-solutions-and-activities) · [Rate laws and reaction mechanisms](/chemistry/physical-chemistry/rate-laws-and-reaction-mechanisms) · [Physics statistical mechanics](/physics/statistical-mechanics/intro)
 
-- [Properties of gases](/chemistry/physical-chemistry/properties-of-gases)
-- [Mixtures, solutions, and activities](/chemistry/physical-chemistry/mixtures-solutions-and-activities)
-- [Rate laws and reaction mechanisms](/chemistry/physical-chemistry/rate-laws-and-reaction-mechanisms)
-- [Physics statistical mechanics](/physics/general/)
+</div>

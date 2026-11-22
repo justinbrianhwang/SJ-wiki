@@ -5,133 +5,368 @@ sidebar_position: 11
 
 # Fluids: Statics, Dynamics, and Bernoulli
 
-Fluids: Statics, Dynamics, and Bernoulli covers pressure, buoyancy, continuity, and Bernoulli's equation for ideal flow. The goal is to recognize the physical structure before choosing equations. In the HRW progression, this topic extends earlier mechanics and prepares later field, wave, or modern-physics reasoning by reusing the same habits: define the system, choose signs and variables, state assumptions, and check dimensions.
+Fluid statics follows from force balance; ideal fluid dynamics follows from conservation of mass and mechanical energy. The equations look compact, but pressure reference, displaced volume, and flow assumptions determine whether they apply.
 
-The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
+## Pressure below a free surface
 
-![A flow tube diagram marks pressure, height, and speed at two cross sections.](https://commons.wikimedia.org/wiki/Special:FilePath/BernoullisLawDerivationDiagram.svg)
-
-*Figure: Bernoulli's equation becomes easier to interpret when the flow tube shows pressure work, height, and velocity together. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:BernoullisLawDerivationDiagram.svg), MannyMax, redrawn by Slashme and Pbrks, CC BY-SA 3.0/GFDL.*
-
-## Definitions
-
-- **Scope:** pressure, buoyancy, continuity, and Bernoulli's equation for ideal flow.
-- **Primary symbols:** $\rho$, $P$, $F_B$, $Q$, $v$.
-- **Reference equations:** $P=P_0+\rho gh$, $F_B=\rho_f gV$, $A_1v_1=A_2v_2$, $P+\frac12\rho v^2+\rho gy=constant$.
-- A **system** is the object, field region, circuit, gas, optical element, or particle collection being modeled.
-- A **state** is specified by the variables that determine the relevant energy, momentum, phase, field, or thermodynamic condition.
-- A **constraint** is a physical restriction such as no slip, fixed length, constant temperature, steady flow, fixed boundary, or symmetry.
-- A **limiting case** is a simplified parameter choice used to test whether the result behaves sensibly.
-
-The definitions in this page are meant to be operational. A symbol is useful only after you know how it would be measured, what units it carries, what sign convention is being used, and which idealizations are being assumed. Before substituting numbers, identify the system boundary and the relevant state variables. For a particle problem the state variables might be position and velocity; for a circuit they might be charge, current, and potential difference; for a thermodynamic process they might be pressure, volume, temperature, and internal energy.
-
-A second habit is to separate model statements from algebra. A model statement says something physical, such as "air resistance is negligible", "the string is massless", "the gas is ideal", "the process is quasistatic", or "the field is uniform". Algebra then follows from those statements. If the model changes, the algebra may still look familiar but the result can become invalid. Write the model assumptions as part of the solution, not as an afterthought.
-
-## Key results
-
-The main relationships are
+Pressure is normal force per area:
 
 $$
-\begin{aligned}
-\text{core formulas} &: $P=P_0+\rho gh$, $F_B=\rho_f gV$, $A_1v_1=A_2v_2$, $P+\frac12\rho v^2+\rho gy=constant$.
-\end{aligned}
+P=\frac{F_\perp}{A}.
 $$
 
-Use these relationships only after identifying which variables are known and which conditions are being assumed. Many problems can be solved by matching a physical phrase to a mathematical operation: balance forces or torques for equilibrium, integrate a rate for accumulated change, conserve a quantity when external transfer is absent, or apply a boundary condition when waves or fields must fit a geometry.
+Pressure is a scalar field even though the force it produces on a surface is normal. At a point in a stationary fluid, pressure is the same in every direction; otherwise a small element would have an unbalanced shear or torque.
 
-A useful solution pattern is: write the governing equation, substitute symbolic constraints, solve for the unknown, and only then insert numbers. This prevents units from becoming decorative and keeps the answer interpretable.
+In a stationary fluid of constant density,
 
-These formulas are conditional statements. Each equation is powerful inside its domain and misleading outside it. Constant-acceleration kinematics requires constant acceleration. Conservation of mechanical energy requires either no nonconservative work or an explicit accounting of it. Gauss's law is always true, but it directly gives an electric field only when symmetry lets the flux integral simplify. Bernoulli's equation assumes steady, incompressible, nonviscous flow along a streamline. Keeping the conditions attached to the formula is part of the formula.
+$$
+P=P_0+\rho gh,
+$$
 
-For numerical work, solve symbolically before inserting values whenever possible. A symbolic expression exposes dimensions and limiting behavior. If a mass should cancel, it should cancel before arithmetic. If an answer should decrease when distance grows, the final expression should show that trend. If an answer becomes infinite in an unphysical limit, that usually marks the boundary where the model has stopped applying.
+where $P_0$ is the pressure at the surface and $h$ is depth below it. The gauge pressure is $P_g=P-P_0=\rho gh$; absolute pressure includes $P_0$.
 
-## Visual
+Balancing a thin horizontal slab gives
+
+$$
+\frac{dP}{dy}=-\rho g,
+$$
+
+with $y$ upward. If density varies, retain it in the integral:
+
+$$
+P(y_2)-P(y_1)=-\int_{y_1}^{y_2}\rho(y)g\,dy.
+$$
+
+The pressure at equal elevations in a connected stationary fluid is equal. A hydraulic lift therefore satisfies $F_1/A_1=F_2/A_2$. The force gain is paid for by distance: incompressibility gives $A_1d_1=A_2d_2$, hence $F_1d_1=F_2d_2$ ideally.
+
+A hatch of area $0.80\,\mathrm{m^2}$ lies $5.0\,\mathrm m$ below the surface of fresh water. Its gauge pressure is
+
+$$
+P_g=(1000)(9.8)(5.0)=4.90\times10^4\,\mathrm{Pa}.
+$$
+
+If the other side is at atmospheric pressure and the hatch is small enough that its depth is effectively uniform, the net force is
+
+$$
+F=P_gA=(4.90\times10^4)(0.80)
+=3.92\times10^4\,\mathrm N.
+$$
+
+Using absolute pressure for only one side would incorrectly include the atmospheric force that is already balanced on the other side.
+
+For a large vertical gate, pressure is not uniform. On a rectangle of width $b$ extending from the surface to depth $H$,
+
+$$
+F=\int_0^H\rho gy\,b\,dy
+=\frac12\rho gbH^2.
+$$
+
+The resultant acts at depth $2H/3$, below the geometric center, because the pressure distribution is triangular.
+
+## Buoyancy is the resultant pressure force
+
+Pressure increases with depth, so the upward pressure force on a submerged object's lower surface exceeds the downward force on its upper surface. The net buoyant force is
+
+$$
+F_B=\rho_f gV_{\mathrm{disp}},
+$$
+
+equal to the weight of displaced fluid. The density is the fluid's density, and the volume is the displaced volume. For a floating object, equilibrium gives $F_B=mg$, so the submerged fraction is $\rho_{\mathrm{object}}/\rho_f$ when densities are uniform.
+
+Archimedes' principle follows by replacing the object mentally with the fluid that occupied the same volume. That fluid parcel was in equilibrium, so surrounding pressure forces had a resultant equal and opposite to its weight. The same surface pressures act on the object.
+
+### Worked example: a submerged block and tether
+
+A block has density $800\,\mathrm{kg/m^3}$ and volume $2.0\times10^{-3}\,\mathrm{m^3}$. It is submerged in water and held by a string attached to the bottom. Its weight is
+
+$$
+W=(800)(2.0\times10^{-3})(9.8)=15.68\,\mathrm N,
+$$
+
+while buoyancy is
+
+$$
+F_B=(1000)(2.0\times10^{-3})(9.8)=19.60\,\mathrm N.
+$$
+
+The tether must pull downward:
+
+$$
+T=F_B-W=3.92\,\mathrm N.
+$$
+
+If cut, the initial acceleration is
+
+$$
+a=\frac{F_B-W}{m}
+=\frac{3.92}{(800)(2.0\times10^{-3})}
+=2.45\,\mathrm{m/s^2},
+$$
+
+before drag and partial emergence change the forces.
+
+Floating equilibrium also needs rotational stability. A small tilt shifts the center of buoyancy. If the shifted buoyant force produces a restoring torque about the center of mass, the orientation is stable; equal vertical forces alone do not settle that question.
+
+## Following a parcel through a flow tube
+
+For steady incompressible flow, conservation of mass gives
+
+$$
+A_1v_1=A_2v_2=Q,
+$$
+
+where $Q$ is volume flow rate. A narrower cross section therefore has a greater speed.
+
+The general steady mass-flow relation is
+
+$$
+\dot m=\rho Av.
+$$
+
+Only constant density reduces it to $Av=\text{constant}$. Gas flow through a large pressure change may be compressible.
 
 ```mermaid
 graph LR
-  A[Physical situation] --> B[Choose model]
-  B --> C[Define variables]
-  C --> D[Apply key law]
-  D --> E[Solve symbolically]
-  E --> F[Check units and limits]
+  A[Choose two cross sections] --> B[Apply continuity]
+  B --> C[Relate the speeds]
+  C --> D[Apply Bernoulli along a streamline]
+  D --> E[Compare pressure and height]
 ```
 
-| Quantity or idea | Use | Check |
+| Effect | Relation | Condition |
 |---|---|---|
-| Main model | pressure, buoyancy, continuity, and Bernoulli's equation for ideal flow | assumptions must match the formula |
-| Symbols | $\rho$, $P$, $F_B$, $Q$, $v$ | define each before use |
-| Key formulas | $P=P_0+\rho gh$, $F_B=\rho_f gV$, $A_1v_1=A_2v_2$, $P+\frac12\rho v^2+\rho gy=constant$ | check dimensions term by term |
-| Limiting case | simplify one parameter | result should match intuition |
+| Hydrostatic pressure | $P=P_0+\rho gh$ | fluid at rest, constant density |
+| Buoyant force | $F_B=\rho_f gV_{\mathrm{disp}}$ | displaced-fluid weight |
+| Continuity | $A_1v_1=A_2v_2$ | steady incompressible flow |
+| Bernoulli balance | $P+\tfrac12\rho v^2+\rho gy=\text{constant}$ | steady, incompressible, nonviscous flow along a streamline |
 
-## Worked example 1
-
-**Problem.** A hatch of area $0.80\,\mathrm{m^2}$ is $5.0\,\mathrm{m}$ under fresh water. Find gauge pressure and force.
-
-**Method.** Select the listed governing relationship and solve symbolically before substituting numbers.
-
-1. Write the relevant relation.
-2. Substitute the known quantities with SI units or consistent derived units.
-3. Solve algebraically for the requested quantity.
-4. The calculation gives
+Water moves at $1.5\,\mathrm{m/s}$ where a horizontal pipe has radius $4.0\,\mathrm{cm}$. Where the radius narrows to $2.0\,\mathrm{cm}$,
 
 $$
-$P_g=\rho gh=1000(9.8)(5.0)=4.90\times10^4\,\mathrm{Pa}$ and $F=P_gA=3.92\times10^4\,\mathrm{N}$..
+v_2=v_1\frac{A_1}{A_2}
+=v_1\left(\frac{r_1}{r_2}\right)^2
+=1.5\left(\frac{4.0}{2.0}\right)^2
+=6.0\,\mathrm{m/s}.
 $$
 
-5. Interpret the magnitude and sign in the original physical situation.
+The square appears because area scales as radius squared.
 
-**Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
-
-## Worked example 2
-
-**Problem.** Water in a horizontal pipe moves at $1.5\,\mathrm{m/s}$ where radius is $4.0\,\mathrm{cm}$. What is speed where radius is $2.0\,\mathrm{cm}$?
-
-**Method.** Use the same modeling routine with a different unknown so the equation is not memorized in only one direction.
-
-1. Identify the system and the applicable approximation.
-2. Start from the governing equation.
-3. Rearrange before substituting values.
-4. The numerical work is
+The volume flow rate is
 
 $$
-Continuity gives $v_2=v_1(r_1/r_2)^2=1.5(4.0/2.0)^2=6.0\,\mathrm{m/s}$..
+Q=\pi(0.040)^2(1.5)
+=7.54\times10^{-3}\,\mathrm{m^3/s}.
 $$
 
-5. Compare with a nearby limiting case or a familiar scale.
+The narrow section gives the same value, providing an arithmetic check.
 
-**Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
+## Bernoulli as mechanical energy density
 
-## Code
+Along a streamline in steady, incompressible, nonviscous flow with no pump or turbine work,
 
-```python
-rho=1000; g=9.8
-P=rho*g*5.0
-F=P*0.80
-v2=1.5*(4/2)**2
-print(P,F,v2)
-```
+$$
+P+\frac12\rho v^2+\rho gy=\text{constant}.
+$$
 
-## Common pitfalls
+Each term has units of energy per volume. A pressure decrease can accompany increased speed, increased height, or both, but the equation does not say that high speed universally causes low pressure.
 
-- Mixing gauge and absolute pressure.
-- Using object density instead of displaced-fluid weight for buoyancy.
-- Applying Bernoulli through pumps or turbulent losses without correction.
-- Using radius ratio instead of area ratio.
-- Always check units, signs, and limiting cases before treating a numerical result as finished.
+Follow a fluid volume $\Delta V$ from section 1 to section 2. Pressure forces do work
 
-A final check is to perturb one input mentally. Doubling a distance, mass, charge, stiffness, frequency, or temperature should change the answer in a way that matches the physical story. If the algebra says the opposite, revisit the setup before blaming arithmetic. Also remember that a negative answer is often information: it may indicate direction opposite to the chosen axis, work done by a system rather than on it, or a potential change that lowers the energy of a positive or negative charge differently.
+$$
+W_P=P_1\Delta V-P_2\Delta V.
+$$
 
-When a problem feels difficult, the hidden issue is often not the last algebraic step but the first modeling decision. Re-read the words and mark what is being idealized: frictionless surface, ideal string, point charge, thin lens, small angle, steady flow, reversible process, nonrelativistic particle, or uniform field. Then mark what is conserved, if anything. Energy conservation, momentum conservation, angular momentum conservation, charge conservation, and entropy constraints are not interchangeable; each one has a system boundary and a transfer condition. If an external impulse acts, momentum may not be conserved for the chosen system. If friction acts within a block-floor system, mechanical energy is not conserved even though total energy is. If a Gaussian surface encloses no net charge, flux is zero, but the field at points on the surface need not be zero.
+The kinetic and gravitational energy changes are
 
-Another common pitfall is using a memorized equation in only its most familiar direction. A formula is a relationship, so practice solving it for different unknowns. In kinematics, solve for time, acceleration, or displacement depending on what the data support. In circuits, solve Ohm's law for voltage, current, or resistance and then check power. In optics, solve the thin-lens equation for image distance, object distance, or focal length and compare the sign with a ray diagram. In thermodynamics, rearrange the first law only after deciding whether work is done by the system or on the system. This flexibility prevents formula matching from replacing reasoning.
+$$
+\Delta K=\frac12\rho\Delta V(v_2^2-v_1^2),
+\qquad
+\Delta U_g=\rho\Delta Vg(y_2-y_1).
+$$
 
-Finally, keep scale awareness. Introductory physics problems often use idealized numbers, but the answers should still sit on recognizable scales: walking speeds are meters per second, orbital speeds are kilometers per second, visible wavelengths are hundreds of nanometers, household currents are often amperes or less, and thermal energies per molecule at room temperature are small in joules but meaningful in electron-volts. When an answer is many orders of magnitude away from these anchors, check unit conversions first. Prefix errors such as nano versus micro, centimeters versus meters, and milliseconds versus seconds are among the fastest ways to turn correct physics into a wrong result.
+Set pressure work equal to the mechanical-energy change, divide by $\Delta V$, and rearrange to recover Bernoulli's equation.
 
-For exam preparation, make the worked examples bidirectional. After solving a forward problem, change the target: ask what initial speed, resistance, angle, charge, temperature change, or wavelength would have produced the stated answer. This exposes whether you understand the structure or only followed the arithmetic once. Then make one assumption false and describe what would change. If air resistance is no longer negligible, projectile motion no longer separates into a constant horizontal speed. If a pulley has rotational inertia, the two string tensions need not match. If a lens is not thin, the thin-lens equation becomes an approximation. If a gas process is not reversible, entropy must be found from a reversible path connecting the same states, not from the literal irreversible path. These small variations turn a page of notes into a usable problem-solving tool.
+For the horizontal pipe above, $y_1=y_2$, so Bernoulli predicts
 
-Before leaving the problem, write one complete sentence that states the result in physical language. That sentence should name the object or system, the direction or sign when relevant, and the assumption under which the answer was obtained.
+$$
+P_1-P_2=\frac12\rho\left(v_2^2-v_1^2\right)>0.
+$$
 
-## Connections
+The narrower, faster section has lower static pressure under the ideal-flow assumptions.
 
-- [Equilibrium and Elasticity](/physics/general/equilibrium-and-elasticity)
-- [Waves and Sound](/physics/general/waves-sound-standing-waves-and-doppler)
+For the water speeds above,
+
+$$
+P_1-P_2
+=\frac12(1000)(6.0^2-1.5^2)
+=1.69\times10^4\,\mathrm{Pa}.
+$$
+
+This is the basis of a Venturi meter: measure pressure between known areas, then combine Bernoulli with continuity to infer flow rate.
+
+### Worked example: efflux from a tank
+
+A large open tank has a small hole $1.25\,\mathrm m$ below its free surface. Apply Bernoulli between the free surface and the jet. Both points are at atmospheric pressure, and the surface speed is negligible. Hence
+
+$$
+v=\sqrt{2gh}
+=\sqrt{2(9.8)(1.25)}
+=4.95\,\mathrm{m/s}.
+$$
+
+If the hole area is $1.0\,\mathrm{cm^2}=1.0\times10^{-4}\,\mathrm{m^2}$, the ideal rate is
+
+$$
+Q=Av=(1.0\times10^{-4})(4.95)
+=4.95\times10^{-4}\,\mathrm{m^3/s}.
+$$
+
+This is Torricelli's law. A real sharp-edged opening gives a smaller flow, summarized by a discharge coefficient.
+
+## Viscosity and flow regime
+
+For a Newtonian fluid, shear stress is
+
+$$
+\tau=\eta\frac{dv}{dy},
+$$
+
+where $\eta$ is dynamic viscosity. No-slip at a wall produces a velocity gradient and dissipates mechanical energy.
+
+Steady laminar flow through a long circular pipe obeys Poiseuille's law:
+
+$$
+Q=\frac{\pi R^4}{8\eta L}\Delta P.
+$$
+
+Doubling radius at fixed pressure drop increases this ideal laminar flow rate by sixteen. The strong radius dependence is one reason vessel constriction matters in biological flow.
+
+The Reynolds number
+
+$$
+\mathrm{Re}=\frac{\rho vD}{\eta}
+$$
+
+compares inertial and viscous effects. Low values favor laminar flow; high values permit turbulence. Transition depends on geometry and disturbances, so one threshold does not cover every flow.
+
+An extended energy equation uses head:
+
+$$
+\frac{P_1}{\rho g}+\frac{v_1^2}{2g}+y_1+h_p
+=\frac{P_2}{\rho g}+\frac{v_2^2}{2g}+y_2+h_t+h_L.
+$$
+
+A pump adds head $h_p$, a turbine removes $h_t$, and friction and fittings contribute $h_L\geq0$.
+
+## Where losses enter
+
+Real pipes have viscosity, wall friction, turbulence, valves, and fittings. Pumps add mechanical energy; turbines remove it. Bernoulli's ideal equation across such elements needs head-gain and head-loss terms. Applying the unmodified form through a pump or across a long rough pipe attributes real energy transfer to a fictitious pressure-speed trade.
+
+Other recurring mistakes are more local:
+
+- Gauge and absolute pressures may be compared only when they use the same reference.
+- Buoyancy uses displaced-fluid weight, not object weight or object density directly.
+- Continuity uses area ratios, so circular-pipe radius ratios are squared.
+- Bernoulli points must lie on the same streamline unless the flow is irrotational.
+- Static pressure, stagnation pressure, and dynamic pressure $\rho v^2/2$ are different; a probe's orientation determines what it measures.
+- The pressure at a free liquid surface need not be atmospheric in a sealed container.
+
+## Manometers and pressure measurement
+
+A manometer turns a pressure difference into a height difference. Moving downward through a stationary fluid increases pressure by $\rho g\Delta h$; moving upward decreases it. One can trace from one connection to the other, adding changes fluid by fluid.
+
+For a simple U-tube filled with liquid density $\rho_m$, one side open to atmosphere and the other connected to a gas, a level difference $h$ gives
+
+$$
+P_{\mathrm{gas}}-P_{\mathrm{atm}}=\rho_mgh
+$$
+
+when the gas side pushes its liquid level lower. If it stands higher, the gauge pressure is negative. In a multi-fluid manometer, no single-density shortcut works; pressure remains continuous across each fluid interface, while the slope with height changes with density.
+
+A barometer is a closed-end manometer with near-vacuum above the column. Atmospheric pressure supports the liquid column: $P_{\mathrm{atm}}=\rho gh$. Mercury permits a short column because its density is high. Water would require a column over ten metres tall at ordinary atmospheric pressure.
+
+## Surface tension and capillarity
+
+Molecules at a liquid surface experience an asymmetric cohesive environment, giving the interface an energy per area and a force per length called surface tension $\gamma$. A movable wire of length $L$ on a soap film feels force $2\gamma L$ because the film has two surfaces.
+
+Curvature creates a pressure jump. For a spherical liquid droplet of radius $R$,
+
+$$
+P_{\mathrm{in}}-P_{\mathrm{out}}=\frac{2\gamma}{R}.
+$$
+
+A soap bubble has two interfaces and gives $4\gamma/R$. Small droplets therefore have larger excess pressure than large ones.
+
+Capillary rise follows from the vertical component of surface tension around a tube. For tube radius $r$, contact angle $\theta$, and liquid density $\rho$,
+
+$$
+2\pi r\gamma\cos\theta
+=\rho g(\pi r^2h),
+$$
+
+so
+
+$$
+h=\frac{2\gamma\cos\theta}{\rho gr}.
+$$
+
+Wetting liquids with $\theta\lt 90^\circ$ rise; nonwetting liquids are depressed. The inverse dependence on radius explains why capillarity is strongest in narrow pores.
+
+## Drag, terminal speed, and similarity
+
+A body moving through fluid experiences drag whose form depends on Reynolds number and shape. At very low Reynolds number, a sphere of radius $R$ obeys Stokes' law
+
+$$
+F_D=6\pi\eta Rv.
+$$
+
+Balancing this against weight minus buoyancy gives a small sphere's terminal speed:
+
+$$
+v_t=\frac{2R^2(\rho_s-\rho_f)g}{9\eta}.
+$$
+
+At high Reynolds number, drag is often modeled as
+
+$$
+F_D=\frac12C_D\rho Av^2,
+$$
+
+where $C_D$ depends on shape and flow regime. Switching between linear and quadratic drag without checking Reynolds number can change predicted terminal speed substantially.
+
+Dimensionless numbers help compare experiments at different scales. Matching Reynolds number preserves the balance of inertia and viscosity in geometrically similar flows. Froude number compares inertia with gravity in free-surface flows, while Mach number compares speed with sound speed in compressible flow. A small model and a full-size vehicle cannot always match every dimensionless group simultaneously.
+
+## Cavitation and pressure limits
+
+Bernoulli calculations can predict very low static pressure in fast regions. Liquid pressure cannot be reduced arbitrarily without changing phase. If local pressure falls below vapor pressure, vapor cavities form. Their later collapse can create noise, vibration, and surface damage in pumps, propellers, and valves.
+
+Gauge pressure may be negative, but absolute pressure cannot be negative in the ordinary continuum model. When a result crosses vapor pressure, the single-phase incompressible assumptions have failed before the algebra does.
+
+Likewise, a siphon does not work because atmospheric pressure “pulls” liquid over the top in every description. Pressure differences and gravity accelerate a continuous column, and the outlet must lie below the source surface for sustained ideal flow. Excessive summit height lowers pressure enough for cavitation or column separation, limiting operation.
+
+## Choosing the right fluid model
+
+Start with scale and regime. Hydrostatics applies when acceleration is absent. Continuity expresses mass conservation broadly, but $A_1v_1=A_2v_2$ additionally assumes constant density. Bernoulli preserves mechanical energy only under its stated conditions. Poiseuille covers fully developed laminar pipe flow. No one equation is a universal “fluid formula.”
+
+Boundary conditions often carry as much information as the differential equations: no-slip at solid walls for viscous flow, specified pressure at a free jet, symmetry at a centerline, and known flow rate at an inlet. An answer with correct algebra but incompatible boundary conditions describes a different physical system.
+
+## Momentum balance at bends and jets
+
+Bernoulli tracks mechanical energy but does not directly give the force a flowing fluid exerts on a pipe. A control-volume momentum balance does. For steady one-dimensional flow,
+
+$$
+\sum\vec F_{\mathrm{external}}
+=\dot m(\vec v_{\mathrm{out}}-\vec v_{\mathrm{in}}).
+$$
+
+Pressure forces, weight, and wall reactions all belong on the left. The force on the pipe is opposite the wall force on the fluid.
+
+A water jet of mass flow $2.0\,\mathrm{kg/s}$ striking a flat plate normally at $10\,\mathrm{m/s}$ and leaving with zero normal velocity changes normal momentum at $20\,\mathrm N$. The plate must exert $20\,\mathrm N$ on the water, and the water exerts $20\,\mathrm N$ on the plate. If the jet rebounds, the momentum change and force are larger.
+
+Pipe bends can therefore experience substantial reaction forces even when inlet and outlet pressures are equal. Energy conservation alone misses vector momentum change, while momentum balance alone does not determine viscous energy loss. The two laws answer complementary questions.
+
+<div className="see-also">
+
+See also: [Equilibrium and Elasticity](/physics/general/equilibrium-and-elasticity) · [Waves and Sound](/physics/general/waves-sound-standing-waves-and-doppler)
+
+</div>

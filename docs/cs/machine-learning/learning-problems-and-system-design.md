@@ -9,7 +9,7 @@ Mitchell's first chapter frames machine learning as the engineering problem of m
 
 The chapter's checkers example is also a compact design pattern for the whole book. A learner does not directly receive the perfect strategy. It receives experience, converts experience into training examples, searches a hypothesis space, and updates a performance system. The same pattern reappears in decision trees, neural networks, Bayesian classifiers, instance-based methods, explanation-based learning, and reinforcement learning.
 
-## Definitions
+## Naming the task, measure, and experience
 
 A computer program learns from experience $E$ with respect to a class of tasks $T$ and performance measure $P$ if its performance at tasks in $T$, as measured by $P$, improves with experience $E$.
 
@@ -35,7 +35,7 @@ $$
 
 where the $x_i$ are hand-designed board features such as number of pieces, number of kings, and number of threatened pieces.
 
-## Key results
+## Reducing performance to function approximation
 
 The central reduction in the chapter is from performance improvement to function approximation. Instead of asking "How can a program learn to play checkers?", the designer asks:
 
@@ -81,8 +81,6 @@ The training-experience choice is especially subtle. Direct instruction, labeled
 
 The representation choice also controls what can be learned. A linear checkers evaluator over six hand-designed features cannot express every useful board pattern. It may miss tactics involving piece placement, tempo, or forced captures. The benefit is that only a few weights must be estimated, so small amounts of experience can improve the program. This tradeoff between expressiveness and sample requirements recurs throughout the book: decision trees can represent disjunctions but overfit, neural networks can represent nonlinear functions but require careful optimization, and Bayesian networks can encode structured uncertainty but demand modeling assumptions.
 
-## Visual
-
 ```mermaid
 flowchart TB
   Task["Task T and performance measure P"] --> Problem["Practice or deployment problem"]
@@ -126,11 +124,9 @@ flowchart TB
 
 This learning-system diagram expands Mitchell's four modules into their data contracts: a performance trace becomes bootstrapped training examples, the generalizer turns features and errors into weight updates, and the revised hypothesis feeds the next behavior. The feedback loop is deliberate because the current hypothesis influences future experience in self-play, active learning, robotics, and reinforcement learning.
 
-## Worked example 1: Specify a well-posed learning problem
+## Specifying a clinical prediction problem
 
-Problem: A hospital wants a program that predicts whether a pneumonia patient is at high risk of complications. Specify $T$, $P$, and $E$ in Mitchell's format.
-
-Method:
+A hospital wants a program that predicts whether a pneumonia patient is at high risk of complications. Specify $T$, $P$, and $E$ in Mitchell's format.
 
 1. Identify the task.
 
@@ -160,19 +156,17 @@ $$
 
    The three parts are concrete enough to test improvement. If a new model has higher sensitivity at the same specificity on a held-out sample, it improved under $P$.
 
-Answer: The well-posed problem is: learn from historical labeled pneumonia records $E$ to classify new records $T$, with performance $P$ measured by sensitivity at 90 percent specificity. The checked answer is valid because it names the future task, the source of training information, and the exact measurement rule.
+The resulting specification uses historical labeled pneumonia records $E$ to classify new records $T$, with performance $P$ measured by sensitivity at 90 percent specificity. It names the future task, the source of training information, and the exact measurement rule.
 
-## Worked example 2: One LMS update for a board evaluator
+## Updating the checkers evaluator once
 
-Problem: A checkers learner represents a board as two features, $x_1 =$ number of black pieces and $x_2 =$ number of red pieces. Its hypothesis is
+A checkers learner represents a board as two features, $x_1 =$ number of black pieces and $x_2 =$ number of red pieces. Its hypothesis is
 
 $$
 \hat{V}(b)=w_0+w_1x_1+w_2x_2.
 $$
 
 Suppose $w_0=0$, $w_1=4$, $w_2=-3$, the current board has $x_1=5$, $x_2=4$, the training value is $V_{\text{train}}(b)=20$, and $\eta=0.1$. Compute the update.
-
-Method:
 
 1. Compute the current prediction.
 
@@ -210,9 +204,9 @@ $$
 \hat{V}_{\text{new}}(b)=1.2+10(5)+1.8(4)=1.2+50+7.2=58.4.
 $$
 
-Answer: The updated weights are $(1.2,10,1.8)$. The check reveals that with $\eta=0.1$ and large feature values, the update overshoots the target value of 20 on this single example. That does not make the rule wrong, but it shows why feature scaling and learning-rate choice matter.
+The updated weights are $(1.2,10,1.8)$. With $\eta=0.1$ and large feature values, the update overshoots the target value of 20 on this single example. The arithmetic points to feature scaling and learning-rate choice rather than an error in the update rule.
 
-## Code
+### Checking the LMS arithmetic
 
 ```python
 import numpy as np
@@ -233,7 +227,7 @@ print("error:", err)
 print("new weights:", new_weights)
 ```
 
-## Common pitfalls
+## Design errors that no optimizer can repair
 
 - Calling a system "learning" without specifying $T$, $P$, and $E$. Without all three, there is no precise claim to evaluate.
 - Confusing the target function with the learned hypothesis. $V$ is the ideal function; $\hat{V}$ is what the learner currently represents.
@@ -242,10 +236,8 @@ print("new weights:", new_weights)
 - Treating self-play as automatically representative. Self-play can generate many examples, but it may miss strategies used by external opponents.
 - Forgetting that a nonoperational definition can still guide learning. The exact minimax value may be too expensive to compute, but it can motivate a learnable approximation.
 
-## Connections
+<div className="see-also">
 
-- [Concept learning](/cs/machine-learning/concept-learning-and-version-spaces)
-- [Artificial neural networks](/cs/machine-learning/artificial-neural-networks)
-- [Reinforcement learning](/cs/machine-learning/reinforcement-learning)
-- [Modern deep learning](/cs/deep-learning/)
-- [Deeper reinforcement learning coverage](/cs/reinforcement-learning/)
+See also: [Concept learning](/cs/machine-learning/concept-learning-and-version-spaces) · [Artificial neural networks](/cs/machine-learning/artificial-neural-networks) · [Reinforcement learning](/cs/machine-learning/reinforcement-learning) · [Modern deep learning](/cs/deep-learning/intro) · [Deeper reinforcement learning coverage](/cs/reinforcement-learning/intro)
+
+</div>

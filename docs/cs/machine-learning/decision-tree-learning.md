@@ -9,7 +9,7 @@ Decision tree learning is one of the most practical algorithms in Mitchell's boo
 
 The chapter also introduces overfitting in a concrete way. A tree can keep growing until it matches every training example, but a perfectly fitted tree may generalize poorly. The tension among expressive trees, noisy data, small samples, and pruning remains central in modern tree methods such as random forests and gradient boosting, even though those methods go beyond Mitchell's 1997 scope.
 
-## Definitions
+## Trees, entropy, and information gain
 
 A decision tree represents a function by internal decision nodes and leaf predictions. Each internal node tests an attribute. Each branch corresponds to an attribute value or threshold outcome. Each leaf gives the predicted class.
 
@@ -37,7 +37,7 @@ ID3 is a greedy top-down decision tree algorithm. At each node it chooses the at
 
 Overfitting occurs when a hypothesis fits training examples so closely that it captures noise or accidental regularities, causing worse performance on future examples.
 
-## Key results
+## Growing a tree and controlling its size
 
 ID3 performs a greedy search through the space of possible decision trees. It does not backtrack. Its bias is therefore a preference bias, not a hard restriction bias: ID3 can represent many discrete functions if allowed to grow large trees, but it prefers short trees that place high-gain attributes near the root.
 
@@ -53,7 +53,7 @@ Handling continuous attributes requires converting numeric values into tests, co
 
 Missing values require another practical extension. A simple approach is to replace a missing value with the most common value of that attribute among examples at the node. A more refined approach distributes the example fractionally among branches according to observed branch frequencies. Mitchell's broader point is that the clean ID3 pseudocode is a core idea, not a finished industrial system; robust tree learners need policies for noise, continuous values, missing values, pruning, and attribute costs.
 
-Attribute costs add one more design dimension. If two tests give similar information gain but one is expensive, risky, or slow to obtain, a practical learner may prefer the cheaper test. Medical diagnosis is the standard example: a symptom question and an invasive laboratory test should not be treated as equally cheap attributes. This turns splitting into a cost-sensitive decision rather than a pure information-gain calculation.
+Attribute costs add one more design dimension. If two tests give similar information gain but one is expensive, risky, or slow to obtain, a cost-aware learner may prefer the cheaper test. Medical diagnosis is the standard example: a symptom question and an invasive laboratory test should not be treated as equally cheap attributes. This turns splitting into a cost-sensitive decision rather than a pure information-gain calculation.
 
 The final tree should be interpreted as both a predictor and a partition of the instance space. Every root-to-leaf path defines a region, and every leaf assigns a class to that region. This makes trees easy to explain but also exposes their instability: a small change in early splits can reorganize many downstream regions. Ensemble methods later exploit this instability, but Mitchell's chapter focuses on the single-tree case where pruning and careful attribute choice are the main controls.
 
@@ -68,8 +68,6 @@ Decision trees are appropriate when:
 | Disjunctions are needed | Different paths encode different cases |
 | Training data may contain errors | Pruning can reduce sensitivity to noise |
 | Interpretability matters | Paths can be read as rules |
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -106,11 +104,9 @@ flowchart TD
 
 This decision-tree diagram shows both the ID3 growth procedure and the resulting tree structure. The builder computes entropy, evaluates every candidate test by information gain, partitions the training subset, and recurses until purity, exhaustion, or a stopping rule creates a leaf. The pruning edge shows how a subtree can be replaced by a leaf when validation error does not increase, while the example tree makes the final root-to-leaf decision paths concrete.
 
-## Worked example 1: Compute entropy and information gain
+### Computing the gain from a wind split
 
-Problem: A training set $S$ has 14 examples: 9 positive and 5 negative. Attribute `Wind` has two values. For `Weak`, there are 6 positive and 2 negative examples. For `Strong`, there are 3 positive and 3 negative examples. Compute $Gain(S, Wind)$.
-
-Method:
+A training set $S$ has 14 examples: 9 positive and 5 negative. Attribute `Wind` has two values. For `Weak`, there are 6 positive and 2 negative examples. For `Strong`, there are 3 positive and 3 negative examples. Compute $Gain(S, Wind)$.
 
 1. Compute parent entropy.
 
@@ -164,13 +160,11 @@ $$
 Gain(S,Wind)=0.940-0.892=0.048.
 $$
 
-Answer: The information gain is approximately $0.048$ bits. This is small because the split does not create very pure child nodes.
+The information gain is approximately $0.048$ bits. It is small because the split does not create very pure child nodes.
 
-## Worked example 2: Prune a subtree using validation accuracy
+### Deciding whether to prune a subtree
 
-Problem: A subtree classifies a validation set of 20 examples. The current subtree gets 15 correct. If replaced by a single majority-class leaf, it gets 16 correct. Should reduced-error pruning replace the subtree?
-
-Method:
+A subtree classifies a validation set of 20 examples. The current subtree gets 15 correct. If replaced by a single majority-class leaf, it gets 16 correct. Should reduced-error pruning replace the subtree?
 
 1. Compute validation accuracy of the current subtree.
 
@@ -192,9 +186,9 @@ $$
 
    The subtree may have captured details of the training set that do not help on validation cases. The leaf is simpler and validated better.
 
-Answer: Yes. Replace the subtree with the majority-class leaf, because validation accuracy improves from $75$ percent to $80$ percent.
+Replace the subtree with the majority-class leaf, because validation accuracy improves from $75$ percent to $80$ percent.
 
-## Code
+### Verifying entropy and gain
 
 ```python
 import math
@@ -228,7 +222,7 @@ print(entropy(labels))
 print(information_gain(rows, labels, "Wind"))
 ```
 
-## Common pitfalls
+## Split and pruning mistakes
 
 - Using training accuracy alone to decide tree size. A larger tree almost always fits training data at least as well, but that is not the same as better generalization.
 - Forgetting the weighted average in information gain. Child entropies must be weighted by subset sizes.
@@ -237,10 +231,8 @@ print(information_gain(rows, labels, "Wind"))
 - Mixing entropy bases. Base 2 gives bits; natural logs give nats. Rankings are unchanged if used consistently, but numeric values differ.
 - Pruning on the test set. Validation data can guide pruning; the final test set should be reserved for unbiased evaluation.
 
-## Connections
+<div className="see-also">
 
-- [Concept learning](/cs/machine-learning/concept-learning-and-version-spaces)
-- [Evaluating hypotheses](/cs/machine-learning/evaluating-hypotheses)
-- [Bayesian learning](/cs/machine-learning/bayesian-learning)
-- [Data mining](/cs/data-mining/)
-- [Statistics](/math/statistics/)
+See also: [Concept learning](/cs/machine-learning/concept-learning-and-version-spaces) · [Evaluating hypotheses](/cs/machine-learning/evaluating-hypotheses) · [Bayesian learning](/cs/machine-learning/bayesian-learning) · [Data mining](/cs/data-mining/intro) · [Statistics](/math/statistics/intro)
+
+</div>

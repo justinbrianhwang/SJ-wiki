@@ -355,9 +355,8 @@ print(newton_system(F, J, [0.7, 0.7]))
 - Using finite-difference Jacobians with step sizes that are too large or too small.
 - Forgetting that multiple solutions may exist and the initial guess influences which one is found.
 
-## Related pages
+<div className="see-also">
 
-- [Newton Secant and polynomial roots](/math/numerical-analysis/newton-secant-polynomial-roots)
-- [Gaussian elimination pivoting and LU](/math/numerical-analysis/gaussian-elimination-pivoting-lu)
-- [ODE stability stiffness and systems](/math/numerical-analysis/ode-stability-stiffness-systems)
-- [least squares and Chebyshev approximation](/math/numerical-analysis/least-squares-chebyshev-approximation)
+See also: [Newton Secant and polynomial roots](/math/numerical-analysis/newton-secant-polynomial-roots) · [Gaussian elimination pivoting and LU](/math/numerical-analysis/gaussian-elimination-pivoting-lu) · [ODE stability stiffness and systems](/math/numerical-analysis/ode-stability-stiffness-systems) · [least squares and Chebyshev approximation](/math/numerical-analysis/least-squares-chebyshev-approximation)
+
+</div>

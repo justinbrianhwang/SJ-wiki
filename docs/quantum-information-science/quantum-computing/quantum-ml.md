@@ -5,11 +5,11 @@ sidebar_position: 5
 
 # Quantum Machine Learning
 
-Quantum machine learning studies whether quantum circuits can improve learning, inference, optimization, or data analysis. The honest view is mixed: quantum kernels, parametrized circuits, QAOA-style optimization, and fault-tolerant quantum linear-algebra subroutines are mathematically rich, but broad practical advantage over strong classical [machine learning](/cs/machine-learning/) and [deep learning](/cs/deep-learning/) baselines is not established.
+Quantum machine learning studies whether quantum circuits can improve learning, inference, optimization, or data analysis. The honest view is mixed: quantum kernels, parametrized circuits, QAOA-style optimization, and fault-tolerant quantum linear-algebra subroutines are mathematically rich, but broad practical advantage over strong classical [machine learning](/cs/machine-learning/intro) and [deep learning](/cs/deep-learning/intro) baselines is not established.
 
-*Nielsen and Chuang do not cover QML as a separate topic. This page keeps the wiki's modern QML treatment and uses N&C-style notation from Chapters 2, 8, 11, and 12: density operators $\rho$, channels $\mathcal{E}$, POVMs, trace distance, fidelity, von Neumann entropy, and quantum information-processing resource accounting.*
+QML postdates Nielsen and Chuang's main topic divisions. The notation here follows Chapters 2, 8, 11, and 12: density operators $\rho$, channels $\mathcal{E}$, POVMs, trace distance, fidelity, von Neumann entropy, and quantum information-processing resource accounting.
 
-## Definitions
+## Models, kernels, and noisy channels
 
 A **parametrized quantum circuit** is a unitary family $U(x,\theta)$ depending on input data $x$ and trainable parameters $\theta$. A common supervised model prepares
 
@@ -90,7 +90,7 @@ $$
 
 is not a training loss by default, but it is the N&C language for mixedness, compression, and information flow. It becomes relevant when evaluating noisy encodings, learned quantum channels, privacy leakage, or information bottleneck analogues.
 
-## Key results
+## What can be differentiated, learned, and compared
 
 The parameter-shift rule gives exact gradients for many gates. If a parameter appears in
 
@@ -139,7 +139,7 @@ Generalization is a statistical question, not a quantum slogan. A high-dimension
 
 NISQ QML and fault-tolerant QML should be separated. NISQ QML uses shallow circuits and accepts device noise as part of the training environment. Fault-tolerant QML could use deeper subroutines such as amplitude estimation, phase estimation, block-encoding, Hamiltonian simulation, or HHL-like linear algebra. Those subroutines are closer to [quantum algorithms](/quantum-information-science/quantum-computing/algorithms) and require the logical qubits supplied by [quantum error correction](/quantum-information-science/quantum-computing/error-correction).
 
-## Visual
+## Three hybrid workflows and their data paths
 
 ```mermaid
 flowchart TB
@@ -193,7 +193,7 @@ The diagram separates three QML workflows that often get blurred together. VQE a
 | Noisy training | Interleaved channels | Kraus maps and process tomography | Learned model differs from ideal circuit |
 | Fault-tolerant QML | Algorithmic subroutines | Phase estimation, amplitude estimation, entropy | Input/output assumptions dominate |
 
-## Worked example 1: Parameter-shift gradient for one qubit
+## Checking a one-qubit parameter-shift gradient
 
 **Problem.** Let
 
@@ -256,9 +256,9 @@ $$
 =-\frac{\sqrt{3}}{2}.
 $$
 
-**Answer.** The parameter-shift estimate equals the analytic derivative, $-\sqrt{3}/2$. The checked condition is that $R_y(\theta)$ has a Pauli generator with the required two-eigenvalue spectrum.
+**Answer.** The parameter-shift estimate equals the analytic derivative, $-\sqrt{3}/2$. The identity applies because $R_y(\theta)$ has a Pauli generator with the required two-eigenvalue spectrum.
 
-## Worked example 2: A two-point quantum kernel
+## Evaluating a two-point quantum kernel
 
 **Problem.** Use the one-qubit feature map
 
@@ -306,7 +306,7 @@ $$
 
 **Answer.** The kernel value is $1/2$. The states are neither identical nor orthogonal, so the kernel lies strictly between $0$ and $1$.
 
-## Code
+## Training under depolarizing noise
 
 This NumPy example trains a one-qubit variational classifier with parameter-shift gradients and evaluates the noisy prediction using a simple depolarizing channel in density-matrix notation.
 
@@ -338,9 +338,15 @@ def loss(xs, ys, theta, noise=0.0):
     return np.mean([(prediction(x, theta, noise) - y) ** 2 for x, y in zip(xs, ys)])
 
 def gradient(xs, ys, theta, noise=0.0):
-    plus = loss(xs, ys, theta + np.pi / 2, noise)
-    minus = loss(xs, ys, theta - np.pi / 2, noise)
-    return 0.5 * (plus - minus)
+    terms = []
+    for x, y in zip(xs, ys):
+        pred = prediction(x, theta, noise)
+        pred_grad = 0.5 * (
+            prediction(x, theta + np.pi / 2, noise)
+            - prediction(x, theta - np.pi / 2, noise)
+        )
+        terms.append(2 * (pred - y) * pred_grad)
+    return np.mean(terms)
 
 xs = np.linspace(-1.0, 1.0, 9)
 ys = np.where(xs >= 0, 1.0, -1.0)
@@ -354,7 +360,7 @@ for x in xs:
     print(f"x={x:+.2f} prediction={prediction(x, theta, noise=0.03):+.3f}")
 ```
 
-## Common pitfalls
+## Claims that need stronger controls
 
 - Assuming QML means automatic speedup. A quantum model must beat classical baselines under the same data, tuning, and resource accounting.
 - Ignoring data encoding. Loading a large classical dataset into amplitudes can cost more than the intended speedup saves.
@@ -367,17 +373,6 @@ for x in xs:
 - Comparing against weak classical baselines. Kernel methods, tensor networks, randomized features, and modern neural networks are serious competitors.
 - Hiding optimizer cost. Many QML experiments spend substantial classical time on tuning, restarts, and learning-rate choices.
 
-## Connections
-
-- [Quantum algorithms](/quantum-information-science/quantum-computing/algorithms) supplies phase estimation, amplitude amplification, HHL-style linear algebra, and oracle models.
-- [Quantum hardware](/quantum-information-science/quantum-computing/hardware) determines circuit depth, noise channels, measurement budget, and connectivity.
-- [Quantum error correction](/quantum-information-science/quantum-computing/error-correction) separates NISQ QML from future fault-tolerant QML.
-- [Machine learning](/cs/machine-learning/) provides kernels, generalization, optimization, model selection, and baseline discipline.
-- [Deep learning](/cs/deep-learning/) is the natural benchmark for claims involving high-dimensional data and learned representations.
-- [Linear algebra](/math/linear-algebra/) supplies Hilbert spaces, kernels, eigensystems, matrix conditioning, and tensor products.
-- [Quantum communication](/quantum-information-science/quantum-communication/) connects when QML models process distributed quantum states or learned channels.
-- [Quantum mechanics](/physics/quantum-mechanics/) supplies density operators, observables, measurement, and open-system language.
-
 ## Further reading
 
 - Michael A. Nielsen and Isaac L. Chuang, *Quantum Computation and Quantum Information*, Chapters 2, 8, 11, and 12 for the notation used here.
@@ -388,3 +383,18 @@ for x in xs:
 - Maria Schuld, Ryan Sweke, and Johannes Meyer, effect of data encoding on expressive power.
 - Vojtech Havlicek and collaborators, supervised learning with quantum-enhanced feature spaces.
 - John Preskill, writing on NISQ computing and near-term quantum devices.
+
+<div className="see-also">
+
+See also:
+
+- [Quantum algorithms](/quantum-information-science/quantum-computing/algorithms) supplies phase estimation, amplitude amplification, HHL-style linear algebra, and oracle models.
+- [Quantum hardware](/quantum-information-science/quantum-computing/hardware) determines circuit depth, noise channels, measurement budget, and connectivity.
+- [Quantum error correction](/quantum-information-science/quantum-computing/error-correction) separates NISQ QML from future fault-tolerant QML.
+- [Machine learning](/cs/machine-learning/intro) provides kernels, generalization, optimization, model selection, and baseline discipline.
+- [Deep learning](/cs/deep-learning/intro) is the natural benchmark for claims involving high-dimensional data and learned representations.
+- [Linear algebra](/math/linear-algebra/intro) supplies Hilbert spaces, kernels, eigensystems, matrix conditioning, and tensor products.
+- [Quantum communication](/quantum-information-science/quantum-communication/intro) connects when QML models process distributed quantum states or learned channels.
+- [Quantum mechanics](/physics/quantum-mechanics/intro) supplies density operators, observables, measurement, and open-system language.
+
+</div>

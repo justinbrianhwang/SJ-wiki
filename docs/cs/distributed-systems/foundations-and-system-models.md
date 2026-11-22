@@ -7,9 +7,9 @@ sidebar_position: 1
 
 A distributed system is a collection of autonomous computers that appears to its users or applications as one coherent system. That promise sounds simple, but it hides a hard fact: communication is delayed, clocks disagree, components fail independently, and no single machine has complete knowledge. Van Steen and Tanenbaum emphasize design goals such as transparency, openness, and scalability; Kleppmann emphasizes reliability, maintainability, operability, and the data-system trade-offs that appear in production; Lynch emphasizes precise models, specifications, executions, and proofs [1], [2], [3].
 
-The goal of this page is to establish the vocabulary used by the rest of the distributed-systems notes. The same system can be viewed as middleware hiding location, as a data platform trading consistency against availability, or as a collection of I/O automata whose traces satisfy a formal specification. Keeping all three views in mind prevents a common mistake: treating real systems as if they were either only engineering artifacts or only mathematical objects.
+The same system can be viewed as middleware hiding location, as a data platform trading consistency against availability, or as a collection of I/O automata whose traces satisfy a formal specification. Keeping all three views in mind prevents a common mistake: treating real systems as either engineering artifacts or mathematical objects, but never both.
 
-## Definitions
+## Choosing the model before the protocol
 
 A **distributed system** consists of multiple computational elements that communicate over a network and coordinate to provide a service. The elements may be processes, virtual machines, containers, storage nodes, mobile devices, or hardware controllers. What makes the subject distinct is not merely that there are many machines; it is that correctness and performance depend on communication, failure handling, and coordination across independently executing components.
 
@@ -25,19 +25,19 @@ An **execution** is an interleaving of process steps and communication events. A
 
 Lynch's **I/O automata** model represents distributed components as state machines with input, output, and internal actions [2]. An automaton has states, start states, actions, transitions, and tasks or fairness assumptions. Systems are built by composing automata through shared actions. The payoff is modular reasoning: prove a process, channel, failure detector, or replicated object correct against a specification, then compose it with other pieces.
 
-## Key results
+## What the models rule out
 
-The first key result is conceptual: partial failure is the defining difference between distributed and local computing. A local function call usually succeeds, throws, or crashes in the same failure domain as its caller. A remote call can complete, time out, be duplicated, be processed after the caller gives up, or leave the caller unable to tell whether the callee failed or the network delayed the reply. This is why distributed APIs must expose retries, idempotence, deadlines, and consistency expectations rather than pretending remote calls are ordinary procedure calls [3].
+Partial failure is the defining difference between distributed and local computing. A local function call usually succeeds, throws, or crashes in the same failure domain as its caller. A remote call can complete, time out, be duplicated, be processed after the caller gives up, or leave the caller unable to tell whether the callee failed or the network delayed the reply. Distributed APIs therefore need explicit retries, idempotence, deadlines, and consistency expectations rather than pretending remote calls are ordinary procedure calls [3].
 
-The second result is the **FLP impossibility theorem**: in a purely asynchronous message-passing system, no deterministic consensus protocol can guarantee agreement, validity, and termination if even one process may crash [4]. FLP does not say consensus is useless. It says that a protocol cannot have all of those guarantees under that model. Practical protocols avoid the impossibility by using randomness, failure detectors, leases, clocks, partial synchrony, operator intervention, or by weakening availability during partitions.
+The **FLP impossibility theorem** states that in a purely asynchronous message-passing system, no deterministic consensus protocol can guarantee agreement, validity, and termination if even one process may crash [4]. FLP does not say consensus is useless. It says that a protocol cannot have all of those guarantees under that model. Deployed protocols add randomness, failure detectors, leases, clocks, partial synchrony, or operator intervention, or they weaken availability during partitions.
 
-The third result is the **CAP theorem**, often stated as: in the presence of a network partition, a replicated service must choose between consistency and availability [5]. The precise version matters. Consistency usually means linearizability; availability means every request to a non-failing node eventually receives a response; partition tolerance means messages can be lost between groups. CAP is not a three-way menu in normal operation. It is a statement about what can be promised when the network splits.
+The **CAP theorem** concerns what can be promised during a network partition: a replicated service must choose between consistency and availability [5]. The precise version matters. Consistency usually means linearizability; availability means every request to a non-failing node eventually receives a response; partition tolerance means messages can be lost between groups. CAP is not a three-way menu in normal operation.
 
-The fourth result is that models are not merely academic. A model determines what a proof or design can claim. In a synchronous model, a timeout can be interpreted as evidence of failure. In an asynchronous model, the same timeout only means "no reply yet." In a crash-stop model, majority quorum systems can mask failed replicas. In a Byzantine model, the same quorum sizes are insufficient unless signatures or larger replica sets are added. Kleppmann's production examples repeatedly show that hidden model assumptions become outages when they meet real networks, clocks, and storage devices [1].
+A model determines what a proof or design can claim. In a synchronous model, a timeout can be interpreted as evidence of failure. In an asynchronous model, the same timeout only means "no reply yet." In a crash-stop model, majority quorum systems can mask failed replicas. In a Byzantine model, the same quorum sizes are insufficient unless signatures or larger replica sets are added. Kleppmann's production examples repeatedly show that hidden model assumptions become outages when they meet real networks, clocks, and storage devices [1].
 
 Proof sketch for why FLP is relevant: consensus needs processes to decide one value. In an asynchronous system, a delayed message from a slow but correct process is indistinguishable from a message that will never arrive because the process crashed. An adversarial scheduler can keep the system in states where either decision is still possible by delaying just the messages that would force a decision. If the protocol eventually decides anyway, there is an execution in which a delayed message reveals that the decision could violate agreement or validity. The formal FLP proof uses bivalence and critical events; the practical lesson is that termination needs timing, randomness, or additional assumptions [4].
 
-## Visual
+## How goals depend on assumptions
 
 ```mermaid
 flowchart TD
@@ -69,6 +69,10 @@ flowchart TD
   I --> I4["Byzantine"]
 ```
 
+The left branch describes what the service should provide; the right branch records the timing, communication, and failure assumptions under which those goals are claimed. A proof that omits the right branch has no defined operating envelope.
+
+## Comparing timing and failure models
+
 | Model assumption | What it gives | What it hides or risks |
 | --- | --- | --- |
 | Synchronous timing | Timeouts can support detection and round-based algorithms | Real networks rarely have permanent tight bounds |
@@ -77,11 +81,11 @@ flowchart TD
 | Crash-stop failures | Simpler quorum and leader protocols | Ignores restarts, disk corruption, and equivocation |
 | Byzantine failures | Handles arbitrary or malicious behavior | Higher cost and stronger cryptographic assumptions |
 
-## Worked example 1: Classify a service outage by model
+## Classifying a pause, partition, and split-brain risk
 
-Problem: A three-node metadata service uses a leader and two followers. Clients report timeouts. Logs show that node `A` is alive but paused for 80 seconds during garbage collection, node `B` can communicate with clients but not with `C`, and node `C` accepts requests from an internal batch job. Classify what the system model can and cannot conclude.
+A three-node metadata service uses a leader and two followers. Clients report timeouts. Logs show that node `A` is alive but paused for 80 seconds during garbage collection, node `B` can communicate with clients but not with `C`, and node `C` accepts requests from an internal batch job. What can the system model conclude?
 
-Method:
+Classify each observation separately:
 
 1. Start with timing. If the protocol assumes a synchronous bound of 5 seconds, then `A` violated the bound. In a partially synchronous model, the pause may be treated as a temporary period before stabilization returns. In an asynchronous model, the pause is indistinguishable from a slow process.
 
@@ -93,13 +97,13 @@ Method:
 
 5. Identify liveness risk. If each node waits for a different unreachable peer, requests may not complete even though no process has permanently crashed.
 
-Checked answer: the right model is message passing with partial synchrony, crash-recovery or pause failures, and a network partition. The service should preserve safety by requiring majority quorums, but it may sacrifice availability until a majority can communicate.
+The fitting model is message passing with partial synchrony, crash-recovery or pause failures, and a network partition. Majority quorums preserve safety, but availability may be lost until a majority can communicate.
 
-## Worked example 2: Reason about CAP for a partitioned register
+## A partitioned register under CAP
 
-Problem: A replicated register has one copy in region East and one copy in region West. During a partition, East receives `write(x=1)` and West receives `read(x)`. Can the system guarantee linearizability and availability?
+A replicated register has one copy in region East and one copy in region West. During a partition, East receives `write(x=1)` and West receives `read(x)`. Can the system guarantee linearizability and availability?
 
-Method:
+The contradiction appears as follows:
 
 1. Define linearizability. Each operation must appear to take effect at one instant between invocation and response, and real-time order must be respected.
 
@@ -111,9 +115,9 @@ Method:
 
 5. If West returns `0` after East has acknowledged the write, linearizability is violated. If West blocks until it hears from East, availability is violated.
 
-Checked answer: under partition, this two-replica register cannot guarantee both linearizability and availability. A CP design blocks or rejects some operations; an AP design answers locally and reconciles later.
+Under partition, this two-replica register cannot guarantee both linearizability and availability. A CP design blocks or rejects some operations; an AP design answers locally and reconciles later.
 
-## Code
+## Encoding timing and quorum assumptions
 
 ```python
 from enum import Enum
@@ -147,7 +151,7 @@ for n in [3, 5, 7]:
           "byzantine quorum =", quorum_size(n, Failure.BYZANTINE))
 ```
 
-## Common pitfalls
+## Model mismatches to look for
 
 - Treating "distributed" as a synonym for "runs on many machines" instead of focusing on coordination under delay and partial failure.
 - Assuming a timeout proves a process is dead. It proves that a local timer expired under local assumptions.
@@ -162,18 +166,6 @@ for n in [3, 5, 7]:
 - Treating majority as magic. Quorums help only when membership, storage durability, and message authenticity match the assumed model.
 - Preserving transparency at the cost of diagnosability. Operators need to see partitions, lag, and partial failures.
 
-## Connections
-
-- [Time, Clocks, and Event Ordering](/cs/distributed-systems/time-clocks-and-event-ordering)
-- [Replication and Consistency](/cs/distributed-systems/replication-and-consistency)
-- [Consensus: Paxos and Raft](/cs/distributed-systems/consensus-paxos-and-raft)
-- [Fault Tolerance and Failure Detection](/cs/distributed-systems/fault-tolerance-and-failure-detection)
-- [Distributed Storage and CAP](/cs/distributed-systems/distributed-storage-and-cap)
-- [Computer Networks](/cs/computer-networks/intro)
-- [Operating Systems](/cs/operating-systems/intro)
-- [Databases](/cs/databases/intro)
-- [Cryptography](/cs/cryptography/intro)
-
 ## References
 
 [1] M. Kleppmann, *Designing Data-Intensive Applications*. Sebastopol, CA: O'Reilly, 2017.  
@@ -181,3 +173,9 @@ for n in [3, 5, 7]:
 [3] M. van Steen and A. S. Tanenbaum, *Distributed Systems*, 3rd ed., 2017.  
 [4] M. J. Fischer, N. A. Lynch, and M. S. Paterson, "Impossibility of distributed consensus with one faulty process," *Journal of the ACM*, vol. 32, no. 2, pp. 374-382, 1985.  
 [5] S. Gilbert and N. Lynch, "Brewer's conjecture and the feasibility of consistent, available, partition-tolerant web services," *SIGACT News*, vol. 33, no. 2, pp. 51-59, 2002.
+
+<div className="see-also">
+
+See also: [Time, Clocks, and Event Ordering](/cs/distributed-systems/time-clocks-and-event-ordering) · [Replication and Consistency](/cs/distributed-systems/replication-and-consistency) · [Consensus: Paxos and Raft](/cs/distributed-systems/consensus-paxos-and-raft) · [Fault Tolerance and Failure Detection](/cs/distributed-systems/fault-tolerance-and-failure-detection) · [Distributed Storage and CAP](/cs/distributed-systems/distributed-storage-and-cap) · [Computer Networks](/cs/computer-networks/intro) · [Operating Systems](/cs/operating-systems/intro) · [Databases](/cs/databases/intro) · [Cryptography](/cs/cryptography/intro)
+
+</div>

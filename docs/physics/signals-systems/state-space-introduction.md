@@ -551,10 +551,8 @@ plt.show()
 - Confusing continuous-time stability conditions with discrete-time ones. CT uses left half-plane; DT uses inside the unit circle.
 - Treating state variables as unique. Many different state choices can represent the same input-output behavior.
 
-## Related pages
+<div className="see-also">
 
-- [System Properties](/physics/signals-systems/system-properties)
-- [LTI Systems and Convolution](/physics/signals-systems/lti-systems-convolution)
-- [Laplace Transform and ROC](/physics/signals-systems/laplace-transform-roc)
-- [Z-Transform and ROC](/physics/signals-systems/z-transform-roc)
-- [Frequency Response and Filtering](/physics/signals-systems/frequency-response-filtering)
+See also: [System Properties](/physics/signals-systems/system-properties) · [LTI Systems and Convolution](/physics/signals-systems/lti-systems-convolution) · [Laplace Transform and ROC](/physics/signals-systems/laplace-transform-roc) · [Z-Transform and ROC](/physics/signals-systems/z-transform-roc) · [Frequency Response and Filtering](/physics/signals-systems/frequency-response-filtering)
+
+</div>

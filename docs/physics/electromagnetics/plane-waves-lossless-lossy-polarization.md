@@ -397,9 +397,13 @@ The antenna accepts half the available power, corresponding to a polarization mi
 - Assuming plane waves have longitudinal field components. Uniform plane waves in homogeneous source-free media are transverse.
 - Comparing penetration depths at different frequencies without noting that $\delta$ decreases as frequency increases in good conductors.
 
-## Related pages
+<div className="see-also">
+
+See also:
 
 - [Maxwell equations for time-varying fields](/physics/electromagnetics/maxwell-equations-time-varying-fields) for the wave-equation derivation.
 - [Waves, phasors, and spectrum](/physics/electromagnetics/waves-phasors-spectrum) for $\alpha$, $\beta$, $\gamma$, and phasor notation.
 - [Wave reflection, fibers, and waveguides](/physics/electromagnetics/reflection-transmission-fibers-waveguides) for what happens at material boundaries.
 - [Antennas, radiation, and arrays](/physics/electromagnetics/antennas-radiation-arrays) for far-field waves from sources.
+
+</div>

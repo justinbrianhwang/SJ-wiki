@@ -7,13 +7,9 @@ sidebar_position: 1
 
 Signals and systems is the study of how information, energy, and physical measurements vary with an independent variable, usually time, and how devices or mathematical rules transform those variations. In Oppenheim, Willsky, and Nawab's treatment, the main theme is representation: a complicated waveform becomes easier to understand after it is decomposed into impulses, shifted copies, exponentials, sinusoids, or transform-domain components.
 
-The notes in this section follow the usual second-edition course arc: begin with signal and system models, build linear time-invariant systems through convolution, move into Fourier series and Fourier transforms, then use sampling, modulation, Laplace transforms, and $z$-transforms to analyze frequency behavior, stability, and realizations. The pages are working study notes rather than a replacement for the textbook. They emphasize definitions, formulas, example calculations, and the decision process for choosing the right domain.
+The notes follow the usual second-edition course arc: begin with signal and system models, build linear time-invariant systems through convolution, move into Fourier series and Fourier transforms, then use sampling, modulation, Laplace transforms, and $z$-transforms to analyze frequency behavior, stability, and realizations. They emphasize formulas, example calculations, and the choice of a suitable representation.
 
-![A Tektronix oscilloscope sits on a bench with its display and controls visible.](https://commons.wikimedia.org/wiki/Special:FilePath/Tektronix_2235_100Mhz_Oscilloscope.png)
-
-*Figure: An oscilloscope grounds signal language in measured voltage traces, triggering, bandwidth, and time scales. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tektronix_2235_100Mhz_Oscilloscope.png), Dennis van Zuijlekom, CC BY-SA 2.0.*
-
-## Definitions
+## Signals, systems, and the LTI reduction
 
 A signal is a function of one or more independent variables. In this section the independent variable is time, so continuous-time signals are written as $x(t)$ and discrete-time signals are written as $x[n]$. Continuous time uses real-valued time $t\in\mathbb{R}$; discrete time uses integer sample index $n\in\mathbb{Z}$. This difference determines whether formulas use integrals or sums, whether frequency is unique or periodic, and whether time shifts can be arbitrary real numbers or must be integer sample shifts.
 
@@ -25,7 +21,7 @@ $$
 
 The most important system class in these notes is the linear time-invariant system. Linearity means superposition holds. Time invariance means a time shift at the input produces the same time shift at the output. These two properties imply that the impulse response determines the entire input-output behavior through convolution.
 
-The chapter list used by these notes is:
+The reading order is:
 
 | Order | Topic area | Wiki page |
 |---:|---|---|
@@ -43,7 +39,7 @@ The chapter list used by these notes is:
 | 12 | Modulation and communication models | [Modulation and Communication Systems](/physics/signals-systems/modulation-communication-systems) |
 | 13 | State variables and first-order vector models | [State-Space Introduction](/physics/signals-systems/state-space-introduction) |
 
-## Key results
+## Three results that organize the subject
 
 The first organizing result is impulse decomposition. In discrete time,
 
@@ -81,6 +77,8 @@ in discrete time. The frequency is preserved; only amplitude and phase change. F
 
 The third organizing result is that transform algebra must be paired with convergence information. A Laplace transform $X(s)$ or a $z$-transform $X(z)$ is incomplete without its region of convergence. The ROC determines sidedness, whether the Fourier transform exists, and whether a causal rational LTI system is stable.
 
+### Choosing a representation
+
 Use this decision path when solving problems:
 
 | If the problem gives... | Usually start with... | Reason |
@@ -97,9 +95,9 @@ Another useful habit is to separate representation questions from system questio
 
 The same separation helps with transform domains. The CTFT and DTFT describe spectra directly on frequency axes. The Laplace and $z$ transforms add convergence regions so that exponential growth, decay, sidedness, and stability can be represented. When a problem includes words such as causal, stable, right-sided, left-sided, pole, zero, or ROC, it is usually asking for Laplace or $z$ reasoning, not only Fourier algebra.
 
-Finally, always track units. Continuous-time frequency $\omega$ is in radians per second, ordinary frequency $f$ is in cycles per second, and discrete-time frequency $\Omega$ is in radians per sample. The conversion $\Omega=\omega T$ is central in sampling problems and is a common place where otherwise correct solutions lose a factor of $2\pi$.
+Always track units. Continuous-time frequency $\omega$ is in radians per second, ordinary frequency $f$ is in cycles per second, and discrete-time frequency $\Omega$ is in radians per sample. The conversion $\Omega=\omega T$ is central in sampling problems and is a common place where otherwise correct solutions lose a factor of $2\pi$.
 
-## Visual
+### From classification to computation
 
 ```mermaid
 flowchart TB
@@ -132,15 +130,15 @@ flowchart TB
   Apps --> Check["check units, frequency convention, ROC, and stability"]
 ```
 
-This overview diagram separates the signals-and-systems workflow into classification, property testing, LTI reduction, time-domain convolution, transform-domain representation, and application layers. The impulse response is shown as the key I/O contract for LTI systems, while Fourier, Laplace, DTFT, and $z$ tools are routed by signal type and ROC needs. The final check node captures the common failure points: units, frequency convention, sidedness, and stability.
+The workflow separates classification, property testing, LTI reduction, time-domain convolution, transform-domain representation, and applications. For an LTI system, the impulse response is the complete input-output contract. Signal type and convergence requirements then determine whether Fourier, Laplace, DTFT, or $z$ methods fit the problem.
 
-## Worked example 1: choosing the right representation
+## Sending a square wave through an LTI system
 
 Problem: A signal is described as a nonzero periodic square wave with period $T_0=4$, and it is passed through an LTI system with known frequency response $H(j\omega)$. Which representation should be used to compute the steady output?
 
 Method:
 
-1. The input is continuous-time because its period is given as a real time $T_0=4$ rather than an integer sample period.
+1. The notation $T_0$ together with the response $H(j\omega)$ identifies a continuous-time problem.
 
 2. The input is periodic and nonzero. A nonzero periodic signal usually has infinite total energy but finite average power, so a Fourier transform as an ordinary function is not the most direct representation.
 
@@ -162,9 +160,9 @@ $$
 y(t)=\sum_{k=-\infty}^{\infty}a_k H\left(jk\frac{\pi}{2}\right)e^{jk(\pi/2)t}.
 $$
 
-Checked answer: Use CT Fourier series coefficients, not a finite-energy CTFT calculation. The LTI system acts by multiplying the $k$th harmonic coefficient by $H(jk\pi/2)$.
+Use continuous-time Fourier series coefficients rather than a finite-energy CTFT calculation. The LTI system multiplies the $k$th harmonic coefficient by $H(jk\pi/2)$.
 
-## Worked example 2: identifying when ROC is required
+## One rational $z$-transform, two sequences
 
 Problem: Two sequences have the same algebraic $z$-transform expression,
 
@@ -198,33 +196,9 @@ $$
 
 5. Therefore the sequences are different even though the rational expression is identical.
 
-Checked answer: They are not the same sequence. The ROC is part of the transform specification.
+They are different sequences. The ROC is part of the transform specification, not an optional annotation.
 
-## Code
-
-```python
-import numpy as np
-
-def choose_tool(is_periodic, is_discrete, is_lti, has_roc_question):
-    if has_roc_question:
-        return "z-transform" if is_discrete else "Laplace transform"
-    if is_periodic:
-        return "DT Fourier series" if is_discrete else "CT Fourier series"
-    if is_lti:
-        return "DTFT/frequency response" if is_discrete else "CTFT/frequency response"
-    return "start with definitions and system-property tests"
-
-cases = [
-    (True, False, True, False),
-    (False, True, True, True),
-    (False, False, False, False),
-]
-
-for case in cases:
-    print(case, "->", choose_tool(*case))
-```
-
-## Common pitfalls
+## Where transform calculations go wrong
 
 - Treating continuous-time and discrete-time variables as interchangeable. Use $t$ for CT and $n$ for DT unless a page explicitly says otherwise.
 - Forgetting the region of convergence for Laplace and $z$ transforms. The same rational expression can describe different signals.
@@ -233,13 +207,8 @@ for case in cases:
 - Applying ideal sampling conclusions without checking bandlimiting. Sampling below Nyquist creates aliasing that cannot be removed by an ideal reconstruction filter.
 - Using LTI shortcuts before proving the system is LTI. Convolution and frequency response are not valid for arbitrary nonlinear or time-varying systems.
 
-## Connections
+<div className="see-also">
 
-- [Signals and Time Transformations](/physics/signals-systems/signals-time-transformations)
-- [Periodicity, Energy, and Power](/physics/signals-systems/periodicity-energy-power)
-- [System Properties](/physics/signals-systems/system-properties)
-- [LTI Systems and Convolution](/physics/signals-systems/lti-systems-convolution)
-- [Continuous-Time Fourier Transform](/physics/signals-systems/continuous-time-fourier-transform)
-- [Sampling, Aliasing, and Reconstruction](/physics/signals-systems/sampling-aliasing-reconstruction)
-- [Laplace Transform and ROC](/physics/signals-systems/laplace-transform-roc)
-- [Z-Transform and ROC](/physics/signals-systems/z-transform-roc)
+See also: [Signals and Time Transformations](/physics/signals-systems/signals-time-transformations) · [Periodicity, Energy, and Power](/physics/signals-systems/periodicity-energy-power) · [System Properties](/physics/signals-systems/system-properties) · [LTI Systems and Convolution](/physics/signals-systems/lti-systems-convolution) · [Continuous-Time Fourier Transform](/physics/signals-systems/continuous-time-fourier-transform) · [Sampling, Aliasing, and Reconstruction](/physics/signals-systems/sampling-aliasing-reconstruction) · [Laplace Transform and ROC](/physics/signals-systems/laplace-transform-roc) · [Z-Transform and ROC](/physics/signals-systems/z-transform-roc)
+
+</div>

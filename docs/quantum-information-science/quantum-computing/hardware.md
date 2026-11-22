@@ -7,17 +7,13 @@ sidebar_position: 2
 
 Quantum hardware is the engineering layer that turns abstract qubits, gates, and measurements into controlled physical systems. The same circuit drawn in [algorithms](/quantum-information-science/quantum-computing/algorithms) looks very different in an ion trap, optical cavity, nuclear magnetic resonance experiment, superconducting chip, neutral-atom array, or photonic network, so hardware comparisons must track coherence, controllability, initialization, readout, connectivity, and compatibility with [error correction](/quantum-information-science/quantum-computing/error-correction).
 
-*This page synthesizes the wiki's earlier hardware draft with Chapter 7 of Nielsen and Chuang. N&C's central organizing idea is implementation requirements: represent quantum information robustly, perform controlled unitary transformations, prepare fiducial input states, and measure outputs. Modern superconducting, neutral-atom, and topological notes are supplementary context beyond the book's original platform emphasis.*
-
-![A NIST surface ion-trap apparatus contains a gold chip and nearby electrodes used to confine ions for quantum logic experiments.](https://commons.wikimedia.org/wiki/Special:FilePath/Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg)
-
-*Figure: Trapped-ion hardware makes qubits from individual charged atoms, laser control, fluorescence readout, and engineered electromagnetic confinement. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg), National Institute of Standards and Technology / Y. Colombe, public domain.*
+Chapter 7 of Nielsen and Chuang organizes hardware around four implementation requirements: represent quantum information robustly, perform controlled unitary transformations, prepare fiducial input states, and measure outputs. Superconducting, neutral-atom, and topological systems extend the book's original platform survey.
 
 ![A scanning electron micrograph shows a Y-junction surface ion trap with routed electrodes and an inset chain of trapped ions.](https://commons.wikimedia.org/wiki/Special:FilePath/Sandia-surface-junction-ion-trap_NJP13.075018.jpg)
 
 *Figure: Scalable trapped-ion processors depend on microfabricated electrode layouts that route, split, and recombine ion chains. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sandia-surface-junction-ion-trap_NJP13.075018.jpg), Moehring et al., CC BY-SA 3.0.*
 
-## Definitions
+## What a platform must provide
 
 A **physical qubit** is a two-level subsystem chosen inside a real device. It may be two hyperfine states of a trapped ion, two polarization or spatial modes of a photon, two nuclear spin states in a molecule, two levels of a superconducting circuit, two clock states of a neutral atom, or a protected parity degree of freedom in a topological proposal. The computational basis is written with explicit basis labels, such as $\vert 0\rangle, \vert 1\rangle$, but the laboratory system may have many extra levels that cause leakage.
 
@@ -45,7 +41,7 @@ Important hardware metrics include:
 | Reset latency | Time to prepare a fresh state | Matters for ancilla-heavy error correction |
 | Crosstalk and leakage | Unwanted response outside the intended gate | Creates correlated and non-Pauli noise |
 
-**Optical photons** can encode qubits in dual-rail states, where $\vert 0_L\rangle=\vert 01\rangle$ and $\vert 1_L\rangle=\vert 10\rangle$ across two optical modes, or in polarization, time-bin, path, or frequency modes. Photons are natural flying qubits for [quantum communication](/quantum-information-science/quantum-communication/), but deterministic photon-photon gates are hard because ordinary optical nonlinearities are weak at the single-photon level.
+**Optical photons** can encode qubits in dual-rail states, where $\vert 0_L\rangle=\vert 01\rangle$ and $\vert 1_L\rangle=\vert 10\rangle$ across two optical modes, or in polarization, time-bin, path, or frequency modes. Photons are natural flying qubits for [quantum communication](/quantum-information-science/quantum-communication/intro), but deterministic photon-photon gates are hard because ordinary optical nonlinearities are weak at the single-photon level.
 
 **Cavity QED** couples atoms to quantized cavity modes. In the ideal strong-coupling picture, an atom and a single field mode exchange excitations through a Jaynes-Cummings interaction. The cavity can mediate interactions between photons or between atoms, but loss through cavity mirrors and spontaneous emission must be controlled.
 
@@ -61,7 +57,7 @@ Important hardware metrics include:
 
 **Topological proposals** encode information nonlocally, often using anyons or Majorana zero modes. The appeal is hardware-level protection from some local noise processes. The conservative status is that topological quantum computing remains an active research program rather than an established scalable production platform.
 
-## Key results
+## From control Hamiltonians to QEC cycles
 
 The first N&C hardware figure of merit is the approximate number of coherent operations available before decoherence:
 
@@ -117,7 +113,7 @@ $$
 \epsilon \approx \frac{hf}{2k_BT}
 $$
 
-for a spin transition of frequency $f$ with $\epsilon\ll 1$. The useful signal is carried by the small deviation term $\Delta\rho$, not by a pure ensemble of identical $\vert 0\rangle^{\otimes n}$ systems. This is why NMR was a powerful control testbed but not a clean route to scalable fault-tolerant quantum computing.
+for a spin transition of frequency $f$ with $\epsilon\ll 1$. The useful signal is carried by the small deviation term $\Delta\rho$, not by a pure ensemble of identical $\vert 0\rangle^{\otimes n}$ systems. NMR was therefore a powerful control testbed but not a clean route to scalable fault-tolerant quantum computing.
 
 Finally, hardware must be evaluated through the QEC cycle:
 
@@ -194,7 +190,7 @@ $$
 
 This makes the experiment a useful hardware milestone for encoded control and mitigation, not evidence of a chemistry speedup.
 
-## Visual
+## What sits behind a logical circuit
 
 ```mermaid
 flowchart TD
@@ -266,7 +262,7 @@ This diagram decomposes hardware into three concrete implementations rather than
 | Neutral atoms | Optical-lattice proposals; modern tweezers are supplementary | Large flexible arrays and Rydberg interactions | Atom loss, loading, uniformity, mid-circuit measurement |
 | Topological proposals | Mostly beyond N&C's main treatment | Possible passive protection from local noise | Experimental maturity and controllable logical gates |
 
-## Worked example 1: Operation budget from coherence and gate time
+## Screening coherence against gate time
 
 **Problem.** Compare two simplified platforms. Platform A has coherence time $\tau_Q=1$ s and two-qubit gate time $t_{\mathrm{op}}=100$ microseconds. Platform B has $\tau_Q=100$ microseconds and $t_{\mathrm{op}}=200$ ns. Estimate $n_{\mathrm{op}}=\tau_Q/t_{\mathrm{op}}$ for each.
 
@@ -298,9 +294,9 @@ $$
 n_{\mathrm{op},B}=\frac{10^{-4}}{2\times 10^{-7}}=5\times 10^2.
 $$
 
-**Answer.** Platform A permits roughly $10{,}000$ elementary gate times per coherence time, while Platform B permits roughly $500$. The checked interpretation is limited: a real error budget also includes gate calibration, measurement, leakage, idle noise, and correlated errors, so this ratio is a first screening metric, not a threshold estimate.
+**Answer.** Platform A permits roughly $10{,}000$ elementary gate times per coherence time, while Platform B permits roughly $500$. A real error budget also includes gate calibration, measurement, leakage, idle noise, and correlated errors, so this ratio is a first screening metric rather than a threshold estimate.
 
-## Worked example 2: Thermal polarization in an NMR-style qubit
+## Estimating NMR thermal polarization
 
 **Problem.** A nuclear spin transition has frequency $f=500$ MHz at room temperature $T=300$ K. Use the high-temperature estimate
 
@@ -347,9 +343,9 @@ $$
 \approx 4.0\times 10^{-5}.
 $$
 
-**Answer.** The polarization is about $4\times 10^{-5}$. This explains the NMR ensemble issue: the density operator is extremely close to maximally mixed, so many molecules are needed to obtain a macroscopic signal, and effective-pure-state signal shrinks as the number of qubits grows.
+**Answer.** The polarization is about $4\times 10^{-5}$. The density operator is extremely close to maximally mixed, so many molecules are needed to obtain a macroscopic signal, and effective-pure-state signal shrinks as the number of qubits grows.
 
-## Code
+## Comparing first-pass hardware metrics
 
 The following Python snippet computes the two N&C-style screening quantities used above: coherent operation budget and NMR thermal polarization.
 
@@ -384,7 +380,7 @@ epsilon = nmr_polarization(frequency_hz=500e6, temperature_k=300)
 print(f"NMR polarization at 500 MHz and 300 K: {epsilon:.2e}")
 ```
 
-## Common pitfalls
+## Metrics that mislead on their own
 
 - Comparing platforms by physical qubit count alone. Coherence, gate quality, measurement, reset, connectivity, and crosstalk determine computational value.
 - Treating $T_1$ or $T_2$ as a complete error model. Gate errors can be dominated by control imperfections, leakage, and correlated noise.
@@ -394,16 +390,6 @@ print(f"NMR polarization at 500 MHz and 300 K: {epsilon:.2e}")
 - Treating NMR demonstrations as scalable fault-tolerant blueprints. They were important control demonstrations, but ensemble signal scaling is the bottleneck.
 - Reading N&C's platform list as current market ranking. The book's criteria remain central, but the leading experimental platforms have evolved since the original edition.
 - Treating topological protection as already solved hardware engineering. Protected encodings and protected gates are distinct experimental challenges.
-
-## Connections
-
-- [Quantum algorithms](/quantum-information-science/quantum-computing/algorithms) translates hardware constraints into depth, gate set, connectivity, and oracle cost.
-- [Quantum error correction](/quantum-information-science/quantum-computing/error-correction) explains why physical noise channels, stabilizer measurement, and fresh ancillas dominate scaling.
-- [Quantum machine learning](/quantum-information-science/quantum-computing/quantum-ml) is strongly constrained by NISQ noise, shot budgets, and trainability.
-- [Quantum communication](/quantum-information-science/quantum-communication/) is especially close to photonic hardware and quantum memories.
-- [Quantum internet](/quantum-information-science/quantum-internet/) connects stationary qubits, flying photons, entanglement distribution, and repeaters.
-- [Linear algebra](/math/linear-algebra/) supplies the unitary, spectral, and tensor-product language used to model gates.
-- [Quantum mechanics](/physics/quantum-mechanics/) supplies Hamiltonians, measurement theory, perturbation ideas, spin, and oscillator physics.
 
 ## Further reading
 
@@ -416,4 +402,18 @@ print(f"NMR polarization at 500 MHz and 300 K: {epsilon:.2e}")
 
 ## References
 
-[1] C. Zhang, F. Xu, S. Zhang, M. Duan, et al. *Universal logical operations in a silicon quantum processor*. Nature Nanotechnology (2026).
+[1] C. Zhang, F. Xu, S. Zhang, M. Duan, et al. *Universal logical operations in a silicon quantum processor*. Nature Nanotechnology 21, 635-641 (2026).
+
+<div className="see-also">
+
+See also:
+
+- [Quantum algorithms](/quantum-information-science/quantum-computing/algorithms) translates hardware constraints into depth, gate set, connectivity, and oracle cost.
+- [Quantum error correction](/quantum-information-science/quantum-computing/error-correction) explains why physical noise channels, stabilizer measurement, and fresh ancillas dominate scaling.
+- [Quantum machine learning](/quantum-information-science/quantum-computing/quantum-ml) is strongly constrained by NISQ noise, shot budgets, and trainability.
+- [Quantum communication](/quantum-information-science/quantum-communication/intro) is especially close to photonic hardware and quantum memories.
+- [Quantum internet](/quantum-information-science/quantum-internet/intro) connects stationary qubits, flying photons, entanglement distribution, and repeaters.
+- [Linear algebra](/math/linear-algebra/intro) supplies the unitary, spectral, and tensor-product language used to model gates.
+- [Quantum mechanics](/physics/quantum-mechanics/intro) supplies Hamiltonians, measurement theory, perturbation ideas, spin, and oscillator physics.
+
+</div>

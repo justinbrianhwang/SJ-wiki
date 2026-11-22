@@ -301,10 +301,8 @@ The `NearestNeighbors` call requests three returned neighbors because a training
 - Letting the same entity appear many times in a reference set. Its duplicates create an artificial dense neighborhood and can mask coordinated abuse.
 - Ignoring exposure. A customer with ten failed requests may be unusual at ten total requests and ordinary at a million.
 
-## Related pages
+<div className="see-also">
 
-- [Advanced Outlier Analysis](/cs/data-mining/chapter-09-advanced-outlier-analysis)
-- [Similarity and Distances](/cs/data-mining/chapter-03-similarity-distances)
-- [Cluster Analysis](/cs/data-mining/chapter-06-cluster-analysis)
-- [Mining Data Streams and Big Data](/cs/data-mining/chapter-12-mining-data-streams)
-- [Mining Time Series Data](/cs/data-mining/chapter-14-mining-time-series-data)
+See also: [Advanced Outlier Analysis](/cs/data-mining/chapter-09-advanced-outlier-analysis) · [Similarity and Distances](/cs/data-mining/chapter-03-similarity-distances) · [Cluster Analysis](/cs/data-mining/chapter-06-cluster-analysis) · [Mining Data Streams and Big Data](/cs/data-mining/chapter-12-mining-data-streams) · [Mining Time Series Data](/cs/data-mining/chapter-14-mining-time-series-data)
+
+</div>

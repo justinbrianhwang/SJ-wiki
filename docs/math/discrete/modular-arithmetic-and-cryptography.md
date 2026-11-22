@@ -13,7 +13,7 @@ Modular arithmetic treats integers by their remainders. This turns infinite inte
 
 The main shift is to stop asking for the exact integer and ask only for its class modulo $m$. Once this is done carefully, addition, multiplication, inverses, and exponentiation can be performed with small representatives. Cryptography then uses the fact that some modular operations are easy in one direction but hard to reverse without hidden information.
 
-## Definitions
+## Residue classes, units, and Euler's phi function
 
 For integers $a,b$ and a positive integer $m$, $a$ is **congruent** to $b$ modulo $m$, written
 
@@ -31,6 +31,16 @@ $$
 
 There are exactly $m$ residue classes modulo $m$, represented by $0,1,\dots,m-1$. Arithmetic modulo $m$ can be performed on any representatives and then reduced back to this range.
 
+```text
+Integers modulo 5 split into five residue classes:
+
+[0]: ..., -10, -5, 0, 5, 10, ...
+[1]: ...,  -9, -4, 1, 6, 11, ...
+[2]: ...,  -8, -3, 2, 7, 12, ...
+[3]: ...,  -7, -2, 3, 8, 13, ...
+[4]: ...,  -6, -1, 4, 9, 14, ...
+```
+
 A **multiplicative inverse** of $a$ modulo $m$ is an integer $b$ such that
 
 $$
@@ -45,7 +55,7 @@ $$
 \phi(n)=(p-1)(q-1).
 $$
 
-## Key results
+## Arithmetic that survives reduction
 
 Congruence is compatible with addition and multiplication. If
 
@@ -91,19 +101,7 @@ $$
 
 Reducing modulo $m$ after each multiplication keeps the numbers small and uses only $O(\log e)$ modular multiplications.
 
-RSA, in simplified mathematical form, chooses primes $p,q$, sets $n=pq$, chooses $e$ relatively prime to $\phi(n)$, and finds $d$ with $ed\equiv1\pmod{\phi(n)}$. Encryption sends $M$ to $C\equiv M^e\pmod n$, and decryption computes $C^d\pmod n$. The practical security rests on the difficulty of factoring large $n$ into $p$ and $q$.
-
-## Visual
-
-```text
-Integers modulo 5 split into five residue classes:
-
-[0]: ..., -10, -5, 0, 5, 10, ...
-[1]: ...,  -9, -4, 1, 6, 11, ...
-[2]: ...,  -8, -3, 2, 7, 12, ...
-[3]: ...,  -7, -2, 3, 8, 13, ...
-[4]: ...,  -6, -1, 4, 9, 14, ...
-```
+RSA, in simplified mathematical form, chooses primes $p,q$, sets $n=pq$, chooses $e$ relatively prime to $\phi(n)$, and finds $d$ with $ed\equiv1\pmod{\phi(n)}$. Encryption sends $M$ to $C\equiv M^e\pmod n$, and decryption computes $C^d\pmod n$. The security of textbook RSA is tied to the difficulty of recovering the private operation from the public key; factoring a suitably generated large $n$ is the best-known route for ordinary RSA moduli.
 
 | Operation | Modular rule | Example modulo $7$ |
 | --- | --- | --- |
@@ -114,15 +112,13 @@ Integers modulo 5 split into five residue classes:
 | exponentiate | repeated squaring | $3^8\equiv2$ |
 | cancel | only invertible factors | can cancel $3$ mod $7$, not $2$ mod $6$ |
 
-## Worked example 1: Solve a linear congruence
+## Solving a congruence with seven residue-class solutions
 
 **Problem.** Solve
 
 $$
 14x\equiv21\pmod{35}.
 $$
-
-**Method.**
 
 1. Compute the gcd:
 
@@ -150,13 +146,11 @@ $$
 4,9,14,19,24,29,34\pmod{35}.
 $$
 
-**Checked answer.** The seven incongruent solutions modulo $35$ are $x\equiv4,9,14,19,24,29,34\pmod{35}$. Substituting $x=4$ gives $14\cdot4=56\equiv21\pmod{35}$, and adding $5$ to $x$ preserves the congruence because $14\cdot5=70$ is divisible by $35$.
+The seven incongruent solutions modulo $35$ are $x\equiv4,9,14,19,24,29,34\pmod{35}$. Substituting $x=4$ gives $14\cdot4=56\equiv21\pmod{35}$, and adding $5$ to $x$ preserves the congruence because $14\cdot5=70$ is divisible by $35$.
 
-## Worked example 2: Fast modular exponentiation
+## Repeated squaring for $7^{23}\bmod 33$
 
 **Problem.** Compute $7^{23}\pmod{33}$ without expanding $7^{23}$.
-
-**Method.**
 
 1. Write the exponent in binary:
 
@@ -193,9 +187,9 @@ $$
 \end{aligned}
 $$
 
-**Checked answer.** $7^{23}\equiv13\pmod{33}$. The computation used five squarings and a few multiplications instead of forming a huge integer.
+$7^{23}\equiv13\pmod{33}$. The computation used five squarings and a few multiplications instead of forming a huge integer.
 
-## Code
+## Computing inverses and powers without large intermediates
 
 ```python
 def egcd(a, b):
@@ -226,7 +220,7 @@ print(modexp(7, 23, 33))
 
 The `modexp` routine is the repeated-squaring algorithm used in real modular arithmetic libraries, although production cryptographic code must also handle side-channel concerns and padding schemes.
 
-## Common pitfalls
+## Cancellation, solution counts, and cryptographic caveats
 
 - Treating $a\bmod m=b$ and $a\equiv b\pmod m$ as the same statement. The first names a remainder; the second is a relation.
 - Cancelling a factor that is not invertible modulo $m$.
@@ -251,16 +245,16 @@ It is also helpful to keep a table of units for small moduli. Modulo $10$, only 
 
 For worked cryptography exercises, use intentionally small primes only to understand the mechanism. Small RSA examples are insecure precisely because factoring $n$ is easy. The lesson is the algebraic loop: choose relatively prime exponents, use an inverse modulo $\phi(n)$, and rely on modular exponentiation for encryption and decryption. Do not infer practical parameter sizes or security practices from classroom-sized numbers.
 
-In modular arithmetic, the modulus is part of the statement. The claim $x\equiv2$ is incomplete until the modulus is named. Changing the modulus changes the residue classes, the invertible elements, and the number of distinct solutions.
+In modular arithmetic, the modulus is part of the statement. The claim $x\equiv2$ is incomplete until the modulus is named. Changing the modulus changes the residue classes, the invertible elements, and the number of distinct solutions. Carrying the modulus through every displayed step also makes invalid cancellation easier to notice.
 
-For that reason, carry the modulus through every displayed step instead of mentioning it only at the beginning.
+<div className="see-also">
 
-This habit makes invalid cancellation easier to notice.
-
-## Connections
+See also:
 
 - [Number theory basics](/math/discrete/number-theory-basics) supplies divisibility, gcds, primes, and Bezout coefficients.
 - [Algorithms and complexity](/math/discrete/algorithms-and-complexity) explains why repeated squaring is efficient.
 - [Relations](/math/discrete/relations) frames congruence modulo $m$ as an equivalence relation.
 - [Equivalence relations and partial orders](/math/discrete/equivalence-relations-and-partial-orders) studies residue classes as equivalence classes.
 - [Finite-state machines and computation](/math/discrete/finite-state-machines-and-computation) connects modular arithmetic to finite memory and cyclic state.
+
+</div>

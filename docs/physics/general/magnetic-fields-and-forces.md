@@ -5,130 +5,361 @@ sidebar_position: 20
 
 # Magnetic Fields and Forces
 
-Magnetic Fields and Forces covers magnetic force on moving charges and currents, circular motion, and magnetic torque. The goal is to recognize the physical structure before choosing equations. In the HRW progression, this topic extends earlier mechanics and prepares later field, wave, or modern-physics reasoning by reusing the same habits: define the system, choose signs and variables, state assumptions, and check dimensions.
+Magnetic fields act on moving charge. Their geometry is encoded by a cross product, so direction matters as much as magnitude. A field can bend a charged particle, push a wire, or rotate a current loop, yet a static magnetic force cannot change the kinetic energy of a point charge.
 
-The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
+The SI unit is the tesla:
 
-![Iron filings reveal the magnetic field pattern between attracting bar magnets.](https://commons.wikimedia.org/wiki/Special:FilePath/Magnetic_field_of_bar_magnets_attracting.png)
+$$
+1\,\mathrm T=1\,\frac{\mathrm N}{\mathrm{A\,m}}
+=1\,\frac{\mathrm{N\,s}}{\mathrm{C\,m}}.
+$$
 
-*Figure: Iron filings provide a physical picture of magnetic field direction and field-line density. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Magnetic_field_of_bar_magnets_attracting.png), Alexander Wilmer Duff, public domain in the United States.*
+Field lines are a drawing convention: their tangent gives the field direction and their density suggests relative strength. They do not represent material threads or particle trajectories.
 
-## Definitions
+## The magnetic part of the Lorentz force
 
-- **Scope:** magnetic force on moving charges and currents, circular motion, and magnetic torque.
-- **Primary symbols:** $\vec B$, $q$, $\vec v$, $I$, $\vec L$, $r$.
-- **Reference equations:** $\vec F=q\vec v\times\vec B$, $F=\vert q\vert vB\sin\theta$, $\vec F=I\vec L\times\vec B$, $r=mv/(\vert q\vert B)$.
-- A **system** is the object, field region, circuit, gas, optical element, or particle collection being modeled.
-- A **state** is specified by the variables that determine the relevant energy, momentum, phase, field, or thermodynamic condition.
-- A **constraint** is a physical restriction such as no slip, fixed length, constant temperature, steady flow, fixed boundary, or symmetry.
-- A **limiting case** is a simplified parameter choice used to test whether the result behaves sensibly.
+For a particle of charge $q$ and velocity $\vec v$,
 
-The definitions in this page are meant to be operational. A symbol is useful only after you know how it would be measured, what units it carries, what sign convention is being used, and which idealizations are being assumed. Before substituting numbers, identify the system boundary and the relevant state variables. For a particle problem the state variables might be position and velocity; for a circuit they might be charge, current, and potential difference; for a thermodynamic process they might be pressure, volume, temperature, and internal energy.
+$$
+\vec F_B=q\vec v\times\vec B,
+$$
 
-A second habit is to separate model statements from algebra. A model statement says something physical, such as "air resistance is negligible", "the string is massless", "the gas is ideal", "the process is quasistatic", or "the field is uniform". Algebra then follows from those statements. If the model changes, the algebra may still look familiar but the result can become invalid. Write the model assumptions as part of the solution, not as an afterthought.
+with magnitude
 
-## Key results
+$$
+F_B=\lvert q\rvert vB\sin\theta.
+$$
 
-The main relationships are
+The angle $\theta$ is between velocity and field. Parallel or antiparallel motion gives zero force; perpendicular motion gives the maximum. For a positive charge, curl the right-hand fingers from $\vec v$ toward $\vec B$ through the smaller angle and the thumb gives $\vec F_B$. A negative charge reverses that direction.
+
+The complete electromagnetic force is
+
+$$
+\vec F=q(\vec E+\vec v\times\vec B).
+$$
+
+Electric and magnetic contributions must be added as vectors. The electric term can act on a charge at rest and can change its speed. The magnetic term requires motion relative to the frame in which the field is specified.
+
+Since the cross product is perpendicular to velocity,
+
+$$
+\vec F_B\cdot\vec v=0.
+$$
+
+The magnetic power delivered to a point charge is therefore zero. A static magnetic field changes momentum direction without changing speed or kinetic energy. If a magnetic device appears to accelerate a charge, an electric field, a time-dependent field, or another force is doing the work.
+
+## Circular and helical motion
+
+Suppose $\vec v$ is perpendicular to a uniform $\vec B$. The magnetic force has constant magnitude and remains perpendicular to the motion, so it supplies centripetal force:
+
+$$
+\lvert q\rvert vB=\frac{mv^2}{r}.
+$$
+
+Hence
+
+$$
+r=\frac{mv}{\lvert q\rvert B}
+=\frac{p}{\lvert q\rvert B}.
+$$
+
+The momentum form remains useful relativistically if $p=\gamma mv$ is used. The nonrelativistic angular frequency follows from $v=r\omega$:
+
+$$
+\omega_c=\frac{\lvert q\rvert B}{m},
+\qquad
+T_c=\frac{2\pi m}{\lvert q\rvert B}.
+$$
+
+At nonrelativistic speed, the cyclotron period is independent of radius and speed. Relativistic momentum breaks that simple independence.
+
+If velocity has both perpendicular and parallel components, only $v_\perp$ bends. The particle follows a helix:
+
+$$
+r=\frac{mv_\perp}{\lvert q\rvert B},
+\qquad
+\text{pitch}=v_\parallel T_c.
+$$
+
+The sign of charge determines the handedness. Looking along the field, positive and negative charges circulate in opposite directions.
+
+### Worked orbit of a proton
+
+A proton moves at $2.0\times10^6\,\mathrm{m/s}$ perpendicular to a $0.50\,\mathrm T$ field. With $m_p=1.67\times10^{-27}\,\mathrm{kg}$ and $q=1.60\times10^{-19}\,\mathrm C$,
 
 $$
 \begin{aligned}
-\text{core formulas} &: $\vec F=q\vec v\times\vec B$, $F=\vert q\vert vB\sin\theta$, $\vec F=I\vec L\times\vec B$, $r=mv/(\vert q\vert B)$.
+r
+&=\frac{m_pv}{qB}\\
+&=\frac{(1.67\times10^{-27})(2.0\times10^6)}
+{(1.60\times10^{-19})(0.50)}\\
+&=4.18\times10^{-2}\,\mathrm m.
 \end{aligned}
 $$
 
-Use these relationships only after identifying which variables are known and which conditions are being assumed. Many problems can be solved by matching a physical phrase to a mathematical operation: balance forces or torques for equilibrium, integrate a rate for accumulated change, conserve a quantity when external transfer is absent, or apply a boundary condition when waves or fields must fit a geometry.
-
-A useful solution pattern is: write the governing equation, substitute symbolic constraints, solve for the unknown, and only then insert numbers. This prevents units from becoming decorative and keeps the answer interpretable.
-
-These formulas are conditional statements. Each equation is powerful inside its domain and misleading outside it. Constant-acceleration kinematics requires constant acceleration. Conservation of mechanical energy requires either no nonconservative work or an explicit accounting of it. Gauss's law is always true, but it directly gives an electric field only when symmetry lets the flux integral simplify. Bernoulli's equation assumes steady, incompressible, nonviscous flow along a streamline. Keeping the conditions attached to the formula is part of the formula.
-
-For numerical work, solve symbolically before inserting values whenever possible. A symbolic expression exposes dimensions and limiting behavior. If a mass should cancel, it should cancel before arithmetic. If an answer should decrease when distance grows, the final expression should show that trend. If an answer becomes infinite in an unphysical limit, that usually marks the boundary where the model has stopped applying.
-
-## Visual
-
-```mermaid
-graph LR
-  A[Physical situation] --> B[Choose model]
-  B --> C[Define variables]
-  C --> D[Apply key law]
-  D --> E[Solve symbolically]
-  E --> F[Check units and limits]
-```
-
-| Quantity or idea | Use | Check |
-|---|---|---|
-| Main model | magnetic force on moving charges and currents, circular motion, and magnetic torque | assumptions must match the formula |
-| Symbols | $\vec B$, $q$, $\vec v$, $I$, $\vec L$, $r$ | define each before use |
-| Key formulas | $\vec F=q\vec v\times\vec B$, $F=\vert q\vert vB\sin\theta$, $\vec F=I\vec L\times\vec B$, $r=mv/(\vert q\vert B)$ | check dimensions term by term |
-| Limiting case | simplify one parameter | result should match intuition |
-
-## Worked example 1
-
-**Problem.** A proton moves at $2.0\times10^6\,\mathrm{m/s}$ perpendicular to $0.50\,\mathrm{T}$. Find radius.
-
-**Method.** Select the listed governing relationship and solve symbolically before substituting numbers.
-
-1. Write the relevant relation.
-2. Substitute the known quantities with SI units or consistent derived units.
-3. Solve algebraically for the requested quantity.
-4. The calculation gives
+The radius is $4.18\,\mathrm{cm}$. Its period is
 
 $$
-$r=mv/(qB)=(1.67\times10^{-27})(2.0\times10^6)/[(1.60\times10^{-19})(0.50)]=4.18\,\mathrm{cm}$..
+\begin{aligned}
+T_c
+&=\frac{2\pi m_p}{qB}\\
+&=\frac{2\pi(1.67\times10^{-27})}
+{(1.60\times10^{-19})(0.50)}\\
+&=1.31\times10^{-7}\,\mathrm s.
+\end{aligned}
 $$
 
-5. Interpret the magnitude and sign in the original physical situation.
+Changing the proton to an electron at the same speed and field would sharply reduce the radius because the electron mass is smaller. Its curvature direction would also reverse because its charge is negative.
 
-**Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
+## Crossed fields as a velocity selector
 
-## Worked example 2
-
-**Problem.** A $0.30\,\mathrm{m}$ wire carries $4.0\,\mathrm{A}$ perpendicular to $0.20\,\mathrm{T}$. Find force.
-
-**Method.** Use the same modeling routine with a different unknown so the equation is not memorized in only one direction.
-
-1. Identify the system and the applicable approximation.
-2. Start from the governing equation.
-3. Rearrange before substituting values.
-4. The numerical work is
+Let an electric field and magnetic field be perpendicular to each other and to a particle beam. Orient them so their forces oppose. An undeflected particle satisfies
 
 $$
-$F=ILB=(4.0)(0.30)(0.20)=0.24\,\mathrm{N}$..
+\lvert q\rvert E=\lvert q\rvert vB,
 $$
 
-5. Compare with a nearby limiting case or a familiar scale.
+giving
 
-**Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
+$$
+v=\frac{E}{B}.
+$$
 
-## Code
+Charge magnitude and mass cancel. Faster particles experience the larger magnetic force and bend one way; slower particles are dominated by the electric force and bend the other way.
 
-```python
-mp=1.67e-27; e=1.60e-19
-print(mp*2e6/(e*0.50),4.0*0.30*0.20)
-```
+For $E=3.0\times10^4\,\mathrm{N/C}$ and $B=0.20\,\mathrm T$,
 
-## Common pitfalls
+$$
+v=\frac{3.0\times10^4}{0.20}
+=1.5\times10^5\,\mathrm{m/s}.
+$$
 
-- Forgetting the sine factor.
-- Ignoring charge sign in direction.
-- Expecting magnetic force alone to change speed.
-- Using electron drift direction for conventional current.
-- Always check units, signs, and limiting cases before treating a numerical result as finished.
+After selection, a second region containing only a magnetic field can sort particles by mass-to-charge ratio:
 
-A final check is to perturb one input mentally. Doubling a distance, mass, charge, stiffness, frequency, or temperature should change the answer in a way that matches the physical story. If the algebra says the opposite, revisit the setup before blaming arithmetic. Also remember that a negative answer is often information: it may indicate direction opposite to the chosen axis, work done by a system rather than on it, or a potential change that lowers the energy of a positive or negative charge differently.
+$$
+\frac{m}{\lvert q\rvert}=\frac{rB}{v}.
+$$
 
-When a problem feels difficult, the hidden issue is often not the last algebraic step but the first modeling decision. Re-read the words and mark what is being idealized: frictionless surface, ideal string, point charge, thin lens, small angle, steady flow, reversible process, nonrelativistic particle, or uniform field. Then mark what is conserved, if anything. Energy conservation, momentum conservation, angular momentum conservation, charge conservation, and entropy constraints are not interchangeable; each one has a system boundary and a transfer condition. If an external impulse acts, momentum may not be conserved for the chosen system. If friction acts within a block-floor system, mechanical energy is not conserved even though total energy is. If a Gaussian surface encloses no net charge, flux is zero, but the field at points on the surface need not be zero.
+This is the basic geometry behind a mass spectrometer. Ions with the same selected speed but different $m/\lvert q\rvert$ follow different radii.
 
-Another common pitfall is using a memorized equation in only its most familiar direction. A formula is a relationship, so practice solving it for different unknowns. In kinematics, solve for time, acceleration, or displacement depending on what the data support. In circuits, solve Ohm's law for voltage, current, or resistance and then check power. In optics, solve the thin-lens equation for image distance, object distance, or focal length and compare the sign with a ray diagram. In thermodynamics, rearrange the first law only after deciding whether work is done by the system or on the system. This flexibility prevents formula matching from replacing reasoning.
+## From moving charges to force on a wire
 
-Finally, keep scale awareness. Introductory physics problems often use idealized numbers, but the answers should still sit on recognizable scales: walking speeds are meters per second, orbital speeds are kilometers per second, visible wavelengths are hundreds of nanometers, household currents are often amperes or less, and thermal energies per molecule at room temperature are small in joules but meaningful in electron-volts. When an answer is many orders of magnitude away from these anchors, check unit conversions first. Prefix errors such as nano versus micro, centimeters versus meters, and milliseconds versus seconds are among the fastest ways to turn correct physics into a wrong result.
+In a straight conductor, many charge carriers drift through the material. Summing their magnetic forces gives
 
-For exam preparation, make the worked examples bidirectional. After solving a forward problem, change the target: ask what initial speed, resistance, angle, charge, temperature change, or wavelength would have produced the stated answer. This exposes whether you understand the structure or only followed the arithmetic once. Then make one assumption false and describe what would change. If air resistance is no longer negligible, projectile motion no longer separates into a constant horizontal speed. If a pulley has rotational inertia, the two string tensions need not match. If a lens is not thin, the thin-lens equation becomes an approximation. If a gas process is not reversible, entropy must be found from a reversible path connecting the same states, not from the literal irreversible path. These small variations turn a page of notes into a usable problem-solving tool.
+$$
+\vec F=I\vec L\times\vec B,
+$$
 
-Before leaving the problem, write one complete sentence that states the result in physical language. That sentence should name the object or system, the direction or sign when relevant, and the assumption under which the answer was obtained.
+where $\vec L$ points along conventional current. In a metal, electrons drift opposite to $\vec L$. Reversing both the carrier charge and its velocity leaves the conventional-current direction consistent.
 
-## Connections
+For a curved wire or nonuniform field, use
 
-- [Magnetic Sources and Induction](/physics/general/ampere-faraday-lenz-and-inductance)
-- [AC Circuits and EM Waves](/physics/general/ac-circuits-and-electromagnetic-waves)
+$$
+d\vec F=I\,d\vec\ell\times\vec B
+$$
+
+and integrate along the conductor. A closed loop in a uniform field has zero net force because opposite segments cancel. It may still have a torque.
+
+### Worked force on a wire
+
+A $0.30\,\mathrm m$ wire carries $4.0\,\mathrm A$ east through a $0.20\,\mathrm T$ field directed north. East crossed with north points upward, and the magnitude is
+
+$$
+F=ILB\sin90^\circ
+=(4.0)(0.30)(0.20)
+=0.24\,\mathrm N.
+$$
+
+If the wire is rotated until it lies $30^\circ$ from the field,
+
+$$
+F=(4.0)(0.30)(0.20)\sin30^\circ
+=0.12\,\mathrm N.
+$$
+
+If it becomes parallel, the force vanishes. The magnetic field does not push charges along a wire parallel to itself.
+
+## Torque and magnetic dipole energy
+
+For a planar loop carrying current $I$, define the magnetic dipole moment
+
+$$
+\vec\mu=NI\vec A,
+$$
+
+where $N$ is the turn count and $\vec A$ is normal to the loop by the right-hand rule. In a uniform field,
+
+$$
+\vec\tau=\vec\mu\times\vec B,
+\qquad
+\tau=\mu B\sin\theta.
+$$
+
+Opposite sides of a rectangular loop experience equal and opposite forces. Their net force is zero, but their lines of action differ, producing a couple. The associated potential energy is
+
+$$
+U=-\vec\mu\cdot\vec B=-\mu B\cos\theta.
+$$
+
+Stable equilibrium has $\vec\mu$ parallel to $\vec B$, where energy is minimum. Antiparallel alignment is unstable.
+
+Take a $50$-turn loop of area $2.0\times10^{-3}\,\mathrm{m^2}$ carrying $0.40\,\mathrm A$ in a $0.30\,\mathrm T$ field. When its moment is $60^\circ$ from the field,
+
+$$
+\mu=NIA=(50)(0.40)(2.0\times10^{-3})
+=4.0\times10^{-2}\,\mathrm{A\,m^2},
+$$
+
+and
+
+$$
+\tau=\mu B\sin60^\circ
+=(4.0\times10^{-2})(0.30)(0.866)
+=1.04\times10^{-2}\,\mathrm{N\,m}.
+$$
+
+This torque principle underlies simple motors and moving-coil meters. Continuous motor rotation also requires current switching or an alternating field so that torque continues in the desired rotational sense.
+
+## Sources of magnetic field
+
+Steady currents create magnetic fields. For a long straight wire,
+
+$$
+B=\frac{\mu_0I}{2\pi r},
+$$
+
+with circular field direction given by a right-hand grip around the current. For the center of a circular loop of radius $R$,
+
+$$
+B=\frac{\mu_0NI}{2R}.
+$$
+
+Inside an ideal long solenoid with $n$ turns per unit length,
+
+$$
+B\approx\mu_0nI.
+$$
+
+These are symmetry results from the Biot–Savart law or Ampère's law. The long-wire expression fails near the wire's ends or when its finite length matters. The ideal-solenoid result neglects edge fringing.
+
+Two long parallel wires illustrate how fields and forces combine. Currents in the same direction attract; opposite currents repel. Each wire creates a field at the other's position, and $I\vec L\times\vec B$ gives the resulting force. It is safer to derive the direction than to memorize the rule in isolation.
+
+## Hall voltage and the sign of charge carriers
+
+A current-carrying strip in a perpendicular magnetic field experiences sideways magnetic force on its mobile carriers. Charge accumulates along one edge until the resulting electric force balances the magnetic force:
+
+$$
+qE_H=qv_dB.
+$$
+
+Thus $E_H=v_dB$. For strip width $w$, the transverse Hall voltage magnitude is
+
+$$
+V_H=E_Hw.
+$$
+
+Its polarity reveals the sign of the dominant carriers. Combining Hall voltage with current and sample geometry can also determine carrier density. The simple formula assumes one dominant carrier type and a uniform sample.
+
+## Magnetic flux is not magnetic force
+
+Magnetic flux through a surface is
+
+$$
+\Phi_B=\int\vec B\cdot d\vec A.
+$$
+
+For uniform field through a flat area, $\Phi_B=BA\cos\theta$, where $\theta$ is measured from the area normal. Force on a moving charge instead contains a sine of the angle between velocity and field. Mixing these angles is common because both formulas involve $\vec B$ but represent different dot and cross products.
+
+Flux becomes central when fields change with time: Faraday's law relates changing flux to induced electric fields. A static uniform flux by itself does not imply a force on a stationary charge.
+
+## Magnetic dipoles in nonuniform fields
+
+A uniform field can rotate a dipole but exerts no net translational force on an ideal current loop. In a nonuniform field, the forces on opposite sides no longer cancel. For a dipole aligned along one dimension, the force is approximately
+
+$$
+F_x\approx\mu_x\frac{dB_x}{dx}.
+$$
+
+The dipole tends to move toward stronger field if its moment is aligned and toward weaker field if anti-aligned. A bar magnet near another magnet behaves this way; saying only that “north attracts south” does not account for the field gradient and orientation that produce net motion.
+
+Atomic magnetic moments arise from electron orbital motion and intrinsic spin. Their interaction energy still has the form $-\vec\mu\cdot\vec B$, although spin is a quantum property rather than a literal charged sphere rotating. Spatially varying fields can split beams according to moment orientation, as in the Stern–Gerlach experiment.
+
+## Magnetic materials
+
+Materials respond differently to applied fields. Diamagnetic response opposes the applied field and occurs in all matter, though it is usually weak. Paramagnetic materials contain moments that tend to align with the field but are randomized by thermal motion. Ferromagnets can develop strong collective alignment and retain magnetization after the external field is removed.
+
+Ferromagnetic material is divided into domains. Within a domain, many moments are aligned; an unmagnetized sample can still have domains oriented so their macroscopic fields largely cancel. An applied field changes domain walls and orientations. The resulting magnetization depends on the material's previous history, producing hysteresis.
+
+These responses mean that the simple vacuum relation between current and field may need a material model. Introductory force formulas using a specified $\vec B$ remain valid for a test charge, but predicting $\vec B$ inside a magnetic material requires more information than current geometry alone.
+
+## No isolated magnetic poles in classical electromagnetism
+
+Electric field lines may begin on positive charge and end on negative charge. Magnetic field lines form closed loops. Gauss's law for magnetism states
+
+$$
+\oint\vec B\cdot d\vec A=0
+$$
+
+for every closed surface. Magnetic flux entering a closed surface equals flux leaving it.
+
+Cutting a bar magnet in half does not isolate north and south poles; it produces two smaller dipoles. Magnetic monopoles have been considered in theoretical physics, but none is needed for the standard classical equations used here.
+
+The zero-flux law does not say the magnetic field is zero. A uniform field through a box has nonzero flux through individual faces, but opposite faces cancel in the closed-surface sum.
+
+## Worked helical path
+
+An electron enters a $0.080\,\mathrm T$ field with perpendicular velocity $v_\perp=3.0\times10^6\,\mathrm{m/s}$ and parallel velocity $v_\parallel=4.0\times10^6\,\mathrm{m/s}$. Its helical radius is
+
+$$
+\begin{aligned}
+r&=\frac{m_ev_\perp}{eB}\\
+&=\frac{(9.11\times10^{-31})(3.0\times10^6)}
+{(1.602\times10^{-19})(0.080)}\\
+&=2.13\times10^{-4}\,\mathrm m.
+\end{aligned}
+$$
+
+The cyclotron period is
+
+$$
+\begin{aligned}
+T_c&=\frac{2\pi m_e}{eB}\\
+&=4.47\times10^{-10}\,\mathrm s.
+\end{aligned}
+$$
+
+During one turn, the electron advances along the field by
+
+$$
+\text{pitch}=v_\parallel T_c
+=(4.0\times10^6)(4.47\times10^{-10})
+=1.79\times10^{-3}\,\mathrm m.
+$$
+
+The total speed stays $5.0\times10^6\,\mathrm{m/s}$ because the perpendicular and parallel components are unchanged in magnitude. Replacing total speed by $v_\perp$ in the radius and by $v_\parallel$ in the pitch is essential.
+
+## Magnetism and reference frames
+
+Electric and magnetic fields are different components of one electromagnetic field. A situation described as magnetic force in one inertial frame can involve a different mixture of electric and magnetic fields in another. For example, a neutral current-carrying wire in the laboratory can have a different charge density in a moving particle's frame because relativistic length contraction affects positive lattice charges and moving carriers differently.
+
+This frame dependence does not make magnetic effects optional. The combined Lorentz force transforms consistently, and all observers agree on the particle's physical trajectory after translating coordinates. It explains why electric and magnetic units and laws fit together so tightly.
+
+The field also depends on the observer, so a bare statement of $\vec B$ should be understood as belonging to a specified frame. Laboratory problems normally leave that frame implicit. When source and test-particle speeds are ordinary, transforming fields is unnecessary; the supplied laboratory fields and velocities belong in the Lorentz-force equation together.
+
+At high relative speed, electric and magnetic field transformation formulas are required; mixing quantities quoted in different frames gives no valid force.
+
+## Geometry and model checks
+
+- Draw $\vec v$, $\vec B$, and the positive-charge force before reversing for a negative charge.
+- The sine belongs to the angle between the vectors in the cross product. It is not automatically one.
+- A magnetic field alone cannot change a point charge's speed.
+- Conventional current points opposite electron drift in a metal.
+- The circular-radius formula uses the velocity component perpendicular to the field.
+- At relativistic speed, replace $mv$ by relativistic momentum.
+- A uniform field can torque a current loop with zero net force; a field gradient can also produce net force on a dipole.
+
+<div className="see-also">
+
+See also: [Ampère, Faraday, Lenz, and Inductance](/physics/general/ampere-faraday-lenz-and-inductance) · [AC Circuits and Electromagnetic Waves](/physics/general/ac-circuits-and-electromagnetic-waves) · [Relativity Intro](/physics/general/relativity-intro)
+
+</div>

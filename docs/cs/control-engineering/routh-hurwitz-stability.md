@@ -9,7 +9,7 @@ Stability is the nonnegotiable requirement in feedback design. A controller that
 
 The criterion is practical because closed-loop characteristic equations quickly become high order. For a feedback system, the denominator may include controller, plant, sensor, and load dynamics. Routh-Hurwitz lets the designer test stability and find allowable gain ranges by arithmetic on polynomial coefficients.
 
-## Definitions
+## Stability conditions and the Routh array
 
 For continuous-time linear time-invariant systems, the closed-loop characteristic equation is commonly written
 
@@ -48,9 +48,9 @@ $$
 
 and subsequent rows follow the same determinant-like pattern.
 
-## Key results
+## Reading the first column
 
-A necessary condition for all roots to be in the left half-plane is that all polynomial coefficients have the same sign and none are zero. This is not sufficient for order three and above, but it is a fast first check.
+A necessary condition for all roots to be in the left half-plane is that all polynomial coefficients have the same sign and none are zero. For order three and above this is only a fast first check, not a sufficient condition.
 
 The Routh-Hurwitz algorithm:
 
@@ -60,7 +60,7 @@ The Routh-Hurwitz algorithm:
 4. Count sign changes to obtain the number of right-half-plane roots.
 5. For stability, require no sign changes and no special-case imaginary-axis behavior.
 
-Two special cases require care. If the first element of a row is zero but the row is not all zero, replace that zero by a small positive $\epsilon$, complete the table, and evaluate sign changes as $\epsilon\to0^+$. This usually indicates roots near the imaginary axis or a structural difficulty in the array.
+Two special cases require care. If the first element of a row is zero but the row is not all zero, replace that zero by a small positive $\epsilon$, complete the table, and evaluate sign changes as $\epsilon\to0^+$. The zero blocks the usual recursion but does not by itself locate any root.
 
 If an entire row becomes zero, the polynomial has roots symmetrically located about the origin. Construct an auxiliary polynomial from the row immediately above the zero row, differentiate it, and replace the zero row with the derivative coefficients. The auxiliary polynomial can also reveal imaginary-axis roots.
 
@@ -84,11 +84,11 @@ The row-of-zeros case has a concrete interpretation. It indicates that part of t
 
 The epsilon case should also be interpreted rather than applied mechanically. A zero in the first column prevents the next row from being computed because the algorithm would divide by zero. Replacing it with $\epsilon$ asks how the sign pattern behaves for a tiny positive perturbation. If the limiting signs change, the system has right-half-plane roots. If the limiting behavior is ambiguous, direct root calculation or symbolic factoring may be appropriate.
 
-For low-order systems, Routh-Hurwitz reduces to familiar coefficient conditions. A first-order polynomial $s+a$ is stable if $a\gt 0$. A second-order polynomial $s^2+as+b$ is stable if $a\gt 0$ and $b\gt 0$. A third-order polynomial $s^3+a_2s^2+a_1s+a_0$ requires positive coefficients and $a_2a_1\gt a_0$. This last inequality is the first point where positive coefficients alone stop being sufficient.
+For low-order systems, Routh-Hurwitz reduces to familiar coefficient conditions. A first-order polynomial $s+a$ is stable if $a\gt 0$. A second-order polynomial $s^2+as+b$ is stable if $a\gt 0$ and $b\gt 0$. A third-order polynomial $s^3+a_2s^2+a_1s+a_0$ requires positive coefficients and $a_2a_1\gt a_0$. The cubic inequality is the first case in which positive coefficients alone are insufficient.
 
 Routh-Hurwitz tells how many roots are in the right half-plane, not where they are. It therefore answers the yes-or-no stability question and supports gain-boundary calculations, but it does not directly give settling time, overshoot, or damping ratio. Once a stable range is known, root locus, numerical poles, or time simulation is still needed to judge performance. A system can be stable and still unacceptable because it is slow, oscillatory, sensitive, or inaccurate.
 
-## Visual
+### Pole locations behind the count
 
 ```text
               Im
@@ -109,15 +109,13 @@ Routh-Hurwitz tells how many roots are in the right half-plane, not where they a
 | repeated $s=\pm j\omega$ | $t\sin\omega t$ terms | unstable |
 | $s=-\sigma\pm j\omega$ | decaying sinusoid | stable mode |
 
-## Worked example 1: Routh test for a cubic
+## A cubic with three stable roots
 
-Problem: Determine the stability of
+Determine the stability of
 
 $$
 D(s)=s^3+6s^2+11s+6.
 $$
-
-Method:
 
 1. Build the first two rows:
 
@@ -152,19 +150,17 @@ $$
 
 There are no sign changes.
 
-Checked answer: all roots are in the left half-plane, so the system is stable. In fact, $D(s)=(s+1)(s+2)(s+3)$.
+There are no right-half-plane roots, so the system is stable. Factoring confirms $D(s)=(s+1)(s+2)(s+3)$.
 
-## Worked example 2: gain range for stability
+## Solving for an allowable gain range
 
-Problem: A unity-feedback system has characteristic equation
+A unity-feedback system has characteristic equation
 
 $$
 D(s)=s^3+4s^2+5s+K.
 $$
 
 Find the range of $K$ for closed-loop stability.
-
-Method:
 
 1. Necessary coefficient conditions require
 
@@ -205,9 +201,11 @@ $$
 0<K<20.
 $$
 
-Checked answer: the closed-loop system is stable for $0\lt K\lt 20$. At $K=20$, the $s^1$ row becomes zero, indicating an imaginary-axis boundary case.
+The closed-loop system is stable for $0\lt K\lt 20$. At $K=20$, the $s^1$ row becomes zero, indicating an imaginary-axis boundary case.
 
-## Code
+## Checking an ordinary Routh table numerically
+
+This implementation handles a zero leading entry with a small positive perturbation. It does not implement the auxiliary-polynomial procedure for an entire row of zeros, so those cases still need symbolic handling.
 
 ```python
 import numpy as np
@@ -238,7 +236,7 @@ print("right-half-plane roots:", sign_changes)
 print("numeric roots:", np.roots(coeffs))
 ```
 
-## Common pitfalls
+## Where a stability count goes wrong
 
 - Testing open-loop poles when the question asks about closed-loop stability.
 - Assuming positive coefficients are sufficient for high-order stability.
@@ -247,10 +245,14 @@ print("numeric roots:", np.roots(coeffs))
 - Ignoring pole-zero cancellations. An unstable hidden mode may not appear in a simplified transfer function.
 - Confusing marginal natural-response stability with BIBO stability.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Time response](/cs/control-engineering/time-response-first-and-second-order) explains how pole locations shape decay and oscillation.
 - [Root locus](/cs/control-engineering/root-locus-sketching-and-analysis) shows how poles move as gain changes.
 - [Nyquist margins](/cs/control-engineering/nyquist-and-frequency-stability-margins) gives a frequency-domain stability test.
 - [State-space modeling](/cs/control-engineering/state-space-modeling-and-conversions) uses $\det(sI-A)$ for stability.
 - [Complex functions](/math/engineering-math/complex-functions-and-analyticity) supports the half-plane and contour ideas used later.
+
+</div>

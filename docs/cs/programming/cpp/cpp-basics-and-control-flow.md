@@ -378,11 +378,8 @@ Increment operators also carry a sequencing distinction. `++i` increments and yi
 
 Input validation must handle stream state, not only numeric range. If `std::cin >> itemCount` encounters letters, the stream enters a failed state and leaves the destination unchanged. Repeating the same extraction without clearing the state and discarding the offending input creates an infinite loop. Programs that do not intend to recover can report the error and return immediately.
 
-## Related pages
+<div className="see-also">
 
-- [functions and parameters](/cs/programming/cpp/functions-parameters-and-scope)
-- [arrays](/cs/programming/cpp/arrays)
-- [strings](/cs/programming/cpp/strings)
-- [streams and file I/O](/cs/programming/cpp/streams-and-file-io)
-- [exception handling](/cs/programming/cpp/exception-handling)
+See also: [functions and parameters](/cs/programming/cpp/functions-parameters-and-scope) · [arrays](/cs/programming/cpp/arrays) · [strings](/cs/programming/cpp/strings) · [streams and file I/O](/cs/programming/cpp/streams-and-file-io) · [exception handling](/cs/programming/cpp/exception-handling)
 
+</div>

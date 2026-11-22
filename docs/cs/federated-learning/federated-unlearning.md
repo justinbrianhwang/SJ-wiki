@@ -7,13 +7,13 @@ sidebar_position: 7
 
 Federated unlearning asks how a federated model can remove the influence of a client, sample, class, or poisoned data source without rerunning the entire federated training process. The motivation is partly legal: GDPR Article 17 and California deletion rights give data subjects ways to request deletion of personal data, subject to exceptions [1], [2]. It is also operational: if one hospital uploaded poisoned gradients, one mobile cohort was mislabeled, or one silo's consent expires, a production FL system needs a way to repair the model while preserving utility for retained clients.
 
-The difficulty is that federated learning does not merely append independent client records to a model. Every round broadcasts a model already influenced by earlier clients, then asks later clients to train from that coupled state. This chapter therefore treats federated unlearning as its own systems and optimization problem, linking the FedAvg loop, privacy controls, poisoning recovery, and audit requirements from the rest of the Federated Learning section.
+The difficulty is that federated learning does not merely append independent client records to a model. Every round broadcasts a model already influenced by earlier clients, then asks later clients to train from that coupled state. Federated unlearning is therefore a systems and optimization problem spanning the FedAvg loop, privacy controls, poisoning recovery, and audit requirements.
 
 ![FedOSD three-client gradient-conflict diagram](https://ar5iv.labs.arxiv.org/html/2412.20200/assets/x1.png)
 
-*Figure: FedOSD's three-client gradient-conflict geometry. A naive unlearning direction for the target client can conflict with retained clients, while the projected FedOSD direction is non-conflicting. From [Pan et al., 2025](https://arxiv.org/abs/2412.20200) - embedded under educational fair use with attribution.*
+*Figure: FedOSD's three-client gradient-conflict geometry. A naive unlearning direction for the target client can conflict with retained clients, while the projected direction is non-conflicting. From [Pan et al., 2025](https://arxiv.org/abs/2412.20200), reproduced with attribution for discussion.*
 
-## Definitions
+## What it means for a federated model to forget
 
 **Machine unlearning** is the task of producing a model that behaves as if some training data had never been used. The gold standard is exact retraining: delete the requested data, rerun the original training algorithm on the retained data with the same protocol, and deploy the retrained model. Exact retraining is conceptually clean but can be unaffordable in FL because it repeats communication rounds, client scheduling, local training, secure aggregation, validation, and rollout.
 
@@ -31,7 +31,7 @@ Centralized unlearning gives important baselines but does not transfer directly.
 
 These baselines assume central access to retained data or algorithmic state that FL deliberately avoids. FU must handle forward coupling across rounds, non-IID client distributions, limited availability, secure aggregation, differential privacy noise, and audit requirements. A server that stored no individual updates may be unable to identify the target client's contribution; a server that stored every update may have created a new privacy liability.
 
-## Key results
+## Reconstructing, reversing, projecting, or perturbing
 
 FedAvg trains by broadcasting a global model $\theta_t$, collecting local updates $\Delta_{k,t}$ from selected clients $S_t$, and aggregating with data-size or policy weights:
 
@@ -98,8 +98,6 @@ Evaluation should report at least five quantities. **Residual knowledge** is oft
 
 Open challenges follow directly from these tradeoffs. Secure aggregation hides individual updates that many FU methods need. Differential privacy can reduce memorization but also complicates accounting after post-hoc deletion. Cross-device FU must handle unavailable clients and missing historical records. Class- and feature-level unlearning require finer granularity than client removal. Federated LLM and FedLoRA settings shift the target from full weights to adapters, prompts, or low-rank deltas [25], [26]. Adversarial clients may issue requests to learn about others or to damage the model. Regulators and users may demand a verifiable proof of erasure rather than a similarity score.
 
-## Visual
-
 ```mermaid
 flowchart LR
   Req["Unlearning request"] --> Choice{"Choose FU path"}
@@ -137,7 +135,7 @@ flowchart LR
 | Distillation | No target data, but needs retained/proxy signal | Sometimes | Recovers utility | Teacher leakage or proxy bias |
 | Pruning / sparsity | Usually class statistics | No | Natural for class unlearning | Hard for arbitrary clients |
 
-## Worked example 1: FedEraser calibration on three clients
+## Replaying a round without the erased client
 
 **Problem.** Three clients trained a two-parameter model. Client 2 requests unlearning. At one retained round, the server has historical updates
 
@@ -198,7 +196,7 @@ $$
 
 The target client's update never appears in the aggregation, and the retained clients' directions are recomputed from a target-free calibration state.
 
-## Worked example 2: FedOSD orthogonal projection
+## Projecting away retained-client conflicts
 
 **Problem.** A target client computes the UCE gradient
 
@@ -274,7 +272,7 @@ $$
 
 The first-order retained-client loss change is neutral, while the target-client UCE loss decreases.
 
-## Code
+## Reproducing the calibration and projection
 
 ```python
 import numpy as np
@@ -308,7 +306,7 @@ print("Retained dot products:", retained @ d)
 print("Target dot product:", target @ d)
 ```
 
-## Common pitfalls
+## What an erasure claim must establish
 
 - Treating deletion of raw client data as deletion of its learned influence.
 - Comparing against FedAvg instead of exact retraining on retained data.
@@ -324,17 +322,6 @@ print("Target dot product:", target @ d)
 - Assuming differential privacy automatically satisfies deletion requests after training.
 - Omitting audit logs, request identity, model lineage, and validation artifacts.
 - Using public proxy data for distillation without checking distribution and privacy bias.
-
-## Connections
-
-- [Federated Learning](/cs/federated-learning/intro)
-- [Foundations and FedAvg](/cs/federated-learning/foundations-and-fedavg)
-- [Privacy: Differential Privacy and Secure Aggregation](/cs/federated-learning/privacy-differential-and-secure-aggregation)
-- [Communication Efficiency and Robustness](/cs/federated-learning/communication-efficiency-and-robustness)
-- [Applications and Systems](/cs/federated-learning/applications-and-systems)
-- [Adversarial Attacks](/cs/adversarial-attacks/intro)
-- [Cryptography](/cs/cryptography/intro)
-- [Optimization algorithms](/cs/deep-learning/optimization-algorithms)
 
 ## References
 
@@ -389,3 +376,9 @@ print("Target dot product:", target @ d)
 [25] E. J. Hu et al., "LoRA: Low-Rank Adaptation of Large Language Models," ICLR, 2022. https://arxiv.org/abs/2106.09685
 
 [26] Y. Yang et al., "Federated Low-Rank Adaptation for Foundation Models: A Survey," arXiv:2505.13502, 2025. https://arxiv.org/abs/2505.13502
+
+<div className="see-also">
+
+See also: [Federated Learning](/cs/federated-learning/intro) · [Foundations and FedAvg](/cs/federated-learning/foundations-and-fedavg) · [Privacy: Differential Privacy and Secure Aggregation](/cs/federated-learning/privacy-differential-and-secure-aggregation) · [Communication Efficiency and Robustness](/cs/federated-learning/communication-efficiency-and-robustness) · [Applications and Systems](/cs/federated-learning/applications-and-systems) · [Adversarial Attacks](/cs/adversarial-attacks/intro) · [Cryptography](/cs/cryptography/intro) · [Optimization algorithms](/cs/deep-learning/optimization-algorithms)
+
+</div>

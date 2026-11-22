@@ -5,11 +5,11 @@ sidebar_position: 14
 
 # Standard Library Highlights
 
-Python is often described as having "batteries included." Halvorsen's textbook introduces the standard library through modules such as `math` and through the general idea that Python ships with reusable modules for common tasks. That point deserves emphasis: before installing a package or writing a custom parser, check whether the standard library already solves the problem.
+Python is often described as having "batteries included." Halvorsen's textbook introduces the standard library through modules such as `math` and through the general idea that Python ships with reusable modules for common tasks. Before installing a package or writing a custom parser, check whether the standard library already solves the problem.
 
-This page focuses on a practical subset: `pathlib` for paths, `collections` for better containers, `datetime` for dates and times, `json` for structured data, and `re` for regular expressions. These modules cover a large fraction of everyday scripting. They also model a broader principle: use specialized library types instead of ad hoc string manipulation or fragile conventions.
+Five modules cover a large fraction of everyday scripting: `pathlib` for paths, `collections` for better containers, `datetime` for dates and times, `json` for structured data, and `re` for regular expressions. They favor specialized library types over ad hoc string manipulation and fragile conventions.
 
-## Definitions
+## Five modules that replace ad hoc code
 
 `pathlib` provides object-oriented filesystem paths. `Path("data") / "file.txt"` builds a path without hard-coding a slash style.
 
@@ -29,36 +29,36 @@ from collections import Counter
 import json
 ```
 
-## Key results
+## Where the library saves custom machinery
 
-The first key result is that `pathlib.Path` should usually replace path string concatenation. It makes path joining, suffix checks, parent directories, file reads, and file writes more readable:
+`pathlib.Path` should usually replace path string concatenation. It makes path joining, suffix checks, parent directories, file reads, and file writes more readable:
 
 ```python
 path = Path("data") / "readings.json"
 text = path.read_text(encoding="utf-8")
 ```
 
-The second result is that `Counter` and `defaultdict` remove common manual patterns. Counting values does not require an `if key not in counts` block; grouping records does not require repeated setup of empty lists.
+`Counter` and `defaultdict` remove common manual patterns. Counting values does not require an `if key not in counts` block; grouping records does not require repeated setup of empty lists.
 
-The third result is that datetimes should be parsed and formatted deliberately. Human-readable date strings are not dates until parsed. Durations should use `timedelta`, not magic numbers scattered through code. Time zones are a serious topic; avoid mixing naive and aware datetimes in production systems.
+Datetimes should be parsed and formatted deliberately. Human-readable date strings are not dates until parsed. Durations should use `timedelta`, not magic numbers scattered through code. Time zones are a serious topic; avoid mixing naive and aware datetimes in production systems.
 
-The fourth result is that JSON is for data, not arbitrary Python objects. A set, datetime, or custom class is not automatically JSON serializable. Convert to dictionaries, lists, strings, and numbers first.
+JSON is for data, not arbitrary Python objects. A set, datetime, or custom class is not automatically JSON serializable. Convert to dictionaries, lists, strings, and numbers first.
 
-The fifth result is that regular expressions should be compiled or named when patterns matter. A raw string avoids accidental backslash escapes:
+Regular expressions should be compiled or named when patterns matter. A raw string avoids accidental backslash escapes:
 
 ```python
 pattern = re.compile(r"^[A-Z]\d{3}$")
 ```
 
-The sixth result is that standard library modules compose well. A script might use `Path` to find JSON files, `json` to parse them, `Counter` to summarize statuses, `datetime` to parse timestamps, and `re` to validate IDs.
+Standard library modules compose well. A script might use `Path` to find JSON files, `json` to parse them, `Counter` to summarize statuses, `datetime` to parse timestamps, and `re` to validate IDs.
 
-A seventh result is that using the standard library often improves portability. A hand-written path join might work on one operating system and fail on another. A manual date parser might accept one format accidentally and reject a valid case. A custom JSON-like format might be easy to write but hard to read safely. Standard modules encode many edge cases that ordinary scripts should not rediscover.
+Using the standard library often improves portability. A hand-written path join might work on one operating system and fail on another. A manual date parser might accept one format accidentally and reject a valid case. A custom JSON-like format might be easy to write but hard to read safely. Standard modules encode many edge cases that ordinary scripts should not rediscover.
 
-An eighth result is that standard does not mean small or trivial. Modules such as `sqlite3`, `subprocess`, `logging`, `argparse`, `statistics`, `decimal`, `fractions`, `tempfile`, and `pathlib` can replace substantial custom code. When a task feels common, search the standard library index before adding a dependency. A third-party package may still be the right choice, but the decision should be informed.
+Standard does not mean small or trivial. Modules such as `sqlite3`, `subprocess`, `logging`, `argparse`, `statistics`, `decimal`, `fractions`, `tempfile`, and `pathlib` can replace substantial custom code. When a task feels common, search the standard library index before adding a dependency. A third-party package may still be the right choice, but the decision should be informed.
 
 Finally, standard-library code still needs careful boundaries. A regular expression can be wrong. A JSON schema can be too loose. A path can point to the wrong directory. A datetime can be naive when a timezone-aware value is required. Library use removes boilerplate; it does not remove the need to state assumptions and test important behavior.
 
-## Visual
+The table separates responsibilities; the pipeline shows how the modules can cooperate without taking over one another's jobs:
 
 | Module | Main job | Good for | Avoid using it for |
 |---|---|---|---|
@@ -81,7 +81,7 @@ flowchart TD
   F --> G
 ```
 
-## Worked example 1: count statuses in JSON files
+## Counting statuses across JSON log files
 
 Problem: given a directory of JSON log files, count how many records have each status.
 
@@ -132,7 +132,7 @@ counts == Counter({"OK": 1, "WARN": 1})
 
 If three files are processed, the final counts are the sum across all records in all files.
 
-## Worked example 2: validate and parse IDs with dates
+## Parsing an ID that contains a date
 
 Problem: parse sample labels like `"A123-2026-05-16"` into a prefix, numeric ID, and date.
 
@@ -182,7 +182,7 @@ number == 123
 day.isoformat() == "2026-05-16"
 ```
 
-## Code
+## Composing paths, JSON, datetimes, and grouping
 
 ```python
 from collections import defaultdict
@@ -217,13 +217,11 @@ print(group_events_by_day(sample))
 
 This runnable example uses `Path`, `json`, `datetime`, and `defaultdict` together in a small but realistic workflow.
 
-In a real project, split the sample-writing code from the grouping function. The function should read and group; the sample setup belongs in a test, a demo, or an `if __name__ == "__main__":` block. This distinction matters because imports should not create files as a side effect. The snippet is compact for learning, but production modules should keep examples away from reusable definitions so importing the module is predictable.
-
-The broader lesson is that standard library modules are building blocks. Compose them deliberately, and keep side effects at the program boundary.
+In a real project, split the sample-writing code from the grouping function. The function should read and group; the sample setup belongs in a test, a demo, or an `if __name__ == "__main__":` block. This distinction matters because imports should not create files as a side effect. The compact example keeps both pieces together for learning, but production modules should keep demos away from reusable definitions so importing the module is predictable.
 
 A useful study exercise is to rewrite a small manual solution with one standard library module. Replace a counting dictionary with `Counter`, string path joins with `Path`, manual JSON formatting with `json.dumps`, or hand-written date slicing with `datetime.fromisoformat`. The comparison makes the library's value concrete.
 
-## Common pitfalls
+## Boundary conditions the modules do not decide for you
 
 - Building paths with hard-coded slashes instead of `Path`.
 - Using `defaultdict` where a missing key should be treated as an error.
@@ -233,9 +231,8 @@ A useful study exercise is to rewrite a small manual solution with one standard 
 - Using regular expressions for simple `.split()` or `.startswith()` tasks.
 - Forgetting raw strings for regex patterns that contain backslashes.
 
-## Connections
+<div className="see-also">
 
-- [Files and Context Managers](/cs/programming/python/files-and-context-managers)
-- [Strings and Text Processing](/cs/programming/python/strings-and-text-processing)
-- [Containers and Idioms](/cs/programming/python/containers-and-idioms)
-- [Testing and the Scientific Stack](/cs/programming/python/testing-and-scientific-stack)
+See also: [Files and Context Managers](/cs/programming/python/files-and-context-managers) · [Strings and Text Processing](/cs/programming/python/strings-and-text-processing) · [Containers and Idioms](/cs/programming/python/containers-and-idioms) · [Testing and the Scientific Stack](/cs/programming/python/testing-and-scientific-stack)
+
+</div>

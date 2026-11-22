@@ -351,10 +351,8 @@ The function exposes the three inputs that drive diagnostic interpretation: prev
 - Assuming sampling without replacement is independent in small populations.
 - Using combinations when order matters, or permutations when it does not.
 
-## Related pages
+<div className="see-also">
 
-- [Random variables and probability distributions](/math/statistics/random-variables-and-distributions)
-- [Normal, t, chi-square, and F distributions](/math/statistics/normal-t-chi-square-and-f-distributions)
-- [Sampling distributions and the central limit theorem](/math/statistics/sampling-distributions-and-clt)
-- [Hypothesis testing logic](/math/statistics/hypothesis-testing-logic)
-- [Proportions and chi-square tests](/math/statistics/proportions-and-chi-square-tests)
+See also: [Random variables and probability distributions](/math/statistics/random-variables-and-distributions) · [Normal, t, chi-square, and F distributions](/math/statistics/normal-t-chi-square-and-f-distributions) · [Sampling distributions and the central limit theorem](/math/statistics/sampling-distributions-and-clt) · [Hypothesis testing logic](/math/statistics/hypothesis-testing-logic) · [Proportions and chi-square tests](/math/statistics/proportions-and-chi-square-tests)
+
+</div>

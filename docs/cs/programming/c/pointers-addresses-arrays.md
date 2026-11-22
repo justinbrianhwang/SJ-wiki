@@ -9,7 +9,7 @@ Pointers are the central C idea after functions. A pointer is a value that locat
 
 Arrays and pointers are taught together because C connects them tightly. An array expression usually converts to a pointer to its first element. Pointer arithmetic moves by elements, not bytes. Function parameters declared as arrays are really pointer parameters. These rules explain much of the compact style that C inherited from early UNIX programming.
 
-## Definitions
+## Addressing objects and stepping through arrays
 
 The address operator `&` produces the address of an object:
 
@@ -58,7 +58,7 @@ int strlen_kr(char *s);
 
 `NULL` is the conventional null pointer constant. A null pointer compares unequal to any valid object pointer and is used to signal "no object" or failure.
 
-## Key results
+## Boundaries, decay, and ownership
 
 Pointer arguments are how C functions modify caller objects. Since scalar arguments are passed by value, `swap(a, b)` cannot exchange caller variables. The caller must pass addresses with `swap(&a, &b)`, and the function must dereference pointer parameters.
 
@@ -82,7 +82,7 @@ Pointer types also document scale. An `int *` says that `p + 1` moves by one `in
 
 The safest pointer loops have an explicit boundary or sentinel. A string loop uses `'\0'` as its sentinel. An array loop should use a count or an end pointer computed from the same array. Avoid loops whose stopping condition depends on memory outside the object; C will not detect that mistake before the program has already executed undefined behavior.
 
-## Visual
+The scaling rule is easiest to see on a contiguous array:
 
 ```text
 int a[5] = { 10, 20, 30, 40, 50 };
@@ -110,56 +110,46 @@ pa + 2 points to a[2]
 | `pa - a` | element distance from first element | yes, same array |
 | `pa < other_array` | compare unrelated arrays | undefined behavior |
 
-## Worked example 1: Swapping through pointer arguments
+## Swapping the caller's objects rather than local copies
 
-Problem: exchange two caller variables `a = 3` and `b = 9` using a function.
+Suppose `a = 3` and `b = 9`. A function that receives only their values cannot exchange the caller's objects:
 
-Method:
+```c
+void swap_bad(int x, int y)
+{
+    int temp = x;
+    x = y;
+    y = temp;
+}
+```
 
-1. A wrong function receives copies:
+Calling `swap_bad(a, b)` copies `3` into `x` and `9` into `y`. Those copies are swapped, then discarded. The useful version receives addresses:
 
-   ```c
-   void swap_bad(int x, int y)
-   {
-       int temp = x;
-       x = y;
-       y = temp;
-   }
-   ```
+```c
+swap(&a, &b);
+```
 
-   Calling `swap_bad(a, b)` copies `3` into `x` and `9` into `y`. The copies are swapped, then discarded.
+```c
+void swap(int *px, int *py)
+{
+    int temp = *px;
+    *px = *py;
+    *py = temp;
+}
+```
 
-2. Correct call passes addresses:
+The assignments operate on the pointed-to objects:
 
-   ```c
-   swap(&a, &b);
-   ```
+- `px` points to `a`; `py` points to `b`.
+- `temp = *px` stores `3`.
+- `*px = *py` stores `9` into `a`.
+- `*py = temp` stores `3` into `b`.
 
-3. Correct function:
+After the call, `a = 9` and `b = 3`.
 
-   ```c
-   void swap(int *px, int *py)
-   {
-       int temp = *px;
-       *px = *py;
-       *py = temp;
-   }
-   ```
+## Measuring `"cat"` from two pointers
 
-4. Trace:
-
-   - `px` points to `a`; `py` points to `b`.
-   - `temp = *px` stores `3`.
-   - `*px = *py` stores `9` into `a`.
-   - `*py = temp` stores `3` into `b`.
-
-Checked answer: after the call, `a = 9` and `b = 3`.
-
-## Worked example 2: Computing string length by pointer subtraction
-
-Problem: compute the length of `"cat"` using a pointer-walking version of `strlen`.
-
-Method:
+A pointer-walking `strlen` keeps the start address and advances a second pointer:
 
 ```c
 int strlen_kr(char *s)
@@ -184,11 +174,13 @@ int strlen_kr(char *s)
 6. Test false. Stop.
 7. Pointer difference:
 
-   $$p - s = 3.$$
+$$
+p - s = 3.
+$$
 
-Checked answer: the length is `3`, excluding the terminating null character.
+The difference is `3`, excluding the terminating null character.
 
-## Code
+## Reversing a mutable array in place
 
 ```c
 #include <stdio.h>
@@ -220,7 +212,7 @@ int main(void)
 }
 ```
 
-## Common pitfalls
+## Pointers that outlive or leave their objects
 
 - Dereferencing an uninitialized pointer. A pointer must point to a valid object or be a null pointer before meaningful use.
 - Treating arrays as assignable. You can copy elements, but not assign one array object to another with `=`.
@@ -230,10 +222,8 @@ int main(void)
 - Assuming `sizeof parameter_array` gives the original array size. In a function parameter, the array has already become a pointer.
 - Casting arbitrary integers to pointers. Except for the null pointer constant, pointers and integers are not interchangeable.
 
-## Connections
+<div className="see-also">
 
-- [Types, Operators, and Expressions](/cs/programming/c/types-operators-expressions)
-- [Functions and Program Structure](/cs/programming/c/functions-program-structure)
-- [Strings, Pointer Arrays, and Command-Line Arguments](/cs/programming/c/strings-pointer-arrays-command-line)
-- [Function Pointers and Complex Declarations](/cs/programming/c/function-pointers-complex-declarations)
-- [Storage Allocation](/cs/programming/c/storage-allocation)
+See also: [Types, Operators, and Expressions](/cs/programming/c/types-operators-expressions) · [Functions and Program Structure](/cs/programming/c/functions-program-structure) · [Strings, Pointer Arrays, and Command-Line Arguments](/cs/programming/c/strings-pointer-arrays-command-line) · [Function Pointers and Complex Declarations](/cs/programming/c/function-pointers-complex-declarations) · [Storage Allocation](/cs/programming/c/storage-allocation)
+
+</div>

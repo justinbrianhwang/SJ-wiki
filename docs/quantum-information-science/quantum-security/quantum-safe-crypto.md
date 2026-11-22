@@ -9,11 +9,11 @@ Quantum-safe cryptography is the engineering program that moves deployed systems
 
 The practical goal is not to panic about every cryptographic primitive. The goal is to identify where RSA, Diffie-Hellman, ECDH, DSA, ECDSA, and EdDSA are used for key establishment or signatures, then replace those uses with standardized post-quantum or hybrid constructions. Symmetric cryptography usually needs parameter review, such as preferring 256-bit keys for long-lived confidentiality, but the main operational burden is public-key migration.
 
+## What has to migrate
+
 ![A public-key shared-secret diagram shows two parties deriving a shared value from private and public inputs.](https://commons.wikimedia.org/wiki/Special:FilePath/Public_key_shared_secret.svg)
 
 *Figure: Migration work starts where public-key key establishment appears in real protocols, because those exchanges expose long-lived confidentiality to harvest-now risk. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Public_key_shared_secret.svg), Davidgothberg, public domain.*
-
-## Definitions
 
 **Quantum-safe cryptography** means cryptographic deployment that is intended to remain secure in the presence of known quantum attacks. In practice this usually means PQC for public-key functions, adequate symmetric key lengths, and protocols that can negotiate or rotate algorithms without redesign.
 
@@ -27,23 +27,23 @@ A **migration priority** is a risk-based ordering. Public endpoints carrying lon
 
 A **harvest-now, decrypt-later** risk exists when an attacker can record protected data now and decrypt it later after a quantum break. It is mainly a confidentiality problem for key establishment. Signature migration has a related but different problem: old signatures and old trust roots may remain accepted after their algorithms become forgeable.
 
-The standards snapshot for this page is May 16, 2026. NIST's final first-wave PQC standards are FIPS 203 for ML-KEM, FIPS 204 for ML-DSA, and FIPS 205 for SLH-DSA, all approved on August 13, 2024. HQC was selected in March 2025 for future KEM standardization. Falcon/FN-DSA is planned as FIPS 206 but is still in development in the latest NIST material checked for this page.
+As of November 22, 2026, NIST's final first-wave PQC standards are FIPS 203 for ML-KEM, FIPS 204 for ML-DSA, and FIPS 205 for SLH-DSA, all approved on August 13, 2024. HQC was selected in March 2025 for future KEM standardization. Falcon/FN-DSA is planned as FIPS 206 and remains in development.
 
-## Key results
+## A migration order that starts with exposure
 
-The first migration result is that **inventory precedes replacement**. A system owner must know where quantum-vulnerable algorithms are used before choosing a deployment order. TLS certificates are visible, but many important uses are not: S/MIME, JWT signing, database client certificates, package repositories, update manifests, secure boot, backups, device enrollment, manufacturing certificates, VPN appliances, SSH host keys, and custom protocols.
+**Inventory precedes replacement.** A system owner must know where quantum-vulnerable algorithms are used before choosing a deployment order. TLS certificates are easy to find, but S/MIME, JWT signing, database client certificates, package repositories, update manifests, secure boot, backups, device enrollment, manufacturing certificates, VPN appliances, SSH host keys, and custom protocols often are not.
 
-The second result is that **hybrid deployment reduces transition risk**. A hybrid such as X25519 plus ML-KEM-768 can keep the classical security properties operators already rely on while adding protection against future quantum attacks. If the PQC component later suffers a classical break, the classical component still protects against ordinary attackers. If a future quantum computer breaks X25519, the PQC component is intended to preserve confidentiality. This "both must fail" intuition is powerful, but it depends on correct protocol design.
+**Hybrid deployment reduces transition risk.** A hybrid such as X25519 plus ML-KEM-768 can keep the classical security properties operators already rely on while adding protection against future quantum attacks. If the PQC component later suffers a classical break, the classical component still protects against ordinary attackers. If a future quantum computer breaks X25519, the PQC component is intended to preserve confidentiality. The "both must fail" intuition depends on a sound combiner, transcript binding, downgrade protection, and correct failure handling.
 
 Large providers tested this path before final standards settled. AWS announced hybrid post-quantum TLS for connections to KMS and ACM in 2022. Cloudflare deployed hybrid post-quantum key agreement for TLS 1.3 at large scale, with public documentation noting support across websites and APIs served through its network. Google and Chromium rolled out X25519Kyber768 experimentation in 2023 and enabled a Kyber draft by default for TLS 1.3 and QUIC on desktop Chrome in 2024, later moving toward ML-KEM naming and final-standard alignment. These deployments should be read as ecosystem migration evidence, not as a blanket claim that every implementation or configuration is secure.
 
-The third result is that **sizes matter**. A classical X25519 key share is 32 bytes. ML-KEM-768 has an encapsulation key of 1184 bytes and a ciphertext of 1088 bytes. Hybrid TLS key establishment therefore adds roughly a couple of kilobytes to the handshake. That is often acceptable, but it can expose packet fragmentation, middlebox limits, hardware parser assumptions, and latency sensitivity. Signatures are often more disruptive: ML-DSA signatures are several kilobytes, while SLH-DSA signatures range from roughly 8 KB to roughly 50 KB depending on parameter set. Certificate chains, transparency logs, constrained links, and firmware update formats must be tested with real sizes.
+**Message sizes have to be measured.** A classical X25519 key share is 32 bytes. ML-KEM-768 has an encapsulation key of 1184 bytes and a ciphertext of 1088 bytes. Hybrid TLS key establishment therefore adds roughly a couple of kilobytes to the handshake. That is often acceptable, but it can expose packet fragmentation, middlebox limits, hardware parser assumptions, and latency sensitivity. Signatures are often more disruptive: ML-DSA signatures are several kilobytes, while SLH-DSA signatures range from roughly 8 KB to roughly 50 KB depending on parameter set. Certificate chains, transparency logs, constrained links, and firmware update formats must be tested with real sizes.
 
-The fourth result is that **timelines are policy and risk tools, not physical predictions**. NSA's CNSA 2.0 guidance for U.S. National Security Systems targets completion of the quantum-resistant transition by 2035, with earlier milestones for some systems and use cases. NIST's transition planning similarly points to deprecating and ultimately disallowing quantum-vulnerable public-key algorithms in federal standards by 2035, with high-risk systems moving earlier. Private organizations should map those dates to their own data lifetimes, product support windows, procurement cycles, and regulatory obligations.
+**Timelines are policy and risk tools, not physical predictions.** NSA's CNSA 2.0 guidance for U.S. National Security Systems targets completion of the quantum-resistant transition by 2035, with earlier milestones for some systems and use cases. Final [NIST IR 8547](https://csrc.nist.gov/pubs/ir/8547/final), published October 27, 2026, likewise sets a transition path that removes quantum-vulnerable algorithms from NIST standards by 2035, with high-risk systems moving earlier. Private organizations should map those dates to their own data lifetimes, product support windows, procurement cycles, and regulatory obligations.
 
-The fifth result is that **migration remains open-ended**. The first standardized algorithms are not the last word. NIST continues work on additional KEM guidance, HQC standardization, FN-DSA, and additional signature candidates. Side-channel resistance, formal security of hybrid modes, embedded performance, hardware acceleration, certificate ecosystem changes, and long-tail device replacement are active engineering problems.
+**Migration remains open-ended.** The first standardized algorithms are not the last word. NIST continues work on HQC standardization, FN-DSA, and additional signature candidates. Side-channel resistance, formal security of hybrid modes, embedded performance, hardware acceleration, certificate ecosystem changes, and long-tail device replacement are active engineering problems.
 
-## Visual
+## Hybrid handshakes inside the migration loop
 
 Quantum-safe migration is best treated as a lifecycle rather than a one-time algorithm swap.
 
@@ -77,7 +77,7 @@ flowchart TB
   Tele -. "detect downgrade or incompatibility" .-> Handshake
 ```
 
-The diagram combines a concrete hybrid TLS 1.3 handshake with the operational migration loop around it. The TLS branch shows classical X25519 and ML-KEM material being combined into handshake secrets, while authentication is called out separately because PQ signatures and certificates have different deployment constraints from KEMs. The migration branch tracks inventory, risk scoring, size and parser testing, staged rollout, telemetry, retirement, and standards monitoring.
+The TLS branch combines classical X25519 and ML-KEM material into handshake secrets. Authentication stays separate because PQ signatures and certificates have different deployment constraints from KEMs. Around that exchange, the migration loop tracks inventory, risk scoring, size and parser testing, staged rollout, telemetry, retirement, and standards monitoring.
 
 | Workstream | Assets to find | First migration action | Main risk |
 |---|---|---|---|
@@ -88,9 +88,9 @@ The diagram combines a concrete hybrid TLS 1.3 handshake with the operational mi
 | Embedded devices | Fixed parsers, small memory, secure boot | Inventory hardware limits before choosing parameters | Cannot fit large keys or signatures |
 | Data encryption | AES-128, short hashes, wrapped keys | Prefer strong symmetric parameters and protect key establishment | Mistaking storage encryption for handshake security |
 
-## Worked example 1: Hybrid TLS key establishment size and security intuition
+## Counting a hybrid TLS exchange
 
-Problem: Compare a classical X25519 key establishment with a hybrid X25519 plus ML-KEM-768 exchange. Estimate key-share bytes and explain what happens if a future quantum attacker breaks X25519 but not ML-KEM.
+Compare a classical X25519 key establishment with a hybrid X25519 plus ML-KEM-768 exchange. Estimate key-share bytes and then consider a future quantum attacker who can break X25519 but not ML-KEM.
 
 1. Count the classical exchange. X25519 uses a 32-byte public key share from the client and a 32-byte public key share from the server:
 
@@ -138,11 +138,11 @@ $$
 
 If a future quantum attacker can recover `x25519_secret` from recorded traffic but cannot recover `mlkem_secret`, the KDF input still contains an unknown high-entropy component. Under a suitable combiner and KDF model, the final traffic secret should remain hidden.
 
-Checked answer: the hybrid exchange adds about 2272 bytes of key-establishment material in this simplified count. Its purpose is not to make X25519 quantum-safe; its purpose is to ensure the final secret remains protected if at least one component remains secure and the protocol combines them correctly.
+The hybrid exchange adds about 2272 bytes of key-establishment material in this simplified count. It does not make X25519 quantum-safe. It protects the final secret when at least one component remains secure and the protocol combines them correctly.
 
-## Worked example 2: Prioritizing a crypto inventory
+## Ranking an inventory by lifetime and reach
 
-Problem: An organization finds three quantum-vulnerable uses. Rank them for migration.
+Suppose an organization finds three quantum-vulnerable uses and needs to rank them for migration.
 
 - A public medical-records API uses ECDHE for TLS. Data confidentiality lifetime is 25 years. The service is patched quarterly.
 - A public marketing site uses ECDHE for TLS. Data confidentiality lifetime is less than one day. The service is easy to patch.
@@ -188,9 +188,9 @@ $$
 \text{firmware signing }(11) > \text{medical API }(10) > \text{marketing site }(6).
 $$
 
-Checked answer: the firmware signing system ranks first because long-lived devices may continue accepting forgeable signatures after a future break. The medical API is nearly as urgent because of harvest-now, decrypt-later confidentiality. The marketing site still needs migration, but it is a lower-risk early target if its data truly expires quickly.
+The firmware signing system ranks first because long-lived devices may continue accepting forgeable signatures after a future break. The medical API is nearly as urgent because of harvest-now, decrypt-later confidentiality. The marketing site still needs migration, but it is a lower-risk early target if its data truly expires quickly.
 
-## Code
+## Turning the inventory into a queue
 
 This script turns a small crypto inventory into a repeatable priority list. It is a planning sketch, not a substitute for a formal risk assessment.
 
@@ -237,7 +237,7 @@ for item in sorted(inventory, key=score, reverse=True):
 
 The output ranks firmware update trust and long-lived medical confidentiality ahead of the short-lived marketing site. A real inventory would include owners, protocols, certificate chains, hardware limits, regulatory tags, and rollback plans.
 
-## Common pitfalls
+## Failure modes to test before rollout
 
 - Starting with algorithm replacement before building an inventory. Unknown cryptography cannot be migrated deliberately.
 - Treating TLS key exchange as the whole problem. Signatures, certificates, package managers, secure boot, and document workflows often have longer tails.
@@ -245,14 +245,18 @@ The output ranks firmware update trust and long-lived medical confidentiality ah
 - Ignoring message sizes. PQC keys and signatures can break fixed buffers, MTU assumptions, certificate-chain limits, and embedded parsers.
 - Waiting for every ecosystem detail to be final. Long-lived data may need protection before all certificate and protocol work is complete.
 - Confusing policy dates with predictions of when a quantum computer will exist. Migration dates are chosen around risk, procurement, and replacement cycles.
-- Making library-specific security claims from algorithm names. Implementation quality, side-channel defenses, validation status, and configuration are out of scope for this conceptual page.
+- Making library-specific security claims from algorithm names. Implementation quality, side-channel defenses, validation status, and configuration require separate review.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Quantum Security](/quantum-information-science/quantum-security/intro) for the threat model, harvest-now risk, and PQC versus QKD framing.
 - [Post-Quantum Cryptography](/quantum-information-science/quantum-security/pqc) for the algorithm families and NIST standardization snapshot.
-- [Classical cryptography](/cs/cryptography/) for the RSA, ECDH, AES, hash, and signature baseline being migrated.
+- [Classical cryptography](/cs/cryptography/intro) for the RSA, ECDH, AES, hash, and signature baseline being migrated.
 - [Quantum computing algorithms](/quantum-information-science/quantum-computing/algorithms) for why Shor and Grover affect different primitives differently.
 - [Quantum key distribution](/quantum-information-science/quantum-communication/qkd) for the hardware path and its contrast with PQC migration.
 - [Number theory basics](/math/discrete/number-theory-basics) for RSA and discrete-logarithm background.
-- [Linear algebra](/math/linear-algebra/) for the matrix and vector language used in lattice-based PQC.
+- [Linear algebra](/math/linear-algebra/intro) for the matrix and vector language used in lattice-based PQC.
+
+</div>

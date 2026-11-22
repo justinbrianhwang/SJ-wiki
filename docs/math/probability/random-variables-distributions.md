@@ -491,10 +491,8 @@ print("P(0.25 <= X <= 0.75) =", cdf(0.75) - cdf(0.25))
 - Using a PDF when the problem gives a CDF, or differentiating a discrete CDF as if it were smooth.
 - Failing to check that probabilities or densities normalize to one.
 
-## Related pages
+<div className="see-also">
 
-- [common discrete distributions](/math/probability/common-discrete-distributions)
-- [common continuous distributions](/math/probability/common-continuous-distributions)
-- [expectation, variance, and moments](/math/probability/expectation-variance-moments)
-- [functions of random variables](/math/probability/transformations-random-variables)
-- [sampling distributions and CLT](/math/statistics/sampling-distributions-and-clt)
+See also: [common discrete distributions](/math/probability/common-discrete-distributions) · [common continuous distributions](/math/probability/common-continuous-distributions) · [expectation, variance, and moments](/math/probability/expectation-variance-moments) · [functions of random variables](/math/probability/transformations-random-variables) · [sampling distributions and CLT](/math/statistics/sampling-distributions-and-clt)
+
+</div>

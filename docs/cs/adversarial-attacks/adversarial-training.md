@@ -7,13 +7,9 @@ sidebar_position: 7
 
 Adversarial training is the most important empirical defense for norm-bounded image robustness. Instead of training only on clean examples, it trains on adversarial examples generated against the current model. The idea is simple: if the model will face worst-case perturbations at test time, include worst-case perturbations in the training objective.
 
-![A visually similar adversarial panda image is classified as a gibbon by an ImageNet model.](https://ar5iv.labs.arxiv.org/html/1412.6572/assets/gibbon_993.png)
+The cost is also central. Strong adversarial training is much more expensive than ordinary empirical risk minimization, can reduce clean accuracy, and can overfit robust accuracy late in training. The min-max objective, its PGD and TRADES variants, and the implementation choices all determine whether the result is meaningful.
 
-*Figure: The FGSM panda example shows that imperceptible perturbations can change model decisions. Image: [ar5iv](https://arxiv.org/abs/1412.6572), Goodfellow, Shlens, and Szegedy, educational use with attribution.*
-
-The cost is also central. Strong adversarial training is much more expensive than ordinary empirical risk minimization, can reduce clean accuracy, and can overfit robust accuracy late in training. This page gives the min-max objective, common variants such as PGD adversarial training and TRADES, and the implementation choices that determine whether the result is meaningful.
-
-## Definitions
+## The robust optimization objective
 
 Standard supervised training minimizes empirical risk:
 
@@ -61,7 +57,7 @@ Here $\beta$ controls the accuracy-robustness tradeoff.
 
 **Robust overfitting** is the phenomenon where robust test accuracy degrades after learning-rate drops or late training even while robust training accuracy improves. It is a reminder that adversarial training is still statistical learning, not just optimization.
 
-## Key results
+## What changes when the adversary joins training
 
 The min-max objective is the central formula:
 
@@ -74,7 +70,7 @@ $$
 \right].
 $$
 
-Madry-style PGD adversarial training popularized a practical version of this objective for deep networks. The [inner PGD attack](/cs/adversarial-attacks/white-box-attacks#iterative-projected-gradient-methods) is not guaranteed to find the exact maximum, but multi-step PGD with random starts is a strong first-order adversary for many norm-bounded image settings. The defense claim should therefore say "robust against the evaluated $\ell_p$ PGD or AutoAttack threat model," not "robust to all attacks."
+Madry-style PGD adversarial training popularized a workable version of this objective for deep networks. The [inner PGD attack](/cs/adversarial-attacks/white-box-attacks#iterative-projected-gradient-methods) is not guaranteed to find the exact maximum, but multi-step PGD with random starts is a strong first-order adversary for many norm-bounded image settings. The defense claim should therefore say "robust against the evaluated $\ell_p$ PGD or AutoAttack threat model," not "robust to all attacks."
 
 Adversarial training changes the learned representation. Models trained robustly often have smoother input gradients, larger margins in the chosen threat set, and features that align better with human-perceptible structure. But robustness is threat-model-specific. A model trained for $\ell_\infty$ radius $\epsilon$ is not automatically robust to patches, rotations, corruptions, or unrestricted semantic changes.
 
@@ -90,7 +86,7 @@ The inner attack should normally be generated against the current model, not a s
 
 Finally, adversarial training is not a drop-in patch after a model is finished. It changes optimization, hyperparameter tuning, checkpoint selection, and sometimes architecture choice. Treat it as a training regime with its own validation protocol.
 
-## Visual
+### Inside a PGD-AT or TRADES update
 
 ![The TRADES figure illustrates the accuracy-robustness tradeoff behind robustness regularization.](https://ar5iv.labs.arxiv.org/html/1901.08573/assets/x1.png)
 
@@ -147,9 +143,9 @@ This diagram shows adversarial training as a min-max loop with a PGD inner maxim
 | Fast adversarial training | One-step FGSM-like attack | Low | Much cheaper | Catastrophic overfitting if poorly controlled |
 | Curriculum or mixed training | Varying attack strength | Variable | Stabilizes learning | Can undertrain for final threat model |
 
-## Worked example 1: Estimating adversarial-training cost
+## Accounting for a PGD-7 batch
 
-Problem: Clean training costs 1 unit per mini-batch. PGD adversarial training uses 7 inner attack steps and then one parameter update. Estimate the cost multiplier if each step costs about one backward pass.
+Assume clean training costs 1 unit per mini-batch. PGD adversarial training uses 7 inner attack steps and then one parameter update. Estimate the cost multiplier if each step costs about one backward pass.
 
 1. Clean training:
 
@@ -181,11 +177,11 @@ $$
 \frac{C_{\mathrm{AT}}}{C_{\mathrm{clean}}} = \frac{8}{1}=8.
 $$
 
-Checked answer: PGD-7 adversarial training is roughly 8 times the clean-training cost under this simple accounting. Actual wall-clock cost depends on implementation, mixed precision, gradient reuse, and hardware.
+Under this simple accounting, PGD-7 adversarial training costs roughly 8 times as much as clean training. Actual wall-clock cost depends on implementation, mixed precision, gradient reuse, and hardware.
 
-## Worked example 2: TRADES loss calculation
+## Weighting the TRADES stability term
 
-Problem: A mini-batch has average clean cross-entropy $0.40$. The adversarial KL term is $0.18$. Compute the TRADES objective for $\beta=6$.
+Take a mini-batch with average clean cross-entropy $0.40$ and adversarial KL term $0.18$. Compute the TRADES objective for $\beta=6$.
 
 1. TRADES objective for the batch:
 
@@ -211,9 +207,9 @@ $$
 0.40+1.08=1.48.
 $$
 
-Checked answer: the batch objective is $1.48$. The KL term dominates the update because $\beta=6$ heavily weights local stability.
+The batch objective is $1.48$. Here the KL term dominates the update because $\beta=6$ heavily weights local stability.
 
-## Code
+## A minimal PGD training step
 
 ```python
 import torch
@@ -244,7 +240,7 @@ def adversarial_training_step(model, optimizer, x, y, epsilon=8 / 255):
 
 This is the basic PGD adversarial-training loop. Production code should handle batch normalization carefully, log clean and robust accuracy separately, and evaluate with stronger attacks than the one used during training.
 
-## Common pitfalls
+## Claims the training run does not support
 
 - Training with one attack and claiming robustness to a broader threat model.
 - Evaluating the final model only with the training attack, especially if the attack is weak.
@@ -254,7 +250,17 @@ This is the basic PGD adversarial-training loop. Production code should handle b
 - Treating adversarial training as certification. It is an empirical defense, not a proof.
 - Ignoring computational cost and comparing robust models to clean baselines with very different training budgets.
 
-## Connections
+## Papers behind the main training recipes
+
+- Madry et al., "Towards Deep Learning Models Resistant to Adversarial Attacks."
+- Zhang et al., "Theoretically Principled Trade-off between Robustness and Accuracy."
+- Shafahi et al., "Adversarial Training for Free!"
+- Wong, Rice, and Kolter, "Fast Is Better Than Free: Revisiting Adversarial Training."
+- Rice, Wong, and Kolter, work on overfitting in adversarially robust deep learning.
+
+<div className="see-also">
+
+See also:
 
 - [Mathematical formulation](/cs/adversarial-attacks/mathematical-formulation) gives the robust risk objective.
 - [White-box attacks](/cs/adversarial-attacks/white-box-attacks#iterative-projected-gradient-methods) supplies the PGD inner maximization.
@@ -262,10 +268,4 @@ This is the basic PGD adversarial-training loop. Production code should handle b
 - [Robustness-accuracy tradeoff](/cs/adversarial-attacks/robustness-accuracy-tradeoff) focuses on why robustness can reduce clean accuracy.
 - [Evaluation and benchmarks](/cs/adversarial-attacks/evaluation-and-benchmarks) explains how to test adversarially trained models.
 
-## Further reading
-
-- Madry et al., "Towards Deep Learning Models Resistant to Adversarial Attacks."
-- Zhang et al., "Theoretically Principled Trade-off between Robustness and Accuracy."
-- Shafahi et al., "Adversarial Training for Free!"
-- Wong, Rice, and Kolter, "Fast Is Better Than Free: Revisiting Adversarial Training."
-- Rice, Wong, and Kolter, work on overfitting in adversarially robust deep learning.
+</div>

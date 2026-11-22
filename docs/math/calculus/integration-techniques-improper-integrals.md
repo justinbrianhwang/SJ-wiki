@@ -7,13 +7,9 @@ sidebar_position: 11
 
 Integration techniques are pattern-recognition tools for finding antiderivatives and evaluating definite integrals. Substitution reverses the chain rule. Integration by parts reverses the product rule. Partial fractions break rational functions into simpler pieces. Improper integrals extend definite integrals to infinite intervals and unbounded integrands through limits.
 
-![Rectangles under a curve approximate area in a Riemann sum.](https://commons.wikimedia.org/wiki/Special:FilePath/Riemannsumme.svg)
-
-*Figure: Riemann sums turn accumulated area into the limiting process behind definite integrals. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Riemannsumme.svg), Emes2k, public domain.*
-
 No single technique solves every integral. The work is to identify structure, transform the integral without changing its value, and check whether the result is an antiderivative, a convergent improper integral, or a divergent expression.
 
-## Definitions
+## What each technique reverses
 
 Substitution uses a new variable $u=g(x)$ and $du=g'(x)\,dx$. It is most useful when the integrand contains a composite function and a constant multiple of the inside derivative.
 
@@ -53,7 +49,7 @@ $$
 
 If the defining limit exists as a finite number, the improper integral converges. Otherwise it diverges.
 
-## Key results
+## Selecting and checking a method
 
 Substitution for definite integrals changes the limits as well as the integrand. If $u=g(x)$, then
 
@@ -143,8 +139,6 @@ For trigonometric integrals, parity guides the method. If a power of sine is odd
 
 Numerical integration is also a legitimate technique when an exact antiderivative is unavailable or unnecessary. Midpoint, trapezoidal, and Simpson rules approximate definite integrals from function values. They do not replace convergence checks for improper integrals, but they are useful after the interval has been made finite and the integrand is well behaved.
 
-## Visual
-
 | Integral pattern | Likely technique | Reason |
 |---|---|---|
 | Composite with inside derivative | substitution | reverses chain rule |
@@ -167,7 +161,7 @@ graph TD
   H -->|no| J["Try identities, tables, or numerical methods"]
 ```
 
-## Worked example 1: integration by parts
+## Undoing a product rule
 
 **Problem.** Evaluate
 
@@ -221,7 +215,7 @@ $$
 
 So the antiderivative is correct.
 
-## Worked example 2: improper integral convergence
+## How fast must an infinite tail decay?
 
 **Problem.** Determine whether
 
@@ -284,9 +278,9 @@ $$
 m(b-a)\le \int_a^b f(x)\,dx\le M(b-a)
 $$
 
-when $m\le f(x)\le M$ throughout the interval under consideration carefully.
+when $m\le f(x)\le M$ throughout the interval.
 
-## Code
+## Estimating a finite cutoff and its tail
 
 ```python
 def midpoint_integral(f, a, b, n=10000):
@@ -303,19 +297,23 @@ for B in [5, 10, 50]:
     print(B, improper_tail_estimate(B))
 ```
 
-## Common pitfalls
+## Algebraic and convergence checks
 
-- Using substitution without changing $dx$ into $du$.
-- Forgetting to change bounds in a definite integral after substitution.
-- Choosing $u$ in integration by parts so the remaining integral becomes harder.
-- Skipping polynomial division before partial fractions when the numerator degree is at least the denominator degree.
-- Treating an improper integral as ordinary endpoint substitution. The limit is part of the definition.
-- Assuming a decreasing positive integrand always has a finite area over an infinite interval.
-- Forgetting absolute values in antiderivatives such as $\int 1/x\,dx=\ln\vert x\vert +C$.
+- A substitution is incomplete while the expression still mixes $x$ and $u$; the differential and every remaining factor must be converted.
+- For a definite integral, either change the bounds to $u$-values or substitute back to $x$ before evaluating. Mixing the two conventions gives mismatched endpoints.
+- Integration by parts is useful only when the new integral is simpler or returns to an equation that can be solved. LIATE is a heuristic, not a guarantee.
+- An improper rational function must undergo polynomial division before partial fractions.
+- An infinite endpoint or vertical asymptote is handled by a limit, never by formal endpoint substitution.
+- Decreasing to zero is not enough for convergence: $1/x$ is positive and decreasing on $[1,\infty)$, yet its integral diverges.
+- The antiderivative of $1/x$ is $\ln\vert x\vert+C$ on intervals not crossing zero; omitting the absolute value loses the negative half-line.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Definite Integrals and the Fundamental Theorem](/math/calculus/definite-integrals-fundamental-theorem): techniques depend on antiderivatives and definite integral evaluation.
 - [Applications of Integrals](/math/calculus/applications-of-integrals): applied problems often require selecting an integration technique.
 - [Sequences and Series](/math/calculus/sequences-and-series): improper integral comparison supports the integral test.
 - [Power Series and Taylor Polynomials](/math/calculus/power-series-and-taylor-polynomials): series can approximate difficult integrals.
+
+</div>

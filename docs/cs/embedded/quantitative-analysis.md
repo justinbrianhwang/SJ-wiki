@@ -9,7 +9,7 @@ Quantitative analysis asks whether a measurable property stays within required b
 
 Lee and Seshia focus on execution-time analysis, especially worst-case execution time (WCET). The key theme is that WCET is a property of both the program and the platform. Loops, branches, function calls, infeasible paths, caches, pipelines, interrupts, and memory hierarchy all affect the result.
 
-## Definitions
+## Quantities, bounds, and control-flow structure
 
 A **quantitative property** is any measurable property of the system or its execution.
 
@@ -35,7 +35,7 @@ A **basic block** is a straight-line code region with one entry and one exit. A 
 
 A **loop bound** is an upper bound on how many times a loop can execute. A **ranking function** maps program states to a well-ordered set and decreases on each loop iteration, proving termination.
 
-## Key results
+## Building a defensible worst-case bound
 
 Termination and loop bounds are prerequisites for WCET. Without a bound on loop iterations or recursion depth, the worst-case time may be unbounded. Determining such bounds is undecidable in general, but many embedded coding styles use simple bounded loops.
 
@@ -67,7 +67,7 @@ Energy and power analysis show why execution time is not the only resource. A pr
 
 Quantitative assumptions should be versioned with the platform. A compiler upgrade, cache configuration change, different flash wait-state setting, or new RTOS tick rate can invalidate a previous bound. For that reason, timing and memory analyses belong in the build and release evidence, not only in an early design notebook.
 
-## Visual
+### From source code to a WCET optimization problem
 
 ```mermaid
 flowchart TD
@@ -91,7 +91,7 @@ flowchart TD
 | Pipeline | Hazards and stalls | Microarchitectural model |
 | Interrupts | Preemption adds latency | Include ISR interference |
 
-## Worked example 1: Loop-bound WCET estimate
+## Accounting for every loop test
 
 Problem: A loop executes at most $32$ iterations. Each iteration executes blocks with worst-case times: condition block $2$ cycles, body block $10$ cycles, update block $3$ cycles. The loop exit condition costs $2$ cycles one extra time. Estimate a simple WCET bound.
 
@@ -129,7 +129,7 @@ $$
 
 Answer: A simple WCET upper bound is $482$ cycles, assuming the block bounds already include hardware effects and no interrupts occur.
 
-## Worked example 2: Cache conflict effect
+## Measuring the cost of a cache conflict pattern
 
 Problem: A loop reads arrays `x` and `y`. On one input size, all needed values fit in one cache block after the first miss. On another size, every access alternates between two blocks mapping to the same direct-mapped cache set. Suppose a cache hit costs $1$ cycle, a miss costs $50$ cycles, and the loop performs $16$ loads. Compare memory-load costs if there is 1 miss versus 16 misses.
 
@@ -161,7 +161,7 @@ $$
 
 Answer: The conflict-heavy case costs $800$ cycles for loads, about $12.3$ times the $65$-cycle case. Small layout changes can have large timing effects.
 
-## Code
+### Recomputing the two timing bounds
 
 ```python
 def loop_wcet(iterations, costs):
@@ -179,7 +179,7 @@ def load_cost(loads, misses, hit_cost=1, miss_cost=50):
 print(load_cost(16, 1), load_cost(16, 16))
 ```
 
-## Common pitfalls
+## Bounds that look stronger than they are
 
 - Using measured average time as a hard real-time guarantee.
 - Ignoring infeasible paths in one direction and hardware variation in the other; both can dominate the bound quality.
@@ -188,10 +188,8 @@ print(load_cost(16, 1), load_cost(16, 16))
 - Forgetting ISR interference when analyzing a task's execution time.
 - Treating a loose WCET bound as useless. A loose safe bound may still prove a threshold property if it is below the deadline.
 
-## Connections
+<div className="see-also">
 
-- [scheduling and real time](/cs/embedded/scheduling-and-real-time)
-- [memory architectures](/cs/embedded/memory-architectures)
-- [embedded processors architecture](/cs/embedded/embedded-processors-architecture)
-- [reachability and model checking](/cs/embedded/reachability-and-model-checking)
-- [Turing machines and Church-Turing thesis](/cs/theory/turing-machines-and-the-church-turing-thesis)
+See also: [scheduling and real time](/cs/embedded/scheduling-and-real-time) · [memory architectures](/cs/embedded/memory-architectures) · [embedded processors architecture](/cs/embedded/embedded-processors-architecture) · [reachability and model checking](/cs/embedded/reachability-and-model-checking) · [Turing machines and Church-Turing thesis](/cs/theory/turing-machines-and-the-church-turing-thesis)
+
+</div>

@@ -13,7 +13,7 @@ Induction proves infinitely many statements by showing how each case follows fro
 
 The connection is practical. A recursive algorithm is trustworthy only when it has a base case, makes progress toward that base case, and combines smaller answers correctly. An induction proof has exactly the same shape: verify the base case, assume smaller or previous cases, and prove the next case.
 
-## Definitions
+## Three forms of induction
 
 The **principle of mathematical induction** proves statements $P(n)$ for all integers $n\ge n_0$ by showing:
 
@@ -34,7 +34,23 @@ The **well-ordering principle** says every nonempty set of nonnegative integers 
 
 A **recursive definition** gives initial values and a rule that builds later values from earlier ones. A **recursive algorithm** solves a problem by calling itself on smaller inputs. A **structural induction** proof works over recursively built objects such as strings, trees, formulas, and lists.
 
-## Key results
+The common proof pattern is short:
+
+```mermaid
+flowchart LR
+  A[Base case] --> B[Inductive hypothesis]
+  B --> C[Prove next case]
+  C --> D["Statement holds for all n >= n0"]
+```
+
+| Method | Hypothesis allowed | Best for | Typical proof obligation |
+| --- | --- | --- | --- |
+| ordinary induction | $P(k)$ | formulas depending on previous case | prove $P(k)\to P(k+1)$ |
+| strong induction | $P(n_0),\dots,P(k)$ | factorization, tilings, recurrences | prove all earlier cases imply next |
+| structural induction | property for smaller built objects | trees, strings, formulas | prove constructors preserve property |
+| loop invariant | property after $k$ iterations | iterative programs | initialization, maintenance, termination |
+
+## Two standard induction arguments
 
 For all positive integers $n$,
 
@@ -67,31 +83,13 @@ Strong induction proves that every integer $n\gt 1$ can be written as a product 
 
 A recursive algorithm terminates when each recursive call decreases a well-founded measure. For nonnegative integers, the measure is often the input itself. For lists, it may be length. For trees, it may be the number of nodes. Correctness then follows by induction on that measure.
 
-## Visual
-
-```mermaid
-flowchart LR
-  A[Base case] --> B[Inductive hypothesis]
-  B --> C[Prove next case]
-  C --> D["Statement holds for all n >= n0"]
-```
-
-| Method | Hypothesis allowed | Best for | Typical proof obligation |
-| --- | --- | --- | --- |
-| ordinary induction | $P(k)$ | formulas depending on previous case | prove $P(k)\to P(k+1)$ |
-| strong induction | $P(n_0),\dots,P(k)$ | factorization, tilings, recurrences | prove all earlier cases imply next |
-| structural induction | property for smaller built objects | trees, strings, formulas | prove constructors preserve property |
-| loop invariant | property after $k$ iterations | iterative programs | initialization, maintenance, termination |
-
-## Worked example 1: Prove a closed form by induction
+## The sum of the first odd integers
 
 **Problem.** Prove that for every integer $n\ge1$,
 
 $$
 \sum_{i=1}^{n}(2i-1)=n^2.
 $$
-
-**Method.**
 
 1. Define $P(n)$ to be the statement $\sum_{i=1}^{n}(2i-1)=n^2$.
 2. Base case $n=1$:
@@ -119,13 +117,11 @@ $$
 \end{aligned}
 $$
 
-**Checked answer.** The base case is true and the inductive step proves $P(k)\to P(k+1)$ for arbitrary $k\ge1$. Therefore the sum of the first $n$ positive odd integers is $n^2$ for every $n\ge1$.
+The base case is true and the inductive step proves $P(k)\to P(k+1)$ for arbitrary $k\ge1$. Therefore the sum of the first $n$ positive odd integers is $n^2$ for every $n\ge1$.
 
-## Worked example 2: Use strong induction for postage
+## Postage needs several base cases
 
 **Problem.** Prove that every integer amount of postage $n\ge12$ cents can be formed using only $4$-cent and $5$-cent stamps.
-
-**Method.**
 
 1. Strong induction is natural because adding one stamp changes the amount by $4$ or $5$, not by $1$.
 2. Establish enough base cases:
@@ -144,9 +140,9 @@ $$
 5. Since $k\ge15$, we have $k-3\ge12$. Also $k-3\le k$, so the inductive hypothesis applies.
 6. Form $k-3$ cents using $4$- and $5$-cent stamps, then add one more $4$-cent stamp.
 
-**Checked answer.** The base cases cover $12,13,14,15$, and the strong inductive step constructs $k+1$ from $k-3$. Therefore every amount $n\ge12$ cents can be formed.
+The base cases cover $12,13,14,15$, and the strong inductive step constructs $k+1$ from $k-3$. Therefore every amount $n\ge12$ cents can be formed.
 
-## Code
+## Recursive code follows the same proof shape
 
 ```python
 from functools import lru_cache
@@ -172,7 +168,7 @@ print([(n, can_make_postage(n)) for n in range(8, 21)])
 
 The recursive postage function mirrors the inductive proof: a target amount is possible if subtracting one legal stamp leaves a smaller possible amount.
 
-## Common pitfalls
+## Where induction arguments break
 
 - Omitting the base case. The inductive step alone proves only that truth would propagate if it ever started.
 - Assuming $P(k+1)$ in the inductive step. The hypothesis is $P(k)$, or earlier cases for strong induction.
@@ -197,10 +193,14 @@ For recursive algorithms, test the base cases first, then test the smallest non-
 
 In strong induction, make sure the base cases extend far enough for the first use of the step. If the step for $k+1$ uses $P(k-3)$, then the proof cannot start from a single base case. The base interval must cover all values before the recurrence or construction can feed itself.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Proof techniques](/math/discrete/proof-techniques) gives the general proof framework used by induction.
 - [Functions, sequences, and sums](/math/discrete/functions-sequences-sums) supplies the formulas and sequences often proved by induction.
 - [Recurrence relations](/math/discrete/recurrence-relations) turns recursive definitions into equations and closed forms.
 - [Number theory basics](/math/discrete/number-theory-basics) uses strong induction for prime factorization and integer representations.
 - [Trees](/math/discrete/trees) uses structural induction over recursively defined graph objects.
+
+</div>

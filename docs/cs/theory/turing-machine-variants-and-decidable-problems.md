@@ -5,54 +5,11 @@ sidebar_position: 11
 
 # Turing Machine Variants and Decidable Problems
 
-The basic Turing machine model is deliberately minimal, so it is natural to ask whether more convenient versions compute more languages. Multitape machines, nondeterministic machines, enumerators, and high-level algorithms all look stronger or more natural. For decidability, these variants are equivalent to the basic model.
+The basic Turing machine is deliberately sparse. Multitape machines, nondeterministic machines, enumerators, and ordinary high-level algorithms all look more capable or more convenient, but they compute the same languages at the level of decidability and recognizability.
 
-![A portrait of Alan Turing as a teenager gives computability theory historical context.](https://commons.wikimedia.org/wiki/Special:FilePath/Alan_Turing_Aged_16.jpg)
+That equivalence permits decidability proofs written as graph searches, parsing algorithms, or simulations. A formal single-tape machine could implement each one. Low-level tape bookkeeping would change efficiency, not the existence of a decider.
 
-*Figure: Alan Turing's work on computation and undecidability frames the theory section. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Alan_Turing_Aged_16.jpg), Unknown photographer, public domain.*
-
-This equivalence matters because it lets us write algorithms at a sensible level without changing what is computable. When proving decidability of automata and grammar questions, we can describe graph searches, table-filling algorithms, and simulations. A formal single-tape Turing machine could implement them, but requiring low-level tape details every time would hide the idea.
-
-## Definitions
-
-A **multitape Turing machine** has several tapes, each with its own head. One transition reads all current tape symbols, writes symbols on all tapes, moves each head, and changes state.
-
-A **nondeterministic Turing machine** branches into several possible moves. It accepts if at least one branch accepts. For language decidability, every nondeterministic machine has an equivalent deterministic simulator.
-
-An **enumerator** is a Turing-machine-like device with an output printer. It enumerates a language if it eventually prints every string in the language and never prints strings outside it. Repetition may be allowed depending on convention.
-
-A language is **decidable** if a Turing machine halts on every input and correctly accepts or rejects. Decidable languages are also called recursive languages in older terminology.
-
-A problem about automata or grammars is encoded as a language. For example, $A_{DFA}=\{\langle B,w\rangle:B$ is a DFA that accepts $w\}$ and $E_{DFA}=\{\langle B\rangle:B$ is a DFA with empty language$\}$.
-
-## Key results
-
-Multitape Turing machines are equivalent in power to single-tape Turing machines. A single tape can encode all tapes separated by delimiters, mark the simulated head positions, scan to gather symbols, and update the encoding. This may be slower, but it decides or recognizes the same languages.
-
-Nondeterministic Turing machines are equivalent to deterministic Turing machines for recognizability and decidability. A deterministic simulator explores the nondeterministic computation tree breadth-first so that an accepting branch, if one exists, is eventually found. If the nondeterministic machine is a decider with bounded branch halting, the simulator can decide.
-
-Enumerators characterize Turing-recognizable languages. A language is Turing-recognizable if and only if some enumerator prints its strings. One direction runs the recognizer on all strings in dovetailing fashion; the other checks whether the input appears in the enumeration.
-
-Many problems about regular languages and context-free languages are decidable. For DFAs, membership is direct simulation, emptiness is graph reachability from the start to an accept state, and equivalence reduces to emptiness of symmetric difference. For CFGs, membership is decidable by parsing, and emptiness is decidable by marking variables that can derive terminal strings.
-
-Variant equivalence proofs usually separate power from convenience. A multitape machine is easier to program because it can keep input, work data, counters, and output on separate tapes. The single-tape simulation encodes these tapes into tracks or delimited regions and performs sweeps to locate simulated heads. This may introduce polynomial overhead, but it never changes whether the simulated machine eventually accepts, rejects, or loops.
-
-Nondeterministic Turing-machine simulation must be fair. A naive simulator that follows the first branch until it halts may never return from an infinite branch, even if another branch accepts quickly. Breadth-first search over the computation tree avoids this problem by exploring all branches of depth $0$, then all branches of depth $1$, and so on. If an accepting branch exists at finite depth, it is eventually reached. This fairness idea also appears in dovetailing recognizers and enumerators.
-
-Enumerator equivalence clarifies the meaning of recognizability. If a recognizer exists, an enumerator can systematically run it on every string for more and more steps. If an enumerator exists, a recognizer for a particular input waits until that input is printed. The waiting recognizer may loop forever when the input is not in the language, which is exactly the recognizability behavior. Ordered enumeration without repetition is stronger and may require decidability rather than mere recognizability.
-
-Decidable questions about DFAs rely on finiteness. Membership runs in time proportional to input length. Emptiness reduces to reachability in a finite directed graph. Equivalence reduces to testing whether there is any string accepted by exactly one of the two machines. Because the product automaton is finite, this last question is again reachability. These algorithms are total because all relevant search spaces are finite.
-
-CFG algorithms are subtler but still decidable for core questions. Membership can be decided by CYK after conversion to Chomsky normal form. Emptiness can be decided by marking variables that derive terminal strings and checking whether the start variable is marked. However, the boundary arrives quickly: equivalence of CFGs is undecidable. This contrast is important because it shows that "grammar problem" does not automatically mean decidable or undecidable; each property must be analyzed.
-
-High-level decidability proofs still require finite search bounds. For a DFA, reachability explores at most $\vert Q\vert $ states. For a CFG emptiness algorithm, the marking process adds variables monotonically and can run for at most $\vert V\vert $ successful marking rounds. For CYK, the table has polynomially many spans and variables. These bounds prove that the described procedures halt, which is the defining requirement for decidability.
-
-The universal Turing machine is the conceptual bridge behind simulation-based decidability and recognizability. It reads an encoding $\langle M,w\rangle$ and simulates the transition function of $M$ on $w$. If $M$ halts, the simulator can report the same outcome. If $M$ loops, the simulator loops. This is enough to recognize $A_{TM}$ but not enough to decide it. The same simulation ability also lets reductions build machines that contain other machine descriptions as data.
-
-Some automata problems change status when the model changes. DFA emptiness is decidable, CFG emptiness is decidable, and TM emptiness is undecidable. DFA equivalence is decidable, while CFG equivalence and TM equivalence are undecidable. The pattern is not "language question equals decidable"; it is that finite-state and some grammar structures permit bounded analysis, while general Turing-machine semantics do not.
-
-This is why the chapter is a hinge between automata and undecidability. It collects positive algorithms first, so later negative results are not overgeneralized. The right conclusion is not that formal-language questions are usually impossible; it is that decidability depends on the model, the property, and whether a finite search bound survives the encoding.
-## Visual
+## Simulation changes convenience, not computability
 
 ```mermaid
 graph TD
@@ -62,6 +19,44 @@ graph TD
   F[Recognizer] <--> G[Enumerator]
 ```
 
+A **multitape Turing machine** has several tapes with independent heads. One transition reads the symbols under all heads, writes new symbols, moves each head, and changes state. A single-tape simulator can encode those tapes in delimited regions or tracks, mark every simulated head position, sweep across the encoding to collect the scanned symbols, and sweep again to apply the update.
+
+The simulation is slower, often by a polynomial factor, but it preserves acceptance, rejection, and divergence. Multitape machines are therefore easier to program without deciding any language that a single-tape machine cannot decide.
+
+A **nondeterministic Turing machine** may have several legal moves from one configuration and accepts if at least one branch accepts. Deterministic and nondeterministic machines recognize the same languages and decide the same languages. The simulation strategy, however, must treat all branches fairly.
+
+## Fair exploration of a computation tree
+
+Following one nondeterministic branch until it halts is unsound for recognition. That branch may run forever while a different branch accepts after a few steps. A deterministic simulator instead explores the computation tree breadth-first: all nodes at depth $0$, then depth $1$, and so on. Any accepting branch has finite depth and is eventually reached.
+
+If the nondeterministic machine is a decider, every branch halts. Its computation tree is finitely branching; by König's lemma, a finitely branching tree with no infinite branch is finite. Breadth-first exploration can therefore finish the whole tree and reject when no branch accepts.
+
+Fair scheduling reappears in dovetailing. Whenever several simulations may run without halting, give each one progressively more steps rather than waiting for any single simulation to finish.
+
+## Recognizers and enumerators
+
+An **enumerator** is a Turing-machine-like device with an output printer. It enumerates $L$ if every string in $L$ eventually appears and no string outside $L$ appears. Unless the convention says otherwise, the output may be unordered and may contain repetitions.
+
+A language is Turing-recognizable exactly when some enumerator prints it. Starting with a recognizer $R$ over alphabet $\{0,1\}$, list the binary strings $s_1,s_2,\ldots$ in length-lexicographic order. At stage $t$, simulate $R$ on each of $s_1,\ldots,s_t$ for $t$ steps and print every string whose simulation accepts. If $R(x)$ accepts after $k$ steps, a sufficiently late stage includes $x$ and runs it long enough to observe acceptance. Nonmembers are never printed.
+
+In the reverse direction, a recognizer for input $x$ runs the enumerator until $x$ appears. It accepts at that point; if $x\notin L$, it may wait forever. That one-sided behavior is precisely recognizability.
+
+Requiring an enumeration in a fixed order without repetition is stronger. For an infinite language, an ordered enumerator can often support a membership decision by running until it prints $x$ or passes the position where $x$ would occur. Mere recognizability does not generally provide that structure.
+
+## Finite search decides the standard automata questions
+
+A language is **decidable** if some Turing machine halts on every input and answers membership correctly; older texts also call such languages **recursive**. Encoded automata and grammar questions are themselves languages, such as
+
+$$
+A_{DFA}=\{\langle B,w\rangle:B\text{ is a DFA that accepts }w\}
+$$
+
+and
+
+$$
+E_{DFA}=\{\langle B\rangle:L(B)=\emptyset\}.
+$$
+
 | Problem | Input encoding | Decidable idea |
 |---|---|---|
 | $A_{DFA}$ | $\langle B,w\rangle$ | simulate DFA on $w$ |
@@ -70,35 +65,13 @@ graph TD
 | $A_{CFG}$ | $\langle G,w\rangle$ | CYK or derivation search with bound |
 | $E_{CFG}$ | $\langle G\rangle$ | mark variables deriving terminal strings |
 
-## Worked example 1: Deciding DFA emptiness
+DFA membership follows the unique run on $w$. DFA emptiness treats the transition diagram as a finite directed graph and asks whether any accepting state is reachable from the start state. DFA equivalence builds a product automaton for the symmetric difference and applies the same emptiness test. The algorithms halt because they examine only finitely many states or state pairs.
 
-**Problem.** Given a DFA $B$, decide whether $L(B)=\emptyset$.
+### Walking the DFA state graph
 
-**Method.** Treat the transition diagram as a directed graph.
+Given DFA $B$, breadth-first search begins at $q_0$. For every transition $\delta(q,a)=r$, regard $r$ as an outgoing neighbor of $q$. Reaching a final state exhibits some word whose transition path ends there, so $L(B)$ is nonempty. Exhausting all reachable states without finding a final state proves $L(B)=\emptyset$.
 
-1. The vertices are the states of $B$.
-2. For each transition $\delta(q,a)=r$, add a directed edge from $q$ to $r$.
-3. Run breadth-first search from the start state $q_0$.
-4. If BFS reaches any accepting state, then some input labels a path from $q_0$ to that state, so the language is nonempty.
-5. If BFS finishes without reaching an accepting state, no accepting computation is possible.
-
-**Checked answer.** The decider accepts $\langle B\rangle$ as empty exactly when no final state is reachable from the start state.
-
-## Worked example 2: Enumerator from a recognizer
-
-**Problem.** Suppose $R$ recognizes language $L$ over alphabet $\{0,1\}$. Construct an enumerator for $L$.
-
-**Method.** Dovetail all simulations.
-
-1. List all binary strings as $s_1,s_2,s_3,\ldots$ by length and lexicographic order.
-2. Stage $t$ simulates $R$ on each of $s_1,\ldots,s_t$ for $t$ steps.
-3. Whenever a simulation accepts during the current stage, print that string.
-4. If $x\in L$, then $R(x)$ accepts after some finite number $k$ of steps.
-5. Once the stage number is at least both the position of $x$ in the list and $k$, the simulation will discover the acceptance and print $x$.
-
-**Checked answer.** Every string in $L$ is eventually printed, and no string outside $L$ is printed because $R$ never accepts nonmembers.
-
-## Code
+The following implementation returns `True` exactly when no final state is reachable:
 
 ```python
 from collections import deque
@@ -110,8 +83,8 @@ def dfa_empty(states, alphabet, delta, start, finals):
         state = q.popleft()
         if state in finals:
             return False
-        for a in alphabet:
-            nxt = delta[(state, a)]
+        for symbol in alphabet:
+            nxt = delta[(state, symbol)]
             if nxt not in seen:
                 seen.add(nxt)
                 q.append(nxt)
@@ -119,22 +92,41 @@ def dfa_empty(states, alphabet, delta, start, finals):
 
 states = {"q0", "q1"}
 alphabet = {"0", "1"}
-delta = {("q0", "0"): "q0", ("q0", "1"): "q1",
-         ("q1", "0"): "q1", ("q1", "1"): "q1"}
+delta = {
+    ("q0", "0"): "q0",
+    ("q0", "1"): "q1",
+    ("q1", "0"): "q1",
+    ("q1", "1"): "q1",
+}
 print(dfa_empty(states, alphabet, delta, "q0", {"q1"}))
 ```
 
-## Common pitfalls
+Transition labels do not affect the reachability test itself, but they are not irrelevant: concatenating the labels along a path reconstructs a word accepted by the reached final state.
 
-- Thinking a multitape machine decides more languages because it is easier to program. It may be faster but not more powerful for decidability.
-- Simulating nondeterminism depth-first. A depth-first simulator can get trapped in an infinite branch and miss an accepting branch.
-- Forgetting that enumerators may print strings in any order unless a specific ordered enumeration is required.
-- Claiming CFG equivalence is decidable. General CFG equivalence is undecidable; membership and emptiness are decidable.
-- Treating graph reachability in a DFA as if labels do not matter. Labels matter for reconstructing a string, but any path label is a valid input string.
+## Where the finite bounds come from
 
-## Connections
+The high-level procedure in a decidability proof needs an explicit reason to halt. DFA reachability visits at most $\vert Q\vert $ states. Product construction for equivalence visits at most $\vert Q_A\vert \vert Q_B\vert $ pairs. Those finite bounds turn informal searches into deciders.
 
-- Basic Turing machines are defined in [Turing machines and the Church-Turing thesis](/cs/theory/turing-machines-and-the-church-turing-thesis).
-- The undecidable boundary starts in [decidability and the halting problem](/cs/theory/decidability-and-the-halting-problem).
-- Mapping reductions appear in [reductions and the recursion theorem](/cs/theory/reductions-and-the-recursion-theorem).
-- Time overhead becomes important in [time complexity, P, and NP](/cs/theory/time-complexity-p-and-np).
+For context-free grammars, membership can be decided by CYK after conversion to Chomsky normal form. Its table ranges over finitely many substrings and variables. CFG emptiness marks variables known to derive terminal strings; the marked set grows monotonically and can gain a variable at most $\vert V\vert $ times. Both procedures halt.
+
+The decidable boundary depends on the model and the property. CFG equivalence is undecidable even though CFG membership and emptiness are decidable. DFA emptiness and equivalence are decidable, while their general Turing-machine counterparts are undecidable. “A question about a formal language” supplies no verdict on its own.
+
+## Universal simulation stops short of a decider
+
+A universal Turing machine reads $\langle M,w\rangle$ and simulates $M$ on $w$. When $M$ accepts or rejects, the universal machine can report the same result. When $M$ loops, the simulation also loops.
+
+Universal simulation is enough to recognize $A_{TM}$ but not to decide it. The simulator has no general finite bound telling it when an unfinished run will never halt. The same ability to treat machine descriptions as data later supports mapping reductions and self-reference arguments; it does not remove the undecidable behavior of the simulated machine.
+
+## Details that commonly break a proof
+
+- A multitape layout improves convenience and may improve time, but does not enlarge the class of decidable languages.
+- Depth-first nondeterministic simulation can disappear into one infinite branch. Breadth-first exploration or dovetailing supplies fairness.
+- An ordinary enumerator need not sort its output or suppress duplicates.
+- CFG membership and emptiness are decidable; general CFG equivalence is not.
+- A high-level search proves decidability only after its finite state space, table, or monotone iteration bound has been identified.
+
+<div className="see-also">
+
+See also: [Turing machines and the Church-Turing thesis](/cs/theory/turing-machines-and-the-church-turing-thesis) · [Decidability and the halting problem](/cs/theory/decidability-and-the-halting-problem) · [Reductions and the recursion theorem](/cs/theory/reductions-and-the-recursion-theorem) · [Time complexity, P, and NP](/cs/theory/time-complexity-p-and-np)
+
+</div>

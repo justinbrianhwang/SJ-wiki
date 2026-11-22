@@ -9,7 +9,7 @@ Embedded-system requirements are often temporal. It is not enough to say "the re
 
 Temporal logic is a precise notation for such requirements. Lee and Seshia introduce invariants first, then linear temporal logic (LTL), because invariants are the most common and simplest time-spanning properties. Formal specifications matter because English requirements leave timing ambiguities that are unacceptable in safety-critical CPS design.
 
-## Definitions
+## Traces, propositions, and temporal operators
 
 An **invariant** is a property that remains true at all times during operation. If $p$ is a proposition over the current state and ports, then the invariant "always $p$" is written in LTL as
 
@@ -38,7 +38,7 @@ The main LTL temporal operators are:
 
 A **counterexample** is a trace showing that a formula does not hold.
 
-## Key results
+## Safety, liveness, and the meaning of time
 
 Safety properties say that nothing bad happens. Invariants are usually safety properties because a finite bad prefix can demonstrate violation.
 
@@ -84,7 +84,7 @@ The best specifications are readable twice: once by humans and once by tools. A 
 
 Temporal formulas should also be kept close to the model version they specify. If a state is renamed, an output is delayed by one tick, or an environment assumption changes, the formula may need to change as well. Specification drift is a real engineering risk, especially when models and code evolve separately.
 
-## Visual
+### From an English requirement to a counterexample
 
 ```mermaid
 flowchart LR
@@ -105,7 +105,7 @@ flowchart LR
 | Immediate response | $G(p \Rightarrow X q)$ | Every request is answered next step |
 | Until | $p U q$ | $p$ holds until $q$ occurs |
 
-## Worked example 1: Traffic-light safety invariant
+## Finding a traffic-light safety violation
 
 Problem: Let $carG$ mean the car traffic light is green. Let $pedG$ mean the pedestrian crossing signal is green. Formalize "cars and pedestrians are never both given right of way" and evaluate the trace below:
 
@@ -151,7 +151,7 @@ $$
 
 Answer: The formula is $G\neg(carG\wedge pedG)$. The given trace is a counterexample because both signals are green at reaction 2.
 
-## Worked example 2: Reset response with next and until
+## Specifying reset with next and weak until
 
 Problem: Let $r$ mean reset is asserted and $e$ mean the FSM is in `ErrorReset`. Formalize: "Whenever reset is asserted, the machine is in ErrorReset on the next tick and remains there until reset is deasserted."
 
@@ -165,25 +165,25 @@ $$
 
 2. Remaining in reset while reset stays asserted needs an until-style condition. Starting at the next tick, $e$ should hold until $\neg r$.
 
-3. One compact formula is
+3. If reset is required eventually to deassert, a strong-until form is
 
 $$
-G(r \Rightarrow X(e\ U\ \neg r)).
+G(r \Rightarrow X(e \wedge (e\ U\ \neg r))).
 $$
 
-4. Interpret carefully: if reset is asserted now, then at the next tick the suffix must satisfy $e U \neg r$.
+4. The explicit conjunction requires $e$ on the next tick even when reset is deasserted on that tick. The until subformula then keeps $e$ true on later ticks before deassertion.
 
-5. If reset is never deasserted, ordinary strong until requires $\neg r$ eventually. If that is not intended, use a weak-until variant or express the property as
+5. If reset may remain asserted forever, use weak until, written $W$:
 
 $$
-G(r \Rightarrow X(e\ U\ \neg r)) \vee G r
+G(r \Rightarrow X(e \wedge (e\ W\ \neg r))).
 $$
 
-   with more careful scoping, depending on the exact requirement language.
+   Weak until permits $e$ to remain true forever when $\neg r$ never arrives.
 
-Answer: A typical strong form is $G(r \Rightarrow X(e\ U\ \neg r))$, but the engineer must decide whether reset is required to eventually deassert.
+Answer: Use $G(r \Rightarrow X(e \wedge (e\ U\ \neg r)))$ when deassertion is required, or replace $U$ with $W$ when reset may stay asserted forever.
 
-## Code
+### Extracting a finite safety counterexample
 
 ```python
 def check_global_not_both(trace):
@@ -198,7 +198,7 @@ ok, index = check_global_not_both(trace)
 print("ok:", ok, "counterexample index:", index)
 ```
 
-## Common pitfalls
+## Specification mistakes that change the property
 
 - Writing "eventually" when the requirement means "next tick" or "within a bounded time."
 - Forgetting that an LTL formula is evaluated over traces, not just isolated states.
@@ -207,10 +207,8 @@ print("ok:", ok, "counterexample index:", index)
 - Using propositions that are not well-defined in the model.
 - Ignoring environmental assumptions. A response property may require assumptions about inputs or fairness.
 
-## Connections
+<div className="see-also">
 
-- [discrete dynamics](/cs/embedded/discrete-dynamics)
-- [reachability and model checking](/cs/embedded/reachability-and-model-checking)
-- [equivalence and refinement](/cs/embedded/equivalence-and-refinement)
-- [finite automata and DFAs](/cs/theory/finite-automata-and-dfas)
-- [composition of state machines](/cs/embedded/composition-of-state-machines)
+See also: [discrete dynamics](/cs/embedded/discrete-dynamics) · [reachability and model checking](/cs/embedded/reachability-and-model-checking) · [equivalence and refinement](/cs/embedded/equivalence-and-refinement) · [finite automata and DFAs](/cs/theory/finite-automata-and-dfas) · [composition of state machines](/cs/embedded/composition-of-state-machines)
+
+</div>

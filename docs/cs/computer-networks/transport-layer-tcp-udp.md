@@ -11,9 +11,9 @@ sidebar_position: 5
 
 The transport layer is where host-to-host packet delivery becomes process-to-process communication. UDP gives applications a minimal datagram interface. TCP builds a reliable ordered byte stream over IP's unreliable datagrams. Peterson-Davie emphasize that transport protocols are end-to-end protocols: they run primarily in hosts, not routers, and they must tolerate loss, reordering, duplication, delay variation, and changing paths [1].
 
-This page covers UDP, TCP connection management, sequence and acknowledgment numbers, sliding-window flow control, retransmission, TCP variants, PMTU and MSS, and QUIC. Congestion control is introduced here but developed more fully in [Congestion Control and Queue Management](/cs/computer-networks/congestion-control-and-queue-management).
+UDP, TCP, and QUIC expose different units and amounts of transport state to applications. Congestion control appears here only where it constrains the send window; [Congestion Control and Queue Management](/cs/computer-networks/congestion-control-and-queue-management) develops the algorithms themselves.
 
-## Definitions
+## Services and state kept at the endpoints
 
 **UDP** is the User Datagram Protocol [2]. It adds source port, destination port, length, and checksum around application data. UDP preserves message boundaries, does not establish a connection, and does not provide retransmission, ordering, congestion control, or flow control by itself. DNS, DHCP, RTP, gaming protocols, telemetry, and QUIC commonly use UDP when applications need control over timing or reliability.
 
@@ -31,29 +31,31 @@ $$
 
 **QUIC** is a transport protocol running over UDP with integrated TLS 1.3, stream multiplexing, connection migration, packet number spaces, loss recovery, and optional 0-RTT data [4]. HTTP/3 runs over QUIC [5].
 
-## Key results
+## Why byte streams behave differently from datagrams
 
-The first result is that UDP is not "unreliable TCP"; it is a minimal transport substrate. For DNS queries, one request and one response may be enough, with application-level retry on timeout. For real-time media, retransmitting old audio may be worse than skipping it. For QUIC, UDP is a deployable envelope that passes through NATs and middleboxes while QUIC implements modern transport features in user space.
+UDP is a minimal transport substrate rather than an unreliable version of TCP. For DNS queries, one request and one response may be enough, with application-level retry on timeout. For real-time media, retransmitting old audio may be worse than skipping it. For QUIC, UDP is a deployable envelope that passes through NATs and middleboxes while QUIC implements modern transport features in user space.
 
-The second result is that TCP sequence numbers count bytes, not packets. If a TCP segment carries 1000 bytes beginning at sequence number 1001, the next expected byte is 2001. SYN and FIN each consume one sequence number even when they carry no application data. This byte-oriented model lets TCP split, coalesce, retransmit, or reorder segments without changing the application stream.
+TCP sequence numbers count bytes, not packets. If a TCP segment carries 1000 bytes beginning at sequence number 1001, the next expected byte is 2001. SYN and FIN each consume one sequence number even when they carry no application data. This byte-oriented model lets TCP split, coalesce, retransmit, or reorder segments without changing the application stream.
 
-The third result is that cumulative ACKs are simple but ambiguous under loss. If the receiver ACKs 5001 repeatedly, the sender knows all bytes before 5001 arrived, but not which later out-of-order bytes may have arrived. Selective acknowledgment (SACK) adds blocks describing out-of-order data, allowing the sender to retransmit missing ranges rather than guessing [6].
+Cumulative ACKs are simple but ambiguous under loss. If the receiver ACKs 5001 repeatedly, the sender knows all bytes before 5001 arrived, but not which later out-of-order bytes may have arrived. Selective acknowledgment (SACK) adds blocks describing out-of-order data, allowing the sender to retransmit missing ranges rather than guessing [6].
 
-The fourth result is that retransmission timeout must adapt to measured RTT. A fixed timeout is either too aggressive on long paths or too slow on short paths. TCP estimates smoothed RTT and variation, then sets RTO conservatively. Karn's algorithm avoids using RTT samples from retransmitted data when ambiguity exists.
+The retransmission timeout must adapt to measured RTT. A fixed timeout is either too aggressive on long paths or too slow on short paths. TCP estimates smoothed RTT and variation, then sets RTO conservatively. Karn's algorithm avoids using RTT samples from retransmitted data when ambiguity exists.
 
-The fifth result is that TCP variants differ mainly in congestion control, not in the reliable byte-stream abstraction. Reno and NewReno use loss as congestion signal and AIMD-style growth. SACK improves loss recovery. CUBIC changes window growth to perform better on high-BDP networks and is widely deployed [7]. BBR estimates bottleneck bandwidth and RTT, pacing traffic to operate near a model of the path [8].
+TCP variants differ mainly in congestion control, not in the reliable byte-stream abstraction. Reno and NewReno use loss as congestion signal and AIMD-style growth. SACK improves loss recovery. CUBIC changes window growth to perform better on high-BDP networks and is widely deployed [7]. BBR estimates bottleneck bandwidth and RTT, pacing traffic to operate near a model of the path [8].
 
-The sixth result is that QUIC fixes several transport deployment problems. Because it encrypts most transport metadata, middleboxes cannot ossify as easily around internal fields. Because streams are multiplexed above UDP but below HTTP semantics, loss on one stream does not create TCP-level head-of-line blocking for other streams. Because connection IDs are not tied to a 4-tuple, a mobile client can migrate across networks.
+QUIC addresses several transport deployment problems. Because it encrypts most transport metadata, middleboxes cannot ossify as easily around internal fields. Because streams are multiplexed above UDP but below HTTP semantics, loss on one stream does not create TCP-level head-of-line blocking for other streams. Because connection IDs are not tied to a 4-tuple, a mobile client can migrate across networks.
 
-A seventh result is that transport protocols define backpressure boundaries. TCP receive windows tell the sender how much buffer space remains at the receiver, but applications still need to read from sockets promptly. If a server stops reading, the receive buffer fills, the advertised window shrinks, and the sender eventually stalls. This is useful backpressure. It becomes a bug when application code accidentally blocks an event loop, forgets to drain a stream, or buffers unbounded responses in memory.
+Transport protocols define backpressure boundaries. TCP receive windows tell the sender how much buffer space remains at the receiver, but applications still need to read from sockets promptly. If a server stops reading, the receive buffer fills, the advertised window shrinks, and the sender eventually stalls. This is useful backpressure. It becomes a bug when application code accidentally blocks an event loop, forgets to drain a stream, or buffers unbounded responses in memory.
 
-An eighth result is that transport APIs expose less than transport protocols know. A socket may report a timeout, reset, or end-of-file, but it cannot always tell whether a remote application processed a request before the failure. That ambiguity is why RPC systems add request IDs, deadlines, cancellation, idempotency tokens, and retry budgets above TCP or QUIC. The transport can deliver bytes reliably; it cannot define business-level success.
+Transport APIs expose less than transport protocols know. A socket may report a timeout, reset, or end-of-file, but it cannot always tell whether a remote application processed a request before the failure. That ambiguity is why RPC systems add request IDs, deadlines, cancellation, idempotency tokens, and retry budgets above TCP or QUIC. The transport can deliver bytes reliably; it cannot define business-level success.
 
-Finally, middleboxes strongly shape deployability. TCP options, new congestion-control behavior, UDP flows, and unusual packet sizes may encounter NATs, firewalls, proxies, and load balancers. QUIC's design reflects this history: it uses UDP for reachability, encrypts most internals to reduce ossification, and includes version negotiation so the protocol can evolve without every router understanding it.
+Middleboxes strongly shape deployability. TCP options, new congestion-control behavior, UDP flows, and unusual packet sizes may encounter NATs, firewalls, proxies, and load balancers. QUIC's design reflects this history: it uses UDP for reachability, encrypts most internals to reduce ossification, and includes version negotiation so the protocol can evolve without every router understanding it.
 
 Transport design also interacts with server architecture. A thread-per-connection server, an event-loop server, and a kernel-bypass dataplane may expose the same TCP service while behaving differently under many idle connections, slow readers, or bursty writes. The protocol defines the bytes on the wire; the implementation determines buffer pressure, scheduling delay, accept-queue overflow, and how quickly backpressure reaches the application.
 
-## Visual
+## TCP on the wire and at the socket
+
+### A connection in sequence space
 
 ```mermaid
 sequenceDiagram
@@ -78,7 +80,7 @@ sequenceDiagram
 | Connection migration | Application-defined | Difficult | Designed with connection IDs |
 | Congestion control | Application-defined | Required | Required |
 
-## Worked example 1: TCP sequence and acknowledgment numbers
+### Following sequence numbers through a handshake
 
 Problem: A TCP client has ISN 1000. A server has ISN 7000. After the handshake, the client sends three 1000-byte segments. Compute the main sequence and ACK numbers.
 
@@ -123,7 +125,7 @@ S -> C: ack=4001
 
 Answer: after the three data segments are received in order, the server's cumulative ACK is 4001, meaning "I have all client bytes before 4001; send byte 4001 next."
 
-## Worked example 2: Send window limited by receiver and congestion
+### Finding the active send-window limit
 
 Problem: A TCP receiver advertises a 64 KB receive window. The sender's congestion window is 40 KB. RTT is 50 ms. Estimate maximum sending rate before headers and losses. Then repeat after window scaling lets the receiver advertise 512 KB while congestion window remains 40 KB.
 
@@ -159,7 +161,7 @@ $$
 
 Answer: increasing only the receive window does not help when congestion window is the limiting factor. To improve throughput, congestion control must safely grow the congestion window or the path RTT/loss conditions must improve.
 
-## Code
+### Exercising a TCP socket pair
 
 ```python
 import socket
@@ -183,7 +185,7 @@ with socket.create_connection(("127.0.0.1", 9000)) as client:
     print(client.recv(4096))
 ```
 
-## Common pitfalls
+## Symptoms that are easy to misread
 
 - Saying TCP packets instead of TCP segments. IP carries packets; TCP creates segments over a byte stream.
 - Forgetting that SYN and FIN consume sequence numbers.
@@ -198,18 +200,6 @@ with socket.create_connection(("127.0.0.1", 9000)) as client:
 - Thinking QUIC is only "TCP over UDP." QUIC changes handshake, encryption, streams, migration, and deployability.
 - Using 0-RTT data without considering replay risk at the application layer.
 - Forgetting NAT and firewall idle timeouts for long-lived UDP and TCP flows.
-
-## Connections
-
-- [Foundations and Layered Architecture](/cs/computer-networks/foundations-and-layered-architecture) explains the end-to-end placement of transport logic.
-- [Internetworking and IP Routing](/cs/computer-networks/internetworking-and-ip-routing) provides the datagram service TCP, UDP, and QUIC use.
-- [Congestion Control and Queue Management](/cs/computer-networks/congestion-control-and-queue-management) expands AIMD, slow start, CUBIC, BBR, ECN, and AQM.
-- [Application Layer and Naming](/cs/computer-networks/application-layer-and-naming) shows how DNS, HTTP, RTP, and gRPC choose transport behavior.
-- [Network Security and TLS](/cs/computer-networks/network-security-and-tls) explains TLS over TCP and TLS 1.3 inside QUIC.
-- [Cryptography](/cs/cryptography/intro) supplies AEAD and key exchange for TLS and QUIC.
-- [Distributed Systems](/cs/distributed-systems/intro) builds RPC, replication, and membership protocols on transport assumptions.
-- [Operating Systems](/cs/operating-systems/intro) covers sockets, kernel TCP, buffers, event loops, and zero-copy I/O.
-- [Computer Architecture](/cs/computer-architecture/intro) matters for checksum offload, TSO/GSO, RSS, and NIC queues.
 
 ## References
 
@@ -228,3 +218,19 @@ with socket.create_connection(("127.0.0.1", 9000)) as client:
 [7] I. Rhee, L. Xu, S. Ha, A. Zimmermann, L. Eggert, and R. Scheffenegger, "CUBIC for Fast Long-Distance Networks," RFC 9438, Aug. 2023.
 
 [8] N. Cardwell, Y. Cheng, C. S. Gunn, S. H. Yeganeh, and V. Jacobson, "BBR: Congestion-based congestion control," *Communications of the ACM*, vol. 60, no. 2, pp. 58-66, 2017.
+
+<div className="see-also">
+
+See also:
+
+- [Foundations and Layered Architecture](/cs/computer-networks/foundations-and-layered-architecture) explains the end-to-end placement of transport logic.
+- [Internetworking and IP Routing](/cs/computer-networks/internetworking-and-ip-routing) provides the datagram service TCP, UDP, and QUIC use.
+- [Congestion Control and Queue Management](/cs/computer-networks/congestion-control-and-queue-management) expands AIMD, slow start, CUBIC, BBR, ECN, and AQM.
+- [Application Layer and Naming](/cs/computer-networks/application-layer-and-naming) shows how DNS, HTTP, RTP, and gRPC choose transport behavior.
+- [Network Security and TLS](/cs/computer-networks/network-security-and-tls) explains TLS over TCP and TLS 1.3 inside QUIC.
+- [Cryptography](/cs/cryptography/intro) supplies AEAD and key exchange for TLS and QUIC.
+- [Distributed Systems](/cs/distributed-systems/intro) builds RPC, replication, and membership protocols on transport assumptions.
+- [Operating Systems](/cs/operating-systems/intro) covers sockets, kernel TCP, buffers, event loops, and zero-copy I/O.
+- [Computer Architecture](/cs/computer-architecture/intro) matters for checksum offload, TSO/GSO, RSS, and NIC queues.
+
+</div>

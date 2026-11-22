@@ -445,9 +445,8 @@ Independence corresponds to $C(u,v)=uv$. The formalism separates marginal behavi
 
 When building a model from marginals, independence is therefore an additional modeling choice, not a neutral default forced by the data. It should be supported by the mechanism or checked against joint observations.
 
-## Related pages
+<div className="see-also">
 
-- [Conditional probability, Bayes, and independence](/math/probability-and-random-variables/conditional-probability-bayes-independence)
-- [Continuous random variables and uniform laws](/math/probability-and-random-variables/continuous-random-variables-and-uniform-laws)
-- [Sums, convolutions, and order statistics](/math/probability-and-random-variables/sums-convolutions-order-statistics)
-- [Covariance, correlation, and conditional expectation](/math/probability-and-random-variables/covariance-correlation-conditional-expectation)
+See also: [Conditional probability, Bayes, and independence](/math/probability-and-random-variables/conditional-probability-bayes-independence) · [Continuous random variables and uniform laws](/math/probability-and-random-variables/continuous-random-variables-and-uniform-laws) · [Sums, convolutions, and order statistics](/math/probability-and-random-variables/sums-convolutions-order-statistics) · [Covariance, correlation, and conditional expectation](/math/probability-and-random-variables/covariance-correlation-conditional-expectation)
+
+</div>

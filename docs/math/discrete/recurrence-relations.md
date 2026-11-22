@@ -9,7 +9,7 @@ A recurrence relation defines each term of a sequence from previous terms. It is
 
 Solving a recurrence means replacing the step-by-step definition with a closed form or at least a sharp growth estimate. Modeling and solving are different skills. The modeling step explains why the terms satisfy the recurrence; the solving step uses iteration, characteristic equations, generating functions, recursion trees, or asymptotic methods.
 
-## Definitions
+## Recurrence types and what counts as a solution
 
 A **recurrence relation** for a sequence $\{a_n\}$ is an equation that expresses $a_n$ in terms of earlier terms. **Initial conditions** specify enough starting values to determine the sequence uniquely.
 
@@ -35,7 +35,7 @@ where $a$ subproblems of size $n/b$ are solved and $g(n)$ additional work is don
 
 A **closed form** expresses $a_n$ directly in terms of $n$ without referring to earlier terms. An **asymptotic solution** describes growth, such as $T(n)=\Theta(n\log n)$, even if no exact closed form is needed.
 
-## Key results
+## Choosing a solving method
 
 For the first-order geometric recurrence
 
@@ -87,8 +87,6 @@ solves to $\Theta(n\log n)$ because each recursion level costs $\Theta(n)$ and t
 
 The master theorem for many recurrences $T(n)=aT(n/b)+g(n)$ compares $g(n)$ with $n^{\log_b a}$. It is powerful but not universal; it requires regularity conditions and does not handle every recurrence.
 
-## Visual
-
 ```mermaid
 flowchart TD
   A[Recurrence problem] --> B{Type}
@@ -112,15 +110,13 @@ flowchart TD
 | $T(n)=2T(n/2)+cn$ | recursion tree | $\Theta(n\log n)$ |
 | $a_n=a_{n-1}+F(n)$ | summation | accumulated forcing term |
 
-## Worked example 1: Solve a linear recurrence
+## Characteristic roots for $a_n=5a_{n-1}-6a_{n-2}$
 
 **Problem.** Solve
 
 $$
 a_n=5a_{n-1}-6a_{n-2},\qquad a_0=2,\quad a_1=5.
 $$
-
-**Method.**
 
 1. Try $a_n=r^n$:
 
@@ -166,7 +162,7 @@ $$
 
 Then $\alpha=1$.
 
-**Checked answer.** The solution is
+The solution is
 
 $$
 a_n=2^n+3^n.
@@ -174,11 +170,9 @@ $$
 
 Checking: $a_0=1+1=2$, $a_1=2+3=5$, and $5(2^{n-1}+3^{n-1})-6(2^{n-2}+3^{n-2})=2^n+3^n$.
 
-## Worked example 2: Count bit strings with no consecutive zeros
+## Counting bit strings with no consecutive zeros
 
 **Problem.** Let $a_n$ be the number of bit strings of length $n$ with no consecutive zeros. Find a recurrence and compute $a_5$.
-
-**Method.**
 
 1. Separate valid strings by their ending.
 2. If a valid string of length $n$ ends in $1$, then the first $n-1$ bits can be any valid string of length $n-1$. This contributes $a_{n-1}$ strings.
@@ -214,9 +208,9 @@ a_5&=a_4+a_3=13.
 \end{aligned}
 $$
 
-**Checked answer.** There are $13$ length-$5$ bit strings with no consecutive zeros. A brute-force listing confirms this count.
+There are $13$ length-$5$ bit strings with no consecutive zeros. A brute-force listing confirms this count.
 
-## Code
+## Generating recurrence values iteratively
 
 ```python
 def no_consecutive_zeros(n):
@@ -241,7 +235,7 @@ print(solve_second_order(2, 5, 5, -6, 8))
 
 The second function numerically checks the recurrence from the first worked example, producing values of $2^n+3^n$.
 
-## Common pitfalls
+## Separating the model, algebra, and initial conditions
 
 - Giving a recurrence without enough initial conditions. A second-order recurrence usually needs two starting values.
 - Solving a recurrence but not checking the initial conditions.
@@ -272,10 +266,14 @@ In algorithm analysis, decide whether the recurrence is exact or asymptotic. Wri
 
 When a recurrence is solved by a table of values, look for both additive and multiplicative patterns. First differences may reveal an arithmetic component; ratios may reveal geometric growth. These observations are not proofs, but they suggest which formal method to try next: telescoping, characteristic equations, or generating functions.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Induction and recursion](/math/discrete/induction-and-recursion) gives the proof method for recursive definitions.
 - [Functions, sequences, and sums](/math/discrete/functions-sequences-sums) introduces sequences and summation notation.
 - [Generating functions](/math/discrete/generating-functions) solves recurrences by turning sequences into power series.
 - [Algorithms and complexity](/math/discrete/algorithms-and-complexity) uses recurrences to analyze divide-and-conquer algorithms.
 - [Counting principles](/math/discrete/counting-principles) supplies combinatorial decompositions that lead to recurrences.
+
+</div>

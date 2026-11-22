@@ -445,9 +445,8 @@ At zero flip probability, $Y$ reveals $X$ and mutual information is one bit. At 
 - Differential entropy for continuous variables uses a density inside the logarithm. It can be negative and changes under rescaling, so discrete entropy intuitions cannot be transferred without adjustment.
 - Huffman coding optimizes expected length among symbol-by-symbol prefix codes. It does not by itself account for model uncertainty, transmission errors, or dependencies between successive symbols.
 
-## Related pages
+<div className="see-also">
 
-- [Conditional probability, Bayes, and independence](/math/probability-and-random-variables/conditional-probability-bayes-independence)
-- [Discrete random variables, expectation, and variance](/math/probability-and-random-variables/discrete-random-variables-expectation-variance)
-- [Markov chains](/math/probability-and-random-variables/markov-chains)
-- [Strong law and Jensen's inequality](/math/probability-and-random-variables/strong-law-and-jensens-inequality)
+See also: [Conditional probability, Bayes, and independence](/math/probability-and-random-variables/conditional-probability-bayes-independence) · [Discrete random variables, expectation, and variance](/math/probability-and-random-variables/discrete-random-variables-expectation-variance) · [Markov chains](/math/probability-and-random-variables/markov-chains) · [Strong law and Jensen's inequality](/math/probability-and-random-variables/strong-law-and-jensens-inequality)
+
+</div>

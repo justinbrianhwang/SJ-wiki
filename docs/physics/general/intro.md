@@ -5,19 +5,50 @@ sidebar_position: 1
 
 # General Physics: HRW Introductory Roadmap
 
-General physics is the discipline of turning ordinary events into quantitative models: falling, sliding, rotating, heating, flowing, oscillating, charging, refracting, and scattering. The Halliday, Resnick, and Walker sequence works because each new unit reuses earlier habits. Measurement and vectors make physical language precise. Mechanics develops force, energy, and momentum. Rotation and fluids show how extended systems need new variables. Oscillations and waves introduce phase and resonance. Thermal physics adds macroscopic and microscopic energy bookkeeping. Electricity and magnetism replace contact forces with fields. Optics tests ray and wave models. Relativity and quantum physics mark the limits of the classical picture.
+General physics turns ordinary events into quantitative models: falling, sliding, rotating, heating, flowing, oscillating, charging, refracting, and scattering. The Halliday–Resnick–Walker sequence is cumulative. Measurement and vectors establish the language; mechanics develops force, energy, and momentum; rotation and fluids extend it beyond point particles; oscillations and waves introduce phase and resonance; thermal physics adds macroscopic and microscopic energy bookkeeping; fields replace contact interactions in electricity and magnetism; optics tests ray and wave descriptions; relativity and quantum physics mark the limits of classical models.
 
-The notes in this folder are structured as study pages rather than textbook replacements. Each page gives definitions, key results, a visual anchor, two worked numerical examples, a short code check, common mistakes, and links to neighboring ideas. The intended use is active: read the statement of a worked example, cover the solution, attempt the method yourself, and then compare the algebra, units, and limiting-case checks.
+## Models, state, and system boundaries
 
-## Definitions
+A **physical model** suppresses details that do not matter at the scale of the question. A point particle has no size or rotation, a rigid body does not deform, an ideal fluid is incompressible and nonviscous, an ideal gas follows a simple equation of state, and an electrostatic model holds charges fixed.
 
-A **physical model** is a simplified representation of a real situation. A point particle model ignores size and rotation; a rigid body model ignores deformation; an ideal fluid has no viscosity and is incompressible; an ideal gas follows a simple equation of state; an electrostatic model assumes charges are at rest. A **state variable** is a measurable quantity that helps specify a system, such as position, velocity, temperature, pressure, charge, current, or angular velocity. A **law** connects state variables and interactions. A **conservation principle** states that some quantity changes only by transfer across the system boundary.
+A **state variable** helps specify a system: position, velocity, temperature, pressure, charge, current, and angular velocity are examples. A **law** relates state variables and interactions. A **conservation principle** states that a quantity changes only by transfer across a chosen system boundary.
 
-Notation matters throughout the course. Vectors carry magnitude and direction, so equations such as $\vec F=m\vec a$ must be interpreted component by component. Scalars such as work, energy, temperature, pressure, entropy, and electric potential do not have direction, though they may be positive or negative relative to a reference. Units are part of definitions. A result with wrong dimensions cannot be correct, and a result with right dimensions is only a candidate until signs, assumptions, and limiting cases also make sense.
+Vectors carry magnitude and direction, so $\vec F=m\vec a$ must be read component by component. Work, energy, temperature, pressure, entropy, and electric potential are scalars; their signs still depend on references and conventions.
 
-## Key results
+Units are part of the model. Wrong dimensions rule out an answer. Correct dimensions leave a candidate that still needs checks on sign, assumptions, limiting cases, and scale.
 
-The course can be organized into four families of results. First are evolution equations, such as kinematics, Newton's second law, rotational dynamics, circuit transients, thermodynamic process equations, and wave equations. Second are conservation laws: energy, linear momentum, angular momentum, charge, and entropy constraints for isolated systems. Third are field laws: Newton's gravitation, Coulomb's law, Gauss's law, Ampere's law, Faraday's law, and the qualitative content of Maxwell's equations. Fourth are model-transition ideas: ray versus wave optics, classical versus relativistic motion, and particle versus wave descriptions of matter.
+## The course as a chain of reused ideas
+
+The subject can be grouped into four families:
+
+- **Evolution equations:** kinematics, Newton's second law, rotational dynamics, circuit transients, thermodynamic process equations, and wave equations.
+- **Conservation laws:** energy, linear momentum, angular momentum, charge, and entropy constraints for isolated systems.
+- **Field laws:** Newtonian gravitation, Coulomb's law, Gauss's law, Ampère's law, Faraday's law, and the qualitative content of Maxwell's equations.
+- **Model transitions:** ray and wave optics, classical and relativistic motion, and particle and wave descriptions of matter.
+
+```mermaid
+graph LR
+  A["Measurement"] --> B["Vectors"]
+  B --> C["Mechanics"]
+  C --> D["Energy and momentum"]
+  D --> E["Rotation and fluids"]
+  E --> F["Oscillations and waves"]
+  F --> G["Thermal physics"]
+  G --> H["Electricity and magnetism"]
+  H --> I["Optics"]
+  I --> J["Modern physics"]
+```
+
+| Course region | Central quantities | Typical method |
+|---|---|---|
+| Measurement and motion | $x$, $v$, $a$, $\vec r$ | units, coordinates, kinematics |
+| Dynamics | $\vec F$, $K$, $U$, $\vec p$ | free-body diagrams, work, impulse |
+| Extended systems | $\tau$, $I$, $\vec L$, stress | rotational dynamics and equilibrium |
+| Thermal physics and waves | $T$, $Q$, $S$, $f$, $\lambda$ | energy accounting and phase |
+| Fields and circuits | $\vec E$, $V$, $I$, $\vec B$ | flux, potential, Kirchhoff's laws |
+| Optics and modern limits | phase, wavelength, $\gamma$, $h$ | rays, interference, relativity, quanta |
+
+In compact form,
 
 $$
 \begin{aligned}
@@ -30,140 +61,90 @@ $$
 \end{aligned}
 $$
 
-The sequence is cumulative. A projectile problem needs vectors and kinematics. A rolling problem needs translation, rotation, energy, and static friction. A circuit transient looks mathematically like exponential cooling or damping. A diffraction problem requires geometry, wave phase, and careful small-angle reasoning. The most efficient study question is not "Which chapter is this from?" but "Which quantity is being transferred or constrained: force, energy, momentum, angular momentum, heat, charge, flux, phase, or probability?"
+A projectile uses vectors and kinematics. Rolling combines translation, rotation, energy, and static friction. A circuit transient has the same exponential structure as cooling and damping. Diffraction combines geometry, phase, and small-angle approximations. Instead of asking which chapter supplied a problem, identify what is transferred or constrained: force, energy, momentum, angular momentum, heat, charge, flux, phase, or probability.
 
-## Visual
+## Energy when the path shape does not matter
 
-```mermaid
-graph LR
-  A[Measurement] --> B[Vectors]
-  B --> C[Mechanics]
-  C --> D[Energy and Momentum]
-  D --> E[Rotation and Fluids]
-  E --> F[Oscillations and Waves]
-  F --> G[Thermal Physics]
-  G --> H[Electricity and Magnetism]
-  H --> I[Optics]
-  I --> J[Modern Physics]
-```
+A $2.0\,\mathrm{kg}$ block starts from rest and descends $1.8\,\mathrm{m}$ on a frictionless track. The normal force is perpendicular to the motion and does no work; gravity is conservative. Because only the vertical drop affects the final speed, an energy balance is shorter than resolving forces along an unspecified track.
 
-| Course region | Central quantities | Typical method |
-|---|---|---|
-| Measurement and motion | $x$, $v$, $a$, $\vec r$ | units, coordinates, kinematics |
-| Dynamics | $\vec F$, $K$, $U$, $\vec p$ | free-body diagrams, work, impulse |
-| Extended systems | $\tau$, $I$, $\vec L$, stress | rotational dynamics and equilibrium |
-| Thermal and waves | $T$, $Q$, $S$, $f$, $\lambda$ | energy accounting and phase |
-| Fields and circuits | $\vec E$, $V$, $I$, $\vec B$ | flux, potential, Kirchhoff laws |
-| Optics and modern limits | phase, wavelength, $\gamma$, $h$ | rays, interference, relativity, quanta |
-
-## Worked example 1: Choosing an energy method
-
-**Problem.** A $2.0\,\mathrm{kg}$ block slides from rest down a frictionless track and drops $1.8\,\mathrm{m}$ vertically. Find its speed at the bottom and explain why energy is the natural method.
-
-**Method.** The normal force is perpendicular to the motion and does no work. Gravity is conservative. The track shape is irrelevant to the final speed, so use conservation of mechanical energy.
-
-1. Define the system as block plus Earth.
-2. Choose the bottom as $U_f=0$ and the release point as $U_i=mgh$.
-3. Initial kinetic energy is zero.
-4. Conservation gives
+Take the system to be the block and Earth, and choose the bottom as $U_f=0$. Then
 
 $$
 \begin{aligned}
-K_i+U_i &= K_f+U_f \\
+K_i+U_i &= K_f+U_f, \\
 0+mgh &= \frac12mv_f^2+0.
 \end{aligned}
 $$
 
-5. Cancel mass and solve:
+Mass cancels, leaving
 
 $$
-v_f=\sqrt{2gh}=\sqrt{2(9.8)(1.8)}=5.94\,\mathrm{m/s}.
+v_f=\sqrt{2gh}
+=\sqrt{2(9.8)(1.8)}
+=5.94\,\mathrm{m/s}.
 $$
 
-**Checked answer.** The mass cancels, as expected for ideal gravitational motion. The speed is below $10\,\mathrm{m/s}$ because the drop is less than $5\,\mathrm{m}$.
+Independence from mass agrees with ideal gravitational motion. A drop under two meters should produce a speed of only several meters per second, so the scale is plausible.
 
-## Worked example 2: Choosing a field method
+## Coulomb's law for two point charges
 
-**Problem.** A charge $q=3.0\,\mathrm{nC}$ is $0.20\,\mathrm{m}$ from a charge $Q=8.0\,\mathrm{nC}$. Find the force magnitude on $q$.
-
-**Method.** For two point charges, Coulomb's law is direct. For many charges, compute $\vec E$ first and then use $\vec F=q\vec E$.
-
-1. Use
+Let $q=3.0\,\mathrm{nC}$ and $Q=8.0\,\mathrm{nC}$ be separated by $0.20\,\mathrm{m}$. For two point charges, the force magnitude follows directly from
 
 $$
-F=k\frac{|Qq|}{r^2}, \quad k=8.99\times10^9\,\mathrm{N\,m^2/C^2}.
+F=k\frac{|Qq|}{r^2},
+\qquad
+k=8.99\times10^9\,\mathrm{N\,m^2/C^2}.
 $$
 
-2. Substitute:
+Substitution gives
 
 $$
-F=(8.99\times10^9)\frac{(8.0\times10^{-9})(3.0\times10^{-9})}{(0.20)^2}.
+\begin{aligned}
+F
+&=(8.99\times10^9)
+\frac{(8.0\times10^{-9})(3.0\times10^{-9})}{(0.20)^2} \\
+&=5.39\times10^{-6}\,\mathrm{N}.
+\end{aligned}
 $$
 
-3. Compute:
+Both charges are positive, so the force on $q$ points away from $Q$. For many source charges, it is usually cleaner to sum their electric fields first and then apply $\vec F=q\vec E$.
 
-$$
-F=5.39\times10^{-6}\,\mathrm{N}.
-$$
+## Choosing an equation only after choosing a model
 
-**Checked answer.** Micro-newtons are reasonable for nanocoulomb charges separated by centimeters.
+Many wrong solutions begin with a familiar formula before the system, coordinates, and assumptions are fixed. Mark the idealizations in the prompt: frictionless surface, ideal string, point charge, thin lens, small angle, steady flow, reversible process, nonrelativistic particle, or uniform field. Then choose a boundary and ask what can cross it.
 
-## Code
+Conservation laws are not interchangeable. An external impulse can change the momentum of the selected system. Friction inside a block–floor system preserves total energy while converting mechanical energy into thermal energy. A Gaussian surface enclosing zero net charge has zero net flux, even though the field at individual points on the surface may be nonzero.
 
-```python
-import math
+A negative result often reports direction or bookkeeping rather than failure: a velocity may oppose the positive axis, work may be done by the system rather than on it, or a potential change may lower the energy of one sign of charge and raise the other.
 
-speed = math.sqrt(2 * 9.8 * 1.8)
-force = 8.99e9 * (8.0e-9 * 3.0e-9) / (0.20 ** 2)
-print(f"roadmap pages = 25")
-print(f"track speed = {speed:.2f} m/s")
-print(f"electric force = {force:.2e} N")
-```
+## Reversing familiar formulas
 
-## Common pitfalls
+Equations are relationships, not one-way recipes. Solve kinematic equations for time, acceleration, or displacement according to the available data. Rearrange Ohm's law for voltage, current, or resistance and then check power. Solve the thin-lens equation for image distance, object distance, or focal length and compare the sign with a ray diagram. Rearrange the first law of thermodynamics only after fixing the convention for work done by or on the system.
 
-- Treating chapters as isolated instead of cumulative.
-- Memorizing equations without their assumptions.
-- Substituting numbers before choosing the system, signs, and coordinates.
-- Confusing vectors and scalars.
-- Reading worked examples passively instead of trying the next step first.
+After a forward solution, change the target. Ask which initial speed, resistance, angle, charge, temperature change, or wavelength would produce the stated outcome. This exposes the structure of the relationship more clearly than repeating the same substitution.
 
-A final check is to perturb one input mentally. Doubling a distance, mass, charge, stiffness, frequency, or temperature should change the answer in a way that matches the physical story. If the algebra says the opposite, revisit the setup before blaming arithmetic. Also remember that a negative answer is often information: it may indicate direction opposite to the chosen axis, work done by a system rather than on it, or a potential change that lowers the energy of a positive or negative charge differently.
+Then change an assumption. Air resistance couples the horizontal and vertical parts of projectile motion. A pulley with rotational inertia may have unequal string tensions. A thick lens makes the thin-lens equation approximate. For an irreversible gas process, entropy change can be calculated along a reversible path connecting the same equilibrium states, even though that path is not the actual process.
 
-When a problem feels difficult, the hidden issue is often not the last algebraic step but the first modeling decision. Re-read the words and mark what is being idealized: frictionless surface, ideal string, point charge, thin lens, small angle, steady flow, reversible process, nonrelativistic particle, or uniform field. Then mark what is conserved, if anything. Energy conservation, momentum conservation, angular momentum conservation, charge conservation, and entropy constraints are not interchangeable; each one has a system boundary and a transfer condition. If an external impulse acts, momentum may not be conserved for the chosen system. If friction acts within a block-floor system, mechanical energy is not conserved even though total energy is. If a Gaussian surface encloses no net charge, flux is zero, but the field at points on the surface need not be zero.
+## Scale, units, and limiting cases
 
-Another common pitfall is using a memorized equation in only its most familiar direction. A formula is a relationship, so practice solving it for different unknowns. In kinematics, solve for time, acceleration, or displacement depending on what the data support. In circuits, solve Ohm's law for voltage, current, or resistance and then check power. In optics, solve the thin-lens equation for image distance, object distance, or focal length and compare the sign with a ray diagram. In thermodynamics, rearrange the first law only after deciding whether work is done by the system or on the system. This flexibility prevents formula matching from replacing reasoning.
+Perturb one input mentally. Doubling a distance, charge, stiffness, frequency, or temperature should change the answer in a way consistent with the model. An inverse-square law must weaken by a factor of four when distance doubles. A spring frequency should rise with stiffness and fall with mass.
 
-Finally, keep scale awareness. Introductory physics problems often use idealized numbers, but the answers should still sit on recognizable scales: walking speeds are meters per second, orbital speeds are kilometers per second, visible wavelengths are hundreds of nanometers, household currents are often amperes or less, and thermal energies per molecule at room temperature are small in joules but meaningful in electron-volts. When an answer is many orders of magnitude away from these anchors, check unit conversions first. Prefix errors such as nano versus micro, centimeters versus meters, and milliseconds versus seconds are among the fastest ways to turn correct physics into a wrong result.
+Keep a few scale anchors: walking speeds are meters per second, orbital speeds kilometers per second, visible wavelengths hundreds of nanometers, household currents commonly amperes or less, and room-temperature molecular energies are tiny in joules but convenient in electron-volts. Results many orders of magnitude away from these scales call for a unit check. Nano versus micro, centimeters versus meters, and milliseconds versus seconds are frequent sources of large errors.
 
-For exam preparation, make the worked examples bidirectional. After solving a forward problem, change the target: ask what initial speed, resistance, angle, charge, temperature change, or wavelength would have produced the stated answer. This exposes whether you understand the structure or only followed the arithmetic once. Then make one assumption false and describe what would change. If air resistance is no longer negligible, projectile motion no longer separates into a constant horizontal speed. If a pulley has rotational inertia, the two string tensions need not match. If a lens is not thin, the thin-lens equation becomes an approximation. If a gas process is not reversible, entropy must be found from a reversible path connecting the same states, not from the literal irreversible path. These small variations turn a page of notes into a usable problem-solving tool.
+Before leaving a calculation, state the result in one complete physical sentence naming the system, direction or sign when relevant, and the assumptions under which the number holds.
 
-Before leaving the problem, write one complete sentence that states the result in physical language. That sentence should name the object or system, the direction or sign when relevant, and the assumption under which the answer was obtained.
+## A working routine for the examples
 
-## Connections
+1. Identify the system, environment, coordinates, and requested quantity.
+2. List the approximations and determine the regime in which they hold.
+3. Draw the geometry, free-body diagram, circuit, ray diagram, or process path that corresponds to the model.
+4. Choose a law from the interactions and boundary conditions, then solve symbolically as far as useful.
+5. Substitute values with units and retain enough precision for the data.
+6. Check dimensions, sign, limiting behavior, and order of magnitude.
+7. Change the target or one assumption to test whether the relationship is understood beyond a single calculation.
 
-- [Measurement and Vectors](/physics/general/measurement-units-and-vectors)
-- [One-Dimensional Kinematics](/physics/general/one-dimensional-kinematics)
-- [Two-Dimensional Motion](/physics/general/two-dimensional-motion)
-- [Newton's Laws and Applications](/physics/general/newtons-laws-and-applications)
-- [Work, Energy, and Conservation](/physics/general/work-energy-and-conservation)
-- [Linear Momentum and Collisions](/physics/general/linear-momentum-and-collisions)
-- [Rotation and Angular Momentum](/physics/general/rotation-torque-and-angular-momentum)
-- [Equilibrium and Elasticity](/physics/general/equilibrium-and-elasticity)
-- [Gravitation](/physics/general/gravitation-and-keplers-laws)
-- [Fluids](/physics/general/fluids-statics-dynamics-and-bernoulli)
-- [Oscillations](/physics/general/oscillations-shm-damping-and-resonance)
-- [Waves and Sound](/physics/general/waves-sound-standing-waves-and-doppler)
-- [Temperature, Heat, and Kinetic Theory](/physics/general/temperature-heat-and-kinetic-theory)
-- [Thermodynamics](/physics/general/first-law-entropy-and-second-law)
-- [Coulomb's Law and Electric Field](/physics/general/coulombs-law-and-electric-fields)
-- [Gauss's Law](/physics/general/gausss-law-and-electric-flux)
-- [Electric Potential and Capacitance](/physics/general/electric-potential-and-capacitance)
-- [Current, Resistance, and DC Circuits](/physics/general/current-resistance-and-dc-circuits)
-- [Magnetic Fields and Forces](/physics/general/magnetic-fields-and-forces)
-- [Magnetic Sources and Induction](/physics/general/ampere-faraday-lenz-and-inductance)
-- [AC Circuits and EM Waves](/physics/general/ac-circuits-and-electromagnetic-waves)
-- [Geometric Optics](/physics/general/geometric-optics-reflection-and-refraction)
-- [Interference and Diffraction](/physics/general/interference-diffraction-and-gratings)
-- [Relativity Intro](/physics/general/relativity-intro)
-- [Quantum Intro](/physics/general/quantum-intro-photons-and-matter-waves)
+<div className="see-also">
+
+See also: [Measurement and Vectors](/physics/general/measurement-units-and-vectors) · [One-Dimensional Kinematics](/physics/general/one-dimensional-kinematics) · [Two-Dimensional Motion](/physics/general/two-dimensional-motion) · [Newton's Laws and Applications](/physics/general/newtons-laws-and-applications) · [Work, Energy, and Conservation](/physics/general/work-energy-and-conservation) · [Linear Momentum and Collisions](/physics/general/linear-momentum-and-collisions) · [Rotation and Angular Momentum](/physics/general/rotation-torque-and-angular-momentum) · [Equilibrium and Elasticity](/physics/general/equilibrium-and-elasticity) · [Gravitation](/physics/general/gravitation-and-keplers-laws) · [Fluids](/physics/general/fluids-statics-dynamics-and-bernoulli) · [Oscillations](/physics/general/oscillations-shm-damping-and-resonance) · [Waves and Sound](/physics/general/waves-sound-standing-waves-and-doppler) · [Temperature, Heat, and Kinetic Theory](/physics/general/temperature-heat-and-kinetic-theory) · [Thermodynamics](/physics/general/first-law-entropy-and-second-law) · [Coulomb's Law and Electric Field](/physics/general/coulombs-law-and-electric-fields) · [Gauss's Law](/physics/general/gausss-law-and-electric-flux) · [Electric Potential and Capacitance](/physics/general/electric-potential-and-capacitance) · [Current, Resistance, and DC Circuits](/physics/general/current-resistance-and-dc-circuits) · [Magnetic Fields and Forces](/physics/general/magnetic-fields-and-forces) · [Magnetic Sources and Induction](/physics/general/ampere-faraday-lenz-and-inductance) · [AC Circuits and EM Waves](/physics/general/ac-circuits-and-electromagnetic-waves) · [Geometric Optics](/physics/general/geometric-optics-reflection-and-refraction) · [Interference and Diffraction](/physics/general/interference-diffraction-and-gratings) · [Relativity Intro](/physics/general/relativity-intro) · [Quantum Intro](/physics/general/quantum-intro-photons-and-matter-waves)
+
+</div>

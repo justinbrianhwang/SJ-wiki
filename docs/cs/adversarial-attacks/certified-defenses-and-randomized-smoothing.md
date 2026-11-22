@@ -7,13 +7,9 @@ sidebar_position: 8
 
 Empirical defenses try strong attacks and report whether the model survives. Certified defenses make a different kind of claim: within a specified perturbation set, no adversarial example exists for a particular input. This distinction is essential. A failed PGD attack is evidence; a valid certificate is a proof under assumptions.
 
-![A visually similar adversarial panda image is classified as a gibbon by an ImageNet model.](https://ar5iv.labs.arxiv.org/html/1412.6572/assets/gibbon_993.png)
-
-*Figure: The FGSM panda example shows that imperceptible perturbations can change model decisions. Image: [ar5iv](https://arxiv.org/abs/1412.6572), Goodfellow, Shlens, and Szegedy, educational use with attribution.*
-
 The field contains many certification approaches, including interval bound propagation, linear relaxations such as CROWN-style methods, convex relaxations, exact verification for small networks, and randomized smoothing. Randomized smoothing is especially important because it scales to large classifiers and gives clean $\ell_2$ certificates by wrapping a base classifier with Gaussian noise.
 
-## Definitions
+## From pointwise certificates to certified accuracy
 
 Let $h(x)$ be a classifier. A **pointwise robustness certificate** at $(x,y)$ with radius $r$ under norm $p$ proves:
 
@@ -51,7 +47,7 @@ where $p_A$ is a lower confidence bound on the top-class probability, $p_B$ is a
 
 **Interval Bound Propagation (IBP)** propagates lower and upper activation bounds through the network. **Linear bound propagation** methods propagate affine upper and lower relaxations. **Convex relaxation** methods replace the nonconvex neural network verification problem with a tractable relaxation that upper-bounds worst-case loss or lower-bounds margins.
 
-## Key results
+## Sound bounds, logit margins, and scalability
 
 Certification is threat-model-specific. A certificate for $\ell_2$ radius $0.5$ does not imply robustness to $\ell_\infty$ radius $8/255$, patches, rotations, corruptions, or semantic edits. The certificate is only as broad as the perturbation set and assumptions used by the verifier.
 
@@ -84,7 +80,7 @@ Certification also has a workflow distinction between prediction and certificati
 
 Certificates can be abstaining by design. If the verifier cannot prove the margin or the smoothing vote is not decisive, the honest result is "not certified," not "not robust." This conservatism is why certified accuracy is usually lower than empirical robust accuracy.
 
-## Visual
+### Two routes to a certificate
 
 ```mermaid
 flowchart TB
@@ -149,9 +145,9 @@ This diagram shows randomized smoothing and IBP as two different certificate-pro
 | Convex relaxations | Norm-bounded sets | Relaxed worst-case margins | Sound and often tighter | Scalability limits |
 | Exact verification | Specified finite network/input setting | Exact satisfiability or optimization | Strongest proof | Usually small-scale |
 
-## Worked example 1: Certified accuracy from radii
+## Reading a certified-accuracy curve
 
-Problem: A test set has five examples. Their certified radii are:
+A test set has five examples with certified radii:
 
 $$
 0.10,\quad 0.25,\quad 0.00,\quad 0.40,\quad 0.18.
@@ -195,11 +191,11 @@ $$
 \mathrm{CertAcc}(0.20)=\frac{2}{5}=0.40.
 $$
 
-Checked answer: the certified accuracy at radius $0.20$ is $40\%$.
+The certified accuracy at radius $0.20$ is therefore $40\%$.
 
-## Worked example 2: Randomized smoothing radius
+## Computing a smoothing radius
 
-Problem: A smoothed classifier uses $\sigma=0.50$. Suppose the top class has lower confidence bound $p_A=0.90$ and the runner-up has upper confidence bound $p_B=0.05$. Use approximate values $\Phi^{-1}(0.90)=1.282$ and $\Phi^{-1}(0.05)=-1.645$. Compute the certified $\ell_2$ radius.
+Let a smoothed classifier use $\sigma=0.50$, with lower confidence bound $p_A=0.90$ for the top class and upper confidence bound $p_B=0.05$ for the runner-up. Using $\Phi^{-1}(0.90)=1.282$ and $\Phi^{-1}(0.05)=-1.645$, compute the certified $\ell_2$ radius.
 
 1. Use the smoothing radius formula:
 
@@ -231,9 +227,9 @@ $$
 R=0.25(2.927)=0.73175.
 $$
 
-Checked answer: the certified $\ell_2$ radius is approximately $0.732$. If the statistical confidence bounds were weaker, the radius would shrink even with the same observed top class.
+The certified $\ell_2$ radius is approximately $0.732$. Weaker statistical confidence bounds would shrink the radius even with the same observed top class.
 
-## Code
+## Noisy voting before confidence bounds
 
 ```python
 import math
@@ -263,7 +259,7 @@ def smoothed_predict(model, x, sigma=0.25, samples=128):
 
 The code illustrates noisy voting, not a production certificate. Correct randomized-smoothing certification requires confidence intervals for $p_A$ and $p_B$, a fixed confidence level, and an abstain decision when the top class is not statistically dominant.
 
-## Common pitfalls
+## What invalidates a certification claim
 
 - Calling a defense certified when it has only been tested against attacks.
 - Reporting certified accuracy without the radius, norm, confidence level, verifier, and abstention policy.
@@ -273,7 +269,17 @@ The code illustrates noisy voting, not a production certificate. Correct randomi
 - Certifying the wrong model, for example the base classifier instead of the smoothed classifier or a preprocessing-free version.
 - Ignoring the clean-accuracy cost and inference-time sampling cost of certification.
 
-## Connections
+## Verification methods to follow
+
+- Cohen, Rosenfeld, and Kolter, "Certified Adversarial Robustness via Randomized Smoothing."
+- Gowal et al., work on interval bound propagation for certified robustness.
+- Zhang et al., CROWN and related linear bound propagation methods.
+- Wong and Kolter, work on provable defenses via convex outer adversarial polytopes.
+- Salman et al., work combining adversarial training and randomized smoothing.
+
+<div className="see-also">
+
+See also:
 
 - [Mathematical formulation](/cs/adversarial-attacks/mathematical-formulation) defines pointwise robustness and robust risk.
 - [Adversarial training](/cs/adversarial-attacks/adversarial-training) gives empirical robustness methods that can be combined with certified training.
@@ -281,10 +287,4 @@ The code illustrates noisy voting, not a production certificate. Correct randomi
 - [Evaluation and benchmarks](/cs/adversarial-attacks/evaluation-and-benchmarks) explains certified accuracy curves and benchmark reporting.
 - [Robustness-accuracy tradeoff](/cs/adversarial-attacks/robustness-accuracy-tradeoff) discusses the cost of robustness objectives.
 
-## Further reading
-
-- Cohen, Rosenfeld, and Kolter, "Certified Adversarial Robustness via Randomized Smoothing."
-- Gowal et al., work on interval bound propagation for certified robustness.
-- Zhang et al., CROWN and related linear bound propagation methods.
-- Wong and Kolter, work on provable defenses via convex outer adversarial polytopes.
-- Salman et al., work combining adversarial training and randomized smoothing.
+</div>

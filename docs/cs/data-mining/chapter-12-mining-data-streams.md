@@ -302,11 +302,8 @@ Python's built-in `hash` is randomized between interpreter processes, so this ed
 - Evaluating drift adaptation on randomly shuffled data, which destroys the temporal change the method is supposed to handle.
 - Using processing-time windows for events whose business meaning is defined by event time.
 
-## Related pages
+<div className="see-also">
 
-- [Data Mining Process and Data Types](/cs/data-mining/chapter-01-process-data-types)
-- [Data Preparation](/cs/data-mining/chapter-02-data-preparation)
-- [Association Pattern Mining](/cs/data-mining/chapter-04-association-pattern-mining)
-- [Cluster Analysis](/cs/data-mining/chapter-06-cluster-analysis)
-- [Outlier Analysis](/cs/data-mining/chapter-08-outlier-analysis)
-- [Advanced Classification Concepts](/cs/data-mining/chapter-11-advanced-classification)
+See also: [Data Mining Process and Data Types](/cs/data-mining/chapter-01-process-data-types) · [Data Preparation](/cs/data-mining/chapter-02-data-preparation) · [Association Pattern Mining](/cs/data-mining/chapter-04-association-pattern-mining) · [Cluster Analysis](/cs/data-mining/chapter-06-cluster-analysis) · [Outlier Analysis](/cs/data-mining/chapter-08-outlier-analysis) · [Advanced Classification Concepts](/cs/data-mining/chapter-11-advanced-classification)
+
+</div>

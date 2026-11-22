@@ -7,9 +7,9 @@ sidebar_position: 15
 
 The neuroscience connection in Sutton and Barto centers on reward prediction error, dopamine, and actor-critic organization in the brain. The point is not that the brain literally runs a textbook algorithm line by line. Rather, temporal-difference learning provides a compact computational hypothesis: certain neural signals resemble the error between received reward plus predicted future reward and previous prediction.
 
-The chapter discusses dopamine neurons, basal ganglia circuits, neural actor-critic ideas, and broader questions such as model-based methods, addiction, and collective reinforcement learning. For a wiki treatment, the most important lesson is how an RL equation can organize evidence about learning signals and action selection.
+The chapter discusses dopamine neurons, basal ganglia circuits, neural actor-critic ideas, and broader questions such as model-based methods, addiction, and collective reinforcement learning. An RL equation can organize evidence about learning signals and action selection without claiming a literal neural implementation.
 
-## Definitions
+## Prediction errors and actor-critic organization
 
 The TD error is
 
@@ -29,7 +29,7 @@ A neural actor-critic model separates:
 
 Addiction is discussed as a domain where reward, prediction, and control can become maladaptive. In computational terms, drug effects may distort reward or prediction-error signals, changing learning in ways that do not align with long-run well-being.
 
-## Key results
+## What TD predicts about timing
 
 TD learning predicts a shift in error timing. Early in learning, reward is unexpected, so positive error occurs at reward delivery. After a cue reliably predicts reward, the cue raises $V(S_t)$ relative to the previous state, producing positive error at the cue. At reward time, the reward is already predicted, so error is small. This timing shift is a major reason TD models became influential in neuroscience.
 
@@ -43,7 +43,7 @@ Model-based behavior in the brain remains a deeper question. Sutton and Barto di
 
 The neuroscience chapter also insists on careful vocabulary. A reward signal says something good or bad happened according to the task. A value signal predicts future reward. A prediction-error signal says the prediction should change. A policy or actor changes the probability of actions. These signals can be correlated in experiments, but they play different computational roles. Collapsing them into one word makes it impossible to state a testable hypothesis.
 
-Timing is the strongest reason TD learning is relevant. A static error-correction model can say that an outcome was surprising, but TD learning predicts when surprise should occur as learning progresses. The movement of positive error from reward delivery back to the earliest reliable predictor is a temporal signature, not just a magnitude signature. This is why cue-reward experiments are such a natural testing ground for TD accounts.
+Timing is the strongest reason TD learning is relevant. A static error-correction model can say that an outcome was surprising, but TD learning predicts when surprise should occur as learning progresses. The movement of positive error from reward delivery back to the earliest reliable predictor is a temporal signature as well as a magnitude signature. Cue-reward experiments can therefore test TD accounts on both when and how strongly neurons respond.
 
 Actor-critic models give a way to connect prediction errors to action learning. If a recent action made the situation better than predicted, the actor can increase the tendency to choose that action in similar circumstances. If the situation became worse than predicted, it can decrease that tendency. The critic does not need to know the full motor plan; it supplies an evaluative signal that can train action-selection mechanisms.
 
@@ -51,11 +51,9 @@ The chapter's discussion of addiction can be read computationally as a warning a
 
 Replay is another bridge between neuroscience and RL. Sequences of neural activity can resemble earlier or possible future trajectories, suggesting that experience may be reused for learning or planning. In algorithmic terms, replay can support model-free value updates, model-based planning, or both. Sutton and Barto treat this as part of the broader question of how brains may combine cached values with internal models.
 
-The biological discussion should therefore be read as a source of computational hypotheses. A hypothesis becomes stronger when it predicts timing, sign, and behavioral consequences, not just a loose association between reward and neural activity.
+The biological discussion is best read as a source of computational hypotheses. A strong hypothesis predicts timing, sign, and behavioral consequences rather than a loose association between reward and neural activity.
 
-This careful stance keeps the connection useful. RL offers equations precise enough to simulate, while neuroscience supplies constraints on what kinds of learning signals and architectures are plausible.
-
-## Visual
+RL offers equations precise enough to simulate, while neuroscience supplies constraints on plausible learning signals and architectures.
 
 ```mermaid
 sequenceDiagram
@@ -64,7 +62,7 @@ sequenceDiagram
   participant Dopamine as "Prediction error signal"
   participant Act as "Actor"
   participant Outcome
-  Cue->>Critic: state changes, predicted value rises
+  Cue->>Critic: "state changes, predicted value rises"
   Critic->>Dopamine: positive TD error if cue was unexpected
   Dopamine->>Act: reinforce recent action or cue response
   Outcome->>Critic: reward arrives
@@ -79,7 +77,7 @@ sequenceDiagram
 | Better reward than expected | Positive error | Positive error | Outcome exceeds current value |
 | Worse reward than expected | Negative error | Negative error | Outcome below current value |
 
-## Worked example 1: Reward response before learning
+## Unexpected reward before learning
 
 Problem: A state has value $V(S_t)=0$, reward $R_{t+1}=1$ arrives, and the next terminal value is $0$. Let $\gamma=1$. Compute the TD error.
 
@@ -105,7 +103,7 @@ Step 4: Interpret. The reward was unexpected because the previous value was zero
 
 Check: If the value had already predicted the reward with $V(S_t)=1$, the same reward would produce $\delta_t=1-1=0$.
 
-## Worked example 2: Omitted expected reward
+## When an expected reward is omitted
 
 Problem: A cue state has learned value $V(S_t)=1$. At the expected reward time, no reward arrives: $R_{t+1}=0$. The next terminal value is $0$ and $\gamma=1$. Compute the TD error.
 
@@ -131,7 +129,7 @@ Step 4: Interpret. The outcome was worse than predicted, so the teaching signal 
 
 Check: The sign is negative because prediction exceeded actual reward plus future value.
 
-## Code
+## Simulating the shift toward an earlier predictor
 
 ```python
 import numpy as np
@@ -139,7 +137,6 @@ import numpy as np
 alpha = 0.2
 gamma = 1.0
 T = 6
-cue_time = 1
 reward_time = 4
 V = np.zeros(T)
 
@@ -163,7 +160,7 @@ print("TD errors when reward occurs:", np.round(learned_deltas, 3))
 print("TD errors when reward is omitted:", np.round(omission_deltas, 3))
 ```
 
-## Common pitfalls
+## Where the analogy breaks
 
 - Saying dopamine is reward. In this framework the relevant signal is closer to reward prediction error, not reward itself.
 - Treating the actor-critic mapping to brain areas as exact. It is a useful computational abstraction, not a complete anatomical model.
@@ -172,10 +169,8 @@ print("TD errors when reward is omitted:", np.round(omission_deltas, 3))
 - Assuming all behavior is model-free. Biological evidence suggests mixtures of cached, habitual, planned, and representational processes.
 - Using RL language to overexplain addiction or motivation without acknowledging that the chapter's models are simplified.
 
-## Connections
+<div className="see-also">
 
-- [Psychology connections](/cs/reinforcement-learning/psychology-connections)
-- [Temporal-difference learning](/cs/reinforcement-learning/temporal-difference-learning)
-- [Policy gradient methods](/cs/reinforcement-learning/policy-gradient-methods)
-- [Applications and frontiers](/cs/reinforcement-learning/applications-and-frontiers)
-- [Probability and random variables](/math/probability-and-random-variables/)
+See also: [Psychology connections](/cs/reinforcement-learning/psychology-connections) · [Temporal-difference learning](/cs/reinforcement-learning/temporal-difference-learning) · [Policy gradient methods](/cs/reinforcement-learning/policy-gradient-methods) · [Applications and frontiers](/cs/reinforcement-learning/applications-and-frontiers) · [Probability and random variables](/math/probability-and-random-variables/intro)
+
+</div>

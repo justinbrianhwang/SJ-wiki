@@ -5,15 +5,9 @@ sidebar_position: 10
 
 # Vertex and Map Colouring
 
-Vertex colouring asks how few labels, or colours, are needed so that adjacent vertices receive different colours. This turns adjacency into a scheduling or separation rule: conflicting exams need different time slots, adjacent regions on a map need different colours, and incompatible tasks need different resources.
+Vertex colouring turns adjacency into a separation rule: conflicting exams need different time slots, adjacent regions need different colours, and incompatible tasks need different resources. The main question is how few colours can satisfy every constraint.
 
-Map colouring is graph colouring in disguise. A plane map can be converted to a dual graph whose vertices are regions and whose edges record shared borders. Colouring the map is then equivalent to vertex-colouring that dual graph. This connection explains why planar graph theory and colouring theory are historically intertwined.
-
-![A small planar map is colored with four colors so adjacent regions differ.](https://commons.wikimedia.org/wiki/Special:FilePath/Fourcolorsmap.svg)
-
-*Figure: Four-colour map example. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fourcolorsmap.svg), Germo, public domain.*
-
-## Definitions
+## Colour classes and the chromatic number
 
 A **proper vertex colouring** of a graph $G$ is a function
 
@@ -21,61 +15,87 @@ $$
 c:V(G)\to \{1,2,\dots,k\}
 $$
 
-such that $c(u)\ne c(v)$ whenever $uv\in E(G)$. If such a colouring exists, $G$ is **$k$-colourable**. The **chromatic number** $\chi(G)$ is the least $k$ for which $G$ is $k$-colourable.
+such that $c(u)\ne c(v)$ whenever $uv\in E(G)$. If such a colouring exists, $G$ is **$k$-colourable**. The **chromatic number** $\chi(G)$ is the least possible $k$.
 
-A graph is **bipartite** if its vertex set can be split into two independent sets. Equivalently, it is $2$-colourable, except for the edgeless case where $\chi(G)=1$.
+Each colour class is an independent set. Thus a proper $k$-colouring is equivalent to a partition of $V(G)$ into $k$ independent sets. This formulation separates two parts of most chromatic-number proofs:
 
-A **clique** is a set of pairwise adjacent vertices. The clique number $\omega(G)$ gives a lower bound:
+- a lower bound showing that too few independent sets cannot cover the vertices;
+- an upper bound given by an explicit colouring or a general theorem.
+
+A **clique** is a set of pairwise adjacent vertices. All its vertices need distinct colours, so
 
 $$
 \omega(G)\le \chi(G).
 $$
 
-A **plane map** can be coloured by building its region-adjacency graph. Two regions are adjacent only when they share a boundary segment, not merely a point.
+If $G$ has $n$ vertices and independence number $\alpha(G)$, each colour class contains at most $\alpha(G)$ vertices, which gives another lower bound:
 
-## Key results
+$$
+\chi(G)\ge \left\lceil\frac{n}{\alpha(G)}\right\rceil.
+$$
 
-**Bipartite characterization.** A graph is bipartite if and only if it has no odd cycle.
+The small families below are useful reference cases.
 
-Proof sketch: if a graph is bipartite, every cycle alternates between the two parts, so every cycle has even length. Conversely, if a connected graph has no odd cycle, choose a root and colour vertices by parity of distance from the root. An edge joining vertices of the same parity would create an odd cycle.
+| Graph family | Chromatic number | Reason |
+|---|---:|---|
+| Null graph $N_n$ | $1$ | no adjacencies |
+| Path $P_n$ with $n\ge 2$ | $2$ | bipartite and has an edge |
+| Even cycle $C_{2r}$ | $2$ | bipartite |
+| Odd cycle $C_{2r+1}$ | $3$ | not bipartite but 3-colourable |
+| Complete graph $K_n$ | $n$ | all vertices pairwise adjacent |
+| Wheel | $3$ or $4$ | depends on the parity of the rim cycle |
 
-**Greedy colouring bound.** Every graph satisfies
+## Odd cycles are the obstruction to two colours
+
+A graph is **bipartite** when its vertices split into two independent sets. Apart from an edgeless graph, this is equivalent to being $2$-colourable. A graph is bipartite if and only if it contains no odd cycle.
+
+In a bipartite graph, every cycle alternates between the two parts and hence has even length. Conversely, in a connected graph with no odd cycle, choose a root and colour vertices by the parity of their distance from it. An edge joining equal parities would combine with shortest paths to the root to produce an odd cycle.
+
+### Determining $\chi(C_5)$
+
+Attempt to alternate two colours around $C_5$. Starting with $v_1$ red forces $v_2$ blue, $v_3$ red, $v_4$ blue, and $v_5$ red. The closing edge $v_5v_1$ then has equal colours at both ends. Hence $\chi(C_5)\ge 3$.
+
+The assignment
+
+$$
+c(v_1)=1,\quad c(v_2)=2,\quad c(v_3)=1,\quad c(v_4)=2,\quad c(v_5)=3
+$$
+
+is proper, so $\chi(C_5)\le 3$. The bounds meet at
+
+$$
+\chi(C_5)=3.
+$$
+
+## Greedy colourings and their limits
+
+Colouring vertices one at a time gives the universal bound
 
 $$
 \chi(G)\le \Delta(G)+1,
 $$
 
-where $\Delta(G)$ is the maximum degree. Colour vertices one at a time; at most $\Delta$ colours are forbidden by already coloured neighbors.
-
-**Brooks' theorem.** If $G$ is connected and is neither a complete graph nor an odd cycle, then
+because at most $\Delta(G)$ colours can be forbidden by already coloured neighbours. Brooks' theorem improves this for a connected graph that is neither complete nor an odd cycle:
 
 $$
 \chi(G)\le \Delta(G).
 $$
 
-**Four-colour theorem.** Every planar graph is $4$-colourable. Equivalently, every plane map can be coloured with at most four colours.
+The order matters. A poor ordering can make greedy colouring use many more colours than $\chi(G)$; even a bipartite graph can be forced to use arbitrarily many. Common heuristics place high-degree vertices first or choose a vertex with many already-coloured neighbours, but a heuristic colouring remains an upper bound rather than proof of optimality.
 
-The four-colour theorem is deep; introductory work usually uses it as a landmark result rather than proving it.
+A graph is **$k$-critical** if $\chi(G)=k$ but deleting any vertex lowers the chromatic number. Odd cycles are $3$-critical, and $K_k$ is $k$-critical. Critical subgraphs often expose the minimum obstruction inside a failed colouring argument.
 
-**Critical graphs.** A graph is **$k$-critical** if $\chi(G)=k$ but deleting any vertex lowers the chromatic number. Critical graphs are useful for minimal-counterexample arguments. For instance, every odd cycle is $3$-critical. Complete graphs $K_k$ are $k$-critical. If a theorem about colourability fails, one often chooses a smallest counterexample and then studies the constraints forced by criticality.
+## Adding a universal hub to a cycle
 
-**Greedy order matters.** The greedy bound $\Delta+1$ is universal, but the number of colours used by a greedy algorithm may be far from optimal under a bad ordering. Bipartite graphs can be forced to use many colours greedily if their vertices are ordered poorly, even though their chromatic number is $2$. Good heuristics order high-degree vertices first or repeatedly choose a vertex with many already-coloured neighbors.
-
-**Lower bounds.** Clique number is not the only lower bound. If a graph has $n$ vertices and independence number $\alpha(G)$, then each colour class is an independent set of size at most $\alpha(G)$, so
+Let $W_6$ consist of a $5$-cycle and a central hub adjacent to all five rim vertices. The rim needs three colours because it is $C_5$. Every proper $3$-colouring of the rim uses all three, so the hub needs a fourth colour. Conversely, colouring the rim $1,2,1,2,3$ and the hub $4$ is proper. Therefore
 
 $$
-\chi(G)\ge \left\lceil \frac{n}{\alpha(G)}\right\rceil.
+\chi(W_6)=4.
 $$
 
-This bound is useful when large cliques are absent but colour classes are still forced to be small.
+With an even rim, two alternating colours suffice on the cycle and a third colour handles the hub. Adding a universal vertex increases the chromatic number by one because it is adjacent to every existing colour class.
 
-**Colour classes.** A proper $k$-colouring partitions the vertex set into $k$ independent sets, one for each colour. Conversely, any partition of $V(G)$ into $k$ independent sets is a proper $k$-colouring. This reformulation is often the simplest way to prove both lower and upper bounds: lower bounds show that too few independent sets cannot cover all vertices, while upper bounds explicitly build such a partition.
-
-**Planar special cases.** The four-colour theorem is the famous general result, but many planar graphs need fewer colours. Every outerplanar graph is $3$-colourable. Every bipartite planar graph is $2$-colourable. Every planar graph is $5$-colourable by a classical short argument using Euler's formula and induction. These weaker results are often more useful in exercises because their proofs are accessible.
-
-**Dual map graph.** In map colouring, the graph being coloured is usually the dual adjacency graph of regions. A bridge or dangling feature in the boundary may create loops or repeated adjacencies if modeled carelessly, so map-colouring problems usually assume well-behaved regions and count adjacency only along nontrivial boundary arcs.
-
-## Visual
+The following example shows an explicit colouring rather than merely a chromatic-number count.
 
 ```mermaid
 graph LR
@@ -88,76 +108,23 @@ graph LR
   C --- E
 ```
 
-| Graph family | Chromatic number | Reason |
-|---|---:|---|
-| Null graph $N_n$ | $1$ | no adjacencies |
-| Path $P_n$ with $n\ge 2$ | $2$ | bipartite and has an edge |
-| Even cycle $C_{2r}$ | $2$ | bipartite |
-| Odd cycle $C_{2r+1}$ | $3$ | not bipartite but greedily 3-colourable |
-| Complete graph $K_n$ | $n$ | all vertices pairwise adjacent |
-| Wheel $W_n$ | $3$ or $4$ | depends on parity of rim cycle |
+## From maps to planar duals
 
-## Worked example 1: Colour an odd cycle
+A plane map becomes a graph by assigning one vertex to each region and joining two vertices when their regions share a boundary segment. Regions that meet only at a point are not adjacent. Colouring the map is equivalent to properly colouring this region-adjacency graph.
 
-**Problem.** Find $\chi(C_5)$.
+![A small planar map is colored with four colors so adjacent regions differ.](https://commons.wikimedia.org/wiki/Special:FilePath/Fourcolorsmap.svg)
 
-**Method.**
+*Figure: A four-colour map. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fourcolorsmap.svg), Germo, public domain.*
 
-1. $C_5$ has vertices $v_1,v_2,v_3,v_4,v_5$ and edges around the cycle.
-2. It is an odd cycle, so it cannot be $2$-coloured. To see this directly, start with $v_1$ red.
-3. Then $v_2$ must be blue.
-4. Then $v_3$ must be red.
-5. Then $v_4$ must be blue.
-6. Then $v_5$ must be red because it is adjacent to $v_4$.
-7. But $v_5$ is also adjacent to $v_1$, which is red. This is a conflict.
+The **four-colour theorem** states that every planar graph is $4$-colourable, or equivalently that every plane map needs at most four colours. It is a deep theorem and is usually taken as a landmark result in an introductory treatment.
 
-So $\chi(C_5)\ge 3$.
+Many planar classes need fewer colours. Every outerplanar graph is $3$-colourable, every bipartite planar graph is $2$-colourable, and every planar graph is $5$-colourable by a shorter classical argument using Euler's formula and induction. Four colours are sufficient in general, not necessary for every planar graph.
 
-Now give a $3$-colouring:
+Care is needed when forming a dual from a map. Bridges, dangling boundary features, or poorly behaved regions can produce loops or repeated adjacencies. Standard map-colouring problems assume well-behaved regions and count adjacency only along a nontrivial boundary arc.
 
-$$
-c(v_1)=1,\ c(v_2)=2,\ c(v_3)=1,\ c(v_4)=2,\ c(v_5)=3.
-$$
+## Exact search on small graphs
 
-Check all edges:
-
-$$
-12:1\ne2,\quad 23:2\ne1,\quad 34:1\ne2,\quad 45:2\ne3,\quad 51:3\ne1.
-$$
-
-**Checked answer.** $\chi(C_5)=3$.
-
-## Worked example 2: Colour a wheel graph
-
-**Problem.** Let $W_6$ be the wheel made from a $5$-cycle rim plus one central hub adjacent to every rim vertex. Find $\chi(W_6)$.
-
-**Method.**
-
-1. The rim is $C_5$, so it already needs $3$ colours.
-2. The hub is adjacent to every rim vertex.
-3. In any proper colouring of the rim $C_5$, all three colours must appear, because $\chi(C_5)=3$.
-4. Therefore the hub cannot use any of those three colours.
-5. Hence
-
-$$
-\chi(W_6)\ge 4.
-$$
-
-Now construct a $4$-colouring. Colour the rim as in the previous example:
-
-$$
-1,2,1,2,3.
-$$
-
-Colour the hub with colour $4$. The hub differs from every rim vertex, and the rim was already properly coloured.
-
-**Checked answer.** $\chi(W_6)=4$.
-
-If the rim had even length instead, the answer would change. A wheel whose rim is an even cycle needs only two colours on the rim and a third colour for the hub. Thus wheels show a common colouring pattern: adding one universal vertex increases the chromatic number by one because it is adjacent to every existing colour class.
-
-## Code
-
-This backtracking routine computes the chromatic number of a small graph exactly.
+This backtracking routine tests $k$-colourability and then finds the least working $k$.
 
 ```python
 def can_colour(adj, k):
@@ -188,24 +155,16 @@ C5 = {i: {((i - 2) % 5) + 1, (i % 5) + 1} for i in range(1, 6)}
 print(chromatic_number(C5))
 ```
 
-The exact backtracking routine is deliberately exponential. It is appropriate for checking small examples and for illustrating the definition of $\chi(G)$. Large colouring instances are computationally hard in general, so practical solvers combine branching, propagation, greedy bounds, and problem-specific structure.
+Exact backtracking is exponential, so it is suitable for small examples rather than large general instances. Larger solvers combine branching, propagation, lower bounds, greedy upper bounds, and structure specific to the input.
 
-For hand colouring, alternate between lower and upper bounds. A clique, odd cycle, or independence-number argument proves that at least some number of colours is necessary. An explicit colouring proves that that many colours are sufficient. Equality requires both sides.
+## Details that change the answer
 
-Colouring proofs are strongest when they give matching lower and upper bounds. A lower bound says why fewer colours cannot work. An upper bound gives an actual colouring or a theorem that guarantees one. If the two bounds meet, the chromatic number is known exactly. If they do not, the result is only an interval, even if the drawing looks persuasive.
+Colour names are interchangeable; their numerical labels have no order or magnitude. What matters is equality at adjacent vertices. A loop therefore makes a proper vertex colouring impossible, since its endpoint would have to differ from itself.
 
-## Common pitfalls
+An explicit colouring proves only an upper bound unless it is matched by a clique, odd cycle, independence-number argument, or another lower bound. A graph with one edge already needs two colours, while a planar graph may need anywhere from one to four. Drawings and greedy outputs can suggest a value, but matching bounds establish it.
 
-- Thinking colours have numerical meaning. Colour labels are interchangeable.
-- Confusing a greedy colouring with an optimal colouring. Greedy performance depends heavily on vertex order.
-- Forgetting that a graph with one edge needs at least two colours.
-- Counting map regions that meet only at a point as adjacent. Map colouring uses shared boundary segments.
-- Assuming every planar graph needs four colours. The theorem says four suffice, not that four are always necessary.
-- Ignoring loops. A graph with a loop has no proper vertex colouring under the usual definition.
+<div className="see-also">
 
-## Connections
+See also: [Planarity and Euler formula](/math/graph-theory/planarity-and-euler-formula) · [Edge colouring and chromatic polynomials](/math/graph-theory/edge-colouring-and-chromatic-polynomials) · [Ramsey theory basics](/math/graph-theory/ramsey-theory-basics) · [Random graphs basics](/math/graph-theory/random-graphs-basics)
 
-- [Planarity and Euler formula](/math/graph-theory/planarity-and-euler-formula)
-- [Edge colouring and chromatic polynomials](/math/graph-theory/edge-colouring-and-chromatic-polynomials)
-- [Ramsey theory basics](/math/graph-theory/ramsey-theory-basics)
-- [Random graphs basics](/math/graph-theory/random-graphs-basics)
+</div>

@@ -292,10 +292,8 @@ The neighbor query requests three returned points, including the query itself, s
 - Choosing spatial folds after viewing outcomes, which can tune the evaluation geography to the desired result.
 - Publishing fine-grained trajectories after removing names and assuming location sequences are anonymous.
 
-## Related pages
+<div className="see-also">
 
-- [Mining Time Series Data](/cs/data-mining/chapter-14-mining-time-series-data)
-- [Mining Discrete Sequences](/cs/data-mining/chapter-15-mining-discrete-sequences)
-- [Similarity and Distances](/cs/data-mining/chapter-03-similarity-distances)
-- [Cluster Analysis](/cs/data-mining/chapter-06-cluster-analysis)
-- [Outlier Analysis](/cs/data-mining/chapter-08-outlier-analysis)
+See also: [Mining Time Series Data](/cs/data-mining/chapter-14-mining-time-series-data) · [Mining Discrete Sequences](/cs/data-mining/chapter-15-mining-discrete-sequences) · [Similarity and Distances](/cs/data-mining/chapter-03-similarity-distances) · [Cluster Analysis](/cs/data-mining/chapter-06-cluster-analysis) · [Outlier Analysis](/cs/data-mining/chapter-08-outlier-analysis)
+
+</div>

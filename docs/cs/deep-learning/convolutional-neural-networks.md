@@ -9,7 +9,7 @@ Convolutional neural networks exploit the structure of images. A fully connected
 
 The core insight is parameter sharing. A small kernel slides across an image and applies the same weights at every location. This makes the model efficient, encourages it to detect the same pattern anywhere in the image, and builds feature maps that preserve spatial layout. Padding, stride, channels, pooling, and stacked convolutional layers then turn this simple operation into a complete architecture such as LeNet.
 
-## Definitions
+## The convolutional vocabulary
 
 For an input image $X$ and kernel $K$, the two-dimensional **cross-correlation** output is
 
@@ -38,7 +38,7 @@ The same formula applies to width.
 
 **LeNet** is an early CNN for digit recognition. It alternates convolution, nonlinear activation, pooling, and fully connected layers.
 
-## Key results
+## What locality and weight sharing buy
 
 Convolutions encode three useful assumptions for images. Locality says nearby pixels are more strongly related than distant pixels. Translation equivariance says shifting an input should shift the feature map in a corresponding way. Parameter sharing says the same detector can be useful at many locations.
 
@@ -52,7 +52,7 @@ Stacking small kernels increases the receptive field. Two $3 \times 3$ convoluti
 
 Channel dimensions are part of the model's learned representation. Early layers may detect edges or color contrasts, while later layers combine channels into textures, parts, and object-level patterns. A convolution with $c_i$ input channels, $c_o$ output channels, and kernel size $k_h \times k_w$ has $c_oc_ik_hk_w$ weights, plus $c_o$ biases when bias is enabled. This makes channel growth a major driver of parameter count and computation.
 
-The receptive field of a unit is the region of the original input that can affect it. Deeper layers have larger receptive fields because each convolution composes neighborhoods from the previous feature map. However, the theoretical receptive field can be larger than the effective region that strongly influences the output, especially early in training. This is one reason architecture design balances depth, stride, pooling, and skip connections.
+The receptive field of a unit is the region of the original input that can affect it. Deeper layers have larger receptive fields because each convolution composes neighborhoods from the previous feature map. However, the theoretical receptive field can be larger than the effective region that strongly influences the output, especially early in training. Architecture design therefore balances depth, stride, pooling, and skip connections.
 
 Layout conventions matter when translating formulas into code. D2L's mathematical images are often written as height-by-width arrays, but PyTorch stores batches as `(N, C, H, W)`. Most silent CNN mistakes are not in the convolution formula; they are in reshaping, flattening, or feeding a channels-last tensor into a channels-first layer.
 
@@ -60,7 +60,7 @@ Translation equivariance should be distinguished from translation invariance. A 
 
 LeNet is historically small, but its pattern remains recognizable. Convolutional layers learn local features, pooling reduces resolution, and dense layers map the final representation to class logits. Modern networks replace sigmoid with ReLU-like activations, add normalization, and use deeper blocks, but the same tensor flow from image to feature maps to classifier is still present.
 
-## Visual
+## From a feature block to LeNet
 
 ```mermaid
 flowchart TB
@@ -105,7 +105,7 @@ The generic block shows the modern Conv-BN-ReLU-Pool pattern with the spatial-si
 | Padding | No | Border handling | Added pixels |
 | Stride | No | Downsampling | Step size |
 
-## Worked example 1: cross-correlation by hand
+## Sliding a kernel by hand
 
 Problem: compute the valid cross-correlation of
 
@@ -164,7 +164,7 @@ Y_{1,1} =
 =0+5+14+24=43.
 $$
 
-Checked answer:
+The resulting feature map is
 
 $$
 Y =
@@ -174,7 +174,7 @@ Y =
 \end{bmatrix}.
 $$
 
-## Worked example 2: output size with padding and stride
+## Tracking shape through padding and stride
 
 Problem: a convolution receives an image of size $32 \times 32$, uses a $5 \times 5$ kernel, padding $p=2$, and stride $s=2$. Find the output spatial size.
 
@@ -204,9 +204,9 @@ $$
 
 4. Width has the same numbers, so $w_{\text{out}}=16$.
 
-Checked answer: the output feature map has spatial size $16 \times 16$. If the layer has $64$ output channels and the batch size is $10$, the full output shape is `(10, 64, 16, 16)`.
+The output feature map has spatial size $16 \times 16$. If the layer has $64$ output channels and the batch size is $10$, the full output shape is `(10, 64, 16, 16)`.
 
-## Code
+## Reconstructing LeNet in PyTorch
 
 ```python
 import torch
@@ -240,7 +240,7 @@ print(logits.shape)
 print("parameters:", sum(p.numel() for p in model.parameters()))
 ```
 
-## Common pitfalls
+## Shape errors and lost spatial detail
 
 - Forgetting that PyTorch convolution expects `(batch, channels, height, width)`.
 - Mixing up mathematical convolution with cross-correlation. Neural network libraries learn the kernel, so the flip is usually irrelevant.
@@ -249,10 +249,8 @@ print("parameters:", sum(p.numel() for p in model.parameters()))
 - Treating padding as harmless. Padding changes border statistics and can affect features near image edges.
 - Flattening too early, which discards spatial structure and creates many unnecessary parameters.
 
-## Connections
+<div className="see-also">
 
-- [PyTorch builders guide](/cs/deep-learning/pytorch-builders-guide)
-- [Modern CNNs](/cs/deep-learning/modern-cnns)
-- [Computer vision applications](/cs/deep-learning/computer-vision-applications)
-- [Linear algebra](/math/linear-algebra/)
-- [Machine learning](/cs/machine-learning/)
+See also: [PyTorch builders guide](/cs/deep-learning/pytorch-builders-guide) · [Modern CNNs](/cs/deep-learning/modern-cnns) · [Computer vision applications](/cs/deep-learning/computer-vision-applications) · [Linear algebra](/math/linear-algebra/intro) · [Machine learning](/cs/machine-learning/intro)
+
+</div>

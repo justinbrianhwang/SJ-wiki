@@ -9,7 +9,7 @@ Vector differential calculus describes how scalar and vector fields change in sp
 
 This topic extends multivariable calculus into a compact operator notation. The same symbol $\nabla$ produces different objects depending on whether it acts on a scalar field or a vector field. Understanding the type of each expression prevents many mistakes and prepares the ground for line, surface, and volume integral theorems.
 
-## Definitions
+## Gradient, divergence, curl, and Laplacian
 
 For a scalar field $f(x,y,z)$, the gradient is
 
@@ -57,7 +57,7 @@ $$
 
 A level surface is $f(x,y,z)=c$. Its normal direction is $\nabla f$ when the gradient is nonzero.
 
-## Key results
+## Local geometry and field identities
 
 The gradient is perpendicular to level surfaces. If a curve $\mathbf{r}(t)$ lies on $f=c$, then $f(\mathbf{r}(t))=c$. Differentiating gives
 
@@ -113,7 +113,7 @@ Equality occurs when $\mathbf{u}$ points in the gradient direction. This proves 
 
 Divergence can be understood by looking at a tiny box. The $x$-component $P$ contributes net outward flux through the two faces perpendicular to the $x$-axis, and the difference between those face fluxes is approximately $P_x$ times the volume. The $y$ and $z$ directions contribute $Q_y$ and $R_z$. Adding them gives flux per unit volume. This local box argument is the infinitesimal version of the divergence theorem.
 
-Curl has a similar small-loop interpretation. The component of $\nabla\times\mathbf{F}$ in a chosen normal direction measures circulation per unit area around a tiny loop perpendicular to that normal. The right-hand rule fixes the sign. This is why curl is a vector in three dimensions: it records both the axis and the orientation of local rotation.
+Curl has a similar small-loop interpretation. The component of $\nabla\times\mathbf{F}$ in a chosen normal direction measures circulation per unit area around a tiny loop perpendicular to that normal. The right-hand rule fixes the sign. In three dimensions, curl is a vector recording both the axis and the orientation of local rotation.
 
 Conservative fields are path-independent. If $\mathbf{F}=\nabla\phi$, then moving from point $A$ to point $B$ changes the potential by $\phi(B)-\phi(A)$, regardless of path. In mechanics, a conservative force has work determined only by endpoints. The local curl test is a fast diagnostic, but the global domain condition decides whether a potential exists everywhere on the region.
 
@@ -121,7 +121,9 @@ The Laplacian combines second derivatives and measures how a value compares with
 
 For vector fields depending on time as well as space, spatial operators are applied with time held fixed. A velocity field $\mathbf{v}(x,y,z,t)$ can have divergence and curl at each instant. The material derivative used in fluid mechanics adds a separate idea: the rate of change following a moving particle. Keeping these derivatives distinct prevents mixing Eulerian and Lagrangian descriptions.
 
-## Visual
+## Tracking the input and output types
+
+The operator symbol $\nabla$ changes meaning with the object it acts on. The diagram and table keep those mappings explicit.
 
 ```mermaid
 flowchart TD
@@ -142,7 +144,7 @@ flowchart TD
 | $\nabla\times\mathbf{F}$ | Vector field in 3D | Vector field | Rotation axis and strength |
 | $\nabla^2 f$ | Scalar field | Scalar field | Diffusion or potential balance |
 
-## Worked example 1: Gradient and tangent plane
+## A tangent plane from the gradient
 
 Problem. Find the tangent plane to
 
@@ -196,7 +198,7 @@ Check. The point satisfies $1+4+9=14$, and the normal is radial, as expected for
 
 The same method works for any smooth implicit surface $f=c$. If $\nabla f$ vanishes at the point, the tangent-plane formula may fail because the surface can have a singular point or multiple tangent directions. Thus the nonzero-gradient condition is part of the geometric statement, not a technical afterthought.
 
-## Worked example 2: Divergence and curl
+## A field with zero divergence and curl
 
 Problem. For
 
@@ -245,7 +247,9 @@ $$
 R_y=x,\quad Q_z=x,
 $$
 
-$$P_z=y,\quad R_x=y,$$
+$$
+P_z=y,\quad R_x=y,
+$$
 
 $$
 Q_x=z,\quad P_y=z.
@@ -267,7 +271,7 @@ Check. The field is $\nabla(xyz)$, so its curl should be zero. Its divergence is
 
 Because the field is both divergence-free and curl-free, it is locally a harmonic potential gradient. This does not mean every field with one of those properties has the other. Divergence and curl measure different aspects of a vector field, and both are needed to describe local behavior.
 
-## Code
+## Checking curl signs in SymPy
 
 ```python
 import sympy as sp
@@ -288,7 +292,7 @@ print(curlF)
 
 The symbolic calculation is useful for checking signs in the curl. In hand work, write the component formula explicitly rather than relying on a remembered determinant pattern, because sign errors in the middle component are common.
 
-## Common pitfalls
+## Type, sign, and coordinate-system checks
 
 - Taking curl of a scalar field or divergence of a scalar field. Check input and output types.
 - Forgetting that $\nabla f$ is normal to a level surface, not tangent to it.
@@ -302,9 +306,8 @@ The symbolic calculation is useful for checking signs in the curl. In hand work,
 - Confusing the Laplacian of a scalar field with the vector Laplacian used in some advanced vector PDEs.
 - Forgetting that curl direction follows the right-hand rule.
 
-## Connections
+<div className="see-also">
 
-- [Vector Integral Calculus](/math/engineering-math/vector-integral-calculus)
-- [Laplace Equation and Potential](/math/engineering-math/laplace-equation-and-potential)
-- [Systems of ODEs and Phase Planes](/math/engineering-math/systems-of-odes-and-phase-plane)
-- [Complex Functions and Analyticity](/math/engineering-math/complex-functions-and-analyticity)
+See also: [Vector Integral Calculus](/math/engineering-math/vector-integral-calculus) · [Laplace Equation and Potential](/math/engineering-math/laplace-equation-and-potential) · [Systems of ODEs and Phase Planes](/math/engineering-math/systems-of-odes-and-phase-plane) · [Complex Functions and Analyticity](/math/engineering-math/complex-functions-and-analyticity)
+
+</div>

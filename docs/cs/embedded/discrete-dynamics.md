@@ -9,7 +9,7 @@ Discrete dynamics describes systems whose behavior advances through reactions ra
 
 Lee and Seshia use finite-state machines and extended state machines as the core notation for this topic. These models make informal requirements precise: they say what state is remembered, what inputs are accepted, what outputs are produced, and how the next state is chosen. That precision is what later enables composition, temporal logic, refinement, reachability analysis, and model checking.
 
-## Definitions
+## Reactions, state, and transition semantics
 
 A **reaction** is one step of a discrete system. During a reaction, the system observes a valuation of its input ports, produces a valuation of its output ports, and possibly changes state.
 
@@ -36,7 +36,7 @@ An **extended state machine** uses variables in addition to control states. If a
 
 A **nondeterministic** state machine has more than one possible reaction for some state/input pair, or more than one initial state. It specifies a family of allowed behaviors rather than one function from inputs to outputs.
 
-## Key results
+## Determinacy, timing, and the cost of extra state
 
 FSM diagrams have mathematical semantics. A graphical transition labeled
 
@@ -60,17 +60,15 @@ Default behavior is part of the model, not an afterthought. If a transition is a
 
 Extended state machines should be used with discipline. They make large diagrams readable, but the variables do not come for free. A single unbounded integer variable can turn an FSM into an infinite-state system, removing many finite-state verification guarantees. A bounded integer variable may still multiply the state space by dozens, hundreds, or millions. The modeling advantage is real, but so is the analysis cost.
 
-## Visual
-
 ```mermaid
 stateDiagram-v2
   [*] --> Empty
-  Empty --> One: up and not down / count := 1
-  One --> Empty: down and not up / count := 0
-  One --> Two: up and not down / count := 2
-  Two --> One: down and not up / count := 1
-  Two --> Two: otherwise / absent
-  Empty --> Empty: otherwise / absent
+  Empty --> One: "up and not down / count := 1"
+  One --> Empty: "down and not up / count := 0"
+  One --> Two: "up and not down / count := 2"
+  Two --> One: "down and not up / count := 1"
+  Two --> Two: "otherwise / absent"
+  Empty --> Empty: "otherwise / absent"
 ```
 
 | Model feature | Basic FSM | Extended state machine | Why the distinction matters |
@@ -81,7 +79,7 @@ stateDiagram-v2
 | Output action | Produces port valuation | Can reference variables | Need pre-update values |
 | Set action | Not present | Updates variables after output | Ordering affects correctness |
 
-## Worked example 1: Garage counter transition trace
+### Tracing a capacity-limited garage counter
 
 Problem: A garage has capacity $M=2$. The FSM starts in state $0$. The input sequence over four reactions is:
 
@@ -126,7 +124,7 @@ $$
 
 Answer: The state sequence is $0,1,2,2,1$. The output sequence is $(1,2,\mathrm{absent},1)$. The third arrival is ignored by the capacity guard.
 
-## Worked example 2: Extended-state space size
+### Counting the reachable extended states
 
 Problem: A traffic-light controller has four control modes: `red`, `green`, `yellow`, and `pending`. It has one integer variable `count`, which can take values from $0$ through $60$. First compute the raw state-space size. Then suppose that in `yellow`, only count values $0$ through $5$ are reachable, while in the other three modes all $61$ values are reachable. Compute the reachable-state count.
 
@@ -170,7 +168,7 @@ $$
 
 Answer: The raw extended state space has $244$ states, but the reachable part has $189$ states. Reachability can be much smaller than the syntactic state space.
 
-## Code
+### Executing the garage-counter reactions
 
 ```python
 def garage_counter(inputs, capacity=2):
@@ -193,7 +191,7 @@ for step, row in enumerate(garage_counter(sequence)):
     print(step, row)
 ```
 
-## Common pitfalls
+## Timing and state assumptions that change the model
 
 - Omitting behavior for "impossible" inputs. Formal models should define what happens even when an arrival occurs at a full garage or a departure occurs at an empty one.
 - Confusing nondeterminism with probability. A nondeterministic transition is allowed, not randomly selected with an implied distribution.
@@ -201,10 +199,8 @@ for step, row in enumerate(garage_counter(sequence)):
 - Updating variables before producing outputs when the model semantics says outputs use old values.
 - Treating a Moore-machine output as if it were a same-reaction Mealy output.
 
-## Connections
+<div className="see-also">
 
-- [finite automata and DFAs](/cs/theory/finite-automata-and-dfas)
-- [composition of state machines](/cs/embedded/composition-of-state-machines)
-- [hybrid systems](/cs/embedded/hybrid-systems)
-- [invariants and temporal logic](/cs/embedded/invariants-and-temporal-logic)
-- [reachability and model checking](/cs/embedded/reachability-and-model-checking)
+See also: [finite automata and DFAs](/cs/theory/finite-automata-and-dfas) · [composition of state machines](/cs/embedded/composition-of-state-machines) · [hybrid systems](/cs/embedded/hybrid-systems) · [invariants and temporal logic](/cs/embedded/invariants-and-temporal-logic) · [reachability and model checking](/cs/embedded/reachability-and-model-checking)
+
+</div>

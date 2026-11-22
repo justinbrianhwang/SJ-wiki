@@ -509,13 +509,13 @@ flowchart TB
   H --> L
 ```
 
-The selection diagram is intentionally framed around I/O contracts: exact retrieval, decode-state growth, training context length, and hardware kernels. It links the architecture diagrams above to operational choices: RWKV and Mamba provide fixed-state decoding, Hyena and Mamba target long training contexts, Griffin bounds recent attention, and full attention remains the reference when quadratic cost is acceptable. The final check node keeps the comparison grounded in kernels and task-specific recall behavior rather than asymptotic notation alone.
+The selection diagram is intentionally framed around I/O contracts: exact retrieval, decode-state growth, training context length, and hardware kernels. It links the architecture diagrams above to operational choices: RWKV and Mamba provide fixed-state decoding, Hyena and Mamba target long training contexts, Griffin bounds recent attention, and full attention remains the reference when quadratic cost is acceptable. The final check node ties the comparison to kernels and task-specific recall behavior rather than asymptotic notation alone.
 
 Use full attention when direct access and simplicity matter more than long-context cost. Use long convolutions when global filters and FFT kernels fit the workload. Use recurrent or SSM models when fixed-state inference is central. Use hybrids when the application needs both long-context efficiency and some exact token access.
 
 The practical comparison should include hardware. A method with better asymptotic length scaling can lose to attention at short contexts if kernels are immature or constants are high. Conversely, attention can become impossible at long contexts because memory, not FLOPs, is the limiting resource.
 
-## Common pitfalls
+## Where efficiency comparisons go wrong
 
 - Calling every subquadratic method "linear attention." Long convolutions, RWKV-style recurrences, selective SSMs, and hybrids use different operators.
 - Assuming fixed state means unlimited memory. Fixed-state models summarize history; they do not store an exact searchable list of all past tokens.
@@ -524,14 +524,6 @@ The practical comparison should include hardware. A method with better asymptoti
 - Treating local attention as free. Its cache is bounded by the window, not eliminated.
 - Ignoring short-context regimes. Full attention is often simpler and faster until sequence lengths are large enough for the alternative's scaling to matter.
 
-## Connections
-
-- [Attention and Transformers](/cs/deep-learning/attention-transformers) gives the full-attention baseline and Transformer block structure.
-- [Sequence Modeling and RNNs](/cs/deep-learning/sequence-modeling-rnns) explains recurrent hidden state, autoregressive generation, and truncated backpropagation.
-- [LSTM Variants](/cs/deep-learning/lstm-variants) connects older gated recurrence to modern recurrent language models.
-- [Computational Performance](/cs/deep-learning/computational-performance) is the right place to reason about memory bandwidth, kernels, batching, and parallelism.
-- [Pretrained Transformers and BERT](/cs/deep-learning/pretrained-transformers-nlp) covers model-family choices for downstream NLP systems.
-
 ## References
 
 [1] M. Poli, S. Massaroli, E. Nguyen, D. Y. Fu, T. Dao, S. Baccus, Y. Bengio, S. Ermon, C. Re. *Hyena Hierarchy: Towards Larger Convolutional Language Models*. ICML 2023.
@@ -539,3 +531,15 @@ The practical comparison should include hardware. A method with better asymptoti
 [3] A. Gu, T. Dao. *Mamba: Linear-Time Sequence Modeling with Selective State Spaces*. COLM 2024.
 [4] S. De, S. L. Smith, A. Fernando, A. Botev, G. Cristian-Muraru, A. Gu, and collaborators. *Griffin: Mixing Gated Linear Recurrences with Local Attention for Efficient Language Models*. 2024.
 [5] O. Lieber, B. Lenz, H. Bata, G. Cohen, J. Osin, I. Dalmedigos, E. Safahi, S. Meirom, Y. Belinkov, S. Shalev-Shwartz, O. Abend, and collaborators. *Jamba: A Hybrid Transformer-Mamba Language Model*. 2024.
+
+<div className="see-also">
+
+See also:
+
+- [Attention and Transformers](/cs/deep-learning/attention-transformers) gives the full-attention baseline and Transformer block structure.
+- [Sequence Modeling and RNNs](/cs/deep-learning/sequence-modeling-rnns) explains recurrent hidden state, autoregressive generation, and truncated backpropagation.
+- [LSTM Variants](/cs/deep-learning/lstm-variants) connects older gated recurrence to modern recurrent language models.
+- [Computational Performance](/cs/deep-learning/computational-performance) is the right place to reason about memory bandwidth, kernels, batching, and parallelism.
+- [Pretrained Transformers and BERT](/cs/deep-learning/pretrained-transformers-nlp) covers model-family choices for downstream NLP systems.
+
+</div>

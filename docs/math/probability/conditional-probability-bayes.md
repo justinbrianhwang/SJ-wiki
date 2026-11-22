@@ -404,10 +404,8 @@ Changing the looped prior shows that predictive value belongs to the test and th
 - Conditioning on a selected subgroup can create association. The data-selection rule belongs in the conditioning event before making a causal interpretation.
 - “Accuracy” merges several quantities and depends on prevalence. Sensitivity, specificity, and predictive values should be reported separately.
 
-## Related pages
+<div className="see-also">
 
-- [sample spaces, events, and axioms](/math/probability/sample-spaces-events-axioms)
-- [joint, marginal, and conditional distributions](/math/probability/joint-marginal-conditional-distributions)
-- [probability pitfalls and intuition](/math/probability/probability-pitfalls-intuition)
-- [discrete probability](/math/discrete/discrete-probability)
-- [estimation and confidence intervals](/math/statistics/estimation-and-confidence-intervals)
+See also: [sample spaces, events, and axioms](/math/probability/sample-spaces-events-axioms) · [joint, marginal, and conditional distributions](/math/probability/joint-marginal-conditional-distributions) · [probability pitfalls and intuition](/math/probability/probability-pitfalls-intuition) · [discrete probability](/math/discrete/discrete-probability) · [estimation and confidence intervals](/math/statistics/estimation-and-confidence-intervals)
+
+</div>

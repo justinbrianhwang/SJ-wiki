@@ -279,10 +279,8 @@ Inspect intermediate distributions rather than accepting a pipeline because it r
 
 The final test is downstream and task-specific. A log transform may improve a linear model by making a multiplicative relation closer to linear, but a tree can often split a skewed raw feature without it. Standardization is central to nearest-neighbor search and regularized linear models, while ordinary decision trees are invariant to monotone transformations of a single feature. Preparation should follow the assumptions of the estimator and the semantics of the measurements, not a fixed checklist.
 
-## Related pages
+<div className="see-also">
 
-- [Data Mining Process and Data Types](/cs/data-mining/chapter-01-process-data-types)
-- [Feature Selection and Dimensionality Reduction](/cs/data-mining/chapter-02-feature-selection-dimensionality-reduction)
-- [Similarity and Distances](/cs/data-mining/chapter-03-similarity-distances)
-- [Mining Data Streams and Big Data](/cs/data-mining/chapter-12-mining-data-streams)
-- [Outlier Analysis](/cs/data-mining/chapter-08-outlier-analysis)
+See also: [Data Mining Process and Data Types](/cs/data-mining/chapter-01-process-data-types) · [Feature Selection and Dimensionality Reduction](/cs/data-mining/chapter-02-feature-selection-dimensionality-reduction) · [Similarity and Distances](/cs/data-mining/chapter-03-similarity-distances) · [Mining Data Streams and Big Data](/cs/data-mining/chapter-12-mining-data-streams) · [Outlier Analysis](/cs/data-mining/chapter-08-outlier-analysis)
+
+</div>

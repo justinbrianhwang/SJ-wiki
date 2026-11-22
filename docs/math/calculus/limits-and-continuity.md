@@ -7,13 +7,9 @@ sidebar_position: 3
 
 A limit describes the value a function approaches, not necessarily the value it actually attains. This distinction lets calculus handle holes, jumps, asymptotes, oscillations, and functions whose formulas change from one region to another. Continuity is the special case where approaching and evaluating agree.
 
-![Augustin-Louis Cauchy is shown in a nineteenth-century portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Augustin_Louis_Cauchy.jpg)
+Limits sit between algebra and the derivative. The derivative is defined as a limit of slopes, and the definite integral is defined as a limit of sums. A weak understanding of limits usually becomes a weak understanding of every later topic, so the goal is to compute limits while recognizing what kind of behavior the graph has near the point.
 
-*Figure: Augustin-Louis Cauchy is a central figure in rigorous limits, continuity, and complex analysis. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Augustin_Louis_Cauchy.jpg), Charles H. Reutlinger, public domain.*
-
-Limits sit between algebra and the derivative. The derivative is defined as a limit of slopes, and the definite integral is defined as a limit of sums. A weak understanding of limits usually becomes a weak understanding of every later topic, so the goal is not just to compute limits but to recognize what kind of behavior the graph has near the point.
-
-## Definitions
+## Approaching a point without using the point
 
 We write
 
@@ -63,7 +59,7 @@ The phrase "deleted window" is important. The condition $0\lt \vert x-a\vert $ e
 
 Continuity on an interval means continuity at every point inside the interval and one-sided continuity at endpoints. On $[a,b]$, continuity at $a$ uses the right-hand limit, and continuity at $b$ uses the left-hand limit. This convention matters in optimization and integration, where closed intervals include endpoints but the function may not be defined beyond them.
 
-## Key results
+## Algebraic tools and continuity theorems
 
 The standard limit laws allow sums, differences, products, quotients, powers, and roots to be moved through limits when the resulting expressions are defined. If $\lim f(x)=A$ and $\lim g(x)=B$ as $x\to a$, then
 
@@ -93,7 +89,7 @@ $$
 \frac{x^2-a^2}{x-a}=x+a\quad (x\ne a).
 $$
 
-The simplified expression has the same values near $a$ but not necessarily at $a$. This distinction is why cancellation is valid for limits but not for redefining the original function without saying so.
+The simplified expression has the same values near $a$ but not necessarily at $a$. Cancellation is therefore valid for limits but not for redefining the original function without saying so.
 
 The Squeeze Theorem states that if $g(x)\le f(x)\le h(x)$ near $a$ and
 
@@ -129,13 +125,11 @@ $$
 
 The proof does not rely on a table or graph. It shows that every requested output tolerance $\epsilon$ can be met by a corresponding input tolerance $\delta$. For more complicated functions, the algebra may require extra bounding steps, but the logic is the same: translate closeness in $x$ into closeness in $f(x)$.
 
-Continuity also interacts well with composition. If $g$ is continuous at $a$ and $f$ is continuous at $g(a)$, then $f\circ g$ is continuous at $a$. This is why many everyday limits are solved by substitution: polynomials, rational functions away from zero denominators, roots on their domains, trigonometric functions, exponentials, and logarithms are continuous where defined. When a composed expression fails, the failure usually comes from a domain restriction, a denominator becoming zero, or a piecewise change in formula.
+Continuity also interacts well with composition. If $g$ is continuous at $a$ and $f$ is continuous at $g(a)$, then $f\circ g$ is continuous at $a$. Many everyday limits can therefore be solved by substitution: polynomials, rational functions away from zero denominators, roots on their domains, trigonometric functions, exponentials, and logarithms are continuous where defined. When a composed expression fails, the failure usually comes from a domain restriction, a denominator becoming zero, or a piecewise change in formula.
 
 That diagnostic habit keeps computation tied to the graph instead of turning limits into memorized algebra or isolated symbol pushing.
 
-## Visual
-
-ASCII sketch of the $\epsilon$-$\delta$ idea:
+The formal definition is easier to remember as a pair of nested tolerances. The sketch below puts the deleted $\delta$-window in the input and the required $\epsilon$-band in the output:
 
 ```text
 output y
@@ -159,7 +153,7 @@ L-e|        ------------------  bottom of epsilon band
 | Vertical asymptote | Infinite or unbounded | Infinite or unbounded | No real limit | No |
 | Oscillation | No settling | No settling | Does not exist | No |
 
-## Worked example 1: removable discontinuity
+## A hole that algebra can expose
 
 **Problem.** Compute
 
@@ -199,7 +193,7 @@ $$
 
 **Checked answer.** The limit is $4$. The original function is not continuous at $x=2$ because it is not defined there. If we define $f(2)=4$, the discontinuity becomes removable.
 
-## Worked example 2: one-sided limits and a jump
+## A jump seen from both sides
 
 **Problem.** Let
 
@@ -243,33 +237,22 @@ because the second branch includes $x=1$.
 
 **Checked answer.** The two-sided limit does not exist because the one-sided limits disagree. The function is not continuous at $x=1$, even though $f(1)$ is defined.
 
-## Code
+## What a failed substitution does—and does not—say
 
-```python
-def sample_limit_values(f, a, steps=(1e-1, 1e-2, 1e-3, 1e-4)):
-    for h in steps:
-        left = f(a - h)
-        right = f(a + h)
-        print(f"h={h:g}: left={left:.8f}, right={right:.8f}")
+- The form $0/0$ is indeterminate: it signals that direct substitution has not decided the limit, not that the limit fails to exist.
+- An infinite limit describes unbounded behavior rather than a limit in the real numbers.
+- Piecewise formulas, absolute values, and sign-changing denominators call for separate left- and right-hand analysis.
+- Canceling a factor preserves nearby values but does not fill the original function's hole at the canceled input.
+- Continuity on a closed interval uses one-sided continuity at its endpoints; this differs from the two-sided condition at an interior point.
+- Numerical tables can suggest a limit and reveal asymmetry, but finite samples do not prove what happens arbitrarily close to the point.
 
-def removable(x):
-    return (x * x - 4) / (x - 2)
+<div className="see-also">
 
-sample_limit_values(removable, 2.0)
-```
-
-## Common pitfalls
-
-- Substituting into an indeterminate form and concluding that no limit exists. The form $0/0$ means more work is needed.
-- Saying an infinite limit "exists" as a real number. Infinite limits describe unbounded behavior.
-- Forgetting to compare left and right limits for piecewise functions, absolute values, and rational functions with sign changes.
-- Canceling a factor and then forgetting that the original expression may still be undefined at the canceled value.
-- Confusing continuity at a point with continuity on an interval. Endpoints use one-sided continuity.
-- Treating numerical tables as proof. Tables suggest behavior, but algebra or theorems justify the answer.
-
-## Connections
+See also:
 
 - [Functions and Models](/math/calculus/functions-and-models): domains and graph behavior determine which limits are meaningful.
 - [Derivatives and Rates](/math/calculus/derivatives-and-rates): derivatives are limits of difference quotients.
 - [Definite Integrals and the Fundamental Theorem](/math/calculus/definite-integrals-fundamental-theorem): definite integrals arise as limits of Riemann sums.
 - [Sequences and Series](/math/calculus/sequences-and-series): convergence is the limit concept applied to indexed lists and infinite sums.
+
+</div>

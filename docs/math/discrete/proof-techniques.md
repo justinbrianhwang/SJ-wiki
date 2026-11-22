@@ -7,13 +7,9 @@ sidebar_position: 4
 
 A proof is a finite chain of justified steps from hypotheses to a conclusion. The main challenge is not remembering a ritual but matching the form of the statement to a method that exposes why it is true. Conditional statements invite direct proof or contraposition. Negated statements invite contradiction. Universal statements require arbitrary elements. Existential statements require witnesses or a carefully justified nonconstructive argument.
 
-![Leonhard Euler is shown in an eighteenth-century portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Leonhard_Euler.jpg)
+Discrete mathematics uses proof techniques constantly because many objects are finite, symbolic, and rule based. Algorithms need correctness proofs, counting formulas need double-counting or bijective proofs, graph statements need structural arguments, and number theory statements need divisibility reasoning. A good proof states its dependencies clearly enough that another reader can check every step.
 
-*Figure: Leonhard Euler's notation and results appear across analysis, graph theory, and number theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Leonhard_Euler.jpg), Jakob Emanuel Handmann, public domain.*
-
-Discrete mathematics uses proof techniques constantly because many objects are finite, symbolic, and rule based. Algorithms need correctness proofs, counting formulas need double-counting or bijective proofs, graph statements need structural arguments, and number theory statements need divisibility reasoning. A good proof makes the dependencies visible enough that another reader can check every step.
-
-## Definitions
+## What each proof method promises
 
 A **theorem** is a statement that has been proved. A **lemma** is a supporting theorem used to prove larger results. A **corollary** follows quickly from a theorem. A **conjecture** is a statement believed to be true but not yet proved.
 
@@ -23,7 +19,7 @@ An **existence proof** shows that an object with a desired property exists. It i
 
 A **proof by cases** divides the hypotheses into exhaustive possibilities and proves the conclusion in every possibility. A **biconditional proof** of $P\leftrightarrow Q$ usually proves both directions $P\to Q$ and $Q\to P$. A **vacuous proof** proves $P\to Q$ by showing $P$ is impossible. A **trivial proof** proves $P\to Q$ by showing $Q$ is always true under the relevant domain.
 
-## Key results
+## Matching logical form to proof method
 
 The logical equivalences behind proof methods are:
 
@@ -54,8 +50,6 @@ Contradiction is powerful but should be used with discipline. To prove $S$, assu
 
 Proof by cases requires two checks: the cases cover all possibilities, and the conclusion is proved in each case. For integer parity, the cases "even" and "odd" are exhaustive. For modular arithmetic modulo $m$, the cases are usually the $m$ possible remainders.
 
-## Visual
-
 ```mermaid
 graph TD
   A[Statement to prove] --> B{Main form}
@@ -77,11 +71,9 @@ graph TD
 | $P\leftrightarrow Q$ | two implications | both directions are present |
 | disprove $\forall x\,P(x)$ | counterexample | one valid domain element violates $P$ |
 
-## Worked example 1: Use contraposition for a divisibility claim
+## Parity by contraposition
 
 **Problem.** Prove: If $n^2$ is even, then $n$ is even.
-
-**Method.**
 
 1. A direct proof would assume $n^2$ is even and try to show $n$ is even. That is possible but awkward without prime factorization.
 2. Use contraposition. The contrapositive is: If $n$ is not even, then $n^2$ is not even.
@@ -100,13 +92,11 @@ $$
 
 6. Since $2k^2+2k$ is an integer, $n^2$ has the form $2m+1$ and is odd.
 
-**Checked answer.** We have proved the contrapositive: if $n$ is odd, then $n^2$ is odd. Therefore the original implication is true: if $n^2$ is even, then $n$ is even.
+We have proved the contrapositive: if $n$ is odd, then $n^2$ is odd. Therefore the original implication is true: if $n^2$ is even, then $n$ is even.
 
-## Worked example 2: Prove an existence statement constructively
+## Constructing the next multiple of three
 
 **Problem.** Prove that for every integer $n$, there exists an integer $m$ such that $m\gt n$ and $m$ is divisible by $3$.
-
-**Method.**
 
 1. The statement has the form $\forall n\exists m\,P(n,m)$.
 2. Choose an arbitrary integer $n$.
@@ -130,29 +120,9 @@ In all cases this is just $m=3q+3$.
    - If $r=1$, then $m-n=(3q+3)-(3q+1)=2\gt 0$.
    - If $r=2$, then $m-n=(3q+3)-(3q+2)=1\gt 0$.
 
-**Checked answer.** For arbitrary $n$, the constructed integer $m=3q+3$ is divisible by $3$ and greater than $n$. Since the construction works for every possible remainder, the universal-existential statement is proved.
+For arbitrary $n$, the constructed integer $m=3q+3$ is divisible by $3$ and greater than $n$. Since the construction works for every possible remainder, the universal-existential statement is proved.
 
-## Code
-
-```python
-def witness_multiple_of_three_above(n):
-    q, r = divmod(n, 3)
-    return 3 * q + 3
-
-def verify(limit=20):
-    for n in range(-limit, limit + 1):
-        m = witness_multiple_of_three_above(n)
-        assert m > n
-        assert m % 3 == 0
-    return True
-
-print(verify())
-print([(n, witness_multiple_of_three_above(n)) for n in range(-4, 8)])
-```
-
-The code checks the witness formula on a finite range. This is not a replacement for the proof, but it is a useful way to test whether the proposed construction behaves as intended before writing the formal argument.
-
-## Common pitfalls
+## Where proofs quietly fail
 
 - Starting a direct proof by assuming the conclusion. That is circular unless the statement is being proved by a valid equivalence chain.
 - Proving examples instead of a universal statement. Examples can guide a proof, but they do not establish "for all."
@@ -174,9 +144,13 @@ After drafting a proof, check every sentence for its source. Each claim should c
 
 The proof method should fit the statement, but first attempts are allowed to change. If a direct proof stalls, try the contrapositive. If an existence proof lacks a witness, try a counting or extremal argument. If a universal claim seems false, search for a counterexample before forcing a proof.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Propositional logic](/math/discrete/propositional-logic) explains the equivalences behind implication and contraposition.
 - [Predicates and quantifiers](/math/discrete/predicates-and-quantifiers) supplies the formal structure of universal and existential claims.
 - [Induction and recursion](/math/discrete/induction-and-recursion) adds proof methods for statements indexed by integers.
 - [Number theory basics](/math/discrete/number-theory-basics) provides many standard direct, contradiction, and contraposition examples.
+
+</div>

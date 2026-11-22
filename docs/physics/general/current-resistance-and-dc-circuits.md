@@ -5,133 +5,379 @@ sidebar_position: 19
 
 # Current, Resistance, and DC Circuits
 
-Current, Resistance, and DC Circuits covers current, resistance, Ohm's law, power, Kirchhoff rules, and RC transients. The goal is to recognize the physical structure before choosing equations. In the HRW progression, this topic extends earlier mechanics and prepares later field, wave, or modern-physics reasoning by reusing the same habits: define the system, choose signs and variables, state assumptions, and check dimensions.
+DC circuit analysis rests on three ideas: charge is conserved at a junction, energy is conserved around a loop, and each component supplies a relation between its current and voltage. Ohm's law is one such component relation, not a universal definition of resistance.
 
-The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
+## Current, resistance, and power
 
-![A Tektronix oscilloscope sits on a bench with its display and controls visible.](https://commons.wikimedia.org/wiki/Special:FilePath/Tektronix_2235_100Mhz_Oscilloscope.png)
+Current is the rate at which charge crosses a surface:
 
-*Figure: An oscilloscope grounds signal language in measured voltage traces, triggering, bandwidth, and time scales. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tektronix_2235_100Mhz_Oscilloscope.png), Dennis van Zuijlekom, CC BY-SA 2.0.*
+$$
+I=\frac{dQ}{dt}.
+$$
 
-## Definitions
+Conventional current points in the direction positive charge would move. In metals, the mobile electrons drift in the opposite direction.
 
-- **Scope:** current, resistance, Ohm's law, power, Kirchhoff rules, and RC transients.
-- **Primary symbols:** $I$, $R$, $V$, $P$, $\rho$, $RC$.
-- **Reference equations:** $I=dQ/dt$, $V=IR$, $R=\rho L/A$, $P=IV=I^2R=V^2/R$, $V_C=\mathcal E(1-e^{-t/RC})$.
-- A **system** is the object, field region, circuit, gas, optical element, or particle collection being modeled.
-- A **state** is specified by the variables that determine the relevant energy, momentum, phase, field, or thermodynamic condition.
-- A **constraint** is a physical restriction such as no slip, fixed length, constant temperature, steady flow, fixed boundary, or symmetry.
-- A **limiting case** is a simplified parameter choice used to test whether the result behaves sensibly.
+For charge carriers of number density $n$, charge magnitude $q$, cross-sectional area $A$, and drift-speed magnitude $v_d$,
 
-The definitions in this page are meant to be operational. A symbol is useful only after you know how it would be measured, what units it carries, what sign convention is being used, and which idealizations are being assumed. Before substituting numbers, identify the system boundary and the relevant state variables. For a particle problem the state variables might be position and velocity; for a circuit they might be charge, current, and potential difference; for a thermodynamic process they might be pressure, volume, temperature, and internal energy.
+$$
+I=nqAv_d.
+$$
 
-A second habit is to separate model statements from algebra. A model statement says something physical, such as "air resistance is negligible", "the string is massless", "the gas is ideal", "the process is quasistatic", or "the field is uniform". Algebra then follows from those statements. If the model changes, the algebra may still look familiar but the result can become invalid. Write the model assumptions as part of the solution, not as an afterthought.
+The random thermal speeds of conduction electrons are much larger than $v_d$, but random motion has no preferred direction and contributes no net current. When a circuit is closed, the electric field establishing the drift propagates through the circuit rapidly; electrons do not have to travel from the battery to the load before the load responds.
 
-## Key results
+Current density records local flow:
 
-The main relationships are
+$$
+\vec J=\frac{dI}{dA}\hat n,
+\qquad
+\vec J=\sigma\vec E
+$$
+
+for an isotropic ohmic material. Conductivity is $\sigma=1/\rho$. The microscopic relation $\vec J=\sigma\vec E$ leads to $R=\rho L/A$ for a uniform straight wire with nearly uniform field.
+
+An ohmic element obeys
+
+$$
+V=IR.
+$$
+
+For a uniform wire,
+
+$$
+R=\rho\frac{L}{A},
+$$
+
+where resistivity $\rho$ is a material property that generally depends on temperature. Electrical power delivered to a component is
+
+$$
+P=IV.
+$$
+
+For an ohmic resistor this becomes
+
+$$
+P=I^2R=\frac{V^2}{R}.
+$$
+
+The choice between these forms depends on which quantity is held fixed. At fixed voltage, increasing $R$ lowers the power; at fixed current, it raises the power.
+
+Near a reference temperature $T_0$, a metal's resistance is often approximated by
+
+$$
+R(T)=R_0[1+\alpha(T-T_0)].
+$$
+
+This linear law works over a limited range. Filament lamps are visibly non-ohmic because heating changes their resistance as current rises. Diodes are non-ohmic for a different reason: their current-voltage relation is strongly asymmetric. Ohm's law should be tested as a model of a component, not used as the definition $R=V/I$ for every device.
+
+The sign in $P=IV$ depends on terminal conventions. Under the passive sign convention, current enters the terminal labeled positive and $P\gt 0$ means the element absorbs energy. A discharging battery has current leaving its positive terminal, so it supplies power and its absorbed power is negative.
+
+## Reducing resistor networks
+
+Resistors in series carry the same current:
+
+$$
+R_{\mathrm{eq}}=R_1+R_2+\cdots.
+$$
+
+Resistors in parallel share the same potential difference:
+
+$$
+\frac{1}{R_{\mathrm{eq}}}
+=\frac{1}{R_1}+\frac{1}{R_2}+\cdots.
+$$
+
+A $12\,\mathrm V$ battery connected to $100\,\Omega$ and $220\,\Omega$ in series has
+
+$$
+R_{\mathrm{eq}}=320\,\Omega,
+\qquad
+I=\frac{12}{320}=0.0375\,\mathrm A.
+$$
+
+The power in the $220\,\Omega$ resistor is
+
+$$
+P=I^2R=(0.0375)^2(220)=0.309\,\mathrm W.
+$$
+
+The voltage drops are
+
+$$
+V_{100}=3.75\,\mathrm V,
+\qquad
+V_{220}=8.25\,\mathrm V,
+$$
+
+which add to the battery's $12.0\,\mathrm V$. The source supplies $P=VI=0.450\,\mathrm W$. The resistors absorb $0.141\,\mathrm W$ and $0.309\,\mathrm W$, so power balances.
+
+For parallel resistors, the equivalent resistance must be smaller than the smallest branch resistance. For example, $6\,\Omega$ and $3\,\Omega$ in parallel give
+
+$$
+R_{\mathrm{eq}}=\left(\frac16+\frac13\right)^{-1}=2\,\Omega.
+$$
+
+Across a $12\,\mathrm V$ source, the branch currents are $2\,\mathrm A$ and $4\,\mathrm A$. Their sum, $6\,\mathrm A$, equals $12\,\mathrm V/2\,\Omega$.
+
+## Real sources and terminal voltage
+
+An ideal source maintains its emf regardless of current. A simple real-battery model places internal resistance $r$ in series with an ideal emf $\mathcal E$. While the battery supplies current $I$,
+
+$$
+V_{\mathrm{terminal}}=\mathcal E-Ir.
+$$
+
+With an external load $R$,
+
+$$
+I=\frac{\mathcal E}{R+r}.
+$$
+
+Take a $12.0\,\mathrm V$ battery with $r=0.50\,\Omega$ connected to $R=5.5\,\Omega$. Then
 
 $$
 \begin{aligned}
-\text{core formulas} &: $I=dQ/dt$, $V=IR$, $R=\rho L/A$, $P=IV=I^2R=V^2/R$, $V_C=\mathcal E(1-e^{-t/RC})$.
+I&=\frac{12.0}{5.5+0.50}=2.00\,\mathrm A,\\
+V_{\mathrm{terminal}}&=12.0-(2.00)(0.50)=11.0\,\mathrm V,\\
+P_R&=I^2R=(2.00)^2(5.5)=22.0\,\mathrm W,\\
+P_r&=I^2r=2.0\,\mathrm W.
 \end{aligned}
 $$
 
-Use these relationships only after identifying which variables are known and which conditions are being assumed. Many problems can be solved by matching a physical phrase to a mathematical operation: balance forces or torques for equilibrium, integrate a rate for accumulated change, conserve a quantity when external transfer is absent, or apply a boundary condition when waves or fields must fit a geometry.
+The chemical source supplies $\mathcal EI=24.0\,\mathrm W$, equal to the load power plus internal heating. During charging, current enters the battery's positive terminal and its terminal voltage exceeds the emf in this model.
 
-A useful solution pattern is: write the governing equation, substitute symbolic constraints, solve for the unknown, and only then insert numbers. This prevents units from becoming decorative and keeps the answer interpretable.
+## Kirchhoff equations for networks that do not reduce
 
-These formulas are conditional statements. Each equation is powerful inside its domain and misleading outside it. Constant-acceleration kinematics requires constant acceleration. Conservation of mechanical energy requires either no nonconservative work or an explicit accounting of it. Gauss's law is always true, but it directly gives an electric field only when symmetry lets the flux integral simplify. Bernoulli's equation assumes steady, incompressible, nonviscous flow along a streamline. Keeping the conditions attached to the formula is part of the formula.
+The junction rule expresses charge conservation:
 
-For numerical work, solve symbolically before inserting values whenever possible. A symbolic expression exposes dimensions and limiting behavior. If a mass should cancel, it should cancel before arithmetic. If an answer should decrease when distance grows, the final expression should show that trend. If an answer becomes infinite in an unphysical limit, that usually marks the boundary where the model has stopped applying.
+$$
+\sum I_{\mathrm{in}}=\sum I_{\mathrm{out}}.
+$$
 
-## Visual
+The loop rule expresses energy conservation:
+
+$$
+\sum_{\mathrm{loop}}\Delta V=0.
+$$
+
+Choose current directions before writing equations. A solved current may be negative; that result means the physical current runs opposite the assumed arrow. When traversing a resistor in the assumed current direction, the potential change is $-IR$. Across an ideal source from its negative to positive terminal, it is $+\mathcal E$.
 
 ```mermaid
 graph LR
-  A[Physical situation] --> B[Choose model]
-  B --> C[Define variables]
-  C --> D[Apply key law]
-  D --> E[Solve symbolically]
-  E --> F[Check units and limits]
+  A[Label branch currents] --> B[Write junction equations]
+  B --> C[Choose loop directions]
+  C --> D[Write voltage changes]
+  D --> E[Solve the simultaneous equations]
+  E --> F[Interpret negative currents]
 ```
 
-| Quantity or idea | Use | Check |
+| Situation | Invariant | Useful relation |
 |---|---|---|
-| Main model | current, resistance, Ohm's law, power, Kirchhoff rules, and RC transients | assumptions must match the formula |
-| Symbols | $I$, $R$, $V$, $P$, $\rho$, $RC$ | define each before use |
-| Key formulas | $I=dQ/dt$, $V=IR$, $R=\rho L/A$, $P=IV=I^2R=V^2/R$, $V_C=\mathcal E(1-e^{-t/RC})$ | check dimensions term by term |
-| Limiting case | simplify one parameter | result should match intuition |
+| Series branch | same current | $R_{\mathrm{eq}}=\sum R_i$ |
+| Parallel branches | same voltage | $1/R_{\mathrm{eq}}=\sum 1/R_i$ |
+| Junction | charge flow balances | $\sum I_{\mathrm{in}}=\sum I_{\mathrm{out}}$ |
+| Closed loop | net potential change is zero | $\sum\Delta V=0$ |
 
-## Worked example 1
+### Worked example: a two-loop network
 
-**Problem.** A $12\,\mathrm{V}$ battery drives $100\,\Omega$ and $220\,\Omega$ resistors in series. Find current and power in $220\,\Omega$.
+Two meshes share a $4\,\Omega$ resistor. The left mesh contains a $10\,\mathrm V$ source and a separate $2\,\Omega$ resistor; the right mesh contains a $4\,\mathrm V$ source opposing the left source and a separate $3\,\Omega$ resistor. Assign clockwise mesh currents $I_1$ and $I_2$. The current through the shared resistor is $I_1-I_2$ in the left-loop direction.
 
-**Method.** Select the listed governing relationship and solve symbolically before substituting numbers.
-
-1. Write the relevant relation.
-2. Substitute the known quantities with SI units or consistent derived units.
-3. Solve algebraically for the requested quantity.
-4. The calculation gives
+The loop equations are
 
 $$
-$R_{eq}=320\,\Omega$, $I=12/320=0.0375\,\mathrm{A}$, and $P=I^2(220)=0.309\,\mathrm{W}$..
+\begin{aligned}
+10-2I_1-4(I_1-I_2)&=0,\\
+-4-3I_2-4(I_2-I_1)&=0.
+\end{aligned}
 $$
 
-5. Interpret the magnitude and sign in the original physical situation.
-
-**Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
-
-## Worked example 2
-
-**Problem.** A $10\,\mu\mathrm{F}$ capacitor charges through $200\,\mathrm{k\Omega}$ from $9.0\,\mathrm{V}$. Find $\tau$ and $V_C(\tau)$.
-
-**Method.** Use the same modeling routine with a different unknown so the equation is not memorized in only one direction.
-
-1. Identify the system and the applicable approximation.
-2. Start from the governing equation.
-3. Rearrange before substituting values.
-4. The numerical work is
+Rearranging,
 
 $$
-$\tau=RC=(200\times10^3)(10\times10^{-6})=2.0\,\mathrm{s}$ and $V_C=9(1-e^{-1})=5.69\,\mathrm{V}$..
+\begin{aligned}
+6I_1-4I_2&=10,\\
+-4I_1+7I_2&=-4.
+\end{aligned}
 $$
 
-5. Compare with a nearby limiting case or a familiar scale.
+Multiply the first equation by $7$ and the second by $4$:
 
-**Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
+$$
+\begin{aligned}
+42I_1-28I_2&=70,\\
+-16I_1+28I_2&=-16.
+\end{aligned}
+$$
 
-## Code
+Adding gives $26I_1=54$, so $I_1=2.08\,\mathrm A$. Substitution yields
 
-```python
-import math
-I=12/(100+220)
-print(I,I**2*220)
-R=200e3; C=10e-6
-print(R*C,9*(1-math.exp(-1)))
-```
+$$
+I_2=\frac{6I_1-10}{4}=0.615\,\mathrm A.
+$$
 
-## Common pitfalls
+The shared branch carries $I_1-I_2=1.46\,\mathrm A$ in the left-loop direction. Both solved mesh currents are positive, so the chosen clockwise directions were consistent with the result.
 
-- Confusing conventional current with electron drift.
-- Mixing up resistor and capacitor combination rules.
-- Ignoring loop sign conventions.
-- Treating capacitors as open circuits during all transients.
-- Always check units, signs, and limiting cases before treating a numerical result as finished.
+## The RC time scale
 
-A final check is to perturb one input mentally. Doubling a distance, mass, charge, stiffness, frequency, or temperature should change the answer in a way that matches the physical story. If the algebra says the opposite, revisit the setup before blaming arithmetic. Also remember that a negative answer is often information: it may indicate direction opposite to the chosen axis, work done by a system rather than on it, or a potential change that lowers the energy of a positive or negative charge differently.
+When a capacitor charges through a resistor from an ideal source $\mathcal E$,
 
-When a problem feels difficult, the hidden issue is often not the last algebraic step but the first modeling decision. Re-read the words and mark what is being idealized: frictionless surface, ideal string, point charge, thin lens, small angle, steady flow, reversible process, nonrelativistic particle, or uniform field. Then mark what is conserved, if anything. Energy conservation, momentum conservation, angular momentum conservation, charge conservation, and entropy constraints are not interchangeable; each one has a system boundary and a transfer condition. If an external impulse acts, momentum may not be conserved for the chosen system. If friction acts within a block-floor system, mechanical energy is not conserved even though total energy is. If a Gaussian surface encloses no net charge, flux is zero, but the field at points on the surface need not be zero.
+$$
+V_C(t)=\mathcal E\left(1-e^{-t/RC}\right),
+\qquad
+I(t)=\frac{\mathcal E}{R}e^{-t/RC}.
+$$
 
-Another common pitfall is using a memorized equation in only its most familiar direction. A formula is a relationship, so practice solving it for different unknowns. In kinematics, solve for time, acceleration, or displacement depending on what the data support. In circuits, solve Ohm's law for voltage, current, or resistance and then check power. In optics, solve the thin-lens equation for image distance, object distance, or focal length and compare the sign with a ray diagram. In thermodynamics, rearrange the first law only after deciding whether work is done by the system or on the system. This flexibility prevents formula matching from replacing reasoning.
+The time constant is
 
-Finally, keep scale awareness. Introductory physics problems often use idealized numbers, but the answers should still sit on recognizable scales: walking speeds are meters per second, orbital speeds are kilometers per second, visible wavelengths are hundreds of nanometers, household currents are often amperes or less, and thermal energies per molecule at room temperature are small in joules but meaningful in electron-volts. When an answer is many orders of magnitude away from these anchors, check unit conversions first. Prefix errors such as nano versus micro, centimeters versus meters, and milliseconds versus seconds are among the fastest ways to turn correct physics into a wrong result.
+$$
+\tau=RC.
+$$
 
-For exam preparation, make the worked examples bidirectional. After solving a forward problem, change the target: ask what initial speed, resistance, angle, charge, temperature change, or wavelength would have produced the stated answer. This exposes whether you understand the structure or only followed the arithmetic once. Then make one assumption false and describe what would change. If air resistance is no longer negligible, projectile motion no longer separates into a constant horizontal speed. If a pulley has rotational inertia, the two string tensions need not match. If a lens is not thin, the thin-lens equation becomes an approximation. If a gas process is not reversible, entropy must be found from a reversible path connecting the same states, not from the literal irreversible path. These small variations turn a page of notes into a usable problem-solving tool.
+The exponential comes from Kirchhoff's rule. With capacitor charge $q$,
 
-Before leaving the problem, write one complete sentence that states the result in physical language. That sentence should name the object or system, the direction or sign when relevant, and the assumption under which the answer was obtained.
+$$
+\mathcal E-IR-\frac qC=0,
+\qquad I=\frac{dq}{dt}.
+$$
 
-## Connections
+Thus
 
-- [Electric Potential and Capacitance](/physics/general/electric-potential-and-capacitance)
-- [AC Circuits and EM Waves](/physics/general/ac-circuits-and-electromagnetic-waves)
+$$
+\frac{dq}{dt}=\frac{\mathcal E}{R}-\frac{q}{RC}.
+$$
+
+Solving with $q(0)=0$ gives $q=C\mathcal E(1-e^{-t/RC})$, from which the stated voltage and current follow. The product $RC$ has units of seconds: $\Omega\,\mathrm F=(\mathrm{V/A})(\mathrm{C/V})=\mathrm{C/A}=\mathrm s$.
+
+At $t=0^+$ an initially uncharged capacitor behaves like a short circuit: its voltage cannot jump, while the current can. As $t\to\infty$ it behaves like an open circuit under DC conditions.
+
+For $C=10\,\mu\mathrm F$, $R=200\,\mathrm{k\Omega}$, and $\mathcal E=9.0\,\mathrm V$,
+
+$$
+\tau=(200\times10^3)(10\times10^{-6})=2.0\,\mathrm s,
+$$
+
+and after one time constant,
+
+$$
+V_C(\tau)=9.0(1-e^{-1})=5.69\,\mathrm V.
+$$
+
+Thus the capacitor reaches about $63.2\%$ of its final voltage in one $\tau$; it is not fully charged after one time constant.
+
+At $t=5\tau$ it has reached $1-e^{-5}\approx99.33\%$ of the final voltage. “Fully charged” is therefore an engineering tolerance, not a finite mathematical time.
+
+Energy reveals another feature of charging. The battery supplies
+
+$$
+E_{\mathrm{source}}=\mathcal E Q=C\mathcal E^2.
+$$
+
+The final capacitor energy is
+
+$$
+U_C=\frac12C\mathcal E^2.
+$$
+
+The remaining half is dissipated in the resistor, independent of $R$; changing $R$ changes the charging time but not the total heat in this ideal circuit. During discharge through a resistor,
+
+$$
+V_C(t)=V_0e^{-t/RC},
+\qquad
+I(t)=-\frac{V_0}{R}e^{-t/RC},
+$$
+
+where the minus sign refers to a current reference direction chosen for charging.
+
+## Measuring without changing the circuit too much
+
+An ammeter is placed in series and should have very small internal resistance. A voltmeter is placed in parallel and should have very large internal resistance. Reversing those connections can badly disturb the circuit; placing a low-resistance ammeter directly across a source may create a damaging current.
+
+A meter's finite resistance causes loading. If a voltmeter of resistance $R_V$ measures a resistor $R$, the branch actually becomes $R\parallel R_V$. The error is small only when $R_V\gg R$. Likewise, an ammeter's resistance adds to the measured branch and should be much smaller than the branch resistance.
+
+## Checks at switching instants
+
+- Do not swap the resistor and capacitor combination rules: capacitors combine oppositely to resistors.
+- A capacitor is neither always open nor always short. Its voltage is continuous through an ideal switching instant, and its long-time DC current is zero.
+- Keep one traversal direction for each loop equation. Changing direction halfway through changes signs without changing the physics.
+- A negative branch current corrects an assumed direction; it does not invalidate the equations.
+- Check power conservation by comparing total power supplied with total power absorbed.
+- Kirchhoff's lumped-circuit model assumes component dimensions are small compared with the electromagnetic wavelength and that stray capacitance and inductance can be neglected.
+
+The limits of an RC solution should be read before trusting intermediate values. For charging, $V_C(0)=0$ and $V_C(\infty)=\mathcal E$; the current starts at $\mathcal E/R$ and decays to zero.
+
+## Node voltage and equivalent-source methods
+
+Kirchhoff equations can be organized without tracing many loops. In node-voltage analysis, choose one node as zero potential and assign unknown voltages to the others. The current through a resistor between nodes $a$ and $b$ is $(V_a-V_b)/R$. Applying current conservation at each nonreference node produces one equation per unknown node voltage.
+
+For example, a node $V$ connects through $2\,\mathrm{k\Omega}$ to a $10\,\mathrm V$ node, through $3\,\mathrm{k\Omega}$ to ground, and through $6\,\mathrm{k\Omega}$ to a $4\,\mathrm V$ node. Taking currents leaving $V$,
+
+$$
+\frac{V-10}{2000}+\frac V{3000}+\frac{V-4}{6000}=0.
+$$
+
+Multiply by $6000$:
+
+$$
+3(V-10)+2V+(V-4)=0.
+$$
+
+Thus $6V-34=0$ and $V=5.67\,\mathrm V$. The branch currents then follow from their voltage differences. This method makes junction conservation automatic and scales better than guessing many branch currents.
+
+Any linear two-terminal network of sources and resistors can be replaced, as seen by a load, by a Thevenin source $V_{\mathrm{th}}$ in series with $R_{\mathrm{th}}$. Find $V_{\mathrm{th}}$ as the open-circuit terminal voltage. Find $R_{\mathrm{th}}$ by turning off independent sources—short ideal voltage sources and open ideal current sources—and calculating resistance seen from the terminals. A Norton equivalent uses current $I_N=V_{\mathrm{th}}/R_{\mathrm{th}}$ in parallel with the same resistance.
+
+Equivalent sources do not reproduce internal voltages and currents, only terminal behavior. Dependent sources cannot be turned off; a test source is then used to determine the input resistance.
+
+## Maximum power and efficiency
+
+A Thevenin source driving load $R_L$ delivers
+
+$$
+P_L=\frac{V_{\mathrm{th}}^2R_L}{(R_{\mathrm{th}}+R_L)^2}.
+$$
+
+Differentiation shows maximum load power at $R_L=R_{\mathrm{th}}$. At that point half the source power is dissipated inside the Thevenin resistance, so efficiency is only fifty percent. Maximum power transfer is useful in signal and communication settings; power-distribution systems usually prefer $R_L\gg R_{\mathrm{th}}$ to reduce source loss.
+
+If $V_{\mathrm{th}}=12\,\mathrm V$ and $R_{\mathrm{th}}=4\,\Omega$, the matched load is $4\,\Omega$. Current is $12/8=1.5\,\mathrm A$, and load power is $(1.5)^2(4)=9.0\,\mathrm W$. A $20\,\Omega$ load receives less power, but the fraction of supplied power reaching it is much higher.
+
+## Energy delivery and electrical safety
+
+Household energy billing uses kilowatt-hours, a unit of energy:
+
+$$
+1\,\mathrm{kWh}=3.6\times10^6\,\mathrm J.
+$$
+
+A $1.5\,\mathrm{kW}$ heater operating for three hours consumes $4.5\,\mathrm{kWh}$, or $16.2\,\mathrm{MJ}$. Power describes rate; energy also depends on duration.
+
+Fuses and circuit breakers respond to excessive current because wiring heat scales roughly as $I^2R$. A short circuit removes most load resistance and can produce dangerous current limited mainly by source and wire resistance. Ground-fault protection instead compares outgoing and returning currents and disconnects when some current takes an unintended path.
+
+The physiological hazard of electricity depends on current path, duration, frequency, skin condition, and contact area, not voltage alone. High voltage can drive dangerous current through the body's resistance, while wet skin lowers that resistance. Circuit calculations involving mains or high-energy capacitors should remain analytical unless proper isolation, discharge procedures, and rated equipment are available.
+
+## Model boundaries
+
+Ideal wires are equipotential and have no resistance. Real wires develop voltage drop and heat, especially at high current. Contacts add resistance; batteries have chemistry-dependent voltage and capacity; capacitors leak; switches arc. A lumped DC model is valuable when these effects are either included as components or small relative to the desired accuracy.
+
+Kirchhoff's loop rule assumes changing magnetic flux through the loop is negligible. In rapidly changing circuits, induced emf must be included. At sufficiently high frequency, propagation delay makes voltage position-dependent along a wire and transmission-line analysis replaces the instantaneous lumped picture.
+
+## Reading component ratings
+
+A resistor's resistance value does not state how much power it can safely dissipate. If a $1.0\,\mathrm{k\Omega}$ resistor carries $30\,\mathrm{mA}$, its power is
+
+$$
+P=I^2R=(0.030)^2(1000)=0.90\,\mathrm W.
+$$
+
+That exceeds the rating of a common quarter-watt part even though Ohm's law is satisfied. Voltage rating can impose another limit, especially for physically small or high-value resistors.
+
+Capacitors have voltage ratings and polarity constraints. Exceeding the dielectric rating can cause breakdown; reversing a polarized electrolytic capacitor can damage it. Batteries specify capacity in ampere-hours, which measures charge, while stored energy also depends on voltage. A $2\,\mathrm{Ah}$ battery at nominal $12\,\mathrm V$ corresponds ideally to about $24\,\mathrm{Wh}$, but usable energy depends on discharge rate, temperature, cutoff voltage, and aging.
+
+Wire gauge affects both resistance and allowable current. A thinner or longer wire has larger resistance, creating more voltage drop and heat at the same current. Connections can dominate resistance when contacts are loose or corroded. These effects are modeled with ordinary series resistances before invoking more elaborate circuit theory.
+
+When reporting a solved circuit, include current directions, node-voltage reference, source polarity, and whether voltages are terminal or emf values. A bare negative number is ambiguous without the reference arrow that made it negative.
+
+Sign conventions are part of the answer, not disposable scratch work.
+
+<div className="see-also">
+
+See also: [Electric Potential and Capacitance](/physics/general/electric-potential-and-capacitance) · [AC Circuits and EM Waves](/physics/general/ac-circuits-and-electromagnetic-waves)
+
+</div>

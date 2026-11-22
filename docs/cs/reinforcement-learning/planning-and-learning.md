@@ -11,13 +11,9 @@ sidebar_position: 8
 
 Planning and learning meet when an agent uses both real experience and a model. A model may be given, learned, deterministic, stochastic, exact, or approximate. Sutton and Barto's Dyna architecture makes the relationship concrete: real interaction updates values and the model, then simulated experience from the model performs additional value updates.
 
-![An agent-environment loop shows actions, observations, and rewards cycling through interaction.](https://commons.wikimedia.org/wiki/Special:FilePath/Agent-environment-diagram-rl.svg)
-
-*Figure: The agent-environment interface is the basic situation that defines reinforcement learning. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Agent-environment-diagram-rl.svg), Martin Thoma, CC0.*
-
 This chapter expands the view of reinforcement learning beyond pure trial and error. Dynamic programming is planning from a complete model. TD learning is learning from real experience. Dyna, prioritized sweeping, trajectory sampling, real-time dynamic programming, heuristic search, rollout, and Monte Carlo tree search occupy the space between them. The central question is how to spend limited computation to improve decisions.
 
-## Definitions
+## One update rule, two sources of experience
 
 A model predicts environment responses. A sample model takes $(s,a)$ and returns a sampled $(s',r)$. A distribution model returns probabilities over possible next states and rewards. In tabular Dyna-Q, the learned model often stores the last observed next state and reward for each experienced state-action pair.
 
@@ -39,6 +35,8 @@ $$
 
 then applies the same Q-learning update to $(S,A,R,S')$.
 
+## Choosing what to simulate
+
 Prioritized sweeping focuses planning backups where they are likely to matter. A priority can be based on the absolute TD error:
 
 $$
@@ -49,7 +47,7 @@ Predecessor states whose values may be affected are then inserted into a priorit
 
 Rollout algorithms use simulations from a current state to evaluate actions under a base policy. Monte Carlo tree search builds a partial search tree from simulated trajectories, balancing exploitation of high-value branches with exploration of under-sampled branches.
 
-## Key results
+## When planning helps—and when models mislead
 
 Planning backups and learning backups can be mathematically identical. The difference is the source of the transition. Real experience comes from the environment; simulated experience comes from the model. This is the key unifying insight of Dyna.
 
@@ -66,8 +64,6 @@ Decision-time planning differs from background planning. In background planning,
 Dyna is especially important because it treats real and simulated experience uniformly after the transition has been produced. The value update does not care whether $(S,A,R,S')$ came from the world or from the model. This makes the architecture modular: better models, better search-control rules, and better value updates can be substituted without changing the overall loop.
 
 Search control is the problem of choosing which simulated backups to perform. Uniform random selection is simple, but it ignores the current planning need. Prioritized sweeping is a search-control method based on expected usefulness. Trajectory sampling is another: by simulating from states likely under the current policy, planning focuses on reachable parts of the state space. Decision-time MCTS focuses even more narrowly on the current root state.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -90,7 +86,7 @@ flowchart TD
 | Rollout | Simulated action evaluations | Current decision | Improves a base policy | Computationally expensive |
 | MCTS | Partial tree from simulations | Current decision tree | Strong anytime planning | Needs many simulations in hard domains |
 
-## Worked example 1: One Dyna-Q real and planning update
+## Reusing a transition in Dyna-Q
 
 Problem: Current $Q(s,a)=0$. The agent takes action $a$ in state $s$, receives $r=1$, and reaches $s'$. At $s'$, the current action values are $Q(s',0)=2$ and $Q(s',1)=3$. Let $\alpha=0.5$ and $\gamma=0.9$. First perform the real Q-learning update. Then suppose a planning step samples the same transition again; perform that update too.
 
@@ -127,7 +123,7 @@ $$
 
 Check: Planning moved the same value closer to the same target without another real environment step. The checked final value is $2.775$.
 
-## Worked example 2: Priority from a TD error
+## Scheduling a predecessor by TD error
 
 Problem: A predecessor pair $(p,b)$ predicts next state $s$. Its model reward is $R=0$. Current values are $Q(p,b)=4$, $\gamma=0.9$, and $\max_a Q(s,a)=10$. Compute the prioritized-sweeping priority based on absolute TD error.
 
@@ -153,7 +149,7 @@ Step 4: Interpret. If the priority queue threshold is, for example, $\theta=0.1$
 
 Check: The predecessor value is far below its current target, so a high priority is expected.
 
-## Code
+## Dyna-Q on a small chain
 
 ```python
 import numpy as np
@@ -196,7 +192,7 @@ print(np.round(Q, 3))
 print("Greedy actions:", np.argmax(Q, axis=1).tolist())
 ```
 
-## Common pitfalls
+## When simulated experience hurts
 
 - Assuming model-based means model-perfect. Dyna often learns a model from the same limited experience as the value function.
 - Counting planning updates as new evidence from the real environment. They are computational use of a model, and model bias can be repeated many times.
@@ -205,10 +201,8 @@ print("Greedy actions:", np.argmax(Q, axis=1).tolist())
 - Confusing rollout with value iteration. Rollout estimates action quality from simulated trajectories under a base policy; it need not compute global value convergence.
 - Treating MCTS as a tabular value-learning algorithm only. It is primarily decision-time planning that grows a search tree from simulations.
 
-## Connections
+<div className="see-also">
 
-- [Dynamic programming](/cs/reinforcement-learning/dynamic-programming)
-- [Temporal-difference learning](/cs/reinforcement-learning/temporal-difference-learning)
-- [n-step bootstrapping](/cs/reinforcement-learning/n-step-bootstrapping)
-- [Applications and frontiers](/cs/reinforcement-learning/applications-and-frontiers)
-- [Machine learning](/cs/machine-learning/)
+See also: [Dynamic programming](/cs/reinforcement-learning/dynamic-programming) · [Temporal-difference learning](/cs/reinforcement-learning/temporal-difference-learning) · [n-step bootstrapping](/cs/reinforcement-learning/n-step-bootstrapping) · [Applications and frontiers](/cs/reinforcement-learning/applications-and-frontiers) · [Machine learning](/cs/machine-learning/intro)
+
+</div>

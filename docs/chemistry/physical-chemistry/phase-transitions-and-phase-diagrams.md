@@ -7,17 +7,9 @@ sidebar_position: 6
 
 Phase diagrams compress a large amount of thermodynamic information into a visual map. They show which phases are stable at given temperature, pressure, and composition, and they mark the conditions under which phases coexist.
 
-Atkins develops both pure-substance phase diagrams and mixture phase diagrams because the same chemical-potential idea controls vaporization, fusion, sublimation, azeotropes, eutectics, liquid crystals, and materials purification. A phase boundary is not just a line on a graph; it is the set of conditions where chemical potentials are equal across phases.
+Pure-substance and mixture diagrams look different, but both come from the same condition: coexisting phases have equal chemical potentials. Vaporization, fusion, azeotropes, eutectics, and materials purification are variations on that condition. A boundary is the set of states at which neither phase has a molar-Gibbs-energy advantage.
 
-![A phase diagram of carbon dioxide plots pressure against temperature and marks triple and critical points.](https://commons.wikimedia.org/wiki/Special:FilePath/Carbon_dioxide_pressure-temperature_phase_diagram.svg)
-
-*Figure: Carbon dioxide phase diagram showing why dry ice sublimes at ordinary pressure. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Carbon_dioxide_pressure-temperature_phase_diagram.svg), Ben Finney and Mark Jacobs, CC0.*
-
-![A phase diagram of water maps solid, liquid, vapor, triple-point, and critical-point regions.](https://commons.wikimedia.org/wiki/Special:FilePath/Phase_diagram_of_water.svg)
-
-*Figure: Water phase diagram for comparison with ordinary pure-substance phase behavior. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Phase_diagram_of_water.svg), Cmglee, CC BY-SA 3.0.*
-
-## Definitions
+## What a phase diagram counts
 
 A **phase** is a form of matter uniform in chemical composition and physical state. A **component** is the minimum number of independent species needed to describe the composition of all phases. A **constituent** is an actual chemical species present.
 
@@ -70,7 +62,7 @@ $$
 {\mathrm{distance\ from\ overall\ composition\ to\ }\alpha}
 $$
 
-## Key results
+## Pure substances: regions, boundaries, and special points
 
 For a pure substance, phase boundaries meet at the triple point, where solid, liquid, and vapor coexist. Since $C=1$ and $P=3$,
 
@@ -88,6 +80,8 @@ so choosing $T$ fixes $p$, or choosing $p$ fixes $T$.
 
 The critical point terminates the liquid-vapor boundary. Above the critical temperature, there is no sharp liquid-vapor phase transition; a supercritical fluid can have liquid-like density and gas-like transport.
 
+Liquid and vapor differ in density and composition fluctuations below the critical point. On approaching the critical point, their densities converge, the enthalpy of vaporization tends toward zero, and density fluctuations grow over long length scales. The meniscus disappears because there are no longer two bulk phases separated by a surface. By contrast, the solid-liquid line does not ordinarily terminate at a critical point: a crystal and a liquid differ in symmetry, so they cannot generally be connected continuously without a phase transition.
+
 The sign of the solid-liquid slope follows from the Clapeyron equation. Most substances have $\Delta_{\mathrm{fus}}V\gt 0$, so the melting point rises with pressure. Water is unusual because ice is less dense than liquid water, so $\Delta_{\mathrm{fus}}V\lt 0$ and the melting line has negative slope.
 
 In binary liquid-vapor diagrams, fractional distillation works because vapor and liquid compositions differ. Azeotropes are exceptions where vapor and liquid have the same composition at a boiling extremum, so simple distillation cannot pass that composition.
@@ -100,7 +94,7 @@ $$
 
 at fixed pressure, so solid $A$, solid $B$, and liquid coexist invariantly.
 
-The most important idea behind a phase diagram is equality of chemical potentials. A phase is stable when its chemical potential is lower than alternatives at the same $T$ and $p$. A boundary occurs when two phases have equal chemical potential. If the system crosses the boundary, the lower-$\mu$ phase changes, and a phase transformation becomes thermodynamically favorable. This interpretation prevents phase diagrams from becoming memorized pictures: every line is a balance of molar Gibbs energies.
+A phase is stable when its chemical potential is lower than alternatives at the same $T$ and $p$. A boundary occurs when two phases have equal chemical potential. If the system crosses the boundary, the lower-$\mu$ phase changes, and a phase transformation becomes thermodynamically favorable. Every line is therefore a balance of molar Gibbs energies rather than an empirical curve to memorize.
 
 The Clapeyron equation follows by differentiating the equality $\mu^\alpha=\mu^\beta$ along a coexistence curve. For each phase,
 
@@ -120,21 +114,31 @@ $$
 \frac{dp}{dT}=\frac{\Delta S}{\Delta V}
 $$
 
-This derivation is compact but conceptually rich: phase-boundary slopes are ratios of entropy and volume changes.
+Phase-boundary slopes are therefore ratios of entropy and volume changes. The equation also explains why a nearly vertical melting line means that fusion changes volume only slightly.
 
 The Clausius-Clapeyron approximation works best for vaporization and sublimation because gas volume dominates condensed-phase volume. If the vapor behaves ideally, $\Delta V\approx RT/p$, and substitution into Clapeyron gives the logarithmic vapor-pressure relation. Plotting $\ln p$ against $1/T$ often gives an approximately straight line whose slope yields $\Delta_{\mathrm{vap}}H/R$ with a sign convention. Curvature appears when the enthalpy of vaporization changes appreciably with temperature or the vapor is not ideal.
 
-The phase rule is a counting rule with chemical content. In a one-component two-phase system, only one intensive variable is free. This is why the boiling point of a pure liquid is fixed once the external pressure is fixed. At the triple point of a pure substance, no intensive freedom remains. In a binary mixture at fixed pressure, a two-phase region has one freedom: if temperature is fixed, the compositions of the two phases are fixed by the ends of the tie line, and the overall composition determines only the relative amounts.
+The phase rule is a counting rule with chemical content. In a one-component two-phase system, only one intensive variable is free. The boiling point of a pure liquid is consequently fixed once the external pressure is fixed. At the triple point of a pure substance, no intensive freedom remains. In a binary mixture at fixed pressure, a two-phase region has one freedom: if temperature is fixed, the compositions of the two phases are fixed by the ends of the tie line, and the overall composition determines only the relative amounts.
 
 Binary liquid-vapor diagrams explain distillation. If vapor is richer in the more volatile component than the liquid, repeated vaporization and condensation enrich the distillate. An azeotrope breaks this strategy because liquid and vapor compositions become equal at the azeotropic point. The mixture then boils like a pure substance at that composition even though it contains two components. The thermodynamic cause is nonideal solution behavior strong enough to create an extremum in boiling temperature or vapor pressure.
 
-Liquid-solid diagrams are central in materials chemistry. Eutectics are important because they melt at lower temperature than either pure component and solidify into fine two-phase microstructures. Peritectics and incongruent melting show that compounds in a binary system may be stable as solids but not as liquids of the same composition. Such diagrams guide alloy preparation, solder selection, ceramic processing, and semiconductor purification.
+Liquid-solid diagrams are central in materials chemistry. Eutectics melt at a lower temperature than either pure component and solidify into two-phase microstructures. Peritectics and incongruent melting show that compounds in a binary system may be stable as solids but not as liquids of the same composition. Such diagrams guide alloy preparation, solder selection, ceramic processing, and semiconductor purification.
+
+## Why a binary two-phase field has width
+
+For a pure substance at fixed pressure, liquid and vapor coexist at one boiling temperature. A binary mixture has two chemical-potential equalities: each component must have the same chemical potential in both phases. At a chosen pressure and temperature, these conditions determine a liquid composition and a vapor composition, which are generally different. Any overall composition between them can be assembled by changing only the relative phase amounts. The diagram therefore shows a two-phase region rather than a single coexistence line.
+
+The bubble-point boundary is reached when the first infinitesimal vapor appears from a liquid mixture. Its composition lies at the other end of a tie line. The dew-point boundary is reached when the first infinitesimal liquid appears from vapor. Between the boundaries, neither the plotted overall composition nor either boundary alone describes the whole sample; both endpoint compositions and a phase fraction are needed.
+
+Raoult's law gives the ideal-solution starting point. Each component's partial vapor pressure is its liquid mole fraction times its pure-component vapor pressure. The vapor is enriched in the component with the larger pure vapor pressure, which supplies the separation exploited by distillation. Positive or negative departures from Raoult's law bend the boundaries. Strong enough departures can produce a vapor-pressure extremum and an azeotrope.
+
+At an azeotrope, liquid and vapor compositions coincide. Boiling then removes material with the same composition as the residue, so repeated equilibrium stages cannot cross that point by ordinary distillation at fixed pressure. Changing pressure may move the azeotropic composition, and other separation methods can exploit a third component, adsorption, membranes, or chemical reaction, but those are changes to the process rather than exceptions to the equilibrium diagram.
 
 Zone refining and zone leveling use phase diagrams under non-equilibrium operating conditions. If impurities are more soluble in the melt than in the solid, a moving molten zone can sweep impurities toward one end of a solid rod. The equilibrium diagram explains the direction of partitioning, while the practical purification depends on repeated passes and controlled solidification. This is a good example of equilibrium thermodynamics informing a process that is deliberately run dynamically.
 
-Liquid crystals broaden the meaning of phase. A mesophase can have orientational order without full positional order, so it is neither an ordinary liquid nor an ordinary crystal. Their phase diagrams depend on temperature, composition, and molecular shape, and their optical anisotropy makes display technology possible. The same phase-rule logic still applies, but the phases have more subtle structural order.
+Liquid crystals broaden the meaning of phase. A mesophase can have orientational order without full positional order, so it lies between an isotropic liquid and an ordinary crystal. Its phase behavior depends on temperature, composition, and molecular shape. The phase rule still applies even when the structural distinction is subtler than solid versus liquid.
 
-## Visual
+## One counting rule, several kinds of diagram
 
 ```mermaid
 flowchart TB
@@ -163,7 +167,7 @@ flowchart TB
   Lever -. "mass balance constraint" .-> Bin2
 ```
 
-This diagram replaces a fixed phase-picture with the underlying thermodynamic architecture. The pure-substance subgraph shows regions, coexistence boundaries, the triple point, critical point, and the Clapeyron-to-Clausius-Clapeyron derivation path; the binary-mixture subgraph shows tie lines, lever rule, eutectics, and azeotropes. The labeled freedoms show how the shape of a phase diagram follows from $F=C-P+2$ and chemical-potential equality rather than from memorized curves.
+The labeled freedoms explain why a two-phase coexistence state is a line for a pure substance in the $p$-$T$ plane but a region for a binary mixture plotted against temperature and overall composition. In the mixture, the tie-line endpoints specify two equilibrium compositions while the overall composition can vary between them by changing phase amounts.
 
 | Feature | Pure substance | Binary mixture |
 |---|---|---|
@@ -173,11 +177,9 @@ This diagram replaces a fixed phase-picture with the underlying thermodynamic ar
 | Distillation relevance | boiling point | vapor and liquid compositions differ |
 | Materials relevance | melting/freezing | alloy microstructure, zone refining, liquid crystals |
 
-## Worked example 1: Vapor pressure from Clausius-Clapeyron
+## Worked example: vapor pressure from Clausius-Clapeyron
 
-**Problem.** A liquid has vapor pressure $100.0\ \mathrm{kPa}$ at $350.0\ \mathrm{K}$ and $\Delta_{\mathrm{vap}}H=35.0\ \mathrm{kJ\ mol^{-1}}$. Estimate its vapor pressure at $330.0\ \mathrm{K}$.
-
-**Method.** Use the integrated Clausius-Clapeyron equation.
+Suppose a liquid has vapor pressure $100.0\ \mathrm{kPa}$ at $350.0\ \mathrm{K}$ and $\Delta_{\mathrm{vap}}H=35.0\ \mathrm{kJ\ mol^{-1}}$. Estimate its vapor pressure at $330.0\ \mathrm{K}$.
 
 1. Write the relation:
 
@@ -218,13 +220,11 @@ p_2=100.0e^{-0.729}
 =48.2\ \mathrm{kPa}
 $$
 
-**Checked answer.** Lower temperature gives lower vapor pressure. The estimate $48\ \mathrm{kPa}$ is plausible for a $20\ \mathrm{K}$ decrease with a moderate vaporization enthalpy.
+Lower temperature must give lower vapor pressure, and the estimate $48\ \mathrm{kPa}$ has that sign. The numerical value assumes a constant vaporization enthalpy and ideal vapor.
 
-## Worked example 2: Lever rule in a two-phase region
+## Worked example: deriving and applying the lever rule
 
-**Problem.** At a certain temperature, a binary liquid-vapor system has liquid composition $x_B^{(l)}=0.20$ and vapor composition $x_B^{(v)}=0.70$. A sample has overall composition $z_B=0.40$. Find the fraction of the total amount in the vapor phase.
-
-**Method.** Use material balance:
+At a certain temperature, a binary liquid-vapor system has liquid composition $x_B^{(l)}=0.20$ and vapor composition $x_B^{(v)}=0.70$. A sample has overall composition $z_B=0.40$. Find the fraction of the total amount in the vapor phase.
 
 $$
 z_B=f_vx_B^{(v)}+(1-f_v)x_B^{(l)}
@@ -254,30 +254,19 @@ $$
 f_v=0.40
 $$
 
-**Checked answer.** The overall composition is closer to the liquid composition than to the vapor composition, so less than half the sample should be vapor. The answer $40\%$ vapor is consistent.
+The other fraction is $f_l=1-f_v=0.60$. Subtracting $x_B^{(l)}$ from the material balance gives the general result
 
-## Code
+$$
+f_v=\frac{z_B-x_B^{(l)}}{x_B^{(v)}-x_B^{(l)}},
+\qquad
+f_l=\frac{x_B^{(v)}-z_B}{x_B^{(v)}-x_B^{(l)}}.
+$$
 
-```python
-import numpy as np
+Each phase amount is proportional to the tie-line segment on the opposite side. Here the overall composition is closer to the liquid endpoint, so liquid must be the larger fraction; $60\%$ liquid and $40\%$ vapor pass that check.
 
-R = 8.314462618
+## Metastability and how to read the map
 
-def vapor_pressure_clausius(p1, T1, T2, delta_h_vap):
-    exponent = -(delta_h_vap / R) * (1.0 / T2 - 1.0 / T1)
-    return p1 * np.exp(exponent)
-
-def vapor_fraction(z, x_liq, x_vap):
-    return (z - x_liq) / (x_vap - x_liq)
-
-for T in [320, 330, 340, 350]:
-    p = vapor_pressure_clausius(100.0, 350.0, T, 35000.0)
-    print(f"T={T} K  p={p:7.2f} kPa")
-
-print("vapor fraction:", vapor_fraction(0.40, 0.20, 0.70))
-```
-
-## Common pitfalls
+An equilibrium boundary says where two phases have equal chemical potential; it does not guarantee immediate conversion on crossing the line. A new phase usually needs a nucleus with enough volume benefit to compensate for the cost of creating an interface. A liquid may therefore supercool below its freezing point, and a vapor may remain supersaturated. Such states are metastable: a lower-$\mu$ state exists, but the activation barrier delays its appearance. The reported transition on heating can consequently differ from the transition on cooling.
 
 - Using the phase rule without checking whether pressure is fixed. Condensed phase diagrams often use the reduced form.
 - Reading a two-phase composition from the overall composition. Phase compositions come from tie-line endpoints; the overall composition gives amounts through the lever rule.
@@ -291,9 +280,8 @@ For lever-rule calculations, draw the tie line and label distances before insert
 
 For phase-boundary slopes, return to Clapeyron rather than memorized signs. The sign depends on both entropy and volume changes. Vaporization has positive $\Delta S$ and large positive $\Delta V$, so vapor pressure rises with temperature. Fusion usually has positive $\Delta S$ and positive $\Delta V$, but water has negative $\Delta V$ for melting ice, giving a negative melting-line slope.
 
-## Connections
+<div className="see-also">
 
-- [Properties of gases](/chemistry/physical-chemistry/properties-of-gases)
-- [Mixtures, solutions, and activities](/chemistry/physical-chemistry/mixtures-solutions-and-activities)
-- [Molecular interactions and transport](/chemistry/physical-chemistry/molecular-interactions-and-transport)
-- [General chemistry phase changes](/chemistry/general/)
+See also: [Properties of gases](/chemistry/physical-chemistry/properties-of-gases) · [Mixtures, solutions, and activities](/chemistry/physical-chemistry/mixtures-solutions-and-activities) · [Molecular interactions and transport](/chemistry/physical-chemistry/molecular-interactions-and-transport) · [states of matter: liquids and solids](/chemistry/general/states-of-matter-liquids-and-solids)
+
+</div>

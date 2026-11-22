@@ -9,11 +9,7 @@ Mathematical modeling is the translation step between a physical story and a sim
 
 The point of the model is not to reproduce every detail of the real system. A useful simulation model keeps the mechanisms that matter for the question being asked and omits details whose effects are small, unknown, or outside the intended operating range. Klee and Allen's text emphasizes this modeling-to-simulation path: begin with physical laws, turn them into equations, and then replace the continuous equation by a discrete-time numerical procedure that MATLAB or Simulink can execute.
 
-![A spring-mass harmonic oscillator shows displacement, spring force, and equilibrium position.](https://commons.wikimedia.org/wiki/Special:FilePath/Harmonic_oscillator.svg)
-
-*Figure: The mass-spring oscillator is the canonical apparatus behind resonance, normal modes, and linearization. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Harmonic_oscillator.svg), LucasVB, public domain.*
-
-## Definitions
+## Choosing states and closing the equations
 
 A continuous-time dynamical system has variables that are functions of real-valued time $t$. A scalar first-order model has the form
 
@@ -43,7 +39,7 @@ Constitutive laws relate effort-like and flow-like variables. Examples include O
 
 A lumped-parameter model assumes spatial variation inside each element can be summarized by a finite number of variables. A distributed-parameter model keeps spatial dependence and leads to partial differential equations. Continuous system simulation often begins with lumped approximations even when the physical system is distributed, because ordinary differential equations are easier to simulate and interpret.
 
-## Key results
+## Building a model from balances
 
 The most useful modeling pattern is the balance equation. If $S(x)$ is the stored quantity and $x$ is the chosen state, then
 
@@ -69,7 +65,7 @@ $$
 C\dot{v}=-\frac{1}{R}v+i_\text{in},
 $$
 
-which is why simulation methods transfer across domains.
+so the same simulation methods transfer across domains.
 
 Dimensional consistency is a non-negotiable check. If the left-hand side has units of meters per second, every term on the right-hand side must also reduce to meters per second. This check catches sign errors, missing capacitances or masses, and accidental use of total quantities where rates are required.
 
@@ -80,8 +76,6 @@ $$
 $$
 
 Equilibria matter because simulations are often run as deviations from a steady operating condition. They also provide a way to check whether long-time numerical results make physical sense.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -100,7 +94,7 @@ flowchart TD
   Decision -- "yes" --> Model(("usable continuous-time model"))
 ```
 
-This modeling diagram shows the derivation pipeline before any solver is chosen. The state and balance layers define the dynamic order, constitutive laws add physical closure, and parameter/unit checks constrain the equations. The feedback loop is intentionally at the boundary stage because an inadequate model often needs a revised system boundary, not just different numerical settings.
+The diagram traces the derivation pipeline before any solver is chosen. The state and balance layers define the dynamic order, constitutive laws add physical closure, and parameter/unit checks constrain the equations. The feedback loop returns to the boundary stage because an inadequate model often needs a revised system boundary rather than different numerical settings.
 
 | Modeling decision | Typical choice | Simulation consequence |
 |---|---|---|
@@ -110,7 +104,9 @@ This modeling diagram shows the derivation pipeline before any solver is chosen.
 | Parameter treatment | Constant, scheduled, random, or estimated | Affects validation and sensitivity studies |
 | Initial condition | Measured, equilibrium, or assumed | Strongly affects transients |
 
-## Worked example 1: Draining tank with a linear outlet
+## Balance laws in two physical domains
+
+### Deriving a draining-tank model
 
 Problem: A tank has cross-sectional area $A=2\ \mathrm{m^2}$ and a linear hydraulic resistance $R_h=5\ \mathrm{s/m^2}$. A constant inflow $q_\text{in}=0.4\ \mathrm{m^3/s}$ begins at $t=0$. The initial height is $h(0)=0.5\ \mathrm{m}$. Derive the model, find the equilibrium, and predict the qualitative time-response plot.
 
@@ -154,7 +150,7 @@ Checked answer: $h(0)=2.0-1.5=0.5\ \mathrm{m}$ and $h(\infty)=2.0\ \mathrm{m}$. 
 
 Simulink description: use a Sum block for $q_\text{in}-q_\text{out}$, a Gain block $1/A$, an Integrator block for $h$, and a feedback Gain block $1/R_h$ from $h$ to the negative input of the Sum. A Scope should show the same rising exponential.
 
-## Worked example 2: Mass-spring-damper model from Newton's law
+### From Newton's law to two first-order states
 
 Problem: A cart of mass $m=4\ \mathrm{kg}$ is attached to a spring $k=20\ \mathrm{N/m}$ and a damper $b=6\ \mathrm{N\,s/m}$. An external force $F(t)$ acts on the cart. Let displacement $q$ be measured from the spring's unstretched position. Derive a first-order state model and find the equilibrium for a constant force $F_0=10\ \mathrm{N}$.
 
@@ -202,7 +198,7 @@ Checked answer: a static spring under $10\ \mathrm{N}$ extends $F_0/k=10/20=0.5\
 
 Simulink description: build two cascaded Integrator blocks for acceleration to velocity to position. Sum $F$, $-b\dot{q}$, and $-kq$, multiply by $1/m$, and feed the acceleration integrator. Scope the position and velocity states.
 
-## Code
+## Integrating both models in MATLAB
 
 ```matlab
 % Draining tank and mass-spring-damper simulations.
@@ -241,7 +237,7 @@ title('Mass-spring-damper step response');
 
 The first plot should rise smoothly from $0.5\ \mathrm{m}$ toward $2\ \mathrm{m}$. The second should oscillate around $0.5\ \mathrm{m}$ with a decaying envelope because the damping ratio is less than one. In Simulink the same responses appear if the integrator initial conditions are set to the stated initial states and the force or inflow is represented with Constant or Step blocks.
 
-## Common pitfalls
+## Model checks before touching the solver
 
 - Choosing outputs as states when they do not contain enough memory. Position without velocity is not a complete mechanical state.
 - Mixing total stored quantities and rates. A flow rate belongs on the right side of a balance equation; a stored amount belongs inside the derivative.
@@ -250,9 +246,8 @@ The first plot should rise smoothly from $0.5\ \mathrm{m}$ toward $2\ \mathrm{m}
 - Running MATLAB before checking units. Numerical solvers can integrate dimensionally impossible equations without warning.
 - Setting all initial conditions to zero by habit. A wrong initial condition can make a correct model look wrong during the transient.
 
-## Connections
+<div className="see-also">
 
-- [State-Space Representation](/physics/simulation/state-space-representation)
-- [Numerical Integration Methods](/physics/simulation/numerical-integration-methods)
-- [Nonlinear Systems and Linearization](/physics/simulation/nonlinear-systems-linearization)
-- [LTI Systems and Convolution](/physics/signals-systems/lti-systems-convolution)
+See also: [State-Space Representation](/physics/simulation/state-space-representation) · [Numerical Integration Methods](/physics/simulation/numerical-integration-methods) · [Nonlinear Systems and Linearization](/physics/simulation/nonlinear-systems-linearization) · [LTI Systems and Convolution](/physics/signals-systems/lti-systems-convolution)
+
+</div>

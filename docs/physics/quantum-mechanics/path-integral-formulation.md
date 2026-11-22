@@ -303,10 +303,8 @@ Gauge systems introduce redundancy: different paths in configuration space may r
 
 The path integral and canonical quantization are equivalent only after their domains, measures, ordering, and boundary conditions are matched. In simple one-dimensional Cartesian problems those choices are nearly invisible. Their reappearance in more complicated systems is a warning against treating the formal continuum notation as self-defining.
 
-## Related pages
+<div className="see-also">
 
-- [Quantum dynamics and pictures](/physics/quantum-mechanics/quantum-dynamics-pictures)
-- [One-dimensional Schrodinger systems](/physics/quantum-mechanics/one-dimensional-schrodinger-systems)
-- [Variational principle and WKB](/physics/quantum-mechanics/variational-principle-wkb)
-- [Scattering theory](/physics/quantum-mechanics/scattering-theory)
-- [Measurement and interpretation](/physics/quantum-mechanics/measurement-interpretation)
+See also: [Quantum dynamics and pictures](/physics/quantum-mechanics/quantum-dynamics-pictures) · [One-dimensional Schrodinger systems](/physics/quantum-mechanics/one-dimensional-schrodinger-systems) · [Variational principle and WKB](/physics/quantum-mechanics/variational-principle-wkb) · [Scattering theory](/physics/quantum-mechanics/scattering-theory) · [Measurement and interpretation](/physics/quantum-mechanics/measurement-interpretation)
+
+</div>

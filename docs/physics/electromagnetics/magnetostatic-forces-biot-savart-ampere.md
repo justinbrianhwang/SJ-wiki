@@ -13,7 +13,7 @@ Two complementary field laws dominate the subject. Biot-Savart law is a source i
 
 *Figure: Parallel current-carrying wires are the laboratory-scale picture behind Ampere forces and magnetostatic interaction energy. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:MagneticWireAttraction.svg), Sbyrnes321, public domain.*
 
-## Definitions
+## Sources, fields, and magnetic force
 
 The magnetic force on a charge $q$ moving with velocity $\vec u$ is
 
@@ -85,7 +85,7 @@ $$
 
 The absence of magnetic monopoles in this model means magnetic flux lines close on themselves. A bar magnet's field may appear to leave one pole and enter another outside the material, but inside the material the flux continues. This is different from electric flux, which can begin on positive free charge and end on negative free charge.
 
-## Key results
+## Choosing Biot-Savart or Ampere's law
 
 For an infinitely long straight wire carrying current $I$ in the $+z$ direction,
 
@@ -138,11 +138,9 @@ Current density notation matters in extended conductors. Volume current density 
 
 The vector magnetic potential $\vec A$ is often introduced after Ampere's law because $\nabla\cdot\vec B=0$ is automatically satisfied by $\vec B=\nabla\times\vec A$. In magnetostatics, $\vec A$ can simplify calculations for current distributions and becomes essential in time-varying field theory. Even when $\vec A$ is not unique, its curl gives the physical $\vec B$ field.
 
-Magnetostatic approximations assume currents are steady enough that charge accumulation and displacement current are negligible. This is usually valid for dc coils and slowly varying currents in compact structures, but it breaks down when dimensions become comparable to wavelength or when capacitive effects between conductors become important.
+Magnetostatic approximations assume currents are steady enough that charge accumulation and displacement current are negligible. This is usually valid for dc coils and slowly varying currents in compact structures, but it breaks down when dimensions become comparable to wavelength or when capacitive effects between conductors become important. Results for an "infinite" wire, sheet, or solenoid are local approximations, accurate only where ends and edges are sufficiently distant.
 
-When a result depends on "infinite" wire, sheet, or solenoid assumptions, treat it as a local approximation. It is accurate only far from ends and edges compared with the observation distance and structure dimensions.
-
-## Visual
+### From a current distribution to force and torque
 
 ```mermaid
 flowchart TD
@@ -163,7 +161,7 @@ flowchart TD
 | Magnetic force | wire in known field | $d\vec F=I\,d\vec l\times\vec B$ |
 | Torque | current loop in known field | $\vec T=\vec m\times\vec B$ |
 
-## Worked example 1: Field around a long wire
+## Field around a long straight wire
 
 Problem: A long straight wire carries $I=8$ A in free space. Find $\vec H$ and $\vec B$ at $\rho=4$ cm.
 
@@ -205,7 +203,7 @@ $$
 
 Check: This is comparable to Earth's magnetic field magnitude, which is reasonable for several amperes at a few centimeters.
 
-## Worked example 2: Force between parallel conductors
+## Attraction between parallel conductors
 
 Problem: Two long parallel wires in air are separated by $d=10$ cm. They carry $I_1=5$ A and $I_2=3$ A in the same direction. Find the force per meter on wire 2.
 
@@ -235,39 +233,23 @@ Step 5: Direction: currents in the same direction attract, so wire 2 is pulled t
 
 Check: The compact formula gives $\mu_0I_1I_2/(2\pi d)$, the same result.
 
-## Code
+## Geometry and sign checks
 
-```python
-import numpy as np
+- The magnetostatic circulation law is written for $\vec H$ and enclosed free current, not directly for $\vec B$ in material media.
+- Magnetic force follows a cross product and is perpendicular to both current and field.
+- Ampere's law gives a direct scalar calculation only when symmetry makes $\vec H$ constant and tangential along the chosen path.
+- Cylindrical radius $\rho$ should not be confused with a charge-density symbol carrying a subscript.
+- Magnetic field lines do not start or end on currents; $\nabla\cdot\vec B=0$ requires closed flux paths.
+- Parallel currents attract when they flow in the same direction and repel when they flow in opposite directions.
+- The infinite-wire result needs an observation point far from both ends relative to its distance from the wire.
 
-mu0 = 4 * np.pi * 1e-7
+<div className="see-also">
 
-def long_wire_fields(I, rho):
-    H = I / (2 * np.pi * rho)
-    B = mu0 * H
-    return H, B
-
-def force_per_length(I1, I2, d):
-    return mu0 * I1 * I2 / (2 * np.pi * d)
-
-H, B = long_wire_fields(8, 0.04)
-print(f"H = {H:.2f} A/m, B = {B:.3e} T")
-print(f"F/l = {force_per_length(5, 3, 0.10):.3e} N/m")
-```
-
-## Common pitfalls
-
-- Using $\vec B$ in Ampere's law instead of $\vec H$. The basic magnetostatic circulation law uses $\vec H$ and free current.
-- Forgetting the cross-product direction in magnetic force. The force is perpendicular to current and field.
-- Applying Ampere's law as a shortcut when symmetry does not make $\vec H$ constant or tangential on the chosen path.
-- Confusing $\rho$ in cylindrical coordinates with charge density. Context and subscript notation matter.
-- Treating magnetic field lines as starting or ending on currents. Magnetic flux has zero divergence; field lines form loops.
-- Missing the sign of attraction or repulsion between parallel currents.
-- Treating a finite straight wire as infinite without checking the observation distance relative to wire length.
-
-## Connections
+See also:
 
 - [Vector algebra and coordinate systems](/physics/electromagnetics/vector-algebra-coordinate-systems) for cross products and cylindrical unit vectors.
 - [Gradient, divergence, curl, and integral theorems](/physics/electromagnetics/gradient-divergence-curl-integral-theorems) for Stokes's theorem behind Ampere's law.
 - [Magnetic materials, inductance, and energy](/physics/electromagnetics/magnetic-materials-inductance-and-energy) for $\mu$, magnetic energy, and inductors.
 - [Maxwell equations for time-varying fields](/physics/electromagnetics/maxwell-equations-time-varying-fields) for the displacement-current extension.
+
+</div>

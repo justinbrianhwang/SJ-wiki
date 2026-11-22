@@ -13,7 +13,7 @@ Rosen's final topic connects discrete structures to models of computation. Gramm
 
 The theme is memory. A finite-state machine has only finitely many states, so it can remember bounded information such as parity or a fixed suffix. A pushdown automaton adds a stack and recognizes many nested structures. A Turing machine adds unbounded tape and becomes a model for general algorithms.
 
-## Definitions
+## Languages, grammars, and machine models
 
 An **alphabet** is a finite set of symbols. A **string** is a finite sequence of symbols. The empty string is often written $\epsilon$. A **language** over an alphabet is a set of strings.
 
@@ -38,11 +38,11 @@ where $S$ is the finite state set, $I$ is the input alphabet, $f:S\times I\to S$
 
 A **Turing machine** has finite control, an unbounded tape, a tape head, and transition rules. It can read, write, move, and change state.
 
-## Key results
+## What finite state can and cannot remember
 
 Regular languages are exactly the languages recognized by finite-state machines. The proof has two directions: a regular grammar can be converted into an automaton that tracks the current nonterminal, and an automaton can be converted into a grammar whose productions simulate transitions.
 
-Finite-state machines have limited memory because the current state is the only stored information. This is why they can recognize patterns such as "binary strings ending in 01" or "binary strings with an even number of $1$s" but cannot recognize
+Finite-state machines have limited memory because the current state is the only stored information. They can recognize patterns such as "binary strings ending in 01" or "binary strings with an even number of $1$s" but cannot recognize
 
 $$
 \{0^n1^n:n\ge0\},
@@ -56,7 +56,7 @@ The Church-Turing thesis states that every effectively computable function can b
 
 The distinction between recognition and decision is important. A recognizer may accept strings in a language and run forever on strings outside it. A decider must halt on every input, accepting strings in the language and rejecting strings outside it.
 
-## Visual
+The two-state parity machine is the smallest useful example of state as a memory summary:
 
 ```mermaid
 stateDiagram-v2
@@ -77,9 +77,9 @@ The accepting state is `Even`; this automaton recognizes binary strings with an 
 | pushdown automaton | stack | $0^n1^n$ | one stack, limited comparisons |
 | Turing machine | unbounded tape | general computable languages | some problems still undecidable |
 
-## Worked example 1: Trace a finite automaton
+## Tracing the parity automaton
 
-**Problem.** Use the automaton in the visual to decide whether the string $10110$ has an even number of $1$s.
+**Problem.** Use the automaton above to decide whether the string $10110$ has an even number of $1$s.
 
 **Method.**
 
@@ -93,7 +93,7 @@ The accepting state is `Even`; this automaton recognizes binary strings with an 
 
 **Checked answer.** The string $10110$ is rejected because it has three $1$s, an odd number. The automaton does not store the count $3$; it stores only the parity.
 
-## Worked example 2: Generate a string from a grammar
+## Deriving $000111$ from a context-free grammar
 
 **Problem.** Consider the grammar
 
@@ -134,7 +134,7 @@ $$
 
 **Checked answer.** The grammar generates $\{0^n1^n:n\ge0\}$. The string $000111$ corresponds to $n=3$. This language is context-free but not regular.
 
-## Code
+## Executing the automaton and grammar
 
 ```python
 def accepts_even_ones(bits):
@@ -160,7 +160,7 @@ print([generate_zero_n_one_n(n) for n in range(5)])
 
 The state machine tracks parity with constant memory. The generator for $0^n1^n$ shows the nested structure a finite automaton cannot remember for unbounded $n$.
 
-## Common pitfalls
+## Designing states and proving what they mean
 
 - Confusing a string with a language. A language is a set of strings.
 - Forgetting that the empty string may be accepted or generated.
@@ -183,9 +183,13 @@ When tracing automata, record the state after each input symbol, including the s
 
 For grammars, distinguish derivation from recognition. A derivation shows how a grammar generates one string. Recognition asks whether a given string belongs to the language at all. A parser is a recognition procedure, while a grammar is a generative description. The two views are equivalent for many grammar classes but serve different tasks.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Propositional logic](/math/discrete/propositional-logic) and [Boolean algebra and logic circuits](/math/discrete/boolean-algebra-and-logic-circuits) underlie digital state machines.
 - [Graphs basics](/math/discrete/graphs-basics) represents automata as directed labeled graphs.
 - [Relations](/math/discrete/relations) frames transition functions and reachability.
 - [Algorithms and complexity](/math/discrete/algorithms-and-complexity) studies tractable, intractable, and undecidable computation.
+
+</div>

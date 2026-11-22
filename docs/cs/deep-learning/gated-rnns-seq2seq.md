@@ -7,9 +7,9 @@ sidebar_position: 11
 
 Basic RNNs carry hidden states through time, but they struggle to preserve useful information over long spans. D2L addresses this with gated recurrent units and long short-term memory networks, then uses recurrent encoders and decoders for machine translation. The result is the classic sequence-to-sequence pattern: one network reads an input sequence into a state representation, and another network generates an output sequence.
 
-This page is a bridge between vanilla recurrence and attention-based models. Gating explains how neural networks can decide what to remember, what to forget, and what to expose. Encoder-decoder training introduces teacher forcing, padding masks, sequence loss, and decoding. Beam search then shows that prediction is not just a forward pass; it is a search problem over possible output sequences.
+Gated recurrence bridges vanilla RNNs and attention-based models. Gating lets a network decide what to remember, forget, and expose. Encoder-decoder training introduces teacher forcing, padding masks, sequence loss, and decoding. Beam search treats prediction as a search over possible output sequences rather than a single forward pass.
 
-## Definitions
+## Gate equations and sequence-to-sequence vocabulary
 
 A **GRU** modifies the RNN hidden-state update using gates. With input $X_t$ and previous hidden state $H_{t-1}$, the reset gate $R_t$ and update gate $Z_t$ are
 
@@ -42,7 +42,7 @@ An **encoder-decoder** model maps an input sequence to an output sequence. The e
 
 **Teacher forcing** trains the decoder using the true previous target token as input. **Beam search** keeps the best $k$ partial sequences during decoding rather than committing to only the best next token.
 
-## Key results
+## How gates preserve state across time
 
 The update gate in a GRU creates a direct interpolation between old and candidate state. If $Z_t$ is close to $1$, then
 
@@ -64,7 +64,7 @@ $$
 C_t = F_t \odot C_{t-1} + I_t \odot \tilde{C}_t.
 $$
 
-The additive form makes it easier to carry memory forward than repeatedly applying only nonlinear transformations. This is why LSTMs became a standard sequence model before transformers became dominant.
+The additive form makes it easier to carry memory forward than repeatedly applying only nonlinear transformations. LSTMs consequently became a standard sequence model before transformers became dominant.
 
 Sequence-to-sequence training minimizes token-level cross-entropy, but padding tokens should not contribute to the loss. If a target has valid length $m$ and padded length $T$, the masked loss is
 
@@ -84,7 +84,7 @@ The fixed-context encoder-decoder is limited because the entire source sequence 
 
 Loss masking is part of the model objective. Padding lets variable-length sequences share a batch, but padded positions do not represent target tokens. If they contribute loss, the model can learn to predict padding too strongly or distort perplexity. Correct valid lengths, masks, and target shifting are therefore as important as the recurrent cell equations.
 
-## Visual
+## Inside an LSTM and its encoder-decoder stack
 
 ```mermaid
 flowchart TB
@@ -141,7 +141,7 @@ The LSTM cell diagram shows all four gate computations from the concatenated `[h
 | Bidirectional RNN | Forward and backward states | Uses both contexts | Not causal for generation |
 | Encoder-decoder | Separate reader and writer | Variable-length translation | Fixed context bottleneck without attention |
 
-## Worked example 1: GRU update gate interpolation
+## Interpolating a GRU state
 
 Problem: a one-dimensional GRU has previous hidden state $H_{t-1}=10$, candidate state $\tilde{H}_t=2$, and update gate $Z_t=0.75$. Compute $H_t$.
 
@@ -177,9 +177,9 @@ $$
 H_t = 7.5 + 0.5 = 8.
 $$
 
-Checked answer: the new hidden state is $8$. Since the update gate is close to $1$, the GRU mostly preserves the old state.
+The new hidden state is $8$. Since the update gate is close to $1$, the GRU mostly preserves the old state.
 
-## Worked example 2: beam search with width two
+## Keeping two hypotheses during beam search
 
 Problem: decode two time steps with beam width $2$. At step 1, candidate log probabilities are `A: -0.1`, `B: -0.7`, `C: -1.2`. At step 2, extensions have log probabilities:
 
@@ -222,9 +222,9 @@ AY:-1.1,\quad
 BY:-1.1.
 $$
 
-Checked answer: the beam keeps `AX` and `BX`. Greedy search would also start with `A`, but beam search preserves `B` as an alternate path because it could lead to a stronger continuation.
+The beam keeps `AX` and `BX`. Greedy search would also start with `A`, but beam search preserves `B` as an alternate path because it could lead to a stronger continuation.
 
-## Code
+## Training a minimal GRU encoder-decoder
 
 ```python
 import torch
@@ -264,7 +264,7 @@ print("sequence loss:", loss.item())
 print("logits shape:", logits.shape)
 ```
 
-## Common pitfalls
+## State, padding, and decoding mistakes
 
 - Using bidirectional encoder states in a decoder without correctly combining directions.
 - Computing loss on padded positions instead of masking them.
@@ -273,10 +273,8 @@ print("logits shape:", logits.shape)
 - Treating GRU and LSTM hidden states as interchangeable; LSTM returns both hidden state and cell state.
 - Carrying hidden states across unrelated sequences in a shuffled batch.
 
-## Connections
+<div className="see-also">
 
-- [Sequence modeling and RNNs](/cs/deep-learning/sequence-modeling-rnns)
-- [Attention and transformers](/cs/deep-learning/attention-transformers)
-- [Natural language processing](/cs/nlp/)
-- [Reinforcement learning](/cs/reinforcement-learning/)
-- [Probability and random variables](/math/probability-and-random-variables/)
+See also: [Sequence modeling and RNNs](/cs/deep-learning/sequence-modeling-rnns) · [Attention and transformers](/cs/deep-learning/attention-transformers) · [Natural language processing](/cs/nlp/intro) · [Reinforcement learning](/cs/reinforcement-learning/intro) · [Probability and random variables](/math/probability-and-random-variables/intro)
+
+</div>

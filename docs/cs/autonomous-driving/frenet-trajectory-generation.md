@@ -9,13 +9,13 @@ Werling, Ziegler, Kammel, and Thrun's "Optimal Trajectory Generation for Dynamic
 
 The paper sits between behavior planning and low-level control. A behavior layer can request "keep speed," "follow," "merge," or "stop"; the Frenet planner turns that tactical request into a time-parameterized, smooth, collision-checked trajectory. Compared with a purely geometric path, the output includes time, speed, acceleration, heading, curvature, and enough smoothness for a feedback controller to track.
 
-## Problem & motivation
+## Why sample in road coordinates
 
 Dynamic street scenarios require more than a shortest path around static obstacles. At highway speed, a planner must decide how quickly to change lanes, whether to pass or follow, how to keep a time gap, and how to avoid a sudden obstacle without producing uncomfortable jerk. The authors argue that many earlier sampling or parametric methods could generate feasible local paths, but their parameter spaces did not necessarily contain the jerk-optimal solution. Replanning at different frequencies could therefore change the chosen transient and produce temporal inconsistency.
 
 The paper's answer is to sample within the function class that solves an unconstrained optimal-control problem: quintic polynomials for fixed terminal position, velocity, and acceleration, and quartic polynomials for velocity-keeping where terminal position is free. The algorithm then filters these optimal free-space candidates by acceleration, curvature, road, and collision constraints. When constraints are inactive, Bellman's principle of optimality explains why the remainder of the previously optimal maneuver remains optimal at the next planning tick. That is the important conceptual contribution: the planner is sampling candidates, but the samples are structured around an optimal-control result rather than arbitrary shape parameters.
 
-## Method
+## Deriving jerk-minimizing Frenet candidates
 
 Let $r(s)$ be the road centerline or another behavior-selected reference curve, parameterized by arc length $s$. Let $n_r(s)$ be its normal vector. A vehicle position is represented as
 
@@ -118,7 +118,7 @@ $$
 
 Collision handling is intentionally hard-gated rather than a nearby-obstacle soft penalty. The paper expands the vehicle contour and enlarges the checked contour toward the time horizon, so later portions of a trajectory maintain stronger clearance.
 
-## Architecture diagram
+### Candidate generation and rejection loop
 
 ![The Frenet tangent-normal diagram shows tangent and normal vectors at two nearby points along a plane curve.](https://commons.wikimedia.org/wiki/Special:FilePath/FrenetTN.svg)
 
@@ -146,7 +146,7 @@ flowchart LR
   Replan --> Project
 ```
 
-## Architecture details
+## High-speed and low-speed regimes
 
 The paper separates high-speed and low-speed trajectory generation. High-speed planning samples $d(t)$ and $s(t)$ independently. This gives velocity-invariant lane changes: the timing of the lateral maneuver can be chosen without rebuilding the lane change around absolute forward speed. Low-speed planning samples $d(s)$ because nonholonomic feasibility is harder to preserve when a vehicle moves slowly and lateral motion cannot be treated as an independent offset time signal.
 
@@ -156,7 +156,7 @@ The planner needs centerline geometry: orientation, curvature, and curvature der
 
 The reported vehicle experiment used the autonomous vehicle Junior with a 100 ms planning cycle for long-term objectives without obstacles. The reactive obstacle-avoidance demonstration was simulation-only because the highway passing scenario was risky. The authors explicitly state that the short horizon does not replace far-sighted behavior planning. The behavior layer still needs to avoid creating critical situations whenever possible.
 
-## Datasets & results
+## Evidence from Junior and highway simulation
 
 This is a classical planning paper, not a benchmark paper with KITTI-style metrics. The evaluation is a combination of implementation on Junior and simulation of highway traffic.
 
@@ -169,7 +169,7 @@ This is a classical planning paper, not a benchmark paper with KITTI-style metri
 
 The most durable result is methodological rather than numerical: by sampling jerk-optimal polynomial connections in a road-aligned frame, the planner gives behavior modules a small set of intuitive knobs while still producing smooth, dynamically checkable trajectories.
 
-## Worked example
+## From boundary conditions to road behavior
 
 ### Example 1: Rest-to-rest lateral lane change
 
@@ -248,7 +248,7 @@ $$
 
 Answer: longitudinal candidates for following should be built around a moving target that goes from 15 m to 75 m over the 3 s horizon.
 
-## Code
+## Sampling lane-change durations
 
 ```python
 import numpy as np
@@ -287,7 +287,7 @@ print(f"best duration: {best_T:.1f} s")
 print(f"coefficients: {best_coeff}")
 ```
 
-## Common pitfalls
+## Where the Frenet assumptions break
 
 - Treating Frenet planning as only a coordinate transform. The important part is the structured optimal-control candidate set and the cost/filtering pipeline.
 - Forgetting that high-speed $d(t)$ decoupling is an approximation. At low speed or near extreme curvature, $d(s)$ or a direct vehicle-model planner may be needed.
@@ -295,17 +295,7 @@ print(f"coefficients: {best_coeff}")
 - Assuming the local planner replaces behavior planning. The paper is explicit that the short horizon should not be asked to make far-sighted tactical decisions.
 - Ignoring curvature after transforming back to Cartesian space. A smooth $s,d$ pair can still imply an infeasible global curvature if the reference path or offset is aggressive.
 
-## Connections
-
-- [Motion planning](/cs/autonomous-driving/motion-planning)
-- [Decision making and behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning)
-- [Control, PID, MPC, pure pursuit, and Stanley](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley)
-- [Sampling-based motion planning](/cs/autonomous-driving/motion-planning)
-- [MPC for autonomous driving](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley)
-- [Prediction and motion forecasting](/cs/autonomous-driving/prediction-and-motion-forecasting)
-- [Systems of ODEs and phase plane](/math/engineering-math/systems-of-odes-and-phase-plane)
-
-## References
+## Sources cited
 
 [1] M. Werling, J. Ziegler, S. Kammel, and S. Thrun, "Optimal Trajectory Generation for Dynamic Street Scenarios in a Frenet Frame," in Proc. IEEE International Conference on Robotics and Automation, 2010, pp. 987-993.
 
@@ -314,3 +304,9 @@ print(f"coefficients: {best_coeff}")
 [3] Y. Kuwata, G. A. Fiore, J. Teo, E. Frazzoli, and J. P. How, "Motion Planning for Urban Driving Using RRT," in Proc. IEEE/RSJ International Conference on Intelligent Robots and Systems, 2008.
 
 [4] D. Ferguson, T. M. Howard, and M. Likhachev, "Motion Planning in Urban Environments," Journal of Field Robotics, vol. 25, no. 11, pp. 939-960, 2008.
+
+<div className="see-also">
+
+See also: [Motion planning](/cs/autonomous-driving/motion-planning) · [Decision making and behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning) · [Control, PID, MPC, pure pursuit, and Stanley](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley) · [Sampling-based motion planning](/cs/autonomous-driving/motion-planning) · [MPC for autonomous driving](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley) · [Prediction and motion forecasting](/cs/autonomous-driving/prediction-and-motion-forecasting) · [Systems of ODEs and phase plane](/math/engineering-math/systems-of-odes-and-phase-plane)
+
+</div>

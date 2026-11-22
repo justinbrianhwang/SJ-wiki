@@ -401,9 +401,8 @@ Deterministic evaluation can understate the learned stochastic policy's objectiv
 
 Several random seeds are indispensable because trajectory sampling, initialization, and minibatch order all influence the data distribution. Report the distribution of final returns and learning speed, not only the best checkpoint. A seed that discovers a rewarding region early can dominate an average. Fixed evaluation seeds reduce measurement noise, while separate training seeds preserve an honest view of exploration variability.
 
-## Related pages
+<div className="see-also">
 
-- [Multi-armed bandits](/cs/reinforcement-learning/multi-armed-bandits)
-- [On-policy control with approximation](/cs/reinforcement-learning/on-policy-control-approximation)
-- [n-step bootstrapping](/cs/reinforcement-learning/n-step-bootstrapping)
-- [Eligibility traces](/cs/reinforcement-learning/eligibility-traces)
+See also: [Multi-armed bandits](/cs/reinforcement-learning/multi-armed-bandits) · [On-policy control with approximation](/cs/reinforcement-learning/on-policy-control-approximation) · [n-step bootstrapping](/cs/reinforcement-learning/n-step-bootstrapping) · [Eligibility traces](/cs/reinforcement-learning/eligibility-traces)
+
+</div>

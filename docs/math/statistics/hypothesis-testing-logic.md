@@ -5,11 +5,11 @@ sidebar_position: 11
 
 # Hypothesis Testing Logic
 
-Hypothesis testing is a formal way to compare observed data with what would be expected if a specified null claim were true. The Lane text presents the logic of significance testing, one- and two-tailed tests, errors, power, and common misconceptions because this topic is widely used and widely misread. A test is not a machine for proving a research hypothesis; it is a probability calculation under a model.
+Hypothesis testing compares observed data with what would be expected if a specified null claim were true. Significance tests are widely used and widely misread. A test does not prove a research hypothesis; it is a probability calculation under a model.
 
 The core question is: If the null hypothesis were true and the assumptions were reasonable, how surprising would a statistic at least as extreme as the observed one be? The answer is the p-value. A small p-value indicates that the data are unusual under the null model, but it does not measure the probability that the null is true, the probability that the result will replicate, or the practical importance of the effect.
 
-## Definitions
+## From a null model to a p-value
 
 The **null hypothesis** $H_0$ is the reference claim tested by the procedure. It often states no difference, no association, or a specific parameter value. The **alternative hypothesis** $H_A$ states the direction or kind of departure the test is designed to detect.
 
@@ -41,9 +41,9 @@ $$
 
 the probability of rejecting $H_0$ when a specified alternative is true.
 
-A test is **one-tailed** if the alternative predicts a direction, such as $\mu\gt \mu_0$. It is **two-tailed** if the alternative allows departures in either direction, such as $\mu\ne\mu_0$.
+A test is **one-tailed** if the alternative predicts a direction, such as $\mu\gt \mu_0$. It is **two-tailed** if the alternative allows departures in either direction, such as $\mu\ne\mu_0$. The direction belongs in the design and analysis plan, before the observed result is known.
 
-## Key results
+## Decisions, errors, and power
 
 The general testing workflow is:
 
@@ -69,9 +69,18 @@ Power increases when the true effect is larger, sample size is larger, measureme
 
 Statistical significance is not practical significance. A tiny effect can be statistically significant in a huge sample, and a practically important effect can be non-significant in a small noisy sample. Reporting an effect estimate and confidence interval should accompany a p-value whenever possible.
 
-The null hypothesis is a model, not a personal belief. In many applications, the exact null of zero difference is already known to be an approximation because real systems rarely match exactly. The test is still useful if the null represents a meaningful reference point: no treatment effect, no linear association, equal category probabilities, or a regulatory target. The conclusion should therefore say what the data show relative to that reference. A good final sentence includes the test decision, the estimated effect, uncertainty, and a context-aware limitation.
+The null hypothesis is a model, not a personal belief. In many applications, the exact null of zero difference is an approximation because real systems rarely match exactly. The test remains useful when the null represents a meaningful reference point: no treatment effect, no linear association, equal category probabilities, or a regulatory target. State the decision relative to that reference, then report the estimated effect, its uncertainty, and any design limitation.
 
-## Visual
+The possible decisions and underlying states form the usual error table:
+
+| Truth about $H_0$ | Decision: reject $H_0$ | Decision: fail to reject $H_0$ |
+|---|---|---|
+| $H_0$ true | Type I error, probability $\alpha$ | Correct non-rejection |
+| $H_0$ false | Correct rejection, power $1-\beta$ | Type II error, probability $\beta$ |
+
+## Following a test from design to interpretation
+
+The calculation sits in the middle of the workflow rather than at either end:
 
 ```mermaid
 flowchart TD
@@ -87,12 +96,7 @@ flowchart TD
   I --> J[Interpret in context without overclaiming]
 ```
 
-| Truth about $H_0$ | Decision: reject $H_0$ | Decision: fail to reject $H_0$ |
-|---|---|---|
-| $H_0$ true | Type I error, probability $\alpha$ | Correct non-rejection |
-| $H_0$ false | Correct rejection, power $1-\beta$ | Type II error, probability $\beta$ |
-
-## Worked example 1: One-sample mean test
+## Testing the calibration of a filling machine
 
 Problem: A filling machine is calibrated to a mean of 250 ml. A quality engineer samples 36 bottles and finds $\bar{x}=252.1$ ml with $s=5.4$ ml. Test at $\alpha=0.05$ whether the mean fill differs from 250 ml.
 
@@ -143,9 +147,9 @@ $$
 
 Answer: Reject $H_0$. The sample provides statistically significant evidence that the machine's mean fill differs from 250 ml. The observed mean is higher, so the practical concern is possible overfilling.
 
-Checked answer: The statistic is positive because the sample mean exceeds 250. Since the test is two-sided, both unusually high and unusually low means count as evidence against $H_0$.
+Check: The statistic is positive because the sample mean exceeds 250. Since the test is two-sided, both unusually high and unusually low means count as evidence against $H_0$.
 
-## Worked example 2: Interpreting Type I error and power
+## What $\alpha=0.01$ and 80% power mean
 
 Problem: A new training program is tested with $H_0$: the program does not change mean score, and $H_A$: the program increases mean score. The researcher chooses $\alpha=0.01$ and designs the study to have 80% power for a 5-point increase. Interpret $\alpha$, power, and the two possible errors.
 
@@ -163,9 +167,9 @@ $$
 
 Answer: The design is conservative about false positives because $\alpha=0.01$. It still has a 20% chance of missing a true 5-point improvement under the assumptions used in the power calculation.
 
-Checked answer: Power is tied to a particular alternative effect size. The statement "the test has 80% power" is incomplete unless the effect size, sample size, variability, and test direction are known.
+Check: Power is tied to a particular alternative effect size. The statement "the test has 80% power" is incomplete unless the effect size, sample size, variability, and test direction are known.
 
-## Code
+## Recomputing the $t$ decision two ways
 
 ```python
 import numpy as np
@@ -188,7 +192,7 @@ print("reject:", abs(t_stat) >= t_crit)
 
 The code shows the equivalence between p-value and critical-value decisions. Both approaches require the same test statistic and reference distribution.
 
-## Common pitfalls
+## Claims the test does not support
 
 - Saying the p-value is the probability that $H_0$ is true.
 - Saying "accept $H_0$" after a non-significant result.
@@ -197,10 +201,8 @@ The code shows the equivalence between p-value and critical-value decisions. Bot
 - Ignoring assumptions because the calculation is easy.
 - Reporting only a p-value without an estimate, confidence interval, or sample size.
 
-## Connections
+<div className="see-also">
 
-- [Estimation and confidence intervals](/math/statistics/estimation-and-confidence-intervals)
-- [Tests for means](/math/statistics/tests-for-means)
-- [ANOVA](/math/statistics/anova)
-- [Proportions and chi-square tests](/math/statistics/proportions-and-chi-square-tests)
-- [Effect size, nonparametric methods, and resampling](/math/statistics/effect-size-nonparametric-and-resampling)
+See also: [Estimation and confidence intervals](/math/statistics/estimation-and-confidence-intervals) · [Tests for means](/math/statistics/tests-for-means) · [ANOVA](/math/statistics/anova) · [Proportions and chi-square tests](/math/statistics/proportions-and-chi-square-tests) · [Effect size, nonparametric methods, and resampling](/math/statistics/effect-size-nonparametric-and-resampling)
+
+</div>

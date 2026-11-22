@@ -9,7 +9,7 @@ Once values are in a vector, the next task is choosing the right values. R gives
 
 Names and recycling make indexing more expressive but also more dangerous. Names let you ask for `"height"` or `"control"` rather than position 3. Recycling lets short vectors align with long vectors, making scalar operations easy, but accidental recycling can silently produce wrong answers. Good R code makes the intended shape clear before it subsets or combines objects.
 
-## Definitions
+## Five ways to address a vector
 
 An **index** is an instruction inside square brackets. For a vector `x`, `x[1]` requests the first element, `x[c(1, 3)]` requests the first and third elements, and `x[-2]` requests all but the second element. R uses one-based indexing, so the first element is position 1, not position 0.
 
@@ -21,7 +21,7 @@ A **named vector** is a vector with a `names` attribute. Names can be set during
 
 **Replacement indexing** assigns into a subset. For example, `x[x < 0] <- 0` replaces all negative values with zero.
 
-## Key results
+## Keep-lists, drop-lists, and recycled filters
 
 Subsetting in R follows a small set of rules that appear everywhere:
 
@@ -41,8 +41,6 @@ Named indexing is more robust than positional indexing when data may be reordere
 
 Replacement indexing keeps the original vector length unless the replacement itself changes the structure. This makes cleaning concise: build a condition, then assign into the positions flagged by the condition.
 
-## Visual
-
 ```text
 x:        12    5    9   18    7
 pos:       1    2    3    4    5
@@ -61,11 +59,11 @@ x[c("Mon","Fri")] -> 12, 7
 | Non-exact repeat | `1:5 + c(0, 100)` | Warning, uneven pattern | High |
 | Logical scalar | `x[TRUE]` | All values | Often accidental |
 
-## Worked example 1: Cleaning impossible measurements
+## Cleaning by position, aggregating by name
 
-Problem: a sensor reports temperatures in degrees Celsius: `21.4`, `22.0`, `-99`, `20.8`, `200`, and `21.9`. The value `-99` is a missing-data code, and `200` is outside the plausible range. Replace both with `NA`, then compute the mean of valid readings.
+### Replacing impossible sensor readings
 
-Method:
+A sensor reports temperatures in degrees Celsius: `21.4`, `22.0`, `-99`, `20.8`, `200`, and `21.9`. The value `-99` is a missing-data code, and `200` is outside the plausible range. Replace both with `NA`, then compute the mean of valid readings.
 
 1. Store the readings.
 2. Build one logical condition for the missing-data code.
@@ -91,15 +89,13 @@ mean(temp, na.rm = TRUE)
 # [1] 21.525
 ```
 
-Checked answer: the valid readings are `21.4`, `22.0`, `20.8`, and `21.9`. Their sum is `86.1`, and `86.1 / 4 = 21.525`. The logical index selected exactly positions 3 and 5 for replacement.
+The valid readings are `21.4`, `22.0`, `20.8`, and `21.9`. Their sum is `86.1`, and `86.1 / 4 = 21.525`. The logical index selected exactly positions 3 and 5 for replacement.
 
 This is a standard R cleaning pattern. You do not need to loop through values one by one; you write a logical statement describing invalid values and assign into those locations.
 
-## Worked example 2: Named lookup for grouped totals
+### Computing a total from stable names
 
-Problem: a small shop records weekly sales by product. Use names to retrieve sales for `"tea"` and `"coffee"`, then compute their combined share of total sales.
-
-Method:
+A small shop records weekly sales by product. Use names to retrieve sales for `"tea"` and `"coffee"`, then compute their combined share of total sales.
 
 1. Build a named numeric vector.
 2. Select by character names.
@@ -122,11 +118,11 @@ sum(hot_drinks) / sum(sales)
 # [1] 0.7916667
 ```
 
-Checked answer: total sales are `42 + 35 + 18 + 25 = 120`. Hot drink sales are `42 + 35 + 18 = 95`. The share is `95 / 120 = 0.7916667`, or about 79.2 percent.
+Total sales are `42 + 35 + 18 + 25 = 120`. Hot drink sales are `42 + 35 + 18 = 95`. The share is `95 / 120 = 0.7916667`, or about 79.2 percent.
 
 The name-based index is safer than `sales[c(1, 2, 3)]` because it records intent. If the vector is later reordered alphabetically or by sales volume, `sales[c("coffee", "tea", "cocoa")]` still selects the intended products.
 
-## Code
+## Rejecting missing names before extraction
 
 ```r
 # Robust named-vector helper: select required names and fail clearly if missing.
@@ -158,11 +154,11 @@ Indexing code is easiest to debug when the index object has a name and can be in
 
 Recycling deserves the same explicitness. Scalar recycling is idiomatic and safe in expressions like `x + 1`; the scalar is meant to apply to every element. Longer recycling should be rare in analysis code unless the repeating pattern is part of the design, such as alternating treatment labels. If you do intend a pattern, create it with `rep(..., length.out = length(x))` so the code says the pattern is deliberate.
 
-One reliable way to study indexing is to write the index object separately and print it. For example, create `keep <- names(sales) %in% c("tea", "coffee")`, inspect `keep`, and then run `sales[keep]`. This makes the relationship between names, logical values, and extracted elements visible. The same method works for data-frame rows: build `rows <- df$score >= 80`, check `table(rows)`, and then subset.
+One reliable way to study indexing is to write the index object separately and print it. For example, create `keep <- names(sales) %in% c("tea", "coffee")`, inspect `keep`, and then run `sales[keep]`. The printed index exposes the relationship between names, logical values, and extracted elements. The same method works for data-frame rows: build `rows <- df$score >= 80`, check `table(rows)`, and then subset.
 
 When replacing values, verify both the number of target positions and the replacement length. Replacing five positions with one value is normal because the one value is recycled intentionally. Replacing five positions with two values is suspicious because the pattern will recycle unevenly or fail. If a replacement expresses a rule, consider computing the replacement vector explicitly so the operation can be checked before assignment.
 
-## Common pitfalls
+## Silent recycling and missing-name lookups
 
 - Forgetting that R indexes from 1. `x[0]` returns an empty vector; it does not return the first value.
 - Mixing positive and negative positions, such as `x[c(1, -3)]`.
@@ -171,9 +167,8 @@ When replacing values, verify both the number of target positions and the replac
 - Dropping names accidentally with operations that rebuild vectors. Check `names(x)` after transformations where names matter.
 - Confusing `[` and `[[` when lists become involved. Vectors usually use `[`, while lists often need `[[` to extract the component itself.
 
-## Connections
+<div className="see-also">
 
-- [Vectors, arithmetic, and comparison](/cs/programming/r/vectors-arithmetic-comparison)
-- [Lists and data frames](/cs/programming/r/lists-and-data-frames)
-- [Factors and categorical data](/cs/programming/r/factors-and-categorical-data)
-- [Apply family](/cs/programming/r/apply-family)
+See also: [Vectors, arithmetic, and comparison](/cs/programming/r/vectors-arithmetic-comparison) · [Lists and data frames](/cs/programming/r/lists-and-data-frames) · [Factors and categorical data](/cs/programming/r/factors-and-categorical-data) · [Apply family](/cs/programming/r/apply-family)
+
+</div>

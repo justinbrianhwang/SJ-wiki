@@ -5,132 +5,287 @@ sidebar_position: 19
 
 # Thermodynamics and Free Energy
 
-Thermodynamics explains the direction and limits of chemical change. Thermochemistry measured heat; thermodynamics adds entropy and free energy so that spontaneity, maximum useful work, and equilibrium composition can be treated in one framework.
+Thermodynamics answers two questions that calorimetry alone cannot settle: which direction can a macroscopic change take, and where must that change stop? Heat released by a reaction matters, but so do the temperature, pressure, phase, and composition. A strongly exothermic reaction may be opposed by entropy; an endothermic process may proceed because it spreads energy or matter over many more molecular arrangements.
 
-In the Ebbing and Gammon sequence this topic sits near first law, enthalpy, spontaneous processes, entropy, standard entropies, third law, Gibbs free energy, spontaneity, free energy interpretation, free energy and equilibrium constants, and temperature effects. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
+The conclusions are conditional. A statement such as “the reaction is spontaneous” means that the forward change lowers the appropriate thermodynamic potential from the specified initial state. It gives no timescale. Diamond is thermodynamically unstable relative to graphite under ordinary conditions, yet the conversion is imperceptibly slow because the kinetic barrier is large.
 
-![A Gibbs energy curve shows a reaction mixture relaxing toward an equilibrium composition.](https://commons.wikimedia.org/wiki/Special:FilePath/Gibbs-Energie-Veranschaulichung.svg)
+## Entropy sets the direction
 
-*Figure: Gibbs energy as the thermodynamic criterion for direction and equilibrium. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Gibbs-Energie-Veranschaulichung.svg), Johannes Schneider, CC BY-SA 4.0.*
+The second law gives the most general criterion for an isolated system:
 
-## Definitions
+$$
+\Delta S_{univ}=\Delta S_{sys}+\Delta S_{surr}\ge 0.
+$$
 
-The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.
+The strict inequality applies to an irreversible spontaneous change. Equality applies to a reversible change or to equilibrium. Entropy is a state function, so its change depends only on the endpoints even when the actual path is irreversible. One may therefore calculate it along any convenient reversible path:
 
-- Spontaneous process proceeds without continuous external forcing under specified conditions.
-- Entropy $S$ measures dispersal of energy and matter among available microstates.
-- Second law states that entropy of the universe increases for a spontaneous process.
-- Third law assigns zero entropy to a perfect crystal at 0 K.
-- Gibbs free energy $G$ combines enthalpy and entropy for constant-temperature, constant-pressure processes.
-- Standard free energy change $\Delta G^\circ$ refers to standard-state conditions.
-- Reaction free energy $\Delta G$ depends on current composition through $Q$.
-- At equilibrium, $\Delta G=0$.
+$$
+dS=\frac{\delta q_{rev}}{T}.
+$$
 
-Definitions in chemistry often connect a symbolic representation to a physical sample. A formula such as $\mathrm{H_2O}$ names a substance, gives the atomic ratio inside one molecule, and supplies the molar mass used in a macroscopic calculation. A state symbol such as $\mathrm{(aq)}$ is not cosmetic; it says the species is dispersed in water and may be treated as ions when writing a net ionic equation. In the same way, constants such as $R$, $K_w$, $F$, or $N_A$ are compact definitions of the measurement system being used.
+On the molecular scale, Boltzmann's relation $S=k_B\ln\Omega$ connects entropy to the number $\Omega$ of accessible microstates. It explains several useful qualitative rules. Expansion gives molecules more possible positions; mixing distinguishes many arrangements that were unavailable in separated samples; heating populates more energy levels. These rules need care. Counting gas molecules is a quick guide to reaction entropy, but molecular complexity, symmetry, and intermolecular forces also affect the result.
 
-## Key results
+The third law assigns $S=0$ to a perfect crystal at $0\ \mathrm{K}$. Heating, phase changes, and other reversible steps then provide absolute molar entropies. Consequently, unlike standard enthalpies of formation, tabulated standard molar entropies $S^\circ$ are not zero for elements in their reference states.
 
-The central results are:
+For a reaction written with stoichiometric coefficients $\nu_i$,
 
-- Entropy of universe: $\Delta S_{univ}=\Delta S_{sys}+\Delta S_{surr}$.
-- Gibbs relation: $\Delta G=\Delta H-T\Delta S$.
-- Standard reaction entropy: $\Delta S^\circ=\sum nS^\circ(products)-\sum nS^\circ(reactants)$.
-- Standard free energy of reaction: $\Delta G^\circ=\sum n\Delta G_f^\circ(products)-\sum n\Delta G_f^\circ(reactants)$.
-- Composition dependence: $\Delta G=\Delta G^\circ+RT\ln Q$.
-- Equilibrium link: $\Delta G^\circ=-RT\ln K$.
+$$
+\Delta S^\circ_{rxn}
+=\sum_i \nu_i S_i^\circ(\text{products})
+-\sum_i \nu_i S_i^\circ(\text{reactants}).
+$$
 
-A negative $\Delta G$ predicts spontaneity in the forward direction for the current conditions, not necessarily speed. A reaction can be spontaneous and slow because kinetics imposes an activation barrier. The equation $\Delta G=\Delta G^\circ+RT\ln Q$ is the bridge between thermodynamics and equilibrium: changing composition changes the driving force until equilibrium is reached.
+The same products-minus-reactants construction works for any molar state function. Multiplying the chemical equation by a factor multiplies $\Delta S^\circ_{rxn}$, $\Delta H^\circ_{rxn}$, and $\Delta G^\circ_{rxn}$ by that factor.
 
-A good way to use these results is to state the chemical model first, then substitute numbers second. For thermodynamics and free energy, the model usually answers questions such as what particles are present, what is conserved, which process is idealized, and which measurement is being interpreted. Once that sentence is clear, the algebra becomes a bookkeeping problem rather than a search for a memorized pattern.
+## From the second law to Gibbs energy
 
-Units are part of the result, not decoration. Whenever a formula contains an empirical constant, a tabulated value, or a ratio of measured quantities, the units tell you whether the expression has been used in the intended form. This is especially important in general chemistry because several equations have nearly identical algebra but different meanings: pressure can be a measured state variable, an equilibrium correction, or a colligative effect; energy can be heat flow, enthalpy, internal energy, or free energy.
+Most laboratory reactions occur in surroundings held near constant temperature and pressure. Under those conditions, the entropy criterion can be written using properties of the system alone. If the only work is pressure-volume work, heat transferred to the system at constant pressure is $q_p=\Delta H_{sys}$. A large thermal reservoir at temperature $T$ therefore changes entropy by
 
-The strongest check is an independent chemical interpretation. Ask whether the sign agrees with direction, whether a concentration can be negative, whether a mole ratio follows the balanced equation, whether an equilibrium shift opposes the stress, and whether a microscopic description explains the macroscopic number. These checks connect thermodynamics and free energy to neighboring topics instead of leaving it as an isolated technique.
+$$
+\Delta S_{surr}=-\frac{\Delta H_{sys}}{T}.
+$$
 
-A second check is to compare the limiting cases. If a reactant amount goes to zero, a product amount cannot remain large. If temperature rises in a gas sample at fixed volume, pressure should not fall in an ideal model. If an acid is diluted, hydronium concentration should normally decrease unless a coupled equilibrium supplies more. Limiting cases often reveal algebra that has been rearranged correctly but applied to the wrong chemical situation.
+Substitution into the second law gives
 
-Finally, keep symbolic and particulate representations side by side. A balanced equation, an equilibrium expression, an orbital diagram, or a polymer repeat unit is a compact symbol for a population of particles. Translating that symbol into words forces you to say what is reacting, what is being counted, and what is being held constant. That translation is usually the difference between a calculation that can be adapted to a new problem and one that only imitates a worked example.
+$$
+\begin{aligned}
+\Delta S_{univ}
+&=\Delta S_{sys}-\frac{\Delta H_{sys}}{T}\\
+&=-\frac{\Delta H_{sys}-T\Delta S_{sys}}{T}\\
+&=-\frac{\Delta G_{sys}}{T},
+\end{aligned}
+$$
 
-## Visual
+where $G=H-TS$. For a finite change at constant $T$,
 
-| Sign pattern | Temperature effect | Spontaneity |
-|---|---|---|
-| $\Delta H\lt 0$, $\Delta S\gt 0$ | favorable at all T | always spontaneous |
-| $\Delta H\gt 0$, $\Delta S\lt 0$ | unfavorable at all T | never spontaneous under standard model |
-| $\Delta H\lt 0$, $\Delta S\lt 0$ | enthalpy favored, entropy opposed | spontaneous at low T |
-| $\Delta H\gt 0$, $\Delta S\gt 0$ | entropy favored, enthalpy opposed | spontaneous at high T |
+$$
+\Delta G=\Delta H-T\Delta S.
+$$
+
+Thus $\Delta G\lt 0$ identifies a thermodynamically favored forward change, $\Delta G\gt 0$ favors the reverse change, and $\Delta G=0$ describes equilibrium. The derivation also states the restrictions: constant temperature and pressure, with no non-pressure-volume work included. At constant temperature and volume, the corresponding criterion uses the Helmholtz energy $A=U-TS$.
+
+At fixed $T$ and $P$, the equilibrium composition minimizes $G$ subject to conservation of atoms. The system does not generally reach the lowest imaginable $G$; it reaches the minimum among compositions allowed by its constraints.
 
 ```mermaid
 flowchart LR
-  A[Delta H] --> C["Delta G = Delta H - T Delta S"]
-  B[Delta S] --> C
-  C --> D{Delta G}
-  D -->|negative| E[Forward spontaneous]
-  D -->|zero| F[Equilibrium]
-  D -->|positive| G[Reverse spontaneous]
+  A["Initial composition"] --> B["Compute reaction quotient Q"]
+  B --> C["Delta G = Delta G standard + RT ln Q"]
+  C --> D{"Sign of Delta G?"}
+  D -->|negative| E["Net forward change"]
+  D -->|zero| F["Equilibrium composition"]
+  D -->|positive| G["Net reverse change"]
 ```
 
-## Worked example 1: Spontaneity from enthalpy and entropy
+## Temperature can reverse the preferred direction
 
-Problem. A process has $\Delta H=25.0\ \mathrm{kJ\ mol^{-1}}$ and $\Delta S=80.0\ \mathrm{J\ mol^{-1}\ K^{-1}}$. Find $\Delta G$ at 298 K and decide spontaneity.
+The signs of $\Delta H$ and $\Delta S$ show how temperature enters, provided both values are roughly constant over the interval considered.
 
-    Method.
+| Sign pattern | Competition in $\Delta G=\Delta H-T\Delta S$ | Favored temperature range |
+|---|---|---|
+| $\Delta H\lt 0$, $\Delta S\gt 0$ | both contributions lower $G$ | all temperatures in the model |
+| $\Delta H\gt 0$, $\Delta S\lt 0$ | both contributions raise $G$ | none in the model |
+| $\Delta H\lt 0$, $\Delta S\lt 0$ | enthalpy helps; entropy term hurts | sufficiently low $T$ |
+| $\Delta H\gt 0$, $\Delta S\gt 0$ | enthalpy hurts; entropy term helps | sufficiently high $T$ |
 
-    1. Convert entropy to kJ: $80.0\ \mathrm{J\ mol^{-1}\ K^{-1}}=0.0800\ \mathrm{kJ\ mol^{-1}\ K^{-1}}$.
-2. Use $\Delta G=\Delta H-T\Delta S$.
-3. Compute $T\Delta S=(298)(0.0800)=23.8\ \mathrm{kJ\ mol^{-1}}$.
-4. Subtract: $\Delta G=25.0-23.8=1.2\ \mathrm{kJ\ mol^{-1}}$.
-5. Positive $\Delta G$ means the forward process is not spontaneous under these conditions.
+The phrases “all temperatures” and “none” are deliberately qualified. Heat capacities make $\Delta H$ and $\Delta S$ temperature-dependent, and melting, boiling, or a structural transition changes the applicable values.
 
-    Checked answer. $\Delta G=+1.2\ \mathrm{kJ\ mol^{-1}}$, so the forward process is nonspontaneous at 298 K. Both enthalpy and entropy are positive, so high temperature may make the process spontaneous; 298 K is just below the threshold.
+### Worked example: locating a crossover
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+Suppose a process has $\Delta H=25.0\ \mathrm{kJ\,mol^{-1}}$ and $\Delta S=80.0\ \mathrm{J\,mol^{-1}\,K^{-1}}$. Convert the entropy units first:
 
-## Worked example 2: Equilibrium constant from standard free energy
+$$
+\Delta S=0.0800\ \mathrm{kJ\,mol^{-1}\,K^{-1}}.
+$$
 
-Problem. At 298 K, a reaction has $\Delta G^\circ=-11.4\ \mathrm{kJ\ mol^{-1}}$. Find $K$.
+At $298\ \mathrm{K}$,
 
-    Method.
+$$
+\begin{aligned}
+\Delta G
+&=\Delta H-T\Delta S\\
+&=25.0-(298)(0.0800)\\
+&=+1.16\ \mathrm{kJ\,mol^{-1}}.
+\end{aligned}
+$$
 
-    1. Use $\Delta G^\circ=-RT\ln K$.
-2. Convert free energy to joules: $-11.4\ \mathrm{kJ\ mol^{-1}}=-11400\ \mathrm{J\ mol^{-1}}$.
-3. Solve for $\ln K=-\Delta G^\circ/(RT)$.
-4. Substitute: $\ln K=11400/[(8.314)(298)]$.
-5. Calculate: $\ln K=4.60$.
-6. Exponentiate: $K=e^{4.60}=99.5$.
+The forward change is unfavorable from this initial state at $298\ \mathrm{K}$. Setting $\Delta G=0$ estimates the crossover temperature:
 
-    Checked answer. $K\approx 1.00\times10^2$. Negative standard free energy corresponds to $K\gt 1$, as found.
+$$
+T_c=\frac{\Delta H}{\Delta S}
+=\frac{25.0}{0.0800}
+=312.5\ \mathrm{K}.
+$$
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+Above about $313\ \mathrm{K}$, the positive entropy term outweighs the positive enthalpy. The result is only an estimate because it treats both quantities as temperature-independent.
 
-## Code
+For a wider temperature interval, Kirchhoff's law supplies a first correction. If the reaction heat-capacity change $\Delta C_P$ is approximately constant,
 
-```python
-from math import exp
+$$
+\begin{aligned}
+\Delta H(T)&=\Delta H(T_0)+\Delta C_P(T-T_0),\\
+\Delta S(T)&=\Delta S(T_0)+\Delta C_P\ln\frac{T}{T_0}.
+\end{aligned}
+$$
 
-R = 8.314
-def delta_g(delta_h_kj, delta_s_j, T):
-    return delta_h_kj - T * (delta_s_j / 1000.0)
+These expressions can be inserted into $\Delta G(T)=\Delta H(T)-T\Delta S(T)$. A phase transition along the path requires treating the temperature ranges separately and adding the transition enthalpy and entropy.
 
-def K_from_delta_g(delta_g_kj, T):
-    return exp(-(delta_g_kj * 1000.0) / (R * T))
+## Standard free energy and chemical composition
 
-print(delta_g(25.0, 80.0, 298.0))
-print(K_from_delta_g(-11.4, 298.0))
-```
+A superscript degree sign denotes a chosen standard state, not “usual laboratory conditions.” For gases the reference fugacity is conventionally tied to the standard pressure, commonly $1\ \mathrm{bar}$; for solutes the elementary treatment uses a $1\ \mathrm{mol\,L^{-1}}$ concentration standard. Pure liquids and solids in their standard states have unit activity. Temperature still has to be stated.
 
-## Common pitfalls
+Standard reaction Gibbs energy can be assembled from tabulated standard Gibbs energies of formation:
 
-- Forgetting to convert entropy from J to kJ. Avoid it by matching units before using $\Delta G=\Delta H-T\Delta S$.
-- Equating spontaneous with fast. Avoid it by separating thermodynamics from kinetics.
-- Using $\Delta G^\circ$ to predict direction at nonstandard composition without $Q$. Avoid it by using $\Delta G=\Delta G^\circ+RT\ln Q$.
-- Thinking equilibrium means $K=1$. Avoid it by remembering equilibrium means $\Delta G=0$, not necessarily equal concentrations.
-- Ignoring temperature when comparing spontaneity. Avoid it by checking the $T\Delta S$ term explicitly.
-- Using logarithm base 10 in $\Delta G^\circ=-RT\ln K$ without conversion. Avoid it by using natural log unless the equation is rewritten.
+$$
+\Delta G^\circ_{rxn}
+=\sum_i \nu_i\Delta G_{f,i}^\circ(\text{products})
+-\sum_i \nu_i\Delta G_{f,i}^\circ(\text{reactants}).
+$$
 
-## Connections
+By convention, $\Delta G_f^\circ=0$ for an element in its standard reference form at the stated temperature. The convention provides a common zero; it does not say that the element contains no Gibbs energy.
 
-- [thermochemistry](/chemistry/general/thermochemistry)
-- [chemical equilibrium](/chemistry/general/chemical-equilibrium)
-- [chemical kinetics](/chemistry/general/chemical-kinetics)
-- [electrochemistry](/chemistry/general/electrochemistry)
+Composition enters through the reaction quotient $Q$:
+
+$$
+\Delta G=\Delta G^\circ+RT\ln Q.
+$$
+
+Activities, rather than dimensional concentrations or pressures, belong in $Q$. For the gas reaction
+
+$$
+aA(g)+bB(g)\rightleftharpoons cC(g),
+$$
+
+an ideal-gas expression is
+
+$$
+Q=\frac{(P_C/P^\circ)^c}{(P_A/P^\circ)^a(P_B/P^\circ)^b}.
+$$
+
+Pure solids and liquids are omitted because their activities are approximately one. They still participate in the reaction and contribute to $\Delta G^\circ$; omission from $Q$ does not mean omission from the thermodynamics.
+
+As reaction progress changes the activities, $Q$ and therefore $\Delta G$ change. At equilibrium $Q=K$ and $\Delta G=0$:
+
+$$
+\Delta G^\circ=-RT\ln K.
+$$
+
+The sign of $\Delta G^\circ$ reports whether products or reactants dominate at equilibrium under the chosen standard-state convention. It does not by itself report the direction from an arbitrary mixture.
+
+### Worked example: equilibrium constant from $\Delta G^\circ$
+
+At $298\ \mathrm{K}$, let $\Delta G^\circ=-11.4\ \mathrm{kJ\,mol^{-1}}$. Convert kilojoules to joules because $R=8.314\ \mathrm{J\,mol^{-1}\,K^{-1}}$:
+
+$$
+\begin{aligned}
+\ln K
+&=-\frac{\Delta G^\circ}{RT}\\
+&=-\frac{-11400}{(8.314)(298)}\\
+&=4.60.
+\end{aligned}
+$$
+
+Exponentiating gives
+
+$$
+K=e^{4.60}=9.95\times10^1.
+$$
+
+Products are favored at equilibrium, but neither complete conversion nor equal concentrations follows. The equilibrium composition also depends on stoichiometry and the initial amounts.
+
+### Worked example: direction under nonstandard conditions
+
+Consider
+
+$$
+N_2O_4(g)\rightleftharpoons 2NO_2(g)
+$$
+
+at $298\ \mathrm{K}$ with $\Delta G^\circ=+4.73\ \mathrm{kJ\,mol^{-1}}$. Let $P_{NO_2}=0.10\ \mathrm{bar}$ and $P_{N_2O_4}=1.00\ \mathrm{bar}$, taking $P^\circ=1\ \mathrm{bar}$. Then
+
+$$
+Q=\frac{(0.10/1)^2}{1.00/1}=0.0100.
+$$
+
+Now evaluate the composition term:
+
+$$
+\begin{aligned}
+RT\ln Q
+&=(8.314)(298)\ln(0.0100)\\
+&=-1.14\times10^4\ \mathrm{J\,mol^{-1}}\\
+&=-11.4\ \mathrm{kJ\,mol^{-1}}.
+\end{aligned}
+$$
+
+Therefore
+
+$$
+\Delta G=4.73-11.4=-6.67\ \mathrm{kJ\,mol^{-1}}.
+$$
+
+Although $\Delta G^\circ$ is positive, the stated mixture has so little $NO_2$ that the forward dissociation is favored. As $NO_2$ accumulates, $Q$ rises and the driving force approaches zero.
+
+## Maximum useful work and coupled changes
+
+At constant $T$ and $P$, $-\Delta G$ is the maximum non-expansion work obtainable from a reversible process. An electrochemical cell can convert part of a reaction's Gibbs-energy decrease into electrical work:
+
+$$
+\Delta G=-nFE.
+$$
+
+Irreversibility reduces the useful work actually recovered. The thermodynamic limit remains valuable even when no real device reaches it.
+
+An unfavorable change can proceed when coupled to a more favorable one, provided the combined $\Delta G$ is negative. Gibbs energies add because $G$ is a state function. If reaction 1 has $\Delta G=+12\ \mathrm{kJ\,mol^{-1}}$ and reaction 2 has $\Delta G=-20\ \mathrm{kJ\,mol^{-1}}$ under the same conditions, the coupled net reaction has $\Delta G=-8\ \mathrm{kJ\,mol^{-1}}$. The coupling must be physical or chemical, not merely arithmetic: the reactions need a shared intermediate, electrical connection, membrane gradient, or another mechanism that forces them to proceed together.
+
+## Reading entropy changes without guessing
+
+Qualitative entropy predictions are strongest when they identify the degrees of freedom that change. A gas expanding into a larger volume gains translational microstates. A solid melting gains many molecular arrangements and modes of motion. Two ideal gases mixing gain configurational possibilities because molecules of each kind can occupy the whole container. Heating usually increases entropy because it opens access to higher-energy states.
+
+Rules based only on the number of particles can fail. Converting one mole of a simple gas into one mole of a more complex gas may increase entropy because the product has more rotational and vibrational states. Dissolving an ionic solid includes competition between disrupting the ordered crystal, dispersing ions, and organizing solvent around charged particles. Strong hydration can make the solvent more ordered even while the solute disperses. Tabulated molar entropies settle cases that a slogan cannot.
+
+Entropy is extensive. Doubling the amount at fixed state doubles entropy, reaction entropy, and heat capacity. Temperature and pressure are intensive; they do not double. The distinction matters when combining equations. A molar entropy must be multiplied by amount before it can be added to a total entropy for another portion of matter.
+
+Mixing also illustrates why “more disorder” is an imprecise definition. If two samples of the same ideal gas begin at equal temperature and pressure, removing the partition causes no observable thermodynamic change: the molecules were already indistinguishable, and labeling them mentally does not create new physical microstates. Mixing different ideal gases does increase entropy. The resolution of this Gibbs mixing issue depends on indistinguishability, not on how untidy the final container looks.
+
+## Reversible paths and irreversible changes
+
+A reversible process is an ideal limit driven by an infinitesimal imbalance, so reversing that imbalance retraces both system and surroundings without net change. It produces no entropy. A real spontaneous process proceeds through finite gradients—temperature differences, pressure differences, or chemical affinities—and produces entropy.
+
+The reversible path is a calculation device, not a claim about what happened. Free expansion of an ideal gas into a vacuum transfers no heat and performs no work, yet the gas entropy increases because its accessible volume increases. The entropy change can be calculated along a hypothetical reversible isothermal expansion between the same initial and final states. Internal energy of the ideal gas remains unchanged because it depends only on temperature, but entropy does not.
+
+At equilibrium, macroscopic forward and reverse rates may continue to be equal. Thermodynamic equilibrium does not mean molecular events stop. It means there is no net driving force for an infinitesimal allowed change, and the macroscopic composition remains stationary apart from fluctuations.
+
+Mechanical, thermal, and chemical equilibrium are separate conditions. Uniform pressure prevents net mechanical change; uniform temperature prevents net heat flow; equal chemical potentials prevent net transfer or reaction. A system can satisfy one condition while relaxing toward another. A sealed container with uniform pressure but a temperature gradient is mechanically balanced yet not in thermal equilibrium.
+
+## What equilibrium constants do and do not say
+
+An equilibrium constant belongs to a particular balanced reaction and temperature. Changing the coefficients changes the numerical constant. Reversing the reaction takes its reciprocal; multiplying every coefficient by two squares it. Those changes agree with the corresponding scaling of standard reaction Gibbs energy.
+
+The magnitude measures position, not speed. A huge equilibrium constant can accompany a reaction that takes years without a catalyst. A value near unity means neither side has a large standard-state advantage, not that every species has the same concentration. Stoichiometry and conservation equations still determine the final amounts.
+
+Temperature changes the equilibrium constant because it changes the standard Gibbs-energy balance. For an endothermic reaction, raising temperature generally favors products; for an exothermic reaction, it generally favors reactants. This is the thermodynamic content behind the temperature part of Le Châtelier's principle. Pressure or concentration changes do not alter the equilibrium constant at fixed temperature, though they change the reaction quotient and therefore move the equilibrium composition.
+
+Adding an inert gas illustrates the importance of specifying constraints. At constant volume and temperature, adding inert gas raises total pressure but leaves every reacting gas's partial pressure unchanged, so an ideal-gas equilibrium composition does not shift. At constant total pressure, the container expands; reacting partial pressures change, and an equilibrium involving different total gas stoichiometries may shift. “Increasing pressure” alone is not enough information.
+
+## Standard values and real conditions
+
+Tables usually report standard quantities at a stated temperature, often near room temperature. Applying them to a flame, cryogenic system, or concentrated electrolyte without corrections can be poor. Heat-capacity data adjust enthalpy and entropy with temperature. Activities or fugacities replace elementary concentration and pressure ratios when interactions are significant.
+
+Standard-state notation also separates a reference value from the actual state. A species can be far below its standard concentration and still have a well-defined standard chemical potential. The actual chemical potential adds a composition-dependent term. That separation is useful because tabulated reference data can be reused across many mixtures, while the activity term describes the mixture at hand.
+
+Uncertainty should follow the calculation. Reaction quantities formed by subtracting several large tabulated values can have a modest result with comparatively large relative uncertainty. A small calculated sign near zero may not support a confident direction prediction once measurement uncertainty, temperature correction, and nonideality are included.
+
+## Checks that prevent wrong conclusions
+
+- Convert entropy to the same energy units as enthalpy before evaluating $T\Delta S$.
+- Use the natural logarithm with $RT\ln Q$ and $RT\ln K$. A base-10 logarithm requires the factor $2.303RT$.
+- Decide direction with $\Delta G$ for the actual composition. $\Delta G^\circ$ describes the standard-state reaction.
+- Keep the reaction equation fixed. Reversing it changes the signs of all reaction state functions and replaces $K$ with $1/K$.
+- Do not insert quantities with units directly into a logarithm. Activities make $Q$ and $K$ dimensionless.
+- Separate thermodynamic possibility from kinetic accessibility. Catalysts alter the path and rate but leave $\Delta G^\circ$ and $K$ unchanged.
+
+<div className="see-also">
+
+See also: [thermochemistry](/chemistry/general/thermochemistry) · [chemical equilibrium](/chemistry/general/chemical-equilibrium) · [chemical kinetics](/chemistry/general/chemical-kinetics) · [electrochemistry](/chemistry/general/electrochemistry) · [free energy and chemical potential](/chemistry/physical-chemistry/free-energy-and-chemical-potential)
+
+</div>

@@ -7,9 +7,9 @@ sidebar_position: 9
 
 Motion planning converts goals and scene understanding into a physically executable trajectory. It must respect obstacles, lanes, traffic rules, comfort, vehicle dynamics, actuator limits, uncertainty, and the future motion of other agents. In an autonomous-driving stack, planning is where perception errors and prediction uncertainty become concrete choices: brake, continue, yield, change lanes, creep, pull over, or reroute.
 
-This page covers search-based planning, sampling-based planning, optimization-based planning, model predictive control, iLQR, trajectory optimization, and lattice planners. It links [prediction](/cs/autonomous-driving/prediction-and-motion-forecasting), [behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning), and [control](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley), because planning sits between high-level intent and low-level actuation.
+Search, sampling, lattices, and trajectory optimization make different compromises between completeness, structure, dynamics, and runtime. Most road planners combine more than one family.
 
-## Definitions
+## Planning families and their contracts
 
 **Motion planning** finds a time-parameterized path or trajectory from the ego vehicle's current state to a desired state while satisfying constraints. A **path** describes geometry without timing, such as $x(s), y(s)$. A **trajectory** includes time, such as $x(t), y(t), v(t), a(t)$.
 
@@ -25,7 +25,7 @@ This page covers search-based planning, sampling-based planning, optimization-ba
 
 **Lattice planning** precomputes or generates motion primitives in a structured grid, such as Frenet coordinates along a lane centerline. It is common in road driving because lane-following geometry gives strong structure.
 
-## Key results
+## Feasibility before optimality
 
 A* minimizes path cost on a graph when edge costs are nonnegative and the heuristic is admissible, meaning it never overestimates the remaining cost. The priority of a node is:
 
@@ -77,7 +77,7 @@ Uncertainty must change the plan, not merely be logged. A predicted vehicle with
 
 Real-time planning is also a scheduling problem. A theoretically better plan that arrives after the control deadline may be worse than a simpler plan delivered on time. Production planners often keep a previously safe trajectory, use warm starts, and maintain emergency fallback trajectories so that solver hiccups do not immediately become unsafe behavior.
 
-## Visual
+### How search, lattices, and MPC hand off
 
 ```mermaid
 flowchart TB
@@ -137,7 +137,7 @@ flowchart TB
 
 This diagram expands planning into a search/candidate layer and a constrained optimization layer. A*/Hybrid A* makes graph expansion, heuristic priority, dynamics checks, and collision checks explicit, while MPC shows the finite-horizon variables, constraints, solver deadline, first-action execution, and dotted receding-horizon feedback.
 
-## Worked example 1: A* priorities on a small grid
+## Ordering an A* detour
 
 Problem: A grid planner starts at $S=(0,0)$ and wants goal $G=(3,0)$. Moves cost 1. There is an obstacle at $(1,0)$, so the planner considers node $A=(0,1)$ and node $B=(1,1)$. Use Manhattan heuristic $h(x,y)=\vert 3-x\vert +\vert 0-y\vert $. Compute $f=g+h$ for both.
 
@@ -181,7 +181,7 @@ Answer: both nodes have priority 5. A* may choose either depending on tie-breaki
 
 Check: The obstacle blocks the direct path, so the shortest feasible route must step up, go around, and step down.
 
-## Worked example 2: Checking curvature from steering
+## Rejecting a curve beyond the steering limit
 
 Problem: A vehicle with wheelbase $L=2.8$ m has maximum steering angle $30^\circ$. What is the minimum turning radius under the kinematic bicycle model? Can it follow a planned curve with radius 4 m?
 
@@ -211,7 +211,7 @@ Answer: the vehicle cannot follow a 4 m radius curve under this steering limit. 
 
 Check: Smaller radius means higher curvature. Since required curvature exceeds the vehicle's maximum curvature, the path is dynamically infeasible.
 
-## Code
+## A compact grid-search implementation
 
 ```python
 import heapq
@@ -250,13 +250,13 @@ def astar_grid(start, goal, blocked, width, height):
 print(astar_grid((0, 0), (3, 0), blocked={(1, 0)}, width=4, height=3))
 ```
 
-## Recent systems and papers
+## Road priors and stable urban integration
 
-Ma et al. adapt RRT-style sampling to structured on-road driving by adding road-scene priors, exact-goal pressure, and vehicle-model postprocessing [1]. Their "fast RRT" starts with offline rule templates for common maneuvers such as straight driving, left turns, right turns, and U-turns, attaches the collision-free parts of those templates to the search tree, and then uses an aggressive extension step that tries to connect directly to the goal instead of merely sampling the goal more often [1]. If that direct rush collides, the algorithm keeps a useful collision-free prefix as a multi-edge branch; if templates and rushing are insufficient, it falls back to ordinary RRT-style expansion with scene-aware sampling and a Dubins-like metric [1]. The resulting path is smoothed through model-based prediction so that the planner outputs a feasible control sequence for a front-steered bicycle model, which is why the method sits between sampling-based planning and the low-level [control](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley) concerns on this page [1]. For moving obstacles, the paper lifts the problem into configuration-time space, where a spatially clear path can still be rejected because it intersects a future obstacle volume [1]. The reported evidence is scenario-based simulation with prototype constraints, not a modern public AV benchmark: the method is very fast in simple template-covered scenes, remains below real-time budgets in multi-obstacle examples, and should be read as a structured-road planner rather than a generic replacement for closed-loop urban planning [1].
+Ma et al. adapt RRT-style sampling to structured on-road driving by adding road-scene priors, exact-goal pressure, and vehicle-model postprocessing [1]. Their "fast RRT" starts with offline rule templates for common maneuvers such as straight driving, left turns, right turns, and U-turns, attaches the collision-free parts of those templates to the search tree, and then uses an aggressive extension step that tries to connect directly to the goal instead of merely sampling the goal more often [1]. If that direct rush collides, the algorithm keeps a useful collision-free prefix as a multi-edge branch; if templates and rushing are insufficient, it falls back to ordinary RRT-style expansion with scene-aware sampling and a Dubins-like metric [1]. The resulting path is smoothed through model-based prediction so that the planner outputs a feasible control sequence for a front-steered bicycle model, placing the method between sampling-based planning and low-level [control](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley) [1]. For moving obstacles, the paper lifts the problem into configuration-time space, where a spatially clear path can still be rejected because it intersects a future obstacle volume [1]. The reported evidence is scenario-based simulation with prototype constraints, not a modern public AV benchmark: the method is very fast in simple template-covered scenes, remains below real-time budgets in multi-obstacle examples, and should be read as a structured-road planner rather than a generic replacement for closed-loop urban planning [1].
 
 Fu et al. present an urban planning and decision layer built for the IN2BOT competition vehicle, where the hard problem is not finding a globally optimal curve but keeping path and speed commands stable when lane detection, GPS, and GIS map alignment are imperfect [2]. The system fuses lidar, radar, camera, integrated navigation, wheel encoder, obstacle-map, traffic-light, traffic-sign, pedestrian, moving-vehicle, and GIS-route information into local path planning plus a run/stop and expected-speed decision output [2]. Its local planner scores parallel candidate lines on a $3000\times3000$ grid representing a $60$ m by $60$ m area, using obstacle cost, distance cost, and rule cost; it switches among lane-based, GIS-line-based, and road-edge-centerline modes depending on lane availability and the correlation between GIS and perceived road edges [2]. The mode switching and stop/run decisions use hysteresis, and the selected 301-point path is temporally filtered before control so that noisy perception or a mode change does not immediately produce a lateral jump [2]. This is a useful complement to [decision making and behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning): it shows how behavior cues such as crossroads, stop signs, traffic signs, selected-line angle, obstacle distance, and path confidence can shape speed before the controller sees the trajectory [2]. Evaluation is competition-style rather than dataset-style, with a 14.5 km route requiring four interventions, a 5 km route completed without intervention, and average speed around 35 km/h, so the paper is best treated as a robust structured-urban integration pattern rather than proof of broad dense-city autonomy [2].
 
-## Common pitfalls
+## Failure modes that survive an elegant objective
 
 - Planning a path without timing. Collision avoidance needs time because other agents move.
 - Ignoring vehicle footprint. A centerline can be collision-free while the vehicle body clips a curb or cone.
@@ -265,18 +265,14 @@ Fu et al. present an urban planning and decision layer built for the IN2BOT comp
 - Over-tuning comfort costs until the vehicle becomes indecisive. Comfort matters, but safety and progress still require assertive behavior in some scenarios.
 - Validating on easy log replay only. Planning must be tested in closed-loop simulation because planner actions change future scene evolution.
 
-## Connections
-
-- [Prediction and motion forecasting](/cs/autonomous-driving/prediction-and-motion-forecasting)
-- [Decision making and behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning)
-- [Control: PID, MPC, pure pursuit, and Stanley](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley)
-- [Simulation and data](/cs/autonomous-driving/simulation-and-data)
-- [Reinforcement learning](/cs/reinforcement-learning/)
-- [Engineering math for optimization and ODEs](/math/engineering-math/)
-- Further reading: LaValle's planning text, A*, Hybrid A*, RRT*, lattice planning papers, MPC and iLQR trajectory optimization literature.
-
-## References
+## Sources cited
 
 [1] L. Ma, J. Xue, K. Kawabata, J. Zhu, C. Ma, and N. Zheng, "Efficient Sampling-Based Motion Planning for On-Road Autonomous Driving," IEEE Transactions on Intelligent Transportation Systems, vol. 16, no. 4, pp. 1961-1976, Aug. 2015.
 
 [2] M. Fu, W. Song, Y. Yang, and M. Wang, "Path Planning and Decision Making for Autonomous Vehicle in Urban Environment," in Proc. IEEE 18th International Conference on Intelligent Transportation Systems, 2015, pp. 686-692.
+
+<div className="see-also">
+
+See also: [Prediction and motion forecasting](/cs/autonomous-driving/prediction-and-motion-forecasting) · [Decision making and behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning) · [Control: PID, MPC, pure pursuit, and Stanley](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley) · [Simulation and data](/cs/autonomous-driving/simulation-and-data) · [Reinforcement learning](/cs/reinforcement-learning/intro) · [Engineering math for optimization and ODEs](/math/engineering-math/intro)
+
+</div>

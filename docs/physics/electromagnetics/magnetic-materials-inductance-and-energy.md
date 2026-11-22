@@ -7,13 +7,13 @@ sidebar_position: 12
 
 Magnetic materials determine how strongly a current produces magnetic flux and how much energy is stored or lost in a magnetic system. In free space, $\vec B=\mu_0\vec H$. In matter, electron orbital and spin moments contribute magnetization, so the relationship can be linear, nonlinear, hysteretic, or anisotropic. Engineering devices such as solenoids, transformers, inductive sensors, motors, and magnetic storage depend on these material effects.
 
-Inductance is the circuit-level measure of magnetic flux linkage per current. Like capacitance, it is fundamentally geometric and material. A current creates $\vec H$, the medium produces $\vec B$, flux links conductors, and energy is stored in the magnetic field. This page covers magnetic materials, boundary conditions, self and mutual inductance, and magnetic energy.
+Inductance is the circuit-level measure of magnetic flux linkage per current. Like capacitance, it is fundamentally geometric and material. A current creates $\vec H$, the medium produces $\vec B$, flux links conductors, and energy is stored in the magnetic field. Magnetic materials, boundary conditions, self and mutual inductance, and field energy belong to that same chain.
 
 ![Iron filings reveal the magnetic field pattern between attracting bar magnets.](https://commons.wikimedia.org/wiki/Special:FilePath/Magnetic_field_of_bar_magnets_attracting.png)
 
 *Figure: Iron filings provide a physical picture of magnetic field direction and field-line density. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Magnetic_field_of_bar_magnets_attracting.png), Alexander Wilmer Duff, public domain in the United States.*
 
-## Definitions
+## From magnetization to flux linkage
 
 Magnetization $\vec M$ is magnetic dipole moment per unit volume. The macroscopic fields satisfy
 
@@ -78,7 +78,7 @@ $$
 w_m=\frac{1}{2}\vec B\cdot\vec H=\frac{1}{2}\mu H^2.
 $$
 
-## Key results
+## Inductance from geometry and material response
 
 For a long solenoid with $N$ turns, length $l$, current $I$, and core permeability $\mu$, Ampere's law gives approximately
 
@@ -130,7 +130,7 @@ $$
 
 Ideal transformers assume tight coupling, negligible winding resistance, and negligible core loss. Real transformers depart from this through leakage inductance, winding capacitance, finite permeability, and frequency-dependent losses.
 
-Magnetic energy is sometimes counterintuitive in high-permeability cores. Since $w_m=\frac{1}{2}BH=\frac{B^2}{2\mu}$ for a linear material, a high-$\mu$ region can carry large flux density with relatively small $H$ and comparatively low energy density for a given $B$. Air gaps often store a significant fraction of the energy in inductors because the gap has low permeability and therefore requires larger $H$. This is why gapped cores are used when an inductor must store energy without saturating.
+Magnetic energy is sometimes counterintuitive in high-permeability cores. Since $w_m=\frac{1}{2}BH=\frac{B^2}{2\mu}$ for a linear material, a high-$\mu$ region can carry large flux density with relatively small $H$ and comparatively low energy density for a given $B$. Air gaps often store a significant fraction of the energy in inductors because the gap has low permeability and therefore requires larger $H$. Gapped cores can therefore store energy while keeping the core below saturation.
 
 Boundary conditions explain flux concentration. Normal $\vec B$ is continuous across an interface, but tangential $\vec H$ changes according to permeability when there is no surface current. Flux tends to prefer high-permeability paths because they require less magnetomotive force for a given flux. The word "prefer" is only shorthand; the actual field still satisfies Maxwell's equations and material relations everywhere.
 
@@ -140,9 +140,7 @@ Inductance measurements can also be frequency dependent. At low frequency, windi
 
 The polarity of mutual inductance is tracked with dot convention in circuits. If currents enter dotted terminals simultaneously and their fluxes reinforce, the mutual voltage terms have the same sign. The dot notation is a compact circuit symbol for magnetic-field orientation and winding sense; assigning it carelessly can reverse transformer or coupled-inductor behavior.
 
-Always pair inductance formulas with the assumed flux path.
-
-## Visual
+### Tracing current into stored magnetic energy
 
 ```mermaid
 flowchart LR
@@ -163,7 +161,7 @@ flowchart LR
 | Boundary normal | $D_n$ jump from charge | $B_n$ continuous |
 | Boundary tangential | $E_t$ continuous electrostatically | $H_t$ jumps by surface current |
 
-## Worked example 1: Inductance of a long solenoid
+## Inductance of a long solenoid
 
 Problem: A solenoid has $N=600$ turns, length $l=0.30$ m, cross-sectional area $A=4.0\times10^{-4}\ \mathrm{m^2}$, and a nonmagnetic core. Find $L$.
 
@@ -202,7 +200,7 @@ $$
 
 Check: If a high-$\mu_r$ core were inserted without saturation, $L$ would scale upward by approximately $\mu_r$.
 
-## Worked example 2: Coaxial inductance per unit length
+## External inductance of a coaxial line
 
 Problem: A coaxial line has $a=0.5$ mm and $b=2.5$ mm with nonmagnetic dielectric. Find $L'$ neglecting internal conductor inductance.
 
@@ -238,36 +236,22 @@ $$
 
 Check: Together with a typical coaxial capacitance of tens of pF/m, this gives a characteristic impedance in the tens of ohms, consistent with practical cables.
 
-## Code
+## Limits of the ideal magnetic model
 
-```python
-import numpy as np
+- Ferromagnetic $\mu_r$ is neither constant nor lossless; saturation and hysteresis can dominate a real design.
+- Flux $\Phi$ and flux linkage $\Lambda=N\Phi$ are different quantities, and the extra factor of $N$ produces the $N^2$ scaling of solenoid inductance.
+- Magnetic interfaces obey continuity of normal $\vec B$ and a surface-current jump in tangential $\vec H$.
+- Short coils and magnetic gaps have fringing fields that the one-dimensional model omits.
+- High permeability does not imply unlimited energy storage. A high-$\mu$ core can saturate and introduce substantial loss.
+- In a nonlinear magnetic material, inductance generally depends on current and on whether incremental or large-signal behavior is being measured.
 
-mu0 = 4 * np.pi * 1e-7
+<div className="see-also">
 
-def solenoid_L(N, area, length, mu_r=1):
-    return mu0 * mu_r * N**2 * area / length
-
-def coax_L_per_m(a, b, mu_r=1):
-    return mu0 * mu_r / (2 * np.pi) * np.log(b / a)
-
-print("solenoid L =", solenoid_L(600, 4e-4, 0.30), "H")
-print("coax L' =", coax_L_per_m(0.5e-3, 2.5e-3), "H/m")
-```
-
-## Common pitfalls
-
-- Assuming $\mu_r$ is constant for ferromagnetic materials. Saturation and hysteresis can dominate real designs.
-- Confusing flux $\Phi$ with flux linkage $\Lambda=N\Phi$.
-- Forgetting the $N^2$ scaling of solenoid inductance.
-- Using electric boundary-condition intuition for magnetic fields. Normal $\vec B$ is continuous; tangential $\vec H$ jumps with surface current.
-- Ignoring fringing in short coils or magnetic gaps.
-- Equating high permeability with unlimited energy storage. High-$\mu$ cores can saturate and often introduce loss.
-- Forgetting that inductance can depend on current in nonlinear magnetic materials.
-
-## Connections
+See also:
 
 - [Magnetostatic forces, Biot-Savart law, and Ampere law](/physics/electromagnetics/magnetostatic-forces-biot-savart-ampere) for magnetic field generation by currents.
 - [Transmission-line models and wave equations](/physics/electromagnetics/transmission-line-models-and-wave-equations) for $L'$ and $C'$ in guided propagation.
 - [Maxwell equations for time-varying fields](/physics/electromagnetics/maxwell-equations-time-varying-fields) for inductive voltage and transformer action.
 - [Gauss law, dielectrics, and boundaries](/physics/electromagnetics/gauss-law-dielectrics-and-boundaries) for comparison with electric materials.
+
+</div>

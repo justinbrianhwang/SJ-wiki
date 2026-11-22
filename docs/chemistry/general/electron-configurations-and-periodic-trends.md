@@ -5,136 +5,276 @@ sidebar_position: 9
 
 # Electron Configurations and Periodic Trends
 
-Electron configurations translate quantum numbers into the periodic table. They explain why elements in a group have related chemistry and why properties such as atomic radius, ionization energy, and electron affinity vary across periods and down groups.
+An electron configuration records how electrons occupy atomic orbitals in a chosen state, usually the isolated ground state. The periodic table is arranged so that recurring valence configurations appear in columns. Trends in size and energy then follow from a competition between nuclear attraction, shielding, distance, and electron-electron repulsion.
 
-In the Ebbing and Gammon sequence this topic sits near electron spin, Pauli exclusion, building-up principle, periodic table, orbital diagrams, Hund's rule, and periodic properties. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
+The trend arrows are summaries rather than causes. Reliable explanations start with which shell and subshell contain the relevant electrons.
 
-![A chart shows the shapes and filling order of electron orbitals.](https://commons.wikimedia.org/wiki/Special:FilePath/Electron_orbitals.svg)
+## From quantum numbers to subshell capacity
 
-*Figure: Electron orbitals as the structural basis for configurations and periodic trends. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Electron_orbitals.svg), Patricia.fidi, public domain.*
+Each one-electron orbital is labeled by quantum numbers. The principal quantum number $n=1,2,3,\ldots$ describes the main shell and is related to size and energy. The angular-momentum quantum number $l$ ranges from 0 to $n-1$ and identifies the subshell: $l=0,1,2,3$ correspond to $s,p,d,f$.
 
-## Definitions
+For a given $l$, the magnetic quantum number $m_l$ takes integer values from $-l$ through $+l$, giving $2l+1$ orbitals. The spin quantum number $m_s$ is $+1/2$ or $-1/2$. Each orbital can therefore hold two electrons of opposite spin.
 
-The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.
+| Subshell | $l$ | Number of orbitals $2l+1$ | Maximum electrons |
+|---|---:|---:|---:|
+| $s$ | 0 | 1 | 2 |
+| $p$ | 1 | 3 | 6 |
+| $d$ | 2 | 5 | 10 |
+| $f$ | 3 | 7 | 14 |
 
-- Pauli exclusion principle states that no two electrons in an atom have the same four quantum numbers.
-- Aufbau or building-up principle fills lower-energy orbitals before higher-energy orbitals for ground states.
-- Hund's rule places electrons singly in degenerate orbitals with parallel spins before pairing.
-- Valence electrons are outer-shell electrons most involved in bonding.
-- Core electrons are inner electrons that shield valence electrons from full nuclear charge.
-- Effective nuclear charge $Z_{eff}$ is the net positive attraction felt by an electron after shielding.
-- Ionization energy is energy required to remove an electron from a gaseous atom or ion.
-- Atomic radius reflects the size of the electron cloud and depends on shell number and nuclear attraction.
+The shell with principal number $n$ contains $n^2$ orbitals and can hold at most $2n^2$ electrons. This capacity does not mean all orbitals of a shell fill consecutively; orbital energies in many-electron atoms overlap between shells.
 
-Definitions in chemistry often connect a symbolic representation to a physical sample. A formula such as $\mathrm{H_2O}$ names a substance, gives the atomic ratio inside one molecule, and supplies the molar mass used in a macroscopic calculation. A state symbol such as $\mathrm{(aq)}$ is not cosmetic; it says the species is dispersed in water and may be treated as ions when writing a net ionic equation. In the same way, constants such as $R$, $K_w$, $F$, or $N_A$ are compact definitions of the measurement system being used.
+## Three rules for a ground-state configuration
 
-## Key results
+The **Pauli exclusion principle** states that no two electrons in an atom have the same four quantum numbers. An orbital holds at most two electrons, and if two occupy it their spins are opposite.
 
-The central results are:
+**Hund's rule** says that electrons occupy degenerate orbitals singly with parallel spins before pairing. For a $p^3$ subshell, the three $p$ orbitals each receive one electron. Pairing earlier would add repulsion without an orbital-energy benefit.
 
-- Orbital capacities: $s=2$, $p=6$, $d=10$, $f=14$ electrons.
-- Common filling order begins $1s,2s,2p,3s,3p,4s,3d,4p,5s,4d,5p,6s,4f,5d,6p$.
-- Across a period, $Z_{eff}$ generally increases and atomic radius decreases.
-- Down a group, added shells generally increase atomic radius.
-- Ionization energy generally increases across a period and decreases down a group.
-- Cations are smaller than parent atoms; anions are larger than parent atoms.
-
-Periodic trends are not memorized arrows only; they are consequences of attraction and shielding. Across a period, protons are added to the nucleus while electrons enter the same principal shell, so valence electrons feel stronger attraction. Down a group, new shells place valence electrons farther from the nucleus and increase shielding.
-
-A good way to use these results is to state the chemical model first, then substitute numbers second. For electron configurations and periodic trends, the model usually answers questions such as what particles are present, what is conserved, which process is idealized, and which measurement is being interpreted. Once that sentence is clear, the algebra becomes a bookkeeping problem rather than a search for a memorized pattern.
-
-Units are part of the result, not decoration. Whenever a formula contains an empirical constant, a tabulated value, or a ratio of measured quantities, the units tell you whether the expression has been used in the intended form. This is especially important in general chemistry because several equations have nearly identical algebra but different meanings: pressure can be a measured state variable, an equilibrium correction, or a colligative effect; energy can be heat flow, enthalpy, internal energy, or free energy.
-
-The strongest check is an independent chemical interpretation. Ask whether the sign agrees with direction, whether a concentration can be negative, whether a mole ratio follows the balanced equation, whether an equilibrium shift opposes the stress, and whether a microscopic description explains the macroscopic number. These checks connect electron configurations and periodic trends to neighboring topics instead of leaving it as an isolated technique.
-
-A second check is to compare the limiting cases. If a reactant amount goes to zero, a product amount cannot remain large. If temperature rises in a gas sample at fixed volume, pressure should not fall in an ideal model. If an acid is diluted, hydronium concentration should normally decrease unless a coupled equilibrium supplies more. Limiting cases often reveal algebra that has been rearranged correctly but applied to the wrong chemical situation.
-
-Finally, keep symbolic and particulate representations side by side. A balanced equation, an equilibrium expression, an orbital diagram, or a polymer repeat unit is a compact symbol for a population of particles. Translating that symbol into words forces you to say what is reacting, what is being counted, and what is being held constant. That translation is usually the difference between a calculation that can be adapted to a new problem and one that only imitates a worked example.
-
-## Visual
+The **Aufbau procedure** fills available orbitals from lower to higher energy. A common approximate order is
 
 ```text
-Energy filling sketch:
-
 1s
 2s  2p
 3s  3p
 4s  3d  4p
 5s  4d  5p
 6s  4f  5d  6p
-
-Read roughly left to right by increasing energy for ground-state filling.
+7s  5f  6d  7p
 ```
 
-| Trend | Across a period | Down a group | Main reason |
+The Madelung ordering by increasing $n+l$, with lower $n$ first on a tie, reproduces much of this sequence. It is a useful mnemonic, not a fundamental theorem that predicts every neutral-atom ground state. Subshell energies depend on occupation, shielding, and electron correlation.
+
+Orbital notation exposes Hund's rule. Nitrogen, with $1s^22s^22p^3$, has
+
+```text
+2p:  [↑] [↑] [↑]
+```
+
+whereas oxygen, $1s^22s^22p^4$, has
+
+```text
+2p:  [↑↓] [↑] [↑]
+```
+
+The precise choice of which box pairs first is arbitrary because the three isolated-atom $p$ orbitals are degenerate.
+
+## Building configurations and checking the count
+
+The full ground-state configuration of chlorine, $Z=17$, is
+
+$$
+\mathrm{1s^2\,2s^2\,2p^6\,3s^2\,3p^5}.
+$$
+
+The superscripts sum to 17. Noble-gas notation replaces the filled core:
+
+$$
+\mathrm{Cl:[Ne]3s^2\,3p^5}.
+$$
+
+This notation highlights the seven valence electrons responsible for chlorine's similarity to other group 17 elements.
+
+The table's blocks correspond to the subshell being filled. The $s$ block spans two columns, the $p$ block six, the transition-metal $d$ block ten, and the inner-transition $f$ block fourteen. Helium is placed with the noble gases because its filled $1s^2$ shell gives noble-gas chemistry even though its configuration belongs formally to the $s$ block.
+
+For main-group elements, valence electrons usually occupy the highest-$n$ $s$ and $p$ subshells. Transition-metal chemistry also involves nearby $(n-1)d$ electrons, so a simple highest-shell definition is less adequate there.
+
+### Worked example: selenium and its common ion
+
+Selenium has $Z=34$. Starting from the argon core with 18 electrons, fill $4s^2$, $3d^{10}$, then $4p^4$:
+
+$$
+\mathrm{Se:[Ar]4s^2\,3d^{10}\,4p^4}.
+$$
+
+The count is
+
+$$
+18+2+10+4=34.
+$$
+
+For $\mathrm{Se^{2-}}$, add two electrons to the partly filled $4p$ subshell:
+
+$$
+\mathrm{Se^{2-}:[Ar]4s^2\,3d^{10}\,4p^6=[Kr]}.
+$$
+
+The ion has 36 electrons and a filled valence shell. The configuration describes an isolated ion; in a solid or molecule, bonding changes the orbital picture, though the electron count remains essential.
+
+## Exceptions near half-filled and filled $d$ subshells
+
+The simplest filling prediction for chromium is $\mathrm{[Ar]4s^23d^4}$, but its observed ground-state configuration is commonly written
+
+$$
+\mathrm{Cr:[Ar]4s^1\,3d^5}.
+$$
+
+Copper is
+
+$$
+\mathrm{Cu:[Ar]4s^1\,3d^{10}}
+$$
+
+rather than $\mathrm{[Ar]4s^23d^9}$. The $4s$ and $3d$ energies are close, and the balance of electron correlation and subshell occupation favors the observed arrangements. Saying only that “half-filled and filled subshells are stable” is a mnemonic, not a general quantitative explanation. Several heavier transition elements have additional exceptions.
+
+Known configurations should be consulted when exact spectroscopy or transition-metal chemistry depends on them. The Aufbau sequence remains effective for locating the relevant subshells and counting electrons.
+
+## Forming ions: remove from the outer shell first
+
+Main-group cations lose electrons from the highest occupied principal shell. Sodium, $\mathrm{[Ne]3s^1}$, becomes $\mathrm{Na^+:[Ne]}$. Anions fill the valence subshell: chlorine gains one electron to reach $\mathrm{[Ar]}$.
+
+Transition-metal ions cause a common reversal. Neutral iron is conventionally written
+
+$$
+\mathrm{Fe:[Ar]4s^2\,3d^6},
+$$
+
+but the $4s$ electrons are removed before $3d$ electrons when cations form:
+
+$$
+\begin{aligned}
+\mathrm{Fe^{2+}}&:\mathrm{[Ar]3d^6},\\
+\mathrm{Fe^{3+}}&:\mathrm{[Ar]3d^5}.
+\end{aligned}
+$$
+
+Although $4s$ fills before $3d$ in the neutral-atom construction, the relative orbital energies change after $3d$ occupation. “Last written, first removed” is unsafe because configurations may be written in different orders; remove from the highest principal quantum number first for these common cations.
+
+### Worked example: cobalt(III) and unpaired electrons
+
+Neutral cobalt, $Z=27$, is
+
+$$
+\mathrm{Co:[Ar]4s^2\,3d^7}.
+$$
+
+To form $\mathrm{Co^{3+}}$, remove two $4s$ electrons and one $3d$ electron:
+
+$$
+\mathrm{Co^{3+}:[Ar]3d^6}.
+$$
+
+For a free $d^6$ ion, Hund filling across five degenerate $d$ orbitals gives
+
+```text
+3d:  [↑↓] [↑] [↑] [↑] [↑]
+```
+
+so four electrons are unpaired in that isolated-ion model. In a coordination complex, ligand-field splitting can instead favor a low-spin arrangement with fewer unpaired electrons. Electron count alone is not enough to assign magnetism in transition-metal complexes.
+
+Species with one or more unpaired electrons are paramagnetic and attracted into a magnetic field. Species with all electrons paired are diamagnetic and weakly repelled. This connection provides experimental evidence about configurations, although molecules and solids may require molecular-orbital or band descriptions.
+
+## Effective nuclear charge and shielding
+
+Every electron is attracted to the nucleus and repelled by other electrons. A rough one-electron summary is the effective nuclear charge
+
+$$
+Z_{\mathrm{eff}}=Z-S,
+$$
+
+where $S$ represents shielding. This is a model quantity rather than one universal integer. Core electrons shield valence electrons strongly; electrons in the same shell shield one another less completely. Penetrating orbitals spend more time near the nucleus and experience greater attraction. For a fixed $n$, penetration generally follows $s\gt p\gt d\gt f$.
+
+Across a period, $Z$ increases one unit at a time while added valence electrons enter roughly the same shell. Shielding does not rise enough to cancel the added nuclear charge, so $Z_{\mathrm{eff}}$ generally increases. Down a group, the valence shell has higher $n$, is farther from the nucleus, and is screened by additional core shells.
+
+These two comparisons—effective attraction across a period and shell number down a group—account for many broad periodic patterns.
+
+## Atomic and ionic radii
+
+An atom has no sharp outer boundary, so atomic radius depends on its operational definition: covalent radius, metallic radius, or van der Waals radius. Trend comparisons should use compatible definitions.
+
+Across a period, atomic radius generally decreases as increasing effective nuclear charge contracts the valence cloud. Down a group, radius increases because a new occupied shell outweighs the greater nuclear charge.
+
+Cations are smaller than their parent atoms. Electron loss reduces repulsion and may remove the outer shell entirely. Anions are larger because added electrons increase repulsion within the valence shell while nuclear charge is unchanged.
+
+For an isoelectronic series, all species have the same electron count, so proton count decides the attraction. Consider
+
+$$
+\mathrm{O^{2-},\ F^-,\ Ne,\ Na^+,\ Mg^{2+}}.
+$$
+
+Each has ten electrons, but nuclear charge rises from 8 to 12. Radius therefore decreases in the order
+
+$$
+\mathrm{O^{2-}>F^->Ne>Na^+>Mg^{2+}}.
+$$
+
+Applying the ordinary left-to-right neutral-atom trend without first noticing equal electron counts often reverses this reasoning.
+
+## Ionization energy and its local exceptions
+
+The first ionization energy is the energy required to remove an electron from a gaseous ground-state atom:
+
+$$
+\mathrm{X(g)\rightarrow X^+(g)+e^-}.
+$$
+
+It generally rises across a period because valence electrons experience increasing attraction, and falls down a group because the removed electron occupies a larger, more shielded shell. Successive ionization energies always increase because an electron is removed from an increasingly positive species.
+
+A large jump in successive ionization energies signals that all valence electrons have been removed and the next electron belongs to a core shell. For magnesium, the large jump occurs after the second ionization, consistent with $\mathrm{[Ne]3s^2}$ and a common $2+$ ion.
+
+The across-period rise has instructive exceptions. Boron's first removed electron is in $2p$, which is higher in energy and less penetrating than beryllium's $2s$ electron, so boron has a lower first ionization energy than a naive monotonic trend predicts. Oxygen has one paired $2p$ orbital, and repulsion within that pair makes electron removal easier than from nitrogen's half-filled $2p^3$ arrangement. These exceptions support the subshell model rather than overturning it.
+
+## Electron affinity and electronegativity
+
+Electron affinity describes the energy change when a gaseous atom gains an electron. Sign conventions vary among texts: some report the energy released as a positive magnitude, while thermodynamic conventions report an exothermic energy change as negative. The convention must be checked before ranking numerical values.
+
+Halogens generally have strongly favorable first electron affinities because one added electron completes a $p$ subshell. Noble gases resist addition into a new shell. Second electron addition to an already negative ion is unfavorable in the gas phase because of electrostatic repulsion, even when a $2-$ ion is stabilized in an ionic lattice.
+
+Electronegativity is a relative measure of an atom's attraction for shared electrons in a bond. It is not an energy measured for an isolated atom in exactly the same way as ionization energy. Electronegativity generally rises across a period and falls down a group; fluorine is highest on the common Pauling scale. Bond polarity depends on the difference between bonded atoms, while molecular polarity also depends on geometry.
+
+## Metallic character and periodic reactivity
+
+Metals tend to lose electrons and form cations, so metallic character increases as ionization energy falls: generally down a group and toward the left. Nonmetallic behavior increases toward the upper right. Metalloids occupy a broad boundary and show intermediate or context-dependent properties.
+
+Reactivity does not follow one arrow for every family. Alkali metals become more reactive down the group because electron loss becomes easier. Halogen oxidizing strength generally decreases down the group because gaining an electron becomes less favorable and bond and solvation effects change. A periodic trend must be tied to the particular reaction rather than used as a universal ranking of “reactivity.”
+
+| Property | General trend across a period | General trend down a group | Main reason |
 |---|---|---|---|
-| Atomic radius | decreases | increases | $Z_{eff}$ versus shell number |
-| First ionization energy | increases | decreases | attraction to valence electron |
-| Metallic character | decreases | increases | ease of losing electrons |
-| Ionic radius | depends on charge | increases | electron count and shell size |
+| atomic radius | decreases | increases | increasing $Z_{\mathrm{eff}}$ versus added shells |
+| first ionization energy | increases | decreases | attraction and distance of removed electron |
+| electronegativity | increases | decreases | attraction for bonding electron density |
+| metallic character | decreases | increases | ease of electron loss |
 
-## Worked example 1: Electron configuration of iron(III)
+## A disciplined way to rank species
 
-Problem. Write the electron configuration of $\mathrm{Fe^{3+}}$.
+1. Count electrons and identify charge. Isoelectronic species should be compared by proton count.
+2. Locate the highest occupied shell. An added shell usually dominates a down-group comparison.
+3. For species in the same shell, compare effective nuclear charge.
+4. Check subshell occupation and pairing when ranking ionization energies or electron affinities near known exceptions.
+5. State whether the comparison concerns atoms, free ions, or ions in a bonded environment.
 
-    Method.
+For Na, Mg, and K, potassium has an additional occupied shell and is largest. Sodium and magnesium share period 3, but magnesium has greater nuclear charge with similar core shielding, so it is smaller:
 
-    1. Neutral iron has atomic number 26, so it has 26 electrons.
-2. Ground-state neutral Fe is $\mathrm{[Ar]4s^2 3d^6}$.
-3. For transition-metal cations, remove electrons from the highest principal quantum number first; remove $4s$ before $3d$.
-4. Remove two $4s$ electrons to get $\mathrm{Fe^{2+}:[Ar]3d^6}$.
-5. Remove one more electron from $3d$ to get $\mathrm{Fe^{3+}:[Ar]3d^5}$.
+$$
+\mathrm{Mg<Na<K}.
+$$
 
-    Checked answer. $\mathrm{Fe^{3+}}$ has configuration $\mathrm{[Ar]3d^5}$. The ion has 23 electrons total: argon core 18 plus five d electrons.
+The explanation is more durable than memorizing the direction of an arrow.
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+## Configuration checks
 
-## Worked example 2: Ranking atomic radii
+- Sum every superscript and compare with the required electron count after charge is included.
+- Apply Hund's rule within one set of degenerate orbitals; it does not mean filling a higher-energy subshell before pairing in a lower one.
+- Remove transition-metal electrons from the highest principal shell before the lower-$n$ $d$ subshell.
+- Treat the Aufbau sequence as a strong working rule with known exceptions, not an infallible energy law.
+- Explain periodic comparisons with shell number, shielding, penetration, and nuclear attraction. “Because it is farther right” only restates the table position.
+- Do not transfer isolated-atom unpaired-electron counts directly to coordination complexes without considering ligand-field splitting.
 
-Problem. Rank $\mathrm{Na}$, $\mathrm{Mg}$, and $\mathrm{K}$ from smallest to largest atomic radius.
+## Spectra as evidence for discrete energies
 
-    Method.
+Electron configurations are supported by spectroscopy rather than inferred only from table shape. When an atom absorbs or emits light, photon energy matches a difference between allowed states:
 
-    1. Locate the elements: Na and Mg are in period 3; K is below Na in group 1.
-2. Across period 3 from Na to Mg, nuclear charge increases while electrons enter the same shell, so radius decreases.
-3. Therefore Mg is smaller than Na.
-4. Down group 1 from Na to K, a new shell is added, so K is larger than Na.
-5. Combine the comparisons: Mg < Na < K.
+$$
+\Delta E=h\nu=\frac{hc}{\lambda}.
+$$
 
-    Checked answer. Smallest to largest: $\mathrm{Mg \lt  Na \lt  K}$. The largest atom should be the one with the highest occupied shell among the three, potassium.
+Discrete spectral lines show that atomic energy changes are quantized. Many-electron spectra are complicated by electron repulsion, spin-orbit coupling, and multiple possible terms, so a configuration does not specify one energy by itself.
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+Photoelectron spectroscopy removes electrons with known photon energy and measures their kinetic energy. The binding-energy pattern separates shells and subshells; peak areas approximately reflect electron counts after sensitivity factors are considered. Sudden changes in binding energy across a series give experimental support to shell structure and effective nuclear charge.
 
-## Code
+Configurations are therefore compact assignments within a model tested by spectra, magnetism, and chemical behavior. They are not little planetary paths. An orbital is a quantum state whose squared wavefunction gives a probability distribution.
 
-```python
-capacities = {"s": 2, "p": 6, "d": 10, "f": 14}
-filling = [("1s", 2), ("2s", 2), ("2p", 6), ("3s", 2),
-           ("3p", 6), ("4s", 2), ("3d", 6)]
+<div className="see-also">
 
-electrons_fe = sum(count for _, count in filling)
-fe3_electrons = electrons_fe - 3
+See also: [quantum theory of atoms](/chemistry/general/quantum-theory-of-atoms) · [ionic and covalent bonding](/chemistry/general/ionic-and-covalent-bonding) · [main-group elements](/chemistry/general/main-group-elements) · [transition metals and coordination compounds](/chemistry/general/transition-metals-and-coordination-compounds)
 
-def period_radius_rule(a_period, b_period, same_period_left_to_right):
-    if a_period != b_period:
-        return "larger shell usually means larger radius"
-    return "radius decreases left to right" if same_period_left_to_right else "compare positions"
-
-print(electrons_fe, fe3_electrons, period_radius_rule(3, 3, True))
-```
-
-## Common pitfalls
-
-- Removing $3d$ electrons before $4s$ for transition-metal cations. Avoid it by removing electrons from the highest principal quantum number first.
-- Memorizing trend arrows without explaining shielding. Avoid it by using shell number and effective nuclear charge.
-- Pairing p electrons too early in orbital diagrams. Avoid it by applying Hund's rule to degenerate orbitals.
-- Counting valence electrons incorrectly for main-group ions. Avoid it by using group number and charge together.
-- Assuming every configuration has no exceptions. Avoid it by checking known stability exceptions such as chromium and copper when needed.
-- Comparing ionic radii without checking electron count. Avoid it by identifying isoelectronic series and nuclear charge.
-
-## Connections
-
-- [quantum theory of atoms](/chemistry/general/quantum-theory-of-atoms)
-- [ionic and covalent bonding](/chemistry/general/ionic-and-covalent-bonding)
-- [main-group elements](/chemistry/general/main-group-elements)
-- [transition metals and coordination compounds](/chemistry/general/transition-metals-and-coordination-compounds)
+</div>

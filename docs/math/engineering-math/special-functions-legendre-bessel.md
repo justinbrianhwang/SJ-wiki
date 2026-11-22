@@ -7,13 +7,9 @@ sidebar_position: 9
 
 Legendre and Bessel functions are special functions because they solve recurring differential equations from geometry. Legendre functions appear with spherical symmetry, angular variables, and expansions on $[-1,1]$. Bessel functions appear with cylindrical symmetry, radial vibration, heat flow in disks, and wave propagation in circular domains.
 
-![Adrien-Marie Legendre is shown in a historical portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Legendre.jpg)
+These named solution families come with well-studied series, orthogonality relations, recurrences, and zeros. In engineering mathematics they play the same role that sine and cosine play for rectangular domains: they provide modes adapted to the geometry and boundary conditions.
 
-*Figure: Adrien-Marie Legendre's name appears in orthogonal polynomials and special functions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Legendre.jpg), Julien-Leopold Boilly, public domain.*
-
-The important lesson is that special functions are not arbitrary new objects. They are named solution families with well-studied series, orthogonality, recurrence relations, and zeros. In engineering mathematics they play the same role that sine and cosine play for rectangular domains: they provide modes adapted to the geometry and boundary conditions.
-
-## Definitions
+## The two differential equations and their regular solutions
 
 Legendre's differential equation is
 
@@ -51,7 +47,7 @@ $$
 
 For Bessel functions in radial problems, orthogonality usually involves the weight $r$ on $0\le r\le R$.
 
-## Key results
+## Projection, recurrences, and boundary zeros
 
 Legendre polynomials satisfy Rodrigues' formula:
 
@@ -114,7 +110,9 @@ In numerical work, recurrence relations can be stable in one direction and unsta
 
 Legendre and Bessel functions also encode qualitative information. The number and location of zeros determine nodal lines, which are places where a vibrating membrane or standing wave is motionless. Orthogonality means that energy or squared error can be decomposed by mode. Smooth data usually produce rapidly decaying expansion coefficients, while discontinuities or sharp boundary layers require many modes.
 
-## Visual
+## Geometry selects the mode family
+
+Separation in spherical or cylindrical coordinates produces different one-dimensional eigenproblems, but both lead to weighted orthogonal expansions.
 
 ```mermaid
 flowchart TD
@@ -135,7 +133,7 @@ flowchart TD
 | $\cos(n\pi x/L)$ | $0\le x\le L$ | $1$ | Rectangular Neumann modes |
 | $\sin(n\pi x/L)$ | $0\le x\le L$ | $1$ | Rectangular Dirichlet modes |
 
-## Worked example 1: Legendre projection
+## Resolving $x^2$ into Legendre modes
 
 Problem. Approximate $f(x)=x^2$ on $[-1,1]$ using Legendre polynomials.
 
@@ -180,7 +178,7 @@ $$
 
 This example is exact because $x^2$ is already a polynomial of degree two. A more complicated function would have infinitely many Legendre coefficients. Orthogonality guarantees that the coefficient of $P_n$ can be found independently by projection, without solving a coupled linear system for all coefficients at once.
 
-## Worked example 2: First terms of a Bessel function
+## Recovering the first terms of $J_0$
 
 Problem. Write the first three nonzero terms of $J_0(x)$.
 
@@ -222,7 +220,7 @@ Check. The derivative at $0$ is $0$, consistent with the evenness of $J_0$.
 
 The approximation is most accurate near the origin because it was derived from a series centered there. For larger $x$, more terms are needed, and oscillatory asymptotic formulas may be more efficient. This local-versus-global issue is one reason special-function libraries combine several methods internally.
 
-## Code
+## Evaluating polynomials and Bessel zeros with SciPy
 
 ```python
 import numpy as np
@@ -240,7 +238,7 @@ The code evaluates $P_2$ and the first zeros of $J_0$. In a circular membrane pr
 
 For coefficient calculations, software can evaluate the functions but the mathematical normalization still has to come from the model. A radial expansion on a disk integrates with $r\,dr$, while a one-dimensional Legendre expansion integrates with $dx$. Using the wrong inner product may still produce numbers, but they will not be the expansion coefficients for the intended problem.
 
-## Common pitfalls
+## Choosing the right weight, branch, and zeros
 
 - Forgetting the weight function in orthogonality integrals, especially the radial weight $r$ for Bessel modes.
 - Assuming every solution of Legendre's equation is a polynomial. Polynomial behavior occurs for special integer parameters.
@@ -256,9 +254,8 @@ For coefficient calculations, software can evaluate the functions but the mathem
 - Comparing modal amplitudes without accounting for the norm of each mode under the correct weighted inner product.
 - Rounding roots too early in downstream eigenvalue calculations.
 
-## Connections
+<div className="see-also">
 
-- [Series Solutions of ODEs](/math/engineering-math/series-solutions)
-- [Orthogonal Functions and Sturm-Liouville Problems](/math/engineering-math/orthogonal-functions-and-sturm-liouville)
-- [PDEs by Separation of Variables](/math/engineering-math/pdes-separation-of-variables)
-- [Wave and Heat Equations](/math/engineering-math/wave-and-heat-equations)
+See also: [Series Solutions of ODEs](/math/engineering-math/series-solutions) · [Orthogonal Functions and Sturm-Liouville Problems](/math/engineering-math/orthogonal-functions-and-sturm-liouville) · [PDEs by Separation of Variables](/math/engineering-math/pdes-separation-of-variables) · [Wave and Heat Equations](/math/engineering-math/wave-and-heat-equations)
+
+</div>

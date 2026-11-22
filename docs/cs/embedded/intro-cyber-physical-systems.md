@@ -5,11 +5,11 @@ sidebar_position: 50
 
 # Cyber-Physical Systems Supplement
 
-This section supplements the hardware-and-assembly-oriented embedded notes with the cyber-physical systems perspective from Lee and Seshia. The existing notes in this folder focus on microprocessors, microcontrollers, buses, peripheral chips, assembly programming, and concrete interfacing. This supplement focuses on models: continuous dynamics, discrete state machines, hybrid systems, concurrency semantics, timing, verification, quantitative analysis, and security.
+The hardware-and-assembly material focuses on microprocessors, microcontrollers, buses, peripheral chips, assembly programming, and concrete interfacing. The Lee and Seshia perspective adds the corresponding system models: continuous dynamics, discrete state machines, hybrid systems, concurrency semantics, timing, verification, quantitative analysis, and security.
 
 The shift in emphasis matters because embedded software is not only software running on small computers. In a cyber-physical system, computation is coupled to physical processes through sensors, actuators, networks, and feedback. Correctness can depend on real time, state evolution, environmental assumptions, and whether the chosen abstraction is sound enough to justify the design.
 
-## Definitions
+## Plant, cyber layer, and models
 
 A **cyber-physical system** (CPS) integrates computation with physical processes. Embedded computers and networks monitor and control a physical plant, often in a feedback loop where physical evolution affects computation and computation affects physical evolution.
 
@@ -40,9 +40,9 @@ The new pages in this supplement are:
 15. [Quantitative Analysis](/cs/embedded/quantitative-analysis)
 16. [Security and Privacy](/cs/embedded/security-and-privacy)
 
-## Key results
+## A loop from models to assurance
 
-The main CPS design loop is modeling, design, and analysis. Modeling clarifies what the system should do and what assumptions are being made. Design selects hardware, software, networks, sensors, and control structure. Analysis checks why the system should meet requirements or where it can fail. In practice, these activities iterate.
+The main CPS design loop is modeling, design, and analysis. Modeling clarifies what the system should do and what assumptions are being made. Design selects hardware, software, networks, sensors, and control structure. Analysis checks why the system should meet requirements or where it can fail. These activities iterate.
 
 Continuous dynamics model the plant and low-level physical behavior. A simple mechanical or electrical model may be written as an ODE, but in an embedded system the ODE is not isolated: software samples it, estimates state, computes control actions, and applies actuation subject to delay and quantization.
 
@@ -54,11 +54,11 @@ Concurrency needs semantics. State-machine composition, synchronous-reactive mod
 
 Analysis is not optional. Temporal logic states requirements precisely. Refinement and equivalence compare designs. Reachability and model checking search state spaces. Quantitative analysis bounds time, memory, energy, or other measurable resources. Security and privacy analysis adds adversarial environments and information-flow concerns.
 
-The Godse-derived hardware notes and the Lee-Seshia CPS notes should be read together. Concrete microcontrollers, buses, and peripherals implement the abstract actors and state machines. Conversely, the abstract models explain why timing, interrupt behavior, quantization, and resource bounds matter for those concrete devices.
+The Godse-derived hardware material and the Lee-Seshia CPS material belong together. Concrete microcontrollers, buses, and peripherals implement the abstract actors and state machines. Conversely, the abstract models explain why timing, interrupt behavior, quantization, and resource bounds matter for those concrete devices.
 
-A useful reading path is to start with the modeling pages, then move down to platform realization, then return to analysis. For example, a feedback-controller design begins with continuous dynamics and sensors, becomes a hybrid or state-machine controller, is implemented using I/O, processors, memory, and scheduling, and is then checked with temporal logic, reachability, quantitative timing analysis, and security review. The pages are ordered to support that loop rather than to isolate topics.
+A useful path starts with modeling, moves down to platform realization, then returns to analysis. For example, a feedback-controller design begins with continuous dynamics and sensors, becomes a hybrid or state-machine controller, is implemented using I/O, processors, memory, and scheduling, and is then checked with temporal logic, reachability, quantitative timing analysis, and security review.
 
-## Visual
+### How the layers close the loop
 
 ```mermaid
 flowchart LR
@@ -82,7 +82,7 @@ flowchart LR
 | Verification | temporal logic, refinement, reachability | Does the model satisfy the requirement? |
 | Assurance | quantitative analysis, security | What bounds and threat assumptions are defensible? |
 
-## Worked example 1: Classifying a quadrotor subsystem
+## Decomposing a quadrotor into CPS models
 
 Problem: A quadrotor has an inertial measurement unit, four motor controllers driven by PWM, a low-level stabilization loop, a wireless link, and a supervisory mode machine with states `takeoff`, `hover`, `land`, and `fault`. Classify each part using the CPS concepts in this supplement.
 
@@ -104,7 +104,7 @@ Method:
 
 Answer: The quadrotor is not captured by one model. It needs continuous plant models, sensor/actuator models, FSM mode logic, hybrid composition, scheduling analysis, and verification of safety properties.
 
-## Worked example 2: Turning an English requirement into analysis tasks
+## Turning a stopping requirement into proof obligations
 
 Problem: Requirement: "If an obstacle is detected, the robot must stop before collision and must not resume motion until the obstacle is gone." Break this into model and analysis obligations.
 
@@ -144,7 +144,7 @@ $$
 
 Answer: The English requirement decomposes into sensor assumptions, actuator assumptions, hybrid mode logic, temporal-logic safety properties, and a quantitative stopping-distance bound.
 
-## Code
+### Checking the stopping margin numerically
 
 ```python
 def stopping_distance(speed, delay, decel):
@@ -167,25 +167,17 @@ print(stopping_distance(case["speed"], case["delay"], case["decel"]))
 print(safe_to_stop(**case))
 ```
 
-## Common pitfalls
+## What a single-layer model misses
 
 - Treating CPS as ordinary software plus sensors. Physical time, concurrency, and feedback change what correctness means.
 - Modeling the plant and controller separately but never analyzing their closed-loop interaction.
 - Ignoring the environment model. Verification without environmental assumptions can be either too weak or unrealistically pessimistic.
 - Using informal English requirements where temporal precision is needed.
 - Assuming the hardware implementation preserves the model's timing semantics automatically.
-- Duplicating hardware-oriented pages instead of linking them. The CPS supplement should complement, not replace, the existing microprocessor and microcontroller material.
+- Repeating hardware descriptions instead of connecting models to the existing microprocessor and microcontroller material.
 
-## Connections
+<div className="see-also">
 
-- [microprocessor and microcomputer basics](/cs/embedded/microprocessor-microcomputer-basics)
-- [8051 architecture, memory, and ports](/cs/embedded/8051-architecture-memory-ports)
-- [serial buses and embedded protocols](/cs/embedded/serial-buses-embedded-protocols)
-- [continuous dynamics](/cs/embedded/continuous-dynamics)
-- [hybrid systems](/cs/embedded/hybrid-systems)
-- [CPU scheduling](/cs/operating-systems/cpu-scheduling)
-- [process synchronization](/cs/operating-systems/process-synchronization)
-- [signals and systems](/physics/signals-systems/)
-- [continuous-time simulation](/physics/simulation/)
-- [first-order ODEs](/math/engineering-math/first-order-odes)
-- [Laplace transform](/math/engineering-math/laplace-transform)
+See also: [microprocessor and microcomputer basics](/cs/embedded/microprocessor-microcomputer-basics) · [8051 architecture, memory, and ports](/cs/embedded/architecture-memory-ports) · [serial buses and embedded protocols](/cs/embedded/serial-buses-embedded-protocols) · [continuous dynamics](/cs/embedded/continuous-dynamics) · [hybrid systems](/cs/embedded/hybrid-systems) · [CPU scheduling](/cs/operating-systems/cpu-scheduling) · [process synchronization](/cs/operating-systems/process-synchronization) · [signals and systems](/physics/signals-systems/intro) · [continuous-time simulation](/physics/simulation/intro) · [first-order ODEs](/math/engineering-math/first-order-odes) · [Laplace transform](/math/engineering-math/laplace-transform)
+
+</div>

@@ -282,10 +282,8 @@ A sorted array also supports logarithmic search and usually has better locality,
 
 Common errors follow the structural cases. Claims of unconditional $O(\log n)$ ignore height. A duplicate policy left unspecified makes insertion, search, and deletion disagree. Deleting a two-child node without removing the successor leaves a duplicate. Freeing a node before saving its child pointer reads freed memory. Recursive updates that ignore the returned root silently detach modifications.
 
-## Related pages
+<div className="see-also">
 
-- [Binary trees and traversals](/cs/data-structures/binary-trees)
-- [Searching algorithms](/cs/data-structures/searching-algorithms)
-- [Sorting algorithms](/cs/data-structures/sorting-algorithms)
-- [Heaps and priority queues](/cs/data-structures/heaps-priority-queues)
-- [Hashing](/cs/data-structures/hashing)
+See also: [Binary trees and traversals](/cs/data-structures/binary-trees) · [Searching algorithms](/cs/data-structures/searching-algorithms) · [Sorting algorithms](/cs/data-structures/sorting-algorithms) · [Heaps and priority queues](/cs/data-structures/heaps-priority-queues) · [Hashing](/cs/data-structures/hashing)
+
+</div>

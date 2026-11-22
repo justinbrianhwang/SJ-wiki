@@ -9,7 +9,7 @@ D2L's computer vision application chapters show how CNN ideas become task system
 
 The main shift is from global image prediction to spatial prediction. Object detection predicts boxes and classes. Segmentation predicts a class for each pixel. Style transfer optimizes an image itself to match content and style statistics. Fine-tuning adapts pretrained features to a new dataset. In each case, the model must preserve or recover spatial information that a plain classifier might discard.
 
-## Definitions
+## From augmentation to dense prediction
 
 **Image augmentation** applies label-preserving transformations such as random flips, crops, color jitter, and normalization. It increases effective data diversity and encodes invariances.
 
@@ -32,7 +32,7 @@ $$
 
 **Neural style transfer** optimizes an output image to match content features from one image and style statistics, often Gram matrices, from another.
 
-## Key results
+## Design choices that change the task
 
 Data augmentation should match the task's invariances. Horizontal flips often preserve object identity for natural images, but vertical flips may be invalid for street scenes, digits, or medical images. Random cropping can improve robustness but may remove small objects if used carelessly.
 
@@ -52,7 +52,7 @@ $$
 
 where $i$ is input size, $s$ stride, $p$ padding, and $k$ kernel size.
 
-Detection models need both classification and localization. A high class score is not enough if the box is badly placed, and an accurate box is not enough if the class is wrong. This is why detection losses usually combine a classification term with a box-regression term, and detection metrics combine confidence ranking with IoU thresholds. Non-maximum suppression then turns many overlapping candidate boxes into a smaller final set.
+Detection models need both classification and localization. A high class score is not enough if the box is badly placed, and an accurate box is not enough if the class is wrong. Detection losses therefore combine a classification term with a box-regression term, while detection metrics combine confidence ranking with IoU thresholds. Non-maximum suppression then turns many overlapping candidate boxes into a smaller final set.
 
 Fine-tuning is also a data-management problem. The normalization statistics expected by a pretrained backbone should match the pretraining recipe, and input resolution should be chosen deliberately. If the new dataset is small, freezing most of the backbone can reduce overfitting and speed training. If the new domain differs strongly from the pretraining domain, unfreezing more layers may be necessary, but the learning rate should usually be smaller for pretrained layers than for a newly initialized head.
 
@@ -64,7 +64,7 @@ Style transfer demonstrates another use of pretrained CNNs. The network does not
 
 For every vision application, preprocessing at inference must match preprocessing at training. Resizing method, crop policy, channel order, and normalization constants can move accuracy by large amounts. This is especially easy to miss when exporting a model outside the notebook where it was trained.
 
-## Visual
+## Detection and segmentation architectures
 
 ```mermaid
 flowchart TB
@@ -180,7 +180,7 @@ Mask R-CNN extends Faster R-CNN with a parallel mask branch after RoIAlign. The 
 | Style transfer | Content and style images | Optimized image | Content and style feature losses |
 | Transposed conv | Low-res feature map | Higher-res feature map | Task-dependent |
 
-## Worked example 1: IoU for two boxes
+## Computing IoU for two boxes
 
 Problem: compute the IoU of box $A=(0,0,4,4)$ and box $B=(2,2,6,5)$, where boxes are `(x1, y1, x2, y2)`.
 
@@ -230,9 +230,9 @@ $$
 \frac{4}{24}=\frac{1}{6}\approx 0.167.
 $$
 
-Checked answer: the IoU is about $0.167$, so this prediction would not match a ground-truth box under a $0.5$ IoU threshold.
+The IoU is about $0.167$, so this prediction would not match a ground-truth box under a $0.5$ IoU threshold.
 
-## Worked example 2: transposed convolution size
+## Recovering spatial size with transposed convolution
 
 Problem: a transposed convolution receives a feature map with size $i=7$, kernel size $k=4$, stride $s=2$, padding $p=1$, and `output_padding=0`. Compute the output size in one dimension.
 
@@ -258,9 +258,9 @@ $$
 12-2+4=14.
 $$
 
-Checked answer: the output size is $14$. If both height and width use the same settings, a $7 \times 7$ feature map becomes $14 \times 14$.
+The output size is $14$. If both height and width use the same settings, a $7 \times 7$ feature map becomes $14 \times 14$.
 
-## Code
+## Verifying box overlap and upsampling in PyTorch
 
 ```python
 import torch
@@ -292,7 +292,7 @@ y = upsampler(x)
 print("upsampled logits:", y.shape)
 ```
 
-## Common pitfalls
+## Failure modes across the vision pipeline
 
 - Applying augmentations that change the label, such as flipping asymmetric symbols or removing small objects with aggressive crops.
 - Fine-tuning a pretrained model with the same learning rate for all layers on a tiny dataset.
@@ -301,10 +301,8 @@ print("upsampled logits:", y.shape)
 - Upsampling segmentation logits without checking alignment to the original image size.
 - Treating style transfer as ordinary supervised learning; the optimized variable can be the image itself.
 
-## Connections
+<div className="see-also">
 
-- [Convolutional neural networks](/cs/deep-learning/convolutional-neural-networks)
-- [Modern CNNs](/cs/deep-learning/modern-cnns)
-- [Computational performance](/cs/deep-learning/computational-performance)
-- [Machine learning](/cs/machine-learning/)
-- [Linear algebra](/math/linear-algebra/)
+See also: [Convolutional neural networks](/cs/deep-learning/convolutional-neural-networks) · [Modern CNNs](/cs/deep-learning/modern-cnns) · [Computational performance](/cs/deep-learning/computational-performance) · [Machine learning](/cs/machine-learning/intro) · [Linear algebra](/math/linear-algebra/intro)
+
+</div>

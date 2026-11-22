@@ -307,10 +307,8 @@ Capacity arithmetic matters in a growable heap. Doubling a `size_t` capacity can
 
 Comparators must define a consistent order. A comparator that changes while items are inside the heap, perhaps because it reads mutable external state, invalidates heap order without touching the array. Store immutable priority values or repair the affected item whenever its priority changes.
 
-## Related pages
+<div className="see-also">
 
-- [binary trees](/cs/data-structures/binary-trees)
-- [sorting algorithms](/cs/data-structures/sorting-algorithms)
-- [shortest paths](/cs/data-structures/shortest-paths)
-- [minimum spanning trees](/cs/data-structures/minimum-spanning-trees)
-- [queues](/cs/data-structures/queues)
+See also: [binary trees](/cs/data-structures/binary-trees) · [sorting algorithms](/cs/data-structures/sorting-algorithms) · [shortest paths](/cs/data-structures/shortest-paths) · [minimum spanning trees](/cs/data-structures/minimum-spanning-trees) · [queues](/cs/data-structures/queues)
+
+</div>

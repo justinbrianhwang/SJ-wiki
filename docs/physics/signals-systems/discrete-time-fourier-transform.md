@@ -477,10 +477,8 @@ Zero padding samples the same windowed DTFT more densely. Peaks look smoother an
 - Treating $\Omega=\pi$ and $\Omega=-\pi$ as unrelated points. They represent the same discrete-time frequency.
 - Assuming a moving average is an ideal lowpass filter. It attenuates bands according to its exact frequency response.
 
-## Related pages
+<div className="see-also">
 
-- [Fourier Series for Periodic Signals](/physics/signals-systems/fourier-series-periodic-signals)
-- [LTI Systems and Convolution](/physics/signals-systems/lti-systems-convolution)
-- [Sampling, Aliasing, and Reconstruction](/physics/signals-systems/sampling-aliasing-reconstruction)
-- [Z-Transform and ROC](/physics/signals-systems/z-transform-roc)
-- [Frequency Response and Filtering](/physics/signals-systems/frequency-response-filtering)
+See also: [Fourier Series for Periodic Signals](/physics/signals-systems/fourier-series-periodic-signals) · [LTI Systems and Convolution](/physics/signals-systems/lti-systems-convolution) · [Sampling, Aliasing, and Reconstruction](/physics/signals-systems/sampling-aliasing-reconstruction) · [Z-Transform and ROC](/physics/signals-systems/z-transform-roc) · [Frequency Response and Filtering](/physics/signals-systems/frequency-response-filtering)
+
+</div>

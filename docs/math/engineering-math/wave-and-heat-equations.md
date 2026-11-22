@@ -9,7 +9,7 @@ The heat equation and wave equation are the two standard time-dependent PDEs in 
 
 Both equations can be solved by separation of variables on simple bounded domains, but their time behavior is fundamentally different. Heat modes decay exponentially, while wave modes oscillate. This difference is visible in energy, smoothing, stability, and how initial data affect later behavior.
 
-## Definitions
+## Equations, boundary data, and initial data
 
 The one-dimensional heat equation is
 
@@ -53,7 +53,7 @@ $$
 u(x,0)=f(x),\qquad u_t(x,0)=g(x).
 $$
 
-## Key results
+## Decaying heat modes and oscillating wave modes
 
 For the fixed-end heat equation on $0\lt x\lt L$,
 
@@ -134,7 +134,9 @@ The steady state of a heat problem is found by setting $u_t=0$, which leaves an 
 
 In applications, both equations may appear in the same system. A thermoelastic structure can conduct heat while also vibrating. The separate model equations teach the limiting behaviors: diffusion smooths gradients, while waves transport disturbances. Coupled models combine these effects and require more advanced analysis.
 
-## Visual
+## The same spatial modes, different time laws
+
+Separation produces the same kind of spatial eigenbasis for the fixed-end problems, but the time equation changes with the order and sign of the PDE.
 
 ```mermaid
 flowchart TD
@@ -155,7 +157,7 @@ flowchart TD
 | Physical behavior | Diffusion and smoothing | Propagation and oscillation |
 | Energy | Decays under fixed boundaries | Conserved in ideal fixed string |
 
-## Worked example 1: Heat equation with one sine mode
+## Decay of a single heat mode
 
 Problem. Solve
 
@@ -201,7 +203,7 @@ Check. The boundary values vanish because the sine vanishes at $0$ and $L$. The 
 
 The decay rate is four times the rate of the first mode because $n=2$ and the rate is proportional to $n^2$. If the initial data contained both $n=1$ and $n=2$ modes, the second mode would disappear faster, leaving the first mode as the dominant long-time shape before it also decays.
 
-## Worked example 2: Wave equation with initial displacement
+## Oscillation from a single displacement mode
 
 Problem. Solve
 
@@ -239,7 +241,7 @@ Check. At $t=0$, the cosine is $1$, so the displacement is correct. Differentiat
 
 The solution periodically changes sign. At a quarter period the displacement is zero while velocity is largest; at a half period the string has the opposite displacement. This is the exchange between kinetic and potential energy in modal form.
 
-## Code
+## Comparing the two modal time factors
 
 ```python
 import numpy as np
@@ -259,7 +261,7 @@ The two functions use similar spatial modes but different time factors. The heat
 
 For multi-mode initial data, the heat code would sum decaying exponentials, while the wave code would sum independent oscillators. Visualizing both with the same initial spatial coefficients makes the contrast between diffusion and propagation clear.
 
-## Common pitfalls
+## Keeping the models and boundary conditions distinct
 
 - Using two initial conditions for the heat equation or only one for the wave equation.
 - Giving heat modes oscillatory time factors or wave modes decaying time factors without damping.
@@ -274,9 +276,8 @@ For multi-mode initial data, the heat code would sum decaying exponentials, whil
 - Treating finite propagation speed as a heat-equation property.
 - Overrounding modal frequencies.
 
-## Connections
+<div className="see-also">
 
-- [PDEs by Separation of Variables](/math/engineering-math/pdes-separation-of-variables)
-- [Fourier Series](/math/engineering-math/fourier-series)
-- [Orthogonal Functions and Sturm-Liouville Problems](/math/engineering-math/orthogonal-functions-and-sturm-liouville)
-- [Numerical Methods Overview](/math/engineering-math/numerical-methods-overview)
+See also: [PDEs by Separation of Variables](/math/engineering-math/pdes-separation-of-variables) · [Fourier Series](/math/engineering-math/fourier-series) · [Orthogonal Functions and Sturm-Liouville Problems](/math/engineering-math/orthogonal-functions-and-sturm-liouville) · [Numerical Methods Overview](/math/engineering-math/numerical-methods-overview)
+
+</div>

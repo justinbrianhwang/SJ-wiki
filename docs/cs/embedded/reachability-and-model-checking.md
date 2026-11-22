@@ -9,7 +9,7 @@ Model checking is algorithmic formal verification. Given a finite-state model an
 
 Lee and Seshia build model checking around reachability. If a bad state is unreachable, then a safety invariant holds. If an accepting cycle corresponding to the negation of a liveness property is reachable, then the model has a counterexample. The power of the method is exhaustive exploration; the challenge is state explosion.
 
-## Definitions
+## Reachable states, closed models, and abstractions
 
 An **open system** receives inputs from and may produce outputs to an environment. A **closed system** has no inputs. Verification usually closes the system by composing the design with an environment model.
 
@@ -41,7 +41,7 @@ An **abstraction** hides details to reduce state space. A sound abstraction may 
 
 **CEGAR** stands for counterexample-guided abstraction refinement. It begins with a coarse abstraction, checks it, and refines it when a counterexample is spurious.
 
-## Key results
+## Turning verification into graph search
 
 To verify $G p$, compute all reachable states and check $p$ on each one. If any reachable state violates $p$, the path to that state is a counterexample. If no reachable state violates $p$, the invariant holds.
 
@@ -74,9 +74,9 @@ For liveness properties, the counterexample often has a stem and a loop. The ste
 
 State explosion should be anticipated during modeling, not only after a tool runs out of memory. A model with five independent Boolean flags already has $2^5=32$ combinations before modes, counters, queues, and environment state are added. Bounded queues, timers, and data variables should use the smallest domains that preserve the property under study.
 
-Model checking results should always be read with the model boundary in mind. A proof that the model satisfies $G p$ is not a proof that the deployed system satisfies $G p$ unless the model faithfully overapproximates the relevant implementation and environment behavior. This is why model checking pairs naturally with refinement: abstractions, environment assumptions, and generated code need traceable relationships.
+Model checking results should always be read with the model boundary in mind. A proof that the model satisfies $G p$ does not establish that the deployed system satisfies $G p$ unless the model faithfully overapproximates the relevant implementation and environment behavior. Model checking therefore pairs naturally with refinement: abstractions, environment assumptions, and generated code need traceable relationships.
 
-## Visual
+### The safety-checking loop
 
 ```mermaid
 flowchart TD
@@ -98,7 +98,7 @@ flowchart TD
 | CEGAR | Iteratively refined abstraction | Automated proof search | May require many refinements |
 | Nested DFS | Reachable accepting cycles | LTL liveness checking | Explicit-state cost |
 
-## Worked example 1: Reachable safety check
+## Finding a one-step safety counterexample
 
 Problem: A closed FSM has states $\{A,B,C,D\}$, initial state $A$, and transitions $A\to B$, $B\to C$, $C\to B$, and $A\to D$. Proposition $p$ is true in $A$, $B$, and $C$, but false in $D$. Does $G p$ hold?
 
@@ -128,7 +128,7 @@ $$
 
 Answer: $G p$ does not hold. The path $A\to D$ is a counterexample.
 
-## Worked example 2: Product state explosion
+## Estimating a synchronous product state space
 
 Problem: A controller has $8$ states, a sensor abstraction has $5$ states, an actuator model has $4$ states, and an environment model has $6$ states. Compute the maximum composite state-space size under synchronous product composition.
 
@@ -160,7 +160,7 @@ $$
 
 Answer: The composed model has up to $960$ states.
 
-## Code
+### Exploring the example graph with DFS
 
 ```python
 def reachable(initial, transitions):
@@ -181,7 +181,7 @@ print("reachable:", states)
 print("safe:", states.isdisjoint(bad))
 ```
 
-## Common pitfalls
+## Claims the model checker did not prove
 
 - Verifying an open system without modeling its environment. Unconstrained inputs may create irrelevant counterexamples or hide assumptions.
 - Confusing unreachable bad states with reachable failures. Safety depends on reachability, not mere existence in the diagram.
@@ -190,10 +190,8 @@ print("safe:", states.isdisjoint(bad))
 - Checking only safety properties when the requirement is liveness or fairness.
 - Assuming symbolic model checking always scales. Symbolic representations can also become exponential.
 
-## Connections
+<div className="see-also">
 
-- [invariants and temporal logic](/cs/embedded/invariants-and-temporal-logic)
-- [equivalence and refinement](/cs/embedded/equivalence-and-refinement)
-- [discrete dynamics](/cs/embedded/discrete-dynamics)
-- [finite automata and DFAs](/cs/theory/finite-automata-and-dfas)
-- [quantitative analysis](/cs/embedded/quantitative-analysis)
+See also: [invariants and temporal logic](/cs/embedded/invariants-and-temporal-logic) · [equivalence and refinement](/cs/embedded/equivalence-and-refinement) · [discrete dynamics](/cs/embedded/discrete-dynamics) · [finite automata and DFAs](/cs/theory/finite-automata-and-dfas) · [quantitative analysis](/cs/embedded/quantitative-analysis)
+
+</div>

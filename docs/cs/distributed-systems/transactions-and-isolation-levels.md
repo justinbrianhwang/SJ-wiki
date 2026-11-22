@@ -7,9 +7,9 @@ sidebar_position: 6
 
 Transactions are the database-facing answer to a distributed-systems problem: many clients act concurrently, machines fail midway through work, and the application still wants the data to obey meaningful invariants. Kleppmann explains how isolation levels differ from their marketing names and why anomalies matter in real systems; Lynch connects commit to agreement under failures; van Steen and Tanenbaum place distributed commit and recovery inside fault tolerance [1], [2], [3].
 
-This page treats transactions as a spectrum of guarantees. ACID serializable transactions are the clean model, but production systems often use weaker isolation, optimistic techniques, multi-version storage, sagas, or deterministic ordering for performance and availability. The core skill is to identify which invariant needs which guarantee.
+Transaction guarantees form a spectrum. ACID serializable transactions are the clean model, but production systems often use weaker isolation, optimistic techniques, multi-version storage, sagas, or deterministic ordering for performance and availability. The central design question is which invariant needs which guarantee.
 
-## Definitions
+## Isolation, anomalies, and commit protocols
 
 A **transaction** is a group of operations treated as one unit. **Atomicity** means all effects commit or none do. **Consistency** means committed transactions preserve application invariants, assuming the transaction code is correct. **Isolation** means concurrent transactions do not interfere beyond the allowed isolation model. **Durability** means committed effects survive failures.
 
@@ -25,25 +25,25 @@ Common anomalies include a **dirty read**, reading uncommitted data; **non-repea
 
 A **transactional outbox** is an application pattern for connecting a database transaction to asynchronous messaging. The transaction updates business tables and inserts an outbox row in the same local commit. A relay later publishes the outbox event and marks it sent. This does not make the outside world transactional, but it prevents the common failure where a database commit succeeds and the corresponding event is lost. The receiving side should still be idempotent because the relay may publish the same event more than once.
 
-A **materialized conflict** is a technique for making a predicate invariant visible as a write conflict. In the on-call example below, instead of letting two transactions update different doctor rows, the system can maintain one row for the shift summary and require any doctor-status change to update or lock that row. Snapshot isolation then detects a write-write conflict. This is not as general as serializability, but it is a practical way to protect selected invariants when the database's default isolation is weaker.
+A **materialized conflict** turns a predicate invariant into a write conflict. In the on-call example below, instead of letting two transactions update different doctor rows, the system can maintain one row for the shift summary and require any doctor-status change to update or lock that row. Snapshot isolation then detects a write-write conflict. The technique is narrower than serializability, but it can protect selected invariants when the database's default isolation is weaker.
 
-## Key results
+## Starting from the invariant
 
-The first key result is that isolation names are not enough. The SQL standard names levels by forbidden anomalies, but real systems implement them differently. Snapshot isolation feels strong because reads are stable, yet it is not serializable. Serializable snapshot isolation adds dependency tracking to abort dangerous structures; strict 2PL blocks rather than aborting at commit [1].
+Isolation names are not enough. The SQL standard names levels by forbidden anomalies, but real systems implement them differently. Snapshot isolation feels strong because reads are stable, yet it is not serializable. Serializable snapshot isolation adds dependency tracking to abort dangerous structures; strict 2PL blocks rather than aborting at commit [1].
 
-The second result is the serializability graph test. Build a precedence graph with one node per transaction and edges for conflicting operations ordered by time. If the graph is acyclic, the schedule is conflict-serializable. If it has a cycle, no equivalent serial order preserves those conflict orders.
+The serializability graph test gives a concrete check. Build a precedence graph with one node per transaction and edges for conflicting operations ordered by time. If the graph is acyclic, the schedule is conflict-serializable. If it has a cycle, no equivalent serial order preserves those conflict orders.
 
-The third result is 2PC's blocking behavior. Once a participant votes yes and enters the prepared state, it cannot unilaterally abort because the coordinator may have decided commit. If the coordinator crashes before the participant learns the decision, the participant must wait for recovery or a replicated transaction manager. Consensus can solve this by replicating the decision, but classic 2PC alone does not [2], [3].
+Two-phase commit blocks in the prepared state. Once a participant votes yes, it cannot unilaterally abort because the coordinator may have decided commit. If the coordinator crashes before the participant learns the decision, the participant must wait for recovery or a replicated transaction manager. Consensus can solve this by replicating the decision, but classic 2PC alone does not [2], [3].
 
-The fourth result is that distributed transactions and consensus are related but not identical. Atomic commit chooses commit only if all participants vote yes; consensus chooses one proposed value despite faults. Atomic commit can be reduced to consensus in fault-tolerant designs, but commercial databases often use 2PC with durable logs and recovery because it is simpler when participants and coordinator are trusted and failures are crash-recovery.
+Distributed transactions and consensus are related but not identical. Atomic commit chooses commit only if all participants vote yes; consensus chooses one proposed value despite faults. Atomic commit can be reduced to consensus in fault-tolerant designs, but commercial databases often use 2PC with durable logs and recovery because it is simpler when participants and coordinator are trusted and failures are crash-recovery.
 
 Proof sketch for write skew under snapshot isolation: two transactions read the same snapshot and each sees that an invariant has enough slack. They update different rows, so no write-write conflict occurs. Both commit. The combined result violates the invariant. Because no single row was concurrently written by both transactions, ordinary snapshot isolation does not detect the problem.
 
 Distributed transaction systems also differ in where they place ordering. Spanner uses TrueTime uncertainty and two-phase commit over Paxos-replicated participants to provide external consistency [8]. Calvin first orders transactions through a deterministic log and then executes them, reducing distributed locking during execution when read/write sets are known [9]. Percolator uses timestamped locks and notifications over Bigtable to support incremental indexing [7]. Aurora separates compute from a replicated storage service and pushes redo processing into the storage layer [10]. These designs are not interchangeable recipes; they show that the bottleneck can be clocks, locks, logs, storage replication, or application contention depending on workload.
 
-The practical decision rule is to start from invariants. Account balance conservation, uniqueness, inventory limits, and access-control changes often need serializable or carefully materialized protection. Profile text, analytics counters, and notification workflows can often use weaker isolation plus idempotent repair. The same application may use strong transactions for a small core and asynchronous derived data for everything else.
+Start from invariants. Account balance conservation, uniqueness, inventory limits, and access-control changes often need serializable or carefully materialized protection. Profile text, analytics counters, and notification workflows can often use weaker isolation plus idempotent repair. The same application may use strong transactions for a small core and asynchronous derived data for everything else.
 
-## Visual
+## The prepared state in two-phase commit
 
 ```mermaid
 sequenceDiagram
@@ -52,14 +52,18 @@ sequenceDiagram
   participant P2 as Participant 2
   C->>P1: prepare transaction T
   C->>P2: prepare transaction T
-  P1-->>C: vote yes, durable prepared record
-  P2-->>C: vote yes, durable prepared record
+  P1-->>C: "vote yes, durable prepared record"
+  P2-->>C: "vote yes, durable prepared record"
   C->>C: write commit decision
   C->>P1: commit T
   C->>P2: commit T
   P1-->>C: ack
   P2-->>C: ack
 ```
+
+After a `yes` vote, the participant has promised to retain enough durable state to commit later. That promise creates the blocking point: until it learns the coordinator's decision, neither unilateral commit nor unilateral abort is safe.
+
+## Comparing isolation guarantees
 
 | Isolation level | Prevents dirty reads | Stable repeated reads | Prevents phantoms | Prevents write skew | Typical implementation |
 | --- | --- | --- | --- | --- | --- |
@@ -69,11 +73,11 @@ sequenceDiagram
 | Snapshot isolation | Yes | Yes | Snapshot-stable | No | MVCC plus write-write conflict checks |
 | Serializable | Yes | Yes | Yes | Yes | strict 2PL, SSI, deterministic execution |
 
-## Worked example 1: Detect write skew under snapshot isolation
+## Write skew under snapshot isolation
 
-Problem: A hospital requires at least one doctor on call. Table `on_call(doctor, active)` has `Alice=true` and `Bob=true`. Transaction `T1` checks that Bob is active, then sets Alice inactive. Transaction `T2` checks that Alice is active, then sets Bob inactive. Both run under snapshot isolation from the same snapshot. Can both commit?
+A hospital requires at least one doctor on call. Table `on_call(doctor, active)` has `Alice=true` and `Bob=true`. Transaction `T1` checks that Bob is active, then sets Alice inactive. Transaction `T2` checks that Alice is active, then sets Bob inactive. Both run under snapshot isolation from the same snapshot. Can both commit?
 
-Method:
+Both transactions begin from the same valid snapshot:
 
 1. Initial invariant:
 
@@ -107,13 +111,13 @@ $$
 active(Alice)+active(Bob)=0+0=0.
 $$
 
-Checked answer: both can commit under snapshot isolation, violating the invariant. Fixes include serializable isolation, predicate locks, materializing the invariant in one row, or explicit locking of the set of on-call doctors.
+Both can commit under snapshot isolation, violating the invariant. Serializable isolation, predicate locks, a materialized conflict row, or explicit locking of the on-call set can prevent the skew.
 
-## Worked example 2: Analyze a 2PC blocking failure
+## Why a prepared participant must block
 
-Problem: A coordinator `C` runs 2PC with participants `P1` and `P2`. Both participants vote yes and write durable prepared records. Before sending the final decision, `C` crashes. What can `P1` safely do?
+A coordinator `C` runs 2PC with participants `P1` and `P2`. Both participants vote yes and write durable prepared records. Before sending the final decision, `C` crashes. What can `P1` safely do?
 
-Method:
+The prepared record constrains both choices:
 
 1. `P1` voted yes, so it promised it can commit if instructed. It has a prepared record and must keep locks or prepared versions.
 
@@ -125,9 +129,9 @@ Method:
 
 5. Therefore `P1` must block until the coordinator recovers or a replicated transaction manager reveals the decision.
 
-Checked answer: classic 2PC is blocking after yes votes. This is the main reason large distributed systems often avoid cross-partition 2PC on hot paths or combine it with consensus-backed coordinators.
+Classic 2PC blocks after `yes` votes. Large distributed systems often avoid cross-partition 2PC on hot paths or place the coordinator decision in a consensus-backed service.
 
-## Code
+## The failure-free 2PC path
 
 ```python
 class Participant:
@@ -161,7 +165,7 @@ print(two_phase_commit(parts))
 print({p.name: p.state for p in parts})
 ```
 
-## Common pitfalls
+## Where transactional guarantees end
 
 - Assuming "repeatable read" means the same thing in every database product.
 - Treating snapshot isolation as serializable because each transaction sees a consistent snapshot.
@@ -176,18 +180,6 @@ print({p.name: p.state for p in parts})
 - Choosing 2PL under long user interactions and then suffering deadlocks or poor latency.
 - Assuming BASE means no correctness requirements.
 
-## Connections
-
-- [Replication and Consistency](/cs/distributed-systems/replication-and-consistency)
-- [Consensus: Paxos and Raft](/cs/distributed-systems/consensus-paxos-and-raft)
-- [Fault Tolerance and Failure Detection](/cs/distributed-systems/fault-tolerance-and-failure-detection)
-- [Distributed Storage and CAP](/cs/distributed-systems/distributed-storage-and-cap)
-- [Stream Processing and Event-Driven Systems](/cs/distributed-systems/stream-processing-and-event-driven-systems)
-- [Computer Networks](/cs/computer-networks/intro)
-- [Operating Systems](/cs/operating-systems/intro)
-- [Databases](/cs/databases/intro)
-- [Cryptography](/cs/cryptography/intro)
-
 ## References
 
 [1] M. Kleppmann, *Designing Data-Intensive Applications*. Sebastopol, CA: O'Reilly, 2017.  
@@ -200,3 +192,9 @@ print({p.name: p.state for p in parts})
 [8] J. C. Corbett et al., "Spanner: Google's globally-distributed database," in *OSDI*, 2012.  
 [9] A. Thomson et al., "Calvin: fast distributed transactions for partitioned database systems," in *SIGMOD*, 2012.  
 [10] A. Verbitski et al., "Amazon Aurora: design considerations for high throughput cloud-native relational databases," in *SIGMOD*, 2017.
+
+<div className="see-also">
+
+See also: [Replication and Consistency](/cs/distributed-systems/replication-and-consistency) · [Consensus: Paxos and Raft](/cs/distributed-systems/consensus-paxos-and-raft) · [Fault Tolerance and Failure Detection](/cs/distributed-systems/fault-tolerance-and-failure-detection) · [Distributed Storage and CAP](/cs/distributed-systems/distributed-storage-and-cap) · [Stream Processing and Event-Driven Systems](/cs/distributed-systems/stream-processing-and-event-driven-systems) · [Computer Networks](/cs/computer-networks/intro) · [Operating Systems](/cs/operating-systems/intro) · [Databases](/cs/databases/intro) · [Cryptography](/cs/cryptography/intro)
+
+</div>

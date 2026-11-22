@@ -7,9 +7,9 @@ sidebar_position: 18
 
 The Standard Template Library gives C++ reusable containers such as `vector`, `list`, `set`, and `map`. Savitch places the STL after templates, exceptions, and linked data structures because STL containers are class templates that hide most of the memory management details while preserving efficient specialized behavior.
 
-The practical lesson is not merely "use a library." It is to choose a container whose operations match the problem. A `vector` is usually the first choice for a growable sequence with fast indexing. A `list` supports efficient insertion and deletion when an iterator already points to the position. A `set` stores unique ordered keys. A `map` stores key-value pairs.
+Container choice follows the operations a program performs. A `vector` is usually the first choice for a growable sequence with fast indexing. A `list` supports efficient insertion and deletion when an iterator already identifies the position. A `set` stores unique ordered keys, while a `map` associates ordered keys with values.
 
-## Definitions
+## Three container families
 
 A **container** is an object that stores a collection of values. STL containers are template classes:
 
@@ -20,30 +20,30 @@ set<int> uniqueIds;
 map<string, int> counts;
 ```
 
-A **sequence container** stores elements in a linear order controlled primarily by insertion position. Important sequence containers include:
+A **sequence container** stores elements in a linear order controlled primarily by insertion position:
 
 - `vector<T>`: dynamic array with fast indexing.
 - `list<T>`: doubly linked list with efficient insertion and deletion at known positions.
 - `deque<T>`: double-ended queue with efficient insertion at both ends.
 
-An **associative container** stores elements ordered by keys:
+An **associative container** orders elements by key:
 
 - `set<T>`: unique keys.
 - `multiset<T>`: keys may repeat.
 - `map<Key, Value>`: unique keys associated with values.
 - `multimap<Key, Value>`: repeated keys allowed.
 
-A **container adapter** provides a restricted interface over an underlying container:
+A **container adapter** exposes a restricted interface over an underlying container:
 
 - `stack<T>`: last-in, first-out.
 - `queue<T>`: first-in, first-out.
 - `priority_queue<T>`: highest-priority element removed first.
 
-An **iterator** is an object that identifies a position in a container. Iterators connect containers to STL algorithms.
+An **iterator** identifies a position in a container and connects containers to STL algorithms.
 
-## Key results
+## Storage, access, and complexity
 
-The standard containers manage their own storage. For most programming tasks, this removes the need to write manual `new[]`, `delete[]`, linked-list destructors, and copy constructors. A `vector<int>` can grow dynamically, copy safely, and free its own memory when it goes out of scope.
+The standard containers manage their own storage. For most programs, this removes the need to write manual `new[]`, `delete[]`, linked-list destructors, and copy constructors. A `vector<int>` can grow dynamically, copy safely, and free its own storage when it goes out of scope.
 
 Different containers optimize different operations:
 
@@ -67,11 +67,9 @@ if (it != count.end()) {
 }
 ```
 
-`set` and `map` keep elements ordered by key. This gives logarithmic search, insertion, and deletion in traditional tree-based implementations. `vector` gives constant-time indexing but may invalidate iterators and references when it reallocates during growth.
+`set` and `map` keep elements ordered by key and guarantee logarithmic search, insertion, and deletion. `vector` gives constant-time indexing, but growth may reallocate its storage and invalidate iterators, pointers, and references to its elements.
 
-Container adapters intentionally hide some operations. For example, `stack` lets you use `push`, `pop`, and `top`; it does not let you iterate through all elements. Also, `pop` removes an item but does not return it, so read `top()` or `front()` before calling `pop()` if the value is needed.
-
-## Visual
+Container adapters intentionally hide operations outside their access discipline. A `stack` provides `push`, `pop`, and `top`, but no iteration over all elements. Its `pop` operation removes an item without returning it, so read `top()` first when the value is needed. The same rule applies to `queue::front()` and `queue::pop()`.
 
 ```mermaid
 flowchart TD
@@ -91,96 +89,51 @@ flowchart TD
 | Container | Best at | Cost to access by index | Typical insert/search cost | Notes |
 |---|---|---:|---:|---|
 | `vector` | Compact sequence, indexing | `O(1)` | End insert amortized `O(1)`, search `O(n)` | Default first choice |
-| `list` | Insert/delete at known position | `O(n)` | Known-position insert `O(1)` | No random access |
+| `list` | Insert/delete at known position | `O(n)` by traversal | Known-position insert `O(1)` | No random access |
 | `set` | Unique sorted keys | Not indexed | `O(log n)` | Stores keys only |
-| `map` | Key-value lookup | Not indexed | `O(log n)` | `operator[]` can insert |
+| `map` | Key-value lookup | Not numerically indexed | `O(log n)` | `operator[]` can insert |
 | `stack` | LIFO behavior | Not available | Top push/pop `O(1)` | Adapter |
 | `queue` | FIFO behavior | Not available | Back push/front pop `O(1)` | Adapter |
 
-## Worked example 1: Choosing vector or list
+## Quiz scores favor contiguous storage
 
-Problem: A program stores quiz scores. It frequently appends new scores and computes the average. It rarely inserts in the middle. Should it use `vector<int>` or `list<int>`?
+Suppose a program frequently appends quiz scores and computes their average, rarely inserts in the middle, and sometimes accesses a score by index. The central operations are append, traverse, and index.
 
-Method:
+`vector<int>` has efficient `push_back`, compact storage, and constant-time indexing. `list<int>` has no constant-time indexing and spends additional memory on links, so its known-position insertion advantage does not help this workload.
 
-1. Identify required operations:
+```cpp
+vector<int> scores;
+scores.push_back(90);
+scores.push_back(80);
+scores.push_back(100);
+```
 
-   - Add score at end.
-   - Traverse all scores.
-   - Sometimes access by index for display.
-   - Rare middle insertion.
-
-2. Compare with container strengths:
-
-   - `vector<int>` has efficient `push_back`, compact storage, and constant-time indexing.
-   - `list<int>` has no constant-time indexing and uses extra memory for links.
-
-3. Compute an average with a vector:
-
-   ```cpp
-   vector<int> scores;
-   scores.push_back(90);
-   scores.push_back(80);
-   scores.push_back(100);
-   ```
-
-   Sum:
+The sum is
 
 $$
 90 + 80 + 100 = 270
 $$
 
-   Average:
+and the average is
 
 $$
-270 / 3 = 90
+270 / 3 = 90.
 $$
 
-Checked answer: `vector<int>` is the better default here. It supports the common operations directly and efficiently.
+For these access patterns, `vector<int>` is the better default.
 
-## Worked example 2: Counting words with a map
+## Word counts exploit ordered lookup
 
-Problem: Count the words in the sequence `red blue red green blue red`.
+Consider the sequence `red blue red green blue red`. Starting with an empty `map<string, int>`, the expression `count[word] += 1` inserts a missing word with the default integer value `0`, then increments the stored count.
 
-Method:
+The updates are:
 
-1. Start with an empty map:
-
-   ```cpp
-   map<string, int> count;
-   ```
-
-2. Process `red`:
-
-   - `count["red"]` is inserted with default `0`.
-   - Increment to `1`.
-
-3. Process `blue`:
-
-   - Insert `blue: 0`.
-   - Increment to `1`.
-
-4. Process second `red`:
-
-   - Existing value is `1`.
-   - Increment to `2`.
-
-5. Process `green`:
-
-   - Insert `green: 0`.
-   - Increment to `1`.
-
-6. Process second `blue`:
-
-   - Existing value is `1`.
-   - Increment to `2`.
-
-7. Process third `red`:
-
-   - Existing value is `2`.
-   - Increment to `3`.
-
-Checked answer:
+1. `red` is inserted and incremented to `1`.
+2. `blue` is inserted and incremented to `1`.
+3. The existing count for `red` becomes `2`.
+4. `green` is inserted and incremented to `1`.
+5. The existing count for `blue` becomes `2`.
+6. The existing count for `red` becomes `3`.
 
 | Word | Count |
 |---|---:|
@@ -188,9 +141,11 @@ Checked answer:
 | `green` | 1 |
 | `red` | 3 |
 
-The output order of a `map` is sorted by key, not by first appearance.
+Iteration follows key order rather than first appearance.
 
-## Code
+## Combining sequences, sets, and maps
+
+The word-count program uses a `vector` to retain the input sequence, a `map` to count by sorted key, and a `set` to retain one copy of each word:
 
 ```cpp
 #include <iostream>
@@ -227,6 +182,8 @@ int main() {
 }
 ```
 
+Adapters are useful when restricted access expresses the program's rules:
+
 ```cpp
 #include <iostream>
 #include <queue>
@@ -253,37 +210,34 @@ int main() {
 }
 ```
 
-## Common pitfalls
+## Lookups, ordering, and invalidation
 
-- Using `map[key]` just to test whether a key exists. This inserts the key if it is absent.
-- Calling `pop()` on `stack` or `queue` and expecting it to return the removed value. Read `top()` or `front()` first.
-- Assuming all containers support `operator[]`. `list`, `set`, and `map` do not provide ordinary numeric indexing.
-- Ignoring iterator invalidation after modifying a `vector`.
-- Choosing `list` because it sounds flexible, even when the program mostly needs indexing and traversal. `vector` is often faster and simpler.
-- Forgetting that `set` stores unique values. Inserting a duplicate does not create a second copy.
+Several interface details affect correctness:
 
-Container-choice checks:
+- `map[key]` inserts a missing key, so it is the wrong operation for a read-only existence test. Use `find`, `contains` in C++20, or another non-inserting lookup.
+- `stack::pop` and `queue::pop` return no value. Read `top()` or `front()` before removal.
+- `list` and `set` do not support `operator[]`. A `map` does, but its argument is a key rather than a numeric position.
+- A duplicate insertion into `set` leaves only one copy. Use `multiset` when repetitions matter, or a `map` when their counts matter.
+- A growing `vector` may reallocate, leaving saved iterators, pointers, and references stale. Node-based containers have different invalidation rules.
 
-- Start with `vector` unless a specific operation argues against it. It is compact, cache-friendly, simple to traverse, and supports random access.
-- Choose `list` only when stable iterators and frequent insertion or deletion at known positions matter more than indexing and compact storage.
-- Choose `map` when each key has one associated value and ordered traversal is useful. Use `find` instead of `operator[]` when looking should not insert.
-- Choose `set` when uniqueness is the point. If duplicates matter, use `multiset` or store counts in a `map`.
-- Use adapters when the restricted interface is the feature. A `stack` prevents accidental access to non-top elements, and a `queue` makes first-in, first-out behavior explicit.
-- Check iterator invalidation rules before storing iterators across modifications. A valid iterator before an insertion is not always valid afterward.
-- Prefer storing values directly in containers. Storing raw owning pointers in containers reintroduces manual memory management and complicates copying, destruction, and exception safety.
+Start with `vector` unless the workload calls for another structure. It is compact, cache-friendly, easy to traverse, and supports random access. Choose `list` when stable iterators and frequent insertion or deletion at already-known positions matter more than indexing and compact storage. Choosing it merely because insertions are theoretically constant-time ignores the cost of finding the position.
 
-Quick self-test: list the three most common operations before choosing the container. If the operations are "append, index, traverse," choose `vector`. If they are "look up by name, update count, print sorted keys," choose `map`. If they are "remember unique IDs," choose `set`. Container choice should follow behavior, not habit.
+Choose `map` when each key has one associated value and ordered traversal is useful. Choose `set` when uniqueness itself matters. Use adapters when the restricted interface is part of the design: a `stack` prevents access to non-top elements, while a `queue` states first-in, first-out behavior directly.
 
-Also check what order matters. `vector` preserves insertion order unless you reorder it. `set` and `map` iterate in key order. `stack` and `queue` expose only the next removable item. A program that depends on first-entry order should not accidentally switch to an ordered associative container without noticing the semantic change.
+Order is part of the semantics. `vector` preserves insertion order until explicitly reordered; `set` and `map` iterate in key order; `stack` and `queue` expose only the next removable item. Replacing a sequence with an ordered associative container can therefore change program behavior even when it stores the same values.
 
-A final review question is what invalidates a stored position. A `vector` may move its elements when it grows, so saved iterators, pointers, and references can become stale. Node-based containers have different rules. Correct container code respects these lifetime details.
+Prefer values with automatic ownership inside containers. Raw owning pointers reintroduce manual memory management and complicate copying, destruction, and exception safety.
 
-Extended practice: solve the same word-frequency problem with a sorted `vector` of pairs and then with a `map`. The vector version makes searching and insertion costs visible; the map version packages the key lookup behavior. Comparing them explains why container choice affects both code clarity and complexity.
+One useful selection exercise is to name the three dominant operations before choosing a type:
 
-## Connections
+- Append, index, traverse suggests `vector`.
+- Look up by name, update a count, print sorted keys suggests `map`.
+- Retain unique IDs suggests `set`.
 
-- [templates](/cs/programming/cpp/templates)
-- [stl algorithms and iterators](/cs/programming/cpp/stl-algorithms-and-iterators)
-- [linked data structures](/cs/programming/cpp/linked-data-structures)
-- [arrays](/cs/programming/cpp/arrays)
-- [exception handling](/cs/programming/cpp/exception-handling)
+For a sharper comparison, solve the word-frequency example with a sorted `vector` of pairs and then with a `map`. The first version exposes the search and insertion work; the second packages ordered key lookup behind the container interface.
+
+<div className="see-also">
+
+See also: [templates](/cs/programming/cpp/templates) · [stl algorithms and iterators](/cs/programming/cpp/stl-algorithms-and-iterators) · [linked data structures](/cs/programming/cpp/linked-data-structures) · [arrays](/cs/programming/cpp/arrays) · [exception handling](/cs/programming/cpp/exception-handling)
+
+</div>

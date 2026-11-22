@@ -9,7 +9,7 @@ The book introduces `ggplot2` as a grammar-of-graphics alternative to base plott
 
 The central shift is from "draw points, then add a line" to "declare the data, map variables to visual properties, and add layers that use those mappings." Once that grammar is understood, scatterplots, histograms, smoothers, facets, and density plots become variations on the same template.
 
-## Definitions
+## Data, mappings, geoms, and scales
 
 `ggplot(data, aes(...))` starts a plot with a data frame and default aesthetic mappings. Aesthetic mappings connect variables to visual properties such as `x`, `y`, `color`, `fill`, `shape`, and `size`.
 
@@ -21,7 +21,7 @@ A **facet** splits a plot into panels by one or more variables. `facet_wrap(~ Sp
 
 A **theme** controls non-data display elements such as grid lines, text size, background, and legend position. A **scale** controls how data values become visual values.
 
-## Key results
+## Building a plot from the grammar
 
 The common `ggplot2` build pattern is:
 
@@ -51,8 +51,6 @@ The mapping-vs-setting distinction is the most common beginner issue. If you wri
 
 `ggplot2` expects tidy-ish rectangular data: one row per observation, variables in columns, and grouping variables stored explicitly. It can plot wide data, but many multi-series plots become easier after reshaping to long format.
 
-## Visual
-
 ```mermaid
 flowchart TD
   A[Data frame] --> B[ggplot data and aes mappings]
@@ -71,11 +69,11 @@ flowchart TD
 | Mapped size | `aes(size = Sepal.Width)` | Size encodes numeric variable |
 | Constant alpha | `alpha = 0.6` | Every item is partly transparent |
 
-## Worked example 1: Scatterplot with linear smooth by group
+## How mappings propagate through layers
 
-Problem: create a scatterplot of petal length against sepal length in `iris`, color by species, and add a separate linear trend for each species.
+### Inherited grouping in points and smoothers
 
-Method:
+Create a scatterplot of petal length against sepal length in `iris`, color by species, and add a separate linear trend for each species.
 
 1. Load `ggplot2`.
 2. Start with `iris` as the data frame.
@@ -104,15 +102,13 @@ p <- ggplot(
 print(p)
 ```
 
-Checked answer: because `color = Species` is inside the initial `aes()`, both `geom_point()` and `geom_smooth()` inherit the grouping. The result is one color per species and a separate fitted line per species. If the color mapping were removed from `aes()`, the smoother would fit one overall line unless grouping were supplied separately.
+Because `color = Species` is inside the initial `aes()`, both `geom_point()` and `geom_smooth()` inherit the grouping. The result is one color per species and a separate fitted line per species. If the color mapping were removed from `aes()`, the smoother would fit one overall line unless grouping were supplied separately.
 
 This is the grammar in action: data and mappings are declared once, then layers use them consistently.
 
-## Worked example 2: Faceted histogram with constant fill
+### Faceting without mapping the fill
 
-Problem: show the distribution of `mpg` in `mtcars` separately for 4-, 6-, and 8-cylinder cars, using facets and a constant fill color.
-
-Method:
+Show the distribution of `mpg` in `mtcars` separately for 4-, 6-, and 8-cylinder cars, using facets and a constant fill color.
 
 1. Copy `mtcars` and convert `cyl` to a factor for categorical display.
 2. Start `ggplot` with `mpg` mapped to x.
@@ -137,11 +133,11 @@ ggplot(cars, aes(x = mpg)) +
   theme_minimal()
 ```
 
-Checked answer: `facet_wrap(~ cyl)` creates one panel for each cylinder level. The fill is constant because `fill = "gray70"` is outside `aes()`. No fill legend is needed because fill does not encode data.
+`facet_wrap(~ cyl)` creates one panel for each cylinder level. The fill is constant because `fill = "gray70"` is outside `aes()`. No fill legend is needed because fill does not encode data.
 
 The plot answers a different question than a single histogram: it shows how the distribution shifts across cylinder groups rather than mixing all cars in one panel.
 
-## Code
+## Programming with column names
 
 ```r
 # Reusable ggplot function for a scatterplot with optional faceting.
@@ -183,15 +179,11 @@ When debugging a ggplot, add one layer at a time. Start with `ggplot(data, aes(.
 
 The grammar also encourages consistency across a report. If several plots use the same grouping variable, reuse the same color scale and labels. If panels compare related variables, keep axis labels and themes consistent. Visual consistency reduces cognitive load and makes real differences in the data easier to see.
 
-For data that is not already in a convenient shape, reshape before plotting rather than fighting the plot call. A long data frame with one measurement column and one variable-name column often makes faceting, coloring, and grouping straightforward. Even when reshaping tools are outside this page, the principle remains: plot code should describe graphics, not hide data cleaning.
+For data that is not already in a convenient shape, reshape before plotting rather than fighting the plot call. A long data frame with one measurement column and one variable-name column often makes faceting, coloring, and grouping straightforward. Plot code should describe graphics, not hide data cleaning.
 
-When comparing base graphics and `ggplot2`, notice where state lives. Base graphics draws on the active device; `ggplot2` builds an object that can be printed later. This difference explains many workflow choices.
+When comparing base graphics and `ggplot2`, notice where state lives. Base graphics draws on the active device; `ggplot2` builds an object that can be stored, modified, printed, and saved later. Plot construction is therefore closer to assembling a model object than drawing directly on a device.
 
-That object can also be stored, modified, and saved, which makes repeated report graphics easier to manage.
-
-This makes plot construction feel closer to building a model object than drawing on paper.
-
-## Common pitfalls
+## Mappings that create the wrong legend
 
 - Putting constants inside `aes()`, such as `aes(color = "red")`, and accidentally creating a legend.
 - Forgetting to convert numeric codes such as cylinder count to factors when they should be categories.
@@ -200,9 +192,8 @@ This makes plot construction feel closer to building a model object than drawing
 - Forgetting `print(p)` when creating ggplot objects inside functions or non-interactive scripts.
 - Using a smoother without understanding the method. LOESS and linear model smoothers answer different questions.
 
-## Connections
+<div className="see-also">
 
-- [Base graphics](/cs/programming/r/base-graphics)
-- [Descriptive statistics](/cs/programming/r/descriptive-statistics)
-- [Advanced graphics and 3D plots](/cs/programming/r/advanced-graphics-3d)
-- [Linear and generalized models](/cs/programming/r/linear-and-generalized-models)
+See also: [Base graphics](/cs/programming/r/base-graphics) · [Descriptive statistics](/cs/programming/r/descriptive-statistics) · [Advanced graphics and 3D plots](/cs/programming/r/advanced-graphics-3d) · [Linear and generalized models](/cs/programming/r/linear-and-generalized-models)
+
+</div>

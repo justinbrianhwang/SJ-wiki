@@ -7,13 +7,9 @@ sidebar_position: 18
 
 NoSQL and big-data systems grew from workloads where a single relational server was not the best fit: massive event logs, web-scale key-value access, flexible semi-structured documents, large graph traversals, streaming data, and analytical scans over petabytes. These systems do not replace relational databases as a category; they broaden the design space for data management.
 
-![A MySQL console screenshot shows a command-line database session with query output.](https://commons.wikimedia.org/wiki/Special:FilePath/Mysql-screenshot.PNG)
-
-*Figure: SQL pages connect abstract relational operations to the database console used in practice. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mysql-screenshot.PNG), Wikimedia Commons contributors, public domain text.*
-
 The key question is not whether a system is "SQL" or "NoSQL." The key question is what data model, consistency contract, access pattern, scale target, and operational cost match the workload. Many modern systems mix ideas: relational databases store JSON, document stores add SQL-like languages, warehouses use columnar storage, and stream processors maintain stateful views.
 
-## Definitions
+## Data models beyond row-oriented OLTP
 
 **NoSQL** is an umbrella term for nontraditional database systems, commonly including key-value stores, document stores, wide-column stores, and graph databases. They often emphasize horizontal scalability, flexible schema, and application-specific access patterns.
 
@@ -34,7 +30,7 @@ Major models:
 
 **Data warehousing** organizes historical data for analysis. **OLAP** systems support aggregations, slicing, dicing, roll-up, drill-down, and pivoting. Warehouses often use star schemas, columnar storage, compression, and materialized summaries.
 
-## Key results
+## Workload shape determines the storage model
 
 Flexible schema does not mean no schema. A document store may allow different fields in different documents, but application code, indexes, validation rules, and analytics still depend on expected structure. Schema-on-read delays interpretation until query time; schema-on-write validates and organizes data before storage.
 
@@ -55,8 +51,6 @@ Data quality becomes harder at scale because errors are amplified by pipelines. 
 Batch and streaming are often combined. A batch job may compute an accurate historical baseline, while a stream processor maintains recent incremental updates. The two results are merged for low-latency dashboards. This pattern is powerful, but it requires consistent definitions so the batch and streaming paths do not count events differently.
 
 Choosing a nonrelational system should include an exit and integration plan. Data rarely stays in one store forever; it is exported to search indexes, warehouses, monitoring systems, and archives. Systems with flexible schemas and application-specific encodings need clear contracts so downstream consumers know how to interpret old and new records as the application evolves.
-
-## Visual
 
 ```mermaid
 flowchart LR
@@ -79,11 +73,9 @@ flowchart LR
 | Daily revenue by region | columnar warehouse | scans, grouping, compression |
 | Fraud alert from events | stream processor | low-latency continuous computation |
 
-## Worked example 1: MapReduce word count
+## Word count through map, shuffle, and reduce
 
-Problem: Count word occurrences across a distributed collection of text documents.
-
-Method:
+To count word occurrences across a distributed collection, the computation separates cleanly into map, shuffle, and reduce stages.
 
 1. The map function reads one document and emits `(word, 1)` for each word:
 
@@ -113,13 +105,11 @@ Method:
    (word, count)
    ```
 
-Checked answer: the count for each word is the sum of all emitted ones for that word. The algorithm is naturally parallel because maps are independent and reduces are independent per key after shuffle.
+The count for each word is the sum of all emitted ones for that word. The algorithm is naturally parallel because maps are independent and reduces are independent per key after shuffle.
 
-## Worked example 2: Pick a data model for product reviews
+## Splitting product reviews between serving and analytics
 
-Problem: An e-commerce application stores products, reviews, users, and votes. Product pages need fast reads showing product details and recent reviews. Analysts need aggregate review scores by category. Choose an operational model and explain the trade-off.
-
-Method:
+An e-commerce application stores products, reviews, users, and votes. Product views need fast reads of details and recent reviews, while analysts need aggregate scores by category. Those paths favor different physical models.
 
 1. Product-page reads are document-shaped:
 
@@ -143,9 +133,9 @@ Method:
 
 5. A relational design could also work, especially if constraints and ad hoc queries dominate. The document design favors product-page reads but must handle duplicated user display names and update propagation.
 
-Checked answer: a hybrid is often best: operational document or relational tables for serving product pages, plus a columnar analytical store for category summaries. The correct design follows access patterns, not labels.
+A hybrid is often best: operational document or relational tables for serving product views, plus a columnar analytical store for category summaries. The correct design follows access patterns, not labels.
 
-## Code
+## A local MapReduce sketch and an OLAP query
 
 ```python
 from collections import Counter
@@ -176,7 +166,7 @@ GROUP BY category
 ORDER BY average_rating DESC;
 ```
 
-## Common pitfalls
+## Bad reasons to choose a nonrelational system
 
 - Treating NoSQL as automatically faster. A poor access pattern is slow in any model.
 - Believing flexible schema means no data governance. Validation and migration still matter.
@@ -185,7 +175,7 @@ ORDER BY average_rating DESC;
 - Ignoring late-arriving events in streaming windows.
 - Assuming eventual consistency is acceptable without checking user-facing invariants.
 
-## Connections
+## Notes that bridge operational and analytical systems
 
 - [Distributed Databases, Replication, Partitioning, and 2PC](/cs/databases/distributed-databases-replication-partitioning-2pc)
 - [Storage, Records, Blocks, and Files](/cs/databases/storage-records-blocks-and-files)

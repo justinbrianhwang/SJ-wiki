@@ -383,10 +383,8 @@ The code uses a single held-out split for compactness. Model selection would use
 - Applying ordinary cross-validation to records with repeated patients, customers, or devices and leaking entity-specific patterns across folds.
 - Reading feature importance as causal effect. Predictive association can reflect confounding, proxies, or data collection rules.
 
-## Related pages
+<div className="see-also">
 
-- [Advanced Classification Concepts](/cs/data-mining/chapter-11-advanced-classification)
-- [Data Preparation](/cs/data-mining/chapter-02-data-preparation)
-- [Similarity and Distances](/cs/data-mining/chapter-03-similarity-distances)
-- [Mining Text Data](/cs/data-mining/chapter-13-mining-text-data)
-- [Mining Graph Data](/cs/data-mining/chapter-17-mining-graph-data)
+See also: [Advanced Classification Concepts](/cs/data-mining/chapter-11-advanced-classification) · [Data Preparation](/cs/data-mining/chapter-02-data-preparation) · [Similarity and Distances](/cs/data-mining/chapter-03-similarity-distances) · [Mining Text Data](/cs/data-mining/chapter-13-mining-text-data) · [Mining Graph Data](/cs/data-mining/chapter-17-mining-graph-data)
+
+</div>

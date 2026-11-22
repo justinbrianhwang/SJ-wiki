@@ -9,7 +9,7 @@ Many Python programs process streams of values: lines in a file, rows in a table
 
 This topic extends the textbook's loops, arrays, functions, and modules into more idiomatic Python. Iterators and generators make lazy pipelines possible. Functional tools such as `map`, `filter`, `functools`, and `itertools` provide reusable building blocks. The point is not to replace every loop. The point is to know when a loop should become a reusable iterator, when a list should become a lazy sequence, and when a standard library tool already expresses the pattern.
 
-## Definitions
+## The iteration protocol
 
 An **iterable** is any object that can produce an iterator. Lists, tuples, strings, dictionaries, sets, files, ranges, and generators are iterable.
 
@@ -41,27 +41,27 @@ squares = (x * x for x in range(10))
 
 `functools` contains higher-order tools such as `partial`, `reduce`, `lru_cache`, and `wraps`. `itertools` contains efficient iterator building blocks such as `count`, `cycle`, `repeat`, `islice`, `chain`, `zip_longest`, `product`, `combinations`, and `groupby`.
 
-## Key results
+## Laziness changes memory, timing, and ownership
 
-The first key result is that iteration is a protocol. A `for` loop does not require a list. It asks the object for an iterator and repeatedly calls for the next value until iteration stops. This is why the same loop shape works for files, ranges, lists, and custom generators.
+Iteration is a protocol. A `for` loop does not require a list. It asks the object for an iterator and repeatedly calls for the next value until iteration stops. The same loop shape therefore works for files, ranges, lists, and custom generators.
 
-The second result is that laziness saves memory and can represent infinite sequences. `range(1_000_000_000)` does not allocate a billion integers. `itertools.count()` can represent an endless count. A generator can read a large file line by line instead of loading it all.
+Laziness saves memory and can represent infinite sequences. `range(1_000_000_000)` does not allocate a billion integers. `itertools.count()` can represent an endless count. A generator can read a large file line by line instead of loading it all.
 
-The third result is that generators are one-time streams. Once consumed, they do not automatically restart. If you need to traverse data several times, store it in a list or create a fresh generator each time.
+Generators are one-time streams. Once consumed, they do not automatically restart. If you need to traverse data several times, store it in a list or create a fresh generator each time.
 
-The fourth result is that `yield` pauses a function while preserving local state. On the next request, the function resumes after the `yield`. This makes stateful sequence logic much simpler than writing a full iterator class.
+`yield` pauses a function while preserving local state. On the next request, the function resumes after the `yield`. This makes stateful sequence logic much simpler than writing a full iterator class.
 
-The fifth result is that functional tools are most useful when they clarify a data pipeline. For example, `sum(x*x for x in values)` is concise and memory efficient. But nested `map` and `filter` calls with lambdas can be harder to read than a direct loop.
+Functional tools are most useful when they clarify a data pipeline. For example, `sum(x*x for x in values)` is concise and memory efficient. But nested `map` and `filter` calls with lambdas can be harder to read than a direct loop.
 
-The sixth result is that `itertools.groupby` groups only adjacent equal keys. Sort first if you need all equal keys grouped together across the whole dataset.
+`itertools.groupby` groups only adjacent equal keys. Sort first if you need all equal keys grouped together across the whole dataset.
 
-A seventh result is that lazy code moves errors later. A generator expression may be created successfully even though it will fail when consumed. For example, `(float(x) for x in fields)` does not convert anything immediately. The `ValueError` appears only when a loop, `list()`, `sum()`, or another consumer asks for values. This is normal, but it affects debugging. When diagnosing a lazy pipeline, force a small prefix with `list(islice(..., n))` or test each stage separately.
+Lazy code moves errors later. A generator expression may be created successfully even though it will fail when consumed. For example, `(float(x) for x in fields)` does not convert anything immediately. The `ValueError` appears only when a loop, `list()`, `sum()`, or another consumer asks for values. This is normal, but it affects debugging. When diagnosing a lazy pipeline, force a small prefix with `list(islice(..., n))` or test each stage separately.
 
-An eighth result is that the consumer controls progress. A generator does not "push" values into a program; the caller pulls them. This makes generators excellent for pipelines, because each stage can process one item and pass it forward. It also means cleanup matters when a generator owns a resource. For file processing, a generator should usually be used inside a `with` block or be designed so the file context is clearly managed.
+The consumer controls progress. A generator does not "push" values into a program; the caller pulls them. This makes generators excellent for pipelines, because each stage can process one item and pass it forward. It also means cleanup matters when a generator owns a resource. For file processing, a generator should usually be used inside a `with` block or be designed so the file context is clearly managed.
 
 Finally, functional style is not a contest to remove loops. Python's `for` loop is idiomatic and readable. Use generator expressions when they make a consumer clearer, such as `any(...)`, `all(...)`, `sum(...)`, and `max(...)`. Use named functions when the transformation has domain meaning. A readable loop is better than a compact pipeline that nobody wants to debug.
 
-## Visual
+The protocol and the common lazy tools fit together as follows:
 
 ```mermaid
 flowchart LR
@@ -82,7 +82,7 @@ flowchart LR
 | `itertools.islice` | yes | Slice an iterator | `islice(lines, 10)` |
 | `functools.lru_cache` | n/a | Memoize pure function results | `@lru_cache` |
 
-## Worked example 1: stream valid readings from lines
+## Streaming valid readings from text lines
 
 Problem: process lines from a sensor file and yield only valid floating-point readings.
 
@@ -132,7 +132,7 @@ list(valid_readings(lines)) == [21.5, 22.0, 20.75]
 
 The generator does not require the full input to be a list. It would also work directly on an open file object.
 
-## Worked example 2: use itertools for combinations
+## Pairwise sensor comparisons with `combinations`
 
 Problem: find all unordered pairs of sensors and compute the absolute difference between their readings.
 
@@ -180,7 +180,7 @@ differences == [
 
 No pair appears twice, and no sensor is paired with itself.
 
-## Code
+## Separating an infinite source from finite consumption
 
 ```python
 from functools import lru_cache
@@ -206,9 +206,9 @@ print(first_ten)
 
 This example combines a generator for an infinite stream, `islice` to take a finite prefix, and `lru_cache` to avoid recomputing recursive Fibonacci values.
 
-The example is intentionally small, but it demonstrates an important boundary: one part describes an infinite source, and another part decides how much to consume. This is a common generator design. A file reader yields records until the file ends; a caller decides whether to process all records or only the first ten. A sensor stream may be unbounded; a caller decides when to stop. Keeping production and consumption separate makes lazy programs flexible without making every function responsible for every stopping rule.
+The example shows a useful boundary: one part describes an infinite source, and another part decides how much to consume. The pattern is common in generator design. A file reader yields records until the file ends; a caller decides whether to process all records or only the first ten. A sensor stream may be unbounded; a caller decides when to stop. Keeping production and consumption separate makes lazy programs flexible without making every function responsible for every stopping rule.
 
-## Common pitfalls
+## Lazy-pipeline surprises
 
 - Expecting a generator to restart after it has been consumed.
 - Calling `list()` on a huge or infinite iterator without thinking about memory.
@@ -218,9 +218,8 @@ The example is intentionally small, but it demonstrates an important boundary: o
 - Catching `StopIteration` manually inside ordinary loops. Let `for` handle it unless implementing iteration internals.
 - Using generators when the data must be indexed many times. A list may be the right structure.
 
-## Connections
+<div className="see-also">
 
-- [Control Flow and Comprehensions](/cs/programming/python/control-flow-and-comprehensions)
-- [Functions, Arguments, and Decorators](/cs/programming/python/functions-arguments-and-decorators)
-- [Files and Context Managers](/cs/programming/python/files-and-context-managers)
-- [Standard Library Highlights](/cs/programming/python/standard-library-highlights)
+See also: [Control Flow and Comprehensions](/cs/programming/python/control-flow-and-comprehensions) · [Functions, Arguments, and Decorators](/cs/programming/python/functions-arguments-and-decorators) · [Files and Context Managers](/cs/programming/python/files-and-context-managers) · [Standard Library Highlights](/cs/programming/python/standard-library-highlights)
+
+</div>

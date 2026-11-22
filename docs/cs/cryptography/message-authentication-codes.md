@@ -9,7 +9,7 @@ Encryption hides content; it does not prove that a message came from the right s
 
 Katz and Lindell present MACs through formal unforgeability experiments and then develop PRF-based MACs, CBC-MAC, HMAC, and authenticated encryption. Smart's hash-and-MAC discussion is more applied and helps explain why real systems often authenticate protocol records, file chunks, or handshake transcripts. The shared point is that integrity needs its own primitive and its own definition.
 
-## Definitions
+## Tags, verification, and the forgery game
 
 A **message authentication code** is a triple:
 
@@ -50,7 +50,7 @@ $$
 \mathrm{HMAC}_K(m)=H((K'\oplus \mathrm{opad})\|H((K'\oplus \mathrm{ipad})\|m)).
 $$
 
-## Key results
+## From a PRF to a secure tag
 
 If $F$ is a secure PRF, then the fixed-length MAC $t=F_k(m)$ is secure for messages in the PRF domain. Proof idea: replace $F_k$ with a truly random function. A tag for a new message is then a fresh uniform value unknown to the adversary, so the success probability is about $2^{-s}$ for an $s$-bit tag. If an adversary forges more often, it distinguishes $F_k$ from random.
 
@@ -74,11 +74,11 @@ MAC definitions also assume that verification covers the exact encoded message. 
 
 A MAC can authenticate a stream by tagging each record, but then record numbers must be part of what is authenticated. Otherwise an attacker may reorder, drop, or duplicate records while keeping each individual tag valid. Secure channels therefore MAC or AEAD-protect a sequence number, direction bit, epoch, or transcript-derived context. The primitive authenticates bytes; the protocol authenticates the conversation.
 
-Verification keys and tagging keys are usually the same in a MAC because both parties share one secret. That symmetry is convenient, but it limits accountability. If Alice and Bob share a MAC key and a valid tag appears, either party could have made it. This is exactly why public disputes and third-party verification require signatures instead.
+Verification keys and tagging keys are usually the same in a MAC because both parties share one secret. That symmetry is convenient, but it limits accountability. If Alice and Bob share a MAC key and a valid tag appears, either party could have made it. Public disputes and third-party verification therefore require signatures instead.
 
 Within a closed protocol, that symmetry is often acceptable and much faster than public-key verification.
 
-## Visual
+## HMAC and CBC-MAC dataflow
 
 ```mermaid
 flowchart TB
@@ -126,7 +126,7 @@ flowchart TB
   Accept -->|"No"| Reject(("Reject without parsing as trusted"))
 ```
 
-This diagram shows MACs as constructions rather than just sender/receiver arrows. HMAC separates the inner and outer keyed hash domains, while CBC-MAC chains block-cipher outputs and uses the final state as the tag under fixed-length or length-protected conditions.
+HMAC separates the inner and outer keyed hash domains. CBC-MAC instead chains block-cipher outputs and uses the final state as the tag under fixed-length or length-protected conditions.
 
 | Construction | Message length | Main assumption | Main warning |
 |---|---|---|---|
@@ -135,11 +135,9 @@ This diagram shows MACs as constructions rather than just sender/receiver arrows
 | HMAC | arbitrary length | hash compression behaves well | use real HMAC, not $H(K\|m)$ |
 | Poly1305-style MAC | bounded one-time or AE use | universal hashing plus one-time key | key/nonce rules matter |
 
-## Worked example 1: PRF MAC forgery probability
+## Guessing a 32-bit tag
 
-Problem: a fixed-length PRF MAC outputs 32-bit tags. In the ideal random-function world, an adversary has seen valid tags for 100 chosen messages and now tries one new message with one guessed tag. What is its success probability?
-
-Method:
+A fixed-length PRF MAC outputs 32-bit tags. In the ideal random-function world, an adversary has seen valid tags for 100 chosen messages and now tries one new message with one guessed tag.
 
 1. In the random-function world, the tag for a new message is independent of all previously seen tags.
 
@@ -157,19 +155,17 @@ $$
 
 4. The 100 previous queries do not improve the probability for a new message, except for ruling out messages already queried.
 
-Checked answer: success probability is $2^{-32}$. In modern systems 32-bit tags are often too short for high-volume settings; 96 or 128 bits is more typical.
+The success probability is $2^{-32}$. In modern systems, 32-bit tags are often too short for high-volume settings; 96 or 128 bits is more typical.
 
-## Worked example 2: variable-length CBC-MAC forgery
+## Extending a CBC-MAC forgery
 
-Problem: use a toy CBC-MAC with zero IV. The attacker knows the tag $t$ for one-block message $a$:
+Take a toy CBC-MAC with zero IV. The attacker knows the tag $t$ for one-block message $a$:
 
 $$
 t=F_k(a).
 $$
 
-Show how to create a valid tag for a two-block message using one more MAC query.
-
-Method:
+One more MAC query is enough to create a valid tag for a two-block message.
 
 1. Query the MAC oracle on a one-block message $b$. Receive:
 
@@ -200,9 +196,9 @@ $$
 
 5. Therefore $u$ is a valid tag for the new two-block message $a\|(t\oplus b)$, even though that message was never queried.
 
-Checked answer: $(a\|(t\oplus b),u)$ is a forgery. This is why plain CBC-MAC must not be used naively for variable-length messages.
+The pair $(a\|(t\oplus b),u)$ is a forgery. Plain CBC-MAC must not be used naively for variable-length messages.
 
-## Code
+## HMAC with constant-time comparison
 
 ```python
 import hmac
@@ -223,7 +219,7 @@ print(verify(key, message, t))
 print(verify(key, b"transfer=900&to=alice", t))
 ```
 
-## Common pitfalls
+## Boundaries the MAC does not cover
 
 - Assuming encryption gives integrity.
 - Using a raw hash as a MAC, such as `SHA256(key || message)`, instead of HMAC or a standard MAC.
@@ -232,9 +228,8 @@ print(verify(key, b"transfer=900&to=alice", t))
 - Truncating tags too aggressively for the number of verification attempts the system allows.
 - Reusing one-time MAC keys in constructions that require one-time use.
 
-## Connections
+<div className="see-also">
 
-- [Symmetric encryption and modes](/cs/cryptography/symmetric-encryption-modes)
-- [Authenticated encryption and GCM](/cs/cryptography/authenticated-encryption-gcm)
-- [Hash functions and random oracles](/cs/cryptography/hash-functions-random-oracles)
-- [Digital signatures](/cs/cryptography/digital-signatures)
+See also: [Symmetric encryption and modes](/cs/cryptography/symmetric-encryption-modes) · [Authenticated encryption and GCM](/cs/cryptography/authenticated-encryption-gcm) · [Hash functions and random oracles](/cs/cryptography/hash-functions-random-oracles) · [Digital signatures](/cs/cryptography/digital-signatures)
+
+</div>

@@ -9,7 +9,7 @@ Gauss's law is the electrostatic statement that electric flux begins and ends on
 
 Dielectrics add material response. Bound charges inside a polarized material reduce or reshape the electric field, so it is convenient to distinguish $\vec E$, $\vec D$, and polarization $\vec P$. Boundary conditions then tell us how normal and tangential field components change across interfaces. These rules are the foundation of capacitors, insulation design, dielectric wave propagation, and conductor shielding.
 
-## Definitions
+## Flux, polarization, and interface conditions
 
 Gauss's law in integral form is
 
@@ -65,7 +65,7 @@ $$
 
 The first says normal $\vec D$ jumps by free surface charge density. The second says tangential $\vec E$ is continuous in electrostatics.
 
-## Key results
+## When symmetry determines the field
 
 Gauss's law is most useful when symmetry tells us the field direction and constancy before integration. For an infinite line charge in a homogeneous medium, cylindrical symmetry gives
 
@@ -105,7 +105,7 @@ $$
 \epsilon_1E_{1n}=\epsilon_2E_{2n}.
 $$
 
-This is why electric field tends to be lower in higher-permittivity material for the same normal displacement flux.
+For the same normal displacement flux, the electric field tends to be lower in the higher-permittivity material.
 
 For tangential components, the electric field does not generally bend toward lower or higher permittivity by the same rule. Instead, $E_t$ is continuous while $D_t=\epsilon E_t$ changes. Combining normal and tangential rules gives a refraction-like relation for electrostatic field lines:
 
@@ -121,9 +121,9 @@ Boundary conditions are local statements. They apply at a point on an interface 
 
 Flux-tube reasoning is often useful in dielectric problems. If no free charge lies inside a narrow tube bounded by field lines, the same normal displacement flux passes through every cross section of that tube. When the tube enters a higher-permittivity material, the electric field needed to carry that $\vec D$ flux is smaller. This picture supports the algebraic boundary condition without requiring a full solution.
 
-In conductor problems, surface charge is usually not known in advance. It is whatever distribution is required to make the conductor an equipotential and to make the internal field zero. This is why assuming uniform surface charge on an arbitrary conductor is usually wrong; uniform charge appears only for highly symmetric cases such as an isolated sphere.
+In conductor problems, surface charge is usually not known in advance. It is whatever distribution is required to make the conductor an equipotential and to make the internal field zero. Uniform surface charge therefore cannot be assumed for an arbitrary conductor; it appears only in highly symmetric cases such as an isolated sphere.
 
-## Visual
+### Choosing between Gauss's law and a boundary-value solution
 
 ```mermaid
 flowchart TD
@@ -142,7 +142,7 @@ flowchart TD
 | Conductor surface | $D_n=\rho_s$ outside | $E_t=0$ | conductor is equipotential |
 | Inside perfect conductor | $\vec E=0$ | none | no electrostatic volume field |
 
-## Worked example 1: Infinite line charge by Gauss's law
+## Field of an infinite line charge
 
 Problem: An infinite line charge on the $z$ axis has $\rho_l=20\ \mathrm{nC/m}$ in free space. Find $\vec E$ at $\rho=5$ cm.
 
@@ -187,7 +187,7 @@ $$
 
 Check: The direction is outward because the charge density is positive.
 
-## Worked example 2: Dielectric boundary field components
+## Resolving a field across a dielectric boundary
 
 Problem: At a charge-free boundary, medium 1 has $\epsilon_{r1}=2$ and medium 2 has $\epsilon_{r2}=5$. In medium 1, $\vec E_1=30\hat n+40\hat t\ \mathrm{V/m}$, where $\hat n$ points from medium 1 to medium 2 and $\hat t$ is tangential. Find $\vec E_2$.
 
@@ -224,39 +224,23 @@ $$
 
 Check: The normal field is smaller in the higher-permittivity medium, while the tangential field is unchanged.
 
-## Code
+## Boundary conditions that are easy to mix up
 
-```python
-import numpy as np
+- A Gaussian surface helps only after symmetry has fixed the field direction and made its magnitude simple on that surface.
+- In the $\vec D$ form of Gauss's law, the enclosed source is free charge; bound polarization charge is already represented through the material response.
+- The end caps of a Gaussian cylinder still need to be examined. Their flux vanishes only when the field is tangent to them.
+- The simple interface rules apply to normal $\vec D$ and tangential $\vec E$, not the other way around.
+- The electrostatic field vanishes inside an ideal conductor, not necessarily outside it.
+- The sign of surface charge depends on the chosen boundary normal.
+- Higher permittivity does not reduce every component of $\vec E$; the result depends on the component and imposed boundary condition.
 
-eps0 = 8.8541878128e-12
-rho_l = 20e-9
-rho = np.linspace(0.01, 0.2, 100)
-E = rho_l / (2 * np.pi * eps0 * rho)
+<div className="see-also">
 
-for r, e in zip(rho[::25], E[::25]):
-    print(f"rho={r:.3f} m, E={e:.2e} V/m")
-
-eps1, eps2 = 2 * eps0, 5 * eps0
-E1n, E1t = 30.0, 40.0
-E2n = eps1 / eps2 * E1n
-E2t = E1t
-print("E2 components:", E2n, E2t)
-```
-
-## Common pitfalls
-
-- Choosing a Gaussian surface before checking symmetry. Gauss's law is always true, but it is only directly solvable when the field is simple on the surface.
-- Including bound polarization charge as "free enclosed charge" in the $\vec D$ form of Gauss's law.
-- Forgetting the end caps of a Gaussian cylinder; sometimes they contribute, sometimes symmetry makes their flux zero.
-- Mixing $\vec E$ and $\vec D$ boundary conditions. Normal $\vec D$ and tangential $\vec E$ have the simple jump/continuity rules.
-- Assuming electric field is zero outside a conductor. It is zero inside an ideal conductor in electrostatic equilibrium, not necessarily outside.
-- Losing the sign of surface charge when choosing the boundary normal direction.
-- Assuming high permittivity always reduces every component of $\vec E$. The statement is component and boundary-condition dependent.
-
-## Connections
+See also:
 
 - [Electrostatic fields and potential](/physics/electromagnetics/electrostatic-fields-and-potential) for Coulomb and potential methods.
 - [Gradient, divergence, curl, and integral theorems](/physics/electromagnetics/gradient-divergence-curl-integral-theorems) for the divergence theorem behind Gauss's law.
 - [Capacitance, energy, and image method](/physics/electromagnetics/capacitance-energy-and-image-method) for conductor and dielectric applications.
 - [Plane waves in media](/physics/electromagnetics/plane-waves-lossless-lossy-polarization) for dielectric parameters in wave propagation.
+
+</div>

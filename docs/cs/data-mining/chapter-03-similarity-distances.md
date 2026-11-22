@@ -315,11 +315,8 @@ The edit-distance implementation stores the full matrix, using $O(mn)$ memory. I
 
 Distance choice should be evaluated through judgments the application actually needs. Retrieval can use labeled relevant pairs and metrics such as recall at $k$. Clustering can compare stability across resamples and inspect representatives. When labels are unavailable, controlled perturbations are useful: a small translation, harmless spelling variation, or time shift should change distance only if the task considers that change important.
 
-## Related pages
+<div className="see-also">
 
-- [Data Preparation](/cs/data-mining/chapter-02-data-preparation)
-- [Feature Selection and Dimensionality Reduction](/cs/data-mining/chapter-02-feature-selection-dimensionality-reduction)
-- [Cluster Analysis](/cs/data-mining/chapter-06-cluster-analysis)
-- [Outlier Analysis](/cs/data-mining/chapter-08-outlier-analysis)
-- [Mining Time Series Data](/cs/data-mining/chapter-14-mining-time-series-data)
-- [Mining Graph Data](/cs/data-mining/chapter-17-mining-graph-data)
+See also: [Data Preparation](/cs/data-mining/chapter-02-data-preparation) · [Feature Selection and Dimensionality Reduction](/cs/data-mining/chapter-02-feature-selection-dimensionality-reduction) · [Cluster Analysis](/cs/data-mining/chapter-06-cluster-analysis) · [Outlier Analysis](/cs/data-mining/chapter-08-outlier-analysis) · [Mining Time Series Data](/cs/data-mining/chapter-14-mining-time-series-data) · [Mining Graph Data](/cs/data-mining/chapter-17-mining-graph-data)
+
+</div>

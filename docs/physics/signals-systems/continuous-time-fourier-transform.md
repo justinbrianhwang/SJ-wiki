@@ -495,10 +495,8 @@ Spectral leakage is the spreading produced when a finite record cuts through a c
 - Assuming a Fourier transform exists as an ordinary integral for every useful signal. Constants and sinusoids require generalized transforms.
 - Dropping phase information. Magnitude alone is not enough to reconstruct a general signal.
 
-## Related pages
+<div className="see-also">
 
-- [Fourier Series for Periodic Signals](/physics/signals-systems/fourier-series-periodic-signals)
-- [LTI Systems and Convolution](/physics/signals-systems/lti-systems-convolution)
-- [Sampling, Aliasing, and Reconstruction](/physics/signals-systems/sampling-aliasing-reconstruction)
-- [Frequency Response and Filtering](/physics/signals-systems/frequency-response-filtering)
-- [Laplace Transform and ROC](/physics/signals-systems/laplace-transform-roc)
+See also: [Fourier Series for Periodic Signals](/physics/signals-systems/fourier-series-periodic-signals) · [LTI Systems and Convolution](/physics/signals-systems/lti-systems-convolution) · [Sampling, Aliasing, and Reconstruction](/physics/signals-systems/sampling-aliasing-reconstruction) · [Frequency Response and Filtering](/physics/signals-systems/frequency-response-filtering) · [Laplace Transform and ROC](/physics/signals-systems/laplace-transform-roc)
+
+</div>

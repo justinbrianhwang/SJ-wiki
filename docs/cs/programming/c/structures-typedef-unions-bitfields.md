@@ -364,10 +364,8 @@ The half-open containment rule includes the lower-left edge and excludes the upp
 - Writing raw structure bytes as a supposedly portable file or wire format.
 - Copying an owning pointer member and later freeing it from both copies.
 
-## Related pages
+<div className="see-also">
 
-- [Linked Structures and Hash Tables](/cs/programming/c/linked-structures-hash-tables)
-- [Types, Operators, and Expressions](/cs/programming/c/types-operators-expressions)
-- [Pointers, Addresses, and Arrays](/cs/programming/c/pointers-addresses-arrays)
-- [Storage Allocation](/cs/programming/c/storage-allocation)
-- [Modern C Considerations](/cs/programming/c/modern-c-considerations)
+See also: [Linked Structures and Hash Tables](/cs/programming/c/linked-structures-hash-tables) · [Types, Operators, and Expressions](/cs/programming/c/types-operators-expressions) · [Pointers, Addresses, and Arrays](/cs/programming/c/pointers-addresses-arrays) · [Storage Allocation](/cs/programming/c/storage-allocation) · [Modern C Considerations](/cs/programming/c/modern-c-considerations)
+
+</div>

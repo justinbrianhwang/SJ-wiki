@@ -387,10 +387,8 @@ Decoherence rates depend on how distinguishable the environment records become. 
 
 Recoherence is allowed by unitary dynamics. In a small controlled environment, records can return to overlap and interference can revive. Macroscopic irreversibility comes from the huge number of degrees of freedom, uncontrolled phases, and recurrence times, rather than from an exact nonunitary law for the total isolated system.
 
-## Related pages
+<div className="see-also">
 
-- [Spin-1/2 systems](/physics/quantum-mechanics/spin-one-half-systems)
-- [Postulates of quantum mechanics](/physics/quantum-mechanics/postulates-of-quantum-mechanics)
-- [Identical particles and symmetrization](/physics/quantum-mechanics/identical-particles-symmetrization)
-- [Measurement and interpretation](/physics/quantum-mechanics/measurement-interpretation)
-- [Symmetries and conservation laws](/physics/quantum-mechanics/symmetries-conservation-laws)
+See also: [Spin-1/2 systems](/physics/quantum-mechanics/spin-one-half-systems) · [Postulates of quantum mechanics](/physics/quantum-mechanics/postulates-of-quantum-mechanics) · [Identical particles and symmetrization](/physics/quantum-mechanics/identical-particles-symmetrization) · [Measurement and interpretation](/physics/quantum-mechanics/measurement-interpretation) · [Symmetries and conservation laws](/physics/quantum-mechanics/symmetries-conservation-laws)
+
+</div>

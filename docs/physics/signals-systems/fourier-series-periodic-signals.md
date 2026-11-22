@@ -533,10 +533,8 @@ If $N$ is even, $k=N/2$ is the Nyquist harmonic $e^{j\pi n}=(-1)^n$ and is its o
 - Assuming the Fourier series equals the original value exactly at a jump. It converges to the midpoint under standard conditions.
 - Losing conjugate symmetry checks for real signals; they are useful for catching sign errors.
 
-## Related pages
+<div className="see-also">
 
-- [Periodicity, Energy, and Power](/physics/signals-systems/periodicity-energy-power)
-- [LTI Systems and Convolution](/physics/signals-systems/lti-systems-convolution)
-- [Continuous-Time Fourier Transform](/physics/signals-systems/continuous-time-fourier-transform)
-- [Discrete-Time Fourier Transform](/physics/signals-systems/discrete-time-fourier-transform)
-- [Frequency Response and Filtering](/physics/signals-systems/frequency-response-filtering)
+See also: [Periodicity, Energy, and Power](/physics/signals-systems/periodicity-energy-power) · [LTI Systems and Convolution](/physics/signals-systems/lti-systems-convolution) · [Continuous-Time Fourier Transform](/physics/signals-systems/continuous-time-fourier-transform) · [Discrete-Time Fourier Transform](/physics/signals-systems/discrete-time-fourier-transform) · [Frequency Response and Filtering](/physics/signals-systems/frequency-response-filtering)
+
+</div>

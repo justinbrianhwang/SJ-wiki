@@ -9,7 +9,7 @@ Discrete probability assigns weights to finite or countable outcomes. It uses co
 
 In discrete mathematics, probability is often a counting problem with uncertainty attached. A clean sample space, precise events, and careful conditioning are more important than formula memorization. Random variables then turn outcomes into numbers, making expected values and variances possible.
 
-## Definitions
+## Sample spaces, events, and random variables
 
 An **experiment** is a process with possible outcomes. The **sample space** $S$ is the set of all outcomes. An **event** is a subset of $S$.
 
@@ -51,7 +51,7 @@ $$
 V(X)=E((X-E(X))^2)=E(X^2)-E(X)^2.
 $$
 
-## Key results
+## Combining and conditioning probabilities
 
 Complement rule:
 
@@ -89,7 +89,7 @@ $$
 
 for random variables $X$ and $Y$, even when they are not independent. This makes indicator variables powerful. If $I_j$ is $1$ when event $A_j$ occurs and $0$ otherwise, then $E(I_j)=P(A_j)$.
 
-## Visual
+The objects and operations fit together as follows:
 
 ```mermaid
 flowchart TD
@@ -111,7 +111,7 @@ flowchart TD
 | independence | $P(E\cap F)=P(E)P(F)$ | knowing one does not change the other |
 | expectation | $\sum_s X(s)p(s)$ | long-run average value |
 
-## Worked example 1: Dice sums and conditional probability
+## Conditioning a dice sum on seeing a three
 
 **Problem.** Roll two fair six-sided dice. Find the probability that the sum is $8$ given that at least one die shows $3$.
 
@@ -148,7 +148,7 @@ $$
 
 **Checked answer.** The probability is $2/11$. The denominator is $11$, not $36$, because conditioning restricts the sample space to outcomes where at least one die is $3$.
 
-## Worked example 2: Expected fixed points in a random permutation
+## Expected fixed points without independence
 
 **Problem.** A random permutation of $\{1,2,\dots,n\}$ is chosen uniformly. Find the expected number of fixed points.
 
@@ -191,7 +191,7 @@ $$
 
 **Checked answer.** The expected number of fixed points is $1$, for every positive integer $n$. The indicators are not independent, but linearity of expectation does not require independence.
 
-## Code
+## Exhaustive checks on small sample spaces
 
 ```python
 from collections import Counter
@@ -214,7 +214,7 @@ print(expected_fixed)
 
 The permutation computation verifies the fixed-point expectation for $n=4$ by exhaustive enumeration.
 
-## Common pitfalls
+## Choosing the denominator and dependence model
 
 - Using unordered dice outcomes when the sample space of ordered rolls is equally likely.
 - Forgetting to change the denominator after conditioning.
@@ -225,7 +225,7 @@ The permutation computation verifies the fixed-point expectation for $n=4$ by ex
 
 The first step in a probability problem is choosing the sample space. For two dice, ordered pairs are equally likely; unordered sums are not. The sum $7$ occurs in six ordered ways, while the sum $2$ occurs in one ordered way. If the sample space is changed to sums without assigning their unequal probabilities, the computation will be biased. Always ask whether the listed outcomes have equal probability before using $\vert E\vert /\vert S\vert $.
 
-Conditioning should be read as replacing the universe. After conditioning on $F$, outcomes outside $F$ are no longer possible, and probabilities must be renormalized by $P(F)$. This is why $P(E\mid F)$ may be much larger or smaller than $P(E)$. A useful check is that $P(F\mid F)=1$ whenever $P(F)\gt 0$, because within the restricted universe $F$ is certain.
+Conditioning should be read as replacing the universe. After conditioning on $F$, outcomes outside $F$ are no longer possible, and probabilities must be renormalized by $P(F)$. Consequently, $P(E\mid F)$ may be much larger or smaller than $P(E)$. A useful check is that $P(F\mid F)=1$ whenever $P(F)\gt 0$, because within the restricted universe $F$ is certain.
 
 Independence is a statement about information, not about visual separation in a diagram. Events can overlap and still be independent, as with drawing a card that is a heart and drawing a card that is an ace from a standard deck. They can also be non-overlapping and therefore dependent if both have positive probability. The equation $P(E\cap F)=P(E)P(F)$ is the definitive test.
 
@@ -243,9 +243,13 @@ A probability answer should include both the event and the denominator being use
 
 For expectation problems, check units. If $X$ counts heads, $E(X)$ is a number of heads. If $X$ is a dollar payoff, $E(X)$ is dollars. Unit checks reveal mistakes such as adding a probability directly to a payoff or averaging event labels instead of random-variable values.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Counting principles](/math/discrete/counting-principles) supplies sample-space counts.
 - [Permutations and combinations](/math/discrete/permutations-and-combinations) counts hands, arrangements, and fixed-position events.
 - [Pigeonhole and inclusion-exclusion](/math/discrete/pigeonhole-and-inclusion-exclusion) supports probabilities of unions and derangements.
 - [Algorithms and complexity](/math/discrete/algorithms-and-complexity) uses probability in randomized and average-case analysis.
+
+</div>

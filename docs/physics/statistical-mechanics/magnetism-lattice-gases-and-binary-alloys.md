@@ -9,7 +9,7 @@ Magnetic systems turn statistical mechanics into a theory of collective order. I
 
 Schwabl's magnetism chapter moves from single moments in a field to interacting spin models, molecular-field approximations, correlation functions, domains, and related systems. The unifying idea is an order parameter: magnetization for spins, density difference for a lattice gas, or concentration difference for a binary alloy.
 
-## Definitions
+## From independent moments to interacting spins
 
 For independent spin-$1/2$ moments in magnetic field $B$, the Hamiltonian is
 
@@ -48,7 +48,7 @@ $$
 
 Here $J\gt 0$ is ferromagnetic, $h$ is an external field, and $\langle ij\rangle$ denotes nearest-neighbor pairs.
 
-## Key results
+## One Ising variable, three physical interpretations
 
 Mean-field theory replaces neighboring spins by their average $m=\langle s\rangle$:
 
@@ -90,7 +90,7 @@ $$
 
 where $\xi$ is the correlation length. Near a continuous phase transition, $\xi$ becomes large and the system loses memory of microscopic lattice details.
 
-The exchange interaction is quantum mechanical in origin even when the Ising model is written with classical variables. It reflects the combination of Coulomb interactions and the symmetry constraints on many-electron wavefunctions. Effective spin Hamiltonians keep only the low-energy magnetic degrees of freedom. This is why the same statistical model can describe very different microscopic materials once the effective coupling constants are known.
+The exchange interaction is quantum mechanical in origin even when the Ising model is written with classical variables. It reflects the combination of Coulomb interactions and the symmetry constraints on many-electron wavefunctions. Effective spin Hamiltonians keep only the low-energy magnetic degrees of freedom, so the same statistical model can describe different microscopic materials once the effective couplings are known.
 
 Mean-field theory predicts ferromagnetic order whenever $T\lt zJ/k_B$, but dimensionality and symmetry matter. A one-dimensional nearest-neighbor Ising chain has no finite-temperature transition, while the two-dimensional Ising model does. Continuous-symmetry magnets in low dimensions require still more care because long-wavelength spin waves can destroy long-range order. These facts motivate the scaling and renormalization-group treatment rather than invalidating the simpler molecular-field picture.
 
@@ -104,7 +104,7 @@ Paramagnetism and ferromagnetism should also be separated experimentally. A para
 
 Correlation functions connect magnetic models to experiments. Neutron scattering, for example, measures spin correlations in momentum space. The Fourier transform of $G(r)$ is the structure factor, and near a critical point its peak sharpens as $\xi$ grows. This is the experimental counterpart of the Ornstein-Zernike form discussed in statistical mechanics.
 
-The lattice-gas and alloy mappings also teach economy. Once an Ising calculation is done, it can be reinterpreted across several physical systems by translating variables. This is not merely mathematical cleverness; it is an early form of universality.
+The lattice-gas and alloy mappings also teach economy. Once an Ising calculation is done, it can be reinterpreted across several physical systems by translating variables. That reuse is an early form of universality.
 
 Anisotropy determines which spin model is appropriate. Ising spins have a preferred axis, XY spins rotate in a plane, and Heisenberg spins rotate in three dimensions. The symmetry of the order parameter affects low-temperature excitations and the possibility of long-range order. Thus the Hamiltonian's symmetry is not decorative; it helps define the universality class.
 
@@ -120,10 +120,7 @@ Real magnetic materials also include anisotropy, impurities, itinerant electrons
 
 The same separation appears in alloys. A minimal lattice model may predict ordering or demixing, but quantitative phase diagrams require actual pair energies, elastic strain effects, and sometimes longer-range interactions. The statistical framework tells us how these ingredients compete through free energy.
 
-That free-energy competition is the shared language behind magnetic ordering, condensation, and alloy phase diagrams.
-It is also why simple lattice models remain useful long after their microscopic idealizations are understood.
-
-## Visual
+Free-energy competition provides the shared language for magnetic ordering, condensation, and alloy phase diagrams, while the couplings supply the material-specific input.
 
 ```mermaid
 graph LR
@@ -145,11 +142,9 @@ graph LR
 | Binary alloy | $s_i=\pm1$ for $A/B$ | pair energies favor mixing or separation | concentration order |
 | Paramagnet | independent $s_i$ | field only | no spontaneous order |
 
-## Worked example 1: Curie law for independent spin halves
+## Curie susceptibility of independent moments
 
-Problem: Derive the small-field susceptibility for $N$ independent spins with moment $\mu$.
-
-Method:
+For $N$ independent moments of magnitude $\mu$, the small-field susceptibility follows directly from the one-spin partition function.
 
 1. The single-spin partition function is
 
@@ -185,23 +180,21 @@ M\approx N\mu(\beta\mu B)
 ={N\mu^2\over k_BT}B.
 $$
 
-Checked answer:
+Thus
 
 $$
 \chi={M\over B}={N\mu^2\over k_BT}.
 $$
 
-## Worked example 2: Mean-field critical temperature of the Ising model
+## Locating the mean-field transition
 
-Problem: Use the self-consistency equation
+Start from the zero-field self-consistency equation
 
 $$
 m=\tanh(\beta zJm)
 $$
 
-at $h=0$ to find the critical temperature.
-
-Method:
+and linearize it near the onset of order.
 
 1. Near the transition, $m$ is small.
 2. Expand the hyperbolic tangent:
@@ -228,25 +221,9 @@ $$
 k_BT_c=zJ.
 $$
 
-Checked answer: this mean-field $T_c$ depends only on coordination number and exchange strength; fluctuation corrections reduce or eliminate ordering in low dimensions.
+This mean-field $T_c$ depends only on coordination number and exchange strength; fluctuation corrections reduce or eliminate ordering in low dimensions.
 
-## Code
-
-```python
-import numpy as np
-
-def mean_field_m(T, J=1.0, z=4, h=0.0, steps=500):
-    beta = 1.0 / T
-    m = 0.5
-    for _ in range(steps):
-        m = np.tanh(beta * (h + z * J * m))
-    return m
-
-for T in [1.0, 2.5, 4.0, 5.0]:
-    print(T, mean_field_m(T, J=1.0, z=4))
-```
-
-## Common pitfalls
+## Where the minimal spin models mislead
 
 - Confusing paramagnetic alignment in a field with spontaneous ferromagnetic order at zero field.
 - Treating mean-field theory as exact in one or two dimensions. Fluctuations can change or destroy its predictions.
@@ -254,10 +231,8 @@ for T in [1.0, 2.5, 4.0, 5.0]:
 - Mapping a lattice gas to Ising spins but losing the chemical-potential term, which maps to magnetic field.
 - Interpreting nonzero finite-size magnetization without considering symmetry breaking and the thermodynamic limit.
 
-## Connections
+<div className="see-also">
 
-- [Phase transitions and order parameters](/physics/statistical-mechanics/phase-transitions-and-order-parameters)
-- [Mean-field and Landau theory](/physics/statistical-mechanics/mean-field-and-landau-theory)
-- [Scaling, universality, and renormalization group](/physics/statistical-mechanics/scaling-universality-and-renormalization-group)
-- [Spin one-half systems](/physics/quantum-mechanics/spin-one-half-systems)
-- [Symmetry breaking in QFT](/physics/quantum-field-theory/symmetry-breaking-goldstone-higgs)
+See also: [Phase transitions and order parameters](/physics/statistical-mechanics/phase-transitions-and-order-parameters) · [Mean-field and Landau theory](/physics/statistical-mechanics/mean-field-and-landau-theory) · [Scaling, universality, and renormalization group](/physics/statistical-mechanics/scaling-universality-and-renormalization-group) · [Spin one-half systems](/physics/quantum-mechanics/spin-one-half-systems) · [Symmetry breaking in QFT](/physics/quantum-field-theory/symmetry-breaking-goldstone-higgs)
+
+</div>

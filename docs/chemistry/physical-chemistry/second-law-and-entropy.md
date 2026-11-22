@@ -9,11 +9,7 @@ The Second Law explains why energy conservation is not enough to predict change.
 
 In Atkins' treatment, entropy begins as a thermodynamic state function defined through reversible heat transfer, then gains a molecular interpretation through the number of accessible microstates. The bridge between those views is central to equilibrium, phase change, free energy, and statistical thermodynamics.
 
-![An animation shows a large particle randomly jostled by many smaller particles.](https://commons.wikimedia.org/wiki/Special:FilePath/Brownian_motion_large.gif)
-
-*Figure: Brownian motion as a visual reminder that thermal behavior reflects many microscopic arrangements. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Brownian_motion_large.gif), Lookang with model by Francisco Esquembre and Fu-Kwun, CC BY-SA 3.0.*
-
-## Definitions
+## Entropy as a state function
 
 The thermodynamic definition of entropy change is
 
@@ -79,7 +75,30 @@ $$
 =nR\ln\frac{p_i}{p_f}
 $$
 
-## Key results
+## Directionality, heat engines, and free energy
+
+The reversible path used to calculate a state change need not be the actual path:
+
+```mermaid
+stateDiagram-v2
+  [*] --> Initial
+  Initial --> ActualProcess: "irreversible path"
+  Initial --> ReversiblePath: "constructed path"
+  ReversiblePath --> Final: "integrate dq_rev/T"
+  ActualProcess --> Final: "same Delta S_sys"
+  Final --> UniverseCheck
+  UniverseCheck --> Spontaneous: "Delta S_univ > 0"
+  UniverseCheck --> Reversible: "Delta S_univ = 0"
+  UniverseCheck --> Impossible: "Delta S_univ < 0"
+```
+
+| Process | System entropy change | Notes |
+|---|---:|---|
+| Heating at constant $C$ | $nC_m\ln(T_f/T_i)$ | Use $C_p$ or $C_V$ according to path |
+| Isothermal perfect-gas expansion | $nR\ln(V_f/V_i)$ | Positive for expansion |
+| Reversible phase transition | $\Delta H_{\mathrm{trs}}/T_{\mathrm{trs}}$ | At transition temperature |
+| Mixing ideal gases | $-nR\sum_J x_J\ln x_J$ | Always nonnegative |
+| Surroundings at constant $T$ | $-q_{\mathrm{sys}}/T$ | Reservoir approximation |
 
 A Carnot cycle is the reference reversible heat engine. Its efficiency is
 
@@ -133,7 +152,7 @@ S^\circ(T)
 +\sum_{\mathrm{transitions}}\frac{\Delta_{\mathrm{trs}}H^\circ}{T_{\mathrm{trs}}}
 $$
 
-Entropy is subtle because the system entropy can decrease during a spontaneous process. Freezing of supercooled water, crystallization from solution, and compression of a gas all reduce some measure of system dispersal. The Second Law is protected because the surroundings entropy changes too. If a process releases enough heat to a reservoir, the surroundings entropy gain can exceed the system entropy loss. This is why the universe entropy, or an equivalent free-energy criterion under controlled conditions, is the proper test.
+Entropy is subtle because the system entropy can decrease during a spontaneous process. Freezing of supercooled water, crystallization from solution, and compression of a gas all reduce some measure of system dispersal. The Second Law is protected because the surroundings entropy changes too. If a process releases enough heat to a reservoir, the surroundings entropy gain can exceed the system entropy loss. The proper test is therefore the universe entropy, or an equivalent free-energy criterion under controlled conditions.
 
 The reversible path in the entropy integral is a calculation device. Suppose a gas expands irreversibly into a vacuum. The actual heat transfer may be zero, and the work may be zero, but the entropy of the gas increases because its final state has a larger accessible volume. To compute the change, one imagines a reversible isothermal expansion between the same states and evaluates $q_{\mathrm{rev}}/T$. This often feels artificial at first, but it follows directly from entropy being a state function while heat is not.
 
@@ -155,30 +174,7 @@ Residual entropy is an important caveat to the simple phrase "entropy at zero is
 
 Entropy also connects naturally to information. Specifying a lower-entropy state requires more detailed information about molecular arrangements. This does not mean thermodynamic entropy is merely subjective; the multiplicity is physical. But the language helps interpret why constraints, compartments, fields, and ordered phases reduce entropy by limiting the number of compatible microstates.
 
-## Visual
-
-```mermaid
-stateDiagram-v2
-  [*] --> Initial
-  Initial --> ActualProcess: irreversible path
-  Initial --> ReversiblePath: constructed path
-  ReversiblePath --> Final: integrate dq_rev/T
-  ActualProcess --> Final: same Delta S_sys
-  Final --> UniverseCheck
-  UniverseCheck --> Spontaneous: Delta S_univ > 0
-  UniverseCheck --> Reversible: Delta S_univ = 0
-  UniverseCheck --> Impossible: Delta S_univ < 0
-```
-
-| Process | System entropy change | Notes |
-|---|---:|---|
-| Heating at constant $C$ | $nC_m\ln(T_f/T_i)$ | Use $C_p$ or $C_V$ according to path |
-| Isothermal perfect-gas expansion | $nR\ln(V_f/V_i)$ | Positive for expansion |
-| Reversible phase transition | $\Delta H_{\mathrm{trs}}/T_{\mathrm{trs}}$ | At transition temperature |
-| Mixing ideal gases | $-nR\sum_J x_J\ln x_J$ | Always nonnegative |
-| Surroundings at constant $T$ | $-q_{\mathrm{sys}}/T$ | Reservoir approximation |
-
-## Worked example 1: Entropy change for heating liquid water
+## Heating liquid water reversibly
 
 **Problem.** Estimate the entropy change when $2.00\ \mathrm{mol}$ of liquid water is heated reversibly from $298.15\ \mathrm{K}$ to $350.00\ \mathrm{K}$ at constant pressure. Use $C_{p,m}=75.3\ \mathrm{J\ K^{-1}\ mol^{-1}}$.
 
@@ -212,7 +208,7 @@ $$
 
 **Checked answer.** The entropy increases because raising temperature makes more energy states accessible. The magnitude is plausible: a few tens of joules per kelvin for two moles heated moderately.
 
-## Worked example 2: Entropy of vaporization and surroundings
+## Balancing system and surroundings at boiling
 
 **Problem.** Benzene boils at approximately $353.25\ \mathrm{K}$ with $\Delta_{\mathrm{vap}}H=30.8\ \mathrm{kJ\ mol^{-1}}$. Estimate $\Delta_{\mathrm{vap}}S$ for $1.00\ \mathrm{mol}$ at the normal boiling point and the entropy change of the surroundings if the vaporization is reversible.
 
@@ -258,26 +254,7 @@ $$
 
 **Checked answer.** Reversible boiling at the normal boiling point has $\Delta S_{\mathrm{univ}}=0$, matching phase equilibrium.
 
-## Code
-
-```python
-import numpy as np
-
-def entropy_heating(n, Cp_m, Ti, Tf):
-    return n * Cp_m * np.log(Tf / Ti)
-
-def entropy_vaporization(delta_h_kj_mol, T):
-    return delta_h_kj_mol * 1000.0 / T
-
-temps = np.linspace(298.15, 400.0, 6)
-for Tf in temps:
-    ds = entropy_heating(1.0, 75.3, 298.15, Tf)
-    print(f"Tf={Tf:7.2f} K  Delta S={ds:7.2f} J/K/mol")
-
-print("Benzene vaporization:", entropy_vaporization(30.8, 353.25))
-```
-
-## Common pitfalls
+## Choosing the right entropy calculation
 
 - Calculating entropy from the actual irreversible path. Use a reversible path connecting the same states.
 - Forgetting the surroundings. Spontaneity is decided by $\Delta S_{\mathrm{univ}}$, not only by $\Delta S_{\mathrm{sys}}$.
@@ -291,9 +268,8 @@ For surroundings entropy, check whether the surroundings can be treated as a res
 
 Finally, do not infer spontaneity from system entropy alone. Condensation, freezing, adsorption, folding, and association can all decrease system entropy while proceeding spontaneously because enthalpy release or solvent entropy compensates. Gibbs energy is often the cleaner criterion at constant temperature and pressure because it already includes the surroundings contribution under those constraints.
 
-## Connections
+<div className="see-also">
 
-- [First law and thermochemistry](/chemistry/physical-chemistry/first-law-and-thermochemistry)
-- [Free energy and chemical potential](/chemistry/physical-chemistry/free-energy-and-chemical-potential)
-- [Boltzmann distribution and partition functions](/chemistry/physical-chemistry/boltzmann-distribution-and-partition-functions)
-- [Multiple integrals](/math/calculus/multiple-integrals)
+See also: [First law and thermochemistry](/chemistry/physical-chemistry/first-law-and-thermochemistry) · [Free energy and chemical potential](/chemistry/physical-chemistry/free-energy-and-chemical-potential) · [Boltzmann distribution and partition functions](/chemistry/physical-chemistry/boltzmann-distribution-and-partition-functions) · [Multiple integrals](/math/calculus/multiple-integrals)
+
+</div>

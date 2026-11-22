@@ -7,9 +7,9 @@ sidebar_position: 21
 
 Social network analysis studies graphs whose nodes are people, accounts, organizations, or social entities and whose edges represent relationships or interactions. Aggarwal's social network chapter covers preliminaries and properties, community detection, collective classification, link prediction, and social influence analysis. The topic is graph mining with stronger behavioral assumptions: social ties often imply homophily, influence, triadic closure, and community structure.
 
-This page covers network properties, centrality, community detection, collective classification, link prediction, and influence. It connects directly to graph mining, web mining, classification, clustering, and privacy.
+Network properties, centrality, community detection, collective classification, link prediction, and influence connect graph mining to behavioral assumptions and privacy concerns.
 
-## Definitions
+## Edges as social and behavioral evidence
 
 A **social network** is a graph $G=(V,E)$ where nodes represent social actors and edges represent ties such as friendship, following, messaging, co-authorship, or transactions.
 
@@ -27,7 +27,7 @@ A **social network** is a graph $G=(V,E)$ where nodes represent social actors an
 
 **Social influence analysis** models how information, behavior, or adoption spreads through a network.
 
-## Key results
+## What ties reveal—and what they do not
 
 **Network data violate independence assumptions.** A user's label, behavior, or risk may be correlated with neighboring users. This helps relational models but complicates evaluation.
 
@@ -41,7 +41,7 @@ A **social network** is a graph $G=(V,E)$ where nodes represent social actors an
 
 **Evaluation needs graph-aware splits.** Randomly hiding edges or labels can leak information through nearby structure. Time-based splits are often better for link prediction and influence tasks.
 
-**Social networks are not just generic graphs.** Edge semantics matter: friendship, following, reply, co-location, and payment edges imply different levels of trust, direction, and causality. A directed follower edge should not be treated the same as a mutual friendship edge unless the task justifies it. Weighted interaction frequency, recency, and multiplex edge types can change centrality, communities, and influence estimates.
+**Social networks carry semantics beyond generic topology.** Friendship, following, reply, co-location, and payment edges imply different levels of trust, direction, and causality. A directed follower edge should not be treated the same as a mutual friendship edge unless the task justifies it. Weighted interaction frequency, recency, and multiplex edge types can change centrality, communities, and influence estimates.
 
 **Influence modeling needs temporal order.** If user A adopts a behavior before user B and there is an edge from A to B, influence is plausible but not proven. If both adopted before the edge existed, homophily or external events are more plausible. Diffusion models should therefore use timestamps, exposure definitions, and baselines for global popularity shocks.
 
@@ -53,7 +53,7 @@ A **social network** is a graph $G=(V,E)$ where nodes represent social actors an
 
 **Link prediction needs negative examples carefully.** Most pairs of nodes are not connected, but treating every missing edge as a true negative can create an overwhelming and sometimes false negative class. Some missing edges are unobserved rather than nonexistent. Sampling negatives, using time-based nonedges, and reporting ranking metrics are common ways to make the problem meaningful.
 
-**Privacy risk is structural.** Even if names are removed, a person's pattern of connections may be unique. Social network mining can reveal communities, bridges, or sensitive associations. This is why social network pages connect naturally to privacy-preserving mining rather than only to graph algorithms.
+**Privacy risk is structural.** Even if names are removed, a person's pattern of connections may be unique. Social network mining can reveal communities, bridges, or sensitive associations, so privacy-preserving methods belong alongside the graph algorithms.
 
 **Temporal granularity matters.** Daily, weekly, and monthly interaction graphs can show different communities and influence paths. Aggregating too broadly can create edges between people who were never active at the same time.
 
@@ -61,7 +61,7 @@ A **social network** is a graph $G=(V,E)$ where nodes represent social actors an
 
 **Multiplex networks need layer choices.** The same people may be connected by friendship, messages, follows, and transactions. Mining one collapsed graph can hide differences among layers, while mining each layer separately can miss cross-layer reinforcement.
 
-## Visual
+## PageRank flow and local link-prediction signals
 
 ```mermaid
 flowchart TB
@@ -108,7 +108,7 @@ This social-network diagram gives the PageRank power-iteration data flow over a 
 | Influence analysis | Network plus adoption times | Spread model | Temporal cascades |
 | Centrality | Network | Important nodes | Degree, paths, eigenvectors |
 
-## Worked example 1: Common-neighbor link prediction
+### Ranking candidate links by common neighbors
 
 **Problem.** In a social graph, edges are:
 
@@ -151,7 +151,7 @@ $$
 
 **Checked answer.** B-D and A-D have equal score under these simple local measures. More features or temporal evidence would be needed to rank them differently.
 
-## Worked example 2: One round of label propagation
+## A tied round of label propagation
 
 **Problem.** Nodes A and C are labeled positive; node E is labeled negative. Unlabeled node D connects to C, E, and F. Node F connects to D and E. Initialize unlabeled labels as unknown. Predict D after one neighbor vote using known labels only.
 
@@ -170,7 +170,7 @@ $$
 
 **Checked answer.** D cannot be assigned unambiguously by one unweighted known-neighbor vote. This illustrates why collective classification needs careful update and tie rules.
 
-## Code
+## Computing local scores, communities, and centrality
 
 Pseudocode for common-neighbor link prediction:
 
@@ -206,7 +206,7 @@ print([sorted(c) for c in communities])
 print(nx.degree_centrality(G))
 ```
 
-## Common pitfalls
+## Where structural evidence is overread
 
 - Interpreting correlation among connected nodes as causal influence.
 - Evaluating link prediction with random splits when the real task is future-link prediction.
@@ -216,10 +216,8 @@ print(nx.degree_centrality(G))
 - Applying homophily-based label propagation in heterophilous networks.
 - Publishing network-derived results without considering privacy leakage through edges.
 
-## Connections
+<div className="see-also">
 
-- [Mining Graph Data](/cs/data-mining/chapter-17-mining-graph-data)
-- [Mining Web Data and Recommenders](/cs/data-mining/chapter-18-mining-web-data)
-- [Cluster Analysis](/cs/data-mining/chapter-06-cluster-analysis)
-- [Data Classification](/cs/data-mining/chapter-10-data-classification)
-- [Privacy-Preserving Data Mining](/cs/data-mining/chapter-20-privacy-preserving-data-mining)
+See also: [Mining Graph Data](/cs/data-mining/chapter-17-mining-graph-data) · [Mining Web Data and Recommenders](/cs/data-mining/chapter-18-mining-web-data) · [Cluster Analysis](/cs/data-mining/chapter-06-cluster-analysis) · [Data Classification](/cs/data-mining/chapter-10-data-classification) · [Privacy-Preserving Data Mining](/cs/data-mining/chapter-20-privacy-preserving-data-mining)
+
+</div>

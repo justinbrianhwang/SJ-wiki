@@ -458,10 +458,8 @@ Then solve effective-theory RG equations from $M$ down to $E$. The running sums 
 
 If several heavy masses are widely separated, remove them sequentially. Each threshold changes beta functions and operator bases. Smooth physical predictions result because matching corrections compensate the change in running at the order calculated.
 
-## Related pages
+<div className="see-also">
 
-- [Renormalization and Counterterms](/physics/quantum-field-theory/renormalization-and-counterterms)
-- [Yang--Mills Theory and QCD](/physics/quantum-field-theory/yang-mills-theory-and-qcd)
-- [Effective Field Theory](/physics/quantum-field-theory/effective-field-theory)
-- [Collective and Condensed Matter Field Theory](/physics/quantum-field-theory/collective-and-condensed-matter-field-theory)
+See also: [Renormalization and Counterterms](/physics/quantum-field-theory/renormalization-and-counterterms) · [Yang--Mills Theory and QCD](/physics/quantum-field-theory/yang-mills-theory-and-qcd) · [Effective Field Theory](/physics/quantum-field-theory/effective-field-theory) · [Collective and Condensed Matter Field Theory](/physics/quantum-field-theory/collective-and-condensed-matter-field-theory)
 
+</div>

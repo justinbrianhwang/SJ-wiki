@@ -366,10 +366,8 @@ The time-rescaling idea gives a deeper check. Under a correctly specified time-v
 
 Poisson approximation for a Bernoulli sum also has a scope condition: no individual event should dominate. A sum containing one indicator with probability $0.5$ and many extremely rare indicators may have the right mean but a poor Poisson shape. The maximum individual probability and local dependence structure matter, not only the total $\lambda$.
 
-## Related pages
+<div className="see-also">
 
-- [Bernoulli, binomial, geometric, and negative binomial laws](/math/probability-and-random-variables/bernoulli-binomial-geometric-negative-binomial)
-- [Continuous random variables and uniform laws](/math/probability-and-random-variables/continuous-random-variables-and-uniform-laws)
-- [Normal, exponential, gamma, beta, and Cauchy laws](/math/probability-and-random-variables/normal-exponential-gamma-beta-cauchy)
-- [Sums, convolutions, and order statistics](/math/probability-and-random-variables/sums-convolutions-order-statistics)
-- [Common discrete distributions](/math/probability/common-discrete-distributions)
+See also: [Bernoulli, binomial, geometric, and negative binomial laws](/math/probability-and-random-variables/bernoulli-binomial-geometric-negative-binomial) · [Continuous random variables and uniform laws](/math/probability-and-random-variables/continuous-random-variables-and-uniform-laws) · [Normal, exponential, gamma, beta, and Cauchy laws](/math/probability-and-random-variables/normal-exponential-gamma-beta-cauchy) · [Sums, convolutions, and order statistics](/math/probability-and-random-variables/sums-convolutions-order-statistics) · [Common discrete distributions](/math/probability/common-discrete-distributions)
+
+</div>

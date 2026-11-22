@@ -7,27 +7,11 @@ sidebar_position: 1
 
 General chemistry is the bridge between observable materials and particle-level explanations. It asks how atoms combine, why reactions stop or continue, how energy and matter are conserved, and how quantitative measurements become chemical conclusions. The subject is broad, but it is not a loose collection of facts: nearly every chapter returns to structure, amount, energy, and change.
 
-In the Ebbing and Gammon sequence this topic sits near measurement, atomic theory, bonding, reactions, equilibrium, thermodynamics, and descriptive chemistry. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
+In the Ebbing and Gammon sequence this topic runs from measurement through atomic theory, bonding, reactions, equilibrium, thermodynamics, and descriptive chemistry. The order matters because later calculations reuse earlier ideas about measurement, atomic structure, bonding, molecular motion, and equilibrium. The notes below form a working reference for choosing and checking those chapter-level tools.
 
-![A color-coded periodic table organizes elements by atomic number, symbol, and broad chemical class.](https://commons.wikimedia.org/wiki/Special:FilePath/Periodic_Table_Of_Elements.svg)
+## The language of chemical models
 
-*Figure: Modern periodic table connecting atomic identity to chemical families. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Periodic_Table_Of_Elements.svg), Dmarcus100, CC BY-SA 4.0.*
-
-![An early Mendeleev periodic table shows elements arranged by recurring chemical properties.](https://commons.wikimedia.org/wiki/Special:FilePath/Mendeleev_Table_5th_II.jpg)
-
-*Figure: Mendeleev's periodic table from the 1891 English edition of Principles of Chemistry. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mendeleev_Table_5th_II.jpg), Dmitrii Mendeleev, public domain.*
-
-![Four Bunsen burner flames show how air flow changes flame color and shape.](https://commons.wikimedia.org/wiki/Special:FilePath/Bunsen_burner_flame_types.jpg)
-
-*Figure: Bunsen burner flame types used in introductory laboratory work. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bunsen_burner_flame_types.jpg), Arthur Jan Fijalkowski, CC BY-SA 3.0/GFDL.*
-
-![A studio portrait shows Marie Curie around 1920.](https://commons.wikimedia.org/wiki/Special:FilePath/Marie_Curie_c1920.jpg)
-
-*Figure: Marie Curie, whose work on radioactivity connects chemistry, physics, and measurement. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Marie_Curie_c1920.jpg), Henri Manuel, public domain.*
-
-## Definitions
-
-The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.
+These are operational definitions: each says what can be counted, measured, compared, or conserved in a chemical argument.
 
 - A chemical model is a simplified description that explains observations and predicts new ones.
 - Matter is anything that has mass and occupies space; chemical change rearranges matter without creating or destroying atoms.
@@ -40,7 +24,7 @@ The following definitions give the vocabulary and notation used in this page. Tr
 
 Definitions in chemistry often connect a symbolic representation to a physical sample. A formula such as $\mathrm{H_2O}$ names a substance, gives the atomic ratio inside one molecule, and supplies the molar mass used in a macroscopic calculation. A state symbol such as $\mathrm{(aq)}$ is not cosmetic; it says the species is dispersed in water and may be treated as ions when writing a net ionic equation. In the same way, constants such as $R$, $K_w$, $F$, or $N_A$ are compact definitions of the measurement system being used.
 
-## Key results
+## Conservation before calculation
 
 The central results are:
 
@@ -63,9 +47,9 @@ A second check is to compare the limiting cases. If a reactant amount goes to ze
 
 Finally, keep symbolic and particulate representations side by side. A balanced equation, an equilibrium expression, an orbital diagram, or a polymer repeat unit is a compact symbol for a population of particles. Translating that symbol into words forces you to say what is reacting, what is being counted, and what is being held constant. That translation is usually the difference between a calculation that can be adapted to a new problem and one that only imitates a worked example.
 
-## Visual
+## Reading from measurement to materials
 
-| Ebbing and Gammon chapter | Chapter title from the TOC | Main wiki page |
+| Ebbing and Gammon chapter | Chapter title from the TOC | Notes page |
 |---:|---|---|
 | 1 | Chemistry and Measurement | /chemistry/general/chemistry-and-measurement |
 | 2 | Atoms, Molecules, and Ions | /chemistry/general/atoms-molecules-and-ions |
@@ -119,68 +103,49 @@ graph TD
   F --> J[Organic and Biological Chemistry]
 ```
 
-## Worked example 1: Moving from grams to molecules
+## From grams of water to individual atoms
 
 Problem. A sample contains 18.0 g of water. Find the moles of water molecules, the number of water molecules, and the number of hydrogen atoms.
 
-    Method.
+Method:
 
-    1. Use the formula $\mathrm{H_2O}$ to compute molar mass: $M = 2(1.008) + 16.00 = 18.016\ \mathrm{g\ mol^{-1}}$.
+1. Use the formula $\mathrm{H_2O}$ to compute molar mass: $M = 2(1.008) + 16.00 = 18.016\ \mathrm{g\ mol^{-1}}$.
 2. Convert mass to moles: $n = 18.0\ \mathrm{g}/18.016\ \mathrm{g\ mol^{-1}} = 0.999\ \mathrm{mol}$.
 3. Convert moles to molecules: $0.999\ \mathrm{mol}\times 6.022\times 10^{23}\ \mathrm{molecules\ mol^{-1}} = 6.02\times 10^{23}$ molecules.
 4. Each molecule contains two hydrogen atoms, so hydrogen atoms $=2(6.02\times 10^{23})=1.20\times 10^{24}$.
 
-    Checked answer. $0.999\ \mathrm{mol\ H_2O}$, $6.02\times 10^{23}$ molecules, and $1.20\times 10^{24}$ hydrogen atoms. The mass is essentially one molar mass of water, so the molecule count should be essentially one Avogadro number.
+Checked answer: $0.999\ \mathrm{mol\ H_2O}$, $6.02\times 10^{23}$ molecules, and $1.20\times 10^{24}$ hydrogen atoms. The mass is essentially one molar mass of water, so the molecule count should be essentially one Avogadro number.
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+Identify the conserved quantity before choosing an equation. Here the units and particle count chosen in the first step control every later step. If the magnitude, units, or limiting condition contradicts the chemical picture, restart from the definition rather than patching the arithmetic.
 
-## Worked example 2: Choosing the right chapter tool
+## Neutralization comes before the logarithm
 
 Problem. A student mixes 25.00 mL of 0.1000 M HCl with 25.00 mL of 0.0800 M NaOH. Decide what concept controls the final pH before doing any logarithm.
 
-    Method.
+Method:
 
-    1. Classify the process as a strong acid-strong base neutralization: $\mathrm{H^+ + OH^- \to H_2O}$.
+1. Classify the process as a strong acid-strong base neutralization: $\mathrm{H^+ + OH^- \to H_2O}$.
 2. Convert volumes to liters: $0.02500\ \mathrm{L}$ for each solution.
 3. Compute acid moles: $0.1000\ \mathrm{mol\ L^{-1}}\times 0.02500\ \mathrm{L}=0.002500\ \mathrm{mol\ H^+}$.
 4. Compute base moles: $0.0800\ \mathrm{mol\ L^{-1}}\times 0.02500\ \mathrm{L}=0.002000\ \mathrm{mol\ OH^-}$.
 5. The limiting reactant is hydroxide, leaving $0.000500\ \mathrm{mol\ H^+}$ in a total volume of $0.05000\ \mathrm{L}$.
 6. Concentration after reaction is $0.000500/0.05000=0.0100\ \mathrm{M}$, so $\mathrm{pH}=-\log(0.0100)=2.000$.
 
-    Checked answer. The controlling idea is stoichiometry first and pH second; the final pH is 2.000. Acid was in excess, so the pH must be below 7.
+Checked answer: the controlling idea is stoichiometry first and pH second; the final pH is 2.000. Acid was in excess, so the pH must be below 7.
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+Again, the units, coefficients, charges, and particles chosen at the start control the rest of the solution. A plausible logarithm cannot repair incorrect reaction stoichiometry.
 
-## Code
+## Checks that catch wrong chemistry
 
-```python
-from math import log10
+- Write the conservation law or model beside a formula instead of treating chapters as unrelated formula lists.
+- Complete any strong-reaction stoichiometry before setting up an equilibrium or pH calculation.
+- Name coefficients, subscripts, and charges explicitly; they count different things.
+- Carry the units attached to constants and tabulated values.
+- A large $K$ describes thermodynamic favorability, not a fast reaction.
+- Descriptive trends are easier to retain when tied to electron structure and bonding.
 
-NA = 6.022e23
-mass_water_g = 18.0
-molar_mass_water = 18.016
-moles = mass_water_g / molar_mass_water
-molecules = moles * NA
-hydrogen_atoms = 2 * molecules
+<div className="see-also">
 
-h_excess_mol = 0.002500 - 0.002000
-h_conc = h_excess_mol / 0.05000
-pH = -log10(h_conc)
-print(moles, molecules, hydrogen_atoms, pH)
-```
+See also: [Chemistry and measurement](/chemistry/general/chemistry-and-measurement) · [Stoichiometry](/chemistry/general/stoichiometry) · [Chemical equilibrium](/chemistry/general/chemical-equilibrium) · [Organic chemistry](/chemistry/general/organic-chemistry)
 
-## Common pitfalls
-
-- Studying chapters as unrelated formula lists. Avoid it by writing the conservation law or model beside every formula.
-- Starting an equilibrium or pH problem before reaction stoichiometry is complete. Avoid it by checking whether a strong reaction consumes a reagent first.
-- Using coefficients, subscripts, and charges interchangeably. Avoid it by naming what each number represents before calculating.
-- Ignoring units in constants. Avoid it by recording units with every tabulated value.
-- Assuming a large $K$ means a fast reaction. Avoid it by separating thermodynamic favorability from kinetic rate.
-- Treating descriptive chemistry as memorization only. Avoid it by connecting families and functional groups to electron structure and bonding.
-
-## Connections
-
-- [chemistry and measurement](/chemistry/general/chemistry-and-measurement)
-- [stoichiometry](/chemistry/general/stoichiometry)
-- [chemical equilibrium](/chemistry/general/chemical-equilibrium)
-- [organic chemistry](/chemistry/general/organic-chemistry)
+</div>

@@ -9,7 +9,7 @@ Genetic algorithms search a hypothesis space by maintaining a population of cand
 
 The chapter is brief relative to decision trees or Bayesian learning, but it contributes an important perspective: learning can be viewed as randomized population search. This is useful when hypotheses are hard to differentiate, search spaces are rugged, or candidate solutions have natural compositional encodings.
 
-## Definitions
+## Population search and its operators
 
 A genetic algorithm maintains a population:
 
@@ -41,7 +41,7 @@ Genetic programming extends the representation from fixed-length strings to exec
 
 A schema is a template describing a subset of strings, using symbols such as `0`, `1`, and `*` for "do not care." For example, `1*0**` matches all five-bit strings beginning with `1` and having third bit `0`.
 
-## Key results
+## What makes an encoding evolvable
 
 The genetic algorithm cycle is:
 
@@ -60,7 +60,7 @@ However, the flexibility has costs. Fitness evaluation can be expensive. Encodin
 
 A genetic algorithm is best understood as a search heuristic rather than a guaranteed route to the global optimum. It can be effective when the search space has reusable partial solutions and when fitness gives a useful signal before the full solution is perfect. If every partial solution has nearly identical fitness, selection has little guidance. If tiny encoding changes cause chaotic fitness changes, crossover and mutation may not preserve progress.
 
-Representation is therefore not a minor implementation detail. Suppose a rule set is encoded as a bit string. Adjacent bits might represent unrelated rule conditions, or they might represent conditions that naturally work together. One-point crossover is more likely to preserve useful combinations in the second design. This is why many successful evolutionary systems use domain-informed encodings rather than arbitrary strings.
+Representation is therefore not a minor implementation detail. Suppose a rule set is encoded as a bit string. Adjacent bits might represent unrelated rule conditions, or they might represent conditions that naturally work together. One-point crossover is more likely to preserve useful combinations in the second design. Many successful evolutionary systems consequently use domain-informed encodings rather than arbitrary strings.
 
 Genetic programming pushes this idea further by evolving program trees. A subtree can represent a meaningful expression, test, or action sequence. Crossover swaps subtrees, so the unit of recombination may be semantically larger than a bit. The benefit is expressive power; the risk is uncontrolled growth, often called bloat, where programs become larger without becoming better.
 
@@ -88,7 +88,7 @@ The same point applies to hyperparameters. Population size, mutation probability
 | Crossover | How are parts recombined? | Useful building blocks are disrupted |
 | Mutation | How is diversity introduced? | Search becomes random or stagnant |
 
-## Visual
+The cycle balances exploitation through fitness-biased selection with exploration through mutation and recombination.
 
 ```mermaid
 flowchart LR
@@ -100,19 +100,15 @@ flowchart LR
     N --> F
 ```
 
-The loop is a search process. Fitness guides exploitation, while mutation and recombination preserve exploration.
+### Cutting and recombining two chromosomes
 
-## Worked example 1: One-point crossover
-
-Problem: Two six-bit parent chromosomes are:
+Take two six-bit parent chromosomes:
 
 $$
 p_1=110010,\qquad p_2=001111.
 $$
 
 Apply one-point crossover after the third bit.
-
-Method:
 
 1. Split each parent after bit 3.
 
@@ -140,11 +136,11 @@ $$
 
    Both children have six bits, matching the parent encoding.
 
-Answer: The children are $110111$ and $001010$. The operation recombines existing genetic material without changing individual bits.
+The children are $110111$ and $001010$. The operation recombines existing genetic material without changing individual bits.
 
-## Worked example 2: Fitness-proportionate selection
+### Turning fitness values into selection probabilities
 
-Problem: A population has four hypotheses with fitness values:
+A population has four hypotheses with fitness values:
 
 | Hypothesis | Fitness |
 |---|---:|
@@ -154,8 +150,6 @@ Problem: A population has four hypotheses with fitness values:
 | $h_4$ | 40 |
 
 Compute the selection probability of each hypothesis under fitness-proportionate selection.
-
-Method:
 
 1. Sum fitness values.
 
@@ -187,9 +181,9 @@ $$
 0.10+0.20+0.30+0.40=1.00.
 $$
 
-Answer: The selection probabilities are 0.10, 0.20, 0.30, and 0.40. The highest-fitness hypothesis is most likely to reproduce, but lower-fitness hypotheses can still be selected, preserving diversity.
+The selection probabilities are 0.10, 0.20, 0.30, and 0.40. The highest-fitness hypothesis is most likely to reproduce, but lower-fitness hypotheses can still be selected, preserving diversity.
 
-## Code
+### Implementing crossover, mutation, and selection
 
 ```python
 import random
@@ -222,7 +216,7 @@ print(c1, c2)
 print(mutate(c1, p=0.05))
 ```
 
-## Common pitfalls
+## How evolutionary search loses its signal
 
 - Designing an encoding where crossover has no semantic value. Recombination helps only when substrings correspond to useful building blocks.
 - Using training accuracy as fitness without validation. A population can evolve overfit rules.
@@ -231,10 +225,8 @@ print(mutate(c1, p=0.05))
 - Treating the schema theorem as a complete guarantee of success. It gives useful intuition, not a universal convergence proof.
 - Forgetting evaluation cost. If each fitness call trains or simulates something expensive, population search can become impractical.
 
-## Connections
+<div className="see-also">
 
-- [Learning problems and system design](/cs/machine-learning/learning-problems-and-system-design)
-- [Rule learning and ILP](/cs/machine-learning/rule-learning-and-ilp)
-- [Evaluating hypotheses](/cs/machine-learning/evaluating-hypotheses)
-- [Computational learning theory](/cs/machine-learning/computational-learning-theory)
-- [Data mining](/cs/data-mining/)
+See also: [Learning problems and system design](/cs/machine-learning/learning-problems-and-system-design) · [Rule learning and ILP](/cs/machine-learning/rule-learning-and-ilp) · [Evaluating hypotheses](/cs/machine-learning/evaluating-hypotheses) · [Computational learning theory](/cs/machine-learning/computational-learning-theory) · [Data mining](/cs/data-mining/intro)
+
+</div>

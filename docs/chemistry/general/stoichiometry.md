@@ -5,141 +5,250 @@ sidebar_position: 4
 
 # Stoichiometry
 
-Stoichiometry turns a balanced chemical equation into a quantitative statement about reacting amounts. Because atoms are conserved, coefficients in the balanced equation become mole ratios. The method is simple in appearance but powerful: it connects grams in a bottle, particles in a formula, and products predicted from a reaction.
+A balanced chemical equation is a quantitative statement about reacting amounts. Its coefficients give mole ratios because atoms are conserved; molar masses then connect those ratios to laboratory measurements in grams.
 
-In the Ebbing and Gammon sequence this topic sits near chemical formulas, mole concept, balanced equations, limiting reagents, theoretical yield, and percent yield. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
+## Moles are the common currency
 
-![A visible chemical reaction produces color and gas as reactants combine in laboratory glassware.](https://commons.wikimedia.org/wiki/Special:FilePath/Chemical_reaction.jpg)
+Molar mass is the mass of one mole of a substance, and Avogadro's constant $N_A$ converts moles to a particle count:
 
-*Figure: Laboratory reaction illustrating why balanced equations must be connected to observable amounts. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Chemical_reaction.jpg), Daria55, CC BY 4.0.*
+$$
+n=\frac{m}{M},\qquad N=nN_A.
+$$
 
-![A portrait shows Antoine-Laurent Lavoisier, associated with conservation of mass in chemical reactions.](https://commons.wikimedia.org/wiki/Special:FilePath/Lavoisier.jpg)
-
-*Figure: Antoine-Laurent Lavoisier, historical context for conservation-based chemical accounting. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Lavoisier.jpg), Jacques-Louis David, public domain.*
-
-## Definitions
-
-The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.
-
-- Molar mass is the mass in grams of one mole of a substance.
-- Formula mass is the sum of atomic masses in a formula unit.
-- Empirical formula is the simplest whole-number atom ratio in a compound.
-- Molecular formula is the actual atom count in one molecule and is a whole-number multiple of the empirical formula.
-- Stoichiometric coefficient is the number before a formula in a balanced equation.
-- Limiting reactant is the reactant consumed first and therefore sets the maximum product amount.
-- Theoretical yield is the maximum amount of product predicted by stoichiometry.
-- Percent yield is actual yield divided by theoretical yield, multiplied by 100 percent.
-
-Definitions in chemistry often connect a symbolic representation to a physical sample. A formula such as $\mathrm{H_2O}$ names a substance, gives the atomic ratio inside one molecule, and supplies the molar mass used in a macroscopic calculation. A state symbol such as $\mathrm{(aq)}$ is not cosmetic; it says the species is dispersed in water and may be treated as ions when writing a net ionic equation. In the same way, constants such as $R$, $K_w$, $F$, or $N_A$ are compact definitions of the measurement system being used.
-
-## Key results
-
-The central results are:
-
-- Mass to moles: $n=m/M$.
-- Moles to particles: particles $=nN_A$.
-- Mass percent of element: $\%A=\mathrm{mass\ of\ A}/\mathrm{mass\ of\ compound}\times 100\%$.
-- Empirical formula from percent composition: assume 100 g, convert to moles, divide by the smallest mole amount.
-- Stoichiometric conversion: $n_B=n_A(\mathrm{coefficient\ of\ B}/\mathrm{coefficient\ of\ A})$.
-- Percent yield: $\%\ \mathrm{yield}=\mathrm{actual}/\mathrm{theoretical}\times100\%$.
-
-Every stoichiometry problem has a central bridge: moles. Grams are laboratory-scale measurements, formula subscripts are particle ratios, and coefficients are reaction ratios; moles let those languages communicate. The balanced equation must be completed before a limiting reagent calculation, because using an unbalanced equation silently changes the conservation law.
-
-A good way to use these results is to state the chemical model first, then substitute numbers second. For stoichiometry, the model usually answers questions such as what particles are present, what is conserved, which process is idealized, and which measurement is being interpreted. Once that sentence is clear, the algebra becomes a bookkeeping problem rather than a search for a memorized pattern.
-
-Units are part of the result, not decoration. Whenever a formula contains an empirical constant, a tabulated value, or a ratio of measured quantities, the units tell you whether the expression has been used in the intended form. This is especially important in general chemistry because several equations have nearly identical algebra but different meanings: pressure can be a measured state variable, an equilibrium correction, or a colligative effect; energy can be heat flow, enthalpy, internal energy, or free energy.
-
-The strongest check is an independent chemical interpretation. Ask whether the sign agrees with direction, whether a concentration can be negative, whether a mole ratio follows the balanced equation, whether an equilibrium shift opposes the stress, and whether a microscopic description explains the macroscopic number. These checks connect stoichiometry to neighboring topics instead of leaving it as an isolated technique.
-
-A second check is to compare the limiting cases. If a reactant amount goes to zero, a product amount cannot remain large. If temperature rises in a gas sample at fixed volume, pressure should not fall in an ideal model. If an acid is diluted, hydronium concentration should normally decrease unless a coupled equilibrium supplies more. Limiting cases often reveal algebra that has been rearranged correctly but applied to the wrong chemical situation.
-
-Finally, keep symbolic and particulate representations side by side. A balanced equation, an equilibrium expression, an orbital diagram, or a polymer repeat unit is a compact symbol for a population of particles. Translating that symbol into words forces you to say what is reacting, what is being counted, and what is being held constant. That translation is usually the difference between a calculation that can be adapted to a new problem and one that only imitates a worked example.
-
-## Visual
+Formula subscripts describe atom ratios within a formula unit or molecule. Stoichiometric coefficients describe ratios among reacting substances. Subscripts must not be changed to balance a reaction because doing so changes the substances themselves.
 
 ```mermaid
 flowchart LR
-  A[grams of A] -->|divide by molar mass| B[moles of A]
-  B -->|balanced equation mole ratio| C[moles of B]
-  C -->|multiply by molar mass| D[grams of B]
-  B --> E{"multiple reactants?"}
-  E -->|yes| F[compare possible product]
-  F --> G[limiting reactant]
+  A[Grams of A] -->|divide by molar mass| B[Moles of A]
+  B -->|balanced-equation ratio| C[Moles of B]
+  C -->|multiply by molar mass| D[Grams of B]
+  B --> E{"More than one reactant?"}
+  E -->|yes| F[Calculate product from each]
+  F --> G[Smaller product amount sets the limit]
   E -->|no| D
 ```
 
-| Task | First move | Key check |
+The equation must be balanced before any mole-ratio step. A calculation based on an unbalanced equation violates the atom accounting even if the arithmetic is clean.
+
+Balancing changes coefficients only. A useful order is to balance elements appearing in the fewest species first, leave free elemental oxygen or hydrogen until late, then reduce all coefficients to the smallest whole numbers. Polyatomic ions that remain intact may be balanced as units. Finally recount every element and, for ionic equations, charge.
+
+For propane combustion, begin with
+
+$$
+\mathrm{C_3H_8+O_2\rightarrow CO_2+H_2O}.
+$$
+
+Three carbon atoms require $3\mathrm{CO_2}$; eight hydrogens require $4\mathrm{H_2O}$. The products then contain ten oxygen atoms, requiring $5\mathrm{O_2}$:
+
+$$
+\mathrm{C_3H_8+5O_2\rightarrow3CO_2+4H_2O}.
+$$
+
+The coefficients describe molecule counts or mole amounts, not mass ratios. One mole of propane and five moles of oxygen do not have equal or coefficient-proportional masses.
+
+## Composition and formulas
+
+An empirical formula gives the smallest whole-number atom ratio. A molecular formula gives the actual atom count and is an integer multiple of the empirical formula. Formula mass is the sum of the atomic masses in one formula unit.
+
+| Task | First move | Check |
 |---|---|---|
-| Empirical formula | Percent to grams to moles | Whole-number ratio |
-| Molecular formula | Empirical mass to molar mass ratio | Integer multiplier |
-| Limiting reagent | Compute product from each reactant | Smaller product amount controls |
-| Percent yield | Compare actual to theoretical | Usually less than 100 percent |
+| Empirical formula | convert composition to moles | reduce to a small whole-number ratio |
+| Molecular formula | compare molar mass with empirical-formula mass | multiplier should be an integer |
+| Limiting reactant | calculate possible product from each reactant | smaller product amount controls |
+| Percent yield | compare isolated and theoretical product | investigate values above 100 percent |
 
-## Worked example 1: Empirical formula from mass percentages
+For an element A in a compound,
 
-Problem. A compound is 40.0 percent C, 6.7 percent H, and 53.3 percent O by mass. Find its empirical formula.
+$$
+\%A=\frac{\text{mass of A}}{\text{mass of compound}}\times100\%.
+$$
 
-    Method.
+## Empirical formula from mass percentages
 
-    1. Assume a 100.0 g sample: 40.0 g C, 6.7 g H, and 53.3 g O.
-2. Convert each mass to moles: C $=40.0/12.01=3.33$ mol, H $=6.7/1.008=6.65$ mol, O $=53.3/16.00=3.33$ mol.
-3. Divide all mole amounts by the smallest value, 3.33.
-4. Ratios are C $1.00$, H $2.00$, O $1.00$.
-5. Write the smallest whole-number formula: $\mathrm{CH_2O}$.
+A compound contains 40.0 percent C, 6.7 percent H, and 53.3 percent O by mass. Taking a 100.0 g basis gives 40.0 g C, 6.7 g H, and 53.3 g O. Convert each to moles:
 
-    Checked answer. The empirical formula is $\mathrm{CH_2O}$. The calculated molar mass of the empirical unit is about 30.03 g/mol, and its mass percentages reproduce the given values.
+$$
+n_C=\frac{40.0}{12.01}=3.33,
+$$
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+$$
+n_H=\frac{6.7}{1.008}=6.65,
+$$
 
-## Worked example 2: Limiting reagent and percent yield
+$$
+n_O=\frac{53.3}{16.00}=3.33.
+$$
 
-Problem. Hydrogen and nitrogen react as $\mathrm{N_2 + 3H_2 \to 2NH_3}$. If 10.0 g $\mathrm{N_2}$ and 2.00 g $\mathrm{H_2}$ react and 9.50 g $\mathrm{NH_3}$ is isolated, find the limiting reagent and percent yield.
+Dividing all three by 3.33 gives the ratio $1.00:2.00:1.00$, so the empirical formula is $\mathrm{CH_2O}$. Its empirical-formula mass is about $30.03\ \mathrm{g\,mol^{-1}}$, and recalculating the mass percentages reproduces the stated composition.
 
-    Method.
+Ratios close to halves or thirds should be multiplied by 2 or 3 rather than rounded immediately. Guard digits help distinguish a genuine fractional ratio from measurement noise.
 
-    1. Convert $\mathrm{N_2}$ to moles: $10.0/28.02=0.357$ mol.
-2. Convert $\mathrm{H_2}$ to moles: $2.00/2.016=0.992$ mol.
-3. Product from nitrogen: $0.357\times(2/1)=0.714$ mol $\mathrm{NH_3}$.
-4. Product from hydrogen: $0.992\times(2/3)=0.661$ mol $\mathrm{NH_3}$.
-5. Hydrogen gives less product, so it is limiting.
-6. Theoretical mass ammonia: $0.661\times17.03=11.3$ g.
-7. Percent yield: $9.50/11.3\times100=84.1\%$.
+If the measured molar mass of this compound were $180.2\ \mathrm{g\,mol^{-1}}$, compare it with the empirical-formula mass:
 
-    Checked answer. $\mathrm{H_2}$ is limiting and the percent yield is $84.1\%$. The yield is below 100 percent and nitrogen remains in excess.
+$$
+k=\frac{180.2}{30.03}=6.00.
+$$
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+Multiplying every empirical subscript by six gives the molecular formula $\mathrm{C_6H_{12}O_6}$. The multiplier applies to the entire empirical formula. A noninteger result far from experimental uncertainty signals that the composition, molar mass, or empirical formula needs rechecking.
 
-## Code
+## Combustion analysis recovers carbon and hydrogen
 
-```python
-def empirical_ratio(masses, molar_masses):
-    moles = [m / M for m, M in zip(masses, molar_masses)]
-    smallest = min(moles)
-    return [x / smallest for x in moles]
+Complete combustion sends all carbon in an unknown compound to $\mathrm{CO_2}$ and all hydrogen to $\mathrm{H_2O}$. The product masses therefore reveal element amounts. If combustion gives $0.440\ \mathrm{g\ CO_2}$ and $0.180\ \mathrm{g\ H_2O}$,
 
-ratio = empirical_ratio([40.0, 6.7, 53.3], [12.01, 1.008, 16.00])
+$$
+n(\mathrm{CO_2})=\frac{0.440}{44.01}=0.0100\ \mathrm{mol},
+$$
 
-n2 = 10.0 / 28.02
-h2 = 2.00 / 2.016
-nh3_from_n2 = n2 * 2
-nh3_from_h2 = h2 * (2 / 3)
-theoretical_g = min(nh3_from_n2, nh3_from_h2) * 17.03
-percent_yield = 9.50 / theoretical_g * 100
-print(ratio, percent_yield)
-```
+so the sample contained $0.0100\ \mathrm{mol}$ C. Also,
 
-## Common pitfalls
+$$
+n(\mathrm{H_2O})=\frac{0.180}{18.015}=0.00999\ \mathrm{mol},
+$$
 
-- Using grams directly in mole ratios. Avoid it by converting every reacting mass to moles first.
-- Choosing the reactant with the smaller mass as limiting. Avoid it by comparing possible product amounts instead.
-- Rounding empirical formula ratios too early. Avoid it by using guard digits and checking near-integer multiples.
-- Using subscripts as reaction coefficients. Avoid it by balancing the equation and using coefficients for reaction ratios.
-- Reporting percent yield without units or context. Avoid it by identifying actual and theoretical yields explicitly.
-- Assuming the theoretical yield is what was collected. Avoid it by separating prediction from experiment.
+which corresponds to $2(0.00999)=0.0200\ \mathrm{mol}$ H atoms. The C:H ratio is $1:2$. Oxygen in the unknown cannot be inferred from the oxygen content of the products without also using the original sample mass, because combustion oxygen came from both sample and $\mathrm{O_2}$.
 
-## Connections
+Hydrates use similar mass accounting. Heating a hydrate to constant mass removes water, so mass lost is assigned to water and residue to anhydrous salt. Convert both to moles and find the ratio in $\mathrm{salt}\cdot x\mathrm{H_2O}$. Incomplete drying makes $x$ too small or too large depending on which mass is misassigned; decomposition of the salt invalidates the simple model.
 
-- [atoms, molecules, and ions](/chemistry/general/atoms-molecules-and-ions)
-- [aqueous reactions and solution stoichiometry](/chemistry/general/aqueous-reactions-and-solution-stoichiometry)
-- [gases](/chemistry/general/gases)
-- [thermochemistry](/chemistry/general/thermochemistry)
+## Limiting hydrogen in ammonia synthesis
+
+For
+
+$$
+\mathrm{N_2+3H_2\to2NH_3},
+$$
+
+suppose 10.0 g $\mathrm{N_2}$ reacts with 2.00 g $\mathrm{H_2}$.
+
+The reactant amounts are
+
+$$
+n(\mathrm{N_2})=\frac{10.0}{28.02}=0.357\ \mathrm{mol},
+$$
+
+$$
+n(\mathrm{H_2})=\frac{2.00}{2.016}=0.992\ \mathrm{mol}.
+$$
+
+Each reactant predicts a possible ammonia amount:
+
+$$
+0.357\left(\frac{2}{1}\right)=0.714\ \mathrm{mol\ NH_3},
+$$
+
+$$
+0.992\left(\frac{2}{3}\right)=0.661\ \mathrm{mol\ NH_3}.
+$$
+
+Hydrogen predicts less product and is the limiting reactant. The theoretical ammonia mass is
+
+$$
+(0.661)(17.03)=11.3\ \mathrm{g}.
+$$
+
+If 9.50 g is isolated, then
+
+$$
+\%\text{ yield}=\frac{9.50}{11.3}\times100=84.1\%.
+$$
+
+Nitrogen remains in excess. The smaller starting mass did not determine the limit; the balanced reaction ratio did.
+
+The amount of excess nitrogen left can also be calculated. Hydrogen consumes nitrogen in a $3:1$ ratio:
+
+$$
+n(\mathrm{N_2\ consumed})=0.992\left(\frac{1}{3}\right)=0.331\ \mathrm{mol}.
+$$
+
+Subtract from the initial amount:
+
+$$
+n(\mathrm{N_2\ left})=0.357-0.331=0.026\ \mathrm{mol}.
+$$
+
+This subtraction must use the consumed amount, not the theoretical product amount. The excess reagent has not vanished merely because one reactant stopped the reaction.
+
+## A dimensional-analysis chain
+
+For a mass-to-mass calculation, units can expose the logic in one line. How much oxygen is needed to burn $22.0\ \mathrm{g}$ propane?
+
+$$
+22.0\ \mathrm{g\ C_3H_8}
+\left(\frac{1\ \mathrm{mol\ C_3H_8}}{44.10\ \mathrm{g\ C_3H_8}}\right)
+\left(\frac{5\ \mathrm{mol\ O_2}}{1\ \mathrm{mol\ C_3H_8}}\right)
+\left(\frac{32.00\ \mathrm{g\ O_2}}{1\ \mathrm{mol\ O_2}}\right)
+=79.8\ \mathrm{g\ O_2}.
+$$
+
+Every unwanted unit cancels. Coefficients convert moles to moles only; inserting a coefficient ratio directly between grams silently assumes equal molar masses.
+
+Particle-count problems use the same bridge. Convert molecules or formula units to moles with $N_A$, apply the coefficient ratio, then convert to the requested particles. For gases at specified conditions, a molar volume or ideal-gas equation supplies the final bridge; a volume ratio equals the coefficient ratio only when gases share temperature and pressure.
+
+## Purity, yield, and sequential reactions
+
+If a reagent sample is 85.0 percent pure by mass, only $0.850$ times its sample mass enters the stoichiometric calculation unless the impurity also reacts. Purity belongs before determining the limiting reagent. Percent yield belongs after theoretical yield:
+
+$$
+\%\text{ yield}=\frac{\text{actual}}{\text{theoretical}}(100\%).
+$$
+
+For a multistep synthesis with independent yields, multiply fractional yields. A theoretical $10.0\ \mathrm{g}$ product passing through 80 percent and then 75 percent-yield steps gives
+
+$$
+(10.0)(0.80)(0.75)=6.0\ \mathrm{g},
+$$
+
+not $10.0(1-0.20-0.25)$. The output of the first step is the input basis for the second.
+
+Stoichiometry predicts amounts if the stated reaction occurs. It does not establish whether a reaction is thermodynamically favorable, fast, selective, or at equilibrium. Those questions require thermodynamics, kinetics, and equilibrium analysis in addition to atom conservation.
+
+## What an experimental yield can reveal
+
+The theoretical yield is the maximum predicted by the stated stoichiometry and limiting reactant. Actual yield is the measured isolated amount. Loss during transfer, incomplete reaction, side reactions, or purification commonly lowers percent yield. A value above 100 percent points to wet or impure product, a measurement problem, or an incorrect theoretical calculation rather than exceptional conversion.
+
+Useful checks are terse:
+
+- convert every reacting amount to moles before using coefficients;
+- compare possible product amounts rather than reactant masses;
+- keep formula subscripts separate from reaction coefficients;
+- state which number is actual and which is theoretical before taking their ratio;
+- verify that the final units and magnitude fit the balanced equation.
+
+## Reaction extent keeps the accounting consistent
+
+For a balanced reaction with stoichiometric numbers $\nu_i$, the change in each amount can be written
+
+$$
+\Delta n_i=\nu_i\xi,
+$$
+
+where reactant $\nu_i$ values are negative, product values positive, and $\xi$ is the reaction extent. In ammonia synthesis, one mole of extent consumes one mole $\mathrm{N_2}$ and three moles $\mathrm{H_2}$ while producing two moles $\mathrm{NH_3}$. The limiting reagent is the one that permits the smallest nonnegative final extent.
+
+Extent prevents a common mistake in reversible or incomplete reactions: balanced coefficients specify changes, not necessarily final amounts. At equilibrium, reactants can remain even when neither was initially “in excess” by the complete-reaction model. Stoichiometric tables provide the amount changes; an equilibrium constant determines how far the reaction proceeds.
+
+## Significant figures and exact coefficients
+
+Stoichiometric coefficients and formula subscripts are exact counted relationships, so they do not limit significant figures. Measured masses, volumes, concentrations, and tabulated quantities do. Intermediate values should retain guard digits, with rounding deferred until the final requested result. Premature rounding is especially damaging when subtracting nearly equal excess amounts.
+
+Dimensional correctness is necessary but not sufficient. A reversed mole ratio can still cancel units if written carelessly. Estimate scale before calculation: if one mole of reactant yields two moles of a lighter product, the product mass may be larger or smaller depending on molar masses and other reactants. Conservation of total mass applies to the closed reaction system, not to one selected product.
+
+## Mixtures require more than one relation
+
+If a sample contains two reactive components, one product measurement usually gives one equation for two unknown amounts. Total sample mass supplies a second equation. For a mixture of carbonates that both release $\mathrm{CO_2}$, write the gas amount as the sum of each component's stoichiometric contribution and solve simultaneously with the mass balance.
+
+The method assumes the listed components are the only contributors and reactions go to completion. Extra moisture, inert filler, or side products add unknowns. A mathematically solvable pair of equations can still model the wrong sample, so qualitative identity and experimental conditions belong in the setup.
+
+When coefficients are fractional, they remain valid mole ratios, but whole-number coefficients are usually preferred for molecular interpretation. Scaling every coefficient leaves all physical predictions unchanged if the reaction enthalpy and extent convention are scaled consistently. Scaling only one coefficient creates a different, unbalanced statement.
+
+Stoichiometric equivalence at a titration endpoint is a mole relation, not necessarily equal volumes or concentrations. A diprotic acid may consume two moles of hydroxide per mole under complete neutralization. Indicator color and instrumental endpoint are experimental estimates of that equivalence point and can introduce a small systematic offset.
+
+## Sanity checks from conservation
+
+For a closed system, total mass before and after reaction agrees even when gas production seems to remove mass from an open vessel. Apparent loss may be material crossing the chosen boundary. Charge and each element are also independently conserved in ordinary chemical reactions.
+
+An answer should be tested against limiting bounds. Product moles cannot exceed the amount permitted by any reactant, percent yield should not exceed 100 percent for pure dry product under the stated model, and an excess amount cannot be negative. These checks catch reversed ratios more quickly than repeating identical arithmetic.
+
+<div className="see-also">
+
+See also: [atoms, molecules, and ions](/chemistry/general/atoms-molecules-and-ions) · [aqueous reactions and solution stoichiometry](/chemistry/general/aqueous-reactions-and-solution-stoichiometry) · [gases](/chemistry/general/gases) · [thermochemistry](/chemistry/general/thermochemistry)
+
+</div>

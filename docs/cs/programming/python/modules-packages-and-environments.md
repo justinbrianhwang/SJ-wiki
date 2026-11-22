@@ -9,7 +9,7 @@ As Python programs grow, one file becomes too crowded. The textbook introduces m
 
 A module gives code a home. A package groups related modules. An environment decides which interpreter and installed packages are available. Good Python projects keep these layers explicit: local modules for project code, the standard library for built-in capabilities, third-party packages for external functionality, and an isolated environment to make the setup reproducible.
 
-## Definitions
+## Modules, packages, and interpreter environments
 
 A **module** is a Python file. If a file is named `fahrenheit.py`, its module name is usually `fahrenheit`, and functions inside it can be imported:
 
@@ -36,13 +36,13 @@ An **environment** is the interpreter plus the libraries available to it. A virt
 
 A **dependency file** records what a project needs. With `pip`, a simple form is `requirements.txt`; with Conda, `environment.yml` is common.
 
-## Key results
+## Imports execute code and resolve through one interpreter
 
-The first key result is that imports should be explicit enough to keep names understandable. `import math` followed by `math.sin(x)` makes the module source visible. `from math import sin` is fine for a small number of very common functions. `from math import *` is discouraged because it fills the namespace with many names and can create collisions.
+Imports should be explicit enough to keep names understandable. `import math` followed by `math.sin(x)` keeps the source module in the call. `from math import sin` is fine for a small number of very common functions. `from math import *` is discouraged because it fills the namespace with many names and can create collisions.
 
-The second result is that Python searches for imports along `sys.path`. The script directory is usually first, which is why naming a file `math.py` or `random.py` can shadow the standard library module of the same name.
+Python searches for imports along `sys.path`. The script directory is usually first, which is why naming a file `math.py` or `random.py` can shadow the standard library module of the same name.
 
-The third result is that modules run when imported. Top-level statements execute once at import time. Therefore reusable modules should put demonstrations and command-line behavior under:
+Modules run when imported. Top-level statements execute once at import time. Therefore reusable modules should put demonstrations and command-line behavior under:
 
 ```python
 if __name__ == "__main__":
@@ -51,19 +51,19 @@ if __name__ == "__main__":
 
 When the file is run as a script, `__name__` is `"__main__"`. When it is imported, `__name__` is the module name.
 
-The fourth result is that package installation and import names are related but not always identical. You might install `python-dateutil` but import `dateutil`. Read package documentation and avoid guessing.
+Package installation and import names are related but not always identical. You might install `python-dateutil` but import `dateutil`. Read package documentation and avoid guessing.
 
-The fifth result is that environment isolation prevents accidental dependencies. If code works only because a package is globally installed on one computer, it will fail elsewhere. A fresh virtual environment is a good test of whether the project's setup instructions are complete.
+Environment isolation prevents accidental dependencies. If code works only because a package is globally installed on one computer, it will fail elsewhere. A fresh virtual environment is a good test of whether the project's setup instructions are complete.
 
-The sixth result is that module design is about stable boundaries. Put functions and classes that are reused together. Avoid circular imports where module A imports B and B imports A; they often signal that shared logic belongs in a third module.
+Module design is about stable boundaries. Put functions and classes that are reused together. Avoid circular imports where module A imports B and B imports A; they often signal that shared logic belongs in a third module.
 
-A seventh result is that import time should be boring. A module should define functions, classes, constants, and lightweight configuration when imported. It should not ask the user for input, open a GUI, start a server, download data, or run a long calculation unless that is the documented purpose of importing it. This is why examples often place demonstration code under the `if __name__ == "__main__":` guard: the file can be both imported as a module and run as a script.
+Import time should be boring. A module should define functions, classes, constants, and lightweight configuration when imported. It should not ask the user for input, open a GUI, start a server, download data, or run a long calculation unless that is the documented purpose of importing it. Demonstration code therefore often sits under the `if __name__ == "__main__":` guard, allowing the file to be imported as a module or run as a script.
 
-An eighth result is that package boundaries should match ownership of ideas. A project might have `io.py` for reading files, `models.py` for data classes, `analysis.py` for calculations, and `plotting.py` for visual output. That organization is not mandatory, but it illustrates a principle: files should be named after responsibilities, not after vague stages such as `misc.py` or `stuff.py`. Vague module names tend to collect unrelated code.
+Package boundaries should match ownership of ideas. A project might have `io.py` for reading files, `models.py` for data classes, `analysis.py` for calculations, and `plotting.py` for visual output. That organization is not mandatory, but it illustrates a principle: files should be named after responsibilities, not after vague stages such as `misc.py` or `stuff.py`. Vague module names tend to collect unrelated code.
 
 Finally, environment files are part of project communication. A short `requirements.txt` or Conda environment file tells another person how to reproduce the imports. Without it, a project depends on memory and local machine history. When a script imports third-party packages, update the dependency record at the same time as the code.
 
-## Visual
+The project tree and the active environment meet at import time:
 
 ```mermaid
 flowchart TD
@@ -86,7 +86,7 @@ flowchart TD
 | Star import | `from math import *` | Very short in tiny experiments | Namespace pollution |
 | Relative import | `from .utils import clean` | Works inside packages | Only valid in package context |
 
-## Worked example 1: create and import a conversion module
+## Extracting conversion functions into a module
 
 Problem: move temperature conversion functions into a reusable module and call them from a separate script.
 
@@ -135,7 +135,7 @@ Checked answer:
 
 The functions can now be imported by tests, notebooks, or other scripts without copying their definitions.
 
-## Worked example 2: diagnose the wrong package environment
+## Diagnosing a mismatched editor environment
 
 Problem: `python -m pip install pandas` succeeds, but the editor still says `ModuleNotFoundError: No module named 'pandas'`.
 
@@ -170,7 +170,7 @@ Step-by-step reasoning:
 
 Checked answer: the error is not really about pandas; it is about two different interpreters. The fix is to align installation and execution.
 
-## Code
+## Tracing interpreter and module resolution
 
 ```python
 import importlib.util
@@ -195,7 +195,7 @@ This diagnostic script reports which interpreter is running and where selected m
 
 Run this script from the same place that runs the failing program: the editor's run button, the terminal, a notebook cell, or a scheduled task. Environment problems are context problems. A command that works in one terminal does not prove that a notebook kernel, IDE debugger, or service account uses the same interpreter. When documenting a project, include the command used to create the environment and the command used to run the program so another person can reproduce both steps.
 
-## Common pitfalls
+## Import and environment failures
 
 - Naming a local file after a standard library module, such as `statistics.py`, `json.py`, or `typing.py`.
 - Using `from module import *` in real projects and losing track of where names came from.
@@ -205,9 +205,8 @@ Run this script from the same place that runs the failing program: the editor's 
 - Committing virtual environment directories into source control. Commit dependency files instead.
 - Creating circular imports because two modules know too much about each other.
 
-## Connections
+<div className="see-also">
 
-- [Setup, REPL, and Environments](/cs/programming/python/setup-repl-and-environments)
-- [Functions, Arguments, and Decorators](/cs/programming/python/functions-arguments-and-decorators)
-- [Files and Context Managers](/cs/programming/python/files-and-context-managers)
-- [Standard Library Highlights](/cs/programming/python/standard-library-highlights)
+See also: [Setup, REPL, and Environments](/cs/programming/python/setup-repl-and-environments) · [Functions, Arguments, and Decorators](/cs/programming/python/functions-arguments-and-decorators) · [Files and Context Managers](/cs/programming/python/files-and-context-managers) · [Standard Library Highlights](/cs/programming/python/standard-library-highlights)
+
+</div>

@@ -9,7 +9,7 @@ Steady-state error measures the accuracy left after transients have died out. In
 
 The chapter's main message is that low-frequency loop structure determines tracking accuracy. System type, static error constants, disturbance location, nonunity feedback, and parameter sensitivity all describe what remains after the fast behavior is gone. These ideas explain why integral action is so valuable and why gain alone often creates trade-offs with transient response.
 
-## Definitions
+## Error constants from the low-frequency loop
 
 For a unity negative-feedback system with forward transfer function $G(s)$,
 
@@ -60,7 +60,7 @@ S_T^a=\frac{\partial T/T}{\partial a/a}
 =\frac{a}{T}\frac{\partial T}{\partial a}.
 $$
 
-## Key results
+## What system type guarantees
 
 For unity feedback, system type determines which polynomial inputs can be tracked with zero error:
 
@@ -96,7 +96,7 @@ $$
 
 This is one of the central reasons feedback is used.
 
-The final value theorem has a hidden stability requirement. It is not enough to take $\lim_{s\to0}sE(s)$ algebraically. All poles of $sE(s)$ must be in the open left half-plane for the limit to equal the time-domain final value. If the closed-loop system is unstable, the computed "steady-state error" may be a finite number even though the actual signal diverges. This is why Nise places stability before steady-state error in the sequence.
+The final value theorem has a hidden stability requirement. It is not enough to take $\lim_{s\to0}sE(s)$ algebraically. All poles of $sE(s)$ must be in the open left half-plane for the limit to equal the time-domain final value. If the closed-loop system is unstable, the computed "steady-state error" may be finite even though the actual signal diverges. Stability must therefore be checked before steady-state error.
 
 System type should be read after the loop has been put into the proper unity-feedback form. A sensor gain $H(s)$ changes the relationship between the summing-junction error and the physical tracking error. If $H(0)\ne1$, the output may settle to a scaled version of the reference even when the summing-junction error goes to zero. In instrumentation problems, calibration can be as important as controller type.
 
@@ -110,7 +110,7 @@ The input class must be specified when stating an error requirement. "Zero stead
 
 Error constants also assume polynomial inputs of unit size. If the ramp has slope $A$, then the ramp input is $A/s^2$ and the steady-state error is $A/K_v$. If a parabolic input has a different acceleration coefficient, scale the formula accordingly. Always keep the command magnitude with the calculation rather than quoting only the unit-input result.
 
-## Visual
+### Where tracking errors and disturbances enter
 
 ```mermaid
 flowchart LR
@@ -132,17 +132,15 @@ flowchart LR
 | Improve sensor calibration | reduces nonunity scaling error | hardware cost |
 | Feedforward known command | reduces predictable error | weak against unmodeled disturbances |
 
-## Worked example 1: system type and static error constants
+## Type 1 tracking of a step and a ramp
 
-Problem: A unity-feedback system has
+A unity-feedback system has
 
 $$
 G(s)=\frac{20(s+2)}{s(s+5)}.
 $$
 
 Find the system type and steady-state errors for unit step and unit ramp inputs.
-
-Method:
 
 1. Count pure integrators in $G(s)$. There is one pole at the origin, so the system is Type 1.
 
@@ -189,13 +187,11 @@ $$
 e_{ss,\text{ramp}}=\frac{1}{K_v}=\frac{1}{8}=0.125.
 $$
 
-Checked answer: Type 1, zero step error, ramp error $0.125$.
+The loop is Type 1, with zero step error and ramp error $0.125$.
 
-## Worked example 2: sensitivity reduction by feedback
+## Quantifying feedback's reduction in gain sensitivity
 
-Problem: A closed-loop unity-feedback system has forward path $G=50$ at low frequency. Estimate the sensitivity of closed-loop gain $T=G/(1+G)$ to a fractional change in $G$. If $G$ increases by $10\%$, approximately how much does $T$ change?
-
-Method:
+A closed-loop unity-feedback system has forward path $G=50$ at low frequency. Estimate the sensitivity of closed-loop gain $T=G/(1+G)$ to a fractional change in $G$. If $G$ increases by $10\%$, approximately how much does $T$ change?
 
 1. Use the sensitivity formula:
 
@@ -228,9 +224,9 @@ $$
 0.00196\times100\%=0.196\%.
 $$
 
-Checked answer: the closed-loop gain changes by only about $0.2\%$ for a $10\%$ forward-path gain change, assuming the low-frequency gain model applies.
+The closed-loop gain changes by about $0.2\%$ for a $10\%$ forward-path gain change, assuming the low-frequency gain model applies.
 
-## Code
+## Evaluating error constants symbolically
 
 ```python
 import sympy as sp
@@ -253,7 +249,7 @@ sensitivity = 1 / (1 + G0)
 print("closed-loop sensitivity:", sensitivity)
 ```
 
-## Common pitfalls
+## Before trusting a final-value calculation
 
 - Applying the final value theorem before verifying closed-loop stability.
 - Counting system type from the closed-loop transfer function instead of the unity-feedback forward path.
@@ -262,10 +258,14 @@ print("closed-loop sensitivity:", sensitivity)
 - Forgetting disturbance location. There is no single disturbance rejection formula for every injection point.
 - Solving for low steady-state error by gain alone when the specification really requires a higher system type.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Routh-Hurwitz stability](/cs/control-engineering/routh-hurwitz-stability) is required before final-value calculations are trusted.
 - [PID and compensators](/cs/control-engineering/pid-lead-lag-and-lag-lead-compensators) explains integral and lag actions for error improvement.
 - [Root-locus design](/cs/control-engineering/root-locus-design-and-classical-compensation) shows the transient cost of changing gain.
 - [Frequency-response design](/cs/control-engineering/frequency-response-compensator-design) shapes low-frequency gain and margins together.
-- [Embedded control](/cs/embedded/) adds implementation limits such as finite resolution and actuator saturation.
+- [Embedded control](/cs/embedded/intro) adds implementation limits such as finite resolution and actuator saturation.
+
+</div>

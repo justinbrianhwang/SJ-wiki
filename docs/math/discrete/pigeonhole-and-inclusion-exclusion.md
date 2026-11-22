@@ -9,7 +9,7 @@ The pigeonhole principle proves that collisions are unavoidable. Inclusion-exclu
 
 Both tools require careful modeling. For pigeonhole arguments, the hard part is choosing boxes so that sharing a box gives the desired conclusion. For inclusion-exclusion, the hard part is identifying which objects were counted more than once and correcting in the right alternating pattern.
 
-## Definitions
+## Crowded boxes and overlapping sets
 
 The **pigeonhole principle** says that if $N$ objects are placed into $k$ boxes and $N\gt k$, then some box contains at least two objects.
 
@@ -20,6 +20,14 @@ $$
 $$
 
 objects. Equivalently, if more than $k(r-1)$ objects are placed into $k$ boxes, then some box contains at least $r$ objects.
+
+```mermaid
+flowchart TD
+  A[Objects] --> B[Assign each object to a box]
+  B --> C{"More objects than capacity?"}
+  C -->|yes| D[Some box is crowded]
+  C -->|no| E[Pigeonhole conclusion not forced]
+```
 
 The **principle of inclusion-exclusion** for two sets is
 
@@ -38,7 +46,7 @@ $$
 
 A **derangement** is a permutation with no fixed points. Derangements are a classic inclusion-exclusion application because the forbidden events "position $i$ is fixed" overlap.
 
-## Key results
+## Alternating corrections in inclusion-exclusion
 
 General inclusion-exclusion for finite sets $A_1,\dots,A_n$:
 
@@ -73,16 +81,6 @@ $$
 
 Factoring out $n!$ yields the formula above.
 
-## Visual
-
-```mermaid
-flowchart TD
-  A[Objects] --> B[Assign each object to a box]
-  B --> C{"More objects than capacity?"}
-  C -->|yes| D[Some box is crowded]
-  C -->|no| E[Pigeonhole conclusion not forced]
-```
-
 | Tool | What it proves or counts | Modeling question |
 | --- | --- | --- |
 | basic pigeonhole | at least one collision | what are the boxes? |
@@ -92,11 +90,9 @@ flowchart TD
 | full inclusion-exclusion | union of many overlapping sets | what intersections have each size? |
 | derangements | avoid all fixed points | what forbidden events overlap? |
 
-## Worked example 1: Force a shared remainder
+## Eight integers force a repeated remainder modulo seven
 
 **Problem.** Prove that among any $8$ integers, two have the same remainder when divided by $7$.
-
-**Method.**
 
 1. The objects are the $8$ integers.
 2. The boxes are the possible remainders modulo $7$:
@@ -109,13 +105,11 @@ $$
 4. Each integer goes into exactly one box, according to its remainder.
 5. Since $8\gt 7$, the pigeonhole principle implies that some box contains at least two integers.
 
-**Checked answer.** Two of the integers have the same remainder modulo $7$. Equivalently, their difference is divisible by $7$.
+Two of the integers have the same remainder modulo $7$. Equivalently, their difference is divisible by $7$.
 
-## Worked example 2: Count integers divisible by 2, 3, or 5
+## Counting multiples of $2$, $3$, or $5$
 
 **Problem.** How many positive integers at most $100$ are divisible by $2$, $3$, or $5$?
-
-**Method.**
 
 1. Let $A_2,A_3,A_5$ be the sets of positive integers at most $100$ divisible by $2,3,5$ respectively.
 2. Single counts:
@@ -148,9 +142,9 @@ $$
 50+33+20-16-10-6+3=74.
 $$
 
-**Checked answer.** There are $74$ positive integers at most $100$ divisible by $2$, $3$, or $5$. The final $+3$ restores multiples of $30$, which were subtracted once too many after being included in all three single counts.
+There are $74$ positive integers at most $100$ divisible by $2$, $3$, or $5$. The final $+3$ restores multiples of $30$, which were subtracted once too many after being included in all three single counts.
 
-## Code
+## Enumerating small cases as a check
 
 ```python
 from math import factorial
@@ -174,7 +168,7 @@ print(count_divisible(100, [2, 3, 5]))
 
 The brute-force divisibility count is useful for checking the inclusion-exclusion calculation on small limits.
 
-## Common pitfalls
+## Modeling collisions and intersections carefully
 
 - Choosing boxes that do not imply the desired conclusion when two objects share a box.
 - Forgetting the ceiling in the generalized pigeonhole principle.
@@ -205,9 +199,13 @@ Pigeonhole conclusions are existential. They usually do not identify which objec
 
 For inclusion-exclusion, the full universe should be clear even when only a union is counted. In derangements, the universe is all permutations. In divisibility problems, it is usually integers in a bounded interval. Naming the universe clarifies whether the final answer is a raw union size, a complement count, or a probability.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Counting principles](/math/discrete/counting-principles) introduces the sum, subtraction, and division rules.
 - [Permutations and combinations](/math/discrete/permutations-and-combinations) supplies factorials and binomial coefficients.
 - [Discrete probability](/math/discrete/discrete-probability) uses inclusion-exclusion for probabilities of unions.
 - [Number theory basics](/math/discrete/number-theory-basics) supplies divisibility, remainders, gcds, and lcms.
+
+</div>

@@ -7,13 +7,9 @@ sidebar_position: 16
 
 The Linux case study ties the course concepts to a real operating system. The textbook chapter describes Linux through the 3.2 kernel era and presents it as a UNIX-like system that runs from small devices to large servers. Linux is useful pedagogically because it exposes the same abstractions studied earlier: processes, kernel threads, scheduling, memory management, file systems, I/O, IPC, networking, modules, and security.
 
-![The Linux mascot marks the operating-system pages that use Linux as a recurring case study.](https://commons.wikimedia.org/wiki/Special:FilePath/Tux.svg)
+The useful scale here is concept to implementation rather than a complete internals manual. A production kernel combines ideas that are often studied separately: a modular monolithic kernel, process descriptors, preemptive scheduling, virtual memory areas, page cache, virtual file system, block I/O layer, device drivers, and permission checks.
 
-*Figure: Linux provides the concrete kernel case study for many OS abstractions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tux.svg), Larry Ewing, Simon Budig, and Garrett LeSage, CC0/attribution permission.*
-
-This page is not a full Linux internals manual. It is a bridge from concept to implementation. The point is to see how a production kernel combines ideas that were studied separately: a modular monolithic kernel, process descriptors, preemptive scheduling, virtual memory areas, page cache, virtual file system, block I/O layer, device drivers, and permission checks.
-
-## Definitions
+## Kernel architecture and core objects
 
 **Linux** is a UNIX-like operating-system kernel originally released by Linus Torvalds and developed collaboratively. A complete Linux-based system combines the kernel with system libraries, tools, daemons, graphical components, package managers, and applications.
 
@@ -29,7 +25,7 @@ The **Virtual File System** (VFS) is an abstraction layer that lets Linux suppor
 
 **Kernel modules** are loadable pieces of kernel code. They improve flexibility but run with kernel privilege, so a module bug can crash or compromise the system.
 
-## Key results
+## Mapping course concepts onto Linux
 
 Linux demonstrates that "monolithic" and "modular" are not opposites in practice. Most core services run in kernel space for performance and integration, while modules provide extensibility. This is a pragmatic structure: it avoids the message-passing overhead of a pure microkernel for common paths, yet it allows optional drivers and file systems to be added without rebuilding the entire kernel image.
 
@@ -52,6 +48,8 @@ The VFS makes file operations polymorphic:
 | File object | Open file state | Open-file table entry |
 | Kernel module | Loadable privileged component | Modular kernel structure |
 
+## IPC, files, and protection in one kernel
+
 Security in Linux combines discretionary access control, user and group IDs, capabilities that split root privileges into smaller units, namespaces, cgroups, and optional security modules such as SELinux or AppArmor in many distributions. The textbook's Linux chapter emphasizes the kernel architecture through its historical point; modern deployments add many policy layers above the same core ideas.
 
 Linux IPC shows the continuity with earlier chapters. Pipes and FIFOs provide byte streams. Signals deliver asynchronous notifications. Shared memory gives fast communication but requires synchronization. Sockets support local and network communication through a common interface. Futexes, widely used by threading libraries, combine user-space fast paths with kernel assistance when a thread must block. These mechanisms are not interchangeable; they represent different points in the design space of performance, structure, and kernel involvement.
@@ -62,7 +60,7 @@ As a case study, Linux is best read as a set of concrete answers rather than the
 
 The same caution applies when reading kernel source or documentation: names are concrete, but concepts are portable. A Linux `task_struct` is not every operating system's PCB, yet it plays the same role of collecting execution state, scheduling information, credentials, and resource links. Learning the mapping from concept to Linux object makes the rest of the OS course less abstract.
 
-## Visual
+## How the kernel subsystems meet
 
 ```mermaid
 flowchart TB
@@ -83,9 +81,11 @@ flowchart TB
 
 Linux exposes a UNIX-like system-call interface while internally coordinating scheduler, memory, VFS, networking, and drivers inside a modular monolithic kernel.
 
-## Worked example 1: mapping `fork()` with copy-on-write
+## Following two common operations
 
-Problem: A Linux process has 100 MiB of private anonymous memory. It calls `fork()`, and the child immediately calls `exec()` to run another program. Why is copy-on-write efficient here?
+### `fork()` through copy-on-write
+
+A Linux process has 100 MiB of private anonymous memory. It calls `fork()`, and the child immediately calls `exec()` to run another program. Why is copy-on-write efficient here?
 
 1. Without copy-on-write, `fork()` would copy the parent's 100 MiB into a new child address space.
 2. If the child immediately calls `exec()`, that copied memory would be discarded almost at once.
@@ -95,11 +95,11 @@ Problem: A Linux process has 100 MiB of private anonymous memory. It calls `fork
 6. If the child calls `exec()` immediately, the old mappings are replaced by the new program image, and most pages were never copied.
 7. The work saved is approximately the full private memory size minus any pages written before `exec()`.
 
-Checked answer: Copy-on-write makes `fork()` plus immediate `exec()` efficient because page tables are copied and physical pages are shared until a write actually requires duplication.
+Copy-on-write makes `fork()` plus immediate `exec()` efficient because page tables are copied and physical pages are shared until a write actually requires duplication.
 
-## Worked example 2: connecting VFS objects to a file read
+### `read()` through VFS objects
 
-Problem: A process calls `read()` on an already open Linux file descriptor. Map the high-level operation to VFS-related objects.
+A process calls `read()` on an already open Linux file descriptor. Map the high-level operation to VFS-related objects.
 
 1. The file descriptor indexes the process's descriptor table.
 2. The descriptor table entry points to a kernel file object representing this open instance. The file object contains current offset and access mode.
@@ -109,9 +109,9 @@ Problem: A process calls `read()` on an already open Linux file descriptor. Map 
 6. If data is missing, the file system maps the file offset to storage blocks and submits block I/O through lower layers.
 7. After data arrives, the kernel updates the file offset and returns the byte count.
 
-Checked answer: A Linux `read()` moves from file descriptor to file object to dentry/inode to file-system operation, often using the page cache before reaching the block device.
+A Linux `read()` moves from file descriptor to file object to dentry/inode to file-system operation, often using the page cache before reaching the block device.
 
-## Code
+## Exercising Linux process creation
 
 ```c
 #include <stdio.h>
@@ -142,7 +142,7 @@ int main(void) {
 
 This program exercises the UNIX-like process model that Linux implements. Internally, Linux represents both parent and child as tasks and uses copy-on-write for the address space.
 
-## Common pitfalls
+## Where Linux names conceal distinctions
 
 - Equating Linux with a full distribution. Linux is the kernel; distributions add user-space components and policy.
 - Assuming "monolithic" means no modules. Linux is monolithic in kernel-space organization but supports loadable modules.
@@ -151,10 +151,8 @@ This program exercises the UNIX-like process model that Linux implements. Intern
 - Forgetting that modules run with kernel privilege. A faulty driver is not isolated like an ordinary application.
 - Applying textbook Linux 3.2 details as if every current kernel is identical. The concepts remain useful, but implementation details evolve.
 
-## Connections
+<div className="see-also">
 
-- [OS Overview, Services, and Structures](/cs/operating-systems/os-overview-structures)
-- [Processes](/cs/operating-systems/processes)
-- [CPU Scheduling](/cs/operating-systems/cpu-scheduling)
-- [Virtual Memory](/cs/operating-systems/virtual-memory)
-- [File-System Implementation](/cs/operating-systems/file-system-implementation)
+See also: [OS Overview, Services, and Structures](/cs/operating-systems/os-overview-structures) · [Processes](/cs/operating-systems/processes) · [CPU Scheduling](/cs/operating-systems/cpu-scheduling) · [Virtual Memory](/cs/operating-systems/virtual-memory) · [File-System Implementation](/cs/operating-systems/file-system-implementation)
+
+</div>

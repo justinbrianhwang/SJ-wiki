@@ -9,7 +9,7 @@ Diagonalization changes coordinates so that a linear transformation becomes simp
 
 This is where eigenvectors become computationally powerful. If a matrix can be written as $A=PDP^{-1}$, then powers, recurrences, and many qualitative questions reduce to the diagonal entries of $D$. The matrix $P$ changes from eigenvector coordinates to standard coordinates, while $P^{-1}$ changes back.
 
-## Definitions
+## Similar matrices and eigenvector coordinates
 
 Square matrices $A$ and $B$ are similar if there is an invertible matrix $P$ such that
 
@@ -35,7 +35,7 @@ The algebraic multiplicity of an eigenvalue is its multiplicity as a root of the
 
 Similarity is an equivalence relation: $A$ is similar to itself, similarity is symmetric, and similarity is transitive. Similar matrices represent the same linear map in different bases.
 
-## Key results
+## The eigenbasis test and what similarity preserves
 
 An $n\times n$ matrix $A$ is diagonalizable if and only if it has $n$ linearly independent eigenvectors. If $P=[\mathbf{v}_1\ \cdots\ \mathbf{v}_n]$ and $A\mathbf{v}_i=\lambda_i\mathbf{v}_i$, then
 
@@ -116,8 +116,6 @@ $$
 
 The entries of $D^k$ are powers of eigenvalues. Large absolute eigenvalues dominate long-term behavior, eigenvalues with absolute value less than one decay, and negative eigenvalues alternate signs. This is the bridge from algebraic factorization to qualitative dynamics.
 
-## Visual
-
 ```mermaid
 flowchart LR
   X["standard coordinates"] --> PInv["P inverse: eigenvector coordinates"]
@@ -134,7 +132,7 @@ flowchart LR
 | Requires eigenbasis | no | yes |
 | Main use | change coordinates | compute powers and decouple dynamics |
 
-## Worked example 1: Diagonalize a 2 by 2 matrix
+## Building an eigenbasis for a two-by-two matrix
 
 Problem: diagonalize
 
@@ -228,7 +226,7 @@ $$
 
 Checked answer: $A=PDP^{-1}$.
 
-## Worked example 2: Use diagonalization to compute a power
+## Computing a matrix power in diagonal coordinates
 
 Problem: compute $A^3$ for the same matrix.
 
@@ -313,7 +311,7 @@ $$
 
 Checked answer: $A^3=\begin{bmatrix}86&39\\78&47\end{bmatrix}$.
 
-## Code
+## Numerical diagonalization with NumPy
 
 ```python
 import numpy as np
@@ -333,7 +331,7 @@ print(P @ np.linalg.matrix_power(D, 3) @ np.linalg.inv(P))
 
 Numerical eigensolvers may return eigenvectors scaled differently or ordered differently. The diagonalization is valid as long as the columns of $P$ match the corresponding diagonal entries of $D$.
 
-## Common pitfalls
+## Where diagonalization goes wrong
 
 - Putting eigenvalues in $D$ in an order that does not match the eigenvectors in $P$.
 - Assuming a repeated eigenvalue automatically prevents diagonalization. It depends on eigenspace dimension.
@@ -350,19 +348,16 @@ Similarity should be read as a change of coordinates, not as an arbitrary algebr
 
 Diagonalization is powerful but not always numerically ideal. If the eigenvector matrix $P$ is poorly conditioned, computations using $PDP^{-1}$ may amplify rounding error. Orthogonal diagonalization for symmetric matrices avoids this issue because orthogonal matrices preserve lengths and have condition number $1$ in the Euclidean norm. This is one reason symmetric eigenvalue problems are especially well behaved.
 
-A diagonal form also makes invariant subspaces visible. Each coordinate axis in the diagonal basis is preserved by the transformation. If several eigenvectors correspond to the same eigenvalue, every vector in their eigenspace is preserved as a direction up to the same scaling. This explains why repeated eigenvalues can still be harmless when their eigenspaces are large enough.
+A diagonal form also exposes invariant subspaces. Each coordinate axis in the diagonal basis is preserved by the transformation. If several eigenvectors correspond to the same eigenvalue, every vector in their eigenspace is preserved as a direction up to the same scaling. Repeated eigenvalues can therefore be harmless when their eigenspaces are large enough.
 
 Similarity is not the same as row equivalence. Row-equivalent matrices arise from left multiplication by elementary matrices and generally do not have the same eigenvalues. Similar matrices involve both $P^{-1}$ and $P$, representing a change of basis in the same space, and they preserve spectral data. Confusing these two equivalence notions leads to incorrect eigenvalue arguments.
 
 When a matrix is not diagonalizable, one can still study it through other forms, such as Jordan form in more advanced courses or Schur form in numerical work. The introductory lesson is simpler: diagonalization is a powerful special case, and the test is the existence of an eigenbasis.
 
-A good final verification is to multiply $AP$ and $PD$. If the columns of $P$ are correctly matched with the diagonal entries of $D$, these two products are equal. This avoids computing $P^{-1}$ just to check the eigenvector pairing.
+A good final verification is to multiply $AP$ and $PD$. If the columns of $P$ are correctly matched with the diagonal entries of $D$, these two products are equal. The comparison catches most ordering mistakes without computing $P^{-1}$.
 
-This check catches most ordering mistakes.
+<div className="see-also">
 
-## Connections
+See also: [Eigenvalues and Eigenvectors](/math/linear-algebra/eigenvalues-and-eigenvectors) · [Matrix Inverses and Elementary Matrices](/math/linear-algebra/matrix-inverses-and-elementary-matrices) · [Quadratic Forms and Spectral Theorems](/math/linear-algebra/quadratic-forms-and-spectral-theorems) · [Singular Value Decomposition](/math/linear-algebra/singular-value-decomposition)
 
-- [Eigenvalues and Eigenvectors](/math/linear-algebra/eigenvalues-and-eigenvectors)
-- [Matrix Inverses and Elementary Matrices](/math/linear-algebra/matrix-inverses-and-elementary-matrices)
-- [Quadratic Forms and Spectral Theorems](/math/linear-algebra/quadratic-forms-and-spectral-theorems)
-- [Singular Value Decomposition](/math/linear-algebra/singular-value-decomposition)
+</div>

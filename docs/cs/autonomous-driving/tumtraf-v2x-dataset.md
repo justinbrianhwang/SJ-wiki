@@ -7,9 +7,9 @@ sidebar_position: 23
 
 TUMTraf V2X, introduced by Walter Zimmer, Gerhard Arya Wardana, Suren Sritharan, Xingcheng Zhou, Rui Song, and Alois C. Knoll at CVPR 2024, is a real-world vehicle-to-infrastructure dataset for cooperative 3D object detection and tracking [1]. Instead of treating the autonomous vehicle as the only observer, the dataset records the same intersection from roadside cameras, a roadside LiDAR, an onboard camera, an onboard LiDAR, RTK GNSS, and IMU sensors. The resulting data is meant to test whether infrastructure can make the vehicle aware of traffic participants that the ego vehicle cannot see because of trucks, buses, trailers, or geometry.
 
-This is a dataset page, so "method" means the data construction, synchronization, labeling protocol, and benchmark design. The paper also proposes CoopDet3D, a BEV-based cooperative camera-LiDAR fusion baseline that combines vehicle and infrastructure representations and reports a large gain over vehicle-only perception. TUMTraf V2X is therefore useful both as a data source for [V2X and connected vehicles](/cs/autonomous-driving/v2x-and-connected-vehicles) and as a concrete case study in [sensor fusion](/cs/autonomous-driving/sensor-fusion).
+The relevant method is the data construction: synchronization, calibration, registration, labeling, and benchmark design. The paper also proposes CoopDet3D, a BEV-based camera-LiDAR baseline that combines vehicle and infrastructure representations and reports a large gain over vehicle-only perception. TUMTraf V2X serves both as a data source for [V2X and connected vehicles](/cs/autonomous-driving/v2x-and-connected-vehicles) and as a concrete case study in [sensor fusion](/cs/autonomous-driving/sensor-fusion).
 
-## Problem & motivation
+## Why the roadside viewpoint matters
 
 Ego-centric autonomous-driving datasets such as KITTI, nuScenes, and Waymo are essential, but they naturally inherit the ego vehicle's limited field of view. If a truck blocks the onboard camera and LiDAR, an onboard-only detector may have no direct evidence for a pedestrian, bicycle, or vehicle behind it. A fixed roadside sensor can have an elevated and more global view of the same scene. Cooperative perception asks whether those viewpoints can be fused into one richer local scene representation.
 
@@ -17,7 +17,7 @@ The TUMTraf V2X paper targets this exact gap. It records a busy German urban int
 
 Two design choices make the dataset especially relevant for real AV systems. First, the labels are cooperative: they are created after registering vehicle and infrastructure point clouds. Second, the benchmark is deliberately multi-view and multi-modal: it compares vehicle-only, infrastructure-only, and cooperative configurations across camera-only, LiDAR-only, and camera-LiDAR fusion settings. This lets a reader separate the value of modality fusion from the value of adding the infrastructure viewpoint.
 
-## Method
+## Recording, registering, and labeling paired views
 
 The dataset uses a vehicle-infrastructure, or V2I, setup. The infrastructure side contains four Basler cameras and one Ouster OS1-64 LiDAR. The vehicle side contains one Basler camera, one Robosense RS-LiDAR-32, an Emlid Reach RS2+ RTK GNSS receiver, and an XSENS MTi-30 IMU. The paper summarizes this as five roadside sensors and four onboard sensors, with the camera and LiDAR streams recorded at 15 Hz and 10 Hz respectively [1].
 
@@ -60,7 +60,7 @@ Labels are created with 3D BAT v24.3.2, the authors' web-based annotation tool. 
 
 The benchmark baseline, CoopDet3D, is built around BEVFusion-style camera-LiDAR fusion and PillarGrid-style cooperative max fusion. It first creates vehicle-side and infrastructure-side BEV features separately, then fuses them with an element-wise max operation before a TransFusion-style 3D detection head. The benchmark evaluates $mAP_{\mathrm{BEV}}$ using nuScenes-style center-distance matching on the ground plane and $mAP_{\mathrm{3D}}$ using the TUM Traffic dev-kit 3D evaluation.
 
-## Architecture diagram
+### Collection and labeling pipeline
 
 ![The TUMTraf V2X roadside sensor setup shows cameras and LiDAR mounted on an overhead infrastructure gantry at an intersection.](https://tum-traffic-dataset.github.io/tumtraf-v2x/static/images/infrastructure_sensors.jpg)
 
@@ -112,7 +112,7 @@ flowchart TB
   DevKit --> Bench["Vehicle-only, infrastructure-only, and cooperative benchmarks"]
 ```
 
-## Architecture details
+## Sensor layout, split, and the CoopDet3D baseline
 
 The dataset is centered on a single instrumented intersection, but the authors deliberately vary traffic maneuvers, lighting, density, and occlusion patterns. They record eight 10-second scenes and split them into train, validation, and test sets using stratified sampling so that classes are distributed across splits. The paper states that the dataset contains 2,000 labeled point clouds and 5,000 labeled images. Its main text rounds the annotation count to about 30k 3D boxes, Table 1 lists 29.38k boxes, and the version-1.0 statistics figures report about 25k labels for the displayed split/statistics view. The safe reading is that the released dataset has on the order of tens of thousands of tracked 3D boxes, with the exact count depending on version and counting convention.
 
@@ -140,7 +140,7 @@ CoopDet3D adds the modeling side. The infrastructure branch fuses three roadside
 
 The authors train the LiDAR-only model first for 20 epochs, then fine-tune the cooperative camera-LiDAR model for eight epochs. The point cloud range is changed from the default BEVFusion setting to $[-75,75]$ m in $x$ and $y$, and $[-8,0]$ m in $z$. The supplementary material reports AdamW with learning rate $10^{-4}$, weight decay 0.01, batch size 4, dropout 0.1, ReLU activations, cyclic momentum, and training on three RTX 3090 GPUs. The selected speed/accuracy tradeoff uses PointPillars 512 2x with a YOLOv8-s camera backbone, reaching 94.22 $mAP_{\mathrm{BEV}}$ at 11.20 FPS and 4.63 GiB VRAM in the reported ablation table.
 
-## Datasets & results
+## What cooperative sensing added on the benchmark
 
 The paper compares TUMTraf V2X against cooperative datasets such as OPV2V, V2XSet, V2X-Sim, V2V4Real, DAIR-V2X-C, and V2X-Seq. Its distinguishing features are real-world V2I data, day and night scenes, track IDs, an HD map, OpenLABEL annotations, worldwide availability, traffic-violation scenarios, and a documented sensor setup. It is much smaller than DAIR-V2X-C in box count, but it gives more engineering detail about sensors, labels, calibration, and scenario composition.
 
@@ -162,7 +162,7 @@ The headline improvement is the cooperative camera-LiDAR result over the vehicle
 
 The paper also compares CoopDet3D against InfraDet3D on the earlier TUMTraf Intersection test set. CoopDet3D generally outperforms the late-fusion InfraDet3D baseline in average $mAP_{\mathrm{3D}}$, especially for camera-LiDAR settings. The authors interpret this as evidence that deep feature fusion is more effective than combining already-decoded outputs when geometry and semantics need to support each other. The same discussion notes a deployment caveat: if deep features are transmitted over V2I links, bandwidth and latency become first-class system constraints.
 
-## Worked example
+## Checking the reported gain and synchronization error
 
 **Walkthrough 1: computing the cooperative 3D mAP gain.** Suppose we want to verify the headline improvement over vehicle-only perception from Table 2.
 
@@ -190,9 +190,9 @@ $$
 \frac{14.36}{76.40}\times 100 \approx 18.8\%.
 $$
 
-Answer: the cooperative camera-LiDAR configuration improves the reported average $mAP_{\mathrm{3D}}$ by 14.36 points, or about 18.8 percent relative to the vehicle camera-LiDAR baseline.
+The cooperative camera-LiDAR configuration improves the reported average $mAP_{\mathrm{3D}}$ by 14.36 points, or about 18.8 percent relative to the vehicle camera-LiDAR baseline.
 
-Check: this matches the abstract's "+14.36 3D mAP" statement and uses the south2 field-of-view table, not a different split.
+The result matches the abstract's "+14.36 3D mAP" statement and comes from the south2 field-of-view table, not a different split.
 
 **Walkthrough 2: estimating motion error from timestamp skew.** The supplementary material reports an average vehicle-infrastructure timestamp difference of 24.91 ms. Estimate how far an object moving at 50 km/h travels during that skew.
 
@@ -214,11 +214,11 @@ $$
 \Delta x = v\Delta t = 13.89 \times 0.02491 \approx 0.346\ \mathrm{m}.
 $$
 
-Answer: the object can move about 0.35 m during the average skew.
+The object can move about 0.35 m during the average skew.
 
-Check: 0.35 m is smaller than a vehicle length but large enough to affect tight 3D boxes, pedestrian boxes, and box association near occluders. This is only synchronization skew; a deployed V2X system would also need to budget network latency.
+A 0.35 m displacement is smaller than a vehicle length but large enough to affect tight 3D boxes, pedestrian boxes, and association near occluders. It accounts only for synchronization skew; a deployed V2X system must also budget network latency.
 
-## Code
+## Matching asynchronous vehicle and roadside frames
 
 ```python
 from bisect import bisect_left
@@ -261,7 +261,7 @@ for match in matches:
     print(match, "motion error at 13.89 m/s:", motion_error(13.89, match.skew_s))
 ```
 
-## Common pitfalls
+## Caveats when using TUMTraf V2X
 
 - Treating cooperative perception as magic visibility. Roadside sensors help with occlusion, but they also introduce calibration, synchronization, network, and trust assumptions.
 - Mixing count conventions without checking the paper version. The text rounds to 30k boxes, Table 1 lists 29.38k, and versioned statistics figures report about 25k labels in the displayed split view.
@@ -271,16 +271,7 @@ for match in matches:
 - Ignoring clock skew and interpolation. A few tens of milliseconds can shift fast objects by decimeters.
 - Overgeneralizing from one intersection. TUMTraf V2X is rich and real, but it is still a targeted dataset, not a universal traffic distribution.
 
-## Connections
-
-- [Cooperative Camera-LiDAR BEV Fusion](/cs/autonomous-driving/v2x-and-connected-vehicles) for the later DriveX 2026 detector evaluated on TUMTraf V2X.
-- [V2X and connected vehicles](/cs/autonomous-driving/v2x-and-connected-vehicles) for communication, trust, latency, and deployment context.
-- [Sensor fusion](/cs/autonomous-driving/sensor-fusion) for early, mid-level, late, and BEV fusion patterns.
-- [Perception, object detection, and segmentation](/cs/autonomous-driving/perception-object-detection-and-segmentation) for 3D boxes, mAP, IoU, and detector heads.
-- [Simulation and data](/cs/autonomous-driving/simulation-and-data) for dataset construction and benchmark caveats.
-- [BEVFusion](/cs/autonomous-driving/bevfusion-mit) for the BEV camera-LiDAR fusion design that CoopDet3D builds on.
-
-## References
+## Dataset, fusion, and benchmark references
 
 [1] W. Zimmer, G. A. Wardana, S. Sritharan, X. Zhou, R. Song, and A. C. Knoll, "TUMTraf V2X Cooperative Perception Dataset," in IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), 2024.
 
@@ -297,3 +288,16 @@ for match in matches:
 [7] W. Zimmer et al., "InfraDet3D: Multi-Modal 3D Object Detection Based on Roadside Infrastructure Camera and LiDAR Sensors," in IEEE Intelligent Vehicles Symposium (IV), 2023.
 
 [8] ASAM, "OpenLABEL Concept Paper," Association for Standardization of Automation and Measuring Systems.
+
+<div className="see-also">
+
+See also:
+
+- [Cooperative Camera-LiDAR BEV Fusion](/cs/autonomous-driving/v2x-and-connected-vehicles) for the later DriveX 2026 detector evaluated on TUMTraf V2X.
+- [V2X and connected vehicles](/cs/autonomous-driving/v2x-and-connected-vehicles) for communication, trust, latency, and deployment context.
+- [Sensor fusion](/cs/autonomous-driving/sensor-fusion) for early, mid-level, late, and BEV fusion patterns.
+- [Perception, object detection, and segmentation](/cs/autonomous-driving/perception-object-detection-and-segmentation) for 3D boxes, mAP, IoU, and detector heads.
+- [Simulation and data](/cs/autonomous-driving/simulation-and-data) for dataset construction and benchmark caveats.
+- [BEVFusion](/cs/autonomous-driving/bevfusion-mit) for the BEV camera-LiDAR fusion design that CoopDet3D builds on.
+
+</div>

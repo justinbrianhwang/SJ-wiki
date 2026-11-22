@@ -9,7 +9,7 @@ Operators are the compact vocabulary of Python programs. They let you compute nu
 
 The important habit is to read an expression in layers. Start with literals and names, then function calls and indexing, then arithmetic, comparisons, boolean logic, and finally assignment statements that store the result. Python has a precedence table, but professional code does not rely on readers memorizing every row. Parentheses are cheap; use them when they clarify intent.
 
-## Definitions
+## Reading expressions from operands upward
 
 An **operator** is syntax that combines or transforms values. Arithmetic operators include `+`, `-`, `*`, `/`, `//`, `%`, and `**`. Comparison operators include `<`, `<=`, `>`, `>=`, `==`, and `!=`. Boolean operators include `and`, `or`, and `not`.
 
@@ -31,25 +31,25 @@ For positive integers this matches school arithmetic. With negative values, reme
 
 **Short-circuit evaluation** means `and` and `or` do not always evaluate both sides. In `x != 0 and total / x > 10`, the division is skipped when `x` is zero.
 
-## Key results
+## Division, identity, and short-circuit rules
 
-The first key result is that `/` and `//` are different. In Python 3, `/` always produces true division, usually a `float`, even when the inputs are integers. `//` produces floor division. This matters in algorithms, indexing, pagination, and unit conversions.
+`/` and `//` are different. In Python 3, `/` always produces true division, usually a `float`, even when the inputs are integers. `//` produces floor division. This matters in algorithms, indexing, pagination, and unit conversions.
 
-The second result is that comparison operators can be chained. Instead of writing `0 <= x and x <= 100`, Python allows `0 <= x <= 100`. This is readable and evaluates `x` only once.
+Comparison operators can be chained. Instead of writing `0 <= x and x <= 100`, Python allows `0 <= x <= 100`. This is readable and evaluates `x` only once.
 
-The third result is that boolean operators return one of their operands, not necessarily the literal values `True` or `False`. For example, `"" or "fallback"` evaluates to `"fallback"`. This can be useful, but do not overuse it when an explicit conditional would be clearer.
+Boolean operators return one of their operands, not necessarily the literal values `True` or `False`. For example, `"" or "fallback"` evaluates to `"fallback"`. This can be useful, but do not overuse it when an explicit conditional would be clearer.
 
-The fourth result is that strings and containers define some familiar operators differently. For strings, `+` concatenates and `*` repeats. For lists, `+` concatenates lists and `in` checks membership. For sets, operators such as `|`, `&`, and `-` mean union, intersection, and difference.
+Strings and containers define some familiar operators differently. For strings, `+` concatenates and `*` repeats. For lists, `+` concatenates lists and `in` checks membership. For sets, operators such as `|`, `&`, and `-` mean union, intersection, and difference.
 
-The fifth result is that equality and identity are separate questions. `==` asks whether values are equal according to their type's equality rule. `is` asks whether two names refer to the exact same object. Use `is` for `None`, singletons, and identity checks; use `==` for value equality.
+Equality and identity are separate questions. `==` asks whether values are equal according to their type's equality rule. `is` asks whether two names refer to the exact same object. Use `is` for `None`, singletons, and identity checks; use `==` for value equality.
 
-A sixth result is that operators are often overloaded by type, so the same symbol can express related but different ideas. `+` adds numbers, concatenates strings, concatenates lists, and can be defined by custom classes. `in` tests substring membership for strings, element membership for lists and sets, and key membership for dictionaries. This is convenient, but it means every expression should be read together with the types of the operands. If the operands are unclear, introduce intermediate names or use `type()` while debugging.
+Operators are often overloaded by type, so the same symbol can express related but different ideas. `+` adds numbers, concatenates strings, concatenates lists, and can be defined by custom classes. `in` tests substring membership for strings, element membership for lists and sets, and key membership for dictionaries. This is convenient, but it means every expression should be read together with the types of the operands. If the operands are unclear, introduce intermediate names or use `type()` while debugging.
 
-A seventh result is that expressions are easier to test when they are decomposed. Consider a single long line that calculates a billing total, applies a discount, applies tax, and rounds the result. Python can evaluate it, but a reader has to reconstruct the business rule from precedence. Splitting the expression into `subtotal`, `discount`, `tax`, and `total` creates natural inspection points and test assertions. This is especially useful with floating-point arithmetic, where rounding at the wrong stage can change results.
+Expressions are easier to test when they are decomposed. Consider a single long line that calculates a billing total, applies a discount, applies tax, and rounds the result. Python can evaluate it, but a reader has to reconstruct the business rule from precedence. Splitting the expression into `subtotal`, `discount`, `tax`, and `total` creates natural inspection points and test assertions. This is especially useful with floating-point arithmetic, where rounding at the wrong stage can change results.
 
-The final practical result is that boolean expressions should avoid hidden work. A condition such as `if user and user.is_active and expensive_check(user):` is valid and uses short-circuiting well: the expensive check runs only when earlier checks pass. But a condition that mutates data, reads files, or logs messages as a side effect is harder to reason about. Keep boolean expressions mostly about asking questions, not changing state. When state must change, put that step on its own line before the condition.
+Boolean expressions should avoid hidden work. A condition such as `if user and user.is_active and expensive_check(user):` is valid and uses short-circuiting well: the expensive check runs only when earlier checks pass. But a condition that mutates data, reads files, or logs messages as a side effect is harder to reason about. Keep boolean expressions mostly about asking questions, not changing state. When state must change, put that step on its own line before the condition.
 
-## Visual
+The table lists the operator families, and the diagram gives a useful top-to-bottom reading order for mixed expressions:
 
 | Category | Operators | Example | Result |
 |---|---|---|---|
@@ -75,7 +75,7 @@ flowchart TD
   I --> J[Boolean or]
 ```
 
-## Worked example 1: evaluate a formula carefully
+## Evaluating a mixed arithmetic expression
 
 Problem: compute the value of:
 
@@ -121,7 +121,7 @@ The expression is valid, but if it appeared in business logic, parentheses would
 result = 3 + (4 * (2 ** 3)) - (10 // 3)
 ```
 
-## Worked example 2: use modulo for a time conversion
+## Splitting elapsed seconds with quotient and remainder
 
 Problem: convert `3671` seconds into hours, minutes, and seconds.
 
@@ -188,7 +188,7 @@ Output:
 1 1 11
 ```
 
-## Code
+## Boundary-testing a time splitter
 
 ```python
 def split_seconds(total_seconds):
@@ -206,7 +206,7 @@ for value in [59, 60, 3599, 3600, 3671]:
     print(f"{value:4d} seconds -> {h:02d}:{m:02d}:{s:02d}")
 ```
 
-This snippet uses arithmetic, comparison, tuple return values, and formatted strings. It is also easy to test because each input has a deterministic output.
+The function uses arithmetic, comparison, tuple return values, and formatted strings. It is also easy to test because each input has a deterministic output.
 
 When adapting this pattern, test boundary values deliberately. For time splitting, boundaries include `0`, `59`, `60`, `3599`, and `3600`. These values reveal whether floor division and modulo are being used correctly. The same idea applies to pagination, array chunking, and unit conversion: choose examples that sit exactly on the boundary and one step to either side. Operators often fail at edges, not in the middle of ordinary-looking input.
 
@@ -214,7 +214,7 @@ Also notice that the function raises an exception before doing arithmetic on inv
 
 For student exercises, write the expected arithmetic beside at least one test case. If the code says `total % 3600`, the notes should show the subtraction that produces the same remainder. This habit catches precedence mistakes and makes the program easier to review without running it.
 
-## Common pitfalls
+## Operator mistakes that appear at boundaries
 
 - Using `/` when an index or count needs an integer. Use `//` for whole-number quotient.
 - Forgetting that `**` binds before unary minus in subtle cases. `-2 ** 2` is `-4`, while `(-2) ** 2` is `4`.
@@ -224,9 +224,8 @@ For student exercises, write the expected arithmetic beside at least one test ca
 - Forgetting short-circuit behavior when the right side has side effects. Avoid side effects inside boolean expressions.
 - Assuming `%` behaves like a simple truncating remainder for negative numbers. Python's modulo follows floor division.
 
-## Connections
+<div className="see-also">
 
-- [Syntax, Variables, and Types](/cs/programming/python/syntax-variables-and-types)
-- [Control Flow and Comprehensions](/cs/programming/python/control-flow-and-comprehensions)
-- [Strings and Text Processing](/cs/programming/python/strings-and-text-processing)
-- [Testing and the Scientific Stack](/cs/programming/python/testing-and-scientific-stack)
+See also: [Syntax, Variables, and Types](/cs/programming/python/syntax-variables-and-types) · [Control Flow and Comprehensions](/cs/programming/python/control-flow-and-comprehensions) · [Strings and Text Processing](/cs/programming/python/strings-and-text-processing) · [Testing and the Scientific Stack](/cs/programming/python/testing-and-scientific-stack)
+
+</div>

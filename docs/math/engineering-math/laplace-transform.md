@@ -5,11 +5,11 @@ sidebar_position: 10
 
 # Laplace Transform
 
-The Laplace transform converts a time-domain function into a function of the complex variable $s$. For linear initial value problems, it turns differentiation into algebra and carries initial conditions into the transformed equation automatically. That is why it is a standard tool for circuits, mechanical vibrations, control systems, discontinuous inputs, and impulses.
+The Laplace transform converts a time-domain function into a function of the complex variable $s$. For linear initial value problems, it turns differentiation into algebra and carries initial conditions into the transformed equation automatically. It is therefore a standard tool for circuits, mechanical vibrations, control systems, discontinuous inputs, and impulses.
 
 The transform is also a way of changing perspective. Time-domain convolution becomes multiplication, exponential decay becomes a shift in the $s$-plane, and stability becomes a question about poles. The method is most effective when the system is linear and causal, meaning the behavior begins at $t=0$ and depends only on present and past input.
 
-## Definitions
+## The one-sided transform and its operating rules
 
 The one-sided Laplace transform of $f(t)$ is
 
@@ -62,7 +62,7 @@ $$
 \mathcal{L}\{f*g\}=F(s)G(s).
 $$
 
-## Key results
+## Solving an initial value problem in the $s$-domain
 
 The standard transform method for a linear IVP is direct. Transform every term, insert initial conditions through the derivative formulas, solve for $Y(s)$, decompose into recognizable pieces, and invert. The initial conditions are not applied after the inverse transform; they have already entered the algebra.
 
@@ -124,6 +124,8 @@ Some basic transforms are used constantly. The expanded table below covers the e
 | Initial value | $f(0^+)=\displaystyle\lim_{s\to\infty}sF(s)$ |
 | Final value (if stable) | $\displaystyle\lim_{t\to\infty}f(t)=\lim_{s\to 0}sF(s)$ |
 
+## Shifts, impulses, and piecewise forcing
+
 The first shifting theorem says
 
 $$
@@ -139,6 +141,8 @@ $$
 $$
 
 Although $\delta$ is not an ordinary function, it models concentrated input. In mechanics, an impulse changes momentum instantaneously; in circuits, an impulse can idealize a very short voltage or current spike.
+
+## Reading dynamics from poles
 
 Partial fractions connect algebra back to time. Simple real poles produce exponentials. Repeated real poles produce polynomial multiples of exponentials. Irreducible quadratics produce sines and cosines. The pole locations therefore encode growth, decay, and oscillation before inversion is even performed.
 
@@ -168,7 +172,9 @@ $$
 
 To use the second shifting theorem directly, the bracketed correction may then need to be rewritten as a function of $t-a$.
 
-The inverse transform is sometimes nonunique at isolated discontinuity points because transforms are integrals and do not detect the value of a function at a single point. This is why tables often define the Heaviside value at the jump by convention. For solving ODEs with piecewise continuous inputs, the left and right behavior is what matters.
+The inverse transform is sometimes nonunique at isolated discontinuity points because transforms are integrals and do not detect the value of a function at a single point. Tables therefore define the Heaviside value at the jump by convention. For ODEs with piecewise continuous inputs, the left and right behavior is what matters.
+
+## Resolvents for systems
 
 Laplace transforms can solve systems as well as scalar equations. For $\mathbf{x}'=A\mathbf{x}+\mathbf{g}(t)$,
 
@@ -184,7 +190,7 @@ $$
 
 The matrix $(sI-A)^{-1}$ exposes the same eigenvalue poles that appear in the matrix exponential.
 
-## Visual
+## From a causal model back to $y(t)$
 
 ```mermaid
 flowchart LR
@@ -209,94 +215,88 @@ flowchart LR
   Check -. "failed check" .-> Prep
 ```
 
-This diagram shows the full Laplace-transform solution pipeline, including the causal rewrite, transform integral, ROC awareness, derivative rules, initial-condition injection, algebraic solve, inverse transform, and validation checks. The s-domain subgraph is the key architecture: differential equations become algebraic equations because initial data enter through derivative transforms. The dotted feedback arrow marks the common failure mode where a step-function rewrite or stability assumption must be corrected.
+The workflow begins by rewriting causal inputs, then carries derivatives and initial data into one algebraic equation for $Y(s)$. Partial fractions and shift theorems prepare the inverse transform. A failed time-domain or stability check usually points back to the causal rewrite or a pole assumption.
 
-## Worked example 1: Initial value problem
+## An undamped response to constant forcing
 
-Problem. Solve
+Consider
 
 $$
 y''+y=1,\qquad y(0)=0,\qquad y'(0)=0.
 $$
 
-Method.
-
-1. Transform the equation:
+Transforming the equation gives
 
 $$
 \mathcal{L}\{y''\}+\mathcal{L}\{y\}=\mathcal{L}\{1\}.
 $$
 
-2. Use the derivative formula:
+Using the derivative formula,
 
 $$
 s^2Y(s)-sy(0)-y'(0)+Y(s)=\frac{1}{s}.
 $$
 
-3. Insert initial data:
+and inserting the zero initial data,
 
 $$
 s^2Y(s)+Y(s)=\frac{1}{s}.
 $$
 
-4. Factor:
+Thus
 
 $$
 Y(s)(s^2+1)=\frac{1}{s}.
 $$
 
-5. Solve for $Y(s)$:
+and
 
 $$
 Y(s)=\frac{1}{s(s^2+1)}.
 $$
 
-6. Decompose:
+Partial fractions give
 
 $$
 \frac{1}{s(s^2+1)}=\frac{1}{s}-\frac{s}{s^2+1}.
 $$
 
-7. Invert term by term:
+The two inverse transforms are
 
 $$
 \mathcal{L}^{-1}\left\{\frac{1}{s}\right\}=1,\qquad
 \mathcal{L}^{-1}\left\{\frac{s}{s^2+1}\right\}=\cos t.
 $$
 
-Answer.
-
 $$
 y(t)=1-\cos t.
 $$
 
-Check. $y(0)=0$, $y'(t)=\sin t$, so $y'(0)=0$. Also $y''+y=\cos t+1-\cos t=1$.
+$y(0)=0$ and $y'(0)=0$, while direct substitution gives $y''+y=\cos t+1-\cos t=1$.
 
 The answer has a clear physical interpretation. The constant forcing creates the static displacement $1$, while the term $-\cos t$ is the transient needed to satisfy the zero initial displacement. Because the homogeneous equation is undamped, the transient does not decay. In a damped equation, the analogous homogeneous terms would usually disappear as $t$ grows.
 
-## Worked example 2: Delayed sinusoidal input
+## Encoding a sinusoid delayed by three units
 
-Problem. Find
+For
 
 $$
 \mathcal{L}\{u(t-3)\sin(t-3)\}.
 $$
 
-Method.
-
-1. Identify the unshifted function:
+the unshifted function is
 
 $$
 f(t)=\sin t.
 $$
 
-2. Its transform is
+with transform
 
 $$
 F(s)=\frac{1}{s^2+1}.
 $$
 
-3. The given function has the exact shifted form
+The given input has the exact shifted form
 
 $$
 u(t-a)f(t-a)
@@ -304,23 +304,21 @@ $$
 
 with $a=3$.
 
-4. Apply the second shifting theorem:
+The second shifting theorem gives
 
 $$
 \mathcal{L}\{u(t-3)\sin(t-3)\}=e^{-3s}F(s).
 $$
 
-Answer.
-
 $$
 \mathcal{L}\{u(t-3)\sin(t-3)\}=\frac{e^{-3s}}{s^2+1}.
 $$
 
-Check. The factor $e^{-3s}$ represents a delay of $3$ time units. It is not the same as replacing $s$ by $s-3$, which would represent multiplication by $e^{3t}$ in time.
+The factor $e^{-3s}$ represents a delay of $3$ time units. Replacing $s$ by $s-3$ would instead represent multiplication by $e^{3t}$ in time.
 
-If the input had been $u(t-3)\sin t$, the theorem would not apply directly because the sine is not written as $\sin(t-3)$. One would rewrite $\sin t=\sin((t-3)+3)$ and expand with angle formulas. This small algebra step is often the difference between a correct shift and an incorrect transform.
+For $u(t-3)\sin t$, first rewrite $\sin t=\sin((t-3)+3)$ and expand with angle formulas. The sine is otherwise not in the shifted form required by the theorem.
 
-## Code
+## Checking partial fractions and delays symbolically
 
 ```python
 import sympy as sp
@@ -338,7 +336,7 @@ The symbolic inverse of the delayed transform should contain a Heaviside functio
 
 Computer algebra is helpful for checking partial fractions, but it should not replace transform-table recognition. Software may return equivalent expressions using `Heaviside`, exponentials, or unevaluated inverse transforms. A good manual check is to transform the returned expression again and confirm that the original rational function and delay factors are recovered.
 
-## Common pitfalls
+## Transform errors that survive the algebra
 
 - Confusing first shifting $F(s-a)$ with time shifting $e^{-as}F(s)$.
 - Forgetting to include initial conditions in transformed derivatives.
@@ -355,9 +353,8 @@ Computer algebra is helpful for checking partial fractions, but it should not re
 - Reporting $Y(s)$ as the final answer when the problem asked for the time-domain solution.
 - Skipping units in transformed circuit equations.
 
-## Connections
+<div className="see-also">
 
-- [First-Order ODEs](/math/engineering-math/first-order-odes)
-- [Second-Order Linear ODEs](/math/engineering-math/second-order-linear-odes)
-- [Nonhomogeneous ODEs and Applications](/math/engineering-math/nonhomogeneous-odes-and-applications)
-- [Fourier Integrals and Transforms](/math/engineering-math/fourier-integrals-and-transforms)
+See also: [First-Order ODEs](/math/engineering-math/first-order-odes) · [Second-Order Linear ODEs](/math/engineering-math/second-order-linear-odes) · [Nonhomogeneous ODEs and Applications](/math/engineering-math/nonhomogeneous-odes-and-applications) · [Fourier Integrals and Transforms](/math/engineering-math/fourier-integrals-and-transforms)
+
+</div>

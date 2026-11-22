@@ -5,91 +5,45 @@ sidebar_position: 7
 
 # Pattern Matching
 
-Pattern matching is Rust's way to describe the shape of data and bind useful pieces of it. It appears in `match`, `if let`, `while let`, `let` bindings, `for` loops, function parameters, and closures. The basic idea is simple: compare a value to patterns from top to bottom, run the first matching arm, and let the compiler check whether all possible cases have been covered where exhaustive handling is required.
+Patterns describe the shape of a value and bind the pieces a branch needs. They appear in `match`, `if let`, `while let`, `let` bindings, `for` loops, function parameters, and closures. Because enum definitions enumerate the possible variants, the compiler can check that a full `match` accounts for every case.
 
-This page expands the enum material from [structs, methods, and enums](/cs/programming/rust/structs-methods-enums). It also connects to [error handling](/cs/programming/rust/error-handling), because `Result` is usually handled with patterns, and to [ownership](/cs/programming/rust/ownership-references-slices), because patterns can move, copy, or borrow parts of a value.
+## A match is ordered and exhaustive
 
-## Definitions
-
-A pattern is syntax that matches the structure of a value. Literal patterns match exact values. Variable patterns bind values. Wildcard patterns such as `_` match anything without binding it. Destructuring patterns break structs, tuples, arrays, references, and enums into parts.
-
-`match` is an expression with arms. Each arm has a pattern and code to run if the pattern matches. In ordinary `match`, arms must be exhaustive: every possible input value must be covered.
-
-`if let` is a shorter form for matching one interesting pattern and ignoring the rest. It is useful when the code only cares about one enum variant.
-
-`while let` repeats while a pattern continues to match. It is often used to pop values from a stack-like collection.
-
-Patterns are either refutable or irrefutable. An irrefutable pattern always matches, such as `let x = 5;`. A refutable pattern may fail, such as `Some(x)`, because the value might be `None`.
-
-A match guard is an extra `if` condition on a `match` arm. It refines a pattern when structural matching alone is not enough.
-
-The binding operator `@` lets a pattern test a value and bind it at the same time:
-
-```rust
-id @ 3..=7
-```
-
-This matches numbers from `3` through `7` and binds the matched number to `id`.
-
-## Key results
-
-The first key result is exhaustiveness. Matching an `Option<T>` must account for both `Some(value)` and `None`, unless a wildcard or catchall arm covers the rest. This is one of Rust's strongest tools for preventing forgotten cases.
-
-The second key result is ordering. `match` arms are checked from top to bottom. A broad pattern placed before a narrow pattern can make the narrow arm unreachable. The compiler warns about unreachable patterns in many cases.
-
-The third key result is that patterns can bind by move. If a pattern extracts a `String` from an enum by value, ownership moves into the binding. Use references or match on borrowed values when the original owner must remain usable.
-
-The fourth key result is that `_` and names beginning with underscore are different. `_` does not bind at all. A name such as `_unused` still binds the value, which may move it, but suppresses unused-variable warnings.
-
-Proof sketch for exhaustiveness: an enum definition lists all possible variants. A `match` over that enum can be checked against the variant set. If any variant is not represented by a pattern and no wildcard covers it, there exists an input for which the expression has no result. Rust rejects that program.
-
-Pattern matching also clarifies ownership at the point where data is opened. Matching on an owned enum can move owned fields out of the enum. Matching on a reference, such as `match &message`, generally binds references to the fields instead. This distinction is useful when working with `String`, `Vec<T>`, or other non-`Copy` data. If a later line still needs the original value, match by reference or use patterns such as `ref` where appropriate. The book's later pattern chapter emphasizes that patterns are not only for `match`: they appear in `let`, `for`, function parameters, and closures. That means the same move-versus-borrow awareness applies in many places, not only in large enum matches.
-
-A final practical rule is to prefer the pattern form that matches the data's real shape. If the logic cares about only one variant, `if let` may communicate that better than a full `match`. If every variant has meaning, a full `match` is better because exhaustiveness protects future changes.
-
-When an enum grows, exhaustive matches become a useful to-do list because the compiler points at every site that needs a decision.
-
-## Visual
+`match` evaluates arms from top to bottom and runs the first matching expression. A broad pattern before a narrow one can therefore make the later arm unreachable.
 
 ```mermaid
 flowchart TD
-  A[Value enters match] --> B[Try arm 1 pattern]
-  B -->|matches| C[Run arm 1 expression]
-  B -->|no| D[Try arm 2 pattern]
-  D -->|matches| E[Run arm 2 expression]
+  A[Value enters match] --> B[Try first arm]
+  B -->|matches| C[Run first arm expression]
+  B -->|no| D[Try next arm]
+  D -->|matches| E[Run that arm expression]
   D -->|no| F[Continue through arms]
   F --> G{"Any arm matches?"}
-  G -->|yes| H[match expression has value]
-  G -->|"no, impossible in valid match"| I[Compiler rejects non-exhaustive match]
+  G -->|yes| H[Match expression has a value]
+  G -->|"no, impossible in a valid match"| I[Compiler rejects the match]
 ```
 
-| Pattern form | Example | Meaning |
+Common pattern forms compose with one another:
+
+| Form | Example | Meaning |
 |---|---|---|
 | Literal | `0` | Match exactly zero |
-| Range | `1..=5` | Match inclusive range |
+| Range | `1..=5` | Match an inclusive range |
 | Variable | `x` | Match anything and bind it |
 | Wildcard | `_` | Match anything and bind nothing |
 | Tuple | `(x, y)` | Destructure two elements |
-| Struct | `Point { x, y: 0 }` | Destructure named fields |
+| Struct | `Point` \{ `x, y: 0` \} | Destructure named fields |
 | Enum | `Some(value)` | Match a specific variant |
-| Guard | `Some(x) if x > 0` | Match plus condition |
-| Binding | `id @ 3..=7` | Test and bind |
+| Guard | `Some(x) if x > 0` | Add a condition |
+| Binding | `id @ 3..=7` | Test and bind the same value |
 
-## Worked example 1: matching nested optional data
+Exhaustiveness follows from the type. If a `match` over `Option<T>` omits `None` and has no catchall arm, an input exists for which the expression would produce no value, so Rust rejects it.
 
-Problem: given `Option<Result<u32, String>>`, report whether there is a successful number, an error message, or no value.
-
-1. Define a sample value:
+Nested patterns handle nested enums without manual unwrapping:
 
 ```rust
 let value = Some(Ok(12));
-```
 
-The outer enum says the value may be present. The inner enum says the present value may be success or error.
-
-2. Write the full match:
-
-```rust
 let message = match value {
     Some(Ok(n)) => format!("number: {n}"),
     Some(Err(e)) => format!("error: {e}"),
@@ -97,56 +51,39 @@ let message = match value {
 };
 ```
 
-3. Trace the first arm. `Some(Ok(n))` matches because the outer value is `Some` and the inner value is `Ok(12)`. The variable `n` binds to `12`.
+For `Some(Ok(12))`, the first arm binds `n` to `12` and produces `"number: 12"`. An error value takes the second arm, and absence takes the third.
 
-4. The result expression is:
+## Refutable patterns belong where failure is allowed
 
-```rust
-format!("number: {n}")
-```
+An irrefutable pattern always matches, as in `let x = 5;` or a function parameter name. A refutable pattern can fail: `Some(x)` does not match `None`.
 
-5. Check the answer. `message` is `"number: 12"`. The second and third arms are not evaluated.
+`let` and function parameters require irrefutable patterns because those positions have no branch for failure. `match`, `if let`, and `while let` are designed for refutable patterns.
 
-6. Test another input. If `value` were `Some(Err(String::from("bad input")))`, the first arm would fail, the second would match, and `message` would be `"error: bad input"`.
-
-The important point is that nested patterns avoid manual unwrapping. The shape of the data is handled directly.
-
-## Worked example 2: destructuring a struct with a guard
-
-Problem: classify a point as the origin, a horizontal-axis point, a vertical-axis point, a diagonal point, or a general point.
-
-1. Define the type and value:
+`if let` is concise when only one shape matters:
 
 ```rust
-struct Point {
-    x: i32,
-    y: i32,
+if let Some(port) = configured_port {
+    println!("listening on {port}");
 }
-
-let p = Point { x: -3, y: 3 };
 ```
 
-2. Match by named fields:
+`while let` repeats while the pattern continues to match and is often used to consume a stack:
 
 ```rust
-let label = match p {
-    Point { x: 0, y: 0 } => "origin",
-    Point { x, y: 0 } => "x axis",
-    Point { x: 0, y } => "y axis",
-    Point { x, y } if x.abs() == y.abs() => "diagonal",
-    Point { .. } => "general",
-};
+while let Some(value) = stack.pop() {
+    println!("{value}");
+}
 ```
 
-3. Check arm by arm. The point is not `(0, 0)`, so the first arm fails. Its `y` is not `0`, so the second arm fails. Its `x` is not `0`, so the third arm fails.
+When every variant carries meaning, a full `match` retains the exhaustiveness check. As an enum grows, the compiler then identifies every match site that needs a decision about the new variant.
 
-4. The fourth arm destructures both fields and applies the guard. `x.abs()` is `3`, and `y.abs()` is `3`, so the guard is true.
+## Destructuring also controls ownership
 
-5. The checked answer is `"diagonal"`.
+Patterns do more than test structure: they can move, copy, or borrow fields. Matching an owned enum by value may move a `String` or `Vec<T>` into a binding. Matching `&message` instead generally binds references through match ergonomics and leaves the owner intact. Explicit `ref` and `ref mut` bindings are still available when the borrowing mode needs to be stated inside a pattern.
 
-Note that the final `Point { .. }` arm is needed for exhaustiveness. Without it, points such as `(2, 5)` would have no matching arm.
+`_` and an underscore-prefixed name differ here. The wildcard `_` does not bind. A name such as `_unused` does bind and can still move its value; the prefix only suppresses the unused-variable warning.
 
-## Code
+The following function borrows each command, so describing the array does not consume it:
 
 ```rust
 #[derive(Debug)]
@@ -185,22 +122,218 @@ fn main() {
 }
 ```
 
-The function borrows each command, so it can describe commands without consuming the array. The guard on the origin-specific move arm must appear before the general move arm.
+The origin-specific arm precedes the general `Move` arm. Reversing them would leave the guarded arm unreachable.
 
-## Common pitfalls
+## Guards and bindings refine structural cases
 
-- Forgetting a variant in a `match` over an enum.
-- Placing `_` or another catchall arm before more specific arms.
-- Using `if let` when all variants should be handled explicitly.
-- Accidentally moving a value out of a pattern when a borrowed match would be better.
-- Assuming `_name` does not bind. It does bind; only `_` avoids binding.
-- Expecting guards to count for exhaustiveness in the same way as plain patterns. A guarded arm might not match if its condition is false.
-- Matching string data by byte index instead of using safe methods and slices.
+A match guard is an `if` condition attached to an arm. It handles a relationship that structural syntax alone cannot state. Guards do not contribute to exhaustiveness like unguarded patterns because their condition may be false.
 
-## Connections
+For example, a point classifier can combine field patterns with a diagonal guard:
 
-- [Structs, methods, and enums](/cs/programming/rust/structs-methods-enums)
-- [Error handling](/cs/programming/rust/error-handling)
-- [Common collections](/cs/programming/rust/common-collections)
-- [Generics, traits, and lifetimes](/cs/programming/rust/generics-traits-lifetimes)
-- [Macros and unsafe Rust](/cs/programming/rust/macros-and-unsafe-rust)
+```rust
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+let p = Point { x: -3, y: 3 };
+
+let label = match p {
+    Point { x: 0, y: 0 } => "origin",
+    Point { x, y: 0 } => "x axis",
+    Point { x: 0, y } => "y axis",
+    Point { x, y } if x.abs() == y.abs() => "diagonal",
+    Point { .. } => "general",
+};
+```
+
+The first three arms fail for `(-3, 3)`; the fourth binds both fields and passes its guard, producing `"diagonal"`. The final `Point` \{ `..` \} arm covers values such as `(2, 5)`.
+
+The `@` operator combines a test with a binding:
+
+```rust
+id @ 3..=7
+```
+
+This pattern accepts the inclusive range and retains the matched number under the name `id`.
+
+## When a pattern says more or less than intended
+
+Most mistakes come from arm coverage, order, or ownership:
+
+- omitting an enum variant from an exhaustive `match`;
+- placing `_` or another catchall before specific arms;
+- using `if let` where every variant should be handled explicitly;
+- moving a non-`Copy` field when the original value is needed later;
+- assuming `_name` behaves like the non-binding wildcard `_`;
+- relying on a guarded arm to cover all values of its underlying pattern;
+- using byte indices to inspect string data instead of string methods and valid slices.
+
+The best pattern form follows the data shape and the number of cases whose behavior matters.
+
+## Worked example: parse a small command language
+
+Patterns become more useful when parsing has already produced structured data. Suppose commands are represented as token slices:
+
+```rust
+#[derive(Debug, PartialEq)]
+enum Action<'a> {
+    Quit,
+    Show(&'a str),
+    Move { x: i32, y: i32 },
+}
+
+fn parse(tokens: &[&str]) -> Result<Action<'_>, &'static str> {
+    match tokens {
+        ["quit"] => Ok(Action::Quit),
+        ["show", name] => Ok(Action::Show(name)),
+        ["move", x, y] => {
+            let x = x.parse().map_err(|_| "invalid x coordinate")?;
+            let y = y.parse().map_err(|_| "invalid y coordinate")?;
+            Ok(Action::Move { x, y })
+        }
+        ["move", ..] => Err("move requires exactly two coordinates"),
+        [] => Err("empty command"),
+        _ => Err("unknown command"),
+    }
+}
+```
+
+For `&["show", "status"]`, the second slice pattern matches exactly two elements, checks the first literal, and binds `name` to the second. The result borrows `status` from the token slice. For `&["move", "3", "-2"]`, the third arm binds both text coordinates, parses them in order, and returns `Move` with integers.
+
+For `&["move", "3"]`, the exact three-element arm fails. The next pattern checks a first element of `move` and allows any remaining length through `..`, so it returns the specific arity error. An unknown first word reaches `_`. Ordering matters: placing `_` first would make every later arm unreachable, while placing the broad `move` arm before the exact form would prevent valid moves from being parsed.
+
+The parser uses patterns for structure and ordinary expressions for fallible numeric conversion. Trying to force parsing into a pattern would mix concerns the language treats separately.
+
+## Binding modes: move, copy, and borrow
+
+Matching a value by value follows ordinary ownership. `Copy` fields are copied; non-`Copy` fields are moved unless the pattern borrows them. Consider:
+
+```rust
+struct User {
+    name: String,
+    active: bool,
+}
+
+let user = User { name: String::from("Ada"), active: true };
+let User { name, active } = user;
+```
+
+`name` receives the owned `String`, while `active` receives a copied boolean. The original `user` cannot be used as a complete value afterward. Matching `&user` instead produces borrowed bindings through match ergonomics:
+
+```rust
+let user = User { name: String::from("Ada"), active: true };
+let User { name, active } = &user;
+assert_eq!(name, "Ada");
+assert!(*active);
+println!("{}", user.name);
+```
+
+The pattern shape still names `User` even though the scrutinee is `&User`; Rust adjusts the default binding mode to references. Explicit `ref` and `ref mut` remain useful in mixed patterns where one field is moved and another borrowed, but borrowing the scrutinee is often clearer.
+
+`@` retains a whole value while destructuring or testing it. It can name a complete `Message::Move` value while a nested field pattern requires its `x` field to be zero. The binding must obey the same ownership rules as the nested fields.
+
+## Worked example: guards do not replace structural coverage
+
+Classify a temperature command with ranges and a guard:
+
+```rust
+fn advice(reading: Option<i32>, limit: i32) -> &'static str {
+    match reading {
+        None => "sensor unavailable",
+        Some(value @ ..=-1) => {
+            let _recorded = value;
+            "freezing"
+        }
+        Some(value) if value > limit => "above configured limit",
+        Some(0..=25) => "normal",
+        Some(_) => "warm",
+    }
+}
+
+assert_eq!(advice(None, 30), "sensor unavailable");
+assert_eq!(advice(Some(-4), 30), "freezing");
+assert_eq!(advice(Some(35), 30), "above configured limit");
+assert_eq!(advice(Some(20), 15), "above configured limit");
+```
+
+For `Some(20)` with limit `15`, the negative range fails, then the guard passes, so the result is “above configured limit” even though `20` also lies in `0..=25`. First match wins. With limit `30`, the guard fails and matching continues to the normal range.
+
+The guarded `Some(value)` arm does not cover every `Some`; its condition can be false. The final `Some(_)` remains necessary for exhaustiveness after the finite normal range. Guards can refer to outer variables such as `limit`, but a pattern binding with the same name would shadow that outer variable. Naming both values distinctly avoids a subtle comparison against the wrong binding.
+
+## `if let`, `let else`, and full `match`
+
+`if let` fits a single interesting pattern plus an optional fallback. `let else` fits an early-exit check that leaves successful bindings in the surrounding scope:
+
+```rust
+fn print_port(value: Option<&str>) {
+    let Some(text) = value else {
+        eprintln!("missing port");
+        return;
+    };
+
+    let Ok(port) = text.parse::<u16>() else {
+        eprintln!("invalid port");
+        return;
+    };
+
+    println!("port: {port}");
+}
+```
+
+If `value` is `None`, the first `else` block must diverge through `return`, `break`, `continue`, or panic. On success, `text` is available afterward. Parsing then performs a second refutable check and leaves `port` in scope. A nested pair of `if let` expressions could express the same logic but would indent the successful path.
+
+A full `match` is preferable when several variants carry policy. Its exhaustiveness check becomes useful during enum evolution: adding a variant points to each decision site lacking a case. A wildcard deliberately opts out of that compiler assistance for future variants, so it should represent a genuinely uniform fallback.
+
+## Rest patterns and ignored values
+
+`..` ignores the remaining fields or elements without naming them. In a `Point` struct pattern, it can leave every field except `x` unnamed. In a tuple, `(first, .., last)` can select endpoints when the tuple length is known. A slice pattern such as `[head, tail @ ..]` binds the first element and the remaining subslice.
+
+The bare wildcard `_` neither binds nor moves a value. `_name` creates a real binding whose name merely suppresses the unused warning, so it may move ownership. This distinction matters with `String`:
+
+```rust
+let value = Some(String::from("text"));
+if let Some(_) = value { /* `value` is not moved by `_` */ }
+println!("{value:?}");
+```
+
+Replacing `_` with `_text` would bind and move the string out of the option, preventing the later print. Use `_` when the value must be ignored without ownership, and an underscore-prefixed name when it is intentionally bound for future or conditional use.
+
+## Exhaustiveness is a maintenance tool
+
+For finite types such as enums and booleans, the compiler can prove full coverage directly. Integer and character types are large but ranges and catchalls can cover them. Guards are deliberately excluded from coverage reasoning because the compiler does not generally prove arbitrary boolean expressions.
+
+Unreachable-pattern warnings often reveal an ordering mistake or a redundant case. They should not be silenced reflexively. If one arm subsumes another, either the broad behavior is intended and the narrow arm should disappear, or the narrow arm must move earlier.
+
+Patterns should express data shape, leaving computation in arm bodies and guards. Deeply nested patterns can be precise, but once error reporting or conversion needs several stages, naming an intermediate value generally produces better diagnostics and clearer ownership.
+
+## Or-patterns combine cases with one binding contract
+
+The `|` operator lets several patterns share one arm:
+
+```rust
+let label = match status {
+    200 | 201 | 204 => "success",
+    400..=499 => "client error",
+    500..=599 => "server error",
+    _ => "other",
+};
+```
+
+For `201`, the first alternative matches and produces `success`. For `503`, the first two arms fail and the server range succeeds. Inclusive ranges work for numeric and character types whose ordering is known to the compiler.
+
+Every alternative in an or-pattern must introduce compatible bindings. An arm such as `Some(x) | None` cannot use `x`, because the `None` alternative has no value to bind. Restructure the arms or bind only information present in every alternative. This rule prevents an arm body from receiving a conditionally initialized name.
+
+Parentheses can clarify where an or-pattern applies inside a larger pattern. `Some(1 | 2)` matches two inner values, while top-level alternatives can repeat a larger shape. Prefer the form that exposes the shared structure without becoming a puzzle.
+
+Ranges describe ordered sets but cannot express every numeric relation. “Two fields are equal,” “one field exceeds a runtime limit,” and “a number is even” require guards or arm-body logic. A guard runs only after its structural pattern has bound values. That order avoids computing a condition for shapes that could never use it.
+
+Pattern matching does not automatically validate external data. Parsing bytes into an enum or struct remains a fallible step, and the resulting structured value may still need semantic checks. Once those checks produce a faithful type, exhaustive matches make later decisions much harder to forget.
+
+The compiler checks that contract continuously.
+
+<div className="see-also">
+
+See also: [Structs, methods, and enums](/cs/programming/rust/structs-methods-enums) · [Error handling](/cs/programming/rust/error-handling) · [Common collections](/cs/programming/rust/common-collections) · [Generics, traits, and lifetimes](/cs/programming/rust/generics-traits-lifetimes) · [Macros and unsafe Rust](/cs/programming/rust/macros-and-unsafe-rust)
+
+</div>

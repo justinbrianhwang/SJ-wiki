@@ -9,7 +9,7 @@ An n-gram language model assigns probabilities to word sequences by assuming tha
 
 N-grams are no longer the strongest language models, but they remain essential for understanding modern NLP. They clarify what a probability over text means, why unseen events are dangerous, how intrinsic evaluation works, and why neural models were such a major change. They also remain useful in speech recognition, spelling correction, input methods, decoding features, and small-data baselines.
 
-## Definitions
+## Factorizing sequence probability
 
 A **language model** is a probability distribution over token sequences. By the chain rule,
 
@@ -40,7 +40,7 @@ With log base $2$, perplexity is $2^{H(W)}$, where $H(W)$ is empirical cross-ent
 
 **Smoothing** adjusts maximum likelihood estimates so unseen n-grams receive nonzero probability. **Backoff** uses a lower-order model when a higher-order count is unavailable. **Interpolation** mixes several orders at once. **Kneser-Ney smoothing** changes the lower-order distribution so a word is likely if it appears in many distinct contexts, not merely if it is frequent.
 
-## Key results
+## Where smoothing puts probability mass
 
 The zero-count problem is the central weakness of unsmoothed n-grams. If a single test bigram has probability $0$, the whole sequence probability becomes $0$ and perplexity is infinite. Add-$k$ smoothing prevents this:
 
@@ -77,8 +77,6 @@ When using n-grams as baselines, keep the experimental protocol strict. The voca
 
 Historically, n-grams were also important because they separated the language model from other system components. In ASR, the acoustic model could propose candidate word strings and the language model could prefer fluent ones. In SMT, the translation model could propose target phrases and the language model could rank target-language fluency. Even when a neural encoder-decoder combines these roles, the n-gram decomposition remains the clearest diagnostic for asking whether an error came from local lexical choice, poor context modeling, or bad search.
 
-## Visual
-
 | Method | Formula idea | Strength | Weakness |
 |---|---|---|---|
 | MLE | normalize observed counts | simple, interpretable | zero probability for unseen events |
@@ -100,9 +98,11 @@ flowchart TD
   H --> I[Sequence probability and perplexity]
 ```
 
-## Worked example 1: add-one smoothed bigram
+## Two smoothing calculations
 
-Problem: train a bigram model on the sentence `I am Sam` with start and end symbols: `<s> I am Sam </s>`. Compute $P(\mathrm{Sam}\mid \mathrm{am})$ with add-one smoothing. Let the vocabulary be `{I, am, Sam, </s>}`, so $\vert V\vert =4$ for predicted tokens.
+### Smoothing the bigram in `I am Sam`
+
+Train a bigram model on the sentence `I am Sam` with start and end symbols: `<s> I am Sam </s>`. Compute $P(\mathrm{Sam}\mid \mathrm{am})$ with add-one smoothing. Let the vocabulary be `\{I, am, Sam, </s>\}`, so $\vert V\vert =4$ for predicted tokens.
 
 1. Count the bigrams:
    - `(<s>, I)` occurs $1$ time.
@@ -122,11 +122,11 @@ P_{+1}(\mathrm{Sam}\mid \mathrm{am})
 \end{aligned}
 $$
 
-Checked answer: the probability is $0.4$. Without smoothing it would be $1.0$, which overfits a one-sentence corpus. Add-one smoothing reserves mass for `I`, `am`, and `</s>` after `am`, even though they were unseen there.
+The probability is $0.4$. Without smoothing it would be $1.0$, which overfits a one-sentence corpus. Add-one smoothing reserves mass for `I`, `am`, and `</s>` after `am`, even though they were unseen there.
 
-## Worked example 2: continuation probability in Kneser-Ney
+### Comparing Kneser-Ney continuation counts
 
-Problem: compare continuation probabilities for `Francisco` and `the` from this observed bigram type set:
+Compare continuation probabilities for `Francisco` and `the` from this observed bigram type set:
 
 ```text
 San Francisco
@@ -141,8 +141,8 @@ near the
 Assume these are the only observed bigram types.
 
 1. Count distinct histories:
-   - `Francisco` appears after `{San, old, near}`, so it has $3$ distinct histories.
-   - `the` appears after `{read, eat, watch, near}`, so it has $4$ distinct histories.
+   - `Francisco` appears after `\{San, old, near\}`, so it has $3$ distinct histories.
+   - `the` appears after `\{read, eat, watch, near\}`, so it has $4$ distinct histories.
 2. Count all observed bigram types:
    - There are $7$ total bigram types.
 3. Compute continuation probabilities:
@@ -152,12 +152,12 @@ P_{\mathrm{cont}}(\mathrm{Francisco})=\frac{3}{7},\qquad
 P_{\mathrm{cont}}(\mathrm{the})=\frac{4}{7}.
 $$
 
-Checked answer: under this toy corpus, `the` receives the larger continuation probability. In a realistic corpus, `Francisco` often has high raw frequency but low continuation diversity, making Kneser-Ney especially helpful.
+Under this toy corpus, `the` receives the larger continuation probability. In a realistic corpus, `Francisco` often has high raw frequency but low continuation diversity, making Kneser-Ney especially helpful.
 
-## Code
+## Computing add-$k$ perplexity
 
 ```python
-from collections import Counter, defaultdict
+from collections import Counter
 from math import exp, log
 
 sentences = [["<s>", "I", "am", "Sam", "</s>"],
@@ -184,7 +184,7 @@ print(add_k_prob("am", "Sam"))
 print(perplexity)
 ```
 
-## Common pitfalls
+## Experimental choices that invalidate perplexity
 
 - Evaluating perplexity on a different tokenization than the training model used.
 - Forgetting start and end symbols, which makes sentence boundary probabilities undefined.
@@ -194,9 +194,8 @@ print(perplexity)
 - Using raw unigram frequency for Kneser-Ney lower-order probabilities instead of continuation counts.
 - Letting unknown words leak from test into training vocabulary.
 
-## Connections
+<div className="see-also">
 
-- [Regular expressions and normalization](/cs/nlp/regular-expressions-normalization-edit-distance)
-- [Neural networks for NLP](/cs/nlp/neural-networks-for-nlp)
-- [RNNs and LSTMs for sequence modeling](/cs/nlp/rnns-lstms-sequence-modeling)
-- [Speech recognition and synthesis](/cs/nlp/speech-recognition-and-synthesis)
+See also: [Regular expressions and normalization](/cs/nlp/regular-expressions-normalization-edit-distance) · [Neural networks for NLP](/cs/nlp/neural-networks-for-nlp) · [RNNs and LSTMs for sequence modeling](/cs/nlp/rnns-lstms-sequence-modeling) · [Speech recognition and synthesis](/cs/nlp/speech-recognition-and-synthesis)
+
+</div>

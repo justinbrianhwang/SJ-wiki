@@ -9,7 +9,7 @@ Public-key encryption lets anyone encrypt to a receiver using a public key, whil
 
 Katz and Lindell present public-key encryption through CPA and CCA experiments, hybrid encryption, KEM/DEM, ElGamal, DDH-based encapsulation, and RSA-based schemes. Smart's public-key and hybrid-encryption chapters complement this with concrete RSA, ElGamal, Rabin, Paillier, and KEM/DEM explanations. The synthesis is that public-key encryption is mostly a key-establishment tool inside larger protocols.
 
-## Definitions
+## Public-key encryption and its attack games
 
 A **public-key encryption scheme** has:
 
@@ -29,6 +29,8 @@ The **CPA indistinguishability experiment** for public-key encryption gives the 
 
 The **CCA experiment** additionally gives a decryption oracle, except that the adversary may not ask to decrypt the challenge ciphertext.
 
+## The ElGamal mask
+
 **ElGamal encryption** works in a cyclic group $G$ of order $q$ with generator $g$:
 
 1. Secret key: $x\leftarrow\mathbb Z_q$.
@@ -47,8 +49,6 @@ $$
 
 A **key encapsulation mechanism**, or KEM, produces a shared key and encapsulation ciphertext. A **data encapsulation mechanism**, or DEM, uses that key for symmetric authenticated encryption. Hybrid encryption combines them.
 
-## Key results
-
 ElGamal correctness follows from:
 
 $$
@@ -64,6 +64,8 @@ $$
 ElGamal is randomized because each encryption uses fresh $r$. Under the DDH assumption, ElGamal is CPA secure for messages encoded as group elements. If $(g,g^x,g^r,g^{xr})$ is indistinguishable from $(g,g^x,g^r,g^z)$, then $h^r m$ looks like a one-time pad over the group.
 
 Plain ElGamal is malleable and not CCA secure. Given $(c_1,c_2)$ encrypting $m$, an attacker can form $(c_1, c_2\cdot \Delta)$, which decrypts to $m\cdot\Delta$. CCA-secure variants add authentication, hashing, KEM/DEM transforms, or other structure.
+
+## Why real messages use KEM/DEM
 
 Hybrid encryption is the practical pattern:
 
@@ -95,15 +97,13 @@ Finally, public-key encryption by itself does not give sender deniability or non
 
 Hybrid encryption also improves failure containment. If the public-key layer encapsulates only a random key, then malformed public-key ciphertexts can be rejected before any large plaintext parser runs. If the DEM is an AEAD, modified data ciphertexts are rejected before release of plaintext. This layered rejection behavior is exactly what CCA-aware design wants: attackers should not get a rich oracle that reports how far a malformed message got through the application.
 
-Key privacy is a separate property. Ordinary public-key encryption primarily hides the message, not necessarily the identity of the recipient public key. Some schemes or protocols may leak which public key was used through ciphertext format, certificate choice, or network metadata. Anonymous messaging systems need stronger definitions and additional routing protections. The basic PKE definition in these notes is not meant to solve traffic analysis.
+Key privacy is a separate property. Ordinary public-key encryption primarily hides the message, not necessarily the identity of the recipient public key. Some schemes or protocols may leak which public key was used through ciphertext format, certificate choice, or network metadata. Anonymous messaging systems need stronger definitions and additional routing protections; the basic PKE definition does not cover traffic analysis.
 
 Randomness quality is as important in public-key encryption as in symmetric encryption. ElGamal needs fresh random exponents; RSA-OAEP needs fresh seeds; KEMs often need coins for encapsulation. If the random source repeats or becomes predictable, ciphertexts may link, session keys may repeat, or private information may leak. Public-key algorithms do not remove the need for a cryptographic random source.
 
-Multi-recipient encryption is another place where naive designs fail. Encrypting the same raw session key independently to many recipients can be safe in a KEM/DEM design if each encapsulation is randomized and the DEM context is clear. Reusing deterministic textbook encryption or omitting recipient identities from associated data can create substitution problems.
+Multi-recipient encryption is another place where naive designs fail. Encrypting the same raw session key independently to many recipients can be safe in a KEM/DEM design if each encapsulation is randomized and the DEM context is clear. Reusing deterministic textbook encryption or omitting recipient identities from associated data can create substitution problems because the recipient set is often security-relevant metadata.
 
-The recipient set is often security-relevant metadata.
-
-## Visual
+### Algebraic ElGamal beside the hybrid construction
 
 ```mermaid
 flowchart TB
@@ -146,8 +146,8 @@ flowchart TB
     Encaps --> Bundle
   end
 
-  Recover --> Lesson["Lesson: randomized public-key layer should protect a key, not a whole file"]
-  Lesson --> Encaps
+  Recover --> Bridge["Use the randomized public-key layer to protect a key"]
+  Bridge --> Encaps
 ```
 
 This diagram separates textbook ElGamal from the practical hybrid pattern. ElGamal exposes the algebraic mask `h^r`, while KEM/DEM uses public-key encryption only to derive an AEAD key and binds recipient/context metadata into the KDF and associated data.
@@ -160,11 +160,9 @@ This diagram separates textbook ElGamal from the practical hybrid pattern. ElGam
 | KEM/DEM hybrid | practical large-message encryption | both halves and binding must be correct |
 | Integrated AEAD channel | best application interface | requires key establishment first |
 
-## Worked example 1: toy ElGamal encryption
+## ElGamal encryption in $\mathbb Z_{23}^{\ast}$
 
-Problem: use $p=23$, group $\mathbb Z_{23}^\ast$, generator $g=5$, secret $x=6$, and message $m=7$. Encrypt with randomness $r=3$.
-
-Method:
+Use $p=23$, group $\mathbb Z_{23}^\ast$, generator $g=5$, secret $x=6$, message $m=7$, and randomness $r=3$.
 
 1. Compute public key:
 
@@ -198,13 +196,11 @@ $$
 (c_1,c_2)=(10,19).
 $$
 
-Checked answer: ElGamal ciphertext is $(10,19)$.
+The ElGamal ciphertext is $(10,19)$.
 
-## Worked example 2: toy ElGamal decryption
+## Inverting the shared mask
 
-Problem: decrypt the ciphertext $(10,19)$ from the previous example using secret key $x=6$.
-
-Method:
+Decrypt $(10,19)$ using secret key $x=6$.
 
 1. Compute:
 
@@ -239,9 +235,9 @@ $$
 m=c_2\cdot(c_1^x)^{-1}=19\cdot4=76\equiv7\pmod{23}.
 $$
 
-Checked answer: decrypted message is $7$.
+The decrypted message is $7$.
 
-## Code
+## Checking the group arithmetic
 
 ```python
 def invmod(a: int, p: int) -> int:
@@ -266,7 +262,7 @@ c = elgamal_encrypt(p, g, h, m, r)
 print(h, c, elgamal_decrypt(p, sk, c))
 ```
 
-## Common pitfalls
+## Composition failures around the public-key core
 
 - Encrypting large data directly with public-key operations.
 - Forgetting public-key encryption does not identify the sender.
@@ -275,9 +271,8 @@ print(h, c, elgamal_decrypt(p, sk, c))
 - Skipping public-key validation or certificate validation.
 - Combining KEM and DEM without binding algorithm choices, identities, and associated data.
 
-## Connections
+<div className="see-also">
 
-- [Discrete logarithms and Diffie-Hellman](/cs/cryptography/discrete-log-diffie-hellman)
-- [RSA and OAEP](/cs/cryptography/rsa-and-oaep)
-- [Authenticated encryption and GCM](/cs/cryptography/authenticated-encryption-gcm)
-- [TLS protocol overview](/cs/cryptography/tls-protocol-overview)
+See also: [Discrete logarithms and Diffie-Hellman](/cs/cryptography/discrete-log-diffie-hellman) · [RSA and OAEP](/cs/cryptography/rsa-and-oaep) · [Authenticated encryption and GCM](/cs/cryptography/authenticated-encryption-gcm) · [TLS protocol overview](/cs/cryptography/tls-protocol-overview)
+
+</div>

@@ -5,135 +5,141 @@ sidebar_position: 2
 
 # Tensors and Data Preprocessing
 
-Deep learning starts with two practical skills: representing data as tensors and making raw data numerically usable. D2L begins here because every later model, from linear regression to transformers, is ultimately a composition of tensor operations. A network can look mysterious at the architectural level, but at runtime it mostly consumes batches of arrays, applies broadcasted arithmetic, multiplies matrices, and moves intermediate results through differentiable operators.
+Deep learning begins with two concrete skills: representing data as tensors and converting raw records into the numeric form a model expects. Every later architecture ultimately consumes batches of arrays, applies broadcasted arithmetic and matrix multiplication, and passes intermediate values through differentiable operators.
 
-Data preprocessing matters just as much as the model definition. Missing values, mixed numeric and categorical columns, inconsistent scales, and accidental train-test leakage can dominate the result before optimization even begins. A disciplined tensor pipeline keeps shapes explicit, keeps statistical estimates tied to the training split, and makes each minibatch look like what the model expects.
+Preprocessing can dominate a result before optimization starts. Missing values, mixed numeric and categorical columns, inconsistent scales, and train-test leakage all change the learning problem. A sound pipeline keeps shapes explicit and fits every data-dependent transformation on the training split alone.
 
-## Definitions
+## Tensor shape is an interface contract
 
-A **tensor** is a multidimensional array with a shape, a data type, and usually a device. In PyTorch, a scalar has shape `()`, a vector has shape `(d,)`, a matrix has shape `(m, n)`, and a minibatch of color images often has shape `(batch, channels, height, width)`.
+A **tensor** is a multidimensional array with a shape, data type, and usually a device. In PyTorch, a scalar has shape `()`, a vector `(d,)`, a matrix `(m, n)`, and a color-image minibatch commonly `(batch, channels, height, width)`.
 
-Let $X \in \mathbb{R}^{n \times d}$ be a tabular feature matrix. The row $x_i$ is the feature vector for example $i$, and a target vector $y \in \mathbb{R}^n$ stores one label or response per row. In image tasks, one row is no longer enough to describe an example, so an input batch may be $X \in \mathbb{R}^{n \times c \times h \times w}$.
+For tabular data, let $X \in \mathbb{R}^{n \times d}$ contain $n$ feature rows and $d$ columns, with target vector $y \in \mathbb{R}^n$. Images require more axes, so a batch may be $X \in \mathbb{R}^{n \times c \times h \times w}$. A token batch often has shape `(batch, time)`.
 
-**Broadcasting** is a rule for applying elementwise operations to tensors whose shapes differ but are compatible. Starting from trailing dimensions, two dimensions are compatible when they are equal or when one of them is $1$. A dimension of size $1$ can be repeated conceptually without copying data.
+| Value | Typical PyTorch shape | Role |
+|---|---:|---|
+| Scalar loss | `()` | Scalar objective for `backward()` |
+| Feature vector | `(d,)` | One tabular example |
+| Minibatch matrix | `(batch, d)` | Vectorized tabular training |
+| Image batch | `(batch, channels, height, width)` | Standard PyTorch CNN layout |
+| Token batch | `(batch, time)` | Discrete sequence input |
+| One-hot features | `(batch, categories)` | Numeric category indicators |
 
-**Indexing and slicing** select subtensors. A slice such as `X[:, 1:3]` means all rows and columns with indices `1` and `2`. In-place updates such as `X[:, 0] = 0` modify storage and can save memory, but they must be used carefully when autograd needs previous values.
-
-**Data preprocessing** turns raw records into tensors. Common steps include parsing files, separating features from labels, imputing missing numeric values, encoding categorical values, standardizing numeric features, shuffling examples, and grouping them into minibatches.
-
-**One-hot encoding** maps a categorical variable with $k$ possible categories to a vector in $\{0,1\}^k$. This lets a linear model or neural network receive category identity without imposing an artificial numeric order.
-
-## Key results
-
-The most important tensor result is that shape reasoning is an invariant. If an operation is valid for a single example but not for a minibatch, it is usually not written in the right vectorized form. For example, a linear model with weights $w \in \mathbb{R}^d$ and bias $b$ should compute all predictions as
-
-$$
-\hat{y} = Xw + b,
-$$
-
-where $X \in \mathbb{R}^{n \times d}$ and broadcasting expands the scalar $b$ across all $n$ rows.
-
-Vectorization replaces Python loops with library kernels. If $X$ has $n$ rows, a loop that computes `torch.dot(X[i], w)` repeatedly launches many small operations. The expression `X @ w` launches a single optimized matrix-vector product and lets PyTorch use low-level linear algebra routines.
-
-Broadcasting is not just syntax. It also affects memory behavior. `A + B` where `A.shape == (3, 1)` and `B.shape == (1, 4)` behaves like adding a repeated column to a repeated row, producing shape `(3, 4)`. The repeated views need not be physically materialized before the result is computed.
-
-Preprocessing has a simple statistical rule: fit preprocessing decisions on the training set, then apply the same decisions to validation and test sets. If the mean and standard deviation of a numeric feature are estimated using the test set, information has leaked from evaluation into training. The same warning applies to vocabulary construction, category discovery, missing-value imputation, and feature selection.
-
-For numeric standardization, use
+Shape reasoning should remain valid when one example becomes a batch. A linear model with $w \in \mathbb{R}^d$ and scalar $b$ predicts every row through
 
 $$
-z_{ij} = \frac{x_{ij} - \mu_j}{\sigma_j + \epsilon},
+\hat{y}=Xw+b,
 $$
 
-where $\mu_j$ and $\sigma_j$ are computed from the training column $j$, and $\epsilon$ prevents division by zero. Standardization does not make a model correct, but it makes optimization better conditioned when features have very different units.
+where the matrix-vector product produces shape $(n)$ and broadcasting applies $b$ to each output. `X @ w` also launches one optimized kernel, whereas a Python loop around `torch.dot(X[i], w)` launches many small operations.
 
-Shape conventions should be documented at dataset boundaries. A tabular batch, image batch, and token batch all carry the batch dimension, but their remaining axes mean different things. Naming these axes in code comments, variable names, or assertions prevents subtle bugs when models are refactored. A useful habit is to check a single minibatch before training and print both feature and target shapes.
+Document axis meanings at dataset boundaries and inspect one minibatch before training. Image files and plotting libraries often use channels-last arrays, while PyTorch convolution layers expect channels first. Integer ids are appropriate for embedding lookup; continuous arithmetic usually requires floating-point tensors.
 
-Data preprocessing should also preserve reversibility where possible. Saving category vocabularies, normalization statistics, and label mappings makes evaluation reproducible and lets predictions be interpreted later. In production systems, the preprocessing artifact is part of the model because changing it changes the numeric input seen by the network.
+### Shape, stride, and storage
 
-## Visual
+A shape says how many indices exist along each axis. A **stride** says how far to move in storage when one index increases. A contiguous $2\times3$ row-major tensor commonly has strides $(3,1)$: moving down one row skips three elements, while moving across one column skips one.
 
-| Concept | Typical PyTorch object | Shape example | Why it matters |
-|---|---:|---:|---|
-| Scalar loss | `torch.Tensor` | `()` | `backward()` is simplest on scalar objectives |
-| Feature vector | `torch.Tensor` | `(d,)` | One example for a tabular model |
-| Minibatch matrix | `torch.Tensor` | `(batch, d)` | Enables vectorized training |
-| Image batch | `torch.Tensor` | `(batch, channels, height, width)` | Standard CNN layout in PyTorch |
-| Token batch | `torch.Tensor` | `(batch, time)` | Standard discrete sequence layout |
-| One-hot features | `torch.Tensor` | `(batch, categories)` | Converts categories to numeric inputs |
+Operations such as transpose can return a view with new shape and strides but the same underlying storage. If
+
+$$
+X=
+\begin{bmatrix}
+1&2&3\\
+4&5&6
+\end{bmatrix},
+$$
+
+then `X.T` has shape `(3, 2)` and can be represented by swapping the strides. No data copy is required. Some kernels require contiguous layout, so `contiguous()` may allocate and reorder the elements. `reshape` can return a view when strides permit it and otherwise makes a copy; code should not rely on which case occurred unless storage aliasing matters.
+
+Slicing usually creates another view. Mutating `X[:, 0]` can therefore change `X` itself, while advanced indexing with a list or Boolean mask commonly returns a copy. This distinction matters in preprocessing code that reuses a supposedly untouched raw tensor.
+
+Data type is part of the contract as well. `float32` is the usual neural-network default; `float64` costs twice the storage and is slower on much accelerator hardware, but can be needed for numerically sensitive scientific calculations. Integer division, overflow, and conversion are not differentiable in the way floating-point model operations are. Class indices passed to cross-entropy or embeddings normally use `int64`, whereas binary or continuous targets usually use floating point.
+
+## Broadcasting aligns trailing dimensions
+
+Broadcasting permits elementwise operations between compatible shapes. Starting from the trailing axis, dimensions must be equal or one of them must have size $1$. The singleton dimension is conceptually repeated, often without materializing a copied tensor.
+
+For
+
+$$
+X=
+\begin{bmatrix}
+1&2&3\\
+4&5&6
+\end{bmatrix},
+\qquad
+r=\begin{bmatrix}10&20&30\end{bmatrix},
+$$
+
+the shapes are $(2,3)$ and $(1,3)$. The last dimensions agree, and the singleton row of $r$ can align with both rows of $X$:
+
+$$
+Y=X+r
+=
+\begin{bmatrix}
+1+10&2+20&3+30\\
+4+10&5+20&6+30
+\end{bmatrix}
+=
+\begin{bmatrix}
+11&22&33\\
+14&25&36
+\end{bmatrix}.
+$$
+
+The result has the common broadcast shape $(2,3)$. Broadcasting may use an expanded view for the input, though the computed result still occupies its full shape.
+
+Singleton axes must be placed deliberately. Suppose an image batch has shape `(8, 3, 32, 32)` and channel means have shape `(3,)`. Subtracting them directly fails because broadcasting compares the final dimensions: it tries to align `3` with the final width `32`. Reshaping the means to `(1, 3, 1, 1)` aligns channel $3$ with channel $3$ while the singleton dimensions expand over batch, height, and width.
+
+A more dangerous case succeeds with the wrong meaning. If a square matrix has shape `(3, 3)`, adding a vector of shape `(3,)` adds it to every row. Someone intending one offset per row needed shape `(3, 1)`. Matching sizes can conceal an axis error, so names such as `batch`, `channel`, and `feature` remain useful even though tensor libraries store only numeric dimensions.
+
+Reduction operations also change contracts. `X.mean(dim=1)` removes axis $1$ and may turn `(batch, time, features)` into `(batch, features)`. With `keepdim=True`, the result is `(batch, 1, features)`, which often broadcasts back across time without a later `unsqueeze`.
+
+Indexing and slicing preserve the same shape discipline. `X[:, 1:3]` selects every row and columns `1` and `2`. In-place assignment such as `X[:, 0] = 0` modifies storage; it needs care when autograd has retained earlier values for a backward pass.
+
+## Split before fitting transformations
+
+Data preprocessing usually parses records, separates targets, imputes missing values, encodes categories, scales numeric columns, shuffles training examples, and forms minibatches. Every decision learned from data belongs to the training split: means, standard deviations, category sets, vocabularies, imputers, feature selection, and label mappings.
 
 ```mermaid
 flowchart TB
   Raw["Raw files, tables, images, or text"] --> Parse["Parse records and labels"]
-  Parse --> Split["Split train / validation / test before fitting statistics"]
-  Split --> TrainStats["Fit train-only artifacts: means, stds, vocab, category map, label map"]
+  Parse --> Split["Split train, validation, and test before fitting statistics"]
+  Split --> TrainStats["Fit training artifacts: means, standard deviations, vocabularies, and mappings"]
   TrainStats --> Num["Numeric path: impute -> standardize -> float tensor (N, d_num)"]
-  TrainStats --> Cat["Categorical path: one-hot or embedding ids -> (N, d_cat)"]
-  TrainStats --> Seq["Sequence/image path: pad, crop, normalize -> (N, T) or (N, C, H, W)"]
+  TrainStats --> Cat["Categorical path: one-hot vectors or embedding ids -> (N, d_cat)"]
+  TrainStats --> Seq["Sequence or image path: pad, crop, normalize -> (N, T) or (N, C, H, W)"]
   Num --> Join["Assemble feature tensors and targets"]
   Cat --> Join
   Seq --> Join
-  Join --> Dataset["Dataset object stores X, y, masks, and metadata"]
-  Dataset --> Loader["DataLoader: shuffle train, batch, collate, pin memory if useful"]
-  Loader --> Batch["Minibatch contract: features, target, valid lengths/masks"]
-  Batch --> Device["Move tensors to model device"]
+  Join --> Dataset["Dataset stores X, y, masks, and metadata"]
+  Dataset --> Loader["DataLoader: shuffle training data, batch, collate, and optionally pin memory"]
+  Loader --> Batch["Minibatch contract: features, targets, and valid lengths or masks"]
+  Batch --> Device["Move tensors to the model device"]
   Device --> Model(("Model-ready tensors"))
-  TrainStats -. "same artifacts reused without refitting" .-> Dataset
+  TrainStats -. "reuse unchanged artifacts for every split" .-> Dataset
 ```
 
-The preprocessing diagram makes leakage boundaries visible: the split happens before normalization statistics, vocabularies, and category maps are fitted. Numeric, categorical, and sequence/image paths all converge into a dataset with explicit targets and masks. The final nodes show the runtime contract a model actually receives: minibatched tensors on the correct device.
+Fitting a mean or vocabulary before the split leaks evaluation information into training. Encoding each split independently creates a different problem: column order and category identity can change between training and inference.
 
-## Worked example 1: broadcasting a minibatch
-
-Problem: compute $Y = X + r$ where
+For numeric column $j$, standardization uses training statistics
 
 $$
-X =
-\begin{bmatrix}
-1 & 2 & 3 \\
-4 & 5 & 6
-\end{bmatrix},
-\qquad
-r =
-\begin{bmatrix}
-10 & 20 & 30
-\end{bmatrix}.
+z_{ij}=\frac{x_{ij}-\mu_j}{\sigma_j+\epsilon},
 $$
 
-Method:
+where $\epsilon$ protects constant or nearly constant columns. Scaling cannot correct a misspecified model, but it improves optimization when features use very different units.
 
-1. Write the shapes. $X$ has shape $(2,3)$ and $r$ has shape $(1,3)$.
-2. Compare trailing dimensions. The last dimensions are both $3$, so they match.
-3. Compare the first dimensions. They are $2$ and $1$, so broadcasting can repeat the single row of $r$ across the two rows of $X$.
-4. Conceptually expand $r$ to
+One-hot encoding maps a categorical variable with $k$ values to a vector in $\{0,1\}^k$. This represents identity without imposing an artificial ordering. Large or open-ended category sets often use integer ids and learned embeddings instead.
 
-$$
-\begin{bmatrix}
-10 & 20 & 30 \\
-10 & 20 & 30
-\end{bmatrix}.
-$$
+Missingness needs a modeling decision, not only a fill value. Mean imputation says that a missing numeric value receives the center of the observed training column. Adding a binary missingness indicator lets the model distinguish an actual value equal to the mean from an imputed one. That distinction can help when the fact of measurement is informative, though it can also capture an unstable data-collection habit.
 
-5. Add elementwise:
+An unseen category at evaluation time cannot create a new model column. Common policies reserve an `unknown` category, use all-zero one-hot encoding with explicit semantics, or reject the record. The choice belongs in the saved preprocessing contract. Treating a new category as an arbitrary existing index silently changes its meaning.
 
-$$
-Y =
-\begin{bmatrix}
-1+10 & 2+20 & 3+30 \\
-4+10 & 5+20 & 6+30
-\end{bmatrix}
-=
-\begin{bmatrix}
-11 & 22 & 33 \\
-14 & 25 & 36
-\end{bmatrix}.
-$$
+Targets demand leakage checks too. A feature recorded after the outcome, an aggregate computed using future rows, or an identifier that encodes the label can make held-out accuracy look excellent. A random row split is insufficient when the intended prediction concerns future time periods or unseen people; split by time or group to match that use.
 
-Checked answer: the output shape is $(2,3)$, matching the broadcasted common shape. Each row of $X$ received the same offset vector $r$.
+## Working a small table by hand
 
-## Worked example 2: preprocessing a small table
-
-Problem: convert the following raw data into model-ready numeric features. The target is `price`.
+Treat the following three rows as a training set, with `price` as the target.
 
 | row | rooms | age | city | price |
 |---:|---:|---:|---|---:|
@@ -141,75 +147,67 @@ Problem: convert the following raw data into model-ready numeric features. The t
 | 2 | 4 | missing | Busan | 310 |
 | 3 | 3 | 20 | Seoul | 280 |
 
-Method:
-
-1. Separate the target:
+The target is
 
 $$
-y = [220, 310, 280]^T.
+y=[220,310,280]^T.
 $$
 
-2. Impute the missing numeric value using the training-column mean. The observed ages are $10$ and $20$, so
+The observed ages have mean $(10+20)/2=15$, so mean imputation produces $[10,15,20]^T$. The `rooms` mean is $3$, with population standard deviation
 
 $$
-\mu_{\text{age}} = \frac{10 + 20}{2} = 15.
+\sigma_{\text{rooms}}
+=\sqrt{\frac{(2-3)^2+(4-3)^2+(3-3)^2}{3}}
+=\sqrt{\frac{2}{3}}
+\approx0.816.
 $$
 
-The imputed age column is $[10, 15, 20]^T$.
-
-3. Standardize `rooms`. Its mean is
+Its standardized values are approximately $[-1.225,1.225,0]$. The imputed `age` column has mean $15$ and population standard deviation
 
 $$
-\mu_{\text{rooms}} = \frac{2 + 4 + 3}{3} = 3.
+\sigma_{\text{age}}
+=\sqrt{\frac{(10-15)^2+(15-15)^2+(20-15)^2}{3}}
+=\sqrt{\frac{50}{3}}
+\approx4.083,
 $$
 
-Its population standard deviation is
+giving standardized ages $[-1.225,0,1.225]$.
+
+With one-hot columns ordered as `[Busan, Seoul]`, the category rows are `[0,1]`, `[1,0]`, and `[0,1]`. One valid model matrix is therefore
 
 $$
-\sigma_{\text{rooms}} =
-\sqrt{\frac{(2-3)^2 + (4-3)^2 + (3-3)^2}{3}}
-= \sqrt{\frac{2}{3}}
-\approx 0.816.
-$$
-
-So the standardized `rooms` values are approximately
-
-$$
-\left[
-\frac{2-3}{0.816},
-\frac{4-3}{0.816},
-\frac{3-3}{0.816}
-\right]
-= [-1.225, 1.225, 0].
-$$
-
-4. Standardize `age`. The imputed age mean is $15$ and the population standard deviation is
-
-$$
-\sigma_{\text{age}} =
-\sqrt{\frac{(10-15)^2 + (15-15)^2 + (20-15)^2}{3}}
-= \sqrt{\frac{50}{3}}
-\approx 4.083.
-$$
-
-The standardized age values are approximately $[-1.225, 0, 1.225]$.
-
-5. One-hot encode `city` with columns `[Busan, Seoul]`. The rows become `[0,1]`, `[1,0]`, and `[0,1]`.
-
-Checked answer: one valid feature matrix is
-
-$$
-X \approx
+X\approx
 \begin{bmatrix}
--1.225 & -1.225 & 0 & 1 \\
-1.225 & 0 & 1 & 0 \\
-0 & 1.225 & 0 & 1
+-1.225&-1.225&0&1\\
+1.225&0&1&0\\
+0&1.225&0&1
 \end{bmatrix}.
 $$
 
-The first two columns are standardized numeric features, and the final two are categorical indicators.
+The first two columns are standardized numeric features; the final two are category indicators.
 
-## Code
+### Transforming a held-out row with training artifacts
+
+Now consider a test row with `rooms = 5`, missing `age`, and city `Incheon`. Reuse the training means $\mu_{\text{rooms}}=3$ and $\mu_{\text{age}}=15$, together with standard deviations $0.816$ and $4.083$. Imputing age with the stored mean gives
+
+$$
+z_{\text{rooms}}=\frac{5-3}{0.816}\approx2.451,
+\qquad
+z_{\text{age}}=\frac{15-15}{4.083}=0.
+$$
+
+If the encoder was fitted with an explicit `unknown` column ordered after `[Busan, Seoul]`, the category vector is `[0,0,1]`. The full feature row is
+
+$$
+x_{\text{test}}
+\approx[2.451,0,0,0,1].
+$$
+
+Refitting on this one row would instead assign rooms a mean of $5$ and an undefined or zero standard deviation, yielding a quite different representation. Calling `get_dummies` on it alone would create an `Incheon` column that the trained weight matrix has never seen. Reuse is a mathematical requirement, not merely a software convenience.
+
+If a missingness indicator is part of the fitted schema, append `age_missing = 1`. Training rows would have indicator values $[0,1,0]^T$. The model can then learn a separate coefficient for the observation process while the numeric age column stays finite.
+
+## Building the same training pipeline
 
 ```python
 import pandas as pd
@@ -242,19 +240,34 @@ for xb, yb in loader:
     print("targets:", yb)
 ```
 
-## Common pitfalls
+Here `raw` is the training split, so its imputation, scaling, and category discovery produce training artifacts. A validation or test table must be transformed with those stored values and the same category column order, without calling `mean` or `get_dummies` independently on the new data.
 
-- Treating tensor shape errors as incidental. Shape mismatches usually reveal an incorrect mental model of the batch dimension.
-- Computing standardization statistics on the full dataset before splitting. This leaks information from validation or test examples.
-- Encoding categories independently in each split. The column order and category set must be learned once from the training data.
-- Assuming broadcasting always copies data. It often uses views, but the final result still has the broadcasted shape.
-- Using integer tensors for model inputs that should participate in floating-point arithmetic.
-- Forgetting that PyTorch image tensors usually use channels-first layout, while many image files and plotting libraries use channels-last layout.
+## The preprocessing artifact belongs with the model
 
-## Connections
+Save normalization statistics, category vocabularies, label mappings, padding conventions, and axis layouts with the learned weights. Changing any of them changes the numeric function evaluated at inference time. Retaining the artifacts also makes encoded examples reversible enough to interpret predictions and reproduce evaluations.
 
-- [Linear algebra foundations](/math/linear-algebra/)
-- [Probability and random variables](/math/probability-and-random-variables/)
-- [Classical machine learning data preparation](/cs/machine-learning/)
-- [Linear regression training](/cs/deep-learning/linear-regression-training)
-- [Computer vision applications](/cs/deep-learning/computer-vision-applications)
+Assertions at the boundary are cheap insurance: check feature and target shapes, dtypes, finite numeric values, category handling, masks, and device placement before a long run. A tensor shape error usually indicates a mistaken batch or axis model rather than an incidental syntax problem.
+
+## Batching changes representation, not meaning
+
+A dataset maps an example index to one sample. A data loader chooses indices, groups samples, and applies a collation rule. Default collation can stack equal-shaped tensors along a new leading batch axis; variable-length sequences need padding, packing, or a custom structure.
+
+Padding requires a validity mask. For sequences of lengths $3$ and $1$ padded to length $3$, one Boolean mask is `[true, true, true]` for the first row and `[true, false, false]` for the second. Loss reduction must count four valid positions, not six rectangular slots. Attention and pooling operations need the same semantic exclusion, though an API may use the opposite convention where true means “masked out.”
+
+Shuffling changes sample order but should not change the transformation learned from training data. Random augmentation does change an example and belongs only in designated pipelines. Reproducibility requires tracking the random generators used by the loader, worker processes, and augmentation library; one global seed may not control all of them.
+
+A final minibatch may be smaller than the requested size. Model code that reshapes using a fixed batch constant can fail only at the end of an epoch. Derive the current size from the tensor, or drop the last batch only when an algorithm genuinely requires fixed-size groups.
+
+## Failure modes that survive a quick glance
+
+- A target with shape `(batch, 1)` may broadcast against predictions of shape `(batch,)` and produce a `(batch, batch)` loss matrix. Both tensors contain the expected number of values, yet the loss compares every prediction with every target. Make their contracts identical before subtraction.
+- Normalizing each minibatch in the input pipeline makes a record's representation depend on its batch companions. Batch normalization is a model layer with defined training and evaluation behavior; ad hoc per-batch feature scaling is a different transformation.
+- Replacing every non-finite value with zero hides overflow and parsing errors along with genuine missing data. Detect `NaN` and infinity before imputation and decide which source values count as missing.
+- Shuffling validation or test rows usually leaves aggregate metrics unchanged, but random augmentation does not. Evaluation transforms should be deterministic unless the metric explicitly averages multiple stochastic views.
+- Moving a tensor to an accelerator returns a tensor on that device; it does not necessarily mutate the original variable. Model parameters, inputs, targets, and any masks used together must reside on compatible devices.
+
+<div className="see-also">
+
+See also: [Linear algebra foundations](/math/linear-algebra/intro) · [Probability and random variables](/math/probability-and-random-variables/intro) · [Classical machine learning data preparation](/cs/machine-learning/intro) · [Linear regression training](/cs/deep-learning/linear-regression-training) · [Computer vision applications](/cs/deep-learning/computer-vision-applications)
+
+</div>

@@ -395,9 +395,8 @@ print(np.linalg.solve(A, b))
 - Destroying sparsity by forming dense matrices inside each iteration.
 - Comparing iteration counts without comparing cost per iteration and preconditioning.
 
-## Related pages
+<div className="see-also">
 
-- [Gaussian elimination pivoting and LU](/math/numerical-analysis/gaussian-elimination-pivoting-lu)
-- [conjugate gradient and iterative refinement](/math/numerical-analysis/conjugate-gradient-iterative-refinement)
-- [matrix factorizations and special systems](/math/numerical-analysis/matrix-factorizations-special-systems)
-- [finite difference methods for PDEs](/math/numerical-analysis/finite-difference-pdes)
+See also: [Gaussian elimination pivoting and LU](/math/numerical-analysis/gaussian-elimination-pivoting-lu) · [conjugate gradient and iterative refinement](/math/numerical-analysis/conjugate-gradient-iterative-refinement) · [matrix factorizations and special systems](/math/numerical-analysis/matrix-factorizations-special-systems) · [finite difference methods for PDEs](/math/numerical-analysis/finite-difference-pdes)
+
+</div>

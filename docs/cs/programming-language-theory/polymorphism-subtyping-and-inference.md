@@ -9,7 +9,7 @@ Simple types classify terms but are deliberately modest. Real languages need reu
 
 The core tension is expressiveness versus decidability and usability. System F makes polymorphism explicit and powerful, but full inference is undecidable. Hindley-Milner gives principal types for a large ML-like fragment, but restricts where polymorphism is introduced. Subtyping models substitutability, but interacts with inference and variance in subtle ways.
 
-## Definitions
+## Reuse through quantification and substitutability
 
 **Parametric polymorphism** allows one term to work uniformly for many types. In System F, types include variables and universal quantification:
 
@@ -77,7 +77,7 @@ This expresses APIs such as "for any subtype of `Comparable`, return a result de
 
 Higher-rank polymorphism permits universal types to appear as function arguments. GADTs refine result types by constructors. Typeclasses and Rust traits provide ad-hoc polymorphism through dictionaries or monomorphized dispatch, complementing parametric polymorphism.
 
-## Key results
+## What can still be inferred
 
 **Parametricity.** A closed System F term of type $\forall X.X\to X$ behaves like identity: it cannot inspect values of unknown type $X$. Relational parametricity is deeper than typechecking; it gives "theorems for free" about polymorphic programs [6].
 
@@ -95,13 +95,11 @@ Higher-rank polymorphism permits universal types to appear as function arguments
 
 **Bidirectional checking.** Many modern typed languages use two mutually reinforcing judgments: checking, where an expression is checked against a known type, and synthesis, where an expression produces a type. Lambda abstractions are easy to check against an arrow type but hard to synthesize without annotations. Variables and applications often synthesize. Bidirectional typing supports higher-rank polymorphism and local inference without pretending that full inference is decidable. It also improves error messages because expected types flow inward through the syntax.
 
-**Parametricity has design consequences.** A function of type $\forall A. A\to A$ cannot manufacture an arbitrary $A$ or inspect one, so it must return its argument or diverge in a language with nontermination. But adding effects, type reflection, unsafe casts, or ad-hoc overloading weakens that reasoning. This is why polymorphism is not just a notation for generics; it is a semantic promise about uniformity, and language features determine how strong that promise remains.
+**Parametricity has design consequences.** A function of type $\forall A. A\to A$ cannot manufacture an arbitrary $A$ or inspect one, so it must return its argument or diverge in a language with nontermination. Effects, type reflection, unsafe casts, and ad-hoc overloading weaken that reasoning. Polymorphism carries a semantic promise of uniformity beyond its use as generic notation, and other language features determine how strong that promise remains.
 
 **Subtyping algorithms need normalization.** Declarative subtyping rules are written for clarity, not always for direct execution. Record permutation, transitivity, and bounded quantification can make naive proof search loop or branch wildly. Implementations often use algorithmic subtyping, which orients rules, removes admissible transitivity where possible, and normalizes record field order. TAPL separates declarative and algorithmic systems to prove that the checker is sound and complete for the intended subtyping relation [1]. This distinction mirrors the gap between a mathematical specification and a compiler implementation.
 
 The same lesson applies to inference: a declarative typing rule may be elegant, while the implementation needs a syntax-directed algorithm, fresh-name discipline, and explicit failure modes.
-
-## Visual
 
 ```mermaid
 graph TD
@@ -126,7 +124,7 @@ graph TD
 | Bounded quantification | $\forall X\lt :T.U$ | generic code with subtype bounds | more complex metatheory |
 | Typeclasses/traits | constraints | ad-hoc overloaded operations | coherence and dispatch rules |
 
-## Worked example 1: Algorithm W for `let id = fun x -> x in id id`
+## Running Algorithm W on `id id`
 
 Problem: infer a principal type for
 
@@ -182,7 +180,46 @@ $$
 
 Generalizing the whole expression would yield $\forall \gamma.\gamma\to\gamma$ if it were bound by another `let`. The checked result is that `id id` is again identity-like, not a type error, because let-polymorphism instantiated `id` twice.
 
-## Worked example 2: checking function subtyping
+## First-order unification with an occurs check
+
+```python
+def occurs(name, ty):
+    tag = ty[0]
+    if tag == "var":
+        return ty[1] == name
+    if tag == "arrow":
+        return occurs(name, ty[1]) or occurs(name, ty[2])
+    return False
+
+def apply_subst(subst, ty):
+    if ty[0] == "var" and ty[1] in subst:
+        return apply_subst(subst, subst[ty[1]])
+    if ty[0] == "arrow":
+        return ("arrow", apply_subst(subst, ty[1]), apply_subst(subst, ty[2]))
+    return ty
+
+def unify(equations):
+    subst = {}
+    while equations:
+        left, right = equations.pop()
+        left, right = apply_subst(subst, left), apply_subst(subst, right)
+        if left == right:
+            continue
+        if left[0] == "var":
+            if occurs(left[1], right):
+                raise TypeError("occurs check failed")
+            subst[left[1]] = right
+        elif right[0] == "var":
+            equations.append((right, left))
+        elif left[0] == right[0] == "arrow":
+            equations.append((left[1], right[1]))
+            equations.append((left[2], right[2]))
+        else:
+            raise TypeError(f"cannot unify {left} with {right}")
+    return subst
+```
+
+## Checking contravariance by hand
 
 Problem: decide whether
 
@@ -231,46 +268,7 @@ $$
 
 Intuition check: a context expecting a function from dogs to animals may safely receive a function that accepts any animal and returns a dog. It will only pass dogs, and receiving a dog is acceptable where an animal is expected.
 
-## Code
-
-```python
-def occurs(name, ty):
-    tag = ty[0]
-    if tag == "var":
-        return ty[1] == name
-    if tag == "arrow":
-        return occurs(name, ty[1]) or occurs(name, ty[2])
-    return False
-
-def apply_subst(subst, ty):
-    if ty[0] == "var" and ty[1] in subst:
-        return apply_subst(subst, subst[ty[1]])
-    if ty[0] == "arrow":
-        return ("arrow", apply_subst(subst, ty[1]), apply_subst(subst, ty[2]))
-    return ty
-
-def unify(equations):
-    subst = {}
-    while equations:
-        left, right = equations.pop()
-        left, right = apply_subst(subst, left), apply_subst(subst, right)
-        if left == right:
-            continue
-        if left[0] == "var":
-            if occurs(left[1], right):
-                raise TypeError("occurs check failed")
-            subst[left[1]] = right
-        elif right[0] == "var":
-            equations.append((right, left))
-        elif left[0] == right[0] == "arrow":
-            equations.append((left[1], right[1]))
-            equations.append((left[2], right[2]))
-        else:
-            raise TypeError(f"cannot unify {left} with {right}")
-    return subst
-```
-
-## Common pitfalls
+## Where polymorphism and subtyping become unsound
 
 - Confusing parametric polymorphism with overloading; parametric code is uniform across types.
 - Forgetting to instantiate a polymorphic `let` binding at each use.
@@ -285,14 +283,6 @@ def unify(equations):
 - Assuming GADTs are just algebraic datatypes; constructors refine type equalities.
 - Treating Rust traits as exactly Haskell typeclasses; coherence, ownership, and monomorphization affect behavior.
 
-## Connections
-
-- [Type Systems and Type Soundness](/cs/programming-language-theory/type-systems-and-type-soundness) supplies the preservation/progress obligations for these richer systems.
-- [Untyped and Typed Lambda Calculus](/cs/programming-language-theory/untyped-and-typed-lambda-calculus) is the base calculus extended here.
-- [Dependent Types and Proof Assistants](/cs/programming-language-theory/dependent-types-and-proof-assistants) continues from universal quantification to terms indexed by values.
-- [Dataflow Analysis and Abstract Interpretation](/cs/programming-language-theory/dataflow-and-abstract-interpretation) shares constraint-solving themes with type inference.
-- [Compilers](/cs/compilers/intro), [Theory of Computation](/cs/theory/intro), [Discrete Math](/math/discrete/intro), and [Cryptography](/cs/cryptography/intro) connect inference to implementation, decidability, partial orders, and verified APIs.
-
 ## References
 
 [1] B. C. Pierce, *Types and Programming Languages*. MIT Press, 2002.  
@@ -302,3 +292,15 @@ def unify(equations):
 [5] R. Milner, "A theory of type polymorphism in programming," *Journal of Computer and System Sciences*, 1978.  
 [6] J. C. Reynolds, "Types, abstraction and parametric polymorphism," 1983.  
 [7] L. Cardelli and P. Wegner, "On understanding types, data abstraction, and polymorphism," *ACM Computing Surveys*, 1985.
+
+<div className="see-also">
+
+See also:
+
+- [Type Systems and Type Soundness](/cs/programming-language-theory/type-systems-and-type-soundness) supplies the preservation/progress obligations for these richer systems.
+- [Untyped and Typed Lambda Calculus](/cs/programming-language-theory/untyped-and-typed-lambda-calculus) is the base calculus extended here.
+- [Dependent Types and Proof Assistants](/cs/programming-language-theory/dependent-types-and-proof-assistants) continues from universal quantification to terms indexed by values.
+- [Dataflow Analysis and Abstract Interpretation](/cs/programming-language-theory/dataflow-and-abstract-interpretation) shares constraint-solving themes with type inference.
+- [Compilers](/cs/compilers/intro), [Theory of Computation](/cs/theory/intro), [Discrete Math](/math/discrete/intro), and [Cryptography](/cs/cryptography/intro) connect inference to implementation, decidability, partial orders, and verified APIs.
+
+</div>

@@ -7,13 +7,13 @@ sidebar_position: 16
 
 ![Atari screenshots from the original deep Q-learning benchmark including Pong, Breakout, Space Invaders, Seaquest, and Beam Rider.](https://ar5iv.labs.arxiv.org/html/1312.5602/assets/x1.png)
 
-*Figure: DQN evaluated a single convolutional Q-network on raw Atari screen inputs across several games. From [Mnih et al., 2013](https://arxiv.org/abs/1312.5602) — embedded under educational fair use with attribution.*
+*Figure: DQN evaluated a single convolutional Q-network on raw Atari screen inputs across several games. From [Mnih et al., 2013](https://arxiv.org/abs/1312.5602), reproduced here for study with attribution.*
 
 Sutton and Barto close the book by showing how reinforcement learning ideas appear in substantial systems and open research directions. The case studies include TD-Gammon, Samuel's checkers player, Watson's Daily Double wagering, memory control, Atari game playing, AlphaGo and AlphaGo Zero, personalized web services, and thermal soaring. The frontier topics include general value functions, options, state representation, reward design, and unresolved issues in sample efficiency and abstraction.
 
-The practical lesson is that successful RL systems rarely use one idea in isolation. They combine value learning, function approximation, planning, search, simulation, domain structure, and carefully chosen reward signals. The frontier lesson is similar: many hard problems in RL are not solved merely by scaling an algorithm. The agent still needs useful state, exploration, temporal abstraction, and objectives that match the intended task.
+Successful RL systems rarely use one idea in isolation. They combine value learning, function approximation, planning, search, simulation, domain structure, and carefully chosen reward signals. Many hard problems are not solved merely by scaling an algorithm: the agent still needs useful state, exploration, temporal abstraction, and objectives that match the intended task.
 
-## Definitions
+## Systems that set the research agenda
 
 TD-Gammon is a backgammon program that used temporal-difference learning with self-play and function approximation. It is a landmark because it showed that TD learning could produce strong play in a complex game without relying only on handcrafted expert rules.
 
@@ -31,27 +31,7 @@ Reward design is the process of specifying the scalar signal the agent optimizes
 
 Sample efficiency measures how much useful learning occurs per unit of real experience. It is a recurring challenge, especially when environment interaction is expensive.
 
-## Key results
-
-Self-play can generate a curriculum in competitive games. TD-Gammon and AlphaGo-style systems improve by playing against versions of themselves or search-improved policies. This reduces dependence on a fixed dataset, but it introduces stability and evaluation questions because the data distribution changes as the agent improves.
-
-Search and learning are complementary. AlphaGo-style systems do not choose between neural networks and planning. Policy and value networks guide search; search produces stronger action choices and training targets. This is a modern expression of the planning-learning integration introduced earlier by Dyna and MCTS.
-
-Deep RL extends function approximation, not the basic objective. A deep network can approximate $Q$, $V$, a policy, or a model, but the agent still faces delayed reward, exploration, distribution shift, bootstrapping, and off-policy instability.
-
-Options address temporal abstraction. Instead of choosing only primitive actions at every step, an agent can learn or use extended behaviors. This can improve exploration, planning depth, and transfer, but it raises the problem of discovering useful options.
-
-State representation is a frontier because the Markov property is not automatic. The agent's observations may omit hidden variables, history, goals, or context. Sutton and Barto emphasize that RL methods often assume a state signal; building or learning that signal remains a deep problem.
-
-Reward design is hard because agents optimize what is specified. A reward that is only correlated with the real goal can produce undesirable behavior. The book frames reward as defining the task, so reward design is part of problem formulation, not an afterthought.
-
-Sample efficiency remains a central limitation. Planning, models, replay, abstraction, demonstrations, and better exploration can help, but each introduces tradeoffs such as model bias, computational cost, or dependence on prior structure.
-
-Exploration remains difficult because the useful information is often delayed and state-dependent. In a simple bandit, uncertainty belongs to actions. In a large MDP, uncertainty belongs to trajectories, representations, models, and long-horizon consequences. Optimism, intrinsic rewards, count-based bonuses, options, and model-based lookahead are all attempts to make exploration less random and more directed.
-
-The applications chapter also shows that evaluation must match deployment. A game-playing system can be judged by win rate against strong opponents, but a web-service agent must consider user experience, delayed effects, and changing populations. A robotics controller must consider physical safety and data cost. These concerns do not replace the RL objective; they shape the MDP formulation, reward signal, constraints, and acceptable exploration strategy.
-
-## Visual
+The systems and open problems fit together as follows:
 
 ```mermaid
 flowchart TD
@@ -82,7 +62,27 @@ flowchart TD
 | Options | Temporally extended actions | Abstraction over time |
 | General value functions | Predictive knowledge | Values beyond ordinary reward |
 
-## Worked example 1: Option value over multiple primitive steps
+## What scale leaves unsolved
+
+Self-play can generate a curriculum in competitive games. TD-Gammon and AlphaGo-style systems improve by playing against versions of themselves or search-improved policies. This reduces dependence on a fixed dataset, but it introduces stability and evaluation questions because the data distribution changes as the agent improves.
+
+Search and learning are complementary. AlphaGo-style systems do not choose between neural networks and planning. Policy and value networks guide search; search produces stronger action choices and training targets. This is a modern expression of the planning-learning integration introduced earlier by Dyna and MCTS.
+
+Deep RL extends function approximation, not the basic objective. A deep network can approximate $Q$, $V$, a policy, or a model, but the agent still faces delayed reward, exploration, distribution shift, bootstrapping, and off-policy instability.
+
+Options address temporal abstraction. Instead of choosing only primitive actions at every step, an agent can learn or use extended behaviors. This can improve exploration, planning depth, and transfer, but it raises the problem of discovering useful options.
+
+State representation is a frontier because the Markov property is not automatic. The agent's observations may omit hidden variables, history, goals, or context. Sutton and Barto emphasize that RL methods often assume a state signal; building or learning that signal remains a deep problem.
+
+Reward design is hard because agents optimize what is specified. A reward that is only correlated with the real goal can produce undesirable behavior. The book frames reward as defining the task, so reward design is part of problem formulation, not an afterthought.
+
+Sample efficiency remains a central limitation. Planning, models, replay, abstraction, demonstrations, and better exploration can help, but each introduces tradeoffs such as model bias, computational cost, or dependence on prior structure.
+
+Exploration remains difficult because the useful information is often delayed and state-dependent. In a simple bandit, uncertainty belongs to actions. In a large MDP, uncertainty belongs to trajectories, representations, models, and long-horizon consequences. Optimism, intrinsic rewards, count-based bonuses, options, and model-based lookahead are all attempts to make exploration less random and more directed.
+
+Evaluation must also match deployment. A game-playing system can be judged by win rate against strong opponents, but a web-service agent must consider user experience, delayed effects, and changing populations. A robotics controller must consider physical safety and data cost. These concerns shape the MDP formulation, reward signal, constraints, and acceptable exploration strategy.
+
+## Backing up a temporally extended option
 
 Problem: An option runs for three primitive steps. It receives rewards $1$, $0$, and $4$, then terminates in state $s'$. The high-level value estimate after termination is $V(s')=10$. Let $\gamma=0.9$. Compute the option's backed-up return for the state where it was initiated.
 
@@ -118,7 +118,7 @@ $$
 
 Check: The option return discounts both internal rewards and the value after option termination. The checked answer is $11.53$.
 
-## Worked example 2: Reward design exposes the real objective
+## How collision penalties change a policy
 
 Problem: A robot can choose action safe or shortcut. Safe reaches the goal in 5 steps with no collisions. Shortcut reaches the goal in 2 steps but causes one collision. Suppose reward is $+10$ for reaching the goal, $-1$ per step, and collision penalty is either $0$ or $-20$. With $\gamma=1$, compare returns.
 
@@ -154,7 +154,7 @@ Now safe is preferred.
 
 Check: The policy changes because the reward defines the task. If collisions matter to the designer but are absent from reward, the agent has no reason to avoid them.
 
-## Code
+## One DQN update in PyTorch
 
 ```python
 import torch
@@ -196,7 +196,7 @@ optimizer.step()
 print("DQN-style loss:", float(loss))
 ```
 
-## Common pitfalls
+## Failure modes that survive scale
 
 - Treating impressive applications as evidence that a single algorithm is universally sufficient. The case studies combine representation, search, data generation, and domain structure.
 - Forgetting that deep RL still has the deadly-triad issues in new forms: approximation, bootstrapping, and off-policy data remain delicate.
@@ -205,10 +205,8 @@ print("DQN-style loss:", float(loss))
 - Assuming options are given for free. Discovering useful temporal abstractions is itself a hard learning problem.
 - Measuring success only by final score while ignoring sample efficiency, compute cost, robustness, and safety constraints.
 
-## Connections
+<div className="see-also">
 
-- [Planning and learning with tabular methods](/cs/reinforcement-learning/planning-and-learning)
-- [Policy gradient methods](/cs/reinforcement-learning/policy-gradient-methods)
-- [Off-policy methods with approximation](/cs/reinforcement-learning/off-policy-approximation)
-- [Deep learning](/cs/deep-learning/)
-- [Machine learning](/cs/machine-learning/)
+See also: [Planning and learning with tabular methods](/cs/reinforcement-learning/planning-and-learning) · [Policy gradient methods](/cs/reinforcement-learning/policy-gradient-methods) · [Off-policy methods with approximation](/cs/reinforcement-learning/off-policy-approximation) · [Deep learning](/cs/deep-learning/intro) · [Machine learning](/cs/machine-learning/intro)
+
+</div>

@@ -7,9 +7,9 @@ sidebar_position: 10
 
 Security changes the distributed-systems model from "components may fail" to "components and networks may actively deceive." Byzantine fault tolerance, authenticated data structures, secure channels, threshold cryptography, and blockchain consensus all exist because crash-fault assumptions are not enough when participants are malicious or compromised. Van Steen and Tanenbaum provide the broad security framing; Lynch supplies Byzantine agreement foundations; Kleppmann explains why most data systems assume non-Byzantine faults unless explicitly designed otherwise [1], [2], [3].
 
-This page is partly supplementary because the supplied textbooks predate or only lightly cover several modern blockchain and threshold-cryptography systems. The core ideas remain classical: define the adversary, authenticate messages, preserve quorum intersection under equivocation, and choose protocols whose cost matches the threat model.
+Several modern blockchain and threshold-cryptography systems postdate the main textbooks, but the core ideas remain classical: define the adversary, authenticate messages, preserve quorum intersection under equivocation, and choose protocols whose cost matches the threat model.
 
-## Definitions
+## Threat models, evidence, and identity
 
 A **threat model** states what the adversary can do. In distributed systems, adversaries may observe traffic, delay or drop messages, corrupt nodes, forge identities, replay old messages, issue conflicting statements to different peers, or attack routing infrastructure. A **network adversary** controls communication behavior; a **node adversary** controls some participants; a **client adversary** sends malicious workloads or malformed requests.
 
@@ -31,9 +31,9 @@ A **quorum certificate** is a compact proof that enough validators voted for a s
 
 Security also includes **availability attacks**. A protocol may be safe under Byzantine faults but still easy to halt if attackers can flood signature verification, fill mempools, saturate peer connections, or exploit expensive error paths. Practical systems therefore combine protocol-level BFT with rate limits, admission control, peer scoring, batching, hardware isolation, and operational incident response.
 
-## Key results
+## Why Byzantine quorums need $3f+1$ replicas
 
-The first key result is the Byzantine quorum threshold. In classic unauthenticated oral-message Byzantine agreement, $n \gt  3f$ is necessary and sufficient under synchronous assumptions. PBFT also uses $3f+1$ replicas so quorums of size $2f+1$ intersect in at least $f+1$ replicas, guaranteeing at least one correct replica in the intersection [4].
+Byzantine quorum thresholds are larger than crash-fault quorums. In classic unauthenticated oral-message Byzantine agreement, $n \gt 3f$ is necessary and sufficient under synchronous assumptions. PBFT also uses $3f+1$ replicas so quorums of size $2f+1$ intersect in at least $f+1$ replicas, guaranteeing at least one correct replica in the intersection [4].
 
 Intersection calculation: with $n=3f+1$ and quorum size $2f+1$, two quorums intersect in at least:
 
@@ -43,21 +43,21 @@ $$
 
 Since at most $f$ replicas are Byzantine, the intersection contains at least one correct replica. That correct replica will not sign conflicting protocol statements for the same view and sequence number.
 
-The second result is that authentication changes cost but not all thresholds. Digital signatures prevent forgery and can make equivocation detectable, but protocols must still collect enough votes to overcome faulty signers. Quorum certificates, aggregate signatures, and threshold signatures reduce message size and verification overhead.
+Authentication changes cost but not every threshold. Digital signatures prevent forgery and can make equivocation detectable, but protocols must still collect enough votes to overcome faulty signers. Quorum certificates, aggregate signatures, and threshold signatures reduce message size and verification overhead.
 
-The third result is that public blockchain consensus adds open membership and incentives. PBFT assumes a known validator set. Proof of Work makes Sybil resistance external by tying influence to energy expenditure. Proof of Stake ties influence to locked economic value and punishment rules. These systems solve a broader membership problem, but they introduce economics, governance, and network-level attack surfaces.
+Public blockchain consensus adds open membership and incentives. PBFT assumes a known validator set. Proof of Work makes Sybil resistance external by tying influence to energy expenditure. Proof of Stake ties influence to locked economic value and punishment rules. These systems solve a broader membership problem, but they introduce economics, governance, and network-level attack surfaces.
 
-The fourth result is that Merkle proofs turn large replicated data into small verifiable claims. If a client trusts the root hash, it can verify that a value belongs to a dataset by recomputing hashes along one path. This is central to blockchains, transparency logs, package registries, and anti-entropy repair.
+Merkle proofs turn large replicated data into small verifiable claims. If a client trusts the root hash, it can verify that a value belongs to a dataset by recomputing hashes along one path. The construction appears in blockchains, transparency logs, package registries, and anti-entropy repair.
 
-The fifth result is that TEEs and threshold cryptography are complements, not replacements for protocols. A TEE can reduce trust in a host process but not eliminate side channels, rollback attacks, or bad input. Threshold keys reduce single-key compromise but still require distributed key generation, share refresh, and quorum policy.
+TEEs and threshold cryptography complement protocols rather than replace them. A TEE can reduce trust in a host process but not eliminate side channels, rollback attacks, or bad input. Threshold keys reduce single-key compromise but still require distributed key generation, share refresh, and quorum policy.
 
-The sixth result is that accountability changes recovery. In crash-fault systems, a bad node can often rejoin after restart and log catch-up. In Byzantine systems, a node that signs conflicting statements may need to be removed, slashed, or quarantined. This requires evidence retention: signed messages, view numbers, sequence numbers, and checkpoint certificates must be stored long enough to prove misbehavior.
+Accountability changes recovery. In crash-fault systems, a bad node can often rejoin after restart and log catch-up. In Byzantine systems, a node that signs conflicting statements may need to be removed, slashed, or quarantined. Evidence such as signed messages, view numbers, sequence numbers, and checkpoint certificates must be stored long enough to prove misbehavior.
 
-The seventh result is that cryptography must bind context. A signature over "commit" is unsafe if it does not include the protocol name, chain or cluster identifier, view or term, sequence number, digest, and configuration. Without domain separation and context binding, signatures can be replayed across protocols or epochs. This is the security analogue of stale routing metadata in sharded storage: the message may be authentic but no longer meaningful in the current configuration.
+Cryptography must bind context. A signature over "commit" is unsafe if it does not include the protocol name, chain or cluster identifier, view or term, sequence number, digest, and configuration. Without domain separation and context binding, signatures can be replayed across protocols or epochs. The message may be authentic but no longer meaningful in the current configuration, much like stale routing metadata in sharded storage.
 
-The eighth result is that open-membership systems pay for Sybil resistance somewhere. Proof of Work pays with energy and specialized hardware. Proof of Stake pays with capital lockup, validator-set management, and economic assumptions. Permissioned BFT pays with admission control and governance. There is no free membership layer; the correct choice depends on whether the system is an internal service, consortium network, or public adversarial environment.
+Open-membership systems pay for Sybil resistance somewhere. Proof of Work pays with energy and specialized hardware. Proof of Stake pays with capital lockup, validator-set management, and economic assumptions. Permissioned BFT pays with admission control and governance. The appropriate membership layer depends on whether the system is an internal service, consortium network, or public adversarial environment.
 
-## Visual
+## Following one PBFT request
 
 ```mermaid
 sequenceDiagram
@@ -67,9 +67,9 @@ sequenceDiagram
   participant R2 as Replica 2
   participant R3 as Replica 3
   Client->>Primary: request operation
-  Primary->>R1: pre-prepare view v, seq n
-  Primary->>R2: pre-prepare view v, seq n
-  Primary->>R3: pre-prepare view v, seq n
+  Primary->>R1: "pre-prepare view v, seq n"
+  Primary->>R2: "pre-prepare view v, seq n"
+  Primary->>R3: "pre-prepare view v, seq n"
   R1->>R2: prepare digest d
   R1->>R3: prepare digest d
   R2->>R1: prepare digest d
@@ -81,6 +81,10 @@ sequenceDiagram
   R3->>Client: reply
 ```
 
+The pre-prepare assigns a view and sequence number; the all-to-all prepare exchange establishes matching evidence across replicas. Authentication prevents forged votes, while quorum intersection prevents two conflicting certificates from containing only faulty replicas in common.
+
+## Matching attacks to defenses
+
 | Threat or fault | Crash-fault protocol handles it? | Byzantine/security mechanism |
 | --- | --- | --- |
 | node stops responding | Yes | replication and failover |
@@ -91,11 +95,11 @@ sequenceDiagram
 | stale data proof | No | Merkle proofs, signed checkpoints |
 | key compromise | No | rotation, threshold keys, HSMs or TEEs |
 
-## Worked example 1: Size a PBFT replica group
+## Sizing a PBFT replica group
 
-Problem: You need to tolerate $f=2$ Byzantine replicas in a PBFT-style service. How many total replicas are needed, what is the quorum size, and why do two quorums intersect in a correct replica?
+A PBFT-style service must tolerate $f=2$ Byzantine replicas. How many total replicas are needed, what is the quorum size, and why do two quorums intersect in a correct replica?
 
-Method:
+The quorum arithmetic:
 
 1. PBFT uses:
 
@@ -129,13 +133,13 @@ $$
 
 correct replica.
 
-Checked answer: use 7 replicas and quorums of 5. Any two quorums intersect in at least 3 replicas, including at least one correct replica.
+Use 7 replicas and quorums of 5. Any two quorums intersect in at least 3 replicas, including at least one correct replica.
 
-## Worked example 2: Verify a Merkle membership proof
+## Verifying a Merkle membership proof
 
-Problem: A Merkle tree has four leaves with hashes `hA`, `hB`, `hC`, `hD`. Internal nodes are `hAB = H(hA || hB)` and `hCD = H(hC || hD)`, root is `H(hAB || hCD)`. A server claims leaf `C` is present and provides proof `[hD, hAB]` with directions `[right, left]`. Show verification.
+A Merkle tree has four leaves with hashes `hA`, `hB`, `hC`, `hD`. Internal nodes are `hAB = H(hA || hB)` and `hCD = H(hC || hD)`, root is `H(hAB || hCD)`. A server claims leaf `C` is present and provides proof `[hD, hAB]` with directions `[right, left]`.
 
-Method:
+Follow the sibling directions from the leaf:
 
 1. Start from the claimed leaf hash:
 
@@ -159,9 +163,9 @@ $$
 
 5. If equal, the proof is valid for leaf `C` at that tree position. If not, the server lied or used different data.
 
-Checked answer: the proof verifies exactly when `H(hAB || H(hC || hD))` equals the trusted root. The proof size grows with tree height, $O(\log n)$.
+The proof verifies exactly when `H(hAB || H(hC || hD))` equals the trusted root. Its size grows with tree height, $O(\log n)$.
 
-## Code
+## Checking a Merkle proof
 
 ```python
 import hashlib
@@ -192,7 +196,7 @@ proof_for_c = [("right", leaves[3]), ("left", h_ab)]
 print(verify_merkle_leaf(b"C", proof_for_c, root))
 ```
 
-## Common pitfalls
+## Security assumptions that protocols cannot repair
 
 - Using Paxos or Raft when the threat model includes malicious or compromised replicas.
 - Saying "Byzantine" without defining membership, authentication, and adversary power.
@@ -207,18 +211,6 @@ print(verify_merkle_leaf(b"C", proof_for_c, root))
 - Mixing crash-fault and Byzantine quorums in the same design.
 - Forgetting denial-of-service resistance; correct cryptography can still be overwhelmed.
 
-## Connections
-
-- [Foundations and System Models](/cs/distributed-systems/foundations-and-system-models)
-- [Consensus: Paxos and Raft](/cs/distributed-systems/consensus-paxos-and-raft)
-- [Fault Tolerance and Failure Detection](/cs/distributed-systems/fault-tolerance-and-failure-detection)
-- [Distributed Storage and CAP](/cs/distributed-systems/distributed-storage-and-cap)
-- [Replication and Consistency](/cs/distributed-systems/replication-and-consistency)
-- [Computer Networks](/cs/computer-networks/intro)
-- [Operating Systems](/cs/operating-systems/intro)
-- [Databases](/cs/databases/intro)
-- [Cryptography](/cs/cryptography/intro)
-
 ## References
 
 [1] M. Kleppmann, *Designing Data-Intensive Applications*. Sebastopol, CA: O'Reilly, 2017.  
@@ -231,3 +223,9 @@ print(verify_merkle_leaf(b"C", proof_for_c, root))
 [8] J. Kwon, "Tendermint: consensus without mining," 2014.  
 [9] Y. Gilad et al., "Algorand: scaling Byzantine agreements for cryptocurrencies," in *SOSP*, 2017.  
 [10] A. Shamir, "How to share a secret," *Communications of the ACM*, vol. 22, no. 11, pp. 612-613, 1979.
+
+<div className="see-also">
+
+See also: [Foundations and System Models](/cs/distributed-systems/foundations-and-system-models) · [Consensus: Paxos and Raft](/cs/distributed-systems/consensus-paxos-and-raft) · [Fault Tolerance and Failure Detection](/cs/distributed-systems/fault-tolerance-and-failure-detection) · [Distributed Storage and CAP](/cs/distributed-systems/distributed-storage-and-cap) · [Replication and Consistency](/cs/distributed-systems/replication-and-consistency) · [Computer Networks](/cs/computer-networks/intro) · [Operating Systems](/cs/operating-systems/intro) · [Databases](/cs/databases/intro) · [Cryptography](/cs/cryptography/intro)
+
+</div>

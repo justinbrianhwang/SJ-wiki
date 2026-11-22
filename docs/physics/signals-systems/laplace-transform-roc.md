@@ -9,11 +9,7 @@ The Laplace transform generalizes the continuous-time Fourier transform by using
 
 For systems, the Laplace transform exposes poles, zeros, stability, causality, and transient behavior. The region of convergence is not optional. The algebraic expression $X(s)$ alone may correspond to different time-domain signals depending on where the transform converges.
 
-![A diagram compares a signal representation in time with its frequency-domain counterpart.](https://commons.wikimedia.org/wiki/Special:FilePath/Time_and_frequency_domains.svg)
-
-*Figure: Time and frequency views highlight why transforms are alternate coordinates for the same signal behavior. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Time_and_frequency_domains.svg), Juanlu001, CC0 1.0.*
-
-## Definitions
+## The transform and its region of convergence
 
 The bilateral Laplace transform of $x(t)$ is
 
@@ -70,7 +66,7 @@ $$
 
 with an ROC at least including the intersection of the individual ROCs, except for possible pole-zero cancellations.
 
-## Key results
+## Transform rules worth keeping at hand
 
 Linearity:
 
@@ -122,17 +118,9 @@ $$
 \operatorname{Re}(p_i)<0.
 $$
 
-The ROC is also a memory of time support. A right-sided signal grows or decays toward $+\infty$, so convergence is controlled by making $e^{-s t}$ decay fast enough as $t\to+\infty$. This produces a right half-plane ROC. A left-sided signal is controlled as $t\to-\infty$, producing a left half-plane ROC. A two-sided signal must satisfy both conditions, producing a vertical strip. This support interpretation is often faster than redoing the integral from scratch.
+## Reading time support from the ROC
 
-Partial fractions are the standard inverse method for rational transforms. After factoring the denominator, write $X(s)$ as a sum of terms such as $A/(s+a)$. Then use the ROC to decide whether each term is right-sided or left-sided. When the ROC is to the right of all poles, all exponential terms are right-sided. When the ROC is to the left of all poles, all are left-sided. When the ROC lies between poles, terms associated with poles left of the ROC are right-sided and terms associated with poles right of the ROC are left-sided.
-
-For differential equations, the unilateral Laplace transform includes initial conditions explicitly. That makes it ideal for solving initial-value problems. The bilateral transform is cleaner for system functions, impulse responses, and frequency-response connections. Mixing the two conventions is possible, but the boundary terms must be handled deliberately.
-
-Pole locations also give qualitative time behavior before any inverse transform is computed. A pole far to the left decays quickly in a causal system. A pole close to the imaginary axis decays slowly and creates a long transient. Complex-conjugate poles create damped oscillations when their real parts are negative. These interpretations are why pole-zero plots are used so often in system design.
-
-Repeated poles create polynomial factors multiplying exponentials in time. For example, a second-order pole at $s=-a$ produces terms involving $e^{-at}$ and $t e^{-at}$ for a right-sided signal. The exponential still controls asymptotic decay or growth, but the polynomial factor changes transient shape.
-
-## Visual
+The ROC retains information about time support. A right-sided signal grows or decays toward $+\infty$, so convergence is controlled by making $e^{-s t}$ decay fast enough as $t\to+\infty$. This produces a right half-plane ROC. A left-sided signal is controlled as $t\to-\infty$, producing a left half-plane ROC. A two-sided signal must satisfy both conditions, producing a vertical strip. This support interpretation is often faster than redoing the integral from scratch.
 
 ```mermaid
 flowchart TB
@@ -158,8 +146,6 @@ flowchart TB
   Stable -- "no" --> NoFT["no ordinary Fourier transform"]
 ```
 
-This Laplace diagram replaces the static ROC sketch with the transform pipeline: a signal produces an algebraic $X(s)$ plus an ROC, and both are needed to identify the time signal. The ROC subgraph shows the three standard shapes for right-sided, left-sided, and two-sided signals. The stability branch makes the key shape transition explicit: the Fourier transform exists only when the $j\omega$ axis lies in the ROC.
-
 | Signal type | Pole pattern | ROC shape | Causality clue |
 |---|---|---|---|
 | Right-sided exponential | pole at $-a$ | $\operatorname{Re}(s)\gt -a$ | causal candidate |
@@ -168,7 +154,19 @@ This Laplace diagram replaces the static ROC sketch with the transform pipeline:
 | Stable rational LTI | poles not on ROC axis | ROC includes $j\omega$ axis | depends on ROC |
 | Causal stable rational LTI | poles in left half-plane | right of rightmost pole and includes $j\omega$ | causal and stable |
 
-## Worked example 1: same expression, different ROC
+The algebraic transform and the ROC together identify the time signal. The three standard ROC shapes distinguish right-sided, left-sided, and two-sided signals. An ordinary Fourier transform exists only when the $j\omega$ axis lies in the ROC.
+
+## Inverting rational transforms and reading the poles
+
+Partial fractions are the standard inverse method for rational transforms. After factoring the denominator, write $X(s)$ as a sum of terms such as $A/(s+a)$. Then use the ROC to decide whether each term is right-sided or left-sided. When the ROC is to the right of all poles, all exponential terms are right-sided. When the ROC is to the left of all poles, all are left-sided. When the ROC lies between poles, terms associated with poles left of the ROC are right-sided and terms associated with poles right of the ROC are left-sided.
+
+For differential equations, the unilateral Laplace transform includes initial conditions explicitly. That makes it ideal for solving initial-value problems. The bilateral transform is cleaner for system functions, impulse responses, and frequency-response connections. Mixing the two conventions is possible, but the boundary terms must be handled deliberately.
+
+Pole locations also give qualitative time behavior before any inverse transform is computed. A pole far to the left decays quickly in a causal system. A pole close to the imaginary axis decays slowly and creates a long transient. Complex-conjugate poles create damped oscillations when their real parts are negative. These interpretations are why pole-zero plots are used so often in system design.
+
+Repeated poles create polynomial factors multiplying exponentials in time. For example, a second-order pole at $s=-a$ produces terms involving $e^{-at}$ and $t e^{-at}$ for a right-sided signal. The exponential still controls asymptotic decay or growth, but the polynomial factor changes transient shape.
+
+## One pole, two possible time signals
 
 Problem: Find the inverse Laplace transform possibilities for
 
@@ -224,7 +222,7 @@ $$
 
 Checked answer: The algebraic expression is incomplete without the ROC. The two possible inverse transforms are $e^{-2t}u(t)$ for ROC right of $-2$, and $-e^{-2t}u(-t)$ for ROC left of $-2$.
 
-## Worked example 2: stability and causality from poles
+## Testing a causal system for stability
 
 Problem: A causal LTI system has system function
 
@@ -254,7 +252,7 @@ $$
 
 Checked answer: The system is not BIBO stable. The pole at $s=3$ corresponds to a growing right-sided exponential mode $e^{3t}u(t)$.
 
-## Code
+## Plotting the example's poles and formal frequency response
 
 ```python
 import numpy as np
@@ -283,7 +281,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-## Common pitfalls
+## Mistakes that change the answer
 
 - Omitting the ROC. A rational expression without its ROC does not uniquely identify a signal.
 - Assuming the Fourier transform exists just because $X(s)$ can be written. The $j\omega$ axis must lie in the ROC.
@@ -291,9 +289,8 @@ plt.show()
 - Confusing unilateral and bilateral derivative properties. Initial-condition terms belong to the unilateral transform.
 - Treating zeros as if they determine stability. Poles and ROC determine the natural modes and stability condition.
 
-## Connections
+<div className="see-also">
 
-- [Continuous-Time Fourier Transform](/physics/signals-systems/continuous-time-fourier-transform)
-- [LTI Systems and Convolution](/physics/signals-systems/lti-systems-convolution)
-- [Frequency Response and Filtering](/physics/signals-systems/frequency-response-filtering)
-- [State-Space Introduction](/physics/signals-systems/state-space-introduction)
+See also: [Continuous-Time Fourier Transform](/physics/signals-systems/continuous-time-fourier-transform) · [LTI Systems and Convolution](/physics/signals-systems/lti-systems-convolution) · [Frequency Response and Filtering](/physics/signals-systems/frequency-response-filtering) · [State-Space Introduction](/physics/signals-systems/state-space-introduction)
+
+</div>

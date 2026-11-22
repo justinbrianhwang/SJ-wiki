@@ -9,7 +9,7 @@ These notes follow the chapter scope of Tom M. Mitchell's *Machine Learning* (Mc
 
 Mitchell's treatment sits historically before today's large neural networks, GPU training, foundation models, and deep reinforcement learning systems. That context matters: the examples are smaller and the algorithms are often presented in their clean classical forms. Many ideas, however, remain central. Backpropagation is still backpropagation. Decision trees still matter. PAC learning and VC dimension still teach sample complexity. Bayesian modeling still provides a language for uncertainty, prior knowledge, and likelihood. Reinforcement learning still revolves around delayed reward, exploration, and value functions.
 
-Use this section as a classic machine-learning map. For modern extensions, cross-reference the deeper SJ Wiki sections on [deep learning](/cs/deep-learning/), [reinforcement learning](/cs/reinforcement-learning/), [data mining](/cs/data-mining/), [probability](/math/probability/), and [statistics](/math/statistics/).
+Use this section as a classic machine-learning map. For modern extensions, cross-reference the deeper SJ Wiki sections on [deep learning](/cs/deep-learning/intro), [reinforcement learning](/cs/reinforcement-learning/intro), [data mining](/cs/data-mining/intro), [probability](/math/probability/intro), and [statistics](/math/statistics/intro).
 
 1. [Learning Problems and System Design](/cs/machine-learning/learning-problems-and-system-design)
 2. [Concept Learning and Version Spaces](/cs/machine-learning/concept-learning-and-version-spaces)

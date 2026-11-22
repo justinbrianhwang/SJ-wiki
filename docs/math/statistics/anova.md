@@ -344,10 +344,8 @@ Statsmodels uses formula notation. `C(method)` tells the model to treat method a
 - Treating ordinal ratings with few levels as if they were precise normal measurements without checking whether that is defensible.
 - Reporting only the p-value and omitting group means, variability, and an effect-size measure.
 
-## Related pages
+<div className="see-also">
 
-- [Tests for means](/math/statistics/tests-for-means)
-- [Hypothesis testing logic](/math/statistics/hypothesis-testing-logic)
-- [Normal, t, chi-square, and F distributions](/math/statistics/normal-t-chi-square-and-f-distributions)
-- [Linear regression inference](/math/statistics/linear-regression-inference)
-- [Effect size, nonparametric methods, and resampling](/math/statistics/effect-size-nonparametric-and-resampling)
+See also: [Tests for means](/math/statistics/tests-for-means) · [Hypothesis testing logic](/math/statistics/hypothesis-testing-logic) · [Normal, t, chi-square, and F distributions](/math/statistics/normal-t-chi-square-and-f-distributions) · [Linear regression inference](/math/statistics/linear-regression-inference) · [Effect size, nonparametric methods, and resampling](/math/statistics/effect-size-nonparametric-and-resampling)
+
+</div>

@@ -9,7 +9,7 @@ Object-oriented development models a problem in terms of objects, classes, attri
 
 The central challenge is deciding what should become an object, what should become an attribute, and what is merely an external entity or relationship. A grocery store, family tree, library, college, bed-and-breakfast, and dental office appear in the examples because they expose common modeling choices: inheritance versus aggregation, relationship objects, multiplicity, and reuse.
 
-## Definitions
+## The modeling vocabulary
 
 An **object** is an entity with identity, state, and behavior. In analysis, objects are often domain concepts. In design and implementation, they may become classes, records, services, or persistent entities.
 
@@ -33,7 +33,7 @@ The **noun-in-text approach** identifies nouns in a problem statement, groups eq
 
 **Multiplicity** restricts how many instances may participate in an association, such as `1`, `0..1`, `1..*`, or `0..*`.
 
-## Key results
+## Choosing objects, attributes, and relationships
 
 Object identification is not mechanical. The noun-in-text method is a useful starting point, but it can mislead. In a family tree problem, words like uncle, aunt, and cousin are relationship roles, not necessarily object subclasses. An uncle is a person in a relationship, not a kind of person with inherited uncle attributes.
 
@@ -49,7 +49,7 @@ Reuse requires domain-level thinking. If the team wants reuse across grocery inv
 
 Use cases and scenarios can reveal objects missed by noun extraction. A scenario about a customer checkout may reveal membership card, purchase transaction, receipt, and inventory adjustment even if the short problem statement did not list them clearly.
 
-## Visual
+### A library model with inheritance and relationship objects
 
 ```mermaid
 classDiagram
@@ -96,11 +96,11 @@ classDiagram
 | Relationship object | association with identity or data | enrollment, loan, reservation |
 | Multiplicity | cardinality rule | copy has 0..1 active loan |
 
-## Worked example 1: Noun-in-text object discovery
+## From dental-office prose to candidate objects
 
-**Problem.** Identify object candidates from this statement: "A dental office has patients, appointments, a calendar, patient records, reminder call lists, daily schedules, and weekly schedules. The receptionist can schedule and cancel appointments. The system answers queries by patient name and by date."
+Consider this statement: "A dental office has patients, appointments, a calendar, patient records, reminder call lists, daily schedules, and weekly schedules. The receptionist can schedule and cancel appointments. The system answers queries by patient name and by date." The task is to identify its object candidates.
 
-**Method.** Extract nouns, group them, remove external actors when appropriate, and choose objects.
+Extract the nouns, group related terms, remove external actors where appropriate, and then choose the objects.
 
 1. Nouns: dental office, patients, appointments, calendar, patient records, reminder call lists, daily schedules, weekly schedules, receptionist, system, queries, patient name, date.
 
@@ -124,13 +124,13 @@ classDiagram
 
    Schedule appointment, cancel appointment, query appointments by patient name, query appointments by date, print reminder list, print daily schedule, print weekly schedule.
 
-**Checked answer.** The object list is checked by scenario support. A returning patient appointment can be represented by `Patient` plus `Appointment`. Reminder calls can be produced from appointments and patient phone data. Daily and weekly schedules can be reports over calendar appointments.
+The scenarios provide a useful check on the object list. A returning-patient appointment can be represented by `Patient` plus `Appointment`. Reminder calls can be produced from appointments and patient phone data. Daily and weekly schedules can be reports over calendar appointments.
 
-## Worked example 2: Multiplicity for college enrollment
+## Why college enrollment needs its own object
 
-**Problem.** A college has courses. Each course has many sections. Students enroll in sections. A student may enroll in many sections, and a section may have many students. Grades are recorded per student per section. Model the association and multiplicities.
+A college has courses, each course has many sections, and students enroll in sections. A student may enroll in many sections, a section may have many students, and grades are recorded per student per section. The association and multiplicities must preserve those facts.
 
-**Method.** Look for many-to-many relationships and relationship attributes.
+The many-to-many relationship and its attributes determine the shape of the model.
 
 1. Course to Section:
 
@@ -148,7 +148,7 @@ classDiagram
 
    Student `1` to Enrollment `0..*`; Section `1` to Enrollment `0..*`; each Enrollment has exactly one Student and exactly one Section.
 
-**Checked answer.**
+The resulting model is:
 
 ```mermaid
 classDiagram
@@ -162,13 +162,11 @@ classDiagram
   Course "1" --> "0..*" Section
   Student "1" --> "0..*" Enrollment
   Section "1" --> "0..*" Enrollment
-  Enrollment "1" --> "1" Student
-  Enrollment "1" --> "1" Section
 ```
 
 The model is checked by asking where grade is stored. It belongs naturally on `Enrollment`, confirming that the relationship object is needed.
 
-## Code
+## A quick noun-frequency pass
 
 ```python
 from collections import Counter
@@ -191,7 +189,7 @@ for word, count in noun_text_candidates(statement):
     print(f"{word}: {count}")
 ```
 
-## Common pitfalls
+## Modeling decisions that age badly
 
 - Treating every noun as an object without grouping synonyms or removing external entities.
 - Modeling roles such as uncle or customer as subclasses when they are relationships or temporary roles.
@@ -201,10 +199,8 @@ for word, count in noun_text_candidates(statement):
 - Expecting reuse without domain analysis and intentional reusable design.
 - Letting implementation classes replace domain understanding too early.
 
-## Connections
+<div className="see-also">
 
-- [Software process models and diagrams](/cs/software-engineering/software-process-models-and-diagrams)
-- [Requirements engineering](/cs/software-engineering/requirements-engineering)
-- [Software design](/cs/software-engineering/software-design)
-- [Object-oriented metrics](/cs/software-engineering/object-oriented-metrics)
-- [Object-oriented testing](/cs/software-engineering/object-oriented-testing)
+See also: [Software process models and diagrams](/cs/software-engineering/software-process-models-and-diagrams) · [Requirements engineering](/cs/software-engineering/requirements-engineering) · [Software design](/cs/software-engineering/software-design) · [Object-oriented metrics](/cs/software-engineering/object-oriented-metrics) · [Object-oriented testing](/cs/software-engineering/object-oriented-testing)
+
+</div>

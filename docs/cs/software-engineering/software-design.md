@@ -7,9 +7,9 @@ sidebar_position: 10
 
 Software design converts the "what" of requirements into the "how" of a buildable system. Gustafson's design chapter covers the movement from user-oriented requirements to development specifications, design phases, interfaces, refinement, modularity, abstraction, cohesion, coupling, program slices, glue tokens, and requirements traceability. The chapter treats design as creative work, but not unstructured work: good design is evaluated by whether it is implementable, understandable, cohesive, loosely coupled, and traceable to requirements.
 
-The chapter also makes a subtle distinction between phenomena in the environment and phenomena visible to the implementation. A user may care about a physical book, a pop can, or a person at a door. The software may only see a barcode, an image pattern, or a sensor event. Design begins from a specification that connects the world and the machine using terms visible enough to both sides.
+The chapter also draws a subtle distinction between phenomena in the environment and phenomena the implementation can observe. A user may care about a physical book, a pop can, or a person at a door. The software may only see a barcode, an image pattern, or a sensor event. Design begins from a specification that connects the world and the machine using terms both sides can observe.
 
-## Definitions
+## The path from specification to modules
 
 **Software design** is the process of defining a system in sufficient detail to permit implementation. It transforms requirements into data structures, architecture, interfaces, and algorithms.
 
@@ -40,7 +40,7 @@ A **program slice** is the set of statements or tokens related to a particular i
 
 **Requirements traceability** links requirements to design elements that satisfy them. A traceability matrix has requirements on one axis and design elements on the other.
 
-## Key results
+## Interfaces, cohesion, and traceability
 
 Design should be traceable to requirements but expressed in solution terms. If a design element has no related requirement, it may be unnecessary infrastructure or an undocumented requirement. If a requirement has no design element, it may be unimplemented. Neither case is automatically wrong, but both deserve review.
 
@@ -56,7 +56,7 @@ Program slicing gives a more precise way to discuss cohesion. If every output sl
 
 Traceability matrices reveal both omissions and surplus design. Blank requirement rows suggest unhandled requirements. Blank design columns suggest design elements not justified by requirements, reusable infrastructure, or missing requirements documentation.
 
-## Visual
+### Architectural styles and the artifacts they require
 
 ```mermaid
 flowchart TB
@@ -134,11 +134,11 @@ This diagram expands software design into four common architectural styles and t
 | Traceability | complete enough | Can each requirement be found in the design? |
 | Interface clarity | high | Are normal, abnormal, and boundary behaviors specified? |
 
-## Worked example 1: Designing an interface for borrowing a book
+## Designing a borrowing interface
 
-**Problem.** A library system must let a patron borrow a book by ISBN. A borrow request should succeed only if the patron exists, an available copy exists, and the loan can be created. Design an interface for the operation and state its result meanings.
+A library system must let a patron borrow a book by ISBN. A request succeeds only if the patron exists, an available copy exists, and the loan can be created. The interface must express those outcomes without exposing storage details.
 
-**Method.** Specify caller-visible behavior without exposing unnecessary internals.
+Specify caller-visible behavior without exposing unnecessary internals.
 
 1. Name the operation from the domain:
 
@@ -168,13 +168,13 @@ BorrowResult(status, loan_id, due_date, message)
 
    On success, exactly one available copy is associated with a new loan, the copy becomes unavailable, and the result contains loan id and due date. On failure, no loan is created and no copy status changes.
 
-**Checked answer.** The interface is cohesive because it describes one operation. It is low-coupling because callers do not manipulate `BookCopy` or `Loan` internals. It is checkable because each outcome and postcondition can become a test.
+The interface is cohesive because it describes one operation. It is low-coupling because callers do not manipulate `BookCopy` or `Loan` internals. Each outcome and postcondition can become a test.
 
-## Worked example 2: Traceability matrix
+## Finding gaps with a traceability matrix
 
-**Problem.** Requirements for a reservation system are: R1 search vacancies by date, R2 store customer phone number, R3 guarantee reservation by credit card, and R4 print weekly schedule. Design elements are D1 `CalendarService`, D2 `CustomerRecord.phone`, D3 `PaymentAuthorization`, D4 `ScheduleReport`, and D5 `AuditLog`. Build a traceability matrix and identify concerns.
+Requirements for a reservation system are: R1 search vacancies by date, R2 store customer phone number, R3 guarantee reservation by credit card, and R4 print weekly schedule. Design elements are D1 `CalendarService`, D2 `CustomerRecord.phone`, D3 `PaymentAuthorization`, D4 `ScheduleReport`, and D5 `AuditLog`. A traceability matrix exposes omissions on either side.
 
-**Method.** Mark a cell when the design element helps satisfy the requirement.
+Mark a cell when the design element helps satisfy the requirement.
 
 | Requirement | D1 CalendarService | D2 CustomerRecord.phone | D3 PaymentAuthorization | D4 ScheduleReport | D5 AuditLog |
 |---|---:|---:|---:|---:|---:|
@@ -193,9 +193,9 @@ BorrowResult(status, loan_id, due_date, message)
 
 5. D5 has no mark.
 
-**Checked answer.** All four requirements have at least one design element, so there is no obvious unimplemented requirement. D5 `AuditLog` has no traced requirement. That may be acceptable if it supports a nonfunctional requirement not listed here, but it should trigger a question: is there an audit requirement missing from the requirements, or is the audit log unnecessary scope?
+All four requirements have at least one design element, so there is no obvious unimplemented requirement. D5 `AuditLog` has no traced requirement. It may support a nonfunctional requirement omitted from the list, but the blank column still prompts a useful question: is an audit requirement missing, or is the audit log unnecessary scope?
 
-## Code
+## Checking traceability mechanically
 
 ```python
 requirements = ["R1 vacancy search", "R2 phone number", "R3 credit guarantee", "R4 weekly schedule"]
@@ -219,7 +219,7 @@ for item in design:
         print(item, "has no traced requirement")
 ```
 
-## Common pitfalls
+## Design smells worth stopping for
 
 - Designing directly from vague user statements without creating a development specification.
 - Exposing internal identifiers or representations in interfaces when domain identifiers are sufficient.
@@ -229,10 +229,8 @@ for item in design:
 - Assuming all coupling is visible in method calls; globals, shared files, and control flags also couple modules.
 - Leaving traceability until the end, when design gaps are expensive to correct.
 
-## Connections
+<div className="see-also">
 
-- [Requirements engineering](/cs/software-engineering/requirements-engineering)
-- [Software process models and diagrams](/cs/software-engineering/software-process-models-and-diagrams)
-- [Software metrics](/cs/software-engineering/software-metrics)
-- [Formal specifications and OCL](/cs/software-engineering/formal-specifications-and-ocl)
-- [Software testing](/cs/software-engineering/software-testing)
+See also: [Requirements engineering](/cs/software-engineering/requirements-engineering) · [Software process models and diagrams](/cs/software-engineering/software-process-models-and-diagrams) · [Software metrics](/cs/software-engineering/software-metrics) · [Formal specifications and OCL](/cs/software-engineering/formal-specifications-and-ocl) · [Software testing](/cs/software-engineering/software-testing)
+
+</div>

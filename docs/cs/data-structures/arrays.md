@@ -286,10 +286,8 @@ Several recurring errors follow directly from the representation:
 - A two-dimensional array is not generally compatible with an `int **`. The former is one contiguous block with fixed row stride; the latter usually points to separately located rows.
 - Zero-length allocation has implementation-defined details at the library boundary. A container can avoid ambiguity by representing the empty state with a null pointer and zero capacity.
 
-## Related pages
+<div className="see-also">
 
-- [Searching algorithms](/cs/data-structures/searching-algorithms)
-- [Sorting algorithms](/cs/data-structures/sorting-algorithms)
-- [Stacks](/cs/data-structures/stacks)
-- [Queues](/cs/data-structures/queues)
-- [Hashing](/cs/data-structures/hashing)
+See also: [Searching algorithms](/cs/data-structures/searching-algorithms) · [Sorting algorithms](/cs/data-structures/sorting-algorithms) · [Stacks](/cs/data-structures/stacks) · [Queues](/cs/data-structures/queues) · [Hashing](/cs/data-structures/hashing)
+
+</div>

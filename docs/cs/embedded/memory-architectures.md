@@ -9,7 +9,7 @@ Memory architecture is often the difference between an embedded system that mere
 
 Lee and Seshia treat memory as part of the cyber-physical platform because it affects not only capacity but timing. A cache miss, DRAM refresh, flash write, page fault, stack overflow, or garbage-collection pause can change whether a task meets a real-time deadline.
 
-## Definitions
+## Technologies, address spaces, and allocation
 
 **Volatile memory** loses contents when power is removed. SRAM and DRAM are volatile; DRAM also requires refresh while powered.
 
@@ -31,9 +31,9 @@ $$
 
 A **stack** stores procedure-call frames in last-in, first-out order. A **heap** supports dynamic memory allocation such as `malloc` and `free`.
 
-## Key results
+## Timing and failure behavior across the hierarchy
 
-Memory timing is platform behavior, not just program behavior. The same instruction sequence can take different time depending on whether data are in registers, SRAM, cache, DRAM, flash, or a memory-mapped peripheral.
+Memory timing belongs to the platform as well as the program. The same instruction sequence can take different time depending on whether data are in registers, SRAM, cache, DRAM, flash, or a memory-mapped peripheral.
 
 Caches improve average performance but complicate worst-case timing. A direct-mapped cache has one line per set, so two addresses mapping to the same set can repeatedly evict each other. A set-associative cache reduces conflict misses but uses replacement policies such as LRU or FIFO, which must be analyzed.
 
@@ -45,7 +45,7 @@ Dynamic allocation is risky in long-running real-time systems. Memory leaks exha
 
 C's memory model exposes addresses through pointers. Returning a pointer to a local stack variable is invalid because the stack frame disappears after the function returns.
 
-Memory maps are also documentation of authority. If a region maps to flash, writes may be slow or require special erase sequences. If a region maps to GPIO or a timer, a write may cause immediate physical effects. If a region is reserved, accessing it may trigger a fault or undefined hardware behavior. Embedded C code that manipulates raw addresses must therefore be reviewed against the processor reference manual, not just against the C language.
+Memory maps are also documentation of authority. If a region maps to flash, writes may be slow or require special erase sequences. If a region maps to GPIO or a timer, a write may cause immediate physical effects. If a region is reserved, accessing it may trigger a fault or undefined hardware behavior. Embedded C code that manipulates raw addresses must therefore be reviewed against the processor reference manual; the C language alone does not define those accesses.
 
 Caches and scratchpads represent two different philosophies. A cache tries to make fast memory transparent, which is helpful for average performance but problematic for timing guarantees. A scratchpad makes fast memory explicit, which burdens the programmer or compiler but can support repeatable timing. Some real-time designs deliberately disable caches for critical regions or lock selected cache lines, while others place critical data in tightly coupled memory.
 
@@ -61,7 +61,7 @@ Memory architecture is therefore a cross-cutting design input. It influences com
 
 Good reviews check both the map and the code that assumes it, including startup initialization.
 
-## Visual
+### The hierarchy behind those timing differences
 
 ```text
 Fast / small / close to CPU
@@ -89,7 +89,7 @@ Slow / large / persistent
 | Cache | Yes | automatic copies | hits/misses and replacement |
 | Scratchpad | Yes | managed hot data | programmer/compiler burden |
 
-## Worked example 1: Cache capacity and address fields
+## Dividing a cache address into fields
 
 Problem: A 32-bit address machine has a cache with $S=64$ sets, associativity $E=2$, and block size $B=16$ bytes. Compute the data capacity and the number of offset, set-index, and tag bits.
 
@@ -121,7 +121,7 @@ $$
 
 Answer: The cache stores $2048$ data bytes. Each address has $4$ offset bits, $6$ set-index bits, and $22$ tag bits.
 
-## Worked example 2: Direct-mapped conflict
+## Tracing a direct-mapped conflict
 
 Problem: A direct-mapped cache has $S=4$ sets and block size $B=16$ bytes. Addresses $0x00$ and $0x40$ are accessed alternately. Determine whether they map to the same set.
 
@@ -155,7 +155,7 @@ $$
 
 Answer: The two addresses conflict. Alternating accesses can cause repeated misses because each block evicts the other.
 
-## Code
+### Inspecting cache fields by address
 
 ```python
 def cache_fields(address, sets=64, block_size=16):
@@ -169,7 +169,7 @@ for address in [0x00, 0x10, 0x40, 0x400]:
     print(hex(address), cache_fields(address, sets=4, block_size=16))
 ```
 
-## Common pitfalls
+## Assumptions that lead to corruption or missed deadlines
 
 - Assuming RAM, flash, and memory-mapped registers behave like identical arrays of bytes.
 - Using caches in hard real-time paths without accounting for hit/miss variability.
@@ -178,10 +178,8 @@ for address in [0x00, 0x10, 0x40, 0x400]:
 - Relying on dynamic allocation in long-running firmware without leak, fragmentation, and pause-time analysis.
 - Forgetting that global variables may retain values across soft resets if the program is not fully reloaded.
 
-## Connections
+<div className="see-also">
 
-- [embedded processors architecture](/cs/embedded/embedded-processors-architecture)
-- [input and output interfacing](/cs/embedded/input-output-interfacing)
-- [8051 architecture, memory, and ports](/cs/embedded/8051-architecture-memory-ports)
-- [8085 I/O, memory, and DMA interfacing](/cs/embedded/8085-io-memory-dma-interfacing)
-- [quantitative analysis](/cs/embedded/quantitative-analysis)
+See also: [embedded processors architecture](/cs/embedded/embedded-processors-architecture) · [input and output interfacing](/cs/embedded/input-output-interfacing) · [8051 architecture, memory, and ports](/cs/embedded/architecture-memory-ports) · [8085 I/O, memory, and DMA interfacing](/cs/embedded/io-memory-dma-interfacing) · [quantitative analysis](/cs/embedded/quantitative-analysis)
+
+</div>

@@ -361,10 +361,8 @@ Const correctness is transitive only through the object itself. A const member f
 
 Finally, private access is a compile-time boundary, not a security boundary. An object still occupies memory in the process, and serialization, debugging, or undefined behavior can expose bytes. Encapsulation organizes valid program behavior. It does not encrypt fields or isolate hostile code.
 
-## Related pages
+<div className="see-also">
 
-- [constructors and copy semantics](/cs/programming/cpp/constructors-and-copy-semantics)
-- [references and operator overloading](/cs/programming/cpp/references-and-operator-overloading)
-- [separate compilation and namespaces](/cs/programming/cpp/separate-compilation-and-namespaces)
-- [inheritance](/cs/programming/cpp/inheritance)
-- [polymorphism](/cs/programming/cpp/polymorphism-and-virtual-functions)
+See also: [constructors and copy semantics](/cs/programming/cpp/constructors-and-copy-semantics) · [references and operator overloading](/cs/programming/cpp/references-and-operator-overloading) · [separate compilation and namespaces](/cs/programming/cpp/separate-compilation-and-namespaces) · [inheritance](/cs/programming/cpp/inheritance) · [polymorphism](/cs/programming/cpp/polymorphism-and-virtual-functions)
+
+</div>

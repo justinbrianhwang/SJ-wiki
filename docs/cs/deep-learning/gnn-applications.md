@@ -7,13 +7,9 @@ sidebar_position: 22
 
 GNN applications are diverse because graph structure appears whenever prediction depends on relationships. The same message-passing idea can predict a molecule's solubility, recommend products, complete a knowledge graph, forecast traffic, simulate a deforming mesh, or guide a combinatorial solver. What changes is the graph construction, the edge semantics, the time model, the loss, and the engineering needed to scale.
 
-![A social network visualization shows clusters, hubs, and bridges that motivate node, edge, and graph-level prediction tasks.](https://commons.wikimedia.org/wiki/Special:FilePath/Social_Network_Analysis_Visualization.png)
+The applications build on [Graph Neural Networks: Basics](/cs/deep-learning/gnn-basics), extending message passing to heterogeneous graphs, temporal graphs, and domain-specific systems. The working sequence is to choose the graph and supervision signal, preserve the relevant symmetries, prevent leakage, and evaluate under conditions that resemble deployment.
 
-*Figure: Social and interaction graphs exhibit hubs, communities, and bridges. GNN applications exploit this structure for recommendation, ranking, fraud detection, and link prediction. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Social_Network_Analysis_Visualization.png), Calvinius, CC BY-SA 3.0.*
-
-This chapter is an applied companion to [Graph Neural Networks: Basics](/cs/deep-learning/gnn-basics). It treats heterogeneous graphs, temporal graphs, major application domains, and current frontiers. The emphasis is practical: choose the graph, choose the supervision signal, preserve the right symmetries, avoid leakage, and evaluate in a way that resembles deployment.
-
-## Definitions
+## Typed relations and temporal events
 
 A **homogeneous graph** has one node type and one edge type. A citation graph with only papers and citation edges is often modeled this way. A **heterogeneous graph** has multiple node or edge types, such as users, items, queries, sellers, and sessions in an e-commerce system. A **knowledge graph** is a typed directed multigraph of triples $(h,r,t)$, where $h$ is a head entity, $r$ is a relation, and $t$ is a tail entity.
 
@@ -36,11 +32,11 @@ A **dynamic graph** changes over time. Snapshot-based methods represent the data
 
 Time encoding matters. Absolute time can capture seasonality, relative time can capture recency, and inter-event time can capture burstiness. In event streams, evaluation must respect chronology: training on future edges and testing on past edges is leakage, not generalization.
 
-## Key results
+## Matching graph construction to the domain
 
 Application success usually depends more on graph construction than on a single architecture name. A molecule can be a graph with atoms as nodes and bonds as edges; a recommender can be a bipartite user-item graph; a traffic network can use road connectivity, learned sensor similarity, or both; a physics simulator can use particles, cells, or mesh vertices; a satisfiability instance can use variables and clauses. The same layer formula can fail if the graph encodes the wrong relations.
 
-For molecular property prediction, message passing aggregates local chemical environments. MoleculeNet made benchmark tasks visible across solubility, toxicity, quantum properties, and bioactivity [10]. Early neural message passing showed that edge-conditioned messages and set readouts can work well for quantum chemistry [11]. Equivariant models add geometry by respecting rotations and translations, which is essential when 3D conformation influences energy or binding. AlphaFold-style systems are broader than ordinary GNNs, but they show the same principle at scale: relational structure, attention, geometry, and learned pair representations can be combined for biological structure prediction [12].
+For molecular property prediction, message passing aggregates local chemical environments. MoleculeNet standardized benchmark tasks across solubility, toxicity, quantum properties, and bioactivity [10]. Early neural message passing showed that edge-conditioned messages and set readouts can work well for quantum chemistry [11]. Equivariant models add geometry by respecting rotations and translations, which is essential when 3D conformation influences energy or binding. AlphaFold-style systems are broader than ordinary GNNs, but they show the same principle at scale: relational structure, attention, geometry, and learned pair representations can be combined for biological structure prediction [12].
 
 ![A PinSAGE diagram shows random-walk-based importance sampling around an item in a billion-node Pinterest graph, with convolutional aggregation over sampled neighborhoods.](https://ar5iv.labs.arxiv.org/html/1806.01973/assets/x1.png)
 
@@ -73,7 +69,7 @@ Graph foundation models are an emerging frontier. GraphGPS combines local messag
 | Physics | Particles, cells, or mesh vertices | GNS, MeshGraphNet | Rollout instability |
 | Optimization | Variables, clauses, cities, jobs | NeuroSAT, attention TSP | Lack of guarantees |
 
-## Visual
+## Six graph-to-prediction pipelines
 
 ```mermaid
 flowchart TB
@@ -132,7 +128,7 @@ sequenceDiagram
   participant Enc as Temporal encoder
   participant Loss as Prediction loss
 
-  E->>Mem: "event ("u, v, t, features")"
+  E->>Mem: "event u, v, t, features"
   Mem->>Sam: "current memories before time t"
   Sam->>Enc: "neighbors with timestamps less than t"
   Enc->>Loss: "embeddings for u and v at time t"
@@ -142,7 +138,7 @@ sequenceDiagram
 
 The first diagram groups applications by graph construction and prediction head. The second diagram shows the causality discipline in event-based temporal GNNs: compute an embedding using history before time $t$, make the prediction, then update memory with the event. Reversing those steps leaks the answer into the representation.
 
-## Worked example 1: LightGCN propagation on a bipartite recommender graph
+## Propagating embeddings through a tiny recommender graph
 
 Problem: a tiny recommender has users $u_1,u_2$ and items $i_1,i_2$. Interactions are $(u_1,i_1)$, $(u_1,i_2)$, and $(u_2,i_2)$. Initial scalar embeddings are
 
@@ -218,9 +214,9 @@ $$
 \bar{e}_{u_1}\bar{e}_{i_1}=2.207(1.354)=2.988.
 $$
 
-Checked answer: the one-step propagated embeddings are $3.414$, $2.828$, $0.707$, and $2.621$ for $u_1,u_2,i_1,i_2$. The example shows why LightGCN can work without nonlinear layers: collaborative filtering signal is already encoded in normalized neighborhood propagation.
+The one-step propagated embeddings are $3.414$, $2.828$, $0.707$, and $2.621$ for $u_1,u_2,i_1,i_2$. LightGCN can work without nonlinear layers because collaborative filtering signal is already encoded in normalized neighborhood propagation.
 
-## Worked example 2: temporal aggregation in a TGN-style memory model
+## Aggregating temporal messages without future leakage
 
 Problem: node $A$ receives two interaction messages before time $t=10$. At time $2$, it receives message $m_1=[1,0]$. At time $7$, it receives message $m_2=[0,2]$. Use exponential time decay with weight $\exp(-(10-t_k)/5)$ and aggregate by weighted average. Compute the memory input for node $A$ at time $10$.
 
@@ -264,9 +260,9 @@ $$
 
 6. Interpret causality. If an event at time $12$ exists in the log, it must not be included when computing the embedding at time $10$.
 
-Checked answer: the time-decayed aggregate is approximately $[0.269,1.462]$. The later message receives more weight because it is more recent.
+The time-decayed aggregate is approximately $[0.269,1.462]$. The later message receives more weight because it is more recent.
 
-## Code
+## Reproducing the two propagation calculations
 
 ```python
 import torch
@@ -307,7 +303,7 @@ temporal_message = (decay[:, None] * messages).sum(dim=0) / decay.sum()
 print("temporal aggregate:", temporal_message.round(decimals=3))
 ```
 
-## Common pitfalls
+## Leakage, stale state, and misleading evaluation
 
 - Building the graph from information unavailable at prediction time. Temporal and recommendation systems are especially vulnerable to future leakage.
 - Treating all missing knowledge graph triples as false. Many are simply unobserved.
@@ -324,18 +320,6 @@ print("temporal aggregate:", temporal_message.round(decimals=3))
 - Letting text features dominate graph structure in graph-plus-LLM systems without ablation.
 - Assuming graph foundation models eliminate task-specific validation. Transfer claims need careful splits and leakage checks.
 - Serving stale embeddings in fast-changing graphs. Freshness can matter as much as offline accuracy.
-
-## Connections
-
-- [Graph Neural Networks: Basics](/cs/deep-learning/gnn-basics) gives the spectral, message-passing, attention, expressiveness, and equivariance foundations used here.
-- [recommender systems](/cs/deep-learning/recommender-systems) provides matrix factorization, neural collaborative filtering, ranking metrics, and serving context for graph recommendation.
-- [attention and transformers](/cs/deep-learning/attention-transformers) connects graph attention, graph transformers, and temporal attention to the broader Transformer family.
-- [pretrained transformers NLP](/cs/deep-learning/pretrained-transformers-nlp) is relevant when graph nodes or edges carry text and LLM embeddings become node features.
-- [reinforcement learning and Bayesian tuning](/cs/deep-learning/reinforcement-learning-and-bayesian-tuning) connects to neural combinatorial optimization and policy-based graph solvers.
-- [computational performance](/cs/deep-learning/computational-performance) covers batching, memory, and hardware concerns that become severe on large graphs.
-- [graph-theory](/math/graph-theory/intro) supports paths, flows, matchings, planarity, random graphs, and algebraic graph theory behind many application graphs.
-- [linear-algebra](/math/linear-algebra/intro) supports embeddings, sparse matrix multiplication, eigenspaces, and bilinear knowledge graph scores.
-- [probability](/math/probability/intro) supports random walks, temporal point processes, negative sampling, and uncertainty in graph predictions.
 
 ## References
 
@@ -386,3 +370,19 @@ print("temporal aggregate:", temporal_message.round(decimals=3))
 [23] L. Rampasek et al., "Recipe for a General, Powerful, Scalable Graph Transformer," NeurIPS, 2022. https://arxiv.org/abs/2205.12454
 
 [24] Y. Liu et al., "One for All: Towards Training One Graph Model for All Classification Tasks," ICLR, 2024. https://arxiv.org/abs/2310.00149
+
+<div className="see-also">
+
+See also:
+
+- [Graph Neural Networks: Basics](/cs/deep-learning/gnn-basics) gives the spectral, message-passing, attention, expressiveness, and equivariance foundations used here.
+- [recommender systems](/cs/deep-learning/recommender-systems) provides matrix factorization, neural collaborative filtering, ranking metrics, and serving context for graph recommendation.
+- [attention and transformers](/cs/deep-learning/attention-transformers) connects graph attention, graph transformers, and temporal attention to the broader Transformer family.
+- [pretrained transformers NLP](/cs/deep-learning/pretrained-transformers-nlp) is relevant when graph nodes or edges carry text and LLM embeddings become node features.
+- [reinforcement learning and Bayesian tuning](/cs/deep-learning/reinforcement-learning-and-bayesian-tuning) connects to neural combinatorial optimization and policy-based graph solvers.
+- [computational performance](/cs/deep-learning/computational-performance) covers batching, memory, and hardware concerns that become severe on large graphs.
+- [graph-theory](/math/graph-theory/intro) supports paths, flows, matchings, planarity, random graphs, and algebraic graph theory behind many application graphs.
+- [linear-algebra](/math/linear-algebra/intro) supports embeddings, sparse matrix multiplication, eigenspaces, and bilinear knowledge graph scores.
+- [probability](/math/probability/intro) supports random walks, temporal point processes, negative sampling, and uncertainty in graph predictions.
+
+</div>

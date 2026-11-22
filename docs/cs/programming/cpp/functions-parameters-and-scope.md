@@ -381,10 +381,8 @@ Global variables create hidden inputs and outputs. They also complicate initiali
 
 Recursive and reentrant calls reinforce the value of local state. Each invocation receives its own value parameters and automatic locals, so one active call does not overwrite another call's frame. A local static is shared instead, which can be useful for immutable cached data but needs synchronization if several threads may initialize or modify related state. The parameter list remains the clearest record of what varies per call.
 
-## Related pages
+<div className="see-also">
 
-- [C++ basics and control flow](/cs/programming/cpp/cpp-basics-and-control-flow)
-- [arrays](/cs/programming/cpp/arrays)
-- [references and operator overloading](/cs/programming/cpp/references-and-operator-overloading)
-- [templates](/cs/programming/cpp/templates)
-- [recursion](/cs/programming/cpp/recursion)
+See also: [C++ basics and control flow](/cs/programming/cpp/cpp-basics-and-control-flow) · [arrays](/cs/programming/cpp/arrays) · [references and operator overloading](/cs/programming/cpp/references-and-operator-overloading) · [templates](/cs/programming/cpp/templates) · [recursion](/cs/programming/cpp/recursion)
+
+</div>

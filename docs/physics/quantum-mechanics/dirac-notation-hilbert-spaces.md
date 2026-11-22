@@ -372,10 +372,8 @@ Completeness also deserves attention in infinite-dimensional spaces. A proposed 
 
 Notation should remain subordinate to the experiment. A ket label may name an eigenvalue, a preparation setting, or several commuting quantum numbers. The label is meaningful only after the corresponding operators and conventions are stated. Reusing the same symbol for an abstract operator, its matrix, and its differential representation is common and usually harmless, but a derivation should make the representation change explicit at least once. That small discipline prevents basis-dependent columns from being mistaken for basis-independent states.
 
-## Related pages
+<div className="see-also">
 
-- [Postulates of quantum mechanics](/physics/quantum-mechanics/postulates-of-quantum-mechanics)
-- [Spin-1/2 systems](/physics/quantum-mechanics/spin-one-half-systems)
-- [Quantum dynamics and pictures](/physics/quantum-mechanics/quantum-dynamics-pictures)
-- [Density operator, entanglement, and decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence)
-- [Symmetries and conservation laws](/physics/quantum-mechanics/symmetries-conservation-laws)
+See also: [Postulates of quantum mechanics](/physics/quantum-mechanics/postulates-of-quantum-mechanics) · [Spin-1/2 systems](/physics/quantum-mechanics/spin-one-half-systems) · [Quantum dynamics and pictures](/physics/quantum-mechanics/quantum-dynamics-pictures) · [Density operator, entanglement, and decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence) · [Symmetries and conservation laws](/physics/quantum-mechanics/symmetries-conservation-laws)
+
+</div>

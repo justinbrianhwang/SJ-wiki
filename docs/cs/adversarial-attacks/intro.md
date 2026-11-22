@@ -15,9 +15,9 @@ Adversarial machine learning studies how learned systems fail when inputs, train
 
 *Figure: Physical patches show that adversarial examples can survive outside the pixel-only setting. Image: [ar5iv](https://arxiv.org/abs/1712.09665), Brown et al., educational use with attribution.*
 
-This section is the foundational layer for SJ Wiki. It organizes adversarial ML as topical chapters with papers cited inline: vocabulary, threat models, mathematical formulations, attack families, defenses, and evaluation rules. The central habit is security-style precision: every robustness claim must state the attacker's goal, knowledge, capability, and budget.
+The notes proceed from vocabulary and threat models to mathematical formulations, attack families, defenses, and evaluation rules, with papers cited where they matter. Security-style precision is the central habit: every robustness claim must state the attacker's goal, knowledge, capability, and budget.
 
-## Definitions
+## Start with the threat model
 
 An **adversarial example** for a classifier $h$ is an input $x'$ derived from a clean input $x$ such that $x'$ is valid under a specified threat model and the model's behavior changes in an attacker-desired way. In a standard norm-bounded image setting:
 
@@ -49,7 +49,7 @@ where $\mathcal{G}$ is the goal, $\mathcal{K}$ is knowledge, $\mathcal{C}$ is ca
 
 An **empirical defense** is supported by attacks failing under a stated evaluation protocol. **Adversarial training** is the leading empirical defense for norm-bounded image robustness. A **certified defense** proves that no valid adversarial example exists within a specified set for a given input. Certification is stronger than attack failure, but it is limited to the norm, radius, model, and verifier assumptions.
 
-## Key results
+## From first-order attacks to robust training
 
 The basic attack optimization problem is:
 
@@ -105,9 +105,9 @@ $$
 
 Evaluation is the field's recurring difficulty. A robustness number is incomplete unless it states the threat model, attack suite, preprocessing, randomization handling, restarts, query budget, and whether the defense was attacked adaptively. Many historical defenses failed because they masked gradients rather than increasing true robustness.
 
-The section is organized as follows:
+Reading order:
 
-1. [Adversarial Attacks](/cs/adversarial-attacks/intro): this hub page and conceptual map.
+1. [Adversarial Attacks](/cs/adversarial-attacks/intro): scope and conceptual map.
 2. [Threat Models and Attack Taxonomy](/cs/adversarial-attacks/threat-models-and-attack-taxonomy): white/grey/black-box access, goals, budgets, transfer, and attacker knowledge.
 3. [Mathematical Formulation](/cs/adversarial-attacks/mathematical-formulation): constrained optimization, min-max risk, dual norms, and loss surfaces.
 4. [White-Box Attacks](/cs/adversarial-attacks/white-box-attacks): FGSM, BIM/I-FGSM, PGD, MIM, C&W, and DeepFool as algorithm families.
@@ -121,7 +121,7 @@ The section is organized as follows:
 12. [Attacks on LLMs and Other Modalities](/cs/adversarial-attacks/attacks-on-llms-and-other-modalities): text, audio, RL, multimodal, jailbreaks, and prompt injection at overview level.
 13. [Data Poisoning and Backdoors](/cs/adversarial-attacks/data-poisoning-and-backdoors): training-time compromise, triggers, clean accuracy, attack success rate, and supply-chain risk.
 
-## Visual
+## How attack claims reach evaluation
 
 ```mermaid
 flowchart TD
@@ -155,7 +155,7 @@ flowchart TD
 | Evaluation | Is the robustness claim actually supported? | [Evaluation and benchmarks](/cs/adversarial-attacks/evaluation-and-benchmarks) |
 | Training-time attack | What if the model was compromised before deployment? | [Data poisoning and backdoors](/cs/adversarial-attacks/data-poisoning-and-backdoors) |
 
-## Worked example 1: Parsing a robustness claim
+## Rewriting a vague robustness claim
 
 Problem: A model card says: "Our classifier is robust to adversarial examples." The appendix says it was evaluated on CIFAR-10 with PGD-20, $\ell_\infty$, $\epsilon=8/255$, untargeted, white-box access, 10 random restarts, and clipping to $[0,1]$. Rewrite the claim precisely.
 
@@ -193,7 +193,7 @@ $$
 
 Checked answer: the precise version is narrower but meaningful. It does not claim robustness to patches, $\ell_2$ attacks, black-box query attacks, corruptions, or prompt injection.
 
-## Worked example 2: Choosing the right page for a question
+## Diagnosing random preprocessing
 
 Problem: A reader asks: "My defense applies random resizing before classification. PGD fails, but a transfer attack succeeds. Where should I look?"
 
@@ -219,7 +219,7 @@ $$
 
 Checked answer: the issue is probably not that transfer attacks are "stronger than white-box access" in principle. It is that the white-box attack was not adapted to the randomized defended system.
 
-## Code
+## Encoding the fields of a robustness claim
 
 ```python
 from dataclasses import dataclass
@@ -256,9 +256,9 @@ claim = RobustnessClaim(
 print(claim.precise_sentence())
 ```
 
-This toy class is a guardrail for writing robustness claims. It forces the writer to specify the fields that are most often missing from vague statements.
+The class acts as a guardrail for writing robustness claims by requiring the fields most often missing from vague statements.
 
-## Common pitfalls
+## Where robustness claims break
 
 - Saying "robust" without naming the threat model.
 - Mixing targeted and untargeted results in the same table without labels.
@@ -267,16 +267,7 @@ This toy class is a guardrail for writing robustness claims. It forces the write
 - Treating a certificate for one norm and radius as a general security proof.
 - Evaluating a defense with attacks that do not include the defense.
 - Reusing image perturbation language for LLM and text attacks without defining semantic or system-level validity.
-- Deep-diving a paper result before understanding the shared vocabulary of goals, knowledge, capability, and budget.
-
-## Connections
-
-- [Machine Learning](/cs/machine-learning/intro) supplies empirical risk, generalization, and classifiers.
-- [Deep Learning](/cs/deep-learning/intro) supplies neural networks, logits, losses, and backpropagation.
-- [Cryptography](/cs/cryptography/intro) provides a neighboring tradition of explicit adversary models and security claims.
-- [Reinforcement Learning](/cs/reinforcement-learning/intro) connects to policy attacks and trajectory-level robustness.
-- [Threat models and attack taxonomy](/cs/adversarial-attacks/threat-models-and-attack-taxonomy) is the next page to read after this overview.
-- [Evaluation and benchmarks](/cs/adversarial-attacks/evaluation-and-benchmarks) is the page to read before trusting a defense number.
+- Reading a paper result in detail before understanding the shared vocabulary of goals, knowledge, capability, and budget.
 
 ## Further reading
 
@@ -286,3 +277,16 @@ This toy class is a guardrail for writing robustness claims. It forces the write
 - Madry et al., "Towards Deep Learning Models Resistant to Adversarial Attacks."
 - Carlini and Wagner, "Towards Evaluating the Robustness of Neural Networks."
 - Athalye, Carlini, and Wagner, "Obfuscated Gradients Give a False Sense of Security."
+
+<div className="see-also">
+
+See also:
+
+- [Machine learning](/cs/machine-learning/intro) supplies empirical risk, generalization, and classifiers.
+- [Deep learning](/cs/deep-learning/intro) supplies neural networks, logits, losses, and backpropagation.
+- [Cryptography](/cs/cryptography/intro) provides a neighboring tradition of explicit adversary models and security claims.
+- [Reinforcement learning](/cs/reinforcement-learning/intro) connects to policy attacks and trajectory-level robustness.
+- [Threat models and attack taxonomy](/cs/adversarial-attacks/threat-models-and-attack-taxonomy) establishes goals, knowledge, capabilities, and budgets.
+- [Evaluation and benchmarks](/cs/adversarial-attacks/evaluation-and-benchmarks) gives the checks needed before trusting a defense number.
+
+</div>

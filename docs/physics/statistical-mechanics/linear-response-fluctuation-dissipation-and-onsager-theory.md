@@ -9,7 +9,7 @@ Linear response theory asks how a system near equilibrium reacts to a weak exter
 
 Onsager's theory gives a complementary macroscopic statement. Thermodynamic forces drive fluxes, entropy production is nonnegative, and microscopic time-reversal symmetry implies reciprocal kinetic coefficients under suitable variable parities.
 
-## Definitions
+## Response kernels, fluxes, and thermodynamic forces
 
 Suppose a perturbation couples to an observable $B$:
 
@@ -53,15 +53,15 @@ $$
 
 With opposite parities or magnetic fields, signs and field reversal must be handled carefully.
 
-## Key results
+## From equilibrium correlations to transport
 
-The fluctuation-dissipation theorem relates response to equilibrium correlation functions. A simple classical version for Brownian motion is
+The fluctuation-dissipation theorem relates response to equilibrium correlation functions. A classical Green-Kubo relation for Brownian mobility is
 
 $$
-D={1\over k_BT}\int_0^\infty \langle v(t)v(0)\rangle m\,dt
+\mu_{\mathrm{mob}}={1\over k_BT}\int_0^\infty \langle v(t)v(0)\rangle\,dt,
 $$
 
-or, more commonly,
+while the diffusion coefficient is
 
 $$
 D=\int_0^\infty \langle v(t)v(0)\rangle\,dt.
@@ -122,14 +122,9 @@ Susceptibilities also encode sum rules. Because response functions are built fro
 
 The response framework is deliberately perturbative in the external field. If the perturbation changes the state substantially, heats the system, or drives it into a new phase, the linear kernel no longer describes the full behavior. Nonequilibrium steady states far from equilibrium require additional tools.
 
-Even within linear response, choosing the correct observable matters. A conserved density responds differently from a nonconserved order parameter because conservation laws force slow hydrodynamic modes. This is why response functions often have strong frequency and wave-number dependence near critical points or in fluids.
+Even within linear response, choosing the correct observable matters. A conserved density responds differently from a nonconserved order parameter because conservation laws force slow hydrodynamic modes. Response functions can therefore have strong frequency and wave-number dependence near critical points or in fluids.
 
-Spatial dependence is handled by response functions $\chi(k,\omega)$ rather than only $\chi(\omega)$. The limits $k\to 0$ and $\omega\to 0$ need not commute, especially for transport. Static susceptibilities, conductivities, and diffusion constants can therefore probe different aspects of the same microscopic dynamics.
-
-Careful order of limits is therefore part of the physics, not just mathematical bookkeeping.
-The same warning appears in hydrodynamics, critical phenomena, and quantum transport calculations.
-
-## Visual
+Spatial dependence is handled by response functions $\chi(k,\omega)$ rather than only $\chi(\omega)$. The limits $k\to 0$ and $\omega\to 0$ need not commute, especially for transport. Static susceptibilities, conductivities, and diffusion constants can therefore probe different aspects of the same microscopic dynamics; the order of limits carries physical content in hydrodynamics, critical phenomena, and quantum transport.
 
 ```mermaid
 flowchart LR
@@ -148,11 +143,9 @@ flowchart LR
 | Electrical conduction | electric field | charge current | conductivity |
 | Viscosity | velocity gradient | momentum flux | viscosity |
 
-## Worked example 1: Einstein relation from drift and diffusion
+## Recovering the Einstein relation from equilibrium
 
-Problem: An overdamped particle has mobility $\mu_{\mathrm{mob}}=1/\gamma$. Show that $D=\mu_{\mathrm{mob}}k_BT$ is required for equilibrium in potential $U(x)$.
-
-Method:
+An overdamped particle has mobility $\mu_{\mathrm{mob}}=1/\gamma$. Requiring equilibrium in a potential $U(x)$ fixes the diffusion coefficient.
 
 1. The Smoluchowski current is
 
@@ -196,11 +189,11 @@ D={1\over \beta\gamma}={k_BT\over \gamma}
 =\mu_{\mathrm{mob}}k_BT.
 $$
 
-Checked answer: the relation is forced by the requirement that the stationary distribution be thermal.
+Thus $D=\mu_{\mathrm{mob}}k_BT$ is required for the stationary distribution to be thermal.
 
-## Worked example 2: Entropy production for coupled fluxes
+## Positive entropy production for two coupled currents
 
-Problem: Let
+Take
 
 $$
 \begin{pmatrix}J_1\\J_2\end{pmatrix}
@@ -209,9 +202,7 @@ $$
 \begin{pmatrix}X_1\\X_2\end{pmatrix}.
 $$
 
-Show that entropy production is nonnegative.
-
-Method:
+The entropy production is nonnegative because the associated quadratic form is positive definite:
 
 1. The entropy production is
 
@@ -234,32 +225,9 @@ $$
 
 4. Both terms are nonnegative for all real $X_1,X_2$.
 
-Checked answer: the symmetric Onsager matrix is positive definite, so it satisfies the second-law constraint.
+The symmetric Onsager matrix is positive definite, so it satisfies the second-law constraint.
 
-## Code
-
-```python
-import numpy as np
-
-def green_kubo_diffusion(times, vacf):
-    return np.trapz(vacf, times)
-
-gamma = 2.0
-m = 1.0
-kBT = 3.0
-times = np.linspace(0, 20, 20001)
-vacf = (kBT / m) * np.exp(-gamma * times / m)
-D = green_kubo_diffusion(times, vacf)
-
-L = np.array([[2.0, 1.0], [1.0, 3.0]])
-eig = np.linalg.eigvalsh((L + L.T) / 2)
-
-print("D from Green-Kubo", D)
-print("Einstein D", kBT / gamma)
-print("Onsager eigenvalues", eig)
-```
-
-## Common pitfalls
+## Limits of linear and reciprocal response
 
 - Applying linear response far from equilibrium where fluxes need not be linear in forces.
 - Forgetting causality: response kernels vanish for negative time.
@@ -267,10 +235,8 @@ print("Onsager eigenvalues", eig)
 - Confusing mobility with chemical potential; both are often denoted by variants of $\mu$.
 - Treating fluctuation-dissipation as optional noise tuning rather than a condition for thermal equilibrium.
 
-## Connections
+<div className="see-also">
 
-- [Brownian motion, Langevin, and Fokker-Planck dynamics](/physics/statistical-mechanics/brownian-motion-langevin-and-fokker-planck-dynamics)
-- [Boltzmann equation and transport](/physics/statistical-mechanics/boltzmann-equation-and-transport)
-- [Canonical ensemble and fluctuations](/physics/statistical-mechanics/canonical-ensemble-and-fluctuations)
-- [Quantum dynamics pictures](/physics/quantum-mechanics/quantum-dynamics-pictures)
-- [Collective and condensed-matter field theory](/physics/quantum-field-theory/collective-and-condensed-matter-field-theory)
+See also: [Brownian motion, Langevin, and Fokker-Planck dynamics](/physics/statistical-mechanics/brownian-motion-langevin-and-fokker-planck-dynamics) · [Boltzmann equation and transport](/physics/statistical-mechanics/boltzmann-equation-and-transport) · [Canonical ensemble and fluctuations](/physics/statistical-mechanics/canonical-ensemble-and-fluctuations) · [Quantum dynamics pictures](/physics/quantum-mechanics/quantum-dynamics-pictures) · [Collective and condensed-matter field theory](/physics/quantum-field-theory/collective-and-condensed-matter-field-theory)
+
+</div>

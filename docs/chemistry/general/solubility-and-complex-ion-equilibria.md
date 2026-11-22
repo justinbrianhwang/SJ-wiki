@@ -5,135 +5,234 @@ sidebar_position: 18
 
 # Solubility and Complex-Ion Equilibria
 
-Solubility equilibria describe slightly soluble ionic solids in contact with their dissolved ions. Complex-ion equilibria add a second layer: metal ions can bind ligands, lowering free metal-ion concentration and often increasing the apparent solubility of a precipitate.
+A slightly soluble salt reaches equilibrium with its dissolved ions. The calculation becomes more interesting when another reaction consumes one of those ions: a common ion suppresses dissolution, acid can remove a basic anion, and a ligand can bind the free metal ion.
 
-In the Ebbing and Gammon sequence this topic sits near solubility product, common-ion effect, precipitation calculations, pH effects on solubility, complex-ion formation, complex ions and solubility, and qualitative analysis. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
+## The dissolution equation comes first
 
-![A sample of silver chloride appears as a pale insoluble solid.](https://commons.wikimedia.org/wiki/Special:FilePath/Silver_chloride.jpg)
+Solubility is the equilibrium amount of a solute that dissolves; molar solubility expresses that amount in moles per liter. The solubility product $K_{sp}$ is written from the dissolution stoichiometry and omits the pure solid.
 
-*Figure: Silver chloride as a classic slightly soluble precipitate for solubility-product calculations. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Silver_chloride.jpg), Vano3333, CC BY-SA 4.0.*
+For silver chloride,
 
-## Definitions
+$$
+\mathrm{AgCl(s)\rightleftharpoons Ag^+(aq)+Cl^-(aq)},
+$$
 
-The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.
+$$
+K_{sp}=[\mathrm{Ag^+}][\mathrm{Cl^-}].
+$$
 
-- Solubility is the amount of solute that dissolves at equilibrium.
-- Molar solubility is solubility expressed in moles per liter.
-- Solubility product $K_{sp}$ is the equilibrium constant for dissolution of a slightly soluble salt.
-- Ion product $Q_{sp}$ has the same form as $K_{sp}$ but uses current ion concentrations.
-- Common-ion effect lowers solubility by adding an ion already present in the dissolution equilibrium.
-- Selective precipitation separates ions by differences in solubility.
-- Complex ion is a metal ion bonded to surrounding ligands.
-- Formation constant $K_f$ measures stability of a complex ion.
+For a salt such as $\mathrm{CaF_2}$, the stoichiometry changes both the concentration relation and the exponent:
 
-Definitions in chemistry often connect a symbolic representation to a physical sample. A formula such as $\mathrm{H_2O}$ names a substance, gives the atomic ratio inside one molecule, and supplies the molar mass used in a macroscopic calculation. A state symbol such as $\mathrm{(aq)}$ is not cosmetic; it says the species is dispersed in water and may be treated as ions when writing a net ionic equation. In the same way, constants such as $R$, $K_w$, $F$, or $N_A$ are compact definitions of the measurement system being used.
+$$
+\mathrm{CaF_2(s)\rightleftharpoons Ca^{2+}(aq)+2F^-(aq)},
+$$
 
-## Key results
+$$
+K_{sp}=[\mathrm{Ca^{2+}}][\mathrm{F^-}]^2.
+$$
 
-The central results are:
-
-- For $\mathrm{AgCl(s)\rightleftharpoons Ag^+ + Cl^-}$, $K_{sp}=[Ag^+][Cl^-]$.
-- Precipitation criterion: if $Q_{sp}\gt K_{sp}$, precipitate forms.
-- For $\mathrm{M(OH)_n}$, solubility often depends strongly on pH through $[OH^-]$.
-- Complex formation lowers free metal ion concentration and can dissolve precipitates.
-- Overall equilibrium constants multiply when reactions are added.
-- Qualitative analysis uses controlled precipitation, complex formation, and acid-base conditions.
-
-The most common solubility error is to confuse molar solubility with $K_{sp}$. They have different units and different stoichiometric exponents. The dissolution equation must be written first, then ion concentrations are expressed in terms of the molar solubility and any common ions already present.
-
-A good way to use these results is to state the chemical model first, then substitute numbers second. For solubility and complex-ion equilibria, the model usually answers questions such as what particles are present, what is conserved, which process is idealized, and which measurement is being interpreted. Once that sentence is clear, the algebra becomes a bookkeeping problem rather than a search for a memorized pattern.
-
-Units are part of the result, not decoration. Whenever a formula contains an empirical constant, a tabulated value, or a ratio of measured quantities, the units tell you whether the expression has been used in the intended form. This is especially important in general chemistry because several equations have nearly identical algebra but different meanings: pressure can be a measured state variable, an equilibrium correction, or a colligative effect; energy can be heat flow, enthalpy, internal energy, or free energy.
-
-The strongest check is an independent chemical interpretation. Ask whether the sign agrees with direction, whether a concentration can be negative, whether a mole ratio follows the balanced equation, whether an equilibrium shift opposes the stress, and whether a microscopic description explains the macroscopic number. These checks connect solubility and complex-ion equilibria to neighboring topics instead of leaving it as an isolated technique.
-
-A second check is to compare the limiting cases. If a reactant amount goes to zero, a product amount cannot remain large. If temperature rises in a gas sample at fixed volume, pressure should not fall in an ideal model. If an acid is diluted, hydronium concentration should normally decrease unless a coupled equilibrium supplies more. Limiting cases often reveal algebra that has been rearranged correctly but applied to the wrong chemical situation.
-
-Finally, keep symbolic and particulate representations side by side. A balanced equation, an equilibrium expression, an orbital diagram, or a polymer repeat unit is a compact symbol for a population of particles. Translating that symbol into words forces you to say what is reacting, what is being counted, and what is being held constant. That translation is usually the difference between a calculation that can be adapted to a new problem and one that only imitates a worked example.
-
-## Visual
+Molar solubility should therefore not be identified directly with $K_{sp}$. The dissolution equation determines how a solubility $s$ maps to each ion concentration.
 
 ```mermaid
 flowchart TD
-  A[Write dissolution equation] --> B[Write Ksp expression]
-  B --> C[Identify initial common ions]
+  A[Write the dissolution equation] --> B[Write the Ksp expression]
+  B --> C[Include initial common ions]
   C --> D[Let molar solubility be s]
   D --> E[Substitute equilibrium concentrations]
-  E --> F[Solve and check]
-  F --> G{"Qsp compared with Ksp?"}
-  G -->|"Qsp > Ksp"| H[Precipitation]
-  G -->|"Qsp <= Ksp"| I[No precipitation]
+  E --> F[Solve and check the approximation]
+  F --> G{"Compare Qsp with Ksp"}
+  G -->|"Qsp > Ksp"| H[Precipitation is favored]
+  G -->|"Qsp <= Ksp"| I[No precipitation predicted]
 ```
 
-| Equilibrium | What reduces free metal ion? | Solubility effect |
+## Silver chloride in pure water
+
+If $K_{sp}=1.8\times10^{-10}$, let the molar solubility of AgCl be $s$. Dissolution produces equal concentrations of the two ions:
+
+$$
+[\mathrm{Ag^+}]=s,\qquad [\mathrm{Cl^-}]=s.
+$$
+
+Then
+
+$$
+s^2=1.8\times10^{-10},
+$$
+
+$$
+s=1.34\times10^{-5}\ \mathrm{M}.
+$$
+
+The square root appears only because the salt produces one of each ion. A different formula gives a different polynomial in $s$.
+
+## Deciding whether mixing causes a precipitate
+
+The ion product $Q_{sp}$ has the same algebraic form as $K_{sp}$ but uses the current concentrations. If $Q_{sp}\gt K_{sp}$, the mixture is supersaturated and precipitation is favored.
+
+Mix equal volumes of $2.0\times10^{-4}\ \mathrm{M}$ $\mathrm{AgNO_3}$ and $2.0\times10^{-4}\ \mathrm{M}$ NaCl. The volume doubles, so each ion concentration is halved:
+
+$$
+[\mathrm{Ag^+}]=[\mathrm{Cl^-}]=1.0\times10^{-4}\ \mathrm{M}.
+$$
+
+Therefore
+
+$$
+Q_{sp}=(1.0\times10^{-4})^2=1.0\times10^{-8}.
+$$
+
+This is about 56 times the stated $K_{sp}$, so AgCl precipitates until the dissolved-ion activities satisfy equilibrium. The dilution step belongs before the $Q_{sp}$ calculation.
+
+## Coupled equilibria can reverse the solubility trend
+
+| Change to the solution | Immediate effect | Effect on dissolution |
 |---|---|---|
-| Common anion added | shifts dissolution left | decreases |
-| Acid consumes basic anion | shifts dissolution right | increases |
-| Ligand binds metal | removes free cation | increases |
-| Added metal cation | shifts dissolution left | decreases |
+| Add a common anion | increases a dissolution product | shifts toward the solid |
+| Add acid that consumes a basic anion | removes a dissolution product | shifts toward dissolved ions |
+| Add a ligand that binds the metal | lowers free metal-ion concentration | shifts toward dissolved ions |
+| Add the metal cation | increases a dissolution product | shifts toward the solid |
 
-## Worked example 1: Molar solubility of silver chloride
+A complex ion is a metal center bound to ligands, and its formation constant $K_f$ measures the equilibrium tendency to form that complex. When a ligand strongly binds the dissolved metal ion, the free metal concentration can become very small even while the total dissolved metal concentration rises. Reactions may be added and their equilibrium constants multiplied to obtain the overall constant for dissolution plus complex formation.
 
-Problem. Find the molar solubility of $\mathrm{AgCl}$ in pure water if $K_{sp}=1.8\times10^{-10}$.
+This coupling supports selective precipitation and classical qualitative analysis. The relevant comparison is among free-ion concentrations, not merely the total analytical concentrations placed in the beaker.
 
-    Method.
+## Stoichiometry changes the relation between $K_{sp}$ and solubility
 
-    1. Write dissolution: $\mathrm{AgCl(s)\rightleftharpoons Ag^+ + Cl^-}$.
-2. Let molar solubility be $s$.
-3. At equilibrium, $[Ag^+]=s$ and $[Cl^-]=s$.
-4. Write $K_{sp}=s^2=1.8\times10^{-10}$.
-5. Solve: $s=\sqrt{1.8\times10^{-10}}=1.34\times10^{-5}\ \mathrm{M}$.
+For $\mathrm{CaF_2}$ dissolving in pure water, let $s$ be the number of moles of formula units dissolved per liter. The ion concentrations are $s$ and $2s$, so
 
-    Checked answer. Molar solubility is $1.34\times10^{-5}\ \mathrm{M}$. A very small $K_{sp}$ gives a small solubility, consistent with a slightly soluble salt.
+$$
+K_{sp}=s(2s)^2=4s^3,
+$$
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+and
 
-## Worked example 2: Will a precipitate form?
+$$
+s=\left(\frac{K_{sp}}{4}\right)^{1/3}.
+$$
 
-Problem. Equal volumes of $2.0\times10^{-4}\ \mathrm{M}$ $\mathrm{AgNO_3}$ and $2.0\times10^{-4}\ \mathrm{M}$ NaCl are mixed. Does AgCl precipitate? Use $K_{sp}=1.8\times10^{-10}$.
+The factor four and cube root come directly from the balanced equation. Consequently, comparing two numerical $K_{sp}$ values does not always rank their molar solubilities when the salts have different stoichiometries. Units, temperature, and activity conventions must also match.
 
-    Method.
+Equilibrium constants are formally written in activities. Introductory calculations replace activity with molar concentration, an approximation most reliable in dilute solutions. Highly charged ions or appreciable ionic strength can produce noticeable deviations. A calculation can be algebraically exact within the concentration model and still differ from experiment for this reason.
 
-    1. Mixing equal volumes halves each concentration.
-2. Initial post-mixing $[Ag^+]=1.0\times10^{-4}\ \mathrm{M}$ and $[Cl^-]=1.0\times10^{-4}\ \mathrm{M}$.
-3. Compute ion product: $Q_{sp}=[Ag^+][Cl^-]=(1.0\times10^{-4})^2=1.0\times10^{-8}$.
-4. Compare with $K_{sp}=1.8\times10^{-10}$.
-5. $Q_{sp}\gt K_{sp}$, so the solution is supersaturated with respect to AgCl.
-6. Precipitation occurs until ion concentrations drop to equilibrium.
+## The common-ion effect with an approximation check
 
-    Checked answer. Yes, AgCl precipitates. The product of ion concentrations is about 56 times larger than $K_{sp}$.
+Place AgCl in $0.100\ \mathrm{M}$ NaCl and use $K_{sp}=1.8\times10^{-10}$. If $s$ molar AgCl dissolves,
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+$$
+[\mathrm{Ag^+}]=s,\qquad[\mathrm{Cl^-}]=0.100+s.
+$$
 
-## Code
+The exact equation is
 
-```python
-from math import sqrt
+$$
+s(0.100+s)=1.8\times10^{-10}.
+$$
 
-def agcl_solubility(Ksp):
-    return sqrt(Ksp)
+Because the pure-water solubility was only about $10^{-5}\ \mathrm{M}$ and the common chloride concentration is $0.100\ \mathrm{M}$, try $s\ll0.100$:
 
-def precipitates(Ksp, cation, anion):
-    Q = cation * anion
-    return Q, Q > Ksp
+$$
+s\approx\frac{1.8\times10^{-10}}{0.100}
+=1.8\times10^{-9}\ \mathrm{M}.
+$$
 
-s = agcl_solubility(1.8e-10)
-Q, forms = precipitates(1.8e-10, 1.0e-4, 1.0e-4)
-print(s, Q, forms)
-```
+The neglected fraction is $s/0.100=1.8\times10^{-8}$, so the approximation is amply justified. The common ion lowers the solubility by roughly four orders of magnitude relative to pure water. Substituting the answer back into the full expression is the quickest check.
 
-## Common pitfalls
+An inert electrolyte is not a common ion merely because it raises ionic strength. A common ion must appear in the dissolution equilibrium. Sodium nitrate supplies neither silver nor chloride to AgCl, although at sufficient concentration it can alter activities.
 
-- Setting molar solubility equal to $K_{sp}$. Avoid it by writing concentrations in terms of $s$ before solving.
-- Forgetting dilution when solutions are mixed. Avoid it by computing post-mixing concentrations before $Q_{sp}$.
-- Ignoring stoichiometric exponents for salts like $\mathrm{CaF_2}$. Avoid it by using the dissolution equation to get ion concentrations.
-- Assuming common ions always come from the solid itself. Avoid it by including any external source of the same ion.
-- Forgetting that pH can change solubility of basic anion salts. Avoid it by checking acid-base reactions involving the anion.
-- Treating complex formation as separate from solubility. Avoid it by combining equilibria when ligands remove free metal ions.
+## Acid can dissolve salts of basic anions
 
-## Connections
+Consider a carbonate salt:
 
-- [chemical equilibrium](/chemistry/general/chemical-equilibrium)
-- [acid-base equilibria, buffers, and titrations](/chemistry/general/acid-base-equilibria-buffers-and-titrations)
-- [transition metals and coordination compounds](/chemistry/general/transition-metals-and-coordination-compounds)
-- [aqueous reactions and solution stoichiometry](/chemistry/general/aqueous-reactions-and-solution-stoichiometry)
+$$
+\mathrm{MCO_3(s)\rightleftharpoons M^{2+}+CO_3^{2-}}.
+$$
+
+Added acid protonates carbonate through bicarbonate toward carbonic acid, which can form water and carbon dioxide. Removing free $\mathrm{CO_3^{2-}}$ drives further dissolution. The net result may be represented schematically as
+
+$$
+\mathrm{MCO_3(s)+2H^+\rightarrow M^{2+}+CO_2+H_2O}.
+$$
+
+Salts with anions that are conjugate bases of weak acids often become more soluble at low pH. Chloride is the conjugate base of a strong acid and is not appreciably consumed by ordinary acid addition, so the same argument does not predict acid-enhanced AgCl solubility.
+
+If a quantitative pH-dependent solubility is required, the dissolution equilibrium, acid dissociation equilibria, mass balance, and charge balance must be solved together. Applying Le Châtelier's principle gives the direction, not necessarily the numerical amount.
+
+## Complex formation changes free concentration, not mass balance
+
+Silver ion binds ammonia:
+
+$$
+\mathrm{Ag^++2NH_3\rightleftharpoons[Ag(NH_3)_2]^+},
+$$
+
+$$
+K_f=\frac{[\mathrm{Ag(NH_3)_2^+}]}{[\mathrm{Ag^+}][\mathrm{NH_3}]^2}.
+$$
+
+Adding this equation to AgCl dissolution cancels free $\mathrm{Ag^+}$ and gives
+
+$$
+\mathrm{AgCl(s)+2NH_3\rightleftharpoons[Ag(NH_3)_2]^++Cl^-}.
+$$
+
+The overall equilibrium constant is $K_{sp}K_f$. A large formation constant can outweigh a small solubility product, so ammonia dissolves substantially more silver chloride than pure water. Total dissolved silver is
+
+$$
+[\mathrm{Ag}]_{\mathrm{tot}}=[\mathrm{Ag^+}]+[\mathrm{Ag(NH_3)_2^+}]
+$$
+
+if those are the only important silver species. The $K_{sp}$ expression still contains free $\mathrm{Ag^+}$, not the total. Substituting total concentration there incorrectly erases the chemical effect of complexation.
+
+Conditional formation constants fold ligand protonation or competing reactions into an effective constant valid at a specified pH and ligand concentration. They are useful because many ligands bind only in a deprotonated form. A tabulated intrinsic $K_f$ can overpredict binding if most ligand is protonated.
+
+## Selective precipitation is a threshold calculation
+
+Suppose a solution contains two metal ions that form salts with the same added anion. For each possible solid, solve the onset condition $Q_{sp}=K_{sp}$ for the anion concentration. The salt requiring the lower anion concentration begins to precipitate first. Separation is good only if most of the first ion can precipitate before the second reaches its threshold.
+
+After precipitation begins, concentrations no longer follow the simple dilution-only values. The solid removes ions until the saturation condition is restored. If reagent continues to be added, a mass-balance calculation is needed. Merely saying that the smaller $K_{sp}$ precipitates first can fail when ion stoichiometries or starting metal concentrations differ.
+
+The same logic explains fractional precipitation and qualitative group separations. Control of pH, free ligand, or common-ion concentration shifts thresholds by controlling the free ions that enter $Q_{sp}$.
+
+## Approximation and interpretation checks
+
+- Compute post-mixing concentrations before evaluating $Q_{sp}$.
+- Carry stoichiometric coefficients into both concentration expressions and exponents.
+- Include ions supplied by other solutes; the solid is not the only possible source of a common ion.
+- Check whether acid-base chemistry consumes the anion or complex formation consumes the cation.
+- Distinguish free metal ion from total dissolved metal when ligands are present.
+
+## A systematic equilibrium setup
+
+When several equilibria are coupled, an ICE table for only one reaction can miss constraints. Begin by listing all chemically significant species, then write equilibrium expressions, material balances for conserved components, and charge balance. Add water autoionization if pH is not fixed. The number of independent equations should match the unknown concentrations.
+
+For a metal $M$ binding ligand $L$, a material balance might be
+
+$$
+[M]_{tot}=[M^{2+}]+[ML^{2+}]+[ML_2^{2+}].
+$$
+
+Stepwise constants describe addition of one ligand at a time, while an overall constant $\beta_2$ describes formation of $ML_2$ directly from free metal and two free ligands. Multiplying stepwise constants gives the corresponding overall constant. Mixing the two conventions double-counts equilibria.
+
+Precipitation does not necessarily remove every trace of an ion. Once solid and solution are at equilibrium, finite free-ion concentrations remain and obey $K_{sp}$. “Complete precipitation” is an analytical approximation meaning that the remaining fraction is acceptably small. Its validity depends on the demanded accuracy.
+
+Supersaturation is also a thermodynamic statement, not a guarantee of immediate visible solid. Nucleation can be slow, especially without seed crystals or rough surfaces. A solution may temporarily have $Q_{sp}\gt K_{sp}$ and remain clear. Equilibrium predicts the favored final direction; kinetics controls how soon it is observed.
+
+Temperature changes equilibrium constants. A numerical $K_{sp}$ or $K_f$ belongs to its stated temperature and medium. Comparing values measured under different ionic strengths or conventions can create apparent contradictions. Tables are most reliable when conditions and definitions match the calculation.
+
+Amphoteric hydroxides add another coupling. A metal hydroxide may dissolve in acid because hydroxide is protonated, yet also dissolve in strong base by forming a soluble hydroxo complex. Its minimum solubility often occurs at an intermediate pH. Labeling the solid “insoluble in water” therefore says little about behavior across the full pH range.
+
+Complexation can also reverse selectivity. A ligand that binds one metal much more strongly lowers that metal's free concentration and delays precipitation of its salt. Conversely, destroying a complex by protonating the ligand can release free metal and trigger precipitation. Analytical schemes exploit these conditional changes, but successful separation depends on quantitative ratios rather than the mere existence of a complex.
+
+When a solid is present, its amount does not appear in $K_{sp}$, but it must be positive for the saturation constraint to apply. If a mass-balance solution predicts a negative solid amount, all solid has dissolved and the equilibrium must be recalculated without imposing saturation. Phase presence is part of the answer, not an automatic assumption.
+
+## Reporting solubility
+
+Molar solubility counts formula units dissolved per volume, while total metal solubility may include several complexes. Mass solubility follows by multiplying by molar mass. The three numbers are not interchangeable, especially for salts with more than one metal ion per formula unit.
+
+A calculated concentration below zero or above the analytical total signals a broken assumption or algebraic root. Polynomial equilibrium equations can have several mathematical roots, but only nonnegative concentrations satisfying every mass balance are physical. Substitution into the original equations is part of the solution.
+
+<div className="see-also">
+
+See also: [chemical equilibrium](/chemistry/general/chemical-equilibrium) · [acid-base equilibria, buffers, and titrations](/chemistry/general/acid-base-equilibria-buffers-and-titrations) · [transition metals and coordination compounds](/chemistry/general/transition-metals-and-coordination-compounds) · [aqueous reactions and solution stoichiometry](/chemistry/general/aqueous-reactions-and-solution-stoichiometry)
+
+</div>

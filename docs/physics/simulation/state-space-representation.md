@@ -9,7 +9,7 @@ State-space representation is the working language of simulation because it expr
 
 This representation also separates model structure from implementation. MATLAB functions such as `ode45`, `ss`, `lsim`, and `step` operate naturally on state equations, and Simulink's Integrator and State-Space blocks are built around the same idea. Transfer functions are useful for linear input-output analysis, but state-space models keep the internal variables visible, which is essential when validating simulations against measured states or checking physical constraints.
 
-## Definitions
+## The derivative map and its dimensions
 
 A continuous-time nonlinear state-space model is
 
@@ -42,7 +42,7 @@ An initial condition $\mathbf{x}(0)=\mathbf{x}_0$ is part of the simulation prob
 
 State variables are not unique. A second-order equation can be represented by position and velocity, by position and momentum, or by transformed modal coordinates. Different choices can improve numerical conditioning, interpretability, or compatibility with measured data.
 
-## Key results
+## From higher-order equations to state evolution
 
 Any ordinary differential equation that can be solved for the highest derivative can be rewritten as first-order state equations. For
 
@@ -85,8 +85,6 @@ For simulation work, state ordering should be documented as carefully as paramet
 
 State scaling also matters. If one state is a voltage near $10^{-3}$ and another is a position near $10^4$, a single absolute tolerance can make the solver over-resolve one state and under-resolve another. In MATLAB this can be handled with vector absolute tolerances, nondimensional states, or a scaled state transformation. In Simulink, the same issue appears when logged signals have very different magnitudes and the solver reports tiny steps or inaccurate zero crossings. A state-space representation is therefore not only a mathematical format; it is also a numerical interface.
 
-## Visual
-
 ```mermaid
 flowchart LR
   U["input u(t)<br/>known forcing or control"] --> Deriv["state-derivative map<br/>f(t,x,u,p) or A x + B u"]
@@ -101,7 +99,7 @@ flowchart LR
 
   subgraph Linear["Linear analysis view"]
     direction TB
-    Mat["matrices A, B, C, D<br/>shapes n x n, n x m, r x n, r x m"] --> Modes["modes from eigenvalues of A"]
+    Mat["matrices A, B, C, D<br/>shapes n x n, n x m, p x n, p x m"] --> Modes["modes from eigenvalues of A"]
     Mat --> TF["transfer function<br/>G(s)=C(sI-A)^-1B+D"]
     Mat --> IC["initial-condition response<br/>exp(A t)x0"]
   end
@@ -119,7 +117,9 @@ This state-space diagram makes the simulation interface explicit: inputs, parame
 | Transfer function | Linear input-output analysis | Easy poles, zeros, frequency response | Hides internal state and initial-condition structure |
 | Block diagram | Simulink implementation | Shows signal flow and feedback | Can obscure equations if blocks are undocumented |
 
-## Worked example 1: Convert an RLC circuit to state-space form
+## From physical storage to an input-output realization
+
+### Choosing energy-storage states for a series RLC circuit
 
 Problem: A series RLC circuit is driven by an input voltage $v_s(t)$. Let $R=4\ \Omega$, $L=0.5\ \mathrm{H}$, and $C=0.1\ \mathrm{F}$. Choose capacitor voltage and inductor current as states. Derive $A$ and $B$ for output $y=v_C$.
 
@@ -181,7 +181,7 @@ Checked answer: dimensions are consistent: $A$ is $2\times2$, $B$ is $2\times1$,
 
 Simulink description: use a State-Space block with the $A$, $B$, $C$, and $D=0$ matrices, or build the two equations with Sum, Gain, and Integrator blocks. The time-response plot should show capacitor voltage rising toward the input with possible overshoot depending on damping.
 
-## Worked example 2: Build a controllable canonical realization
+### Recovering phase-variable states from a transfer function
 
 Problem: The transfer function
 
@@ -248,7 +248,7 @@ Checked answer: the DC gain is $G(0)=3/5=0.6$, matching the equilibrium. The tim
 
 Simulink description: this system can be implemented with one Transfer Fcn block using numerator `[3]` and denominator `[1 4 5]`, or with two Integrator blocks in state form. The state implementation is better when internal velocity-like state $x_2$ must be inspected.
 
-## Code
+## Checking both realizations with MATLAB
 
 ```matlab
 clear; clc; close all;
@@ -281,7 +281,7 @@ title('Second-order realization response');
 
 The MATLAB `ss` command creates LTI state-space objects that can be plotted directly. For nonlinear or time-varying systems, replace `ss` with a derivative function and integrate with `ode45`, `ode15s`, or another solver. In Simulink, the equivalent compact implementation is a State-Space block; the expanded implementation is an integrator bank with feedback gains matching the rows of $A$ and feedthrough gains matching $B$.
 
-## Common pitfalls
+## State choices that mislead the simulation
 
 - Using the output as the only state for a second-order model. The derivative of the output is also needed unless the model has been reduced for a valid reason.
 - Confusing $B$ and $C$ dimensions. $B$ maps inputs into state derivatives; $C$ maps states into outputs.
@@ -290,9 +290,8 @@ The MATLAB `ss` command creates LTI state-space objects that can be plotted dire
 - Ignoring initial conditions when comparing a state-space simulation to a transfer-function step response. Many transfer-function commands default to zero initial state.
 - Treating hidden pole-zero cancellations as harmless. A canceled internal unstable mode can still be dangerous if it corresponds to a real state.
 
-## Connections
+<div className="see-also">
 
-- [Mathematical Modeling of Continuous-Time Systems](/physics/simulation/mathematical-modeling-continuous-time)
-- [Linear Systems, Transfer Functions, and Modes](/physics/simulation/linear-systems-transfer-functions-modes)
-- [MATLAB Scripting for Simulation](/physics/simulation/matlab-scripting-for-simulation)
-- [State-Space Introduction](/physics/signals-systems/state-space-introduction)
+See also: [Mathematical Modeling of Continuous-Time Systems](/physics/simulation/mathematical-modeling-continuous-time) · [Linear Systems, Transfer Functions, and Modes](/physics/simulation/linear-systems-transfer-functions-modes) · [MATLAB Scripting for Simulation](/physics/simulation/matlab-scripting-for-simulation) · [State-Space Introduction](/physics/signals-systems/state-space-introduction)
+
+</div>

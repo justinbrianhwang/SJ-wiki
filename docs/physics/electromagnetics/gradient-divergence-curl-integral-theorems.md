@@ -377,9 +377,13 @@ Coordinate singularities require interpretation. At $\rho=0$, the cylindrical di
 - Applying integral theorems across singularities without isolating them. Point charges and line currents require care.
 - Treating a zero closed integral as proof that the integrand is zero everywhere. Cancellation over a path or surface can hide local structure unless the result holds for every possible region.
 
-## Related pages
+<div className="see-also">
+
+See also:
 
 - [Vector differential calculus](/math/engineering-math/vector-differential-calculus) for operator derivations.
 - [Vector integral calculus](/math/engineering-math/vector-integral-calculus) for Stokes and divergence theorem details.
 - [Gauss law, dielectrics, and boundaries](/physics/electromagnetics/gauss-law-dielectrics-and-boundaries) for flux applications.
 - [Maxwell equations for time-varying fields](/physics/electromagnetics/maxwell-equations-time-varying-fields) for the differential and integral Maxwell forms.
+
+</div>

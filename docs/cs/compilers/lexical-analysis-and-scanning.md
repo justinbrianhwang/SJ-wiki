@@ -5,15 +5,22 @@ sidebar_position: 1
 
 # Lexical Analysis and Scanning
 
-![A compilation-flow diagram shows source code passing through a compiler that produces machine code or bytecode.](https://commons.wikimedia.org/wiki/Special:FilePath/Compiler.svg)
-
-*Figure: A compiler is a multi-phase pipeline; lexical analysis is the first phase that turns source characters into the token stream consumed by the parser. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Compiler.svg), Public-Domain.*
-
 Lexical analysis is the compiler phase that turns raw source text into a stream of tokens. It is usually the first real contact between a language implementation and a user's program: characters become names, numbers, keywords, string literals, operators, punctuation, and end-of-file markers. Nystrom's Lox scanner is deliberately hand-written so that every branch is visible, while the classic compiler texts present the same job as regular-language recognition by finite automata [1], [2].
 
 Scanning matters because every later phase depends on the token stream being precise, stable, and well located in the original file. A parser can recover from a missing semicolon only if the scanner has preserved enough position information; an interpreter can report a string-literal error only if the scanner knows where the literal began; a generated lexer can be fast only because regular expressions admit automata with simple state transitions.
 
-## Definitions
+## From source bytes to located tokens
+
+```mermaid
+flowchart LR
+  A["Source bytes"] --> B["Decode and track positions"]
+  B --> C["Recognize lexeme by DFA or branches"]
+  C --> D{"Accepting token?"}
+  D -->|yes| E["Emit token with span"]
+  D -->|no| F["Report lexical error"]
+  E --> G["Parser input stream"]
+  F --> C
+```
 
 A **lexeme** is a contiguous substring of the source program that has meaning as a unit. In `var count = 12;`, the lexemes are `var`, `count`, `=`, `12`, and `;`. A **token** is the compiler's classified record for a lexeme, usually containing a token kind, the original spelling, an optional semantic value, and a source location. The lexeme `12` might become a token such as `NUMBER("12", 12.0, line=1, column=13)`.
 
@@ -27,15 +34,15 @@ $$
 
 An **NFA** (nondeterministic finite automaton) may have multiple outgoing transitions for the same input and may use $\epsilon$ transitions that consume no character. A **DFA** (deterministic finite automaton) has exactly one next state for each state and input class. Thompson construction turns regular expressions into NFAs, and subset construction turns NFAs into DFAs [2]. Scanner generators such as lex and flex exploit this pipeline, then emit table-driven or direct-coded scanners.
 
-The **longest match rule**, also called maximal munch, says that the scanner should consume the longest prefix that forms a valid token. This is why `==` becomes one equality token rather than two assignment tokens, and why `ifx` is an identifier rather than keyword `if` followed by identifier `x`. When two token rules match the same longest lexeme, lexer specifications use priority, often the rule order.
+The **longest match rule**, also called maximal munch, says that the scanner should consume the longest prefix that forms a valid token. Under this rule, `==` becomes one equality token rather than two assignment tokens, and `ifx` is an identifier rather than keyword `if` followed by identifier `x`. When two token rules match the same longest lexeme, lexer specifications use priority, often the rule order.
 
 **Lookahead** is input inspected before deciding which token to emit. A hand-written scanner often needs one character of lookahead for `!` versus `!=`, `<` versus `<=`, and `/` versus `//` comments. Some languages need more lookahead or lexical modes, for example nested comments, string interpolation, or indentation-sensitive layout.
 
 **Source locations** usually include byte offset, line, and column. For Unicode source, byte offsets and displayed columns are not identical: UTF-8 code points can occupy multiple bytes, and grapheme clusters may occupy several code points. A robust scanner can keep byte spans for machine use and line-column positions for diagnostics.
 
-## Key results
+## Encoding token rules as automata
 
-The first key result is that token languages are usually regular. This gives the compiler writer a clean implementation choice. A hand-written scanner can encode a small DFA directly in control flow, as Nystrom does for Lox [1]. A generated scanner can combine many token regexes into one automaton and provide predictable linear-time recognition [2]. Both styles implement the same model:
+Token languages are usually regular. A hand-written scanner can encode a small DFA directly in control flow, as Nystrom does for Lox [1]. A generated scanner can combine many token regexes into one automaton and provide predictable linear-time recognition [2]. Both styles implement the same model:
 
 1. Start at the current source position.
 2. Advance while the current prefix can still match a token.
@@ -43,7 +50,7 @@ The first key result is that token languages are usually regular. This gives the
 4. Emit the token for the longest accepted prefix.
 5. If no accepting state was reached, report a lexical error and resynchronize.
 
-The second key result is the regex-to-automaton path:
+The construction follows the path:
 
 $$
 \text{regular expressions} \to \text{NFA} \to \text{DFA} \to \text{scanner code}.
@@ -51,33 +58,7 @@ $$
 
 Thompson construction builds small NFA fragments for concatenation, alternation, and repetition. Subset construction represents each DFA state as a set of NFA states. If the NFA has states $Q_N$, a DFA state is an element of $2^{Q_N}$, though practical lexers rarely visit all possible subsets. DFA minimization can merge equivalent states, but many production tools skip full minimization when transition tables are already compact enough.
 
-The third result is that lexical priority is part of the language definition, not just an implementation detail. Suppose the rules are:
-
-| Priority | Rule | Example |
-|---:|---|---|
-| 1 | keyword `for` | `for` |
-| 2 | identifier `[A-Za-z_][A-Za-z0-9_]*` | `format` |
-| 3 | integer `[0-9]+` | `123` |
-| 4 | whitespace `[ \t\r\n]+` | spaces |
-
-For input `for`, both the keyword rule and identifier rule match length 3, so priority selects the keyword. For input `format`, the identifier rule matches length 6 while the keyword matches only length 3, so longest match selects the identifier. This is why generated lexers normally list keywords before identifiers or perform keyword lookup after reading an identifier.
-
-The fourth result is diagnostic: a scanner should not simply crash on unknown characters. It should produce an error with the smallest helpful span, then continue at a defensible boundary. Nystrom's scanner reports an unexpected character but keeps scanning, letting the interpreter find more errors in one run [1]. Production compilers often attach file name, line, column, byte span, and a snippet.
-
-Finally, UTF-8 handling separates lexical correctness from convenience. A scanner may treat ASCII punctuation and keywords byte by byte, but it should have an explicit policy for non-ASCII identifiers, invalid byte sequences, normalization, and display width. Languages differ: some allow Unicode identifiers; others restrict identifiers to ASCII for simplicity. Either policy is acceptable if it is documented and consistently enforced.
-
-## Visual
-
-```mermaid
-flowchart LR
-  A["Source bytes"] --> B["Decode and track positions"]
-  B --> C["Recognize lexeme by DFA or branches"]
-  C --> D{"Accepting token?"}
-  D -->|yes| E["Emit token with span"]
-  D -->|no| F["Report lexical error"]
-  E --> G["Parser input stream"]
-  F --> C
-```
+Hand-written and generated scanners differ mainly in where their complexity lives:
 
 | Concern | Hand-written scanner | Generated scanner |
 |---|---|---|
@@ -87,7 +68,26 @@ flowchart LR
 | Typical tools | Direct code, recursive helpers | lex, flex, re2c, ANTLR lexer |
 | Best fit | Educational interpreters, small DSLs, custom syntax | Industrial grammars, stable specs, many token classes |
 
-## Worked example 1: Tokenizing a small declaration
+## Longest match and rule priority
+
+Lexical priority is part of the language definition, not an implementation detail. Suppose the rules are:
+
+| Priority | Rule | Example |
+|---:|---|---|
+| 1 | keyword `for` | `for` |
+| 2 | identifier `[A-Za-z_][A-Za-z0-9_]*` | `format` |
+| 3 | integer `[0-9]+` | `123` |
+| 4 | whitespace `[ \t\r\n]+` | spaces |
+
+For input `for`, both the keyword rule and identifier rule match length 3, so priority selects the keyword. For input `format`, the identifier rule matches length 6 while the keyword matches only length 3, so longest match selects the identifier. Generated lexers therefore normally list keywords before identifiers or perform keyword lookup after reading an identifier.
+
+## Error recovery and Unicode policy
+
+A scanner should not simply crash on unknown characters. It should produce an error with the smallest helpful span, then continue at a defensible boundary. Nystrom's scanner reports an unexpected character but keeps scanning, letting the interpreter find more errors in one run [1]. Production compilers often attach file name, line, column, byte span, and a snippet.
+
+UTF-8 handling separates lexical correctness from convenience. A scanner may treat ASCII punctuation and keywords byte by byte, but it should have an explicit policy for non-ASCII identifiers, invalid byte sequences, normalization, and display width. Languages differ: some allow Unicode identifiers; others restrict identifiers to ASCII for simplicity. Either policy is acceptable if it is documented and consistently enforced.
+
+## Tokenizing `var total = price * 1.08;`
 
 Problem: scan the Lox-like source line:
 
@@ -120,9 +120,7 @@ Checked answer:
 | 7 | `SEMICOLON` | `;` | none |
 | 8 | `EOF` | empty | none |
 
-The important checks are longest match for the number and keyword lookup for `var`.
-
-## Worked example 2: Subset construction for a tiny token
+## Subset construction for `a(b|c)*`
 
 Problem: construct the reachable DFA states for the regular expression `a(b|c)*`. The language contains strings beginning with `a`, followed by zero or more `b` or `c` characters.
 
@@ -166,7 +164,7 @@ Checked answer:
 
 Testing confirms the result: `a`, `ab`, `acb`, and `abcc` are accepted; empty input, `b`, `aa`, and `ba` are rejected.
 
-## Code
+## A hand-written scanner for the declaration grammar
 
 ```python
 from dataclasses import dataclass
@@ -261,7 +259,7 @@ if __name__ == "__main__":
         print(token)
 ```
 
-## Common pitfalls
+## Scanner bugs that leak into later phases
 
 - Confusing lexemes with token kinds, especially when keywords are stored as special identifiers.
 - Forgetting the longest match rule, which breaks `==`, `<=`, `identifier1`, and decimal literals.
@@ -277,16 +275,6 @@ if __name__ == "__main__":
 - Assuming generated lexers remove the need to understand token priority.
 - Ignoring lexical modes when the language has interpolation, raw strings, or nested comments.
 
-## Connections
-
-- [Parsing and Syntax Trees](/cs/compilers/parsing-and-syntax-trees) consumes the token stream and imposes grammatical structure.
-- [Tree-Walking Interpreters](/cs/compilers/tree-walking-interpreters) depend on token spans for runtime error messages.
-- [Bytecode Compilation and Virtual Machines](/cs/compilers/bytecode-compilation-and-virtual-machines) often reuse scanner tokens during direct bytecode compilation.
-- [Theory of Computation](/cs/theory/intro) supplies regular languages, NFAs, DFAs, and closure properties.
-- [Programming Language Theory](/cs/programming-language-theory/intro) connects lexical form to formal syntax and semantics.
-- [Operating Systems](/cs/operating-systems/intro) matters when scanners read files, encodings, and memory-mapped buffers.
-- [Computer Architecture](/cs/computer-architecture/intro) matters for high-throughput scanners that exploit cache behavior and SIMD.
-
 ## References
 
 [1] R. Nystrom, *Crafting Interpreters*. Genever Benning, 2021.  
@@ -296,3 +284,17 @@ if __name__ == "__main__":
 [5] S. S. Muchnick, *Advanced Compiler Design and Implementation*. Morgan Kaufmann, 1997.  
 [6] K. Thompson, "Regular expression search algorithm," *Communications of the ACM*, vol. 11, no. 6, 1968.  
 [7] J. E. Hopcroft and J. D. Ullman, *Introduction to Automata Theory, Languages, and Computation*. Addison-Wesley, 1979.
+
+<div className="see-also">
+
+See also:
+
+- [Parsing and Syntax Trees](/cs/compilers/parsing-and-syntax-trees) consumes the token stream and imposes grammatical structure.
+- [Tree-Walking Interpreters](/cs/compilers/tree-walking-interpreters) depend on token spans for runtime error messages.
+- [Bytecode Compilation and Virtual Machines](/cs/compilers/bytecode-compilation-and-virtual-machines) often reuse scanner tokens during direct bytecode compilation.
+- [Theory of Computation](/cs/theory/intro) supplies regular languages, NFAs, DFAs, and closure properties.
+- [Programming Language Theory](/cs/programming-language-theory/intro) connects lexical form to formal syntax and semantics.
+- [Operating Systems](/cs/operating-systems/intro) matters when scanners read files, encodings, and memory-mapped buffers.
+- [Computer Architecture](/cs/computer-architecture/intro) matters for high-throughput scanners that exploit cache behavior and SIMD.
+
+</div>

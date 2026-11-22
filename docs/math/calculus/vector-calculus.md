@@ -9,7 +9,7 @@ Vector calculus studies fields, flow, circulation, and flux. It connects line in
 
 These theorems are higher-dimensional versions of the Fundamental Theorem of Calculus. They say that an integral over a boundary can often be computed from information inside the region, or that an integral over a region can be converted to a boundary integral when that is easier.
 
-## Definitions
+## Fields, work, circulation, and flux
 
 A vector field in the plane has form
 
@@ -59,7 +59,7 @@ $$
 
 Flux measures flow through a curve or surface. Circulation measures flow along a curve.
 
-## Key results
+## Four ways to trade a boundary for its interior
 
 The Fundamental Theorem for Line Integrals says that if $\mathbf{F}=\nabla f$ and $C$ goes from point $A$ to point $B$, then
 
@@ -118,7 +118,7 @@ $$
 \mathbf{F}(\mathbf{r}(t))\cdot\mathbf{r}'(t)
 $$
 
-measures the part of the field pointing along the motion, scaled by speed. This is why vector line integrals model work.
+measures the part of the field pointing along the motion, scaled by speed. That tangential accumulation is the work done along the path.
 
 Flux integrals compute normal component. For a parametrized surface $\mathbf{r}(u,v)$, an oriented surface element is
 
@@ -138,7 +138,7 @@ The sign depends on the chosen normal orientation.
 
 Divergence has a source interpretation. Positive divergence means the field has net outward flow near a point; negative divergence means net inward flow. Curl has a rotation interpretation. In a fluid analogy, curl measures the tendency of a small paddle wheel to spin.
 
-The big theorems form a hierarchy. Green's Theorem is a two-dimensional curl theorem. Stokes' Theorem generalizes circulation-curl relationships to surfaces in space. The Divergence Theorem relates flux through a closed surface to source strength in the enclosed volume. Each theorem requires smoothness and orientation hypotheses that should be checked before use.
+The four theorems form a hierarchy. Green's Theorem is a two-dimensional curl theorem. Stokes' Theorem generalizes the circulation-curl relationship to surfaces in space. The Divergence Theorem relates flux through a closed surface to source strength in the enclosed volume. Each theorem has smoothness and orientation hypotheses that must be checked before use.
 
 Conservative fields are path independent. If $\mathbf{F}=\nabla f$, the work between two endpoints depends only on the endpoints. Equivalently, every closed-loop integral is zero:
 
@@ -169,8 +169,6 @@ The Divergence Theorem is especially useful when a direct surface integral would
 
 Stokes' Theorem is useful because many different surfaces can have the same boundary curve. If orientation is handled consistently, the surface integral of curl is the same over any convenient surface spanning the boundary. Choosing a flat disk instead of a curved cap can turn a difficult integral into an easy one.
 
-## Visual
-
 ```mermaid
 graph TD
   A[Gradient] --> B[Conservative field]
@@ -190,7 +188,7 @@ graph TD
 | Stokes | circulation around space curve | surface integral of curl | boundary to surface |
 | Divergence | flux through closed surface | triple integral of divergence | surface to volume |
 
-## Worked example 1: work in a conservative field
+## Replacing a path integral by endpoint values
 
 **Problem.** Let
 
@@ -251,7 +249,7 @@ $$
 
 **Checked answer.** The work is $4-1=3$. The path does not matter because the field is conservative.
 
-## Worked example 2: Green's Theorem around the unit circle
+## Circulation around the unit circle
 
 **Problem.** Evaluate
 
@@ -334,11 +332,9 @@ If the circle were traversed clockwise, the same computation would give $-2\pi$.
 
 For flux, the analogous orientation choice is the normal direction. On a closed surface, "outward" is the standard convention. On an open surface, the problem must specify or imply a normal direction, and the boundary orientation for Stokes' Theorem must match that choice by the right-hand rule.
 
-The safest workflow is to name the theorem, state the orientation, rewrite the integral in the theorem's notation, and only then compute. This prevents mixing a circulation integral with a flux theorem or applying a closed-surface theorem to an open surface by accident during setup and checking work later on.
+Name the theorem, state the orientation, and rewrite the integral in the theorem's notation before computing. This keeps the geometry and algebra aligned and exposes a circulation/flux mismatch or an open/closed-surface mismatch before it turns into a sign error.
 
-That workflow keeps geometry and algebra aligned throughout the computation and final interpretation clearly enough for checking answers carefully.
-
-## Code
+## A numerical orientation check
 
 ```python
 from math import cos, sin, pi
@@ -357,18 +353,22 @@ def line_integral_circle(n=10000):
 print(line_integral_circle())
 ```
 
-## Common pitfalls
+## Geometry to settle before integrating
 
-- Ignoring orientation. Reversing a curve reverses circulation.
-- Checking $P_y=Q_x$ for a conservative field without checking domain conditions.
-- Confusing flux with circulation. Flux uses normal direction; circulation uses tangent direction.
-- Applying the Divergence Theorem to a surface that is not closed without adding missing pieces or using another method.
-- Forgetting that Stokes' Theorem requires compatible boundary and normal orientations.
-- Treating $\nabla\cdot\mathbf{F}$ and $\nabla\times\mathbf{F}$ as interchangeable. Divergence measures source strength; curl measures rotational tendency.
+- Reversing a curve reverses circulation, and reversing a surface normal reverses flux.
+- The test $P_y=Q_x$ does not establish a global potential without an appropriate domain condition.
+- Flux uses the normal component of a field; circulation uses its tangential component.
+- The Divergence Theorem needs a closed surface. An open surface must be closed with additional pieces or handled by another method.
+- For Stokes' Theorem, the boundary direction and surface normal must obey the right-hand rule together.
+- Divergence measures source strength, whereas curl measures rotational tendency; the operators are not interchangeable.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Vector Functions and Motion](/math/calculus/vector-functions-and-motion): line integrals use parametrized curves.
 - [Partial Derivatives and the Gradient](/math/calculus/partial-derivatives-and-gradient): gradient, divergence, and curl are built from partial derivatives.
 - [Multiple Integrals](/math/calculus/multiple-integrals): Green's and Divergence Theorems convert boundary integrals to multiple integrals.
 - [Vectors and Geometry of Space](/math/calculus/vectors-and-geometry-of-space): orientation, normals, dot products, and cross products support the big theorems.
+
+</div>

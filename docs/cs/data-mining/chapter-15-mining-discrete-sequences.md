@@ -313,10 +313,8 @@ print(round(forward_walk_walk(), 3))
 - Comparing raw HMM likelihoods for sequences of very different lengths without a length model or normalization.
 - Treating the Viterbi path probability as the total likelihood of the observed sequence.
 
-## Related pages
+<div className="see-also">
 
-- [Association Pattern Mining](/cs/data-mining/chapter-04-association-pattern-mining)
-- [Advanced Association Patterns](/cs/data-mining/chapter-05-advanced-association-patterns)
-- [Similarity and Distances](/cs/data-mining/chapter-03-similarity-distances)
-- [Mining Time Series Data](/cs/data-mining/chapter-14-mining-time-series-data)
-- [Mining Web Data and Recommenders](/cs/data-mining/chapter-18-mining-web-data)
+See also: [Association Pattern Mining](/cs/data-mining/chapter-04-association-pattern-mining) · [Advanced Association Patterns](/cs/data-mining/chapter-05-advanced-association-patterns) · [Similarity and Distances](/cs/data-mining/chapter-03-similarity-distances) · [Mining Time Series Data](/cs/data-mining/chapter-14-mining-time-series-data) · [Mining Web Data and Recommenders](/cs/data-mining/chapter-18-mining-web-data)
+
+</div>

@@ -9,7 +9,7 @@ Pipelining overlaps the execution of multiple instructions by dividing processor
 
 The classic five-stage RISC pipeline is simple enough to reason about but rich enough to expose the central problems of processor implementation. Structural hazards occur when two instructions need the same hardware resource. Data hazards occur when an instruction needs a value that an earlier instruction has not yet produced. Control hazards occur when the next instruction address depends on a branch or jump that has not yet been resolved.
 
-## Definitions
+## Five stages and three kinds of hazard
 
 The five standard stages are:
 
@@ -37,7 +37,7 @@ In the classic in-order five-stage integer pipeline, RAW hazards are the main da
 
 A load-use hazard occurs when an instruction immediately after a load needs the loaded value. Even with forwarding, the data may not be available until the end of MEM, too late for the consumer's EX stage in the next cycle. A one-cycle stall is often required in the classic pipeline.
 
-## Key results
+## Forwarding, interlocks, and pipeline depth
 
 Pipeline execution time can be modeled as:
 
@@ -64,13 +64,11 @@ sub  r4, r1, r5
 
 Pipeline depth is a trade-off. More stages can reduce clock cycle time, but they increase branch penalty, forwarding complexity, register overhead, and sensitivity to hazards. Extremely deep pipelines can lose if mispredictions and stalls become frequent.
 
-Balanced stages matter because the clock period is set by the slowest stage plus pipeline-register overhead. Splitting a fast stage does not help if a different stage remains slow. Splitting a slow stage may help clock rate, but it can create more bypass paths and more cycles between producing and consuming values. This is why the clean five-stage drawing is a model, not a complete prescription for a production processor.
+Balanced stages matter because the clock period is set by the slowest stage plus pipeline-register overhead. Splitting a fast stage does not help if a different stage remains slow. Splitting a slow stage may help clock rate, but it can create more bypass paths and more cycles between producing and consuming values. The clean five-stage drawing is a model, not a complete prescription for a production processor.
 
 Hazard detection is part of correctness, not an optional performance feature. A pipeline without interlocks may be faster on carefully scheduled code, but it exposes timing details to software and becomes fragile across implementations. General-purpose ISAs normally require the hardware to preserve the architectural semantics. The compiler can still schedule instructions to reduce stalls, but incorrect code should not silently execute because a dependent instruction arrived one cycle too early.
 
-Pipelining also changes exception handling. If several instructions are in flight, the processor must report exceptions as if instructions executed one at a time in program order. Simple in-order pipelines can usually do this by allowing earlier instructions to finish and flushing later ones. Out-of-order pipelines need reorder buffers or equivalent mechanisms, which is why precise exceptions reappear in the ILP pages.
-
-## Visual
+Pipelining also changes exception handling. If several instructions are in flight, the processor must report exceptions as if instructions executed one at a time in program order. Simple in-order pipelines can usually do this by allowing earlier instructions to finish and flushing later ones. Out-of-order pipelines need reorder buffers or equivalent mechanisms, so precise exceptions reappear in the ILP discussion.
 
 ```mermaid
 flowchart TB
@@ -107,7 +105,7 @@ flowchart TB
   Hazard -. "creates one-cycle bubble" .-> Timing
 ```
 
-This five-stage pipeline diagram shows the stage boundaries, pipeline registers, forwarding paths, and interlock logic that make the textbook pipeline correct. ALU results can forward from EX/MEM or MEM/WB to the EX operand mux, but a load-use pair needs a bubble because the loaded data arrives too late for the next cycle's EX stage. The branch flush and PC feedback path make control hazards explicit rather than hiding them in a Gantt chart.
+ALU results can forward from EX/MEM or MEM/WB to the EX operand mux, but a load-use pair needs a bubble because the loaded data arrives too late for the next cycle's EX stage. The branch flush and PC feedback path handle the corresponding control hazard.
 
 | Hazard | Cause | Typical remedy | Residual cost |
 |---|---|---|---|
@@ -117,7 +115,7 @@ This five-stage pipeline diagram shows the stage boundaries, pipeline registers,
 | WAW data | Later write before earlier write | In-order completion or renaming | Mostly in advanced pipelines |
 | Control | Next PC unknown | Prediction, delayed branch, speculation | Misprediction flush |
 
-## Worked example 1: Pipeline cycles with no stalls
+## Counting fill and drain cycles
 
 Problem: A five-stage pipeline executes 100 instructions. Assume no hazards, one instruction fetched per cycle, and one cycle per stage. How many cycles are needed? What is CPI? What is speedup over a nonpipelined processor that takes 5 cycles per instruction?
 
@@ -154,7 +152,7 @@ $$
 
 Checked answer: The pipeline takes 104 cycles, CPI is 1.04, and speedup is about $4.81\times$. The speedup is less than $5\times$ because filling and draining the pipeline cost cycles.
 
-## Worked example 2: CPI with load-use stalls
+## Adding load-use stalls to CPI
 
 Problem: A program has ideal CPI 1 on a five-stage pipeline. Loads are 25% of instructions. Of all loads, 40% are immediately followed by an instruction that uses the loaded value, causing one stall cycle. Branch stalls are ignored. Find the effective CPI.
 
@@ -190,7 +188,7 @@ $$
 
 Checked answer: Effective CPI is $1.10$. The 1000-instruction check gives the same ratio, ignoring the small pipeline fill overhead.
 
-## Code
+## Checking cycle and CPI calculations
 
 ```python
 def pipeline_cycles(instructions, stages=5, stalls=0):
@@ -215,7 +213,7 @@ The fill-and-drain formula is most visible for short sequences, such as basic bl
 
 When comparing two pipelines, keep the clock period and CPI together. A pipeline with more stages may have a lower clock cycle time but a higher CPI from hazards. The faster design is the one with lower total execution time, not the prettier stage diagram.
 
-## Common pitfalls
+## Trade-offs hidden by a clean pipeline timeline
 
 - Saying pipelining makes a single instruction faster; it mainly improves instruction throughput.
 - Ignoring pipeline register overhead and stage imbalance.
@@ -224,9 +222,8 @@ When comparing two pipelines, keep the clock period and CPI together. A pipeline
 - Counting pipeline fill and drain overhead incorrectly for short instruction sequences.
 - Treating compiler scheduling as a substitute for hardware interlocks in general-purpose systems.
 
-## Connections
+<div className="see-also">
 
-- [Instruction Set Principles](/cs/computer-architecture/instruction-set-principles)
-- [Branch Prediction and Control Hazards](/cs/computer-architecture/branch-prediction)
-- [Dynamic Scheduling and Tomasulo](/cs/computer-architecture/dynamic-scheduling-tomasulo)
-- [Speculation, Renaming, and Multiple Issue](/cs/computer-architecture/speculation-renaming-multiple-issue)
+See also: [Instruction Set Principles](/cs/computer-architecture/instruction-set-principles) · [Branch Prediction and Control Hazards](/cs/computer-architecture/branch-prediction) · [Dynamic Scheduling and Tomasulo](/cs/computer-architecture/dynamic-scheduling-tomasulo) · [Speculation, Renaming, and Multiple Issue](/cs/computer-architecture/speculation-renaming-multiple-issue)
+
+</div>

@@ -9,7 +9,7 @@ Counting turns structure into numbers. Before using formulas, identify whether c
 
 The goal is not to memorize a formula for every situation. It is to describe the objects being counted so precisely that the correct rule becomes visible. Sum, product, subtraction, division, pigeonhole, and inclusion-exclusion are the core tools behind permutations, combinations, probability, graph enumeration, and recurrence modeling.
 
-## Definitions
+## Six ways to organize a count
 
 The **sum rule** applies to disjoint alternatives. If a task can be done in one of $m$ ways or one of $n$ other ways, with no overlap, then it can be done in $m+n$ ways. If the alternatives overlap, the sum rule must be corrected by subtracting the overlap.
 
@@ -29,7 +29,7 @@ The **pigeonhole principle** says that placing $N$ objects into $k$ boxes forces
 
 A **case split** is useful when different parts of the sample space have different counting rules. The cases must be exhaustive and disjoint, or the counts must be adjusted.
 
-## Key results
+## Why the rules work
 
 For finite sets,
 
@@ -59,7 +59,7 @@ It is especially effective for "at least one" conditions, because the complement
 
 The division rule explains why unordered choices often involve factorials. If an ordered procedure lists each unordered object in $d$ different orders, divide by $d$ to remove the artificial order.
 
-## Visual
+The wording of a problem often suggests a first approach, but the cases and multiplicities still need checking.
 
 ```mermaid
 flowchart TD
@@ -69,7 +69,7 @@ flowchart TD
   A --> E{"Overcounted?"}
   E -->|same object counted d times| F[Use division rule]
   E -->|overlapping sets| G[Use inclusion-exclusion]
-  A --> H{"At least one / avoid condition?"}
+  A --> H["At least one / avoid condition?"]
   H --> I[Count complement]
 ```
 
@@ -82,7 +82,7 @@ flowchart TD
 | "force a repeat" | pigeonhole principle | identify boxes correctly |
 | "no adjacent" | recurrence or case split | local constraints affect later choices |
 
-## Worked example 1: Count strings with a complement
+## Bit strings containing both symbols
 
 **Problem.** How many length-$8$ bit strings contain at least one $1$ and at least one $0$?
 
@@ -110,7 +110,7 @@ $$
 \sum_{k=1}^{7}\binom{8}{k}=2^8-\binom80-\binom88=254.
 $$
 
-## Worked example 2: Use product and subtraction for passwords
+## Passwords with at least one digit
 
 **Problem.** A password has length $6$ and uses uppercase letters A-Z and digits 0-9. Repetition is allowed. How many passwords contain at least one digit?
 
@@ -150,7 +150,7 @@ $$
 
 **Checked answer.** There are $1,867,866,560$ such passwords. The complement method avoids six overlapping cases: digit in position $1$, digit in position $2$, and so on.
 
-## Code
+## Checking small cases by enumeration
 
 ```python
 from itertools import product
@@ -173,7 +173,7 @@ print(count_passwords(6))
 
 For small $n$, brute force is a good way to test a proposed counting formula. For real sizes, formulas replace enumeration.
 
-## Common pitfalls
+## Model the objects before calculating
 
 - Applying the sum rule to overlapping cases without subtracting the overlap.
 - Multiplying choices after a previous choice has changed the number of later possibilities.
@@ -188,7 +188,7 @@ Casework is safe only when the cases are disjoint and exhaustive. If cases overl
 
 Complements are especially useful when a requirement says "at least one." Count all objects, then subtract those with none. For "at least one digit," subtract all-letter strings. For "at least one repeated birthday," subtract the case where all birthdays are distinct. The complement is often a single clean product where the direct count would require many overlapping cases.
 
-The division rule needs uniform overcounting. If each final object is counted exactly $d$ times, division by $d$ is correct. If some objects are counted more often than others, division gives a distorted result. This is why arranging words with repeated letters requires division by the factorial of each repeated multiplicity, not by one universal factorial unless all symbols are distinct.
+The division rule needs uniform overcounting. If each final object is counted exactly $d$ times, division by $d$ is correct. If some objects are counted more often than others, division gives a distorted result. Arranging words with repeated letters therefore requires division by the factorial of each repeated multiplicity, not by one universal factorial unless all symbols are distinct.
 
 When uncertain, compute a small version by hand or with code. A proposed formula for length-$n$ strings can be checked at $n=1,2,3$. A formula for distributing objects can be checked with two boxes and three objects. Small cases do not prove the formula, but they expose many modeling errors before a formal proof is written.
 
@@ -198,10 +198,14 @@ For subtraction counts, describe the invalid set precisely. "Bad strings" is not
 
 If the complement is not easier, return to cases, recurrences, or inclusion-exclusion.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Sets and set operations](/math/discrete/sets-and-set-operations) supplies unions, intersections, complements, and products.
 - [Permutations and combinations](/math/discrete/permutations-and-combinations) specializes these principles for arrangements and selections.
 - [Pigeonhole and inclusion-exclusion](/math/discrete/pigeonhole-and-inclusion-exclusion) expands two major counting tools.
 - [Discrete probability](/math/discrete/discrete-probability) turns counts into probabilities for equally likely outcomes.
 - [Recurrence relations](/math/discrete/recurrence-relations) handles counting problems with step-by-step constraints.
+
+</div>

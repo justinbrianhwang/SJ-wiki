@@ -584,10 +584,8 @@ plt.show()
 - Confusing the Jacobian of the forward transformation with the Jacobian of the inverse transformation.
 - Forgetting endpoint behavior for decreasing transformations and CDF calculations.
 
-## Related pages
+<div className="see-also">
 
-- [random variables and distributions](/math/probability/random-variables-distributions)
-- [joint, marginal, and conditional distributions](/math/probability/joint-marginal-conditional-distributions)
-- [expectation, variance, and moments](/math/probability/expectation-variance-moments)
-- [common continuous distributions](/math/probability/common-continuous-distributions)
-- [sampling distributions and CLT](/math/statistics/sampling-distributions-and-clt)
+See also: [random variables and distributions](/math/probability/random-variables-distributions) · [joint, marginal, and conditional distributions](/math/probability/joint-marginal-conditional-distributions) · [expectation, variance, and moments](/math/probability/expectation-variance-moments) · [common continuous distributions](/math/probability/common-continuous-distributions) · [sampling distributions and CLT](/math/statistics/sampling-distributions-and-clt)
+
+</div>

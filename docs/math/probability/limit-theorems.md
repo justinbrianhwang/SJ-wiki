@@ -499,10 +499,8 @@ print("exact binomial:", exact)
 - Applying the normal approximation to a binomial when $np$ or $n(1-p)$ is too small.
 - Forgetting the continuity correction for discrete-to-continuous approximations when accuracy matters.
 
-## Related pages
+<div className="see-also">
 
-- [expectation, variance, and moments](/math/probability/expectation-variance-moments)
-- [common discrete distributions](/math/probability/common-discrete-distributions)
-- [common continuous distributions](/math/probability/common-continuous-distributions)
-- [sampling distributions and CLT](/math/statistics/sampling-distributions-and-clt)
-- [normal, t, chi-square, and F distributions](/math/statistics/normal-t-chi-square-and-f-distributions)
+See also: [expectation, variance, and moments](/math/probability/expectation-variance-moments) · [common discrete distributions](/math/probability/common-discrete-distributions) · [common continuous distributions](/math/probability/common-continuous-distributions) · [sampling distributions and CLT](/math/statistics/sampling-distributions-and-clt) · [normal, t, chi-square, and F distributions](/math/statistics/normal-t-chi-square-and-f-distributions)
+
+</div>

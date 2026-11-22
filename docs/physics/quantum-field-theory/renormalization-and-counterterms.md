@@ -402,11 +402,8 @@ Regularization and renormalization should remain separate in the calculation log
 
 The order of limits matters as well. Remove the regulator only after all counterterms needed at the chosen perturbative order have been included and parameters have been fixed. Taking a cutoff to infinity graph by graph can discard cancellations enforced by symmetry or by lower-order counterterm insertions.
 
-## Related pages
+<div className="see-also">
 
-- [Scalar Phi-Four Theory](/physics/quantum-field-theory/scalar-phi-four-theory)
-- [Perturbation Theory and Feynman Diagrams](/physics/quantum-field-theory/perturbation-and-feynman-diagrams)
-- [Renormalization Group](/physics/quantum-field-theory/renormalization-group)
-- [Effective Field Theory](/physics/quantum-field-theory/effective-field-theory)
-- [Gauge Invariance and QED](/physics/quantum-field-theory/gauge-invariance-and-qed)
+See also: [Scalar Phi-Four Theory](/physics/quantum-field-theory/scalar-phi-four-theory) · [Perturbation Theory and Feynman Diagrams](/physics/quantum-field-theory/perturbation-and-feynman-diagrams) · [Renormalization Group](/physics/quantum-field-theory/renormalization-group) · [Effective Field Theory](/physics/quantum-field-theory/effective-field-theory) · [Gauge Invariance and QED](/physics/quantum-field-theory/gauge-invariance-and-qed)
 
+</div>

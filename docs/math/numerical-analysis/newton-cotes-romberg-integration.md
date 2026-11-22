@@ -431,9 +431,8 @@ print("pi", math.pi)
 - Treating Romberg table entries as monotone. Extrapolation can overshoot.
 - Ignoring endpoint singularities. Trapezoidal and Simpson error formulas assume bounded derivatives.
 
-## Related pages
+<div className="see-also">
 
-- [adaptive and Gaussian quadrature](/math/numerical-analysis/adaptive-gaussian-quadrature)
-- [numerical differentiation and Richardson extrapolation](/math/numerical-analysis/numerical-differentiation-richardson)
-- [mathematical preliminaries and error analysis](/math/numerical-analysis/mathematical-preliminaries-error-analysis)
-- [finite difference methods for PDEs](/math/numerical-analysis/finite-difference-pdes)
+See also: [adaptive and Gaussian quadrature](/math/numerical-analysis/adaptive-gaussian-quadrature) · [numerical differentiation and Richardson extrapolation](/math/numerical-analysis/numerical-differentiation-richardson) · [mathematical preliminaries and error analysis](/math/numerical-analysis/mathematical-preliminaries-error-analysis) · [finite difference methods for PDEs](/math/numerical-analysis/finite-difference-pdes)
+
+</div>

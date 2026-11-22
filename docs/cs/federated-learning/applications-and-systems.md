@@ -5,15 +5,11 @@ sidebar_position: 6
 
 # Applications and Systems
 
-![An edge-computing infrastructure diagram shows distributed edge devices, gateways, and a central cloud, illustrating the deployment topology federated learning targets.](https://commons.wikimedia.org/wiki/Special:FilePath/Edge_computing_infrastructure.png)
-
-*Figure: Federated learning naturally fits edge-computing deployments where sensors, gateways, and a coordinating cloud share an optimization workload but not raw data. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Edge_computing_infrastructure.png), Magnaweb, CC BY-SA 4.0.*
-
 Federated learning becomes concrete when the data boundary matters. The original motivating examples were mobile keyboards and on-device language models, where typed text is abundant, sensitive, and naturally local [1], [4]. The same pattern appears in hospitals that cannot pool patient records, banks that cannot freely exchange transaction histories, vehicles that observe different roads, labs that hold private genomic data, and modern LLM deployments where full-model fine-tuning is too large to ship every round.
 
 Systems work decides whether those ideas survive contact with production. An FL deployment needs client orchestration, eligibility rules, secure aggregation, privacy accounting, update compression, model validation, rollback, monitoring, and governance. The LLM era adds model-size pressure: Yao et al. survey federated LLM fine-tuning and prompt learning under heterogeneity, privacy, and communication constraints [2], while Yang et al. survey FedLoRA, where clients transmit low-rank adapter parameters instead of full foundation-model updates [3].
 
-## Definitions
+## The application landscape
 
 **Mobile keyboard FL** trains next-word prediction, emoji prediction, ranking, or personalization models on-device. The data are sensitive and self-labeled by user interaction. Clients are numerous, unreliable, and only briefly eligible [4].
 
@@ -37,7 +33,7 @@ $$
 
 **FedLoRA** combines LoRA with FL: each client trains low-rank adapters $(A_k,B_k)$ and communicates adapter parameters or reconstructed low-rank updates. Yang et al. organize FedLoRA challenges into distributed learning, heterogeneity, and efficiency, including aggregation discordance, heterogeneous ranks, personalization, clustering, split learning, and compression [3].
 
-## Key results
+## From mobile keyboards to federated LLMs
 
 Mobile keyboards are the canonical cross-device success story. Hard et al. describe federated learning for mobile keyboard prediction, and McMahan et al. study recurrent language models with differential privacy [4], [5]. The setting aligns well with FL: labels arise from typed text, raw records are sensitive, clients are plentiful, and the product can benefit from population-level improvement plus local personalization.
 
@@ -55,7 +51,7 @@ The LLM era changes scale. Full-model FL for a 7B-parameter model is usually inf
 
 ![A FedLoRA diagram contrasts full-parameter federated fine-tuning with low-rank adapter exchange across clients and a server-side aggregator.](https://ar5iv.labs.arxiv.org/html/2505.13502/assets/x1.png)
 
-*Figure: FedLoRA exchanges only the low-rank adapter parameters per client, slashing per-round communication relative to full-model federated fine-tuning. From [Yang et al., 2025](https://arxiv.org/abs/2505.13502) — embedded under educational fair use with attribution.*
+*Figure: FedLoRA exchanges only low-rank adapter parameters, reducing per-round communication relative to full-model federated fine-tuning. From [Yang et al., 2025](https://arxiv.org/abs/2505.13502), reproduced with attribution for discussion.*
 
 FedLoRA is the most important adapter-based pattern. Instead of transmitting every parameter, clients send low-rank matrices. If $W$ is $4096\times4096$ and rank $r=8$, a full matrix update has $16{,}777{,}216$ parameters, while LoRA has $8(4096+4096)=65{,}536$ parameters, a $256$ times reduction before metadata. The challenge is aggregation: averaging $A$ and $B$ separately is not generally equivalent to averaging $BA$. Yang et al. describe approaches such as full-rank reconstruction then decomposition, stacking, selective aggregation, heterogeneous ranks, and personalized adapters [3].
 
@@ -68,8 +64,6 @@ FedLoRA is the most important adapter-based pattern. Instead of transmitting eve
 | IoT/TinyML | Edge/cross-device | Memory and energy | Compression, small heads, gateways |
 | Recommendation | Cross-device/hybrid | Personalization and skew | Local embeddings, DP, secure aggregation |
 | Federated LLMs | Cross-silo or edge | Model size | Prompt tuning, adapters, LoRA, distillation |
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -98,7 +92,7 @@ flowchart TD
   Audit --> Monitor
 ```
 
-## Worked example 1: Full-model FL versus LoRA transmission
+## How much LoRA reduces transmission
 
 **Problem.** A transformer layer has a dense projection matrix $W\in\mathbb{R}^{4096\times4096}$. Compare float16 communication for a full update $\Delta W$ with LoRA rank $r=8$, where each transmitted parameter uses $2$ bytes.
 
@@ -136,7 +130,7 @@ $$
 
 **Checked answer.** For this matrix, LoRA rank $8$ reduces transmitted parameters by $256$ times. Across many layers the exact ratio depends on which matrices receive adapters, but the principle explains why FedLoRA is central for foundation models.
 
-## Worked example 2: Cross-silo round time for full update versus adapter
+## Estimating a cross-silo upload bottleneck
 
 **Problem.** A hospital consortium has $12$ hospitals. Each hospital uploads over a sustained $50$ Mbps link. A full model update is $200$ MB. A secure aggregation protocol adds $50\%$ communication overhead. An adapter update is $8$ MB with the same overhead. Estimate the upload time per hospital and the synchronous round upload bottleneck if all hospitals have the same bandwidth.
 
@@ -180,7 +174,7 @@ If all hospitals have the same bandwidth and upload in parallel, the upload bott
 
 **Checked answer.** Adapter communication cuts this upload phase by $48/1.92=25$ times in the toy consortium.
 
-## Code
+## Sizing payloads before deployment
 
 ```python
 def lora_params(m, n, r):
@@ -208,7 +202,7 @@ print("Full upload seconds:", upload_seconds(200, 1.5, 50))
 print("Adapter upload seconds:", upload_seconds(8, 1.5, 50))
 ```
 
-## Common pitfalls
+## Where deployments break
 
 - Treating a research FL algorithm as a deployment architecture.
 - Ignoring client eligibility, retries, and failed rounds in cross-device systems.
@@ -224,17 +218,6 @@ print("Adapter upload seconds:", upload_seconds(8, 1.5, 50))
 - Choosing an FL framework before specifying cross-device versus cross-silo requirements.
 - Underestimating logging, identity, certificate, and policy management in cross-silo deployments.
 - Treating recommendation personalization as optional when user distributions are highly skewed.
-
-## Connections
-
-- [Foundations and FedAvg](/cs/federated-learning/foundations-and-fedavg)
-- [Privacy: Differential Privacy and Secure Aggregation](/cs/federated-learning/privacy-differential-and-secure-aggregation)
-- [Communication Efficiency and Robustness](/cs/federated-learning/communication-efficiency-and-robustness)
-- [Recommender systems](/cs/deep-learning/recommender-systems)
-- [Pretrained transformers for NLP](/cs/deep-learning/pretrained-transformers-nlp)
-- [Efficient sequence modeling](/cs/deep-learning/efficient-sequence-modeling)
-- [Security and privacy](/cs/embedded/security-and-privacy)
-- [Distributed databases](/cs/databases/distributed-databases-replication-partitioning-2pc)
 
 ## References
 
@@ -256,7 +239,7 @@ print("Adapter upload seconds:", upload_seconds(8, 1.5, 50))
 
 [9] M. J. Sheller et al., "Federated Learning in Medicine: Facilitating Multi-Institutional Collaborations Without Sharing Patient Data," Scientific Reports, 2020. https://www.nature.com/articles/s41598-020-69250-1
 
-[10] J. V. S. C. V. V. et al., "MELLODDY: Cross-Pharma Federated Learning at Unprecedented Scale Unlocks Benefits in QSAR Without Compromising Proprietary Information," Journal of Chemical Information and Modeling, 2022. https://doi.org/10.1021/acs.jcim.1c00799
+[10] W. Heyndrickx et al., "MELLODDY: Cross-Pharma Federated Learning at Unprecedented Scale Unlocks Benefits in QSAR Without Compromising Proprietary Information," Journal of Chemical Information and Modeling, 2024. https://doi.org/10.1021/acs.jcim.3c00799
 
 [11] H. R. Roth et al., "NVIDIA FLARE: Federated Learning from Simulation to Real-World," 2022. https://arxiv.org/abs/2210.13291
 
@@ -277,3 +260,9 @@ print("Adapter upload seconds:", upload_seconds(8, 1.5, 50))
 [19] P. Kairouz et al., "Advances and Open Problems in Federated Learning," Foundations and Trends in Machine Learning, 2021. https://arxiv.org/abs/1912.04977
 
 [20] L. Collins, H. Hassani, A. Mokhtari, and S. Shakkottai, "Exploiting Shared Representations for Personalized Federated Learning," ICML, 2021. https://arxiv.org/abs/2102.07078
+
+<div className="see-also">
+
+See also: [Foundations and FedAvg](/cs/federated-learning/foundations-and-fedavg) · [Privacy: Differential Privacy and Secure Aggregation](/cs/federated-learning/privacy-differential-and-secure-aggregation) · [Communication Efficiency and Robustness](/cs/federated-learning/communication-efficiency-and-robustness) · [Recommender systems](/cs/deep-learning/recommender-systems) · [Pretrained transformers for NLP](/cs/deep-learning/pretrained-transformers-nlp) · [Efficient sequence modeling](/cs/deep-learning/efficient-sequence-modeling) · [Security and privacy](/cs/embedded/security-and-privacy) · [Distributed databases](/cs/databases/distributed-databases-replication-partitioning-2pc)
+
+</div>

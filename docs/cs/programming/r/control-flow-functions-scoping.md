@@ -9,7 +9,7 @@ R is vector-oriented, but real programs still need decisions, repetition, reusab
 
 The main design principle is to keep data flow visible. A function should receive inputs as arguments, compute using local variables, and return a value. It should not depend on a mysterious object in the global environment unless that object is intentionally part of the interface. Scoping rules make R flexible, but they also allow hidden dependencies if code is written casually.
 
-## Definitions
+## Branches, loops, functions, and environments
 
 **Control flow** is code that changes which statements run or how many times they run. `if` and `else` choose branches; `for` and `while` repeat; `break` exits a loop; `next` skips to the next iteration.
 
@@ -17,11 +17,11 @@ An **`if` condition** must have length one. For vectorized conditional replaceme
 
 A **function** is an object created with `function(...) { ... }`. It has formal arguments, a body, and an environment. The last evaluated expression is returned unless `return()` is used explicitly.
 
-**Lexical scoping** means a function looks for names first inside its own local environment, then in the environment where it was created, and then along the search path. This is why functions can see objects from their creation context, but relying on that behavior accidentally can make code hard to reproduce.
+**Lexical scoping** means a function looks for names first inside its own local environment, then in the environment where it was created, and then along the search path. Functions can therefore see objects from their creation context, but relying on that behavior accidentally can make code hard to reproduce.
 
 The **search path** is the sequence of attached packages and environments R consults for names. `search()` displays it.
 
-## Key results
+## Choosing element-wise or scalar control flow
 
 Use `if` for one decision and vectorized logic for many element-wise decisions:
 
@@ -51,7 +51,7 @@ if (length(x) == 0) return(NA_real_)
 
 Scoping explains this common bug: a function works in your current session because it reads a global variable, but fails for someone else because that variable is absent. Pass the value as an argument instead.
 
-## Visual
+## How lexical lookup proceeds
 
 ```mermaid
 flowchart TD
@@ -69,6 +69,8 @@ flowchart TD
   J --> L
 ```
 
+### Loop controls
+
 | Loop keyword | Meaning | Example use |
 |---|---|---|
 | `for` | Iterate over a known sequence | Apply a model to each column |
@@ -77,11 +79,9 @@ flowchart TD
 | `break` | Exit loop immediately | Stop when a target is found |
 | `next` | Skip rest of current iteration | Ignore invalid item |
 
-## Worked example 1: Writing a validated summary function
+## Validating a trimmed-mean function
 
-Problem: write a function that computes a trimmed mean after checking that input is numeric and that the trim proportion is between 0 and 0.5.
-
-Method:
+Write a function that computes a trimmed mean after checking that input is numeric and that the trim proportion is between 0 and 0.5.
 
 1. Define formal arguments `x`, `trim`, and `na.rm`.
 2. Stop if `x` is not numeric.
@@ -117,15 +117,13 @@ trimmed_mean(c(1, 2, 3, 100), trim = 0.25)
 # [1] 2.5
 ```
 
-Checked answer: the sorted vector is `1, 2, 3, 100`. With `trim = 0.25` and length 4, `floor(4 * 0.25) = 1`, so one value is removed from each end. The remaining values are 2 and 3, whose mean is 2.5.
+The sorted vector is `1, 2, 3, 100`. With `trim = 0.25` and length 4, `floor(4 * 0.25) = 1`, so one value is removed from each end. The remaining values are 2 and 3, whose mean is 2.5.
 
 The function does not depend on any global variable. Every input that changes the result is an argument.
 
-## Worked example 2: Looping until convergence
+## Stopping Newton iteration at a tolerance
 
-Problem: approximate $\sqrt{10}$ using Newton's method and a `while` loop. Stop when consecutive guesses differ by less than `0.0001`.
-
-Method:
+Approximate $\sqrt{10}$ using Newton's method and a `while` loop. Stop when consecutive guesses differ by less than `0.0001`.
 
 1. Choose an initial guess.
 2. Update with $g_{\text{new}} = \frac{1}{2}(g + 10/g)$.
@@ -157,11 +155,11 @@ sqrt(10)
 # [1] 3.162278
 ```
 
-Checked answer: the approximation matches `sqrt(10)` to the printed precision. The loop stops because the update eventually changes by less than `0.0001`. The variable `iterations` confirms that the loop ran a finite number of times.
+The approximation matches `sqrt(10)` to the printed precision. The loop stops because the update eventually changes by less than `0.0001`. The variable `iterations` confirms that the loop ran a finite number of times.
 
 The required safety feature is the update inside the loop. Without updating `difference`, a `while` loop can run forever.
 
-## Code
+## A model-fitting function with local state
 
 ```r
 # Fit the same simple model to several response variables.
@@ -197,7 +195,7 @@ When debugging a function, test it with the smallest input that exercises the im
 
 Scoping can be studied by intentionally creating names in different places. Create `x <- 10` globally, then define `f <- function(x) x + 1`, and call `f(3)`. The result is 4 because the argument named `x` inside the function masks the global `x`. This is not a trick; it is the rule that makes functions reliable. Inputs should be passed as arguments, not guessed from the surrounding workspace.
 
-## Common pitfalls
+## Hidden state and unsafe loop bounds
 
 - Using `if` with a logical vector. `if` needs one `TRUE` or `FALSE`; use `ifelse` or indexing for element-wise logic.
 - Writing `for (i in 1:length(x))` when `x` might be length zero. Use `seq_along(x)`.
@@ -206,9 +204,8 @@ Scoping can be studied by intentionally creating names in different places. Crea
 - Building loops that grow objects one element at a time for large data. Preallocate or use apply-style tools.
 - Swallowing errors with broad `try` calls and then continuing as if results were valid.
 
-## Connections
+<div className="see-also">
 
-- [Getting started with R](/cs/programming/r/getting-started-rstudio-packages)
-- [Apply family](/cs/programming/r/apply-family)
-- [Special values, classes, and coercion](/cs/programming/r/special-values-classes-coercion)
-- [Linear and generalized models](/cs/programming/r/linear-and-generalized-models)
+See also: [Getting started with R](/cs/programming/r/getting-started-rstudio-packages) · [Apply family](/cs/programming/r/apply-family) · [Special values, classes, and coercion](/cs/programming/r/special-values-classes-coercion) · [Linear and generalized models](/cs/programming/r/linear-and-generalized-models)
+
+</div>

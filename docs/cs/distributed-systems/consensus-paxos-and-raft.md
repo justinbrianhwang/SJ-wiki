@@ -15,9 +15,9 @@ Consensus is the coordination problem behind replicated logs, leader election, c
 
 *Figure: Raft's three server states — follower, candidate, leader — and the transitions among them via election timeouts and majority-vote outcomes. From [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Raft.png), public domain.*
 
-Paxos and Raft solve the same core problem under crash faults and partial synchrony, but they differ in presentation. Paxos is a compact family of protocols built around ballots, promises, and quorum intersection. Raft deliberately decomposes consensus into leader election, log replication, and safety rules. Both are best understood as ways to maintain a replicated log whose committed prefix is identical on a majority of nodes.
+Paxos and Raft solve the same core problem under crash faults, but they differ in presentation. Their safety arguments do not require bounded delay; progress relies on eventual timing and leadership assumptions such as partial synchrony. Paxos is a compact family of protocols built around ballots, promises, and quorum intersection. Raft deliberately decomposes consensus into leader election, log replication, and safety rules. Both are best understood as ways to maintain a replicated log whose committed prefix is identical on a majority of nodes.
 
-## Definitions
+## From one decision to a replicated log
 
 The **consensus problem** has three classic properties. **Agreement** says no two correct processes decide different values. **Validity** says a decided value must be one of the proposed values, or must satisfy an application-defined validity predicate. **Termination** says every correct process eventually decides. In asynchronous crash-prone systems, deterministic consensus cannot guarantee all three by FLP [4].
 
@@ -35,7 +35,7 @@ The **consensus problem** has three classic properties. **Agreement** says no tw
 
 A **log entry** is the unit most applications actually care about. It usually contains a client command, a term or ballot, an index or slot, and sometimes configuration metadata. A **commit index** is the highest log position known to be durable enough to execute. An **applied index** is the highest committed position the state machine has actually applied. Keeping those separate avoids a subtle bug: replication can make an entry committed before a slow state machine has executed it. A **snapshot** compacts an old committed prefix so new or recovering replicas do not need to replay an unbounded log.
 
-## Key results
+## Why quorum intersection preserves safety
 
 The safety heart of Paxos is quorum intersection. Any two majorities of acceptors intersect in at least one acceptor. If a value might have been chosen by one majority, a later proposer that contacts another majority must hear from at least one acceptor in the first majority. The prepare/promise rule then forces the later proposer to preserve the already chosen value.
 
@@ -45,11 +45,11 @@ Raft's safety is usually phrased through the log-matching property and leader co
 
 Consensus and total order broadcast are equivalent in a standard sense: consensus instances can choose successive log entries, while total order broadcast can decide a proposed value by broadcasting proposals and deciding the first delivered value. This equivalence connects Lynch's formal treatment to database replication and distributed commit [2].
 
-The engineering result is that consensus is a replicated-log service, not a magic availability layer. A minority partition cannot safely accept writes. A majority partition can make progress if it elects or retains a leader. Slow disks, long pauses, and poor timeout settings can cause election storms even without permanent failures.
+Consensus is a replicated-log service, not a magic availability layer. A minority partition cannot safely accept writes. A majority partition can make progress if it elects or retains a leader. Slow disks, long pauses, and poor timeout settings can cause election storms even without permanent failures.
 
-Another practical result is that client deduplication is part of the replicated-log contract. If a leader appends a command, commits it, and crashes before replying, the client may retry against a new leader. Without a client identifier and request sequence number, the command can execute twice. Consensus orders log entries; it does not automatically make commands idempotent. Production replicated state machines usually store the latest completed request per client inside the replicated state so retries return the original response.
+Client deduplication is part of the replicated-log contract. If a leader appends a command, commits it, and crashes before replying, the client may retry against a new leader. Without a client identifier and request sequence number, the command can execute twice. Consensus orders log entries; it does not automatically make commands idempotent. Production replicated state machines usually store the latest completed request per client inside the replicated state so retries return the original response.
 
-## Visual
+## Tracing a Paxos round
 
 ```mermaid
 sequenceDiagram
@@ -62,15 +62,19 @@ sequenceDiagram
   Proposer->>A1: Prepare ballot 10
   Proposer->>A2: Prepare ballot 10
   Proposer->>A3: Prepare ballot 10
-  A1-->>Proposer: Promise 10, no accepted value
-  A2-->>Proposer: Promise 10, accepted value x at ballot 7
-  A3-->>Proposer: Promise 10, no accepted value
-  Proposer->>A1: Accept ballot 10, value x
-  Proposer->>A2: Accept ballot 10, value x
-  Proposer->>A3: Accept ballot 10, value x
-  A1-->>Learner: Accepted ballot 10, value x
-  A2-->>Learner: Accepted ballot 10, value x
+  A1-->>Proposer: "Promise 10, no accepted value"
+  A2-->>Proposer: "Promise 10, accepted value x at ballot 7"
+  A3-->>Proposer: "Promise 10, no accepted value"
+  Proposer->>A1: "Accept ballot 10, value x"
+  Proposer->>A2: "Accept ballot 10, value x"
+  Proposer->>A3: "Accept ballot 10, value x"
+  A1-->>Learner: "Accepted ballot 10, value x"
+  A2-->>Learner: "Accepted ballot 10, value x"
 ```
+
+The promises in this trace force ballot 10 to carry `x`: the proposer cannot replace the value reported from ballot 7 with a fresh proposal.
+
+## How the protocol families differ
 
 | Protocol | Fault model | Normal leader? | Main teaching abstraction | Typical use |
 | --- | --- | --- | --- | --- |
@@ -81,11 +85,11 @@ sequenceDiagram
 | PBFT | Byzantine | primary per view | pre-prepare, prepare, commit | permissioned BFT services |
 | HotStuff | Byzantine | rotating leaders | chained quorum certificates | BFT replication and blockchains |
 
-## Worked example 1: Single-decree Paxos with prior accepted value
+## A prior accepted value constrains ballot 8
 
-Problem: Five acceptors `A1` to `A5` form a Paxos group. In ballot 3, `A2`, `A3`, and `A4` accepted value `red`, but the proposer crashed before learners heard a decision. Later a proposer starts ballot 8 and receives promises from `A1`, `A2`, and `A5`. What value may it propose?
+Five acceptors `A1` to `A5` form a Paxos group. In ballot 3, `A2`, `A3`, and `A4` accepted value `red`, but the proposer crashed before learners heard a decision. Later a proposer starts ballot 8 and receives promises from `A1`, `A2`, and `A5`. What value may it propose?
 
-Method:
+The quorum argument:
 
 1. A value is chosen when a majority accepts it. With five acceptors, a majority is:
 
@@ -107,13 +111,13 @@ $$
 
 6. Paxos requires the proposer to send accept requests for `red`, not a new value such as `blue`.
 
-Checked answer: the ballot 8 proposer must propose `red`. This preserves safety even though the earlier proposer crashed before announcing success.
+The ballot 8 proposer must propose `red`. The earlier crash does not undo a choice already made by a majority.
 
-## Worked example 2: Raft leader election and committed entry
+## Why a stale Raft candidate cannot win
 
-Problem: A Raft cluster has five servers. In term 4, leader `S1` replicated log entry `(index=10, term=4, command=set x=1)` to `S1`, `S2`, and `S3`, then crashed. `S4` and `S5` do not have entry 10. Can `S4` become leader in term 5?
+A Raft cluster has five servers. In term 4, leader `S1` replicated log entry `(index=10, term=4, command=set x=1)` to `S1`, `S2`, and `S3`, then crashed. `S4` and `S5` do not have entry 10. Can `S4` become leader in term 5?
 
-Method:
+The election argument:
 
 1. Entry 10 is on a majority:
 
@@ -133,9 +137,9 @@ has size 3 out of 5.
 
 6. `S2` and `S3` should deny `S4`'s vote. `S4` can get votes from itself and `S5` at most, which is 2.
 
-Checked answer: `S4` cannot become leader in term 5 under the stated conditions. Raft's voting rule protects the committed entry by ensuring a future leader includes it.
+`S4` cannot become leader in term 5 under the stated conditions. Raft's voting rule forces a future leader to include the committed entry.
 
-## Code
+## Checking Raft log freshness in Python
 
 ```python
 from dataclasses import dataclass
@@ -169,7 +173,7 @@ for server in logs:
     print(server, "can win:", can_win(server, logs[server], logs))
 ```
 
-## Common pitfalls
+## Where implementations depart from the proof
 
 - Thinking Paxos acceptors "vote once." They can accept multiple ballots, subject to promises.
 - Forgetting that a value may be chosen before any client learns it.
@@ -184,18 +188,6 @@ for server in logs:
 - Assuming Byzantine behavior is handled by Paxos or Raft. They tolerate crash faults, not equivocation.
 - Using consensus for high-volume data paths when only metadata or ordering requires it.
 
-## Connections
-
-- [Foundations and System Models](/cs/distributed-systems/foundations-and-system-models)
-- [Time, Clocks, and Event Ordering](/cs/distributed-systems/time-clocks-and-event-ordering)
-- [Replication and Consistency](/cs/distributed-systems/replication-and-consistency)
-- [Fault Tolerance and Failure Detection](/cs/distributed-systems/fault-tolerance-and-failure-detection)
-- [Security and Byzantine Fault Tolerance](/cs/distributed-systems/security-and-byzantine-fault-tolerance)
-- [Computer Networks](/cs/computer-networks/intro)
-- [Operating Systems](/cs/operating-systems/intro)
-- [Databases](/cs/databases/intro)
-- [Cryptography](/cs/cryptography/intro)
-
 ## References
 
 [1] M. Kleppmann, *Designing Data-Intensive Applications*. Sebastopol, CA: O'Reilly, 2017.  
@@ -209,3 +201,9 @@ for server in logs:
 [9] F. P. Junqueira, B. C. Reed, and M. Serafini, "Zab: high-performance broadcast for primary-backup systems," in *DSN*, 2011.  
 [10] M. Castro and B. Liskov, "Practical Byzantine fault tolerance," in *OSDI*, 1999.  
 [11] M. Yin et al., "HotStuff: BFT consensus with linearity and responsiveness," in *PODC*, 2019.
+
+<div className="see-also">
+
+See also: [Foundations and System Models](/cs/distributed-systems/foundations-and-system-models) · [Time, Clocks, and Event Ordering](/cs/distributed-systems/time-clocks-and-event-ordering) · [Replication and Consistency](/cs/distributed-systems/replication-and-consistency) · [Fault Tolerance and Failure Detection](/cs/distributed-systems/fault-tolerance-and-failure-detection) · [Security and Byzantine Fault Tolerance](/cs/distributed-systems/security-and-byzantine-fault-tolerance) · [Computer Networks](/cs/computer-networks/intro) · [Operating Systems](/cs/operating-systems/intro) · [Databases](/cs/databases/intro) · [Cryptography](/cs/cryptography/intro)
+
+</div>

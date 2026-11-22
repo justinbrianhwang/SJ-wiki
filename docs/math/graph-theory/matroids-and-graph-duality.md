@@ -1,4 +1,4 @@
----
+﻿---
 title: Matroids and Graph Duality
 sidebar_position: 15
 ---
@@ -7,13 +7,9 @@ sidebar_position: 15
 
 Matroids abstract the idea of independence. In linear algebra, independence means no vector is a linear combination of the others. In graph theory, independence often means no cycle has been formed. Matroids capture the shared exchange behavior behind these situations, allowing graph arguments about trees, cycles, and cuts to be expressed in a more general language.
 
-![The Petersen graph is drawn with an outer pentagon and inner star.](https://commons.wikimedia.org/wiki/Special:FilePath/Petersen_graph.svg)
-
-*Figure: The Petersen graph is a standard counterexample and test case throughout graph theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Petersen_graph.svg), David Benbennick, public domain.*
-
 Graph duality becomes especially clean through matroids. The cycle structure of a planar graph is dual to the cut structure of its plane dual, and matroid duality turns this into an exact algebraic statement. Wilson's final chapter uses matroids to unify ideas that appeared earlier as separate graph theorems.
 
-## Definitions
+## Independence on an edge ground set
 
 A **matroid** $M$ on a finite ground set $E$ can be defined by a family $\mathcal{I}$ of **independent sets** satisfying:
 
@@ -33,7 +29,7 @@ $$
 
 In a graph, minimal edge cuts are often called **bonds**. In the cycle matroid of a graph, cocircuits correspond to bonds.
 
-## Key results
+## Exchange, rank, and duality
 
 **Graphic matroid bases.** If $G$ is connected, the bases of $M(G)$ are exactly the spanning trees of $G$.
 
@@ -75,8 +71,6 @@ $$
 
 This formula explains why complements of bases become bases in the dual.
 
-## Visual
-
 The triangle with a pendant edge has cycle matroid circuits and cut structure that are easy to see.
 
 ```mermaid
@@ -95,17 +89,15 @@ graph LR
 | $\{AB,BC,CD\}$ | spanning tree | base |
 | $\{CD\}$ | bridge cut | cocircuit in connected case |
 
-## Worked example 1: List bases of a cycle matroid
+## The four bases of $M(C_4)$
 
-**Problem.** Let $G=C_4$ with vertices $1,2,3,4$ and edges
+Let $G=C_4$ with vertices $1,2,3,4$ and edges
 
 $$
 e_1=12,\quad e_2=23,\quad e_3=34,\quad e_4=41.
 $$
 
 List the bases of $M(G)$.
-
-**Method.**
 
 1. The graph is connected and has $4$ vertices.
 2. Every base of $M(G)$ is a spanning tree.
@@ -121,17 +113,15 @@ $$
 
 **Check.** Each set has size $3$, is acyclic, and connects all four vertices. No $4$-edge set is independent because the whole cycle is dependent.
 
-## Worked example 2: Compute graphic matroid rank
+## Rank from connected components
 
-**Problem.** Let $G$ have vertices $\{1,2,3,4,5\}$ and edge subset
+Let $G$ have vertices $\{1,2,3,4,5\}$ and edge subset
 
 $$
 A=\{12,23,45\}.
 $$
 
 Find the rank $r(A)$ in the cycle matroid $M(G)$.
-
-**Method.**
 
 1. Build the spanning subgraph with all five vertices and only edges in $A$.
 2. The edges $12,23$ connect vertices $\{1,2,3\}$ into one component.
@@ -152,11 +142,11 @@ $$
 
 6. Since $A$ itself has three edges and contains no cycle, it is independent, so its rank should indeed be $3$.
 
-**Checked answer.** $r(A)=3$.
+$r(A)=3$.
 
 A second way to see the same answer is to ask for the largest forest contained in $A$. The set $A$ is already a forest with three edges, so its largest independent subset has size $3$. If the subset had contained a triangle, the rank would have been smaller than the number of selected edges.
 
-## Code
+### Graphic rank with union-find
 
 The rank of a graphic matroid can be computed by union-find.
 
@@ -194,7 +184,7 @@ When translating between graph language and matroid language, keep the ground se
 
 Matroid language is compact, so examples are essential. Whenever a statement mentions independent sets, bases, circuits, or cocircuits, translate it back into the graphic case: forests, spanning trees, cycles, and bonds. If the translated graph statement is familiar, the matroid statement is usually abstracting exactly the property that made the graph proof work.
 
-## Common pitfalls
+## Where graph and matroid vocabulary diverge
 
 - Confusing independent sets in a graph with independent vertex sets. In the cycle matroid, the ground set is the edge set.
 - Calling every cut a cocircuit. Cocircuits are minimal nonempty cuts in the corresponding matroid sense.
@@ -203,9 +193,8 @@ Matroid language is compact, so examples are essential. Whenever a statement men
 - Treating matroid duality as the same thing as geometric planar duality. They agree for connected plane graphs under the edge correspondence, but matroid duality is broader.
 - Ignoring loops and bridges. In $M(G)$, loops are circuits of size $1$, while bridges appear in every base of a connected graph.
 
-## Connections
+<div className="see-also">
 
-- [Trees and spanning trees](/math/graph-theory/trees-and-spanning-trees)
-- [Duality surfaces and infinite graphs](/math/graph-theory/duality-surfaces-and-infinite-graphs)
-- [Matchings Hall and Konig](/math/graph-theory/matchings-hall-and-konig)
-- [Algebraic graph theory basics](/math/graph-theory/algebraic-graph-theory-basics)
+See also: [Trees and spanning trees](/math/graph-theory/trees-and-spanning-trees) · [Duality surfaces and infinite graphs](/math/graph-theory/duality-surfaces-and-infinite-graphs) · [Matchings Hall and Konig](/math/graph-theory/matchings-hall-and-konig) · [Algebraic graph theory basics](/math/graph-theory/algebraic-graph-theory-basics)
+
+</div>

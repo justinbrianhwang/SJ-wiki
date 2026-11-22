@@ -292,10 +292,8 @@ The p-value tests a no-linear-correlation null under model assumptions. It shoul
 - Combining subgroups whose separate relationships differ from the overall relationship.
 - Using correlation to claim causation from observational data.
 
-## Related pages
+<div className="see-also">
 
-- [Graphing distributions](/math/statistics/graphing-distributions)
-- [Summarizing distributions](/math/statistics/summarizing-distributions)
-- [Linear regression inference](/math/statistics/linear-regression-inference)
-- [Hypothesis testing logic](/math/statistics/hypothesis-testing-logic)
-- [Effect size, nonparametric methods, and resampling](/math/statistics/effect-size-nonparametric-and-resampling)
+See also: [Graphing distributions](/math/statistics/graphing-distributions) · [Summarizing distributions](/math/statistics/summarizing-distributions) · [Linear regression inference](/math/statistics/linear-regression-inference) · [Hypothesis testing logic](/math/statistics/hypothesis-testing-logic) · [Effect size, nonparametric methods, and resampling](/math/statistics/effect-size-nonparametric-and-resampling)
+
+</div>

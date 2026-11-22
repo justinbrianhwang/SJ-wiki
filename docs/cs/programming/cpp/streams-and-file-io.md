@@ -342,10 +342,8 @@ Stream positions are opaque position types, not always simple byte indexes in te
 
 Output can fail after opening because a device fills, a connection closes, or a buffered write is rejected. Checking only the constructor misses those later errors. A report generator that promises a file should test the stream after its final write and close before announcing success. Input streams likewise may encounter a low-level error distinct from clean end of file; `bad()` identifies that stronger failure category.
 
-## Related pages
+<div className="see-also">
 
-- [C++ basics and control flow](/cs/programming/cpp/cpp-basics-and-control-flow)
-- [strings](/cs/programming/cpp/strings)
-- [separate compilation and namespaces](/cs/programming/cpp/separate-compilation-and-namespaces)
-- [exception handling](/cs/programming/cpp/exception-handling)
-- [STL algorithms and iterators](/cs/programming/cpp/stl-algorithms-and-iterators)
+See also: [C++ basics and control flow](/cs/programming/cpp/cpp-basics-and-control-flow) · [strings](/cs/programming/cpp/strings) · [separate compilation and namespaces](/cs/programming/cpp/separate-compilation-and-namespaces) · [exception handling](/cs/programming/cpp/exception-handling) · [STL algorithms and iterators](/cs/programming/cpp/stl-algorithms-and-iterators)
+
+</div>

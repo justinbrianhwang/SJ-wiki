@@ -9,7 +9,7 @@ D2L's modern CNN chapters show how image models evolved from LeNet into deeper, 
 
 These models are more than a historical sequence. They introduce reusable design ideas: blocks, bottlenecks, normalization, residual connections, concatenation, global average pooling, and computational tradeoffs between width, depth, and resolution. Modern vision models still rely on these ideas even when attention or hybrid architectures are added.
 
-## Definitions
+## The architecture vocabulary
 
 An **architecture block** is a repeated module with a recognizable input-output pattern. VGG blocks repeat $3 \times 3$ convolutions and pooling. Inception blocks run several branches in parallel. Residual blocks add an input to a learned transformation.
 
@@ -37,7 +37,7 @@ $$
 x_l = H_l([x_0,x_1,\ldots,x_{l-1}]).
 $$
 
-## Key results
+## Why small kernels, bottlenecks, and skip paths work
 
 Depth increases representational power but makes optimization harder. Residual connections help because a block can learn a residual correction around the identity. If the best transformation is close to identity, it is easier to make $F(x)$ small than to force a plain stack of layers to learn an exact identity mapping.
 
@@ -67,7 +67,7 @@ Residual and dense connections can be read as information-routing mechanisms. A 
 
 Architecture comparison should control for training recipe. AlexNet, VGG, GoogLeNet, ResNet, and DenseNet differ in structure, but reported performance also depends on data augmentation, optimizer, learning-rate schedule, initialization, batch size, and input resolution. D2L's concise implementations are educational baselines; production comparisons need matched compute and tuned recipes.
 
-## Visual
+## How the architecture families route features
 
 ```mermaid
 flowchart TB
@@ -165,9 +165,9 @@ flowchart TB
   In["Input image: (N, 3, 224, 224)"] --> Stem["Stem: Conv 7 x 7, 64, stride 2 -> (N, 64, 112, 112)"]
   Stem --> Pool["MaxPool 3 x 3, stride 2 -> (N, 64, 56, 56)"]
   Pool --> S1["conv2_x: 3 bottlenecks (1 x 1,64; 3 x 3,64; 1 x 1,256) -> (N, 256, 56, 56)"]
-  S1 --> S2["conv3_x: 4 bottlenecks (1 x 1,128; 3 x 3,128; 1 x 1,512), first stride 2 -> #lsqb;N, 512, 28, 28)"]
-  S2 --> S3["conv4_x: 6 bottlenecks (1 x 1,256; 3 x 3,256; 1 x 1,1024), first stride 2 -> #lsqb;N, 1024, 14, 14)"]
-  S3 --> S4["conv5_x: 3 bottlenecks (1 x 1,512; 3 x 3,512; 1 x 1,2048), first stride 2 -> #lsqb;N, 2048, 7, 7)"]
+  S1 --> S2["conv3_x: 4 bottlenecks (1 x 1,128; 3 x 3,128; 1 x 1,512), first stride 2 -> (N, 512, 28, 28)"]
+  S2 --> S3["conv4_x: 6 bottlenecks (1 x 1,256; 3 x 3,256; 1 x 1,1024), first stride 2 -> (N, 1024, 14, 14)"]
+  S3 --> S4["conv5_x: 3 bottlenecks (1 x 1,512; 3 x 3,512; 1 x 1,2048), first stride 2 -> (N, 2048, 7, 7)"]
   S4 --> GAP["Global average pool over 7 x 7 -> (N, 2048)"]
   GAP --> FC["FC 1000 logits"]
   FC --> Out(("Class distribution"))
@@ -226,7 +226,7 @@ MobileNet's depthwise-separable block splits spatial filtering from channel mixi
 | ResNet | Residual addition | Very deep optimization | Shape alignment required |
 | DenseNet | Feature concatenation | Strong feature reuse | Channel growth |
 
-## Worked example 1: parameters saved by a bottleneck
+## Counting the parameters saved by a bottleneck
 
 Problem: compare the parameter count of a direct $5 \times 5$ convolution from $192$ input channels to $32$ output channels with a bottleneck design that first uses a $1 \times 1$ convolution from $192$ to $16$ channels, then a $5 \times 5$ convolution from $16$ to $32$ channels. Ignore biases.
 
@@ -273,9 +273,9 @@ $$
 \frac{153600}{15872} \approx 9.68.
 $$
 
-Checked answer: the bottleneck design uses $15{,}872$ parameters instead of $153{,}600$, roughly a $9.7$ times reduction. This is why Inception-style blocks use $1 \times 1$ reductions before expensive kernels.
+The bottleneck design uses $15{,}872$ parameters instead of $153{,}600$, roughly a $9.7$ times reduction. Inception-style blocks therefore use $1 \times 1$ reductions before expensive kernels.
 
-## Worked example 2: residual block shape matching
+## Matching a residual shortcut to its branch
 
 Problem: an input tensor has shape `(batch, 64, 56, 56)`. A residual branch uses a convolutional path that outputs `(batch, 128, 28, 28)`. Can the original input be added directly to the branch output? If not, specify a projection.
 
@@ -292,9 +292,9 @@ $$
 
 5. The $1 \times 1$ projection changes channels from $64$ to $128$, and stride $2$ changes spatial size from $56 \times 56$ to $28 \times 28$.
 
-Checked answer: direct addition is invalid. A $1 \times 1$ convolution with stride $2$ and $128$ output channels produces a shortcut tensor of shape `(batch, 128, 28, 28)`, which can be added to the residual branch.
+Direct addition is invalid. A $1 \times 1$ convolution with stride $2$ and $128$ output channels produces a shortcut tensor of shape `(batch, 128, 28, 28)`, which can be added to the residual branch.
 
-## Code
+## Encoding the shape check in a residual block
 
 ```python
 import torch
@@ -331,7 +331,7 @@ y = block(x)
 print(y.shape)
 ```
 
-## Common pitfalls
+## Shape, normalization, and comparison traps
 
 - Adding residual tensors with mismatched channel or spatial dimensions.
 - Forgetting that batch normalization has different training and evaluation behavior.
@@ -340,10 +340,8 @@ print(y.shape)
 - Assuming $1 \times 1$ convolutions are trivial. They can dominate channel mixing and parameter counts.
 - Treating named architectures as fixed recipes rather than reusable design patterns.
 
-## Connections
+<div className="see-also">
 
-- [Convolutional neural networks](/cs/deep-learning/convolutional-neural-networks)
-- [Computer vision applications](/cs/deep-learning/computer-vision-applications)
-- [Optimization algorithms](/cs/deep-learning/optimization-algorithms)
-- [PyTorch builders guide](/cs/deep-learning/pytorch-builders-guide)
-- [Machine learning](/cs/machine-learning/)
+See also: [Convolutional neural networks](/cs/deep-learning/convolutional-neural-networks) · [Computer vision applications](/cs/deep-learning/computer-vision-applications) · [Optimization algorithms](/cs/deep-learning/optimization-algorithms) · [PyTorch builders guide](/cs/deep-learning/pytorch-builders-guide) · [Machine learning](/cs/machine-learning/intro)
+
+</div>

@@ -9,41 +9,39 @@ Java manages object memory through garbage collection. Programs allocate objects
 
 The source book's memory chapter focuses on reachability. An object is alive for program purposes while it can be reached from active roots through strong references. Reference objects such as soft, weak, and phantom references allow programs to interact with reachability in controlled ways. Finalization is covered, but with strong warnings about design hazards.
 
-## Definitions
+## Reachability and reference strength
 
-The source basis for this page is Chapter 17 on garbage collection, a simple memory model, finalization, interacting with the garbage collector, reachability states, and reference objects. The terms below are written as contracts: each one tells you what the compiler can check, what the runtime must preserve, and what a reader of the program may rely on.
+Chapter 17 supplies the model of garbage collection, finalization, collector interaction, reachability states, and reference objects. Whether an object remains alive depends on paths from roots, not on the age or location of its allocation.
 
-**Garbage collection.** Garbage collection is automatic reclamation of memory occupied by objects that are no longer reachable by the program. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Garbage collection.** Automatic reclamation of memory occupied by objects that are no longer reachable by the program.
 
-**Reachability.** Reachability describes whether an object can be accessed from active roots such as local variables, static fields, thread stacks, and other reachable objects. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Reachability.** Whether an object can be accessed from active roots through local variables, static fields, thread stacks, and other reachable objects.
 
-**Strong reference.** A strong reference is an ordinary reference that keeps an object strongly reachable while the reference itself is reachable. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Strong reference.** An ordinary reference that keeps its target strongly reachable while the reference itself is reachable.
 
-**Soft reference.** A soft reference can refer to an object that may be reclaimed under memory pressure. It is often associated with caches. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Soft reference.** A reference to an object that may be reclaimed under memory pressure, historically associated with caches.
 
-**Weak reference.** A weak reference does not keep its referent alive. Weak references are useful for associations that should disappear when the key object is otherwise unused. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Weak reference.** A reference that does not keep its referent alive, useful for associations that should disappear when an object is otherwise unused.
 
-**Phantom reference.** A phantom reference supports post-reachability cleanup coordination after an object becomes phantom reachable and is enqueued. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Phantom reference.** A reference used with a reference queue for cleanup coordination after an object becomes phantom reachable.
 
-**Finalization.** Finalization is a mechanism by which an object's `finalize` method may be invoked before reclamation. The source warns against relying on it for ordinary cleanup. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Finalization.** A mechanism by which an object's `finalize` method may be invoked before reclamation. The source warns against relying on it for ordinary cleanup.
 
-**Object resurrection.** Resurrection occurs when finalization or related logic makes an otherwise unreachable object reachable again. The source treats this as a design smell. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Object resurrection.** Making an otherwise unreachable object reachable again during finalization or related logic; a strong design warning.
 
-## Key results
+## Tracing the live object graph
 
-**Reachability, not scope alone, determines collection.** A local variable going out of scope can remove one reference, but the object remains alive if reachable through another path. Conversely, an object may be eligible for collection even if its allocation site is recent, provided no live reference can reach it. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Reachability, not scope alone, determines collection.** A local variable going out of scope removes one possible reference, but the object remains alive if another path reaches it. A newly allocated object may still become eligible for collection as soon as no live reference reaches it.
 
-**Garbage collection does not close resources on time.** The collector reclaims memory, not external resources in a predictable schedule. A file stream should be closed through program logic, not left for finalization. This connects memory management directly to the I/O chapter's cleanup idioms. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Garbage collection does not close resources on time.** The collector reclaims memory, not external resources on a predictable schedule. Program logic must close file streams rather than leaving them for finalization.
 
-**Finalization is uncertain and hazardous.** The runtime does not promise prompt finalization, and finalizers can create ordering, performance, security, and resurrection problems. The source's guidance is to review designs that seem to require resurrection or finalizer-dependent behavior. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Finalization is uncertain and hazardous.** The runtime does not promise prompt finalization, and finalizers can create ordering, performance, security, and resurrection problems. Designs that depend on finalizer timing need replacement.
 
-**Reference objects are specialized tools.** Soft and weak references are useful when cached or associated data should not force an object to remain alive. They are not ordinary substitutes for fields. Code using them must handle the referent disappearing between checks. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Reference objects are specialized tools.** Soft and weak references suit cached or associated data that should not force an object to remain alive. They are not ordinary field substitutes, and code must handle a missing referent.
 
-**Reachability can change when a reference is read.** Calling `get` on a reference object and storing a non-null result in a local variable creates a strong reference for as long as that local is live. This is why code should copy the referent to a strong variable before using it after a null check. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Reading a reference can change reachability.** Storing a non-null result from `get` in a local creates a strong reference while that local remains live. Copy the referent once before checking and using it.
 
 To reason about garbage collection, draw an object graph. Mark roots such as active locals, static fields, and live thread objects. Follow strong references from those roots. Every object reached by that traversal is strongly reachable. Objects not reached may be reclaimable, subject to softer reference categories and runtime details. Then separately list non-memory resources. If an object owns a file, socket, native handle, or lock, ask where program logic releases it. Garbage collection may eventually reclaim object memory, but correctness should not depend on when that happens.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -64,7 +62,7 @@ flowchart TD
 | Phantom reference | No direct `get` use | Cleanup coordination after reachability |
 | Finalizer reference | Runtime-managed | Discouraged as cleanup strategy |
 
-## Worked example 1: finding unreachable objects
+## Why clearing `b` does not free its node
 
 Problem: Given `Node a = new Node(); Node b = new Node(); a.next = b; b = null;`, decide whether the second node is collectible.
 
@@ -78,7 +76,7 @@ Method:
 
 Checked answer: The second node is still reachable. Clearing one variable is not enough when another strong path remains.
 
-## Worked example 2: using a weak reference safely
+## Stabilizing a weak referent during use
 
 Problem: A weak reference may contain a cached byte array. Show why the referent should be copied to a strong local before use.
 
@@ -92,7 +90,7 @@ Method:
 
 Checked answer: The checked pattern is `T value = ref.get(); if (value != null) use(value);`. The local variable stabilizes the referent for the current operation.
 
-## Code
+## Observing a weak reference without assuming collection
 
 ```java
 import java.lang.ref.WeakReference;
@@ -129,7 +127,7 @@ public class ReferenceDemo {
 }
 ```
 
-## Common pitfalls
+## Timing assumptions the collector does not promise
 
 - Do not rely on `System.gc()` as a command that immediately collects a specific object. It is only an interaction request.
 - Do not use finalizers for timely release of files, sockets, or locks.
@@ -137,9 +135,13 @@ public class ReferenceDemo {
 - Do not call `WeakReference.get()` twice when one strong local would make the operation stable.
 - Do not confuse memory cleanup with logical cleanup. Object memory and external resources have different lifecycles.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Tokens, Values, and Variables](/cs/programming/java/tokens-values-variables): explains reference variables and object sharing.
 - [I/O Streams, Files, Serialization, and NIO](/cs/programming/java/io-streams-files-serialization-nio): shows explicit cleanup for non-memory resources.
 - [Collections, Iteration, and Maps](/cs/programming/java/collections-iteration-maps): includes weak map ideas in collection design.
 - [Threads, Synchronization, and the Memory Model](/cs/programming/java/threads-synchronization-memory-model): connects reachability to live threads and memory visibility.
+
+</div>

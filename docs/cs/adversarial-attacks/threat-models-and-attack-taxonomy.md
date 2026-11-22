@@ -7,13 +7,9 @@ sidebar_position: 2
 
 Adversarial machine learning is only meaningful once the attacker's powers are stated. A defense that is strong against a transfer attack may fail under white-box gradients; a detector that works for digital $\ell_\infty$ image noise may be irrelevant for a printed sticker or a prompt-injection attack. Threat modeling is the discipline that turns "the model is robust" into a claim with assumptions, budgets, goals, and evaluation rules.
 
-![A visually similar adversarial panda image is classified as a gibbon by an ImageNet model.](https://ar5iv.labs.arxiv.org/html/1412.6572/assets/gibbon_993.png)
+The useful vocabulary connects the security view of attacker goal, knowledge, capability, and strategy with the optimization view used in [mathematical formulation](/cs/adversarial-attacks/mathematical-formulation), [white-box attacks](/cs/adversarial-attacks/white-box-attacks), and [evaluation and benchmarks](/cs/adversarial-attacks/evaluation-and-benchmarks).
 
-*Figure: The FGSM panda example shows that imperceptible perturbations can change model decisions. Image: [ar5iv](https://arxiv.org/abs/1412.6572), Goodfellow, Shlens, and Szegedy, educational use with attribution.*
-
-This page gives the vocabulary used throughout the adversarial-attacks section. It connects the security-style view of attacker goal, knowledge, capability, and strategy with the optimization view used in [mathematical formulation](/cs/adversarial-attacks/mathematical-formulation), [white-box attacks](/cs/adversarial-attacks/white-box-attacks), and [evaluation and benchmarks](/cs/adversarial-attacks/evaluation-and-benchmarks).
-
-## Definitions
+## Five coordinates of a threat model
 
 A **threat model** is a structured description of what the adversary wants, what the adversary knows, what the adversary can modify, and what costs or budgets constrain the attack. A compact version is:
 
@@ -29,7 +25,7 @@ $$
 x' = x + \delta, \qquad \|\delta\|_p \le \epsilon.
 $$
 
-A **poisoning attack** changes the training data or training process. A **backdoor attack** is a poisoning-style attack that makes the model behave normally except when a trigger is present. This page set focuses mostly on evasion, but the same threat-model discipline applies to poisoning and backdoors.
+A **poisoning attack** changes the training data or training process. A **backdoor attack** is a poisoning-style attack that makes the model behave normally except when a trigger is present. The notes here focus mostly on evasion, but the same threat-model discipline applies to poisoning and backdoors.
 
 An **untargeted attack** succeeds when the model no longer predicts the original correct class:
 
@@ -57,7 +53,7 @@ A **query budget** limits how many times the attacker may call the model. Query 
 
 **Transferability** is the phenomenon that an adversarial example generated against one model can fool another model. Transfer attacks use a surrogate model and require no target-model queries once the attack examples are generated.
 
-## Key results
+## Each axis changes the optimization problem
 
 Threat models are not just documentation; they change the mathematical problem. If the attacker is untargeted and white-box with an $\ell_\infty$ budget, the inner problem often looks like:
 
@@ -94,7 +90,7 @@ A useful robustness claim therefore includes at least:
 - Budget: norm radius, query count, time limit, patch area, edit distance, token count, or intervention cost.
 - Evaluation strategy: attack algorithms, restarts, adaptive attack details, random seeds, and stopping rules.
 
-## Visual
+### From a broad claim to a concrete attack
 
 ```mermaid
 flowchart TD
@@ -123,9 +119,9 @@ flowchart TD
 | Budget | $\epsilon$, $\ell_p$ norm, query count, edit distance, patch area, token limit | Numerical values and preprocessing scale |
 | Strategy | Gradient, search, surrogate, adaptive, expectation over transformations | Algorithms, restarts, and stopping rules |
 
-## Worked example 1: Classifying a threat model
+## Detecting a digital-to-physical mismatch
 
-Problem: A paper claims a traffic-sign classifier is robust because no attack succeeded when adding $\ell_\infty$ noise of at most $4/255$ to a digital test image. The deployment concern is stickers placed on real stop signs and photographed by a dashboard camera. Classify the mismatch.
+A paper calls a traffic-sign classifier robust because no attack succeeded with digital $\ell_\infty$ noise up to $4/255$. The deployment concern is a sticker on a real stop sign photographed by a dashboard camera. Classify the mismatch.
 
 1. The evaluated capability is digital additive noise:
 
@@ -145,11 +141,11 @@ $$
 
 4. The evaluated attack may be white-box or black-box, but the statement gives no information about query access, model knowledge, or adaptive optimization through the camera transformation.
 
-Checked answer: the robustness claim does not cover the deployment concern. It may be a valid $\ell_\infty$ digital robustness claim, but it is not evidence of physical patch robustness. A better evaluation would use [physical-world and patch attacks](/cs/adversarial-attacks/physical-world-and-patch-attacks) with expectation over transformations.
+The claim may describe $\ell_\infty$ digital robustness, but it does not cover physical patches. That deployment concern needs [physical-world and patch attacks](/cs/adversarial-attacks/physical-world-and-patch-attacks) evaluated over relevant transformations.
 
-## Worked example 2: Comparing $\ell_\infty$ and $\ell_2$ budgets
+## The same perturbation under two norms
 
-Problem: An image has $28 \times 28 = 784$ grayscale pixels scaled to $[0,1]$. Attack A changes every pixel by $0.01$. Attack B changes 4 pixels by $0.10$ and leaves the rest unchanged. Compare their $\ell_\infty$ and $\ell_2$ sizes.
+Take a $28 \times 28$ grayscale image scaled to $[0,1]$. Attack A changes every pixel by $0.01$; Attack B changes 4 pixels by $0.10$. Compare their $\ell_\infty$ and $\ell_2$ sizes.
 
 1. Attack A has perturbation vector $\delta_A$ with 784 entries, each equal to $0.01$.
 
@@ -179,9 +175,9 @@ $$
 = 0.20.
 $$
 
-Checked answer: Attack A is smaller under $\ell_\infty$ but larger under $\ell_2$. This is why reports must name the norm. Saying "small perturbation" is ambiguous.
+Attack A is smaller under $\ell_\infty$ but larger under $\ell_2$. Reports must name the norm; "small perturbation" is ambiguous.
 
-## Code
+## Checking budget and success separately
 
 ```python
 from dataclasses import dataclass
@@ -215,7 +211,7 @@ def is_valid_adversarial(x, x_adv, y, model, threat: ThreatModel, target=None):
 
 This sketch is not an attack. It is a small threat-model checker: it separates budget validity from success validity. That separation prevents a common evaluation error where invalid examples are counted as successful attacks.
 
-## Common pitfalls
+## Under-specified robustness claims
 
 - Reporting adversarial accuracy without stating the norm, $\epsilon$, preprocessing scale, and clipping range.
 - Treating black-box failure as evidence of white-box robustness.
@@ -225,7 +221,16 @@ This sketch is not an attack. It is a small threat-model checker: it separates b
 - Evaluating a randomized or preprocessing defense with an attack that ignores the randomness or preprocessing.
 - Reusing image-centric norm-ball language for text and LLM attacks without defining the semantic validity constraint.
 
-## Connections
+## Origins of the taxonomy
+
+- Biggio and Roli, "Wild Patterns: Ten Years After the Rise of Adversarial Machine Learning."
+- Szegedy et al., "Intriguing Properties of Neural Networks."
+- Goodfellow, Shlens, and Szegedy, "Explaining and Harnessing Adversarial Examples."
+- Athalye, Carlini, and Wagner, "Obfuscated Gradients Give a False Sense of Security."
+
+<div className="see-also">
+
+See also:
 
 - [Mathematical formulation](/cs/adversarial-attacks/mathematical-formulation) turns threat models into constrained optimization problems.
 - [White-box attacks](/cs/adversarial-attacks/white-box-attacks) assumes the strongest common knowledge model.
@@ -234,9 +239,4 @@ This sketch is not an attack. It is a small threat-model checker: it separates b
 - [Evaluation and benchmarks](/cs/adversarial-attacks/evaluation-and-benchmarks) explains why threat-model drift causes misleading robustness claims.
 - [Cryptography](/cs/cryptography/intro) is the neighboring field most associated with explicit adversary models.
 
-## Further reading
-
-- Biggio and Roli, "Wild Patterns: Ten Years After the Rise of Adversarial Machine Learning."
-- Szegedy et al., "Intriguing Properties of Neural Networks."
-- Goodfellow, Shlens, and Szegedy, "Explaining and Harnessing Adversarial Examples."
-- Athalye, Carlini, and Wagner, "Obfuscated Gradients Give a False Sense of Security."
+</div>

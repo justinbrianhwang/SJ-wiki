@@ -5,15 +5,15 @@ sidebar_position: 7
 
 # Mixtures, Solutions, and Activities
 
-Mixtures are where chemical potential becomes unavoidable. The properties of a solution are not just weighted averages of pure-component properties; each component contributes a partial molar amount that depends on composition and intermolecular interactions.
+Mixtures are where chemical potential becomes unavoidable. Solution properties cannot be obtained by merely weighting pure-component properties; each component contributes a partial molar amount that depends on composition and intermolecular interactions.
 
-Atkins develops simple mixtures from ideal gas mixing through ideal and nonideal liquid solutions, then extends the discussion to activities, colligative properties, and electrolyte solutions. The central idea is that equilibrium is governed by chemical potential, while composition enters through activity rather than bare concentration whenever nonideality matters.
+Ideal gas mixing and Raoult's law establish the reference behavior; activities, colligative properties, and electrolyte corrections describe departures from it. Equilibrium is governed by chemical potential, with activity replacing bare concentration when nonideality matters.
 
 ![A diagram shows red blood cells changing volume in hypotonic, isotonic, and hypertonic solutions.](https://commons.wikimedia.org/wiki/Special:FilePath/Osmotic_pressure_on_blood_cells_diagram.svg)
 
 *Figure: Osmotic pressure as a macroscopic consequence of chemical-potential differences in solution. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Osmotic_pressure_on_blood_cells_diagram.svg), LadyofHats, public domain.*
 
-## Definitions
+## Partial molar quantities and limiting laws
 
 The **partial molar quantity** of component $J$ for an extensive property $X$ is
 
@@ -79,7 +79,7 @@ $$
 
 where $b$ is molality, $c$ is molar concentration, and $\Pi$ is osmotic pressure.
 
-## Key results
+## Mixing, nonideality, and colligative effects
 
 The Gibbs energy of mixing for two perfect gases or an ideal solution is
 
@@ -169,9 +169,7 @@ Colligative properties share a common source: solute lowers the chemical potenti
 
 Electrolytes complicate the story because each formula unit produces multiple ions and because Coulomb interactions are long ranged. Ionic strength weights concentrations by charge squared, so a small amount of a multivalent ion can affect activity coefficients strongly. The Debye-Huckel limiting law predicts that mean activity coefficients decrease from 1 as ionic strength increases from zero. At higher concentrations, ion size, specific association, solvent structure, and short-range interactions require extended models or experimental activity data.
 
-A practical calculation must also respect standard-state conventions. Activities based on mole fraction, molality, and concentration use different standard states. The numerical value of an activity coefficient has meaning only with its convention. This is why equilibrium constants and electrochemical potentials must state their standard states carefully.
-
-## Visual
+Calculations must also respect standard-state conventions. Activities based on mole fraction, molality, and concentration use different standard states. The numerical value of an activity coefficient has meaning only with its convention. Equilibrium constants and electrochemical potentials must therefore state their standard states carefully.
 
 | Law or concept | Mathematical form | Applies to | Physical meaning |
 |---|---:|---|---|
@@ -194,7 +192,7 @@ graph LR
   D --> H
 ```
 
-## Worked example 1: Gibbs energy and entropy of ideal mixing
+## Entropic driving force for ideal-gas mixing
 
 **Problem.** Mix $1.00\ \mathrm{mol}$ of $\mathrm{N_2}$ and $3.00\ \mathrm{mol}$ of $\mathrm{H_2}$ at $298.15\ \mathrm{K}$ and the same initial pressure. Calculate $\Delta_{\mathrm{mix}}G$ and $\Delta_{\mathrm{mix}}S$.
 
@@ -242,7 +240,7 @@ $$
 
 **Checked answer.** $\Delta_{\mathrm{mix}}G=-5.57\ \mathrm{kJ}$ and $\Delta_{\mathrm{mix}}S=+18.7\ \mathrm{J\ K^{-1}}$. The signs match spontaneous ideal mixing.
 
-## Worked example 2: Osmotic pressure of a dilute solution
+## Osmotic pressure of a dilute protein solution
 
 **Problem.** A protein solution has concentration $2.50\times10^{-4}\ \mathrm{mol\ L^{-1}}$ at $298.15\ \mathrm{K}$. Estimate the osmotic pressure in pascals and mmHg assuming ideal dilute behavior.
 
@@ -275,36 +273,7 @@ $$
 
 **Checked answer.** The osmotic pressure is small but measurable. The units work because $\mathrm{J\ m^{-3}}=\mathrm{Pa}$.
 
-## Code
-
-```python
-import numpy as np
-
-R = 8.314462618
-T = 298.15
-
-def ideal_mixing(n_moles):
-    n_moles = np.array(n_moles, dtype=float)
-    total = n_moles.sum()
-    x = n_moles / total
-    s = np.sum(x * np.log(x))
-    delta_g = total * R * T * s
-    delta_s = -total * R * s
-    return x, delta_g, delta_s
-
-x, dg, ds = ideal_mixing([1.0, 3.0])
-print("mole fractions:", x)
-print("Delta_mix G (kJ):", dg / 1000)
-print("Delta_mix S (J/K):", ds)
-
-def osmotic_pressure(c_mol_L, T=298.15):
-    c_mol_m3 = c_mol_L * 1000.0
-    return c_mol_m3 * R * T
-
-print("Pi Pa:", osmotic_pressure(2.5e-4))
-```
-
-## Common pitfalls
+## Choosing a standard state before calculating
 
 - Treating mole fraction, molarity, and molality as interchangeable. Their differences matter outside very dilute aqueous solutions.
 - Applying Raoult's law to a dilute solute when Henry's law is appropriate.
@@ -318,9 +287,8 @@ For colligative properties, check whether the solute dissociates, associates, or
 
 Partial molar quantities are slopes, not simple fractions. If a graph of total volume versus amount is curved, the partial molar volume changes with composition. The tangent slope gives the partial molar value at that composition, while the total mixture property comes from summing $n_J\bar X_J$. This distinction is essential in solution thermodynamics and in interpreting experimental data.
 
-## Connections
+<div className="see-also">
 
-- [Free energy and chemical potential](/chemistry/physical-chemistry/free-energy-and-chemical-potential)
-- [Chemical equilibrium](/chemistry/physical-chemistry/chemical-equilibrium)
-- [Electrochemistry](/chemistry/physical-chemistry/electrochemistry)
-- [General chemistry solutions](/chemistry/general/)
+See also: [Free energy and chemical potential](/chemistry/physical-chemistry/free-energy-and-chemical-potential) · [Chemical equilibrium](/chemistry/physical-chemistry/chemical-equilibrium) · [Electrochemistry](/chemistry/physical-chemistry/electrochemistry) · [General chemistry solutions](/chemistry/general/intro)
+
+</div>

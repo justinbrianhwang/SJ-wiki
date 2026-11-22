@@ -9,7 +9,7 @@ Computational learning theory asks what can be learned in principle, how much da
 
 This material remains foundational because it gives formal language for generalization. Modern models are often too large for the simplest finite-hypothesis bounds to be tight, but the discipline of stating a distribution, an error tolerance, a confidence level, and a hypothesis class is still essential.
 
-## Definitions
+## The PAC contract and its capacity measures
 
 A concept class $C$ is a set of target concepts. A hypothesis space $H$ is the set of hypotheses available to the learner. In many analyses $C \subseteq H$, but agnostic settings allow the target to fall outside $H$.
 
@@ -36,7 +36,7 @@ The VC dimension of $H$, written $VC(H)$, is the size of the largest finite set 
 
 The mistake-bound model studies online learning. It asks how many mistakes a learner can make before converging, under some sequence of examples.
 
-## Key results
+## Sample bounds, mistake bounds, and computation
 
 For a finite hypothesis space $H$, a sufficient number of training examples for a consistent learner is:
 
@@ -58,13 +58,13 @@ $$
 
 Weighted Majority softens this idea by reducing weights of mistaken experts rather than eliminating them completely. It is more robust when no expert is perfect.
 
-The finite hypothesis bound shows why hypothesis-space size matters only logarithmically in one idealized setting. Doubling the number of hypotheses does not double the required sample size; it adds only $\ln 2 / \epsilon$ examples to the sufficient bound. However, this should not be read as permission to make $H$ arbitrarily wild. If $H$ is so expressive that it contains many bad hypotheses that fit small samples by chance, the logarithmic term still grows, and computation may become impossible.
+The finite hypothesis bound shows that hypothesis-space size matters only logarithmically in one idealized setting. Doubling the number of hypotheses does not double the required sample size; it adds only $\ln 2 / \epsilon$ examples to the sufficient bound. However, this should not be read as permission to make $H$ arbitrarily wild. If $H$ is so expressive that it contains many bad hypotheses that fit small samples by chance, the logarithmic term still grows, and computation may become impossible.
 
-VC dimension answers a different question: not "how many hypotheses are there?" but "how many arbitrary labelings can the class realize?" Infinite classes can have finite VC dimension when their geometry constrains them. Linear separators in a fixed-dimensional space are infinite because their weights are real-valued, but they cannot shatter every large finite point set. This is why capacity is not the same thing as parameter count in a naive sense, although related bounds often depend on parameters.
+VC dimension answers a different question: not "how many hypotheses are there?" but "how many arbitrary labelings can the class realize?" Infinite classes can have finite VC dimension when their geometry constrains them. Linear separators in a fixed-dimensional space are infinite because their weights are real-valued, but they cannot shatter every large finite point set. Capacity is therefore not the same thing as parameter count in a naive sense, although related bounds often depend on parameters.
 
 The mistake-bound model changes the rhythm of learning. PAC analysis draws a sample and asks about the final hypothesis. Online analysis sees examples one at a time and charges the learner for wrong predictions. This is useful for algorithms that must act while learning, and it foreshadows reinforcement-learning concerns where behavior during learning matters, not only final accuracy.
 
-PAC learnability also requires computational feasibility, not just enough examples. A theorem that says a small sample contains enough information is incomplete if finding the consistent hypothesis requires exponential search. This is why Mitchell states learnability in terms of polynomial time and polynomial sample size. Some concept classes are statistically learnable but computationally difficult under certain representations.
+PAC learnability also requires computational feasibility, not just enough examples. A theorem that says a small sample contains enough information is incomplete if finding the consistent hypothesis requires exponential search. Mitchell therefore states learnability in terms of polynomial time and polynomial sample size. Some concept classes are statistically learnable but computationally difficult under certain representations.
 
 The conjunction example illustrates a positive result. Boolean conjunctions can be learned by beginning with the most specific or most inclusive conjunction and deleting literals contradicted by positive examples, depending on the setup. The number of possible conjunctions is large, but the structure of the representation allows an efficient learner. This contrasts with arbitrary boolean functions, where an unbiased hypothesis space is too expressive to support useful generalization from modest samples.
 
@@ -75,8 +75,6 @@ The theory also explains why "more data" is not a single universal requirement. 
 Finally, the chapter distinguishes information from computation. A sample may contain enough evidence to identify a good hypothesis, yet the learner may not be able to find it efficiently. This distinction is one reason computational learning theory belongs in computer science rather than only statistics.
 
 This perspective also keeps negative results useful. Showing that a broad class is not learnable under certain assumptions does not mean learning is hopeless; it means some assumption must change. The learner may need a smaller hypothesis space, a stronger bias, a different representation, a helpful membership query, a margin assumption, or a weaker performance guarantee.
-
-## Visual
 
 ```mermaid
 flowchart TB
@@ -109,11 +107,9 @@ flowchart TB
 
 The PAC side of the diagram labels the statistical contract: once `D`, `H`, `epsilon`, and `delta` are fixed, a sufficient sample size supports a high-probability true-error guarantee. The online branch shows a different architecture where examples arrive sequentially and the learner updates a version space or expert weights after each mistake.
 
-## Worked example 1: Finite hypothesis sample bound
+### Evaluating a finite-class sample bound
 
-Problem: A consistent learner searches a finite hypothesis space of size $\vert H\vert =1024$. How many examples suffice to guarantee error at most $\epsilon=0.05$ with confidence $1-\delta=0.95$?
-
-Method:
+A consistent learner searches a finite hypothesis space of size $\vert H\vert =1024$. How many examples suffice to guarantee error at most $\epsilon=0.05$ with confidence $1-\delta=0.95$?
 
 1. Identify parameters.
 
@@ -154,13 +150,11 @@ $$
 m=199.
 $$
 
-Answer: 199 examples suffice under the finite-hypothesis consistent-learning bound. This is sufficient, not necessarily necessary.
+The finite-hypothesis consistent-learning bound gives 199 examples. This is sufficient, not necessarily necessary.
 
-## Worked example 2: Mistake bound for Halving
+### Following the Halving mistake bound
 
-Problem: The Halving algorithm begins with $\vert H\vert =64$ hypotheses and the true target is in $H$. What is the maximum number of mistakes?
-
-Method:
+The Halving algorithm begins with $\vert H\vert =64$ hypotheses and the true target is in $H$. What is the maximum number of mistakes?
 
 1. Each mistake means the majority vote was wrong.
 
@@ -184,9 +178,9 @@ Method:
 
 6. Once one hypothesis remains and the target is in $H$, no further mistakes are possible.
 
-Answer: The mistake bound is $\log_2 64=6$. The checked table shows the version space halves with each mistake.
+The mistake bound is $\log_2 64=6$; the version space halves with each mistake.
 
-## Code
+### Computing the two bounds
 
 ```python
 import math
@@ -201,7 +195,7 @@ print(finite_h_sample_bound(1024, epsilon=0.05, delta=0.05))
 print(halving_mistake_bound(64))
 ```
 
-## Common pitfalls
+## Guarantees that do not transfer automatically
 
 - Reading PAC bounds as exact predictions of test accuracy. They are worst-case sufficient guarantees under assumptions.
 - Forgetting the distribution assumption. Training and future examples are assumed to come from the same distribution.
@@ -210,10 +204,8 @@ print(halving_mistake_bound(64))
 - Believing low VC dimension is always better. Too little capacity can underfit if the target concept is complex.
 - Applying the Halving mistake bound when the true concept is not in $H$ or when labels are noisy. The classic guarantee assumes realizability.
 
-## Connections
+<div className="see-also">
 
-- [Concept learning](/cs/machine-learning/concept-learning-and-version-spaces)
-- [Evaluating hypotheses](/cs/machine-learning/evaluating-hypotheses)
-- [Artificial neural networks](/cs/machine-learning/artificial-neural-networks)
-- [Statistics](/math/statistics/)
-- [Probability](/math/probability/)
+See also: [Concept learning](/cs/machine-learning/concept-learning-and-version-spaces) · [Evaluating hypotheses](/cs/machine-learning/evaluating-hypotheses) · [Artificial neural networks](/cs/machine-learning/artificial-neural-networks) · [Statistics](/math/statistics/intro) · [Probability](/math/probability/intro)
+
+</div>

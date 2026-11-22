@@ -7,13 +7,13 @@ sidebar_position: 7
 
 Greedy algorithms build a solution one locally best choice at a time. They are attractive because the code is often short and fast, but the proof burden is high: a greedy choice that feels natural can be catastrophically wrong. The central question is not "what choice looks best now?" but "why can some optimal solution be transformed to include this choice?" [1], [3].
 
-This page covers the main proof styles: exchange arguments, stay-ahead arguments, cut properties, and the matroid theorem. It also gives counterexamples, because knowing when greedy fails is part of using it responsibly. CLRS emphasizes canonical examples such as activity selection, Huffman coding, MST, and Dijkstra; Kleinberg and Tardos add interval partitioning and scheduling; Vazirani connects greedy algorithms to approximation, especially set cover [1], [3], [6].
+The main proof styles are exchange arguments, stay-ahead arguments, cut properties, and the matroid theorem. Counterexamples matter just as much because they mark the boundary of each rule. CLRS emphasizes canonical examples such as activity selection, Huffman coding, MST, and Dijkstra; Kleinberg and Tardos add interval partitioning and scheduling; Vazirani connects greedy algorithms to approximation, especially set cover [1], [3], [6].
 
 ![Huffman tree example.](https://commons.wikimedia.org/wiki/Special:FilePath/Huffman_tree_2.svg)
 
 *Figure: Huffman coding repeatedly combines the two least frequent symbols. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Huffman_tree_2.svg), public domain or CC-BY-SA via Wikimedia Commons.*
 
-## Definitions
+## What a greedy proof must establish
 
 A **greedy algorithm** constructs a solution through irrevocable choices, each selected by a local rule. A proof must show that the local rule is globally safe.
 
@@ -21,7 +21,7 @@ An **exchange argument** starts with an optimal solution and modifies it to incl
 
 A **matroid** is a pair $(E,\mathcal{I})$ where $E$ is a finite ground set and $\mathcal{I}$ is a family of independent subsets satisfying heredity and exchange. Heredity says every subset of an independent set is independent. Exchange says if $A,B\in\mathcal{I}$ and $\vert A\vert \lt \vert B\vert $, then some element of $B\setminus A$ can be added to $A$ while preserving independence. Edmonds's theorem says that the simple greedy algorithm finds a maximum-weight independent set in every matroid, and matroids are exactly the structures for which that broad greedy guarantee holds [12].
 
-## Key results
+## Exchange arguments across classic problems
 
 Activity selection is the cleanest interval example. Given intervals with start and finish times, select the largest number of non-overlapping intervals. Sorting by earliest finish time and repeatedly taking the first compatible interval is optimal. The exchange proof replaces the first interval in an optimal solution with the greedy interval; because the greedy interval finishes no later, the remaining intervals still fit [1], [3].
 
@@ -40,8 +40,6 @@ Scheduling jobs to minimize maximum lateness has another elegant greedy rule. If
 Set cover demonstrates greedy as approximation rather than exact optimization. Repeatedly choose the set covering the largest number of still-uncovered elements. The result can be a factor $H_n=\ln n+O(1)$ larger than optimum, and this logarithmic behavior is essentially the right scale under standard complexity assumptions [6], [13]. The same local-choice style that gives exact algorithms for matroids gives controlled approximate algorithms for harder covering problems.
 
 Greedy fails for 0/1 knapsack, longest path, and arbitrary coin systems. For coin change with denominations $1,3,4$, greedy makes $6=4+1+1$ using three coins, but the optimum is $3+3$ using two. These failures show why a proof must be part of the algorithm, not an afterthought.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -69,7 +67,9 @@ flowchart TD
 | Dijkstra | minimum tentative distance vertex | optimal for nonnegative edges | stay-ahead |
 | Set cover | set covering most uncovered elements | $H_n$-approximation | charging |
 
-## Worked example 1: interval scheduling on six activities
+## Greedy choices by hand
+
+### Earliest finish time on six activities
 
 **Problem.** Select the maximum number of non-overlapping intervals:
 
@@ -93,7 +93,7 @@ flowchart TD
 
 **Checked answer.** The greedy set is $\{A,D,F\}$ with size 3. No solution can have 4 intervals because every interval before D conflicts with A or D, and the time line only supports at most one of A/B/C/E before D plus D plus F. The exchange proof gives the general optimality guarantee.
 
-## Worked example 2: Huffman code construction
+### Building a Huffman tree from frequencies
 
 **Problem.** Frequencies are
 
@@ -129,7 +129,7 @@ Assign 0 to left edges and 1 to right edges using the merge order above. One val
 
 **Checked answer.** The weighted path length is $45+36+39+20+36+48=224$. The exact bit strings can flip left and right choices, but the tree shape and weighted length are optimal.
 
-## Code
+## Three greedy constructions
 
 ```python
 from heapq import heappop, heappush, heapify
@@ -156,29 +156,33 @@ def fractional_knapsack(items, capacity):
     return total, taken
 
 def huffman_code(freq):
-    heap = [(weight, symbol) for symbol, weight in freq.items()]
+    if not freq:
+        return {}
+
+    heap = [(weight, order, symbol)
+            for order, (symbol, weight) in enumerate(freq.items())]
     heapify(heap)
-    counter = 0
+    counter = len(heap)
     while len(heap) > 1:
-        w1, t1 = heappop(heap)
-        w2, t2 = heappop(heap)
+        w1, _, t1 = heappop(heap)
+        w2, _, t2 = heappop(heap)
         counter += 1
-        heappush(heap, (w1 + w2, (counter, t1, t2)))
+        heappush(heap, (w1 + w2, counter, (t1, t2)))
 
     def walk(tree, prefix, out):
         if isinstance(tree, str):
             out[tree] = prefix or "0"
             return
-        _, left, right = tree
+        left, right = tree
         walk(left, prefix + "0", out)
         walk(right, prefix + "1", out)
 
     result = {}
-    walk(heap[0][1], "", result)
+    walk(heap[0][2], "", result)
     return result
 ```
 
-## Common pitfalls
+## Local rules that still need proof
 
 - Assuming a greedy rule is correct because it works on small examples.
 - Proving that the first greedy choice is good but not proving the induction step.
@@ -193,15 +197,6 @@ def huffman_code(freq):
 - Ignoring tie-breaking when deterministic output matters, even if optimality does not.
 - Missing the lower bound used in a stay-ahead proof.
 - Claiming matroid greedy applies before verifying the exchange axiom.
-
-## Connections
-
-- [Dynamic Programming](/cs/algorithms/dynamic-programming) for problems where local choices fail and state tables are needed.
-- [Graph Algorithms](/cs/algorithms/graph-algorithms) for MST and Dijkstra.
-- [Approximation Algorithms](/cs/algorithms/approximation-algorithms) for greedy set cover, vertex cover variants, and scheduling approximations.
-- [Network Flow and Matching](/cs/algorithms/network-flow-and-matching) for problems where augmenting paths replace local greedy choices.
-- [Data Structures](/cs/data-structures/intro) for heaps, union-find, and priority queues.
-- [Discrete Math](/math/discrete/intro) for matroids, exchange arguments, and graph cuts.
 
 ## References
 
@@ -230,3 +225,16 @@ def huffman_code(freq):
 [12] J. Edmonds, "Submodular functions, matroids, and certain polyhedra," *Combinatorial Structures and Their Applications*, pp. 69-87, 1970.
 
 [13] L. Lovasz, "On the ratio of optimal integral and fractional covers," *Discrete Mathematics*, vol. 13, no. 4, pp. 383-390, 1975.
+
+<div className="see-also">
+
+See also:
+
+- [Dynamic Programming](/cs/algorithms/dynamic-programming) for problems where local choices fail and state tables are needed.
+- [Graph Algorithms](/cs/algorithms/graph-algorithms) for MST and Dijkstra.
+- [Approximation Algorithms](/cs/algorithms/approximation-algorithms) for greedy set cover, vertex cover variants, and scheduling approximations.
+- [Network Flow and Matching](/cs/algorithms/network-flow-and-matching) for problems where augmenting paths replace local greedy choices.
+- [Data Structures](/cs/data-structures/intro) for heaps, union-find, and priority queues.
+- [Discrete Math](/math/discrete/intro) for matroids, exchange arguments, and graph cuts.
+
+</div>

@@ -13,7 +13,7 @@ Guided waves add geometry. Optical fibers guide light by total internal reflecti
 
 *Figure: Snell's law turns an everyday refraction scene into a boundary-condition calculation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Snells_law.svg), Cristan and Sawims, public domain.*
 
-## Definitions
+## Boundary coefficients and modal cutoffs
 
 For normal incidence from medium 1 to medium 2, the electric-field reflection and transmission coefficients are
 
@@ -67,7 +67,7 @@ $$
 
 TE means the electric field has no component in the propagation direction, while TM means the magnetic field has no component in the propagation direction. TEM waves, like the ideal coaxial-line mode, require at least two conductors and have neither electric nor magnetic longitudinal components. A hollow single-conductor rectangular waveguide cannot support a true TEM mode because the boundary conditions and field topology do not allow the required static transverse potential solution.
 
-## Key results
+## From refraction to guided modes
 
 At oblique incidence, perpendicular and parallel polarizations have different reflection coefficients. The boundary conditions must be applied to tangential $\vec E$ and $\vec H$, producing Fresnel coefficients. The qualitative outcomes are:
 
@@ -116,7 +116,7 @@ Mode excitation depends on source symmetry. A probe, loop, aperture, or transiti
 
 Single-mode operation is often a design goal because multiple propagating modes travel with different phase and group velocities. If more than one mode is excited, power can arrive with different delays or field patterns, complicating measurements and communication channels. Waveguide dimensions are therefore chosen to keep the operating band above the dominant cutoff and below the next cutoff.
 
-## Visual
+### How an interface becomes a guide
 
 ```mermaid
 flowchart TB
@@ -150,8 +150,6 @@ flowchart TB
   Single --> Output
 ```
 
-This diagram separates boundary scattering from guided-wave structure. The top pipeline applies electromagnetic boundary conditions to produce Fresnel reflection, transmission, refraction, and possible evanescent fields. The fiber and rectangular-waveguide subgraphs then show how those boundary facts become modal guidance, cutoff conditions, dominant modes, and dispersion.
-
 | Phenomenon | Condition | Result |
 |---|---|---|
 | Normal reflection | $\eta_1\ne\eta_2$ | partial reflected wave |
@@ -160,7 +158,7 @@ This diagram separates boundary scattering from guided-wave structure. The top p
 | Waveguide cutoff | $f\lt f_c$ | no propagating mode |
 | Cavity resonance | standing waves in closed guide | discrete resonant frequencies |
 
-## Worked example 1: Normal incidence from air to glass
+## Normal incidence from air to glass
 
 Problem: A normally incident plane wave in air strikes lossless nonmagnetic glass with $\epsilon_r=4$. Find $\Gamma$, reflected power fraction, and transmitted electric-field coefficient.
 
@@ -198,7 +196,7 @@ $$
 
 Check: The transmitted electric-field amplitude is smaller, but power accounting also includes the impedance change.
 
-## Worked example 2: TE10 cutoff in a rectangular waveguide
+## TE$_{10}$ cutoff in a rectangular waveguide
 
 Problem: An air-filled rectangular waveguide has $a=2.286$ cm and $b=1.016$ cm. Find the TE$_{10}$ cutoff frequency and determine whether $10$ GHz propagates.
 
@@ -245,39 +243,23 @@ Since $f_c/f=0.656$, propagation is above cutoff but phase behavior differs from
 
 Check: This dimension is the common WR-90 broad wall, whose useful band includes X-band near 10 GHz.
 
-## Code
+## Conditions hidden by the compact formulas
 
-```python
-import numpy as np
+- Plane-wave reflection uses intrinsic impedance $\eta$ where a transmission-line calculation uses $Z$.
+- Squaring the transmitted field coefficient does not by itself give transmitted power; impedance and propagation angle also enter.
+- Oblique-incidence coefficients depend on polarization.
+- Total internal reflection requires incidence from the higher-index side.
+- Waveguide cutoff is not material absorption. Below cutoff, the mode is evanescent even in a perfectly conducting, lossless guide.
+- TE and TM are defined relative to the propagation direction, not relative to an arbitrary wall.
+- More source power cannot force a below-cutoff mode to propagate.
 
-c = 299_792_458.0
+<div className="see-also">
 
-def normal_incidence_gamma(er1, er2, mur1=1.0, mur2=1.0):
-    eta1 = np.sqrt(mur1 / er1)
-    eta2 = np.sqrt(mur2 / er2)
-    return (eta2 - eta1) / (eta2 + eta1)
-
-def rectangular_cutoff(a, b, m, n, eps_r=1.0, mu_r=1.0):
-    vp = c / np.sqrt(eps_r * mu_r)
-    return 0.5 * vp * np.sqrt((m / a)**2 + (n / b)**2)
-
-print("Gamma air to er=4:", normal_incidence_gamma(1, 4))
-print("TE10 cutoff:", rectangular_cutoff(0.02286, 0.01016, 1, 0), "Hz")
-```
-
-## Common pitfalls
-
-- Using the transmission-line reflection coefficient formula with $Z$ but forgetting that plane waves use intrinsic impedance $\eta$.
-- Assuming transmitted field coefficient squared is transmitted power fraction. Power depends on impedance and angle.
-- Forgetting polarization dependence at oblique incidence.
-- Applying total internal reflection when the wave goes from lower index to higher index. It requires incidence from higher index.
-- Treating waveguide cutoff as material absorption. Below cutoff the mode is evanescent even in a perfectly conducting, lossless guide.
-- Calling TE and TM modes by their electric-field direction relative to a wall. TE/TM are defined relative to the propagation direction.
-- Assuming a waveguide can carry any low frequency if the source is strong enough. Below cutoff, increasing source power does not create a propagating mode of that type.
-
-## Connections
+See also:
 
 - [Plane waves, loss, polarization, and power](/physics/electromagnetics/plane-waves-lossless-lossy-polarization) for $\eta$, $\gamma$, polarization, and Poynting vector.
 - [Reflections, Smith chart, and matching](/physics/electromagnetics/reflections-smith-chart-and-matching) for the guided-wave impedance analogy.
 - [Maxwell equations for time-varying fields](/physics/electromagnetics/maxwell-equations-time-varying-fields) for boundary conditions.
 - [Antennas, radiation, and arrays](/physics/electromagnetics/antennas-radiation-arrays) for apertures and radiation from guided structures.
+
+</div>

@@ -5,51 +5,19 @@ sidebar_position: 12
 
 # Serial Buses and Embedded Protocols
 
-The source includes a buses and protocols chapter covering serial communication classes, RS-232C, RS-423A, RS-422A, RS-485, I2C, Modbus, and IEEE-488. These topics widen the view from one microcontroller board to communication between devices. A microcontroller may send bytes through a UART, share an I2C bus with memory and clock chips, or exchange Modbus frames with an industrial controller.
+Serial links connect a microcontroller to devices at several scales: a UART may cross one board, I2C may share a short bus among memory and clock chips, and Modbus RTU may run over RS-485 between industrial controllers.
 
-The common theme is that a bus is more than a wire. It defines electrical levels, direction rules, timing, addressing, framing, acknowledgements, and error checks. Software must follow the protocol's order exactly, while hardware must satisfy voltage, termination, pull-up, and distance requirements.
+Each choice carries several contracts at once. Electrical levels, direction rules, clocking, addressing, frame boundaries, acknowledgements, and error checks all have to agree. Matching the byte format while ignoring the electrical layer is enough to make a link fail.
 
-## Definitions
+## From pins to complete messages
 
-**Serial communication** transmits data one bit at a time over one or a small number of signal lines. It contrasts with parallel transfer, where multiple bits move simultaneously.
+**Serial communication** moves data one bit at a time over one or a few signal lines. A simplex link sends in one direction, a half-duplex link takes turns, and a full-duplex link transmits and receives simultaneously.
 
-**Simplex** communication allows data in one direction only. **Half-duplex** allows both directions but not at the same time. **Full-duplex** allows simultaneous transmit and receive.
+An **asynchronous** link has no shared clock. A UART frame usually contains a start bit, data bits, optional parity, and one or more stop bits. A **synchronous** link supplies a clock or a defined clocking relationship so the receiver knows when to sample.
 
-**Asynchronous serial** communication sends frames without a shared clock. A UART frame commonly contains a start bit, data bits, optional parity, and one or more stop bits.
+Framing above the byte level is separate. UART bytes do not identify message boundaries, so protocols add sync markers, fixed lengths, length fields, quiet intervals, checksums, CRCs, or addresses. After one byte is lost, a receiver needs one of those rules to find the next valid frame.
 
-**Synchronous serial** communication uses a clock or defined clocking relationship so the receiver samples bits at known times.
-
-**RS-232C** defines single-ended serial electrical signaling and connector conventions for short point-to-point communication. Logic levels are not ordinary TTL levels, so level conversion is normally required between an 8051 UART and RS-232.
-
-**RS-422** and **RS-485** use differential signaling. RS-485 is widely used for multidrop half-duplex networks because several devices can share a twisted pair when drivers are controlled correctly.
-
-**I2C** is a two-wire synchronous bus using serial data `SDA` and serial clock `SCL`, open-drain signaling, pull-up resistors, start and stop conditions, 7-bit or 10-bit addressing, and acknowledge bits.
-
-**Modbus** is a master-slave or client-server style industrial protocol. Modbus RTU frames on serial links include address, function code, data, and CRC.
-
-**IEEE-488**, also known as GPIB, is a parallel instrument-control bus historically used for test equipment.
-
-## Key results
-
-The first key result is that electrical compatibility is not the same as byte compatibility. An 8051 UART can create an asynchronous byte stream, but RS-232 requires level shifting and inversion compared with TTL logic. RS-485 requires differential drivers and direction control.
-
-The second key result is that asynchronous UART timing is open-loop inside each frame. The receiver detects the start bit, then samples based on its own baud-rate clock. If transmitter and receiver baud rates differ too much, sampling drifts and framing errors occur.
-
-The third key result is that I2C devices never drive the bus high. They release the open-drain line, and pull-up resistors bring it high. This allows multiple devices to share the bus and makes acknowledgement possible, but it also limits speed through bus capacitance and pull-up resistance.
-
-The fourth key result is that I2C transfer order is structured: start condition, address plus direction bit, acknowledge, data bytes with acknowledge bits, and stop condition. A repeated start can change direction without releasing the bus.
-
-The fifth key result is that Modbus RTU relies on framing gaps and CRC. A receiver must know where one frame ends and another begins, and it must reject frames whose CRC does not match.
-
-The sixth key result is that multidrop buses require an addressing or arbitration rule. I2C uses device addresses and arbitration on `SDA`; Modbus uses a slave address field; RS-485 only defines the electrical layer, so the higher-level protocol must prevent two nodes from transmitting at once.
-
-The seventh key result is that bus length and speed are engineering tradeoffs. A short board-level I2C bus can run faster than a long cable with high capacitance. RS-485 can cover much longer distances, but it needs proper termination, biasing, and transceiver direction timing. RS-232 is simple for point-to-point links but is not a multidrop network. Choosing a bus begins with distance, noise, number of nodes, speed, and existing device support.
-
-The eighth key result is that a frame format must define both content and boundaries. UART bytes alone do not say where a message starts. Protocols add start markers, lengths, time gaps, checksums, CRCs, addresses, or fixed byte counts. Modbus RTU uses timing gaps and CRC; I2C uses start/stop conditions and acknowledges; many custom UART protocols use sync bytes and length fields. Without boundaries, a receiver cannot recover cleanly after a lost byte.
-
-The ninth key result is that acknowledgements mean different things at different layers. An I2C ACK means a device pulled `SDA` low for one bit time; it does not prove that a sensor measurement is complete or that an EEPROM write has finished internally. A Modbus response proves that a slave parsed a request and chose a response; it does not prove that an actuator physically reached a final position. Good software distinguishes link-level success from application-level success.
-
-## Visual
+The main contracts can be compared in one diagram:
 
 ```mermaid
 flowchart TB
@@ -103,88 +71,72 @@ flowchart TB
   Modbus --> Term["RS-485 termination, bias, and bus arbitration"]
 ```
 
-This serial-bus diagram compares the actual frame and wiring contracts for UART/RS-style links, I2C, SPI, and Modbus RTU. Each subgraph labels the ordering of start/address/data/acknowledgement or chip-select/clock/data events, so the bus is not reduced to a generic byte arrow. The hardware side notes make the electrical assumptions visible: level shifting, open-drain pull-ups, chip-select fanout, differential termination, and driver turnaround.
-
 | Bus or standard | Signaling | Topology | Software concern | Hardware concern |
 |---|---|---|---|---|
-| TTL UART | Single-ended logic | Point-to-point | Baud, framing, flags | Logic-level compatibility |
-| RS-232C | Single-ended, higher voltage | Point-to-point | UART framing | Level shifter and cable length |
-| RS-485 | Differential | Multidrop | Direction and protocol | Termination and biasing |
-| I2C | Open-drain two-wire | Multidrop | Address, ACK, bus state | Pull-ups and capacitance |
-| Modbus RTU | Usually over RS-485 | Master-slave network | CRC and timing gaps | Transceiver direction |
+| TTL UART | Single-ended logic | Point-to-point | Baud and frame settings | Logic-level compatibility |
+| RS-232C | Single-ended, bipolar voltage | Point-to-point | UART framing | Level shifter and cable length |
+| RS-485 | Differential | Multidrop | Direction and higher-level protocol | Termination and biasing |
+| I2C | Open-drain two-wire | Multidrop | Address, ACK, and bus state | Pull-ups and capacitance |
+| SPI | Clocked, separate data directions | Chip-select fanout | Clock polarity, phase, and frame size | Signal integrity and chip selects |
+| Modbus RTU | Commonly carried over RS-485 | Client-server network | CRC and timing gaps | Transceiver turnaround |
 | IEEE-488 | Parallel instrument bus | Multiple instruments | Talker/listener control | Cable and bus loading |
 
-## Worked example 1: Decoding an I2C address byte
+## UART bytes and the RS electrical layers
 
-Problem: An I2C master sends address byte `D0H` immediately after a start condition. Determine the 7-bit slave address and transfer direction.
+A UART generates an asynchronous logic-level byte stream. Its receiver detects a start bit and then samples using its own baud-rate clock. Excessive transmitter-receiver clock error shifts the sample point across the frame and eventually produces data or framing errors.
 
-Method:
+**RS-232C** defines point-to-point, single-ended electrical signaling at voltages and polarity that differ from ordinary MCU logic. An 8051 UART therefore needs an RS-232 level shifter; connecting the pins directly is electrically wrong even when both ends use identical UART framing.
 
-1. In 7-bit I2C addressing, the transmitted address byte contains the 7-bit address in bits 7 through 1.
+**RS-422** and **RS-485** use differential signaling. RS-485 is common on multidrop, half-duplex networks, but it defines the electrical layer rather than message ownership. The higher-level protocol must stop two nodes from driving the pair simultaneously, and the hardware needs correct termination, biasing, and driver-enable timing.
 
-2. Bit 0 is the direction bit: `0` for write and `1` for read.
+RS-423A is a related single-ended electrical standard. It appears less often in current microcontroller designs but belongs to the same distinction between a UART's byte framing and the external line driver.
 
-3. Convert `D0H` to binary:
+## How an I2C transfer holds the bus together
+
+I2C uses `SDA` for data and `SCL` for the clock. Devices pull these lines low or release them; pull-up resistors provide the high state. A push-pull high output violates that contract and can contend with another device pulling low.
+
+A normal transfer consists of a start condition, address plus direction bit, acknowledge, data bytes with acknowledge bits, and a stop condition. A repeated start changes phase or direction without releasing the bus. Arbitration also relies on the wired behavior of `SDA`.
+
+Pull-up resistance and bus capacitance set the rising-edge speed. Weak pull-ups on a capacitive bus rise too slowly; excessively strong pull-ups demand too much sink current. Bus speed, trace or cable length, device count, and voltage therefore belong in the same calculation.
+
+An ACK has narrow meaning: the receiver pulled `SDA` low for one bit time. It does not prove that a sensor conversion is complete or that an EEPROM has finished its internal write cycle.
+
+### Decoding the address byte `D0H`
+
+In 7-bit addressing, bits 7 through 1 carry the device address and bit 0 selects write (`0`) or read (`1`). The transmitted byte is
 
 ```text
 D0H = 1101 0000
 ```
 
-4. Extract bits 7 through 1:
+Removing the direction bit leaves
 
 ```text
-1101000
+1101000 = 68H
 ```
 
-5. Convert `1101000` to hexadecimal. Pad on the left for grouping:
+and the low bit is `0`. The transfer therefore writes to 7-bit address `68H`, the DS1307 RTC address. A read uses `D1H`; only the direction bit changes. Data sheets that list `D0H` and `D1H` as separate “addresses” are showing the address-plus-direction byte, not two 7-bit addresses.
+
+## SPI selects devices rather than addressing them
+
+SPI uses a clock, separate master-to-peripheral and peripheral-to-master data lines, and a chip-select signal. Transfer is full-duplex at the shift-register level: every transmitted bit clocks one received bit. Devices must agree on clock polarity, clock phase, word length, bit order, and the chip-select boundaries that define a command.
+
+There is no standard SPI message format or acknowledgement. One chip-select per peripheral is common, sometimes with a decoder. A successful electrical transfer only shows that bits were clocked; device status must be defined by the peripheral protocol.
+
+## Modbus RTU framing and CRC
+
+Modbus defines application fields such as unit address, function code, and data. Modbus RTU adds serial framing through silent intervals and a CRC. RS-485 is a common carrier, but the two standards solve different layers.
+
+Consider the request bytes `01 03 00 10 00 02` followed by two CRC bytes:
 
 ```text
-0110 1000 = 68H
+01H       unit address 1
+03H       read holding registers
+00 10     starting address 0010H
+00 02     quantity 2
 ```
 
-6. The least significant bit of `D0H` is `0`, so the direction is write.
-
-Answer: the 7-bit slave address is `68H`, and the operation is a write. This is the common address used by DS1307 RTC devices.
-
-Check: The read address byte for the same 7-bit address would be `D1H`, because only the low direction bit changes.
-
-## Worked example 2: Identifying a Modbus RTU frame
-
-Problem: A Modbus RTU request begins with bytes `01 03 00 10 00 02` followed by two CRC bytes. Interpret the fields before the CRC.
-
-Method:
-
-1. The first byte is the slave address:
-
-```text
-01H -> slave 1
-```
-
-2. The second byte is the function code:
-
-```text
-03H -> read holding registers
-```
-
-3. The next two bytes are the starting register address:
-
-```text
-00 10 -> 0010H
-```
-
-4. The next two bytes are the quantity of registers:
-
-```text
-00 02 -> 2 registers
-```
-
-5. The final two bytes, not shown in detail here, are the CRC transmitted low byte first in Modbus RTU.
-
-Answer: the frame asks slave 1 to read two holding registers starting at address `0010H`.
-
-Check: The request is not complete without a valid CRC. A receiver should compute the CRC over the address, function, and data fields and compare it with the received CRC bytes.
-
-## Code
+The request asks unit 1 for two holding registers starting at `0010H`. It is incomplete until the receiver verifies the CRC over the address, function, and data fields. Modbus RTU transmits the CRC low byte first.
 
 ```c
 /* Modbus RTU CRC-16, polynomial 0xA001.
@@ -209,19 +161,16 @@ unsigned int modbus_crc16(const unsigned char *buf, unsigned int len) {
 }
 ```
 
-## Common pitfalls
+A valid Modbus response confirms that a server parsed the request and chose a response. It does not confirm that an actuator reached its commanded position; that requires application state or physical feedback.
 
-- Connecting an 8051 UART directly to RS-232 without a level converter.
-- Forgetting RS-485 driver direction control in half-duplex systems, causing two nodes to drive the bus.
-- Treating I2C lines as push-pull outputs. I2C requires open-drain behavior and pull-ups.
-- Ignoring acknowledge bits. A missing ACK usually means wrong address, absent device, bus fault, or timing issue.
-- Confusing 7-bit I2C addresses with the 8-bit address-plus-direction byte shown in some data sheets.
-- Transmitting Modbus CRC high byte first. Modbus RTU sends CRC low byte first.
-- Assuming a protocol such as Modbus defines the physical layer. Modbus can run over different links; RS-485 is common but separate.
+## Choosing and debugging the link
 
-## Connections
+Distance, noise, node count, speed, duplex requirements, and device support narrow the choice. Short board-level I2C buses trade simplicity for capacitance limits. SPI is fast and direct but consumes chip selects. RS-232 suits short point-to-point links. RS-485 covers longer multidrop wiring but adds transceivers, termination, bias, and turnaround control. IEEE-488, also called GPIB, remains relevant mainly for instrument-control systems.
 
-- [8051 timers, serial port, and interrupts](/cs/embedded/8051-timers-serial-interrupts)
-- [Serial EEPROM and DS1307 RTC interfacing](/cs/embedded/serial-eeprom-rtc-ds1307)
-- [8051 external-world interfacing](/cs/embedded/8051-external-world-interfacing)
-- [Microcontroller derivatives, AVR, and PIC](/cs/embedded/microcontroller-derivatives-avr-pic)
+Debug from the lowest contract upward. First verify voltage levels, common reference or differential wiring, pull-ups, termination, and driver direction. Then check clock or baud settings, polarity and phase, start and stop conditions, addresses, frame boundaries, and CRC byte order. A missing I2C ACK can indicate a wrong address, absent device, bus fault, or timing failure; treating it as a generic software error discards the most useful clue.
+
+<div className="see-also">
+
+See also: [8051 timers, serial port, and interrupts](/cs/embedded/timers-serial-interrupts) · [Serial EEPROM and DS1307 RTC interfacing](/cs/embedded/serial-eeprom-rtc-ds1307) · [8051 external-world interfacing](/cs/embedded/external-world-interfacing) · [Microcontroller derivatives, AVR, and PIC](/cs/embedded/microcontroller-derivatives-avr-pic)
+
+</div>

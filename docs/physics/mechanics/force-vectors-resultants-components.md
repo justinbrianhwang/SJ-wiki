@@ -533,9 +533,8 @@ The integral and composite-area methods are two versions of the same first-momen
 - A zero force resultant does not rule out a nonzero couple. Check moments whenever forces are nonconcurrent.
 - Newtons and meters may be used together in a moment calculation, but geometry given in millimeters must first be converted if the desired moment unit is N m.
 
-## Related pages
+<div className="see-also">
 
-- [Particle equilibrium](/physics/mechanics/particle-equilibrium)
-- [Rigid-body equilibrium](/physics/mechanics/rigid-body-equilibrium)
-- [Particle kinematics](/physics/mechanics/particle-kinematics)
-- [Impulse, momentum, and impact](/physics/mechanics/impulse-momentum-impact)
+See also: [Particle equilibrium](/physics/mechanics/particle-equilibrium) · [Rigid-body equilibrium](/physics/mechanics/rigid-body-equilibrium) · [Particle kinematics](/physics/mechanics/particle-kinematics) · [Impulse, momentum, and impact](/physics/mechanics/impulse-momentum-impact)
+
+</div>

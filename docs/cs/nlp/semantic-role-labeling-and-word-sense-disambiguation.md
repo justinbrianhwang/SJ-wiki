@@ -9,7 +9,7 @@ Semantic role labeling and word-sense disambiguation move from surface form towa
 
 Both tasks ask a contextual question. For SRL: who did what to whom, where, when, and how? For WSD: which meaning of a word is intended here? They are distinct tasks, but they share a dependence on syntax, lexical semantics, context, and inventories of labels.
 
-## Definitions
+## Predicates, roles, and sense inventories
 
 A **predicate** evokes an event, state, or relation. Its **arguments** fill semantic roles. In `Asha gave Boyang a book`, the predicate `gave` has a giver, recipient, and theme.
 
@@ -27,7 +27,7 @@ A simplified SRL output might be:
 
 SRL can be formulated as span classification, sequence labeling, or structured prediction. WSD can be treated as supervised classification with contextual features or contextual embeddings.
 
-## Key results
+## Resolving arguments under global constraints
 
 Semantic roles are useful because syntax alone does not identify event participants. In active and passive forms, the subject changes but the underlying role can remain stable:
 
@@ -42,11 +42,11 @@ SRL pipelines often include predicate identification, predicate sense disambigua
 
 Constraints matter because not every local role decision is globally coherent. A predicate should not usually have two core `ARG0` spans, argument spans should not overlap, and role labels must belong to the predicate's frame. Integer linear programming, dynamic programming, CRFs, and constrained decoding have all been used to enforce such rules.
 
-WSD has a strong most-frequent-sense baseline. Many words are skewed toward one sense, so systems must beat this baseline to show contextual understanding. Contextual embeddings improve WSD because the same word type receives different vectors in different contexts. A practical method is to average contextual embeddings for labeled training examples of each sense, then classify a new occurrence by nearest sense vector.
+WSD has a strong most-frequent-sense baseline. Many words are skewed toward one sense, so systems must beat this baseline to show contextual understanding. Contextual embeddings improve WSD because the same word type receives different vectors in different contexts. One simple method averages contextual embeddings for labeled training examples of each sense, then classifies a new occurrence by nearest sense vector.
 
 SRL and WSD also expose the limits of fixed inventories. Sense boundaries can be fuzzy, metaphors can stretch frames, and different resources carve meaning differently. The label inventory is part of the model.
 
-Syntax is helpful but not sufficient. Constituency parses can propose argument spans, and dependency parses can reveal paths from predicates to arguments, but semantic roles do not always follow syntax directly. Control, raising, passive voice, nominal predicates, implicit arguments, and coordination can all require additional reasoning. This is why SRL systems historically combined parse features with classifiers and why neural systems still benefit from syntactic signals in some domains.
+Syntax is helpful but not sufficient. Constituency parses can propose argument spans, and dependency parses can reveal paths from predicates to arguments, but semantic roles do not always follow syntax directly. Control, raising, passive voice, nominal predicates, implicit arguments, and coordination can all require additional reasoning. SRL systems have therefore combined parse features with classifiers, and neural systems still benefit from syntactic signals in some domains.
 
 WSD and SRL meet at predicate sense. PropBank roles such as `ARG0` and `ARG1` depend on the predicate frameset, so choosing the wrong sense can change the interpretation of every argument. In FrameNet, the lexical unit evokes a frame, and frame elements are defined relative to that frame. A model that labels argument spans without resolving predicate sense may produce locally plausible but semantically inconsistent outputs.
 
@@ -59,8 +59,6 @@ WSD evaluation has a similar decomposition. A system may choose among senses for
 For applications, coarse meaning may be enough. A search system may only need to separate financial `bank` from river `bank`; a lexical resource project may need much finer distinctions. Similarly, IE may only need buyer, seller, and goods, while a semantic theory may care about possession transfer, payment, and obligations. The granularity should follow the downstream question.
 
 The same granularity issue appears in roles. Some tasks need only agent-like and patient-like participants; others need instrument, beneficiary, source, destination, manner, and temporal modifiers. More labels can express more meaning, but they require more data and create harder annotation decisions.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -82,9 +80,11 @@ flowchart TD
 | WordNet | synsets and lexical relations | word senses | useful WSD inventory |
 | AMR | graph of concepts and roles | `want-01`, `:ARG0` | sentence-level meaning graph |
 
-## Worked example 1: PropBank-style SRL
+## Applying role and sense inventories
 
-Problem: label the roles in `Maya sold Ravi a bicycle yesterday` for predicate `sold`.
+### Assigning roles in `Maya sold Ravi a bicycle`
+
+Label the roles in `Maya sold Ravi a bicycle yesterday` for predicate `sold`.
 
 1. Identify predicate:
    - `sold` evokes a selling event.
@@ -104,11 +104,11 @@ Problem: label the roles in `Maya sold Ravi a bicycle yesterday` for predicate `
 [ARG0 Maya] [PRED sold] [ARG2 Ravi] [ARG1 a bicycle] [AM-TMP yesterday]
 ```
 
-Checked answer: the roles are not determined only by position. If the sentence were passive, `A bicycle was sold to Ravi by Maya yesterday`, the same event roles would remain.
+The roles are not determined only by position. If the sentence were passive, `A bicycle was sold to Ravi by Maya yesterday`, the same event roles would remain.
 
-## Worked example 2: word-sense disambiguation with context
+### Choosing the river sense of `bank`
 
-Problem: choose the sense of `bank` in `The canoe reached the bank before sunset`. Candidate senses are financial institution and river edge.
+Choose the sense of `bank` in `The canoe reached the bank before sunset`. Candidate senses are financial institution and river edge.
 
 1. Extract context words:
    - `canoe`, `reached`, `before`, `sunset`.
@@ -125,9 +125,9 @@ Problem: choose the sense of `bank` in `The canoe reached the bank before sunset
 bank = river edge
 ```
 
-Checked answer: the intended sense is river edge. A supervised WSD model would learn this from context features or contextual embeddings around labeled examples.
+The intended sense is river edge. A supervised WSD model would learn this from context features or contextual embeddings around labeled examples.
 
-## Code
+## A lexical WSD baseline
 
 ```python
 from collections import Counter
@@ -159,7 +159,7 @@ print(scores)
 print(max(scores, key=scores.get))
 ```
 
-## Common pitfalls
+## Inventory and granularity traps
 
 - Treating PropBank `ARG0` as always identical to Agent; roles are predicate-specific.
 - Ignoring predicate sense, which changes argument interpretation.
@@ -169,9 +169,8 @@ print(max(scores, key=scores.get))
 - Assuming WordNet, FrameNet, and PropBank labels are interchangeable.
 - Using contextual embeddings without deciding which layer or pooling method represents the target word.
 
-## Connections
+<div className="see-also">
 
-- [Constituency parsing with CKY](/cs/nlp/constituency-parsing-cky)
-- [Dependency parsing](/cs/nlp/dependency-parsing)
-- [Vector semantics and embeddings](/cs/nlp/vector-semantics-and-embeddings)
-- [Information extraction](/cs/nlp/information-extraction)
+See also: [Constituency parsing with CKY](/cs/nlp/constituency-parsing-cky) · [Dependency parsing](/cs/nlp/dependency-parsing) · [Vector semantics and embeddings](/cs/nlp/vector-semantics-and-embeddings) · [Information extraction](/cs/nlp/information-extraction)
+
+</div>

@@ -5,136 +5,206 @@ sidebar_position: 13
 
 # Solutions and Colligative Properties
 
-Solutions are homogeneous mixtures whose behavior depends on both chemical identity and particle count. Solubility asks whether a solute dissolves significantly; concentration describes how much dissolves; colligative properties measure effects that depend mainly on the number of dissolved particles.
+A solution is a homogeneous mixture whose behavior depends on chemical interactions and particle count. Solubility asks how much can dissolve at equilibrium; concentration reports how much is present; colligative properties track how dissolved particles shift solvent phase equilibria.
 
-In the Ebbing and Gammon sequence this topic sits near types of solutions, solution process, temperature and pressure effects on solubility, concentration units, vapor pressure lowering, boiling-point elevation, freezing-point depression, osmosis, ionic solutions, and colloids. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
+## Choosing a concentration scale
 
-![A diagram shows red blood cells changing volume in hypotonic, isotonic, and hypertonic solutions.](https://commons.wikimedia.org/wiki/Special:FilePath/Osmotic_pressure_on_blood_cells_diagram.svg)
+The solvent usually sets the phase and is present in the larger amount; the remaining component is the solute. No single concentration unit is best for every calculation.
 
-*Figure: Osmotic pressure as a colligative effect driven by dissolved particle concentration. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Osmotic_pressure_on_blood_cells_diagram.svg), LadyofHats, public domain.*
-
-![A fractional distillation apparatus diagram shows a heated flask, column, condenser, and receiving flask.](https://commons.wikimedia.org/wiki/Special:FilePath/Fractional_distillation_lab_apparatus.svg)
-
-*Figure: Fractional distillation as a practical separation method for liquid mixtures. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fractional_distillation_lab_apparatus.svg), Theresa Knott and John Kershaw, CC BY-SA 3.0/GFDL.*
-
-## Definitions
-
-The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.
-
-- Solute is the component dissolved in the solvent.
-- Solvent is the component present in larger amount or setting the solution phase.
-- Solubility is the maximum amount of solute that dissolves under specified conditions.
-- Molarity is moles solute per liter of solution.
-- Molality is moles solute per kilogram of solvent.
-- Mole fraction is moles of one component divided by total moles.
-- Colligative property depends on number of solute particles rather than identity in the ideal limit.
-- Van't Hoff factor $i$ is the effective number of particles produced per formula unit.
-
-Definitions in chemistry often connect a symbolic representation to a physical sample. A formula such as $\mathrm{H_2O}$ names a substance, gives the atomic ratio inside one molecule, and supplies the molar mass used in a macroscopic calculation. A state symbol such as $\mathrm{(aq)}$ is not cosmetic; it says the species is dispersed in water and may be treated as ions when writing a net ionic equation. In the same way, constants such as $R$, $K_w$, $F$, or $N_A$ are compact definitions of the measurement system being used.
-
-## Key results
-
-The central results are:
-
-- Molarity: $M=n/V_{solution}$.
-- Molality: $m=n/\mathrm{kg\ solvent}$.
-- Raoult's law for ideal solution: $P_A=X_A P_A^\circ$.
-- Boiling-point elevation: $\Delta T_b=iK_bm$.
-- Freezing-point depression: $\Delta T_f=iK_fm$.
-- Osmotic pressure: $\Pi=iMRT$.
-
-Dissolution is favorable when solute-solvent attractions and entropy can compensate for separating solute particles and solvent particles. Colligative properties then treat the dissolved particles statistically: a solution has fewer solvent particles at the surface, a lower solvent chemical potential, and pressure or temperature shifts needed to restore phase equilibrium.
-
-A good way to use these results is to state the chemical model first, then substitute numbers second. For solutions and colligative properties, the model usually answers questions such as what particles are present, what is conserved, which process is idealized, and which measurement is being interpreted. Once that sentence is clear, the algebra becomes a bookkeeping problem rather than a search for a memorized pattern.
-
-Units are part of the result, not decoration. Whenever a formula contains an empirical constant, a tabulated value, or a ratio of measured quantities, the units tell you whether the expression has been used in the intended form. This is especially important in general chemistry because several equations have nearly identical algebra but different meanings: pressure can be a measured state variable, an equilibrium correction, or a colligative effect; energy can be heat flow, enthalpy, internal energy, or free energy.
-
-The strongest check is an independent chemical interpretation. Ask whether the sign agrees with direction, whether a concentration can be negative, whether a mole ratio follows the balanced equation, whether an equilibrium shift opposes the stress, and whether a microscopic description explains the macroscopic number. These checks connect solutions and colligative properties to neighboring topics instead of leaving it as an isolated technique.
-
-A second check is to compare the limiting cases. If a reactant amount goes to zero, a product amount cannot remain large. If temperature rises in a gas sample at fixed volume, pressure should not fall in an ideal model. If an acid is diluted, hydronium concentration should normally decrease unless a coupled equilibrium supplies more. Limiting cases often reveal algebra that has been rearranged correctly but applied to the wrong chemical situation.
-
-Finally, keep symbolic and particulate representations side by side. A balanced equation, an equilibrium expression, an orbital diagram, or a polymer repeat unit is a compact symbol for a population of particles. Translating that symbol into words forces you to say what is reacting, what is being counted, and what is being held constant. That translation is usually the difference between a calculation that can be adapted to a new problem and one that only imitates a worked example.
-
-## Visual
-
-| Concentration unit | Formula | Best use | Temperature dependent? |
+| Concentration unit | Formula | Typical use | Temperature sensitive? |
 |---|---|---|---|
-| Molarity | $n/L_{solution}$ | reactions in solution | yes, volume changes |
-| Molality | $n/kg_{solvent}$ | colligative properties | no practical volume dependence |
-| Mole fraction | $n_i/n_{total}$ | vapor pressure | no |
-| Mass percent | mass part/mass whole | mixture reporting | no |
+| Molarity | $M=n/V_{solution}$ | reactions carried out by solution volume | yes, because volume changes |
+| Molality | $m=n/\mathrm{kg\ solvent}$ | boiling- and freezing-point shifts | no volume term |
+| Mole fraction | $X_i=n_i/n_{total}$ | vapor-pressure relations | no volume term |
+| Mass percent | mass part / mass whole | reporting mixture composition | no volume term |
+
+Molality uses kilograms of solvent, not kilograms of solution. Molarity uses the final solution volume, not the volume of pure solvent before mixing.
+
+## Why a solute dissolves
+
+Dissolution requires separating some solute particles and some solvent particles, then forming solute-solvent interactions. Favorable mixing reflects the balance of those energetic changes with the increase in entropy. The rule “like dissolves like” is a useful first screen for intermolecular compatibility, but it does not replace that balance.
+
+Solubility is an equilibrium amount, whereas the rate of dissolving is kinetic. Stirring or grinding may reach equilibrium faster without changing the equilibrium solubility at the same temperature and pressure.
+
+## Vapor pressure and liquid-mixture separation
+
+For an ideal solution, Raoult's law gives the partial pressure of component A:
+
+$$
+P_A=X_A P_A^\circ.
+$$
+
+A nonvolatile solute lowers the solvent mole fraction and therefore lowers the solvent vapor pressure. For two volatile liquids, the vapor is usually enriched in the more volatile component. Repeated vaporization and condensation in a fractionating column sharpen that separation.
+
+Strongly nonideal solutions can deviate substantially from Raoult's law because unlike-particle interactions differ from like-particle interactions.
+
+## One particle-count argument, four colligative effects
 
 ```mermaid
 flowchart LR
-  A[Solute particles added] --> B[Solvent mole fraction decreases]
-  B --> C[Vapor pressure lowers]
-  C --> D[Boiling point rises]
-  C --> E[Freezing point lowers]
-  A --> F[Osmotic pressure develops]
+  A[Add solute particles] --> B[Lower solvent chemical potential]
+  B --> C[Lower vapor pressure]
+  C --> D[Raise boiling point]
+  C --> E[Lower freezing point]
+  A --> F[Develop osmotic pressure]
 ```
 
-## Worked example 1: Freezing-point depression
+For dilute ideal solutions,
 
-Problem. A solution contains 10.0 g ethylene glycol, $\mathrm{C_2H_6O_2}$, dissolved in 200.0 g water. Estimate the freezing point. Use $K_f=1.86\ ^\circ\mathrm{C\ kg\ mol^{-1}}$ and $i=1$.
+$$
+\Delta T_b=iK_bm,
+$$
 
-    Method.
+$$
+\Delta T_f=iK_fm,
+$$
 
-    1. Compute molar mass of ethylene glycol: $2(12.01)+6(1.008)+2(16.00)=62.07\ \mathrm{g\ mol^{-1}}$.
-2. Find moles solute: $10.0/62.07=0.161\ \mathrm{mol}$.
-3. Convert solvent mass to kilograms: $200.0\ \mathrm{g}=0.2000\ \mathrm{kg}$.
-4. Molality: $m=0.161/0.2000=0.805\ \mathrm{m}$.
-5. Freezing depression: $\Delta T_f=iK_fm=(1)(1.86)(0.805)=1.50^\circ\mathrm{C}$.
-6. Pure water freezes at $0.00^\circ\mathrm{C}$, so solution freezes at $-1.50^\circ\mathrm{C}$.
+$$
+\Pi=iMRT.
+$$
 
-    Checked answer. The estimated freezing point is $-1.50^\circ\mathrm{C}$. A nonvolatile solute lowers the freezing point, so the sign is negative relative to pure water.
+The van't Hoff factor $i$ is the effective number of dissolved particles per formula unit. A nonelectrolyte has $i\approx1$; an ionic solute can have a larger value, though ion pairing often makes the measured factor smaller than the ideal integer.
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+## Freezing point of an ethylene glycol solution
 
-## Worked example 2: Osmotic pressure of a dilute solution
+Dissolve 10.0 g ethylene glycol, $\mathrm{C_2H_6O_2}$, in 200.0 g water. With $K_f=1.86\ ^\circ\mathrm{C\,kg\,mol^{-1}}$ and $i=1$:
 
-Problem. Find the osmotic pressure at 298 K of 0.0100 M glucose solution.
+1. The molar mass is $62.07\ \mathrm{g\,mol^{-1}}$.
+2. The solute amount is $10.0/62.07=0.161\ \mathrm{mol}$.
+3. The solvent mass is $0.2000\ \mathrm{kg}$, so $m=0.161/0.2000=0.805\ \mathrm{mol\,kg^{-1}}$.
+4. $\Delta T_f=(1)(1.86)(0.805)=1.50^\circ\mathrm{C}$.
 
-    Method.
+Relative to pure water at $0.00^\circ\mathrm{C}$, the estimated freezing point is $-1.50^\circ\mathrm{C}$. The formula returns the positive magnitude of the depression; subtract it from the pure-solvent freezing point.
 
-    1. Glucose is a nonelectrolyte, so $i=1$.
-2. Use $\Pi=iMRT$.
-3. Choose $R=0.082057\ \mathrm{L\ atm\ mol^{-1}\ K^{-1}}$.
-4. Substitute: $\Pi=(1)(0.0100)(0.082057)(298)$.
-5. Calculate: $\Pi=0.244\ \mathrm{atm}$.
+## Osmotic pressure at low concentration
 
-    Checked answer. $\Pi=0.244\ \mathrm{atm}$. A dilute solution should have osmotic pressure well below 1 atm but still measurable.
+For 0.0100 M glucose at 298 K, glucose is a nonelectrolyte and $i=1$:
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+$$
+\Pi=(1)(0.0100\ \mathrm{mol\,L^{-1}})(0.082057\ \mathrm{L\,atm\,mol^{-1}\,K^{-1}})(298\ \mathrm{K})
+=0.244\ \mathrm{atm}.
+$$
 
-## Code
+Osmotic pressure can remain readily measurable at concentrations for which boiling- or freezing-point shifts are small.
 
-```python
-R = 0.082057
+## Energetics, temperature, and gas solubility
 
-def freezing_point(mass_solute_g, molar_mass, kg_solvent, Kf, i=1):
-    moles = mass_solute_g / molar_mass
-    molality = moles / kg_solvent
-    return 0.0 - i * Kf * molality
+The enthalpy of solution can be separated conceptually into breaking solute–solute attractions, opening space among solvent molecules, and forming solute–solvent attractions. The first two cost energy; the last releases it. A positive enthalpy does not forbid dissolution because increased entropy can still make $\Delta G=\Delta H-T\Delta S$ negative. Strong lattice attraction can likewise keep an ionic solid sparingly soluble despite favorable hydration.
 
-def osmotic_pressure(M, T, i=1):
-    return i * M * R * T
+Temperature effects depend on the dissolution enthalpy, so hotter water does not invariably dissolve more solid. Dissolved gases usually become less soluble on heating. At fixed temperature, a common form of Henry's law is
 
-print(freezing_point(10.0, 62.07, 0.2000, 1.86))
-print(osmotic_pressure(0.0100, 298.0))
-```
+$$
+C=k_HP.
+$$
 
-## Common pitfalls
+Increasing the gas partial pressure increases its dilute dissolved concentration. Several reciprocal definitions of $k_H$ are used, so the equation and units must be checked together.
 
-- Using molarity instead of molality for freezing-point depression. Avoid it by checking whether the formula requires solvent mass.
-- Ignoring dissociation of ionic solutes. Avoid it by including the van't Hoff factor when the model calls for it.
-- Assuming all ionic solutions have ideal integer $i$ values. Avoid it by remembering ion pairing can reduce effective particle count.
-- Confusing solubility with rate of dissolving. Avoid it by separating equilibrium amount from kinetic process.
-- Using total solution mass as solvent mass for molality. Avoid it by using kilograms of solvent only.
-- Applying Raoult's law to strongly nonideal solutions without caution. Avoid it by checking volatility and interactions.
+## Composition calculations before colligative calculations
 
-## Connections
+Suppose $5.85\ \mathrm{g}$ NaCl is mixed with $100.0\ \mathrm{g}$ water. Using $58.44\ \mathrm{g\,mol^{-1}}$ gives $0.100\ \mathrm{mol}$ NaCl. Therefore
 
-- [aqueous reactions and solution stoichiometry](/chemistry/general/aqueous-reactions-and-solution-stoichiometry)
-- [states of matter, liquids, and solids](/chemistry/general/states-of-matter-liquids-and-solids)
-- [chemical equilibrium](/chemistry/general/chemical-equilibrium)
-- [acid-base equilibria, buffers, and titrations](/chemistry/general/acid-base-equilibria-buffers-and-titrations)
+$$
+m=\frac{0.100\ \mathrm{mol}}{0.1000\ \mathrm{kg}}=1.00\ \mathrm{mol\,kg^{-1}},
+$$
+
+while the mass percentage is
+
+$$
+\frac{5.85}{5.85+100.0}(100\%)=5.53\%.
+$$
+
+Molarity cannot be recovered from these masses without the solution volume or density. Mixing volumes are not generally additive.
+
+Dilution instead conserves solute moles when no reaction occurs:
+
+$$
+M_1V_1=M_2V_2.
+$$
+
+To prepare $250.0\ \mathrm{mL}$ of $0.100\ \mathrm{M}$ solution from $1.00\ \mathrm{M}$ stock, use
+
+$$
+V_1=\frac{(0.100)(250.0)}{1.00}=25.0\ \mathrm{mL}.
+$$
+
+The aliquot is diluted to a final volume of $250.0\ \mathrm{mL}$, rather than mixed with that much water.
+
+## Why the phase-transition shifts have opposite signs
+
+A nonvolatile solute lowers the solvent chemical potential and vapor pressure. The solution must be heated further before its vapor pressure reaches the external pressure, so boiling point rises. The liquid is also stabilized relative to pure solid solvent, so a lower temperature is needed to freeze it. The formulas report positive magnitudes $\Delta T_b$ and $\Delta T_f$; add the former to the pure boiling point and subtract the latter from the pure freezing point.
+
+For two volatile liquids, ideal behavior gives
+
+$$
+P_{\mathrm{tot}}=X_AP_A^\circ+X_BP_B^\circ.
+$$
+
+The vapor mole fraction $y_A=P_A/P_{\mathrm{tot}}$ differs from liquid $X_A$ and is enriched in the more volatile component. Fractional distillation repeats this equilibrium separation. Strong nonideality can create an azeotrope where vapor and liquid compositions match, preventing further separation by ordinary distillation.
+
+Osmosis uses the same chemical-potential argument. Solvent crosses a membrane toward the solution with lower solvent chemical potential until a pressure difference balances it. “Isotonic” refers to effective osmotic pressure across a particular membrane, not molarity alone. A solute able to cross that membrane may contribute temporarily to osmolarity without maintaining cell volume.
+
+## Interpreting the van't Hoff factor
+
+Ideal $\mathrm{NaCl}$ dissociation suggests $i=2$, and $\mathrm{CaCl_2}$ suggests $i=3$. Real values can be lower because opposite ions remain correlated or pair transiently. At higher concentrations, activity effects also matter. Measured colligative behavior can define an effective $i$, but that number should not be read as a literal count of permanently independent particles.
+
+If a solute associates, $i$ may be below one. Dimerization of two solute molecules into one particle reduces the number of independently moving species. Colligative measurements have therefore been used to infer molar masses and association, provided ideality and solute chemistry are treated carefully.
+
+## Where the ideal formulas need care
+
+- Use molality, not molarity, in $\Delta T_b$ and $\Delta T_f$.
+- Base molality on solvent mass alone.
+- Include dissociation through $i$, but do not assume an ionic solution has its ideal integer value at every concentration.
+- Separate equilibrium solubility from the rate at which a solid dissolves.
+- Apply Raoult's law cautiously when interactions are strongly nonideal or when several components are volatile.
+
+## Real solutions and standard states
+
+Ideal-solution formulas replace chemical potential corrections with mole fractions or concentrations. Real solutions use activities, $a_i=\gamma_i c_i/c^\circ$ in one convention. The activity coefficient $\gamma_i$ approaches one at sufficient dilution but can depart strongly from it in concentrated electrolyte solutions. The chosen standard state matters, so activity coefficients from incompatible conventions cannot be mixed.
+
+Electrolyte solutions are especially nonideal because each ion interacts over long range with an ionic atmosphere. Charge balance requires the total positive and negative charge concentrations to match in bulk. Individual-ion activities are not directly measurable in isolation; mean ionic activity coefficients are commonly used.
+
+## Solubility versus miscibility
+
+“Soluble” often refers to a solute dissolving up to a finite concentration, whereas two liquids are miscible when they mix in all proportions. Partial miscibility produces two liquid phases over part of the composition range. Each phase contains some of both components but has a different composition.
+
+Adding a third component can change mutual solubility by preferential interactions. Salt can reduce the water solubility of some neutral organics, while a cosolvent can increase it. Such outcomes cannot be inferred from polarity labels alone because entropy and all pair interactions enter the free energy of mixing.
+
+Supersaturated solutions contain more dissolved material than the stable equilibrium amount. They are metastable and may crystallize after seeding or disturbance. Saturation describes equilibrium at specified temperature and pressure; concentrated merely describes a relatively large amount and need not mean saturated.
+
+## Colligative molar-mass measurement
+
+If $1.50\ \mathrm{g}$ of a nonelectrolyte dissolved in $50.0\ \mathrm{g}$ benzene lowers its freezing point by $1.02^\circ\mathrm{C}$ and $K_f=5.12\ ^\circ\mathrm{C\,kg\,mol^{-1}}$, then
+
+$$
+m=\frac{1.02}{5.12}=0.199\ \mathrm{mol\,kg^{-1}}.
+$$
+
+The solute amount is $(0.199)(0.0500)=0.00995\ \mathrm{mol}$, giving molar mass
+
+$$
+M=\frac{1.50\ \mathrm{g}}{0.00995\ \mathrm{mol}}=151\ \mathrm{g\,mol^{-1}}.
+$$
+
+Association would make the apparent molar mass too large because fewer particles produce a smaller depression. Dissociation would make it too small unless the van't Hoff factor were included.
+
+Reverse osmosis applies pressure greater than the osmotic pressure on the concentrated side, forcing solvent toward the dilute side. The membrane rejects solutes imperfectly in real devices, and concentration polarization near its surface raises the effective demand. The ideal equation supplies a lower-bound thermodynamic scale rather than complete engineering performance.
+
+Boiling-point elevation depends on external pressure as well as composition. The colligative formula compares solution and pure solvent at the same pressure; it does not claim a universal boiling temperature. Likewise, freezing-point depression assumes the solid phase that separates is nearly pure solvent. If solute enters the solid or a new compound crystallizes, a full phase diagram is needed.
+
+Colligative laws are limiting laws for dilute solutions. They depend on particle count because solute identity enters only through its effect on solvent chemical potential in that limit. At higher concentration, molecular size and specific interactions reappear through activities. Two equimolal solutes with the same nominal $i$ need not then produce identical shifts.
+
+Concentration labels require a basis. A statement such as “10 percent solution” is incomplete unless it specifies mass/mass, mass/volume, or volume/volume. These conventions yield different compositions and should not be converted without density information.
+
+## Phase separation and extraction
+
+When two liquids are immiscible, a solute distributes between them according to its relative affinity. A partition coefficient describes the equilibrium concentration ratio for a specified molecular form. Several small extractions usually recover more solute than one extraction using the same total solvent volume because each fresh portion re-establishes the distribution.
+
+Acid-base extraction changes affinity by changing charge. A neutral organic acid may favor an organic phase, while deprotonation gives an ionic salt that favors water. Restoring the neutral form can precipitate or re-extract it. Mass balance spans both phases, so concentration in either layer alone is not total recovery.
+
+Repeated concentration changes require a fresh basis at each step. Evaporation removes solvent but normally leaves nonvolatile solute behind; dilution adds solvent while preserving solute amount; crystallization removes solute and may also remove solvent as a hydrate. Applying the dilution equation to evaporation or crystallization without a mass balance gives the wrong composition.
+
+<div className="see-also">
+
+See also: [aqueous reactions and solution stoichiometry](/chemistry/general/aqueous-reactions-and-solution-stoichiometry) · [states of matter, liquids, and solids](/chemistry/general/states-of-matter-liquids-and-solids) · [chemical equilibrium](/chemistry/general/chemical-equilibrium) · [acid-base equilibria, buffers, and titrations](/chemistry/general/acid-base-equilibria-buffers-and-titrations)
+
+</div>

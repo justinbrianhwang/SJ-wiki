@@ -1,4 +1,4 @@
----
+﻿---
 title: Menger Theorem and Network Flows
 sidebar_position: 14
 ---
@@ -13,7 +13,7 @@ Menger's theorem and max-flow min-cut are two versions of the same principle: th
 
 Network flows add capacities to directed edges. Instead of asking only whether a path exists, we ask how much material can be sent from a source to a sink while respecting capacity constraints. The algorithmic picture is built from augmenting paths, residual networks, and cuts.
 
-## Definitions
+## Paths, separators, and feasible flow
 
 An **$s$-$t$ path** is a path from source $s$ to target $t$. Two paths are **edge-disjoint** if they share no edges, and **internally vertex-disjoint** if they share no vertices except possibly $s$ and $t$.
 
@@ -28,7 +28,7 @@ The **value** of the flow is the net amount leaving $s$.
 
 The **residual capacity** of a forward arc is $c(u,v)-f(u,v)$, and the residual capacity of a backward arc is $f(u,v)$.
 
-## Key results
+## Packings equal bottlenecks
 
 **Menger's edge theorem.** For distinct vertices $s,t$ in a finite graph, the maximum number of pairwise edge-disjoint $s$-$t$ paths equals the minimum size of an $s$-$t$ edge cut.
 
@@ -40,7 +40,7 @@ The **residual capacity** of a forward arc is $c(u,v)-f(u,v)$, and the residual 
 
 These theorems explain why unit-capacity flow can prove Menger-type path-packing results.
 
-**Residual networks.** A residual network records what changes are still possible. A forward residual edge means extra flow can be sent along an arc. A backward residual edge means existing flow can be cancelled and rerouted. This is why augmenting-path algorithms can recover from an early poor choice: they are not simply adding more flow, they are adjusting the current flow inside the feasible region.
+**Residual networks.** A residual network records what changes are still possible. A forward residual edge means extra flow can be sent along an arc. A backward residual edge means existing flow can be cancelled and rerouted. Augmenting-path algorithms can therefore recover from an early poor choice by adjusting the current flow, including along backward edges.
 
 **Cuts as certificates.** A flow proves a lower bound on the maximum value. A cut proves an upper bound, because every unit of flow from $s$ to $t$ must cross from the source side of the cut to the sink side. When a flow value equals a cut capacity, both are optimal. This dual certificate pattern is one of the most important habits in network optimization.
 
@@ -49,8 +49,6 @@ These theorems explain why unit-capacity flow can prove Menger-type path-packing
 **Edge connectivity and vertex connectivity.** The edge version of Menger's theorem leads to edge connectivity: the minimum number of edges whose removal disconnects the graph. The vertex version leads to vertex connectivity: the minimum number of vertices whose removal disconnects the graph or reduces it to a trivial graph. These parameters measure different kinds of robustness. A network can have high edge connectivity but low vertex connectivity if many routes pass through the same articulation point.
 
 **Ford-Fulkerson termination.** With integer capacities, each augmenting path increases the flow value by at least $1$, so the basic Ford-Fulkerson method terminates. With irrational capacities and careless path choices, termination can fail. Edmonds-Karp avoids this issue by always choosing a shortest augmenting path in the residual network and has a polynomial time bound.
-
-## Visual
 
 ```mermaid
 graph LR
@@ -68,11 +66,9 @@ graph LR
 | $\{s,b\}$ | $s\to a,\ b\to t$ | $3+3=6$ |
 | $\{s,a,b\}$ | $a\to t,\ b\to t$ | $2+3=5$ |
 
-## Worked example 1: Compute a maximum flow
+## Augmenting to a flow of value five
 
-**Problem.** In the network above, find a maximum $s$-$t$ flow.
-
-**Method.**
+In the network above, find a maximum $s$-$t$ flow.
 
 Capacities are:
 
@@ -106,19 +102,17 @@ $$
 
 **Cut check.** The cut $S=\{s\}$ has capacity $3+2=5$. Since we found a flow of value $5$ and a cut of capacity $5$, max-flow min-cut proves optimality.
 
-**Checked answer.** The maximum flow value is $5$.
+The maximum flow value is $5$.
 
-## Worked example 2: Edge-disjoint paths via unit capacities
+## Certifying two edge-disjoint paths
 
-**Problem.** In an undirected graph with edges
+In an undirected graph with edges
 
 $$
 sa,\ sb,\ ac,\ bc,\ at,\ ct,\ bt,
 $$
 
 find the maximum number of edge-disjoint $s$-$t$ paths.
-
-**Method.**
 
 1. Exhibit three paths:
 
@@ -151,11 +145,11 @@ Now $P_1$ uses $sa,at$, and $P_2$ uses $sb,bc,ct$. They are edge-disjoint.
 3. Can there be a third? The source $s$ has degree $2$, with incident edges $sa$ and $sb$. Every $s$-$t$ path must use one of these two edges when leaving $s$.
 4. Therefore any collection of edge-disjoint $s$-$t$ paths has size at most $2$.
 
-**Checked answer.** The maximum number of edge-disjoint $s$-$t$ paths is $2$, equal to the minimum edge cut $\{sa,sb\}$.
+The maximum number of edge-disjoint $s$-$t$ paths is $2$, equal to the minimum edge cut $\{sa,sb\}$.
 
 This is exactly the unit-capacity form of max-flow min-cut. Give every undirected edge capacity $1$ in both directions, or orient each edge both ways with shared-capacity care in a more formal model. The degree of $s$ supplies a cut of capacity $2$, and the two displayed paths supply a flow of value $2$.
 
-## Code
+## Edmonds-Karp in a residual network
 
 Edmonds-Karp is the breadth-first-search version of Ford-Fulkerson.
 
@@ -210,7 +204,7 @@ In worked flow problems, always finish by naming a cut with the same value as th
 
 In flow computations, separate feasibility from optimality. Feasibility means capacities and conservation hold. Optimality means no larger flow exists, usually certified by a cut of equal value. Many arithmetic mistakes produce flows that look large but violate conservation at an intermediate vertex. Check conservation before looking for the final cut certificate.
 
-## Common pitfalls
+### Feasibility and optimality checks
 
 - Confusing edge-disjoint and vertex-disjoint paths.
 - Allowing an $s$-$t$ vertex cut to include $s$ or $t$ in the standard form of Menger's theorem.
@@ -219,9 +213,8 @@ In flow computations, separate feasibility from optimality. Feasibility means ca
 - Comparing flow value to the wrong cut direction. An $s$-$t$ cut counts arcs from the source side to the sink side.
 - Treating capacities as edge weights for shortest paths. Flow capacities limit throughput; they are not distances.
 
-## Connections
+<div className="see-also">
 
-- [Matchings Hall and Konig](/math/graph-theory/matchings-hall-and-konig)
-- [Algorithms on weighted graphs](/math/graph-theory/algorithms-on-weighted-graphs)
-- [Walks paths and connectedness](/math/graph-theory/walks-paths-and-connectedness)
-- [Digraphs tournaments and Markov chains](/math/graph-theory/digraphs-tournaments-and-markov-chains)
+See also: [Matchings Hall and Konig](/math/graph-theory/matchings-hall-and-konig) · [Algorithms on weighted graphs](/math/graph-theory/algorithms-on-weighted-graphs) · [Walks paths and connectedness](/math/graph-theory/walks-paths-and-connectedness) · [Digraphs tournaments and Markov chains](/math/graph-theory/digraphs-tournaments-and-markov-chains)
+
+</div>

@@ -584,10 +584,8 @@ print(phi_hat, phi_theory)
 - Dropping the domain restriction, such as $t\lt \lambda$ for an exponential MGF.
 - Treating complex characteristic functions as optional decoration. They are often the right tool for rigorous convergence results.
 
-## Related pages
+<div className="see-also">
 
-- [expectation, variance, and moments](/math/probability/expectation-variance-moments)
-- [common discrete distributions](/math/probability/common-discrete-distributions)
-- [common continuous distributions](/math/probability/common-continuous-distributions)
-- [limit theorems](/math/probability/limit-theorems)
-- [random variables and distributions](/math/probability/random-variables-distributions)
+See also: [expectation, variance, and moments](/math/probability/expectation-variance-moments) · [common discrete distributions](/math/probability/common-discrete-distributions) · [common continuous distributions](/math/probability/common-continuous-distributions) · [limit theorems](/math/probability/limit-theorems) · [random variables and distributions](/math/probability/random-variables-distributions)
+
+</div>

@@ -9,7 +9,7 @@ Network flow studies how much material can be shipped from a source to a sink th
 
 Flow algorithms are also a bridge from graph theory to optimization. The max-flow/min-cut theorem gives a strong duality statement: the best feasible flow value equals the capacity of the smallest cut separating source from sink. That equality explains why augmenting-path algorithms can certify optimality, not merely improve a solution. Stable matching is different in objective but similar in spirit: a simple proposal process terminates with a matching that has no blocking pair [13].
 
-## Definitions
+## Residual capacity and matching structure
 
 A **flow network** is a directed graph $G=(V,E)$ with nonnegative capacities $c(u,v)$, a source $s$, and a sink $t$. A flow $f$ satisfies capacity constraints $0\le f(u,v)\le c(u,v)$ and flow conservation at every vertex except $s$ and $t$:
 
@@ -23,7 +23,7 @@ The **residual graph** records possible changes to the current flow. If $f(u,v)\
 
 A **matching** is a set of edges no two of which share an endpoint. In bipartite matching, vertices are split into left and right sets and every edge goes between the sides. A **stable matching** has two equally sized sets with preference lists; it has no blocking pair $(m,w)$ such that both prefer each other to their assigned partners.
 
-## Key results
+## Augmenting paths as certificates
 
 Ford-Fulkerson is a framework, not one fixed algorithm [7]. Start with zero flow. While the residual graph has an augmenting path from $s$ to $t$, push as much flow as possible along that path. The path bottleneck is the minimum residual capacity on the path. When no augmenting path remains, let $S$ be the vertices reachable from $s$ in the residual graph. No residual edge crosses from $S$ to $T$, so every original edge crossing the cut is saturated and every reverse crossing edge has zero flow. Thus the current flow value equals the cut capacity, proving optimality.
 
@@ -44,8 +44,6 @@ Bipartite matching can be solved by max flow: connect $s$ to every left vertex w
 Stable matching is not maximum-weight matching. Gale-Shapley has one side propose down preference lists; recipients keep their favorite proposal so far and reject the rest [13]. The algorithm terminates because each proposer advances monotonically through a finite list. It is stable because a blocking pair would imply the proposer eventually proposed to that recipient, and the recipient rejected or later traded up. The result is proposer-optimal among all stable matchings.
 
 Applications include assignment, project selection, image segmentation by graph cuts, disjoint paths, circulation with demands, baseball elimination, and scheduling. In each case, the modeling step is at least as important as the algorithm: identify conservation, capacities, source/sink structure, and what a cut or matching certificate means in the original problem.
-
-## Visual
 
 ```mermaid
 flowchart LR
@@ -77,7 +75,7 @@ flowchart TD
 | Bipartite matching | augmenting paths or flow | $O(E\sqrt V)$ for Hopcroft-Karp | min vertex cover |
 | Stable matching | deferred acceptance | $O(n^2)$ | no blocking pair |
 
-## Worked example 1: max flow on a four-node graph
+## Certifying max flow on four nodes
 
 **Problem.** Network edges are
 
@@ -96,7 +94,7 @@ Find a maximum flow.
 
 **Checked answer.** Flow value 5 equals cut capacity 5, so by max-flow/min-cut it is maximum. The final edge flows are $s\to a=3$, $s\to b=2$, $a\to t=2$, $a\to b=1$, $b\to t=3$.
 
-## Worked example 2: Gale-Shapley on 3 men x 3 women
+## Deferred acceptance on three pairs
 
 **Problem.** Preferences are:
 
@@ -130,7 +128,7 @@ Check stability. Potential blocking pairs:
 
 **Checked answer.** The matching $(A,X),(B,Y),(C,Z)$ is stable. It is proposer-optimal among stable matchings because the men proposed.
 
-## Code
+## Flow and matching implementations
 
 ```python
 from collections import deque
@@ -234,7 +232,7 @@ def gale_shapley(men_prefs, women_prefs):
     return {m: w for w, m in engaged.items()}
 ```
 
-## Common pitfalls
+## Modeling and residual-graph mistakes
 
 - Forgetting backward residual edges, which are essential for canceling earlier choices.
 - Treating Ford-Fulkerson as polynomial without specifying integral capacities or a path rule.
@@ -248,15 +246,6 @@ def gale_shapley(men_prefs, women_prefs):
 - Missing lower and upper bounds in circulation-with-demands reductions.
 - Treating image graph cuts as ordinary shortest paths; the cut objective is different.
 - Forgetting that a min cut certificate proves max flow value, not necessarily uniqueness of the flow.
-
-## Connections
-
-- [Graph Algorithms](/cs/algorithms/graph-algorithms) for BFS, residual reachability, and shortest paths.
-- [Greedy Algorithms](/cs/algorithms/greedy-algorithms) for local improvement ideas and why augmenting paths need stronger certificates.
-- [Approximation Algorithms](/cs/algorithms/approximation-algorithms) for vertex cover, matching relaxations, and LP rounding.
-- [Dynamic Programming](/cs/algorithms/dynamic-programming) for shortest-path subroutines in min-cost flow.
-- [Data Structures](/cs/data-structures/intro) for queues, heaps, and disjoint sets used around flow models.
-- [Discrete Math](/math/discrete/intro) for cuts, matchings, and Hall-type theorems.
 
 ## References
 
@@ -287,3 +276,16 @@ def gale_shapley(men_prefs, women_prefs):
 [13] D. Gale and L. S. Shapley, "College admissions and the stability of marriage," *The American Mathematical Monthly*, vol. 69, no. 1, pp. 9-15, 1962. https://doi.org/10.2307/2312726
 
 [14] R. E. Tarjan, *Data Structures and Network Algorithms*. SIAM, 1983.
+
+<div className="see-also">
+
+See also:
+
+- [Graph Algorithms](/cs/algorithms/graph-algorithms) for BFS, residual reachability, and shortest paths.
+- [Greedy Algorithms](/cs/algorithms/greedy-algorithms) for local improvement ideas and why augmenting paths need stronger certificates.
+- [Approximation Algorithms](/cs/algorithms/approximation-algorithms) for vertex cover, matching relaxations, and LP rounding.
+- [Dynamic Programming](/cs/algorithms/dynamic-programming) for shortest-path subroutines in min-cost flow.
+- [Data Structures](/cs/data-structures/intro) for queues, heaps, and disjoint sets used around flow models.
+- [Discrete Math](/math/discrete/intro) for cuts, matchings, and Hall-type theorems.
+
+</div>

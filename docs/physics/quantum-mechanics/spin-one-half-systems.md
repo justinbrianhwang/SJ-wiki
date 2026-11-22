@@ -317,10 +317,8 @@ The Bloch sphere can obscure this distinction because it represents rays, not sp
 
 For a closed loop of a pure-state Bloch vector, the geometric phase is related to the solid angle enclosed by the loop. The phase becomes observable relative to another path. This extends the half-angle structure from static state coordinates to dynamical interference.
 
-## Related pages
+<div className="see-also">
 
-- [Postulates of quantum mechanics](/physics/quantum-mechanics/postulates-of-quantum-mechanics)
-- [Dirac notation and Hilbert spaces](/physics/quantum-mechanics/dirac-notation-hilbert-spaces)
-- [Quantum dynamics and pictures](/physics/quantum-mechanics/quantum-dynamics-pictures)
-- [Angular momentum algebra](/physics/quantum-mechanics/angular-momentum-algebra)
-- [Density operator, entanglement, and decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence)
+See also: [Postulates of quantum mechanics](/physics/quantum-mechanics/postulates-of-quantum-mechanics) · [Dirac notation and Hilbert spaces](/physics/quantum-mechanics/dirac-notation-hilbert-spaces) · [Quantum dynamics and pictures](/physics/quantum-mechanics/quantum-dynamics-pictures) · [Angular momentum algebra](/physics/quantum-mechanics/angular-momentum-algebra) · [Density operator, entanglement, and decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence)
+
+</div>

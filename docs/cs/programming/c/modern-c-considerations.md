@@ -9,7 +9,7 @@ K&R second edition teaches ANSI C as it existed around the C89/C90 standard, and
 
 The goal is not to rewrite K&R out of history. The goal is to read K&R fluently while writing C that survives modern compilers, larger codebases, security reviews, and different platforms. The original idioms remain valuable when they express data flow clearly; they need adjustment when they rely on old defaults, unchecked buffers, or implementation-specific behavior.
 
-## Definitions
+## What “modernizing K&R” means
 
 "K&R style" can mean several different things:
 
@@ -56,7 +56,7 @@ Modern code also uses `const` more aggressively, especially for string literals 
 size_t strlen(const char *s);
 ```
 
-## Key results
+## Contracts that older C left implicit
 
 Do not rely on implicit declarations. K&R explains the historical default of `int`, but modern compilers diagnose calls without visible prototypes. Missing prototypes are especially dangerous for functions returning pointers or taking floating-point arguments.
 
@@ -80,7 +80,7 @@ Modern C also makes const-correctness more important than the book's examples su
 
 Later C standards added conveniences, but they did not change the core discipline. Declarations can appear closer to first use, `//` comments are common, `stdint.h` provides fixed-width integer names, and newer standards refine library and language rules. These features are useful, but a programmer who understands K&R's storage, pointer, and expression model can adopt them without losing sight of what the machine-level operations mean.
 
-## Visual
+The recurring edits are small, but each one turns an assumption into an explicit contract:
 
 | K&R-era habit | Modern recommendation | Reason |
 |---|---|---|
@@ -108,9 +108,9 @@ flowchart TD
   G --> H
 ```
 
-## Worked example 1: Modernizing an old function declaration
+## Converting `power` to prototype style
 
-Problem: convert an old-style `power` function and call site to prototype style.
+Start with an old-style declaration and definition:
 
 Old form:
 
@@ -127,22 +127,19 @@ int base, n;
 }
 ```
 
-Method:
-
-1. Put parameter types in the prototype:
+Put the parameter types in the prototype:
 
    ```c
    int power(int base, int n);
    ```
 
-2. Put parameter types in the definition:
+Then put the types in the definition:
 
    ```c
    int power(int base, int n)
    ```
 
-3. Keep the body unchanged, because call-by-value behavior is the same.
-4. Compile-time checking now catches calls such as:
+The body remains unchanged because call-by-value behavior is the same. With the prototype visible, the compiler can diagnose calls such as:
 
    ```c
    power("2", 4)
@@ -150,11 +147,11 @@ Method:
 
    because `"2"` has type `char *`, not `int`.
 
-Checked answer: the modern function computes the same values, for example `power(2, 5) = 32`, while giving the compiler enough information to diagnose incorrect calls.
+The modern function computes the same values, for example `power(2, 5) = 32`, while giving the compiler enough information to reject incompatible arguments.
 
-## Worked example 2: Replacing unsafe string input
+## Bounding input to an eight-byte array
 
-Problem: read a name into `char name[8]` from input `Sunjunior\n` without overflowing the buffer.
+Suppose `Sunjunior\n` is read into `char name[8]`.
 
 Unsafe method:
 
@@ -162,15 +159,13 @@ Unsafe method:
 gets(name);
 ```
 
-This has no size argument. The input needs 10 bytes including newline and terminator handling, while the array has only 8. Overflow is possible.
+This has no size argument. `gets` discards the newline, but the nine-letter name still needs 10 bytes with its null terminator; the array has only 8.
 
-Modern bounded method:
+A bounded call is:
 
 ```c
 fgets(name, sizeof name, stdin);
 ```
-
-Step-by-step:
 
 1. `sizeof name` is `8`.
 2. `fgets` reads at most `7` characters plus `'\0'`.
@@ -188,9 +183,9 @@ Step-by-step:
 
 5. Because no newline appears in `name`, the program can detect that the line was truncated and drain the remainder if necessary.
 
-Checked answer: the buffer is not overflowed. The program receives the first chunk `"Sunjuni"` and can explicitly handle the too-long line.
+The buffer does not overflow. The program receives the first chunk `"Sunjuni"` and can explicitly handle the rest of the line.
 
-## Code
+## Reading a complete line with dynamic growth
 
 ```c
 #include <stdio.h>
@@ -209,6 +204,10 @@ char *read_line(FILE *fp)
 
     while ((c = getc(fp)) != EOF) {
         if (len + 1 >= cap) {
+            if (cap > (size_t)-1 / 2) {
+                free(buf);
+                return NULL;
+            }
             size_t newcap = cap * 2;
             char *tmp = realloc(buf, newcap);
             if (tmp == NULL) {
@@ -246,7 +245,7 @@ int main(void)
 }
 ```
 
-## Common pitfalls
+## Compatibility edits that introduce new bugs
 
 - Treating K&R's historical examples as permission to use implicit `int` or undeclared functions today.
 - Modifying string literals because older code assigned them to `char *`.
@@ -256,10 +255,8 @@ int main(void)
 - Ignoring compiler warnings. Many warnings point to real C type or lifetime bugs.
 - Assuming POSIX functions are ISO C. `read`, `write`, `open`, and `lseek` are system interfaces, not standard C library calls.
 
-## Connections
+<div className="see-also">
 
-- [Tutorial Introduction](/cs/programming/c/tutorial-introduction)
-- [Types, Operators, and Expressions](/cs/programming/c/types-operators-expressions)
-- [Preprocessor and Separate Compilation](/cs/programming/c/preprocessor-separate-compilation)
-- [Standard Library Reference](/cs/programming/c/standard-library-reference)
-- [Unix System Interface](/cs/programming/c/unix-system-interface)
+See also: [Tutorial Introduction](/cs/programming/c/tutorial-introduction) · [Types, Operators, and Expressions](/cs/programming/c/types-operators-expressions) · [Preprocessor and Separate Compilation](/cs/programming/c/preprocessor-separate-compilation) · [Standard Library Reference](/cs/programming/c/standard-library-reference) · [Unix System Interface](/cs/programming/c/unix-system-interface)
+
+</div>

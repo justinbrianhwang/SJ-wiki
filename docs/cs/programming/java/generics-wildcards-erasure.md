@@ -9,41 +9,39 @@ Generics are one of the major Java 5 additions emphasized by the fourth edition.
 
 The source book also stresses the cost of migration compatibility. Java generics are implemented with erasure rather than fully reified runtime type arguments. That choice allowed old and new code to interoperate, but it explains raw types, unchecked warnings, limits around generic arrays, bridge methods, and why some type information is not available at runtime.
 
-## Definitions
+## Type parameters before and after erasure
 
-The source basis for this page is Chapter 11 on generic type declarations, working with generic types, generic methods and constructors, wildcard capture, erasure, raw types, method finding, class extension with generic types, and Appendix A's migration discussion. The terms below are written as contracts: each one tells you what the compiler can check, what the runtime must preserve, and what a reader of the program may rely on.
+Chapter 11 covers generic declarations, generic methods and constructors, wildcard capture, erasure, raw types, method finding, and extension of generic classes; Appendix A supplies the migration context. Most of the type relationships exist for compile-time proof rather than runtime reification.
 
-**Type parameter.** A type parameter is a placeholder such as `T`, `E`, or `K` declared by a generic type or method. It stands for an actual type argument supplied by use or inference. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Type parameter.** A placeholder such as `T`, `E`, or `K` declared by a generic type or method. Use or inference supplies the actual type argument.
 
-**Parameterized type.** A parameterized type is a generic type with actual type arguments, such as `List<String>` or `Map<String, Integer>`. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Parameterized type.** A generic type with actual type arguments, such as `List<String>` or `Map<String, Integer>`.
 
-**Bound.** A bound restricts a type parameter, as in `<T extends Number>`. Bounds let generic code call methods known to be available through the bound. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Bound.** A restriction such as `<T extends Number>` that lets generic code use operations known through the bound.
 
-**Wildcard.** A wildcard `?` represents an unknown type argument. Bounded wildcards such as `? extends T` and `? super T` express producer and consumer relationships. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Wildcard.** An unknown type argument written `?`. Bounds such as `? extends T` and `? super T` express producer and consumer relationships.
 
-**Generic method.** A generic method declares its own type parameters before the return type. The type parameter can relate several arguments and the return value. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Generic method.** A method that declares type parameters before its return type, often relating several arguments and the result.
 
-**Erasure.** Erasure is the compilation strategy that removes most type-argument information from runtime representation while inserting casts and bridge methods as needed. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Erasure.** The compilation strategy that removes most type-argument information from runtime representation while inserting casts and bridge methods as needed.
 
-**Raw type.** A raw type is the name of a generic type used without type arguments, such as `List`. Raw types exist for compatibility with pre-generics code and produce unchecked risks. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Raw type.** A generic type name used without type arguments, such as `List`. Raw types preserve compatibility with pre-generics code at the cost of unchecked risks.
 
-**Wildcard capture.** Wildcard capture is the compiler's internal treatment of an unknown wildcard as a specific, though unnamed, type within a limited context. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Wildcard capture.** The compiler's treatment of an unknown wildcard as a specific, unnamed type within a limited context.
 
-## Key results
+## Variance rules that preserve type safety
 
-**Generics move type errors earlier.** Without generics, a collection can accept any `Object`, and mistakes may appear later as casts fail. With `List<String>`, adding the wrong type is rejected at compile time. The runtime representation is not fully specialized, but the source-level contract is still valuable. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Generics move type errors earlier.** Without generics, a collection accepts any `Object`, and mistakes may appear later as failed casts. With `List<String>`, the compiler rejects the wrong element type even though the runtime representation is not fully specialized.
 
-**Invariance is deliberate.** `List<Integer>` is not a subtype of `List<Number>`, even though `Integer` is a subtype of `Number`. If it were, code could insert a `Double` into a list that was actually an integer list. Wildcards express the safe direction of use instead. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Invariance is deliberate.** `List<Integer>` is not a subtype of `List<Number>`, even though `Integer` is a subtype of `Number`. Otherwise, code could insert a `Double` into an integer list. Wildcards express safe one-way use.
 
-**Use `extends` for producers and `super` for consumers.** A `List<? extends Number>` can produce numbers to read, but you cannot safely add an arbitrary number because the exact element type is unknown. A `List<? super Integer>` can consume integers, but reading gives only `Object` without further knowledge. This is the practical meaning behind wildcard bounds. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Use `extends` for producers and `super` for consumers.** A `List<? extends Number>` produces readable numbers, but the unknown exact element type prevents arbitrary additions. A `List<? super Integer>` consumes integers, while reads yield only `Object` without further knowledge.
 
-**Unchecked warnings identify migration boundaries.** Raw types and some casts are allowed so old and new code can work together, but the compiler warns when it cannot prove type safety. Treat unchecked warnings as design signals. They often mean a generic boundary should be tightened. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Unchecked warnings identify migration boundaries.** Raw types and some casts let old and new code interoperate, but the compiler warns when it cannot prove type safety. The warning often marks a boundary that should be tightened.
 
-**Erasure shapes what reflection and arrays can do.** Because most type arguments are erased, runtime checks cannot always distinguish `List<String>` from `List<Integer>`. Arrays, however, carry runtime component type information, so generic array creation has restrictions. This mismatch is one of the key practical limits of Java generics. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Erasure shapes what reflection and arrays can do.** Runtime checks cannot generally distinguish `List<String>` from `List<Integer>`. Arrays do carry runtime component types, so generic array creation is restricted. The mismatch is a central limit of Java generics.
 
 A reliable generic-design method is to decide whether each parameter is an input producer, an output consumer, or both. If a method only reads elements from a source, an upper-bounded wildcard often makes it more flexible. If it only writes elements to a destination, a lower-bounded wildcard may be right. If it both reads and writes values of the same exact element type, use a named type parameter. Then look for raw types and unchecked warnings; each warning marks a place where the compiler has lost evidence. The source's discussion of erasure is not an implementation curiosity. It is the reason these design rules exist.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -63,7 +61,7 @@ flowchart TD
 | Raw `List` | `Object` with unchecked casts | Anything | Legacy boundary only |
 | `List<?>` | `Object` | Usually only `null` | Unknown but type-safe list |
 
-## Worked example 1: copying with bounded wildcards
+## Copying from a producer into a consumer
 
 Problem: Design a method that copies integers from a source list into a destination list that can accept integers.
 
@@ -77,7 +75,7 @@ Method:
 
 Checked answer: A checked signature is `<T> void copy(List<? extends T> source, List<? super T> dest)`. The bounds match producer and consumer roles.
 
-## Worked example 2: why `List<Integer>` is not `List<Number>`
+## The `Double` that invariance keeps out
 
 Problem: Explain the bug that would occur if a `List<Integer>` could be assigned to a `List<Number>` variable.
 
@@ -91,7 +89,7 @@ Method:
 
 Checked answer: The assignment is forbidden to preserve type safety. Use a wildcard when a method only needs producer or consumer behavior instead of exact list element type.
 
-## Code
+## Encoding producer and consumer roles
 
 ```java
 import java.util.ArrayList;
@@ -126,7 +124,7 @@ public class GenericsDemo {
 }
 ```
 
-## Common pitfalls
+## Where type evidence disappears
 
 - Do not use raw types in new code except at unavoidable legacy boundaries. They remove compile-time evidence.
 - Do not expect `List<Integer>` to be assignable to `List<Number>`. Generic types are invariant unless wildcards express a safe relationship.
@@ -134,9 +132,13 @@ public class GenericsDemo {
 - Do not ignore unchecked warnings. They mark places where type safety depends on programmer reasoning rather than compiler proof.
 - Do not overuse wildcards in return types. Callers often need a concrete relationship that a named type parameter expresses better.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Collections, Iteration, and Maps](/cs/programming/java/collections-iteration-maps): applies generics to everyday container APIs.
 - [Interfaces, Nested Classes, and Enums](/cs/programming/java/interfaces-nested-classes-enums): explains generic interfaces such as `Comparable<T>`.
 - [Annotations and Reflection](/cs/programming/java/annotations-reflection): returns to generic type inspection limits.
 - [Primitives, Operators, and Conversions](/cs/programming/java/primitives-operators-conversions): explains boxing needed for primitive values in generic collections.
+
+</div>

@@ -372,10 +372,8 @@ Qualified calls suppress virtual dispatch. Inside an override, `Base::draw()` de
 
 Virtual dispatch carries an indirect-call and object-layout cost, usually small but real. The larger cost is contractual: every derived class must preserve the base semantics, and changing the virtual interface affects the whole hierarchy. Templates or variants can be better when the set of types is known at compile time and value semantics matter more than open-ended extension.
 
-## Related pages
+<div className="see-also">
 
-- [inheritance](/cs/programming/cpp/inheritance)
-- [classes and encapsulation](/cs/programming/cpp/classes-and-encapsulation)
-- [constructors and copy semantics](/cs/programming/cpp/constructors-and-copy-semantics)
-- [references and operator overloading](/cs/programming/cpp/references-and-operator-overloading)
-- [templates](/cs/programming/cpp/templates)
+See also: [inheritance](/cs/programming/cpp/inheritance) · [classes and encapsulation](/cs/programming/cpp/classes-and-encapsulation) · [constructors and copy semantics](/cs/programming/cpp/constructors-and-copy-semantics) · [references and operator overloading](/cs/programming/cpp/references-and-operator-overloading) · [templates](/cs/programming/cpp/templates)
+
+</div>

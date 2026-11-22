@@ -7,9 +7,9 @@ sidebar_position: 10
 
 The file system is often the most visible part of an operating system. Users name, organize, copy, protect, and share files every day, while programs rely on a stable interface for persistent data. The OS hides the physical differences among disks, SSDs, optical media, and network storage behind the logical idea of a file: a named collection of information with attributes and operations.
 
-This page focuses on the interface rather than the implementation. The implementation page explains directory structures, allocation, free-space management, and recovery. Here the central questions are what a file is, how it is accessed, how directories name files, how file systems are mounted, what sharing means, and how access is protected.
+The interface concerns what a file is, how programs access it, how directories assign names, how file systems are mounted, and how sharing is protected. Directory indexes, block allocation, free-space management, and recovery belong to the implementation beneath that interface.
 
-## Definitions
+## File objects, handles, and access methods
 
 A **file** is a logical storage unit defined by the OS. It usually has data plus attributes such as name, identifier, type, location, size, protection bits, timestamps, and owner. The textbook emphasizes that a file abstracts away physical storage properties so programs can use a uniform view.
 
@@ -25,7 +25,7 @@ A **path name** identifies a file by walking directories. An **absolute path** s
 
 **File sharing** allows multiple users or processes to access the same file. Sharing requires semantics for concurrent access, permissions, locks, and consistency. **Advisory locks** require cooperating processes to check them; **mandatory locks** are enforced by the OS.
 
-## Key results
+## Naming and opening persistent objects
 
 The file interface separates persistent naming from physical placement. A program that calls `read(fd, buf, n)` need not know whether bytes come from a disk block, SSD page, network server, memory cache, or device driver. That abstraction is powerful, but it means the OS must define precise semantics for offsets, end-of-file, metadata changes, and errors.
 
@@ -42,6 +42,8 @@ File attributes are not decorative; they drive protection and behavior:
 | Timestamps | created, modified, accessed | Synchronization, backup, auditing |
 | Owner/group | user and group IDs | Authorization and accounting |
 
+## Directories, sharing, and protection
+
 Directory structures are a naming policy. A single-level directory is simple but name conflicts are unavoidable. A two-level directory gives each user a private namespace but weakens sharing. A tree provides hierarchy and locality. Acyclic graphs add shared files or directories through links while avoiding cycles. General graphs require cycle detection or reference-management policies.
 
 Sharing semantics can be subtle. In UNIX-style semantics, writes by one process can become visible to other processes that read later, although buffering and caching complicate timing. In session semantics, changes become visible when a file is closed. Immutable shared files avoid many race problems but require replacing the whole file to update it.
@@ -56,7 +58,7 @@ Mounting also has administrative and security consequences. A removable or remot
 
 File deletion is another interface detail that surprises students. In UNIX-like semantics, unlinking a name removes a directory entry, not necessarily the underlying open file immediately. If a process still has the file open, the storage can remain allocated until the last reference is closed. This behavior is useful for temporary files and log rotation, but it reinforces the distinction between names, open handles, and file objects.
 
-## Visual
+## Mounting another namespace into the tree
 
 ```mermaid
 flowchart TD
@@ -73,9 +75,9 @@ flowchart TD
 
 The tree gives users a stable naming structure. Mounting makes another file system appear as a subtree, so ordinary path traversal can reach files on a different device.
 
-## Worked example 1: resolving an absolute path
+### Resolving `/home/ada/project/main.c`
 
-Problem: Resolve the path `/home/ada/project/main.c` in a tree-structured directory. Identify each lookup and the object reached.
+Resolve the path `/home/ada/project/main.c` in a tree-structured directory. Identify each lookup and the object reached.
 
 1. Start at the root directory `/` because the path is absolute.
 2. Look up entry `home` in `/`. Suppose it maps to the directory object for `/home`.
@@ -85,11 +87,11 @@ Problem: Resolve the path `/home/ada/project/main.c` in a tree-structured direct
 6. The OS checks execute/search permission on each directory traversed and requested access permission on `main.c`.
 7. If the caller requested `open(..., O_RDONLY)`, the OS checks read permission. If successful, it creates or references an open-file table entry and returns a file descriptor.
 
-Checked answer: The path is resolved through four directory lookups after the root: `home`, `ada`, `project`, and `main.c`. Directory search permission and final file access permission are both required.
+The path is resolved through four directory lookups after the root: `home`, `ada`, `project`, and `main.c`. Directory search permission and final file access permission are both required.
 
-## Worked example 2: sequential versus direct access
+## Choosing between sequential and direct access
 
-Problem: A log analyzer reads every line of a 2 GB log file once. A database reads record number 850,000 and then record number 12. Which access method fits each workload?
+A log analyzer reads every line of a 2 GB log file once. A database reads record number 850,000 and then record number 12. Which access method fits each workload?
 
 1. The log analyzer consumes records in order and does not need random jumps.
 2. Sequential access fits the log analyzer. The OS and storage device can prefetch upcoming blocks and keep disk or SSD access efficient.
@@ -107,9 +109,9 @@ $$
 
 5. Reading sequentially from the beginning to record 850,000 would waste enormous work. Direct access can seek or map directly to the block containing the requested record.
 
-Checked answer: Sequential access fits the log scan; direct access fits the database. The correct interface follows the pattern of use, not the file size alone.
+Sequential access fits the log scan; direct access fits the database. The correct interface follows the pattern of use, not the file size alone.
 
-## Code
+## Inspecting path metadata through the interface
 
 ```python
 from pathlib import Path
@@ -129,9 +131,9 @@ for key, value in summarize_file("docs/cs/operating-systems/intro.md").items():
     print(f"{key}: {value}")
 ```
 
-This Python snippet uses a high-level library, but the operations still correspond to file-system interface concepts: path resolution, metadata lookup, and type inspection.
+The high-level library still invokes file-system interface operations: path resolution, metadata lookup, and type inspection.
 
-## Common pitfalls
+## Names, handles, and permission surprises
 
 - Confusing a filename with a file object. Several names can refer to one object through links, and an open descriptor can outlive a directory entry.
 - Assuming every file has a meaningful extension. File type may be inferred from metadata, content, conventions, or not at all.
@@ -140,10 +142,8 @@ This Python snippet uses a high-level library, but the operations still correspo
 - Assuming local and remote sharing have identical semantics. Network latency and caching can change visibility rules.
 - Forgetting that `open` is a security boundary. The OS checks permissions and access modes before returning a handle.
 
-## Connections
+<div className="see-also">
 
-- [File-System Implementation](/cs/operating-systems/file-system-implementation)
-- [Mass Storage and RAID](/cs/operating-systems/mass-storage-raid)
-- [I/O Systems](/cs/operating-systems/io-systems)
-- [Protection and Access Control](/cs/operating-systems/protection-access-control)
-- [Security](/cs/operating-systems/security)
+See also: [File-System Implementation](/cs/operating-systems/file-system-implementation) · [Mass Storage and RAID](/cs/operating-systems/mass-storage-raid) · [I/O Systems](/cs/operating-systems/io-systems) · [Protection and Access Control](/cs/operating-systems/protection-access-control) · [Security](/cs/operating-systems/security)
+
+</div>

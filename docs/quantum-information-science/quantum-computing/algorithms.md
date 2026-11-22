@@ -5,15 +5,15 @@ sidebar_position: 3
 
 # Algorithms
 
-Quantum algorithms are not faster because they "try all answers" and then reveal the right one. They are faster when a circuit arranges amplitudes so that measurement samples information about hidden structure: a period, an eigenphase, a marked subspace, or a useful expectation value. This page gives the foundational circuit-model algorithms and uses Nielsen and Chuang's notation for oracles, quantum Fourier transforms, phase estimation, Shor's order-finding reduction, and Grover search.
+Quantum algorithms are not faster because they "try all answers" and then reveal the right one. They are faster when a circuit arranges amplitudes so that measurement samples information about hidden structure: a period, an eigenphase, a marked subspace, or a useful expectation value. The foundational circuit-model examples use oracles, quantum Fourier transforms, phase estimation, Shor's order-finding reduction, and Grover search.
 
-*This page synthesizes the wiki's earlier algorithm overview with Chapters 1, 5, and 6 of Nielsen and Chuang. The N&C emphasis is that QFT and search are the two canonical algorithmic engines: QFT exposes algebraic periodicity, while Grover's iterate performs an optimal two-dimensional amplitude rotation.*
+Nielsen and Chuang treat the QFT and search as two canonical algorithmic engines: the QFT exposes algebraic periodicity, while Grover's iterate performs an optimal two-dimensional amplitude rotation.
 
 ![A Shor algorithm circuit diagram shows the order-finding structure behind quantum factoring.](https://commons.wikimedia.org/wiki/Special:FilePath/Shor%27s_algorithm.svg)
 
 *Figure: Shor's algorithm is the canonical example where a quantum subroutine changes the security assumptions behind RSA-style public-key cryptography. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Shor%27s_algorithm.svg), Bender2k14, CC BY-SA 4.0.*
 
-## Definitions
+## What the cost model must specify
 
 A **quantum algorithm** is a uniform family of circuits followed by classical post-processing. Inputs may be classical bit strings, quantum states, or oracle access to a function. Costs may count gates, circuit depth, qubits, oracle calls, precision, or fault-tolerant logical resources. A speedup claim is meaningful only after the input model and output model are fixed.
 
@@ -77,7 +77,7 @@ $$
 
 and uses a phase oracle plus a reflection about $\vert \psi\rangle$ to rotate amplitude toward the good subspace.
 
-## Key results
+## From phase kickback to order finding
 
 Deutsch-Jozsa gives an exact oracle separation for a promise problem. Given $f:\{0,1\}^n\to\{0,1\}$ promised constant or balanced, the amplitude of $\vert 0^n\rangle$ after the final Hadamards is
 
@@ -153,12 +153,12 @@ $$
 A near-optimal choice is
 
 $$
-k\approx \left\lfloor \frac{\pi}{4\theta}-\frac{1}{2}\right\rceil,
+k\approx \operatorname{round}\left(\frac{\pi}{4\theta}-\frac{1}{2}\right),
 $$
 
 which gives $O(\sqrt{N/M})$ oracle calls. N&C also emphasize two limits: quantum counting combines Grover with phase estimation to estimate $M$, and Grover search is optimal in the black-box model, so unstructured search cannot be improved to logarithmic query complexity.
 
-## Visual
+## Circuit anatomy across algorithm families
 
 ```mermaid
 flowchart TB
@@ -258,7 +258,7 @@ flowchart TB
 
 *Figure: Grover's algorithm alternates an oracle phase flip with diffusion before measuring the search register. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Grover%27s_algorithm_circuit.svg), Fawly, CC BY-SA 4.0.*
 
-This diagram replaces the old taxonomy with circuit-level views of the core algorithms. The kickback circuits show the query register, ancilla preparation, oracle action, final Hadamards, and measurement contract; QFT and QPE expose the controlled-phase and controlled-power ladders used by Shor. Grover's loop shows the oracle and diffusion sub-operations explicitly, while HHL shows the phase-estimation, controlled-rotation, uncomputation, and postselection structure that makes its output a quantum state rather than a full classical vector.
+The kickback circuits show the query register, ancilla preparation, oracle action, final Hadamards, and measurement contract. QFT and QPE expose the controlled-phase and controlled-power ladders used by Shor. Grover's loop separates the oracle from the diffusion operator. HHL combines phase estimation, a controlled rotation, uncomputation, and postselection, so its output is a quantum state rather than a full classical vector.
 
 | Algorithmic pattern | N&C representative | Quantum operation | Classical post-processing | Main caveat |
 |---|---|---|---|---|
@@ -269,7 +269,7 @@ This diagram replaces the old taxonomy with circuit-level views of the core algo
 | Quantum counting | Grover plus phase estimation | Estimate eigenphase of Grover iterate | Convert angle to $M$ | Still needs oracle access |
 | State-output linear algebra | HHL-style later algorithms | Prepare amplitude-encoded answer state | Estimate observables | Data loading and readout can erase speedup |
 
-## Worked example 1: Shor post-processing for factoring 15
+## Factoring 15 after order finding
 
 **Problem.** Factor $N=15$ using the order-finding branch of Shor's algorithm with $a=2$. Show the order and the classical gcd step.
 
@@ -333,9 +333,9 @@ $$
 
 Continued fractions recover denominator $4$, matching the order. A measurement of $192$ would give $192/256=3/4$, also revealing denominator $4$.
 
-**Answer.** The order of $2$ modulo $15$ is $4$, and the classical post-processing returns factors $3$ and $5$. The checked point is that the quantum subroutine is not "factoring directly"; it estimates a phase whose denominator is the period needed by the number-theoretic reduction.
+**Answer.** The order of $2$ modulo $15$ is $4$, and the classical post-processing returns factors $3$ and $5$. The quantum subroutine estimates a phase whose denominator supplies the period needed by the number-theoretic reduction; it does not emit the factors directly.
 
-## Worked example 2: Grover iteration count and success check
+## Choosing the Grover iteration count
 
 **Problem.** A search space has $N=64$ items and $M=1$ marked item. Estimate the number of Grover iterations and check the success probability formula.
 
@@ -380,9 +380,9 @@ This is close to $\pi/2\approx 1.5708$, so the sine squared is close to $1$.
 
 **Answer.** Use about $6$ Grover iterations. The state has rotated very near the marked subspace, so measurement returns the marked item with high probability. The check also shows why over-iteration is a mistake: after passing the marked subspace, further rotations decrease success probability.
 
-## Code
+## Classical post-processing for Shor samples
 
-This snippet implements the classical post-processing part of Shor's algorithm for small examples. It assumes the quantum phase-estimation stage has supplied a candidate rational approximation.
+The following small implementation starts from a rational approximation supplied by quantum phase estimation and performs the continued-fraction and gcd steps.
 
 ```python
 from fractions import Fraction
@@ -418,7 +418,7 @@ print(shor_postprocess(n=15, a=2, measured=64, q=256))
 print(shor_postprocess(n=15, a=2, measured=192, q=256))
 ```
 
-## Common pitfalls
+## Where speedup claims go wrong
 
 - Saying "quantum parallelism" without explaining interference. Superposition alone does not make all branch results readable.
 - Treating QFT as a faster classical FFT. It transforms amplitudes of a quantum state; extracting all transformed amplitudes would require many measurements.
@@ -431,16 +431,6 @@ print(shor_postprocess(n=15, a=2, measured=192, q=256))
 - Claiming NISQ devices can run useful Shor factoring at cryptographic sizes. Shor requires deep, fault-tolerant modular arithmetic.
 - Forgetting input and output models in later algorithms such as HHL. Preparing $\vert b\rangle$ and reading useful observables are part of the algorithm.
 
-## Connections
-
-- [Quantum hardware](/quantum-information-science/quantum-computing/hardware) determines whether controlled powers, modular arithmetic, or Grover oracles can be run before noise dominates.
-- [Quantum error correction](/quantum-information-science/quantum-computing/error-correction) is required for deep algorithms such as Shor and high-precision phase estimation.
-- [Quantum machine learning](/quantum-information-science/quantum-computing/quantum-ml) borrows amplitude estimation, phase estimation, kernels, and variational circuits, but often changes the input-output model.
-- [Cryptography](/cs/cryptography/) connects directly to factoring, discrete logarithms, and post-quantum security.
-- [Linear algebra](/math/linear-algebra/) supplies eigenvectors, unitaries, tensor products, projections, and Fourier transforms.
-- [Quantum mechanics](/physics/quantum-mechanics/) supplies measurement, unitary evolution, phase, and interference.
-- [Quantum communication](/quantum-information-science/quantum-communication/) uses many of the same primitive circuits, including teleportation and phase-sensitive measurements.
-
 ## Further reading
 
 - Michael A. Nielsen and Isaac L. Chuang, *Quantum Computation and Quantum Information*, Chapters 1, 5, and 6.
@@ -449,3 +439,17 @@ print(shor_postprocess(n=15, a=2, measured=192, q=256))
 - Daniel Simon, on the power of quantum computation.
 - Ethan Bernstein and Umesh Vazirani, quantum complexity theory.
 - Aram Harrow, Avinatan Hassidim, and Seth Lloyd, quantum algorithm for linear systems.
+
+<div className="see-also">
+
+See also:
+
+- [Quantum hardware](/quantum-information-science/quantum-computing/hardware) determines whether controlled powers, modular arithmetic, or Grover oracles can be run before noise dominates.
+- [Quantum error correction](/quantum-information-science/quantum-computing/error-correction) is required for deep algorithms such as Shor and high-precision phase estimation.
+- [Quantum machine learning](/quantum-information-science/quantum-computing/quantum-ml) borrows amplitude estimation, phase estimation, kernels, and variational circuits, but often changes the input-output model.
+- [Cryptography](/cs/cryptography/intro) connects directly to factoring, discrete logarithms, and post-quantum security.
+- [Linear algebra](/math/linear-algebra/intro) supplies eigenvectors, unitaries, tensor products, projections, and Fourier transforms.
+- [Quantum mechanics](/physics/quantum-mechanics/intro) supplies measurement, unitary evolution, phase, and interference.
+- [Quantum communication](/quantum-information-science/quantum-communication/intro) uses many of the same primitive circuits, including teleportation and phase-sensitive measurements.
+
+</div>

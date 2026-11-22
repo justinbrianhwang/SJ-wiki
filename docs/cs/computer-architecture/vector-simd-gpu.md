@@ -9,7 +9,7 @@ Data-level parallelism appears when the same operation can be applied to many da
 
 H&P's data-level parallelism chapter compares vector architectures, SIMD instruction extensions, and GPUs. They differ in programming model and implementation style, but they share a core idea: amortize instruction control over multiple data operations. This can deliver high throughput and good energy efficiency when work is regular, but it performs poorly when control flow diverges or memory access is irregular.
 
-## Definitions
+## Three ways to amortize instruction control
 
 A vector architecture operates on vector registers, where one instruction specifies an operation over many elements:
 
@@ -39,7 +39,26 @@ $$
 
 Gather and scatter are vector memory operations that load from or store to non-contiguous addresses. They improve programmability but are usually slower than unit-stride accesses.
 
-## Key results
+The choice among these models depends on the regularity and scale of the work:
+
+```mermaid
+flowchart LR
+    A[Scalar loop] --> B{"Regular independent iterations?"}
+    B -->|yes| C[SIMD or vectorize]
+    C --> D{"Enough parallel work?"}
+    D -->|small/latency sensitive| E[CPU SIMD]
+    D -->|large throughput job| F[GPU]
+    B -->|no| G["Scalar, task parallel, or algorithm change"]
+```
+
+| Style | Control | Best memory pattern | Strength | Weakness |
+|---|---|---|---|---|
+| Vector processor | One vector instruction | Long unit-stride streams | High sustained numeric throughput | Startup overhead for short vectors |
+| CPU SIMD | Packed lanes in scalar core | Aligned contiguous data | Low overhead inside CPU code | Fixed width and cleanup cases |
+| GPU SIMT | Many threads grouped into warps | Coalesced global accesses | Massive throughput | Divergence and transfer overhead |
+| MIMD multicore | Independent threads | Partitioned locality | Flexible tasks | Higher control overhead |
+
+## What keeps the lanes busy
 
 Vector machines make memory latency manageable by issuing long streams of predictable accesses. Once a vector pipeline is full, it can produce one result per lane per cycle. Startup overhead matters for short vectors, so long regular loops are ideal.
 
@@ -59,76 +78,51 @@ GPUs need occupancy, but occupancy is not the final goal. High occupancy gives t
 
 Data transfers also shape heterogeneous systems. A kernel that runs $50\times$ faster on a GPU may still lose if input and output must cross a slow interconnect for a small problem. Batching many operations, keeping data resident on the device, and overlapping transfers with computation are standard techniques for making GPU acceleration pay off.
 
-## Visual
+## Ideal SIMD scaling for array addition
 
-```mermaid
-flowchart LR
-    A[Scalar loop] --> B{"Regular independent iterations?"}
-    B -->|yes| C[SIMD or vectorize]
-    C --> D{"Enough parallel work?"}
-    D -->|small/latency sensitive| E[CPU SIMD]
-    D -->|large throughput job| F[GPU]
-    B -->|no| G["Scalar, task parallel, or algorithm change"]
-```
+A scalar loop adds two arrays of 1024 single-precision floats. The scalar processor performs one add per cycle. A SIMD unit has 128-bit registers, so it can add four 32-bit floats per instruction, one SIMD add per cycle. Ignoring loads, stores, and loop overhead gives the ideal speedup.
 
-| Style | Control | Best memory pattern | Strength | Weakness |
-|---|---|---|---|---|
-| Vector processor | One vector instruction | Long unit-stride streams | High sustained numeric throughput | Startup overhead for short vectors |
-| CPU SIMD | Packed lanes in scalar core | Aligned contiguous data | Low overhead inside CPU code | Fixed width and cleanup cases |
-| GPU SIMT | Many threads grouped into warps | Coalesced global accesses | Massive throughput | Divergence and transfer overhead |
-| MIMD multicore | Independent threads | Partitioned locality | Flexible tasks | Higher control overhead |
-
-## Worked example 1: SIMD speedup for array addition
-
-Problem: A scalar loop adds two arrays of 1024 single-precision floats. A scalar processor performs one add per cycle. A SIMD unit has 128-bit registers, so it can add four 32-bit floats per instruction, one SIMD add per cycle. Ignore loads, stores, and loop overhead. Compute ideal speedup.
-
-Method:
-
-1. Scalar operations:
+The scalar work is:
 
 $$
 1024\ \mathrm{float\ adds}
 $$
 
-At one add per cycle:
+At one add per cycle, its running time is:
 
 $$
 T_{scalar}=1024\ \mathrm{cycles}
 $$
 
-2. SIMD lanes:
+The SIMD register holds:
 
 $$
 \frac{128\ \mathrm{bits}}{32\ \mathrm{bits/float}}=4\ \mathrm{lanes}
 $$
 
-3. SIMD instructions:
+The array therefore requires:
 
 $$
 \frac{1024}{4}=256\ \mathrm{SIMD\ adds}
 $$
 
-4. SIMD cycles:
+At one SIMD add per cycle:
 
 $$
 T_{SIMD}=256\ \mathrm{cycles}
 $$
 
-5. Speedup:
+The ideal speedup is:
 
 $$
 \mathrm{Speedup}=\frac{1024}{256}=4
 $$
 
-Checked answer: Ideal arithmetic speedup is $4\times$. Real speedup may be lower if loads, stores, alignment, or memory bandwidth dominate.
+The ideal arithmetic speedup is $4\times$. Loads, stores, alignment, and memory bandwidth can reduce the measured speedup.
 
-## Worked example 2: Roofline bound for a GPU kernel
+## Locating a GPU kernel on the roofline
 
-Problem: A GPU has peak performance 10 TFLOP/s and memory bandwidth 500 GB/s. A kernel performs 20 floating-point operations for every 8 bytes loaded or stored. Estimate the roofline performance bound.
-
-Method:
-
-1. Compute arithmetic intensity.
+A GPU has peak performance of 10 TFLOP/s and memory bandwidth of 500 GB/s. A kernel performs 20 floating-point operations for every 8 bytes loaded or stored. Its arithmetic intensity is:
 
 $$
 \begin{aligned}
@@ -137,7 +131,7 @@ AI &= \frac{20\ \mathrm{FLOP}}{8\ \mathrm{bytes}} \\
 \end{aligned}
 $$
 
-2. Compute bandwidth-bound performance.
+The bandwidth roof is:
 
 $$
 \begin{aligned}
@@ -148,21 +142,19 @@ P_{mem}
 \end{aligned}
 $$
 
-3. Compare with peak compute.
+Comparing it with peak compute gives:
 
 $$
 \min(10,\ 1.25)=1.25\ \mathrm{TFLOP/s}
 $$
 
-4. Interpret. The kernel is memory-bandwidth bound unless data reuse is improved.
-
-Checked answer: The roofline bound is 1.25 TFLOP/s. To approach 10 TFLOP/s, arithmetic intensity would need at least:
+The roofline bound is 1.25 TFLOP/s, so the kernel is memory-bandwidth bound unless data reuse improves. To approach 10 TFLOP/s, arithmetic intensity would need to reach at least:
 
 $$
 \frac{10\ \mathrm{TFLOP/s}}{500\ \mathrm{GB/s}}=20\ \mathrm{FLOP/byte}
 $$
 
-## Code
+## Quick checks for tails and roofline bounds
 
 ```python
 def simd_chunks(length, lanes):
@@ -191,18 +183,14 @@ A second diagnostic is bytes per useful result. If each output element requires 
 
 Vectorization should also be checked for numerical and semantic changes. Reassociation of floating-point operations can change rounding, and predicated execution can touch memory addresses that scalar control flow would skip unless masking is precise. Correctness constraints may limit the transformations available to a compiler.
 
-## Common pitfalls
+## Where throughput estimates go wrong
 
-- Counting vector lanes as speedup while ignoring memory bandwidth.
-- Assuming GPU threads are independent MIMD threads rather than grouped SIMT execution.
-- Ignoring branch divergence inside warps or wavefronts.
-- Using scattered memory accesses that prevent coalescing.
-- Forgetting CPU-GPU transfer overhead for small kernels.
-- Expecting auto-vectorization when pointers may alias or loop bounds are unknown.
+Lane count is only an arithmetic upper bound; it says nothing about memory bandwidth, alignment, or instruction overhead. GPU thread counts can be similarly misleading because threads execute in SIMT groups. Divergent branches serialize paths within a warp or wavefront, and scattered addresses turn a coalesced access into several memory transactions.
 
-## Connections
+Small kernels may spend more time crossing the CPU-GPU interconnect than executing. On CPUs, auto-vectorization can also disappear when pointers may alias, alignment is unknown, or loop bounds are hard for the compiler to analyze. Compiler vectorization reports and hardware performance counters are better evidence than source-level inspection alone.
 
-- [Cache Optimization and Prefetching](/cs/computer-architecture/cache-optimization-and-prefetching)
-- [Multicore, Synchronization, and NUMA](/cs/computer-architecture/multicore-synchronization-numa)
-- [Domain-Specific Accelerators](/cs/computer-architecture/domain-specific-accelerators)
-- [Warehouse-Scale Computers](/cs/computer-architecture/warehouse-scale-computers)
+<div className="see-also">
+
+See also: [Cache Optimization and Prefetching](/cs/computer-architecture/cache-optimization-and-prefetching) · [Multicore, Synchronization, and NUMA](/cs/computer-architecture/multicore-synchronization-numa) · [Domain-Specific Accelerators](/cs/computer-architecture/domain-specific-accelerators) · [Warehouse-Scale Computers](/cs/computer-architecture/warehouse-scale-computers)
+
+</div>

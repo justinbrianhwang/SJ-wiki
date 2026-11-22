@@ -7,13 +7,9 @@ sidebar_position: 19
 
 Multivariable extrema extend optimization to surfaces and constraints. Without constraints, critical points occur where the gradient is zero or undefined. With constraints, the gradient of the objective must align with the gradient of the constraint at an interior constrained optimum.
 
-![A matrix transforms two vectors into new positions in the plane.](https://commons.wikimedia.org/wiki/Special:FilePath/Matrix_multiplication.svg)
-
-*Figure: Matrix multiplication can be read geometrically as a transformation of vectors. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Matrix_multiplication.svg), Jakob.scholbach and Pbroks13, CC BY-SA 3.0.*
-
 The geometry is more important than the algebra. At an unconstrained local maximum or minimum, every first-order direction has zero change. On a constraint curve or surface, only directions tangent to the constraint are allowed, so the objective gradient must be perpendicular to those tangent directions.
 
-## Definitions
+## Candidate points in several variables
 
 For $f(x,y)$, a critical point is a point where
 
@@ -57,7 +53,7 @@ $$
 \nabla f=\lambda\nabla g+\mu\nabla h.
 $$
 
-## Key results
+## Curvature tests and the geometry of constraints
 
 The second derivative test for a critical point $(a,b)$ of $f(x,y)$ says:
 
@@ -150,8 +146,6 @@ Lagrange multipliers have a clear level-curve picture. At a constrained extremum
 
 In applied problems, constraints often encode limited resources. A maximum volume subject to fixed surface area, a minimum cost subject to production requirements, or a shortest distance subject to lying on a curve all fit this pattern. The multiplier equations are only useful after the objective and constraint correctly represent the situation.
 
-## Visual
-
 ```mermaid
 graph TD
   A[Optimization problem] --> B{"Constraint?"}
@@ -172,7 +166,7 @@ graph TD
 | Nonsmooth boundary | separate pieces and corners | direct comparison |
 | Saddle point | $D\lt 0$ | neither max nor min |
 
-## Worked example 1: classify unconstrained critical points
+## Classifying an unconstrained quadratic surface
 
 **Problem.** Find and classify the critical point of
 
@@ -242,7 +236,7 @@ Since $D\gt 0$ and $f_{xx}\gt 0$, the point is a local minimum.
 
 **Checked answer.** The function has a local minimum at $(0,3)$. The value is $f(0,3)=9-18=-9$.
 
-## Worked example 2: constrained optimization with Lagrange multipliers
+## Extremizing a product on the unit circle
 
 **Problem.** Maximize and minimize
 
@@ -330,7 +324,7 @@ The feasible set is the unit circle, which is closed and bounded, and $f(x,y)=xy
 
 If the constraint were not closed or bounded, a finite candidate list might not tell the whole story. Always match the existence argument to the feasible set.
 
-## Code
+## Sampling the constraint as a numerical check
 
 ```python
 def f(x, y):
@@ -348,18 +342,22 @@ print(max(samples))
 print(min(samples))
 ```
 
-## Common pitfalls
+## Making the candidate search complete
 
-- Forgetting points where partial derivatives do not exist.
-- Using the second derivative test when $D=0$ as if it classified the point.
-- Checking only interior critical points on a closed region and missing boundary extrema.
-- Applying Lagrange multipliers when $\nabla g=\mathbf{0}$ at a candidate without separate analysis.
-- Solving $\nabla f=\lambda\nabla g$ but forgetting the constraint equation.
-- Reporting candidates instead of objective values when asked for maxima and minima.
+- Critical points also include places where first partial derivatives fail to exist; solving only $\nabla f=\mathbf{0}$ can miss them.
+- The case $D=0$ is inconclusive. Classification then needs another argument, such as direct comparison or higher-order terms.
+- A closed region requires an interior search and a boundary search, including corners and nonsmooth pieces.
+- The usual Lagrange argument assumes $\nabla g\ne\mathbf{0}$. A feasible point where the constraint gradient vanishes needs separate analysis.
+- The equations $\nabla f=\lambda\nabla g$ do not replace the constraint equation; all of them must be solved together.
+- Candidate coordinates are not yet maximum or minimum values. Evaluate the objective at every feasible candidate before comparing them.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Partial Derivatives and the Gradient](/math/calculus/partial-derivatives-and-gradient): gradients and Hessian entries drive multivariable optimization.
 - [Applications of Derivatives](/math/calculus/applications-of-derivatives): second derivative testing generalizes from one variable.
 - [Multiple Integrals](/math/calculus/multiple-integrals): extrema help bound and interpret multivariable integrals.
 - [Vector Calculus](/math/calculus/vector-calculus): constrained geometry reappears in surfaces and flux orientation.
+
+</div>

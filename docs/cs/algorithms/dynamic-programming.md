@@ -5,15 +5,11 @@ sidebar_position: 6
 
 # Dynamic Programming
 
-Dynamic programming, usually shortened to DP, turns an exponential recursive search into a polynomial computation by solving each distinct subproblem once. It is the method behind edit distance, sequence alignment, knapsack, matrix-chain multiplication, optimal binary search trees, interval optimization, tree optimization, and many shortest-path formulations [1], [3].
+Dynamic programming, usually shortened to DP, often turns an exponential recursive search into a polynomial computation by solving each distinct subproblem once, provided the number of distinct states is polynomial. It is the method behind edit distance, sequence alignment, knapsack, matrix-chain multiplication, optimal binary search trees, interval optimization, tree optimization, and many shortest-path formulations [1], [3].
 
 The central skill is not memorizing recurrences. It is choosing a state that contains exactly enough information to make future decisions independent of the past. Bellman's principle of optimality gives the philosophical version: an optimal policy has the property that, after any first decision, the remaining decisions must be optimal for the resulting subproblem [7]. Modern algorithm courses often add another view: a DP is a shortest-path or longest-path computation on an implicit acyclic graph of states.
 
-![Hamming distance visualization over 4-bit strings.](https://commons.wikimedia.org/wiki/Special:FilePath/Hamming_distance_4_bit_binary.svg)
-
-*Figure: Hamming-distance states give a small example of a state space where local transitions define global distances. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hamming_distance_4_bit_binary.svg), public domain or CC-BY-SA via Wikimedia Commons.*
-
-## Definitions
+## State, transition, and evaluation order
 
 A problem has **optimal substructure** if an optimal solution can be assembled from optimal solutions to smaller subproblems. It has **overlapping subproblems** if a naive recursion repeatedly asks for the same subproblem. DP is appropriate when both properties are present and the state space is not too large.
 
@@ -25,7 +21,7 @@ Space optimization is possible when a transition uses only a small window of pre
 
 DP states form a directed graph even when the graph is never built explicitly. Each state has edges to the states it depends on. A tabulation order is a topological order of that graph, and memoized recursion is depth-first search with caching over the same graph. This perspective is useful for debugging: if a recurrence has a cycle, then it is not a plain acyclic DP until an additional monotone dimension, relaxation method, or fixed-point argument is supplied.
 
-## Key results
+## Recurrence families
 
 The simplest DP examples are one-dimensional. Fibonacci has recurrence $F_n=F_{n-1}+F_{n-2}$; memoization changes the exponential recursion tree into $O(n)$ states. Climbing stairs is the same recurrence with different base cases. House robber uses
 
@@ -73,8 +69,6 @@ Finally, regex matching, word break, palindrome partitioning, and parsing-style 
 
 The cost of a DP is usually the number of states times the cost per transition. That simple product should be written down before coding. An $O(n^2)$ table with $O(n)$ split choices is $O(n^3)$, not $O(n^2)$. Many advanced DP optimizations, including Knuth optimization, divide-and-conquer DP optimization, and monotone queues, are ways to reduce transition cost after proving extra structure.
 
-## Visual
-
 ```mermaid
 flowchart LR
   A["Define subproblem state"] --> B["Write recurrence"]
@@ -98,7 +92,9 @@ flowchart LR
 | Bitmask | $(S,last)$ | add one element | TSP, assignment variants |
 | DAG path | vertex/state | relax incoming edges | shortest-path interpretation |
 
-## Worked example 1: LCS table for two strings
+## Two tables, filled explicitly
+
+### Filling an LCS table
 
 **Problem.** Find the LCS length of $X=\texttt{ABCBDAB}$ and $Y=\texttt{BDCABA}$.
 
@@ -126,7 +122,7 @@ $$[1,1,1,1,2,2].$$
 
 **Checked answer.** The LCS length is $L[7][6]=4$. One valid LCS is `BCBA`; another is `BDAB`. The table gives the value, and parent pointers or backward tracing recover a sequence.
 
-## Worked example 2: 0/1 knapsack table
+### Reading a 0/1 knapsack table
 
 **Problem.** Items have weights and values
 
@@ -156,7 +152,7 @@ Capacity is $W=5$. Find the maximum value using each item at most once.
 
 **Checked answer.** The optimum value is $8$, achieved by taking item 4 alone. Taking items 1 and 2 gives value $7$, so the final comparison is meaningful.
 
-## Code
+## Space-conscious implementations
 
 ```python
 from bisect import bisect_left
@@ -193,7 +189,7 @@ def lis_nlogn(values):
     return len(tails)
 ```
 
-## Common pitfalls
+## State design and loop-direction traps
 
 - Starting with code before defining the state in words.
 - Leaving information out of the state, which makes the recurrence depend on hidden history.
@@ -208,15 +204,6 @@ def lis_nlogn(values):
 - Ignoring integer overflow in languages with fixed-width arithmetic.
 - Using bitmask DP when $n$ is too large for $2^n$ states.
 - Claiming DP is always polynomial; the number of states may still be exponential.
-
-## Connections
-
-- [Divide and Conquer](/cs/algorithms/divide-and-conquer) contrasts independent recursive subproblems with overlapping ones.
-- [Greedy Algorithms](/cs/algorithms/greedy-algorithms) explains when a local choice can replace a table.
-- [Graph Algorithms](/cs/algorithms/graph-algorithms) for shortest paths on explicit graphs; DP often works on implicit DAGs.
-- [String Algorithms](/cs/algorithms/string-algorithms) for edit distance, LCS, and approximate matching.
-- [Approximation Algorithms](/cs/algorithms/approximation-algorithms) for knapsack FPTAS and pseudo-polynomial DP.
-- [Discrete Math](/math/discrete/intro) for induction, recurrences, and combinatorial state spaces.
 
 ## References
 
@@ -243,3 +230,16 @@ def lis_nlogn(values):
 [11] R. E. Bellman, "On a routing problem," *Quarterly of Applied Mathematics*, vol. 16, no. 1, pp. 87-90, 1958.
 
 [12] S. Arora and B. Barak, *Computational Complexity: A Modern Approach*. Cambridge University Press, 2009.
+
+<div className="see-also">
+
+See also:
+
+- [Divide and Conquer](/cs/algorithms/divide-and-conquer) contrasts independent recursive subproblems with overlapping ones.
+- [Greedy Algorithms](/cs/algorithms/greedy-algorithms) explains when a local choice can replace a table.
+- [Graph Algorithms](/cs/algorithms/graph-algorithms) for shortest paths on explicit graphs; DP often works on implicit DAGs.
+- [String Algorithms](/cs/algorithms/string-algorithms) for edit distance, LCS, and approximate matching.
+- [Approximation Algorithms](/cs/algorithms/approximation-algorithms) for knapsack FPTAS and pseudo-polynomial DP.
+- [Discrete Math](/math/discrete/intro) for induction, recurrences, and combinatorial state spaces.
+
+</div>

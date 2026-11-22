@@ -352,10 +352,8 @@ SciPy uses `pmf` for discrete probability mass functions and `cdf` for cumulativ
 - Ignoring dependence among trials, such as multiple purchases by the same customer.
 - Rounding intermediate probabilities too aggressively.
 
-## Related pages
+<div className="see-also">
 
-- [Probability basics](/math/statistics/probability-basics)
-- [Normal, t, chi-square, and F distributions](/math/statistics/normal-t-chi-square-and-f-distributions)
-- [Sampling distributions and the central limit theorem](/math/statistics/sampling-distributions-and-clt)
-- [Proportions and chi-square tests](/math/statistics/proportions-and-chi-square-tests)
-- [Hypothesis testing logic](/math/statistics/hypothesis-testing-logic)
+See also: [Probability basics](/math/statistics/probability-basics) · [Normal, t, chi-square, and F distributions](/math/statistics/normal-t-chi-square-and-f-distributions) · [Sampling distributions and the central limit theorem](/math/statistics/sampling-distributions-and-clt) · [Proportions and chi-square tests](/math/statistics/proportions-and-chi-square-tests) · [Hypothesis testing logic](/math/statistics/hypothesis-testing-logic)
+
+</div>

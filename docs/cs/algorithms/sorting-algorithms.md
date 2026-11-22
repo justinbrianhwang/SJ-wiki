@@ -7,7 +7,7 @@ sidebar_position: 3
 
 Sorting takes a collection of records and rearranges it so keys appear in nondecreasing or nonincreasing order. It is one of the central algorithmic problems because sorted order turns many hard-looking tasks into scanning tasks: duplicate detection, set intersection, binary search, interval merging, sweep-line geometry, and many database operations all become simpler after sorting [1, Ch. 2, 6-8].
 
-This page treats sorting as a design space rather than a list of named procedures. The main trade-offs are comparisons versus key arithmetic, stability versus raw memory movement, in-place updates versus auxiliary arrays, and predictable worst-case time versus excellent practical behavior. CLRS emphasizes lower bounds and correctness proofs, Sedgewick and Wayne emphasize implementation details and partitioning discipline, while Mehlhorn and Sanders connect sorting to memory hierarchy, external sorting, and parallel settings [1], [2], [6].
+Sorting is better treated as a design space than as a list of named procedures. The main trade-offs are comparisons versus key arithmetic, stability versus raw memory movement, in-place updates versus auxiliary arrays, and predictable worst-case time versus excellent practical behavior. CLRS emphasizes lower bounds and correctness proofs, Sedgewick and Wayne emphasize implementation details and partitioning discipline, while Mehlhorn and Sanders connect sorting to memory hierarchy, external sorting, and parallel settings [1], [2], [6].
 
 ![Quicksort animation showing partitioning around pivots.](https://commons.wikimedia.org/wiki/Special:FilePath/Quicksort.gif)
 
@@ -21,7 +21,7 @@ This page treats sorting as a design space rather than a list of named procedure
 
 *Figure: Heapsort keeps the maximum at the heap root and repeatedly extracts it. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sorting_heapsort_anim.gif), public domain or CC-BY-SA via Wikimedia Commons.*
 
-## Definitions
+## Stability, memory, and key access
 
 A sorting algorithm receives a sequence $A[0],\ldots,A[n-1]$ of records, each with a key $k(A[i])$, and produces a permutation $A'$ such that $k(A'[0])\le k(A'[1])\le\cdots\le k(A'[n-1])$. If equal-key records retain their original relative order, the algorithm is **stable**. Stability matters whenever a later sort refines an earlier one, for example sorting employees by department and then stably by hire date.
 
@@ -31,7 +31,7 @@ A sorting algorithm is **adaptive** if it becomes faster on partially ordered in
 
 A **comparison sort** only obtains ordering information from questions of the form "is $x\lt y$?" Bubble sort, insertion sort, selection sort, merge sort, quicksort, heapsort, shellsort, TimSort, and IntroSort are comparison sorts. A **non-comparison sort** uses more structure, such as integer keys in a bounded range or digit representations. Counting sort, radix sort, and bucket sort can beat the $\Omega(n\log n)$ comparison lower bound because their decision process is not only binary comparison [1, Ch. 8].
 
-## Key results
+## Comparison families and structured keys
 
 The basic quadratic sorts still earn a place in a serious algorithms course because they isolate important ideas. Bubble sort repeatedly swaps adjacent inversions; it is stable and adaptive with an early-exit flag, but it performs too many writes. Selection sort repeatedly selects the minimum remaining item; it makes only $O(n)$ swaps, but it is not stable in its usual array form and performs $\Theta(n^2)$ comparisons even on sorted input. Insertion sort maintains a sorted prefix; it is stable, in-place, and very fast on tiny or nearly sorted arrays, which is why production hybrid sorts use it for small subproblems [2].
 
@@ -48,8 +48,6 @@ The central impossibility result is the comparison lower bound. Any comparison s
 Production sorting chooses hybrids. **TimSort** detects runs, extends short runs with binary insertion sort, then merges while maintaining invariants that keep the merge stack balanced. It is stable and adaptive, which matches real application data. **IntroSort**, used as the basis of many C++ `std::sort` implementations, starts with quicksort, switches to heapsort if recursion becomes too deep, and uses insertion sort for tiny partitions. The result preserves quicksort's cache-friendly average behavior while guaranteeing $O(n\log n)$ worst-case time [6].
 
 External sorting treats memory as the scarce resource. If only $M$ records fit in RAM, sort chunks of size $M$ into initial runs, write them to disk, then perform multiway merge passes using input buffers and one output buffer. Parallel sorting uses partitioning or sampling to distribute work across processors, then merges or redistributes buckets. The key idea in both settings is the same as in internal sorting: comparisons matter, but data movement and locality often dominate wall-clock time.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -79,7 +77,9 @@ flowchart TD
 | TimSort | $O(n\log n)$ | data dependent | $O(n)$ worst case | Yes | No | Exploits natural runs |
 | IntroSort | $O(n\log n)$ | $O(n\log n)$ | $O(\log n)$ | No | Mostly | Quicksort plus heapsort fallback |
 
-## Worked example 1: merge-sort recurrence
+## Recurrence and partition traces
+
+### Expanding the merge-sort recurrence
 
 **Problem.** Solve the recurrence for merge sort on $n=2^k$ items:
 
@@ -107,7 +107,7 @@ $$T(n)=2^{\log_2 n}T(1)+cn\log_2 n=nd+cn\log_2 n.$$
 
 **Checked answer.** The exact expression under this simplified model is $T(n)=cn\log_2 n+dn$, so merge sort is $\Theta(n\log n)$. The result also follows from the Master Theorem with $a=2$, $b=2$, and $f(n)=\Theta(n)$.
 
-## Worked example 2: Lomuto quicksort partition trace
+### Tracing a Lomuto partition
 
 **Problem.** Partition $A=[9,3,7,1,8,2,5]$ using Lomuto's scheme with pivot $5$, the last element. The goal is to place elements $\le5$ before the pivot and elements $\gt 5$ after it.
 
@@ -126,7 +126,7 @@ $$T(n)=2^{\log_2 n}T(1)+cn\log_2 n=nd+cn\log_2 n.$$
 
 **Checked answer.** The pivot ends at index $3$. All entries left of it are $\le5$, and all entries right of it are $\gt 5$. The left and right sides are not sorted yet; recursive quicksort calls handle them.
 
-## Code
+## Stable merge sort and randomized quicksort
 
 ```python
 from random import randrange
@@ -177,7 +177,7 @@ if __name__ == "__main__":
     print(quicksort(data))
 ```
 
-## Common pitfalls
+## Guarantees hidden by implementation details
 
 - Treating "in-place" and "low memory in practice" as identical. Recursive quicksort still uses stack space.
 - Forgetting that stable merge chooses from the left run first when keys tie.
@@ -191,15 +191,6 @@ if __name__ == "__main__":
 - Building an external sort with two-way merges when a multiway merge would reduce disk passes.
 - Forgetting that Python's `list.sort` and Java object sorting are stable TimSort variants.
 - Sorting records by a key function that is expensive to recompute; decorate-sort-undecorate or cache keys.
-
-## Connections
-
-- [Big-O Notation](/cs/algorithms/big-o) for the asymptotic language used in the comparison table.
-- [Searching Algorithms](/cs/algorithms/searching-algorithms) because binary search and order statistics depend on sorted or partitioned structure.
-- [Divide and Conquer](/cs/algorithms/divide-and-conquer) for merge sort, quicksort, and recurrence solving.
-- [Randomized Algorithms](/cs/algorithms/randomized-algorithms) for randomized quicksort and randomized selection.
-- [Data Structures](/cs/data-structures/intro) for heaps, arrays, linked lists, B-trees, and memory-layout effects.
-- [Computational Geometry](/cs/algorithms/computational-geometry) where sorting by coordinate is the first step in hulls and sweep lines.
 
 ## References
 
@@ -226,3 +217,16 @@ if __name__ == "__main__":
 [11] T. Peters, "Timsort description," Python Software Foundation, 2002.
 
 [12] D. R. Musser, "Introspective sorting and selection algorithms," *Software: Practice and Experience*, vol. 27, no. 8, pp. 983-993, 1997.
+
+<div className="see-also">
+
+See also:
+
+- [Big-O Notation](/cs/algorithms/big-o) for the asymptotic language used in the comparison table.
+- [Searching Algorithms](/cs/algorithms/searching-algorithms) because binary search and order statistics depend on sorted or partitioned structure.
+- [Divide and Conquer](/cs/algorithms/divide-and-conquer) for merge sort, quicksort, and recurrence solving.
+- [Randomized Algorithms](/cs/algorithms/randomized-algorithms) for randomized quicksort and randomized selection.
+- [Data Structures](/cs/data-structures/intro) for heaps, arrays, linked lists, B-trees, and memory-layout effects.
+- [Computational Geometry](/cs/algorithms/computational-geometry) where sorting by coordinate is the first step in hulls and sweep lines.
+
+</div>

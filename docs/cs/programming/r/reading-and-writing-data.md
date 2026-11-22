@@ -5,36 +5,34 @@ sidebar_position: 9
 
 # Reading and Writing Data
 
-Analysis starts when data enters R and becomes an object with known columns, classes, and missing-value conventions. *The Book of R* introduces built-in data sets, text tables, spreadsheet workbooks, web files, graphics output, and ad hoc object storage. The details vary by file type, but the same discipline applies: know the path, know the delimiter, inspect the imported object, and save outputs in a format suited to their next use.
+Analysis begins when data enters R as an object with known columns, classes, and missing-value conventions. The details vary across text tables, spreadsheet workbooks, serialized R objects, web files, and graphics output, but the same discipline applies: know the path and format, inspect what was imported, and save results for their next use.
 
-The safest workflow is to separate raw input from derived output. Raw files should remain unchanged. R scripts should read raw files, perform explicit cleaning steps, and write cleaned data, tables, plots, or serialized R objects to predictable locations. This keeps the analysis reproducible and makes mistakes easier to trace.
+Keep raw input separate from derived output. Scripts should read unchanged source files, perform explicit cleaning steps, and write cleaned data, tables, plots, or serialized objects to predictable locations. That separation keeps the analysis reproducible and makes errors traceable.
 
-## Definitions
+## Choosing an interchange or storage format
 
-A **CSV file** is a comma-separated text file. It is commonly read with `read.csv()` or `read.table(sep = ",", header = TRUE)`, and written with `write.csv()`.
+A **CSV file** is comma-separated text, commonly read with `read.csv()` and written with `write.csv()`. More generally, a **delimited text file** stores rows as lines and separates columns with commas, tabs, semicolons, pipes, or another delimiter. `read.table()` is the flexible base R reader, while `read.delim()` is a tab-delimited convenience wrapper.
 
-A **delimited text file** stores rows as lines and columns separated by a delimiter such as comma, tab, semicolon, or pipe. `read.table()` is the flexible base R reader; `read.delim()` is a tab-delimited convenience wrapper.
+An **Excel workbook** is a spreadsheet file such as `.xlsx`. Base R does not read that format directly; packages such as `readxl` are commonly used.
 
-An **Excel workbook** is a spreadsheet file such as `.xlsx`. Base R does not read `.xlsx` directly; contributed packages such as `readxl` are commonly used.
-
-An **RData** file stores one or more R objects by name. `save()` writes named objects to `.RData`, and `load()` restores them into an environment. An **RDS** file stores one object without forcing its name; `saveRDS()` and `readRDS()` are often cleaner for scripted workflows.
-
-A **graphics device** is an output target for plots. Devices include the interactive plot pane, `png()`, `pdf()`, and other file devices. Plot code runs while the device is open, and `dev.off()` closes the file.
-
-## Key results
-
-Import decisions should be explicit:
+R also has formats that preserve its own classes and attributes. An **RData** file stores one or more named objects: `save()` writes them and `load()` restores them into an environment. An **RDS** file stores a single object without fixing its name, so `saveRDS()` and `readRDS()` tend to be clearer in scripts.
 
 | Format | Read function | Write function | Preserves R classes well? | Good use |
 |---|---|---|---|---|
 | CSV | `read.csv` | `write.csv` | Partly | Exchange with spreadsheets and other tools |
-| Tab-delimited | `read.delim` | `write.table` | Partly | Plain text data transfer |
-| Excel `.xlsx` | `readxl::read_excel` | `writexl::write_xlsx` or other package | Partly | Spreadsheet collaboration |
+| Tab-delimited | `read.delim` | `write.table` | Partly | Plain-text data transfer |
+| Excel `.xlsx` | `readxl::read_excel` | `writexl::write_xlsx` or another package | Partly | Spreadsheet collaboration |
 | RData | `load` | `save` | Yes | Multiple R objects |
 | RDS | `readRDS` | `saveRDS` | Yes | One object with explicit assignment |
 | Image/PDF plot | Not usually read as data | `png`, `pdf`, `jpeg` | Not data | Reports and figures |
 
-After every import, inspect structure and dimensions:
+Choose according to the next consumer. CSV exchanges rectangular data with non-R tools but loses some R-specific classes and attributes. RDS preserves one object inside an R workflow. RData handles several objects but may populate the current environment with names that are not obvious from the call. Plot files are generated output and should be reproducible from code.
+
+## Inspecting an import before analysis
+
+Import arguments should document the file's conventions. CSV parsing can fail when a file uses a non-comma delimiter, decimal commas, embedded commas in quoted strings, unusual missing codes, or inconsistent headers. Set `sep`, `header`, `na.strings`, `stringsAsFactors`, or `colClasses` when the defaults do not match.
+
+After reading a file, inspect both its shape and its column types:
 
 ```r
 dim(dat)
@@ -44,15 +42,7 @@ summary(dat)
 head(dat)
 ```
 
-CSV import can go wrong when files use non-comma delimiters, decimal commas, embedded commas in quoted strings, nonstandard missing codes, or inconsistent header rows. Use arguments such as `sep`, `header`, `na.strings`, `stringsAsFactors`, and `colClasses` when defaults do not match the file.
-
-RData is convenient but can hide object names. `load("file.RData")` creates objects in the current environment and returns their names invisibly. RDS is usually more explicit:
-
-```r
-clean_data <- readRDS("clean_data.rds")
-```
-
-## Visual
+The checks fit into a short import loop:
 
 ```mermaid
 flowchart TD
@@ -74,18 +64,9 @@ flowchart TD
 | Column classes | `str(dat)` | Numeric data imported as character |
 | Missing values | `colSums(is.na(dat))` | Unrecognized missing-value codes |
 
-## Worked example 1: Reading a CSV string and cleaning classes
+### Declaring missing codes and factor levels
 
-Problem: a small CSV stores patient id, group, and response. The missing response code is `"."`. Read it, convert group to a factor, convert response to numeric, and compute group means.
-
-Method:
-
-1. Represent the CSV text with `textConnection` for a self-contained example.
-2. Use `read.csv` with `na.strings = "."`.
-3. Inspect the result.
-4. Convert group to a factor with explicit levels.
-5. Aggregate response by group.
-6. Check one mean manually.
+This small CSV records patient id, group, and response, with `.` used for a missing response. Declaring that code during import prevents it from becoming an ordinary string. The group levels are then set explicitly before calculating means.
 
 ```r
 txt <- "id,group,response
@@ -109,22 +90,13 @@ aggregate(response ~ group, data = dat, FUN = mean, na.rm = TRUE)
 # 2 treated      6.6
 ```
 
-Checked answer: the treated responses are 6.3 and 6.9, so their mean is `(6.3 + 6.9) / 2 = 6.6`. The control group has one observed response, 5.1, because the other is missing.
+The treated mean is `(6.3 + 6.9) / 2 = 6.6`. The control group has one observed value, 5.1, because the other response is missing. This is a realistic import policy despite the small sample: missing codes are declared at the boundary, then class choices are made explicitly.
 
-The example is small, but the import policy is realistic: missing codes are declared during reading, then class choices are made explicitly.
+## Round-tripping an R object and writing a plot
 
-## Worked example 2: Saving a cleaned object and a plot
+A **graphics device** is an output target for plotting. The interactive plot pane is one device; `png()`, `pdf()`, and similar functions open file devices. Plot commands run while the device is open, and `dev.off()` closes and completes the file.
 
-Problem: create a cleaned `mtcars` subset with model names and four variables. Save it as RDS, read it back, and write a PNG scatterplot.
-
-Method:
-
-1. Build the cleaned data frame.
-2. Save one object with `saveRDS`.
-3. Read it back with explicit assignment.
-4. Open a PNG graphics device.
-5. Draw the plot.
-6. Close the device with `dev.off()`.
+The following code creates a subset of `mtcars`, verifies an RDS round trip, and writes a PNG scatterplot:
 
 ```r
 cars <- mtcars[, c("mpg", "wt", "hp", "cyl")]
@@ -144,15 +116,19 @@ plot(cars2$wt, cars2$mpg, pch = 19, xlab = "Weight", ylab = "MPG")
 dev.off()
 ```
 
-Checked answer: `identical(cars, cars2)` returns `TRUE`, so the RDS round trip preserved the object. The plot file path is temporary in this example, but a project script would use a stable path such as `"figures/mpg_vs_weight.png"`.
+`identical(cars, cars2)` returning `TRUE` confirms that the object survived serialization unchanged. A project script would replace the temporary filenames with stable paths such as `"data/clean/cars.rds"` and `"figures/mpg_vs_weight.png"`. If `dev.off()` is omitted, a file graphics device can remain incomplete or locked until the session ends.
 
-The key habit is to close file graphics devices. If `dev.off()` is forgotten, the file may be incomplete or locked until the session ends.
-
-## Code
+`load("file.RData")` behaves differently: it creates objects in the current environment and invisibly returns their names. RDS makes the destination explicit:
 
 ```r
-# Reusable import checker for rectangular data.
+clean_data <- readRDS("clean_data.rds")
+```
 
+## A reusable import report
+
+For repeated rectangular imports, a compact checker can return dimensions, names, class and missingness summaries, and a preview as structured data:
+
+```r
 check_import <- function(df) {
   stopifnot(is.data.frame(df))
   report <- data.frame(
@@ -179,31 +155,28 @@ example <- read.csv(textConnection(txt), na.strings = ".")
 print(check_import(example))
 ```
 
-The checker returns a list rather than only printing text because the pieces may be useful later. `dimensions` can be compared with an expected row and column count. `report` can be written to a quality-control file. `preview` can be displayed in an interactive session. Returning structured information makes the function useful in both exploratory and scripted contexts.
+Returning a list keeps each result available for later work. `dimensions` can be compared with an expected shape, `report` can be written to a quality-control file, and `preview` can be shown interactively.
 
-File import is also where reproducibility often breaks. A script that reads `"mydata.csv"` depends on the working directory; a script that reads `"data/mydata.csv"` inside an RStudio project is clearer. A script that says `na.strings = c("", "NA", ".")` documents missing-value conventions; a script that accepts defaults leaves readers guessing. If an Excel file is required, the package dependency should be visible near the top of the script, and the sheet name or sheet number should be specified.
+For a larger project, keep a small data dictionary beside the import code. Record each column's intended class, units, allowed missing codes, and factor levels. The import can then verify that numeric columns are numeric, categories have expected levels, and dates do not produce unexpected `NA` values.
 
-For saving, choose the format according to the next user. CSV is excellent for exchanging rectangular data with non-R tools, but it loses some R-specific classes and attributes. RDS is excellent for preserving one cleaned R object inside an R workflow. RData can save multiple objects, but it can also clutter an environment when loaded. Plot files are outputs, not data; save them from code so they can be regenerated after any change.
+## Paths and failure modes
 
-Finally, never overwrite raw data as part of cleaning. Write cleaned data to a new file or object. That single rule makes it possible to rerun the analysis, audit decisions, and recover when a cleaning assumption changes.
+A script that reads `"mydata.csv"` depends on the working directory. A path such as `"data/raw/mydata.csv"` inside an RStudio project states more of its context. A common layout separates `data/raw`, `data/clean`, `figures`, and `results`: source material remains read-only, while every other directory contains reproducible outputs.
 
-For larger projects, keep a small data dictionary beside the import code. It should name each column, its intended class, allowed missing codes, units, and any factor levels. The import script can then be checked against that dictionary: numeric columns should be numeric, categorical columns should have expected levels, and dates should parse without unexpected `NA`s. This is a practical way to turn informal knowledge about a file into reproducible validation.
+Several details deserve an explicit check:
 
-It is also useful to separate input paths and output paths. A common project layout has `data/raw`, `data/clean`, `figures`, and `results`. The exact names are less important than the separation. Raw data are read-only inputs; clean data are reproducible outputs; figures and result tables are generated artifacts. This organization makes scripts easier to rerun and reduces the chance of confusing source material with derived material.
+- Confirm paths with `getwd()` and `file.exists(path)` before diagnosing the parser.
+- List every missing code, including variants such as `"."`, `"NA "`, and `"-99"`, rather than letting them become ordinary data.
+- Inspect `str()`; printed numeric-looking values may still be character columns.
+- Keep scripts and raw inputs rather than relying on a saved `.RData` workspace as the only record of an analysis.
+- Use `row.names = FALSE` when writing CSV files for consumers that do not expect an extra row-name column.
+- Record Excel package dependencies and specify the sheet name or number.
+- Close each file graphics device with `dev.off()`.
 
-## Common pitfalls
+Cleaning should write a new file or object instead of overwriting the raw input. When an assumption changes, the script can then be rerun from the original evidence.
 
-- Reading a file from the wrong working directory. Check `getwd()` and `file.exists(path)`.
-- Letting a missing code such as `"."`, `"NA "`, or `"-99"` become ordinary data.
-- Trusting printed output without checking `str()`. Numeric-looking columns may be character.
-- Saving analysis state only as `.RData`. Scripts plus raw data are more reproducible.
-- Forgetting `row.names = FALSE` when writing CSV files for non-R users.
-- Opening a graphics device and forgetting `dev.off()`.
-- Using Excel import code without recording the package dependency.
+<div className="see-also">
 
-## Connections
+See also: [Getting started with R](/cs/programming/r/getting-started-rstudio-packages) · [Special values, classes, and coercion](/cs/programming/r/special-values-classes-coercion) · [Lists and data frames](/cs/programming/r/lists-and-data-frames) · [Base graphics](/cs/programming/r/base-graphics)
 
-- [Getting started with R](/cs/programming/r/getting-started-rstudio-packages)
-- [Special values, classes, and coercion](/cs/programming/r/special-values-classes-coercion)
-- [Lists and data frames](/cs/programming/r/lists-and-data-frames)
-- [Base graphics](/cs/programming/r/base-graphics)
+</div>

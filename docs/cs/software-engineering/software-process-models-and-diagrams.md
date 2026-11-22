@@ -9,7 +9,7 @@ The second chapter of Gustafson's book moves from life cycle phases to modeling 
 
 The unifying idea is disciplined abstraction. A diagram is not useful because it is pretty; it is useful because it leaves out the right details while preserving the relationships needed for a decision. A process model can train new team members, a data flow diagram can expose missing inputs and outputs, an object model can clarify associations and multiplicities, a state diagram can prevent impossible transitions, and a lattice can model ordered security or dependency relationships.
 
-## Definitions
+## What each notation is allowed to say
 
 A **software process model** describes the processes used to achieve software development. In the notation used by the textbook, tasks or processes are ovals, artifacts are rectangles, actors are stick figures, and optional decisions are diamonds. Arcs show flow, usually from left to right and top to bottom. A task should not connect directly to another task; an artifact should separate them because one task's result becomes another task's input.
 
@@ -27,7 +27,7 @@ A **use case diagram** shows interactions between external actors and system fun
 
 A **control flow graph** represents possible execution paths through code or logic. A **state diagram** represents states and transitions of an entity over time. A **lattice model** represents ordered values where pairs have least upper bounds and greatest lower bounds, which is useful for security levels and other partial orders.
 
-## Key results
+## Match the diagram to the question
 
 Correctness rules are the main value of this chapter. A diagram with vague labels can hide errors. A process model should have reachable tasks, terminal tasks, and artifact-mediated task transitions. A data flow diagram should keep data and control separate. An object model should distinguish inheritance from aggregation and ordinary association. A state diagram should make illegal transitions absent rather than merely undocumented.
 
@@ -41,7 +41,7 @@ Object models require careful relationship selection. It is tempting to draw eve
 
 State diagrams are useful only when the state names are meaningful and transitions are triggered by events. A state diagram with states named "step 1" and "step 2" is usually just a weak flowchart. A better diagram names domain conditions such as "draft," "submitted," "approved," and "rejected."
 
-## Visual
+### An artifact-mediated review process
 
 ```mermaid
 flowchart LR
@@ -77,11 +77,11 @@ flowchart LR
 | Sequence diagram | What messages occur in a scenario over time? | mixing every possible path into one scenario |
 | State diagram | What states and transitions are legal? | naming states after implementation steps |
 
-## Worked example 1: Repairing a process model
+## Repairing a task-to-task defect workflow
 
-**Problem.** A draft model for defect handling contains this chain: `Developer fixes bug -> Tester retests bug -> Team lead approves release`. What is wrong, and how should it be repaired?
+A draft defect-handling model contains this chain: `Developer fixes bug -> Tester retests bug -> Team lead approves release`. It connects tasks directly and therefore omits the artifacts passed between them.
 
-**Method.** Apply the process model rule that tasks are separated by artifacts.
+Apply the process-model rule that artifacts separate tasks.
 
 1. "Developer fixes bug" is a task. Its output should be something reviewable or usable by another task. Possible artifacts are a changed source file, a build, a commit, and a developer note.
 
@@ -91,7 +91,7 @@ flowchart LR
 
 4. The team lead approval may also have a decision: pass means release approval, fail means rework.
 
-**Checked answer.** A repaired model is:
+A repaired model is:
 
 1. Developer fixes bug.
 2. Output artifacts: patched source code and build candidate.
@@ -102,11 +102,11 @@ flowchart LR
 
 The repair is checked by verifying that each task has an input artifact and each downstream task consumes an upstream artifact. The model is now auditable: the team can ask where the build candidate is, where the retest result is, and who approved the release.
 
-## Worked example 2: Constructing a state diagram
+## Encoding the legal states of an order
 
-**Problem.** Model the states of a simple online order. The order starts as a cart, can be submitted, must be paid before shipment, can be canceled before shipment, and becomes delivered after shipment is confirmed.
+A simple online order starts as a cart, can be submitted, must be paid before shipment, can be canceled before shipment, and becomes delivered after shipment is confirmed. These rules define its states and legal transitions.
 
-**Method.** Identify stable conditions, then identify legal event-triggered transitions.
+Identify stable conditions first, then the legal event-triggered transitions.
 
 1. Stable conditions are `Cart`, `Submitted`, `Paid`, `Shipped`, `Delivered`, and `Canceled`.
 
@@ -122,7 +122,7 @@ The repair is checked by verifying that each task has an input artifact and each
 
 7. The `cancel` event is legal from `Cart` and `Submitted`, and perhaps from `Paid` if the business allows refund before shipment. It is not legal from `Shipped` in this simple model.
 
-**Checked answer.**
+The resulting state machine is:
 
 ```mermaid
 stateDiagram-v2
@@ -140,11 +140,9 @@ stateDiagram-v2
 
 The answer is checked by trying prohibited paths. "Ship before pay" has no transition. "Cancel after delivered" has no transition. These absences are part of the model's meaning.
 
-## Code
+## Checking which workflow tasks are reachable
 
 ```python
-from collections import defaultdict, deque
-
 def reachable_tasks(start_artifacts, task_inputs, task_outputs):
     available = set(start_artifacts)
     done = set()
@@ -182,7 +180,7 @@ print("reachable tasks:", sorted(done))
 print("available artifacts:", sorted(artifacts))
 ```
 
-## Common pitfalls
+## Diagram errors that change the model's meaning
 
 - Mixing diagram purposes. A data flow diagram is not a state machine, and a sequence diagram is not a class model.
 - Labeling process boxes with nouns. Process or data-flow processes should use verb phrases because they represent actions.
@@ -191,10 +189,8 @@ print("available artifacts:", sorted(artifacts))
 - Drawing inheritance for convenience. Inheritance should mean "is a kind of," not merely "is related to."
 - Creating a state diagram that allows every transition. The value of a state diagram is often in the transitions it forbids.
 
-## Connections
+<div className="see-also">
 
-- [Software life cycle models](/cs/software-engineering/software-life-cycle-models)
-- [Requirements engineering](/cs/software-engineering/requirements-engineering)
-- [Software design](/cs/software-engineering/software-design)
-- [Object-oriented development](/cs/software-engineering/object-oriented-development)
-- [Formal specifications and OCL](/cs/software-engineering/formal-specifications-and-ocl)
+See also: [Software life cycle models](/cs/software-engineering/software-life-cycle-models) · [Requirements engineering](/cs/software-engineering/requirements-engineering) · [Software design](/cs/software-engineering/software-design) · [Object-oriented development](/cs/software-engineering/object-oriented-development) · [Formal specifications and OCL](/cs/software-engineering/formal-specifications-and-ocl)
+
+</div>

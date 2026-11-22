@@ -9,7 +9,7 @@ Mitchell's evaluation chapter gives the statistical machinery needed to say whet
 
 The chapter is intentionally practical. It introduces sample error, true error, confidence intervals, tests for comparing hypotheses, and paired tests for comparing learning algorithms. These tools connect directly to modern model evaluation, even though modern practice often uses larger datasets, cross-validation, bootstrap procedures, and benchmark suites.
 
-## Definitions
+## Sample error, true error, and uncertainty
 
 Let $h$ be a hypothesis and $D$ be a sample of examples drawn independently from some distribution. For a discrete-valued target function, the sample error is:
 
@@ -37,7 +37,7 @@ Hypothesis testing compares observed differences against what might occur by sam
 
 A paired t-test compares two learning algorithms across matched trials, such as the same train/test splits. Pairing reduces noise because each pair shares the same data conditions.
 
-## Key results
+## From error counts to comparisons
 
 If a hypothesis is tested on $n$ independent examples and commits $r$ errors, then the number of errors behaves like a binomial random variable with parameter $p=error_{\mathcal{D}}(h)$:
 
@@ -93,13 +93,13 @@ The chapter also distinguishes estimating a single hypothesis from comparing alg
 
 In small-sample settings, the normal approximation should be treated as an approximation rather than a law. Mitchell introduces it because it is simple and widely useful, but the underlying binomial structure matters. When errors are rare or test sets are small, exact intervals or resampling methods may be preferable. The main lesson is not the specific constant $1.96$; it is that observed error is a random variable.
 
-Cross-validation is a practical response to limited data. Instead of reserving one large test subset during development, the data are partitioned into folds, and each fold is used as a test fold while the others train the model. The resulting errors are averaged. This gives a more stable estimate than a single split when data are scarce, although it is still an estimate and can still be biased if used repeatedly for model selection.
+Cross-validation helps when data are limited. Instead of reserving one large test subset during development, the data are partitioned into folds, and each fold is used as a test fold while the others train the model. The resulting errors are averaged. This gives a more stable estimate than a single split when data are scarce, although it is still an estimate and can still be biased if used repeatedly for model selection.
 
 The paired t-test section is best read as a warning against overinterpreting isolated wins. If algorithm $A$ beats algorithm $B$ on one split, the difference may reflect the split rather than the algorithm. Matched trials ask whether the difference persists across comparable conditions. Even then, the conclusion depends on the number of trials, the variability of the differences, and whether the assumptions behind the test are reasonable.
 
 Evaluation choices should be made before looking at the final results whenever possible. If the metric, test subset, or comparison procedure is changed after seeing outcomes, the reported number can become an artifact of selection. Mitchell's formulas assume a clean sampling story; disciplined experimental design is what makes that story plausible.
 
-The practical habit is to write down the evaluation protocol before tuning begins, then treat deviations as new experiments rather than as the same estimate.
+A sound habit is to write down the evaluation protocol before tuning begins, then treat deviations as new experiments rather than as the same estimate.
 
 | Evaluation question | Suitable tool | Main assumption |
 |---|---|---|
@@ -107,8 +107,6 @@ The practical habit is to write down the evaluation protocol before tuning begin
 | Is one hypothesis better than another? | Difference in error, hypothesis test | Comparable evaluation distributions |
 | Is one algorithm better across datasets or splits? | Paired t-test | Matched trials, approximately normal differences |
 | Is the model overfitting? | Training vs validation/test curves | Validation data represent future cases |
-
-## Visual
 
 ```mermaid
 flowchart TB
@@ -134,11 +132,9 @@ flowchart TB
 
 This evaluation diagram separates the roles of training, validation, and test data and attaches the statistical estimates to the correct stage. Parameters are fit on training data, model choices are made on validation data, and the untouched test set produces the final sample error and confidence interval. The paired-comparison branch shows how matched split differences feed a t-test, while the dotted edge marks the leakage risk when test data influence selection.
 
-## Worked example 1: Confidence interval for error
+### Putting an interval around a test error
 
-Problem: A classifier is tested on $n=200$ independent examples and makes $r=30$ errors. Estimate a 95 percent confidence interval for its true error.
-
-Method:
+A classifier is tested on $n=200$ independent examples and makes $r=30$ errors. Estimate a 95 percent confidence interval for its true error.
 
 1. Compute sample error.
 
@@ -171,19 +167,17 @@ $$
 
    The interval is centered at the observed 15 percent error and spans about 5 percentage points on each side. With 200 examples, this degree of uncertainty is plausible.
 
-Answer: The approximate 95 percent confidence interval is $[0.101,0.200]$. In words, the true error is estimated to be between about 10.1 percent and 20.0 percent.
+The approximate 95 percent confidence interval is $[0.101,0.200]$. In words, the true error is estimated to be between about 10.1 percent and 20.0 percent.
 
-## Worked example 2: Paired t-test calculation
+### Comparing two learners on matched splits
 
-Problem: Algorithms $A$ and $B$ are compared on five matched train/test splits. The observed error differences $\delta_i=error_i(A)-error_i(B)$ are:
+Algorithms $A$ and $B$ are compared on five matched train/test splits. The observed error differences $\delta_i=error_i(A)-error_i(B)$ are:
 
 $$
 [0.03, 0.01, 0.04, -0.01, 0.02].
 $$
 
 Compute the paired t statistic.
-
-Method:
 
 1. Compute the mean difference.
 
@@ -222,9 +216,9 @@ t=\frac{0.018}{0.01924/\sqrt{5}}
 =\frac{0.018}{0.00860}\approx 2.09.
 $$
 
-Answer: The paired t statistic is about $2.09$ with $4$ degrees of freedom. This suggests $A$ has higher error than $B$ on average, but the sample is small, so the final significance judgment must be made against a t table or software.
+The paired t statistic is about $2.09$ with $4$ degrees of freedom. This suggests $A$ has higher error than $B$ on average, but the sample is small, so the final significance judgment must be made against a t table or software.
 
-## Code
+### Recomputing the interval and t statistic
 
 ```python
 import math
@@ -245,7 +239,7 @@ print(error_confidence_interval(errors=30, n=200))
 print(paired_t_statistic([0.03, 0.01, 0.04, -0.01, 0.02]))
 ```
 
-## Common pitfalls
+## How evaluation leaks or overstates evidence
 
 - Evaluating on the training set and reporting the result as future accuracy. This estimates memorization plus generalization, not generalization alone.
 - Reusing the test set for model selection. Once the test set guides choices, it is no longer an unbiased final test.
@@ -254,10 +248,8 @@ print(paired_t_statistic([0.03, 0.01, 0.04, -0.01, 0.02]))
 - Comparing algorithms on different splits without pairing. Paired comparisons are usually more sensitive because they control for split difficulty.
 - Treating statistical significance as practical significance. A tiny improvement can be statistically detectable but operationally irrelevant.
 
-## Connections
+<div className="see-also">
 
-- [Decision tree learning](/cs/machine-learning/decision-tree-learning)
-- [Artificial neural networks](/cs/machine-learning/artificial-neural-networks)
-- [Computational learning theory](/cs/machine-learning/computational-learning-theory)
-- [Statistics](/math/statistics/)
-- [Probability](/math/probability/)
+See also: [Decision tree learning](/cs/machine-learning/decision-tree-learning) · [Artificial neural networks](/cs/machine-learning/artificial-neural-networks) · [Computational learning theory](/cs/machine-learning/computational-learning-theory) · [Statistics](/math/statistics/intro) · [Probability](/math/probability/intro)
+
+</div>

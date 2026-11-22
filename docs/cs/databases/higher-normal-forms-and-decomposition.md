@@ -9,7 +9,7 @@ BCNF and 3NF handle redundancy explained by functional dependencies. Some schema
 
 Decomposition is the practical operation behind normalization. It replaces one relation by two or more relations that store the same information with fewer anomalies. The quality of a decomposition is judged by lossless join, dependency preservation, and the normal form reached. These goals can pull in different directions, which is why design is an engineering activity rather than a purely mechanical exercise.
 
-## Definitions
+## Three tests for a decomposition
 
 A **decomposition** of relation schema `R` is a set of schemas `R1, R2, ..., Rn` whose union of attributes is `R`. It is **lossless** if every legal instance of `R` can be reconstructed exactly by joining the projections on `R1` through `Rn`.
 
@@ -21,7 +21,7 @@ A **multivalued dependency** (MVD) is written `X ->> Y`. It means that for each 
 
 **Fourth normal form (4NF)** requires that for every nontrivial MVD `X ->> Y`, `X` is a superkey. Every FD is also an MVD, so 4NF is at least as strict as BCNF with respect to those dependencies, and stricter when independent multivalued facts exist.
 
-## Key results
+## Choosing among 3NF, BCNF, and 4NF
 
 A binary decomposition of `R` into `R1` and `R2` is lossless under FDs if:
 
@@ -53,8 +53,6 @@ Lossless join should be checked for every decomposition step, not only at the en
 
 Decomposition also affects query ergonomics. A fully normalized design may require joins for common reports, which is usually acceptable when indexes and views are designed well. When the same expensive join is needed constantly, a materialized view or maintained summary can be added deliberately. That is different from leaving the logical design redundant by accident.
 
-## Visual
-
 ```mermaid
 flowchart TD
   A["Unnormalized or redundant relation"] --> B{"FD anomaly?"}
@@ -75,11 +73,9 @@ flowchart TD
 | 4NF | removes independent multivalued redundancy | needs true MVD knowledge, not just data samples |
 | Performance | fewer joins for reads | controlled denormalization with update discipline |
 
-## Worked example 1: 3NF synthesis from dependencies
+## Synthesizing 3NF from a small dependency set
 
-Problem: For `R(A, B, C, D)` with FDs `A -> B`, `B -> C`, and `A -> D`, synthesize a 3NF decomposition.
-
-Method:
+For `R(A, B, C, D)` with FDs `A -> B`, `B -> C`, and `A -> D`, the 3NF synthesis proceeds from a canonical cover.
 
 1. Check the dependencies. The right sides are already single attributes, and there are no obvious extraneous attributes because every left side has one attribute.
 
@@ -105,17 +101,15 @@ $$
 R_2(B, C)
 $$
 
-4. Check whether a relation contains a candidate key for the original `R`. Compute `A+`: from `A`, get `B` and `D`; from `B`, get `C`. Therefore `A+ = {A, B, C, D}` and `A` is a candidate key. `R1` contains `A`.
+4. Check whether a relation contains a candidate key for the original `R`. Compute $A^+$: from `A`, get `B` and `D`; from `B`, get `C`. Therefore $A^+ = \{A, B, C, D\}$ and `A` is a candidate key. `R1` contains `A`.
 
 5. No extra key relation is needed.
 
-Checked answer: `{R1(A, B, D), R2(B, C)}` is dependency-preserving because `A -> BD` is enforced in `R1` and `B -> C` is enforced in `R2`. It is lossless because a relation containing a key of the original schema is present in the synthesis result.
+The decomposition `\{R1(A, B, D), R2(B, C)\}` is dependency-preserving because `A -> BD` is enforced in `R1` and `B -> C` is enforced in `R2`. It is lossless because a relation containing a key of the original schema is present in the synthesis result.
 
-## Worked example 2: 4NF for independent hobbies and languages
+## Separating independent hobbies and languages
 
-Problem: Relation `PersonFact(person, hobby, language)` records a person's hobbies and languages. A person's hobbies are independent of languages. For Ada, suppose hobbies are `{chess, music}` and languages are `{English, Korean}`. The relation contains all four combinations. Decompose to remove redundancy.
-
-Method:
+Relation `PersonFact(person, hobby, language)` records a person's hobbies and languages, with the two sets independent. For Ada, suppose the hobbies are `\{chess, music\}` and the languages are `\{English, Korean\}`. The relation contains all four combinations.
 
 1. State the MVDs:
 
@@ -150,9 +144,9 @@ $$
      ON ph.person = pl.person;
    ```
 
-Checked answer: Ada's two hobbies are stored twice in the original relation, once per language, and each language is stored once per hobby. The 4NF design stores two hobby rows and two language rows, eliminating the four-combination redundancy while preserving the ability to reconstruct the combined relation.
+Ada's two hobbies are stored twice in the original relation, once per language, and each language is stored once per hobby. The 4NF design stores two hobby rows and two language rows, eliminating the four-combination redundancy while preserving the ability to reconstruct the combined relation.
 
-## Code
+## Checking a binary decomposition by closure
 
 ```python
 def is_lossless_binary(r1, r2, fds):
@@ -177,7 +171,7 @@ fds = [("A", "BD"), ("B", "C")]
 print(is_lossless_binary("ABD", "BC", fds))
 ```
 
-## Common pitfalls
+## Where decomposition arguments go wrong
 
 - Calling a decomposition good because it has many tables. More tables do not automatically mean better design.
 - Ignoring lossless join. A decomposition that creates spurious tuples is incorrect even if each smaller relation looks tidy.
@@ -186,7 +180,7 @@ print(is_lossless_binary("ABD", "BC", fds))
 - Treating 4NF as a replacement for E-R modeling. It is a refinement tool, not the whole design process.
 - Denormalizing for speed without a plan for maintaining duplicate facts consistently.
 
-## Connections
+## Nearby notes on relational design
 
 - [Normalization and Functional Dependencies](/cs/databases/normalization-functional-dependencies)
 - [E-R Modeling and Relational Mapping](/cs/databases/er-modeling-and-relational-mapping)

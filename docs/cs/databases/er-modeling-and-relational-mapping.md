@@ -9,7 +9,7 @@ Database design starts before tables. The entity-relationship model gives design
 
 E-R modeling sits between requirements analysis and relational design. It helps expose ambiguity: Is an instructor an entity or just an attribute of a course section? Can a section have more than one instructor? Can a department exist without instructors? The mapping from E-R diagrams to relations then turns those answers into tables, primary keys, foreign keys, and sometimes separate relationship tables.
 
-## Definitions
+## Entities, relationships, and participation
 
 An **entity** is a distinguishable object, such as a particular student, instructor, department, course, or section. An **entity set** is a collection of similar entities, such as all students. An **attribute** records a property of an entity or relationship. Attributes can be simple, composite, multivalued, or derived.
 
@@ -31,7 +31,7 @@ In relational mapping:
 | Multivalued attribute | separate relation with owner key and attribute value |
 | Composite attribute | store component attributes |
 
-## Key results
+## Turning conceptual constraints into relations
 
 Design choices in the E-R model affect integrity constraints later. A one-to-many relationship is not only a drawing style; it implies a uniqueness condition if mapped through a relationship table, or a foreign key placement if mapped directly. Total participation often becomes `NOT NULL` plus a foreign key, though some constraints require assertions or application logic when SQL cannot express them directly.
 
@@ -44,8 +44,6 @@ Ternary relationships should not be casually decomposed into three binary relati
 A good E-R model also records assumptions that are easy to overlook in prose. If a student may have at most one advisor, that is a key constraint on the advising relationship. If a section must have at least one instructor, that is a participation constraint that may need a deferred constraint or transaction-level check in SQL. The diagram is not merely a picture; it is a compact statement of business rules that should survive the transition to relations.
 
 Attribute placement is a useful test of design quality. If an attribute can be answered by looking at one entity alone, it probably belongs to that entity. If it needs two or more participating entities to make sense, it probably belongs to a relationship. For example, `salary` belongs to an instructor in the simple university model, but `grade` belongs to the relationship between a student and a section.
-
-## Visual
 
 ```mermaid
 erDiagram
@@ -77,11 +75,9 @@ erDiagram
 | Optional participation | instructor may advise no students | nullable foreign key or separate relationship |
 | Total participation | section must belong to course | `NOT NULL` foreign key |
 
-## Worked example 1: Map students and departments
+### Mapping the department–student relationship
 
-Problem: Model departments and students. Each student belongs to exactly one department. A department can have zero or more students. Departments have a name, building, and budget. Students have ID, name, and total credits.
-
-Method:
+Each student belongs to exactly one department, while a department can have zero or more students. Departments have a name, building, and budget; students have ID, name, and total credits.
 
 1. Identify entity sets:
 
@@ -118,13 +114,11 @@ Method:
 
 5. Check the participation constraints. `student.dept_name NOT NULL` plus the foreign key says every student has a valid department. The schema does not require every department to have students, which matches the requirement.
 
-Checked answer: the design stores department facts once, stores student facts once, and represents the relationship by a foreign key without a separate table because the relationship has no many-to-many multiplicity.
+The design stores department facts once, stores student facts once, and represents the relationship by a foreign key without a separate table because the relationship has no many-to-many multiplicity.
 
-## Worked example 2: Map students taking sections with grades
+### Giving enrollment attributes their proper home
 
-Problem: Model students taking course sections. A student can take many sections, and a section can contain many students. The grade belongs to the enrollment.
-
-Method:
+A student can take many sections, and a section can contain many students. The grade belongs to the enrollment rather than either participating entity.
 
 1. Identify the entity sets:
 
@@ -158,9 +152,9 @@ Method:
 
 5. Check why `grade` does not belong in `student`. One student has many grades. It also does not belong in `section`, because one section has many students with different grades. It belongs exactly at the relationship level.
 
-Checked answer: the primary key prevents the same student from being recorded twice for the same section. The foreign keys prevent enrollment in nonexistent students or sections. The grade is stored once for the enrollment fact it describes.
+The primary key prevents the same student from being recorded twice for the same section. The foreign keys prevent enrollment in nonexistent students or sections. The grade is stored once for the enrollment fact it describes.
 
-## Code
+### Encoding one-advisor-per-student in SQL
 
 ```sql
 CREATE TABLE instructor (
@@ -182,7 +176,7 @@ CREATE TABLE advisor (
 -- An instructor can advise many students because i_ID is not unique.
 ```
 
-## Common pitfalls
+## Modeling decisions that usually signal trouble
 
 - Starting with tables before clarifying entity sets, relationships, and cardinalities.
 - Treating a many-to-many relationship as a repeated text field inside one table.
@@ -191,7 +185,7 @@ CREATE TABLE advisor (
 - Using natural-language names as keys when stable surrogate or institutional identifiers are available.
 - Forgetting that total participation may require `NOT NULL`, foreign keys, and sometimes additional constraints.
 
-## Connections
+## From conceptual design to schema discipline
 
 - [SQL DDL, DML, and Basic Queries](/cs/databases/sql-ddl-dml-and-basic-queries)
 - [Normalization and Functional Dependencies](/cs/databases/normalization-functional-dependencies)

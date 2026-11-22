@@ -9,7 +9,7 @@ Permutations and combinations count selections from a finite set. The key distin
 
 These formulas are special cases of the product and division rules. The safest approach is to describe the object being counted in words before choosing a formula: ordered or unordered, with or without repetition, all objects or only some objects, distinct objects or repeated types.
 
-## Definitions
+## What is ordered, and what may repeat
 
 A **permutation** of $n$ distinct objects is an ordering of all $n$ objects. There are
 
@@ -45,7 +45,7 @@ $$
 \frac{n!}{n_1!n_2!\cdots n_k!}.
 $$
 
-## Key results
+## Why the counting formulas have their shape
 
 The formula for combinations follows from the division rule. First count ordered selections:
 
@@ -91,8 +91,6 @@ $$
 
 as $\binom{n+r-1}{r}$. Think of $r$ stars and $n-1$ bars; the bars separate stars into $n$ boxes.
 
-## Visual
-
 | Selection model | Order matters? | Repetition allowed? | Formula |
 | --- | --- | --- | --- |
 | arrange all $n$ distinct objects | yes | no | $n!$ |
@@ -113,11 +111,9 @@ flowchart TD
   F -->|no| H[binomial coefficient]
 ```
 
-## Worked example 1: Count committees with roles
+## A committee with two assigned roles
 
 **Problem.** From $12$ students, choose a committee of $4$. Then choose a chair and secretary from the committee. How many outcomes are possible?
-
-**Method.**
 
 1. First choose the committee. Order does not matter:
 
@@ -139,17 +135,15 @@ $$
 P(12,2)\binom{10}{2}=12\cdot11\cdot45=5940.
 $$
 
-**Checked answer.** There are $5940$ outcomes. The two methods agree because they describe the same final object: a $4$-person committee with two distinct roles assigned.
+There are $5940$ outcomes. The two methods agree because they describe the same final object: a $4$-person committee with two distinct roles assigned.
 
-## Worked example 2: Count solutions with stars and bars
+## Stars and bars for four nonnegative variables
 
 **Problem.** How many nonnegative integer solutions are there to
 
 $$
 x_1+x_2+x_3+x_4=10?
 $$
-
-**Method.**
 
 1. Interpret the equation as distributing $10$ identical objects among $4$ boxes.
 2. Use $10$ stars and $4-1=3$ bars.
@@ -166,9 +160,9 @@ $$
 \binom{13}{10}=286.
 $$
 
-**Checked answer.** There are $286$ nonnegative integer solutions. For example, the pattern `**|*****||***` corresponds to $(2,5,0,3)$.
+There are $286$ nonnegative integer solutions. For example, the pattern `**|*****||***` corresponds to $(2,5,0,3)$.
 
-## Code
+## Checking exact counts in Python
 
 ```python
 from math import factorial, comb, perm
@@ -192,7 +186,7 @@ print(stars_and_bars(4, 10))
 
 Python's `math.comb` and `math.perm` are exact integer functions, useful for checking combinatorial calculations.
 
-## Common pitfalls
+## Where the model changes
 
 - Using permutations when order does not matter.
 - Dividing by $r!$ when repetition or repeated types mean not every object has exactly $r!$ orderings.
@@ -223,9 +217,13 @@ For combinations with restrictions, consider whether to choose the special objec
 
 If a counting problem has identical objects and labeled boxes, stars and bars may apply. If the objects are distinct and the boxes are labeled, each object chooses a box, giving a product count instead. If both objects and boxes are unlabeled, the problem is usually about partitions and needs different methods.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Counting principles](/math/discrete/counting-principles) supplies the product and division rules behind these formulas.
 - [Pigeonhole and inclusion-exclusion](/math/discrete/pigeonhole-and-inclusion-exclusion) handles overlapping restrictions.
 - [Discrete probability](/math/discrete/discrete-probability) uses combinations to count equally likely outcomes.
 - [Generating functions](/math/discrete/generating-functions) generalizes stars and bars and coefficient extraction.
+
+</div>

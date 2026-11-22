@@ -21,7 +21,7 @@ Pretrained language models learn general-purpose representations from large unla
 
 The practical shift is from training a separate model from scratch for each NLP task to reusing a large model that already encodes syntax, lexical meaning, world associations, and many task formats. Adaptation may happen by adding a classifier head and updating weights, by prompting without weight updates, or by instruction tuning and preference optimization.
 
-## Definitions
+## Three pretraining families
 
 A **pretrained language model** is trained on a broad self-supervised objective before being used for downstream tasks. **Self-supervised** means the training signal is derived from the text itself.
 
@@ -43,7 +43,7 @@ BERT-style models are bidirectional encoders. They are naturally suited to repre
 
 **Fine-tuning** adapts a pretrained model with labeled task data, often by adding a small task head and updating all or some parameters. **Prompting** describes the task in text and asks the model to generate or score an answer. **In-context learning** gives examples inside the prompt. **Instruction tuning** trains a model on many instruction-response pairs so it follows natural-language task descriptions more reliably.
 
-## Key results
+## Adapting representations to downstream tasks
 
 Pretraining works because many NLP tasks depend on reusable linguistic and semantic regularities. A model trained to predict tokens must learn word order, agreement, selectional preferences, entity facts, genre conventions, and discourse patterns. Fine-tuning or prompting exposes a downstream task through this learned representation.
 
@@ -72,15 +72,13 @@ The adaptation method should match the amount of supervision and the risk of the
 
 Contextual embeddings also changed how older NLP tasks are implemented. A CRF tagger once needed hand-built capitalization, suffix, and gazetteer features. A BERT-style encoder supplies token vectors that already encode much of this context, so the task head can be simple. But the old structure has not disappeared: BIO constraints, span boundaries, coreference clusters, and decoding algorithms still matter on top of pretrained representations.
 
-For generated outputs, probability is not truth. A causal LM assigns high probability to text that resembles its training distribution and prompt context. It can produce correct facts, plausible falsehoods, biased completions, or unsafe instructions. This is why retrieval, tool use, verification, calibration, and refusal policies are engineering components, not optional wrappers.
+For generated outputs, probability is not truth. A causal LM assigns high probability to text that resembles its training distribution and prompt context. It can produce correct facts, plausible falsehoods, biased completions, or unsafe instructions. Retrieval, tool use, verification, calibration, and refusal policies are therefore engineering components, not optional wrappers.
 
 Pretraining also changes data economics. Instead of requiring a large labeled dataset for every task, one can often use a smaller labeled set, a natural-language prompt, or a retrieval index. This does not eliminate supervision; it moves supervision into corpus selection, instruction datasets, human preference data, evaluation suites, and deployment feedback. The source of the supervision should still be documented because it shapes model behavior.
 
 A useful rule is to distinguish model knowledge from application knowledge. Model knowledge is whatever the parameters encode from training. Application knowledge is supplied at run time through retrieved documents, tools, databases, or user context. For high-stakes or fast-changing facts, application knowledge should dominate because it can be inspected and updated without retraining the base model.
 
 This distinction also helps evaluation. A closed-book benchmark tests parameterized memory and reasoning under a prompt. An open-book or retrieval-augmented benchmark tests whether the system can find, use, and cite supplied evidence. Mixing the two hides important failure modes.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -106,9 +104,11 @@ flowchart TD
 | Encoder-decoder | bidirectional source, causal target | denoising or seq2seq | translation, summarization |
 | Instruction-tuned LLM | usually causal | supervised instructions plus preferences | assistant behavior |
 
-## Worked example 1: masked language modeling loss
+## Losses and task heads
 
-Problem: a masked LM receives `The [MASK] barked`. The model predicts probabilities for the masked token:
+### Computing a masked-token loss
+
+A masked LM receives `The [MASK] barked` and predicts these probabilities for the masked token:
 
 | candidate | probability |
 |---|---:|
@@ -142,11 +142,11 @@ $$
 L\approx0.357.
 $$
 
-Checked answer: the loss is about $0.357$ nats. If the model had assigned probability $0.01$ to `dog`, the loss would be $4.605$, much worse.
+The loss is about $0.357$ nats. If the model had assigned probability $0.01$ to `dog`, the loss would be $4.605$, much worse.
 
-## Worked example 2: classification head on `[CLS]`
+### Classifying from the `[CLS]` representation
 
-Problem: a BERT-style model outputs
+A BERT-style model outputs
 
 $$
 z_{\mathrm{CLS}}=[2,-1].
@@ -186,9 +186,9 @@ $$
 
 4. Softmax argmax does not require computing probabilities; the largest logit is $2$.
 
-Checked answer: the classifier predicts positive sentiment. If probabilities are desired, divide $e^2$, $e^{-1}$, and $e^{-3}$ by their sum.
+The classifier predicts positive sentiment. If probabilities are desired, divide $e^2$, $e^{-1}$, and $e^{-3}$ by their sum.
 
-## Code
+## Training a BERT-style classifier head
 
 ```python
 import torch
@@ -216,7 +216,7 @@ print(logits.shape)
 print(loss.item())
 ```
 
-## Common pitfalls
+## What transfer does not guarantee
 
 - Using a causal decoder for token classification without accounting for missing right context.
 - Fine-tuning with too high a learning rate and destroying pretrained representations.
@@ -226,9 +226,8 @@ print(loss.item())
 - Ignoring subword-to-word alignment in sequence labeling.
 - Reporting only benchmark accuracy while ignoring bias, privacy, memorization, and domain shift.
 
-## Connections
+<div className="see-also">
 
-- [Transformers and self-attention](/cs/nlp/transformers-self-attention)
-- [Vector semantics and embeddings](/cs/nlp/vector-semantics-and-embeddings)
-- [Sequence labeling with HMMs and CRFs](/cs/nlp/sequence-labeling-hmms-crfs)
-- [Dialogue and chatbots](/cs/nlp/dialogue-and-chatbots)
+See also: [Transformers and self-attention](/cs/nlp/transformers-self-attention) · [Vector semantics and embeddings](/cs/nlp/vector-semantics-and-embeddings) · [Sequence labeling with HMMs and CRFs](/cs/nlp/sequence-labeling-hmms-crfs) · [Dialogue and chatbots](/cs/nlp/dialogue-and-chatbots)
+
+</div>

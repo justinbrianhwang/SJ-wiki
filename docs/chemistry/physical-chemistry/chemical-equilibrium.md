@@ -7,13 +7,13 @@ sidebar_position: 8
 
 Chemical equilibrium is a thermodynamic condition, not a statement that reactions have stopped. Forward and reverse elementary events may continue, but the macroscopic composition has no further tendency to change because the Gibbs energy is at a minimum under the imposed conditions.
 
-Atkins frames equilibrium through the reaction Gibbs energy and the extent of reaction. This approach unifies gas-phase equilibria, solution equilibria, biological coupling, and electrochemical cells: the same $\Delta_rG$ decides direction, and $\Delta_rG=0$ defines equilibrium.
+Reaction Gibbs energy and extent of reaction give a single language for gas-phase equilibria, solutions, biological coupling, and electrochemical cells. The sign of $\Delta_rG$ selects the direction of change; $\Delta_rG=0$ marks equilibrium.
 
 ![A Gibbs energy curve shows a reaction mixture relaxing toward an equilibrium composition.](https://commons.wikimedia.org/wiki/Special:FilePath/Gibbs-Energie-Veranschaulichung.svg)
 
 *Figure: Gibbs energy minimum as the thermodynamic definition of equilibrium. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Gibbs-Energie-Veranschaulichung.svg), Johannes Schneider, CC BY-SA 4.0.*
 
-## Definitions
+## Reaction extent and the Gibbs-energy slope
 
 For a reaction
 
@@ -65,7 +65,7 @@ $$
 \Delta_rG^\circ=\sum_J \nu_J\Delta_fG^\circ(J)
 $$
 
-## Key results
+## Reading direction from $Q$, $K$, and $\Delta_rG$
 
 The sign of $\Delta_rG$ gives direction at the current composition:
 
@@ -127,7 +127,7 @@ The reaction Gibbs energy is best visualized as the slope of $G$ with respect to
 
 Activities make the equilibrium expression dimensionless. For a gas, $a_J$ may be approximated by $p_J/p^\circ$ at low pressure. For a solute, it may be approximated by $c_J/c^\circ$ or $b_J/b^\circ$ in ideal dilute solution. These ratios are dimensionless even if chemists casually write concentrations or pressures inside $K$. A rigorous equilibrium constant is dimensionless and depends on the chosen standard states.
 
-The standard Gibbs energy does not tell the whole story of direction unless the system is in its standard state. A reaction with positive $\Delta_rG^\circ$ can proceed forward if $Q$ is sufficiently small. Conversely, a reaction with negative $\Delta_rG^\circ$ can be forced backward if products are accumulated enough to make $Q$ large. This is why removing a product can drive a reaction forward and why biological systems can use concentration ratios to control pathways.
+The standard Gibbs energy does not tell the whole story of direction unless the system is in its standard state. A reaction with positive $\Delta_rG^\circ$ can proceed forward if $Q$ is sufficiently small. Conversely, a reaction with negative $\Delta_rG^\circ$ can be forced backward if products are accumulated enough to make $Q$ large. Removing a product can therefore drive a reaction forward, and biological systems can use concentration ratios to control pathways.
 
 Le Chatelier's principle is a qualitative summary of the quantitative condition $Q=K$. If pressure, temperature, or composition changes, the reaction quotient or equilibrium constant changes. The system then responds in the direction that restores $\Delta_rG=0$. Composition and pressure changes usually change $Q$ immediately. Temperature changes change $K$ itself through the van't Hoff relation because the relative standard chemical potentials of reactants and products change with temperature.
 
@@ -138,8 +138,6 @@ Temperature effects are governed by reaction enthalpy, not by mole count. The va
 Equilibrium and kinetics must be separated. A large equilibrium constant says products are favored at equilibrium, not that equilibrium is reached quickly. Diamond is thermodynamically metastable relative to graphite under ordinary conditions but persists because the kinetic barrier is large. Ammonia synthesis is thermodynamically favored by low temperature and high pressure, but low temperature slows the rate; industrial conditions compromise equilibrium yield, rate, and catalyst performance.
 
 Coupled reactions are central in biochemistry and electrochemistry. If an unfavorable reaction is mechanistically linked to a favorable one, the combined stoichiometric equation has a total $\Delta_rG$ equal to the sum. ATP hydrolysis, ion gradients, and redox chains all exploit this additivity. The coupling must be physical or mechanistic; merely writing two equations on paper does not make one drive the other.
-
-## Visual
 
 ```mermaid
 flowchart TB
@@ -159,7 +157,7 @@ flowchart TB
   VantHoff -. "new equilibrium constant" .-> Q
 ```
 
-This chemical-equilibrium diagram shows the thermodynamic decision pipeline, not just the final condition. Stoichiometric numbers define the activity quotient, the quotient enters $\Delta_rG$, and the sign of that driving force routes the system toward products, reactants, or equilibrium. The perturbation loop explains Le Chatelier behavior quantitatively through recalculating $Q$ or changing $K$ with temperature.
+The diagram follows the thermodynamic decision from stoichiometric numbers to the activity quotient and then to $\Delta_rG$. Its perturbation loop expresses Le Chatelier behavior by recalculating $Q$ or changing $K$ with temperature.
 
 | Quantity | Meaning | Depends on current composition? | At equilibrium |
 |---|---|---:|---|
@@ -169,7 +167,7 @@ This chemical-equilibrium diagram shows the thermodynamic decision pipeline, not
 | $\Delta_rG^\circ$ | standard-state reaction Gibbs energy | no, at fixed $T$ | $-RT\ln K$ |
 | $\Delta_rH^\circ$ | standard reaction enthalpy | weakly, through $T$ | controls $d\ln K/dT$ |
 
-## Worked example 1: Equilibrium constant from standard Gibbs energy
+## Converting a standard Gibbs energy into $K$
 
 **Problem.** For a reaction at $298.15\ \mathrm{K}$, $\Delta_rG^\circ=+12.0\ \mathrm{kJ\ mol^{-1}}$. Calculate $K$.
 
@@ -198,7 +196,7 @@ $$
 
 **Checked answer.** Since $\Delta_rG^\circ\gt 0$, $K\lt 1$. The reaction is reactant-favored under standard conditions.
 
-## Worked example 2: Direction from reaction quotient
+## Testing the direction of ammonia synthesis
 
 **Problem.** Consider
 
@@ -247,28 +245,7 @@ $$
 
 **Checked answer.** The forward reaction is spontaneous because the mixture has too little ammonia relative to the equilibrium composition.
 
-## Code
-
-```python
-import math
-
-R = 8.314462618
-
-def K_from_delta_g(delta_g_kj, T=298.15):
-    return math.exp(-delta_g_kj * 1000.0 / (R * T))
-
-def delta_g_from_QK(Q, K, T=298.15):
-    return R * T * math.log(Q / K) / 1000.0
-
-K = K_from_delta_g(12.0)
-print("K =", K)
-
-Q = 1.0**2 / (2.0 * 3.0**3)
-print("Q =", Q)
-print("Delta_r G at mixture (kJ/mol) =", delta_g_from_QK(Q, 0.500))
-```
-
-## Common pitfalls
+## Keeping the thermodynamic quantities straight
 
 - Confusing $Q$ and $K$. $Q$ is calculated from the current mixture; $K$ is the equilibrium value at that temperature.
 - Including pure solids or pure liquids in $Q$ as concentration terms. Their activities are normally 1 in their standard states.
@@ -284,9 +261,8 @@ Finally, distinguish a shift in equilibrium composition from a change in equilib
 
 For numerical equilibrium problems, do not round intermediate composition variables too early. Equilibrium constants can be very sensitive when small differences of large amounts determine a residual concentration. Keep extra digits through the ICE-table or extent calculation, then round the final physically meaningful quantity.
 
-## Connections
+<div className="see-also">
 
-- [Free energy and chemical potential](/chemistry/physical-chemistry/free-energy-and-chemical-potential)
-- [Mixtures, solutions, and activities](/chemistry/physical-chemistry/mixtures-solutions-and-activities)
-- [Electrochemistry](/chemistry/physical-chemistry/electrochemistry)
-- [General chemistry equilibrium](/chemistry/general/)
+See also: [Free energy and chemical potential](/chemistry/physical-chemistry/free-energy-and-chemical-potential) · [Mixtures, solutions, and activities](/chemistry/physical-chemistry/mixtures-solutions-and-activities) · [Electrochemistry](/chemistry/physical-chemistry/electrochemistry) · [General chemistry equilibrium](/chemistry/general/intro)
+
+</div>

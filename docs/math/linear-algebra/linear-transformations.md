@@ -11,9 +11,9 @@ Linear transformations are the function version of matrices. They preserve addit
 
 *Figure: Matrix multiplication can be read geometrically as a transformation of vectors. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Matrix_multiplication.svg), Jakob.scholbach and Pbroks13, CC BY-SA 3.0.*
 
-This page ties together two viewpoints. A matrix can be read as an array of numbers, but it is often better read as an action on vectors. Conversely, an abstract linear function becomes computable once bases are chosen, because its behavior on a basis determines its behavior everywhere.
+Two viewpoints meet here. A matrix can be read as an array of numbers, but it is often better read as an action on vectors. Conversely, an abstract linear function becomes computable once bases are chosen, because its behavior on a basis determines its behavior everywhere.
 
-## Definitions
+## Linearity, kernel, range, and matrix representation
 
 A function $T:V\to W$ between vector spaces is linear if
 
@@ -60,7 +60,7 @@ T(\mathbf{e}_1)&T(\mathbf{e}_2)&\cdots&T(\mathbf{e}_n)
 \end{bmatrix}.
 $$
 
-## Key results
+## What bases, pivots, and composition tell us
 
 A linear transformation is determined by its values on a basis. If $B=\{\mathbf{v}_1,\ldots,\mathbf{v}_n\}$ is a basis for $V$ and the values $T(\mathbf{v}_i)$ are known, then for any
 
@@ -130,8 +130,6 @@ Thus a nontrivial kernel prevents one-to-one behavior. The range measures which 
 
 Geometrically, common linear transformations include rotations, reflections, projections, shears, and scalings. Projections have nontrivial kernels because they collapse directions perpendicular to the target subspace. Rotations in $\mathbb{R}^2$ are one-to-one and onto because they preserve all information and can be reversed by rotating back.
 
-## Visual
-
 ```mermaid
 flowchart LR
   V["Domain V"] --> T["linear transformation T"]
@@ -149,7 +147,7 @@ flowchart LR
 | What is $\ker(T)$? | solve $A\mathbf{x}=\mathbf{0}$ | inputs lost by the map |
 | What is $\operatorname{range}(T)$? | column space of $A$ | possible outputs |
 
-## Worked example 1: Build a standard matrix
+## Recovering a rotation from basis images
 
 Problem: find the standard matrix for the linear transformation $T:\mathbb{R}^2\to\mathbb{R}^2$ that rotates vectors counterclockwise by $90^\circ$.
 
@@ -197,7 +195,7 @@ $$
 
 which is exactly the $90^\circ$ counterclockwise rotation rule. Checked answer: $T(\mathbf{x})=A\mathbf{x}$ with the matrix above.
 
-## Worked example 2: Kernel, range, one-to-one, and onto
+## A map that loses two input dimensions
 
 Problem: let $T:\mathbb{R}^3\to\mathbb{R}^2$ be defined by
 
@@ -267,7 +265,7 @@ Step 4: decide one-to-one and onto. The kernel contains nonzero vectors, so $T$ 
 
 Checked answer: $\dim(\ker T)=2$, $\dim(\operatorname{range}T)=1$, and $2+1=3=\dim(\mathbb{R}^3)$.
 
-## Code
+## Computing the kernel and range in SymPy
 
 ```python
 import sympy as sp
@@ -283,7 +281,7 @@ print("columnspace:", A.columnspace())
 
 The matrix computation gives the kernel and range of the transformation because the transformation is $T(\mathbf{x})=A\mathbf{x}$ in standard coordinates.
 
-## Common pitfalls
+## Linearity tests and mapping errors
 
 - Testing linearity by checking only one example. Linearity must hold for all vectors and scalars.
 - Forgetting that translations such as $T(\mathbf{x})=A\mathbf{x}+\mathbf{b}$ with $\mathbf{b}\neq\mathbf{0}$ are not linear.
@@ -312,9 +310,8 @@ The matrix of a projection illustrates kernel and range clearly. Projection onto
 
 Rank-nullity gives a quick dimension test for possible behavior. A linear map from a higher-dimensional space to a lower-dimensional space cannot be one-to-one, because nullity must be positive. A linear map from a lower-dimensional space to a higher-dimensional space cannot be onto, because its range dimension is at most the domain dimension.
 
-## Connections
+<div className="see-also">
 
-- [Matrices and Matrix Algebra](/math/linear-algebra/matrices-and-matrix-algebra)
-- [Bases, Dimension, and Rank](/math/linear-algebra/bases-dimension-and-rank)
-- [General Vector Spaces](/math/linear-algebra/vector-spaces)
-- [Matrix Inverses and Elementary Matrices](/math/linear-algebra/matrix-inverses-and-elementary-matrices)
+See also: [Matrices and Matrix Algebra](/math/linear-algebra/matrices-and-matrix-algebra) · [Bases, Dimension, and Rank](/math/linear-algebra/bases-dimension-and-rank) · [General Vector Spaces](/math/linear-algebra/vector-spaces) · [Matrix Inverses and Elementary Matrices](/math/linear-algebra/matrix-inverses-and-elementary-matrices)
+
+</div>

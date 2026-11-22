@@ -9,7 +9,7 @@ CPU scheduling is the policy problem at the heart of multiprogramming: when seve
 
 The textbook presents scheduling after synchronization in this edition, but conceptually it builds on processes and threads. The scheduler chooses among ready execution contexts; the dispatcher performs the context switch; timers and blocking operations create opportunities to reconsider the choice. Different environments want different outcomes, so a batch server, desktop, mobile phone, and real-time controller should not all use the same simple rule.
 
-## Definitions
+## What the scheduler actually controls
 
 The **CPU scheduler** selects a process or thread from the ready queue. In operating systems that support kernel threads, the scheduled entities are usually kernel-level threads, even when people casually say "process scheduling."
 
@@ -23,7 +23,7 @@ Common criteria include **CPU utilization**, **throughput**, **turnaround time**
 
 Major algorithms include first-come, first-served (FCFS), shortest-job-first (SJF), priority scheduling, round-robin (RR), multilevel queue scheduling, multilevel feedback queues, and real-time algorithms such as rate-monotonic and earliest-deadline-first.
 
-## Key results
+## Algorithms under competing goals
 
 FCFS is simple but can cause the **convoy effect**: short processes wait behind one long CPU-bound process, reducing device and CPU overlap. SJF is optimal for minimum average waiting time if exact next CPU-burst lengths are known, but they are usually not known. Operating systems estimate burst lengths with exponential averaging:
 
@@ -54,17 +54,19 @@ Under **earliest-deadline-first**, the task with the nearest absolute deadline r
 | Multilevel feedback | Yes | Adapts to behavior | More tuning and complexity |
 | EDF | Yes | Strong real-time utilization property | Deadline tracking overhead and assumptions |
 
+## Placement, affinity, and production schedulers
+
 Multiprocessor scheduling adds another layer of policy. With multiple cores, the OS must decide not only which thread runs next but also where it should run. **Processor affinity** keeps a thread on the same CPU when possible so its cache contents remain useful. **Load balancing** moves work from busy CPUs to idle CPUs. These goals conflict: aggressive migration balances queues but can destroy cache locality; strict affinity preserves locality but can leave some cores idle while others are overloaded.
 
 The textbook's operating-system examples show why production schedulers are rarely a single textbook algorithm. Linux's Completely Fair Scheduler uses a fairness model based on virtual runtime rather than a fixed round-robin queue. Windows scheduling combines priorities, dynamic boosts, and special support for user-mode scheduling. Real-time classes must coexist with ordinary interactive and batch work. A scheduler therefore contains mechanisms for accounting, preemption, priority adjustment, load balancing, and wakeup placement, while the policy expresses what kind of responsiveness or fairness the system wants.
 
 Evaluation is also more subtle than computing an average for a small table of bursts. Queueing behavior depends on arrival distributions, burst variability, I/O blocking, lock contention, cache effects, and interrupt load. Simulations are useful because they let designers test algorithms under controlled workloads. Measurements on a real system are necessary because dispatch latency, timer granularity, NUMA topology, and device interrupts can change the result. A good scheduling argument states the workload, metric, and assumptions; otherwise "better scheduler" is too vague to mean much.
 
-Energy is another scheduling concern, especially for mobile and multicore systems. A scheduler may pack work onto fewer cores so other cores can sleep, or spread work to finish sooner and return the whole chip to a low-power state. Those policies interact with thermal limits and real-time responsiveness. The scheduling problem is therefore not only "who runs next?" but "which execution choice best serves throughput, latency, fairness, deadlines, cache locality, and energy under current load?" This is why scheduler changes are usually evaluated with workload traces, benchmark suites, and latency measurements instead of only hand-computed examples.
+Energy is another scheduling concern, especially for mobile and multicore systems. A scheduler may pack work onto fewer cores so other cores can sleep, or spread work to finish sooner and return the whole chip to a low-power state. Those policies interact with thermal limits and real-time responsiveness. The scheduling problem is therefore not only "who runs next?" but "which execution choice best serves throughput, latency, fairness, deadlines, cache locality, and energy under current load?" Scheduler changes are usually evaluated with workload traces, benchmark suites, and latency measurements instead of only hand-computed examples.
 
 Even in a small teaching example, state the arrival times explicitly; otherwise waiting time, turnaround time, and response time can be computed from different hidden assumptions.
 
-## Visual
+## From wakeup to dispatch
 
 ```mermaid
 flowchart TB
@@ -111,9 +113,11 @@ flowchart TB
 
 This scheduling diagram shows the real control path around the scheduler instead of only a single ready queue. Runnable entities enter policy-specific queues, the dispatcher performs the context switch, and timer or blocking events feed updated state back into the queues. The embedded Gantt row gives a concrete round-robin shape for a 4 ms quantum, while the dotted load-balancing edge shows that multiprocessor scheduling also has placement and affinity constraints.
 
-## Worked example 1: comparing FCFS and SJF
+## Two scheduling traces
 
-Problem: Three processes arrive at time 0. Their CPU bursts are `P1 = 24`, `P2 = 3`, and `P3 = 3` milliseconds. Compute average waiting time for FCFS order `P1, P2, P3` and for nonpreemptive SJF.
+### How the convoy effect changes waiting time
+
+Three processes arrive at time 0. Their CPU bursts are `P1 = 24`, `P2 = 3`, and `P3 = 3` milliseconds. Compute average waiting time for FCFS order `P1, P2, P3` and for nonpreemptive SJF.
 
 1. FCFS schedule:
    - `P1` runs from 0 to 24, so `P1` waits 0.
@@ -136,11 +140,11 @@ $$
 \frac{0 + 3 + 6}{3} = \frac{9}{3} = 3\ \mathrm{ms}
 $$
 
-Checked answer: FCFS average waiting time is 17 ms; SJF average waiting time is 3 ms. The improvement is large because FCFS placed two short jobs behind a long job.
+FCFS average waiting time is 17 ms; SJF average waiting time is 3 ms. The improvement is large because FCFS placed two short jobs behind a long job.
 
-## Worked example 2: round-robin with a 4 ms quantum
+### Tracing a 4 ms round-robin quantum
 
-Problem: Processes arrive at time 0 with bursts `P1 = 10`, `P2 = 4`, and `P3 = 5`. Use round-robin with quantum 4 ms and order `P1, P2, P3`. Compute completion times.
+Processes arrive at time 0 with bursts `P1 = 10`, `P2 = 4`, and `P3 = 5`. Use round-robin with quantum 4 ms and order `P1, P2, P3`. Compute completion times.
 
 1. Time 0-4: `P1` runs for 4 ms. Remaining `P1 = 6`.
 2. Time 4-8: `P2` runs for 4 ms. Remaining `P2 = 0`, so `P2` completes at 8.
@@ -150,9 +154,9 @@ Problem: Processes arrive at time 0 with bursts `P1 = 10`, `P2 = 4`, and `P3 = 5
 6. Time 17-19: `P1` runs for 2 ms. Remaining `P1 = 0`, so `P1` completes at 19.
 7. Completion times are `P1 = 19`, `P2 = 8`, `P3 = 17`. Since all arrived at 0, turnaround times are the same as completion times.
 
-Checked answer: The RR sequence is `P1, P2, P3, P1, P3, P1`; completion times are 19 ms, 8 ms, and 17 ms. Short `P2` finishes quickly even though `P1` arrived first.
+The RR sequence is `P1, P2, P3, P1, P3, P1`; completion times are 19 ms, 8 ms, and 17 ms. Short `P2` finishes quickly even though `P1` arrived first.
 
-## Code
+## Simulating round-robin order
 
 ```python
 from collections import deque
@@ -186,7 +190,7 @@ print(completion)
 
 This simulation assumes all processes arrive at time 0 and context-switch cost is zero. Those assumptions simplify the scheduler enough to inspect the round-robin order directly.
 
-## Common pitfalls
+## Reading scheduler comparisons carefully
 
 - Optimizing only average waiting time. Interactive systems often care more about response time and tail latency.
 - Treating SJF as directly implementable with perfect knowledge. Real systems estimate future bursts from past behavior.
@@ -195,10 +199,8 @@ This simulation assumes all processes arrive at time 0 and context-switch cost i
 - Confusing real-time scheduling with "fast." Real-time means bounded timing behavior, not maximum throughput.
 - Forgetting that modern kernels often schedule threads, not entire multi-threaded processes.
 
-## Connections
+<div className="see-also">
 
-- [Processes](/cs/operating-systems/processes)
-- [Threads](/cs/operating-systems/threads)
-- [Process Synchronization](/cs/operating-systems/process-synchronization)
-- [Deadlocks](/cs/operating-systems/deadlocks)
-- [Linux Case Study](/cs/operating-systems/linux-case-study)
+See also: [Processes](/cs/operating-systems/processes) · [Threads](/cs/operating-systems/threads) · [Process Synchronization](/cs/operating-systems/process-synchronization) · [Deadlocks](/cs/operating-systems/deadlocks) · [Linux Case Study](/cs/operating-systems/linux-case-study)
+
+</div>

@@ -556,10 +556,8 @@ print(cov_xy)
 - Using covariance formulas without checking that second moments exist.
 - Ignoring nonlinear plots. A curved relationship can have near-zero correlation.
 
-## Related pages
+<div className="see-also">
 
-- [joint, marginal, and conditional distributions](/math/probability/joint-marginal-conditional-distributions)
-- [expectation, variance, and moments](/math/probability/expectation-variance-moments)
-- [functions of random variables](/math/probability/transformations-random-variables)
-- [bivariate data and correlation](/math/statistics/bivariate-data-and-correlation)
-- [linear regression inference](/math/statistics/linear-regression-inference)
+See also: [joint, marginal, and conditional distributions](/math/probability/joint-marginal-conditional-distributions) · [expectation, variance, and moments](/math/probability/expectation-variance-moments) · [functions of random variables](/math/probability/transformations-random-variables) · [bivariate data and correlation](/math/statistics/bivariate-data-and-correlation) · [linear regression inference](/math/statistics/linear-regression-inference)
+
+</div>

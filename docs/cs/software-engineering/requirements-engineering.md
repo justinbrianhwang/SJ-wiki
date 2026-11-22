@@ -9,7 +9,7 @@ Requirements engineering defines what the system must do and what constraints it
 
 Requirements sit at the boundary between the environment and the machine. Users describe real-world work, goals, exceptions, and constraints. Developers need a specification detailed enough to design and test against. The requirements process translates domain language into precise, reviewable descriptions without prematurely hiding user-visible behavior inside implementation decisions.
 
-## Definitions
+## The requirements model and its artifacts
 
 A **requirement** is a statement of needed capability, condition, quality, interface, or constraint. Functional requirements describe behavior; nonfunctional requirements describe qualities or constraints such as performance, reliability, security, usability, and regulatory limits.
 
@@ -33,7 +33,7 @@ A **data dictionary** records information about each data element: name, locatio
 
 A **system diagram** is a less formal overview diagram that may combine people, data stores, functions, and data flows. Its flexibility is useful, but its lack of formal rules can cause ambiguity.
 
-## Key results
+## From domain language to testable behavior
 
 Requirements artifacts must be detailed enough to support design and testing. A requirement that cannot guide design or produce a test is too vague. "The system shall be user friendly" is not enough. "A receptionist shall schedule a returning patient appointment in no more than three screens using patient name, desired date range, and appointment type" is closer to designable and testable.
 
@@ -49,7 +49,7 @@ State diagrams protect requirements from illegal behavior. If a reservation can 
 
 The IEEE-style SRS outline is valuable because it separates context from detailed requirements. The introduction explains purpose and scope. The overall description explains perspective, functions, users, constraints, assumptions, and deferred requirements. The specific requirements describe interfaces, functions, performance, design constraints, and attributes in enough detail for design and test.
 
-## Visual
+### How the artifacts converge on the SRS
 
 ```mermaid
 flowchart TD
@@ -77,11 +77,11 @@ flowchart TD
 | Data dictionary | whole project | consistent meaning of data |
 | SRS | whole project | designable and testable requirements |
 
-## Worked example 1: Building scenarios for appointment scheduling
+## Appointment scenarios that expose missing requirements
 
-**Problem.** A dental office system must let a receptionist schedule appointments. Existing patients can be found by name. New patients must first be added to patient records. The system should produce reminder calls two days before the appointment. Write two scenarios and identify what requirements they reveal.
+A dental office system must let a receptionist schedule appointments. Existing patients can be found by name; new patients must first be added to patient records. The system should produce reminder calls two days before the appointment. Two scenarios expose the requirements behind both paths.
 
-**Method.** Write user-visible sequences, then extract requirements.
+Write user-visible sequences first, then extract the requirements they imply.
 
 1. Scenario A: returning patient.
 
@@ -95,13 +95,13 @@ flowchart TD
 
    The system shall search patient records by name. It shall allow creation of a new patient record during appointment scheduling. It shall display available appointment times by appointment type. It shall create confirmed appointments linked to patient records. It shall generate a reminder call list two days before scheduled appointments.
 
-**Checked answer.** The scenarios are valid because they describe user-visible actions and significant alternatives. The requirements are checked against the scenarios: every scenario step has a corresponding required capability, and the new-patient path does not assume a preexisting record.
+The scenarios describe user-visible actions and a significant alternative. Every step has a corresponding required capability, and the new-patient path does not assume a preexisting record.
 
-## Worked example 2: Checking a reservation state model
+## Preventing illegal reservation transitions
 
-**Problem.** A bed-and-breakfast reservation can be requested, guaranteed by credit card, canceled before arrival, expired if not guaranteed by a deadline, checked in on arrival, and checked out after the stay. Build a requirements-level state model and check whether "check in before guarantee" is allowed.
+A bed-and-breakfast reservation can be requested, guaranteed by credit card, canceled before arrival, expired if not guaranteed by a deadline, checked in on arrival, and checked out after the stay. A requirements-level state model should also settle whether "check in before guarantee" is allowed.
 
-**Method.** Use domain states and event-triggered transitions.
+Use domain states and event-triggered transitions.
 
 1. Domain states: `Requested`, `Guaranteed`, `Canceled`, `Expired`, `CheckedIn`, and `CheckedOut`.
 
@@ -115,7 +115,7 @@ flowchart TD
 
 6. Terminal states are `Canceled`, `Expired`, and `CheckedOut`.
 
-**Checked answer.**
+The resulting state model is:
 
 ```mermaid
 stateDiagram-v2
@@ -133,7 +133,7 @@ stateDiagram-v2
 
 "Check in before guarantee" is not allowed because there is no transition from `Requested` to `CheckedIn`. The model is checked against the requirements rule: allowed scenario sequences are present, and the prohibited sequence is absent.
 
-## Code
+## Executing reservation scenarios against the model
 
 ```python
 transitions = {
@@ -159,7 +159,7 @@ if not valid:
     print(f"blocked event {bad_event!r} while in state {state!r}")
 ```
 
-## Common pitfalls
+## Requirements that fail under review
 
 - Writing requirements in implementation terms before the user-visible behavior is clear.
 - Including only the happy path and omitting significant alternatives.
@@ -169,10 +169,8 @@ if not valid:
 - Creating a data dictionary after design instead of using it to stabilize requirements vocabulary.
 - Writing SRS statements that are not detailed enough to design or test from.
 
-## Connections
+<div className="see-also">
 
-- [Software process models and diagrams](/cs/software-engineering/software-process-models-and-diagrams)
-- [Software design](/cs/software-engineering/software-design)
-- [Software testing](/cs/software-engineering/software-testing)
-- [Software quality assurance](/cs/software-engineering/software-quality-assurance)
-- [Formal specifications and OCL](/cs/software-engineering/formal-specifications-and-ocl)
+See also: [Software process models and diagrams](/cs/software-engineering/software-process-models-and-diagrams) · [Software design](/cs/software-engineering/software-design) · [Software testing](/cs/software-engineering/software-testing) · [Software quality assurance](/cs/software-engineering/software-quality-assurance) · [Formal specifications and OCL](/cs/software-engineering/formal-specifications-and-ocl)
+
+</div>

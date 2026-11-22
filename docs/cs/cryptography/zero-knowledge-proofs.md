@@ -7,9 +7,9 @@ sidebar_position: 16
 
 Zero-knowledge proofs let a prover convince a verifier that a statement is true without revealing why it is true. This sounds paradoxical until you separate knowledge from verification: the verifier should become convinced of truth, but anything it sees should be simulatable without the secret witness. That simulation idea is the heart of zero knowledge.
 
-The supplied Katz and Lindell edition is focused mainly on encryption, MACs, hashes, number theory, public-key encryption, and signatures. Smart's later chapters include zero-knowledge, graph isomorphism, Sigma protocols, and voting applications, so this page leans more heavily on Smart while keeping the same proof-aware style used in modern cryptography. Zero knowledge connects naturally to identification, signatures through Fiat-Shamir, commitments, and secure multiparty computation.
+The supplied Katz and Lindell edition is focused mainly on encryption, MACs, hashes, number theory, public-key encryption, and signatures. Smart's later chapters include zero knowledge, graph isomorphism, Sigma protocols, and voting applications, so the discussion leans more heavily on Smart while keeping the same proof-aware style used in modern cryptography. Zero knowledge connects naturally to identification, signatures through Fiat-Shamir, commitments, and secure multiparty computation.
 
-## Definitions
+## Simulators, witnesses, and three-move proofs
 
 An **interactive proof** is a protocol between a prover $P$ and verifier $V$ for a language $L$. The prover wants to convince the verifier that $x\in L$.
 
@@ -39,11 +39,13 @@ $$
 
 This is used conceptually in Schnorr-style signatures.
 
-## Key results
+## Simulating the graph-isomorphism protocol
 
 The graph-isomorphism protocol shows the zero-knowledge idea cleanly. The prover knows an isomorphism $\phi:G_0\to G_1$. To prove knowledge without revealing $\phi$, it chooses a random isomorphic copy $H$ of one graph, sends $H$, receives a random challenge bit $b$, and reveals an isomorphism from $G_b$ to $H$. An honest prover can answer either challenge because it knows how $G_0$ and $G_1$ relate. A cheating prover who does not know an isomorphism can usually prepare to answer only one challenge.
 
 Completeness is straightforward: the honest prover always answers. Soundness error is $1/2$ per round for graph isomorphism; repeating the protocol $t$ times reduces cheating probability to $2^{-t}$. Zero knowledge comes from simulation: a simulator guesses the challenge bit first, constructs $H$ as an isomorphic copy of $G_b$, and outputs a transcript. Conditioned on the guessed challenge matching, the transcript distribution matches a real one. Rewinding lets the simulator try again.
+
+## Schnorr responses and witness extraction
 
 Schnorr identification proves knowledge of $x$ such that $y=g^x$. The prover sends $R=g^r$, receives challenge $e$, and answers $z=r+ex$. The verifier checks:
 
@@ -65,48 +67,22 @@ $$
 
 This extraction property explains why answering unpredictable challenges demonstrates knowledge.
 
-Zero knowledge does not mean "no information exists anywhere." It means the verifier's view can be simulated from public information. Side channels, bad randomness, repeated commitments, or nonstandard challenge generation can break the property.
-
-There are several strengths of zero knowledge. **Honest-verifier zero knowledge** assumes the verifier follows the protocol, especially when choosing random challenges. This is often easier to prove for Sigma protocols. Full zero knowledge must handle malicious verifiers that choose challenges adaptively, abort selectively, or embed information in messages. Compilers and commitment techniques can sometimes upgrade protocols, but the distinction matters.
-
-Proof of knowledge is stronger than ordinary soundness. Soundness says a false statement cannot be proven. A proof of knowledge says that any prover who convinces the verifier must "know" a witness, formalized by an extractor that can recover the witness from the prover. In Schnorr, two accepting responses to the same commitment with different challenges let the extractor solve for the discrete logarithm. This is why challenge unpredictability is essential.
-
-Zero-knowledge protocols often use commitments. A commitment lets a party bind to a value while hiding it until opening. In many protocols, the prover commits to randomized data, receives a challenge, and opens just enough to answer. The commitment must be binding so the prover cannot change its mind after the challenge, and hiding so the verifier learns nothing early.
-
-Noninteractive zero knowledge, or NIZK, removes back-and-forth communication, but it needs extra setup, a common reference string, or a random-oracle-style Fiat-Shamir transform depending on the protocol. Blockchain systems, anonymous credentials, and privacy-preserving audits often need NIZKs because verifiers may check proofs later or on-chain. The conceptual properties remain completeness, soundness, and zero knowledge, but the setup assumptions become part of the statement.
-
-The graph-isomorphism example is pedagogically clean but not the dominant deployed proof system. It matters because it makes simulation easy to see. Modern systems use arithmetic circuits, polynomial commitments, pairings, hash-based proof systems, or lattice assumptions. The same definitions still govern them, even when the engineering is much more complex.
-
-Repetition can be sequential or parallel, but the proof details change. Running a one-bit-challenge protocol many times sequentially clearly reduces soundness error, because a cheating prover must keep answering fresh challenges. Parallel repetition is more efficient, but the analysis can be subtler depending on the protocol and adversary model. Textbook examples often use repetition to make the soundness error visibly negligible.
-
-Zero knowledge is especially valuable when authentication would otherwise reveal a reusable secret. Instead of sending a password or private key, a prover can demonstrate knowledge of a witness tied to a public statement. The verifier learns that the prover is authorized, but does not receive the secret itself. This idea underlies identification protocols and motivates the move from interactive identification to signatures via Fiat-Shamir.
-
-Soundness error should be interpreted like other cryptographic failure probabilities. A one-round protocol with cheating probability $1/2$ is not enough by itself, but repeating it 128 times can drive the idealized error toward $2^{-128}$. The implementation must ensure challenges are independent and unpredictable, or the repetition analysis no longer applies.
-
-As with encryption and signatures, the proof statement and the implementation discipline must match.
-
-A simulated transcript is only convincing evidence when the real transcript follows the modeled protocol.
-
-Model drift weakens the claim.
-
-## Visual
-
 ```mermaid
 sequenceDiagram
   participant P as "Prover with witness x"
   participant V as Verifier
-  Note over P,V: Public statement: y = g^x in group G of order q
-  P->>P: sample r in Z_q and compute commitment R = g^r
-  P->>V: commitment R
-  V->>V: sample random challenge e in Z_q
-  V->>P: challenge e
-  P->>P: response z = r + e*x mod q
-  P->>V: response z
-  V->>V: verify g^z == R * y^e
-  Note over P,V: Fiat-Shamir replaces e with H("statement, R, context") for signatures
+  Note over P,V: "Public statement: y = g^x in group G of order q"
+  P->>P: "sample r in Z_q and compute commitment R = g^r"
+  P->>V: "commitment R"
+  V->>V: "sample random challenge e in Z_q"
+  V->>P: "challenge e"
+  P->>P: "response z = r + e*x mod q"
+  P->>V: "response z"
+  V->>V: "verify g^z == R * y^e"
+  Note over P,V: "Fiat-Shamir replaces e with H("statement, R, context") for signatures"
 ```
 
-This sequence is the Schnorr Sigma protocol in its three moves: commitment, random challenge, and response. The verifier checks the labeled algebraic relation without learning the witness, while the note marks where Fiat-Shamir turns the interaction into a noninteractive signature-style proof.
+The sequence is the Schnorr Sigma protocol in its three moves: commitment, random challenge, and response. The verifier checks the algebraic relation without learning the witness, while the final note marks where Fiat-Shamir turns the interaction into a noninteractive signature-style proof.
 
 | Property | Informal test | Failure mode |
 |---|---|---|
@@ -116,11 +92,35 @@ This sequence is the Schnorr Sigma protocol in its three moves: commitment, rand
 | Special soundness | two challenges reveal witness | extractor cannot recover witness |
 | Fiat-Shamir | challenge from hash | random-oracle assumption and domain separation needed |
 
-## Worked example 1: Schnorr identification check
+## Proof strength and commitment requirements
 
-Problem: use $p=23$, $q=11$, $g=2$, secret $x=4$, public key $y=16$, random $r=3$, and verifier challenge $e=7$. Show the verifier accepts.
+Zero knowledge does not mean "no information exists anywhere." It means the verifier's view can be simulated from public information. Side channels, bad randomness, repeated commitments, or nonstandard challenge generation can break the property.
 
-Method:
+There are several strengths of zero knowledge. **Honest-verifier zero knowledge** assumes the verifier follows the protocol, especially when choosing random challenges. This is often easier to prove for Sigma protocols. Full zero knowledge must handle malicious verifiers that choose challenges adaptively, abort selectively, or embed information in messages. Compilers and commitment techniques can sometimes upgrade protocols, but the distinction matters.
+
+Proof of knowledge is stronger than ordinary soundness. Soundness says a false statement cannot be proven. A proof of knowledge says that any prover who convinces the verifier must "know" a witness, formalized by an extractor that can recover the witness from the prover. In Schnorr, two accepting responses to the same commitment with different challenges let the extractor solve for the discrete logarithm. Challenge unpredictability is therefore essential.
+
+Zero-knowledge protocols often use commitments. A commitment lets a party bind to a value while hiding it until opening. In many protocols, the prover commits to randomized data, receives a challenge, and opens just enough to answer. The commitment must be binding so the prover cannot change its mind after the challenge, and hiding so the verifier learns nothing early.
+
+## From Fiat-Shamir to deployed NIZKs
+
+Noninteractive zero knowledge, or NIZK, removes back-and-forth communication, but it needs extra setup, a common reference string, or a random-oracle-style Fiat-Shamir transform depending on the protocol. Blockchain systems, anonymous credentials, and privacy-preserving audits often need NIZKs because verifiers may check proofs later or on-chain. The conceptual properties remain completeness, soundness, and zero knowledge, but the setup assumptions become part of the statement.
+
+The graph-isomorphism example is pedagogically clean but not the dominant deployed proof system. Its simulation argument is unusually easy to inspect. Modern systems use arithmetic circuits, polynomial commitments, pairings, hash-based proof systems, or lattice assumptions. The same definitions still govern them, even when the engineering is much more complex.
+
+## Repetition, randomness, and model drift
+
+Repetition can be sequential or parallel, but the proof details change. Running a one-bit-challenge protocol many times sequentially clearly reduces soundness error, because a cheating prover must keep answering fresh challenges. Parallel repetition is more efficient, but the analysis can be subtler depending on the protocol and adversary model. Textbook examples often use repetition to make the soundness error visibly negligible.
+
+Zero knowledge is especially valuable when authentication would otherwise reveal a reusable secret. Instead of sending a password or private key, a prover can demonstrate knowledge of a witness tied to a public statement. The verifier learns that the prover is authorized, but does not receive the secret itself. The same idea underlies identification protocols and motivates the move from interactive identification to signatures via Fiat-Shamir.
+
+Soundness error should be interpreted like other cryptographic failure probabilities. A one-round protocol with cheating probability $1/2$ is not enough by itself, but repeating it 128 times can drive the idealized error toward $2^{-128}$. The implementation must ensure challenges are independent and unpredictable, or the repetition analysis no longer applies.
+
+As with encryption and signatures, the proof statement and implementation discipline must match. A simulated transcript supports the claim only when real transcripts follow the modeled protocol; model drift weakens it.
+
+## Checking a Schnorr identification transcript
+
+Use $p=23$, $q=11$, $g=2$, secret $x=4$, public key $y=16$, random $r=3$, and verifier challenge $e=7$. The verifier accepts because both sides of its check agree.
 
 1. Prover sends:
 
@@ -148,17 +148,17 @@ $$
 R y^e=8\cdot16^7\pmod{23}.
 $$
 
-   From the signature page calculation, $16^7\equiv18$, so:
+   Repeated squaring gives $16^7\equiv18$, so:
 
 $$
 8\cdot18=144\equiv6\pmod{23}.
 $$
 
-Checked answer: both sides are $6$, so the verifier accepts.
+Both sides are $6$, so the verifier accepts.
 
-## Worked example 2: extracting a Schnorr witness from two transcripts
+## Extracting a witness from two Schnorr transcripts
 
-Problem: suppose two accepting transcripts share $R$ but have challenges and responses:
+Suppose two accepting transcripts share $R$ but have challenges and responses:
 
 $$
 e=2,\quad z=5
@@ -170,9 +170,7 @@ $$
 e'=7,\quad z'=3
 $$
 
-in a group of order $q=11$. Recover the secret $x$.
-
-Method:
+in a group of order $q=11$. The two equations are enough to recover the secret $x$.
 
 1. For accepting transcripts:
 
@@ -212,9 +210,9 @@ $$
 x\equiv2\cdot2=4\pmod{11}.
 $$
 
-Checked answer: extracted witness is $x=4$.
+The extracted witness is $x=4$.
 
-## Code
+## Testing verification and extraction in Python
 
 ```python
 def invmod(a: int, q: int) -> int:
@@ -239,18 +237,17 @@ print(schnorr_accepts(p, g, y, R, 7, z2))
 print(extract_witness(q, 2, z1, 7, z2))
 ```
 
-## Common pitfalls
+## Assumptions an implementation can break
 
-- Saying zero knowledge means the verifier learns literally nothing. It learns that the statement is true.
-- Ignoring soundness amplification. One round may have too much cheating probability.
-- Reusing commitments or nonces in Sigma protocols.
-- Applying Fiat-Shamir without domain separation or a suitable hash model.
-- Confusing proof of knowledge with proof of statement membership.
-- Forgetting that implementation side channels can reveal the witness even if the protocol transcript is zero knowledge.
+- Zero knowledge means the verifier learns nothing beyond the claim; it still learns that the statement is true.
+- A single round may leave too much soundness error, so the repetition count belongs in the security analysis.
+- Commitments and nonces in Sigma protocols must not be reused.
+- Fiat-Shamir needs domain separation and a suitable hash model.
+- Proof of knowledge and proof of statement membership make different claims.
+- Side channels can reveal the witness even when the modeled transcript is zero knowledge.
 
-## Connections
+<div className="see-also">
 
-- [Digital signatures](/cs/cryptography/digital-signatures)
-- [Discrete logarithms and Diffie-Hellman](/cs/cryptography/discrete-log-diffie-hellman)
-- [Hash functions and random oracles](/cs/cryptography/hash-functions-random-oracles)
-- [Post-quantum cryptography](/cs/cryptography/post-quantum-cryptography)
+See also: [Digital signatures](/cs/cryptography/digital-signatures) · [Discrete logarithms and Diffie-Hellman](/cs/cryptography/discrete-log-diffie-hellman) · [Hash functions and random oracles](/cs/cryptography/hash-functions-random-oracles) · [Post-quantum cryptography](/cs/cryptography/post-quantum-cryptography)
+
+</div>

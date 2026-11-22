@@ -7,17 +7,17 @@ sidebar_position: 4
 
 ![A NAT-concept diagram shows how a router rewrites private source addresses into a shared public address and back, enabling many internal hosts to share one IP.](https://commons.wikimedia.org/wiki/Special:FilePath/NAT_Concept-en.svg)
 
-*Figure: Network Address Translation (NAT) lets many private hosts share a public IP by rewriting source addresses and tracking port mappings — central to IPv4 longevity. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:NAT_Concept-en.svg), Public-Domain.*
+*Figure: Network Address Translation (NAT) lets many private hosts share a public IP by rewriting source addresses and tracking port mappings, extending the useful life of IPv4. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:NAT_Concept-en.svg), public domain.*
 
 ![An IPv6 header diagram labels the 40-byte fixed header fields including version, traffic class, flow label, payload length, next header, hop limit, and 128-bit source/destination addresses.](https://commons.wikimedia.org/wiki/Special:FilePath/IPv6_header-en.svg)
 
-*Figure: IPv6 fixed header layout — simpler than IPv4 (no checksum, no fragmentation in middleboxes) with extension headers carrying optional features. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:IPv6_header-en.svg), Public-Domain.*
+*Figure: The IPv6 fixed header is simpler than the IPv4 header: it has no header checksum, and routers do not fragment packets. Extension headers carry optional features. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:IPv6_header-en.svg), public domain.*
 
 Internetworking is the idea that many different local networks can be joined by a common packet layer. IP does not require every link to look the same. It requires each link to carry an IP datagram to the next hop, while routers make hop-by-hop forwarding decisions toward a destination prefix. This narrow waist is one of the central reasons the Internet scaled [1].
 
-This page covers IPv4, IPv6, addressing, subnetting, CIDR, ARP, DHCP, ICMP, NAT, distance-vector routing, link-state routing, BGP, MPLS, and segment routing. Peterson-Davie divide basic and advanced internetworking across chapters; this page synthesizes them because addressing, forwarding, and routing are inseparable in operational networks.
+Addressing, forwarding, and routing are inseparable in an operational network. IPv4 and IPv6 define the datagrams and address spaces; ARP, NDP, DHCP, and ICMP support a host's immediate reachability; IGPs and BGP determine paths; MPLS and segment routing add explicit steering.
 
-## Definitions
+## Addresses, neighbors, and forwarding state
 
 An **IP datagram** is a network-layer packet carried independently through the internetwork. IPv4 is specified by RFC 791 [2]. IPv6 is specified by RFC 8200 [3]. IP offers a best-effort service: no delivery guarantee, no ordering guarantee, and no built-in retransmission.
 
@@ -31,29 +31,31 @@ An **IP address** identifies an interface or a set of interfaces, depending on u
 
 **Distance-vector routing** shares distances to destinations with neighbors; RIP is a classic example. **Link-state routing** floods link-state advertisements and lets each router compute shortest paths; OSPF and IS-IS are examples. **Path-vector routing** advertises paths plus policy attributes; BGP is the interdomain routing protocol of the Internet [7]. **MPLS** forwards packets using labels rather than only IP prefixes [8]. **Segment routing** encodes a path as a list of segments, often using MPLS labels or IPv6 segment routing headers.
 
-## Key results
+## Why routing scales—and where it does not
 
-The first result is that IP forwarding is local and stateless with respect to flows. A router does not need to remember every connection; it examines the destination address, finds the best matching prefix, decrements TTL or hop limit, updates checksums where applicable, and forwards to the next hop. This design supports scale, although routers still maintain large forwarding tables and control-plane state.
+IP forwarding is local and stateless with respect to flows. A router does not need to remember every connection; it examines the destination address, finds the best matching prefix, decrements TTL or hop limit, updates checksums where applicable, and forwards to the next hop. This design supports scale, although routers still maintain large forwarding tables and control-plane state.
 
-The second result is that CIDR makes aggregation possible. Without aggregation, every router would need a route for every subnet. With aggregation, an ISP can announce a larger prefix that covers many customer networks. Aggregation is limited by topology, multihoming, traffic engineering, and policy. The global BGP table grows when organizations announce more-specific prefixes for reachability or policy reasons.
+CIDR makes aggregation possible. Without aggregation, every router would need a route for every subnet. With aggregation, an ISP can announce a larger prefix that covers many customer networks. Aggregation is limited by topology, multihoming, traffic engineering, and policy. The global BGP table grows when organizations announce more-specific prefixes for reachability or policy reasons.
 
-The third result is that IPv6 expands address space and simplifies some header behavior, but it does not remove routing complexity. IPv6 has fixed-length 128-bit addresses, extension headers, ICMPv6 dependence, stateless address autoconfiguration, and no IPv4-style header checksum [3]. Transition mechanisms include dual stack, tunneling, and translation. Dual stack is operationally simplest when both IPv4 and IPv6 connectivity are available.
+IPv6 expands address space and simplifies some header behavior, but it does not remove routing complexity. IPv6 has fixed-length 128-bit addresses, extension headers, ICMPv6 dependence, stateless address autoconfiguration, and no IPv4-style header checksum [3]. Transition mechanisms include dual stack, tunneling, and translation. Dual stack is operationally simplest when both IPv4 and IPv6 connectivity are available.
 
-The fourth result is the contrast between intra-domain and inter-domain routing. Within one administrative domain, the goal is usually shortest or policy-weighted paths under a common operator. Between domains, the goal is business policy: customer routes are preferred over peers, valley-free routing is common, and path attributes may matter more than metric distance. BGP's AS path is both loop-prevention mechanism and policy signal [7].
+Intra-domain and inter-domain routing optimize for different goals. Within one administrative domain, the target is usually shortest or policy-weighted paths under a common operator. Between domains, business policy dominates: customer routes are preferred over peers, valley-free routing is common, and path attributes may matter more than metric distance. BGP's AS path is both loop-prevention mechanism and policy signal [7].
 
-The fifth result is that distance-vector protocols are simple but vulnerable to count-to-infinity and slow convergence. Split horizon, poison reverse, hold-down timers, and bounded metrics mitigate but do not eliminate the issue. Link-state protocols converge by flooding topology and running Dijkstra's shortest-path algorithm, at the cost of more memory and CPU.
+Distance-vector protocols are simple but vulnerable to count-to-infinity and slow convergence. Split horizon, poison reverse, hold-down timers, and bounded metrics mitigate but do not eliminate the issue. Link-state protocols converge by flooding topology and running Dijkstra's shortest-path algorithm, at the cost of more memory and CPU.
 
-The sixth result is that MPLS and segment routing separate service paths from ordinary destination-based forwarding. MPLS labels can steer VPNs, traffic-engineered paths, and fast reroute. Segment routing reduces per-flow state in the network by placing ordered instructions in the packet or label stack. These tools are common in provider and data-center backbones even though the public Internet service remains IP.
+MPLS and segment routing separate service paths from ordinary destination-based forwarding. MPLS labels can steer VPNs, traffic-engineered paths, and fast reroute. Segment routing reduces per-flow state in the network by placing ordered instructions in the packet or label stack. These tools are common in provider and data-center backbones even though the public Internet service remains IP.
 
-A seventh result is that the control plane and forwarding plane have different failure modes. A router can keep forwarding packets using an existing forwarding information base while its routing process restarts, or it can have a healthy routing adjacency but install the wrong route because of policy. Operators therefore distinguish reachability, adjacency state, route selection, forwarding entries, ARP or NDP resolution, and actual packet delivery. Tools such as ping and traceroute test symptoms, not the whole routing system.
+The control plane and forwarding plane have different failure modes. A router can keep forwarding packets using an existing forwarding information base while its routing process restarts, or it can have a healthy routing adjacency but install the wrong route because of policy. Operators therefore distinguish reachability, adjacency state, route selection, forwarding entries, ARP or NDP resolution, and actual packet delivery. Tools such as ping and traceroute test symptoms, not the whole routing system.
 
-An eighth result is that address assignment is an operational protocol, not clerical bookkeeping. DHCP lease duration affects mobility and outage recovery. IPv6 router advertisements affect default-route selection and address formation. NAT port pools can be exhausted by many short-lived flows. Address summarization can reduce routing state, but only when topology and allocation align. Poor addressing plans create long-term costs because route filters, firewall rules, DNS records, monitoring, and documentation accumulate around them.
+Address assignment is an operational protocol, not clerical bookkeeping. DHCP lease duration affects mobility and outage recovery. IPv6 router advertisements affect default-route selection and address formation. NAT port pools can be exhausted by many short-lived flows. Address summarization can reduce routing state, but only when topology and allocation align. Poor addressing plans create long-term costs because route filters, firewall rules, DNS records, monitoring, and documentation accumulate around them.
 
-Finally, routing security is inseparable from routing correctness. Prefix filters, max-prefix limits, route dampening, RPKI validation, BGP communities, and monitoring systems are part of the practical routing design. The base protocols were designed for cooperation among administrative domains, but the modern Internet needs explicit defenses against leaks, hijacks, misconfiguration, and accidental route amplification.
+Routing security is inseparable from routing correctness. Prefix filters, max-prefix limits, route dampening, RPKI validation, BGP communities, and monitoring systems are part of the operational design. The base protocols were designed for cooperation among administrative domains, but the modern Internet needs explicit defenses against leaks, hijacks, misconfiguration, and accidental route amplification.
 
 The practical test of an IP design is whether it fails intelligibly. A good design makes it clear which router owns a prefix, which DHCP scope serves a link, where NAT state is created, which routing protocol installed a path, and which policy may discard traffic. That clarity is as important as the forwarding algorithm because most outages are repaired by humans using imperfect evidence.
 
-## Visual
+## Forwarding and path selection worked through
+
+### A packet's path from LAN to neighboring AS
 
 ```mermaid
 flowchart LR
@@ -77,7 +79,7 @@ flowchart LR
 | BGP | Between autonomous systems | Prefix paths and attributes | Internet interdomain routing |
 | MPLS | Provider/core | Labels and label bindings | VPNs, traffic engineering |
 
-## Worked example 1: Subnetting and longest-prefix match
+### Subnetting before a longest-prefix lookup
 
 Problem: Split `192.0.2.0/24` into four equal subnets. Then choose the route for destination `192.0.2.130` from this table:
 
@@ -117,7 +119,7 @@ $$
 
 Answer: the equal subnets are the four `/26` blocks above, and `192.0.2.130` forwards to R2.
 
-## Worked example 2: Dijkstra shortest paths for link-state routing
+### Running Dijkstra on a link-state database
 
 Problem: Router A receives this topology: A-B cost 2, A-C cost 5, B-C cost 1, B-D cost 2, C-D cost 3. Compute shortest paths from A.
 
@@ -167,7 +169,7 @@ No update.
 
 Answer: shortest path to B is A-B cost 2; to C is A-B-C cost 3; to D is A-B-D cost 4.
 
-## Code
+### Checking prefixes with Python's IP address library
 
 ```python
 import ipaddress
@@ -193,7 +195,7 @@ for net in ipaddress.ip_network("192.0.2.0/24").subnets(new_prefix=26):
     print(net)
 ```
 
-## Common pitfalls
+## Operational traps in IP networks
 
 - Treating IP addresses as host identities rather than interface or locator identifiers.
 - Forgetting longest-prefix match and choosing the first route that matches.
@@ -208,17 +210,6 @@ for net in ipaddress.ip_network("192.0.2.0/24").subnets(new_prefix=26):
 - Assuming MPLS encrypts traffic. Labels steer packets; encryption requires separate mechanisms.
 - Announcing more-specific prefixes without understanding global table impact and route filtering.
 - Ignoring reverse paths. Forward reachability does not guarantee return reachability.
-
-## Connections
-
-- [MAC and Local Area Networks](/cs/computer-networks/mac-and-local-area-networks) explains how IP packets reach the next hop on Ethernet and Wi-Fi.
-- [Transport Layer: TCP and UDP](/cs/computer-networks/transport-layer-tcp-udp) depends on IP's best-effort datagram service.
-- [Congestion Control and Queue Management](/cs/computer-networks/congestion-control-and-queue-management) explains how routing and queueing interact under load.
-- [Modern Data Center Networks and SDN](/cs/computer-networks/modern-data-center-and-sdn) extends routing into ECMP fabrics, overlays, and programmable control planes.
-- [Cryptography](/cs/cryptography/intro) supports IPsec, RPKI, DNSSEC, and secure routing control channels.
-- [Distributed Systems](/cs/distributed-systems/intro) depends on addressing, routing failure modes, and partial connectivity assumptions.
-- [Operating Systems](/cs/operating-systems/intro) implements routing tables, ARP caches, firewall hooks, and network namespaces.
-- [Computer Architecture](/cs/computer-architecture/intro) matters for TCAM, forwarding ASICs, and route lookup performance.
 
 ## References
 
@@ -237,3 +228,18 @@ for net in ipaddress.ip_network("192.0.2.0/24").subnets(new_prefix=26):
 [7] Y. Rekhter, T. Li, and S. Hares, "A Border Gateway Protocol 4 (BGP-4)," RFC 4271, Jan. 2006.
 
 [8] E. Rosen, A. Viswanathan, and R. Callon, "Multiprotocol Label Switching Architecture," RFC 3031, Jan. 2001.
+
+<div className="see-also">
+
+See also:
+
+- [MAC and Local Area Networks](/cs/computer-networks/mac-and-local-area-networks) explains how IP packets reach the next hop on Ethernet and Wi-Fi.
+- [Transport Layer: TCP and UDP](/cs/computer-networks/transport-layer-tcp-udp) depends on IP's best-effort datagram service.
+- [Congestion Control and Queue Management](/cs/computer-networks/congestion-control-and-queue-management) explains how routing and queueing interact under load.
+- [Modern Data Center Networks and SDN](/cs/computer-networks/modern-data-center-and-sdn) extends routing into ECMP fabrics, overlays, and programmable control planes.
+- [Cryptography](/cs/cryptography/intro) supports IPsec, RPKI, DNSSEC, and secure routing control channels.
+- [Distributed Systems](/cs/distributed-systems/intro) depends on addressing, routing failure modes, and partial connectivity assumptions.
+- [Operating Systems](/cs/operating-systems/intro) implements routing tables, ARP caches, firewall hooks, and network namespaces.
+- [Computer Architecture](/cs/computer-architecture/intro) matters for TCAM, forwarding ASICs, and route lookup performance.
+
+</div>

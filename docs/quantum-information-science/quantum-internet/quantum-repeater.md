@@ -13,15 +13,11 @@ The repeater problem is the central engineering bridge between [entanglement as 
 
 *Figure: Quantum repeaters require memory-like behavior: successful elementary links must wait while other probabilistic links and heralding messages arrive. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quantum_buffer_%285940501733%29.jpg), National Institute of Standards and Technology / A. Marino, public domain.*
 
-![An optical-table SPDC experiment shows hardware used to create entangled photon pairs.](https://commons.wikimedia.org/wiki/Special:FilePath/Quantum_Entanglement_Experiment_via_Spontaneous_Parametric_Down-Conversion_%28SPDC%29.jpg)
-
-*Figure: Entangled-photon sources are one physical route to the elementary links that repeater protocols try to store, swap, and purify. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quantum_Entanglement_Experiment_via_Spontaneous_Parametric_Down-Conversion_%28SPDC%29.jpg), Farbodk, CC BY-SA 4.0.*
-
-## Definitions
+## Link primitives and channel models
 
 An **elementary link** is a short quantum connection between neighboring nodes. A link attempt may send one or more photons through fiber or free space. A successful attempt is usually **heralded**, meaning detectors and classical messages announce that entanglement has been created.
 
-A **quantum memory** is a matter system or encoded qubit that stores the state associated with a successful link while other links are still being attempted. Candidate platforms include trapped ions, neutral atoms, rare-earth doped crystals, nitrogen-vacancy centers in diamond, quantum dots, and atomic ensembles. For networking, the memory is not just a storage cell; it must interface efficiently with photons, support local operations, survive classical round-trip delays, and be measurable with high fidelity.
+A **quantum memory** is a matter system or encoded qubit that stores the state associated with a successful link while other links are still being attempted. Candidate platforms include trapped ions, neutral atoms, rare-earth doped crystals, nitrogen-vacancy centers in diamond, quantum dots, and atomic ensembles. A network memory must also interface efficiently with photons, support local operations, survive classical round-trip delays, and be measurable with high fidelity.
 
 **Entanglement swapping** extends entanglement. Suppose Alice shares a Bell pair with repeater node $R$, and $R$ shares another Bell pair with Bob. A Bell measurement at $R$ on its two local qubits projects Alice and Bob into a Bell state up to a known Pauli correction. The intermediate node's qubits are measured and consumed.
 
@@ -55,7 +51,7 @@ $$
 
 This channel-state view is especially natural for repeaters. An elementary entanglement-generation attempt can be analyzed as preparing a Bell pair and letting one half pass through the physical link. The resulting shared state is the channel's Choi state up to normalization and convention. Nielsen and Chuang emphasize the operator-sum and process-tomography descriptions; the Choi form is the compact modern notation for the same background idea.
 
-## Key results
+## Beating exponential loss with stored links
 
 The direct-transmission problem is exponential. If a source emits photons at a clock rate $f$, a very simple upper estimate for the raw arrival rate is
 
@@ -63,7 +59,7 @@ $$
 R_{\mathrm{direct}}\approx f\,\eta(L).
 $$
 
-Because $\eta(L)$ is exponential in $L$, every additional fixed length in fiber multiplies the success probability by a constant factor below one. This is why direct quantum links become impractical over long distances even when local devices are excellent.
+Because $\eta(L)$ is exponential in $L$, every additional fixed length in fiber multiplies the success probability by a constant factor below one. Direct quantum links therefore become impractical over long distances even when local devices are excellent.
 
 Quantum repeaters avoid copying the unknown state. They do not amplify a qubit in the classical sense. Instead, they distribute entanglement and use measurement to stitch links together. The basic swapping identity can be written schematically as
 
@@ -128,15 +124,17 @@ $$
 \frac{R}{R_s}=1-fH_2(e_t)-H_2(e_p)\approx0.50
 $$
 
-secret bits per sifted bit under the paper's assumptions. That is a conditional fraction, not the optical swapping rate; the reported swapping rate was about $0.01$ Hz. The repeater lesson is therefore two-sided: telecom-band time-bin swapping can reach nonclassical fidelity with deployable components, but useful long-distance repeaters still need much higher rates, lower loss, stronger indistinguishability, multiplexing, and memory-compatible interfaces.
+secret bits per sifted bit under the paper's assumptions. That is a conditional fraction, not the optical swapping rate; the reported swapping rate was about $0.01$ Hz. Telecom-band time-bin swapping can reach nonclassical fidelity with deployable components. Useful long-distance repeaters still need much higher rates, lower loss, stronger indistinguishability, multiplexing, and memory-compatible interfaces.
 
-The channel-state viewpoint turns this into an error-accounting rule. If an elementary link is represented by a Bell-diagonal Choi state, then swapping combines Bell error labels, local memories add additional Kraus noise while a link waits, and purification is an LOCC map on several copies of those shared states. This is why a repeater performance model normally tracks both rate and state quality; a high heralding rate with a poor Choi state may be less useful than a slower link that distills efficiently.
+The channel-state viewpoint turns this into an error-accounting rule. If an elementary link is represented by a Bell-diagonal Choi state, then swapping combines Bell error labels, local memories add additional Kraus noise while a link waits, and purification is an LOCC map on several copies of those shared states. A repeater performance model therefore tracks both rate and state quality; a high heralding rate with a poor Choi state may be less useful than a slower link that distills efficiently.
 
 Nielsen and Chuang Chapter 12 connects entanglement distillation with quantum communication. If Alice sends halves of Bell pairs through a noisy channel and then Alice and Bob distill the resulting shared mixed states, the distilled Bell pairs can teleport unknown qubits reliably. Thus distillation can function as an error-correction method for a communication channel, with the achievable rate controlled by the distillable entanglement of the channel-generated state. Repeaters add spatial segmentation and memories to that information-theoretic idea.
 
 Capacity formulas are benchmarks, not repeater designs. The Holevo-Schumacher-Westmoreland expression bounds the classical information rate achievable over a noisy quantum channel with product-state encodings, while quantum capacity is governed by coherent-information regularization in the general theory. For a physical repeater chain, those capacities sit above a more detailed stack: photon survival, heralding probability, memory lifetime, local gate fidelity, purification yield, scheduling policy, and final application fidelity.
 
-The BDCZ scheme, named for Briegel, Duer, Cirac, and Zoller, is the canonical first-generation repeater idea. Its structure is:
+### Memory-based, ensemble, and all-photonic designs
+
+The BDCZ scheme, named for Briegel, Dür, Cirac, and Zoller, is the canonical first-generation repeater idea. Its structure is:
 
 1. Divide the total distance into elementary links.
 2. Attempt to generate entanglement independently on each elementary link.
@@ -155,7 +153,7 @@ Quantum memory requirements are severe. A useful repeater memory should have coh
 
 Small-scale demonstrations have validated pieces of the stack. Delft/QuTech experiments with nitrogen-vacancy centers in diamond have demonstrated heralded entanglement between separated nodes, multi-node network behavior, and teleportation-like primitives across non-neighboring nodes in laboratory-scale settings. These are not long-haul production repeaters. They are important because they show matter qubits, photons, heralding, memories, and classical control working together in a network architecture.
 
-## Visual
+### Architecture map
 
 ```mermaid
 flowchart LR
@@ -219,7 +217,7 @@ The repeater diagram compares three architectures in one place. The BDCZ block s
 | Trusted-node chain | Classical measurement and regeneration | Deployable for QKD in limited settings | Nodes must be trusted; no end-to-end entanglement |
 | Channel-state analysis | Kraus maps and Choi states | Separates physical link noise from protocol logic | Requires accurate tomography or calibrated noise model |
 
-## Worked example 1: Why elementary links help with loss
+## Example: Why elementary links help with loss
 
 **Problem.** A fiber has attenuation $\alpha=0.2$ dB/km. Compare direct transmission over 200 km with elementary-link transmission over 20 km segments. Ignore all losses except fiber attenuation.
 
@@ -263,7 +261,7 @@ $$
 
 **Checked answer.** Direct survival over 200 km is $10^{-4}$. A 20 km elementary attempt has survival about $0.398$. Repeaters exploit this large local advantage, but the final rate depends on memory and swapping overhead.
 
-## Worked example 2: Fidelity loss under one swapping step
+## Example: Fidelity loss under one swapping step
 
 **Problem.** Two elementary links each produce a Werner-like Bell-diagonal pair with fidelity $F=0.90$ to $\lvert\Phi^+\rangle$. The other three Bell states each have probability $(1-F)/3$. Assuming perfect local Bell measurement and no memory error, estimate the fidelity after entanglement swapping.
 
@@ -297,9 +295,9 @@ $$
 
 5. The output pair spans twice the distance, but the fidelity has dropped from $0.90$ to about $0.813$. After many nesting levels, this degradation can become unacceptable unless the protocol uses purification, error correction, or much cleaner elementary links.
 
-**Checked answer.** One ideal swapping step gives an approximate output fidelity $F'\approx0.813$. This is why repeaters are not only a loss-management problem; they are also an error-management problem.
+**Checked answer.** One ideal swapping step gives an approximate output fidelity $F'\approx0.813$. Repeater design must therefore manage accumulated state errors as well as photon loss.
 
-## Code
+## Simulating loss, swapping, and channel noise
 
 ```python
 import numpy as np
@@ -345,7 +343,7 @@ bell = np.array([1, 0, 0, 1], dtype=complex) / np.sqrt(2)
 print("amplitude-damping Choi fidelity:", np.real(bell.conj() @ J @ bell))
 ```
 
-## Common pitfalls
+## Modeling assumptions that fail first
 
 - Calling any intermediate QKD node a quantum repeater. Trusted nodes can extend key distribution, but they measure and regenerate classical secrets rather than preserving end-to-end entanglement.
 - Assuming repeaters amplify unknown qubits. A repeater avoids no-cloning by generating entanglement, storing it, and using Bell measurements.
@@ -356,17 +354,12 @@ print("amplitude-damping Choi fidelity:", np.real(bell.conj() @ J @ bell))
 - Assuming all-photonic repeaters remove all hard hardware requirements. They reduce matter-memory dependence but require large photonic graph states, low loss, fast feedforward, and efficient sources.
 - Extrapolating small laboratory demonstrations to deployed long-haul service. Current demonstrations validate building blocks; engineering a reliable repeater chain is a larger systems problem.
 
-## Connections
-
-- [Quantum Internet](/quantum-information-science/quantum-internet/intro)
-- [Entanglement as a Network Resource](/quantum-information-science/quantum-internet/entanglement)
-- [Quantum Teleportation](/quantum-information-science/quantum-internet/teleportation)
-- [Quantum Network](/quantum-information-science/quantum-communication/quantum-network)
-- [Quantum Communication](/quantum-information-science/quantum-communication/intro)
-- [Quantum Key Distribution](/quantum-information-science/quantum-communication/qkd)
-- [Quantum Error Correction](/quantum-information-science/quantum-computing/error-correction)
-- [Density Operator, Entanglement, and Decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence)
-
 ## References
 
 [1] S. I. Davis, R. Valivarthi, A. Cameron, C. Pena, S. Xie, L. Narvaez, N. Lauk, C. Li, K. Taylor, R. Youssef, C. Wang, K. Kapoor, B. Korzh, N. Sinclair, M. Shaw, P. Spentzouris, M. Spiropulu. *Entanglement swapping systems toward a quantum internet*. arXiv:2503.18906, 2025.
+
+<div className="see-also">
+
+See also: [Quantum Internet](/quantum-information-science/quantum-internet/intro) · [Entanglement as a Network Resource](/quantum-information-science/quantum-internet/entanglement) · [Quantum Teleportation](/quantum-information-science/quantum-internet/teleportation) · [Quantum Network](/quantum-information-science/quantum-communication/quantum-network) · [Quantum Communication](/quantum-information-science/quantum-communication/intro) · [Quantum Key Distribution](/quantum-information-science/quantum-communication/qkd) · [Quantum Error Correction](/quantum-information-science/quantum-computing/error-correction) · [Density Operator, Entanglement, and Decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence)
+
+</div>

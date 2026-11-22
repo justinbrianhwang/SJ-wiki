@@ -581,11 +581,8 @@ The constant $M$ bounds the relevant second derivatives in the chosen norm. Comp
 
 The bound can be conservative, especially when different curvature terms cancel. Simulation sweeps then refine it: scale one perturbation direction by factors of two and verify that the absolute discrepancy decreases approximately quadratically before numerical errors dominate. Different directions may have very different validity radii, so a single spherical operating envelope is often a poor description.
 
-## Related pages
+<div className="see-also">
 
-- [State-Space Representation](/physics/simulation/state-space-representation)
-- [Linear Systems, Transfer Functions, and Modes](/physics/simulation/linear-systems-transfer-functions-modes)
-- [Simulink Block Diagrams](/physics/simulation/simulink-block-diagrams)
-- [Numerical Integration Methods](/physics/simulation/numerical-integration-methods)
-- [System Properties](/physics/signals-systems/system-properties)
+See also: [State-Space Representation](/physics/simulation/state-space-representation) · [Linear Systems, Transfer Functions, and Modes](/physics/simulation/linear-systems-transfer-functions-modes) · [Simulink Block Diagrams](/physics/simulation/simulink-block-diagrams) · [Numerical Integration Methods](/physics/simulation/numerical-integration-methods) · [System Properties](/physics/signals-systems/system-properties)
 
+</div>

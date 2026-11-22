@@ -9,7 +9,7 @@ Vectors and matrices require one atomic type. Lists remove that restriction: a l
 
 The book introduces lists before data frames because data frames are easier to understand once you know that each column is a list component. A data frame looks rectangular, but internally it is a named list of equal-length vectors. This explains both its flexibility and its indexing rules: `df[rows, columns]` treats it like a table, while `df$column` or `df[["column"]]` extracts a column component.
 
-## Definitions
+## Components, columns, and extraction operators
 
 A **list** is a generic vector whose elements can be any R objects. List elements are often called components. Lists are created with `list()`.
 
@@ -21,7 +21,7 @@ A **row** is an observation or record. A **column** is a variable. This terminol
 
 The function `str()` displays an object's structure. For lists and data frames, `str()` is often more informative than printing because it shows component names, types, and abbreviated contents.
 
-## Key results
+## Rectangular data built from a list
 
 Lists are the standard return type for complex functions. A hypothesis test, regression model, or clustering result usually contains several related objects: estimates, residuals, call, coefficients, diagnostics, and metadata. Returning a list keeps those pieces together without forcing them into a rectangular table.
 
@@ -41,8 +41,6 @@ The formula says which columns to use, and `data = mtcars` tells R where to find
 | Data frame | 2D table | Mixed by column | `df[i, j]`, `df$col` | Data analysis |
 
 Data frame subsetting has one extra hazard: selecting one column with `df[, "col"]` may return a vector, while `df[, "col", drop = FALSE]` returns a one-column data frame. Use `drop = FALSE` when program code needs a data frame regardless of column count.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -66,11 +64,11 @@ cars
 |-- gear: numeric, length 32
 ```
 
-## Worked example 1: Extracting from a nested list
+## Extraction at component and row level
 
-Problem: create a list representing an experiment with metadata, raw observations, and a summary. Extract the treatment name and the second raw observation correctly.
+### Following a path through a nested list
 
-Method:
+Create a list representing an experiment with metadata, raw observations, and a summary. Extract the treatment name and the second raw observation correctly.
 
 1. Build a list with named components.
 2. Put another list inside it for metadata.
@@ -97,15 +95,13 @@ str(experiment$metadata)
 #  $ treatment: chr "fertilizer"
 ```
 
-Checked answer: `experiment$metadata` extracts the nested metadata list, and `$treatment` extracts the string `"fertilizer"`. `experiment[["raw"]]` extracts the numeric vector `c(5.2, 5.8, 6.1, 5.5)`, so position 2 is `5.8`.
+`experiment$metadata` extracts the nested metadata list, and `$treatment` extracts the string `"fertilizer"`. `experiment[["raw"]]` extracts the numeric vector `c(5.2, 5.8, 6.1, 5.5)`, so position 2 is `5.8`.
 
 The key distinction is that `experiment["raw"]` would return a one-component list, not the numeric vector. When you want the component itself, use `[[` or `$`.
 
-## Worked example 2: Building and filtering a data frame
+### Keeping rows aligned through a filter
 
-Problem: create a small student data frame, add a pass/fail column, and select students who passed with a score of at least 85.
-
-Method:
+Create a small student data frame, add a pass/fail column, and select students who passed with a score of at least 85.
 
 1. Create equal-length vectors for name, section, and score.
 2. Combine them with `data.frame`.
@@ -129,11 +125,11 @@ students[selected, c("name", "section", "score")]
 # 3 Chen       B    85
 ```
 
-Checked answer: Ana has 91 and Chen has 85, so both satisfy `score >= 85` and pass. Bo passes with 78 but does not meet the 85 threshold. Dia does not pass. The logical filter has length 4, matching the four rows.
+Ana has 91 and Chen has 85, so both satisfy `score >= 85` and pass. Bo passes with 78 but does not meet the 85 threshold. Dia does not pass. The logical filter has length 4, matching the four rows.
 
 This example shows why data frames dominate analysis code: each variable keeps its natural type, but the rows remain aligned.
 
-## Code
+## Unpacking a structured `aggregate` result
 
 ```r
 # Summarize a data frame by a grouping column using base R.
@@ -170,7 +166,7 @@ Lists are best when pieces are related but not rectangular. A model result, an i
 
 For practice, use `str()` on every unfamiliar list or data frame before extracting from it. The structure display answers the questions that printed output hides: what are the component names, what are the column classes, how long is each piece, and whether nested objects are present. This habit makes later model objects much less intimidating.
 
-## Common pitfalls
+## When extraction changes the object shape
 
 - Using `[` when `[[` is needed. `x["a"]` returns a list; `x[["a"]]` returns the component.
 - Assuming every rectangular object is a matrix. A data frame can mix numeric, character, logical, and factor columns.
@@ -179,9 +175,8 @@ For practice, use `str()` on every unfamiliar list or data frame before extracti
 - Relying on partial matching with `$`. Prefer `[[` with exact column names in functions.
 - Adding a column whose length is not one and not the number of rows. Recycling can hide mistakes.
 
-## Connections
+<div className="see-also">
 
-- [Indexing, names, and recycling](/cs/programming/r/indexing-names-recycling)
-- [Factors and categorical data](/cs/programming/r/factors-and-categorical-data)
-- [Reading and writing data](/cs/programming/r/reading-and-writing-data)
-- [Linear and generalized models](/cs/programming/r/linear-and-generalized-models)
+See also: [Indexing, names, and recycling](/cs/programming/r/indexing-names-recycling) · [Factors and categorical data](/cs/programming/r/factors-and-categorical-data) · [Reading and writing data](/cs/programming/r/reading-and-writing-data) · [Linear and generalized models](/cs/programming/r/linear-and-generalized-models)
+
+</div>

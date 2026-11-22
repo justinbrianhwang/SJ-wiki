@@ -9,7 +9,7 @@ K&R approaches storage allocation twice. First, Chapter 5 presents a tiny stack-
 
 This topic connects pointers, arrays, structures, unions, typedefs, and the UNIX system interface. It is also where undefined behavior becomes especially concrete. Writing one byte past an allocated block can corrupt allocator metadata. Freeing the same block twice can damage the free list. Returning an incorrectly aligned pointer can make otherwise valid object access fail.
 
-## Definitions
+## Three storage durations and two allocators
 
 Static and automatic storage are created by declarations:
 
@@ -63,13 +63,13 @@ void *realloc(void *p, size_t size);
 void free(void *p);
 ```
 
-## Key results
+## Headers, alignment, and ownership
 
 Pointer arithmetic is scaled by the pointed-to type. In the simple allocator, `allocp += n` advances by `n` characters because `allocp` is a `char *`. In the general allocator, `p + 1` advances by one `Header`, skipping allocator metadata and pointing at usable storage.
 
 The null pointer signals allocation failure. A caller must check `malloc` before dereferencing the returned pointer. K&R examples sometimes omit checks to keep the example short; robust code cannot.
 
-Alignment matters. A block returned by `malloc` must be usable for any object type whose size fits. K&R's allocator uses a union containing a restrictive type to force header alignment. Modern allocators have more precise alignment rules, but the problem is the same.
+Alignment matters. A block returned by `malloc` must satisfy the standard's fundamental alignment guarantee. K&R's allocator uses a union containing a restrictive type to force header alignment. Types with extended alignment may need aligned-allocation facilities in newer C, but the underlying problem is the same.
 
 Free-list allocators store metadata next to user storage. That is efficient, but it means buffer overflows can destroy the allocator's internal structure. C does not protect the metadata.
 
@@ -83,13 +83,13 @@ The allocator boundary is also a type boundary. `malloc` returns `void *`, which
 
 Lifetime is separate from reachability. A pointer can still contain an address after `free`, but the object lifetime has ended. Conversely, allocated storage can remain live even if all pointers to it are lost, producing a memory leak. Correct C programs track both questions: who owns this allocation, and when is the last valid use?
 
-A practical allocation convention is to make the allocating function and freeing responsibility obvious at the same abstraction level. If `read_line` returns a newly allocated string, its documentation or name should make clear that the caller must call `free`. If a table takes ownership of inserted strings, the table's destroy function should free them. K&R's small examples often end before cleanup is shown, but long-running programs and libraries need explicit release paths.
+Keep the allocating function and the freeing responsibility obvious at the same abstraction level. If `read_line` returns a newly allocated string, its documentation or name should say that the caller must call `free`. If a table takes ownership of inserted strings, the table's destroy function should free them. K&R's small examples often end before cleanup is shown, but long-running programs and libraries need explicit release paths.
 
 The size expression should follow the object being allocated. `malloc(n * sizeof *p)` remains correct if `p`'s pointed-to type changes, while `malloc(n * sizeof(struct old_name))` can silently become stale after a refactor. This idiom is not unique to modern C; it is a direct continuation of K&R's preference for declarations and expressions that agree.
 
 A custom allocator should normally be hidden behind a small interface. Callers should not know where headers are stored, how the free list is ordered, or how blocks are coalesced. K&R exposes those details for teaching, but production code keeps allocator metadata private because one incorrect external write can invalidate the whole heap.
 
-## Visual
+## How K&R's free list finds a block
 
 ```text
 Allocated block as seen by allocator:
@@ -125,15 +125,15 @@ flowchart TD
 | `realloc(p, size)` | new part uninitialized | yes | `NULL`, old block unchanged | returned pointer replaces old on success |
 | `free(p)` | not applicable | releases | none | `p` must be allocated pointer or `NULL` |
 
-## Worked example 1: Simple stack allocator pointer movement
+## Rewinding the fixed-buffer allocator
 
-Problem: a simple allocator has `ALLOCSIZE = 10`, `allocp = allocbuf`, and receives `alloc(4)`, then `alloc(3)`, then `afree(first)`. Track the offsets.
-
-Method:
+Take `ALLOCSIZE = 10` and `allocp = allocbuf`, then call `alloc(4)`, `alloc(3)`, and `afree(first)`. The offsets evolve as follows:
 
 1. Initial state:
 
-   $$allocp - allocbuf = 0.$$
+$$
+allocp - allocbuf = 0.
+$$
 
 2. First request `alloc(4)`:
 
@@ -141,7 +141,9 @@ Method:
    - Return old pointer at offset `0`.
    - Advance `allocp` by `4`.
 
-   $$allocp - allocbuf = 4.$$
+$$
+allocp - allocbuf = 4.
+$$
 
 3. Second request `alloc(3)`:
 
@@ -149,30 +151,34 @@ Method:
    - Return pointer at offset `4`.
    - Advance by `3`.
 
-   $$allocp - allocbuf = 7.$$
+$$
+allocp - allocbuf = 7.
+$$
 
 4. `afree(first)` where `first` is offset `0`:
 
    - Pointer lies inside the buffer.
    - Set `allocp = first`.
 
-   $$allocp - allocbuf = 0.$$
+$$
+allocp - allocbuf = 0.
+$$
 
-Checked answer: both allocations are effectively discarded because this allocator can only free in stack order. If the second block were still in use, freeing the first would make future allocations overwrite it.
+Both allocations are effectively discarded. The allocator can only reclaim a suffix of its allocation stack; if the second block were still in use, rewinding to the first would let a later allocation overwrite it.
 
-## Worked example 2: Rounding bytes to header units
+## Rounding a 20-byte request to header units
 
-Problem: suppose `sizeof(Header) = 16` and a user requests `20` bytes. Compute the number of header units needed in K&R's allocator formula:
+Suppose `sizeof(Header) = 16` and a user requests `20` bytes. K&R's formula is:
 
 ```c
 nunits = (nbytes + sizeof(Header) - 1) / sizeof(Header) + 1;
 ```
 
-Method:
-
 1. Substitute:
 
-   $$nbytes = 20,\quad H = 16.$$
+$$
+nbytes = 20,\quad H = 16.
+$$
 
 2. Round user bytes up to header units:
 
@@ -187,15 +193,19 @@ $$
 
 3. Add one unit for the allocator header:
 
-   $$nunits = 2 + 1 = 3.$$
+$$
+nunits = 2 + 1 = 3.
+$$
 
 4. Total block size:
 
-   $$3 \times 16 = 48\text{ bytes}.$$
+$$
+3 \times 16 = 48\text{ bytes}.
+$$
 
-Checked answer: the allocator needs 3 header-sized units: one for metadata and two for user storage.
+The allocator needs 3 header-sized units: one for metadata and two for user storage.
 
-## Code
+## Duplicating a string with explicit ownership
 
 ```c
 #include <stdio.h>
@@ -229,7 +239,7 @@ int main(void)
 }
 ```
 
-## Common pitfalls
+## Heap corruption, leaks, and lost pointers
 
 - Not checking `malloc` or `calloc` for `NULL`.
 - Writing beyond the requested size, corrupting neighboring objects or allocator metadata.
@@ -240,10 +250,8 @@ int main(void)
 - Assuming `calloc` initializes pointers or floating values by semantic zero on every possible machine; it zeroes bytes, though this works for the common hosted targets students usually use.
 - Implementing custom allocators without handling alignment.
 
-## Connections
+<div className="see-also">
 
-- [Pointers, Addresses, and Arrays](/cs/programming/c/pointers-addresses-arrays)
-- [Linked Structures and Hash Tables](/cs/programming/c/linked-structures-hash-tables)
-- [Unix System Interface](/cs/programming/c/unix-system-interface)
-- [Standard Library Reference](/cs/programming/c/standard-library-reference)
-- [Modern C Considerations](/cs/programming/c/modern-c-considerations)
+See also: [Pointers, Addresses, and Arrays](/cs/programming/c/pointers-addresses-arrays) · [Linked Structures and Hash Tables](/cs/programming/c/linked-structures-hash-tables) · [Unix System Interface](/cs/programming/c/unix-system-interface) · [Standard Library Reference](/cs/programming/c/standard-library-reference) · [Modern C Considerations](/cs/programming/c/modern-c-considerations)
+
+</div>

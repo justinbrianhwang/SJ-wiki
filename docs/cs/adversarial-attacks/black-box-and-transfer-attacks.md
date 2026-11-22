@@ -7,13 +7,9 @@ sidebar_position: 5
 
 Black-box attacks study what an adversary can do without direct access to model weights or gradients. That restriction is common in deployed systems: an attacker may only submit inputs to an API, observe labels or confidence scores, and pay a cost for every query. Transfer attacks are even more restrictive at attack time: the adversary builds adversarial examples on a surrogate model and hopes they generalize to the target.
 
-![A visually similar adversarial panda image is classified as a gibbon by an ImageNet model.](https://ar5iv.labs.arxiv.org/html/1412.6572/assets/gibbon_993.png)
-
-*Figure: The FGSM panda example shows that imperceptible perturbations can change model decisions. Image: [ar5iv](https://arxiv.org/abs/1412.6572), Goodfellow, Shlens, and Szegedy, educational use with attribution.*
-
 These attacks matter because white-box robustness is not the only operational question. A public classifier, moderation model, malware detector, speech recognizer, or LLM endpoint may expose limited feedback rather than gradients. The right evaluation asks how success changes with attacker knowledge, feedback type, query budget, surrogate data, and distribution shift.
 
-## Definitions
+## Feedback channels and query budgets
 
 A **black-box attack** assumes the attacker cannot directly inspect parameters $\theta$ or compute exact gradients $\nabla_x \mathcal{L}(f_\theta(x), y)$. The attacker may have one of several feedback channels:
 
@@ -53,7 +49,7 @@ $$
 
 where $u_i$ are random perturbation directions. A symmetric estimator uses both $x+\sigma u_i$ and $x-\sigma u_i$ to reduce bias.
 
-## Key results
+## Transfer, gradient estimation, and boundary search
 
 Transferability is the first black-box baseline. If two models learn similar decision boundaries, an input that crosses one boundary can cross the other. Transfer improves when the surrogate shares architecture, training data, preprocessing, loss, and augmentation with the target. It can also improve with attack choices that avoid overfitting to one model's local gradient, such as momentum or input transformations.
 
@@ -76,7 +72,7 @@ Square Attack is a strong score-based or decision-flavored black-box method for 
 
 Black-box attacks expose a central evaluation point: limited-query robustness is not the same as true robustness. A model may survive 100 queries but fail at 10,000 queries. Conversely, a defense that hides scores can reduce practical attack success without providing a mathematical certificate. The claim must name the feedback channel and budget.
 
-## Representative query attacks
+## Attack families by available feedback
 
 ### Score-based finite-difference optimization
 
@@ -175,7 +171,7 @@ Worked micro-example: for a $32\times32$ RGB image, the search vector has five f
 
 One-pixel results should be treated as sparse black-box stress tests. They are not directly comparable to $\ell_\infty$ PGD results unless the threat sets are explicitly separated.
 
-## Visual
+### Choosing an attack from target feedback
 
 ```mermaid
 flowchart TD
@@ -202,9 +198,9 @@ flowchart TD
 | One Pixel Attack | Scores/probabilities | Evolutionary sparse edits | Extreme low-dimensional sparse search | Narrow threat model |
 | Boundary attack | Decisions only | Boundary-following search | Works with hard labels | Needs adversarial starting point |
 
-## Worked example 1: Finite-difference gradient cost
+## The query cost of a full finite-difference gradient
 
-Problem: A score-based attacker wants to estimate the gradient of a loss for a $32 \times 32 \times 3$ image using central finite differences. How many model queries are needed for one full coordinate gradient estimate? What if the query budget is $20{,}000$?
+For a $32 \times 32 \times 3$ image, suppose a score-based attacker estimates every loss-gradient coordinate with central finite differences. How many model queries does one estimate require, and how many fit within a $20{,}000$-query budget?
 
 1. Compute dimension:
 
@@ -236,11 +232,11 @@ $$
 20000 - 3(6144)=1568.
 $$
 
-Checked answer: only three full central-difference gradients fit in the budget. This explains why random-direction estimators and search-based attacks are attractive for high-dimensional images.
+Only three full central-difference gradients fit in the budget. Random-direction estimators and search-based attacks avoid this steep coordinatewise cost.
 
-## Worked example 2: Transfer attack accounting
+## Accounting for a transfer-only run
 
-Problem: An attacker trains a surrogate model and creates 500 adversarial images. The target API is queried once per image. A total of 180 images fool the target. Compute the transfer success rate and explain what query budget should be reported.
+Suppose an attacker trains a surrogate model and creates 500 adversarial images, then queries the target API once per image. A total of 180 images fool the target. Compute the transfer success rate and state the query budget.
 
 1. The number of attempted target inputs is:
 
@@ -268,9 +264,9 @@ $$
 
 5. The target-query budget during crafting is zero if the attacker did not use target feedback to tune the examples. The final evaluation uses one target query per example.
 
-Checked answer: the transfer success rate is $36\%$. The report should say "transfer-only crafting with 0 target queries, evaluated with 1 target query per candidate." If the attacker repeatedly adjusted examples based on target failures, it would no longer be pure transfer.
+The transfer success rate is $36\%$. The report should say "transfer-only crafting with 0 target queries, evaluated with 1 target query per candidate." Repeatedly adjusting examples after target failures would no longer be pure transfer.
 
-## Code
+## NES under score access
 
 ```python
 import torch
@@ -300,7 +296,7 @@ def black_box_pgd_nes(model, x, y, epsilon=8 / 255, step_size=2 / 255, steps=20)
 
 This sketch assumes score access sufficient to compute cross-entropy from logits. A real API may return only labels, rounded probabilities, top-$k$ outputs, or rate-limited responses; the attack and query accounting must match that interface.
 
-## Common pitfalls
+## Accounting choices that change the threat model
 
 - Calling an attack black-box even though it uses gradients from the exact target model.
 - Ignoring query counts or reporting only final success after unlimited retries.
@@ -310,15 +306,7 @@ This sketch assumes score access sufficient to compute cross-entropy from logits
 - Estimating gradients through logits when the deployed API exposes only labels.
 - Omitting failed attempts from median-query or success-rate reporting.
 
-## Connections
-
-- [Threat models and attack taxonomy](/cs/adversarial-attacks/threat-models-and-attack-taxonomy) defines score-query, decision-query, and transfer-only access.
-- [White-box attacks](/cs/adversarial-attacks/white-box-attacks) are the gradient-access baseline that black-box attacks approximate or replace.
-- [Gradient masking and obfuscation](/cs/adversarial-attacks/gradient-masking-and-obfuscation) explains why black-box attacks can sometimes outperform naive white-box attacks against broken defenses.
-- [Evaluation and benchmarks](/cs/adversarial-attacks/evaluation-and-benchmarks) covers AutoAttack, adaptive evaluation, and reporting discipline.
-- [Machine learning](/cs/machine-learning/intro) gives the model-fitting background for surrogate models.
-
-## Further reading
+## Query-attack lineage
 
 - Papernot et al., work on substitute models and transfer attacks.
 - Chen et al., "ZOO: Zeroth Order Optimization Based Black-box Attacks to Deep Neural Networks."
@@ -328,9 +316,21 @@ This sketch assumes score access sufficient to compute cross-entropy from logits
 - Andriushchenko et al., "Square Attack: A Query-Efficient Black-Box Adversarial Attack via Random Search."
 - Su, Vargas, and Sakurai, "One Pixel Attack for Fooling Deep Neural Networks."
 
-## References
+## Primary attack papers
 
 [1] P.-Y. Chen, H. Zhang, Y. Sharma, J. Yi, C.-J. Hsieh. *ZOO: Zeroth Order Optimization Based Black-box Attacks to Deep Neural Networks without Training Substitute Models*. AISec 2017.
 [2] W. Brendel, J. Rauber, M. Bethge. *Decision-Based Adversarial Attacks: Reliable Attacks Against Black-Box Machine Learning Models*. ICLR 2018.
 [3] M. Andriushchenko, F. Croce, N. Flammarion, M. Hein. *Square Attack: A Query-Efficient Black-Box Adversarial Attack via Random Search*. ECCV 2020.
 [4] J. Su, D. Vargas, K. Sakurai. *One Pixel Attack for Fooling Deep Neural Networks*. IEEE Transactions on Evolutionary Computation 2019.
+
+<div className="see-also">
+
+See also:
+
+- [Threat models and attack taxonomy](/cs/adversarial-attacks/threat-models-and-attack-taxonomy) defines score-query, decision-query, and transfer-only access.
+- [White-box attacks](/cs/adversarial-attacks/white-box-attacks) are the gradient-access baseline that black-box attacks approximate or replace.
+- [Gradient masking and obfuscation](/cs/adversarial-attacks/gradient-masking-and-obfuscation) explains why black-box attacks can sometimes outperform naive white-box attacks against broken defenses.
+- [Evaluation and benchmarks](/cs/adversarial-attacks/evaluation-and-benchmarks) covers AutoAttack, adaptive evaluation, and reporting discipline.
+- [Machine learning](/cs/machine-learning/intro) gives the model-fitting background for surrogate models.
+
+</div>

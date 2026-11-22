@@ -7,9 +7,9 @@ sidebar_position: 5
 
 Pseudorandomness is the practical substitute for true randomness. A one-time pad needs a key as long as the message because it uses truly uniform keystream bits. A pseudorandom generator expands a short uniform seed into a longer string that efficient adversaries cannot distinguish from uniform. A pseudorandom function goes further: it gives keyed random-looking answers on many inputs.
 
-Katz and Lindell treat PRGs and PRFs as foundational primitives for private-key encryption and MACs. Smart approaches the same territory through stream ciphers, LFSRs, block ciphers, and the later provable-security vocabulary. The synthesis is useful: a practical stream cipher is engineered machinery, but the security goal it tries to approximate is the PRG indistinguishability experiment.
+Katz and Lindell treat PRGs and PRFs as foundational primitives for private-key encryption and MACs. Smart approaches the same territory through stream ciphers, LFSRs, block ciphers, and the later provable-security vocabulary. The synthesis is useful: a deployed stream cipher is engineered machinery, but the security goal it tries to approximate is the PRG indistinguishability experiment.
 
-## Definitions
+## From a seed to an oracle
 
 A **pseudorandom generator**, or PRG, is a deterministic polynomial-time algorithm
 
@@ -47,7 +47,7 @@ It is secure if no PPT oracle algorithm can distinguish oracle access to $F_k(\c
 
 A **pseudorandom permutation**, or PRP, is a keyed family of permutations. Block ciphers such as AES are modeled as PRPs or strong PRPs, depending on whether the adversary also gets inverse-oracle access.
 
-## Key results
+## Replacing a uniform pad
 
 The PRG-based fixed-length encryption scheme is the computational analogue of the one-time pad. Let $G$ expand an $n$-bit seed to $\ell$ bits. To encrypt an $\ell$-bit message, choose key $k\leftarrow\{0,1\}^n$ and compute
 
@@ -89,26 +89,24 @@ Stretch matters. A PRG with output length $n+1$ already contains deep theoretica
 
 PRFs are stronger interfaces than PRGs because the adversary chooses inputs adaptively. The same key must answer many queries, and the outputs should look like a consistent random function. Consistency matters: querying the same input twice must return the same value, unlike drawing a fresh random string each time. Security says that this consistency is the only visible structure.
 
-PRPs add invertibility, which is exactly what block ciphers need for decryption. But many modes never call the inverse direction and only require that forward outputs on distinct inputs look random. This is why proofs may switch between PRP and PRF assumptions with a birthday-bound loss: a random permutation and a random function are hard to distinguish until collisions or inverse structure become visible.
+PRPs add invertibility, which is what block ciphers need for decryption. Many modes never call the inverse direction and require only that forward outputs on distinct inputs look random. Proofs may therefore switch between PRP and PRF assumptions with a birthday-bound loss: a random permutation and a random function are hard to distinguish until collisions or inverse structure become visible.
 
-A practical warning follows from all these definitions: never use a general-purpose programming-language PRNG for cryptographic keys, nonces that require unpredictability, or pads. Such generators are often designed for simulation speed and reproducibility, not adversarial prediction resistance. Cryptographic randomness must come from an approved CSPRNG or operating-system entropy interface.
+General-purpose programming-language PRNGs do not belong in cryptographic keys, unpredictable nonces, or pads. They are often designed for simulation speed and reproducibility, not adversarial prediction resistance. Cryptographic randomness must come from an approved CSPRNG or operating-system entropy interface.
 
 The same primitive may appear under different names in different layers. A block cipher used in CTR mode behaves like a PRF on counter inputs. HMAC can be used as a PRF inside a KDF. A stream cipher can be viewed as a stateful PRG with nonce input. These identifications are useful, but only when the input rules match the proof. A PRF is not safe if the same key is reused across incompatible domains without labels.
 
-Backtracking resistance is another generator goal. If an attacker compromises the current internal state, a well-designed generator should make it hard to reconstruct old outputs that were produced before earlier state updates. This is important for long-running services that generate many keys over time.
+Backtracking resistance is another generator goal. If an attacker compromises the current internal state, a well-designed generator should make it hard to reconstruct old outputs that were produced before earlier state updates. After fresh entropy is mixed in, recovery security should again protect future output from an attacker who knew the old state.
 
-Forward security after reseeding is the matching goal for future outputs.
-
-## Visual
+## How the pad reaches the ciphertext
 
 ```mermaid
 flowchart TD
-  S[Uniform seed or key] --> G[PRG or PRF]
-  N[Nonce / input] --> G
-  G --> K[Keystream or pad]
-  M[Message] --> X[XOR]
+  S["Uniform seed or key"] --> G["PRG or PRF"]
+  N["Nonce or input"] --> G
+  G --> K["Keystream or pad"]
+  M["Message"] --> X["XOR"]
   K --> X
-  X --> C[Ciphertext]
+  X --> C["Ciphertext"]
 ```
 
 | Primitive | Input | Output behavior | Typical use | Main security experiment |
@@ -118,11 +116,9 @@ flowchart TD
 | PRP | key and block | random-permutation-like block mapping | block ciphers | distinguish permutation oracle from random permutation |
 | Stream cipher | key, nonce, state | keystream sequence | high-speed encryption | distinguish keystream from random under nonce rules |
 
-## Worked example 1: PRG encryption as a computational one-time pad
+## XOR with a toy generator output
 
-Problem: suppose a toy PRG maps a 4-bit seed `1010` to the 8-bit output `01101101`. Encrypt the 8-bit message `11001010`.
-
-Method:
+Suppose a toy PRG maps a 4-bit seed `1010` to the 8-bit output `01101101`. Encrypt the 8-bit message `11001010`.
 
 1. Write the message and pad:
 
@@ -146,15 +142,13 @@ Method:
    m      = 1 1 0 0 1 0 1 0
    ```
 
-Checked answer: ciphertext `10100111`, recovered message `11001010`.
+The ciphertext is `10100111`, and decryption recovers `11001010`.
 
 Security check: this toy is not secure because a 4-bit seed can be brute-forced. The worked arithmetic shows the construction, not a real parameter choice.
 
-## Worked example 2: nonce collision probability
+## When a 32-bit random nonce repeats
 
-Problem: a PRF-based encryption scheme samples a random 32-bit nonce for each message. Estimate the collision probability after $q=10{,}000$ encryptions.
-
-Method:
+A PRF-based encryption scheme samples a random 32-bit nonce for each message. Estimate the collision probability after $q=10{,}000$ encryptions.
 
 1. Use the birthday approximation:
 
@@ -185,16 +179,17 @@ $$
 
 4. Interpret the result: about a $1.16\%$ chance of at least one repeated nonce.
 
-Checked answer: 32-bit random nonces are too small for 10,000 encryptions if collisions are dangerous. Use larger nonces or deterministic counters with uniqueness guarantees.
+The collision probability is about $1.16\%$. A 32-bit random nonce is too small for 10,000 encryptions when collisions are dangerous; larger nonces or deterministic unique counters are needed.
 
-## Code
+## Expanding counters with an HMAC PRF
 
 ```python
-from hashlib import sha256
+import hashlib
+import hmac
 
 def prf_block(key: bytes, nonce: int, counter: int) -> bytes:
-    data = key + nonce.to_bytes(12, "big") + counter.to_bytes(4, "big")
-    return sha256(data).digest()
+    data = nonce.to_bytes(12, "big") + counter.to_bytes(4, "big")
+    return hmac.new(key, data, hashlib.sha256).digest()
 
 def xor_stream_encrypt(key: bytes, nonce: int, message: bytes) -> bytes:
     out = bytearray()
@@ -211,7 +206,7 @@ print(c.hex())
 print(xor_stream_encrypt(key, nonce, c))
 ```
 
-## Common pitfalls
+## Where pseudorandomness assumptions fail
 
 - Using a statistically nice generator as if it were cryptographic. Simulations and cryptography need different guarantees.
 - Reusing a nonce in stream encryption or CTR mode.
@@ -220,9 +215,8 @@ print(xor_stream_encrypt(key, nonce, c))
 - Confusing PRFs with collision-resistant hashes. They solve different problems.
 - Ignoring birthday limits for random nonces and random function outputs.
 
-## Connections
+<div className="see-also">
 
-- [Computational security definitions](/cs/cryptography/computational-security-definitions)
-- [Symmetric encryption modes](/cs/cryptography/symmetric-encryption-modes)
-- [Message authentication codes](/cs/cryptography/message-authentication-codes)
-- [Hash functions and random oracles](/cs/cryptography/hash-functions-random-oracles)
+See also: [Computational security definitions](/cs/cryptography/computational-security-definitions) · [Symmetric encryption modes](/cs/cryptography/symmetric-encryption-modes) · [Message authentication codes](/cs/cryptography/message-authentication-codes) · [Hash functions and random oracles](/cs/cryptography/hash-functions-random-oracles)
+
+</div>

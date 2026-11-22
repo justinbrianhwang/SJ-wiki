@@ -9,7 +9,7 @@ Computer architecture studies the contract between software and hardware, and th
 
 These notes follow the scope of *Computer Architecture: A Quantitative Approach*, 5th edition: quantitative design, memory hierarchy, instruction-level parallelism, data-level parallelism, thread-level parallelism, warehouse-scale computing, and supporting appendix topics such as instruction sets, pipelining, virtual memory, and storage. They are written as original study notes, with formulas, diagrams, worked examples, and small runnable models.
 
-## Definitions
+## Three layers of a machine
 
 Computer architecture includes three related layers:
 
@@ -33,7 +33,7 @@ $$
 
 where fraction $f$ of the old execution time is improved by local speedup $s$. The same pattern appears in parallel processing, memory hierarchies, storage, accelerators, and warehouse-scale systems: only the affected fraction improves, and overhead can erase local gains.
 
-Generated page list:
+Reading order:
 
 | Position | Page | Main scope |
 |---:|---|---|
@@ -54,7 +54,7 @@ Generated page list:
 | 16 | [Storage, RAID, and SSDs](/cs/computer-architecture/storage-raid-ssds) | Disk timing, RAID, SSD behavior, queueing |
 | 17 | [Domain-Specific Accelerators](/cs/computer-architecture/domain-specific-accelerators) | Accelerators, data movement, systolic/tensor-style ideas |
 
-## Key results
+## Parallelism, locality, and measured bottlenecks
 
 The main result of the subject is methodological: architecture is a set of trade-offs tied to workload behavior. A faster clock may increase branch penalties and power. A larger cache may reduce misses but lengthen hits. An out-of-order core may hide latency but spend more energy on wakeup, selection, speculation, and recovery. A GPU may deliver enormous throughput but lose on small or irregular tasks because transfer overhead and divergence dominate.
 
@@ -71,7 +71,7 @@ Memory hierarchy is the connecting theme. Caches support scalar and out-of-order
 
 The final result is that local peak numbers are rarely enough. Peak FLOP/s, peak issue width, peak bandwidth, or advertised MTTF can be useful, but architectural judgment comes from sustained performance on a relevant workload, with energy and cost included.
 
-## Visual
+## Following work from the ISA to memory
 
 ```mermaid
 flowchart TD
@@ -110,7 +110,7 @@ This architecture overview shows the path from workload goals through ISA, front
 | Is this system affordable to run? | Energy per task, PUE, availability | Power, WSC, storage |
 | Does special hardware pay off? | End-to-end speedup and joules/task | SIMD/GPU, accelerators |
 
-## Worked example 1: Choosing which bottleneck to optimize
+## Amdahl's law chooses the larger bottleneck
 
 Problem: A program spends 50% of time in memory stalls, 30% in useful integer execution, 15% in branch stalls, and 5% in other overhead. You can either halve memory stalls or make branch prediction perfect. Which gives better speedup?
 
@@ -163,7 +163,7 @@ $$
 
 Checked answer: Halving memory stalls is better for this workload. Perfect branch prediction sounds stronger, but it affects only 15% of baseline time, while the memory optimization affects a larger fraction.
 
-## Worked example 2: Reading a page path through the notes
+## Diagnosing poor four-core scaling
 
 Problem: A student wants to understand why a four-core program is slower than expected. The profiler shows high lock time, many cache invalidations, and remote memory accesses. Which pages should they read first, and what quantitative checks should they perform?
 
@@ -176,7 +176,7 @@ $$
 \mathrm{Efficiency}=\frac{\mathrm{Speedup}}{4}
 $$
 
-If efficiency is low, the problem is not just "needs more cores."
+If efficiency is low, adding more cores does not address the underlying limit.
 
 2. Read [Multicore, Synchronization, and NUMA](/cs/computer-architecture/multicore-synchronization-numa). Check whether lock contention serializes work and whether remote memory placement raises average latency.
 
@@ -188,40 +188,9 @@ If efficiency is low, the problem is not just "needs more cores."
 
 Checked answer: The right path is multicore first, coherence second, cache effects third. The key checks are speedup, efficiency, lock wait time, invalidation traffic, and local versus remote memory access.
 
-## Code
+The same diagnostic habit applies across the subject: start with the metric, then follow the measured bottleneck into processor, memory, parallelism, storage, or accelerator design. A favorite mechanism is not evidence that it limits the workload.
 
-```python
-pages = [
-    ("quantitative-design-and-performance", "CPU time and Amdahl"),
-    ("power-energy-cost-dependability", "energy and availability"),
-    ("instruction-set-principles", "ISA contract"),
-    ("pipelining-hazards", "pipeline stalls"),
-    ("branch-prediction", "control hazards"),
-    ("dynamic-scheduling-tomasulo", "out-of-order scheduling"),
-    ("speculation-renaming-multiple-issue", "speculative ILP"),
-    ("cache-organization-amat", "cache basics"),
-    ("cache-optimization-and-prefetching", "cache optimizations"),
-    ("virtual-memory-tlb-vms", "translation"),
-    ("coherence-consistency-mesi", "shared-memory correctness"),
-    ("multicore-synchronization-numa", "thread-level parallelism"),
-    ("vector-simd-gpu", "data-level parallelism"),
-    ("warehouse-scale-computers", "request-level parallelism"),
-    ("storage-raid-ssds", "persistent storage"),
-    ("domain-specific-accelerators", "specialized hardware"),
-]
-
-def print_reading_path(keyword):
-    for slug, topic in pages:
-        if keyword.lower() in topic.lower() or keyword.lower() in slug:
-            print(f"/cs/computer-architecture/{slug} -> {topic}")
-
-print_reading_path("parallel")
-print_reading_path("cache")
-```
-
-The snippet is a tiny reading-path helper. It is not a replacement for the sidebar, but it captures the intended organization: start with the metric, then follow the bottleneck into processor, memory, parallelism, storage, or accelerator pages. The same habit applies when using the notes for design work. Do not begin with a favorite mechanism; begin with the measured bottleneck and choose the page that explains that bottleneck.
-
-## Common pitfalls
+## Comparisons that hide the real cost
 
 - Treating architecture as a list of components rather than a set of quantitative trade-offs.
 - Comparing processors using clock rate alone.
@@ -231,12 +200,8 @@ The snippet is a tiny reading-path helper. It is not a replacement for the sideb
 - Studying multicore, GPU, and WSC designs without separating ILP, DLP, TLP, and RLP.
 - Forgetting that the memory hierarchy affects nearly every topic in the course.
 
-## Connections
+<div className="see-also">
 
-- [Quantitative Design and Performance](/cs/computer-architecture/quantitative-design-and-performance)
-- [Power, Energy, Cost, and Dependability](/cs/computer-architecture/power-energy-cost-dependability)
-- [Instruction Set Principles](/cs/computer-architecture/instruction-set-principles)
-- [Pipelining and Hazards](/cs/computer-architecture/pipelining-hazards)
-- [Cache Organization and AMAT](/cs/computer-architecture/cache-organization-amat)
-- [Coherence, Consistency, and MESI](/cs/computer-architecture/coherence-consistency-mesi)
-- [Warehouse-Scale Computers](/cs/computer-architecture/warehouse-scale-computers)
+See also: [Quantitative design and performance](/cs/computer-architecture/quantitative-design-and-performance) · [Power, energy, cost, and dependability](/cs/computer-architecture/power-energy-cost-dependability) · [Instruction set principles](/cs/computer-architecture/instruction-set-principles) · [Pipelining and hazards](/cs/computer-architecture/pipelining-hazards) · [Cache organization and AMAT](/cs/computer-architecture/cache-organization-amat) · [Coherence, consistency, and MESI](/cs/computer-architecture/coherence-consistency-mesi) · [Warehouse-scale computers](/cs/computer-architecture/warehouse-scale-computers)
+
+</div>

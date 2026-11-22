@@ -13,7 +13,7 @@ The first skill is translation: decide what the vertices are, decide what the ed
 
 *Figure: The complete graph $K_5$. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Complete_graph_K5.svg), David Benbennick, public domain.*
 
-## Definitions
+## Choosing vertices, edges, and direction
 
 An **undirected graph** $G=(V,E)$ consists of a vertex set $V$ and an edge set $E$ whose elements join pairs of vertices. A **simple graph** has no loops and no multiple edges. A **multigraph** may have multiple edges. A **pseudograph** may also have loops.
 
@@ -33,7 +33,7 @@ Special graphs:
 
 An **adjacency list** stores each vertex's neighbors. An **adjacency matrix** stores a zero-one table where entry $(i,j)$ records whether $v_i$ is adjacent to $v_j$. For undirected simple graphs, the matrix is symmetric with zeros on the diagonal.
 
-## Key results
+## Degree identities and structural invariants
 
 The handshaking theorem:
 
@@ -65,7 +65,9 @@ A simple graph is bipartite if and only if its vertices can be colored with two 
 
 Graph isomorphism asks whether two graphs are structurally identical after renaming vertices. Equal degree sequences are necessary for isomorphism but not sufficient. Invariants such as number of vertices, edges, components, cycles, and bipartiteness can prove non-isomorphism.
 
-## Visual
+## Choosing a graph representation
+
+The four-vertex graph below is sparse, so an adjacency list or edge list stores it compactly.
 
 ```mermaid
 graph LR
@@ -82,7 +84,7 @@ graph LR
 | edge list | $O(m)$ | scan or sort edges | neighbor lookup requires search |
 | incidence matrix | $O(nm)$ | algebraic edge-vertex questions | large for many graphs |
 
-## Worked example 1: Use the handshaking theorem
+## Recovering an edge count from degrees
 
 **Problem.** A simple graph has degree sequence
 
@@ -117,7 +119,7 @@ $$
 
 **Checked answer.** The graph would have $7$ edges, and the parity condition is satisfied. This does not prove the degree sequence is graphical, but it passes a necessary test.
 
-## Worked example 2: Build an adjacency matrix
+## Building and checking an adjacency matrix
 
 **Problem.** Let $V=\{a,b,c,d\}$ and
 
@@ -147,7 +149,7 @@ $$
 
 **Checked answer.** The row sums are $2,2,3,1$, matching the degrees of $a,b,c,d$. The total row sum is $8$, so there are $4$ edges, as listed.
 
-## Code
+## Converting an adjacency list to counts and a matrix
 
 ```python
 def degrees(graph):
@@ -177,7 +179,7 @@ for row in adjacency_matrix(G, ["a", "b", "c", "d"]):
 
 The handshaking theorem appears in the final check: the sum of all degrees is twice the number of undirected edges.
 
-## Common pitfalls
+## Modeling and representation checks
 
 - Counting each undirected edge twice when computing $\vert E\vert $ from adjacency lists.
 - Forgetting that a loop contributes $2$ to degree in an undirected graph.
@@ -202,10 +204,14 @@ A good representation check is to compute the same invariant two ways. Count edg
 
 For special graphs, memorize the construction more than the picture. $K_n$ joins every pair of vertices, $C_n$ uses one cycle through all vertices, and $K_{m,n}$ joins across two parts but never within a part. Reconstructing the edge rule prevents confusing similar-looking drawings.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Relations](/math/discrete/relations) represents directed graphs as relations on vertices.
 - [Graph paths, connectivity, and shortest paths](/math/discrete/graph-paths-connectivity-shortest-paths) studies movement through graphs.
 - [Euler, Hamilton, planarity, and coloring](/math/discrete/euler-hamilton-planarity-coloring) uses degree, cycles, and coloring.
 - [Trees](/math/discrete/trees) studies connected acyclic graphs.
 - [Algorithms and complexity](/math/discrete/algorithms-and-complexity) analyzes graph traversal and representation costs.
+
+</div>

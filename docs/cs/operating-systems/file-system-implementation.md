@@ -7,9 +7,9 @@ sidebar_position: 11
 
 File-system implementation explains how the friendly interface of files and directories becomes persistent structures on storage. The user sees names, folders, permissions, and bytes. The OS must maintain metadata, allocate blocks, track free space, cache data, recover after crashes, and connect the file-system layer to the block-device layer. Good implementation turns slow storage into a usable abstraction without losing consistency.
 
-The textbook separates file-system interface from implementation because the two levels answer different questions. The interface says what operations mean; the implementation says how to store and retrieve the data. This page focuses on file-control blocks, directory implementation, allocation methods, free-space management, caching, recovery, NFS, and the WAFL example mentioned in the chapter.
+The textbook separates file-system interface from implementation because the two levels answer different questions. The interface says what operations mean; the implementation says how to store and retrieve the data. The implementation work includes file-control blocks, directory indexes, allocation, free-space management, caching, recovery, and remote-file-system behavior.
 
-## Definitions
+## From directory names to data blocks
 
 A **file-control block** (FCB) stores metadata needed to manage a file. UNIX-style systems use an **inode** for this role. It may include ownership, permissions, size, timestamps, and pointers to data blocks. The directory maps names to FCBs or inode numbers.
 
@@ -25,7 +25,7 @@ A **directory implementation** can use a linear list of names and pointers, a ha
 
 **Journaling** records intended metadata changes before applying them, so after a crash the file system can replay or roll back to a consistent state. **Log-structured** designs write changes sequentially to a log-like structure.
 
-## Key results
+## Allocation and free-space accounting
 
 Allocation method controls both performance and fragmentation:
 
@@ -39,6 +39,8 @@ Allocation method controls both performance and fragmentation:
 Contiguous allocation is attractive for read-only media or files with known size. Linked allocation avoids external fragmentation but makes direct access expensive because block $n$ requires following $n$ pointers. Indexed allocation is flexible and supports direct access, but small files should not pay huge index overhead. UNIX-style inode structures address this by combining direct pointers for small files with single, double, and triple indirect pointers for larger files.
 
 Free-space bitmaps make it easy to find contiguous runs if the bitmap is cached. For a disk with $N$ blocks, the bitmap needs $N$ bits. If the block size is 4 KiB and the disk has 1,000,000 blocks, the bitmap is 1,000,000 bits, or 125,000 bytes, which is small compared with the data area.
+
+## Caching, recovery, and remote access
 
 Caching improves performance but creates a consistency problem. If a process writes data and the OS delays the actual storage write, a crash can lose data or leave metadata pointing to uninitialized blocks. Journaling narrows the problem by making metadata updates recoverable. It does not automatically guarantee that every application-level write is durable; applications still need explicit synchronization calls when durability matters.
 
@@ -58,7 +60,7 @@ Because metadata links many structures together, implementation bugs often appea
 
 Simple consistency checkers exist because these relationships can be verified after an unclean shutdown.
 
-## Visual
+## Following a pathname through an inode
 
 ```mermaid
 flowchart TD
@@ -113,9 +115,11 @@ flowchart TD
 
 This inode diagram separates name lookup, inode lookup, and block mapping. Small files are reached through direct pointers, while larger files progress through single, double, and triple indirection; the example notes the common 4 KiB/4-byte pointer fanout for a single-indirect block. The dotted dependency to the free-space bitmap, journal, and page cache shows why allocation, crash recovery, and caching must preserve the same inode-to-block invariants.
 
-## Worked example 1: bitmap free-space size
+## Sizing file-system metadata
 
-Problem: A file system has 2,097,152 blocks. How much space is needed for a free-space bitmap? Express the answer in bytes and KiB.
+### A free-space bitmap
+
+A file system has 2,097,152 blocks. How much space is needed for a free-space bitmap? Express the answer in bytes and KiB.
 
 1. A bitmap uses 1 bit per block:
 
@@ -143,11 +147,11 @@ $$
 
 5. A 256 KiB bitmap is small enough to cache easily.
 
-Checked answer: The bitmap needs 262,144 bytes, or 256 KiB.
+The bitmap needs 262,144 bytes, or 256 KiB.
 
-## Worked example 2: indexed allocation capacity
+### Direct and indirect reach
 
-Problem: A file system uses 4 KiB blocks and 4-byte block pointers. An inode has 12 direct pointers and one single-indirect pointer. Ignoring double and triple indirection, what is the maximum file size addressable?
+A file system uses 4 KiB blocks and 4-byte block pointers. An inode has 12 direct pointers and one single-indirect pointer. Ignoring double and triple indirection, what is the maximum file size addressable?
 
 1. Direct pointer capacity:
 
@@ -179,9 +183,9 @@ $$
 \frac{4144}{1024} = 4.046875\ \mathrm{MiB}
 $$
 
-Checked answer: The inode can address 4,144 KiB, or about 4.05 MiB, without double or triple indirect pointers.
+The inode can address 4,144 KiB, or about 4.05 MiB, without double or triple indirect pointers.
 
-## Code
+## Checking metadata size and inode reach
 
 ```python
 def bitmap_size(block_count):
@@ -204,7 +208,7 @@ print(inode_capacity(4096, 4, 12))
 
 The calculations mirror common file-system design questions: metadata size and maximum addressable file size under an indexing scheme.
 
-## Common pitfalls
+## Where metadata designs fail
 
 - Assuming directories store file data. Directories usually map names to metadata records.
 - Choosing contiguous allocation without planning for file growth. Expansion can require compaction or relocation.
@@ -213,10 +217,8 @@ The calculations mirror common file-system design questions: metadata size and m
 - Treating journaling as a full backup. Journaling restores metadata consistency; it does not replace backups or application-level durability.
 - Ignoring small-file overhead. A design optimized for huge files can waste space and I/O on many tiny files.
 
-## Connections
+<div className="see-also">
 
-- [File-System Interface](/cs/operating-systems/file-system-interface)
-- [Mass Storage and RAID](/cs/operating-systems/mass-storage-raid)
-- [Virtual Memory](/cs/operating-systems/virtual-memory)
-- [I/O Systems](/cs/operating-systems/io-systems)
-- [Linux Case Study](/cs/operating-systems/linux-case-study)
+See also: [File-System Interface](/cs/operating-systems/file-system-interface) · [Mass Storage and RAID](/cs/operating-systems/mass-storage-raid) · [Virtual Memory](/cs/operating-systems/virtual-memory) · [I/O Systems](/cs/operating-systems/io-systems) · [Linux Case Study](/cs/operating-systems/linux-case-study)
+
+</div>

@@ -5,11 +5,11 @@ sidebar_position: 7
 
 # Deadlocks
 
-Deadlock is the failure mode where a set of processes can never make progress because each is waiting for an event that only another member of the set can cause. It is not simply a slow system, a busy lock, or a priority problem. In a deadlock, the wait relationship forms a closed trap: every participant is stuck, and ordinary scheduling cannot free them.
+Deadlock is the failure mode where a set of processes can never make progress because each is waiting for an event that only another member of the set can cause. It differs from a slow system, a busy lock, or a priority problem. In a deadlock, the wait relationship forms a closed trap: every participant is stuck, and ordinary scheduling cannot free them.
 
-Silberschatz, Galvin, and Gagne place the detailed deadlock discussion inside the synchronization chapter in the Essentials edition, while the broader dinosaur-book family often treats it as a full chapter. The topic deserves its own wiki page because the same ideas appear in mutexes, semaphores, memory allocation, file locks, device allocation, database transactions, and distributed systems.
+Silberschatz, Galvin, and Gagne place the detailed deadlock discussion inside the synchronization chapter in the Essentials edition, while the broader dinosaur-book family often treats it as a full chapter. The same ideas appear in mutexes, semaphores, memory allocation, file locks, device allocation, database transactions, and distributed systems.
 
-## Definitions
+## Resources, waits, and the four conditions
 
 A **deadlock** exists when every process in a set is waiting for an event that can be caused only by another process in the same set. The event is often the release of a resource.
 
@@ -23,7 +23,7 @@ A **resource-allocation graph** has process nodes, resource nodes, request edges
 
 The **banker's algorithm** is a deadlock-avoidance algorithm. It requires each process to declare its maximum possible demand. The OS grants a request only if the resulting state is safe, meaning there exists some order in which all processes can finish.
 
-## Key results
+## Prevention, avoidance, and detection
 
 The four necessary conditions are a diagnostic checklist:
 
@@ -46,13 +46,13 @@ The prevention, avoidance, and detection approaches fit different environments. 
 
 Deadlock is closely related to starvation but not identical. In starvation, a process waits indefinitely because scheduling or allocation policy keeps favoring others; the resource might become free many times, but the process never wins. In deadlock, the resource cannot become free because the holder is also waiting in the dependency cycle. Aging helps starvation but does not break a deadlock cycle. Killing or rolling back a participant can break deadlock but may be far too disruptive if the real problem was only unfair scheduling.
 
-Operating systems also face deadlock-like problems with internal locks. Suppose a filesystem path holds a directory lock while requesting a memory allocation, and the memory allocator tries to reclaim pages by calling back into the filesystem. If the reclaim path needs the same directory lock, the kernel can deadlock even though no user process explicitly requested two locks. This is why kernel developers care about lock ordering, nonblocking allocation flags, interrupt context, and avoiding calls into complex subsystems while holding low-level locks.
+Operating systems also face deadlock-like problems with internal locks. Suppose a filesystem path holds a directory lock while requesting a memory allocation, and the memory allocator tries to reclaim pages by calling back into the filesystem. If the reclaim path needs the same directory lock, the kernel can deadlock even though no user process explicitly requested two locks. Kernel developers therefore track lock ordering, nonblocking allocation flags, interrupt context, and calls into complex subsystems made while holding low-level locks.
 
-A practical deadlock analysis starts by naming resources precisely. "The file system is locked" is too vague; the useful question is which inode lock, journal lock, memory reclaim lock, device queue lock, or user-visible file lock is held. Precise resource naming makes cycles visible and helps decide whether prevention, detection, timeout, retry, or redesign is the right response. Vague resource names hide the actual wait-for graph.
+Deadlock analysis starts by naming resources precisely. "The file system is locked" is too vague; the useful question is which inode lock, journal lock, memory reclaim lock, device queue lock, or user-visible file lock is held. Precise resource naming exposes cycles and helps decide whether prevention, detection, timeout, retry, or redesign is the right response. Vague resource names hide the actual wait-for graph.
+
+## Reading the resource and wait-for graphs
 
 Deadlock proofs and fixes both become clearer when the exact resource graph is drawn.
-
-## Visual
 
 ```mermaid
 flowchart TB
@@ -96,11 +96,11 @@ flowchart TB
   Recheck --> Cycle
 ```
 
-This deadlock diagram shows both the resource-allocation graph and the derived wait-for graph. The explicit assignment and request edges reveal the `P1 -> P2 -> P1` cycle, while the extra multi-instance resource shows why a cycle is only immediately decisive for single-instance resources. The recovery branch makes the operational choices visible: abort a participant or preempt/rollback a recoverable resource, then re-run detection.
+The diagram shows both the resource-allocation graph and the derived wait-for graph. The explicit assignment and request edges reveal the `P1 -> P2 -> P1` cycle, while the extra multi-instance resource shows why a cycle is only immediately decisive for single-instance resources. The recovery branch records the operational choices: abort a participant or preempt and roll back a recoverable resource, then rerun detection.
 
-## Worked example 1: identifying the four conditions
+## Two locks, four necessary conditions
 
-Problem: Two threads need locks `A` and `B`. Thread 1 executes `lock(A); lock(B);`, while Thread 2 executes `lock(B); lock(A);`. Show whether deadlock is possible.
+Two threads need locks `A` and `B`. Thread 1 executes `lock(A); lock(B);`, while Thread 2 executes `lock(B); lock(A);`. Show whether deadlock is possible.
 
 1. Mutual exclusion: a lock is held by at most one thread, so the condition holds.
 2. Hold and wait: Thread 1 can hold `A` while waiting for `B`; Thread 2 can hold `B` while waiting for `A`. The condition holds.
@@ -112,11 +112,11 @@ Problem: Two threads need locks `A` and `B`. Thread 1 executes `lock(A); lock(B)
    - Thread 2 requests `A` and waits.
 5. The wait cycle is Thread 1 $\rightarrow B \rightarrow$ Thread 2 $\rightarrow A \rightarrow$ Thread 1.
 
-Checked answer: Deadlock is possible because all four necessary conditions can hold. A standard fix is to impose one order, for example always acquire `A` before `B`.
+Deadlock is possible because all four necessary conditions can hold. A standard fix is to impose one order, for example always acquire `A` before `B`.
 
-## Worked example 2: banker's safety check
+## Finding a banker's safe sequence
 
-Problem: There is one resource type with 10 total instances. Three processes currently have allocations `P1 = 2`, `P2 = 3`, `P3 = 2`. Their maximum claims are `P1 = 5`, `P2 = 6`, `P3 = 4`. Is the state safe?
+There is one resource type with 10 total instances. Three processes currently have allocations `P1 = 2`, `P2 = 3`, `P3 = 2`. Their maximum claims are `P1 = 5`, `P2 = 6`, `P3 = 4`. Is the state safe?
 
 1. Compute available resources:
 
@@ -157,9 +157,9 @@ $$
 Available = 7 + 3 = 10
 $$
 
-Checked answer: The state is safe. One safe sequence is `P3, P1, P2`. The system is not required to run in that exact order, but the existence of the sequence proves safety.
+The state is safe. One safe sequence is `P3, P1, P2`. The system is not required to run in that exact order, but the existence of the sequence proves safety.
 
-## Code
+## Checking a tentative allocation
 
 ```python
 def is_safe(available, allocation, maximum):
@@ -190,7 +190,7 @@ print(is_safe(available, allocation, maximum))
 
 This is the safety portion of the banker's algorithm for multiple resource types. A real request algorithm first pretends to grant a request and then runs this safety check.
 
-## Common pitfalls
+## Distinguishing deadlock from delay
 
 - Calling every long wait a deadlock. Deadlock requires a cycle of dependencies with no possible progress.
 - Forgetting the multiple-instance case. A cycle in a resource-allocation graph may not be sufficient when resources have several instances.
@@ -199,10 +199,8 @@ This is the safety portion of the banker's algorithm for multiple resource types
 - Ignoring lock ordering in code review. Inconsistent acquisition order is one of the simplest ways to create circular wait.
 - Recovering without considering invariants. Killing a process or preempting a resource can leave files, devices, or shared data inconsistent.
 
-## Connections
+<div className="see-also">
 
-- [Process Synchronization](/cs/operating-systems/process-synchronization)
-- [Threads](/cs/operating-systems/threads)
-- [CPU Scheduling](/cs/operating-systems/cpu-scheduling)
-- [Main Memory](/cs/operating-systems/main-memory)
-- [File-System Implementation](/cs/operating-systems/file-system-implementation)
+See also: [Process Synchronization](/cs/operating-systems/process-synchronization) · [Threads](/cs/operating-systems/threads) · [CPU Scheduling](/cs/operating-systems/cpu-scheduling) · [Main Memory](/cs/operating-systems/main-memory) · [File-System Implementation](/cs/operating-systems/file-system-implementation)
+
+</div>

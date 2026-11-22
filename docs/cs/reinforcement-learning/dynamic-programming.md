@@ -343,9 +343,8 @@ Policy stability alone can also stop too early if evaluation is crude. A policy 
 
 Unit tests for a planner should use MDPs with analytically known values, stochastic branches whose probabilities do not happen to be equal, and terminal states containing deliberately nonzero stored values. The last case catches accidental terminal bootstrapping. Running the same problem with forward and reverse in-place sweep orders should converge to the same fixed point even though intermediate sequences differ. Probability rows should be checked to sum to one before planning; otherwise a backup is no longer an expectation.
 
-## Related pages
+<div className="see-also">
 
-- [Reinforcement learning problem and finite MDPs](/cs/reinforcement-learning/rl-problem-and-mdps)
-- [Monte Carlo methods](/cs/reinforcement-learning/monte-carlo-methods)
-- [Temporal-difference learning](/cs/reinforcement-learning/temporal-difference-learning)
-- [Planning and learning with tabular methods](/cs/reinforcement-learning/planning-and-learning)
+See also: [Reinforcement learning problem and finite MDPs](/cs/reinforcement-learning/rl-problem-and-mdps) · [Monte Carlo methods](/cs/reinforcement-learning/monte-carlo-methods) · [Temporal-difference learning](/cs/reinforcement-learning/temporal-difference-learning) · [Planning and learning with tabular methods](/cs/reinforcement-learning/planning-and-learning)
+
+</div>

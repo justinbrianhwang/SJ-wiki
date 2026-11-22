@@ -9,7 +9,7 @@ Input and output are where sequential software meets a concurrent physical world
 
 Lee and Seshia use I/O to expose a central CPS tension. Software is written as ordered statements, but the environment is not ordered by the program. Polling, interrupts, GPIO, PWM, serial interfaces, buses, memory-mapped registers, and device drivers are all mechanisms for reconciling that mismatch.
 
-## Definitions
+## Signals, registers, and software control
 
 **General-purpose input/output** (GPIO) pins can be configured by software as digital inputs or outputs. They expose logical values as voltage levels, subject to electrical limits.
 
@@ -37,7 +37,7 @@ An **interrupt controller** prioritizes interrupt requests and maps them to inte
 
 A **device driver** is software that manages a peripheral, often combining register access, interrupts, buffering, and synchronization.
 
-## Key results
+## From an electrical event to shared state
 
 PWM is appropriate when the physical plant averages fast switching. Heating elements, motors, and LEDs can often be controlled this way because their thermal, electrical, or mechanical response is slower than the switching period.
 
@@ -71,7 +71,7 @@ For safety-related I/O, fail-safe electrical defaults are as important as softwa
 
 I/O documentation should therefore include reset behavior and startup sequencing. A pin that is safe as an output after initialization may float during boot. A peripheral register may retain state across warm reset. A driver that assumes a clean power-on state may fail after watchdog recovery.
 
-## Visual
+### The complete I/O path
 
 ```mermaid
 flowchart TB
@@ -106,8 +106,6 @@ flowchart TB
   Poll -. "avoid infinite busy wait" .-> Timeout
 ```
 
-This I/O interfacing diagram shows the complete path from an external electrical event to peripheral registers, polling, interrupts, DMA, shared buffers, main control code, and actuator output. It labels the concurrency boundaries that make embedded I/O difficult: volatile register access, atomic shared-state updates, memory barriers for DMA, and timeout/error handling. The diagram also distinguishes software-visible events from electrical front-end requirements such as pull-ups, filtering, level shifting, and drivers.
-
 | I/O method | Good for | Weakness | Typical protection |
 |---|---|---|---|
 | Polling | Simple status checks | Busy waiting, missed timing | Bounded loops, timeouts |
@@ -116,7 +114,7 @@ This I/O interfacing diagram shows the complete path from an external electrical
 | Memory-mapped registers | Fast peripheral control | Requires exact device semantics | `volatile`, masks, register docs |
 | PWM | Power control | Ripple, switching loss | Proper frequency and driver |
 
-## Worked example 1: PWM average voltage
+## Averaging a PWM waveform
 
 Problem: A PWM output switches between $0$ V and $3.3$ V at a duty cycle of $35\%$. Find the ideal average voltage seen by a slow plant.
 
@@ -144,7 +142,7 @@ $$
 
 Answer: The ideal average is $1.155$ V, assuming the load and driver behave linearly over the PWM period.
 
-## Worked example 2: GPIO current limit
+## Sizing a GPIO current-limiting resistor
 
 Problem: A GPIO output at $3.3$ V drives an LED and resistor path. The GPIO pin must not source more than $8$ mA. Ignoring LED voltage for a conservative first check, find the minimum resistor.
 
@@ -178,29 +176,7 @@ $$
 
 Answer: Use at least $412.5\ \Omega$ under this conservative model; $470\ \Omega$ keeps the current below $8$ mA.
 
-## Code
-
-```python
-class TimerISR:
-    def __init__(self, count):
-        self.timer_count = count
-
-    def systick(self):
-        if self.timer_count != 0:
-            self.timer_count -= 1
-
-def run_delay(milliseconds):
-    timer = TimerISR(milliseconds)
-    ticks = 0
-    while timer.timer_count != 0:
-        timer.systick()  # hardware would trigger this once per ms
-        ticks += 1
-    return ticks
-
-print("ticks elapsed:", run_delay(2000))
-```
-
-## Common pitfalls
+## Failure modes at the hardware-software boundary
 
 - Treating `volatile` as a lock. It controls compiler assumptions, not atomicity or mutual exclusion.
 - Writing multi-byte shared variables on an 8-bit microcontroller without checking whether the write is interruptible.
@@ -209,10 +185,8 @@ print("ticks elapsed:", run_delay(2000))
 - Assuming a memory-mapped register behaves like RAM. Reads and writes may have side effects.
 - Polling forever without a timeout or system-level scheduling argument.
 
-## Connections
+<div className="see-also">
 
-- [sensors and actuators](/cs/embedded/sensors-and-actuators)
-- [8255 programmable peripheral interface](/cs/embedded/8255-programmable-peripheral-interface)
-- [8051 timers, serial, and interrupts](/cs/embedded/8051-timers-serial-interrupts)
-- [8085 I/O, memory, and DMA interfacing](/cs/embedded/8085-io-memory-dma-interfacing)
-- [process synchronization](/cs/operating-systems/process-synchronization)
+See also: [sensors and actuators](/cs/embedded/sensors-and-actuators) · [8255 programmable peripheral interface](/cs/embedded/programmable-peripheral-interface) · [8051 timers, serial, and interrupts](/cs/embedded/timers-serial-interrupts) · [8085 I/O, memory, and DMA interfacing](/cs/embedded/io-memory-dma-interfacing) · [process synchronization](/cs/operating-systems/process-synchronization)
+
+</div>

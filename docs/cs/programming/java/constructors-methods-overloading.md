@@ -9,41 +9,39 @@ Construction and method invocation are the everyday mechanics of object-oriented
 
 Overloading lets several methods or constructors share a name when their parameter lists differ. This can make APIs natural, but it also means the compiler must choose a most specific applicable method. The source book treats this choice as a precise language rule, not as a matter of intuition. Good overloaded APIs make the intended choice obvious to both compiler and reader.
 
-## Definitions
+## What a call binds and initializes
 
-The source basis for this page is Chapter 2 sections on creating objects, construction and initialization, methods, `this`, overloading methods, static member imports, `main`, and native methods. The terms below are written as contracts: each one tells you what the compiler can check, what the runtime must preserve, and what a reader of the program may rely on.
+Chapter 2 supplies the material on object creation, initialization, methods, `this`, overloading, static member imports, `main`, and native methods. The important distinctions concern when a call is selected and which receiver or object state it acts on.
 
-**Constructor invocation.** Constructor invocation creates and initializes a new object, usually through `new`. A constructor can delegate to another constructor in the same class with `this(...)` or to a superclass constructor with `super(...)`. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Constructor invocation.** Creation and initialization of a new object, usually through `new`. A constructor can delegate within its class using `this(...)` or to a superclass constructor using `super(...)`.
 
-**Initialization order.** Object initialization follows an order involving default field values, explicit field initializers, initialization blocks, superclass construction, and constructor bodies. Understanding the order prevents use of state before it is ready. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Initialization order.** The sequence of default field values, superclass construction, explicit field initializers, initialization blocks, and constructor bodies. Tracking it prevents use of state before it is ready.
 
-**Receiver.** The receiver is the object on which an instance method is invoked. Inside the method, `this` refers to that receiver. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Receiver.** The object on which an instance method is invoked. Inside the method, `this` refers to that receiver.
 
-**Parameter.** A parameter is a method or constructor variable initialized by the caller's argument. Parameter names can shadow field names, making `this.field` useful. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Parameter.** A method or constructor variable initialized by the caller's argument. A parameter name can shadow a field name, making `this.field` useful.
 
-**Return value.** A method may return a value whose type is declared in the method header, or it may be declared `void` and return no value. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Return value.** A value whose type appears in the method header; a `void` method returns no value.
 
-**Overloading.** Overloading declares multiple methods or constructors with the same name but different parameter lists. The compiler chooses among them using argument types and conversion rules. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Overloading.** Multiple methods or constructors with the same name but different parameter lists. The compiler chooses among them using argument types and conversion rules.
 
-**Varargs.** A variable arity parameter, written with `...`, lets callers pass zero or more trailing arguments that are received as an array. Java 5 added this feature. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Varargs.** A variable-arity parameter, written with `...`, that receives zero or more trailing arguments as an array. Java 5 added this feature.
 
-**Native method.** A native method is declared in Java but implemented outside Java, usually to connect with platform-specific code. The source mentions native methods as a boundary, not as ordinary application style. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Native method.** A method declared in Java but implemented outside Java, usually to connect with platform-specific code. The source treats native methods as a boundary, not ordinary application style.
 
-## Key results
+## Centralizing construction and resolving overloads
 
-**Constructors should centralize validity.** A class with several constructors should avoid duplicating validation inconsistently. Constructor delegation lets one constructor perform common checks and initialization for the others. This supports the same invariant regardless of which public constructor a client uses. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Constructors should centralize validity.** A class with several constructors should avoid duplicating validation inconsistently. Constructor delegation lets one constructor perform common checks and initialization for the others, preserving the same invariant through every public entry point.
 
-**`this` is a precision tool.** `this` can clarify that `this.name` is the field while `name` is the parameter. It can also pass the current object to another method. Overusing it everywhere may be noisy, but using it where shadowing or receiver identity matters prevents ambiguity. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**`this` identifies the receiver precisely.** It distinguishes `this.name`, the field, from `name`, the parameter, and can pass the current object to another method. Using it where shadowing or receiver identity matters prevents ambiguity.
 
-**Overloading is compile-time selection.** The compiler selects an overloaded method based on the compile-time argument types and applicable conversions. Runtime dynamic dispatch applies after a signature has been chosen. Confusing overloading with overriding leads to surprising method calls. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Overloading is compile-time selection.** The compiler selects an overloaded method from the compile-time argument types and applicable conversions. Runtime dynamic dispatch applies only after a signature has been chosen.
 
-**Varargs are arrays at the method boundary.** A varargs parameter is received as an array inside the method. It improves call-site convenience, but the method still needs to handle the array length and possible values carefully. Overloaded varargs methods can be hard to read if several calls appear applicable. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Varargs are arrays at the method boundary.** A varargs parameter is received as an array. It improves call-site convenience, but the method must still handle length and values carefully. Overloaded varargs methods become hard to read when several calls appear applicable.
 
-**A method's contract includes effects as well as return type.** The signature tells which arguments and return type are involved, but the method documentation and implementation define state changes, exceptions, and invariants. A `void` method can still be the most important operation in a class if it changes object state safely. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**A method's contract includes effects as well as return type.** The signature identifies arguments and return type; documentation and implementation define state changes, exceptions, and invariants. A `void` method may still perform the class's central state transition.
 
 When tracing an invocation, do it in two passes. First, choose the signature: list the method name, argument expressions, compile-time argument types, and conversions allowed for overload resolution. Second, choose the implementation: if the selected method is an instance method and can be overridden, dynamic dispatch uses the actual receiver object's class. Constructors are different: they are not inherited and not dynamically dispatched. This two-pass separation is a compact way to avoid many errors around overloaded methods, subclass methods, and calls through superclass references.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -62,7 +60,7 @@ flowchart TD
 | Method override | Runtime after signature choice | Which implementation belongs to the receiver object? |
 | Varargs call | Compile time | Are fixed arguments enough, or is an array created for extras? |
 
-## Worked example 1: constructor delegation for a rectangle
+## Delegating rectangle construction
 
 Problem: Design `Rectangle(int width, int height)` and `Rectangle(int side)` so both reject nonpositive sizes.
 
@@ -76,7 +74,7 @@ Method:
 
 Checked answer: Both constructors produce valid rectangles or throw the same exception for invalid dimensions. The invariant is centralized in one constructor body.
 
-## Worked example 2: separating overload and override
+## Why `print(x)` selects `print(Object)`
 
 Problem: Suppose a class has `print(Object o)` and `print(String s)`, and the variable is declared `Object x = "hi";`. Which overload is selected by `print(x)`?
 
@@ -90,7 +88,7 @@ Method:
 
 Checked answer: `print(Object)` is selected. Overloading is decided before runtime receiver dispatch and uses compile-time argument types.
 
-## Code
+## Constructor delegation beside overload selection
 
 ```java
 public class ConstructorOverloadDemo {
@@ -134,7 +132,7 @@ public class ConstructorOverloadDemo {
 }
 ```
 
-## Common pitfalls
+## Ambiguous calls and duplicated validation
 
 - Do not duplicate constructor validation in several places if delegation can centralize it.
 - Do not forget that `this(...)` or `super(...)` must be the first statement when used in a constructor.
@@ -142,9 +140,13 @@ public class ConstructorOverloadDemo {
 - Do not create overloaded methods whose calls differ only by subtle boxing, widening, or varargs choices unless the API benefit is clear.
 - Do not let parameter names shadow fields accidentally. Use clear names or `this.field` where the distinction matters.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Classes, Objects, and Encapsulation](/cs/programming/java/classes-objects-encapsulation): explains the invariants constructors protect.
 - [Inheritance, Polymorphism, and Object](/cs/programming/java/inheritance-polymorphism-object): separates overriding from overloading.
 - [Primitives, Operators, and Conversions](/cs/programming/java/primitives-operators-conversions): supplies conversion rules used in overload resolution.
 - [Generics, Wildcards, and Erasure](/cs/programming/java/generics-wildcards-erasure): shows how generic methods add another layer to method selection.
+
+</div>

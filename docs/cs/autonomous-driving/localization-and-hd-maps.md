@@ -251,10 +251,8 @@ Operational monitoring also needs discontinuity limits and cross-sensor residual
 - The kinematic bicycle model is weakest during high sideslip, wheel lift, or aggressive transients. A neat dead-reckoning trace is not proof that the assumed dynamics held.
 - A fresh map can still be incompatible with current temporary traffic control. Release age and scene agreement answer different questions.
 
-## Related pages
+<div className="see-also">
 
-- [Sensors: cameras, lidar, radar, and IMU](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu)
-- [Sensor fusion](/cs/autonomous-driving/sensor-fusion)
-- [Motion planning](/cs/autonomous-driving/motion-planning)
-- [Decision making and behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning)
-- [Simulation and data](/cs/autonomous-driving/simulation-and-data)
+See also: [Sensors: cameras, lidar, radar, and IMU](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu) · [Sensor fusion](/cs/autonomous-driving/sensor-fusion) · [Motion planning](/cs/autonomous-driving/motion-planning) · [Decision making and behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning) · [Simulation and data](/cs/autonomous-driving/simulation-and-data)
+
+</div>

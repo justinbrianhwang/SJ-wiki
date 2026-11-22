@@ -5,70 +5,38 @@ sidebar_position: 61
 
 # Scheduling and Real Time
 
-Scheduling decides which task executes when. In general-purpose computing, scheduling is often about throughput, fairness, or responsiveness. In embedded systems, scheduling is often about correctness: a controller that computes the right output too late can be wrong. Real-time scheduling therefore connects software execution to physical time.
+Scheduling decides which task executes when. General-purpose schedulers often optimize throughput, fairness, or responsiveness. In an embedded system, timing can be part of correctness: a controller that computes the right output too late can still be wrong.
 
-Lee and Seshia present scheduling as a design and analysis problem over tasks, deadlines, periods, precedence constraints, mutual exclusion, and processor assignment. Rate-monotonic scheduling and earliest-deadline-first scheduling are the central uniprocessor examples, while priority inversion and multiprocessor anomalies show why timing remains difficult in realistic systems.
+Lee and Seshia treat scheduling as a design and analysis problem over tasks, deadlines, periods, precedence constraints, mutual exclusion, and processor assignment. Rate-monotonic scheduling and earliest-deadline-first scheduling are the central uniprocessor cases; priority inversion and multiprocessor anomalies show where the tidy results stop applying directly.
 
-## Definitions
+## The task model behind a schedule
 
-A **task** is a unit of schedulable computation. A task execution may have a release time $r_i$, start time, finish time $f_i$, execution time $e_i$, deadline $d_i$, and possibly a period $p_i$.
-
-The **response time** of a task execution is the elapsed time from release to completion:
+A **task** is a unit of schedulable computation. One execution may have a release time $r_i$, start time, finish time $f_i$, execution time $e_i$, deadline $d_i$, and possibly a period $p_i$. Its response time is
 
 $$
 f_i-r_i.
 $$
 
-The **execution time** is the amount of time the processor actually spends running the task. It does not include time blocked or preempted.
+Execution time counts only time on the processor, not time spent blocked or preempted. A **feasible schedule** meets every required deadline. A hard deadline is a correctness constraint; a soft deadline is a performance target for which lateness is undesirable but tolerable.
 
-A **hard deadline** is a correctness constraint. Missing it is a system failure. A **soft deadline** is a performance goal where lateness is undesirable but not necessarily catastrophic.
+A preemptive scheduler may suspend one task to run another. A non-preemptive scheduler lets the selected task run until it blocks or finishes. Periodic work, such as a control loop, has a regular release pattern. Sporadic work has a known minimum inter-arrival time. Aperiodic work, such as arbitrary user commands, may arrive in bursts and is commonly isolated behind a budget or server so that it cannot consume unbounded processor time.
 
-A **feasible schedule** meets all required deadlines.
+## What RM and EDF can guarantee
 
-A **preemptive scheduler** may stop one task and run another before the first completes. A **non-preemptive scheduler** lets a chosen task run until it blocks or finishes.
+**Rate-monotonic** (RM) scheduling assigns fixed priorities to periodic tasks: the shorter the period, the higher the priority. For independent periodic tasks on one preemptive processor, RM is optimal among fixed-priority schedulers under the classic assumptions. If any fixed-priority assignment can schedule the task set, the rate-monotonic assignment can.
 
-**Rate-monotonic** (RM) scheduling is a fixed-priority policy for periodic tasks where shorter period means higher priority.
-
-**Earliest deadline first** (EDF) is a dynamic-priority policy where the ready task with the earliest absolute deadline runs first.
-
-**Priority inversion** occurs when a high-priority task is blocked while a lower-priority task indirectly prevents progress.
-
-## Key results
-
-For independent periodic tasks on one preemptive processor, RM is optimal among fixed-priority schedulers under its classic assumptions. If any fixed-priority assignment can schedule the task set, the rate-monotonic assignment can.
-
-RM has a utilization sufficient condition:
+RM has the sufficient utilization test
 
 $$
 U=\sum_{i=1}^{n}\frac{e_i}{p_i}
 \le n(2^{1/n}-1).
 $$
 
-As $n$ grows, this bound approaches $\ln 2\approx 0.693$. This is sufficient, not necessary; some task sets above the bound are still schedulable.
+As $n$ grows, the bound approaches $\ln 2\approx 0.693$. The condition is sufficient, not necessary: a task set above the bound may still be schedulable.
 
-EDF is optimal with respect to feasibility for independent preemptive uniprocessor tasks with deadlines and arrivals. For periodic tasks with deadlines equal to periods, EDF can schedule any task set with total utilization at most $1$, assuming ideal overhead-free scheduling.
+**Earliest deadline first** (EDF) gives the processor to the ready job with the earliest absolute deadline. It is optimal for feasibility for independent, preemptible jobs on one processor. For periodic tasks whose relative deadlines equal their periods, ideal EDF schedules every task set with total utilization at most $1$.
 
-Precedence constraints change the problem. For finite task sets with precedences, latest-deadline-first construction can be used to build an optimal schedule backwards. EDF can be modified by adjusting deadlines to account for successor deadlines.
-
-Mutual exclusion complicates priority scheduling. Priority inheritance temporarily raises the priority of a lock holder to the priority of the highest-priority task blocked on that lock. Priority ceiling protocols constrain lock acquisition to avoid certain deadlocks and bound blocking.
-
-Multiprocessor scheduling is harder than uniprocessor scheduling. Even small changes, such as reducing one task's execution time, can increase overall makespan under some policies because the relative order of resource contention changes.
-
-A scheduling analysis is only as strong as its task model. The classic RM and EDF results assume things such as known execution times, independent tasks, negligible context-switch overhead, and a single processor. Real systems add release jitter, blocking on locks, interrupt interference, cache warm-up, communication delays, and data-dependent execution. The theorem is still useful, but the engineer must either satisfy the assumptions or account for the deviations.
-
-Release times and deadlines should come from the physical problem, not merely from convenient software periods. A control loop period may be chosen from plant dynamics and stability margins. A braking computation deadline may come from stopping distance. A sensor fusion task may need to finish before the controller reads the next estimate. If deadlines are arbitrary, a feasible schedule may still fail to support the physical requirement.
-
-Scheduling also interacts with verification. A mode-machine model may prove that a fault handler is eventually requested, but scheduling analysis must show that the handler runs soon enough. A mutual-exclusion proof may show that shared state is protected, while priority-inversion analysis must show that the protection does not block a critical task too long. CPS correctness typically needs both logical and timing arguments.
-
-The distinction between periodic, sporadic, and aperiodic work is especially important in embedded systems. Periodic tasks, such as control loops, fit cleanly into RM and EDF analysis. Sporadic tasks, such as fault events with a known minimum inter-arrival time, can often be analyzed if the minimum spacing is respected. Aperiodic tasks, such as arbitrary user commands, are harder because they may arrive in bursts. Practical systems often protect hard real-time tasks by assigning budgets or servers to less predictable work, ensuring that logging, communication, or diagnostics cannot consume unlimited processor time.
-
-Blocking time must be included in response-time reasoning. A high-priority task may have a short execution time but still miss a deadline if it waits for a lock, a bus transaction, a DMA completion, or a lower-level driver. Similarly, a task released on time may start late because interrupts or higher-priority tasks occupy the processor. A schedule diagram is therefore not only a list of computation blocks; it is a record of release times, preemptions, blocking intervals, and completion times. For a hard real-time claim, all of those intervals need defensible bounds.
-
-A final scheduling design should identify the clock or timer that releases each periodic task, the priority or deadline assigned to each task, the maximum time spent with interrupts disabled, and the policy for overload. Overload policy matters because no scheduler can meet all deadlines if the requested work exceeds available processor time. A real system should define which work is dropped, degraded, deferred, or escalated to a fault mode.
-
-It should also identify measurement hooks and acceptance tests. Without traces of releases, starts, preemptions, completions, and deadline misses, validating the scheduling assumptions on hardware becomes guesswork during integration and field debugging. Those traces are strong evidence.
-
-## Visual
+The diagram shows an RM schedule for a period-4 task with execution time 1 and a period-6 task with execution time 3. The higher-priority task preempts the lower-priority job at time 8.
 
 ```mermaid
 gantt
@@ -88,94 +56,55 @@ gantt
 | Scheduler | Priority type | Classic strength | Limitation |
 |---|---|---|---|
 | Fully static | Design-time order and time | Very predictable | Requires known execution times |
-| Static order | Design-time order, run-time timing | Simple generated code | Blocks can delay later tasks |
-| RM | Fixed priority | Optimal among fixed-priority periodic schedules | Utilization bound below 100% |
+| Static order | Design-time order, run-time timing | Simple generated code | Long blocks delay later tasks |
+| RM | Fixed priority | Optimal among fixed-priority periodic schedules | Simple utilization bound is below 100% |
 | EDF | Dynamic priority | Optimal for many uniprocessor task models | More run-time scheduling work |
-| Priority inheritance | Lock-aware fixed priority | Bounds priority inversion | Does not remove all locking complexity |
+| Priority inheritance | Lock-aware fixed priority | Bounds some priority inversion | Does not remove locking complexity |
 
-## Worked example 1: RM utilization bound
+These claims depend on the model: known execution times, independent tasks, negligible scheduling overhead, and one processor. Release jitter, locks, interrupts, cache effects, communication delays, and data-dependent execution all require extra analysis.
 
-Problem: Three periodic tasks have $(e_1,p_1)=(1,4)$, $(e_2,p_2)=(1,5)$, and $(e_3,p_3)=(2,20)$. Check the RM sufficient utilization bound.
+## Checking the RM utilization bound
 
-Method:
-
-1. Compute utilization:
+Take three periodic tasks with $(e_1,p_1)=(1,4)$, $(e_2,p_2)=(1,5)$, and $(e_3,p_3)=(2,20)$. Their utilization is
 
 $$
-U=\frac{1}{4}+\frac{1}{5}+\frac{2}{20}.
+U=\frac{1}{4}+\frac{1}{5}+\frac{2}{20}
+ =0.25+0.20+0.10=0.55.
 $$
 
-2. Convert:
+For $n=3$, the RM bound is
 
 $$
-U=0.25+0.20+0.10=0.55.
+3(2^{1/3}-1)\approx 3(1.2599-1)=0.7797.
 $$
 
-3. RM bound for $n=3$:
+Because
 
 $$
-3(2^{1/3}-1).
+0.55 \le 0.7797,
 $$
 
-4. Evaluate:
+the sufficient test passes. Under the classic assumptions, RM meets all deadlines for this task set.
+
+## Ordering two ready jobs with EDF
+
+Suppose two independent jobs are ready at time $0$. $J_1$ has execution time $2$ and deadline $5$; $J_2$ has execution time $1$ and deadline $3$. Since
 
 $$
-2^{1/3}\approx 1.2599,
+d_2=3<d_1=5,
 $$
 
-   so
+EDF runs $J_2$ from time $0$ to $1$, then $J_1$ from time $1$ to $3$. Their finish times satisfy
 
 $$
-3(1.2599-1)=0.7797.
-$$
-
-5. Compare:
-
-$$
-0.55 \le 0.7797.
-$$
-
-Answer: The sufficient RM utilization test passes. Under the classic assumptions, RM will meet all deadlines for this task set.
-
-## Worked example 2: EDF schedule for two jobs
-
-Problem: At time $0$, two independent jobs are ready on one preemptive processor. $J_1$ has execution time $2$ and deadline $5$. $J_2$ has execution time $1$ and deadline $3$. Construct the EDF schedule and check deadlines.
-
-Method:
-
-1. Compare deadlines:
-
-$$
-d_2=3 < d_1=5.
-$$
-
-2. EDF runs $J_2$ first from time $0$ to time $1$.
-
-$$
-f_2=1.
-$$
-
-3. Check $J_2$:
-
-$$
-f_2=1\le d_2=3.
-$$
-
-4. Run $J_1$ next from time $1$ to time $3$.
-
-$$
-f_1=3.
-$$
-
-5. Check $J_1$:
-
-$$
+f_2=1\le d_2=3,
+\qquad
 f_1=3\le d_1=5.
 $$
 
-Answer: EDF schedule is $J_2$ then $J_1$. Both jobs meet their deadlines.
+Both jobs meet their deadlines.
 
-## Code
+For a fixed ready set, the same calculation can be turned into a small trace helper:
 
 ```python
 def edf_schedule(jobs):
@@ -194,19 +123,30 @@ for row in edf_schedule(jobs):
     print(row)
 ```
 
-## Common pitfalls
+The helper is deliberately non-preemptive and assumes every job is already released; it is not a simulator for general EDF arrivals.
 
-- Treating average execution time as sufficient for hard real-time scheduling. Deadlines depend on worst-case behavior.
-- Misusing the RM utilization bound as necessary. Failing the bound does not prove the task set is unschedulable.
-- Ignoring scheduler overhead, context-switch time, cache effects, and interrupt latency.
-- Letting high-priority tasks block on locks without priority-inversion mitigation.
-- Assuming multiprocessor scheduling behaves monotonically. Local improvements can worsen the global schedule.
-- Treating soft and hard deadlines as the same engineering requirement.
+## Precedence, locks, and multiple processors
 
-## Connections
+Precedence constraints alter the scheduling problem. For finite task sets with precedences, a latest-deadline-first construction can build an optimal schedule backward. EDF can also use adjusted deadlines that account for successor deadlines.
 
-- [CPU scheduling](/cs/operating-systems/cpu-scheduling)
-- [process synchronization](/cs/operating-systems/process-synchronization)
-- [multitasking and threads](/cs/embedded/multitasking-and-threads)
-- [quantitative analysis](/cs/embedded/quantitative-analysis)
-- [input and output interfacing](/cs/embedded/input-output-interfacing)
+Mutual exclusion introduces blocking. **Priority inversion** occurs when a high-priority task waits while a lower-priority task indirectly prevents progress. Priority inheritance temporarily raises the lock holder to the highest priority of any task blocked on that lock. Priority-ceiling protocols restrict lock acquisition to prevent certain deadlocks and bound blocking.
+
+Blocking time belongs in response-time calculations. A task with a short execution time can still miss its deadline while waiting for a lock, bus transaction, DMA completion, driver, interrupt, or higher-priority task. A useful schedule trace records releases, starts, preemptions, blocking intervals, completions, and misses.
+
+Multiprocessor scheduling is harder still. Under some policies, even reducing one task's execution time can increase the total makespan because it changes the order of contention for processors or shared resources. Uniprocessor RM and EDF theorems cannot simply be carried over.
+
+## Turning physical timing into evidence
+
+Release times and deadlines should come from the physical problem. A control-loop period follows from plant dynamics and stability margins; a braking deadline may follow from stopping distance; a sensor-fusion task must finish before its estimate is consumed. An arbitrary software deadline can be feasible while failing the physical requirement.
+
+Logical and timing proofs also answer different questions. A mode-machine model may prove that a fault handler is eventually requested, while scheduling analysis must show that it runs soon enough. Mutual exclusion may protect shared state while still blocking a critical task for too long.
+
+A scheduling design should record the timer that releases each periodic task, each priority or deadline, the maximum interrupt-disabled interval, and the overload policy. When demand exceeds processor capacity, the design must say which work is dropped, degraded, deferred, or escalated to a fault mode.
+
+Hardware validation needs traces of releases, starts, preemptions, completions, and deadline misses. Average execution time is not evidence for a hard real-time claim; worst-case execution, blocking, scheduler overhead, cache effects, and interrupt latency need defensible bounds. A failed RM utilization bound does not prove infeasibility, and soft and hard deadlines should not be treated as interchangeable.
+
+<div className="see-also">
+
+See also: [CPU scheduling](/cs/operating-systems/cpu-scheduling) · [process synchronization](/cs/operating-systems/process-synchronization) · [multitasking and threads](/cs/embedded/multitasking-and-threads) · [quantitative analysis](/cs/embedded/quantitative-analysis) · [input and output interfacing](/cs/embedded/input-output-interfacing)
+
+</div>

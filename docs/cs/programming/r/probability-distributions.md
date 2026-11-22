@@ -5,192 +5,344 @@ sidebar_position: 12
 
 # Probability Distributions in R
 
-R has a consistent interface for probability distributions. The book uses probability as a bridge between programming and statistics: once you can create vectors, call functions, and plot results, you can compute probabilities, quantiles, simulated samples, and distribution curves. This makes abstract probability concrete because every distribution family has a small set of related functions.
+R uses one naming scheme for most probability distributions. Once the event has been translated into a density, cumulative probability, quantile, or random experiment, the corresponding function name is usually predictable. The hard part is rarely typing `pnorm` or `dbinom`; it is deciding which mathematical quantity the question asks for and checking that R's parameterization matches the model.
 
-Most distribution functions come in four forms. For a distribution root such as `norm`, R provides `dnorm` for density, `pnorm` for cumulative probability, `qnorm` for quantiles, and `rnorm` for random generation. The same prefix pattern appears for binomial (`binom`), Poisson (`pois`), uniform (`unif`), exponential (`exp`), t (`t`), chi-square (`chisq`), F (`f`), and many others.
+## One family, four views
 
-## Definitions
+A probability distribution assigns probabilities to possible outcomes of a random variable. For a discrete random variable, the probability mass function is
 
-A **probability distribution** describes possible values of a random variable and how probability is assigned to those values.
+$$
+P(X = x) = f(x).
+$$
 
-A **discrete distribution** assigns probability to countable values. Examples include Bernoulli, binomial, and Poisson distributions. R's `d` functions return probabilities for discrete distributions.
+For a continuous random variable, $f(x)$ is a density. Probability is area under the density, so $P(X=x)=0$ at every individual point even when $f(x)$ is large. In both cases the cumulative distribution function is
 
-A **continuous distribution** assigns probability over intervals. Examples include normal, uniform, exponential, and t distributions. R's `d` functions return density values, not interval probabilities.
+$$
+F(x) = P(X \le x).
+$$
 
-A **cumulative distribution function (CDF)** returns $P(X \le x)$. In R, `p*` functions compute CDF values, such as `pnorm(1.96)`.
+R combines a prefix with a distribution-family root:
 
-A **quantile function** is the inverse CDF. It returns the value $x$ such that $P(X \le x) = p$. In R, `q*` functions compute quantiles, such as `qnorm(0.975)`.
-
-A **random sample generator** creates pseudo-random observations from a distribution. In R, `r*` functions do this, such as `rbinom(100, size = 10, prob = 0.3)`.
-
-## Key results
-
-R's distribution naming pattern is the main result:
-
-| Prefix | Meaning | Normal example | Binomial example |
+| Prefix | Returned quantity | Normal example | Binomial example |
 |---|---|---|---|
-| `d` | density or probability mass | `dnorm(x, mean, sd)` | `dbinom(x, size, prob)` |
-| `p` | cumulative probability | `pnorm(q, mean, sd)` | `pbinom(q, size, prob)` |
-| `q` | quantile | `qnorm(p, mean, sd)` | `qbinom(p, size, prob)` |
-| `r` | random generation | `rnorm(n, mean, sd)` | `rbinom(n, size, prob)` |
+| `d` | Density or probability mass | `dnorm(x, mean, sd)` | `dbinom(x, size, prob)` |
+| `p` | Cumulative probability | `pnorm(q, mean, sd)` | `pbinom(q, size, prob)` |
+| `q` | Quantile for a cumulative probability | `qnorm(p, mean, sd)` | `qbinom(p, size, prob)` |
+| `r` | Pseudo-random observations | `rnorm(n, mean, sd)` | `rbinom(n, size, prob)` |
 
-For continuous distributions, point probabilities are zero. `dnorm(0)` is a density height, not $P(X = 0)$. To get interval probabilities, subtract CDF values:
+The first argument changes meaning with the prefix. A `d` function receives possible values, a `p` function receives cutoffs, a `q` function receives probabilities, and an `r` function receives the number of observations to generate. All are vectorized.
+
+```r
+dnorm(c(-1, 0, 1))
+pnorm(c(-1, 0, 1))
+qnorm(c(0.025, 0.5, 0.975))
+rnorm(3)
+```
+
+The same scheme covers `unif`, `exp`, `gamma`, `pois`, `t`, `chisq`, `f`, and many other families. It also encourages a useful separation: the distribution states the model, while the prefix states the question asked of that model.
+
+## Translating words into events
+
+Write the event before writing R code. For a discrete count $X$:
+
+| Wording | Event | R form |
+|---|---|---|
+| exactly 3 | $P(X=3)$ | `d*(3, ...)` |
+| at most 3 | $P(X\le3)$ | `p*(3, ...)` |
+| fewer than 3 | $P(X\le2)$ | `p*(2, ...)` |
+| more than 3 | $P(X\gt 3)$ | `p*(3, ..., lower.tail = FALSE)` |
+| at least 3 | $P(X\ge3)=P(X\gt 2)$ | `p*(2, ..., lower.tail = FALSE)` |
+
+The one-unit boundary shift is specific to a discrete support. For continuous $X$, strict and non-strict inequalities have the same probability. An interval comes from CDF subtraction:
+
+$$
+P(a < X \le b) = F(b) - F(a).
+$$
+
+For discrete variables the same subtraction computes $P(a\lt X\le b)$. If the desired event includes $a$, subtract $F(a-1)$ when the support advances by integer steps.
+
+Tail arguments are preferable to manual subtraction when the requested probability is very small:
+
+```r
+pnorm(8, lower.tail = FALSE)
+# better numerical route than 1 - pnorm(8)
+```
+
+The direct upper-tail calculation avoids losing significant digits when the lower-tail CDF rounds extremely close to one. Most `p` functions also accept `log.p = TRUE`, which returns a log-probability and can prevent underflow in likelihood calculations.
+
+## Worked normal interval: standardize, then subtract
+
+Suppose exam scores are modeled as normal with mean 75 and standard deviation 8. Let $X\sim N(75,8^2)$. The probability of a score between 70 and 90 is
 
 $$
 \begin{aligned}
-P(a < X < b) &= F(b) - F(a).
+P(70<X<90)
+&= F(90)-F(70).
 \end{aligned}
 $$
 
-For discrete distributions, `dbinom(3, size = 10, prob = 0.4)` is the probability of exactly 3 successes. A cumulative statement such as "at most 3 successes" uses `pbinom(3, size = 10, prob = 0.4)`.
+The corresponding standardized values are
 
-Simulation should be reproducible when used in notes, reports, or tests. `set.seed()` fixes the pseudo-random sequence so readers can reproduce the same sample.
+$$
+\begin{aligned}
+z_{70} &= \frac{70-75}{8} = -0.625,\\
+z_{90} &= \frac{90-75}{8} = 1.875.
+\end{aligned}
+$$
 
-## Visual
-
-```mermaid
-flowchart LR
-  A["Distribution family root: norm, binom, pois"] --> B["d: density or mass"]
-  A --> C["p: cumulative probability"]
-  A --> D["q: quantile"]
-  A --> E["r: random generation"]
-  C --> F[Interval probability by subtraction]
-  D --> G[Critical values]
-  E --> H[Simulation]
-```
-
-| Distribution | R root | Parameters | Common use |
-|---|---|---|---|
-| Normal | `norm` | `mean`, `sd` | Measurement variation, approximations |
-| Binomial | `binom` | `size`, `prob` | Number of successes in fixed trials |
-| Poisson | `pois` | `lambda` | Event counts per interval |
-| Uniform | `unif` | `min`, `max` | Equal chance over interval |
-| Exponential | `exp` | `rate` | Waiting times |
-| t | `t` | `df` | Inference for means with estimated variance |
-
-## Worked example 1: Normal interval probability
-
-Problem: suppose exam scores are approximately normal with mean 75 and standard deviation 8. Find the probability that a randomly chosen score is between 70 and 90.
-
-Method:
-
-1. Define $X \sim N(75, 8^2)$.
-2. Use the CDF identity $P(70 \lt  X \lt  90) = F(90) - F(70)$.
-3. Compute both cumulative probabilities with `pnorm`.
-4. Subtract.
-5. Sanity-check using z-scores.
+R can work either on the original scale or on the standard-normal scale:
 
 ```r
 lower <- pnorm(70, mean = 75, sd = 8)
 upper <- pnorm(90, mean = 75, sd = 8)
 prob <- upper - lower
 
-lower
-# [1] 0.2659855
+c(lower = lower, upper = upper, interval = prob)
+#     lower     upper  interval
+# 0.2659855 0.9696036 0.7036181
 
-upper
-# [1] 0.9696036
-
-prob
+pnorm(1.875) - pnorm(-0.625)
 # [1] 0.7036181
 ```
 
-Checked answer: the lower z-score is `(70 - 75) / 8 = -0.625`, and the upper z-score is `(90 - 75) / 8 = 1.875`. The interval spans from moderately below the mean to well above it, so a probability around 0.70 is plausible. The computed answer is approximately 0.704.
+The two routes agree because standardization transforms $X$ into $Z=(X-75)/8$, which has mean zero and standard deviation one. About 70.4% of the model's area lies in the interval. Calling `dnorm(70, 75, 8)` and `dnorm(90, 75, 8)` would produce density heights at the endpoints; subtracting those heights has no probability interpretation.
 
-The key is that `dnorm(70)` and `dnorm(90)` would not answer this question; they are density heights. Interval probability comes from `pnorm`.
+Suppose instead the question asks for the cutoff exceeded by 5% of students. If $c$ is that cutoff, then $P(X\le c)=0.95$, so
 
-## Worked example 2: Binomial exact and cumulative probabilities
+```r
+cutoff <- qnorm(0.95, mean = 75, sd = 8)
+cutoff
+# [1] 88.15883
 
-Problem: a machine produces an acceptable part with probability 0.9. In 12 independent parts, find the probability of exactly 10 acceptable parts and the probability of at least 10 acceptable parts.
+pnorm(cutoff, mean = 75, sd = 8)
+# [1] 0.95
+```
 
-Method:
+The standard-normal 95th percentile is about $1.644854$; transforming back gives $75+8(1.644854)=88.1588$. The round trip through `pnorm` checks the interpretation.
 
-1. Define $X \sim \mathrm{Binomial}(12, 0.9)$.
-2. Use `dbinom` for exactly 10.
-3. Use either a sum of `dbinom(10:12, ...)` or a CDF complement for at least 10.
-4. Check that both cumulative methods agree.
+## Worked binomial count: derive the mass before summing it
+
+A machine independently produces an acceptable part with probability $0.9$. For 12 parts, let $X$ be the number acceptable. Then $X\sim\operatorname{Binomial}(12,0.9)$ and
+
+$$
+P(X=k)=\binom{12}{k}(0.9)^k(0.1)^{12-k}.
+$$
+
+For exactly ten acceptable parts:
+
+$$
+\begin{aligned}
+P(X=10)
+&= \binom{12}{10}(0.9)^{10}(0.1)^2\\
+&= 66(0.3486784401)(0.01)\\
+&\approx 0.2301278.
+\end{aligned}
+$$
+
+`dbinom` evaluates the same mass:
 
 ```r
 exact_10 <- dbinom(10, size = 12, prob = 0.9)
-at_least_10_sum <- sum(dbinom(10:12, size = 12, prob = 0.9))
-at_least_10_cdf <- 1 - pbinom(9, size = 12, prob = 0.9)
-
 exact_10
 # [1] 0.2301278
-
-at_least_10_sum
-# [1] 0.8891308
-
-at_least_10_cdf
-# [1] 0.8891308
 ```
 
-Checked answer: "at least 10" means 10, 11, or 12 acceptable parts. Summing those exact probabilities matches the complement of "at most 9." The result is high, about 0.889, because the success probability is 0.9 and 12 trials is not large.
+"At least ten" combines three mutually exclusive outcomes:
 
-This example also shows the value of naming variables. `exact_10` and `at_least_10_cdf` prevent confusion between point and cumulative probabilities.
+$$
+\begin{aligned}
+P(X\ge10)
+&=P(X=10)+P(X=11)+P(X=12)\\
+&=0.2301278+0.3765727+0.2824295\\
+&\approx0.8891300.
+\end{aligned}
+$$
 
-## Code
+There are two equivalent calls:
 
 ```r
-# Compare theoretical and simulated binomial probabilities.
+by_sum <- sum(dbinom(10:12, size = 12, prob = 0.9))
+by_tail <- pbinom(9, size = 12, prob = 0.9, lower.tail = FALSE)
 
-set.seed(123)
-n_sim <- 10000
-size <- 12
-prob <- 0.9
-
-simulated <- rbinom(n_sim, size = size, prob = prob)
-sim_table <- prop.table(table(factor(simulated, levels = 0:size)))
-theory <- dbinom(0:size, size = size, prob = prob)
-
-comparison <- data.frame(
-  successes = 0:size,
-  simulated = as.numeric(sim_table),
-  theoretical = theory
-)
-
-print(tail(comparison, 5))
-
-plot(
-  comparison$successes,
-  comparison$theoretical,
-  type = "h",
-  lwd = 4,
-  xlab = "Acceptable parts",
-  ylab = "Probability",
-  main = "Binomial(12, 0.9) probabilities"
-)
-points(comparison$successes, comparison$simulated, pch = 19)
+c(by_sum = by_sum, by_tail = by_tail)
+#    by_sum   by_tail
+# 0.8891300 0.8891300
 ```
 
-The simulation table is a useful bridge between probability theory and data analysis. The `theoretical` column is what the binomial model says before data are simulated. The `simulated` column is what happened in 10,000 pseudo-random experiments. The two columns should be close, but not identical, because simulation has sampling variability. Increasing `n_sim` usually makes the simulated proportions move closer to the theoretical probabilities.
+The tail call uses 9 because the complement of $X\ge10$ is $X\le9$. Using `pbinom(10, lower.tail = FALSE)` would compute $P(X\gt 10)$ and omit the mass at 10.
 
-This code also illustrates why factor levels are supplied in `table(factor(simulated, levels = 0:size))`. Without explicit levels, outcomes that did not occur in the simulation would be absent from the table, shortening the result and misaligning it with `0:size`. By declaring all possible success counts, the simulated and theoretical vectors have the same length and refer to the same outcomes.
+Quantiles of discrete distributions need a small qualification. The CDF is a staircase, so it usually has no ordinary inverse. R returns the smallest supported value $x$ whose CDF is at least the requested probability:
 
-When using distribution functions, name the event in words before coding it. "Exactly 3" becomes `dbinom(3, ...)`. "At most 3" becomes `pbinom(3, ...)`. "More than 3" becomes `pbinom(3, ..., lower.tail = FALSE)` or `1 - pbinom(3, ...)`. "Between 70 and 90" for a continuous variable becomes a difference of two CDF values. Translating the event first prevents off-by-one errors and wrong-tail errors.
+$$
+Q(p)=\inf\{x:F(x)\ge p\}.
+$$
 
-Simulation is also a diagnostic tool. If a theoretical probability calculation seems suspicious, simulate the experiment and compare the approximate frequency. Disagreement usually means either the formula was coded incorrectly or the simulation does not match the same assumptions.
+Consequently, `pbinom(qbinom(p, ...), ...)` can exceed `p`; the jump at the returned count crosses the requested level.
 
-Distribution functions also support inference pages. Critical values in confidence intervals come from quantile functions such as `qt` and `qnorm`. P-values often come from cumulative probabilities such as `pt`, `pnorm`, or `pchisq`. Random generators support power simulations and teaching demonstrations. Learning the `d`, `p`, `q`, `r` pattern once pays off across most of introductory statistics.
+### Why the binomial mean and variance have their familiar form
 
-Parameterization must be checked from the help page. For example, normal functions use `mean` and `sd`, while exponential functions use `rate` by default, and some distributions offer alternative parameter names. A mathematically correct idea can become wrong code if the parameter is supplied on the wrong scale. When in doubt, run a small sanity check, such as verifying the simulated mean is close to the theoretical mean.
+The formulas $E[X]=np$ and $\operatorname{Var}(X)=np(1-p)$ become transparent when the count is written as a sum of indicator variables. Let $I_i=1$ when trial $i$ succeeds and $I_i=0$ otherwise. Then
 
-Graphing a distribution is often the fastest sanity check. A discrete mass function should have bars at possible values whose heights sum to one. A continuous density should have plausible shape and scale, but areas, not point heights, represent probabilities. Pairing probability calculations with plots makes tail direction and endpoint choices easier to verify.
+$$
+X=I_1+I_2+\cdots+I_n.
+$$
 
-When a result is a probability, check that it lies between 0 and 1. When a result is a quantile, check that it is on the original measurement scale. This simple distinction catches many prefix mix-ups.
+Each indicator has $E[I_i]=p$. Linearity of expectation does not require independence, so
 
-## Common pitfalls
+$$
+\begin{aligned}
+E[X]
+&=E[I_1]+\cdots+E[I_n]\\
+&=np.
+\end{aligned}
+$$
 
-- Treating a continuous density value as a probability. Use CDF differences for intervals.
-- Confusing `lower.tail = FALSE` with subtracting the wrong endpoint. For `P(X > q)`, use `lower.tail = FALSE` or `1 - p*(q)`.
-- Forgetting distribution parameters. `sd` in `rnorm` is standard deviation, not variance.
-- Using `set.seed()` once and then expecting every later random call to be independent of earlier calls in the script.
-- Simulating a small number of observations and expecting exact agreement with theoretical probabilities.
-- Using `pbinom(10, ...)` for "at least 10"; that gives "at most 10."
+For a Bernoulli indicator, $I_i^2=I_i$, giving
 
-## Connections
+$$
+\begin{aligned}
+\operatorname{Var}(I_i)
+&=E[I_i^2]-E[I_i]^2\\
+&=p-p^2\\
+&=p(1-p).
+\end{aligned}
+$$
 
-- [Vectors, arithmetic, and comparison](/cs/programming/r/vectors-arithmetic-comparison)
-- [Apply family](/cs/programming/r/apply-family)
-- [Descriptive statistics](/cs/programming/r/descriptive-statistics)
-- [Statistical inference](/cs/programming/r/statistical-inference)
+Independence makes the covariance terms zero, so variances add and $\operatorname{Var}(X)=np(1-p)$. With 12 parts and success probability $0.9$, the count has mean $10.8$ and standard deviation $\sqrt{12(0.9)(0.1)}\approx1.039$. An observed count of 10 is less than one standard deviation below the mean, consistent with its sizeable probability mass.
+
+## A Poisson rate must match its interval
+
+Suppose calls arrive according to a Poisson model at an average rate of three per hour. For a 20-minute interval, the mean count is not 3 but
+
+$$
+\lambda=3\left(\frac{20}{60}\right)=1.
+$$
+
+The probability of at least two calls is
+
+$$
+\begin{aligned}
+P(X\ge2)
+&=1-P(X\le1)\\
+&=1-\left(e^{-1}\frac{1^0}{0!}+e^{-1}\frac{1^1}{1!}\right)\\
+&=1-2e^{-1}\\
+&\approx0.2642411.
+\end{aligned}
+$$
+
+```r
+lambda_20_min <- 3 * 20 / 60
+ppois(1, lambda = lambda_20_min, lower.tail = FALSE)
+# [1] 0.2642411
+```
+
+Rates and exposure units must be reconciled before the distribution call. The same issue appears with events per kilometer, defects per square meter, or failures per machine-day. A correct `ppois` call with a mismatched interval still answers the wrong model.
+
+The Poisson and exponential families describe two views of the same idealized process. Under a homogeneous Poisson process with rate $\lambda$, the count in an interval of length $t$ is Poisson with mean $\lambda t$, while the waiting time to the next event is exponential with rate $\lambda$. For three calls per hour, the probability of waiting more than 20 minutes is
+
+$$
+P(T>1/3)=e^{-3(1/3)}=e^{-1}\approx0.3678794.
+$$
+
+```r
+pexp(1 / 3, rate = 3, lower.tail = FALSE)
+# [1] 0.3678794
+```
+
+The process assumptions are strong: arrivals must be independent, the rate must be stable over the interval, and simultaneous arrivals must have negligible probability. A daily call-center pattern with a lunch-hour surge violates the constant-rate assumption even if its overall daily mean is estimated accurately.
+
+## Density height and probability area
+
+A continuous density must be nonnegative and integrate to one. It may exceed one at some points; only an area is constrained to be at most one. A uniform distribution on the narrow interval from 0 to 0.1 has density 10 throughout that interval, yet its total area is $10(0.1)=1$.
+
+This distinction matters when drawing curves. The default `dnorm` curve is a geometric representation of density, while a histogram drawn with `freq = FALSE` estimates density on compatible vertical units. A count histogram uses frequency units and cannot be compared directly with a density curve without rescaling.
+
+Numerical integration provides another check on a CDF difference:
+
+```r
+area <- integrate(
+  dnorm,
+  lower = 70,
+  upper = 90,
+  mean = 75,
+  sd = 8
+)$value
+
+area
+# [1] 0.7036181
+```
+
+`integrate` approximates the area under the density, while the earlier CDF subtraction uses a distribution-specific implementation. The CDF call is normally simpler and more accurate for a standard family; integration is useful when working with a custom density or checking a derivation.
+
+## Matching a family to the random experiment
+
+Distribution choice begins with the data-generating story. A binomial variable counts successes in a fixed number of comparable independent trials. A Poisson variable counts events in an exposure interval under a constant-rate idealization. An exponential variable records a nonnegative waiting time with the memoryless property. A normal variable is continuous, symmetric, and supported over the whole real line, even if negative values are implausible for the measured quantity.
+
+Similar-looking histograms do not establish the assumptions. A bounded percentage near zero or one may be poorly represented by a normal model. Counts with variance far larger than their mean often fit a Poisson model badly. Waiting times affected by aging or recovery do not have the exponential model's constant hazard. The `d`, `p`, `q`, and `r` interface evaluates whichever family is requested; it does not diagnose whether that family is defensible.
+
+Approximations should preserve the event boundary. When a binomial count is approximated by a continuous normal variable, a continuity correction assigns each integer count a unit-width interval. Thus $P(X\le 9)$ is approximated with a normal cutoff at $9.5$, while $P(X\ge10)$ uses the upper area beyond $9.5$. Omitting the half-unit shift can matter when the count is not very large.
+
+For the 12-part example, the binomial mean is $10.8$ and standard deviation is about $1.039$. The continuity-corrected normal approximation to $P(X\ge10)$ is
+
+```r
+mu <- 12 * 0.9
+sigma <- sqrt(12 * 0.9 * 0.1)
+pnorm(9.5, mean = mu, sd = sigma, lower.tail = FALSE)
+```
+
+This is only a check, not an improvement over the exact `pbinom` result. With a success probability near one and only 12 trials, the distribution is visibly skewed and the exact calculation is cheap. Normal approximations are more persuasive when both expected successes $np$ and expected failures $n(1-p)$ are comfortably away from zero.
+
+## Parameterization is part of the model
+
+Short distribution calls can conceal a parameter mismatch. Base R uses `sd`, not variance, for the normal distribution. The exponential distribution uses `rate` by default, so its mean is $1/\text{rate}$. Gamma functions also default to a rate parameter but allow `scale`; supplying both is an error. The binomial `size` is the number of trials, while negative-binomial functions use `size` as a dispersion-related parameter, not a trial count.
+
+| Family | R root | Main parameters | Mean | Variance |
+|---|---|---|---|---|
+| Binomial | `binom` | `size = n`, `prob = p` | $np$ | $np(1-p)$ |
+| Poisson | `pois` | `lambda` | $\lambda$ | $\lambda$ |
+| Normal | `norm` | `mean = \mu`, `sd = \sigma` | $\mu$ | $\sigma^2$ |
+| Uniform | `unif` | `min = a`, `max = b` | $(a+b)/2$ | $(b-a)^2/12$ |
+| Exponential | `exp` | `rate = \lambda` | $1/\lambda$ | $1/\lambda^2$ |
+| Student t | `t` | `df` | $0$ for $df\gt 1$ | $df/(df-2)$ for $df\gt 2$ |
+
+The t distribution's heavy tails weaken as its degrees of freedom increase; it approaches the standard normal. Chi-squared and F distributions also depend on degrees of freedom and appear naturally in inference about variances and model comparisons. Checking `args()` or the function help before relying on memory is cheap and prevents scale-versus-rate errors.
+
+## Simulation as a model check
+
+The `r` functions generate pseudo-random observations. `set.seed()` fixes the initial generator state so a calculation can be reproduced. It does not make a Monte Carlo estimate exact, and inserting another random call changes all later values in that sequence.
+
+```r
+set.seed(123)
+n_sim <- 100000
+draws <- rbinom(n_sim, size = 12, prob = 0.9)
+
+simulated <- mean(draws >= 10)
+theoretical <- pbinom(9, size = 12, prob = 0.9, lower.tail = FALSE)
+c(simulated = simulated, theoretical = theoretical)
+```
+
+The logical expression `draws >= 10` produces one indicator per simulated experiment. Its mean is the proportion of experiments satisfying the event. The Monte Carlo standard error for an estimated probability $\hat p$ based on $N$ independent simulations is approximately
+
+$$
+\sqrt{\frac{\hat p(1-\hat p)}{N}}.
+$$
+
+With $p\approx0.889$ and $N=100000$, that standard error is about $0.0010$. A discrepancy of a few thousandths is ordinary; a discrepancy of several tenths points toward a wrong event boundary, parameter, or simulation design.
+
+Simulation is especially useful when no convenient closed form exists, but it should not replace an exact distribution function that already gives the desired probability quickly and accurately. It can still serve as an independent check on event translation.
+
+## Checks before accepting a probability
+
+- Confirm whether `d*` returns mass or density for the chosen family.
+- Write strict and non-strict boundaries explicitly, especially for counts.
+- Check the units and meaning of every parameter, including rate versus scale and standard deviation versus variance.
+- Prefer `lower.tail = FALSE` and `log.p = TRUE` when extreme tails could suffer cancellation or underflow.
+- Verify that probabilities lie in $[0,1]$ and that quantiles are on the measurement scale.
+- Compare the result with the distribution's mean and spread. A numerically valid answer can still be implausible under the stated model.
+- Treat model assumptions separately from calculation accuracy. Independence, constant event rates, and approximate normality are substantive claims, not properties checked by the R function.
+
+<div className="see-also">
+
+See also: [Vectors, Arithmetic, and Comparison](/cs/programming/r/vectors-arithmetic-comparison) · [Descriptive Statistics](/cs/programming/r/descriptive-statistics) · [Statistical Inference](/cs/programming/r/statistical-inference) · [Apply Family](/cs/programming/r/apply-family)
+
+</div>

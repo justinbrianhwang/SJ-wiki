@@ -5,140 +5,180 @@ sidebar_position: 10
 
 # Ionic and Covalent Bonding
 
-Chemical bonding explains why atoms form stable substances and why those substances have particular formulas, shapes, energies, and reactivities. Ionic bonding emphasizes electrostatic attraction between ions; covalent bonding emphasizes shared electron pairs. Most real bonds lie between the ideal extremes.
+A chemical bond is a stable rearrangement of electrons and nuclei, not a tiny rod between two atoms. Stability means that the bonded arrangement has lower energy than the separated particles under the same conditions. Two limiting descriptions organize most introductory chemistry: electrons may be transferred to give ions held together by electrostatic attraction, or they may be shared between nuclei. Real electron density varies continuously between these limits. Even sodium chloride has some covalent character, while an H–Cl bond has enough charge separation to behave quite differently from H–H.
 
-In the Ebbing and Gammon sequence this topic sits near ionic bonds, electron configurations of ions, ionic radii, covalent bonds, electronegativity, Lewis formulas, resonance, octet exceptions, formal charge, bond length, and bond energy. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
+## From atomic energetics to an ionic lattice
 
-![A crystal-structure diagram shows sodium and chloride ions arranged in the cubic lattice of sodium chloride.](https://commons.wikimedia.org/wiki/Special:FilePath/Sodium_chloride_crystal.png)
+Writing sodium chloride formation as “sodium gives an electron to chlorine” hides an energetic puzzle. Removing an electron from gaseous sodium costs energy, and adding it to gaseous chlorine recovers only part of that cost. Isolated $\mathrm{Na^+}$ and $\mathrm{Cl^-}$ are therefore not automatically more stable than isolated neutral atoms. The decisive contribution is the attraction of every ion to many oppositely charged neighbors in the crystal.
 
-*Figure: Sodium chloride crystal structure illustrating an ionic lattice. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sodium_chloride_crystal.png), H Padleckas, public domain.*
+For two point charges, Coulomb's law gives the potential energy
 
-![A rotating model shows the tetrahedral network of the diamond cubic crystal structure.](https://commons.wikimedia.org/wiki/Special:FilePath/Diamond_cubic_animation.gif)
+$$
+E=\frac{1}{4\pi\epsilon_0}\frac{q_1q_2}{r}.
+$$
 
-*Figure: Diamond cubic lattice showing covalent network bonding in a solid. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Diamond_cubic_animation.gif), MarinaVladivostok, CC0.*
+Opposite charges make $q_1q_2$ negative. Bringing them closer lowers the energy until short-range repulsion between overlapping electron clouds becomes important. In a crystal the pairwise terms extend throughout the lattice. Lattice energy therefore grows in magnitude when ionic charges are larger and ion-to-ion distances are smaller. The comparison between $\mathrm{NaCl}$ and $\mathrm{MgO}$ is instructive: the latter contains $2+$ and $2-$ ions, so its electrostatic attraction is much stronger than a size comparison alone would suggest.
 
-## Definitions
+Cations are smaller than their parent atoms because electron loss reduces electron–electron repulsion and may remove an entire valence shell. Anions are larger because added electrons increase repulsion within the valence shell. Within an isoelectronic series such as $\mathrm{O^{2-}}$, $\mathrm{F^-}$, $\mathrm{Na^+}$, and $\mathrm{Mg^{2+}}$, all species have ten electrons; radius decreases as nuclear charge rises.
 
-The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.
+An ionic solid is an extended array, not a collection of discrete molecules. Its familiar properties follow from that structure. Separating an ion from the lattice costs substantial energy, hence many salts have high melting points. A shifted layer can bring like charges next to one another, causing cleavage rather than plastic deformation. Ions cannot carry current while locked in place, but a molten salt or aqueous ionic solution conducts because charged particles can move.
 
-- An ionic bond is electrostatic attraction between oppositely charged ions.
-- A covalent bond is attraction produced by shared electron density between nuclei.
-- Electronegativity is an atom's tendency to attract bonding electrons.
-- A polar covalent bond has unequal sharing of electron density.
-- A Lewis structure shows valence electrons as dots or bonding lines.
-- Resonance represents delocalized bonding using multiple valid Lewis contributors.
-- Formal charge is a bookkeeping charge assigned from a Lewis structure.
-- Bond energy is the enthalpy required to break a bond in the gas phase.
+## Sharing electrons and the electronegativity continuum
 
-Definitions in chemistry often connect a symbolic representation to a physical sample. A formula such as $\mathrm{H_2O}$ names a substance, gives the atomic ratio inside one molecule, and supplies the molar mass used in a macroscopic calculation. A state symbol such as $\mathrm{(aq)}$ is not cosmetic; it says the species is dispersed in water and may be treated as ions when writing a net ionic equation. In the same way, constants such as $R$, $K_w$, $F$, or $N_A$ are compact definitions of the measurement system being used.
+When two hydrogen atoms approach, each nucleus attracts both electrons. Electron density between the nuclei attracts both positive centers and can lower the total energy. At very short distance, nucleus–nucleus and electron–electron repulsions rise sharply. The minimum of the resulting energy curve defines the equilibrium bond length, while the depth relative to separated atoms is related to bond dissociation energy.
 
-## Key results
+Equal atoms share electron density equally. Different atoms usually do not. Electronegativity summarizes an atom's tendency to attract bonding electrons; it generally increases across a period and upward within a group. In $\mathrm{HCl}$, electron density is displaced toward chlorine, conventionally written
 
-The central results are:
+$$
+\mathrm{H^{\delta+}-Cl^{\delta-}}.
+$$
 
-- Formal charge: $FC=\mathrm{valence} - \mathrm{nonbonding} - \frac{1}{2}\mathrm{bonding}$.
-- Lewis structures favor complete octets, minimal formal charge, and negative formal charge on more electronegative atoms.
-- Bond order increases as bond length generally decreases and bond strength increases.
-- Approximate reaction enthalpy from bond energies: $\Delta H\approx\sum D(\mathrm{bonds\ broken})-\sum D(\mathrm{bonds\ formed})$.
-- Ionic radius: cations are smaller than parent atoms and anions are larger.
-- Electronegativity generally increases toward fluorine across the periodic table.
+The partial charges form a bond dipole. They are not formal charges and need not be integers. An electronegativity difference is a guide rather than a phase boundary: bonding, molecular environment, polarization, and crystal structure all affect the result. Small highly charged cations can distort a neighboring anion's electron cloud, adding covalent character to a nominally ionic compound.
 
-Lewis structures are models of electron accounting, not photographs of molecules. They are most useful when paired with formal charge and resonance reasoning. Ionic bonding is also a model: lattice energy, ion size, and charge help explain why ionic solids are hard, brittle, high-melting, and often soluble in polar solvents.
+| Description | Electron distribution | Structural unit | Typical consequences |
+|---|---|---|---|
+| Ionic limit | charge largely localized on ions | extended lattice | brittle solid; mobile ions conduct when molten or dissolved |
+| Nonpolar covalent | nearly equal sharing | molecule or network | small bond dipole |
+| Polar covalent | unequal sharing | usually a molecule | dipole-dependent forces and charge-sensitive reactions |
+| Network covalent | shared bonds throughout a solid | extended network | often hard, high-melting, and nonconducting |
+| Metallic | valence electrons delocalized over many atoms | extended solid | electrical conductivity and malleability |
 
-A good way to use these results is to state the chemical model first, then substitute numbers second. For ionic and covalent bonding, the model usually answers questions such as what particles are present, what is conserved, which process is idealized, and which measurement is being interpreted. Once that sentence is clear, the algebra becomes a bookkeeping problem rather than a search for a memorized pattern.
+Diamond illustrates why “covalent” does not imply a low melting molecular substance. Each carbon is bonded into a three-dimensional network, so melting requires disruption of many strong bonds. Molecular iodine also has covalent I–I bonds, yet its molecules are held to one another by much weaker intermolecular attractions.
 
-Units are part of the result, not decoration. Whenever a formula contains an empirical constant, a tabulated value, or a ratio of measured quantities, the units tell you whether the expression has been used in the intended form. This is especially important in general chemistry because several equations have nearly identical algebra but different meanings: pressure can be a measured state variable, an equilibrium correction, or a colligative effect; energy can be heat flow, enthalpy, internal energy, or free energy.
+## Lewis structures as electron accounting
 
-The strongest check is an independent chemical interpretation. Ask whether the sign agrees with direction, whether a concentration can be negative, whether a mole ratio follows the balanced equation, whether an equilibrium shift opposes the stress, and whether a microscopic description explains the macroscopic number. These checks connect ionic and covalent bonding to neighboring topics instead of leaving it as an isolated technique.
-
-A second check is to compare the limiting cases. If a reactant amount goes to zero, a product amount cannot remain large. If temperature rises in a gas sample at fixed volume, pressure should not fall in an ideal model. If an acid is diluted, hydronium concentration should normally decrease unless a coupled equilibrium supplies more. Limiting cases often reveal algebra that has been rearranged correctly but applied to the wrong chemical situation.
-
-Finally, keep symbolic and particulate representations side by side. A balanced equation, an equilibrium expression, an orbital diagram, or a polymer repeat unit is a compact symbol for a population of particles. Translating that symbol into words forces you to say what is reacting, what is being counted, and what is being held constant. That translation is usually the difference between a calculation that can be adapted to a new problem and one that only imitates a worked example.
-
-## Visual
+A Lewis structure tracks valence electrons and connectivity. It is not a map of exact electron density or three-dimensional shape. A reliable construction routine is:
 
 ```mermaid
 flowchart TD
-  A[Count valence electrons] --> B[Choose central atom]
-  B --> C[Connect atoms with single bonds]
-  C --> D[Complete outer octets]
-  D --> E[Place remaining electrons on central atom]
-  E --> F{"Central atom octet?"}
-  F -->|no| G[Make multiple bonds if allowed]
-  F -->|yes| H[Compute formal charges]
+  A["Count valence electrons, including charge"] --> B["Choose a plausible skeleton"]
+  B --> C["Join atoms with single bonds"]
+  C --> D["Complete terminal-atom octets"]
+  D --> E["Place remaining electrons on the center"]
+  E --> F{"Does the center have an octet?"}
+  F -->|No| G["Form allowed multiple bonds"]
+  F -->|Yes| H["Calculate formal charges"]
   G --> H
-  H --> I[Select best resonance set]
+  H --> I["Compare resonance contributors"]
 ```
 
-| Bond model | Electron picture | Typical properties |
-|---|---|---|
-| Ionic | electron transfer, ion lattice | high melting, brittle solids |
-| Nonpolar covalent | nearly equal sharing | low polarity molecules |
-| Polar covalent | unequal sharing | bond dipoles, polar reactions |
-| Metallic | delocalized electrons | conductivity, malleability |
+Hydrogen forms one bond and is never central in an ordinary Lewis structure. The least electronegative non-hydrogen atom is often central, though chemical connectivity outranks that shortcut. Halogens are usually terminal. The total electron count must include charge: add one electron for each negative charge and subtract one for each positive charge.
 
-## Worked example 1: Formal charges in nitrate
+Formal charge assigns bonding electrons equally between the bonded atoms:
 
-Problem. Draw one Lewis contributor for $\mathrm{NO_3^-}$ and compute formal charges.
+$$
+FC=V-N-\frac{B}{2},
+$$
 
-    Method.
+where $V$ is the free atom's valence count, $N$ is the number of nonbonding electrons, and $B$ is the number of bonding electrons around the atom. The sum of all formal charges must equal the species' overall charge. Good structures usually satisfy octets, minimize charge separation, and place negative formal charge on the more electronegative atoms. These criteria can conflict; an octet is commonly more important for second-period elements than minimizing every formal charge.
 
-    1. Count valence electrons: N has 5, three O atoms have $3(6)=18$, and the charge adds 1, for total 24.
-2. Place N central and connect three O atoms with single bonds, using 6 electrons.
-3. Complete O octets with 18 more electrons; total 24 used.
-4. Nitrogen has only 6 electrons, so convert one O lone pair into an N=O double bond.
-5. Formal charge on double-bonded O: $6-4-2=0$.
-6. Formal charge on each single-bonded O: $6-6-1=-1$.
-7. Formal charge on N: $5-0-4=+1$.
+### Worked example: carbon dioxide
 
-    Checked answer. One contributor has N at +1, two singly bonded O atoms at -1, and the double-bonded O at 0; three equivalent resonance contributors share the charge. Formal charges sum to -1, matching the ion charge.
+For $\mathrm{CO_2}$, count
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+$$
+4+2(6)=16
+$$
 
-## Worked example 2: Reaction enthalpy from bond energies
+valence electrons. The skeleton O–C–O uses four electrons. Completing both oxygen octets uses the remaining twelve, but carbon then has only four electrons around it. Convert one lone pair from each oxygen into a bonding pair:
 
-Problem. Estimate $\Delta H$ for $\mathrm{H_2 + Cl_2 \to 2HCl}$ using $D(H-H)=436$, $D(Cl-Cl)=243$, and $D(H-Cl)=431\ \mathrm{kJ\ mol^{-1}}$.
+$$
+\mathrm{O=C=O}.
+$$
 
-    Method.
+For carbon, $FC=4-0-8/2=0$. For each oxygen, $FC=6-4-4/2=0$. All atoms have octets and no formal charge. Two double bonds also predict equivalent C–O bonds. The Lewis structure still does not by itself establish the linear shape; electron-domain geometry supplies that result.
 
-    1. Identify bonds broken: one H-H and one Cl-Cl.
-2. Energy to break bonds: $436+243=679\ \mathrm{kJ}$.
-3. Identify bonds formed: two H-Cl bonds.
-4. Energy released in forming bonds is represented by subtracting $2(431)=862\ \mathrm{kJ}$.
-5. Compute $\Delta H\approx679-862=-183\ \mathrm{kJ}$.
+### Worked example: nitrate and resonance
 
-    Checked answer. Estimated $\Delta H\approx -183\ \mathrm{kJ}$ per reaction as written. The negative sign means stronger product bonds form than reactant bonds broken.
+For $\mathrm{NO_3^-}$, the count is
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+$$
+5+3(6)+1=24.
+$$
 
-## Code
+Three N–O single bonds consume six electrons. Completing the three oxygen octets consumes the remaining eighteen, leaving nitrogen with only six electrons. Move one oxygen lone pair into an N–O bond. In the resulting contributor, the double-bonded oxygen has formal charge zero, each single-bonded oxygen has $-1$, and nitrogen has $+1$:
 
-```python
-def formal_charge(valence, nonbonding, bonding_electrons):
-    return valence - nonbonding - bonding_electrons / 2
+$$
+(+1)+0+(-1)+(-1)=-1.
+$$
 
-n_fc = formal_charge(5, 0, 8)
-single_o_fc = formal_charge(6, 6, 2)
-double_o_fc = formal_charge(6, 4, 4)
+Any of the three oxygens can supply the extra bonding pair, giving three equivalent contributors. The nitrate ion does not oscillate between them. Its electron density is delocalized, and all three N–O distances are equivalent. A useful average bond order is
 
-broken = 436 + 243
-formed = 2 * 431
-delta_h = broken - formed
-print(n_fc, single_o_fc, double_o_fc, delta_h)
-```
+$$
+\frac{2+1+1}{3}=\frac{4}{3},
+$$
 
-## Common pitfalls
+although bond order here is a model rather than a direct count of localized bonds.
 
-- Believing resonance structures interconvert as separate molecules. Avoid it by treating them as contributors to one delocalized structure.
-- Forgetting to include ion charge in valence electron count. Avoid it by adding electrons for negative charge and subtracting for positive charge.
-- Choosing the least electronegative atom incorrectly. Avoid it by placing hydrogen terminal and checking common central atoms.
-- Using formal charge as real charge without nuance. Avoid it by calling it a bookkeeping tool for model selection.
-- Estimating bond enthalpy with liquid or solid phase assumptions. Avoid it by remembering average bond energies are gas-phase approximations.
-- Assuming electronegativity difference alone determines all bond properties. Avoid it by also considering structure, lattice energy, and molecular environment.
+## Where the octet rule bends
 
-## Connections
+The octet rule reflects the especially stable filled $s$ and $p$ valence shells of main-group atoms, but it has defined limits.
 
-- [electron configurations and periodic trends](/chemistry/general/electron-configurations-and-periodic-trends)
-- [molecular geometry and bonding theory](/chemistry/general/molecular-geometry-and-bonding-theory)
-- [thermochemistry](/chemistry/general/thermochemistry)
-- [organic chemistry](/chemistry/general/organic-chemistry)
+- Hydrogen needs two electrons. Beryllium and boron often form electron-deficient compounds; $\mathrm{BF_3}$ can be drawn with only six electrons around boron.
+- Odd-electron species cannot give every atom an octet. Nitric oxide has eleven valence electrons and is a radical.
+- Period 3 and heavier central atoms can be represented by expanded-valence Lewis structures, as in $\mathrm{SF_6}$. Modern bonding descriptions need not assign literal population of low-lying $d$ orbitals, so “expanded octet” is best treated as Lewis bookkeeping.
+- A carbon, nitrogen, oxygen, or fluorine atom cannot exceed an octet in an ordinary valid Lewis structure because its valence shell contains only one $s$ and three $p$ orbitals.
+
+Coordinate covalent bonds fit the same accounting scheme. In $\mathrm{NH_3+H^+\rightarrow NH_4^+}$, nitrogen supplies both electrons to the new N–H bond, but after formation all four N–H bonds in ammonium are equivalent. The origin of the pair does not create a permanently different kind of bond.
+
+## Bond order, length, and reaction energy
+
+For otherwise similar atom pairs, greater bond order usually means a shorter and stronger bond. A multiple bond places more density between the nuclei, pulling them closer. Comparisons must hold the atoms and environment roughly fixed: an O–H bond cannot be ranked against C–C solely by the single-bond label.
+
+Average gas-phase bond enthalpies estimate reaction enthalpy through
+
+$$
+\Delta H_{\mathrm{rxn}}\approx
+\sum D(\text{bonds broken})-
+\sum D(\text{bonds formed}).
+$$
+
+For
+
+$$
+\mathrm{H_2+Cl_2\rightarrow2HCl},
+$$
+
+use $D(\mathrm{H-H})=436$, $D(\mathrm{Cl-Cl})=243$, and $D(\mathrm{H-Cl})=431\ \mathrm{kJ\,mol^{-1}}$. Breaking the reactant bonds requires
+
+$$
+436+243=679\ \mathrm{kJ},
+$$
+
+and forming two H–Cl bonds releases
+
+$$
+2(431)=862\ \mathrm{kJ}.
+$$
+
+Thus
+
+$$
+\Delta H_{\mathrm{rxn}}\approx679-862=-183\ \mathrm{kJ}
+$$
+
+for the reaction as written. The negative sign indicates an exothermic reaction. The value is approximate because a tabulated bond enthalpy averages that bond over several gas-phase molecules; a measured standard enthalpy also depends on the actual physical states.
+
+## Two property predictions from the same bonding picture
+
+Consider first why magnesium oxide melts at a much higher temperature than sodium chloride. Both are ionic lattices with the same overall cation-to-anion ratio, so merely calling both compounds “ionic” loses the useful distinction. The ions in $\mathrm{MgO}$ carry charges of $+2$ and $-2$, whereas those in $\mathrm{NaCl}$ carry $+1$ and $-1$. The Coulombic charge product therefore changes in magnitude from one to four. $\mathrm{Mg^{2+}}$ is also smaller than $\mathrm{Na^+}$, bringing opposite charges closer. Crystal geometry and short-range repulsion prevent a literal fourfold lattice-energy prediction, but both effects point toward a much more strongly bound MgO lattice. The reasoning uses charge and radius, not a memorized list of melting points.
+
+Now compare $\mathrm{CO_2}$ and $\mathrm{H_2O}$. Each contains polar bonds, yet carbon dioxide has no permanent molecular dipole while water does. Bond dipoles are vectors. The two equal C=O dipoles in linear carbon dioxide point in opposite directions and cancel. Water is bent, so its two O–H dipoles add to a nonzero resultant. The molecular polarity then affects intermolecular attraction and solubility behavior. A polar bond is therefore insufficient evidence for a polar molecule; geometry must be included.
+
+There is a second distinction in the same pair. Intramolecular bonds determine the identity of each molecule, while intermolecular forces act between molecules. Boiling water does not normally break O–H covalent bonds; it separates intact water molecules from one another. Confusing the two energy scales leads to statements such as “hydrogen bonds break water molecules,” when ordinary vaporization primarily overcomes attractions between them.
+
+Ionic formulas require their own reading habit. $\mathrm{CaCl_2}$ gives the lowest whole-number ratio of ions needed for electrical neutrality: one $\mathrm{Ca^{2+}}$ for two $\mathrm{Cl^-}$. It does not claim that the solid contains isolated three-ion units. A molecular formula such as $\mathrm{H_2O}$, by contrast, describes the atom count in a discrete molecule. Empirical and molecular formulas can look similar on paper while referring to different structural levels.
+
+## Reading the models without overreading them
+
+Formal charge is not a measured atomic charge. It follows an equal-splitting rule even for a strongly polar bond. Oxidation state uses a different, ionic splitting rule and may assign still larger integer charges. Partial charge comes from an electron-density model or experiment. Mixing the three produces apparent contradictions that are bookkeeping errors rather than unusual chemistry.
+
+Likewise, a Lewis line represents a shared electron pair but says little about bond polarity, orbital composition, or exact strength. Resonance contributors are not isolable structures, and drawing more contributors does not mean that all contribute equally. Contributors with complete octets and favorable formal charges normally carry more weight.
+
+Finally, solubility cannot be inferred from the word “ionic” alone. Dissolving a salt requires separating lattice ions and stabilizing them with solvent. A high lattice energy can outweigh favorable ion–dipole interactions, leaving an ionic compound only sparingly soluble.
+
+<div className="see-also">
+
+See also: [electron configurations and periodic trends](/chemistry/general/electron-configurations-and-periodic-trends) · [molecular geometry and bonding theory](/chemistry/general/molecular-geometry-and-bonding-theory) · [thermochemistry](/chemistry/general/thermochemistry) · [states of matter: liquids and solids](/chemistry/general/states-of-matter-liquids-and-solids)
+
+</div>

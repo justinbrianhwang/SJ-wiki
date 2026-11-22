@@ -7,9 +7,9 @@ sidebar_position: 1
 
 Simulation of dynamic systems studies how mathematical models evolve over time when they are solved on a computer. In the setting of Klee and Allen's *Simulation of Dynamic Systems with MATLAB and Simulink*, the main focus is continuous system simulation: physical, biological, and engineered systems represented by algebraic equations, ordinary differential equations, difference equations, and block diagrams.
 
-These notes are written as working study pages. They emphasize model derivation, state-space form, numerical integration, MATLAB scripts, Simulink implementation, time-response interpretation, and verification. The goal is not to replace a textbook or software manual, but to give a coherent path from physical assumptions to a simulation result that can be checked, explained, and improved.
+These working notes emphasize model derivation, state-space form, numerical integration, MATLAB scripts, Simulink implementation, time-response interpretation, and verification. The sequence runs from physical assumptions to a simulation result that can be checked, explained, and improved.
 
-## Definitions
+## Models, states, and implementations
 
 A dynamic system is a system whose current behavior depends on stored information from the past. The stored information is represented by state variables. For a continuous-time system,
 
@@ -42,7 +42,7 @@ The source text's table of contents follows this broad sequence:
 | 7 | Simulation tools, trimming, optimization, linearization, acceleration | [MATLAB Scripting](/physics/simulation/matlab-scripting-for-simulation), [Nonlinear Linearization](/physics/simulation/nonlinear-systems-linearization) |
 | 8 | Advanced integration, dynamic errors, multirate, real-time simulation | [Discrete-Time Systems](/physics/simulation/discrete-time-sampled-data-systems), [Validation Examples](/physics/simulation/validation-multi-domain-examples) |
 
-## Key results
+## From physical assumptions to a computed response
 
 The central simulation pipeline is
 
@@ -76,9 +76,9 @@ $$
 
 is simple but low accuracy and conditionally stable. Runge-Kutta methods use staged slopes for higher accuracy. Adaptive solvers estimate error and adjust step size. Stiff solvers handle systems where fast stable modes restrict explicit methods.
 
-The result of a simulation should be checked against at least one anchor: an equilibrium, an analytical solution, a limiting case, a conservation law, a refined-step solution, a frequency-domain prediction, or measured data. This verification habit is the difference between making a plot and doing simulation engineering.
+The result of a simulation should be checked against at least one anchor: an equilibrium, an analytical solution, a limiting case, a conservation law, a refined-step solution, a frequency-domain prediction, or measured data. Without such a check, the output is only a plot.
 
-## Visual
+### The simulation loop
 
 ```mermaid
 flowchart TD
@@ -102,11 +102,11 @@ flowchart TD
   Decision -- "yes" --> Use(("documented simulation result"))
 ```
 
-This overview diagram shows the full simulation architecture from question framing to documented result. The model path exposes boundaries, states, laws, equations, and pre-run checks before MATLAB or Simulink implementation; the numerical path exposes solver settings, logs, verification, and validation. The two feedback arrows distinguish revising the physics model from revising the implementation.
+The model path runs through boundaries, states, laws, equations, and pre-run checks before MATLAB or Simulink implementation. The numerical path covers solver settings, logs, verification, and validation. Its two feedback arrows separate a flawed physical model from a flawed implementation.
 
 | Page order | Page | Main deliverable |
 |---:|---|---|
-| 1 | This overview | Map of the simulation workflow |
+| 1 | Overview | Map of the simulation workflow |
 | 2 | [Mathematical Modeling](/physics/simulation/mathematical-modeling-continuous-time) | Conservation laws and physical derivations |
 | 3 | [State-Space Representation](/physics/simulation/state-space-representation) | First-order vector form and matrices |
 | 4 | [Numerical Integration Methods](/physics/simulation/numerical-integration-methods) | Euler, trapezoidal, RK4, adaptive ideas |
@@ -119,7 +119,7 @@ This overview diagram shows the full simulation architecture from question frami
 | 11 | [Hybrid Systems](/physics/simulation/hybrid-systems-event-handling) | Events, modes, resets, hysteresis |
 | 12 | [Validation Examples](/physics/simulation/validation-multi-domain-examples) | Verification, validation, and domain analogies |
 
-## Worked example 1: Choose a simulation workflow for a tank model
+## Matching MATLAB and Simulink on a tank model
 
 Problem: A well-mixed tank obeys
 
@@ -159,9 +159,9 @@ This gives an analytical check for the time-response plot.
 
 6. Verify. Compare MATLAB and Simulink outputs at the same input, initial condition, and solver settings. Then compare the final value with $\bar{h}$. This points to [Validation Examples](/physics/simulation/validation-multi-domain-examples).
 
-Checked answer: the correct response is a monotone exponential toward $R_hq_\text{in}$. If MATLAB and Simulink disagree, the likely causes are different initial conditions, solver settings, input timing, or block signs.
+The response should be a monotone exponential toward $R_hq_\text{in}$. If MATLAB and Simulink disagree, first compare their initial conditions, solver settings, input timing, and block signs.
 
-## Worked example 2: Decide when linear analysis is enough
+## Where the pendulum linearization stops working
 
 Problem: A pendulum model is
 
@@ -215,9 +215,9 @@ This points to [Nonlinear Systems and Linearization](/physics/simulation/nonline
 
 6. Check both models. Run the nonlinear and linear simulations for $5^\circ$ and for $60^\circ$. The small-angle plots should agree closely; the large-angle plots should diverge.
 
-Checked answer: linear analysis is enough for local small-signal behavior near the downward equilibrium, but nonlinear simulation is required for large motion or switching constraints. The difference should be visible in the time-response plot as angle grows.
+Linear analysis describes local small-signal behavior near the downward equilibrium. Large motion or switching constraints require the nonlinear model, and the two time responses separate as the release angle grows.
 
-## Code
+## Comparing the two pendulum models in MATLAB
 
 ```matlab
 clear; clc; close all;
@@ -252,7 +252,7 @@ xlabel('Time (s)');
 
 The first subplot should show close agreement between nonlinear and linear models. The second should show visible mismatch because the sine nonlinearity matters. A Simulink version uses two parallel subsystems, one with a Trigonometric Function block and one with a State-Space block, feeding a common Scope for comparison.
 
-## Common pitfalls
+## Checks before trusting a run
 
 - Treating simulation as a substitute for deriving and checking the model.
 - Building a Simulink diagram before deciding what the states are.
@@ -261,16 +261,8 @@ The first subplot should show close agreement between nonlinear and linear model
 - Confusing discrete controller sample time with numerical solver step size.
 - Reporting validation without independent data or an explicit quantity of interest.
 
-## Connections
+<div className="see-also">
 
-- [Mathematical Modeling of Continuous-Time Systems](/physics/simulation/mathematical-modeling-continuous-time)
-- [State-Space Representation](/physics/simulation/state-space-representation)
-- [Numerical Integration Methods](/physics/simulation/numerical-integration-methods)
-- [Step Size, Accuracy, and Stability](/physics/simulation/step-size-accuracy-stability)
-- [Linear Systems, Transfer Functions, and Modes](/physics/simulation/linear-systems-transfer-functions-modes)
-- [Nonlinear Systems and Linearization](/physics/simulation/nonlinear-systems-linearization)
-- [MATLAB Scripting for Simulation](/physics/simulation/matlab-scripting-for-simulation)
-- [Simulink Block Diagrams](/physics/simulation/simulink-block-diagrams)
-- [Discrete-Time and Sampled-Data Systems](/physics/simulation/discrete-time-sampled-data-systems)
-- [Hybrid Systems and Event Handling](/physics/simulation/hybrid-systems-event-handling)
-- [Validation and Multi-Domain Simulation Examples](/physics/simulation/validation-multi-domain-examples)
+See also: [Mathematical Modeling of Continuous-Time Systems](/physics/simulation/mathematical-modeling-continuous-time) · [State-Space Representation](/physics/simulation/state-space-representation) · [Numerical Integration Methods](/physics/simulation/numerical-integration-methods) · [Step Size, Accuracy, and Stability](/physics/simulation/step-size-accuracy-stability) · [Linear Systems, Transfer Functions, and Modes](/physics/simulation/linear-systems-transfer-functions-modes) · [Nonlinear Systems and Linearization](/physics/simulation/nonlinear-systems-linearization) · [MATLAB Scripting for Simulation](/physics/simulation/matlab-scripting-for-simulation) · [Simulink Block Diagrams](/physics/simulation/simulink-block-diagrams) · [Discrete-Time and Sampled-Data Systems](/physics/simulation/discrete-time-sampled-data-systems) · [Hybrid Systems and Event Handling](/physics/simulation/hybrid-systems-event-handling) · [Validation and Multi-Domain Simulation Examples](/physics/simulation/validation-multi-domain-examples)
+
+</div>

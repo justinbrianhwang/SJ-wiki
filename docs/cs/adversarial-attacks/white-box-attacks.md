@@ -7,9 +7,9 @@ sidebar_position: 4
 
 White-box attacks assume the attacker can inspect and differentiate the full model and defense. This is the standard stress test for adversarial robustness because it removes accidental secrecy: if a defense only works when the attacker does not know the preprocessing, loss, randomness, or architecture, the defense is brittle under a security interpretation.
 
-Most white-box image attacks are variations on constrained optimization. They use gradients with respect to the input, not the weights, and search inside a threat set such as an $\ell_\infty$ or $\ell_2$ ball. This page gives the conceptual scaffold for FGSM, BIM/I-FGSM, PGD, momentum iterative attacks, Carlini-Wagner attacks, DeepFool, and elastic-net attacks with the original papers cited inline.
+Most white-box image attacks are variations on constrained optimization. They use gradients with respect to the input, not the weights, and search inside a threat set such as an $\ell_\infty$ or $\ell_2$ ball. FGSM, BIM/I-FGSM, PGD, momentum iterative attacks, Carlini-Wagner attacks, DeepFool, and elastic-net attacks differ mainly in how they search that set and encode success.
 
-## Definitions
+## The white-box objective and its update rules
 
 For a classifier $f_\theta$, loss $\mathcal{L}$, clean input $x$, label $y$, perturbation set $\Delta(x)$, and adversarial input $x_{\mathrm{adv}}=x+\delta$, the white-box untargeted attack problem is:
 
@@ -63,7 +63,7 @@ $$
 
 with a loss $\Phi$ designed around logit margins and target success. **DeepFool** approximates the classifier locally by linear decision boundaries and iteratively moves to the nearest boundary.
 
-## Key results
+## What makes an attack genuinely white-box
 
 FGSM follows from the first-order Taylor approximation described in [mathematical formulation](/cs/adversarial-attacks/mathematical-formulation). It is fast, simple, and historically important, but it is not a strong standalone robustness evaluation. A model can resist one-step attacks while remaining vulnerable to iterative attacks.
 
@@ -119,7 +119,7 @@ Attack complexity is usually reported in gradient evaluations. FGSM uses one bac
 
 White-box access also includes preprocessing and postprocessing when those components affect the decision. If the system normalizes inputs, crops images, rejects examples, or ensembles several models, the attack should target that whole computation. Otherwise the evaluation is only white-box for a simplified model, not for the deployed system.
 
-## Representative white-box methods
+## Attack algorithms by optimization style
 
 ### Single-step sign attacks
 
@@ -331,7 +331,7 @@ for c in binary_search_values:
 
 These attacks are most useful when the evaluation question is low distortion, confidence-margin behavior, metric sensitivity, or whether a suspicious defense only defeated a weak loss.
 
-## Visual
+### Comparing projected and penalty-based search
 
 | Attack | Main idea | Typical budget | Strengths | Limitations |
 |---|---|---|---|---|
@@ -379,11 +379,11 @@ flowchart TB
   Verify --> Output(("Return x_adv with attack metadata"))
 ```
 
-This diagram separates the two white-box loops that are often compressed into one arrow. PGD alternates gradient ascent, projection into the epsilon ball, and clipping to the valid input range, while C&W optimizes a distortion-plus-logit-margin objective with a coefficient search before returning the best verified adversarial example.
+PGD alternates gradient ascent, projection into the epsilon ball, and clipping to the valid input range. C&W instead optimizes a distortion-plus-logit-margin objective and searches over its penalty coefficient before returning the best verified adversarial example.
 
-## Worked example 1: One FGSM step on normalized pixels
+## One FGSM step on normalized pixels
 
-Problem: A grayscale input has four pixels:
+Take a four-pixel grayscale input:
 
 $$
 x = (0.20, 0.50, 0.90, 0.10).
@@ -417,7 +417,7 @@ $$
 
 4. Clip to $[0,1]$. No coordinate is outside the interval, so the value is unchanged.
 
-Checked answer:
+The resulting adversarial input is:
 
 $$
 x_{\mathrm{adv}}=(0.15,0.55,0.90,0.15).
@@ -425,9 +425,9 @@ $$
 
 The third pixel does not change because the gradient coordinate is zero. In real floating-point code, exactly zero gradients can also be a warning sign if they arise from nondifferentiable preprocessing or saturated activations.
 
-## Worked example 2: Two PGD iterations with projection
+## Two PGD iterations with projection
 
-Problem: Let:
+For two PGD steps, let:
 
 $$
 x=(0.50,0.50),\quad \epsilon=0.10,\quad \alpha=0.08.
@@ -471,9 +471,9 @@ $$
 x^2-x=(0.10,0.00), \qquad \|x^2-x\|_\infty=0.10.
 $$
 
-Checked answer: after two steps, $x^2=(0.60,0.50)$, exactly on the boundary of the allowed $\ell_\infty$ ball.
+After two steps, $x^2=(0.60,0.50)$, exactly on the boundary of the allowed $\ell_\infty$ ball.
 
-## Code
+## Reference FGSM and PGD implementations
 
 ```python
 import torch
@@ -488,7 +488,7 @@ def fgsm(model, x, y, epsilon):
         return x_adv.clamp(0.0, 1.0).detach()
 
 def pgd_linf(model, x, y, epsilon, step_size, steps, restarts=1):
-    best_x = x.detach()
+    best_x = x.detach().clone()
     best_loss = torch.full((x.shape[0],), -float("inf"), device=x.device)
 
     for _ in range(restarts):
@@ -515,7 +515,7 @@ def pgd_linf(model, x, y, epsilon, step_size, steps, restarts=1):
 
 This code uses gradients with respect to the input, not the model parameters. In a real evaluation, the model should be in `eval()` mode unless the threat model intentionally allows batch-statistics behavior during attack.
 
-## Common pitfalls
+## Configurations that understate vulnerability
 
 - Calling FGSM robustness a strong white-box evaluation. It is a baseline, not a complete test.
 - Forgetting random starts and restarts for PGD, especially when evaluating defenses.
@@ -525,15 +525,7 @@ This code uses gradients with respect to the input, not the model parameters. In
 - Reporting only average loss increase instead of attack success rate or robust accuracy.
 - Ignoring adaptive methods such as BPDA or EOT when the defense uses nondifferentiable or randomized preprocessing.
 
-## Connections
-
-- [Mathematical formulation](/cs/adversarial-attacks/mathematical-formulation) derives FGSM and projected-gradient updates.
-- [Gradient masking and obfuscation](/cs/adversarial-attacks/gradient-masking-and-obfuscation) explains why white-box attacks must be adaptive.
-- [Adversarial training](/cs/adversarial-attacks/adversarial-training) uses [PGD-like attacks](/cs/adversarial-attacks/white-box-attacks#iterative-projected-gradient-methods) inside training.
-- [Evaluation and benchmarks](/cs/adversarial-attacks/evaluation-and-benchmarks) discusses AutoAttack, restarts, and benchmark discipline.
-- [Deep learning](/cs/deep-learning/intro) gives the backpropagation machinery used to compute input gradients.
-
-## Further reading
+## The white-box attack lineage
 
 - Goodfellow, Shlens, and Szegedy, "Explaining and Harnessing Adversarial Examples."
 - Kurakin, Goodfellow, and Bengio, "Adversarial Examples in the Physical World."
@@ -542,7 +534,7 @@ This code uses gradients with respect to the input, not the model parameters. In
 - Carlini and Wagner, "Towards Evaluating the Robustness of Neural Networks."
 - Moosavi-Dezfooli, Fawzi, and Frossard, "DeepFool: A Simple and Accurate Method to Fool Deep Neural Networks."
 
-## References
+## Original attack papers
 
 [1] I. J. Goodfellow, J. Shlens, C. Szegedy. *Explaining and Harnessing Adversarial Examples*. ICLR 2015.
 [2] A. Kurakin, I. J. Goodfellow, S. Bengio. *Adversarial Examples in the Physical World*. ICLR Workshop 2017.
@@ -551,3 +543,15 @@ This code uses gradients with respect to the input, not the model parameters. In
 [5] N. Carlini, D. Wagner. *Towards Evaluating the Robustness of Neural Networks*. IEEE Symposium on Security and Privacy 2017.
 [6] S.-M. Moosavi-Dezfooli, A. Fawzi, P. Frossard. *DeepFool: A Simple and Accurate Method to Fool Deep Neural Networks*. CVPR 2016.
 [7] P.-Y. Chen, Y. Sharma, H. Zhang, J. Yi, C.-J. Hsieh. *EAD: Elastic-Net Attacks to Deep Neural Networks via Adversarial Examples*. AAAI 2018.
+
+<div className="see-also">
+
+See also:
+
+- [Mathematical formulation](/cs/adversarial-attacks/mathematical-formulation) derives FGSM and projected-gradient updates.
+- [Gradient masking and obfuscation](/cs/adversarial-attacks/gradient-masking-and-obfuscation) explains why white-box attacks must be adaptive.
+- [Adversarial training](/cs/adversarial-attacks/adversarial-training) uses [PGD-like attacks](/cs/adversarial-attacks/white-box-attacks#iterative-projected-gradient-methods) inside training.
+- [Evaluation and benchmarks](/cs/adversarial-attacks/evaluation-and-benchmarks) discusses AutoAttack, restarts, and benchmark discipline.
+- [Deep learning](/cs/deep-learning/intro) gives the backpropagation machinery used to compute input gradients.
+
+</div>

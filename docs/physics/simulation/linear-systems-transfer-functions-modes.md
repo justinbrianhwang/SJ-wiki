@@ -7,9 +7,9 @@ sidebar_position: 6
 
 Linear system analysis gives simulation a set of benchmarks. When a model is linear and time invariant, its response can be studied through poles, zeros, transfer functions, eigenvalues, and frequency response. These tools explain what a time plot should look like before the simulation is run: exponential decay, oscillation, overshoot, resonance, filtering, or instability.
 
-In a simulation workflow, linear analysis is useful in two directions. First, a known transfer function or state model can be simulated and checked against analytical results. Second, a nonlinear model can be linearized around an operating point so its local modes and frequency response can be understood. This page connects the simulation notes to the broader signals-and-systems material.
+In a simulation workflow, linear analysis is useful in two directions. First, a known transfer function or state model can be simulated and checked against analytical results. Second, a nonlinear model can be linearized around an operating point so its local modes and frequency response can be understood. The same ideas connect time-domain simulation to signals-and-systems analysis.
 
-## Definitions
+## Three views of the same LTI model
 
 A continuous-time LTI state-space model is
 
@@ -43,7 +43,7 @@ $$
 
 $\omega_n$ is the natural frequency and $\zeta$ is the damping ratio. These parameters directly predict the shape of the time response.
 
-## Key results
+## Reading modes in time and frequency
 
 The modes of an LTI state model are associated with eigenvalues of $A$. If $A$ has an eigenvalue $\lambda$, the natural response includes a term like $e^{\lambda t}$, possibly multiplied by polynomials if repeated eigenvalues are defective. Stability for a continuous-time LTI system requires all internal modes to have negative real parts:
 
@@ -86,15 +86,13 @@ This result is essential when interpreting simulated filters, mechanical resonan
 
 Linear results are also useful as regression tests for simulation software. If a Simulink block diagram built from integrators does not match the `step` response of the equivalent transfer function, the problem is usually not subtle mathematics; it is a sign error, an initial condition mismatch, a parameter typo, or a solver setting difference. Before adding nonlinearities, limits, or controllers, it is good practice to verify the underlying linear plant against a compact analytical or Control System Toolbox representation.
 
-Modes should be interpreted with the output in mind. A state matrix may contain several eigenvalues, but not every mode is equally visible in every output. Some modes are weakly excited by a given input, and some are weakly observed by a given sensor. This is why a simulation report should state both the internal mode analysis and the specific time response being plotted. A mode that is invisible in one output can still matter for actuator limits, internal stress, or later nonlinear coupling.
+Modes should be interpreted with the output in mind. A state matrix may contain several eigenvalues, but not every mode is equally visible in every output. Some modes are weakly excited by a given input, and some are weakly observed by a given sensor. A simulation report should therefore state both the internal mode analysis and the specific time response being plotted. A mode that is invisible in one output can still matter for actuator limits, internal stress, or later nonlinear coupling.
 
 Frequency-domain checks give another way to detect time-domain mistakes. If a simulated sinusoidal input at frequency $\omega$ produces a steady output amplitude that does not match $\vert G(j\omega)\vert $, then the input amplitude, transient removal, sample rate, or model implementation should be questioned. Likewise, a step response with an unexpected final value should be compared with the DC gain $G(0)$. These comparisons are quick and often catch errors before a large nonlinear or hybrid model is built on top of a faulty linear subsystem.
 
 In Simulink, linear subsystems can be represented at different levels of abstraction. A Transfer Fcn block is compact and convenient for response checks. A State-Space block makes multi-input and multi-output systems straightforward. An integrator-level realization is longer but exposes internal variables and lets the modeler insert nonlinearities, saturations, limits, and sensors at physically meaningful points. Choosing the right representation depends on what must be inspected or modified during the simulation study.
 
 Initial conditions are the other reason state-space form remains important. A transfer function describes zero-state input-output behavior by default; a physical simulation often starts with stored energy already present. A charged capacitor, moving mass, warm object, or nonzero aircraft attitude can produce output before any new input is applied. If that initial condition is part of the problem, the state model gives the cleanest way to specify it and to separate forced response from natural response.
-
-## Visual
 
 ```mermaid
 flowchart TB
@@ -119,7 +117,7 @@ flowchart TB
   Verify --> Result(("verified linear subsystem"))
 ```
 
-This linear-systems diagram separates internal modal analysis from transfer-function input-output analysis. State-space matrices expose eigenvalues and initial-condition response, while $G(s)$ exposes poles, zeros, step/impulse behavior, and frequency response. The verification node is the practical architecture: linear analytical results are regression tests for the simulation implementation.
+The diagram separates internal modal analysis from transfer-function input-output analysis. State-space matrices expose eigenvalues and initial-condition response, while $G(s)$ exposes poles, zeros, step/impulse behavior, and frequency response. At the verification node, analytical results act as regression tests for the simulation implementation.
 
 | Pole location | Time-domain behavior | Simulation clue |
 |---|---|---|
@@ -129,7 +127,7 @@ This linear-systems diagram separates internal modal analysis from transfer-func
 | Pure imaginary pair | Sustained oscillation | No decay in ideal linear model |
 | Complex pair with positive real part | Growing oscillation | Oscillatory instability |
 
-## Worked example 1: Predict a step response from poles
+## Predicting a step response before simulation
 
 Problem: Analyze
 
@@ -189,7 +187,7 @@ Checked answer: a unit-step response should rise toward $1$, overshoot to about 
 
 Simulink description: use a Step block feeding a Transfer Fcn block with numerator `[9]` and denominator `[1 3 9]`. A Scope should show the underdamped response. A To Workspace block can export the response for measuring peak time and overshoot.
 
-## Worked example 2: State matrix modes and transfer function
+## Recovering a transfer function from a state model
 
 Problem: The state model is
 
@@ -256,7 +254,7 @@ Checked answer: the system is stable and critically damped. A unit-step response
 
 Simulink description: a State-Space block with these matrices or a Transfer Fcn block with denominator `[1 4 4]` and numerator `[1]` should give the same zero-initial-condition output. If the state initial condition is nonzero, the State-Space block exposes natural response effects that a simple transfer-function step comparison may not show.
 
-## Code
+## Cross-checking both representations in MATLAB
 
 ```matlab
 clear; clc; close all;
@@ -288,7 +286,7 @@ title('Critically damped state-space step response');
 
 The Bode plot for the first system should show a resonance-like rise because $\zeta=0.5$ is underdamped, but the peak is moderate. The state-space step response should approach $0.25$ monotonically. These analytical predictions are useful before trusting any Simulink output.
 
-## Common pitfalls
+## Where linear checks go wrong
 
 - Treating transfer function stability as the whole story when a state realization may contain hidden unstable canceled modes.
 - Forgetting that `step` assumes zero initial conditions unless told otherwise.
@@ -297,9 +295,8 @@ The Bode plot for the first system should show a resonance-like rise because $\z
 - Comparing continuous-time pole locations to discrete-time pole criteria. Continuous-time stability uses the left half-plane; discrete-time stability uses the unit circle.
 - Ignoring units on frequency. MATLAB often reports rad/s, while experimental data may be in Hz.
 
-## Connections
+<div className="see-also">
 
-- [Laplace Transform and ROC](/physics/signals-systems/laplace-transform-roc)
-- [Frequency Response and Filtering](/physics/signals-systems/frequency-response-filtering)
-- [State-Space Representation](/physics/simulation/state-space-representation)
-- [Discrete-Time and Sampled-Data Systems](/physics/simulation/discrete-time-sampled-data-systems)
+See also: [Laplace Transform and ROC](/physics/signals-systems/laplace-transform-roc) · [Frequency Response and Filtering](/physics/signals-systems/frequency-response-filtering) · [State-Space Representation](/physics/simulation/state-space-representation) · [Discrete-Time and Sampled-Data Systems](/physics/simulation/discrete-time-sampled-data-systems)
+
+</div>

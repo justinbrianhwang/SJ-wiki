@@ -7,13 +7,13 @@ sidebar_position: 15
 
 Atomic structure is the first major chemical application of the Schrodinger equation. Hydrogenic atoms can be solved exactly, and many-electron atoms are then understood through approximations: shielding, effective nuclear charge, orbital energies, spin, and angular momentum coupling.
 
-Atkins uses atomic spectra to connect quantum numbers with measured transitions. Spectral lines are not arbitrary fingerprints; they are energy differences constrained by selection rules.
+Atomic spectra connect quantum numbers with measured transitions. Each line records an energy difference, and its intensity is constrained by the transition moment and selection rules.
 
 ![A hydrogen spectrum diagram shows discrete spectral series on a wavelength scale.](https://commons.wikimedia.org/wiki/Special:FilePath/Hydrogen_spectrum.svg)
 
 *Figure: Hydrogen spectral series connecting atomic energy levels to observed light. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hydrogen_spectrum.svg), OrangeDog, CC BY-SA 3.0.*
 
-## Definitions
+## Hydrogenic states and atomic labels
 
 A hydrogenic atom is a one-electron species with nuclear charge $+Ze$, such as $\mathrm{H}$, $\mathrm{He^+}$, or $\mathrm{Li^{2+}}$. Its energy levels are
 
@@ -63,7 +63,7 @@ $$
 
 where $S$ is total spin, $L$ is total orbital angular momentum, and $J$ is total angular momentum.
 
-## Key results
+## From orbitals to observed lines
 
 For hydrogenic atoms, the spectral wavenumber for a transition from $n_i$ to $n_f$ is
 
@@ -109,7 +109,7 @@ Spin-orbit coupling splits terms because magnetic interactions connect spin and 
 
 The hydrogen atom is exactly solvable because it has one electron moving in a Coulomb potential. Separation of variables in spherical polar coordinates gives radial functions and spherical harmonics. The angular functions define orbital shapes and angular momentum, while the radial functions control size and radial nodes. The energy depends only on $n$ for a hydrogenic atom, producing large degeneracy. This degeneracy is broken in many-electron atoms because electron-electron interactions change the effective potential.
 
-Shielding and penetration explain the ordering of subshell energies. An $s$ electron can penetrate close to the nucleus and experience a larger effective nuclear charge. A $p$ electron of the same shell penetrates less, and $d$ and $f$ electrons often penetrate still less. As a result, in many-electron atoms the energy order is not simply determined by $n$. This underlies the periodic table, the Aufbau pattern, and many exceptions caused by near-degenerate subshells.
+Shielding and penetration explain the ordering of subshell energies. An $s$ electron can penetrate close to the nucleus and experience a larger effective nuclear charge. A $p$ electron of the same shell penetrates less, and $d$ and $f$ electrons often penetrate still less. As a result, both $n$ and $l$ influence the energy order in many-electron atoms. This underlies the periodic table, the Aufbau pattern, and many exceptions caused by near-degenerate subshells.
 
 The Pauli principle is more than a filling rule. It follows from the antisymmetry of many-electron wavefunctions under exchange of identical fermions. A Slater determinant changes sign when two electron labels are exchanged and becomes zero if two electrons occupy the same spin-orbital. This mathematical structure produces shell structure and the chemical periodicity that general chemistry introduces empirically.
 
@@ -128,8 +128,6 @@ $$
 where $\delta_l$ is the quantum defect. It is largest for penetrating orbitals such as $s$ orbitals and smaller for high-$l$ orbitals.
 
 Atomic structure is also the starting point for molecular bonding. Atomic orbital energies, radial extension, angular shapes, and symmetry determine how orbitals overlap to form molecular orbitals. Periodic trends in ionization energy, electron affinity, and atomic radius all come from the same quantum structure discussed here.
-
-## Visual
 
 ```mermaid
 graph TD
@@ -152,7 +150,7 @@ graph TD
 | $m_s$ | $\pm1/2$ | spin projection |
 | $J$ | $\vert L-S\vert $ to $L+S$ | spin-orbit split total angular momentum |
 
-## Worked example 1: Hydrogen Balmer transition
+## Locating the Balmer $\mathrm{H_\alpha}$ line
 
 **Problem.** Calculate the wavelength of the hydrogen emission line for $n_i=3\to n_f=2$ using $R_\infty=1.09737\times10^7\ \mathrm{m^{-1}}$.
 
@@ -193,7 +191,7 @@ $$
 
 **Checked answer.** This is the red Balmer $\mathrm{H_\alpha}$ line, so the magnitude and color are correct.
 
-## Worked example 2: Nodes in a hydrogenic orbital
+## Counting nodes in a $4d$ orbital
 
 **Problem.** How many radial and angular nodes are present in a $4d$ orbital?
 
@@ -229,26 +227,7 @@ $$
 
 **Checked answer.** A $4d$ orbital has 2 angular nodes and 1 radial node.
 
-## Code
-
-```python
-Rinf = 1.0973731568160e7  # m^-1
-
-def hydrogen_wavelength(n_initial, n_final, Z=1):
-    wavenumber = Rinf * Z**2 * (1 / n_final**2 - 1 / n_initial**2)
-    return 1 / wavenumber
-
-for ni in [3, 4, 5, 6]:
-    lam_nm = hydrogen_wavelength(ni, 2) * 1e9
-    print(f"Balmer {ni}->2: {lam_nm:8.2f} nm")
-
-def nodes(n, l):
-    return {"radial": n - l - 1, "angular": l, "total": n - 1}
-
-print(nodes(4, 2))
-```
-
-## Common pitfalls
+## Keeping the atomic models separate
 
 - Treating many-electron orbital energies as hydrogenic. In many-electron atoms, $2s$ and $2p$ are not generally equal.
 - Forgetting that $l=0,1,2,3$ correspond to $s,p,d,f$.
@@ -258,7 +237,7 @@ print(nodes(4, 2))
 
 The safest way to avoid these errors is to keep three levels of description separate. First, the one-electron hydrogenic model gives exact orbitals and energies that depend only on $n$. Second, the orbital approximation for many-electron atoms keeps orbital labels but changes their energies through shielding and electron repulsion. Third, observed spectra involve terms and transitions between many-electron states, not simply jumps between isolated one-electron pictures. A calculation may use all three languages, but it should not mix their assumptions without comment.
 
-When assigning lines, always ask what is being conserved or changed. Energy conservation sets the photon frequency. Angular momentum conservation and parity determine strong electric-dipole selection rules. Spin conservation explains why some transitions are weak or absent in light atoms. Spin-orbit coupling relaxes pure spin labels in heavier atoms, so weak "forbidden" lines may appear. This is why spectral intensity gives structural information beyond line position.
+When assigning lines, always ask what is being conserved or changed. Energy conservation sets the photon frequency. Angular momentum conservation and parity determine strong electric-dipole selection rules. Spin conservation explains why some transitions are weak or absent in light atoms. Spin-orbit coupling relaxes pure spin labels in heavier atoms, so weak "forbidden" lines may appear. Spectral intensity therefore carries structural information beyond line position.
 
 For periodic trends, avoid explaining everything by distance alone. Nuclear charge increases across a period, shielding changes imperfectly, orbital penetration differs by subshell, and electron-electron repulsion changes with configuration. The effective nuclear charge is a model that summarizes these effects, not a directly inserted charge in the exact Hamiltonian. It is useful precisely because it compresses a many-electron problem into an interpretable one-electron picture.
 
@@ -268,9 +247,8 @@ For spectroscopy, record whether wavelengths are in air or vacuum when precision
 
 Keep significant figures realistic: atomic spectroscopy can be extremely precise, but approximate models such as shielding rules or simple term ordering do not justify excessive numerical precision.
 
-## Connections
+<div className="see-also">
 
-- [Quantum foundations](/chemistry/physical-chemistry/quantum-foundations)
-- [Molecular structure and computational chemistry](/chemistry/physical-chemistry/molecular-structure-and-computational-chemistry)
-- [Electronic, laser, and magnetic resonance spectroscopy](/chemistry/physical-chemistry/electronic-laser-and-magnetic-resonance-spectroscopy)
-- [Physics quantum mechanics](/physics/quantum-mechanics/)
+See also: [Quantum foundations](/chemistry/physical-chemistry/quantum-foundations) · [Molecular structure and computational chemistry](/chemistry/physical-chemistry/molecular-structure-and-computational-chemistry) · [Electronic, laser, and magnetic resonance spectroscopy](/chemistry/physical-chemistry/electronic-laser-and-magnetic-resonance-spectroscopy) · [Physics quantum mechanics](/physics/quantum-mechanics/intro)
+
+</div>

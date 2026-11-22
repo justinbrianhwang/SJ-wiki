@@ -7,9 +7,9 @@ sidebar_position: 15
 
 Formal notations use mathematically defined syntax or semantics to state software behavior precisely. Gustafson's final chapter introduces formal specifications, preconditions, postconditions, invariants, and the Object Constraint Language (OCL). The chapter's motivation is direct: natural language is ambiguous, while mathematical notions such as sets and sequences have precise meanings.
 
-Formal methods can reduce errors by making requirements and design constraints explicit. Their cost is difficulty: formal specifications require skill, careful modeling, and agreement about how software concepts map to mathematical concepts. OCL is presented as a practical formal notation connected to UML object models. It uses class context, navigation through associations, collection operations, invariants, and pre/postconditions.
+Formal methods can reduce errors by making requirements and design constraints explicit. Their cost is difficulty: formal specifications require skill, careful modeling, and agreement about how software concepts map to mathematical concepts. OCL is a formal notation connected to UML object models. It uses class context, navigation through associations, collection operations, invariants, and pre/postconditions.
 
-## Definitions
+## Contracts, invariants, and OCL navigation
 
 A **formal notation** is a notation whose syntax or semantics has a mathematical foundation. Formality can apply to structure, meaning, or both.
 
@@ -30,13 +30,13 @@ An **invariant** is a statement that must be true before and after every operati
 
 **Navigation** in OCL follows associations from one object to related objects using dot notation. If multiplicity is many, the result is a collection. If multiplicity is `0..1` or `1`, the result is a single object or optional object.
 
-OCL collection operations include `size`, `count`, `includes`, `includesAll`, `sum`, `select`, and `forAll`. The source chapter specifically mentions operations such as `size`, `count(object)`, `includes(object)`, `sum`, and `includesall(collection)`.
+OCL collection operations include `size()`, `count(object)`, `includes(object)`, `includesAll(collection)`, `sum()`, `select`, and `forAll`.
 
 The OCL notation `@pre` refers to a value before an operation. The keyword `result` refers to the operation result.
 
-## Key results
+## What precision adds to an object model
 
-Formal specifications are useful because they answer questions precisely. Natural language requirements can hide disagreement. "A patron may not check out too many books" is ambiguous. An invariant or precondition can state `self.checkedout->size < 10`, which is at least precise enough to discuss whether the limit is 9, 10, or "less than or equal to 10."
+Formal specifications answer questions precisely. Natural language requirements can hide disagreement. "A patron may not check out too many books" is ambiguous. An invariant or precondition can state `self.checkedout->size() < 10`, which is precise enough to discuss whether the limit is 9, 10, or "less than or equal to 10."
 
 Preconditions define caller responsibility or operation scope. If `pop` has precondition `not stack.isEmpty`, then callers must not pop an empty stack under that operation's normal specification. If empty-pop behavior must be specified, then the operation needs an explicit error postcondition instead of relying only on the precondition.
 
@@ -60,7 +60,7 @@ OCL is especially useful where a diagram is structurally correct but semanticall
 
 Formal specification also improves reviews. Reviewers can challenge a constraint directly: is the checkout limit less than 10 or less than or equal to 10? Should a reservation invariant allow checkout date to equal checkin date? Should a failed `borrow` operation leave all associations unchanged? These questions are far easier to answer when the rule is explicit than when it is buried in prose.
 
-## Visual
+### Reading constraints against the library model
 
 ```mermaid
 classDiagram
@@ -93,13 +93,13 @@ classDiagram
 | Postcondition | after operation | checked-out count increased by one |
 | Invariant | before and after every operation | no copy has more than one active loan |
 | Navigation | expression over associations | `self.cardholders.checkedout` |
-| Collection operation | calculation over collection | `self.checkedout->size` |
+| Collection operation | calculation over collection | `self.checkedout->size()` |
 
-## Worked example 1: Stack formal specification
+## A bounded stack as a contract
 
-**Problem.** Specify a bounded stack with operations `push(x)` and `pop()` using preconditions, postconditions, and invariants. The stack has capacity `MAX` and an internal sequence `items`.
+Specify a bounded stack with operations `push(x)` and `pop()` using preconditions, postconditions, and invariants. The stack has capacity `MAX` and an internal sequence `items`.
 
-**Method.** State the invariant first, then operation contracts.
+Start with the invariant, then state the operation contracts.
 
 1. Invariant: size is never negative and never greater than capacity.
 
@@ -136,13 +136,13 @@ items_{after} &= allButLast(items_{before})
 \end{aligned}
 $$
 
-**Checked answer.** The invariant is preserved. If `push` starts with size less than `MAX`, appending one item gives size at most `MAX`. If `pop` starts with size greater than zero, removing one item gives size at least zero. The contracts are precise enough to test normal behavior and define caller obligations for full or empty stacks.
+The invariant is preserved. If `push` starts with size less than `MAX`, appending one item gives size at most `MAX`. If `pop` starts with size greater than zero, removing one item gives size at least zero. The contracts are precise enough to test normal behavior and define caller obligations for full or empty stacks.
 
-## Worked example 2: OCL constraints for library borrowing
+## Borrowing constraints in OCL
 
-**Problem.** In a library model, a `Patron` has association `checkedout` to `Loan`. Write OCL-style constraints stating that a patron may not have more than 10 loans after borrowing, and that borrowing increases the number of loans by one.
+In a library model, a `Patron` has association `checkedout` to `Loan`. The constraints must limit the patron to 10 loans after borrowing and require the operation to increase the loan count by one.
 
-**Method.** Use operation context, precondition, postcondition, and `@pre`.
+Use an operation context, two preconditions, and postconditions that compare the old and new states.
 
 1. Context:
 
@@ -153,7 +153,7 @@ context Patron::borrow(copy: Copy) : Loan
 2. The patron must have fewer than 10 loans before borrowing if the postcondition will enforce at most 10 after:
 
 ```ocl
-pre: self.checkedout->size < 10
+pre: self.checkedout->size() < 10
 ```
 
 3. The copy should not already be borrowed:
@@ -165,7 +165,7 @@ pre: copy.borrowed->isEmpty
 4. After borrowing, checked-out count increases by one:
 
 ```ocl
-post: self.checkedout->size = self.checkedout@pre->size + 1
+post: self.checkedout->size() = self.checkedout@pre->size() + 1
 ```
 
 5. The result should be among the patron's checked-out loans:
@@ -174,9 +174,9 @@ post: self.checkedout->size = self.checkedout@pre->size + 1
 post: self.checkedout->includes(result)
 ```
 
-**Checked answer.** The precondition `< 10` plus the `+ 1` postcondition implies the after-size is at most 10. The result membership postcondition connects the returned loan to the model. The copy precondition prevents creating a second active loan for the same copy.
+The precondition `< 10` plus the `+ 1` postcondition implies the after-size is at most 10. The result-membership postcondition connects the returned loan to the model. The copy precondition prevents creating a second active loan for the same copy.
 
-## Code
+## Enforcing the same contracts at runtime
 
 ```python
 class BoundedStack:
@@ -205,7 +205,7 @@ class BoundedStack:
         return result
 ```
 
-## Common pitfalls
+## Where formal models go wrong
 
 - Writing formal constraints that restate implementation steps instead of specifying externally meaningful behavior.
 - Forgetting to define whether failed preconditions are caller errors or specified error cases.
@@ -215,10 +215,8 @@ class BoundedStack:
 - Omitting `@pre` when a postcondition must compare old and new values.
 - Writing constraints disconnected from the UML/object model context.
 
-## Connections
+<div className="see-also">
 
-- [Requirements engineering](/cs/software-engineering/requirements-engineering)
-- [Software design](/cs/software-engineering/software-design)
-- [Software testing](/cs/software-engineering/software-testing)
-- [Object-oriented development](/cs/software-engineering/object-oriented-development)
-- [Object-oriented testing](/cs/software-engineering/object-oriented-testing)
+See also: [Requirements engineering](/cs/software-engineering/requirements-engineering) · [Software design](/cs/software-engineering/software-design) · [Software testing](/cs/software-engineering/software-testing) · [Object-oriented development](/cs/software-engineering/object-oriented-development) · [Object-oriented testing](/cs/software-engineering/object-oriented-testing)
+
+</div>

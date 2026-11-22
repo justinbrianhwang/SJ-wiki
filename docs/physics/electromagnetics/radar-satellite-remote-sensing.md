@@ -7,13 +7,9 @@ sidebar_position: 17
 
 Applied electromagnetics becomes system engineering in satellite communication and radar. The field formulas remain present, but they are embedded in link budgets, antenna beams, noise margins, range resolution, Doppler shifts, and target scattering. A satellite link asks how much transmitted power survives free-space spreading and antenna gains to become usable received power. A radar asks how much of the transmitted wave scatters from a target and returns to the receiver.
 
-Ulaby's final chapter uses these systems as selected highlights rather than a complete communications or radar course. The goal of this page is the same: connect electromagnetic wave propagation, antennas, and power density to practical remote sensing and communication calculations.
+Ulaby's final chapter uses these systems as selected highlights rather than a complete communications or radar course. The calculations connect electromagnetic wave propagation, antennas, and power density to remote sensing and communication systems.
 
-![A large C-band radar dish stands at Kennedy Space Center.](https://commons.wikimedia.org/wiki/Special:FilePath/C-band_Radar-dish_Antenna.jpg)
-
-*Figure: A radar dish gives remote sensing a physical aperture, beamwidth, and link-budget context. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:C-band_Radar-dish_Antenna.jpg), NASA, public domain.*
-
-## Definitions
+## Power, delay, Doppler, and noise
 
 Free-space path loss is the inverse of the Friis spreading factor:
 
@@ -69,7 +65,7 @@ $$
 
 where $k$ is Boltzmann's constant, $T$ is system noise temperature, and $B$ is bandwidth. Low-noise amplifiers, narrow filters, coding gain, and coherent integration are all ways to improve detectability when received signals are extremely weak.
 
-## Key results
+## What controls link margin and radar resolution
 
 Satellite communication links use high-gain antennas because path distances are enormous. For a geostationary satellite range of roughly $3.6\times10^7$ m, free-space path loss at microwave frequencies can exceed 190 dB. This does not mean communication is impossible; it means every term in the link budget matters: transmit power, antenna gain, pointing, atmospheric loss, polarization, receiver noise, and modulation/coding margin.
 
@@ -79,7 +75,7 @@ $$
 \theta_{\mathrm{BW}}\sim\frac{\lambda}{D},
 $$
 
-where $D$ is aperture diameter. Larger dishes produce narrower beams and higher gain, but require better pointing. This is why satellite ground stations use parabolic reflectors and why radar angular resolution improves with aperture size.
+where $D$ is aperture diameter. Larger dishes produce narrower beams and higher gain, but require better pointing. Satellite ground stations therefore use parabolic reflectors, and radar angular resolution improves with aperture size.
 
 Radar range resolution is controlled by bandwidth. A short pulse has large bandwidth and fine range resolution; pulse compression can combine high energy with large bandwidth by transmitting a coded waveform and processing the echo. Angular resolution is controlled primarily by antenna aperture and wavelength. Doppler processing separates moving targets by radial velocity.
 
@@ -95,7 +91,7 @@ $$
 
 Similarly, Doppler estimation depends on pulse repetition frequency and coherent processing interval. Long coherent observation improves velocity resolution but may conflict with target maneuvering, scanning requirements, or range ambiguity constraints.
 
-Remote-sensing interpretation must include polarization and incidence angle. A surface that is bright at one polarization or angle may be dark at another because roughness and dielectric contrast couple differently to field components. This is why radar images are not simple optical photographs; they are measurements of electromagnetic scattering geometry and material response.
+Remote-sensing interpretation must include polarization and incidence angle. A surface that is bright at one polarization or angle may be dark at another because roughness and dielectric contrast couple differently to field components. Radar images therefore represent electromagnetic scattering geometry and material response rather than optical brightness.
 
 Satellite transponders shift, amplify, and retransmit signals between uplink and downlink bands. Frequency translation prevents the strong transmitted downlink from interfering directly with the weak received uplink at the satellite. The antenna footprint, transponder bandwidth, polarization plan, and available power all shape how many channels or users the satellite can support.
 
@@ -103,7 +99,7 @@ In both radar and communication systems, margins matter. Rain attenuation, atmos
 
 System calculations should also respect regulatory and operational constraints. Transmit power, occupied bandwidth, antenna pointing, and frequency allocation are not chosen from physics alone. The electromagnetic model tells what is possible; spectrum rules and mission requirements decide what is allowed and useful.
 
-## Visual
+### Where communication and radar paths diverge
 
 ```mermaid
 flowchart TB
@@ -134,8 +130,6 @@ flowchart TB
   Margin --> Result(("link or sensing performance"))
 ```
 
-This system diagram shows why satellite links and radar share transmit and propagation blocks but diverge after the outbound path. The satellite branch adds a transponder, downlink, receive gain, and carrier-to-noise margin; the radar branch adds target cross section, return spreading, matched processing, Doppler, and detection. The final margin node records nonideal losses and regulatory constraints that decide whether the ideal electromagnetic calculation is usable.
-
 | System quantity | Satellite link | Radar |
 |---|---|---|
 | Distance dependence | $R^{-2}$ one-way | $R^{-4}$ round-trip scattering |
@@ -144,7 +138,7 @@ This system diagram shows why satellite links and radar share transmit and propa
 | Time measurement | propagation delay affects latency | delay gives range |
 | Frequency shift | oscillator and motion compensation | Doppler gives radial velocity |
 
-## Worked example 1: Satellite downlink received power
+## Closing a satellite downlink budget
 
 Problem: A satellite transmits $P_t=20$ W at $12$ GHz. The transmit antenna gain is $G_t=30$ dB, the ground receive antenna gain is $G_r=40$ dB, range is $R=3.8\times10^7$ m, and other losses total $3$ dB. Find received power in dBW.
 
@@ -189,7 +183,7 @@ $$
 
 Check: This is a very small power, about $2.75\times10^{-13}$ W, which is realistic for satellite receivers with low-noise front ends and bandwidth-aware detection.
 
-## Worked example 2: Radar range and Doppler
+## Recovering radar range and radial speed
 
 Problem: A monostatic radar operates at $10$ GHz. An echo returns $40\ \mu$s after transmission, and the measured Doppler shift is $2$ kHz. Find target range and radial speed magnitude.
 
@@ -228,7 +222,7 @@ $$
 
 Check: A 10 GHz radar has a 3 cm wavelength, so a 30 m/s target creates a few kilohertz of two-way Doppler shift, which is plausible.
 
-## Code
+## Computing link loss, range, and Doppler speed
 
 ```python
 import numpy as np
@@ -255,19 +249,23 @@ print("range =", radar_range(40e-6), "m")
 print("speed =", radial_speed(2e3, 10e9), "m/s")
 ```
 
-## Common pitfalls
+## Quantities that should not be conflated
 
-- Forgetting the round-trip factor of 2 in radar range and Doppler.
-- Using the one-way Friis equation for radar echo power. Monostatic radar has the $R^{-4}$ range dependence.
-- Mixing dBW, dBm, and linear watts inside one link budget.
-- Treating antenna gain as extra generated power. Gain redistributes radiated power spatially; it does not create energy.
-- Ignoring wavelength in path loss comparisons. At the same range, higher frequency has larger free-space path loss for fixed antenna gains, but aperture-size constraints can change the system tradeoff.
-- Confusing range resolution with maximum range. Resolution depends on pulse width or bandwidth; maximum range depends on power, noise, losses, and detection threshold.
-- Interpreting radar cross section as literal physical area. It is an equivalent scattering measure and can be larger or smaller than the target's projected size.
+- Radar range and monostatic Doppler both contain a round-trip factor of 2.
+- The one-way Friis equation does not describe radar echo power; a monostatic radar has $R^{-4}$ range dependence.
+- A link budget must use dBW, dBm, or linear watts consistently.
+- Antenna gain redistributes radiated power spatially; it does not generate extra power.
+- At fixed antenna gains and range, higher frequency gives larger free-space path loss, although fixed-aperture antennas change that comparison.
+- Range resolution depends on pulse width or bandwidth. Maximum range depends on power, noise, losses, and the detection threshold.
+- Radar cross section is an equivalent scattering area and can be larger or smaller than the target's projected area.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Antennas, radiation, and arrays](/physics/electromagnetics/antennas-radiation-arrays) for gain, effective area, and Friis formula.
 - [Plane waves, loss, polarization, and power](/physics/electromagnetics/plane-waves-lossless-lossy-polarization) for power density and wavelength.
 - [Reflection, transmission, fibers, and waveguides](/physics/electromagnetics/reflection-transmission-fibers-waveguides) for aperture and propagation concepts.
-- [Signals and systems](/physics/signals-systems/) for bandwidth, pulses, Doppler processing, and filtering.
+- [Signals and systems](/physics/signals-systems/intro) for bandwidth, pulses, Doppler processing, and filtering.
+
+</div>

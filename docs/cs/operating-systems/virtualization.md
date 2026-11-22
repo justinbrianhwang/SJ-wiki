@@ -5,15 +5,11 @@ sidebar_position: 17
 
 # Virtualization
 
-![The Docker container engine logo identifies the canonical container runtime contrasted with full hypervisors in this chapter.](https://commons.wikimedia.org/wiki/Special:FilePath/Docker_%28container_engine%29_logo.svg)
-
-*Figure: Docker is the canonical OS-level virtualization runtime, contrasted in this chapter with full system VMs such as KVM, Xen, and VMware ESXi. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Docker_(container_engine)_logo.svg), Docker, Inc., Apache 2.0.*
-
 Virtualization inserts a controlled execution layer beneath, beside, or inside an operating system so that software sees a machine different from the one that physically exists. At operating-system scale, the usual goal is to let several guest systems share one host while preserving the illusion that each guest owns its CPUs, memory, devices, clocks, and interrupts. That illusion supports consolidation, cloud multi-tenancy, migration, testing, and legacy compatibility.
 
-Smith and Nair present virtual machines as a family of interface-preserving mechanisms, not as one product category [1]. This page focuses on the virtualization layer beneath the OS: system virtual machines, CPU virtualization, memory virtualization, I/O virtualization, containers as a lighter OS-level sibling, and modern cloud variants such as microVMs and confidential VMs. It connects naturally to [virtual memory](/cs/operating-systems/virtual-memory), [I/O systems](/cs/operating-systems/io-systems), [protection](/cs/operating-systems/protection-access-control), and the [Linux case study](/cs/operating-systems/linux-case-study).
+Smith and Nair present virtual machines as a family of interface-preserving mechanisms rather than one product category [1]. The relevant layers include system virtual machines, CPU virtualization, memory virtualization, I/O virtualization, containers, microVMs, and confidential VMs.
 
-## Definitions
+## The interfaces a virtual machine must preserve
 
 A **virtual machine** is an execution environment whose visible interface is implemented by another layer. The guest sees a virtual interface; the host supplies real resources. A useful VM preserves enough behavior that ordinary software runs with little awareness of the layer beneath it [1].
 
@@ -45,9 +41,9 @@ An **IOMMU** virtualizes DMA. Intel VT-d and AMD-Vi translate device DMA address
 
 **Containers** are not full system VMs. Linux containers use namespaces, cgroups, capabilities, seccomp, and LSMs such as AppArmor or SELinux to isolate processes that share the host kernel. Docker, containerd, runc, CRI-O, and Kubernetes build packaging and orchestration around this model. LXC and OpenVZ are important ancestors.
 
-## Key results
+## From trap-and-emulate to hardware-assisted execution
 
-The first key result is Popek-Goldberg virtualizability. If every sensitive instruction traps when executed outside privileged mode, a VMM can run all innocuous instructions natively and emulate only the sensitive ones [2]. This gives the classic architecture:
+Popek-Goldberg virtualizability gives the classical starting point. If every sensitive instruction traps when executed outside privileged mode, a VMM can run all innocuous instructions natively and emulate only the sensitive ones [2]:
 
 $$
 \text{sensitive instructions} \subseteq \text{privileged instructions}
@@ -57,19 +53,7 @@ When the subset condition fails, a VMM can still exist, but the efficiency proof
 
 CPU virtualization is a controlled state-machine loop. Guest code runs until an exit condition occurs: a privileged instruction, interrupt, VMM-relevant page fault, hypercall, I/O access, timer event, or nested virtualization event. The VMM saves guest state, updates virtual resources, possibly injects a virtual interrupt or exception, and re-enters the guest. Hardware support reduced scanning and patching by letting the VMM configure VMEXIT causes and by loading and saving state through structures such as the VMCS [1].
 
-Memory virtualization moved from software-maintained shadow page tables to hardware nested paging. With shadow paging, the VMM tracks guest page-table writes and maintains guest-virtual to host-physical shadow mappings [1]. With EPT or NPT, the processor walks guest tables to get a guest physical address, then hypervisor tables to get a host physical address. Hardware may cache combined translations. Nested paging removes much shadow-maintenance overhead, but misses can still be expensive.
-
-I/O virtualization is often hardest because devices have complex state, vendor-specific behavior, interrupts, DMA, firmware, queues, and timing assumptions [1]. Emulated devices maximize compatibility but are slow. Paravirtualized devices such as virtio and Xen split drivers expose virtualization-friendly queues. Direct assignment gives a guest near-native access through an IOMMU, but reduces sharing and complicates live migration. SR-IOV gives one PCIe device multiple virtual functions, each assignable to a guest.
-
-Hypervisor architectures split responsibility differently. **KVM** turns Linux into a hypervisor through kernel support for vCPUs, memory slots, and exits, while QEMU often provides firmware and device models [6]. **Xen** separates privileged dom0 from unprivileged domU guests and originally relied heavily on paravirtualization [4]. **ESXi** is a bare-metal VMware hypervisor. **Hyper-V** uses a parent partition for many management and device responsibilities while child partitions run guests. Microhypervisors such as NOVA and seL4 minimize the trusted computing base; seL4 also shows how formal verification can enter this design space.
-
-Containers trade a smaller boundary for speed and density. A containerized process is scheduled by the host kernel, uses the host kernel's VFS and memory machinery, and is constrained by namespace and cgroup views. This makes startup and image distribution efficient, but kernel bugs are shared across tenants. gVisor adds a user-space kernel between applications and the host kernel, while Kata-style systems combine container workflows with lightweight VMs.
-
-Modern cloud platforms combine several layers. AWS Nitro moves much virtualization and I/O work into dedicated hardware and service cards. Firecracker provides minimal KVM-based microVMs for serverless and container workloads, emphasizing fast startup and a small device model [9]. Unikernels such as MirageOS and IncludeOS specialize one application into a small VM image [8]. Confidential computing adds memory encryption and attestation: AMD SEV, SEV-ES, SEV-SNP, Intel TDX, and Arm CCA reduce what a cloud operator or compromised hypervisor can observe. They do not remove all side channels, but they change the trust boundary.
-
-Performance depends on exit frequency, TLB behavior, memory placement, and I/O path length. A VMEXIT can cost thousands of cycles, and the real cost includes cache pollution, TLB effects, lock contention, and scheduler delay. Tagged TLBs, address-space identifiers, VPIDs, PCIDs, and nested-page translation caches reduce flush overhead. Virtual CPUs introduce **steal time**, when a guest vCPU is runnable but the host schedules something else. NUMA awareness and vCPU pinning matter because guest-local memory may be remote on the host. Live migration usually uses **pre-copy**, repeatedly copying dirty pages while the VM runs, then pausing for final state. **Post-copy** resumes at the destination sooner and faults missing pages across the network, reducing duplicate copying but increasing failure risk. Containers use CRIU-style checkpoint and restore for process state.
-
-## Visual
+### Execution stacks, VM exits, and nested translation
 
 ```mermaid
 flowchart TB
@@ -104,6 +88,24 @@ flowchart TB
   end
 ```
 
+### Memory and device virtualization
+
+Memory virtualization moved from software-maintained shadow page tables to hardware nested paging. With shadow paging, the VMM tracks guest page-table writes and maintains guest-virtual to host-physical shadow mappings [1]. With EPT or NPT, the processor walks guest tables to get a guest physical address, then hypervisor tables to get a host physical address. Hardware may cache combined translations. Nested paging removes much shadow-maintenance overhead, but misses can still be expensive.
+
+I/O virtualization is often hardest because devices have complex state, vendor-specific behavior, interrupts, DMA, firmware, queues, and timing assumptions [1]. Emulated devices maximize compatibility but are slow. Paravirtualized devices such as virtio and Xen split drivers expose virtualization-friendly queues. Direct assignment gives a guest near-native access through an IOMMU, but reduces sharing and complicates live migration. SR-IOV gives one PCIe device multiple virtual functions, each assignable to a guest.
+
+### How current hypervisors divide responsibility
+
+Hypervisor architectures split responsibility differently. **KVM** turns Linux into a hypervisor through kernel support for vCPUs, memory slots, and exits, while QEMU often provides firmware and device models [6]. **Xen** separates privileged dom0 from unprivileged domU guests and originally relied heavily on paravirtualization [4]. **ESXi** is a bare-metal VMware hypervisor. **Hyper-V** uses a parent partition for many management and device responsibilities while child partitions run guests. Microhypervisors such as NOVA and seL4 minimize the trusted computing base; seL4 also shows how formal verification can enter this design space.
+
+### Containers, microVMs, and confidential VMs
+
+Containers trade a smaller boundary for speed and density. A containerized process is scheduled by the host kernel, uses the host kernel's VFS and memory machinery, and is constrained by namespace and cgroup views. This makes startup and image distribution efficient, but kernel bugs are shared across tenants. gVisor adds a user-space kernel between applications and the host kernel, while Kata-style systems combine container workflows with lightweight VMs.
+
+Modern cloud platforms combine several layers. AWS Nitro moves much virtualization and I/O work into dedicated hardware and service cards. Firecracker provides minimal KVM-based microVMs for serverless and container workloads, emphasizing fast startup and a small device model [9]. Unikernels such as MirageOS and IncludeOS specialize one application into a small VM image [8]. Confidential computing adds memory encryption and attestation: AMD SEV, SEV-ES, SEV-SNP, Intel TDX, and Arm CCA reduce what a cloud operator or compromised hypervisor can observe. They do not remove all side channels, but they change the trust boundary.
+
+Performance depends on exit frequency, TLB behavior, memory placement, and I/O path length. A VMEXIT can cost thousands of cycles, and the real cost includes cache pollution, TLB effects, lock contention, and scheduler delay. Tagged TLBs, address-space identifiers, VPIDs, PCIDs, and nested-page translation caches reduce flush overhead. Virtual CPUs introduce **steal time**, when a guest vCPU is runnable but the host schedules something else. NUMA awareness and vCPU pinning matter because guest-local memory may be remote on the host. Live migration usually uses **pre-copy**, repeatedly copying dirty pages while the VM runs, then pausing for final state. **Post-copy** resumes at the destination sooner and faults missing pages across the network, reducing duplicate copying but increasing failure risk. Containers use CRIU-style checkpoint and restore for process state.
+
 | Technique | Guest changes | Main mechanism | Strength | Cost or risk |
 |---|---:|---|---|---|
 | Trap and emulate | No | Sensitive privileged instructions trap to VMM | Simple when ISA is virtualizable | Fails efficiently when sensitive instructions do not trap |
@@ -112,9 +114,9 @@ flowchart TB
 | Hardware assist | No | VT-x or AMD-V, EPT or NPT, IOMMU | Runs unmodified guests with less software patching | VMEXIT, nested page-walk, and device costs remain |
 | Containers | App or packaging changes | Namespaces, cgroups, LSMs | Fast start, high density | Shared-kernel security boundary |
 
-## Worked example 1: classifying x86-like instructions
+## Classifying x86 instructions under Popek-Goldberg
 
-Problem: Classify `mov rax, rbx`, `popf`, `mov cr3, rax`, and `hlt` as privileged, sensitive, innocuous, or non-virtualizable under the Popek-Goldberg lens. Assume a pre-VT-x x86-like machine where a guest kernel is deprivileged and the VMM relies on traps.
+Classify `mov rax, rbx`, `popf`, `mov cr3, rax`, and `hlt` as privileged, sensitive, innocuous, or non-virtualizable under the Popek-Goldberg lens. Assume a pre-VT-x x86-like machine where a guest kernel is deprivileged and the VMM relies on traps.
 
 1. Recall the definitions.
 
@@ -154,9 +156,9 @@ $$
 
    Therefore a pure trap-and-emulate VMM is not efficient for this ISA fragment. A correct VMM must use binary translation, paravirtualization, or hardware-assisted controls.
 
-## Worked example 2: nested paging address translation
+## Translating an address through EPT
 
-Problem: A guest process accesses guest virtual address `0x1234`. Page size is 256 bytes, so the low 8 bits are the offset. The guest page table maps guest virtual page `0x12` to guest physical frame `0xA7`. The EPT maps guest physical frame `0xA7` to host physical frame `0x3C`. Translate the address and identify where faults could occur.
+A guest process accesses guest virtual address `0x1234`. Page size is 256 bytes, so the low 8 bits are the offset. The guest page table maps guest virtual page `0x12` to guest physical frame `0xA7`. The EPT maps guest physical frame `0xA7` to host physical frame `0x3C`. Translate the address and identify where faults could occur.
 
 1. Split the guest virtual address.
 
@@ -208,7 +210,7 @@ $$
 
    The access to guest virtual address `0x1234` reaches host physical address `0x3C34`, assuming both guest and nested entries are valid and permit the requested read, write, or execute access.
 
-## Code
+## Modeling shadow mappings and a virtqueue
 
 ```python
 from collections import deque
@@ -299,7 +301,7 @@ queue.device_step()
 print(queue.complete())
 ```
 
-## Common pitfalls
+## Boundaries and overheads that are easy to miss
 
 - Treating containers as small VMs. Containers share the host kernel; full VMs run separate guest kernels.
 - Forgetting that guest physical memory is still virtual from the hypervisor's point of view.
@@ -312,19 +314,6 @@ print(queue.complete())
 - Treating live migration as just copying RAM. Dirty-page rate, device state, storage access, network identity, and failure handling determine whether migration is practical.
 - Assuming confidential VMs hide everything. Memory encryption and attestation help, but side channels, device trust, firmware, and availability remain concerns.
 - Confusing emulated devices with paravirtual devices. Emulated e1000 or IDE devices target compatibility; virtio devices target efficient queues.
-
-## Connections
-
-- [Virtual Memory](/cs/operating-systems/virtual-memory): nested paging extends ordinary page-table translation with a hypervisor-owned second translation.
-- [Main Memory](/cs/operating-systems/main-memory): allocation, fragmentation, NUMA, and page replacement reappear as host-level VM placement problems.
-- [Processes](/cs/operating-systems/processes): containers virtualize process views through namespaces rather than virtual hardware.
-- [CPU Scheduling](/cs/operating-systems/cpu-scheduling): hypervisors schedule vCPUs and expose steal time when a guest is runnable but not running.
-- [I/O Systems](/cs/operating-systems/io-systems): emulated devices, virtio queues, DMA, and interrupt remapping all depend on OS I/O concepts.
-- [Protection and Access Control](/cs/operating-systems/protection-access-control): hypervisors rely on privilege separation, capabilities, and hardware isolation.
-- [Security](/cs/operating-systems/security): VM escape, side channels, device assignment, and confidential computing are security topics as much as OS topics.
-- [Linux Case Study](/cs/operating-systems/linux-case-study): KVM, cgroups, namespaces, KSM, seccomp, and LSMs are Linux implementations of the abstractions here.
-- [Computer Architecture](/cs/computer-architecture/intro): VT-x, AMD-V, EPT, NPT, TLBs, rings, interrupts, and IOMMUs are architecture support for OS virtualization.
-- [Distributed Systems](/cs/distributed-systems/intro): cloud scheduling, live migration, overlay networks, and fault isolation turn local virtualization into a distributed platform.
 
 ## References
 
@@ -345,3 +334,20 @@ print(queue.complete())
 [8] F. Manco et al., "My VM is lighter and safer than your container," in *Proc. 26th ACM Symposium on Operating Systems Principles*, 2017, pp. 218-233.
 
 [9] A. Agache et al., "Firecracker: Lightweight virtualization for serverless applications," in *Proc. 17th USENIX Symposium on Networked Systems Design and Implementation*, 2020, pp. 419-434.
+
+<div className="see-also">
+
+See also:
+
+- [Virtual Memory](/cs/operating-systems/virtual-memory): nested paging extends ordinary page-table translation with a hypervisor-owned second translation.
+- [Main Memory](/cs/operating-systems/main-memory): allocation, fragmentation, NUMA, and page replacement reappear as host-level VM placement problems.
+- [Processes](/cs/operating-systems/processes): containers virtualize process views through namespaces rather than virtual hardware.
+- [CPU Scheduling](/cs/operating-systems/cpu-scheduling): hypervisors schedule vCPUs and expose steal time when a guest is runnable but not running.
+- [I/O Systems](/cs/operating-systems/io-systems): emulated devices, virtio queues, DMA, and interrupt remapping all depend on OS I/O concepts.
+- [Protection and Access Control](/cs/operating-systems/protection-access-control): hypervisors rely on privilege separation, capabilities, and hardware isolation.
+- [Security](/cs/operating-systems/security): VM escape, side channels, device assignment, and confidential computing are security topics as much as OS topics.
+- [Linux Case Study](/cs/operating-systems/linux-case-study): KVM, cgroups, namespaces, KSM, seccomp, and LSMs are Linux implementations of the abstractions here.
+- [Computer Architecture](/cs/computer-architecture/intro): VT-x, AMD-V, EPT, NPT, TLBs, rings, interrupts, and IOMMUs are architecture support for OS virtualization.
+- [Distributed Systems](/cs/distributed-systems/intro): cloud scheduling, live migration, overlay networks, and fault isolation turn local virtualization into a distributed platform.
+
+</div>

@@ -7,13 +7,9 @@ sidebar_position: 1
 
 Data structures are organized ways to store data so that the operations a program needs can be performed efficiently and correctly. In a C course, this subject is especially concrete. Every abstraction eventually becomes an arrangement of arrays, structures, pointers, dynamically allocated blocks, and functions that enforce an invariant. That makes C demanding, but also useful: it shows exactly what a stack, list, heap, hash table, tree, or graph costs in memory and time.
 
-![A hash table diagram shows keys mapped into buckets with linked-list collision chains.](https://commons.wikimedia.org/wiki/Special:FilePath/Dsa_hash_table.svg)
+These notes follow the core scope of the Korean-language textbook *C로 쓴 자료구조론*: algorithm specification, abstract data types, arrays, stacks and queues, linked lists, trees, heaps, binary search trees, graphs, sorting, hashing, and advanced search structures. The emphasis is on structures and algorithms that students are expected to implement and trace by hand in a C course.
 
-*Figure: Separate chaining shows how a hash table stores multiple keys at the same bucket. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dsa_hash_table.svg), Amit6, public domain.*
-
-These notes follow the core scope of a Korean-language C data-structures textbook, *C로 쓴 자료구조론*, whose table of contents includes algorithm specification, abstract data types, arrays, stacks and queues, linked lists, trees, heaps, binary search trees, graphs, sorting, hashing, and advanced search structures. The pages here focus on the standard curriculum topics requested for SJ Wiki: the structures and algorithms most students are expected to implement and trace by hand in a Data Structures in C course.
-
-## Definitions
+## From an ADT contract to a C representation
 
 A **data type** is a set of values together with operations on those values. In C, `int`, `double`, and pointer types are built in, while `struct` lets programmers define new record layouts.
 
@@ -31,7 +27,7 @@ An **invariant** is a condition that must remain true before and after every pub
 
 The **cost** of an operation is usually described by asymptotic complexity. If input size is `n`, $O(1)$ means constant time, $O(\log n)$ means logarithmic time, $O(n)$ means linear time, and $O(n \log n)$ is common for efficient comparison sorting. Complexity does not replace real measurement, but it explains how an algorithm scales and which costs dominate.
 
-The wiki chapter list is:
+Reading order:
 
 | Page | Main idea | Typical implementation focus |
 |---|---|---|
@@ -50,11 +46,15 @@ The wiki chapter list is:
 | [sorting algorithms](/cs/data-structures/sorting-algorithms) | ordering records | insertion, quick, merge, heap, radix |
 | [searching algorithms](/cs/data-structures/searching-algorithms) | locating keys | linear and binary search |
 
-## Key results
+## Match the invariant to the operations
 
 The central result of the course is that there is no single best data structure. There are only structures whose invariants match the operations you need.
 
 If the program needs constant-time access by position, an array is natural. If it needs frequent insertions and deletions near known positions, a linked list may be better. If it needs last-in-first-out behavior, use a stack. If it needs first-in-first-out behavior, use a queue. If it needs repeated access to the smallest or largest priority, use a heap. If it needs expected fast dictionary operations and does not need sorted order, use hashing. If it needs ordered traversal and dynamic search, use a search tree. If it needs relationships among many objects, use a graph representation.
+
+![A hash table diagram shows keys mapped into buckets with linked-list collision chains.](https://commons.wikimedia.org/wiki/Special:FilePath/Dsa_hash_table.svg)
+
+*Separate chaining preserves dictionary operations when several keys map to the same bucket. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dsa_hash_table.svg), Amit6, public domain.*
 
 The implementation must preserve the ADT invariant. A correct but slow implementation may still be useful for small input; a fast implementation that violates its invariant is not a data structure, but a bug waiting to surface. Most C errors in this subject come from crossing the abstraction boundary: manipulating internal fields from outside the module, confusing capacity with size, failing to update both sides of a link, or using freed memory.
 
@@ -71,7 +71,7 @@ Asymptotic cost gives the first comparison:
 
 Proofs in this subject are often invariant proofs. For example, binary search is correct because the target, if present, remains inside the interval `[lo, hi]` after every comparison. Heap insertion is correct because only the path from the new leaf to the root can violate heap order. Kruskal's algorithm is correct because each selected edge is safe by the cut property and cycle checks preserve the tree invariant.
 
-## Visual
+## How the implementations depend on one another
 
 ```mermaid
 graph TD
@@ -97,7 +97,7 @@ graph TD
 
 The diagram shows why the course starts with arrays, pointers, and ADTs. Nearly every later topic is a controlled combination of those ingredients.
 
-## Worked example 1: choosing a structure for an undo feature
+## An undo history is a stack
 
 Problem: A text editor must support `undo`. Each edit action should be reversed in the opposite order from how it was performed. Choose a data structure and justify the operations.
 
@@ -120,7 +120,7 @@ Method:
 
 Checked answer: use a stack. A queue would be wrong because it would undo the oldest edit first. A sorted structure would be unnecessary because chronological nesting, not key order, determines the operation.
 
-## Worked example 2: choosing a representation for a sparse road graph
+## Adjacency lists for a sparse road network
 
 Problem: A road network has `100,000` intersections and `250,000` bidirectional roads. The program must run BFS-like reachability queries and Dijkstra shortest paths with nonnegative distances. Should the graph use an adjacency matrix or adjacency lists?
 
@@ -150,9 +150,9 @@ So the list representation stores `100,000` vertex heads plus about `500,000` ad
 
 Checked answer: use adjacency lists. The graph is sparse, and the required algorithms benefit from iterating only over actual roads.
 
-## Code
+## Counting linear and binary search comparisons
 
-This short C program compares the number of comparisons used by linear search and binary search on the same sorted array. It is not a benchmarking tool; it is a trace that makes the complexity difference visible.
+This short C program compares the number of comparisons used by linear search and binary search on the same sorted array. It is a trace rather than a benchmark; the reported counts expose the scaling difference directly.
 
 ```c
 #include <stdio.h>
@@ -199,7 +199,7 @@ int main(void) {
 }
 ```
 
-## Common pitfalls
+## Invariants, ownership, and algorithm assumptions
 
 - Learning operation names without learning invariants. The invariant is what makes the operation correct.
 - Choosing a structure only by average-case complexity. Worst-case behavior, memory use, order requirements, and implementation risk also matter.
@@ -208,19 +208,8 @@ int main(void) {
 - Using a graph algorithm without checking its assumptions, such as running Dijkstra with negative edges.
 - Assuming a page's example implementation is the only implementation. ADTs can have multiple valid representations.
 
-## Connections
+<div className="see-also">
 
-- [arrays and array operations](/cs/data-structures/arrays)
-- [stacks](/cs/data-structures/stacks)
-- [queues](/cs/data-structures/queues)
-- [linked lists](/cs/data-structures/linked-lists)
-- [binary trees](/cs/data-structures/binary-trees)
-- [binary search trees](/cs/data-structures/binary-search-trees)
-- [heaps and priority queues](/cs/data-structures/heaps-priority-queues)
-- [hashing](/cs/data-structures/hashing)
-- [graph representation](/cs/data-structures/graph-representation)
-- [graph traversals](/cs/data-structures/graph-traversals)
-- [minimum spanning trees](/cs/data-structures/minimum-spanning-trees)
-- [shortest paths](/cs/data-structures/shortest-paths)
-- [sorting algorithms](/cs/data-structures/sorting-algorithms)
-- [searching algorithms](/cs/data-structures/searching-algorithms)
+See also: [Arrays and array operations](/cs/data-structures/arrays) · [Stacks](/cs/data-structures/stacks) · [Queues](/cs/data-structures/queues) · [Linked lists](/cs/data-structures/linked-lists) · [Binary trees](/cs/data-structures/binary-trees) · [Binary search trees](/cs/data-structures/binary-search-trees) · [Heaps and priority queues](/cs/data-structures/heaps-priority-queues) · [Hashing](/cs/data-structures/hashing) · [Graph representation](/cs/data-structures/graph-representation) · [Graph traversals](/cs/data-structures/graph-traversals) · [Minimum spanning trees](/cs/data-structures/minimum-spanning-trees) · [Shortest paths](/cs/data-structures/shortest-paths) · [Sorting algorithms](/cs/data-structures/sorting-algorithms) · [Searching algorithms](/cs/data-structures/searching-algorithms)
+
+</div>

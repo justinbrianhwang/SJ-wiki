@@ -698,9 +698,8 @@ This is only the long-time part. Specified initial displacement and velocity wou
 - Resonance is a frequency-response statement. A large static displacement caused by a soft spring is not resonant motion.
 - Linear stiffness and viscous damping are models over a limited range. Clearance, dry friction, geometric nonlinearity, and amplitude-dependent material behavior can change both decay and frequency.
 
-## Related pages
+<div className="see-also">
 
-- [Particle kinetics with Newton's second law](/physics/mechanics/particle-kinetics-newton)
-- [Work-energy methods](/physics/mechanics/work-energy-methods)
-- [Impulse, momentum, and impact](/physics/mechanics/impulse-momentum-impact)
-- [Planar rigid-body motion](/physics/mechanics/planar-rigid-body-motion)
+See also: [Particle kinetics with Newton's second law](/physics/mechanics/particle-kinetics-newton) · [Work-energy methods](/physics/mechanics/work-energy-methods) · [Impulse, momentum, and impact](/physics/mechanics/impulse-momentum-impact) · [Planar rigid-body motion](/physics/mechanics/planar-rigid-body-motion)
+
+</div>

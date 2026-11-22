@@ -7,9 +7,9 @@ sidebar_position: 14
 
 Autonomous-driving safety is not a single metric. It combines functional safety, intended-functionality safety, cybersecurity, validation, operational limits, human factors, scenario coverage, monitoring, and organizational discipline. A vehicle can fail because a component breaks, because a component works as designed but the design was insufficient, because a machine-learning model generalizes poorly, or because the operational design domain was misunderstood.
 
-This page introduces ISO 26262, ISO 21448 SOTIF, ASIL, scenario testing, formal safety arguments, Mobileye RSS, edge-case mining, and the difference between component reliability and system-level safety. It is the foundation for evaluating every technical page in this section, from [sensors](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu) to [end-to-end driving](/cs/autonomous-driving/end-to-end-driving).
+The useful split is between component malfunctions, limitations of intended behavior, and evidence that the assembled system controls both. ISO 26262, ISO 21448 SOTIF, ASIL reasoning, scenario tests, safety cases, RSS, and edge-case mining address different parts of that argument.
 
-## Definitions
+## Failure classes and safety vocabulary
 
 **Functional safety** addresses unreasonable risk caused by malfunctioning electrical or electronic systems. ISO 26262 is the main automotive functional-safety standard for road vehicles.
 
@@ -27,7 +27,7 @@ This page introduces ISO 26262, ISO 21448 SOTIF, ASIL, scenario testing, formal 
 
 **Edge-case mining** searches logs and simulations for rare, difficult, or high-risk situations: unusual objects, near misses, perception disagreement, abrupt cut-ins, map mismatches, emergency vehicles, or ODD boundary cases.
 
-## Key results
+## Dividing the work among ISO 26262, SOTIF, and validation
 
 ISO 26262 and SOTIF address complementary failure classes. ISO 26262 asks whether the system malfunctions and how hazards are controlled. SOTIF asks whether the intended function is insufficient under foreseeable conditions even when no component has failed.
 
@@ -59,7 +59,7 @@ A release process should define what blocks deployment. Examples include an incr
 
 Incident analysis should look for systemic causes, not only immediate triggers. A crash or near miss may involve perception uncertainty, map assumptions, behavior arbitration, remote-assistance policy, test-driver procedure, and organizational release pressure. Safety engineering treats those interactions as part of the system.
 
-## Visual
+### From hazard analysis to release evidence
 
 ```mermaid
 flowchart TB
@@ -122,9 +122,9 @@ flowchart TB
 
 This diagram combines the ISO 26262 V-model, SOTIF performance-limit loop, and scenario-testing pipeline. Requirements and safety goals flow down into architecture and implementation, evidence flows back up through verification and validation, and the dotted feedback paths show how field monitoring updates hazards, scenarios, ODD limits, and the safety case.
 
-## Worked example 1: Qualitative ASIL reasoning
+## Reasoning qualitatively about ASIL
 
-Problem: An automated highway feature could unintentionally command hard braking from 100 km/h in dense traffic because of a false obstacle. Reason qualitatively about severity, exposure, controllability, and why this may lead to a high ASIL.
+Consider an automated highway feature that could command hard braking from 100 km/h in dense traffic because of a false obstacle. Severity, exposure, and controllability explain why the event may receive a high ASIL.
 
 1. Severity: sudden hard braking at highway speed can cause rear-end collisions and serious injury, so severity is high.
 2. Exposure: if the feature is intended for highways and dense traffic is common, exposure is not rare.
@@ -132,13 +132,13 @@ Problem: An automated highway feature could unintentionally command hard braking
 4. Safety goal: prevent unintended severe braking or limit it through plausibility checks, redundancy, graded braking, driver or system fallback, and monitoring.
 5. ASIL implication: high severity, meaningful exposure, and difficult controllability push the hazard toward a stringent ASIL classification under the standard's tables.
 
-Answer: the exact ASIL requires the formal ISO 26262 classification process, but the qualitative reasoning indicates this is a high-criticality hazardous event.
+The exact ASIL requires the formal ISO 26262 classification process, but the qualitative reasoning marks this as a high-criticality hazardous event.
 
-Check: The analysis focuses on the hazardous event, not the component label. A camera false positive, radar ghost, fusion bug, or planner error can all contribute to the same hazardous braking event.
+The analysis belongs to the hazardous event, not to a component label. A camera false positive, radar ghost, fusion bug, or planner error can all contribute to the same braking event.
 
-## Worked example 2: RSS-style safe following distance
+## Computing an RSS-style following distance
 
-Problem: Use a simplified longitudinal safety calculation. Ego speed is $v_e=25$ m/s, lead vehicle speed is $v_l=20$ m/s, response time is $\rho=1$ s, maximum ego acceleration during response is $a_{\max}=2$ m/s², comfortable ego braking is $b_e=4$ m/s², and lead braking is $b_l=6$ m/s². Compute:
+For a simplified longitudinal calculation, let ego speed be $v_e=25$ m/s, lead-vehicle speed $v_l=20$ m/s, response time $\rho=1$ s, maximum ego acceleration during response $a_{\max}=2$ m/s², comfortable ego braking $b_e=4$ m/s², and lead braking $b_l=6$ m/s². Compute:
 
 $$
 d_{\min} = v_e\rho + \frac{1}{2}a_{\max}\rho^2
@@ -177,11 +177,11 @@ $$
 d_{\min}=26+91.125-33.333=83.792\ \mathrm{m}.
 $$
 
-Answer: the simplified safe following distance is about 83.8 m.
+The simplified safe following distance is about 83.8 m.
 
-Check: The required distance is large because ego is faster than the lead vehicle and may continue accelerating during response time.
+The distance is large because ego is faster than the lead vehicle and may continue accelerating during the response interval.
 
-## Code
+## Checking the longitudinal bound in code
 
 ```python
 def rss_longitudinal_distance(v_ego, v_lead, response_time, accel_max, brake_ego, brake_lead):
@@ -206,11 +206,11 @@ print("safe distance:", d)
 print("scenario score:", severity_score(collisions=0, near_misses=2, hard_brakes=7))
 ```
 
-## Recent systems and papers
+## Fault injection through CARLA and Autoware
 
 Matos, Duraes, and Cunha turn sensor-failure discussion into a closed-loop safety-evaluation workflow by injecting faults into CARLA sensor streams before Autoware.Universe consumes them, then classifying the route outcome as `OK`, `Timeout`, `Out`, or `Collision` [1]. The framework combines CARLA 0.9.15, a modified CARLA ROS bridge, Scenario Runner, and Autoware, with faults applied at the bridge layer so the autonomy stack still receives ordinary ROS topics and the experiment tests system response rather than a single isolated module [1]. The fault model varies location, type, trigger, and duration: LiDAR, GNSS, IMU gyroscope, IMU accelerometer, and IMU quaternion streams are subjected to silent failure or severe noise at route triggers such as start, stop sign, right turn, crosswalk, and final intersection, with the fault persisting after activation [1]. The reported results are stack-specific but instructive: all nominal-noise golden tests completed, GNSS faults and accelerometer/quaternion faults were tolerated in this LiDAR-map-dominated setup, severe gyroscope noise produced collisions, departures, and timeouts, LiDAR severe noise caused fail-safe non-completion, and silent LiDAR failure caused collisions in all five main triggers [1]. This evidence complements scenario testing and formal runtime ideas such as [shield synthesis and runtime enforcement](/cs/autonomous-driving/shield-synthesis-runtime-enforcement): simulation fault injection can reveal whether monitors, fusion, localization, planning, and minimal-risk behavior actually contain a degraded sensor instead of merely assuming diagnostics will work [1]. The paper should not be read as a fleet crash-rate estimate or a universal sensor ranking, because the camera pipeline was excluded and different ODDs, Autoware versions, redundancy choices, and fault monitors could change the outcome pattern [1].
 
-## Common pitfalls
+## Where a safety argument stays incomplete
 
 - Treating ISO 26262 compliance as full AV safety. It addresses malfunctioning E/E systems, not every intended-functionality limitation.
 - Treating SOTIF as only a perception standard. Planning, control, HMI, ODD monitoring, and fallback can also have performance limitations.
@@ -219,16 +219,14 @@ Matos, Duraes, and Cunha turn sensor-failure discussion into a closed-loop safet
 - Assuming human fallback is available at any automation level. Level 4 safety cannot rely on instant human takeover inside the ODD.
 - Ignoring post-release monitoring. Field data, incident analysis, and regression controls are part of the safety lifecycle.
 
-## Connections
+## Standards and references
 
-- [SAE levels and operational design domain](/cs/autonomous-driving/sae-levels-and-operational-design-domain)
-- [Simulation and data](/cs/autonomous-driving/simulation-and-data)
-- [Decision making and behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning)
-- [Adversarial and physical attacks on AV](/cs/autonomous-driving/adversarial-and-physical-attacks-on-av)
-- [Embedded systems](/cs/embedded/)
-- [Engineering math for probability and control](/math/engineering-math/)
-- Further reading: ISO 26262, ISO 21448 SOTIF, Mobileye RSS, UL 4600, safety-case literature, scenario-based testing papers, and public AV safety reports.
-
-## References
+Useful primary sources include ISO 26262, ISO 21448 SOTIF, Mobileye's RSS publications, UL 4600, safety-case literature, scenario-based testing research, and public AV safety reports.
 
 [1] F. Matos, J. Duraes, and J. Cunha, "Simulating the Effects of Sensor Failures on Autonomous Vehicles for Safety Evaluation," *Informatics*, vol. 12, no. 3, article 94, 2025.
+
+<div className="see-also">
+
+See also: [SAE levels and operational design domain](/cs/autonomous-driving/sae-levels-and-operational-design-domain) · [Simulation and data](/cs/autonomous-driving/simulation-and-data) · [Decision making and behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning) · [Adversarial and physical attacks on AV](/cs/autonomous-driving/adversarial-and-physical-attacks-on-av) · [Embedded systems](/cs/embedded/intro) · [Engineering math for probability and control](/math/engineering-math/intro)
+
+</div>

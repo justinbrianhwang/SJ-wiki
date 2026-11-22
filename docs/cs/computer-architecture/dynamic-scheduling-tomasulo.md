@@ -9,7 +9,7 @@ Dynamic scheduling lets hardware find instruction-level parallelism that the com
 
 Tomasulo's algorithm is the classic model for this idea. It was developed for floating-point execution, but its concepts reappear throughout modern processors: reservation stations, tags instead of architectural register names, broadcast results, and dependency-driven wakeup. The algorithm attacks RAW hazards by waiting for values and attacks WAR/WAW name hazards by renaming registers to producer tags.
 
-## Definitions
+## Dependencies Tomasulo can rearrange
 
 Instruction-level parallelism, ILP, is the amount of independent work among nearby instructions. Dependencies limit ILP:
 
@@ -34,7 +34,7 @@ The basic stages are:
 
 Modern processors refine this with physical register files, issue queues, load/store queues, and reorder buffers, but the dependency idea is the same.
 
-## Key results
+## Tags, wakeup, and the finite instruction window
 
 Tomasulo's algorithm removes many stalls by separating true dependencies from name dependencies. Consider:
 
@@ -48,7 +48,7 @@ The two writes to `F2` create a WAW name dependence if the machine treats `F2` a
 
 RAW dependencies remain real. If instruction B needs instruction A's result, B cannot execute before that result exists. Dynamic scheduling helps by allowing unrelated instructions C, D, and E to bypass B while B waits.
 
-Memory dependencies are more difficult because addresses may not be known early. A load can pass an older store only when the machine knows they do not refer to the same address, or when speculation and recovery mechanisms are available. This is why load/store queues are central to out-of-order processors.
+Memory dependencies are more difficult because addresses may not be known early. A load can pass an older store only when the machine knows they do not refer to the same address, or when speculation and recovery mechanisms are available. Load/store queues are therefore central to out-of-order processors.
 
 The performance benefit is bounded by available ILP, functional units, front-end bandwidth, branch prediction, and memory latency. Out-of-order execution is not magic; it rearranges independent work to cover stalls, but it cannot manufacture independence in a serial dependency chain.
 
@@ -57,8 +57,6 @@ The instruction window is the hardware's search space for independent work. A la
 Memory ordering makes dynamic scheduling less clean than register scheduling. Register names are known at decode, but memory addresses may require computation. A younger load might be independent of an older store, or it might read the same address. Conservative hardware waits, losing performance. Aggressive hardware predicts independence, executes the load, and replays if a violation is discovered. The right choice depends on workload behavior and recovery cost.
 
 Tomasulo's algorithm is often taught with a common data bus, but real processors cannot broadcast unlimited results to unlimited consumers. Physical layout, wire delay, and energy force clustered schedulers, limited bypass networks, and staged wakeup paths. The conceptual model remains valuable because it explains why tags, renaming, and operand readiness are central to out-of-order execution.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -95,7 +93,7 @@ flowchart TD
     RegFile --> Fetch
 ```
 
-This Tomasulo diagram exposes the renamed dataflow behind out-of-order execution. Issue allocates reservation stations, records producer tags in the register-status table, and lets each station wait on values or tags until its operands and functional unit are ready. The common data bus wakes consumers by tag, while the destination-tag check prevents older writes from overwriting newer architectural mappings.
+Issue allocates reservation stations, records producer tags in the register-status table, and lets each station wait on values or tags until its operands and functional unit are ready. The common data bus wakes consumers by tag, while the destination-tag check prevents older writes from overwriting newer architectural mappings.
 
 | Structure | Holds | Purpose |
 |---|---|---|
@@ -105,7 +103,7 @@ This Tomasulo diagram exposes the renamed dataflow behind out-of-order execution
 | Common data bus | Completed tag and value | Wakes dependent instructions |
 | Load/store queue | Memory operations and addresses | Preserves memory ordering when needed |
 
-## Worked example 1: Out-of-order issue around a cache miss
+## Scheduling past a cache miss
 
 Problem: A simple in-order core sees the following instructions. `I1` is a load that misses and takes 20 cycles. `I2` depends on `I1`. `I3` and `I4` are independent one-cycle ALU operations. Compare in-order execution with dynamic scheduling, ignoring fetch and write-back overhead.
 
@@ -154,7 +152,7 @@ $$
 
 Checked answer: Dynamic scheduling reduces this tiny sequence from about 23 to 21 cycles. The gain is small because only two independent one-cycle operations are available to cover a long miss.
 
-## Worked example 2: Register renaming removes WAW and WAR
+## Renaming away WAW and WAR hazards
 
 Problem: Consider this instruction sequence:
 
@@ -198,7 +196,7 @@ I4: F14 = T3 / F16
 
 Checked answer: Renaming converts name reuse into distinct tags. RAW dependencies remain, but WAW and WAR hazards on `F2` disappear from the scheduling problem.
 
-## Code
+## A minimal register renamer
 
 ```python
 class Renamer:
@@ -231,11 +229,11 @@ for op, dst, srcs in program:
 
 The renamer code demonstrates name mapping, but a real machine must also free old physical registers. A physical register cannot return to the free list when a newer version is created, because older instructions or exceptions may still need the old value. Many processors free the previous physical register only when the redefining instruction commits and the old version is no longer part of the precise architectural state.
 
-The model also ignores issue width and functional-unit conflicts. Renaming can reveal that two operations are independent, but they still compete for reservation stations, ports, execution units, and result buses. Dynamic scheduling is therefore a resource-allocation problem as well as a dependency problem. This is why increasing the instruction window does not automatically produce proportional IPC gains.
+The model also ignores issue width and functional-unit conflicts. Renaming can reveal that two operations are independent, but they still compete for reservation stations, ports, execution units, and result buses. Dynamic scheduling is therefore a resource-allocation problem as well as a dependency problem. Increasing the instruction window does not automatically produce proportional IPC gains.
 
-A practical performance study should separate front-end starvation from back-end scheduling limits. If the decoder or branch predictor fails to supply enough instructions, reservation stations sit empty. If the window is full but few instructions are ready, true dependencies or memory latency are the likely limit.
+A performance study should separate front-end starvation from back-end scheduling limits. If the decoder or branch predictor fails to supply enough instructions, reservation stations sit empty. If the window is full but few instructions are ready, true dependencies or memory latency are the likely limit.
 
-## Common pitfalls
+## What the textbook machine leaves out
 
 - Assuming out-of-order execution changes the program-visible instruction order.
 - Forgetting that true RAW dependencies cannot be renamed away.
@@ -244,9 +242,8 @@ A practical performance study should separate front-end starvation from back-end
 - Assuming an infinite common data bus or unlimited bypass bandwidth.
 - Measuring ILP on code without realistic branch and cache behavior.
 
-## Connections
+<div className="see-also">
 
-- [Pipelining and Hazards](/cs/computer-architecture/pipelining-hazards)
-- [Speculation, Renaming, and Multiple Issue](/cs/computer-architecture/speculation-renaming-multiple-issue)
-- [Branch Prediction and Control Hazards](/cs/computer-architecture/branch-prediction)
-- [Instruction Set Principles](/cs/computer-architecture/instruction-set-principles)
+See also: [Pipelining and Hazards](/cs/computer-architecture/pipelining-hazards) · [Speculation, Renaming, and Multiple Issue](/cs/computer-architecture/speculation-renaming-multiple-issue) · [Branch Prediction and Control Hazards](/cs/computer-architecture/branch-prediction) · [Instruction Set Principles](/cs/computer-architecture/instruction-set-principles)
+
+</div>

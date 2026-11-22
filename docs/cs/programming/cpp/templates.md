@@ -352,10 +352,8 @@ Variadic templates accept a parameter pack of zero or more types or values. The 
 
 Generic code should avoid narrowing hidden inside instantiation. If a template accumulates sizes in `int`, it may work in tests and fail for a large container whose `size_type` is wider. Deriving related types from iterator traits or using `auto` for exact intermediate results often preserves the caller's range. Explicit conversions still belong at boundaries where the intended loss is known.
 
-## Related pages
+<div className="see-also">
 
-- [functions, parameters, and scope](/cs/programming/cpp/functions-parameters-and-scope)
-- [references and operator overloading](/cs/programming/cpp/references-and-operator-overloading)
-- [classes and encapsulation](/cs/programming/cpp/classes-and-encapsulation)
-- [arrays](/cs/programming/cpp/arrays)
-- [stl containers](/cs/programming/cpp/stl-containers)
+See also: [functions, parameters, and scope](/cs/programming/cpp/functions-parameters-and-scope) · [references and operator overloading](/cs/programming/cpp/references-and-operator-overloading) · [classes and encapsulation](/cs/programming/cpp/classes-and-encapsulation) · [arrays](/cs/programming/cpp/arrays) · [stl containers](/cs/programming/cpp/stl-containers)
+
+</div>

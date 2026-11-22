@@ -7,13 +7,9 @@ sidebar_position: 7
 
 Exponential, logarithmic, and inverse functions are where calculus moves beyond polynomial behavior. Exponentials model quantities whose rate of change is proportional to the current amount. Logarithms undo exponential growth and convert multiplication into addition. Inverse functions reverse input-output roles, so their derivatives explain how rates change when a relationship is solved in the opposite direction.
 
-![Leonhard Euler is shown in an eighteenth-century portrait.](https://commons.wikimedia.org/wiki/Special:FilePath/Leonhard_Euler.jpg)
-
-*Figure: Leonhard Euler's notation and results appear across analysis, graph theory, and number theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Leonhard_Euler.jpg), Jakob Emanuel Handmann, public domain.*
-
 These functions appear in growth and decay, compound interest, radioactive half-life, pH, sound intensity, population models, and change of scale. They also support many integration techniques and differential equations later in calculus.
 
-## Definitions
+## Exponentials, logarithms, and reversed mappings
 
 The natural exponential function $e^x$ is the unique function satisfying
 
@@ -50,7 +46,7 @@ An inverse function reverses a one-to-one function. If $f(a)=b$, then $f^{-1}(b)
 
 For inverse trigonometric functions, the original trigonometric functions must be restricted to intervals where they are one-to-one. For example, $\arcsin x$ is the inverse of $\sin x$ restricted to $[-\pi/2,\pi/2]$.
 
-## Key results
+## Derivatives, reciprocal slopes, and relative growth
 
 The core derivative formulas are
 
@@ -140,9 +136,9 @@ $$
 \log_a x=\frac{\ln x}{\ln a}.
 $$
 
-Since $\ln a$ is a constant, differentiating gives $\frac{d}{dx}\log_a x=1/(x\ln a)$. This is also why natural logarithms dominate calculus: base $e$ removes the extra constant from the derivative.
+Since $\ln a$ is a constant, differentiating gives $\frac{d}{dx}\log_a x=1/(x\ln a)$. Natural logarithms dominate calculus because base $e$ removes the extra constant from the derivative.
 
-Logarithmic scales compress multiplicative change. If a quantity is multiplied by $10$, its common logarithm increases by $1$. If a quantity is multiplied by $e$, its natural logarithm increases by $1$. This is why logarithms are used for pH, decibels, earthquake magnitude, and data spanning many orders of magnitude. Calculus on a logarithmic scale often turns relative change into ordinary change:
+Logarithmic scales compress multiplicative change. If a quantity is multiplied by $10$, its common logarithm increases by $1$. If a quantity is multiplied by $e$, its natural logarithm increases by $1$. Logarithms are therefore used for pH, decibels, earthquake magnitude, and data spanning many orders of magnitude. Calculus on a logarithmic scale often turns relative change into ordinary change:
 
 $$
 \frac{d}{dt}\ln P(t)=\frac{P'(t)}{P(t)}.
@@ -168,7 +164,7 @@ $$
 \left(1+\frac{r}{n}\right)^n.
 $$
 
-As $n$ increases without bound, the factor approaches $e^r$. This is why $e^{rt}$ is the natural continuous compounding model.
+As $n$ increases without bound, the factor approaches $e^r$. The resulting continuous compounding model is $e^{rt}$.
 
 For inverse trigonometric functions, remember that the output is an angle in a restricted interval. The statement $\arcsin(1/2)=\pi/6$ is not listing every angle whose sine is $1/2$; it gives the principal value in $[-\pi/2,\pi/2]$. Calculus formulas for inverse trigonometric derivatives rely on those principal branches.
 
@@ -185,8 +181,6 @@ for fixed $n\gt 0$ and $p\gt 0$. They help estimate series, improper integrals, 
 They also explain why graph scales matter: exponential curves may look flat and then suddenly steep on ordinary axes, while logarithmic axes reveal multiplicative patterns more evenly across large ranges of data.
 
 This matters in modeling, estimation, and asymptotic comparison.
-
-## Visual
 
 | Function | Domain | Range | Derivative | Typical model |
 |---|---:|---:|---:|---|
@@ -205,7 +199,7 @@ graph LR
   E --> F["(f^-1)' at f(a)"]
 ```
 
-## Worked example 1: differentiate exponential and logarithmic expressions
+## Differentiating a mixed exponential-logarithmic product
 
 **Problem.** Differentiate
 
@@ -262,7 +256,7 @@ y'=e^{3x^2-1}\left(6x\ln(5x+2)+\frac{5}{5x+2}\right),
 \qquad x>-\frac25.
 $$
 
-## Worked example 2: exponential decay and half-life
+## Recovering a decay law from its half-life
 
 **Problem.** A substance has mass $80$ grams at time $t=0$ and decays continuously with half-life $12$ years. Find the model and the mass after $30$ years.
 
@@ -336,7 +330,7 @@ $$
 
 grams per year at that instant. The rate is smaller than it was initially because the remaining mass is smaller.
 
-## Code
+## Evaluating the decay model numerically
 
 ```python
 from math import exp, log
@@ -349,18 +343,22 @@ for years in [0, 12, 24, 30]:
     print(years, round(decay_model(80, 12, years), 4))
 ```
 
-## Common pitfalls
+## Domain and notation checks
 
-- Writing $\ln(a+b)=\ln a+\ln b$. Logarithms turn products into sums, not sums into sums.
-- Forgetting domain restrictions such as $x\gt 0$ for $\ln x$.
-- Treating $f^{-1}(x)$ as $1/f(x)$. Inverse function notation is not reciprocal notation.
-- Using the inverse derivative formula when $f'(a)=0$. The inverse may have a vertical tangent or fail to be differentiable.
-- Dropping the chain-rule factor in derivatives such as $\ln(5x+2)$ or $e^{3x^2}$.
-- Confusing half-life with the decay constant. The decay constant is $k=-\ln 2/T$, not $T$ itself.
+- Logarithms split products and powers, not sums: there is no identity $\ln(a+b)=\ln a+\ln b$.
+- Every logarithmic expression brings a positivity condition. In particular, $\ln(g(x))$ requires $g(x)\gt 0$ before any differentiation or equation solving.
+- The notation $f^{-1}$ denotes a function that reverses $f$; the reciprocal is $1/f$.
+- The inverse-derivative formula requires a nonzero original slope. When $f'(a)=0$, the inverse may have a vertical tangent or may not be differentiable.
+- Composed exponentials and logarithms still need their inner derivative, as in $\ln(5x+2)$ and $e^{3x^2}$.
+- Half-life $T$ is a time interval, while the decay constant has units of inverse time and equals $k=-\ln 2/T$.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Functions and Models](/math/calculus/functions-and-models): exponentials, logarithms, and inverses are major model families.
 - [Differentiation Rules](/math/calculus/differentiation-rules): these functions expand the derivative rule set.
 - [Integration Techniques and Improper Integrals](/math/calculus/integration-techniques-improper-integrals): logarithms often appear from integrating $1/x$ and rational functions.
 - [Sequences and Series](/math/calculus/sequences-and-series): exponential and logarithmic comparisons help classify growth rates.
+
+</div>

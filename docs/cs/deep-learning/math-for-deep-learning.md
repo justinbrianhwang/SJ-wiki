@@ -9,7 +9,7 @@ The mathematical preliminaries in D2L are intentionally compact: enough linear a
 
 Deep learning repeatedly applies the same pattern. A model maps inputs to predictions through differentiable tensor operations. A loss function turns predictions into a scalar objective. Automatic differentiation computes gradients of that scalar with respect to model parameters. An optimizer uses those gradients to change the parameters. Linear algebra describes the computation; calculus supplies the local direction of improvement; probability explains why losses such as squared error and cross-entropy are natural.
 
-## Definitions
+## The objects carried through a model
 
 A **scalar** is a single number, often written $x \in \mathbb{R}$. A **vector** is an ordered list $x \in \mathbb{R}^d$. A **matrix** is a rectangular array $X \in \mathbb{R}^{m \times n}$. A **tensor** is an array with any number of axes.
 
@@ -44,7 +44,7 @@ $$
 
 A **random variable** assigns numeric values to uncertain outcomes. The expectation $\mathbb{E}[X]$ is a probability-weighted average. Conditional probability $P(A \mid B)$ measures the probability of $A$ after assuming $B$ occurred.
 
-## Key results
+## Why gradients, likelihoods, and shapes recur
 
 Linear models use matrix multiplication to express many predictions at once:
 
@@ -96,7 +96,7 @@ Notation consistency reduces cognitive load in deep learning. D2L usually reserv
 
 The link between likelihood and loss is a recurring modeling choice. Squared error corresponds to Gaussian noise with fixed variance. Cross-entropy corresponds to categorical likelihood. Other data assumptions lead to other losses, such as Poisson losses for counts or quantile losses for asymmetric prediction. D2L focuses on common losses, but the principle is broader: choose objectives that match the data-generating story and task metric.
 
-## Visual
+## From a tensor program to an optimizer step
 
 ```mermaid
 flowchart TB
@@ -127,7 +127,7 @@ This computation graph connects the math objects to the training mechanics. The 
 | Expectation | Risk, average loss, sampling | Confusing sample mean with exact expectation |
 | Conditional probability | Supervised prediction and Bayes reasoning | Ignoring what is being conditioned on |
 
-## Worked example 1: gradient of a quadratic loss
+## Differentiating a quadratic loss by hand
 
 Problem: compute the gradient of
 
@@ -224,9 +224,9 @@ X^T r =
 \end{bmatrix}.
 $$
 
-Checked answer: $\nabla_w f = [-7, -10]^T$. A gradient-descent step subtracts this gradient, so it increases both components of $w$ for a small positive learning rate.
+$\nabla_w f = [-7, -10]^T$. A gradient-descent step subtracts this gradient, so it increases both components of $w$ for a small positive learning rate.
 
-## Worked example 2: Bayes rule for a classifier signal
+## Applying Bayes' rule to a rare class
 
 Problem: a detector flags an image as containing a rare class. The prior probability of the class is $P(C)=0.01$. The detector has true positive rate $P(F \mid C)=0.95$ and false positive rate $P(F \mid \neg C)=0.05$. Find $P(C \mid F)$.
 
@@ -263,9 +263,9 @@ P(C \mid F) =
 \approx 0.161.
 $$
 
-Checked answer: even with a strong detector, a positive flag only gives about $16.1\%$ probability because the class is rare. This is the base-rate effect, and it is one reason accuracy alone can be misleading.
+Even with a strong detector, a positive flag only gives about $16.1\%$ probability because the class is rare. The base-rate effect can make accuracy alone misleading.
 
-## Code
+## Comparing autograd with the matrix derivative
 
 ```python
 import torch
@@ -284,7 +284,7 @@ manual_grad = X.T @ (X @ w.detach() - y)
 print("manual gradient:", manual_grad)
 ```
 
-## Common pitfalls
+## Shape and computation-graph mistakes
 
 - Confusing a row vector, column vector, and rank-1 tensor. PyTorch often accepts rank-1 tensors, but derivations require explicit orientation.
 - Calling `backward()` repeatedly without clearing accumulated gradients. Optimizers usually need `zero_grad()` each iteration.
@@ -293,10 +293,8 @@ print("manual gradient:", manual_grad)
 - Treating probability estimates as calibrated merely because they came from a softmax.
 - Forgetting that gradient descent moves opposite the gradient, while the gradient points toward steepest local increase.
 
-## Connections
+<div className="see-also">
 
-- [Linear algebra](/math/linear-algebra/)
-- [Probability and random variables](/math/probability-and-random-variables/)
-- [Classical machine learning](/cs/machine-learning/)
-- [Optimization algorithms](/cs/deep-learning/optimization-algorithms)
-- [Reinforcement learning and Bayesian tuning](/cs/deep-learning/reinforcement-learning-and-bayesian-tuning)
+See also: [Linear algebra](/math/linear-algebra/intro) · [Probability and random variables](/math/probability-and-random-variables/intro) · [Classical machine learning](/cs/machine-learning/intro) · [Optimization algorithms](/cs/deep-learning/optimization-algorithms) · [Reinforcement learning and Bayesian tuning](/cs/deep-learning/reinforcement-learning-and-bayesian-tuning)
+
+</div>

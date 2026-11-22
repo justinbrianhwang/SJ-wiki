@@ -334,9 +334,8 @@ If the best action depends on observed covariates, pooling everyone into one mea
 
 Moving to a richer model costs assumptions and data. A simple bandit remains valuable as a baseline and as a diagnostic of whether sequential state dynamics actually matter. The smallest model that respects the causal timing of the task is usually the easiest one to audit.
 
-## Related pages
+<div className="see-also">
 
-- [Reinforcement learning problem and finite MDPs](/cs/reinforcement-learning/rl-problem-and-mdps)
-- [Policy gradient methods](/cs/reinforcement-learning/policy-gradient-methods)
-- [Monte Carlo methods](/cs/reinforcement-learning/monte-carlo-methods)
-- [Temporal-difference learning](/cs/reinforcement-learning/temporal-difference-learning)
+See also: [Reinforcement learning problem and finite MDPs](/cs/reinforcement-learning/rl-problem-and-mdps) · [Policy gradient methods](/cs/reinforcement-learning/policy-gradient-methods) · [Monte Carlo methods](/cs/reinforcement-learning/monte-carlo-methods) · [Temporal-difference learning](/cs/reinforcement-learning/temporal-difference-learning)
+
+</div>

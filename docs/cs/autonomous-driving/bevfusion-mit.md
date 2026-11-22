@@ -7,9 +7,9 @@ sidebar_position: 21
 
 BEVFusion by Zhijian Liu, Haotian Tang, Alexander Amini, Xinyu Yang, Huizi Mao, Daniela Rus, and Song Han is a unified bird's-eye-view fusion framework for multi-task autonomous-driving perception, published at ICRA 2023 [1]. The central claim is simple but important: camera features should not be squeezed onto sparse LiDAR points, and LiDAR features should not be warped into a perspective image plane. Both modalities should meet in a shared BEV representation where road-scene geometry, dense image semantics, detection heads, and map-segmentation heads all speak the same spatial language.
 
-This page covers the MIT-Han-Lab BEVFusion system. It should be distinguished from Liang et al.'s NeurIPS 2022 system with the same name, which emphasizes independent camera and LiDAR streams for robustness to modality failure [2]. Here the main technical contribution is a generic multi-task BEV fusion architecture plus an optimized BEV pooling kernel that makes Lift-Splat-style camera-to-BEV projection practical enough for a real detector.
+The MIT-Han-Lab system should be distinguished from Liang et al.'s NeurIPS 2022 system with the same name, which emphasizes independent camera and LiDAR streams for robustness to modality failure [2]. Its main technical contribution is a generic multi-task BEV fusion architecture plus an optimized BEV pooling kernel that makes Lift-Splat-style camera-to-BEV projection fast enough for a real detector.
 
-## Problem & motivation
+## Why the modalities meet in BEV
 
 LiDAR-camera fusion is tempting because the sensors fail differently. LiDAR gives accurate metric geometry but is sparse, especially for distant objects and low-reflectance surfaces. Cameras provide dense semantic texture but lack direct depth. Before BEVFusion, many fusion systems used point-level decoration: project image features onto LiDAR points, attach the features to the points, and run a LiDAR detector. That is effective for 3D boxes, but it discards most image features because only pixels hit by LiDAR receive a fused representation. The paper reports that for a typical 32-beam LiDAR, less than 5 percent of camera features are matched to a LiDAR point [1].
 
@@ -17,7 +17,7 @@ That loss is tolerable when the task is object-centric and the object has enough
 
 BEVFusion therefore treats BEV as the common working memory. Camera features are lifted through predicted depth distributions, LiDAR features are flattened or encoded into BEV, and the fused BEV tensor feeds task heads for 3D object detection and BEV map segmentation. The bottleneck is that camera lifting creates a very dense feature point cloud. The paper's optimized BEV pooling turns that operation from a research prototype bottleneck into a usable module.
 
-## Method
+## Lifting camera and LiDAR features into BEV
 
 Let the input be multi-view images $I_1,\ldots,I_N$ and a LiDAR point cloud $P=\{p_i\}$. BEVFusion first applies modality-specific encoders:
 
@@ -69,7 +69,7 @@ $$
 
 where $E_{\mathrm{bev}}$ is a fully convolutional BEV encoder with residual blocks. The authors use this encoder partly to compensate for local camera-LiDAR misalignment caused by depth estimation error. Task-specific heads then operate on the shared BEV tensor. The detection head follows center-based 3D detection, predicting class heatmaps plus box size, center offset, height, rotation, and velocity. The map-segmentation head treats each map category as a binary segmentation problem because categories can overlap, such as crosswalk and drivable area.
 
-## Architecture diagram
+### From sensor encoders to task heads
 
 ![BEVFusion overview showing camera and LiDAR encoders, camera-to-BEV view transformation, fused BEV features, and task-specific heads.](https://ar5iv.labs.arxiv.org/html/2205.13542/assets/x2.png)
 
@@ -98,7 +98,7 @@ flowchart TB
   MapHead --> Map["Drivable area and map elements"]
 ```
 
-## Architecture details
+## Resolution, calibration, and the pooling kernel
 
 The reported nuScenes configuration uses Swin-T [4] as the image backbone and VoxelNet or SECOND-style sparse convolutional processing [5] for LiDAR features. An FPN [6] fuses multi-scale camera features and produces a feature map at one-eighth of the input image size. The paper downsamples camera images to $256 \times 704$ and uses a typical camera feature map of $32 \times 88$ with six cameras. Depth is discretized over the range $[1,60]$ m with 0.5 m spacing, giving 118 bins in the example workload. That creates roughly two million lifted camera feature points per frame before BEV pooling.
 
@@ -108,7 +108,7 @@ The optimized BEV pooling is the most system-specific part. In Figure 3 of the p
 
 The design is task-agnostic. Detection uses mAP and NDS on nuScenes and Waymo; segmentation uses IoU and mean IoU over six BEV map categories. The same fused BEV tensor can support both because BEV is aligned with road layout and downstream planning.
 
-## Datasets & results
+## What improves on nuScenes and Waymo
 
 The paper evaluates on nuScenes and Waymo for 3D object detection, and on nuScenes for BEV map segmentation. It reports single-model nuScenes results without test-time augmentation for the main comparisons. On nuScenes test, BEVFusion reports 70.2 mAP and 72.9 NDS, compared with 68.9 mAP and 71.6 NDS for TransFusion in the table. It also reports 253.2G MACs and 119.2 ms latency on an RTX 3090, lower than several comparable fusion systems [1].
 
@@ -125,7 +125,7 @@ The map segmentation numbers are especially important. Point-level fusion method
 
 The analysis section also shows robustness trends. In rainy scenes, BEVFusion improves over the LiDAR-only CenterPoint baseline by 10.7 mAP in the paper's reported split. At night, multi-modal BEVFusion improves BEV map segmentation by 12.8 mIoU over the camera-only variant, highlighting the value of geometry when images degrade.
 
-## Worked example
+## Two views of BEV pooling
 
 **Walkthrough 1: assigning lifted camera features to a BEV cell.** Suppose a camera feature at one pixel has feature vector $f=[2,-1]$ and the depth head predicts three depth probabilities:
 
@@ -196,7 +196,7 @@ $$
 
 The answer is identical, but the computation avoids writing unused prefix values and avoids a dependency chain across all lifted points.
 
-## Code
+## Interval pooling in PyTorch
 
 ```python
 import torch
@@ -230,7 +230,7 @@ cell_ids = torch.tensor([0, 0, 1, 1, 1, 2, 2, 2])
 print(bev_pool_interval(features, cell_ids, num_cells=4).squeeze())
 ```
 
-## Common pitfalls
+## Reading the result without overclaiming it
 
 - Treating BEVFusion as only a detector misses the paper's motivation. The shared BEV representation is valuable because it also supports semantic map segmentation.
 - Confusing the MIT ICRA 2023 BEVFusion with Liang et al.'s NeurIPS 2022 BEVFusion leads to wrong architectural claims. The MIT paper emphasizes optimized BEV pooling and multi-task shared BEV; the NeurIPS paper emphasizes independent streams and robustness to modality malfunction.
@@ -239,17 +239,7 @@ print(bev_pool_interval(features, cell_ids, num_cells=4).squeeze())
 - Reporting only mAP understates the result. NDS, latency, MACs, and map-segmentation mIoU are central to the paper's argument.
 - BEV pooling relies on calibration stability. If intrinsics or extrinsics change, precomputed ranks and grid indices must be regenerated.
 
-## Connections
-
-- [Sensor fusion](/cs/autonomous-driving/sensor-fusion) for early, mid-level, and late fusion context.
-- [Perception, object detection, and segmentation](/cs/autonomous-driving/perception-object-detection-and-segmentation) for 3D boxes, BEV segmentation, mAP, and IoU.
-- [Sensors: cameras, LiDAR, radar, IMU](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu) for modality failure modes and calibration.
-- [BEVFusion, robust stream design](/cs/autonomous-driving/sensor-fusion) for the NeurIPS 2022 BEVFusion name collision.
-- [BEVDilation](/cs/autonomous-driving/sensor-fusion) for a later LiDAR-centric alternative to symmetric BEV fusion.
-- [Fusion4CA](/cs/autonomous-driving/sensor-fusion) for a follow-up direction that tries to exploit camera features more completely inside BEVFusion-style pipelines.
-- [Deep learning](/cs/deep-learning/) for CNN backbones, FPNs, attention, and detection heads.
-
-## References
+## Sources cited
 
 [1] Z. Liu, H. Tang, A. Amini, X. Yang, H. Mao, D. L. Rus, and S. Han, "BEVFusion: Multi-Task Multi-Sensor Fusion with Unified Bird's-Eye View Representation," in IEEE International Conference on Robotics and Automation (ICRA), 2023.
 
@@ -262,3 +252,17 @@ print(bev_pool_interval(features, cell_ids, num_cells=4).squeeze())
 [5] Y. Yan, Y. Mao, and B. Li, "SECOND: Sparsely Embedded Convolutional Detection," Sensors, 2018.
 
 [6] T.-Y. Lin et al., "Feature Pyramid Networks for Object Detection," in IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), 2017.
+
+<div className="see-also">
+
+See also:
+
+- [Sensor fusion](/cs/autonomous-driving/sensor-fusion) for early, mid-level, and late fusion context.
+- [Perception, object detection, and segmentation](/cs/autonomous-driving/perception-object-detection-and-segmentation) for 3D boxes, BEV segmentation, mAP, and IoU.
+- [Sensors: cameras, LiDAR, radar, IMU](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu) for modality failure modes and calibration.
+- [BEVFusion, robust stream design](/cs/autonomous-driving/sensor-fusion) for the NeurIPS 2022 BEVFusion name collision.
+- [BEVDilation](/cs/autonomous-driving/sensor-fusion) for a later LiDAR-centric alternative to symmetric BEV fusion.
+- [Fusion4CA](/cs/autonomous-driving/sensor-fusion) for a follow-up direction that tries to exploit camera features more completely inside BEVFusion-style pipelines.
+- [Deep learning](/cs/deep-learning/intro) for CNN backbones, FPNs, attention, and detection heads.
+
+</div>

@@ -7,9 +7,9 @@ sidebar_position: 20
 
 CenterPoint by Tianwei Yin, Xingyi Zhou, and Philipp Krahenbuhl is a CVPR 2021 3D object detection and tracking system for LiDAR point clouds [1]. Its main move is to stop treating 3D detection as a search over many oriented anchor boxes. Instead, it represents each object by its BEV center point, detects center heatmap peaks, and regresses the remaining box attributes only at those peaks.
 
-The result is a detector that is simpler than many anchor-based 3D pipelines and easier to connect to tracking. A detected object is a point with box attributes and velocity; a track is a path of points through time. This page should be read after the general [perception page](/cs/autonomous-driving/perception-object-detection-and-segmentation) and alongside [prediction and motion forecasting](/cs/autonomous-driving/prediction-and-motion-forecasting), because CenterPoint sits exactly at the perception-to-tracking boundary.
+The result is a detector that is simpler than many anchor-based 3D pipelines and easier to connect to tracking. A detected object is a point with box attributes and velocity; a track is a path of points through time. CenterPoint therefore sits exactly at the perception-to-tracking boundary.
 
-## Problem & motivation
+## Why anchors are awkward in BEV
 
 Anchor-based 3D detectors tile BEV with candidate boxes at fixed sizes, orientations, and positions. That works tolerably for 2D image boxes because most image boxes are axis-aligned rectangles. It is a poorer fit for road-scene 3D boxes: cars, buses, bicycles, and pedestrians can appear at arbitrary yaw angles, and the ego vehicle itself can be turning. A small set of axis-aligned or two-yaw anchors creates awkward target assignment rules and a large background search space. Adding more anchor orientations improves coverage but increases compute and false-positive opportunities.
 
@@ -17,7 +17,7 @@ CenterPoint argues that the natural object representation for 3D detection is a 
 
 The second motivation is tracking. A 3D tracker often keeps a Kalman-filter state for each object and performs association with box IoU or Mahalanobis distance. CenterPoint makes association almost embarrassingly direct: predict a ground-plane velocity for each current detection, project the current center back to the previous frame, and match to the closest old track of the same class. The paper reports strong tracking accuracy with only about 1 ms association overhead on nuScenes [1].
 
-## Method
+## Detecting boxes as center heatmap peaks
 
 Let a LiDAR point cloud be
 
@@ -106,12 +106,12 @@ with binary cross-entropy supervision. At inference, the paper combines the firs
 Tracking then uses the velocity head. For a current detection at center $\hat{p}_i^{(t)}$ with predicted velocity $\hat{v}_i^{(t)}$, the estimated previous center is
 
 $$
-\tilde{p}_i^{(t-1)}=\hat{p}_i^{(t)}-\hat{v}_i^{(t)}.
+\tilde{p}_i^{(t-1)}=\hat{p}_i^{(t)}-\hat{v}_i^{(t)}\Delta t.
 $$
 
 The tracker greedily matches detections, in descending confidence order, to unmatched previous tracks by closest center distance within a class-specific threshold. Unmatched detections start new tracks; unmatched old tracks are kept for up to three frames and advanced using their last velocity.
 
-## Architecture diagram
+### From LiDAR points to tracked centers
 
 ![CenterPoint overview showing a point-cloud backbone, center heatmap head, face-center feature sampling, and MLP box refinement.](https://github.com/tianweiy/CenterPoint/raw/master/docs/teaser.png)
 
@@ -144,7 +144,7 @@ flowchart TB
   Match --> Tracks["3D tracks with ids"]
 ```
 
-## Architecture details
+## The refinement head and training setup
 
 The first-stage output heads share an initial $3 \times 3$ convolution, batch normalization, and ReLU. Each output then has its own small branch of two $3 \times 3$ convolutions separated by batch normalization and ReLU. This is intentionally close to image keypoint heads: dense maps are cheap once the BEV backbone has produced $M$.
 
@@ -156,7 +156,7 @@ On nuScenes, the reported detection range is $[-51.2,51.2]$ m in $x$ and $y$, an
 
 Training follows prior CBGS-style settings on nuScenes [9]. The supplement reports AdamW with one-cycle learning rate, maximum learning rate $10^{-3}$, weight decay 0.01, momentum from 0.85 to 0.95, batch size 16, and 20 epochs on four V100 GPUs. The Waymo schedule uses learning rate $3\times 10^{-3}$ and 30 epochs, with a 6-epoch second-stage fine-tuning phase for ablations. Data augmentation includes random flips along both axes, global scaling in $[0.95,1.05]$, global rotation, and ground-truth sampling on nuScenes.
 
-## Datasets & results
+## What the center representation changes
 
 CenterPoint evaluates on nuScenes and Waymo Open Dataset. nuScenes reports mAP, NDS, and AMOTA for tracking; mAP uses center-distance thresholds rather than 3D IoU, while NDS combines mAP with translation, scale, orientation, velocity, and attribute errors [7]. Waymo reports mAP and heading-aware mAPH at Level 1 and Level 2 difficulty, with IoU thresholds 0.7 for vehicles and 0.5 for pedestrians [8].
 
@@ -174,7 +174,7 @@ The ablations make the representation argument more concrete. On Waymo validatio
 
 For the second stage on Waymo validation, VoxelNet first-stage performance is 66.5 vehicle mAPH and 62.7 pedestrian mAPH. Sampling the box center improves to 68.0 and 64.9; sampling the center plus side-face centers improves to 68.3 and 65.3, with about 6 ms refinement overhead. The comparable dense sampling variant reaches similar accuracy but is slower. The conclusion is not that CenterPoint needs a heavy second stage. It is that a few carefully chosen point features recover lost local geometry at a much smaller cost than full 3D RoI feature extraction.
 
-## Worked example
+## Reconstructing and tracking one center
 
 **Walkthrough 1: heatmap target and metric box reconstruction.** Suppose the BEV grid origin is $(x_{\min},y_{\min})=(-51.2,-51.2)$ m and the output stride is $s=0.4$ m per heatmap cell. A car center is at metric coordinate $(12.3,-4.1)$ m.
 
@@ -218,10 +218,10 @@ The checked answer is a 3D box centered at $(12.3,-4.1)$ m with yaw about 30 deg
 | 17 | $(10.0,2.0)$ |
 | 23 | $(18.0,5.0)$ |
 
-A current detection has center $(11.2,2.1)$ and predicted velocity $(1.0,0.0)$ in meters per frame. CenterPoint projects the current center back:
+A current detection has center $(11.2,2.1)$, predicted velocity $(1.0,0.0)$ m/s, and a 1 s interval from the previous frame. CenterPoint projects the current center back:
 
 $$
-\tilde{p}^{(t-1)}=(11.2,2.1)-(1.0,0.0)=(10.2,2.1).
+\tilde{p}^{(t-1)}=(11.2,2.1)-(1.0,0.0)(1)=(10.2,2.1).
 $$
 
 Distances to previous tracks are
@@ -239,7 +239,7 @@ $$
 
 If the class-specific matching threshold is 2 m, the detection inherits id 17. If no previous track were within threshold, it would start a new id. This is the full association idea: the learned velocity converts tracking into nearest-neighbor matching between center points.
 
-## Code
+## Heatmap targets and greedy association
 
 ```python
 import torch
@@ -254,10 +254,10 @@ def gaussian_heatmap_target(width, height, center_xy, sigma, device="cpu"):
     target = torch.exp(-((xx - cx) ** 2 + (yy - cy) ** 2) / (2 * sigma ** 2))
     return target.clamp_(0.0, 1.0)
 
-def greedy_center_tracker(detections, tracks, max_dist=2.0):
+def greedy_center_tracker(detections, tracks, dt_s=1.0, max_dist=2.0):
     """Minimal velocity-based association.
 
-    detections: list of dicts with center, velocity, score, cls
+    detections: list of dicts with center, velocity in m/s, score, cls
     tracks: list of dicts with center, id, cls
     """
     matches = []
@@ -265,7 +265,7 @@ def greedy_center_tracker(detections, tracks, max_dist=2.0):
     detections = sorted(detections, key=lambda d: d["score"], reverse=True)
 
     for det in detections:
-        projected_prev = det["center"] - det["velocity"]
+        projected_prev = det["center"] - det["velocity"] * dt_s
         best_j, best_dist = None, float("inf")
 
         for j, trk in enumerate(tracks):
@@ -291,7 +291,7 @@ trks = [{"center": torch.tensor([10.0, 2.0]), "id": 17, "cls": "car"}]
 print(greedy_center_tracker(dets, trks))
 ```
 
-## Common pitfalls
+## Limits of the point representation
 
 - Calling CenterPoint "anchor-free" is correct, but incomplete. The detection head is anchor-free; the full system still depends on a discretized BEV grid and backbone stride.
 - The heatmap peak is not the full box. The peak gives object existence and rough center; offsets, size, height, yaw, and velocity come from separate regression heads.
@@ -301,17 +301,7 @@ print(greedy_center_tracker(dets, trks))
 - Greedy tracking can fail under occlusion, long gaps, or close interactions. CenterPoint keeps unmatched tracks briefly, but it does not solve identity reasoning in crowded scenes.
 - NDS and AMOTA are not interchangeable. NDS is a detection score; AMOTA evaluates multi-object tracking with identity and false-positive/false-negative penalties.
 
-## Connections
-
-- [Perception, object detection, and segmentation](/cs/autonomous-driving/perception-object-detection-and-segmentation) for 3D boxes, BEV heatmaps, mAP, IoU, and NDS.
-- [Prediction and motion forecasting](/cs/autonomous-driving/prediction-and-motion-forecasting) for the next step after CenterPoint tracking: forecasting future agent motion.
-- [Sensor fusion](/cs/autonomous-driving/sensor-fusion) for how CenterPoint-style LiDAR detections are combined with cameras and radar in fused stacks.
-- [Sensors: cameras, LiDAR, radar, IMU](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu) for LiDAR sparsity, range, reflectance, and calibration context.
-- [MIT BEVFusion](/cs/autonomous-driving/bevfusion-mit) for a BEV fusion system that uses a center-based detection head.
-- [BEVFusion robust stream design](/cs/autonomous-driving/sensor-fusion) for a fusion framework that can wrap CenterPoint-style LiDAR streams.
-- [Weather-induced sensor occlusion robustness](/cs/autonomous-driving/sensor-fusion) for a later evaluation showing how LiDAR degradation affects BEVFusion-style detection.
-
-## References
+## Sources cited
 
 [1] T. Yin, X. Zhou, and P. Krahenbuhl, "Center-Based 3D Object Detection and Tracking," in IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), 2021.
 
@@ -332,3 +322,17 @@ print(greedy_center_tracker(dets, trks))
 [9] B. Zhu, Z. Jiang, X. Zhou, Z. Li, and G. Yu, "Class-Balanced Grouping and Sampling for Point Cloud 3D Object Detection," arXiv:1908.09492, 2019.
 
 [10] S. Shi et al., "PV-RCNN: Point-Voxel Feature Set Abstraction for 3D Object Detection," in IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), 2020.
+
+<div className="see-also">
+
+See also:
+
+- [Perception, object detection, and segmentation](/cs/autonomous-driving/perception-object-detection-and-segmentation) for 3D boxes, BEV heatmaps, mAP, IoU, and NDS.
+- [Prediction and motion forecasting](/cs/autonomous-driving/prediction-and-motion-forecasting) for the next step after CenterPoint tracking: forecasting future agent motion.
+- [Sensor fusion](/cs/autonomous-driving/sensor-fusion) for how CenterPoint-style LiDAR detections are combined with cameras and radar in fused stacks.
+- [Sensors: cameras, LiDAR, radar, IMU](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu) for LiDAR sparsity, range, reflectance, and calibration context.
+- [MIT BEVFusion](/cs/autonomous-driving/bevfusion-mit) for a BEV fusion system that uses a center-based detection head.
+- [BEVFusion robust stream design](/cs/autonomous-driving/sensor-fusion) for a fusion framework that can wrap CenterPoint-style LiDAR streams.
+- [Weather-induced sensor occlusion robustness](/cs/autonomous-driving/sensor-fusion) for a later evaluation showing how LiDAR degradation affects BEVFusion-style detection.
+
+</div>

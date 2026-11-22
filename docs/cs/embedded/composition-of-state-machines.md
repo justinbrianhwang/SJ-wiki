@@ -9,7 +9,7 @@ Real embedded systems are too large to model as one flat state machine. A useful
 
 Lee and Seshia emphasize that the hard part is not the drawing style. The hard part is semantics. Two diagrams that look almost identical can mean different things depending on whether reactions are synchronous, asynchronous, interleaved, scheduled, cascaded, or hierarchical. Those choices affect determinism, missed events, deadlock possibilities, and whether a composed model can be analyzed modularly.
 
-## Definitions
+## Four ways to combine machines
 
 **Side-by-side composition** combines machines without direct port communication. The composite actor exposes the union of their input and output ports.
 
@@ -25,7 +25,7 @@ Lee and Seshia emphasize that the hard part is not the drawing style. The hard p
 
 **Hierarchical state machines** allow a state to contain a refinement that is another state machine. Being in the outer state means being in one of the inner states. History transitions remember which inner state was active when the outer state was last exited.
 
-## Key results
+## Determinism, causality, and state-space growth
 
 Synchronous side-by-side composition of finite-state machines forms another FSM. If machine $A$ has state set $S_A$ and machine $B$ has state set $S_B$, then the composite state set is the Cartesian product:
 
@@ -45,17 +45,15 @@ Hierarchical state machines reduce diagram size but do not remove semantic oblig
 
 Composition is where small modeling choices become large behavioral differences. With synchronous side-by-side composition, two components observe the same logical instant. With asynchronous interleaving, one component may react while the other does not. With scheduled asynchronous composition, the environment or scheduler has a visible role in choosing which component moves. These are not equivalent interpretations of the same drawing; they are different models.
 
-The Cartesian-product state space is the price of modularity. If each component is understandable on its own, their product may still be too large to draw or inspect manually. This is why composition and verification are tightly connected. A designer uses composition to write the model, then uses reachability, abstraction, or refinement to reason about the composite without flattening everything by hand.
+The Cartesian-product state space is the price of modularity. If each component is understandable on its own, their product may still be too large to draw or inspect manually. Composition and verification are therefore tightly connected: reachability, abstraction, and refinement let a designer reason about the composite without flattening everything by hand.
 
 Communication through ports is usually preferable to communication through shared variables when the semantics can support it. Ports make dependencies explicit in the diagram, while shared variables hide communication in expressions inside guards and actions. Hidden communication is harder to schedule, harder to review, and harder to verify. When shared variables are unavoidable, the model should say whether reads and writes are atomic, ordered, prioritized, or simultaneous.
 
-Hierarchy should not be treated as just a drawing convenience. Entering a refined state may initialize the inner machine, resume it from history, or choose a default substate depending on the semantics. Exiting an outer state may abort the inner reaction or allow it to finish first. These choices affect outputs and state updates. A clear hierarchy semantics lets a designer reason locally about a submachine while still knowing how it interacts with its container.
+Hierarchy is more than a drawing convenience. Entering a refined state may initialize the inner machine, resume it from history, or choose a default substate depending on the semantics. Exiting an outer state may abort the inner reaction or allow it to finish first. These choices affect outputs and state updates. A clear hierarchy semantics supports local reasoning about a submachine while preserving its interaction with the container.
 
 Feedback composition is the point where this chapter hands off to models of computation. If $A$'s output feeds $B$ and $B$'s output feeds $A$, then an instantaneous synchronous reaction needs a causality rule. Some models reject ambiguous feedback, some insert delays, and some search for fixed points. The correct choice depends on what the diagram is intended to mean physically or logically.
 
 For documentation, each composite model should state its composition semantics near the diagram. A reader should not have to infer whether reactions are synchronous, whether events can be missed, whether shared variables are atomic, or whether history states resume. Those details are part of the model, not implementation trivia.
-
-## Visual
 
 ```mermaid
 flowchart LR
@@ -78,7 +76,7 @@ flowchart LR
 | Cascade | Upstream output feeds downstream input | Clear data dependency | Feedback creates causality questions |
 | Hierarchical | State contains a submachine | Compact control structure | Variant semantics differ subtly |
 
-## Worked example 1: Product state space and reachability
+### Enumerating a synchronous product
 
 Problem: Machine $A$ has states $\{a_0,a_1\}$ and toggles on every synchronous reaction. Machine $B$ has states $\{b_0,b_1,b_2\}$ and advances one step modulo $3$ on every synchronous reaction. The initial state is $(a_0,b_0)$. Find the product-state size and the first six composite states.
 
@@ -112,7 +110,7 @@ $$
 
 Answer: The product has $6$ states, and all $6$ are reachable in this example.
 
-## Worked example 2: Asynchronous interleaving creates nondeterminism
+### How interleaving creates nondeterminism
 
 Problem: Two deterministic machines are composed asynchronously with interleaving semantics. $A$ toggles output $a$ between absent and present on its own reactions. $B$ toggles output $b$ between absent and present on its own reactions. Initially both outputs would be absent if their machines react. List the possible first composite outputs.
 
@@ -136,7 +134,7 @@ $$
 
 Answer: The possible first outputs are $(present, absent)$ and $(absent, present)$. Deterministic components have produced a nondeterministic composition.
 
-## Code
+## Generating the product trace
 
 ```python
 from itertools import product
@@ -157,7 +155,7 @@ print("product size:", len(all_states))
 print("trace:", synchronous_product_trace())
 ```
 
-## Common pitfalls
+## Semantic choices that cannot remain implicit
 
 - Assuming "parallel" has a single meaning. Synchronous, asynchronous, interleaved, time-triggered, and threaded models are different.
 - Forgetting that a product state space grows multiplicatively.
@@ -165,10 +163,8 @@ print("trace:", synchronous_product_trace())
 - Treating a cascade feedback cycle as if one component obviously reacts first. In a zero-time logical model, feedback needs explicit semantics.
 - Drawing hierarchical states without deciding whether inner or outer transitions have priority.
 
-## Connections
+<div className="see-also">
 
-- [discrete dynamics](/cs/embedded/discrete-dynamics)
-- [concurrent models of computation](/cs/embedded/concurrent-models-of-computation)
-- [process synchronization](/cs/operating-systems/process-synchronization)
-- [finite automata and DFAs](/cs/theory/finite-automata-and-dfas)
-- [multitasking and threads](/cs/embedded/multitasking-and-threads)
+See also: [discrete dynamics](/cs/embedded/discrete-dynamics) · [concurrent models of computation](/cs/embedded/concurrent-models-of-computation) · [process synchronization](/cs/operating-systems/process-synchronization) · [finite automata and DFAs](/cs/theory/finite-automata-and-dfas) · [multitasking and threads](/cs/embedded/multitasking-and-threads)
+
+</div>

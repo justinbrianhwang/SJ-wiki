@@ -5,54 +5,21 @@ sidebar_position: 8
 
 # Pushdown Automata and Deterministic CFLs
 
-A pushdown automaton is a finite automaton equipped with a stack. The stack gives it unbounded last-in-first-out memory, which is exactly the right shape for nested and balanced structure. While a DFA can remember only bounded summaries, a PDA can push markers while reading one part of the input and pop them while reading a corresponding later part.
+A pushdown automaton adds a stack to finite control. The stack supplies unbounded last-in-first-out memory, matching the shape of nested syntax and balanced obligations. A machine can push markers while reading one region and pop them against a later region.
 
-Pushdown automata are the machine counterpart of context-free grammars. CFGs generate strings by recursive expansion; PDAs recognize strings by using a stack to manage unfinished obligations. The equivalence between CFGs and PDAs is one of the central bridges of automata theory. Deterministic PDAs form a smaller class with important parsing applications.
+Pushdown automata are the recognizing counterpart of context-free grammars. CFGs expand unfinished variables; PDAs store unfinished work on a stack. Nondeterministic PDAs recognize exactly the context-free languages, while deterministic PDAs recognize a proper subclass important in parsing.
 
-## Definitions
+## The stack as a list of unfinished obligations
 
-A **pushdown automaton**, or **PDA**, is a finite-state machine with an input head and a stack. A transition may read an input symbol or $\epsilon$, inspect the top stack symbol, replace that top symbol by a string of stack symbols, and move to a new state.
+For $0^n1^n$, each pushed marker means that one future `1` must appear. For balanced parentheses, each marker records an unmatched opening parenthesis. In grammar simulation, the stack holds variables and terminals still to be matched against unread input.
 
-One common formal definition uses a 6-tuple $(Q,\Sigma,\Gamma,\delta,q_0,F)$, where $\Gamma$ is the stack alphabet and $\delta$ maps a state, optional input symbol, and optional stack symbol to a set of possible next moves. The exact convention varies, but the computational idea is stable.
-
-A PDA **accepts by final state** if some computation consumes the input and ends in an accepting state. Some definitions use **acceptance by empty stack** instead. For nondeterministic PDAs these conventions are equivalent.
-
-A **deterministic PDA**, or **DPDA**, has at most one legal move from each instantaneous situation and cannot have both an input-consuming move and an epsilon move competing for the same state and stack top. DPDAs recognize the deterministic context-free languages.
-
-A **configuration** of a PDA records the current state, unread input, and stack contents. PDA correctness proofs often reason about configurations and stack invariants.
-
-## Key results
-
-The languages recognized by nondeterministic PDAs are exactly the context-free languages. For CFG to PDA, the stack stores variables and terminals that remain to be matched. The PDA nondeterministically chooses productions for variables and consumes terminals when they match the input. For PDA to CFG, variables describe how the PDA can go from one state to another while balancing stack behavior.
-
-Nondeterminism matters for PDAs more than for finite automata. NFAs and DFAs are equivalent, but NPDAs are strictly more powerful than DPDAs. For example, palindromes over a simple alphabet can be recognized by an NPDA that guesses the midpoint; without an explicit midpoint marker, a DPDA cannot in general know when to switch from pushing to popping.
-
-DCFLs have useful closure properties but not all CFL closure properties. They are closed under complement, which depends on determinism and total halting behavior, but they are not closed under union in the same broad way as CFLs. This asymmetry is important in parsing theory.
-
-In parsing, deterministic context-free behavior is prized because it supports efficient single-path recognition. LR parsing and related methods can be understood as disciplined deterministic stack computation, even though practical parser generators add engineering layers beyond the formal DPDA model.
-
-A PDA stack should be interpreted as a list of obligations. In the language $0^n1^n$, each pushed marker says "one future `1` must appear." In balanced parentheses, each pushed marker says "one future closing parenthesis must match this opening parenthesis." In grammar simulation, the stack contains terminals and variables still to be matched against the unread input. This obligation view makes PDA design more systematic than thinking of the stack as a general-purpose array.
-
-The equivalence between CFGs and PDAs is conceptually two-way. From a grammar to a PDA, the machine begins with the start variable on the stack. If the top is a variable, it nondeterministically replaces it by the right-hand side of a production. If the top is a terminal, it must match and consume the next input symbol. From a PDA to a grammar, variables encode balanced computations that start and end with specified stack behavior. The second direction is more technical, but the common theme is that stack discipline matches recursive syntax.
-
-Acceptance conventions can obscure the main idea if they are mixed carelessly. Acceptance by empty stack emphasizes that all obligations have been discharged. Acceptance by final state emphasizes control-state success after input consumption. For nondeterministic PDAs the two conventions can simulate each other, but for deterministic machines details are more delicate. Always state which convention is being used before proving a construction.
-
-Determinism restricts when a PDA may choose to switch phases. For $0^n1^n$, the first `1` visibly marks the shift from pushing to popping, so a DPDA can recognize the language. For palindromes without a midpoint marker, the shift point is not visible; an NPDA can guess it, but a DPDA cannot generally know it. This is the core reason deterministic context-free languages form a proper subclass of context-free languages.
-
-Parser theory uses deterministic stack behavior because a compiler should not explore exponentially many parses during ordinary syntax analysis. LR-style parsers encode enough finite control to decide which stack action to take from the current state and lookahead. The theory of DPDAs explains why some grammars need rewriting or extra disambiguation before deterministic parsing works.
-
-For PDA traces, write the stack with a consistent convention. Some authors put the top of stack on the left, others on the right. The transition notation is easy to misread unless the convention is fixed. In worked examples, it is often clearer to say "push `X`" and "pop `X`" in words, then reserve formal transition tuples for final specifications.
-
-A PDA can use finite control to remember phases while using the stack for unbounded obligations. In $0^n1^n$, finite control records whether the machine is still reading zeros or has moved to ones. The stack records how many unmatched zeros remain. Both parts are necessary: the stack alone does not prevent a later zero, and finite control alone cannot count. This division of labor is a recurring design pattern.
-
-Deterministic CFLs are especially relevant when an input marker determines the stack phase. The language $\{wcw^R:w\in\{0,1\}^*\}$ is deterministic context-free because the symbol `c` announces the midpoint. The language of unmarked palindromes lacks that signal and needs nondeterministic guessing. This contrast is a good test for whether nondeterminism is being used for convenience or for genuine extra power.
-## Visual
+Finite control and stack memory have separate jobs. In a machine for $0^n1^n$, the state records whether the input is still in the zero block or has entered the one block; the stack records how many zeros remain unmatched. The stack alone does not forbid a later zero, and finite control alone cannot store the count.
 
 ```mermaid
 flowchart TB
   Tape["Input tape: 0 0 0 1 1 1"] --> Head["Input head: moves right when a symbol is consumed"]
   Stack["Stack top -> X | X | X | $ <- bottom marker"] --> Top["Only the top stack symbol is visible"]
-  Head --> Control{Finite control state}
+  Head --> Control{"Finite control state"}
   Top --> Control
 
   subgraph DPDA["DPDA for 0^n 1^n"]
@@ -66,6 +33,7 @@ flowchart TB
     Bad0["read 0 in pop state, or pop from $ before input ends"]
     Push --> Push0 --> Push
     Push --> Switch --> Pop
+    Push -- "empty input with bottom marker" --> End
     Pop --> Pop1 --> Pop
     Pop --> End --> Accept(("accept"))
     Pop --> Bad0 --> Reject(("reject"))
@@ -73,7 +41,7 @@ flowchart TB
 
   Control --> Push
 
-  subgraph NPDA["NPDA pattern for unmarked palindromes"]
+  subgraph NPDA["NPDA pattern for unmarked even palindromes"]
     direction TB
     P1["phase 1: push each input symbol"]
     Guess{"epsilon choice: guess midpoint"}
@@ -87,49 +55,44 @@ flowchart TB
   end
 ```
 
-The PDA diagram separates finite control, the one-way input head, and the stack interface so the transition labels show exactly what is read, pushed, or popped. The `0^n1^n` DPDA has a visible phase switch at the first `1`, while the palindrome NPDA uses an epsilon branch to guess an unmarked midpoint before comparing symbols against the stack.
-
-| Model | Memory | Language family |
+| Model | Memory and choice | Language family |
 |---|---|---|
-| DFA | finite state only | regular |
-| NFA | finite state plus branching | regular |
-| DPDA | one stack, deterministic moves | deterministic CFL |
-| NPDA | one stack plus branching | CFL |
-| Turing machine | read-write tape | recursively enumerable or decidable, depending on halting |
+| DFA | finite state | regular |
+| NFA | finite state with branching | regular |
+| DPDA | one stack with deterministic moves | deterministic CFLs |
+| NPDA | one stack with branching | CFLs |
+| Turing machine | read-write tape | recognizable languages, or decidable ones when it always halts |
 
-## Worked example 1: PDA for $\{0^n1^n:n\ge0\}$
+## Configurations and acceptance conventions
 
-**Problem.** Design a PDA that accepts strings of the form $0^n1^n$.
+One standard formalization is a 7-tuple
 
-**Method.** Push one stack marker per `0`, then pop one per `1`.
+$$
+(Q,\Sigma,\Gamma,\delta,q_0,Z_0,F),
+$$
 
-1. Begin with a bottom marker on the stack.
-2. In state `push`, read `0` symbols. For each `0`, push one marker `X`.
-3. When the first `1` appears, move to state `pop` and pop one `X`.
-4. Continue reading `1` symbols in `pop`, popping one `X` for each.
-5. If the input ends and the stack top is the bottom marker, accept.
-6. If a `0` appears after entering `pop`, reject because the input is not in block form.
-7. If the stack empties too early or has extra `X` markers after input ends, reject.
+where $\Gamma$ is the stack alphabet and $Z_0$ is the initial stack symbol. A transition may consume an input symbol or $\epsilon$, inspect the top stack symbol, replace it by a string of stack symbols, and change control state. Equivalent definitions package the start stack and acceptance conditions differently.
 
-**Checked answer.** `0011` pushes two markers and pops two markers, then accepts. `001` leaves one marker and rejects. `011` tries to pop too many markers and rejects.
+A **configuration** records the current state, unread input, and complete stack contents. Only the top stack symbol is directly accessible in one move. Correctness proofs usually give an invariant connecting these three components.
 
-## Worked example 2: Why nondeterminism helps for palindromes
+Under **acceptance by final state**, an accepting computation consumes the entire input and ends in a final state. Under **acceptance by empty stack**, it consumes the input and discharges the stack. For nondeterministic PDAs the conventions recognize the same language class, though a proof must state which one its construction uses. Converting conventions for deterministic machines requires more care because extra epsilon moves can interfere with determinism.
 
-**Problem.** Explain an NPDA for $P=\{ww^R:w\in\{0,1\}^*\}$, the even-length palindromes.
+For traces, fix whether the left or right end of a written stack is the top. Saying “push `X`” and “pop `X`” often communicates a worked run more safely than an unexplained transition tuple.
 
-**Method.** Guess the midpoint.
+## A deterministic machine for $0^n1^n$
 
-1. In the first phase, read input symbols and push each symbol onto the stack.
-2. At any moment, take an epsilon transition to the second phase. This guesses that the midpoint has been reached.
-3. In the second phase, read each remaining input symbol.
-4. For each read symbol, pop the top stack symbol and require it to match.
-5. Accept if the input is consumed exactly when the stack returns to the bottom marker.
-6. For `0110`, push `0`, push `1`, guess midpoint, read `1` and pop `1`, read `0` and pop `0`, then accept.
-7. For `0100`, no midpoint guess makes all later symbols match the stack, so reject.
+The first `1` visibly announces the transition from pushing to popping, so nondeterministic midpoint guessing is unnecessary.
 
-**Checked answer.** The NPDA recognizes even palindromes by using nondeterminism to choose the split point, then using the stack to compare the second half against the reverse of the first.
+1. Begin in `push` with bottom marker `$`.
+2. For each `0`, push one `X`.
+3. On the first `1`, enter `pop` and remove one `X`.
+4. For every later `1`, remove another `X`.
+5. Accept when the input is exhausted and only `$` remains. If the input is empty, accept directly for $n=0$.
+6. Reject a `0` in the pop phase, a pop attempted at `$`, or leftover `X` markers after the input ends.
 
-## Code
+Thus `0011` pushes twice and pops twice; `001` leaves a marker; `011` tries to pop below the unmatched-zero count; and `0101` returns to `0` after the phase change.
+
+### Simulating the stack discipline
 
 ```python
 def accepts_0n1n_pda_style(w):
@@ -149,17 +112,52 @@ for sample in ["", "01", "0011", "001", "0101"]:
     print(sample, accepts_0n1n_pda_style(sample))
 ```
 
-## Common pitfalls
+This code executes the deterministic push/pop strategy directly. A general PDA simulator would also represent control states, epsilon transitions, and—in the nondeterministic case—a set of configurations.
 
-- Letting a PDA inspect deep stack contents. Only the top of the stack is directly visible.
-- Forgetting that a transition can replace the top stack symbol with several symbols, one symbol, or nothing.
-- Assuming DPDA and NPDA power is the same because DFA and NFA power is the same.
-- Accepting with unread input remaining. Acceptance by final state still requires the input to be consumed under the standard convention.
-- Designing a PDA for $0^n1^n$ that accepts `0101` because it switches between push and pop phases more than once.
+## Translating between grammars and stack machines
 
-## Connections
+The languages recognized by NPDAs are exactly the context-free languages.
+
+From a CFG to a PDA, initialize the stack with the start variable. If a variable is on top, nondeterministically replace it with the right-hand side of one of its productions. If a terminal is on top, consume the same terminal from the input and pop it. Acceptance occurs when the proposed derivation has matched the complete input and no obligations remain.
+
+From a PDA to a CFG, grammar variables describe balanced computations that move between specified states while removing a designated stack symbol without disturbing the stack beneath it. This direction is more technical, but it expresses the same correspondence: recursive derivations and last-in-first-out obligations carry equivalent information.
+
+The translation also explains why a PDA transition may replace one stack symbol with several. Expanding a grammar variable can introduce an entire right-hand side of new obligations.
+
+## Why an unmarked midpoint needs nondeterminism
+
+For the even palindromes
+
+$$
+P=\{ww^R:w\in\{0,1\}^*\},
+$$
+
+an NPDA pushes input symbols during its first phase, takes an epsilon transition that guesses the midpoint, and then reads and pops matching symbols. It accepts only if the input ends exactly at the bottom marker.
+
+On `0110`, one branch pushes `0`, pushes `1`, switches phases, and matches `1` then `0`. On `0100`, every possible switch point eventually creates a mismatch or unequal lengths.
+
+A DPDA cannot generally determine where an unmarked palindrome's midpoint occurs. By contrast,
+
+$$
+\{wcw^R:w\in\{0,1\}^*\}
+$$
+
+is deterministic context-free because `c` announces the phase change. Nondeterminism therefore adds genuine recognition power to PDAs, unlike the DFA/NFA case.
+
+Formally, a DPDA permits at most one move from each applicable state, input, and stack-top situation. If an epsilon move is available for a state and stack top, a competing input-consuming move cannot also be available there.
+
+## Deterministic CFLs in parsing
+
+Deterministic context-free languages are closed under complement, after arranging a complete deterministic machine with the appropriate acceptance convention. They do not have the full union closure enjoyed by CFLs. The asymmetry reflects the absence of branching between alternative parses.
+
+LR-style parsers use deterministic stack behavior: finite control and lookahead determine the next shift or reduction without exploring all parse trees. Grammars may need rewriting, precedence declarations, or disambiguation before this single-path behavior is available. The formal DPDA model captures the core choice discipline, while parser generators add tables, error handling, and implementation details.
+
+<div className="see-also">
+
+See also:
 
 - The equivalent grammar viewpoint is in [context-free grammars and normal forms](/cs/theory/context-free-grammars-and-normal-forms).
 - Pumping limits for CFLs are in [non-context-free languages](/cs/theory/non-context-free-languages).
 - Turing machines extend stack memory to tape memory in [Turing machines and the Church-Turing thesis](/cs/theory/turing-machines-and-the-church-turing-thesis).
-- Deterministic parsing connects to compiler topics outside this theory sequence.
+
+</div>

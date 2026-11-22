@@ -7,7 +7,7 @@ sidebar_position: 9
 
 Graphs model relationships: roads between cities, prerequisites between courses, calls between functions, dependencies between packages, links between web pages, and states connected by transitions. Graph algorithms are therefore a central toolkit for computer science. They combine data structures, proof invariants, and traversal order into procedures for reachability, connectivity, ordering, spanning trees, and shortest paths [1], [3].
 
-This page gives a course-scale map rather than a single algorithm. Breadth-first search and depth-first search provide the basic traversal grammar. Topological sorting, connected components, strongly connected components, bridges, articulation points, MSTs, and shortest paths layer additional invariants on top. The important distinction is what the edge weights and graph direction allow: unweighted graphs favor BFS, nonnegative weighted graphs allow Dijkstra, negative edges require Bellman-Ford or reweighting, and arbitrary all-pairs shortest paths use Floyd-Warshall or Johnson's algorithm [1], [6].
+Breadth-first search and depth-first search provide the basic traversal grammar. Topological sorting, connected components, strongly connected components, bridges, articulation points, MSTs, and shortest paths layer additional invariants on top. The important distinction is what the edge weights and graph direction allow: unweighted graphs favor BFS, nonnegative weighted graphs allow Dijkstra, negative edges require Bellman-Ford or reweighting, and arbitrary all-pairs shortest paths use Floyd-Warshall or Johnson's algorithm [1], [6].
 
 ![Breadth-first search animation.](https://commons.wikimedia.org/wiki/Special:FilePath/Animated_BFS.gif)
 
@@ -21,7 +21,7 @@ This page gives a course-scale map rather than a single algorithm. Breadth-first
 
 *Figure: Tarjan's algorithm detects strongly connected components using DFS low-link values. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tarjan%27s_Algorithm_Animation.gif), public domain or CC-BY-SA via Wikimedia Commons.*
 
-## Definitions
+## Graph models and representations
 
 A graph is $G=(V,E)$, where $V$ is a set of vertices and $E$ is a set of edges. In an undirected graph, an edge $\{u,v\}$ has no direction. In a directed graph, an edge $(u,v)$ goes from $u$ to $v$. A weighted graph has a function $w:E\to\mathbb{R}$ assigning edge costs, lengths, or capacities.
 
@@ -31,13 +31,13 @@ A **path** is a sequence of vertices connected by edges. A graph is connected if
 
 During DFS in a directed graph, edges can be classified as tree, back, forward, or cross edges. A back edge to an ancestor indicates a directed cycle. Discovery time, finish time, and low-link values are timestamps that encode ancestor reachability.
 
-## Key results
+## Traversal invariants, cuts, and relaxation
 
 BFS explores in increasing number of edges from a source. With a queue, it runs in $O(V+E)$ time on adjacency lists and computes shortest-path distances in unweighted graphs. The proof is by layer invariant: when a vertex is first discovered, all shorter paths would have had to pass through an earlier layer already processed [1].
 
 DFS explores one branch until it cannot continue, then backtracks. It also runs in $O(V+E)$ and produces discovery and finish times. In undirected graphs, DFS identifies connected components. In directed graphs, reverse finish-time order is central to Kosaraju's SCC algorithm, while Tarjan's algorithm computes SCCs in one pass using a stack and low-link values [10].
 
-Topological sorting has two standard implementations. Kahn's algorithm repeatedly removes vertices of indegree zero. DFS topological sort appends vertices after exploring all outgoing edges, then reverses the finish list. Both are correct because a DAG always has at least one source, and DFS finish times place every vertex before those reachable from it.
+Topological sorting has two standard implementations. Kahn's algorithm repeatedly removes vertices of indegree zero. DFS topological sort appends vertices after exploring all outgoing edges, then reverses the finish list. Both are correct because a DAG always has at least one source, and reverse finish order places every vertex before its outgoing successors.
 
 Bridges and articulation points in undirected graphs use low-link values. For a DFS tree edge $(u,v)$, if `low[v] > disc[u]`, then no back edge from $v$'s subtree reaches $u$ or an ancestor, so $(u,v)$ is a bridge. A non-root vertex $u$ is an articulation point if some child $v$ has `low[v] >= disc[u]`; removing $u$ separates that child subtree.
 
@@ -56,8 +56,6 @@ $$D^{(k)}[i][j]=\min(D^{(k-1)}[i][j],D^{(k-1)}[i][k]+D^{(k-1)}[k][j]).$$
 Johnson's algorithm adds a new source, runs Bellman-Ford to compute potentials, reweights edges to nonnegative values, then runs Dijkstra from every vertex [13].
 
 $A^*$ search augments Dijkstra with a heuristic $h(v)$ estimating distance to the goal. If $h$ is admissible and consistent, $A^*$ remains optimal while often expanding far fewer states. Eulerian tours, which use every edge exactly once, have clean degree characterizations and linear algorithms. Hamiltonian tours, which visit every vertex exactly once, are NP-complete in general, so graph algorithms also mark the boundary between efficient and intractable problems.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -88,7 +86,9 @@ flowchart TD
 | Bellman-Ford | weighted with negative edges | edge relaxations | $O(VE)$ |
 | Floyd-Warshall | all-pairs | matrix DP | $O(V^3)$ |
 
-## Worked example 1: Dijkstra on a five-node graph
+## Relaxation on concrete graphs
+
+### Dijkstra on a five-node graph
 
 **Problem.** Find shortest paths from $A$ with edges:
 
@@ -107,7 +107,7 @@ All weights are nonnegative.
 
 **Checked answer.** Distances are $A:0$, $C:1$, $B:3$, $D:4$, $E:7$. The shortest path to $E$ is $A\to C\to B\to D\to E$ with length $1+2+1+3=7$.
 
-## Worked example 2: Bellman-Ford detecting a negative cycle
+### Bellman-Ford detecting a negative cycle
 
 **Problem.** Consider edges:
 
@@ -125,7 +125,7 @@ Does a reachable negative cycle exist?
 
 **Checked answer.** The cycle $A\to B\to C\to A$ has total weight $1-3+1=-1$, so distances are not well-defined below. Bellman-Ford correctly reports a reachable negative cycle.
 
-## Code
+## Traversal, shortest-path, and MST routines
 
 ```python
 from heapq import heappop, heappush
@@ -223,7 +223,7 @@ def scc_tarjan(graph):
     return comps
 ```
 
-## Common pitfalls
+## Assumptions that change the answer
 
 - Using an adjacency matrix for a sparse graph with millions of vertices.
 - Marking BFS vertices only when popped from the queue, causing duplicate enqueues.
@@ -238,16 +238,6 @@ def scc_tarjan(graph):
 - Using Floyd-Warshall when $V$ is too large for $O(V^3)$ time and $O(V^2)$ memory.
 - Treating Hamiltonian cycle like Eulerian cycle; their difficulty is very different.
 - Using an inadmissible $A^*$ heuristic while still claiming optimality.
-
-## Connections
-
-- [Greedy Algorithms](/cs/algorithms/greedy-algorithms) for MST cut properties and Dijkstra's stay-ahead proof.
-- [Dynamic Programming](/cs/algorithms/dynamic-programming) for Floyd-Warshall and shortest paths on DAGs.
-- [Network Flow and Matching](/cs/algorithms/network-flow-and-matching) for augmenting paths and residual graphs.
-- [Backtracking and Branch & Bound](/cs/algorithms/backtracking-and-branch-and-bound) for Hamiltonian paths, graph coloring, and exact search.
-- [Data Structures](/cs/data-structures/intro) for heaps, queues, stacks, and union-find.
-- [Theory of Computation](/cs/theory/intro) for NP-completeness of Hamiltonian cycle.
-- [Discrete Math](/math/discrete/intro) for graph terminology and proof techniques.
 
 ## References
 
@@ -278,3 +268,17 @@ def scc_tarjan(graph):
 [13] D. B. Johnson, "Efficient algorithms for shortest paths in sparse networks," *Journal of the ACM*, vol. 24, no. 1, pp. 1-13, 1977. https://doi.org/10.1145/321992.321993
 
 [14] M. L. Fredman and R. E. Tarjan, "Fibonacci heaps and their uses in improved network optimization algorithms," *Journal of the ACM*, vol. 34, no. 3, pp. 596-615, 1987.
+
+<div className="see-also">
+
+See also:
+
+- [Greedy Algorithms](/cs/algorithms/greedy-algorithms) for MST cut properties and Dijkstra's stay-ahead proof.
+- [Dynamic Programming](/cs/algorithms/dynamic-programming) for Floyd-Warshall and shortest paths on DAGs.
+- [Network Flow and Matching](/cs/algorithms/network-flow-and-matching) for augmenting paths and residual graphs.
+- [Backtracking and Branch & Bound](/cs/algorithms/backtracking-and-branch-and-bound) for Hamiltonian paths, graph coloring, and exact search.
+- [Data Structures](/cs/data-structures/intro) for heaps, queues, stacks, and union-find.
+- [Theory of Computation](/cs/theory/intro) for NP-completeness of Hamiltonian cycle.
+- [Discrete Math](/math/discrete/intro) for graph terminology and proof techniques.
+
+</div>

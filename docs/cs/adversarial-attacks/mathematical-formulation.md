@@ -7,13 +7,9 @@ sidebar_position: 3
 
 Adversarial examples are usually introduced as surprising inputs, but the technical core is an optimization problem. Given a trained model and a valid set of input changes, the attacker searches for a nearby point that maximizes loss, changes the predicted label, or induces a target behavior. Defenses then try to train or certify models whose predictions are stable throughout that valid set.
 
-![A visually similar adversarial panda image is classified as a gibbon by an ImageNet model.](https://ar5iv.labs.arxiv.org/html/1412.6572/assets/gibbon_993.png)
+The notation below is shared by [white-box attacks](/cs/adversarial-attacks/white-box-attacks), [adversarial training](/cs/adversarial-attacks/adversarial-training), and [certified defenses](/cs/adversarial-attacks/certified-defenses-and-randomized-smoothing). The formulas are simple to state and hard to solve exactly: the inner maximization is nonconvex for neural networks, and the constraint set determines what "nearby" means.
 
-*Figure: The FGSM panda example shows that imperceptible perturbations can change model decisions. Image: [ar5iv](https://arxiv.org/abs/1412.6572), Goodfellow, Shlens, and Szegedy, educational use with attribution.*
-
-This page builds the notation used by [white-box attacks](/cs/adversarial-attacks/white-box-attacks), [adversarial training](/cs/adversarial-attacks/adversarial-training), and [certified defenses](/cs/adversarial-attacks/certified-defenses-and-randomized-smoothing). The same formulas are simple enough to write down and hard enough to solve exactly: the inner maximization is nonconvex for neural networks, and the choice of constraint set determines what "nearby" means.
-
-## Definitions
+## From logits to adversarial risk
 
 Let $f_\theta : \mathcal{X} \to \mathbb{R}^K$ be a classifier with parameters $\theta$ and logits $f_\theta(x)$. The predicted class is:
 
@@ -81,7 +77,7 @@ $$
 \forall x' \text{ with } \|x'-x\|_p \le r,\quad h_\theta(x') = y.
 $$
 
-## Key results
+## First-order geometry and dual norms
 
 For a locally linear loss, the best first-order $\ell_\infty$ perturbation has the sign of the input gradient. Let:
 
@@ -142,7 +138,7 @@ The perturbation set is also part of the mathematics, not a side note. Norm ball
 
 The same care applies to the loss. Cross-entropy is common because it is already used for training, but margin losses, target losses, detector losses, or sequence-level losses may better match the attack goal. The objective should encode the success condition, not merely be easy to differentiate.
 
-## Visual
+### One inner problem, three uses
 
 ```mermaid
 flowchart LR
@@ -163,9 +159,9 @@ flowchart LR
 | $\ell_1$ | $\|\delta\|_1 \le \epsilon$ | Put mass on largest $\vert g_i\vert $ | Sparse-ish budget analysis |
 | $\ell_0$ | At most $s$ changed coordinates | Change largest-gradient coordinates | Sparse pixel or feature attacks |
 
-## Worked example 1: First-order $\ell_\infty$ attack on a linear loss
+## Maximizing a linearized loss in an $\ell_\infty$ ball
 
-Problem: Suppose the input gradient of the loss at an image is:
+Suppose the input gradient of the loss at an image is:
 
 $$
 g = (0.2, -0.5, 0.0, 1.4).
@@ -210,11 +206,11 @@ g^\top \delta^\star
 \end{aligned}
 $$
 
-Checked answer: the first-order perturbation is $(0.1,-0.1,0,0.1)$ and the approximated loss increase is $0.21$.
+The first-order perturbation is $(0.1,-0.1,0,0.1)$, with approximate loss increase $0.21$.
 
-## Worked example 2: Robust radius for a binary linear classifier
+## Distance to a binary linear boundary
 
-Problem: Let a binary classifier predict class $+1$ when $w^\top x + b \gt  0$ and class $-1$ otherwise. Let:
+Let a binary classifier predict class $+1$ when $w^\top x + b \gt  0$ and class $-1$ otherwise, with:
 
 $$
 w = (3,4), \qquad b=-5, \qquad x=(2,1).
@@ -265,9 +261,9 @@ w^\top(x+\delta^\star)+b
 = 0.
 $$
 
-Checked answer: the minimum $\ell_2$ distance to the boundary is $1$, achieved by $\delta^\star=(-0.6,-0.8)$. Any classifier with margin less than $\epsilon$ at a point cannot be certified robust to $\ell_2$ radius $\epsilon$ at that point.
+The minimum $\ell_2$ distance to the boundary is $1$, achieved by $\delta^\star=(-0.6,-0.8)$. A point with margin below $\epsilon$ cannot be certified robust to $\ell_2$ radius $\epsilon$ for this classifier.
 
-## Code
+## Projected ascent for the inner maximization
 
 ```python
 import torch
@@ -292,7 +288,7 @@ def pgd_inner_max(model, x, y, epsilon=8 / 255, step_size=2 / 255, steps=10):
 
 The code implements the inner maximization used in many adversarial-training loops. It uses random initialization, gradient ascent on the input, projection to the $\ell_\infty$ ball, and clipping to the valid image range.
 
-## Common pitfalls
+## Constraint and objective mismatches
 
 - Optimizing the wrong objective for targeted attacks. Targeted attacks usually minimize the target loss, while untargeted attacks maximize the true-label loss.
 - Forgetting the input-domain constraint $x+\delta \in [0,1]^d$ after projecting onto a norm ball.
@@ -301,7 +297,16 @@ The code implements the inner maximization used in many adversarial-training loo
 - Using cross-entropy loss blindly when logits saturate; stronger attacks may use margin losses or confidence losses.
 - Assuming that the closest adversarial example under $\ell_2$ is also closest under $\ell_\infty$ or $\ell_0$.
 
-## Connections
+## Papers behind the formulation
+
+- Goodfellow, Shlens, and Szegedy, "Explaining and Harnessing Adversarial Examples."
+- Madry et al., "Towards Deep Learning Models Resistant to Adversarial Attacks."
+- Carlini and Wagner, "Towards Evaluating the Robustness of Neural Networks."
+- Zhang et al., "Theoretically Principled Trade-off between Robustness and Accuracy."
+
+<div className="see-also">
+
+See also:
 
 - [Threat models and attack taxonomy](/cs/adversarial-attacks/threat-models-and-attack-taxonomy) defines the attacker assumptions behind $\Delta(x)$.
 - [White-box attacks](/cs/adversarial-attacks/white-box-attacks) are numerical methods for the inner maximization.
@@ -309,9 +314,4 @@ The code implements the inner maximization used in many adversarial-training loo
 - [Certified defenses and randomized smoothing](/cs/adversarial-attacks/certified-defenses-and-randomized-smoothing) replaces attack search with proof obligations.
 - [Deep learning](/cs/deep-learning/intro) provides the loss functions, logits, and gradient computation used here.
 
-## Further reading
-
-- Goodfellow, Shlens, and Szegedy, "Explaining and Harnessing Adversarial Examples."
-- Madry et al., "Towards Deep Learning Models Resistant to Adversarial Attacks."
-- Carlini and Wagner, "Towards Evaluating the Robustness of Neural Networks."
-- Zhang et al., "Theoretically Principled Trade-off between Robustness and Accuracy."
+</div>

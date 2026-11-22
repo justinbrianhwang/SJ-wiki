@@ -5,15 +5,15 @@ sidebar_position: 13
 
 # Bode Plots and Frequency Response
 
-Frequency response studies the steady-state output of a stable linear system driven by sinusoidal inputs. Nise introduces Bode plots as a practical way to approximate and interpret magnitude and phase over many decades of frequency. The same transfer function used for time response is evaluated on the imaginary axis, $s=j\omega$.
+Frequency response studies the steady-state output of a stable linear system driven by sinusoidal inputs. Bode plots organize magnitude and phase over many decades of frequency. The same transfer function used for time response is evaluated on the imaginary axis, $s=j\omega$.
 
 ![A Bode plot shows gain and phase changing with frequency.](https://commons.wikimedia.org/wiki/Special:FilePath/Bodeplot.png)
 
 *Figure: Bode plots connect frequency-response calculations to a standard engineering visualization. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bodeplot.png), Stw and Vukg, public domain.*
 
-The value of frequency response is design visibility. Low-frequency gain relates to steady-state tracking. Crossover frequency relates to speed and bandwidth. Phase lag near crossover relates to overshoot and stability margin. Bode plots show these trade-offs in a form engineers can sketch, measure, and tune.
+Low-frequency gain relates to steady-state tracking. Crossover frequency relates to speed and bandwidth. Phase lag near crossover relates to overshoot and stability margin. Bode plots put these trade-offs in a form engineers can sketch, measure, and tune.
 
-## Definitions
+## Reading a transfer function on the imaginary axis
 
 For a transfer function $G(s)$, the frequency response is
 
@@ -51,7 +51,7 @@ $$
 c_{ss}(t)=A|G(j\omega)|\sin(\omega t+\angle G(j\omega)).
 $$
 
-## Key results
+## Building a Bode plot factor by factor
 
 Basic Bode factors:
 
@@ -64,7 +64,7 @@ Basic Bode factors:
 | real zero $(1+s/\omega_z)$ | slope changes by $+20$ dB/dec | $0^\circ$ to $+90^\circ$ |
 | second-order poles | possible resonant peak | up to $-180^\circ$ |
 
-For a product of transfer-function factors, magnitudes in dB add and phases add. This is why Bode plots are convenient:
+For a product of transfer-function factors, magnitudes in dB add and phases add:
 
 $$
 20\log_{10}|G_1G_2|=20\log_{10}|G_1|+20\log_{10}|G_2|.
@@ -90,13 +90,9 @@ The decibel scale is useful because it turns multiplication into addition, but i
 
 For design documentation, a Bode plot should be accompanied by the transfer function, units, operating point, and whether the plotted system is open loop, closed loop, sensitivity, or complementary sensitivity. Many wrong conclusions come from looking at the correct curve for the wrong transfer function.
 
-Phase should be unwrapped or interpreted consistently. A plot that jumps from $-179^\circ$ to $+179^\circ$ may represent a smooth continuation, not a sudden physical phase lead. Margin calculations depend on the continuous phase trend near crossover, so plotting conventions must be checked.
+Phase should be unwrapped or interpreted consistently. A plot that jumps from $-179^\circ$ to $+179^\circ$ may represent a smooth continuation, not a sudden physical phase lead. Margin calculations depend on the continuous phase trend near crossover, so plotting conventions and wrapped phase plots must be labeled clearly. Frequency axes also need units, normally rad/s.
 
-Always label wrapped phase plots clearly.
-
-Units matter.
-
-## Visual
+### The asymptote around a first-order pole
 
 ```text
 Magnitude asymptote for 10/(1+s/5)
@@ -118,7 +114,7 @@ dB
 | high-frequency rolloff | final magnitude slope | noise attenuation and unmodeled dynamics |
 | resonant peak | magnitude bump | low damping and overshoot tendency |
 
-## Worked example 1: magnitude and phase at one frequency
+## Evaluating magnitude and phase at one frequency
 
 Problem: For
 
@@ -168,7 +164,7 @@ $$
 
 Checked answer: magnitude is about $11.0$ dB and phase is $-45^\circ$.
 
-## Worked example 2: asymptotic Bode sketch
+## Deriving the Bode asymptotes
 
 Problem: Sketch the asymptotic magnitude slopes for
 
@@ -215,7 +211,7 @@ Since $20$ dB at $\omega=1$ after the origin pole expression $20-20\log_{10}\ome
 
 Checked answer: slopes are $-20$ dB/dec for $\omega\lt 1$, $0$ dB/dec for $1\lt \omega\lt 10$, and $-20$ dB/dec for $\omega\gt 10$.
 
-## Code
+## Computing the exact response with SciPy
 
 ```python
 import numpy as np
@@ -234,7 +230,7 @@ print("phase at 2 rad/s:", phase[idx], "deg")
 print("approx gain crossover rad/s:", w[np.argmin(np.abs(mag))])
 ```
 
-## Common pitfalls
+## Errors that spoil an otherwise plausible plot
 
 - Using $10\log_{10}$ for voltage-like transfer-function magnitude instead of $20\log_{10}$.
 - Forgetting that phases add algebraically, with poles contributing negative phase and zeros positive phase.
@@ -243,10 +239,14 @@ print("approx gain crossover rad/s:", w[np.argmin(np.abs(mag))])
 - Ignoring units of $\omega$. Bode formulas use rad/s unless explicitly converted.
 - Assuming higher bandwidth is always better. Noise, actuator limits, and unmodeled dynamics constrain useful bandwidth.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Nyquist and margins](/cs/control-engineering/nyquist-and-frequency-stability-margins) uses the same open-loop frequency response for stability.
 - [Frequency-response design](/cs/control-engineering/frequency-response-compensator-design) shapes Bode plots with lag, lead, and lag-lead compensation.
 - [Steady-state errors](/cs/control-engineering/steady-state-errors-and-sensitivity) connect low-frequency gain to tracking error.
 - [Time response](/cs/control-engineering/time-response-first-and-second-order) relates bandwidth and damping to transient behavior.
-- [Signals and systems](/physics/signals-systems/) studies sinusoidal steady state in a broader setting.
+- [Signals and systems](/physics/signals-systems/intro) studies sinusoidal steady state in a broader setting.
+
+</div>

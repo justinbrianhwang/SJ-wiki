@@ -9,11 +9,7 @@ Molecular partition functions factor the motion and internal structure of a mole
 
 For many gases, the separability approximation is accurate enough that one can write the molecular partition function as a product. Each factor has a distinct temperature dependence, which explains heat capacities, entropies, and equilibrium constants.
 
-![A hydrogen spectrum diagram shows discrete spectral series on a wavelength scale.](https://commons.wikimedia.org/wiki/Special:FilePath/Hydrogen_spectrum.svg)
-
-*Figure: Discrete spectral lines as observable evidence of molecular and atomic energy-level spacing. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hydrogen_spectrum.svg), OrangeDog, CC BY-SA 3.0.*
-
-## Definitions
+## Factoring molecular motion
 
 When molecular energy is approximately separable,
 
@@ -78,7 +74,7 @@ $$
 q_{\mathrm{elec}}=\sum_i g_i e^{-\epsilon_i/kT}
 $$
 
-## Key results
+## When each degree of freedom becomes active
 
 Translational motion is usually the largest contributor to entropy because $q_{\mathrm{trans}}$ is proportional to volume and to $T^{3/2}$:
 
@@ -147,11 +143,9 @@ Electronic partition functions are usually simple at room temperature because el
 
 Nuclear spin is often omitted in elementary thermodynamic partition functions, but it can matter in spectroscopy and in precise statistical mechanics. Homonuclear molecules such as $\mathrm{H_2}$ have ortho and para nuclear-spin modifications with different allowed rotational levels. The interplay of nuclear spin symmetry and rotational wavefunction symmetry affects rotational populations and heat capacities at low temperature.
 
-A practical thermodynamic calculation must use the proper standard state. The translational partition function contains volume, so converting molecular partition functions into standard molar entropies or equilibrium constants requires specifying a standard pressure or concentration. For an ideal gas, the standard molar volume at pressure $p^\circ$ is $RT/p^\circ$, and this volume enters the translational contribution.
+Thermodynamic calculations must use the proper standard state. The translational partition function contains volume, so converting molecular partition functions into standard molar entropies or equilibrium constants requires specifying a standard pressure or concentration. For an ideal gas, the standard molar volume at pressure $p^\circ$ is $RT/p^\circ$, and this volume enters the translational contribution.
 
 The same partition functions connect to spectroscopy. Rotational constants measured by microwave spectroscopy determine moments of inertia used in $q_{\mathrm{rot}}$. Vibrational wavenumbers measured by IR or Raman spectroscopy determine $\theta_{\mathrm{vib}}$ and zero-point energies. Electronic spectra identify excited states for $q_{\mathrm{elec}}$. Thus spectroscopy supplies the molecular data that statistical thermodynamics needs.
-
-## Visual
 
 | Contribution | Typical energy scale | Partition function trend | Heat capacity behavior |
 |---|---:|---|---|
@@ -172,7 +166,7 @@ graph LR
   E --> I[electronic populations]
 ```
 
-## Worked example 1: Translational partition function of argon
+## How many translational states fit in one litre
 
 **Problem.** Estimate $q_{\mathrm{trans}}$ for one Ar atom in a $1.00\ \mathrm{L}$ container at $298.15\ \mathrm{K}$. Use $m=39.948\ \mathrm{u}$ and $1\ \mathrm{u}=1.66054\times10^{-27}\ \mathrm{kg}$.
 
@@ -213,7 +207,7 @@ $$
 
 **Checked answer.** The value is enormous because translational energy levels in a macroscopic container are extremely closely spaced.
 
-## Worked example 2: Vibrational population of HCl
+## Why the HCl stretch is frozen out at 298 K
 
 **Problem.** HCl has a vibrational wavenumber near $2886\ \mathrm{cm^{-1}}$. Estimate the fraction of molecules in $v=1$ relative to $v=0$ at $298.15\ \mathrm{K}$ using the harmonic oscillator.
 
@@ -244,9 +238,9 @@ $$
 \frac{N_1}{N_0}=e^{-13.93}=8.9\times10^{-7}
 $$
 
-**Checked answer.** Almost all HCl molecules are in $v=0$ at room temperature. This is why vibrational heat capacity is small at ordinary temperatures for high-frequency stretches.
+**Checked answer.** Almost all HCl molecules are in $v=0$ at room temperature, so high-frequency stretches contribute little vibrational heat capacity under these conditions.
 
-## Code
+## Evaluating translational and vibrational factors
 
 ```python
 import numpy as np
@@ -269,7 +263,7 @@ for T in [100, 298.15, 1000, 3000]:
     print(T, vib_population_ratio(2886.0, T))
 ```
 
-## Common pitfalls
+## Energy-zero, symmetry, and rotor checks
 
 - Forgetting the volume dependence of $q_{\mathrm{trans}}$. Translational entropy changes with volume.
 - Using a rotational high-temperature approximation when $T$ is not large compared with $\theta_{\mathrm{rot}}$.
@@ -287,15 +281,10 @@ A useful consistency check is to ask which contribution changes when a variable 
 
 For polyatomic molecules, count vibrational modes before multiplying vibrational partition functions. Each normal mode contributes a factor, but degeneracies and low-frequency torsions may require special treatment beyond the simple harmonic oscillator.
 
-Low-frequency internal rotations are a common source of error because they are not quite vibrations and not quite free rotations. Treating them as harmonic oscillators can underestimate entropy.
+Low-frequency internal rotations are a common source of error because they are not quite vibrations and not quite free rotations. Treating them as harmonic oscillators can underestimate entropy. For precise work, compare harmonic oscillator, hindered rotor, and free rotor limits before choosing the approximation; the resulting entropy can change appreciably.
 
-For precise work, compare harmonic oscillator, hindered rotor, and free rotor limits before choosing the approximation.
+<div className="see-also">
 
-The entropy can change appreciably.
+See also: [Boltzmann distribution and partition functions](/chemistry/physical-chemistry/boltzmann-distribution-and-partition-functions) · [Thermodynamic functions from statistics](/chemistry/physical-chemistry/thermodynamic-functions-from-statistics) · [Rotational, vibrational, and Raman spectroscopy](/chemistry/physical-chemistry/rotational-vibrational-and-raman-spectroscopy) · [Quantum models of motion](/chemistry/physical-chemistry/quantum-models-of-motion)
 
-## Connections
-
-- [Boltzmann distribution and partition functions](/chemistry/physical-chemistry/boltzmann-distribution-and-partition-functions)
-- [Thermodynamic functions from statistics](/chemistry/physical-chemistry/thermodynamic-functions-from-statistics)
-- [Rotational, vibrational, and Raman spectroscopy](/chemistry/physical-chemistry/rotational-vibrational-and-raman-spectroscopy)
-- [Quantum models of motion](/chemistry/physical-chemistry/quantum-models-of-motion)
+</div>

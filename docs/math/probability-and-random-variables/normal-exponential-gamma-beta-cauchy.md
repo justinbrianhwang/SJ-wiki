@@ -438,10 +438,8 @@ These representations help simulate the distributions, but they also clarify the
 
 Rates have units of inverse time; scales have units of time. If $X$ is exponential with rate $3$ per hour, $E[X]=1/3$ hour. Writing a mean of $3$ hours signals a rate/scale reversal. Gamma shape and beta parameters are dimensionless. A normal variance carries squared measurement units, while its standard deviation carries the original units. Dimensional checks cannot prove a formula, but they expose many parameter mistakes immediately.
 
-## Related pages
+<div className="see-also">
 
-- [Poisson random variables and Poisson processes](/math/probability-and-random-variables/poisson-random-variables-and-processes)
-- [Continuous random variables and uniform laws](/math/probability-and-random-variables/continuous-random-variables-and-uniform-laws)
-- [Sums, convolutions, and order statistics](/math/probability-and-random-variables/sums-convolutions-order-statistics)
-- [Weak law, concentration, and the central limit theorem](/math/probability-and-random-variables/weak-law-concentration-central-limit-theorem)
-- [Common continuous distributions](/math/probability/common-continuous-distributions)
+See also: [Poisson random variables and Poisson processes](/math/probability-and-random-variables/poisson-random-variables-and-processes) · [Continuous random variables and uniform laws](/math/probability-and-random-variables/continuous-random-variables-and-uniform-laws) · [Sums, convolutions, and order statistics](/math/probability-and-random-variables/sums-convolutions-order-statistics) · [Weak law, concentration, and the central limit theorem](/math/probability-and-random-variables/weak-law-concentration-central-limit-theorem) · [Common continuous distributions](/math/probability/common-continuous-distributions)
+
+</div>

@@ -5,11 +5,11 @@ sidebar_position: 18
 
 # Partial Derivatives and the Gradient
 
-Partial derivatives extend the derivative to functions of several variables by changing one input at a time. The gradient collects those first partial derivatives into a vector. Together they describe slopes, tangent planes, directional derivatives, level curves, and local linear approximation for surfaces.
+Partial derivatives extend the derivative to functions of several variables by changing one input at a time. The gradient collects those first partial derivatives into a vector. These tools describe slopes, tangent planes, directional derivatives, level curves, and local linear approximations for surfaces.
 
-The main conceptual shift is that a multivariable function can change in many directions from the same point. A single derivative number is no longer enough. The gradient gives the direction of steepest increase and organizes all directional rates into one vector formula.
+A multivariable function can change in many directions from the same point, so one derivative number is no longer enough. The gradient gives the direction of steepest increase and organizes all directional rates into one vector formula.
 
-## Definitions
+## Coordinate slopes and arbitrary directions
 
 For a function $f(x,y)$, the partial derivative with respect to $x$ is
 
@@ -55,7 +55,7 @@ $$
 f(x,y,z)=c.
 $$
 
-## Key results
+## The gradient as first-order geometry
 
 The gradient points in the direction of steepest increase. Since
 
@@ -126,7 +126,7 @@ $$
 
 It estimates the output change caused by small input changes. In measurement problems, if $x$ and $y$ have small errors, the differential estimates the resulting error in $z=f(x,y)$.
 
-For functions of three variables, the gradient normal property is especially important. If $F(x,y,z)=c$ is a level surface, then $\nabla F$ is perpendicular to the tangent plane. This is why tangent planes to spheres, ellipsoids, and implicit surfaces are often found more cleanly with gradients than by solving for one variable.
+For functions of three variables, the gradient normal property is especially important. If $F(x,y,z)=c$ is a level surface, then $\nabla F$ is perpendicular to the tangent plane. Tangent planes to spheres, ellipsoids, and other implicit surfaces are therefore often found more cleanly with gradients than by solving for one variable.
 
 The directional derivative formula also makes angle dependence explicit. Moving perpendicular to the gradient gives zero first-order change because the dot product is zero. Moving opposite the gradient gives the steepest decrease, with value $-\vert \nabla f\vert $.
 
@@ -150,8 +150,6 @@ For level curves on a contour map, closely spaced contours indicate a large grad
 
 Linear approximation is local. If $(x,y)$ moves too far from $(a,b)$, curvature and higher-order terms can dominate. The tangent plane gives first-order behavior, and the Hessian describes the next-order correction.
 
-## Visual
-
 ```mermaid
 graph LR
   A["f(x,y)"] --> B[Partial derivatives f_x and f_y]
@@ -170,7 +168,7 @@ graph LR
 | Tangent plane | $z=f(a,b)+f_x(x-a)+f_y(y-b)$ | best local linear surface |
 | Level curve normal | $\nabla f$ | perpendicular to constant-value curve |
 
-## Worked example 1: gradient and directional derivative
+## Measuring change away from the coordinate axes
 
 **Problem.** Let
 
@@ -226,7 +224,7 @@ $$
 
 **Checked answer.** $\nabla f(2,1)=\langle4,10\rangle$, and the directional derivative in the direction $\langle3,4\rangle$ is $52/5$. The maximum directional derivative at the point would be $\vert \nabla f\vert =\sqrt{116}=2\sqrt{29}$.
 
-## Worked example 2: tangent plane and linear approximation
+## Using a tangent plane as a sensitivity estimate
 
 **Problem.** Find the tangent plane to
 
@@ -300,11 +298,9 @@ When using finite differences numerically, the same hold-one-variable-fixed inte
 
 The notation should reflect that distinction. The symbol $\partial$ signals that other independent variables are held fixed, while $d/dt$ along a path means every coordinate depending on $t$ may change. Many multivariable mistakes come from using a partial derivative when a total derivative along a curve is required in context.
 
-Writing the dependency first prevents that error in solutions and explanations consistently enough.
+Writing the dependency first prevents that error in both calculations and explanations. It is a small notation habit with a large payoff.
 
-It is a small notation habit with large payoff.
-
-## Code
+## Checking analytic partials with central differences
 
 ```python
 def f(x, y):
@@ -319,18 +315,22 @@ def partial_y(f, x, y, h=1e-5):
 print(partial_x(f, 2, 1), partial_y(f, 2, 1))
 ```
 
-## Common pitfalls
+## Distinctions that matter in a calculation
 
-- Forgetting to use a unit vector for directional derivatives.
-- Treating partial derivatives as if all variables change at once. One variable changes; the others are held constant.
-- Assuming $\nabla f=\mathbf{0}$ whenever a level curve has a horizontal tangent. The gradient is normal, not tangent.
-- Writing a tangent plane without evaluating derivatives at the base point.
-- Confusing a tangent plane to $z=f(x,y)$ with a level-surface tangent plane for $F(x,y,z)=c$.
-- Assuming mixed partials are equal without the needed continuity conditions.
+- A directional derivative uses a unit vector. Otherwise the dot product includes the length of the supplied direction as an extra scale factor.
+- In a partial derivative, one variable changes while the other independent variables remain fixed. Along a path, all coordinates that depend on the path parameter may change.
+- A horizontal tangent to a level curve does not make $\nabla f$ zero; the gradient is normal to that tangent.
+- The coefficients of a tangent plane are the partial derivatives evaluated at the base point, not functions left in terms of $x$ and $y$.
+- The graph $z=f(x,y)$ and an implicit level surface $F(x,y,z)=c$ use related but different tangent-plane formulas.
+- Equality of the mixed partials requires suitable regularity, such as continuity of the second partial derivatives near the point.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Derivatives and Rates](/math/calculus/derivatives-and-rates): partial derivatives are one-variable derivatives in coordinate directions.
 - [Vectors and Geometry of Space](/math/calculus/vectors-and-geometry-of-space): gradients are vectors and often normals.
 - [Extrema and Lagrange Multipliers](/math/calculus/extrema-and-lagrange-multipliers): gradients and second partials classify multivariable extrema.
 - [Vector Calculus](/math/calculus/vector-calculus): grad is one of the central vector differential operators.
+
+</div>

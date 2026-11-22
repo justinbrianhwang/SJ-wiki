@@ -9,11 +9,7 @@ Molecular symmetry organizes structure, bonding, and spectroscopy. Rather than t
 
 Atkins introduces point groups, symmetry operations, character tables, and symmetry labels as practical tools. The core payoff is selection: symmetry decides whether an orbital overlap, matrix element, or vibrational transition can be nonzero.
 
-![A ball-and-stick methane model shows four equivalent C-H bonds arranged tetrahedrally.](https://commons.wikimedia.org/wiki/Special:FilePath/Methane-3D-balls.png)
-
-*Figure: Methane as a high-symmetry molecule with tetrahedral geometry. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Methane-3D-balls.png), Benjah-bmm27, public domain.*
-
-## Definitions
+## Symmetry operations and representations
 
 A **symmetry operation** moves a molecule into an indistinguishable orientation. A **symmetry element** is the geometrical object associated with the operation.
 
@@ -63,7 +59,31 @@ where $h$ is the group order, $n_R$ is the number of operations in class $R$, an
 
 An integral can be nonzero only if the direct product of all factors contains the totally symmetric representation.
 
-## Key results
+## From molecular geometry to selection rules
+
+The usual route from a structure to a spectroscopic prediction is:
+
+```mermaid
+flowchart TD
+  A[Molecular geometry] --> B[Identify symmetry elements]
+  B --> C[Assign point group]
+  C --> D[Build reducible representation]
+  D --> E[Reduce into irreducible representations]
+  E --> F[Label orbitals or vibrations]
+  F --> G{Use direct products}
+  G --> H["overlap allowed?"]
+  G --> I["IR active?"]
+  G --> J["Raman active?"]
+  G --> K["electronic transition allowed?"]
+```
+
+| Operation | Symbol | Example meaning |
+|---|---|---|
+| Identity | $E$ | do nothing |
+| Proper rotation | $C_n$ | rotate by $360^\circ/n$ |
+| Reflection | $\sigma$ | reflect through a plane |
+| Inversion | $i$ | send $(x,y,z)$ to $(-x,-y,-z)$ |
+| Improper rotation | $S_n$ | rotate then reflect perpendicular to axis |
 
 For orbital overlap,
 
@@ -77,7 +97,7 @@ $$
 \Gamma(\psi_a)\otimes\Gamma(\psi_b)
 $$
 
-contains the totally symmetric representation. This is why orbitals of incompatible symmetry do not form bonding and antibonding pairs.
+contains the totally symmetric representation. Orbitals of incompatible symmetry therefore do not form bonding and antibonding pairs.
 
 For electric dipole transitions, the transition moment integral is
 
@@ -125,31 +145,7 @@ SALCs provide a systematic way to build molecular orbitals in polyatomic molecul
 
 Group theory does not replace chemical judgment. It can say an interaction is forbidden by symmetry or allowed by symmetry, but it does not by itself give the magnitude. Allowed overlap may still be small because orbitals are far apart or poorly energy matched. A symmetry-allowed transition may still be weak because the transition moment is numerically small. Symmetry is a filter, not a complete quantitative theory.
 
-## Visual
-
-```mermaid
-flowchart TD
-  A[Molecular geometry] --> B[Identify symmetry elements]
-  B --> C[Assign point group]
-  C --> D[Build reducible representation]
-  D --> E[Reduce into irreducible representations]
-  E --> F[Label orbitals or vibrations]
-  F --> G{Use direct products}
-  G --> H["overlap allowed?"]
-  G --> I["IR active?"]
-  G --> J["Raman active?"]
-  G --> K["electronic transition allowed?"]
-```
-
-| Operation | Symbol | Example meaning |
-|---|---|---|
-| Identity | $E$ | do nothing |
-| Proper rotation | $C_n$ | rotate by $360^\circ/n$ |
-| Reflection | $\sigma$ | reflect through a plane |
-| Inversion | $i$ | send $(x,y,z)$ to $(-x,-y,-z)$ |
-| Improper rotation | $S_n$ | rotate then reflect perpendicular to axis |
-
-## Worked example 1: Vibrational mode count for water
+## Counting the vibrational modes of water
 
 **Problem.** How many normal modes does $\mathrm{H_2O}$ have?
 
@@ -181,7 +177,7 @@ $$
 
 **Checked answer.** Water has three vibrational modes: symmetric stretch, bend, and antisymmetric stretch.
 
-## Worked example 2: Direct product test in $C_{2v}$
+## Testing a polarized transition in $C_{2v}$
 
 **Problem.** In $C_{2v}$, suppose an initial state has symmetry $A_1$, a final state has symmetry $B_1$, and $x$ transforms as $B_1$. Is the $x$-polarized transition symmetry allowed?
 
@@ -215,7 +211,7 @@ $$
 
 **Checked answer.** The transition is allowed for $x$ polarization by symmetry. Intensity can still be small for other physical reasons.
 
-## Code
+## Checking $C_{2v}$ direct products in Python
 
 ```python
 # Direct products for C2v using sign characters under (E, C2, sigma_v(xz), sigma_v'(yz))
@@ -239,7 +235,7 @@ print(direct_product("B1", "B1", "A1"))
 print(direct_product("A2", "B1"))
 ```
 
-## Common pitfalls
+## Checks that catch symmetry mistakes
 
 - Confusing symmetry operation with symmetry element.
 - Assigning point groups before checking all operations.
@@ -247,7 +243,7 @@ print(direct_product("A2", "B1"))
 - Assuming symmetry-allowed means intense. Symmetry is a necessary condition, not the only intensity factor.
 - Multiplying characters from different point groups. Direct products must be within the same group.
 
-A practical point-group workflow prevents most errors. Sketch the molecule in a clear orientation, identify the principal axis, check for perpendicular $C_2$ axes, then check mirror planes and inversion. If the molecule is slightly distorted in reality, decide whether the idealized or actual symmetry is appropriate for the problem. Spectroscopy of a distorted molecule may show bands that are forbidden in the higher ideal symmetry.
+Sketch the molecule in a clear orientation, identify the principal axis, check for perpendicular $C_2$ axes, then check mirror planes and inversion. If the molecule is slightly distorted in reality, decide whether the idealized or actual symmetry is appropriate for the problem. Spectroscopy of a distorted molecule may show bands that are forbidden in the higher ideal symmetry.
 
 When reducing representations, keep classes and operations distinct. A character table column may represent a class containing several operations; the reduction formula includes the class size $n_R$. Omitting that factor gives wrong counts. After reduction, the sum of dimensions must match the dimension of the original representation. This provides a quick arithmetic check.
 
@@ -255,9 +251,8 @@ For vibrational analysis, subtract translations and rotations only after forming
 
 If a direct product or reduction result seems surprising, test it against a simple physical picture. A totally symmetric vibration should preserve all symmetry operations, an antisymmetric stretch should change sign under some operations, and an orbital with a nodal plane should be antisymmetric to reflection through that plane. Character tables formalize these observations; they should not feel disconnected from molecular shape.
 
-## Connections
+<div className="see-also">
 
-- [Molecular structure and computational chemistry](/chemistry/physical-chemistry/molecular-structure-and-computational-chemistry)
-- [Rotational, vibrational, and Raman spectroscopy](/chemistry/physical-chemistry/rotational-vibrational-and-raman-spectroscopy)
-- [Electronic, laser, and magnetic resonance spectroscopy](/chemistry/physical-chemistry/electronic-laser-and-magnetic-resonance-spectroscopy)
-- [Engineering math linear algebra](/math/engineering-math/)
+See also: [Molecular structure and computational chemistry](/chemistry/physical-chemistry/molecular-structure-and-computational-chemistry) · [Rotational, vibrational, and Raman spectroscopy](/chemistry/physical-chemistry/rotational-vibrational-and-raman-spectroscopy) · [Electronic, laser, and magnetic resonance spectroscopy](/chemistry/physical-chemistry/electronic-laser-and-magnetic-resonance-spectroscopy) · [Engineering math linear algebra](/math/engineering-math/intro)
+
+</div>

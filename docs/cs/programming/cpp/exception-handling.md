@@ -312,10 +312,8 @@ Constructors have no failure return value, so exceptions fit failed construction
 
 Catch-all handlers belong mainly at boundaries such as a thread entry function or `main`, where no exception may safely escape. They can perform logging and controlled shutdown, but they cannot inspect an unknown exception through `what()`. Swallowing one and continuing with uncertain state converts a diagnosable failure into later corruption.
 
-## Related pages
+<div className="see-also">
 
-- [constructors and copy semantics](/cs/programming/cpp/constructors-and-copy-semantics)
-- [file I/O](/cs/programming/cpp/streams-and-file-io)
-- [classes and encapsulation](/cs/programming/cpp/classes-and-encapsulation)
-- [pointers and dynamic memory](/cs/programming/cpp/pointers-and-dynamic-memory)
-- [stl containers](/cs/programming/cpp/stl-containers)
+See also: [constructors and copy semantics](/cs/programming/cpp/constructors-and-copy-semantics) · [file I/O](/cs/programming/cpp/streams-and-file-io) · [classes and encapsulation](/cs/programming/cpp/classes-and-encapsulation) · [pointers and dynamic memory](/cs/programming/cpp/pointers-and-dynamic-memory) · [stl containers](/cs/programming/cpp/stl-containers)
+
+</div>

@@ -342,10 +342,8 @@ Downcasting from base to derived should be rare in client logic. `dynamic_cast` 
 
 Multiple inheritance can model a type satisfying several independent interfaces, especially when those bases contain little or no state. Inheriting implementation from several stateful bases raises harder questions about duplicate base subobjects and the diamond pattern. Virtual inheritance can share a common base, but it changes construction responsibilities. A single-base hierarchy or composition remains easier to audit when it expresses the model adequately.
 
-## Related pages
+<div className="see-also">
 
-- [classes and encapsulation](/cs/programming/cpp/classes-and-encapsulation)
-- [constructors and copy semantics](/cs/programming/cpp/constructors-and-copy-semantics)
-- [polymorphism](/cs/programming/cpp/polymorphism-and-virtual-functions)
-- [pointers and dynamic memory](/cs/programming/cpp/pointers-and-dynamic-memory)
-- [templates](/cs/programming/cpp/templates)
+See also: [classes and encapsulation](/cs/programming/cpp/classes-and-encapsulation) · [constructors and copy semantics](/cs/programming/cpp/constructors-and-copy-semantics) · [polymorphism](/cs/programming/cpp/polymorphism-and-virtual-functions) · [pointers and dynamic memory](/cs/programming/cpp/pointers-and-dynamic-memory) · [templates](/cs/programming/cpp/templates)
+
+</div>

@@ -9,7 +9,7 @@ Distributed systems need time for leases, logs, metrics, snapshots, transactions
 
 The central distinction is between real time and causal time. Real time answers "what did the wall clock say?" Causal time answers "which events could have influenced which other events?" Lamport clocks, vector clocks, hybrid logical clocks, and snapshot algorithms are different ways of extracting useful order from systems that do not have a single global clock.
 
-## Definitions
+## Physical time and causal time
 
 A **physical clock** is a hardware or operating-system clock intended to approximate real time. It has **offset**, the difference from a reference clock, and **drift**, the rate at which it gains or loses time. **Clock skew** is the difference between two clocks at a given instant. **NTP** synchronizes clocks over packet-switched networks and is good enough for many operational uses, but its accuracy depends on delay symmetry and network conditions. **PTP** can achieve tighter synchronization on controlled networks with hardware support.
 
@@ -25,7 +25,7 @@ A **hybrid logical clock** combines a physical time component with a logical cou
 
 A **distributed snapshot** records a consistent global state: a set of process states and channel states that could have occurred together in some execution. The Chandy-Lamport algorithm uses marker messages to record such a snapshot without stopping the computation, assuming reliable FIFO channels [7].
 
-## Key results
+## What logical clocks can prove
 
 Lamport's key result is that the happens-before relation gives a partial order of events without physical time [4]. This lets systems reason about causality: a response happens after a request; a replicated update delivered after another update may depend on it; a message receive cannot precede its send. Because the order is partial, concurrent events are expected, not exceptional.
 
@@ -37,20 +37,24 @@ The snapshot result is that a system can capture a consistent cut while messages
 
 Physical-clock results are more operational. NTP and PTP reduce skew but do not eliminate uncertainty. A timestamped write can be unsafe if the system assumes a clock is monotonic when it can step backward, or if it assumes bounded skew without enforcing it. Spanner's commit wait shows the correct pattern: if external consistency depends on physical time, the protocol must account for the uncertainty interval [9].
 
-## Visual
+## Tracing causality across three processes
 
 ```mermaid
 sequenceDiagram
   participant P1
   participant P2
   participant P3
-  P1->>P1: a: local event L=1 V=["1,0,0"]
-  P1->>P2: b: send m L=2 V=["2,0,0"]
-  P2->>P2: c: receive m L=3 V=["2,1,0"]
-  P3->>P3: d: local event L=1 V=["0,0,1"]
-  P2->>P3: e: send n L=4 V=["2,2,0"]
-  P3->>P3: f: receive n L=5 V=["2,2,2"]
+  P1->>P1: "a: local event, L=1, V=[1 0 0]"
+  P1->>P2: "b: send m, L=2, V=[2 0 0]"
+  P2->>P2: "c: receive m, L=3, V=[2 1 0]"
+  P3->>P3: "d: local event, L=1, V=[0 0 1]"
+  P2->>P3: "e: send n, L=4, V=[2 2 0]"
+  P3->>P3: "f: receive n, L=5, V=[2 2 2]"
 ```
+
+Events `d` and `c` receive comparable Lamport timestamps even though neither can influence the other. Their vector timestamps remain incomparable until a message carries one history into the other.
+
+## Choosing a timestamp mechanism
 
 | Mechanism | Timestamp shape | Captures causality exactly? | Typical use |
 | --- | --- | --- | --- |
@@ -60,11 +64,11 @@ sequenceDiagram
 | Hybrid logical clock | physical time plus counter | Preserves causality with compact metadata | databases, replicated logs, causally aware timestamps |
 | Snapshot marker | recorded cut and channel state | Captures consistent global state | checkpoints, debugging, termination detection |
 
-## Worked example 1: Trace Lamport clocks on three processes
+## Assigning Lamport timestamps by hand
 
-Problem: Processes `P1`, `P2`, and `P3` start with Lamport clock `0`. `P1` performs local event `a`, sends message `m` to `P2`, `P3` performs local event `d`, `P2` receives `m`, then `P2` sends `n` to `P3`, and `P3` receives `n`. Assign Lamport timestamps.
+Processes `P1`, `P2`, and `P3` start with Lamport clock `0`. `P1` performs local event `a`, sends message `m` to `P2`, `P3` performs local event `d`, `P2` receives `m`, then `P2` sends `n` to `P3`, and `P3` receives `n`.
 
-Method:
+Advance the clock on every event and receive:
 
 1. `P1` event `a`: increment from `0` to `1`. So $L(a)=1$.
 
@@ -78,13 +82,13 @@ Method:
 
 6. `P3` receives `n` with timestamp `4`. Its local clock is `1`, so it sets clock to $\max(1,4)+1=5$. So $L(receive(n))=5$.
 
-Checked answer: the timestamps are $1,2,1,3,4,5$ in event order. The local event on `P3` has timestamp `1`, which is less than `P2`'s receive timestamp `3`, but that does not imply `d` caused the receive. Lamport clocks order causality safely, but they over-order concurrent events.
+The timestamps are $1,2,1,3,4,5$ in event order. The local event on `P3` has timestamp `1`, which is less than `P2`'s receive timestamp `3`, but that does not imply `d` caused the receive. Lamport clocks order causality safely, but they over-order concurrent events.
 
-## Worked example 2: Detect concurrency with vector clocks
+## Detecting concurrency with vector clocks
 
-Problem: Three processes start with vector `[0,0,0]`. `P1` sends update `x` after one local increment. Independently, `P3` creates update `y`. Later `P2` receives `x` and creates update `z`. Determine whether `x`, `y`, and `z` are causally ordered or concurrent.
+Three processes start with vector `[0,0,0]`. `P1` sends update `x` after one local increment. Independently, `P3` creates update `y`. Later `P2` receives `x` and creates update `z`.
 
-Method:
+Compare timestamps componentwise:
 
 1. `P1` creates `x` by incrementing its own component:
 
@@ -110,9 +114,9 @@ $$
 
 6. Compare `y` and `z`: `[0,0,1]` and `[1,1,0]` are incomparable, so `y` and `z` are concurrent.
 
-Checked answer: `x` happens before `z`; `x` and `y` are concurrent; `y` and `z` are concurrent. A conflict resolver must not discard `y` merely because `z` has a later scalar or wall-clock timestamp.
+`x` happens before `z`; `x` and `y` are concurrent; `y` and `z` are concurrent. A conflict resolver must not discard `y` merely because `z` has a later scalar or wall-clock timestamp.
 
-## Code
+## Comparing vector timestamps
 
 ```python
 from dataclasses import dataclass
@@ -158,7 +162,7 @@ print("x vs z:", compare(x, z))
 print("y vs z:", compare(y, z))
 ```
 
-## Common pitfalls
+## Clock assumptions that leak into correctness
 
 - Assuming synchronized clocks make distributed state easy. Even small uncertainty matters for leases and external consistency.
 - Using wall-clock timestamps to resolve conflicts when causal metadata is required.
@@ -173,18 +177,6 @@ print("y vs z:", compare(y, z))
 - Letting debug logs imply false order because machine clocks differ.
 - Building leases without accounting for clock drift, process pauses, and renewal races.
 
-## Connections
-
-- [Foundations and System Models](/cs/distributed-systems/foundations-and-system-models)
-- [Replication and Consistency](/cs/distributed-systems/replication-and-consistency)
-- [Consensus: Paxos and Raft](/cs/distributed-systems/consensus-paxos-and-raft)
-- [Transactions and Isolation Levels](/cs/distributed-systems/transactions-and-isolation-levels)
-- [Stream Processing and Event-Driven Systems](/cs/distributed-systems/stream-processing-and-event-driven-systems)
-- [Computer Networks](/cs/computer-networks/intro)
-- [Operating Systems](/cs/operating-systems/intro)
-- [Databases](/cs/databases/intro)
-- [Cryptography](/cs/cryptography/intro)
-
 ## References
 
 [1] M. Kleppmann, *Designing Data-Intensive Applications*. Sebastopol, CA: O'Reilly, 2017.  
@@ -196,3 +188,9 @@ print("y vs z:", compare(y, z))
 [7] K. M. Chandy and L. Lamport, "Distributed snapshots: determining global states of distributed systems," *ACM Transactions on Computer Systems*, vol. 3, no. 1, pp. 63-75, 1985.  
 [8] S. Kulkarni, M. Demirbas, D. Madeppa, B. Avva, and M. Leone, "Logical physical clocks," in *Principles of Distributed Systems*, 2014.  
 [9] J. C. Corbett et al., "Spanner: Google's globally-distributed database," in *OSDI*, 2012.
+
+<div className="see-also">
+
+See also: [Foundations and System Models](/cs/distributed-systems/foundations-and-system-models) · [Replication and Consistency](/cs/distributed-systems/replication-and-consistency) · [Consensus: Paxos and Raft](/cs/distributed-systems/consensus-paxos-and-raft) · [Transactions and Isolation Levels](/cs/distributed-systems/transactions-and-isolation-levels) · [Stream Processing and Event-Driven Systems](/cs/distributed-systems/stream-processing-and-event-driven-systems) · [Computer Networks](/cs/computer-networks/intro) · [Operating Systems](/cs/operating-systems/intro) · [Databases](/cs/databases/intro) · [Cryptography](/cs/cryptography/intro)
+
+</div>

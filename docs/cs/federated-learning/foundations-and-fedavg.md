@@ -7,13 +7,13 @@ sidebar_position: 1
 
 ![A FedAvg training-curve figure compares federated averaging against synchronized SGD across communication rounds.](https://ar5iv.labs.arxiv.org/html/1602.05629/assets/x1.png)
 
-*Figure: The original FedAvg paper showed that local SGD averaging can reach target accuracy in many fewer rounds than synchronized FedSGD across MNIST/CIFAR/Shakespeare. From [McMahan et al., 2017](https://arxiv.org/abs/1602.05629) — embedded under educational fair use with attribution.*
+*Figure: In the original FedAvg experiments, local SGD averaging reached target accuracy in fewer rounds than synchronized FedSGD on MNIST, CIFAR, and Shakespeare. From [McMahan et al., 2017](https://arxiv.org/abs/1602.05629), reproduced with attribution for discussion.*
 
-Federated learning is the training pattern where data remains on clients while models or model updates move. The usual mental picture is a server coordinating many clients: it broadcasts a current model, selected clients run local optimization, and the server aggregates the returned updates. McMahan et al. introduced this as a practical deep-learning method for decentralized mobile data and showed that local computation can reduce communication rounds by large factors compared with synchronized FedSGD [1].
+Federated learning is the training pattern where data remains on clients while models or model updates move. The usual mental picture is a server coordinating many clients: it broadcasts a current model, selected clients run local optimization, and the server aggregates the returned updates. McMahan et al. developed the method for decentralized mobile data and showed that local computation can reduce communication rounds by large factors compared with synchronized FedSGD [1].
 
 The foundation matters because nearly every later federated-learning idea modifies one of four design choices: which clients participate, how much local computation they do, what they send, and how the server aggregates it. Cross-device systems emphasize massive scale, intermittent availability, and privacy-preserving aggregation. Cross-silo systems emphasize governance, auditability, higher client reliability, and institutional data sovereignty. In both cases, FedAvg is the baseline to understand before studying heterogeneity, personalization, privacy, compression, or robustness.
 
-## Definitions
+## The global objective and one FedAvg round
 
 Let there be $K$ clients. Client $k$ owns a local dataset $P_k$ with $n_k=\vert P_k\vert $ examples, and $n=\sum_{k=1}^{K} n_k$. For a model parameter vector $w\in\mathbb{R}^d$, define the local objective
 
@@ -65,13 +65,13 @@ The basic hyperparameters are $T$ communication rounds, client fraction $C$, loc
 | Common aggregation | Sampled synchronous rounds | Full or partial participation |
 | Security emphasis | Secure aggregation, DP, abuse resistance | Access control, MPC, legal audit |
 
-## Key results
+## Why local SGD saves rounds—and when it drifts
 
-FedAvg can be read as a practical compromise between minibatch SGD and local training. With $E=1$ and one minibatch per selected client, it resembles FedSGD. As $E$ grows, clients spend more computation between communications, and the server receives a model that has moved along the client's local objective. If client data are IID samples from the same distribution, then local objectives $F_k$ are noisy approximations of $f$, so averaging local SGD trajectories can approximate centralized SGD while requiring fewer synchronizations.
+FedAvg sits between minibatch SGD and independent local training. With $E=1$ and one minibatch per selected client, it resembles FedSGD. As $E$ grows, clients spend more computation between communications, and the server receives a model that has moved along the client's local objective. If client data are IID samples from the same distribution, then local objectives $F_k$ are noisy approximations of $f$, so averaging local SGD trajectories can approximate centralized SGD while requiring fewer synchronizations.
 
 The communication win comes from doing more local work per round. McMahan et al. reported that FedAvg reduced communication rounds by roughly $10$ to $100$ times over synchronized SGD in their experimental settings, including MNIST/CIFAR-style image tasks and a Shakespeare next-character prediction task [1]. The precise speedup depends on model, data partition, learning rate, and target accuracy, but the mechanism is simple: one upload can carry the effect of many local minibatch updates.
 
-FedAvg is not just averaging independently trained final models. All clients start a round from the same $w_t$, so local models remain in a shared coordinate system. The original paper illustrates that averaging neural-network weights is much more sensible when models share initialization and training history than when independently initialized networks are averaged [1]. This point still matters in modern FL: aggregation is meaningful because local optimization is coordinated around a common global iterate.
+FedAvg does not average independently trained final models. All clients start a round from the same $w_t$, so local models remain in a shared coordinate system. The original paper illustrates that averaging neural-network weights is much more sensible when models share initialization and training history than when independently initialized networks are averaged [1]. Aggregation is meaningful because local optimization is coordinated around a common global iterate.
 
 The same design creates client drift. Under non-IID data, $F_k$ may point toward a local optimum that differs substantially from the optimum of $f$. Multiple local steps compound the mismatch, so the update returned by client $k$ may no longer be an unbiased or low-variance estimate of a global descent direction. Later methods such as FedProx, SCAFFOLD, FedNova, FedBN, and MOON can all be interpreted as attempts to constrain, correct, normalize, or representationally align this drift [5], [6], [7], [11], [12].
 
@@ -94,8 +94,6 @@ for t = 0, 1, ..., T-1:
 ```
 
 The important proof intuition is not that FedAvg always has a clean unbiased-gradient interpretation. Rather, in the IID limit with small local learning rates, the average of local SGD trajectories behaves like a larger minibatch stochastic update. As data become heterogeneous, higher-order terms accumulate because each client evaluates gradients at different locally moved points. This is the bridge to the heterogeneity chapter.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -135,7 +133,7 @@ flowchart TD
   Wnext --> Wt
 ```
 
-## Worked example 1: One scalar FedAvg round
+## Following one scalar aggregation round
 
 **Problem.** Three clients participate in one full FedAvg round. The current scalar model is $w_t=2.0$. Client sizes are $n_1=10$, $n_2=30$, and $n_3=60$. Each client performs local training and returns:
 
@@ -172,7 +170,7 @@ $$
 
 **Checked answer.** The large third client pulls the model upward. A simple unweighted average would be $(1.6+2.2+2.5)/3=2.1$, but FedAvg uses data-weighted averaging, giving $w_{t+1}=2.32$.
 
-## Worked example 2: Communication cost versus local computation
+## Pricing local computation against uplink traffic
 
 **Problem.** A model has $d=5{,}000{,}000$ float32 parameters. Each upload sends one model update, so each parameter costs $4$ bytes before compression. Training uses $T=400$ rounds, $K=1{,}000{,}000$ total clients, and client fraction $C=0.01$. Compare total uplink traffic with a hypothetical FedSGD run that needs $T_{\mathrm{SGD}}=8{,}000$ rounds using the same client fraction.
 
@@ -221,7 +219,7 @@ $$
 
 **Checked answer.** If local computation lets FedAvg use $400$ rounds instead of $8{,}000$, the uplink traffic is $20$ times smaller before considering compression or secure-aggregation overhead.
 
-## Code
+## A minimal FedAvg simulation
 
 ```python
 import numpy as np
@@ -251,7 +249,7 @@ print([float(w[0]) for w in local_models])
 print(float(fedavg_round(global_w, local_models, sizes)[0]))
 ```
 
-## Common pitfalls
+## Assumptions that quietly change the experiment
 
 - Treating federated learning as a privacy guarantee by itself; updates can still leak information.
 - Averaging clients uniformly when the objective is defined with $n_k/n$ weights.
@@ -265,17 +263,6 @@ print(float(fedavg_round(global_w, local_models, sizes)[0]))
 - Ignoring client eligibility bias; available clients may not represent the whole population.
 - Treating secure aggregation as compatible with every anomaly detector; individual updates may be hidden.
 - Forgetting that real FL systems need retries, deadlines, telemetry, privacy accounting, and rollout controls.
-
-## Connections
-
-- [Optimization algorithms](/cs/deep-learning/optimization-algorithms)
-- [Computational performance](/cs/deep-learning/computational-performance)
-- [Recommender systems](/cs/deep-learning/recommender-systems)
-- [Privacy-preserving data mining](/cs/data-mining/chapter-20-privacy-preserving-data-mining)
-- [Symmetric encryption modes](/cs/cryptography/symmetric-encryption-modes)
-- [Threat models and attack taxonomy](/cs/adversarial-attacks/threat-models-and-attack-taxonomy)
-- [Heterogeneity and Federated Optimization](/cs/federated-learning/heterogeneity-and-optimization)
-- [Privacy: Differential Privacy and Secure Aggregation](/cs/federated-learning/privacy-differential-and-secure-aggregation)
 
 ## References
 
@@ -308,3 +295,9 @@ print(float(fedavg_round(global_w, local_models, sizes)[0]))
 [14] European Union, "Regulation (EU) 2016/679: General Data Protection Regulation," 2016. https://eur-lex.europa.eu/eli/reg/2016/679/oj
 
 [15] U.S. Department of Health and Human Services, "Health Insurance Portability and Accountability Act of 1996." https://www.hhs.gov/hipaa/
+
+<div className="see-also">
+
+See also: [Optimization algorithms](/cs/deep-learning/optimization-algorithms) · [Computational performance](/cs/deep-learning/computational-performance) · [Recommender systems](/cs/deep-learning/recommender-systems) · [Privacy-preserving data mining](/cs/data-mining/chapter-20-privacy-preserving-data-mining) · [Symmetric encryption modes](/cs/cryptography/symmetric-encryption-modes) · [Threat models and attack taxonomy](/cs/adversarial-attacks/threat-models-and-attack-taxonomy) · [Heterogeneity and Federated Optimization](/cs/federated-learning/heterogeneity-and-optimization) · [Privacy: Differential Privacy and Secure Aggregation](/cs/federated-learning/privacy-differential-and-secure-aggregation)
+
+</div>

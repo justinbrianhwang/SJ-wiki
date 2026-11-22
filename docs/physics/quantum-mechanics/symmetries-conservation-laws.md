@@ -9,7 +9,7 @@ Symmetry is the shortest route from physical invariance to conserved quantities 
 
 Sakurai devotes a chapter to symmetries, conservation laws, degeneracies, parity, lattice translations, and time reversal. Ballentine treats symmetries of spacetime and the Galilei group early, making generators central. The Gottfried-named notes connect symmetries to rotations, angular momentum, and identical particles. Schiff's classic applications appear throughout central potentials, parity, and selection rules.
 
-## Definitions
+## Operators that implement invariance
 
 A transformation is a symmetry if it preserves physical transition probabilities:
 
@@ -53,7 +53,7 @@ $$
 
 Time reversal is represented by an antiunitary operator $\Theta$, not a unitary one, because it must reverse momenta and angular momenta while preserving probabilities.
 
-## Key results
+## From commuting generators to conserved quantities
 
 If a unitary symmetry $U$ leaves the Hamiltonian invariant,
 
@@ -109,8 +109,6 @@ $$
 
 leading to Bloch-like states with phase under discrete translation. Sakurai uses this to show that symmetry reasoning is broader than rotations.
 
-## Visual
-
 ```mermaid
 flowchart TD
   A[Physical invariance] --> B[Unitary or antiunitary operator]
@@ -130,7 +128,7 @@ flowchart TD
 | Parity | $\Pi$ | even/odd label | selection rules |
 | Time reversal | $\Theta$ | antiunitary | constraints on dynamics |
 
-## Worked example 1: Translation invariance and momentum conservation
+## Free motion and translation invariance
 
 **Problem.** Show that a free particle conserves momentum.
 
@@ -168,7 +166,7 @@ $$
 
 **Checked answer.** Momentum is conserved because the Hamiltonian is invariant under spatial translations.
 
-## Worked example 2: Parity selection rule
+## A diagonal matrix element forbidden by parity
 
 **Problem.** Let $V(x)=V(-x)$, so energy eigenstates have definite parity. Show that $\langle n\vert X\vert n\rangle=0$ for a nondegenerate bound state.
 
@@ -201,25 +199,9 @@ $$
 \langle X\rangle=0.
 $$
 
-**Checked answer.** This is why first-order shifts from an odd perturbation vanish in parity eigenstates.
+**Checked answer.** First-order shifts from an odd perturbation vanish in parity eigenstates for the same reason.
 
-## Code
-
-```python
-import numpy as np
-
-# Parity check for harmonic oscillator-like even/odd sample functions
-x = np.linspace(-5, 5, 2001)
-psi_even = np.exp(-x**2 / 2)
-psi_odd = x * np.exp(-x**2 / 2)
-
-for psi in [psi_even, psi_odd]:
-    norm = np.trapz(abs(psi) ** 2, x)
-    x_mean = np.trapz(abs(psi) ** 2 * x, x) / norm
-    print(x_mean)
-```
-
-## Common pitfalls
+## What has to stay invariant
 
 - Saying "symmetry" without specifying the operator and what it leaves invariant.
 - Confusing invariance of a state with invariance of the Hamiltonian. A Hamiltonian can be symmetric even when a particular state is not.
@@ -231,7 +213,7 @@ for psi in [psi_even, psi_odd]:
 
 A reliable symmetry argument has three parts. First, identify the transformation: translation, rotation, inversion, time reversal, exchange, or a more abstract internal transformation. Second, identify how states and operators transform. Third, verify that the Hamiltonian and boundary conditions are invariant. Leaving out the boundary conditions is a common mistake. A free-particle Hamiltonian is translation invariant on the infinite line, but a box with walls is not invariant under arbitrary translations.
 
-Continuous symmetries give generators, and generators give conserved quantities when they commute with the Hamiltonian. This is the quantum version of Noether's theorem. The commutator is not just a formal test; it tells how the corresponding observable changes in the Heisenberg picture. If $[H,G]=0$, then the distribution of $G$ is constant in time. If $[H,G]\neq0$, the symmetry is broken and transitions between different $G$ labels may become allowed.
+Continuous symmetries give generators, and generators give conserved quantities when they commute with the Hamiltonian. This is the quantum version of Noether's theorem. The commutator also gives the corresponding observable's rate of change in the Heisenberg picture. If $[H,G]=0$, then the distribution of $G$ is constant in time. If $[H,G]\neq0$, the symmetry is broken and transitions between different $G$ labels may become allowed.
 
 Discrete symmetries work differently. Parity has eigenvalues $\pm1$ rather than a continuous generator. Time reversal is antiunitary, which means it complex conjugates amplitudes in addition to transforming operators. Exchange symmetry is a restriction on the allowed state space for identical particles. Putting all of these under the word "symmetry" is useful, but the mathematical implementation differs from case to case.
 
@@ -245,14 +227,10 @@ In numerical and approximate work, preserving symmetry is often a design choice.
 
 Sakurai's symmetry chapter is placed after angular momentum because rotations provide the most important example, but Ballentine's earlier symmetry treatment is a reminder that the idea is foundational. Quantum numbers are not arbitrary labels; they are eigenvalues of operators associated with transformations that leave the physics invariant.
 
-A final practical rule is to ask what would change if the coordinate axes were relabeled. If the physics changes, there must be an external structure such as a field, boundary, lattice, or measuring apparatus. If no such structure exists, axis-dependent answers usually indicate that symmetry was broken by the calculation rather than by the system.
+As a quick check, ask what would change if the coordinate axes were relabeled. If the physics changes, there must be an external structure such as a field, boundary, lattice, or measuring apparatus. If no such structure exists, axis-dependent answers usually indicate that the calculation, rather than the system, broke the symmetry; the check catches many false splittings.
 
-This question is quick and catches many false splittings.
+<div className="see-also">
 
-## Connections
+See also: [Quantum dynamics and pictures](/physics/quantum-mechanics/quantum-dynamics-pictures) · [Angular momentum algebra](/physics/quantum-mechanics/angular-momentum-algebra) · [Central potentials and the hydrogen atom](/physics/quantum-mechanics/central-potentials-hydrogen-atom) · [Time-independent perturbation theory](/physics/quantum-mechanics/time-independent-perturbation-theory) · [Measurement and interpretation](/physics/quantum-mechanics/measurement-interpretation)
 
-- [Quantum dynamics and pictures](/physics/quantum-mechanics/quantum-dynamics-pictures)
-- [Angular momentum algebra](/physics/quantum-mechanics/angular-momentum-algebra)
-- [Central potentials and the hydrogen atom](/physics/quantum-mechanics/central-potentials-hydrogen-atom)
-- [Time-independent perturbation theory](/physics/quantum-mechanics/time-independent-perturbation-theory)
-- [Measurement and interpretation](/physics/quantum-mechanics/measurement-interpretation)
+</div>

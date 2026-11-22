@@ -5,52 +5,19 @@ sidebar_position: 16
 
 # Space Complexity
 
-Space complexity measures working memory rather than time. A computation may run for many steps while using only a small amount of storage, and nondeterministic choices can sometimes be simulated with surprisingly little extra space. Space classes are central for graph reachability, quantified Boolean formulas, games, and memory-limited computation.
+Space complexity measures working memory rather than running time. A computation may take many steps while retaining only a small amount of state; it can scan the input again or recompute facts instead of storing them. This tradeoff appears in graph reachability, quantified Boolean formulas, games, and memory-limited computation.
 
-The main classes in the introductory theory sequence are PSPACE, NPSPACE, L, and NL. Savitch's theorem relates deterministic and nondeterministic space by showing that nondeterministic space can be simulated deterministically with only a quadratic space blowup. This is one of the most striking contrasts with time complexity, where no analogous proof is known for P and NP.
+The main classes here are PSPACE, NPSPACE, L, and NL. Savitch's theorem relates deterministic and nondeterministic space: nondeterministic space can be simulated deterministically with only a quadratic increase in space. No comparable theorem is known to collapse P and NP.
 
-## Definitions
+## What counts as workspace
 
-For a Turing machine, **space usage** counts the number of tape cells used on the work tapes as a function of input length. Read-only input tape cells are often excluded in multi-tape definitions so sublinear space classes make sense.
+For a Turing machine, **space usage** is the number of work-tape cells used as a function of the input length. In the standard multitape model, the input sits on a read-only tape and does not count toward the bound. This convention permits sublinear-space classes.
 
-The class **PSPACE** is the set of languages decidable using polynomial space. Time may be exponential, because a polynomial-space machine has exponentially many possible configurations.
+The class **PSPACE** contains languages decidable in polynomial space. **NPSPACE** is its nondeterministic counterpart: some branch must accept while respecting the polynomial bound. **L** and **NL** impose deterministic and nondeterministic $O(\log n)$ space bounds, respectively.
 
-The class **NPSPACE** is the nondeterministic version of PSPACE. A nondeterministic machine accepts if some branch accepts while using polynomial space.
+A polynomial-space computation need not run in polynomial time. It may revisit and overwrite its workspace for exponentially many steps.
 
-**Savitch's theorem** states that for $s(n)\ge\log n$, $\mathrm{NSPACE}(s(n))\subseteq \mathrm{DSPACE}(s(n)^2)$. In particular, PSPACE equals NPSPACE.
-
-The class **L** contains languages decidable in deterministic logarithmic space. The class **NL** contains languages decidable in nondeterministic logarithmic space.
-
-A problem is **NL-complete** if it is in NL and every language in NL reduces to it under log-space reductions. Directed reachability, often called `PATH`, is the standard NL-complete problem.
-
-## Key results
-
-PSPACE contains P and NP because polynomial-time computations can visit only polynomially many tape cells. PSPACE is contained in EXPTIME because a polynomial-space deterministic computation has at most exponentially many configurations; if it runs longer without halting, a configuration repeats.
-
-Savitch's theorem proves PSPACE equals NPSPACE. The key recursive procedure asks whether configuration $c_2$ is reachable from configuration $c_1$ within at most $t$ steps by guessing or iterating over a midpoint configuration $m$ and recursively checking reachability from $c_1$ to $m$ and from $m$ to $c_2$ within $t/2$ steps. Reusing space across recursive calls keeps space quadratic.
-
-TQBF, the problem of deciding true quantified Boolean formulas, is PSPACE-complete. The formula may alternate existential and universal quantifiers, naturally matching game-tree or alternating computation. A depth-first recursive evaluator uses polynomial space because it stores only one branch at a time.
-
-Directed reachability is NL-complete. It is in NL because a nondeterministic log-space machine can store the current vertex and a step counter, guessing the next vertex at each step. Hardness comes from encoding configurations of any NL computation as graph vertices.
-
-Space complexity is sensitive to what is counted. If the input tape were counted as working space, then no algorithm reading an input of length $n$ could use less than $n$ space. To study logarithmic space, the standard model gives the machine a read-only input tape, one or more work tapes whose used cells are counted, and sometimes a write-only output tape for reductions. The machine may scan the input many times while storing only small summaries.
-
-Configuration graphs explain many space results. A machine using $s(n)$ space has only exponentially many configurations in $s(n)$ because a configuration records state, head positions, and work-tape contents. Nondeterministic acceptance becomes graph reachability in this configuration graph. Savitch's theorem solves reachability recursively without storing the whole graph, trading time for space.
-
-The recursive reachability idea in Savitch's theorem is worth internalizing. To decide whether $c_2$ is reachable from $c_1$ within $t$ steps, try every possible midpoint configuration $m$ and check whether $c_1$ reaches $m$ within $t/2$ steps and $m$ reaches $c_2$ within $t/2$ steps. The recursion depth is logarithmic in $t$, and each level stores only a constant number of configurations. Since each configuration uses $O(s(n))$ space, the total is $O(s(n)^2)$ under the usual bounds.
-
-PSPACE-complete problems often involve alternating choices. TQBF alternates existential and universal quantifiers. Games alternate moves between players. An existential quantifier asks whether some move works; a universal quantifier asks whether all opponent responses can be handled. A depth-first evaluation may explore an exponential game tree, but it stores only the current path and current subformula, so polynomial space suffices.
-
-Log-space reductions are stricter than polynomial-time reductions because the reduction itself must not use enough memory to solve the problem outright. They are used for completeness inside small space classes such as NL. Directed reachability is NL-complete because an NL machine's configurations form a graph of polynomial size, and a log-space transducer can output or query the relevant adjacency structure using only small counters and local recomputation.
-
-The theorem NL equals coNL, proved by Immerman and Szelepcsenyi, is another surprising space result. It says nondeterministic log-space can decide nonreachability as well as reachability. The proof is beyond the basic page, but the result warns against assuming nondeterministic space behaves like nondeterministic time.
-
-Space bounds can allow repeated recomputation. A log-space algorithm may scan the input many times and recompute local facts instead of storing them. This is why time and space should not be conflated. Saving space often costs time, and Savitch's theorem is an extreme example: it reduces nondeterministic space to deterministic space by recursively recomputing reachability information rather than storing a visited set.
-
-For PSPACE, the accepting computation may be exponentially long, but a depth-first search through possibilities can reuse memory after returning from a branch. This is exactly what happens when evaluating TQBF. The algorithm tries truth values recursively; after finishing one branch, it discards that branch's local assignment and tries the next. The recursion stack has depth at most the number of variables, so the space is polynomial.
-
-In NL, nondeterminism supplies a path certificate one vertex at a time. The machine does not need to store the whole path; it only stores the current vertex and a counter. If a guessed path is wrong, that branch rejects. If a path exists, one branch guesses it. This is the same existential flavor as NP, but with a much smaller storage budget and no need to write down the entire certificate at once.
-## Visual
+## How the main classes fit together
 
 ```mermaid
 graph TD
@@ -70,69 +37,77 @@ graph TD
 | NP | nondeterministic polynomial time | SAT |
 | PSPACE | polynomial space | TQBF, generalized games |
 
-## Worked example 1: Log-space reachability certificate
+P and NP lie inside PSPACE because a polynomial-time computation can visit only polynomially many tape cells. PSPACE lies inside EXPTIME because a polynomial-space deterministic machine has at most exponentially many configurations; a longer nonhalting computation must repeat one.
 
-**Problem.** Show why directed reachability is in NL.
+## Configuration graphs turn computation into reachability
 
-**Method.** Store only the current vertex and a counter.
+A machine using $s(n)$ space has exponentially many possible configurations in $s(n)$. A configuration records the control state, head positions, and current work-tape contents. Legal transitions form a directed **configuration graph**, and nondeterministic acceptance asks whether an accepting configuration is reachable from the start configuration.
 
-1. Input is $\langle G,s,t\rangle$ with $n$ vertices.
-2. A nondeterministic machine stores the current vertex, initially $s$.
-3. It also stores a counter from $0$ to $n-1$ to prevent paths longer than necessary.
-4. At each step, if the current vertex is $t$, accept.
-5. Otherwise nondeterministically choose an outgoing neighbor and update the current vertex.
-6. Increment the counter. If the counter reaches $n$ without seeing $t$, reject that branch.
-7. Storing a vertex name and counter needs $O(\log n)$ bits each.
+This viewpoint supports several results at once. It places polynomial-space deterministic computation in exponential time, reduces an NL machine's acceptance problem to directed reachability, and gives Savitch's deterministic simulation a graph on which to operate. The graph need not be stored explicitly: individual configurations and their outgoing transitions can be reconstructed as needed.
 
-**Checked answer.** If a path exists, some branch guesses it and accepts. If no path exists, every branch fails within $n-1$ edge moves. Thus `PATH` is in NL.
+Space bounds therefore tolerate extensive recomputation. A log-space algorithm may rescan its input many times; a polynomial-space search may discard a branch and later reconstruct related information. The saved memory can cost enormous time.
 
-## Worked example 2: Evaluating a quantified formula in polynomial space
+## Savitch's midpoint recursion
 
-**Problem.** Evaluate $\exists x\,\forall y\,((x\lor y)\land(\neg x\lor y))$.
+For $s(n)\ge \log n$, **Savitch's theorem** states
 
-**Method.** Work from the quantifiers inward.
+$$
+\mathrm{NSPACE}(s(n))\subseteq \mathrm{DSPACE}(s(n)^2).
+$$
 
-1. The matrix is $(x\lor y)\land(\neg x\lor y)$.
-2. Try $x=\text{true}$. Then the matrix becomes $(\text{true}\lor y)\land(\text{false}\lor y)$, which simplifies to $\text{true}\land y$, or $y$.
-3. The universal quantifier over $y$ asks whether $y$ is true for both values of $y$. It is false when $y=\text{false}$.
-4. Try $x=\text{false}$. The matrix becomes $(\text{false}\lor y)\land(\text{true}\lor y)$, which also simplifies to $y$.
-5. Again, $\forall y\, y$ is false.
-6. No existential choice for $x$ makes the universal condition true.
+Suppose `REACH` must decide whether configuration $c_2$ is reachable from $c_1$ within at most $t$ transitions. It tries each possible midpoint configuration $m$ and recursively checks both halves:
 
-**Checked answer.** The quantified formula is false. A recursive evaluator needs to store only the current partial assignment and recursion depth, both polynomial in formula size.
+$$
+\operatorname{REACH}(c_1,c_2,t)
+=
+\bigvee_m
+\left(
+\operatorname{REACH}(c_1,m,\lceil t/2\rceil)
+\land
+\operatorname{REACH}(m,c_2,\lfloor t/2\rfloor)
+\right).
+$$
 
-## Code
+The recursion has depth $O(\log t)$. Each level retains only a constant number of configurations and counters, then reuses the same memory after a recursive call returns. Under the usual bound $t=2^{O(s(n))}$, the depth is $O(s(n))$ and each configuration occupies $O(s(n))$ space, for $O(s(n)^2)$ total space. The running time can be much larger because midpoint configurations are repeatedly enumerated.
 
-```python
-def reachable_nondet_style(graph, start, target):
-    # Deterministic BFS here checks the same reachability relation.
-    seen = {start}
-    frontier = [start]
-    while frontier:
-        v = frontier.pop()
-        if v == target:
-            return True
-        for w in graph.get(v, []):
-            if w not in seen:
-                seen.add(w)
-                frontier.append(w)
-    return False
+For polynomial $s(n)$, squaring the bound still gives a polynomial, hence PSPACE = NPSPACE.
 
-G = {"a": ["b", "d"], "b": ["c"], "c": [], "d": ["c"]}
-print(reachable_nondet_style(G, "a", "c"))
-```
+## Directed reachability under a logarithmic budget
 
-## Common pitfalls
+A problem is **NL-complete** if it belongs to NL and every language in NL reduces to it by a log-space reduction. Directed reachability, usually called `PATH`, is the standard example.
 
-- Counting input tape space against log-space algorithms. Standard definitions use a read-only input tape and count work space.
-- Assuming polynomial space means polynomial time. A polynomial-space machine may run exponentially long.
-- Believing NPSPACE is larger than PSPACE by analogy with NP and P. Savitch's theorem collapses them at polynomial space.
-- Forgetting that NL computations need a step bound to avoid cycling forever.
-- Treating PSPACE-complete games as ordinary finite games without considering input-scaled board size.
+Given $\langle G,s,t\rangle$ with $n$ vertices, a nondeterministic machine stores the current vertex, initially $s$, and the number of edges guessed so far. It first accepts if the current vertex is $t$. If the counter is already $n-1$, it rejects; otherwise it guesses an outgoing neighbor, updates the current vertex, increments the counter, and repeats. If a path exists, a simple path exists, so some branch guesses it within $n-1$ edge moves. If no path exists, every branch rejects. The vertex name and counter each need $O(\log n)$ bits.
 
-## Connections
+For hardness, take any NL machine and regard its configurations as vertices. The start configuration reaches an accepting configuration exactly when the machine accepts. A log-space transducer can produce or query this graph's local adjacency information using small counters and recomputation rather than materializing the graph.
 
-- Time classes are introduced in [time complexity, P, and NP](/cs/theory/time-complexity-p-and-np).
-- NP-complete reductions are covered in [NP-completeness and classic reductions](/cs/theory/np-completeness-and-classic-reductions).
-- Advanced hierarchy and interactive proof results are surveyed in [advanced complexity topics](/cs/theory/advanced-complexity-topics).
-- Configuration graphs rely on Turing-machine definitions from [Turing machines and the Church-Turing thesis](/cs/theory/turing-machines-and-the-church-turing-thesis).
+Log-space reductions are deliberately stricter than polynomial-time reductions. The reduction must not have enough workspace to solve the source problem outright, which matters when defining completeness for small space classes.
+
+The Immerman--Szelepcsényi theorem adds the equality NL = coNL: nondeterministic logarithmic space can decide nonreachability as well as reachability. Its counting proof is more involved, but the result blocks a naive analogy between nondeterministic space and the open P-versus-NP question.
+
+## TQBF as a depth-first game
+
+**TQBF** asks whether a fully quantified Boolean formula is true. Alternating existential and universal quantifiers match alternating moves in a game tree: an existential quantifier asks whether some move works, while a universal quantifier requires every response to work. A depth-first evaluator may traverse an exponential tree, but it stores only the current path, partial assignment, and subformula.
+
+Consider
+
+$$
+\exists x\,\forall y\,((x\lor y)\land(\neg x\lor y)).
+$$
+
+Trying $x=\text{true}$ reduces the matrix to $y$, which is false when the universal player chooses $y=\text{false}$. Trying $x=\text{false}$ also reduces the matrix to $y$ and fails for the same choice. No existential assignment to $x$ satisfies the universal condition, so the quantified formula is false.
+
+TQBF is PSPACE-complete. The same depth-first pattern applies to many PSPACE-complete games: after completing a branch, the evaluator discards its local assignment and reuses the memory. The board or position description must scale with the input; a fixed finite game has only finitely many positions and does not express the same complexity question.
+
+## Model details that change the argument
+
+- Counting the read-only input as workspace destroys the usual interpretation of sublinear-space classes.
+- Polynomial space permits exponential time; the machine can keep overwriting the same cells.
+- NPSPACE does not appear to exceed PSPACE: Savitch's theorem proves equality.
+- An NL reachability procedure needs a step counter. Without it, a branch may follow a cycle forever.
+- A depth-first PSPACE procedure saves memory only if completed branch state is released or overwritten.
+
+<div className="see-also">
+
+See also: [Time complexity, P, and NP](/cs/theory/time-complexity-p-and-np) · [NP-completeness and classic reductions](/cs/theory/np-completeness-and-classic-reductions) · [Advanced complexity topics](/cs/theory/advanced-complexity-topics) · [Turing machines and the Church-Turing thesis](/cs/theory/turing-machines-and-the-church-turing-thesis)
+
+</div>

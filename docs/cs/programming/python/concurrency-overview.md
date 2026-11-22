@@ -9,7 +9,7 @@ Concurrency is about handling multiple tasks whose lifetimes overlap. The textbo
 
 Python offers several concurrency tools. Threads are useful for overlapping I/O-bound work. Processes are useful for CPU-bound work because they avoid the limitations of the global interpreter lock in standard CPython. `asyncio` is useful for large numbers of cooperative I/O tasks when the libraries involved support async APIs. Each tool has costs, so start with clear sequential code and introduce concurrency only when measurement or design need justifies it.
 
-## Definitions
+## Concurrency, parallelism, and waiting
 
 **Concurrency** means multiple tasks are in progress during the same time period. **Parallelism** means multiple tasks are executing at the exact same time, usually on multiple CPU cores. Concurrency may or may not be parallel.
 
@@ -17,7 +17,7 @@ A **thread** is a flow of execution inside one process. Threads share memory, wh
 
 A **process** is an independent program instance with its own memory. Processes communicate through files, queues, pipes, sockets, or other inter-process mechanisms. They have more overhead than threads but are safer for CPU-heavy work.
 
-The **global interpreter lock** or **GIL** in standard CPython prevents multiple Python bytecode threads from executing at the same instant in one process. This means threads do not usually speed up CPU-bound pure Python loops, but they can still help with I/O-bound tasks where threads spend time waiting.
+The **global interpreter lock** or **GIL** in the default CPython build prevents multiple Python bytecode threads from executing at the same instant in one process. Optional free-threaded CPython builds behave differently. On the usual GIL-enabled build, threads do not generally speed up CPU-bound pure Python loops, but they can still help with I/O-bound tasks where threads spend time waiting.
 
 **Asynchronous programming** uses an event loop and coroutines. A coroutine declared with `async def` can pause at `await`, allowing other tasks to run while it waits for I/O.
 
@@ -25,27 +25,27 @@ An **I/O-bound** task spends most time waiting on external resources, such as ne
 
 A **race condition** occurs when program behavior depends on unpredictable timing between tasks. A **lock** protects shared state so only one thread enters a critical section at a time.
 
-## Key results
+## Choosing a model by workload
 
-The first key result is that the workload determines the model. If the program downloads many URLs, reads many files, or waits on sensors, threads or async may help. If the program computes millions of independent numeric results in pure Python, processes or vectorized libraries are better candidates.
+The workload determines the model. If the program downloads many URLs, reads many files, or waits on sensors, threads or async may help. If the program computes millions of independent numeric results in pure Python, processes or vectorized libraries are better candidates.
 
-The second result is that `concurrent.futures` is often the most approachable interface. `ThreadPoolExecutor` and `ProcessPoolExecutor` share a similar API, letting you submit independent functions and gather results.
+`concurrent.futures` is often the most approachable interface. `ThreadPoolExecutor` and `ProcessPoolExecutor` share a similar API, letting you submit independent functions and gather results.
 
-The third result is that shared mutable state is the main danger in threaded code. Prefer passing inputs to worker functions and collecting returned outputs. When sharing is unavoidable, use locks or thread-safe queues.
+Shared mutable state is the main danger in threaded code. Prefer passing inputs to worker functions and collecting returned outputs. When sharing is unavoidable, use locks or thread-safe queues.
 
-The fourth result is that process workers require picklable inputs and outputs. Functions submitted to a process pool should usually be defined at module top level, not nested inside another function.
+Process workers require picklable inputs and outputs. Functions submitted to a process pool should usually be defined at module top level, not nested inside another function.
 
-The fifth result is that async code requires async-compatible libraries. You cannot make ordinary blocking file or network calls magically nonblocking by putting them inside `async def`. The awaited operation must cooperate with the event loop.
+Async code requires async-compatible libraries. You cannot make ordinary blocking file or network calls magically nonblocking by putting them inside `async def`. The awaited operation must cooperate with the event loop.
 
-The sixth result is that concurrency should be tested with failure in mind. Workers can raise exceptions, time out, return partial results, or be cancelled. A concurrent program that only works on the success path is fragile.
+Concurrency should be tested with failure in mind. Workers can raise exceptions, time out, return partial results, or be cancelled. A concurrent program that only works on the success path is fragile.
 
-A seventh result is that concurrency changes observability. Print statements from several threads or processes can interleave, making logs hard to read. A task that fails in a worker may not show a traceback until its future is inspected. Timing-dependent bugs may disappear when debug output is added. Use structured logging, collect results deliberately, and keep worker functions small enough that they can be tested sequentially.
+Concurrency changes observability. Print statements from several threads or processes can interleave, making logs hard to read. A task that fails in a worker may not show a traceback until its future is inspected. Timing-dependent bugs may disappear when debug output is added. Use structured logging, collect results deliberately, and keep worker functions small enough that they can be tested sequentially.
 
-An eighth result is that cancellation and shutdown are part of the design. A program that starts background work should know how to stop it when the user exits, when a timeout expires, or when one task fails. Context managers around executors help because they define a lifetime for the pool. In async code, cancellation propagates through awaited tasks, so cleanup should use `try` and `finally` where resources must be released.
+Cancellation and shutdown are part of the design. A program that starts background work should know how to stop it when the user exits, when a timeout expires, or when one task fails. Context managers around executors help because they define a lifetime for the pool. In async code, cancellation propagates through awaited tasks, so cleanup should use `try` and `finally` where resources must be released.
 
 Finally, prefer data isolation over locks when possible. If each worker receives input and returns output without touching shared state, the program is easier to reason about. Queues, immutable inputs, and result collection are often simpler than shared dictionaries protected by locks. Use locks for small critical sections, not as a way to make a complex shared design barely safe.
 
-## Visual
+The workload decision can be summarized as follows:
 
 ```mermaid
 flowchart TD
@@ -67,7 +67,7 @@ flowchart TD
 | `asyncio` | Many cooperative I/O tasks | one thread by default | Blocking the event loop |
 | Vectorized libraries | Numeric arrays | library-managed | Memory use and API complexity |
 
-## Worked example 1: use threads for I/O-style waiting
+## Overlapping blocking waits with threads
 
 Problem: simulate five slow I/O requests and run them concurrently with threads.
 
@@ -105,7 +105,7 @@ Step-by-step:
 
 Checked answer: `results` contains five strings, one for each name. The order may differ from the input order because completion order is not guaranteed.
 
-## Worked example 2: use asyncio for cooperative tasks
+## Scheduling cooperative tasks with `asyncio`
 
 Problem: run three coroutines that wait for different delays, then gather their results.
 
@@ -156,7 +156,7 @@ results == [
 
 The total time is close to the longest delay, not the sum of all delays.
 
-## Code
+## Distributing CPU work across processes
 
 ```python
 from concurrent.futures import ProcessPoolExecutor
@@ -180,7 +180,7 @@ The `if __name__ == "__main__"` guard is important for process-based code, espec
 
 Before replacing sequential code with this pattern, measure one worker function by itself. Process pools have startup and serialization overhead, so tiny tasks can become slower when distributed. A good process-pool task is large enough to justify the handoff and independent enough that workers do not need constant communication. If the function spends most of its time in a NumPy operation that already releases the GIL or uses optimized native code, vectorization may be a better first step than multiprocessing.
 
-## Common pitfalls
+## Where concurrent programs break
 
 - Adding concurrency before measuring whether sequential code is actually too slow.
 - Using threads for CPU-bound pure Python loops and expecting linear speedup.
@@ -190,9 +190,8 @@ Before replacing sequential code with this pattern, measure one worker function 
 - Submitting nested functions or non-picklable objects to a process pool.
 - Ignoring exceptions inside futures. Always call `.result()` or otherwise inspect failures.
 
-## Connections
+<div className="see-also">
 
-- [Iterators, Generators, and Functional Tools](/cs/programming/python/iterators-generators-and-functional-tools)
-- [Files and Context Managers](/cs/programming/python/files-and-context-managers)
-- [Errors, Exceptions, and Debugging](/cs/programming/python/errors-exceptions-and-debugging)
-- [Testing and the Scientific Stack](/cs/programming/python/testing-and-scientific-stack)
+See also: [Iterators, Generators, and Functional Tools](/cs/programming/python/iterators-generators-and-functional-tools) · [Files and Context Managers](/cs/programming/python/files-and-context-managers) · [Errors, Exceptions, and Debugging](/cs/programming/python/errors-exceptions-and-debugging) · [Testing and the Scientific Stack](/cs/programming/python/testing-and-scientific-stack)
+
+</div>

@@ -9,7 +9,7 @@ Recovery is the part of a DBMS that makes atomicity and durability believable af
 
 Write-ahead logging and ARIES are central ideas in recovery. The log is an append-only record of changes and transaction events. Write-ahead logging says the log record describing a change must reach stable storage before the changed data page reaches stable storage. ARIES organizes restart into analysis, redo, and undo phases, allowing flexible buffer management and efficient recovery.
 
-## Definitions
+## Log records, page state, and restart metadata
 
 A **log record** describes a transaction event such as update, commit, abort, end, checkpoint, or compensation. An update log record commonly stores the transaction id, page id, previous log sequence number, redo information, and undo information.
 
@@ -24,7 +24,7 @@ A **checkpoint** records recovery metadata so restart does not need to scan the 
 
 **ARIES** is a recovery method based on repeating history during redo and then undoing loser transactions. A **loser transaction** was active at the time of crash and did not commit. A **winner transaction** committed before the crash.
 
-## Key results
+## Why WAL permits steal/no-force buffering
 
 Steal/no-force buffer management is efficient but requires logging. **Steal** means the buffer manager may write a dirty page containing uncommitted updates to disk. This requires undo during recovery. **No-force** means the system does not have to write all pages modified by a transaction at commit. This requires redo during recovery.
 
@@ -51,8 +51,6 @@ Undo must respect logical operation semantics. Some systems can undo by restorin
 Recovery testing is operationally important. A system that has never restored from backup or replayed logs under realistic conditions has an unverified durability story. Administrators need to know recovery time objectives, recovery point objectives, backup frequency, archive-log retention, and whether replicas can be promoted without losing acknowledged commits. The theory explains the mechanisms; operations prove they work.
 
 Log records must cover index changes as well as table changes. If a transaction inserts a row and an index entry, recovery must bring both structures back to a mutually consistent state. Otherwise a committed row could become unreachable through an index, or an index could point to a nonexistent record.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -98,11 +96,9 @@ This ARIES diagram shows both normal execution and restart recovery. WAL forces 
 | No-steal | never write uncommitted dirty pages | less undo, restrictive buffer use |
 | Steal/no-force | common high-performance choice | needs both undo and redo |
 
-## Worked example 1: Apply WAL rules
+### Checking the log before flushing a dirty page
 
-Problem: Transaction `T1` updates page `P5`, generating log record LSN 120. The page's `pageLSN` becomes 120. The buffer manager wants to flush `P5` to disk. What must be true before the flush?
-
-Method:
+Transaction `T1` updates page `P5`, generating log record LSN 120 and setting the page's `pageLSN` to 120. Before the buffer manager may flush `P5`, the WAL ordering rule must hold.
 
 1. Identify the page being flushed:
 
@@ -118,13 +114,11 @@ Method:
 
 5. After the log is stable through 120, the page flush is safe. If a crash happens, recovery can undo or redo the change using the log.
 
-Checked answer: the data page cannot be written before the corresponding log record is durable. The log must be forced through LSN 120 first.
+The data page cannot be written before the corresponding log record is durable. The log must be forced through LSN 120 first.
 
-## Worked example 2: Redo or skip using pageLSN
+### Using `pageLSN` to skip redundant redo
 
-Problem: During ARIES redo, the recovery manager sees an update log record with LSN 200 for page `P9`. The disk copy of `P9` has `pageLSN = 240`. Should the update be redone?
-
-Method:
+During ARIES redo, the recovery manager sees an update log record with LSN 200 for page `P9`. The disk copy of `P9` has `pageLSN = 240`, so the comparison is enough to decide whether to repeat the update.
 
 1. Compare the page's stored LSN with the log record LSN:
 
@@ -148,9 +142,9 @@ $$
 
 4. ARIES therefore skips this redo record for `P9`.
 
-Checked answer: skip the redo for LSN 200 because `P9`'s `pageLSN` shows that the logged update is already present on disk.
+Skip the redo for LSN 200 because `P9`'s `pageLSN` shows that the logged update is already present on disk.
 
-## Code
+### The redo predicate in code
 
 ```python
 def should_redo(page_lsn, record_lsn):
@@ -174,7 +168,7 @@ UPDATE account SET balance = balance + 100 WHERE account_id = 'B';
 COMMIT;
 ```
 
-## Common pitfalls
+## Recovery statements that need qualification
 
 - Thinking commit means every changed data page was written. Under no-force, commit can be durable through the log.
 - Forgetting the difference between undo and redo. Undo removes loser effects; redo repeats history for updates not reflected on disk.
@@ -183,7 +177,7 @@ COMMIT;
 - Assuming recovery only handles committed transactions. It must also clean up incomplete transactions.
 - Omitting compensation log records in mental ARIES traces. They make undo itself crash-safe.
 
-## Connections
+## Notes that complete the durability story
 
 - [Transactions, ACID, and Serializability](/cs/databases/transactions-acid-and-serializability)
 - [Concurrency Control with Locks, Deadlocks, and Timestamps](/cs/databases/concurrency-control-locks-deadlocks-timestamps)

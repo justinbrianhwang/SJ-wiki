@@ -9,7 +9,7 @@ Embedded processors are chosen under constraints that are different from desktop
 
 Lee and Seshia emphasize the distinction between an instruction set architecture and a processor realization. The ISA defines what instructions mean. A chip implements that ISA with pipelines, caches, buses, memories, peripherals, and parallel hardware. Two chips may run the same machine code but have very different timing, which is central in cyber-physical systems.
 
-## Definitions
+## Architectural levers behind the ISA
 
 An **instruction set architecture** (ISA) defines the instructions, registers, data sizes, and programmer-visible behavior of a processor family. A **processor realization** is a particular chip or core implementing an ISA.
 
@@ -27,7 +27,7 @@ A **GPU** is a processor specialized for highly parallel graphics and numeric wo
 
 **Fixed-point arithmetic** represents fractional values using integers with an implied binary point. It is common when floating-point hardware is absent or too costly.
 
-## Key results
+## Matching timing, arithmetic, and workload structure
 
 ISA compatibility does not imply timing compatibility. A control task that works on one realization of an ISA may miss deadlines on another because pipelines, memory hierarchy, cache behavior, and interrupt latency differ.
 
@@ -57,11 +57,9 @@ Parallelism must be matched to the structure of the workload. A control loop wit
 
 Interrupt latency is another architectural concern. A processor with long non-interruptible instructions, disabled interrupts inside repeated instructions, or complex cache miss behavior may have a large worst-case interrupt response even if its average instruction throughput is high. For CPS, the question "how fast can it compute?" is often less important than "what is the longest time before the critical handler begins and completes?"
 
-Energy is tied to architecture as well. A faster processor may finish and sleep, saving energy, or it may burn more power than a simpler controller running continuously. Hardware accelerators can reduce energy for repeated kernels, but only if data movement does not dominate. This is why embedded processor selection is usually a system-level trade study.
+Energy is tied to architecture as well. A faster processor may finish and sleep, saving energy, or it may burn more power than a simpler controller running continuously. Hardware accelerators can reduce energy for repeated kernels, but only if data movement does not dominate. Processor selection therefore requires a system-level trade study.
 
 Debug visibility is another practical architectural factor. Trace units, cycle counters, performance counters, watchpoints, and deterministic replay can make the difference between a diagnosable timing problem and a field failure that cannot be reproduced. For educational designs this may feel secondary, but for deployed CPS it is part of the assurance story.
-
-## Visual
 
 ```mermaid
 flowchart TB
@@ -124,7 +122,7 @@ flowchart TB
   Analyze --> Result(("Selected architecture and software partition"))
 ```
 
-This embedded-processor architecture diagram compares the actual blocks behind common processor choices. The microcontroller branch emphasizes on-chip memory and peripherals, the DSP branch shows MAC/circular-buffer/fixed-point support, the high-performance CPU branch exposes timing variability from pipelines and caches, and the heterogeneous SoC branch labels shared-memory interference. The final analysis node makes processor choice a system-level decision tied to timing, energy, tools, and assurance rather than peak throughput alone.
+The branches expose the hardware behind each choice: on-chip memory and peripherals for the microcontroller, MAC and circular-buffer support for the DSP, pipeline and cache variability for the high-performance CPU, and shared-resource interference for the heterogeneous SoC. The final comparison includes timing, energy, tools, and assurance rather than peak throughput alone.
 
 | Architecture feature | Helps with | Timing consequence |
 |---|---|---|
@@ -136,7 +134,7 @@ This embedded-processor architecture diagram compares the actual blocks behind c
 | VLIW | Parallel operations | More predictable if scheduled statically |
 | Multicore | Workload partitioning | Shared resources can interfere |
 
-## Worked example 1: FIR operation rate
+### Sizing a processor for a 32-tap FIR filter
 
 Problem: A 32-tap FIR filter processes samples at $1$ MHz. Each output requires $32$ multiplications and $31$ additions. Compute the arithmetic operation rate.
 
@@ -164,7 +162,7 @@ $$
 
 Answer: The filter requires $63$ million arithmetic operations per second before overhead. This explains why DSP processors include multiply-accumulate and circular-buffer support.
 
-## Worked example 2: Fixed-point multiplication scale
+### Tracking scale through Q1.15 multiplication
 
 Problem: Represent values in signed Q1.15 format, meaning one sign/integer bit and $15$ fractional bits. The real value $0.5$ is represented by integer $0.5\cdot 2^{15}=16384$. Multiply $0.5$ by $0.5$ and recover the Q1.15 result.
 
@@ -196,7 +194,7 @@ $$
 
 Answer: The fixed-point product is integer $8192$, representing $0.25$. Without the scaling shift, the integer product would not be in the original format.
 
-## Code
+### Encoding and multiplying Q1.15 values
 
 ```python
 def q15(value):
@@ -215,7 +213,7 @@ result = q15_mul(a, b)
 print(a, b, result, from_q15(result))
 ```
 
-## Common pitfalls
+## Selection criteria that benchmarks miss
 
 - Selecting a processor by clock rate alone. Memory hierarchy, peripherals, arithmetic support, and timing predictability may dominate.
 - Assuming same ISA means same real-time behavior. The ISA usually says little about timing.
@@ -224,10 +222,8 @@ print(a, b, result, from_q15(result))
 - Trusting out-of-order or superscalar execution in hard real-time code without a timing-analysis strategy.
 - Assuming multicore automatically isolates tasks. Shared cache, memory, and bus resources can couple timing.
 
-## Connections
+<div className="see-also">
 
-- [microprocessor and microcomputer basics](/cs/embedded/microprocessor-microcomputer-basics)
-- [Intel 8085 architecture, buses, and timing](/cs/embedded/intel-8085-architecture-buses-timing)
-- [8051 architecture, memory, and ports](/cs/embedded/8051-architecture-memory-ports)
-- [memory architectures](/cs/embedded/memory-architectures)
-- [quantitative analysis](/cs/embedded/quantitative-analysis)
+See also: [microprocessor and microcomputer basics](/cs/embedded/microprocessor-microcomputer-basics) · [Intel 8085 architecture, buses, and timing](/cs/embedded/intel-8085-architecture-buses-timing) · [8051 architecture, memory, and ports](/cs/embedded/architecture-memory-ports) · [memory architectures](/cs/embedded/memory-architectures) · [quantitative analysis](/cs/embedded/quantitative-analysis)
+
+</div>

@@ -5,11 +5,11 @@ sidebar_position: 4
 
 # Control Flow
 
-Control flow is the order in which a C program performs computations. K&R has already used `if`, `while`, and `for` before formally describing them; Chapter 3 completes the set with `else if`, `switch`, `do while`, `break`, `continue`, and `goto`. The language provides only a few constructs, but they combine into compact loops, filters, searches, and parsers.
+Control flow is the order in which a C program performs computations. K&R uses `if`, `while`, and `for` before formally describing them; Chapter 3 completes the set with `else if`, `switch`, `do while`, `break`, `continue`, and `goto`. The language provides only a few constructs, but they combine into compact loops, filters, searches, and parsers.
 
-The important habit is to choose the construct that exposes the shape of the computation. A `for` loop is ideal when initialization, test, and increment belong together. A `while` loop fits input-driven repetition. A `switch` is clear for a fixed set of integer or character cases. `goto` is rare, but K&R does not pretend it is forbidden; it is mainly useful for leaving deeply nested logic or centralizing cleanup in old C code.
+Choose the construct that exposes the shape of the computation. A `for` loop suits cases where initialization, test, and increment belong together. A `while` loop fits input-driven repetition. A `switch` is clear for a fixed set of integer or character cases. `goto` is rare, but K&R does not pretend it is forbidden; it is mainly useful for leaving deeply nested logic or centralizing cleanup in old C code.
 
-## Definitions
+## Statements, blocks, and branch ownership
 
 An expression statement is an expression followed by a semicolon:
 
@@ -28,9 +28,7 @@ if (n > 0) {
 }
 ```
 
-The `if` statement evaluates an expression. If the expression is nonzero, it executes the true branch; otherwise it executes the optional `else` branch.
-
-The `else if` chain is just nested `if` statements written in a readable layout:
+The `if` statement evaluates an expression. If the expression is nonzero, it executes the true branch; otherwise it executes the optional `else` branch. An `else if` chain is nested `if` statements written in a readable layout:
 
 ```c
 if (c < 0)
@@ -41,38 +39,13 @@ else
     puts("positive");
 ```
 
-The `switch` statement compares an integer expression against constant integer case labels. Execution starts at the matching case and continues until a `break`, `return`, or the end of the `switch`.
-
-The `while` loop tests before each iteration. The `do while` loop tests after each iteration, so its body runs at least once. The `for` loop:
-
-```c
-for (expr1; expr2; expr3)
-    statement
-```
-
-is equivalent to initialization `expr1`, then a `while (expr2)` loop whose body is followed by `expr3`, except that `continue` jumps to `expr3` before retesting.
-
-`break` exits the nearest enclosing loop or `switch`. `continue` skips the rest of the nearest loop body and starts the next iteration. `goto label;` jumps to a labeled statement in the same function.
-
-## Key results
-
 The dangling-`else` rule attaches an `else` to the nearest previous unmatched `if`. Indentation cannot change the rule. Braces are the reliable way to express the intended grouping, especially when nested decisions are modified later.
 
-`switch` labels are labels, not isolated branches. K&R stresses that fall-through is both useful and dangerous. It is useful when several case labels share one action, as with digit characters. It is dangerous when a missing `break` accidentally executes the next case.
+An `if` controls exactly one statement unless braces create a compound statement; the same is true of a `for` loop. Adding a second indented line without adding braces is therefore a maintenance bug. K&R's compact formatting works when the controlled statement is truly one statement. Modern code often adds braces consistently because edits are common and compilers do not infer intent from indentation.
 
-Loop selection communicates intent. Use `while ((c = getchar()) != EOF)` when the loop is controlled by input. Use `for (i = 0; i < n; ++i)` when processing array elements. Use `do while` when one pass is required before the test can be meaningful, as in integer-to-string conversion of zero.
+## Switch dispatch and fall-through
 
-The comma operator evaluates left to right and yields the right operand's value. K&R uses it sparingly in `for` loops such as reversing a string with `i++` and `j--` together. The commas separating function arguments are not comma operators and do not impose left-to-right evaluation of arguments.
-
-`goto` is not needed for ordinary loops or decisions. Its defensible use in C is narrow: breaking out of multiple nested loops, or jumping to shared cleanup code after partial resource acquisition. Even then, the label should be close and the invariant should be obvious.
-
-The chapter also reinforces a style rule that is easy to underestimate: control flow should make the exceptional cases visible. In K&R examples, normal loops usually have a short body and a clear termination condition. When a loop has several exits, each exit has a reason: `return` because the answer is known, `break` because a search failed or completed, or `continue` because the current item should be skipped. This is especially important in C because there is no built-in exception mechanism and no automatic cleanup for local resources. The visible path through the function is the error-handling design.
-
-For search and parsing code, the loop invariant is the most useful way to reason. In binary search, the invariant is that if the target is present, it lies between `low` and `high` inclusive. Every update must preserve that fact while shrinking the range. In a character scanner, the invariant might be that all characters before the current pointer have already been classified. K&R does not use the term heavily, but the examples are written so these invariants can be checked by inspection.
-
-Another practical result is that C statements compose without hidden blocks. An `if` controls exactly one statement unless braces create a compound statement. A `for` loop controls exactly one statement. This is why adding a second line under a loop without braces is a classic maintenance bug. K&R's compact formatting works when the controlled statement is truly one statement; modern code often adds braces consistently because edits are common and compilers will not infer intent from indentation.
-
-## Visual
+The `switch` statement compares an integer expression against constant integer case labels. Execution starts at the matching case and continues until a `break`, `return`, or the end of the `switch`.
 
 ```mermaid
 flowchart TD
@@ -89,6 +62,29 @@ flowchart TD
   G --> F
 ```
 
+Case labels are labels, not isolated branches. K&R stresses that fall-through is both useful and dangerous. Several labels can deliberately share one action, as with digit characters; an omitted `break` can also execute the next case by accident.
+
+Suppose a scanner classifies `A`, newline, `5`, and `?` with a `switch` for whitespace and digits and a default for other characters. Starting from
+
+$$
+digits = 0,\quad white = 0,\quad other = 0,
+$$
+
+`A` reaches `default`, so `other` becomes 1. Newline matches `case '\n'`, so `white` becomes 1. The character `5` matches a digit case, so `digits` becomes 1. Finally, `?` reaches `default`, leaving `digits = 1`, `white = 1`, and `other = 2`. Each case needs a `break` unless fall-through is intentional.
+
+## Choosing and controlling loops
+
+The `while` loop tests before each iteration. The `do while` loop tests after each iteration, so its body runs at least once. The `for` loop
+
+```c
+for (expr1; expr2; expr3)
+    statement
+```
+
+is equivalent to initialization `expr1`, then a `while (expr2)` loop whose body is followed by `expr3`, except that `continue` jumps to `expr3` before retesting.
+
+`break` exits the nearest enclosing loop or `switch`. `continue` skips the rest of the nearest loop body and starts the next iteration. `goto label;` jumps to a labeled statement in the same function.
+
 | Construct | Test location | Typical K&R use | Exit mechanism |
 |---|---|---|---|
 | `if` | once, before branch | two-way decision | branch completes |
@@ -98,71 +94,38 @@ flowchart TD
 | `for` | before body, with update | array traversal, counted loop | false test, `break`, `return` |
 | `do while` | after body | generate at least one digit | false test, `break`, `return` |
 
-## Worked example 1: Binary search decisions
+Use `while ((c = getchar()) != EOF)` when input controls repetition, `for (i = 0; i < n; ++i)` when processing array elements, and `do while` when the test cannot be meaningful until one pass has run, as in integer-to-string conversion of zero.
 
-Problem: search for `x = 13` in sorted array `v = {1, 4, 9, 13, 20, 25, 31}` using K&R's binary-search structure.
+The comma operator evaluates left to right and yields the right operand's value. K&R uses it sparingly in `for` loops, for example to reverse a string while advancing `i++` and `j--` together. The commas separating function arguments are not comma operators and do not impose left-to-right evaluation of arguments.
 
-Method:
+`goto` is unnecessary for ordinary loops and decisions. Its defensible uses in C are narrow: leaving multiple nested loops or jumping to shared cleanup after partial resource acquisition. Even then, the label should be close and the invariant should be obvious.
 
-1. Initialize:
+## Reasoning from loop invariants
 
-   $$low = 0,\quad high = 6.$$
+For search and parsing code, a loop invariant is often the cleanest argument. In binary search, if the target is present, it remains between `low` and `high` inclusive. Every update must preserve that claim while shrinking the range. In a character scanner, the invariant might be that all characters before the current pointer have already been classified. K&R does not use the term heavily, but its examples are written so these invariants can be checked by inspection.
 
-2. First loop:
+Search for `x = 13` in the sorted array `v = \{1, 4, 9, 13, 20, 25, 31\}`. Initially,
 
-   $$mid = (0 + 6) / 2 = 3.$$
+$$
+low = 0,\quad high = 6,
+$$
 
-   `v[3]` is `13`. Compare:
+and the first midpoint is
 
-   $$x = 13,\quad v[mid] = 13.$$
+$$
+mid = 0 + (6 - 0) / 2 = 3.
+$$
 
-3. The first test `x < v[mid]` is false.
-4. The second test `x > v[mid]` is false.
-5. The `else` branch returns `mid`.
+Because `v[3]` is `13`, both comparisons are false and the final `else` returns index `3` after one iteration.
 
-Checked answer: the search returns index `3`. The loop stops after one iteration because the middle element is the target.
+For `x = 8`, the bounds evolve as follows:
 
-Now check `x = 8`:
+1. At `mid = 3`, `v[3] = 13`, so set `high = 2`.
+2. At `mid = 1`, `v[1] = 4`, so set `low = 2`.
+3. At `mid = 2`, `v[2] = 9`, so set `high = 1`.
+4. Now `low = 2` and `high = 1`; the loop ends and returns `-1`.
 
-1. Start `low = 0`, `high = 6`, `mid = 3`, `v[3] = 13`.
-2. Since `8 < 13`, set `high = mid - 1 = 2`.
-3. Next `mid = (0 + 2) / 2 = 1`, `v[1] = 4`.
-4. Since `8 > 4`, set `low = mid + 1 = 2`.
-5. Next `mid = (2 + 2) / 2 = 2`, `v[2] = 9`.
-6. Since `8 < 9`, set `high = 1`.
-7. Now `low = 2` and `high = 1`, so the loop ends.
-
-Checked answer: `8` is absent, so the function returns `-1`.
-
-## Worked example 2: Switch-based character classification
-
-Problem: classify the input characters `A`, newline, `5`, and `?` using a `switch` for whitespace and digits, and a default for other characters.
-
-Method:
-
-1. Initialize counters:
-
-   $$digits = 0,\quad white = 0,\quad other = 0.$$
-
-2. Character `A` matches no digit case and no whitespace case, so `default` runs:
-
-   $$other = 1.$$
-
-3. Character newline matches `case '\n'`:
-
-   $$white = 1.$$
-
-4. Character `5` matches one of the digit cases:
-
-   $$digits = 1.$$
-
-5. Character `?` matches `default`:
-
-   $$other = 2.$$
-
-Checked answer: after processing the stream, `digits = 1`, `white = 1`, and `other = 2`. Each case must end in `break` unless fall-through is intentional.
-
-## Code
+The implementation keeps the invariant explicit and computes the midpoint without adding the two bounds directly:
 
 ```c
 #include <stdio.h>
@@ -197,20 +160,20 @@ int main(void)
 }
 ```
 
-## Common pitfalls
+## Control-flow mistakes that survive indentation
 
-- Letting `else` bind to the wrong `if`. Use braces when an outer `if` owns the `else`.
-- Forgetting `break` in a `switch`, causing accidental fall-through into the next case.
-- Writing a null loop body by accident: `while (condition);` loops over an empty statement.
-- Updating the wrong variable in nested `for` loops.
-- Using `continue` in a `for` loop without remembering that the increment expression still runs.
-- Writing `high = mid + 1` in binary search when the target is less than `v[mid]`; that can make the loop incorrect or infinite.
-- Hiding unrelated work inside `for` loop headers. K&R uses compact loops, but the expressions should still be loop-control expressions.
+- An `else` may bind to a nearer `if` than the layout suggests. Use braces when an outer `if` owns the `else`.
+- A missing `break` in a `switch` falls through to the next case.
+- `while (condition);` has an empty body and can loop forever.
+- Nested `for` loops make it easy to update the wrong control variable.
+- A `continue` in a `for` loop still runs the increment expression.
+- In binary search, using `high = mid + 1` when the target is below `v[mid]` can make the loop incorrect or infinite.
+- Unrelated work in a `for` header obscures the loop controls; compact expressions are useful only while they remain recognizable as initialization, test, and update.
 
-## Connections
+C has no exception mechanism or automatic cleanup for local resources, so exits carry part of the error-handling design. Short loop bodies and explicit termination conditions help. When a loop has several exits, each should have a specific role: `return` when the answer is known, `break` when a search has failed or completed, and `continue` when the current item should be skipped.
 
-- [Tutorial Introduction](/cs/programming/c/tutorial-introduction)
-- [Types, Operators, and Expressions](/cs/programming/c/types-operators-expressions)
-- [Functions and Program Structure](/cs/programming/c/functions-program-structure)
-- [Pointers, Addresses, and Arrays](/cs/programming/c/pointers-addresses-arrays)
-- [Unix System Interface](/cs/programming/c/unix-system-interface)
+<div className="see-also">
+
+See also: [Tutorial Introduction](/cs/programming/c/tutorial-introduction) · [Types, Operators, and Expressions](/cs/programming/c/types-operators-expressions) · [Functions and Program Structure](/cs/programming/c/functions-program-structure) · [Pointers, Addresses, and Arrays](/cs/programming/c/pointers-addresses-arrays) · [Unix System Interface](/cs/programming/c/unix-system-interface)
+
+</div>

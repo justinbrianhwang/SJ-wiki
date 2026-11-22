@@ -5,19 +5,17 @@ sidebar_position: 16
 
 # Quadratic Forms and Spectral Theorems
 
-Quadratic forms turn symmetric matrices into scalar-valued geometry. They describe conic sections, surfaces, energy functions, constrained extrema, and optimization tests. The spectral theorem is the key simplifier: a real symmetric matrix can be diagonalized by an orthogonal change of coordinates.
+A quadratic form turns a symmetric matrix into scalar-valued geometry. Quadratic forms describe conics, surfaces, energy functions, constrained extrema, and second-order behavior in optimization. The spectral theorem supplies the simplifying coordinates: an orthogonal change of basis removes all cross terms.
 
-The reason symmetry matters is that symmetric matrices have especially clean eigenstructure. Their eigenvalues are real, eigenvectors from different eigenspaces are orthogonal, and an orthonormal eigenbasis exists. That lets quadratic forms be rotated into a coordinate system with no cross terms.
+## Encoding cross terms in a symmetric matrix
 
-## Definitions
-
-A quadratic form in $\mathbb{R}^n$ is an expression
+A quadratic form on $\mathbb{R}^n$ is
 
 $$
 Q(\mathbf{x})=\mathbf{x}^TA\mathbf{x},
 $$
 
-where $A$ is symmetric. For two variables,
+where $A$ may be taken symmetric. In two variables,
 
 $$
 Q(x,y)=ax^2+2bxy+cy^2
@@ -33,116 +31,105 @@ b&c
 \end{bmatrix}.
 $$
 
-A matrix $Q$ is orthogonal if
-
-$$
-Q^TQ=I.
-$$
-
-Orthogonal matrices preserve lengths and dot products. A matrix $A$ is orthogonally diagonalizable if
-
-$$
-Q^TAQ=D
-$$
-
-for some orthogonal $Q$ and diagonal $D$.
-
-A quadratic form is positive definite if $Q(\mathbf{x})\gt 0$ for every nonzero $\mathbf{x}$. It is negative definite if $Q(\mathbf{x})\lt 0$ for every nonzero $\mathbf{x}$. It is indefinite if it takes both positive and negative values.
-
-## Key results
-
-Spectral theorem for real symmetric matrices: if $A$ is real and symmetric, then $A$ is orthogonally diagonalizable. That is, there is an orthogonal matrix $Q$ and a real diagonal matrix $D$ such that
-
-$$
-A=QDQ^T.
-$$
-
-The columns of $Q$ are orthonormal eigenvectors of $A$, and the diagonal entries of $D$ are the corresponding eigenvalues.
-
-Principal axes theorem: if $A$ is symmetric and $\mathbf{x}=Q\mathbf{y}$, then
+The factor $2$ in the mixed term comes from the two off-diagonal products. If a nonsymmetric matrix appears, only its symmetric part contributes:
 
 $$
 \mathbf{x}^TA\mathbf{x}
 =
-\mathbf{y}^TQ^TAQ\mathbf{y}
-=
-\mathbf{y}^TD\mathbf{y}.
+\mathbf{x}^T\left(\frac{A+A^T}{2}\right)\mathbf{x}.
 $$
 
-Thus the quadratic form becomes
+The skew-symmetric part contributes zero.
+
+There is a useful reverse operation. A symmetric bilinear form
 
 $$
-\lambda_1y_1^2+\cdots+\lambda_ny_n^2,
+B(\mathbf{x},\mathbf{y})=\mathbf{x}^TA\mathbf{y}
 $$
 
-with no cross terms.
-
-Eigenvalues classify definiteness:
-
-| Eigenvalues of symmetric $A$ | Type of quadratic form |
-|---|---|
-| all positive | positive definite |
-| all nonnegative and at least one zero | positive semidefinite |
-| all negative | negative definite |
-| all nonpositive and at least one zero | negative semidefinite |
-| both positive and negative | indefinite |
-
-For a differentiable function of two variables, the Hessian matrix at a critical point is symmetric under common smoothness assumptions. The definiteness of the Hessian gives the second-derivative test: positive definite means local minimum, negative definite means local maximum, and indefinite means saddle point.
-
-The cross term in a quadratic form measures how the original coordinate axes fail to align with the natural axes of the form. For
+determines the quadratic form by $Q(\mathbf{x})=B(\mathbf{x},\mathbf{x})$, and the quadratic form recovers the bilinear form through the polarization identity
 
 $$
-Q(x,y)=ax^2+2bxy+cy^2,
+B(\mathbf{x},\mathbf{y})
+=\frac14\left(Q(\mathbf{x}+\mathbf{y})-Q(\mathbf{x}-\mathbf{y})\right).
 $$
 
-the term $2bxy$ mixes the variables. Orthogonal diagonalization chooses new perpendicular axes so that the same form is written without a mixed term:
+Expanding the two terms proves the identity: the pure $Q(\mathbf{x})$ and $Q(\mathbf{y})$ terms cancel, while the mixed terms add to $4\mathbf{x}^TA\mathbf{y}$. Thus the cross terms record how pairs of directions interact under the associated bilinear form.
+
+For a polynomial written with an $xy$ coefficient rather than a $2xy$ coefficient, the bookkeeping changes accordingly. For example,
 
 $$
-Q=\lambda_1y_1^2+\lambda_2y_2^2.
+3x^2-8xy+5y^2
 $$
 
-The eigenvectors of the symmetric matrix point along these principal axes, and the eigenvalues measure curvature or scaling in those directions.
-
-Positive definiteness has several equivalent tests. For symmetric matrices, the eigenvalue test is conceptually clean: all eigenvalues must be positive. For a $2\times2$ symmetric matrix
+is represented by
 
 $$
-\begin{bmatrix}
-a&b\\
-b&c
-\end{bmatrix},
+\begin{bmatrix}3&-4\\-4&5\end{bmatrix},
 $$
 
-positive definiteness is equivalent to
+because the two off-diagonal products together contribute $-8xy$.
+
+## Rotating to principal axes
+
+The real spectral theorem states that a real symmetric matrix has an orthonormal eigenbasis. Equivalently, there is an orthogonal $Q$ and a real diagonal $D$ such that
 
 $$
-a>0
-\quad\text{and}\quad
-ac-b^2>0.
+A=QDQ^T,
+\qquad
+Q^TQ=I.
 $$
 
-The second condition is the determinant being positive. These are the leading principal minor conditions in the $2\times2$ case.
-
-Quadratic forms also encode constrained extrema on spheres. If $A$ is symmetric and $\|\mathbf{x}\|=1$, then the Rayleigh quotient
-
-$$
-R(\mathbf{x})=\mathbf{x}^TA\mathbf{x}
-$$
-
-takes values between the smallest and largest eigenvalues of $A$. The maximum is the largest eigenvalue, achieved at a corresponding unit eigenvector; the minimum is the smallest eigenvalue. This result explains why eigenvalues appear in optimization, mechanics, statistics, and numerical methods.
-
-In applications, a positive definite matrix often represents energy, variance, or squared distance. The positivity condition guarantees that the quantity is genuinely zero only at the zero vector and positive otherwise. Indefinite forms represent saddle geometry: there are directions of increase and directions of decrease through the same point.
-
-## Visual
+The columns of $Q$ are orthonormal eigenvectors, and the diagonal entries of $D$ are their eigenvalues.
 
 ```mermaid
 flowchart LR
-  X["original coordinates x"] --> QT["rotate/reflection Q^T"]
-  QT --> Y["principal coordinates y"]
-  Y --> D["diagonal quadratic form"]
+  X["Original coordinates x"] --> QT["Apply Q^T"]
+  QT --> Y["Principal coordinates y"]
+  Y --> D["Diagonal quadratic form"]
   D --> Z["lambda_1 y_1^2 + ... + lambda_n y_n^2"]
 ```
 
-ASCII picture of removing a cross term:
+With $\mathbf{x}=Q\mathbf{y}$,
+
+$$
+\mathbf{x}^TA\mathbf{x}
+=\mathbf{y}^TQ^TAQ\mathbf{y}
+=\mathbf{y}^TD\mathbf{y}
+=\lambda_1y_1^2+\cdots+\lambda_ny_n^2.
+$$
+
+The eigenvectors point along the principal axes, and the eigenvalues give the curvature or scale along those axes. Orthogonality matters because $\|\mathbf{x}\|=\|\mathbf{y}\|$: the coordinate change rotates or reflects without stretching.
+
+### Why symmetry produces perpendicular eigendirections
+
+The core orthogonality calculation is short. Suppose $A=A^T$ and
+
+$$
+A\mathbf{u}=\lambda\mathbf{u},
+\qquad
+A\mathbf{v}=\mu\mathbf{v}.
+$$
+
+Then
+
+$$
+\lambda\mathbf{u}^T\mathbf{v}
+=(A\mathbf{u})^T\mathbf{v}
+=\mathbf{u}^TA\mathbf{v}
+=\mu\mathbf{u}^T\mathbf{v}.
+$$
+
+If $\lambda\ne\mu$, it follows that $\mathbf{u}^T\mathbf{v}=0$. Repeated eigenvalues need a little more care: their eigenspace may have dimension greater than one, but Gram--Schmidt can choose an orthonormal basis inside it. Applying this to every eigenspace yields an orthonormal eigenbasis.
+
+A complete proof of the spectral theorem can be organized by induction on dimension. A real symmetric matrix attains a maximum of its Rayleigh quotient on the unit sphere; a Lagrange-multiplier calculation shows that a maximizing vector is an eigenvector. Its orthogonal complement is invariant under $A$, since for $\mathbf{x}\perp\mathbf{q}$,
+
+$$
+\mathbf{q}^TA\mathbf{x}=(A\mathbf{q})^T\mathbf{x}
+=\lambda\mathbf{q}^T\mathbf{x}=0.
+$$
+
+Restrict $A$ to that $(n-1)$-dimensional complement and repeat. The argument explains both parts of the theorem: real eigenvalues appear through a real optimization problem, and the successive directions remain orthogonal.
 
 ```text
 xy-coordinate axes             principal axes
@@ -155,76 +142,87 @@ xy-coordinate axes             principal axes
       |
 ```
 
-## Worked example 1: Diagonalize a quadratic form
+The mixed term measures the failure of the original coordinate axes to align with these principal directions.
 
-Problem: diagonalize
+## Reading definiteness from eigenvalues
+
+A quadratic form is positive definite when $Q(\mathbf{x})\gt 0$ for every nonzero $\mathbf{x}$, negative definite when it is always negative, and indefinite when it takes both signs.
+
+| Eigenvalues of symmetric $A$ | Type of quadratic form |
+|---|---|
+| all positive | positive definite |
+| all nonnegative with at least one zero | positive semidefinite |
+| all negative | negative definite |
+| all nonpositive with at least one zero | negative semidefinite |
+| both positive and negative | indefinite |
+
+For a symmetric $2\times2$ matrix
 
 $$
-Q(x,y)=5x^2+4xy+2y^2.
+\begin{bmatrix}a&b\\b&c\end{bmatrix},
 $$
 
-Step 1: write the symmetric matrix. Since the cross term is $2bxy$, we have $2b=4$, so $b=2$:
+positive definiteness is equivalent to
 
 $$
-A=
-\begin{bmatrix}
-5&2\\
-2&2
-\end{bmatrix}.
+a>0
+\quad\text{and}\quad
+ac-b^2>0.
 $$
 
-Step 2: compute eigenvalues.
+These are the leading-principal-minor conditions in dimension two. The diagonal entries alone do not classify a general form.
+
+In higher dimensions, **Sylvester's criterion** says that a real symmetric matrix is positive definite exactly when all leading principal minors are positive:
+
+$$
+\det A_{1:k,1:k}>0,
+\qquad k=1,\ldots,n.
+$$
+
+The statement follows naturally from an $LDL^T$ factorization. When elimination proceeds without row exchanges,
+
+$$
+A=LDL^T,
+$$
+
+with $L$ unit lower triangular and $D$ diagonal. Setting $\mathbf{z}=L^T\mathbf{x}$ gives
+
+$$
+\mathbf{x}^TA\mathbf{x}=\mathbf{z}^TD\mathbf{z}.
+$$
+
+Positive pivots in $D$ therefore give positive definiteness, and those pivots are ratios of consecutive leading principal minors. Cholesky factorization is the special form $A=R^TR$ available precisely when $A$ is positive definite. It gives the identity
+
+$$
+\mathbf{x}^TA\mathbf{x}=\|R\mathbf{x}\|_2^2.
+$$
+
+Positive semidefiniteness is subtler: nonnegative leading principal minors alone are not the usual criterion. One may instead check that every eigenvalue is nonnegative, or that all principal minors are nonnegative.
+
+Positive definite matrices often encode energy, variance-weighted distance, or local curvature. Positive semidefinite forms allow flat directions: they never become negative, but may vanish on nonzero vectors. Covariance matrices are positive semidefinite because variances cannot be negative, while exact linear dependence can produce zero variance in some direction. Indefinite forms have both increasing and decreasing directions and produce saddle geometry.
+
+Definiteness is preserved by any invertible change of variables, not only an orthogonal one. If $A$ changes by congruence to $S^TAS$ and $S$ is invertible, then $S\mathbf{y}$ runs through every vector as $\mathbf{y}$ does. Sylvester's law of inertia strengthens this observation: the numbers of positive, negative, and zero squares in a diagonal form are invariant under congruence. Eigenvalues themselves change under a general congruence, but their sign counts do not.
+
+This distinguishes similarity from congruence. Similarity, $S^{-1}AS$, represents the same linear operator in another basis and preserves eigenvalues. Congruence, $S^TAS$, represents the same quadratic form after a coordinate change and preserves inertia. Orthogonal matrices make the two transformations coincide because $Q^{-1}=Q^T$.
+
+## Diagonalizing $5x^2+4xy+2y^2$
+
+The symmetric matrix is
+
+$$
+A=\begin{bmatrix}5&2\\2&2\end{bmatrix}.
+$$
+
+Its characteristic polynomial is
 
 $$
 \det(A-\lambda I)
-=
-\det
-\begin{bmatrix}
-5-\lambda&2\\
-2&2-\lambda
-\end{bmatrix}
-=(5-\lambda)(2-\lambda)-4.
+=(5-\lambda)(2-\lambda)-4
+=\lambda^2-7\lambda+6
+=(\lambda-6)(\lambda-1).
 $$
 
-Expand:
-
-$$
-(5-\lambda)(2-\lambda)-4
-=10-7\lambda+\lambda^2-4
-=\lambda^2-7\lambda+6.
-$$
-
-Factor:
-
-$$
-\lambda^2-7\lambda+6=(\lambda-6)(\lambda-1).
-$$
-
-Step 3: find orthogonal eigenvectors. For $\lambda=6$,
-
-$$
-A-6I=
-\begin{bmatrix}
--1&2\\
-2&-4
-\end{bmatrix},
-$$
-
-so $-x+2y=0$ and an eigenvector is $\begin{bmatrix}2\\1\end{bmatrix}$.
-
-For $\lambda=1$,
-
-$$
-A-I=
-\begin{bmatrix}
-4&2\\
-2&1
-\end{bmatrix},
-$$
-
-so $2x+y=0$ and an eigenvector is $\begin{bmatrix}1\\-2\end{bmatrix}$.
-
-Step 4: normalize:
+For $\lambda=6$, an eigenvector is $\begin{bmatrix}2&1\end{bmatrix}^T$. For $\lambda=1$, an eigenvector is $\begin{bmatrix}1&-2\end{bmatrix}^T$. After normalization,
 
 $$
 \mathbf{q}_1=\frac{1}{\sqrt5}\begin{bmatrix}2\\1\end{bmatrix},
@@ -232,73 +230,185 @@ $$
 \mathbf{q}_2=\frac{1}{\sqrt5}\begin{bmatrix}1\\-2\end{bmatrix}.
 $$
 
-Then in principal coordinates,
+These eigenvectors are orthonormal, and in principal coordinates the form is
 
 $$
 Q=6y_1^2+y_2^2.
 $$
 
-Checked answer: both eigenvalues are positive, so the form is positive definite.
+Both eigenvalues are positive, so the form is positive definite. Level sets $Q=c\gt 0$ are ellipses aligned with the eigenvectors.
 
-## Worked example 2: Classify a critical point with a Hessian
+The semiaxis lengths can also be read off. For $c\gt 0$,
 
-Problem: classify the critical point $(0,0)$ of
+$$
+6y_1^2+y_2^2=c
+\quad\Longleftrightarrow\quad
+\frac{y_1^2}{c/6}+\frac{y_2^2}{c}=1.
+$$
+
+The ellipse has semiaxis $\sqrt{c/6}$ in the $\mathbf{q}_1$ direction and $\sqrt c$ in the $\mathbf{q}_2$ direction. Larger eigenvalue means greater curvature and a shorter level-set axis. If the eigenvalues had opposite signs, the same calculation would give a hyperbola; if one were zero, the level set could become a pair of parallel lines or an empty set depending on $c$.
+
+The coordinate equation $\mathbf{x}=Q\mathbf{y}$ is worth tracking carefully. Columns of $Q$ are the new axes expressed in old coordinates, while $\mathbf{y}=Q^T\mathbf{x}$ contains the coordinates along those axes.
+
+## Using a Hessian at a critical point
+
+Consider
 
 $$
 f(x,y)=x^2+4xy+y^2.
 $$
 
-Step 1: compute the gradient.
+Its gradient is
 
 $$
 f_x=2x+4y,
 \qquad
-f_y=4x+2y.
+f_y=4x+2y,
 $$
 
-At $(0,0)$ both derivatives are zero, so it is a critical point.
-
-Step 2: compute the Hessian.
+so $(0,0)$ is a critical point. The Hessian is
 
 $$
 H=
-\begin{bmatrix}
-f_{xx}&f_{xy}\\
-f_{yx}&f_{yy}
-\end{bmatrix}
-=
 \begin{bmatrix}
 2&4\\
 4&2
 \end{bmatrix}.
 $$
 
-Step 3: find eigenvalues.
+Its characteristic equation is
 
 $$
-\det(H-\lambda I)
-=
-\det
-\begin{bmatrix}
-2-\lambda&4\\
-4&2-\lambda
-\end{bmatrix}
-=(2-\lambda)^2-16.
+(2-\lambda)^2-16=0,
 $$
 
-Set this equal to zero:
+which gives eigenvalues $-2$ and $6$. The Hessian is indefinite, so $(0,0)$ is a saddle point.
+
+For a sufficiently smooth real-valued function, the Hessian is symmetric. A positive definite Hessian curves upward in every direction near a critical point, a negative definite Hessian curves downward, and an indefinite Hessian supplies both kinds of directions.
+
+## Extremes on the unit sphere
+
+For symmetric $A$, the Rayleigh quotient is
 
 $$
-(2-\lambda)^2=16
-\quad\Longrightarrow\quad
-2-\lambda=\pm4.
+R(\mathbf{x})=
+\frac{\mathbf{x}^TA\mathbf{x}}{\mathbf{x}^T\mathbf{x}}.
 $$
 
-Thus $\lambda=-2$ or $\lambda=6$.
+On the unit sphere it reduces to $\mathbf{x}^TA\mathbf{x}$. Its minimum and maximum are the smallest and largest eigenvalues of $A$, attained at corresponding unit eigenvectors. In particular, for a unit eigenvector $\mathbf{q}_i$,
 
-Step 4: classify. The Hessian has one positive and one negative eigenvalue, so it is indefinite. Checked answer: $(0,0)$ is a saddle point.
+$$
+\mathbf{q}_i^TA\mathbf{q}_i=\lambda_i.
+$$
 
-## Code
+Eigenvalues are therefore the values of the form along its principal unit directions. This interpretation connects quadratic forms to constrained optimization, mechanics, statistics, and eigenvalue algorithms.
+
+The Lagrange-multiplier derivation is worth keeping at hand. To extremize $\mathbf{x}^TA\mathbf{x}$ subject to $\mathbf{x}^T\mathbf{x}=1$, form
+
+$$
+L(\mathbf{x},\lambda)
+=\mathbf{x}^TA\mathbf{x}-\lambda(\mathbf{x}^T\mathbf{x}-1).
+$$
+
+For symmetric $A$,
+
+$$
+\nabla_{\mathbf{x}}L=2A\mathbf{x}-2\lambda\mathbf{x}.
+$$
+
+Stationarity is exactly the eigenvalue equation $A\mathbf{x}=\lambda\mathbf{x}$. Multiplying on the left by $\mathbf{x}^T$ and using $\|\mathbf{x}\|=1$ gives $\lambda=\mathbf{x}^TA\mathbf{x}$. Expanding a general unit vector in the orthonormal eigenbasis,
+
+$$
+\mathbf{x}=\sum_i c_i\mathbf{q}_i,
+\qquad
+\sum_i c_i^2=1,
+$$
+
+then gives
+
+$$
+R(\mathbf{x})=\sum_i\lambda_i c_i^2.
+$$
+
+It is a weighted average of the eigenvalues, so it lies between the smallest and largest. Equality at an endpoint requires all weight to lie in the corresponding eigenspace.
+
+### A constrained maximum with a non-unit constraint
+
+Maximize $xy$ subject to $x^2+4y^2=1$. Write the objective and constraint as quadratic forms:
+
+$$
+xy=
+\begin{bmatrix}x&y\end{bmatrix}
+\begin{bmatrix}0&1/2\\1/2&0\end{bmatrix}
+\begin{bmatrix}x\\y\end{bmatrix},
+$$
+
+$$
+x^2+4y^2=
+\begin{bmatrix}x&y\end{bmatrix}
+\begin{bmatrix}1&0\\0&4\end{bmatrix}
+\begin{bmatrix}x\\y\end{bmatrix}.
+$$
+
+The multiplier equations are
+
+$$
+y=2\lambda x,
+\qquad
+x=8\lambda y.
+$$
+
+For a nonzero feasible point, substitution gives $1=16\lambda^2$, so $\lambda=\pm1/4$. For the maximum take $\lambda=1/4$, hence $y=x/2$. The constraint becomes
+
+$$
+x^2+4(x/2)^2=2x^2=1,
+$$
+
+so $x=\pm1/\sqrt2$ and $y=\pm1/(2\sqrt2)$ with matching signs. At either point,
+
+$$
+xy=\frac14.
+$$
+
+Opposite signs give the minimum $-1/4$. This is a generalized eigenvalue problem $A\mathbf{x}=\lambda B\mathbf{x}$ with a positive definite constraint matrix $B$.
+
+## Completing squares versus finding eigenvectors
+
+Orthogonal diagonalization is the cleanest geometric method, but completing squares is often faster for symbolic classification. Starting from a variable with a nonzero square coefficient, collect every term involving that variable and complete one square. What remains is a quadratic form in fewer variables. Repeating the process produces a diagonal expression after an invertible, generally nonorthogonal, change of variables.
+
+For example, the expression $x^2+4xy+3y^2$ can be written as $(x+2y)^2-y^2$. Its one positive square and one negative square show that it is indefinite. The transformation does not preserve lengths or angles, so the new axes are not the principal axes of the original Euclidean coordinates. It does preserve the numbers of positive and negative squares, in agreement with the law of inertia.
+
+The two methods answer slightly different questions. Completing squares or an $LDL^T$ factorization classifies signs with relatively little algebra. The spectral decomposition supplies orthonormal directions, actual eigenvalues, extremal values on spheres, and semiaxis lengths. When only definiteness is needed, computing every eigenvector can be unnecessary work. When geometry or sensitivity matters, inertia alone omits important scale information.
+
+Coordinate scaling can make that difference sharp. The forms $x^2+y^2$ and $1000x^2+0.001y^2$ are both positive definite and have the same inertia. Their level curves are very different: the second is extremely elongated. Its eigenvalue ratio also signals poor conditioning in optimization, because progress along the steep direction and the shallow direction occurs at very different rates.
+
+## Where quadratic forms enter models
+
+In mechanics, a small displacement vector often has potential energy $\frac12\mathbf{x}^TK\mathbf{x}$, where the stiffness matrix $K$ is symmetric. Positive definiteness means every nonzero displacement costs energy and the equilibrium is stable. A zero eigenvalue describes a mechanism or rigid motion that costs no quadratic energy. A negative eigenvalue gives a direction in which the stated equilibrium lowers its energy, so the equilibrium is unstable.
+
+In statistics, a covariance matrix $\Sigma$ is positive semidefinite because $\mathbf{a}^T\Sigma\mathbf{a}$ is the variance of the scalar combination $\mathbf{a}^T\mathbf{X}$. Its eigenvectors give uncorrelated principal directions, and its eigenvalues are the variances along them. A zero eigenvalue records an exact linear relation among the measured variables. When $\Sigma$ is positive definite, the form
+
+$$
+(\mathbf{x}-\boldsymbol{\mu})^T\Sigma^{-1}
+(\mathbf{x}-\boldsymbol{\mu})
+$$
+
+defines squared Mahalanobis distance. Directions with large variance are penalized less because the inverse covariance has small eigenvalues there.
+
+For a twice differentiable objective, the Hessian supplies the local quadratic model
+
+$$
+f(\mathbf{x}+\mathbf{h})
+\approx f(\mathbf{x})
++\nabla f(\mathbf{x})^T\mathbf{h}
++\frac12\mathbf{h}^TH(\mathbf{x})\mathbf{h}.
+$$
+
+At a critical point the linear term vanishes, leaving the Hessian form as the leading local information. Away from a critical point, definiteness of the Hessian still describes curvature, but it does not by itself locate or classify the current point because the gradient term remains.
+
+Quadratic constraints also lead to generalized eigenvalues. Optimizing $\mathbf{x}^TA\mathbf{x}$ subject to $\mathbf{x}^TB\mathbf{x}=1$ gives $A\mathbf{x}=\lambda B\mathbf{x}$. When $B$ is positive definite, one can transform the constraint to a sphere using a Cholesky factor of $B$. If $B$ is singular or indefinite, the feasible set may be unbounded or disconnected, and the ordinary minimum--maximum conclusions need not hold.
+
+## Checking the decomposition numerically
 
 ```python
 import numpy as np
@@ -311,55 +421,30 @@ D = np.diag(values)
 
 print(values)
 print(Q.T @ A @ Q)
+print(np.allclose(A, Q @ D @ Q.T))
 print(np.all(values > 0))
 ```
 
-`np.linalg.eigh` is specialized for symmetric or Hermitian matrices. It returns real eigenvalues and orthonormal eigenvectors, matching the spectral theorem.
+`np.linalg.eigh` is specialized for real symmetric or complex Hermitian matrices. It returns real eigenvalues and orthonormal eigenvectors, matching the spectral theorem.
 
-## Common pitfalls
+## Where classifications go wrong
 
-- Forgetting that the matrix of $ax^2+2bxy+cy^2$ has off-diagonal entries $b$, not $2b$.
-- Applying the real spectral theorem to a nonsymmetric matrix.
-- Assuming diagonalizable automatically means orthogonally diagonalizable. Orthogonal diagonalization is stronger and is guaranteed for real symmetric matrices.
-- Classifying definiteness from diagonal entries of $A$ instead of eigenvalues or a valid criterion.
-- Ignoring zero eigenvalues when distinguishing positive definite from positive semidefinite.
-- Losing the coordinate change: $\mathbf{x}=Q\mathbf{y}$, so the new variables are coordinates in the orthonormal eigenbasis.
+- In $ax^2+2bxy+cy^2$, the off-diagonal matrix entries are $b$, not $2b$.
+- The real spectral theorem requires symmetry. A general diagonalizable matrix need not be orthogonally diagonalizable.
+- Zero eigenvalues distinguish semidefinite forms from definite ones and represent flat directions.
+- The old and new coordinates must not be interchanged: $\mathbf{x}=Q\mathbf{y}$ and $\mathbf{y}=Q^T\mathbf{x}$.
+- Level-set shape follows eigenvalue signs: equal signs give ellipse-like behavior, opposite signs give hyperbola-like behavior, and a zero eigenvalue leaves a flat direction.
 
-A safe classification routine is to start with symmetry. The standard eigenvalue definiteness test applies to symmetric matrices. If the matrix is not symmetric, first rewrite the quadratic form using its symmetric part, because
+When the starting matrix is not symmetric, replace it by $(A+A^T)/2$ before applying the definiteness test. That symmetric matrix represents exactly the same quadratic form.
 
-$$
-\mathbf{x}^TA\mathbf{x}
-=
-\mathbf{x}^T\left(\frac{A+A^T}{2}\right)\mathbf{x}.
-$$
+One further caution concerns the Hessian test. A positive definite Hessian at a critical point gives a strict local minimum, and a negative definite one gives a strict local maximum. An indefinite Hessian gives a saddle. A semidefinite Hessian gives no classification by itself: $x^4+y^4$ and $x^4-y^4$ both have the zero Hessian at the origin, but the first has a minimum and the second a saddle. Higher-order terms decide the case.
 
-The skew-symmetric part contributes nothing to the quadratic form. After the symmetric matrix is identified, use eigenvalues or a valid principal-minor test.
+Numerical classification should allow for uncertainty near zero. If the smallest computed eigenvalue is comparable to rounding error or uncertainty in the matrix entries, labeling the form definite or indefinite from its sign alone overstates the evidence. Scaling the matrix, examining a backward error, and reporting a near-null direction are more informative. Exact symbolic criteria remain decisive only when the entries themselves are exact.
 
-When diagonalizing a quadratic form, keep track of which variables are old and which are new. The equation $\mathbf{x}=Q\mathbf{y}$ means the columns of $Q$ are the new orthonormal axes written in old coordinates. The vector $\mathbf{y}$ contains coordinates along those axes. Losing this distinction can lead to correct eigenvalue arithmetic but wrong geometric interpretation.
+Symmetry should also be checked at the scale of the data. A measured or assembled matrix may differ slightly from its transpose. Replacing it by its symmetric part is appropriate only when the intended model is a quadratic form or self-adjoint operator and the asymmetry is numerical noise. If the asymmetry carries modeled effects, such as directed transport, symmetrizing changes the problem rather than cleaning it.
 
-The signs of eigenvalues describe the shape. In two variables, two positive eigenvalues give ellipses for level curves $Q=c\gt 0$. One positive and one negative eigenvalue gives hyperbola-like level curves and saddle behavior. A zero eigenvalue creates a flat direction. These pictures are often more memorable than the terminology.
+<div className="see-also">
 
-In optimization, positive definite Hessians mean the function curves upward in every direction near the critical point. Negative definite Hessians mean it curves downward in every direction. Indefinite Hessians mean there are both upward and downward directions, so the point is a saddle. This is the multivariable version of the one-variable second derivative test.
+See also: [Eigenvalues and Eigenvectors](/math/linear-algebra/eigenvalues-and-eigenvectors) · [Diagonalization and Similarity](/math/linear-algebra/diagonalization-and-similarity) · [Orthogonality in Rn](/math/linear-algebra/orthogonality-in-rn) · [Singular Value Decomposition](/math/linear-algebra/singular-value-decomposition)
 
-Orthogonal changes of coordinates are preferred because they do not distort lengths. If $Q$ is orthogonal, then $\|\mathbf{x}\|=\|\mathbf{y}\|$ when $\mathbf{x}=Q\mathbf{y}$. Thus diagonalizing a quadratic form by an orthogonal matrix rotates or reflects the coordinate system without stretching it. The shape changes its description, not its underlying geometry.
-
-Positive semidefinite forms deserve separate attention. They never take negative values, but they can be zero for nonzero vectors. Geometrically, this means there are flat directions. In statistics, covariance matrices are positive semidefinite because variances cannot be negative, but zero variance can occur in directions with exact linear dependence.
-
-The spectral theorem is also the reason symmetric matrices are central in applications. Energy matrices, covariance matrices, Hessians, and many graph matrices are symmetric. Their orthonormal eigenvectors provide stable axes for analysis, and their real eigenvalues can be ordered and interpreted as curvatures, variances, frequencies, or connectivity measures depending on the model.
-
-A useful final check is to evaluate the quadratic form on eigenvectors. If $A\mathbf{q}_i=\lambda_i\mathbf{q}_i$ and $\|\mathbf{q}_i\|=1$, then
-
-$$
-\mathbf{q}_i^TA\mathbf{q}_i=\lambda_i.
-$$
-
-So eigenvalues are the values of the quadratic form on its principal unit directions.
-
-That sentence is often the simplest interpretation of the spectral theorem for quadratic forms.
-
-## Connections
-
-- [Eigenvalues and Eigenvectors](/math/linear-algebra/eigenvalues-and-eigenvectors)
-- [Diagonalization and Similarity](/math/linear-algebra/diagonalization-and-similarity)
-- [Orthogonality in Rn](/math/linear-algebra/orthogonality-in-rn)
-- [Singular Value Decomposition](/math/linear-algebra/singular-value-decomposition)
+</div>

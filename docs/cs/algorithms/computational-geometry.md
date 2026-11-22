@@ -7,13 +7,13 @@ sidebar_position: 13
 
 Computational geometry designs algorithms for points, lines, segments, polygons, and higher-dimensional geometric objects. It turns geometric intuition into robust predicates and data structures. The subject powers graphics, robotics, GIS, CAD, collision detection, mesh generation, motion planning, and spatial indexing [1], [4].
 
-The main danger is that pictures lie. A convex hull looks obvious on a diagram, but a correct implementation needs an orientation predicate, a tie policy for collinear points, and numerical care. This page focuses on the canonical undergraduate-to-graduate toolkit: orientation tests, segment intersection, convex hulls, closest pairs, sweep lines, Voronoi diagrams, Delaunay triangulations, point location, range trees, kd-trees, polygon triangulation, and low-dimensional linear programming [5], [6].
+The main danger is that pictures lie. A convex hull looks obvious on a diagram, but a correct implementation needs an orientation predicate, a tie policy for collinear points, and numerical care. The canonical toolkit includes orientation tests, segment intersection, convex hulls, closest pairs, sweep lines, Voronoi diagrams, Delaunay triangulations, point location, range trees, kd-trees, polygon triangulation, and low-dimensional linear programming [5], [6].
 
 ![Convex hull illustration.](https://commons.wikimedia.org/wiki/Special:FilePath/ConvexHull.svg)
 
 *Figure: The convex hull is the smallest convex polygon containing a point set. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:ConvexHull.svg), public domain or CC-BY-SA via Wikimedia Commons.*
 
-## Definitions
+## Predicates before pictures
 
 For points $a=(a_x,a_y)$, $b=(b_x,b_y)$, and $c=(c_x,c_y)$, the orientation predicate is the sign of the cross product
 
@@ -27,7 +27,7 @@ $$A=\frac12\left|\sum_i x_i y_{i+1}-y_i x_{i+1}\right|.$$
 
 The **convex hull** of a point set is the smallest convex set containing it. The **closest pair** problem asks for the pair of points with minimum Euclidean distance. A **sweep-line** algorithm imagines a vertical or horizontal line moving across events, maintaining an active set of objects intersecting the sweep line. A **Voronoi diagram** partitions the plane by nearest site, and the **Delaunay triangulation** is its geometric dual under general-position assumptions.
 
-## Key results
+## Hulls, sweeps, and spatial subdivisions
 
 The orientation predicate is the primitive behind most planar algorithms. Segment intersection can be decided by orientations:
 
@@ -50,8 +50,6 @@ Voronoi diagrams and Delaunay triangulations encode nearest-neighbor structure. 
 Point location asks which face of a planar subdivision contains a query point. Slab decomposition, trapezoidal maps, and persistent search structures give different preprocessing-query trade-offs. Orthogonal range trees answer axis-aligned rectangle queries by recursively organizing coordinates, while kd-trees split space by alternating coordinate axes and are widely used for nearest-neighbor search in moderate dimensions. High dimensions weaken these structures due to the curse of dimensionality.
 
 Polygon triangulation decomposes a simple polygon into triangles. Ear clipping repeatedly removes a convex ear whose diagonal lies inside the polygon; it is simple but not asymptotically optimal. Linear programming in fixed dimension can be solved in expected linear time by randomized incremental algorithms such as Seidel's method, showing that geometric dimension can be a parameter independent of the number of constraints.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -79,7 +77,9 @@ flowchart TD
 | Polygon area | shoelace formula | $O(n)$ | signed edge sum |
 | kd-tree query | spatial partition | data dependent | bounding boxes |
 
-## Worked example 1: Graham scan trace on six points
+## Geometry by hand
+
+### Tracing Graham scan on six points
 
 **Problem.** Compute the convex hull of
 
@@ -101,7 +101,7 @@ $$[(0,0),(2,0),(2,2),(0,2)].$$
 
 The points $(1,0.5)$ and $(1,1)$ are interior and correctly removed by right-turn tests.
 
-## Worked example 2: closest pair by divide and conquer
+### Closing the strip in closest pair
 
 **Problem.** Find the closest pair among
 
@@ -126,7 +126,9 @@ $$\{(0,0),(1,3),(2,2),(4,4),(5,1),(6,2)\}.$$
 
 **Checked answer.** The closest distance is $\sqrt2$, achieved by $(1,3),(2,2)$ and also by $(5,1),(6,2)$.
 
-## Code
+## Planar primitives and closest-pair search
+
+The compact closest-pair routine re-sorts each strip by $y$, so its bound is $O(n\log^2 n)$. Carrying $y$-sorted subarrays through the recursion removes the extra logarithm and attains the optimal $O(n\log n)$ bound described above.
 
 ```python
 from math import hypot
@@ -201,7 +203,7 @@ def closest_pair(points):
     return solve(pts)
 ```
 
-## Common pitfalls
+## Degeneracies and numerical traps
 
 - Using floating-point orientation tests without considering near-collinear inputs.
 - Forgetting collinear overlap cases in segment intersection.
@@ -216,15 +218,6 @@ def closest_pair(points):
 - Applying shoelace formula to unordered points rather than polygon boundary order.
 - Confusing point-in-polygon ray crossings on boundary cases.
 - Forgetting that geographic coordinates on a sphere are not ordinary planar coordinates.
-
-## Connections
-
-- [Divide and Conquer](/cs/algorithms/divide-and-conquer) for closest pair and geometric divide steps.
-- [Sorting Algorithms](/cs/algorithms/sorting-algorithms) for coordinate sorting in hulls and sweeps.
-- [Graph Algorithms](/cs/algorithms/graph-algorithms) for planar graphs, triangulations, and shortest paths in geometric graphs.
-- [Searching Algorithms](/cs/algorithms/searching-algorithms) for kd-trees, range trees, and point location.
-- [Data Structures](/cs/data-structures/intro) for balanced trees, segment trees, priority queues, and spatial indexes.
-- [Discrete Math](/math/discrete/intro) for planar graph structure and combinatorial geometry.
 
 ## References
 
@@ -253,3 +246,16 @@ def closest_pair(points):
 [12] R. Seidel, "Small-dimensional linear programming and convex hulls made easy," *Discrete & Computational Geometry*, vol. 6, pp. 423-434, 1991.
 
 [13] J. L. Bentley, "Multidimensional binary search trees used for associative searching," *Communications of the ACM*, vol. 18, no. 9, pp. 509-517, 1975.
+
+<div className="see-also">
+
+See also:
+
+- [Divide and Conquer](/cs/algorithms/divide-and-conquer) for closest pair and geometric divide steps.
+- [Sorting Algorithms](/cs/algorithms/sorting-algorithms) for coordinate sorting in hulls and sweeps.
+- [Graph Algorithms](/cs/algorithms/graph-algorithms) for planar graphs, triangulations, and shortest paths in geometric graphs.
+- [Searching Algorithms](/cs/algorithms/searching-algorithms) for kd-trees, range trees, and point location.
+- [Data Structures](/cs/data-structures/intro) for balanced trees, segment trees, priority queues, and spatial indexes.
+- [Discrete Math](/math/discrete/intro) for planar graph structure and combinatorial geometry.
+
+</div>

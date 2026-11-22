@@ -9,7 +9,7 @@ Warehouse-scale computers, WSCs, treat a building full of servers, networking, p
 
 A supercomputer often targets tightly coupled scientific jobs and expensive low-latency interconnects. A WSC targets request-level parallelism, data-level parallelism across huge datasets, operational cost, energy proportionality, fault tolerance, and software systems that survive component failures. The individual server matters, but the architecture of the whole facility matters more.
 
-## Definitions
+## When the warehouse is the computer
 
 Request-level parallelism, RLP, is parallelism across independent or loosely coupled requests. A web service can handle many users at once because each request can often be assigned to a different server or process.
 
@@ -34,27 +34,9 @@ Lower PUE means less power is spent on cooling, conversion losses, and other non
 
 Service-level objectives, SLOs, specify latency, availability, or throughput targets. Tail latency is the high-percentile response time, such as 99th percentile latency. It matters because a user-visible request may depend on many subrequests; one slow component can delay the whole response.
 
-## Key results
+## Coordinating services across racks
 
-WSC design is dominated by total cost of ownership. Server purchase price, power, cooling, networking, building infrastructure, repair, and replacement cycles all matter. A small percentage improvement in energy efficiency or utilization can be worth a large absolute amount because it applies to thousands of servers.
-
-RLP changes the performance metric. A single request's latency matters, but the system must also maximize useful throughput under latency constraints. If throughput rises only by violating tail-latency SLOs, it is not a valid improvement.
-
-Fault tolerance is mandatory. At WSC scale, hardware failures are normal events. Software must replicate data, retry tasks, route around failures, and deploy changes gradually. The architecture assumes components fail and designs for service continuity.
-
-Networking is part of architecture. Oversubscription, rack locality, bisection bandwidth, and congestion affect application placement. A data-intensive job that repeatedly crosses racks can be slower and more expensive than one scheduled near its data.
-
-WSC workloads often mix online services and batch analytics. Online services need predictable latency. Batch systems want high throughput and can use spare capacity. Coordinating these workloads is a scheduling and isolation problem.
-
-Tail latency is amplified by fan-out. A front-end request may query dozens or hundreds of back-end shards, then wait for the slowest required response. Even if each shard is fast most of the time, the probability that at least one shard is slow can be high. WSC software therefore uses replication, hedged requests, timeouts, partial results, and careful dependency graphs to control the tail.
-
-Utilization is a cost problem as much as a performance problem. Servers bought for peak traffic sit partly idle during low demand, yet they still consume power and occupy capital. Workload consolidation improves utilization but can create interference in caches, memory bandwidth, storage, and networks. Isolation mechanisms and cluster schedulers try to pack work while preserving SLOs.
-
-The network topology affects application architecture. Placing related services or data shards in the same rack can reduce latency and cross-rack traffic, but it may reduce fault isolation. Spreading replicas across failure domains improves availability but increases network distance. WSC design repeatedly balances locality, redundancy, and operational simplicity.
-
-WSC dependability is usually achieved above individual hardware components. Instead of making every server extremely reliable, designers often use commodity servers with software replication and automatic recovery. This shifts complexity into distributed systems, monitoring, and deployment, but it can produce better cost-performance and faster hardware refresh cycles.
-
-## Visual
+The load balancers, service racks, storage, monitoring, and deployment systems form a feedback loop. Monitoring detects failures and load changes; scheduling and deployment then alter where work runs.
 
 ```mermaid
 flowchart TD
@@ -81,83 +63,93 @@ flowchart TD
 | Utilization | Fraction of useful work | Low utilization wastes capital and power |
 | Availability | Service accomplishment | Failures are routine at scale |
 
-## Worked example 1: PUE and facility power
+## Cost, latency, and failure at fleet scale
 
-Problem: A datacenter has 20 MW of IT load and PUE 1.25. Compute total facility power and non-IT overhead power. Then compare with improving PUE to 1.15 at the same IT load.
+WSC design is dominated by total cost of ownership. Server purchase price, power, cooling, networking, building infrastructure, repair, and replacement cycles all matter. A small percentage improvement in energy efficiency or utilization can be worth a large absolute amount because it applies to thousands of servers.
 
-Method:
+RLP changes the performance metric. A single request's latency matters, but the system must also maximize useful throughput under latency constraints. If throughput rises only by violating tail-latency SLOs, it is not a valid improvement.
 
-1. Use the PUE definition.
+Fault tolerance is mandatory. At WSC scale, hardware failures are normal events. Software must replicate data, retry tasks, route around failures, and deploy changes gradually. The architecture assumes components fail and designs for service continuity.
+
+Networking is part of architecture. Oversubscription, rack locality, bisection bandwidth, and congestion affect application placement. A data-intensive job that repeatedly crosses racks can be slower and more expensive than one scheduled near its data.
+
+WSC workloads often mix online services and batch analytics. Online services need predictable latency. Batch systems want high throughput and can use spare capacity. Coordinating these workloads is a scheduling and isolation problem.
+
+Tail latency is amplified by fan-out. A front-end request may query dozens or hundreds of back-end shards, then wait for the slowest required response. Even if each shard is fast most of the time, the probability that at least one shard is slow can be high. WSC software therefore uses replication, hedged requests, timeouts, partial results, and careful dependency graphs to control the tail.
+
+Utilization is a cost problem as much as a performance problem. Servers bought for peak traffic sit partly idle during low demand, yet they still consume power and occupy capital. Workload consolidation improves utilization but can create interference in caches, memory bandwidth, storage, and networks. Isolation mechanisms and cluster schedulers try to pack work while preserving SLOs.
+
+The network topology affects application architecture. Placing related services or data shards in the same rack can reduce latency and cross-rack traffic, but it may reduce fault isolation. Spreading replicas across failure domains improves availability but increases network distance. WSC design repeatedly balances locality, redundancy, and operational simplicity.
+
+WSC dependability is usually achieved above individual hardware components. Instead of making every server extremely reliable, designers often use commodity servers with software replication and automatic recovery. This shifts complexity into distributed systems, monitoring, and deployment, but it can produce better cost-performance and faster hardware refresh cycles.
+
+## Converting PUE into megawatts
+
+A datacenter has 20 MW of IT load and a PUE of 1.25. Total facility power follows directly from the definition:
 
 $$
 \mathrm{Total}=\mathrm{PUE}\times \mathrm{IT}
 $$
 
-2. Baseline total power:
+At the original PUE, total power is:
 
 $$
 1.25 \times 20\ \mathrm{MW}=25\ \mathrm{MW}
 $$
 
-3. Baseline overhead:
+The non-IT overhead is:
 
 $$
 25-20=5\ \mathrm{MW}
 $$
 
-4. Improved total power:
+Reducing PUE to 1.15 at the same IT load changes total power to:
 
 $$
 1.15 \times 20\ \mathrm{MW}=23\ \mathrm{MW}
 $$
 
-5. Improved overhead:
+The new overhead is:
 
 $$
 23-20=3\ \mathrm{MW}
 $$
 
-6. Savings:
+The continuous saving is:
 
 $$
 25-23=2\ \mathrm{MW}
 $$
 
-Checked answer: Reducing PUE from 1.25 to 1.15 saves 2 MW continuously for the same IT work. Over a year, that is:
+Over a year, the 2 MW reduction becomes:
 
 $$
 2\ \mathrm{MW}\times8760\ \mathrm{h}=17520\ \mathrm{MWh}
 $$
 
-## Worked example 2: Tail latency amplification
+## Why p99 latency compounds under fan-out
 
-Problem: A user request fans out to 50 independent backend services. Each backend meets its local 99th percentile target of 100 ms, meaning each one has a 1% chance of exceeding 100 ms. If the user response waits for all 50, what is the probability that at least one backend exceeds 100 ms?
-
-Method:
-
-1. Probability one backend does not exceed 100 ms:
+A user request fans out to 50 independent backend services and waits for all of them. Each backend meets a local 99th-percentile target of 100 ms, so each has a 1% chance of exceeding 100 ms. The probability that one backend stays within the target is:
 
 $$
 1-0.01=0.99
 $$
 
-2. Probability all 50 do not exceed 100 ms, assuming independence:
+Assuming independence, the probability that all 50 stay within the target is:
 
 $$
 0.99^{50}=0.605
 $$
 
-3. Probability at least one exceeds 100 ms:
+The complementary event is that at least one backend exceeds 100 ms:
 
 $$
 1-0.605=0.395
 $$
 
-4. Interpret. Even though each service has only 1% tail probability, the fan-out request sees a much larger tail risk.
+There is about a 39.5% chance that at least one backend exceeds 100 ms, even though each service has only a 1% tail probability. WSC software uses hedged requests, careful fan-out control, caching, and tail-tolerant designs to contain that amplification.
 
-Checked answer: There is about a 39.5% chance that at least one backend exceeds 100 ms. This is why WSC software uses hedged requests, careful fan-out control, caching, and tail-tolerant designs.
-
-## Code
+## Back-of-the-envelope fleet calculations
 
 ```python
 def facility_power(it_mw, pue):
@@ -176,7 +168,7 @@ print(f"tail risk={fanout_tail_probability(50, 0.01):.1%}")
 
 The PUE calculation isolates facility overhead, but server efficiency still matters inside the IT load. A low PUE datacenter full of inefficient servers can waste more energy than a higher-PUE facility with better utilization and newer hardware. Architects therefore combine facility metrics with server-level performance per watt, workload placement, and power management policies.
 
-The tail-probability function assumes independent back-end delays. Real delays are often correlated because many services share networks, storage systems, power events, software releases, or overloaded dependencies. Correlation can make tail behavior worse than the independent estimate. This is why monitoring systems track both per-service latency and fleet-wide events.
+The tail-probability function assumes independent back-end delays. Real delays are often correlated because many services share networks, storage systems, power events, software releases, or overloaded dependencies. Correlation can make tail behavior worse than the independent estimate. Monitoring systems therefore track both per-service latency and fleet-wide events.
 
 Capacity planning also needs headroom. Running close to saturation increases queueing delay and leaves little room for failures or traffic bursts. WSC operators often reserve capacity for maintenance, machine failures, and sudden demand. The unused headroom looks inefficient in a narrow utilization chart, but it is part of meeting availability and latency objectives.
 
@@ -186,18 +178,14 @@ The same systems view applies to hardware refresh. Replacing servers gradually m
 
 Even naming, inventory, and monitoring data become architectural inputs at this scale for daily service operation.
 
-## Common pitfalls
+## Errors in fleet-level reasoning
 
-- Treating WSCs as just large supercomputers.
-- Optimizing average latency while ignoring tail latency.
-- Reporting throughput without the SLO under which it was achieved.
-- Ignoring idle power and poor energy proportionality.
-- Assuming hardware failures are exceptional rather than routine.
-- Moving data across the network repeatedly instead of scheduling work near data.
+A WSC is not a larger supercomputer: request-level parallelism, commodity failure modes, energy, and service continuity lead to different design choices. Average latency can hide a poor tail, and throughput numbers are incomplete without the SLO under which they were measured.
 
-## Connections
+Idle power and weak energy proportionality matter even when peak efficiency looks good. Hardware failures must be treated as routine operating conditions. Data placement belongs in the same analysis: repeatedly moving a large dataset across the network may cost more than scheduling computation near the data.
 
-- [Power, Energy, Cost, and Dependability](/cs/computer-architecture/power-energy-cost-dependability)
-- [Multicore, Synchronization, and NUMA](/cs/computer-architecture/multicore-synchronization-numa)
-- [Storage, RAID, and SSDs](/cs/computer-architecture/storage-raid-ssds)
-- [Vector, SIMD, and GPU Architectures](/cs/computer-architecture/vector-simd-gpu)
+<div className="see-also">
+
+See also: [Power, Energy, Cost, and Dependability](/cs/computer-architecture/power-energy-cost-dependability) · [Multicore, Synchronization, and NUMA](/cs/computer-architecture/multicore-synchronization-numa) · [Storage, RAID, and SSDs](/cs/computer-architecture/storage-raid-ssds) · [Vector, SIMD, and GPU Architectures](/cs/computer-architecture/vector-simd-gpu)
+
+</div>

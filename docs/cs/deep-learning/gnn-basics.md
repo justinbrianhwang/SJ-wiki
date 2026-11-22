@@ -5,15 +5,11 @@ sidebar_position: 21
 
 # Graph Neural Networks: Basics
 
-Graphs are the natural data structure when the important signal is not just a vector, sequence, or grid, but a set of entities connected by relations. Molecules are atoms joined by bonds, social platforms are people joined by interactions, recommender systems are users connected to items, traffic networks are sensors connected by roads, and knowledge graphs are entities connected by typed facts. Graph neural networks, or GNNs, learn representations that respect this relational structure while still using the differentiable optimization tools of deep learning.
+Graphs are the natural data structure when the signal lies in entities and their relations rather than in an isolated vector, sequence, or grid. Molecules are atoms joined by bonds, social platforms are people joined by interactions, recommender systems are users connected to items, traffic networks are sensors connected by roads, and knowledge graphs are entities connected by typed facts. Graph neural networks, or GNNs, learn representations that respect this relational structure while still using the differentiable optimization tools of deep learning.
 
-![A historical map of Konigsberg highlights the river and bridges that motivated graph theory.](https://commons.wikimedia.org/wiki/Special:FilePath/Konigsberg_Bridge.png)
+The foundations span graph notation, spectral graph convolutions, message passing, attention on graphs, expressiveness limits, depth pathologies, and geometric equivariance. Most GNNs alternate between local communication over edges and learned nonlinear feature transformations; the architecture names describe different choices for those two operations.
 
-*Figure: The bridges of Konigsberg motivated the abstraction from physical layout to graph structure that GNNs now extend with learned representations. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Konigsberg_Bridge.png), Merian-Erben, public domain.*
-
-This chapter consolidates the foundations: graph notation, spectral graph convolutions, message passing, attention on graphs, expressiveness limits, depth pathologies, and geometric equivariance. It connects directly to [linear algebra](/math/linear-algebra/intro), [graph theory](/math/graph-theory/intro), [attention and transformers](/cs/deep-learning/attention-transformers), and the application chapter [Graph Neural Networks: Applications](/cs/deep-learning/gnn-applications). The goal is not to memorize architecture names, but to see how most GNNs alternate between local communication over edges and learned nonlinear feature transformations.
-
-## Definitions
+## Graph notation, tasks, and classical embeddings
 
 A graph is $G=(V,E)$ with node set $V$, edge set $E$, and often attributes. For $n=\vert V\vert $, the adjacency matrix $A\in\mathbb{R}^{n\times n}$ has $A_{ij}\ne 0$ when an edge connects node $i$ to node $j$. In an unweighted simple graph, $A_{ij}\in\{0,1\}$. In a weighted graph, $A_{ij}$ stores an edge weight. In a directed graph, $A_{ij}$ and $A_{ji}$ may differ. In an undirected graph, $A=A^T$. Node features are stored as $X\in\mathbb{R}^{n\times d}$, where row $x_i$ describes node $i$. Edge features may be stored as $e_{ij}$ for each edge $(i,j)$, or as a tensor indexed by edge list position.
 
@@ -41,7 +37,7 @@ Graph tasks differ by prediction target. A **node-level task** predicts labels o
 
 Before neural message passing became standard, classical graph embedding methods learned node vectors from graph proximity. DeepWalk runs truncated random walks and trains a skip-gram objective, treating walks like sentences [1]. node2vec biases random walks between breadth-first and depth-first behavior, allowing embeddings to prefer homophily or structural role similarity [2]. LINE preserves first-order and second-order proximity in large networks [3]. These methods are useful background because they already express a core idea of GNNs: graph neighborhoods provide training signal even when labels are sparse.
 
-## Key results
+## From spectral filters to message passing
 
 Spectral graph methods start from the Laplacian eigendecomposition. For an undirected graph, $L$ is symmetric positive semidefinite, so
 
@@ -102,7 +98,7 @@ $$
 
 The updated node representation is a weighted sum of neighbor features. Multi-head attention stabilizes learning and lets different heads attend to different relation patterns. GATv2 changes the order of linear projection and attention scoring so the ranking of neighbors can depend more dynamically on the query node [11]. Graph transformers take the attention idea further by allowing global or sparsified attention and injecting graph structure through spatial encodings, centrality encodings, edge encodings, Laplacian eigenvectors, random-walk features, or shortest-path biases. Graphormer is a representative architecture that adds centrality, spatial, and edge encodings to Transformer-style attention [12].
 
-Expressiveness has a precise ceiling. Standard message-passing GNNs update node states by repeatedly aggregating neighbor multisets. Therefore, if the 1-WL color refinement test cannot distinguish two graphs, a broad class of message-passing GNNs cannot distinguish them either [9], [13]. This is not a practical death sentence, since many real tasks are not adversarial isomorphism tests, but it explains why higher-order GNNs, positional encodings, subgraph methods, and graph transformers exist.
+Expressiveness has a precise ceiling. Standard message-passing GNNs update node states by repeatedly aggregating neighbor multisets. Therefore, if the 1-WL color refinement test cannot distinguish two graphs, a broad class of message-passing GNNs cannot distinguish them either [9], [13]. Many real tasks are not adversarial isomorphism tests, but the limit motivates higher-order GNNs, positional encodings, subgraph methods, and graph transformers.
 
 Depth introduces two common pathologies. **Over-smoothing** means node embeddings become increasingly similar as layers repeatedly average over the graph. For a connected graph, powers of a normalized adjacency tend to wash out high-frequency variation, and Dirichlet energy often decays with depth [14], [15]. **Over-squashing** means information from exponentially many distant nodes is compressed through a small number of edges into fixed-width hidden states [16]. This is especially severe when a graph has narrow bottlenecks or negative curvature-like expansion properties [17].
 
@@ -134,7 +130,7 @@ where $m_{ij}$ is an edge message computed from features and squared distances. 
 | Graph Transformer | Global or biased attention | Long-range modeling | Requires structural encodings |
 | Equivariant GNN | Symmetry-respecting feature and coordinate updates | Molecular and physical systems | More specialized assumptions |
 
-## Visual
+## Three routes through a graph layer
 
 ```mermaid
 flowchart TB
@@ -191,7 +187,7 @@ flowchart LR
 
 The first diagram shows how spectral convolution, message passing, and attention are not separate subjects. They are different views of the same design problem: how to move information across graph edges while preserving permutation structure. The second diagram isolates the depth problem. More layers enlarge the receptive field, but repeated averaging can erase distinctions unless the architecture preserves earlier signals or changes the propagation geometry.
 
-## Worked example 1: GCN forward pass on a 3-node graph
+## Normalizing a three-node GCN by hand
 
 Problem: compute one GCN layer on a path graph with three nodes, $1-2-3$. Use scalar node features
 
@@ -279,9 +275,9 @@ $$
 \end{bmatrix}.
 $$
 
-Checked answer: node $1$ receives its own feature and node $2$'s feature, node $2$ receives all three, and node $3$ receives node $2$ plus itself. The normalization prevents the high-degree middle node from dominating purely because it has more neighbors.
+Node $1$ receives its own feature and node $2$'s feature, node $2$ receives all three, and node $3$ receives node $2$ plus itself. The normalization prevents the high-degree middle node from dominating purely because it has more neighbors.
 
-## Worked example 2: GAT attention coefficients on a small graph
+## Computing attention over a node's neighborhood
 
 Problem: node $1$ attends to itself and two neighbors, nodes $2$ and $3$. Let transformed one-dimensional features be
 
@@ -339,9 +335,9 @@ $$
 0.259(1)+0.705(2)+0.035(-1)=1.634.
 $$
 
-Checked answer: node $2$ receives the largest weight because its score with node $1$ is highest. The attention weights sum to $0.999$ after rounding, as required by softmax.
+Node $2$ receives the largest weight because its score with node $1$ is highest. The attention weights sum to $0.999$ after rounding, as required by softmax.
 
-## Code
+## Checking the GCN and GAT calculations in PyTorch
 
 ```python
 import torch
@@ -381,7 +377,7 @@ print("gat attention:", alpha.round(decimals=3))
 print("gat output:", gat_out.round(decimals=3))
 ```
 
-## Common pitfalls
+## Where graph models lose their assumptions
 
 - Confusing the degree matrix before and after adding self-loops. In a GCN, normalize the same adjacency that is actually propagated.
 - Treating node order as meaningful. A valid graph model should be invariant or equivariant to relabeling unless explicit positional identifiers are part of the data.
@@ -395,17 +391,6 @@ print("gat output:", gat_out.round(decimals=3))
 - Forgetting that 1-WL limits are about architecture classes. A task can still be solved if labels, features, positions, or substructures break symmetry.
 - Applying Euclidean equivariant models to arbitrary relational graphs. Coordinate-based symmetry assumptions only make sense when coordinates have physical meaning.
 - Leaking labels through graph construction. Edges built using target labels or future information can make validation accuracy meaningless.
-
-## Connections
-
-- [Graph Neural Networks: Applications](/cs/deep-learning/gnn-applications) applies these layers to molecules, recommenders, knowledge graphs, traffic, physics, and optimization.
-- [attention and transformers](/cs/deep-learning/attention-transformers) explains the attention mechanism reused by GATs and graph transformers.
-- [recommender systems](/cs/deep-learning/recommender-systems) connects user-item graphs to matrix factorization and graph-based recommendation.
-- [optimization algorithms](/cs/deep-learning/optimization-algorithms) gives the training background for sparse minibatches and deep stacks.
-- [math for deep learning](/cs/deep-learning/math-for-deep-learning) reviews the linear algebra and differentiation used in GNN layers.
-- [graph-theory](/math/graph-theory/intro) provides the underlying language of walks, paths, connectivity, trees, and graph algorithms.
-- [linear-algebra](/math/linear-algebra/intro) is the home for eigendecomposition, diagonalization, orthogonality, and matrix products behind spectral GNNs.
-- [probability](/math/probability/intro) supports random walks, node2vec sampling, stochastic minibatches, and graph diffusion.
 
 ## References
 
@@ -450,3 +435,18 @@ print("gat output:", gat_out.round(decimals=3))
 [20] K. T. Schutt et al., "SchNet: A Continuous-filter Convolutional Neural Network for Modeling Quantum Interactions," NeurIPS, 2017. https://arxiv.org/abs/1706.08566
 
 [21] V. G. Satorras, E. Hoogeboom, and M. Welling, "E(n) Equivariant Graph Neural Networks," ICML, 2021. https://arxiv.org/abs/2102.09844
+
+<div className="see-also">
+
+See also:
+
+- [Graph Neural Networks: Applications](/cs/deep-learning/gnn-applications) applies these layers to molecules, recommenders, knowledge graphs, traffic, physics, and optimization.
+- [attention and transformers](/cs/deep-learning/attention-transformers) explains the attention mechanism reused by GATs and graph transformers.
+- [recommender systems](/cs/deep-learning/recommender-systems) connects user-item graphs to matrix factorization and graph-based recommendation.
+- [optimization algorithms](/cs/deep-learning/optimization-algorithms) gives the training background for sparse minibatches and deep stacks.
+- [math for deep learning](/cs/deep-learning/math-for-deep-learning) reviews the linear algebra and differentiation used in GNN layers.
+- [graph-theory](/math/graph-theory/intro) provides the underlying language of walks, paths, connectivity, trees, and graph algorithms.
+- [linear-algebra](/math/linear-algebra/intro) is the home for eigendecomposition, diagonalization, orthogonality, and matrix products behind spectral GNNs.
+- [probability](/math/probability/intro) supports random walks, node2vec sampling, stochastic minibatches, and graph diffusion.
+
+</div>

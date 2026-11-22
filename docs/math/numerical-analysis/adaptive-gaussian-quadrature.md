@@ -7,13 +7,9 @@ sidebar_position: 11
 
 Composite quadrature spends evaluation points uniformly. That is reasonable when the integrand is equally easy everywhere, but wasteful when most of the interval is smooth and only a small region is difficult. Adaptive quadrature refines the interval only where an error indicator says refinement is needed.
 
-![A parabola is fitted over an interval to illustrate Simpson rule.](https://commons.wikimedia.org/wiki/Special:FilePath/Simpsons_rule.svg)
-
-*Figure: Simpson rule improves numerical integration by approximating the integrand with a quadratic arc. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Simpsons_rule.svg), Wdvorak, CC BY-SA 3.0.*
-
 Gaussian quadrature takes a different approach. Instead of equally spacing the nodes, it chooses both nodes and weights to maximize polynomial exactness. For smooth integrands, a small number of Gaussian nodes can outperform much denser Newton-Cotes rules. The price is that the nodes are less intuitive and basic Gauss rules are not naturally nested.
 
-## Definitions
+## Adaptive Simpson's accept-or-split test
 
 Adaptive Simpson quadrature compares one Simpson estimate on $[a,b]$ with two Simpson estimates on $[a,m]$ and $[m,b]$, where $m=(a+b)/2$. If
 
@@ -29,6 +25,36 @@ $$
 
 comes from the fourth-order error model for Simpson's rule.
 
+Here is the scaling behind the factor $15$. If $S_h$ denotes a composite Simpson approximation with panel scale $h$, its leading error has the form
+
+$$
+I-S_h=Ch^4+O(h^6).
+$$
+
+Halving the panel scale gives
+
+$$
+I-S_{h/2}=C\left(\frac h2\right)^4+O(h^6)
+=\frac{Ch^4}{16}+O(h^6).
+$$
+
+Subtracting the two relations yields
+
+$$
+S_{h/2}-S_h
+=\frac{15}{16}Ch^4+O(h^6).
+$$
+
+Therefore the refined estimate still has error approximately $(S_{h/2}-S_h)/15$, and adding that quantity to $S_{h/2}$ cancels the leading term. The correction is a local Richardson extrapolation. It is reliable only while the same smooth-error model describes both panel sizes.
+
+An implementation also has to divide a global tolerance among panels. Giving each child half its parent's absolute tolerance ensures that the accepted local budgets sum to at most the requested amount. A relative tolerance is usually scaled against the current magnitude estimate, often through a test resembling
+
+$$
+\text{error}\le \text{atol}+\text{rtol}\,|Q|.
+$$
+
+Pure relative error is poorly defined for an integral near zero; pure absolute error can be either excessive or too loose when magnitudes vary greatly.
+
 The $n$-point Gauss-Legendre rule on $[-1,1]$ has the form
 
 $$
@@ -41,25 +67,79 @@ $$
 t=\frac{b-a}{2}x+\frac{a+b}{2}.
 $$
 
-## Key results
+Including the Jacobian gives the complete mapped rule:
+
+$$
+\int_a^b f(t)\,dt
+\approx
+\frac{b-a}{2}
+\sum_{i=1}^n w_i
+f\left(
+\frac{b-a}{2}x_i+\frac{a+b}{2}
+\right).
+$$
+
+The factor $(b-a)/2$ multiplies the weights; omitting it integrates over the wrong interval scale.
+
+## Polynomial exactness and paired rules
 
 An $n$-point Gauss-Legendre rule is exact for every polynomial of degree at most $2n-1$. This is much higher than what is possible with $n$ fixed equally spaced nodes. Orthogonality of Legendre polynomials is the reason: the error component orthogonal to all lower-degree polynomials is pushed to a higher degree.
 
+The exactness argument can be made precise without solving for every weight. Given a polynomial $p$ with degree at most $2n-1$, divide it by the Legendre polynomial $P_n$:
+
+$$
+p(x)=q(x)P_n(x)+r(x),
+$$
+
+where $\deg q\le n-1$ and $\deg r\le n-1$. Orthogonality gives
+
+$$
+\int_{-1}^1q(x)P_n(x)\,dx=0.
+$$
+
+At every Gaussian node $x_i$, $P_n(x_i)=0$, so $p(x_i)=r(x_i)$. The quadrature weights are chosen to integrate every polynomial of degree at most $n-1$, hence they integrate $r$ exactly. Both the integral and the quadrature sum discard the $qP_n$ term, proving exactness through degree $2n-1$.
+
+No $n$-node rule can have a larger degree of exactness. If its nodes are $x_1,\ldots,x_n$, the polynomial
+
+$$
+g(x)=\prod_{i=1}^n(x-x_i)^2
+$$
+
+has degree $2n$, is nonnegative, and is not identically zero. Its true integral is positive, but any rule using only those nodes returns zero. Degree $2n-1$ is therefore optimal.
+
 Adaptive methods depend on local error estimation. The estimate is not a proof unless the smoothness assumptions behind the model are satisfied. A narrow spike, endpoint singularity, or oscillation between sample points can fool a local comparison. Therefore robust adaptive codes include recursion limits, minimum interval widths, and diagnostic failure returns.
 
-Gaussian quadrature is excellent for smooth integrands on finite intervals. When the integrand has singular behavior, discontinuities, or strong endpoint features, a change of variables or adaptive subdivision may be needed first. Gauss-Kronrod rules extend Gauss nodes with extra nodes to produce nested pairs, which is why many production quadrature routines use adaptive Gauss-Kronrod rather than plain Gauss-Legendre alone.
+Gaussian quadrature is excellent for smooth integrands on finite intervals. When the integrand has singular behavior, discontinuities, or strong endpoint features, a change of variables or adaptive subdivision may be needed first. Gauss-Kronrod rules extend Gauss nodes with extra nodes to produce nested pairs, so production quadrature routines often use adaptive Gauss-Kronrod rather than plain Gauss-Legendre alone.
 
-A reliable way to use these results is to keep the analysis tied to the actual numerical question rather than to the formula alone. For adaptive and Gaussian quadrature, the input record should include the integrand, interval, smoothness expectations, and cost of each function evaluation. Without that record, two computations that look similar on paper may have different numerical meanings. The same formula can be a safe production tool in one scaling and a fragile experiment in another. This is why the examples on this page show the intermediate arithmetic: the goal is not only to reach a number, but to expose what assumptions made that number meaningful.
+Known breakpoints should be supplied explicitly. If $f$ changes formula or has a derivative jump at $c$, split the integral as
 
-The next record is the verification record. Useful diagnostics for this topic include a paired-rule difference, recursion depth, and comparison with a known special case when one is available. A diagnostic should be chosen before the computation is trusted, not after a pleasing answer appears. When an exact answer is unavailable, compare two independent approximations, refine the mesh or tolerance, check a residual, or test the method on a neighboring problem with known behavior. If several diagnostics disagree, treat the disagreement as information about conditioning, stability, or implementation rather than as a nuisance to be averaged away.
+$$
+\int_a^b f(x)\,dx
+=\int_a^c f(x)\,dx+\int_c^b f(x)\,dx.
+$$
 
-The cost record matters as well. In this topic the dominant costs are usually number of integrand evaluations and how they are distributed over the interval. Numerical analysis is full of methods that are mathematically attractive but computationally mismatched to the problem size. A dense factorization may be acceptable for a classroom matrix and impossible for a PDE grid. A high-order rule may use fewer steps but more expensive stages. A guaranteed method may take many iterations but provide a bound that a faster method cannot. The right comparison is therefore cost to reach a verified tolerance, not order or elegance in isolation.
+Otherwise a high-order rule wastes effort trying to approximate nonsmooth behavior by one polynomial. Endpoint singularities often improve under substitution. For
 
-Finally, every method here has a recognizable failure mode: hidden spikes, endpoint singularities, and non-nested Gaussian rules. These failures are not edge cases to memorize; they are signals that the hypotheses behind the result have been violated or that a different numerical model is needed. A good implementation makes such failures visible through exceptions, warnings, residual reports, or conservative stopping rules. A good hand solution does the same thing in prose by naming the assumption being used and checking it at the point where it matters.
+$$
+\int_0^1 x^{-1/2}g(x)\,dx,
+$$
 
-For study purposes, the most useful habit is to separate four layers: the continuous mathematical problem, the discrete approximation, the algebraic or iterative algorithm used to compute it, and the diagnostic used to judge the result. Many mistakes come from mixing these layers. A small algebraic residual may not mean a small modeling error. A small step-to-step change may not mean the discrete equations are solved. A high-order truncation formula may not help when the data are noisy or the arithmetic is unstable. Keeping the layers separate makes the results on this page portable to larger examples.
+set $x=t^2$, $dx=2t\,dt$. The singular factor cancels:
 
-## Visual
+$$
+\int_0^1 x^{-1/2}g(x)\,dx
+=2\int_0^1 g(t^2)\,dt.
+$$
+
+The transformed integrand is smooth when $g$ is smooth, so Gaussian or Simpson rules regain their expected efficiency.
+
+Oscillatory integrals need separate judgment. Subdivision can eventually resolve a moderate frequency, but a generic adaptive rule may sample at repeated zeros and report a misleadingly small error. Methods that incorporate the oscillatory weight, or analytical cancellation before quadrature, are safer for high frequency.
+
+Gauss-Legendre weights are positive. Positivity prevents a large cancellation between weighted samples when the integrand itself is nonnegative, and it contributes to numerical robustness. The nodes lie strictly inside the interval, which is useful when endpoint values are singular or undefined but the integral is proper. It does not repair a genuinely nonintegrable singularity.
+
+The useful diagnostics are the paired-rule difference, recursion depth, and agreement with a known special case when one is available. Function-evaluation count matters too, especially when each evaluation is expensive. The relevant comparison is the cost of reaching a checked tolerance, not node count alone.
+
+## How the quadrature families allocate work
 
 | Method | Node placement | Error information | Strength | Weakness |
 |---|---|---|---|---|
@@ -98,9 +178,9 @@ flowchart TB
   Report --> Result(("integral estimate"))
 ```
 
-This quadrature diagram shows adaptive integration as a queue of panels with paired estimates and local error tests. Simpson and Gauss-Kronrod style rules differ in node placement and efficiency, but both route through the same accept-or-split controller. The output includes not only the integral estimate but also the accumulated error and recursion depth diagnostics.
+Adaptive integration can be read as a queue of panels with paired estimates and local error tests. Simpson and Gauss-Kronrod rules differ in node placement and efficiency, but both use the same accept-or-split controller. A useful return record includes the estimate, accumulated error indicator, and recursion depth.
 
-## Worked example 1: three-point Gauss rule for $x^4$
+## Three Gauss nodes integrate $x^4$ exactly
 
 **Problem.** Use the three-point Gauss-Legendre rule on $[-1,1]$ to integrate $f(x)=x^4$.
 
@@ -142,7 +222,7 @@ $$
 
 **Checked answer.** The three-point Gauss rule gives the exact value $2/5$ because it is exact through degree five.
 
-## Worked example 2: adaptive Simpson decision
+## Deciding whether to split near an endpoint singularity
 
 **Problem.** For $f(x)=\sqrt{x}$ on $[0,1]$, compare one Simpson panel with two half panels.
 
@@ -175,7 +255,90 @@ $$
 
 **Checked answer.** The large difference signals that the interval should be subdivided, especially near $0$ where the derivative is unbounded.
 
-## Code
+The corrected refined value is also easy to compute:
+
+$$
+Q_{\mathrm{corr}}
+=0.656556637
++\frac{0.656556637-0.638071187}{15}
+=0.657788\ldots.
+$$
+
+It is closer to $2/3=0.666666\ldots$, but still not highly accurate because the fourth derivative assumptions behind Simpson extrapolation fail at the endpoint. Repeated refinement concentrates panels near zero and restores convergence, though not at the smooth-function rate.
+
+## Two Gauss nodes on an exponential
+
+Approximate
+
+$$
+\int_0^1 e^x\,dx
+$$
+
+with the two-point Gauss-Legendre rule. On $[-1,1]$ the nodes are $\pm1/\sqrt3$ and both weights are one. Mapping to $[0,1]$ gives
+
+$$
+t_1=\frac12-\frac{1}{2\sqrt3},
+\qquad
+t_2=\frac12+\frac{1}{2\sqrt3},
+$$
+
+and mapped weights $1/2$. Thus
+
+$$
+Q_2
+=\frac12\left(e^{t_1}+e^{t_2}\right).
+$$
+
+Using $t_1=0.211324865\ldots$ and $t_2=0.788675135\ldots$,
+
+$$
+Q_2
+=\frac12(1.235314\ldots+2.200479\ldots)
+=1.717896\ldots.
+$$
+
+The exact value is
+
+$$
+e-1=1.718281828\ldots,
+$$
+
+so the absolute error is about $3.86\times10^{-4}$. The rule is not exact because the exponential is not a polynomial, but its Taylor terms through degree three are integrated exactly.
+
+## Interpreting an error report
+
+An adaptive routine's reported error is usually an estimate assembled from local rule differences. It is not the forward error measured against the unknown exact integral. The estimate can be conservative, optimistic, or accidentally zero. Repeating the calculation with tighter tolerances and a different rule is a useful independent check when the answer matters.
+
+Cancellation needs care. If large positive and negative contributions nearly cancel, the integral may be small even though each panel contribution is large. A relative tolerance scaled only by the final sum can demand unreasonable accuracy or give an unstable ratio. Splitting the positive and negative regions, or using an absolute tolerance based on the scale of the absolute integral, gives the controller a more meaningful target.
+
+Roundoff eventually limits refinement. As panels become extremely narrow, their endpoints and midpoints may round to the same floating-point number. Function values are then duplicated and subtraction in local estimates loses significance. An adaptive method should stop with a diagnostic when further subdivision cannot create distinct nodes. Continuing recursion cannot recover information absent from the number format.
+
+Function noise creates a similar floor. If each evaluation carries random or deterministic error of size $\varepsilon_f$, requesting an integral tolerance far below the accumulated evaluation noise only drives needless subdivision. Paired rules interpret changes between noisy samples as quadrature error. The attainable tolerance should reflect the accuracy and repeatability of the function evaluations.
+
+## Infinite intervals and improper integrals
+
+Gaussian rules described above assume a finite interval and unit weight. Infinite intervals can be mapped to finite ones. For example, $x=t/(1-t)$ maps $t\in[0,1)$ to $x\in[0,\infty)$, giving
+
+$$
+\int_0^\infty f(x)\,dx
+=\int_0^1
+f\left(\frac{t}{1-t}\right)
+\frac{dt}{(1-t)^2}.
+$$
+
+The transformed integrand may become sharply peaked near $t=1$, so the change of variables must be judged together with the decay of $f$. Specialized Gauss rules use weight functions tailored to common infinite-domain or endpoint behavior and can be much more efficient.
+
+An improper integral should first be checked for existence. No quadrature method can assign an ordinary finite integral to a nonintegrable singularity merely by avoiding the singular point. For a convergent singular integral, transformation or analytic subtraction can isolate the difficult part. Principal-value integrals are a different notion and need symmetric limiting procedures; a generic adaptive routine does not infer that interpretation.
+
+## Choosing a rule from the integrand
+
+Smoothness, evaluation cost, and available structure drive the choice. A low-order adaptive method is attractive for black-box functions with localized difficulty because it can discover where to refine. Fixed Gauss-Legendre rules suit smooth functions when repeated integration over many panels or parameters makes predictable vectorized evaluation valuable. Gauss-Kronrod combines high polynomial efficiency with an embedded estimate and is a common general-purpose default.
+
+If evaluating $f$ is expensive, reusing nodes matters more than a small difference in arithmetic cost. Nested rules preserve previous values when an estimate is refined. Plain Gauss-Legendre rules of successive orders are not nested, so increasing the order discards earlier evaluations. For a cheap function, that drawback may be irrelevant; for a simulation-backed integrand, it can dominate.
+
+High dimension changes the situation entirely. A tensor product of an $n$-point one-dimensional rule uses $n^d$ samples in $d$ dimensions. Adaptive boxes face the same exponential growth. Sparse grids, Monte Carlo, or problem-specific transformations become more suitable as dimension rises. One-dimensional efficiency claims should not be extrapolated unchanged to multivariate integration.
+
+## Adaptive Simpson and Gauss-Legendre routines
 
 ```python
 import numpy as np
@@ -209,17 +372,20 @@ print(gauss_legendre(lambda x: x**4, -1.0, 1.0, 3))
 print(adaptive_simpson(np.sqrt, 0.0, 1.0), 2.0 / 3.0)
 ```
 
-## Common pitfalls
+## When the error indicator can lie
 
-- Assuming an adaptive error estimate is a rigorous bound. It is a model-based indicator.
-- Allowing unbounded recursion near singularities without reporting failure.
-- Using Gaussian quadrature on a nonsmooth integrand without subdivision or transformation.
-- Forgetting the interval change-of-variables factor $(b-a)/2$.
-- Comparing Gaussian rules only by node count. Smoothness, cost per function evaluation, and nesting also matter.
+- An adaptive error estimate is a model-based indicator, not automatically a rigorous bound. A narrow spike or oscillation between nodes can escape both members of a pair.
+- Recursion near a singularity needs a depth or minimum-width limit and an explicit failure report.
+- A nonsmooth integrand usually needs subdivision or a change of variables before Gaussian quadrature is effective.
+- Mapping a Gauss rule from $[-1,1]$ to $[a,b]$ requires the factor $(b-a)/2$.
+- Node count alone is a poor comparison: smoothness, cost per evaluation, and nesting determine the total work.
 
-## Connections
+The sample implementation returns an estimate even when it reaches maximum depth. Library code should distinguish acceptance from forced termination and report the remaining error indicator. It should also cache shared endpoint and midpoint values; recomputing them at every recursion level needlessly raises the function-evaluation count. Nonfinite function values need an explicit path as well, since comparisons involving NaN can bypass the intended tolerance test.
 
-- [Newton Cotes and Romberg integration](/math/numerical-analysis/newton-cotes-romberg-integration)
-- [numerical differentiation and Richardson extrapolation](/math/numerical-analysis/numerical-differentiation-richardson)
-- [finite difference methods for PDEs](/math/numerical-analysis/finite-difference-pdes)
-- [least squares and Chebyshev approximation](/math/numerical-analysis/least-squares-chebyshev-approximation)
+Reversed limits should be handled explicitly: integrating from $b$ to $a$ returns the negative of the integral from $a$ to $b$. A zero-width interval returns zero without evaluating the function. These cases look minor, but they prevent recursive code from creating negative panel widths or evaluating an undefined integrand at an endpoint when no evaluation is mathematically needed.
+
+<div className="see-also">
+
+See also: [Newton Cotes and Romberg integration](/math/numerical-analysis/newton-cotes-romberg-integration) · [numerical differentiation and Richardson extrapolation](/math/numerical-analysis/numerical-differentiation-richardson) · [finite difference methods for PDEs](/math/numerical-analysis/finite-difference-pdes) · [least squares and Chebyshev approximation](/math/numerical-analysis/least-squares-chebyshev-approximation)
+
+</div>

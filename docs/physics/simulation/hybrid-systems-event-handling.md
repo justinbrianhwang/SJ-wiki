@@ -9,7 +9,7 @@ Hybrid systems combine continuous dynamics with discrete changes. A bouncing bal
 
 Hybrid simulation is harder than purely continuous simulation because the solver must locate events accurately and restart the model with changed equations or states. A time step that skips over a threshold can produce wrong event times, wrong energy loss, or even a different sequence of modes. The modeler needs to identify events explicitly and decide which variables are continuous, which jump, and which logic states remember past decisions.
 
-## Definitions
+## Flows, guards, resets, and remembered modes
 
 A hybrid system has a continuous state $x$, a discrete mode $q$, and dynamics that depend on the mode:
 
@@ -37,7 +37,7 @@ Zero-crossing detection is a solver feature that attempts to locate the time whe
 
 Zeno behavior is an infinite number of events in finite time. Idealized bouncing with a coefficient of restitution less than one can approach this mathematically. Practical models need tolerances, sticking rules, or event cutoffs.
 
-## Key results
+## What the simulator must do at an event
 
 Hybrid models should be specified by mode, flow, guard, and reset:
 
@@ -71,15 +71,13 @@ where $0\le e\le1$ is the coefficient of restitution.
 
 For a relay with hysteresis, the switching rule is not a memoryless function of the input. It depends on the previous relay state. This discrete memory is the difference between a simple saturation and a true hybrid switching element.
 
-Event handling changes the meaning of solver accuracy. In a smooth ODE, reducing local truncation error usually improves the trajectory everywhere. In a hybrid system, a small error in event time can place the state in the wrong mode, after which the continuous trajectory follows the wrong equations. This is why event functions, zero-crossing detection, and clear reset rules are not optional details. They define the model's execution semantics.
+Event handling changes the meaning of solver accuracy. In a smooth ODE, reducing local truncation error usually improves the trajectory everywhere. In a hybrid system, a small error in event time can place the state in the wrong mode, after which the continuous trajectory follows the wrong equations. Event functions, zero-crossing detection, and clear reset rules define the model's execution semantics.
 
 Hybrid models also need careful plotting. A continuous state plot alone can hide the reason for a change in slope. Plotting the discrete mode, event flag, controller sample, or reset count underneath the continuous response makes the result interpretable. For example, a thermostat temperature plot is incomplete without the heater on/off signal; a bouncing ball height plot is incomplete without showing impact times or velocity resets; a sampled controller response is incomplete without the control update sequence.
 
-A practical modeling rule is to avoid hidden switching. If a parameter changes value at an event, represent that change with a named mode or logged signal. If a state is reset, write the reset equation next to the block or in the script. If a guard includes a tolerance, document it. These details are part of the mathematical model because they can change the sequence of events and therefore the final response.
+Avoid hidden switching. If a parameter changes value at an event, represent that change with a named mode or logged signal. If a state is reset, write the reset equation next to the block or in the script. If a guard includes a tolerance, document it. These details are part of the mathematical model because they can change the sequence of events and therefore the final response.
 
 Hybrid systems should be tested with cases that exercise every mode. A thermostat test that never crosses the lower threshold does not verify the on transition. A bouncing ball test with no impact does not verify the reset. A sampled controller test with a constant input may not reveal rate-transition mistakes. Good examples deliberately force each guard, reset, and mode so the event logic is visible in the response.
-
-## Visual
 
 ```mermaid
 flowchart TB
@@ -110,7 +108,7 @@ flowchart TB
   Solver --> Mode
 ```
 
-This hybrid-system diagram shows both continuous dynamics and discrete event semantics. Each mode owns its own differential equation and guard condition; when a guard is crossed, the event is located, a reset or mode update is applied, and the event is logged before integration resumes. The thermostat hysteresis thresholds make the routing explicit and prevent hidden switching logic.
+The diagram combines continuous dynamics with discrete event semantics. Each mode owns its differential equation and guard condition; when a guard is crossed, the event is located, a reset or mode update is applied, and the event is logged before integration resumes. The thermostat hysteresis thresholds keep the switching logic explicit.
 
 | Hybrid issue | Why it matters | Modeling response |
 |---|---|---|
@@ -120,7 +118,9 @@ This hybrid-system diagram shows both continuous dynamics and discrete event sem
 | Sample-time boundary | Digital logic updates only at ticks | Use Rate Transition or discrete blocks |
 | Algebraic switching | Mode depends instantly on output | Add dynamics, delay, or robust logic |
 
-## Worked example 1: Thermostat with hysteresis
+## Two kinds of event semantics
+
+### A thermostat that remembers its last switch
 
 Problem: A room has thermal model
 
@@ -182,7 +182,7 @@ Checked answer: the temperature should cycle between $19^\circ\mathrm{C}$ and $2
 
 Simulink description: use a Relay block with on/off thresholds or a Stateflow chart for the mode $q$. Multiply $q$ by heater power, sum heat loss and heater input, divide by $C$, and integrate temperature. Scope both $T$ and $q$ so the switching logic is visible.
 
-## Worked example 2: Bouncing ball event reset
+### Locating and resetting a bouncing-ball impact
 
 Problem: A ball is dropped from $h(0)=2\ \mathrm{m}$ with $v(0)=0$. Let $g=9.81\ \mathrm{m/s^2}$ and coefficient of restitution $e=0.8$. Find the first impact time and post-impact velocity.
 
@@ -234,7 +234,7 @@ Checked answer: the post-impact velocity is upward and smaller in magnitude than
 
 Simulink description: use Integrator blocks for velocity and height, an event-enabled reset on height/velocity at impact, or a Stateflow chart to implement the reset. A simple Saturation block is not enough because velocity must change discontinuously according to the restitution law.
 
-## Code
+## Simulating sampled switches and located events in MATLAB
 
 ```matlab
 clear; clc; close all;
@@ -298,7 +298,7 @@ end
 
 The thermostat example uses a simple fixed-step loop, so switch times are approximate. The bouncing ball example uses MATLAB event detection, which locates the ground crossing more accurately and restarts integration after the reset. In Simulink, the same distinction appears between coarse sample-based switching and zero-crossing-aware continuous event handling.
 
-## Common pitfalls
+## Failure modes at switching boundaries
 
 - Letting a solver step past an event and then applying the reset late.
 - Modeling hysteresis as a memoryless function. Hysteresis requires stored mode information.
@@ -307,9 +307,8 @@ The thermostat example uses a simple fixed-step loop, so switch times are approx
 - Forgetting to reset all affected states after an event.
 - Using continuous scopes only; always plot the discrete mode or event flag alongside the continuous state.
 
-## Connections
+<div className="see-also">
 
-- [Discrete-Time and Sampled-Data Systems](/physics/simulation/discrete-time-sampled-data-systems)
-- [Simulink Block Diagrams](/physics/simulation/simulink-block-diagrams)
-- [Step Size, Accuracy, and Stability](/physics/simulation/step-size-accuracy-stability)
-- [Nonlinear Systems and Linearization](/physics/simulation/nonlinear-systems-linearization)
+See also: [Discrete-Time and Sampled-Data Systems](/physics/simulation/discrete-time-sampled-data-systems) · [Simulink Block Diagrams](/physics/simulation/simulink-block-diagrams) · [Step Size, Accuracy, and Stability](/physics/simulation/step-size-accuracy-stability) · [Nonlinear Systems and Linearization](/physics/simulation/nonlinear-systems-linearization)
+
+</div>

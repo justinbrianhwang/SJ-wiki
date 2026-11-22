@@ -9,7 +9,7 @@ Python's built-in containers are one of the main reasons the language feels prod
 
 Choosing the right container is a design decision. If order and mutation matter, use a list. If fixed position and unpacking matter, use a tuple. If uniqueness and membership tests matter, use a set. If lookup by key matters, use a dictionary. Most beginner code becomes simpler when data is put into the container that matches the operation being performed.
 
-## Definitions
+## Four container shapes
 
 A **list** is an ordered, mutable sequence:
 
@@ -49,11 +49,11 @@ Keys must be hashable. Values can be any object.
 
 An **idiom** is a common, readable pattern used by experienced programmers. Examples include `for item in items`, `if key in mapping`, `for index, value in enumerate(items)`, and `for key, value in mapping.items()`.
 
-## Key results
+## Match the container to the operation
 
-The first key result is that container choice follows access pattern. If code repeatedly asks "have I seen this value?", a set is usually better than a list because membership testing is designed for that use. If code repeatedly asks "what value belongs to this name?", a dictionary is the natural structure.
+Container choice follows access pattern. If code repeatedly asks "have I seen this value?", a set is usually better than a list because membership testing is designed for that use. If code repeatedly asks "what value belongs to this name?", a dictionary is the natural structure.
 
-The second result is that list methods divide into mutating and non-mutating operations. `append`, `extend`, `sort`, and `reverse` mutate the list and return `None`. `sorted(items)` returns a new list. Confusing these is a common beginner bug:
+List methods divide into mutating and non-mutating operations. `append`, `extend`, `sort`, and `reverse` mutate the list and return `None`. `sorted(items)` returns a new list. Confusing these is a common beginner bug:
 
 ```python
 numbers = [3, 1, 2]
@@ -61,7 +61,7 @@ result = numbers.sort()
 print(result)  # None
 ```
 
-The third result is that iteration should expose meaning. Use `.items()` for dictionary key-value pairs:
+Iteration should expose meaning. Use `.items()` for dictionary key-value pairs:
 
 ```python
 for name, score in scores.items():
@@ -70,22 +70,20 @@ for name, score in scores.items():
 
 This is clearer than looping over keys and indexing manually.
 
-The fourth result is that mutability controls aliasing. A tuple cannot be resized, but it can contain mutable objects. A list copied with `b = a` is not copied at all; both names refer to the same list. Use `a.copy()` for a shallow copy, and `copy.deepcopy()` only when nested mutable structures require independent copies.
+Mutability controls aliasing. A tuple cannot be resized, but it can contain mutable objects. A list copied with `b = a` is not copied at all; both names refer to the same list. Use `a.copy()` for a shallow copy, and `copy.deepcopy()` only when nested mutable structures require independent copies.
 
-The fifth result is that comprehensions often express container transformations better than manual loops, provided the transformation is simple. A list comprehension builds a list, a set comprehension builds a set, and a dictionary comprehension builds a dictionary.
+Comprehensions often express container transformations better than manual loops, provided the transformation is simple. A list comprehension builds a list, a set comprehension builds a set, and a dictionary comprehension builds a dictionary.
 
-A sixth result is that containers can model records, relationships, and indexes. A list of dictionaries is natural for rows read from JSON or CSV. A dictionary of lists is natural for grouping scores by student. A dictionary whose values are dictionaries can model nested lookup, but it can also become hard to validate. When a container structure needs a long explanation, consider whether a dataclass or small class would make the data shape explicit.
+Containers can model records, relationships, and indexes. A list of dictionaries is natural for rows read from JSON or CSV. A dictionary of lists is natural for grouping scores by student. A dictionary whose values are dictionaries can model nested lookup, but it can also become hard to validate. When a container structure needs a long explanation, consider whether a dataclass or small class would make the data shape explicit.
 
-A seventh result is that ordering should be intentional. Lists and tuples are ordered by position. Dictionaries preserve insertion order in modern Python, but they are still primarily key-value structures. Sets should not be used when meaningful output order is required. If a report must be stable, sort the data at the point of output:
+Ordering should be intentional. Lists and tuples are ordered by position. Dictionaries preserve insertion order in modern Python, but they are still primarily key-value structures. Sets should not be used when meaningful output order is required. If a report must be stable, sort the data at the point of output:
 
 ```python
 for name in sorted(scores):
     print(name, scores[name])
 ```
 
-An eighth result is that container operations often communicate complexity. `if item in seen_set` tells readers that membership is central and expected to be efficient. `for key, value in mapping.items()` tells readers that both sides of a mapping are needed. `name, score = row` tells readers that the tuple has exactly two fields. These small idioms reduce the amount of mental bookkeeping needed to read a program.
-
-## Visual
+Container operations often communicate complexity. `if item in seen_set` tells readers that membership is central and expected to be efficient. `for key, value in mapping.items()` tells readers that both sides of a mapping are needed. `name, score = row` tells readers that the tuple has exactly two fields. These small idioms reduce the amount of mental bookkeeping needed to read a program. The table and decision tree collect the same choices in compact form.
 
 | Container | Ordered | Mutable | Unique values | Main operation | Literal |
 |---|---:|---:|---:|---|---|
@@ -105,7 +103,7 @@ flowchart TD
   F -->|no| H[list]
 ```
 
-## Worked example 1: summarize scores with a dictionary
+## Keeping each student's best score
 
 Problem: given `(student, score)` pairs, keep the highest score for each student.
 
@@ -156,7 +154,7 @@ Checked answer:
 
 The dictionary is the right tool because the central operation is lookup by name.
 
-## Worked example 2: find duplicates with a set
+## Detecting repeated sample IDs
 
 Problem: identify repeated sample IDs while preserving a list of duplicate occurrences.
 
@@ -204,7 +202,7 @@ duplicates == ["A1", "B2", "B2"]
 
 If only the set of duplicated IDs is needed, use `duplicate_ids = set(duplicates)`, which gives `{"A1", "B2"}`.
 
-## Code
+## Group first, then aggregate
 
 ```python
 from collections import defaultdict
@@ -229,7 +227,7 @@ print(grouped)
 print(averages)
 ```
 
-This snippet combines tuples for records, a dictionary for grouping, lists for collected scores, and a dictionary comprehension for final averages.
+The example combines tuples for records, a dictionary for grouping, lists for collected scores, and a dictionary comprehension for final averages.
 
 The same pattern appears in many data-processing scripts. First, choose a record shape for one observation. Second, choose an index or grouping container for the question being asked. Third, compute a derived result in a separate pass. Keeping these stages separate makes it easier to print intermediate structures and to test each part. If grouping is wrong, inspect `grouped`; if averaging is wrong, test `average_scores` with a small hand-built dictionary.
 
@@ -237,7 +235,7 @@ When performance matters, this structure also gives you a clear place to improve
 
 For learning, inspect containers with `repr()` or the debugger rather than only printing final answers. Seeing the intermediate list, set, or dictionary often reveals whether the program grouped by the right key, preserved the needed order, or accidentally reused the same mutable object.
 
-## Common pitfalls
+## Mistakes that change container semantics
 
 - Using a list for repeated membership tests when a set would be clearer and faster.
 - Assigning the result of `list.sort()` and expecting a sorted list. The method mutates and returns `None`.
@@ -247,9 +245,8 @@ For learning, inspect containers with `repr()` or the debugger rather than only 
 - Confusing shallow copies with deep copies in nested structures.
 - Using parallel lists for related fields when a dictionary, tuple, dataclass, or small class would make relationships explicit.
 
-## Connections
+<div className="see-also">
 
-- [Control Flow and Comprehensions](/cs/programming/python/control-flow-and-comprehensions)
-- [Strings and Text Processing](/cs/programming/python/strings-and-text-processing)
-- [Functions, Arguments, and Decorators](/cs/programming/python/functions-arguments-and-decorators)
-- [Standard Library Highlights](/cs/programming/python/standard-library-highlights)
+See also: [Control Flow and Comprehensions](/cs/programming/python/control-flow-and-comprehensions) · [Strings and Text Processing](/cs/programming/python/strings-and-text-processing) · [Functions, Arguments, and Decorators](/cs/programming/python/functions-arguments-and-decorators) · [Standard Library Highlights](/cs/programming/python/standard-library-highlights)
+
+</div>

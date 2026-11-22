@@ -302,10 +302,8 @@ Serialization can instead record missing children. A preorder stream for each no
 
 Several errors recur around the same boundaries. Inorder is assumed to be sorted without a search-tree invariant. Height conventions are mixed inside one formula. Array child indices are used without comparing them to the logical length. A recursive function omits the null base case. A traversal modifies or frees a node before saving links it still needs. A graph with a cycle is passed to tree code, turning finite recursion into an infinite walk.
 
-## Related pages
+<div className="see-also">
 
-- [Binary search trees](/cs/data-structures/binary-search-trees)
-- [Heaps and priority queues](/cs/data-structures/heaps-priority-queues)
-- [Stacks](/cs/data-structures/stacks)
-- [Queues](/cs/data-structures/queues)
-- [Graph traversals](/cs/data-structures/graph-traversals)
+See also: [Binary search trees](/cs/data-structures/binary-search-trees) · [Heaps and priority queues](/cs/data-structures/heaps-priority-queues) · [Stacks](/cs/data-structures/stacks) · [Queues](/cs/data-structures/queues) · [Graph traversals](/cs/data-structures/graph-traversals)
+
+</div>

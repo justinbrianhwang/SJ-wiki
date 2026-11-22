@@ -7,13 +7,9 @@ sidebar_position: 17
 
 Post-quantum cryptography studies public-key algorithms intended to remain secure against attackers with large quantum computers. The motivation is simple: Shor's algorithm would break the factoring and discrete-log assumptions behind RSA, finite-field Diffie-Hellman, elliptic-curve Diffie-Hellman, DSA, Schnorr, and ECDSA if sufficiently large fault-tolerant quantum computers become available. Symmetric cryptography is affected differently: Grover's algorithm gives a quadratic search speedup, so larger symmetric keys and hash outputs can compensate.
 
-![An Alice and Bob quantum-cryptography setup exchanges polarized photons over a channel.](https://commons.wikimedia.org/wiki/Special:FilePath/Alice_e_Bob_%28crittografia_quantistica%29.png)
+The two supplied textbooks predate the current NIST post-quantum standards. Their framework of assumptions, reductions, hybrid encryption, signatures, and symmetric primitives still applies. NIST published FIPS 203, FIPS 204, and FIPS 205 on August 13, 2024, covering ML-KEM, ML-DSA, and SLH-DSA; its [PQC standardization project](https://csrc.nist.gov/Projects/Post-Quantum-Cryptography/Post_Quantum_Cryptography-Standardization) lists HQC and Falcon as selected algorithms whose standards remain in development.
 
-*Figure: Alice and Bob diagrams make communication and adversary models easier to track. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Alice_e_Bob_%28crittografia_quantistica%29.png), Ft1 at Italian Wikipedia, public domain.*
-
-The two supplied textbooks predate the current NIST post-quantum standards, so this page necessarily goes beyond them. It uses their framework of assumptions, reductions, hybrid encryption, signatures, and symmetric primitives, and adds current standardization context from NIST. NIST published FIPS 203, FIPS 204, and FIPS 205 on August 13, 2024, covering ML-KEM, ML-DSA, and SLH-DSA; its PQC process page also notes HQC selection for future standardization on March 11, 2025.
-
-## Definitions
+## The replacement interfaces
 
 A scheme is **post-quantum** if it is intended to resist known attacks by both classical and quantum computers. This does not mean it uses quantum mechanics. Most post-quantum cryptography runs on ordinary computers.
 
@@ -37,13 +33,13 @@ KEMs are the natural public-key component for hybrid encryption and TLS key esta
 
 **Hash-based signatures** rely mainly on hash-function security and can be stateful or stateless. They often have larger signatures but conservative assumptions.
 
-## Key results
+## What quantum algorithms change
 
 RSA and discrete-log public-key systems are not post-quantum because Shor's algorithm solves factoring and discrete logarithms in polynomial time on a suitable quantum computer. That affects encryption, signatures, and key exchange. A future quantum adversary could also record today's traffic and decrypt later if the session key was established using quantum-vulnerable public-key exchange and no post-quantum protection.
 
 Symmetric primitives are more resilient. Grover's algorithm gives a square-root speedup for exhaustive key search, so a 256-bit symmetric key is often discussed as giving about 128-bit quantum search security. Hash collision search has different quantum considerations, but the practical conclusion is still to use conservative output sizes and modern hashes.
 
-Post-quantum migration is mostly a protocol and engineering problem, not just an algorithm swap. Public keys, ciphertexts, and signatures may be larger. Implementations must resist side channels. Protocols must bind algorithm negotiation into transcripts. Certificates and hardware security modules may need new formats and performance budgets.
+Post-quantum migration is a protocol and engineering program, not an isolated algorithm swap. Public keys, ciphertexts, and signatures may be larger. Implementations must resist side channels. Protocols must bind algorithm negotiation into transcripts. Certificates and hardware security modules may need new formats and performance budgets.
 
 Hybrid key exchange combines a classical secret and a post-quantum secret, then derives the final key from both:
 
@@ -67,21 +63,21 @@ Algorithm agility is necessary but risky. Protocols need a way to negotiate new 
 
 The NIST standards do not end research. They provide stable targets for deployment, testing, validation, and interoperability. Cryptanalysis, side-channel research, alternate candidates, and hybrid designs continue. A conservative migration plan treats post-quantum adoption as a staged engineering program: inventory cryptography, identify long-lived secrets, deploy hybrid key exchange where appropriate, update signature infrastructure, and monitor standards updates.
 
-A final caution is that security categories are not interchangeable byte-for-byte with old key sizes. A post-quantum parameter set has a claimed security category, performance profile, failure probability if any, and implementation requirements. Choosing among them is a system decision involving data lifetime, bandwidth, CPU budget, certificate size, and interoperability. The right question is not "which algorithm is newest?" but "which standardized parameter set meets this protocol's threat model and operational limits?"
+Security categories are not interchangeable byte-for-byte with old key sizes. A post-quantum parameter set has a claimed security category, performance profile, failure probability if any, and implementation requirements. Choosing among them is a system decision involving data lifetime, bandwidth, CPU budget, certificate size, and interoperability. The relevant question is which standardized parameter set meets the protocol's threat model and operational limits.
 
-For study purposes, post-quantum cryptography is best viewed as continuity plus new assumptions. The interfaces are still KEMs, signatures, hashes, KDFs, and AEAD channels. What changes is the hardness landscape and the size/performance profile of the public-key pieces.
+The interfaces remain KEMs, signatures, hashes, KDFs, and AEAD channels. The hardness landscape and the size and performance profile of the public-key pieces change.
 
-## Visual
+## Mapping the migration
 
 ```mermaid
 flowchart TD
-  A[Quantum threat] --> B[Shor breaks factoring and discrete log]
-  A --> C[Grover weakens brute-force search]
-  B --> D[Replace RSA/DH/ECDSA]
-  C --> E[Use larger symmetric/hash parameters]
-  D --> F[ML-KEM for key establishment]
-  D --> G[ML-DSA / SLH-DSA for signatures]
-  F --> H[Hybrid protocols during migration]
+  A["Quantum threat"] --> B["Shor breaks factoring and discrete log"]
+  A --> C["Grover weakens brute-force search"]
+  B --> D["Replace RSA, DH, and ECDSA"]
+  C --> E["Use larger symmetric and hash parameters"]
+  D --> F["ML-KEM for key establishment"]
+  D --> G["ML-DSA or SLH-DSA for signatures"]
+  F --> H["Hybrid protocols during migration"]
   G --> H
 ```
 
@@ -93,11 +89,9 @@ flowchart TD
 | Code-based | Classic McEliece, HQC | KEM/encryption | long history, often large keys |
 | Symmetric/hash | AES-256, SHA-384/SHA-512 | data protection | mostly parameter scaling |
 
-## Worked example 1: Grover-style key-size intuition
+## Reading symmetric key sizes under Grover search
 
-Problem: explain why AES-128 is often said to offer about 64-bit security against ideal Grover search, while AES-256 offers about 128-bit security.
-
-Method:
+AES-128 is often said to offer about 64-bit security against ideal Grover search, while AES-256 offers about 128-bit security.
 
 1. Classical exhaustive search over a $k$-bit key space takes about:
 
@@ -127,13 +121,11 @@ $$
 2^{256/2}=2^{128}.
 $$
 
-Checked answer: the rough Grover exponent halves the symmetric key length. This is why 256-bit symmetric keys are a conservative post-quantum choice for long-term protection.
+The rough Grover exponent halves the symmetric key length. A 256-bit symmetric key is therefore a conservative post-quantum choice for long-term protection.
 
-## Worked example 2: hybrid key derivation
+## Combining classical and post-quantum secrets
 
-Problem: a protocol obtains a classical ECDHE secret `C` and a post-quantum KEM secret `P`. Show how to derive a final session key while binding the handshake transcript `T`.
-
-Method:
+A protocol obtains a classical ECDHE secret `C` and a post-quantum KEM secret `P`. The final session key must also bind the handshake transcript `T`.
 
 1. Concatenate secrets in an unambiguous order:
 
@@ -157,9 +149,9 @@ $$
 
 5. Downgrade check: the transcript must include the offered and selected algorithms. Otherwise an attacker might strip the post-quantum component.
 
-Checked answer: derive the final key from both secrets and the transcript. Hybridization without transcript binding is incomplete.
+The final key derives from both secrets and the transcript. Hybridization without transcript binding is incomplete.
 
-## Code
+## An explicit hybrid HKDF input
 
 ```python
 import hashlib
@@ -187,7 +179,7 @@ info = b"hybrid key" + hashlib.sha256(transcript).digest()
 print(hkdf_expand(prk, info, 32).hex())
 ```
 
-## Common pitfalls
+## Migration errors beyond algorithm choice
 
 - Saying "quantum computers break all cryptography." They mainly threaten current public-key assumptions; symmetric cryptography can be strengthened.
 - Assuming post-quantum means quantum hardware is required. These are classical algorithms resisting quantum attacks.
@@ -196,9 +188,8 @@ print(hkdf_expand(prk, info, 32).hex())
 - Treating newly standardized algorithms as immune to implementation side channels.
 - Using hybrid key exchange without downgrade protection.
 
-## Connections
+<div className="see-also">
 
-- [Number theory background](/cs/cryptography/number-theory-background)
-- [Discrete logarithms and Diffie-Hellman](/cs/cryptography/discrete-log-diffie-hellman)
-- [Public-key encryption](/cs/cryptography/public-key-encryption-elgamal-hybrid)
-- [TLS protocol overview](/cs/cryptography/tls-protocol-overview)
+See also: [Number theory background](/cs/cryptography/number-theory-background) · [Discrete logarithms and Diffie-Hellman](/cs/cryptography/discrete-log-diffie-hellman) · [Public-key encryption](/cs/cryptography/public-key-encryption-elgamal-hybrid) · [TLS protocol overview](/cs/cryptography/tls-protocol-overview)
+
+</div>

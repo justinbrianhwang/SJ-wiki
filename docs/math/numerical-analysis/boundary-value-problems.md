@@ -9,7 +9,15 @@ Boundary value problems prescribe conditions at two or more points instead of gi
 
 Two standard approaches are shooting and finite differences. Shooting guesses missing initial data and solves IVPs until the far boundary matches. Finite differences replace derivatives by algebraic equations at grid points, producing a linear or nonlinear system for all unknown values at once.
 
-## Definitions
+A BVP can fail before discretization. Depending on the differential equation and boundary conditions, it may have one solution, no solution, or many. For example,
+
+$$
+y''+y=0,\qquad y(0)=0,\qquad y(\pi)=0
+$$
+
+has the family $y(x)=C\sin x$. Replacing the right boundary by $y(\pi)=1$ gives no solution. A small residual from a numerical method has meaning only after the continuous problem is known or expected to be well posed.
+
+## Turning endpoint conditions into unknowns
 
 A second-order two-point boundary value problem has the form
 
@@ -33,6 +41,40 @@ $$
 
 The value of $s$ is adjusted until the computed endpoint satisfies $y(b;s)=\beta$.
 
+Define the shooting residual
+
+$$
+F(s)=y(b;s)-\beta.
+$$
+
+Bisection can be used when a sign-changing bracket is available and $F$ is continuous. The secant method avoids derivatives and usually converges faster. Newton's method needs $F'(s)$, which can be obtained from a sensitivity equation rather than a finite difference.
+
+For a general equation $y''=f(x,y,y')$, let
+
+$$
+z(x)=\frac{\partial y(x;s)}{\partial s}.
+$$
+
+Differentiating the ODE with respect to $s$ gives
+
+$$
+z''=f_y(x,y,y')z+f_{y'}(x,y,y')z',
+$$
+
+with initial conditions
+
+$$
+z(a)=0,\qquad z'(a)=1.
+$$
+
+Then $F'(s)=z(b)$, and Newton updates the slope by
+
+$$
+s_{\text{new}}=s-\frac{y(b;s)-\beta}{z(b)}.
+$$
+
+The state and sensitivity equations can be integrated together. If $z(b)$ is tiny, the endpoint barely responds to the initial slope and Newton's step becomes unreliable; this is a conditioning warning for shooting.
+
 A finite difference method uses grid points $x_i=a+ih$ and replaces derivatives by formulas such as
 
 $$
@@ -41,7 +83,27 @@ $$
 
 The boundary values are known, and the interior values become unknowns in a system of algebraic equations.
 
-## Key results
+The centered formula follows from Taylor expansions:
+
+$$
+\begin{aligned}
+y(x_i+h)&=y_i+hy_i'+\frac{h^2}{2}y_i''
++\frac{h^3}{6}y_i'''+\frac{h^4}{24}y_i^{(4)}+O(h^5),\\
+y(x_i-h)&=y_i-hy_i'+\frac{h^2}{2}y_i''
+-\frac{h^3}{6}y_i'''+\frac{h^4}{24}y_i^{(4)}+O(h^5).
+\end{aligned}
+$$
+
+Adding cancels the odd derivatives. After rearrangement,
+
+$$
+\frac{y(x_i-h)-2y(x_i)+y(x_i+h)}{h^2}
+=y''(x_i)+\frac{h^2}{12}y^{(4)}(x_i)+O(h^4).
+$$
+
+The local truncation error is second order. Under stability and sufficient smoothness, the global nodal error is also $O(h^2)$.
+
+## Choosing between shooting and a mesh solve
 
 For linear problems of the form
 
@@ -51,26 +113,64 @@ $$
 
 finite differences usually lead to a tridiagonal linear system. This structure should be exploited with a tridiagonal solver rather than dense elimination.
 
+Writing the coefficients shows the structure. Substitute centered differences for both derivatives:
+
+$$
+\frac{w_{i-1}-2w_i+w_{i+1}}{h^2}
+=p_i\frac{w_{i+1}-w_{i-1}}{2h}+q_iw_i+r_i.
+$$
+
+Collecting terms gives
+
+$$
+\left(1+\frac{hp_i}{2}\right)w_{i-1}
++(-2-h^2q_i)w_i
++\left(1-\frac{hp_i}{2}\right)w_{i+1}
+=h^2r_i.
+$$
+
+Each row touches only a node and its two neighbors. Dirichlet values at the ends move into the first and last right-hand-side entries.
+
 Shooting is intuitive and easy to implement when the IVP is stable with respect to the missing slope. It can be unreliable for unstable or stiff problems because small changes in the guessed slope may cause huge endpoint changes. Multiple solutions can also make the shooting residual nonlinear and difficult.
+
+Multiple shooting divides the interval into several segments and introduces unknown initial data at each segment. Continuity equations join neighboring trajectories. This costs a larger nonlinear system, but it limits the exponential growth that a single unstable IVP can accumulate across the whole interval.
 
 Finite difference methods are more global. For nonlinear BVPs, the finite difference equations form a nonlinear system that can be solved by Newton's method. The Jacobian is often banded because each equation involves only neighboring grid values.
 
+If the discrete equations are denoted by $\mathbf{F}(\mathbf{w})=\mathbf{0}$, Newton's method solves
+
+$$
+J(\mathbf{w}^{(k)})\boldsymbol{\delta}^{(k)}
+=-\mathbf{F}(\mathbf{w}^{(k)})
+$$
+
+and sets $\mathbf{w}^{(k+1)}=\mathbf{w}^{(k)}+\boldsymbol{\delta}^{(k)}$. The initial guess matters when several solutions exist. Continuation can help: solve an easier nearby problem first, then vary a parameter gradually and reuse each solution as the next initial guess.
+
 Boundary conditions affect accuracy. A second-order centered difference in the interior may not give second-order global accuracy if boundary approximations are only first order.
 
-A reliable way to use these results is to keep the analysis tied to the actual numerical question rather than to the formula alone. For boundary value problems, the input record should include the differential equation, boundary conditions, mesh, and choice of shooting or finite differences. Without that record, two computations that look similar on paper may have different numerical meanings. The same formula can be a safe production tool in one scaling and a fragile experiment in another. This is why the examples on this page show the intermediate arithmetic: the goal is not only to reach a number, but to expose what assumptions made that number meaningful.
+Dirichlet conditions specify values. Neumann conditions specify derivatives, while Robin conditions combine value and derivative:
 
-The next record is the verification record. Useful diagnostics for this topic include endpoint mismatch for shooting or algebraic residuals for finite difference equations. A diagnostic should be chosen before the computation is trusted, not after a pleasing answer appears. When an exact answer is unavailable, compare two independent approximations, refine the mesh or tolerance, check a residual, or test the method on a neighboring problem with known behavior. If several diagnostics disagree, treat the disagreement as information about conditioning, stability, or implementation rather than as a nuisance to be averaged away.
+$$
+\alpha y(a)+\beta y'(a)=\gamma.
+$$
 
-The cost record matters as well. In this topic the dominant costs are usually IVP solves, nonlinear iterations, and banded linear solves. Numerical analysis is full of methods that are mathematically attractive but computationally mismatched to the problem size. A dense factorization may be acceptable for a classroom matrix and impossible for a PDE grid. A high-order rule may use fewer steps but more expensive stages. A guaranteed method may take many iterations but provide a bound that a faster method cannot. The right comparison is therefore cost to reach a verified tolerance, not order or elegance in isolation.
+A first-order one-sided derivative,
 
-Finally, every method here has a recognizable failure mode: unstable shooting directions, boundary discretization errors, and multiple solutions. These failures are not edge cases to memorize; they are signals that the hypotheses behind the result have been violated or that a different numerical model is needed. A good implementation makes such failures visible through exceptions, warnings, residual reports, or conservative stopping rules. A good hand solution does the same thing in prose by naming the assumption being used and checking it at the point where it matters.
+$$
+y'(a)\approx\frac{w_1-w_0}{h},
+$$
 
-For study purposes, the most useful habit is to separate four layers: the continuous mathematical problem, the discrete approximation, the algebraic or iterative algorithm used to compute it, and the diagnostic used to judge the result. Many mistakes come from mixing these layers. A small algebraic residual may not mean a small modeling error. A small step-to-step change may not mean the discrete equations are solved. A high-order truncation formula may not help when the data are noisy or the arithmetic is unstable. Keeping the layers separate makes the results on this page portable to larger examples.
+can reduce the overall order. A second-order formula such as
 
-A useful BVP check is to compare the boundary residual with the interior residual. If the boundary values are satisfied to high accuracy while the interior equations are poor, the mesh equations or nonlinear solve are suspect. If the interior residual is small but the boundary residual is large, the shooting parameter, boundary insertion, or endpoint discretization should be inspected first.
- Mesh endpoints and unknown indexing should be written down, because off-by-one grid errors are common in BVP codes.
+$$
+y'(a)\approx\frac{-3w_0+4w_1-w_2}{2h}
+$$
 
-## Visual
+preserves second-order consistency but widens the first matrix row. Ghost points offer another route: extend the centered stencil beyond the boundary and eliminate the ghost value with the boundary equation.
+
+The relevant costs are IVP solves for shooting and banded linear solves or Newton steps for finite differences. Endpoint mismatch is the natural shooting diagnostic; the algebraic residual and mesh-refinement behavior check a finite difference solution.
+
+A useful BVP check is to compare the boundary residual with the interior residual. If the boundary values are satisfied to high accuracy while the interior equations are poor, the mesh equations or nonlinear solve are suspect. If the interior residual is small but the boundary residual is large, inspect the shooting parameter, boundary insertion, or endpoint discretization first. Mesh endpoints and unknown indexing should be written down because off-by-one grid errors are common in BVP codes.
 
 ```mermaid
 flowchart TB
@@ -102,7 +202,7 @@ flowchart TB
   Check --> Solution(("BVP approximation"))
 ```
 
-The BVP diagram separates shooting from finite differences because their state and failure modes are different. Shooting turns the BVP into repeated IVP solves driven by an endpoint residual, while finite differences build a grid, stencil equations, boundary insertions, and a global algebraic solve. The shared verification node requires both boundary and interior residual checks.
+Shooting becomes a sequence of IVP solves driven by an endpoint residual. Finite differences instead build a grid, stencil equations, boundary insertions, and a global algebraic solve. Both routes need boundary and interior residual checks.
 
 | Method | Unknowns | Strength | Weakness |
 |---|---|---|---|
@@ -111,7 +211,7 @@ The BVP diagram separates shooting from finite differences because their state a
 | Nonlinear finite difference | grid values | handles nonlinear BVPs globally | requires Newton or nonlinear solver |
 | Collocation | coefficients or nodal values | high accuracy | more complex assembly |
 
-## Worked example 1: finite difference for $y''=0$
+## A one-node finite difference solve
 
 **Problem.** Solve
 
@@ -151,7 +251,7 @@ $$
 
 **Checked answer.** The exact solution is the line $y=1+2x$, so $y(0.5)=2$. The finite difference value is exact for this linear solution.
 
-## Worked example 2: shooting slope for a forced equation
+## Recovering the missing shooting slope
 
 **Problem.** For
 
@@ -199,7 +299,109 @@ So $s=\pi$.
 
 **Checked answer.** Shooting must use $y'(0)=\pi$ to satisfy the right boundary. The resulting solution is $y(x)=\sin(\pi x)$.
 
-## Code
+For this linear equation, the shooting residual is affine in the missing slope. Let $u$ solve the equation with $u(0)=0$, $u'(0)=0$, and let $v$ solve the homogeneous equation $v''=0$ with $v(0)=0$, $v'(0)=1$. Then
+
+$$
+y(x;s)=u(x)+sv(x).
+$$
+
+Here $u(x)=\sin(\pi x)-\pi x$, $v(x)=x$, so
+
+$$
+y(1;s)=-\pi+s.
+$$
+
+The boundary equation $y(1;s)=0$ gives $s=\pi$ in one scalar solve. Linear shooting generally needs only two IVP integrations: one particular trajectory and one homogeneous sensitivity trajectory.
+
+## Mesh refinement as an accuracy check
+
+Suppose a centered finite difference method is second order and gives values $W_h$ and $W_{h/2}$ at a grid point common to both meshes. Write
+
+$$
+W_h=y+Ch^2+O(h^4),
+\qquad
+W_{h/2}=y+\frac{Ch^2}{4}+O(h^4).
+$$
+
+Their difference estimates three quarters of the coarse-grid leading error:
+
+$$
+W_{h/2}-W_h\approx-\frac34Ch^2.
+$$
+
+An improved estimate is
+
+$$
+W_{\mathrm{ext}}
+=W_{h/2}+\frac{W_{h/2}-W_h}{3}.
+$$
+
+With three meshes, the observed ratio
+
+$$
+\frac{\|W_h-W_{h/2}\|}
+{\|W_{h/2}-W_{h/4}\|}
+$$
+
+should approach $4$ in the asymptotic second-order regime. A very different ratio can indicate a coarse mesh, a nonsmooth solution, a first-order boundary stencil, or an algebraic solve that has not converged tightly enough.
+
+## Collocation and finite elements
+
+Finite differences are not the only global discretization. Collocation represents the unknown by a piecewise polynomial and forces the differential equation to hold at selected points. Continuity conditions join neighboring pieces, and an adaptive collocation solver can refine intervals where a residual estimate is large. The output is a continuous approximation rather than values only at grid nodes.
+
+Finite elements begin from a weak form. For a problem such as $-y''=f$ with zero endpoint values, multiply by a test function $v$ and integrate:
+
+$$
+\int_a^b -y''v\,dx
+=\int_a^b fv\,dx.
+$$
+
+Integration by parts transfers one derivative from $y$:
+
+$$
+\int_a^b y'v'\,dx
+=\int_a^b fv\,dx,
+$$
+
+because the boundary term vanishes for suitable test functions. Piecewise linear trial and test functions then produce a sparse system. The weak form needs fewer classical derivatives and extends naturally to irregular geometries in higher-dimensional PDEs.
+
+Collocation, finite differences, and finite elements can all reach high accuracy, but their error indicators and solution representations differ. A finite difference residual is tied to a stencil. A collocation residual can be evaluated between nodes. A finite element method has energy-norm and elementwise estimators derived from the weak form. Comparing methods only by the number of stored unknowns overlooks these differences.
+
+## Conditioning and boundary layers
+
+A well-posed continuous problem can still yield a difficult discrete system. Fine meshes introduce coefficients proportional to $1/h^2$, and the condition number of a basic second-derivative matrix grows as the mesh is refined. Stable banded solvers handle moderate one-dimensional problems well, while large systems may need preconditioned iterative methods.
+
+Singularly perturbed equations can contain boundary layers: thin regions where the solution changes rapidly near an endpoint. A uniform grid fine enough to resolve the layer wastes points elsewhere. Shooting may also be unstable because one solution mode grows exponentially while another decays. Nonuniform meshes, fitted transformations, or methods designed for the perturbation are preferable.
+
+Residual-based mesh adaptation estimates where the differential equation is poorly satisfied and inserts points there. Refinement should consider both the residual and the mesh scale; a large derivative alone does not prove large error. After changing the mesh, interpolating the old solution supplies an initial guess for a new nonlinear solve.
+
+## A mixed boundary condition by a ghost point
+
+Consider $y''=0$ on $[0,1]$ with $y'(0)=2$ and $y(1)=3$. The exact solution is $y=1+2x$. On a grid with spacing $h$, introduce a ghost value $w_{-1}$ and use centered formulas at the left endpoint:
+
+$$
+\frac{w_1-w_{-1}}{2h}=2,
+\qquad
+\frac{w_{-1}-2w_0+w_1}{h^2}=0.
+$$
+
+The derivative condition gives
+
+$$
+w_{-1}=w_1-4h.
+$$
+
+Substitution into the differential equation gives
+
+$$
+2w_1-2w_0-4h=0,
+$$
+
+or $w_1-w_0=2h$. This is the correct slope relation. Together with the interior second-difference equations and $w_N=3$, it recovers the linear solution exactly.
+
+The ghost value is not an extra physical unknown after elimination. It is a bookkeeping device that lets the centered interior formula reach the boundary. Signs in the normal derivative need attention in higher dimensions because the outward normal points in opposite coordinate directions at opposite ends.
+
+## Assembling the finite difference system
 
 ```python
 import numpy as np
@@ -228,7 +430,7 @@ xs, ys = finite_difference_poisson(0.0, 1.0, 0.0, 0.0,
 print(max(abs(ys - np.sin(np.pi * xs))))
 ```
 
-## Common pitfalls
+## Boundary and stability failures
 
 - Treating a BVP like an IVP without accounting for the far boundary condition.
 - Using shooting on an unstable IVP and blaming the root finder for sensitivity.
@@ -236,9 +438,20 @@ print(max(abs(ys - np.sin(np.pi * xs))))
 - Destroying tridiagonal or banded structure with dense assembly.
 - Applying centered interior formulas but lower-order boundary formulas without checking global accuracy.
 
-## Connections
+A small algebraic residual alone does not measure discretization error. It says the computed grid values solve the discrete equations, not that those equations approximate the continuous solution accurately on the chosen mesh. Residual checks and mesh refinement answer different questions and both belong in a trustworthy calculation.
 
-- [Euler Taylor and Runge Kutta methods](/math/numerical-analysis/euler-taylor-runge-kutta)
-- [nonlinear systems](/math/numerical-analysis/nonlinear-systems)
-- [matrix factorizations and special systems](/math/numerical-analysis/matrix-factorizations-special-systems)
-- [finite difference methods for PDEs](/math/numerical-analysis/finite-difference-pdes)
+Linear boundary value operators also have a null-space test. If the corresponding homogeneous problem has only the zero solution, a compatible linear problem has at most one solution. A nonzero homogeneous solution signals either nonuniqueness or a solvability condition on the forcing. Discretizations inherit an analogous warning through a singular or nearly singular system matrix.
+
+For nonlinear problems, convergence of Newton's method proves only that one discrete solution was found. Different initial guesses may converge to different branches. Parameter continuation, plots of a diagnostic against the parameter, and repeated solves from distinct initial guesses help reveal multiplicity. Mesh refinement should track the same branch; a sudden jump may be a branch switch rather than ordinary discretization error.
+
+Boundary residuals need units and scaling just as interior residuals do. A derivative condition and a value condition can have very different numerical magnitudes. Scaling each equation by a characteristic size prevents the nonlinear solver from satisfying one class of conditions while effectively ignoring another.
+
+Finally, a visually smooth curve through the boundary values is weak evidence. The differential operator may amplify a small shape error, especially when second derivatives are involved. Verification should evaluate the equation and boundary conditions quantitatively, then repeat on a finer mesh or with an independent method when possible.
+
+Adaptive BVP meshes should retain the boundary points exactly. Moving or smoothing endpoints changes the stated conditions. Interior node movement is acceptable when the solution is transferred consistently and the new discrete equations are rebuilt. Reporting the final mesh is useful because two approximations with the same number of nodes may have very different resolution near a layer.
+
+<div className="see-also">
+
+See also: [Euler Taylor and Runge Kutta methods](/math/numerical-analysis/euler-taylor-runge-kutta) · [nonlinear systems](/math/numerical-analysis/nonlinear-systems) · [matrix factorizations and special systems](/math/numerical-analysis/matrix-factorizations-special-systems) · [finite difference methods for PDEs](/math/numerical-analysis/finite-difference-pdes)
+
+</div>

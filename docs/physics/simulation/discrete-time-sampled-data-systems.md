@@ -9,7 +9,7 @@ Discrete-time models update at separated time instants rather than evolving over
 
 Continuous simulation and discrete-time modeling meet in several places. Numerical integration itself creates a difference equation. Digital controllers sample sensor data and hold actuator commands. Simulink models often combine continuous plant blocks with discrete controllers. Understanding the difference between solver step size, sample time, and output logging interval prevents many simulation errors.
 
-## Definitions
+## From continuous dynamics to a difference equation
 
 A discrete-time state model is
 
@@ -55,7 +55,7 @@ $$
 
 The $z$-transform plays a role in discrete-time analysis similar to the Laplace transform in continuous time.
 
-## Key results
+## Pole mapping, aliasing, and sample-time choices
 
 Discrete-time stability for an LTI system requires all eigenvalues of $A_d$ to lie inside the unit circle:
 
@@ -93,7 +93,7 @@ Discrete-time models are also useful for systems whose natural clock is not a nu
 
 When comparing continuous and discrete simulations, use the same input convention. Exact zero-order hold conversion assumes the input is constant over each interval. A first-order hold assumes linear interpolation between samples. Impulse-invariant, matched pole-zero, and bilinear transformations preserve different features of the continuous model. No conversion is universally best; the appropriate one depends on whether time response, frequency response, controller implementation, or numerical convenience is the priority.
 
-In Simulink, sampled-data diagrams should make rate changes visible. A continuous plant feeding a discrete controller usually needs a sampler or Zero-Order Hold interpretation at the interface. A discrete controller feeding a continuous actuator should state whether the command is held, filtered, delayed, or interpolated. Rate Transition blocks are not just cosmetic in multi-rate models; they document and manage the timing boundary between signals that update at different rates.
+In Simulink, sampled-data diagrams should show rate changes explicitly. A continuous plant feeding a discrete controller usually needs a sampler or Zero-Order Hold interpretation at the interface. A discrete controller feeding a continuous actuator should state whether the command is held, filtered, delayed, or interpolated. Rate Transition blocks document and manage the timing boundary between signals that update at different rates.
 
 Time-response plots for sampled-data systems should show samples when samples matter. Connecting sample points with a smooth line can suggest behavior between samples that the discrete model does not define. A useful report often overlays the continuous response, the held input, and the sampled output. This makes it clear which behavior belongs to the physical plant, which belongs to the digital algorithm, and which belongs only to plotting interpolation.
 
@@ -101,7 +101,7 @@ Initial conditions also need translation. A continuous plant state $x(0)$ become
 
 For final-value checks, compare discrete equilibria directly rather than assuming the continuous formula survived discretization. Exact zero-order hold preserves the constant-input equilibrium for nonsingular first-order examples, but approximate methods or added delays may shift the apparent steady value.
 
-## Visual
+## Timing boundaries in the sampled-data loop
 
 ```mermaid
 flowchart LR
@@ -127,7 +127,7 @@ flowchart LR
   Check --> Result(("sampled-data simulation"))
 ```
 
-This sampled-data architecture shows every timing boundary: sensor filtering, sampling, controller memory, zero-order hold, and continuous plant response. The conversion subgraph separates exact zero-order-hold discretization from approximate methods such as Euler or bilinear transforms. The loop makes the I/O contract explicit: the controller only sees $y[k]$, while the plant receives a held continuous input between ticks.
+The architecture marks sensor filtering, sampling, controller memory, zero-order hold, and continuous plant response. The conversion subgraph separates exact zero-order-hold discretization from approximate methods such as Euler or bilinear transforms. The controller sees only $y[k]$, while the plant receives a held continuous input between ticks.
 
 | Concept | Continuous time | Discrete time |
 |---|---|---|
@@ -138,7 +138,7 @@ This sampled-data architecture shows every timing boundary: sensor filtering, sa
 | Frequency uniqueness | Nonperiodic in $\omega$ | Periodic in digital frequency |
 | Input holding | Not needed | Must define between samples for plant input |
 
-## Worked example 1: Exact discretization of a first-order plant
+## Exact ZOH discretization of a first-order plant
 
 Problem: A continuous plant is
 
@@ -198,7 +198,7 @@ which matches the continuous equilibrium $0=-2\bar{x}+3$. The sampled time-respo
 
 Simulink description: use a Discrete State-Space block with sample time `0.1`, $A_d=0.8187$, $B_d=0.2719$, $C=1$, and $D=0$. A Zero-Order Hold block should appear between a discrete controller and continuous plant when modeling sampled-data behavior explicitly.
 
-## Worked example 2: Euler discretization and stability
+## When forward Euler invents an instability
 
 Problem: Approximate
 
@@ -246,7 +246,7 @@ Checked answer: the continuous system is stable, but the chosen Euler step is to
 
 Simulink description: a fixed-step Euler solver with step `0.3` on the continuous model can show the numerical instability. A Discrete Transfer Fcn or Discrete State-Space block using exact `c2d` coefficients should show the stable sampled response.
 
-## Code
+## Comparing exact sampling and Euler in MATLAB
 
 ```matlab
 clear; clc; close all;
@@ -289,9 +289,9 @@ legend('Location', 'best');
 title('Discrete stability comparison');
 ```
 
-The first plot should show red sample points sitting on the continuous curve. The second should show Euler diverging while exact sampling decays. This distinction is central in simulation: discretization is a modeling and numerical decision, not a harmless formatting change.
+The first plot should show red sample points sitting on the continuous curve. The second should show Euler diverging while exact sampling decays. Discretization changes both the model and its numerical behavior.
 
-## Common pitfalls
+## Timing and interpretation errors
 
 - Confusing solver fixed step with a digital controller's sample period.
 - Logging too slowly and then interpreting aliased plots as physical oscillations.
@@ -300,9 +300,8 @@ The first plot should show red sample points sitting on the continuous curve. Th
 - Forgetting the hold assumption when converting between continuous and discrete models.
 - Mixing blocks with inherited sample times without checking the compiled sample-time display.
 
-## Connections
+<div className="see-also">
 
-- [Z-Transform and ROC](/physics/signals-systems/z-transform-roc)
-- [Sampling, Aliasing, and Reconstruction](/physics/signals-systems/sampling-aliasing-reconstruction)
-- [Step Size, Accuracy, and Stability](/physics/simulation/step-size-accuracy-stability)
-- [Hybrid Systems and Event Handling](/physics/simulation/hybrid-systems-event-handling)
+See also: [Z-Transform and ROC](/physics/signals-systems/z-transform-roc) · [Sampling, Aliasing, and Reconstruction](/physics/signals-systems/sampling-aliasing-reconstruction) · [Step Size, Accuracy, and Stability](/physics/simulation/step-size-accuracy-stability) · [Hybrid Systems and Event Handling](/physics/simulation/hybrid-systems-event-handling)
+
+</div>

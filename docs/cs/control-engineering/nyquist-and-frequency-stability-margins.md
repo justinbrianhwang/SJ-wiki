@@ -5,15 +5,11 @@ sidebar_position: 14
 
 # Nyquist and Frequency Stability Margins
 
-Nyquist analysis is the frequency-domain stability test that complements Routh-Hurwitz and root locus. Instead of forming a Routh table or drawing pole paths, it studies how the open-loop transfer function maps a contour around the right half-plane. Nise uses Nyquist to connect encirclements of the critical point $-1+j0$ with closed-loop stability, then defines gain and phase margins as practical robustness measures.
-
-![A Bode plot shows gain and phase changing with frequency.](https://commons.wikimedia.org/wiki/Special:FilePath/Bodeplot.png)
-
-*Figure: Bode plots connect frequency-response calculations to a standard engineering visualization. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bodeplot.png), Stw and Vukg, public domain.*
+Nyquist analysis is the frequency-domain stability test that complements Routh-Hurwitz and root locus. Instead of forming a Routh table or drawing pole paths, it studies how the open-loop transfer function maps a contour around the right half-plane. Encirclements of the critical point $-1+j0$ determine closed-loop stability; gain and phase margins summarize robustness near that boundary.
 
 The power of Nyquist is that it reasons from open-loop frequency response while accounting for open-loop unstable poles. Bode plots are easier to read for routine design, but Nyquist gives the underlying stability logic and handles cases where open-loop right-half-plane poles matter.
 
-## Definitions
+## Encirclements, poles, and the critical point
 
 For a negative-feedback system with loop transfer function
 
@@ -61,7 +57,7 @@ $$
 PM=180^\circ+\angle L(j\omega_{gc}).
 $$
 
-## Key results
+## Reading gain and phase margins from the loop response
 
 For open-loop stable systems, the Nyquist stability condition often reduces to a simple rule: the Nyquist plot should not encircle $-1+j0$. If it passes close to $-1$, the closed-loop system may be stable but fragile. Margins quantify that fragility.
 
@@ -73,6 +69,8 @@ Margins are not merely numerical rituals:
 | phase margin | magnitude $=1$ | allowable extra lag before instability |
 | crossover frequency | magnitude $=1$ | approximate closed-loop speed location |
 | distance to $-1$ | Nyquist plot | combined gain-phase robustness |
+
+## What the margins do and do not guarantee
 
 Closed-loop transient behavior is related but not identical to margins. A low phase margin often corresponds to high overshoot and oscillation. A larger phase margin often gives more damping. However, exact time-domain predictions require more than margin alone, especially for high-order systems or nonminimum-phase plants.
 
@@ -102,7 +100,7 @@ In design reviews, a Nyquist or margin calculation should identify the loop brok
 
 Nyquist plots should be drawn with enough frequency labels to show direction. Encirclement count depends on how the curve is traversed as frequency increases. Without arrows or frequency markers, a plot may show shape but not the information needed for the criterion.
 
-## Visual
+## Counting encirclements in the Nyquist plane
 
 ```text
 Nyquist idea near the critical point
@@ -125,7 +123,7 @@ Im
 | one open-loop RHP pole and one counterclockwise encirclement | sign convention cancels $P$ | can be stable |
 | plot crosses $-1$ | characteristic root on $j\omega$ axis | marginal boundary |
 
-## Worked example 1: gain and phase margins
+## Finding crossover and phase margin analytically
 
 Problem: For
 
@@ -201,7 +199,7 @@ $$
 
 Checked answer: $\omega_{gc}\approx2.86$ rad/s and $PM\approx35^\circ$.
 
-## Worked example 2: time-delay phase loss
+## Converting delay into lost phase margin
 
 Problem: A loop has phase margin $50^\circ$ at crossover frequency $\omega_{gc}=4$ rad/s. A pure delay $T$ is added. What delay reduces the phase margin to $30^\circ$?
 
@@ -239,7 +237,7 @@ $$
 
 Checked answer: a delay of about $87$ ms reduces phase margin from $50^\circ$ to $30^\circ$ at $4$ rad/s.
 
-## Code
+## Locating crossover numerically
 
 ```python
 import numpy as np
@@ -262,7 +260,7 @@ delay = np.deg2rad(20) / 4
 print("delay for 20 deg phase loss at 4 rad/s:", delay)
 ```
 
-## Common pitfalls
+## Margin calculations that give false confidence
 
 - Using closed-loop transfer function for Nyquist margins instead of open-loop loop transfer $L(s)$.
 - Forgetting open-loop right-half-plane poles in the Nyquist encirclement count.
@@ -271,10 +269,14 @@ print("delay for 20 deg phase loss at 4 rad/s:", delay)
 - Ignoring time delay because it has unity magnitude. Delay can remove phase margin rapidly.
 - Assuming a comfortable margin fixes actuator saturation or nonlinear behavior.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Bode plots](/cs/control-engineering/bode-plots-and-frequency-response) provide the magnitude and phase data used to read margins.
 - [Frequency-response design](/cs/control-engineering/frequency-response-compensator-design) shapes margins with lead and lag networks.
 - [Routh-Hurwitz stability](/cs/control-engineering/routh-hurwitz-stability) is the polynomial-domain stability counterpart.
 - [Complex functions](/math/engineering-math/complex-functions-and-analyticity) underlies contour mapping arguments.
 - [Digital control](/cs/control-engineering/digital-control-sampling-and-z-transform) maps stability from the $s$-plane to the $z$-plane.
+
+</div>

@@ -5,59 +5,37 @@ sidebar_position: 1
 
 # Probability and Random Variables
 
-This section is a rigorous probability course map following MIT 18.440 Probability and Random Variables, Scott Sheffield, Spring 2014. It begins with counting and axioms, then builds random variables, expectation, variance, standard distributions, joint laws, transforms, limit theorems, Markov chains, entropy, martingales, and the risk-neutral probability viewpoint used in Black-Scholes.
+This course map follows Scott Sheffield's MIT 18.440 *Probability and Random Variables* from Spring 2014. Counting and axioms lead into random variables, expectation, standard distributions, joint laws, transforms, limit theorems, Markov chains, entropy, martingales, and the risk-neutral viewpoint behind Black–Scholes.
 
-The notes are meant to sit between a short applied probability introduction and a measure-theoretic graduate course. They use finite and countable models when possible, continuous densities when needed, and proof sketches for the structural results that students repeatedly use. The section also links outward to the shorter `/math/probability/` pages, discrete mathematics probability, and statistics when the same ideas appear in a different style.
+The level sits between a short applied introduction and a measure-theoretic graduate course. Finite and countable models come first, continuous densities enter when needed, and proof sketches accompany results that recur across the subject.
 
-## Definitions
+## From events to distributions
 
-The section treats **probability** as a mathematical measure $P$ on events in a sample space, **random variables** as real-valued functions on that space, and **distributions** as the induced laws of those variables. The early pages emphasize exact finite models; the middle pages emphasize densities and joint laws; the later pages emphasize asymptotic behavior and stochastic processes.
+**Probability** is a measure $P$ on events in a sample space. A **random variable** is a real-valued function on that space, and its **distribution** is the probability law induced on its values. Early problems use exact finite models; middle chapters work with densities and joint laws; later chapters study limits and stochastic processes.
 
-The generated pages, in lecture order, are:
-
-1. [Counting and combinatorics](/math/probability-and-random-variables/counting-and-combinatorics)
-2. [Probability axioms and inclusion-exclusion](/math/probability-and-random-variables/probability-axioms-and-inclusion-exclusion)
-3. [Conditional probability, Bayes, and independence](/math/probability-and-random-variables/conditional-probability-bayes-independence)
-4. [Discrete random variables, expectation, and variance](/math/probability-and-random-variables/discrete-random-variables-expectation-variance)
-5. [Bernoulli, binomial, geometric, and negative binomial laws](/math/probability-and-random-variables/bernoulli-binomial-geometric-negative-binomial)
-6. [Poisson random variables and Poisson processes](/math/probability-and-random-variables/poisson-random-variables-and-processes)
-7. [Continuous random variables and uniform laws](/math/probability-and-random-variables/continuous-random-variables-and-uniform-laws)
-8. [Normal, exponential, gamma, beta, and Cauchy laws](/math/probability-and-random-variables/normal-exponential-gamma-beta-cauchy)
-9. [Joint distributions, transformations, and independence](/math/probability-and-random-variables/joint-distributions-transformations-independence)
-10. [Sums, convolutions, and order statistics](/math/probability-and-random-variables/sums-convolutions-order-statistics)
-11. [Covariance, correlation, and conditional expectation](/math/probability-and-random-variables/covariance-correlation-conditional-expectation)
-12. [Moment and characteristic functions](/math/probability-and-random-variables/moment-and-characteristic-functions)
-13. [Weak law, concentration, and the central limit theorem](/math/probability-and-random-variables/weak-law-concentration-central-limit-theorem)
-14. [Strong law and Jensen's inequality](/math/probability-and-random-variables/strong-law-and-jensens-inequality)
-15. [Markov chains](/math/probability-and-random-variables/markov-chains)
-16. [Entropy and coding](/math/probability-and-random-variables/entropy-and-coding)
-17. [Martingales, risk-neutral probability, and Black-Scholes](/math/probability-and-random-variables/martingales-risk-neutral-probability-black-scholes)
-
-## Key results
-
-The first organizing principle is that finite probability is counting plus normalization. If $S$ is a finite sample space with equally likely outcomes, then
+For a finite sample space $S$ with equally likely outcomes,
 
 $$
 P(A)=\frac{|A|}{|S|}.
 $$
 
-The hard part is usually choosing $S$ so that this ratio is legitimate. Counting tools such as permutations, binomial coefficients, multinomial coefficients, complements, and inclusion-exclusion provide the numerator and denominator.
+The real work is choosing $S$ so that equiprobability holds. Permutations, binomial and multinomial coefficients, complements, and inclusion–exclusion then provide the numerator and denominator.
 
-The second organizing principle is conditioning. For $P(B)\gt 0$,
+Conditioning changes the probability model when information arrives. For $P(B)\gt 0$,
 
 $$
 P(A\mid B)=\frac{P(A\cap B)}{P(B)}.
 $$
 
-Bayes' formula, independence, conditional distributions, conditional expectation, and martingales are all extensions of this idea. Conditioning is the formal way probability updates when information arrives.
+Bayes' formula, independence, conditional distributions, conditional expectation, and martingales all extend this operation.
 
-The third organizing principle is that random variables allow algebra. Means, variances, covariance, sums, transformations, moment generating functions, and characteristic functions all work because a random variable turns an outcome into a number. The two most used identities are
+Random variables turn outcomes into quantities that can be added, transformed, and summarized. Two identities carry much of the elementary algebra:
 
 $$
 E[X+Y]=E[X]+E[Y]
 $$
 
-and, when covariance is controlled,
+and
 
 $$
 \operatorname{Var}(X+Y)
@@ -65,21 +43,11 @@ $$
 \operatorname{Var}(X)+\operatorname{Var}(Y)+2\operatorname{Cov}(X,Y).
 $$
 
-The fourth organizing principle is asymptotic regularity. Under suitable hypotheses, averages stabilize and normalized errors become normal:
+The second identity does not require independence; independence is a sufficient condition for the covariance term to vanish when the variances exist.
 
-$$
-\frac{X_1+\cdots+X_n}{n}\to \mu,
-\qquad
-\frac{X_1+\cdots+X_n-n\mu}{\sigma\sqrt n}\Rightarrow N(0,1).
-$$
+## The dependency chain
 
-The law of large numbers and the central limit theorem explain why large random systems can be predictable even when individual outcomes remain random.
-
-The pages are deliberately cumulative. A later page often reuses an earlier idea rather than re-proving it from scratch. Poisson processes rely on binomial rare-event limits and exponential waiting times. Conditional expectation relies on conditional probability and joint distributions. Martingales rely on conditional expectation. Risk-neutral pricing relies on martingales, expectation, and the normal distribution. When a computation feels mysterious, the right repair is usually to walk backward through this dependency chain until the sample space, conditioning event, or distributional mechanism is explicit.
-
-The section also separates exact answers from approximations. Inclusion-exclusion, conditioning, convolution, and transform identities are exact when their assumptions hold. Poisson approximation, normal approximation, and large-number reasoning become accurate in limiting regimes. A rigorous solution should say which mode it is using. For example, a binomial formula may give an exact probability, a Poisson law may give a rare-event approximation, and a normal law may give a large-sample approximation to the same family of problems.
-
-## Visual
+Later topics reuse earlier mechanisms rather than starting over. Poisson processes connect binomial rare-event limits to exponential waiting times. Conditional expectation rests on conditional probability and joint distributions. Martingales rest on conditional expectation. Risk-neutral pricing combines martingales, expectation, and the normal law.
 
 ```mermaid
 graph TD
@@ -107,15 +75,45 @@ graph TD
 | Limit theory | What happens after many trials? | [Weak law, concentration, and the central limit theorem](/math/probability-and-random-variables/weak-law-concentration-central-limit-theorem) |
 | Processes and information | How does randomness evolve or encode uncertainty? | [Markov chains](/math/probability-and-random-variables/markov-chains) |
 
-## Worked example 1: choosing the right early-course tool
+When a calculation becomes opaque, trace backward until the sample space, conditioning event, or distributional mechanism is explicit.
 
-Problem: A probability problem says $n$ hats are shuffled randomly among $n$ people. It asks for the probability that nobody gets their own hat. Which pages should be used, and what is the solution path?
+## Exact formulas and limiting models
 
-Method:
+Inclusion–exclusion, conditioning, convolution, and transform identities give exact answers when their assumptions hold. Poisson and normal approximations instead describe limiting regimes. A solution should identify which mode it uses. The same problem family may admit an exact binomial probability, a rare-event Poisson approximation, and a large-sample normal approximation.
 
-1. The phrase "shuffled randomly" suggests a finite equally likely model: all $n!$ permutations are equally likely. Start with [counting and combinatorics](/math/probability-and-random-variables/counting-and-combinatorics).
-2. The event "nobody gets their own hat" is a complement of a union. Let $E_i$ be the event that person $i$ gets their own hat.
-3. The desired event is
+Asymptotic regularity explains why aggregated randomness becomes predictable. Under suitable hypotheses,
+
+$$
+\frac{X_1+\cdots+X_n}{n}\to \mu,
+\qquad
+\frac{X_1+\cdots+X_n-n\mu}{\sigma\sqrt n}\Rightarrow N(0,1).
+$$
+
+The laws of large numbers stabilize averages; the central limit theorem describes the scale and shape of their fluctuations.
+
+## Lecture order
+
+1. [Counting and combinatorics](/math/probability-and-random-variables/counting-and-combinatorics)
+2. [Probability axioms and inclusion-exclusion](/math/probability-and-random-variables/probability-axioms-and-inclusion-exclusion)
+3. [Conditional probability, Bayes, and independence](/math/probability-and-random-variables/conditional-probability-bayes-independence)
+4. [Discrete random variables, expectation, and variance](/math/probability-and-random-variables/discrete-random-variables-expectation-variance)
+5. [Bernoulli, binomial, geometric, and negative binomial laws](/math/probability-and-random-variables/bernoulli-binomial-geometric-negative-binomial)
+6. [Poisson random variables and Poisson processes](/math/probability-and-random-variables/poisson-random-variables-and-processes)
+7. [Continuous random variables and uniform laws](/math/probability-and-random-variables/continuous-random-variables-and-uniform-laws)
+8. [Normal, exponential, gamma, beta, and Cauchy laws](/math/probability-and-random-variables/normal-exponential-gamma-beta-cauchy)
+9. [Joint distributions, transformations, and independence](/math/probability-and-random-variables/joint-distributions-transformations-independence)
+10. [Sums, convolutions, and order statistics](/math/probability-and-random-variables/sums-convolutions-order-statistics)
+11. [Covariance, correlation, and conditional expectation](/math/probability-and-random-variables/covariance-correlation-conditional-expectation)
+12. [Moment and characteristic functions](/math/probability-and-random-variables/moment-and-characteristic-functions)
+13. [Weak law, concentration, and the central limit theorem](/math/probability-and-random-variables/weak-law-concentration-central-limit-theorem)
+14. [Strong law and Jensen's inequality](/math/probability-and-random-variables/strong-law-and-jensens-inequality)
+15. [Markov chains](/math/probability-and-random-variables/markov-chains)
+16. [Entropy and coding](/math/probability-and-random-variables/entropy-and-coding)
+17. [Martingales, risk-neutral probability, and Black-Scholes](/math/probability-and-random-variables/martingales-risk-neutral-probability-black-scholes)
+
+## Derangements: counting before probability
+
+Suppose $n$ hats are shuffled uniformly among $n$ people. To find the probability that nobody receives their own hat, let $E_i$ be the event that person $i$ does receive it. All $n!$ permutations form the equally likely sample space, and
 
 $$
 E_1^c\cap\cdots\cap E_n^c
@@ -123,100 +121,67 @@ E_1^c\cap\cdots\cap E_n^c
 (E_1\cup\cdots\cup E_n)^c.
 $$
 
-4. This points to [probability axioms and inclusion-exclusion](/math/probability-and-random-variables/probability-axioms-and-inclusion-exclusion).
-5. For any fixed set of $r$ people, the probability all $r$ get their own hats is
+For any fixed set of $r$ people, exactly $(n-r)!$ permutations fix all of them, so that intersection has probability
 
 $$
 \frac{(n-r)!}{n!}.
 $$
 
-6. Inclusion-exclusion gives
+Inclusion–exclusion gives the exact derangement probability
 
 $$
-P(\text{nobody gets own hat})
+P(\text{nobody receives their own hat})
 =
-\sum_{r=0}^{n}(-1)^r\frac1{r!}.
+\sum_{r=0}^{n}(-1)^r\frac{1}{r!}.
 $$
 
-Checked answer: for large $n$, this is close to $e^{-1}$. The navigation is counting first, axioms second, inclusion-exclusion third.
+As $n$ grows, the sum approaches $e^{-1}$. The path through the notes is [counting and combinatorics](/math/probability-and-random-variables/counting-and-combinatorics), followed by [probability axioms and inclusion-exclusion](/math/probability-and-random-variables/probability-axioms-and-inclusion-exclusion).
 
-## Worked example 2: choosing the right late-course tool
+## Four hundred coin tosses: exact model, asymptotic explanation
 
-Problem: A fair coin is tossed $400$ times. We want to know why the fraction of heads should be close to $1/2$ and how to approximate the chance of seeing between $190$ and $210$ heads.
-
-Method:
-
-1. Let $X$ be the number of heads. The count is binomial$(400,1/2)$, so begin with [Bernoulli, binomial, geometric, and negative binomial laws](/math/probability-and-random-variables/bernoulli-binomial-geometric-negative-binomial).
-2. The expected count and variance are
+Let $X$ be the number of heads in 400 independent fair tosses. Then
 
 $$
-E[X]=400\cdot\frac12=200,
+X\sim\operatorname{Binomial}(400,1/2),
+$$
+
+with
+
+$$
+E[X]=200,
 \qquad
-\operatorname{Var}(X)=400\cdot\frac12\cdot\frac12=100.
+\operatorname{Var}(X)=100.
 $$
 
-3. The fraction $X/400$ is close to $1/2$ by the law of large numbers, so use [weak law, concentration, and the central limit theorem](/math/probability-and-random-variables/weak-law-concentration-central-limit-theorem).
-4. For an approximation of the interval probability, use the central limit theorem. Standard deviation is $10$.
-5. With continuity correction,
+The law of large numbers explains why $X/400$ should lie near $1/2$. To approximate the probability of 190 through 210 heads, use a normal variable $N$ with mean $200$ and standard deviation $10$. A continuity correction gives
 
 $$
 P(190\le X\le 210)
 \approx
-P(189.5\le N\le 210.5),
+P(189.5\le N\le 210.5).
 $$
 
-where $N$ is normal with mean $200$ and standard deviation $10$.
-6. Standardizing gives
+After standardization,
 
 $$
 P(-1.05\le Z\le 1.05)
-=\Phi(1.05)-\Phi(-1.05)
+=
+\Phi(1.05)-\Phi(-1.05)
 \approx 0.706.
 $$
 
-Checked answer: the section path is binomial model, then expectation and variance, then CLT approximation.
+The exact model belongs to [Bernoulli, binomial, geometric, and negative binomial laws](/math/probability-and-random-variables/bernoulli-binomial-geometric-negative-binomial); the approximation and its justification belong to [weak law, concentration, and the central limit theorem](/math/probability-and-random-variables/weak-law-concentration-central-limit-theorem).
 
-## Code
+## Checks before applying a formula
 
-```python
-pages = [
-    ("Counting", "/math/probability-and-random-variables/counting-and-combinatorics"),
-    ("Axioms", "/math/probability-and-random-variables/probability-axioms-and-inclusion-exclusion"),
-    ("Conditioning", "/math/probability-and-random-variables/conditional-probability-bayes-independence"),
-    ("Random variables", "/math/probability-and-random-variables/discrete-random-variables-expectation-variance"),
-    ("Limit theorems", "/math/probability-and-random-variables/weak-law-concentration-central-limit-theorem"),
-]
+- Establish the sample space before counting, especially when outcomes may not be equally likely.
+- $P(A\mid B)$ and $P(B\mid A)$ condition on different information and generally have different values.
+- Choose distributions from their random mechanisms: fixed trial count, waiting time, rare-event count, and continuous measurement lead to different laws.
+- State whether an answer is exact or approximate and verify the assumptions behind an approximation.
+- Expectation and variance summarize a law but do not identify it; distinct distributions can share both.
 
-def suggest_pages(problem_text):
-    text = problem_text.lower()
-    suggestions = []
-    if "shuffle" in text or "choose" in text or "count" in text:
-        suggestions.append(pages[0])
-    if "at least" in text or "none" in text or "union" in text:
-        suggestions.append(pages[1])
-    if "given" in text or "test" in text or "bayes" in text:
-        suggestions.append(pages[2])
-    if "average" in text or "many" in text or "normal approximation" in text:
-        suggestions.append(pages[4])
-    return suggestions
+<div className="see-also">
 
-for title, link in suggest_pages("many fair coin tosses need a normal approximation"):
-    print(title, "->", link)
-```
+See also: [Probability](/math/probability/intro) · [Statistics](/math/statistics/intro) · [Limits and Continuity](/math/calculus/limits-and-continuity) · [Linear Algebra](/math/linear-algebra/intro)
 
-## Common pitfalls
-
-- Skipping the sample-space step and applying formulas to outcomes that are not equally likely.
-- Treating conditional probabilities as reversible; $P(A\mid B)$ and $P(B\mid A)$ answer different questions.
-- Memorizing distribution formulas without identifying the random mechanism: fixed number of trials, waiting time, rare-event count, memoryless wait, or accumulated small effects.
-- Using independence when the story describes sampling without replacement or a shared constraint.
-- Applying limit theorems without checking finite mean, finite variance, independence, and scaling.
-- Treating martingale and risk-neutral probability statements as ordinary real-world frequency claims rather than conditional-expectation and pricing statements.
-
-## Connections
-
-- [Short probability introduction](/math/probability)
-- [Discrete probability](/math/discrete/discrete-probability)
-- [Statistics overview](/math/statistics)
-- [Calculus limits](/math/calculus/limits)
-- [Linear algebra overview](/math/linear-algebra)
+</div>

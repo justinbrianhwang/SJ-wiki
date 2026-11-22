@@ -5,326 +5,401 @@ sidebar_position: 16
 
 # Vectors and Geometry of Space
 
-Vectors describe magnitude and direction. In space, they provide the language for lines, planes, distances, projections, angles, areas, and volumes. Calculus in several variables depends on this geometry because gradients, vector fields, tangent planes, and surface integrals all use vector operations.
+Three-dimensional analytic geometry becomes manageable once points and directions are kept separate. A point marks a location; a vector records displacement. Lines are built from a point and a direction, while planes are built from a point and a normal. Dot products extract parallel components, cross products produce perpendicular directions, and the triple product measures oriented volume.
 
-The main shift from two-dimensional coordinate geometry is that equations are often not unique. A line in space needs a point and a direction vector. A plane needs a point and a normal vector. Vector notation keeps those relationships organized.
+## Displacement, length, and direction
 
-## Definitions
-
-A vector in $\mathbb{R}^3$ is
+For points $P=(p_1,p_2,p_3)$ and $Q=(q_1,q_2,q_3)$, the displacement from $P$ to $Q$ is
 
 $$
-\mathbf{v}=\langle v_1,v_2,v_3\rangle.
+\overrightarrow{PQ}
+=\langle q_1-p_1,q_2-p_2,q_3-p_3\rangle.
 $$
 
-Its magnitude is
+A vector $\mathbf v=\langle v_1,v_2,v_3\rangle$ has Euclidean norm
 
 $$
-|\mathbf{v}|=\sqrt{v_1^2+v_2^2+v_3^2}.
+\lVert\mathbf v\rVert
+=\sqrt{v_1^2+v_2^2+v_3^2}.
 $$
+
+The distance between $P$ and $Q$ is $\lVert\overrightarrow{PQ}\rVert$. Any nonzero vector can be normalized to a unit vector
+
+$$
+\widehat{\mathbf v}=\frac{\mathbf v}{\lVert\mathbf v\rVert}.
+$$
+
+Normalization fails for the zero vector because it has no direction. That small restriction recurs in angle, projection, and distance formulas whenever a denominator contains a vector norm.
+
+Vectors are free vectors in elementary calculus: translating an arrow without changing its components does not change the vector. Points are not interchangeable in that way. Expressions such as $Q-P$ and $P+\mathbf v$ make geometric sense; adding two points does not have the same coordinate-independent meaning.
+
+## The dot product measures alignment
 
 The dot product is
 
 $$
-\mathbf{u}\cdot\mathbf{v}=u_1v_1+u_2v_2+u_3v_3.
+\mathbf u\cdot\mathbf v
+=u_1v_1+u_2v_2+u_3v_3.
 $$
 
-It also satisfies
+It is connected to angle by
 
 $$
-\mathbf{u}\cdot\mathbf{v}=|\mathbf{u}||\mathbf{v}|\cos\theta.
+\mathbf u\cdot\mathbf v
+=\lVert\mathbf u\rVert\lVert\mathbf v\rVert\cos\theta,
 $$
 
-The cross product is
+where $0\le\theta\le\pi$ is the smaller angle between nonzero vectors. One derivation compares two expressions for the squared length of $\mathbf u-\mathbf v$. Coordinate algebra gives
 
 $$
-\mathbf{u}\times\mathbf{v}
-=
-\langle u_2v_3-u_3v_2,\ u_3v_1-u_1v_3,\ u_1v_2-u_2v_1\rangle.
+\lVert\mathbf u-\mathbf v\rVert^2
+=\lVert\mathbf u\rVert^2+\lVert\mathbf v\rVert^2
+-2\mathbf u\cdot\mathbf v.
 $$
 
-It is perpendicular to both $\mathbf{u}$ and $\mathbf{v}$, and its magnitude is
+The law of cosines applied to the triangle formed by $\mathbf u$ and $\mathbf v$ gives the same left side as
 
 $$
-|\mathbf{u}\times\mathbf{v}|=|\mathbf{u}||\mathbf{v}|\sin\theta.
+\lVert\mathbf u\rVert^2+\lVert\mathbf v\rVert^2
+-2\lVert\mathbf u\rVert\lVert\mathbf v\rVert\cos\theta.
 $$
 
-A line through point $\mathbf{r}_0$ with direction $\mathbf{v}$ is
+Equating the two proves the angle identity. It immediately gives
 
 $$
-\mathbf{r}(t)=\mathbf{r}_0+t\mathbf{v}.
+\cos\theta
+=\frac{\mathbf u\cdot\mathbf v}
+{\lVert\mathbf u\rVert\lVert\mathbf v\rVert}.
 $$
 
-A plane through point $\mathbf{r}_0$ with normal vector $\mathbf{n}$ is
+A positive dot product indicates an acute angle, a negative one an obtuse angle, and zero means orthogonality. Floating-point calculations may produce a cosine slightly outside $[-1,1]$ through rounding, so numerical code commonly clamps the ratio before applying inverse cosine.
+
+The scalar component of $\mathbf u$ along $\mathbf v$ is
 
 $$
-\mathbf{n}\cdot(\mathbf{r}-\mathbf{r}_0)=0.
+\operatorname{comp}_{\mathbf v}\mathbf u
+=\frac{\mathbf u\cdot\mathbf v}{\lVert\mathbf v\rVert},
 $$
 
-## Key results
-
-The angle between nonzero vectors is determined by
+and the vector projection is
 
 $$
-\cos\theta=\frac{\mathbf{u}\cdot\mathbf{v}}{|\mathbf{u}||\mathbf{v}|}.
+\operatorname{proj}_{\mathbf v}\mathbf u
+=\frac{\mathbf u\cdot\mathbf v}{\lVert\mathbf v\rVert^2}\mathbf v.
 $$
 
-Vectors are orthogonal exactly when their dot product is zero.
-
-The projection of $\mathbf{u}$ onto $\mathbf{v}$ is
+The remainder is perpendicular to $\mathbf v$:
 
 $$
-\operatorname{proj}_{\mathbf{v}}\mathbf{u}
-=
-\frac{\mathbf{u}\cdot\mathbf{v}}{|\mathbf{v}|^2}\mathbf{v}.
+\mathbf u
+=\operatorname{proj}_{\mathbf v}\mathbf u
++\left(\mathbf u-\operatorname{proj}_{\mathbf v}\mathbf u\right).
 $$
 
-The scalar component of $\mathbf{u}$ in the direction of $\mathbf{v}$ is
+Checking the dot product of the parenthesized remainder with $\mathbf v$ gives zero. This parallel/perpendicular split is the common mechanism behind closest points, least squares, and work done by a force.
+
+## The cross product produces an oriented normal
+
+For vectors in $\mathbb R^3$,
 
 $$
-\operatorname{comp}_{\mathbf{v}}\mathbf{u}
-=
-\frac{\mathbf{u}\cdot\mathbf{v}}{|\mathbf{v}|}.
+\mathbf u\times\mathbf v
+=\left\langle
+u_2v_3-u_3v_2,
+u_3v_1-u_1v_3,
+u_1v_2-u_2v_1
+\right\rangle.
 $$
 
-The area of the parallelogram spanned by $\mathbf{u}$ and $\mathbf{v}$ is
+Taking its dot product with either input gives zero after cancellation, so it is perpendicular to both. Its magnitude is
 
 $$
-|\mathbf{u}\times\mathbf{v}|.
+\lVert\mathbf u\times\mathbf v\rVert
+=\lVert\mathbf u\rVert\lVert\mathbf v\rVert\sin\theta.
 $$
 
-The volume of the parallelepiped spanned by $\mathbf{u}$, $\mathbf{v}$, and $\mathbf{w}$ is
+This is the area of the parallelogram spanned by the two vectors: base times perpendicular height. Half the magnitude gives the area of the corresponding triangle. Parallel inputs give the zero vector, which cannot serve as a normal.
+
+Direction follows the right-hand rule. Reversing the inputs reverses orientation:
 
 $$
-|\mathbf{u}\cdot(\mathbf{v}\times\mathbf{w})|.
+\mathbf v\times\mathbf u=-(\mathbf u\times\mathbf v).
 $$
 
-The distance from point $\mathbf{p}$ to the plane
+Unlike the dot product, the cross product is not commutative and should not be manipulated as though it were ordinary scalar multiplication.
+
+The scalar triple product
 
 $$
-ax+by+cz=d
+\mathbf u\cdot(\mathbf v\times\mathbf w)
 $$
 
-is
+is the signed volume of the parallelepiped determined by the ordered vectors. Its absolute value is ordinary volume; its sign records orientation. A zero triple product means the three vectors are coplanar. To test whether four points are coplanar, choose one as a base point and use the three displacement vectors to the others.
+
+## Lines: one point and one direction
+
+A line through $P_0$ with nonzero direction $\mathbf v$ has vector equation
 
 $$
-\frac{|a p_1+b p_2+c p_3-d|}{\sqrt{a^2+b^2+c^2}}.
+\mathbf r(t)=\mathbf r_0+t\mathbf v.
 $$
 
-This formula is projection of the point-plane displacement onto the unit normal.
-
-Quadric surfaces extend conics into space. Ellipsoids, paraboloids, hyperboloids, cones, and cylinders are recognized by squared variables and signs. Cross-sections, traces, and symmetry help identify their shapes.
-
-The dot product detects how much one vector points in another vector's direction. If $\mathbf{u}\cdot\mathbf{v}\gt 0$, the angle is acute. If it is negative, the angle is obtuse. If it is zero, the vectors are perpendicular. This sign information is often enough for geometry problems before calculating the actual angle.
-
-The cross product encodes orientation as well as area. Its direction is determined by the right-hand rule. Reversing the order reverses the direction:
+In coordinates, if $\mathbf r_0=\langle x_0,y_0,z_0\rangle$ and $\mathbf v=\langle a,b,c\rangle$, then
 
 $$
-\mathbf{v}\times\mathbf{u}=-(\mathbf{u}\times\mathbf{v}).
+x=x_0+at,
+\qquad y=y_0+bt,
+\qquad z=z_0+ct.
 $$
 
-This matters in torque, normal vectors, and surface orientation in vector calculus.
-
-Lines in space may intersect, be parallel, or be skew. Skew lines are nonparallel lines that do not intersect; this cannot happen in the plane but is common in three dimensions. To test intersection, set the parametric coordinates equal and solve for the parameters. If no common parameters exist and direction vectors are not parallel, the lines are skew.
-
-Planes can be parallel, identical, or intersect in a line. Two planes with normals $\mathbf{n}_1$ and $\mathbf{n}_2$ are parallel when the normals are scalar multiples. If the normals are not parallel, the direction of their line of intersection is
+Different choices of base point and nonzero scalar multiples of the direction describe the same line. Symmetric equations such as
 
 $$
-\mathbf{n}_1\times\mathbf{n}_2.
+\frac{x-x_0}{a}=\frac{y-y_0}{b}=\frac{z-z_0}{c}
 $$
 
-Distance formulas are projection formulas. The distance from a point to a line can be written
+are valid only when all displayed direction components are nonzero. If $b=0$, the safe coordinate statement is $y=y_0$, not division by zero.
+
+Two lines in space can intersect, be parallel, or be skew. Nonparallel lines need not intersect because they may lie in different planes. To test intersection, give the lines different parameters, equate all three coordinates, and look for one pair of parameter values satisfying every equation. Using the same parameter for both lines silently imposes an extra condition.
+
+The distance from a point $P$ to a line through $P_0$ in direction $\mathbf v$ is
 
 $$
-\frac{|(\mathbf{p}-\mathbf{r}_0)\times\mathbf{v}|}{|\mathbf{v}|},
+d=\frac{\lVert\overrightarrow{P_0P}\times\mathbf v\rVert}
+{\lVert\mathbf v\rVert}.
 $$
 
-where $\mathbf{r}_0$ is a point on the line and $\mathbf{v}$ is a direction vector. The numerator is the area of a parallelogram; dividing by the base length gives the height, which is the perpendicular distance.
+The numerator is the area of a parallelogram with base $\lVert\mathbf v\rVert$ and height $d$. Dividing area by base recovers the perpendicular height.
 
-Coordinate surfaces provide quick orientation. Equations such as $x=c$, $y=c$, and $z=c$ are planes parallel to coordinate planes. Equations such as $x^2+y^2=R^2$ describe circular cylinders around the $z$-axis because $z$ is unrestricted. Recognizing unrestricted variables helps identify cylinders and extruded surfaces.
+## Planes: one point and one normal
 
-Vector equations are often easier to translate after identifying what must be parallel or perpendicular. A line's direction vector is parallel to the line. A plane's normal vector is perpendicular to every direction lying in the plane. If two nonparallel vectors lie in a plane, their cross product gives a normal vector for the plane.
-
-The scalar triple product has a sign as well as a magnitude. The sign indicates orientation of the ordered triple $(\mathbf{u},\mathbf{v},\mathbf{w})$. If the scalar triple product is zero, the three vectors are coplanar, so the parallelepiped volume is zero. This provides a compact test for whether four points lie in the same plane: form three displacement vectors from one point and compute the scalar triple product.
-
-Projections split a vector into parallel and perpendicular parts:
+A plane through $P_0$ with nonzero normal $\mathbf n$ consists of all points $P$ for which $\overrightarrow{P_0P}$ is perpendicular to $\mathbf n$:
 
 $$
-\mathbf{u}=\operatorname{proj}_{\mathbf{v}}\mathbf{u}
-\ +\left(\mathbf{u}-\operatorname{proj}_{\mathbf{v}}\mathbf{u}\right).
+\mathbf n\cdot(\mathbf r-\mathbf r_0)=0.
 $$
 
-The first part lies along $\mathbf{v}$, and the second part is orthogonal to $\mathbf{v}$. This decomposition is the geometric heart of least squares, work as force along displacement, and distance formulas.
+Writing $\mathbf n=\langle a,b,c\rangle$ produces
 
-Spheres have equation
+$$
+a(x-x_0)+b(y-y_0)+c(z-z_0)=0,
+$$
+
+or $ax+by+cz=d$. Scaling the entire equation by a nonzero constant does not change the plane.
+
+Two nonparallel direction vectors $\mathbf u$ and $\mathbf v$ lying in a plane determine a normal $\mathbf u\times\mathbf v$. If they are parallel, they do not determine a unique plane. Two planes are parallel exactly when their normals are scalar multiples. Otherwise their intersection is a line whose direction is parallel to $\mathbf n_1\times\mathbf n_2$.
+
+The signed distance from $P=(p_1,p_2,p_3)$ to $ax+by+cz=d$ is
+
+$$
+\delta=\frac{ap_1+bp_2+cp_3-d}{\sqrt{a^2+b^2+c^2}}.
+$$
+
+Ordinary distance is $\vert \delta\vert $. To derive it, take any point $P_0$ in the plane and project $\overrightarrow{P_0P}$ onto the unit normal $\mathbf n/\lVert\mathbf n\rVert$. The numerator is the plane equation evaluated at $P$, and the denominator corrects for a normal that is not unit length.
+
+The closest point on the plane follows by subtracting the signed normal displacement:
+
+$$
+P_{\mathrm{closest}}
+=P-\delta\frac{\mathbf n}{\lVert\mathbf n\rVert}.
+$$
+
+## Worked example: a plane through three points
+
+Find the plane through
+
+$$
+A=(1,0,2),\qquad B=(3,1,1),\qquad C=(0,2,4),
+$$
+
+then find the distance from $Q=(2,2,5)$ to that plane.
+
+First form two directions in the plane:
+
+$$
+\overrightarrow{AB}=\langle2,1,-1\rangle,
+\qquad
+\overrightarrow{AC}=\langle-1,2,2\rangle.
+$$
+
+Their cross product is
+
+$$
+\begin{aligned}
+\overrightarrow{AB}\times\overrightarrow{AC}
+&=\langle
+1(2)-(-1)(2),
+(-1)(-1)-2(2),
+2(2)-1(-1)
+\rangle\\
+&=\langle4,-3,5\rangle.
+\end{aligned}
+$$
+
+This nonzero result also confirms that the three points are not collinear. Using point $A$ and normal $\mathbf n=\langle4,-3,5\rangle$,
+
+$$
+4(x-1)-3(y-0)+5(z-2)=0.
+$$
+
+After expansion,
+
+$$
+4x-3y+5z=14.
+$$
+
+Substituting $B$ gives $12-3+5=14$, and substituting $C$ gives $0-6+20=14$, so both checks pass.
+
+For $Q$, the numerator of the distance formula is
+
+$$
+|4(2)-3(2)+5(5)-14|=|13|=13.
+$$
+
+The normal length is
+
+$$
+\sqrt{4^2+(-3)^2+5^2}=\sqrt{50}=5\sqrt2.
+$$
+
+Therefore
+
+$$
+d=\frac{13}{5\sqrt2}=\frac{13\sqrt2}{10}.
+$$
+
+## Worked example: deciding whether two lines are skew
+
+Consider
+
+$$
+L_1:\ \mathbf r=\langle1,0,1\rangle
++s\langle1,2,-1\rangle
+$$
+
+and
+
+$$
+L_2:\ \mathbf r=\langle0,1,2\rangle
++t\langle2,1,1\rangle.
+$$
+
+The direction vectors are not scalar multiples, so the lines are not parallel. An intersection would require
+
+$$
+\begin{aligned}
+1+s&=2t,\\
+2s&=1+t,\\
+1-s&=2+t.
+\end{aligned}
+$$
+
+From the first equation, $s=2t-1$. Substitute this into the second:
+
+$$
+2(2t-1)=1+t
+\quad\Longrightarrow\quad
+3t=3
+\quad\Longrightarrow\quad
+t=1.
+$$
+
+Then $s=1$. The third equation would demand
+
+$$
+1-1=2+1,
+$$
+
+or $0=3$, which is impossible. The first two coordinates can agree at a projected crossing, but the third does not. Since the lines are neither parallel nor intersecting, they are skew.
+
+Their separation can be found with a triple product. Let $\mathbf d_1$ and $\mathbf d_2$ be the two directions and let $\mathbf w=\langle0,1,2\rangle-\langle1,0,1\rangle=\langle-1,1,1\rangle$. A normal to both directions is
+
+$$
+\mathbf d_1\times\mathbf d_2
+=\langle3,-3,-3\rangle.
+$$
+
+Thus the distance between the skew lines is
+
+$$
+\frac{|\mathbf w\cdot(\mathbf d_1\times\mathbf d_2)|}
+{\lVert\mathbf d_1\times\mathbf d_2\rVert}
+=\frac{|-3-3-3|}{\sqrt{27}}
+=\sqrt3.
+$$
+
+## Reading equations of surfaces
+
+One scalar equation in three variables usually describes a surface. Two independent equations usually intersect in a curve, and three independent equations usually leave isolated points. Degeneracies and dependent equations are the exceptions.
+
+A sphere has equation
 
 $$
 (x-h)^2+(y-k)^2+(z-\ell)^2=R^2.
 $$
 
-The center is $(h,k,\ell)$ and radius is $R$. Completing squares in three variables reveals this form, just as in two-dimensional circles.
+Completing squares reveals its center and radius. If a variable is absent, the surface often extends freely in that direction: $x^2+y^2=R^2$ is a circular cylinder parallel to the $z$-axis.
 
-Coordinate choices can simplify computations. If a problem involves a plane with normal $\mathbf{n}$, using components parallel and perpendicular to $\mathbf{n}$ often reduces the geometry to one projection. If a problem involves a line, decomposing a vector into parts parallel and perpendicular to the line usually reveals distances and closest points.
+Quadric surfaces are classified by signs, coefficients, and planar traces:
 
-The algebra should always match the dimension. Two equations usually describe a curve in space, often the intersection of two surfaces. One equation usually describes a surface. Three independent equations usually identify isolated points. This differs from the plane, where one equation usually describes a curve.
+| Standard pattern | Surface | Useful trace |
+|---|---|---|
+| $x^2/a^2+y^2/b^2+z^2/c^2=1$ | ellipsoid | ellipses in coordinate planes |
+| $z=x^2/a^2+y^2/b^2$ | elliptic paraboloid | horizontal ellipses, vertical parabolas |
+| $z=x^2/a^2-y^2/b^2$ | hyperbolic paraboloid | opposite-opening parabolas |
+| $x^2/a^2+y^2/b^2-z^2/c^2=1$ | one-sheet hyperboloid | horizontal ellipses |
+| $z^2/c^2-x^2/a^2-y^2/b^2=1$ | two-sheet hyperboloid | no points near $z=0$ |
+| $x^2/a^2+y^2/b^2-z^2/c^2=0$ | elliptic cone | lines through the origin in vertical traces |
 
-## Visual
+Before naming a surface, inspect several traces and note which variables are unrestricted. A memorized silhouette is less reliable when axes are permuted, centers are translated, or coefficients stretch the shape.
 
-| Operation | Formula | Geometric meaning |
-|---|---:|---|
-| Magnitude | $\vert \mathbf{v}\vert $ | length |
-| Dot product | $\mathbf{u}\cdot\mathbf{v}$ | angle and projection |
-| Cross product | $\mathbf{u}\times\mathbf{v}$ | perpendicular vector and area |
-| Scalar triple product | $\mathbf{u}\cdot(\mathbf{v}\times\mathbf{w})$ | signed volume |
-| Line | $\mathbf{r}_0+t\mathbf{v}$ | point plus direction |
-| Plane | $\mathbf{n}\cdot(\mathbf{r}-\mathbf{r}_0)=0$ | point plus normal |
+## Checks that catch geometric mix-ups
 
-```text
-           n
-           ^
-           |     plane: n dot (r-r0)=0
-           |
-     ------*----------------
-          r0
+- A line needs a direction parallel to it; a plane equation needs a vector perpendicular to it. Swapping those roles gives plausible-looking but wrong equations.
+- Cross-product order controls orientation. Areas and distances use its magnitude, but oriented normals and flux retain its sign.
+- Distance formulas divide by the norm of a direction or normal. Without that division, rescaling the same line or plane would change the alleged distance.
+- Symmetric line equations cannot divide by a zero direction component. Parametric equations handle every direction without a special case.
+- Solving only two coordinate equations does not prove two space lines intersect. The remaining coordinate is an independent consistency check.
+- An angle formula assumes both vectors are nonzero. Orthogonality with the zero vector is algebraically true, but the angle with it is undefined.
 
-line: r(t)=r0+t v moves from r0 in direction v
-```
+## Choosing a representation that matches the question
 
-## Worked example 1: equation of a plane
+Vector, parametric, and scalar equations describe the same geometric objects from different angles. A parametric line is best for generating points, testing an intersection, or describing motion. Two scalar plane equations can describe a line as their intersection, which is sometimes better for constraints. A plane's scalar equation makes side tests and distances immediate, while a two-parameter vector equation displays the directions lying inside it.
 
-**Problem.** Find the plane through $P=(1,2,0)$ with normal vector
+Converting between forms should be driven by the next operation. To intersect a line with a plane, substitute the line parametrization into the plane equation and solve one scalar equation for the line parameter. To intersect two planes, take the cross product of their normals for a direction and solve the two plane equations for one point. To measure distance, move to a normal or projection description. Reaching for coordinates before identifying the relevant parallel or perpendicular relation usually creates more equations than needed.
 
-$$
-\mathbf{n}=\langle 3,-1,4\rangle.
-$$
+Representations are nonunique. A direction vector can be multiplied by any nonzero scalar, a plane equation can be scaled, and the base point of a line can be replaced by any other point on it. Verification should compare the represented sets rather than the literal coefficients. Parallel normals plus one shared point identify the same plane; parallel line directions plus one shared point identify the same line.
 
-Then decide whether $Q=(2,1,1)$ lies on the plane.
+Degenerate input requires a pause. Two identical points do not determine a line direction. Three collinear points do not determine a unique plane. Two parallel direction vectors have zero cross product and therefore cannot supply a plane normal. The zero result is information about the geometry, not an invitation to pick an arbitrary normal and continue.
 
-**Method.**
+## Closest points as orthogonal decompositions
 
-1. Use the point-normal form:
+Every elementary distance problem here is a closest-point problem. The displacement from the closest point on a line to the external point must be perpendicular to the line direction. The displacement from the closest point on a plane must be parallel to its normal. These conditions produce linear equations and also prove minimality through the Pythagorean theorem.
 
-$$
-\mathbf{n}\cdot(\mathbf{r}-\mathbf{r}_0)=0.
-$$
+For a line, write a candidate point using its parameter and minimize the squared distance. Differentiating that quadratic gives the same orthogonality equation as projection. Squared distance is preferred because it has the same minimizer as distance but avoids a square root. In higher-dimensional linear algebra, this becomes least squares: the residual is perpendicular to every column direction.
 
-2. Let $\mathbf{r}=\langle x,y,z\rangle$ and $\mathbf{r}_0=\langle1,2,0\rangle$:
+The distance between skew lines follows the same logic. Their common perpendicular must be perpendicular to both direction vectors, so it lies along their cross product. Projecting the displacement between any chosen base points onto the unit common-normal direction gives the separation. Changing either base point by a line-direction multiple does not alter that projection, because those added parts are perpendicular to the common normal.
 
-$$
-\langle3,-1,4\rangle\cdot\langle x-1,y-2,z-0\rangle=0.
-$$
+Signed distances retain side information. Once a unit normal orientation is chosen, points on one side of a plane have positive signed distance and points on the other have negative signed distance. Reversing the normal reverses every sign but leaves ordinary distances unchanged. Signed distance functions are useful for clipping, collision tests, and determining whether points lie in the same half-space.
 
-3. Compute the dot product:
+## Orientation and coordinate handedness
 
-$$
-3(x-1)-1(y-2)+4z=0.
-$$
+The right-hand rule assumes a right-handed coordinate system. In such a system, the first standard basis vector crossed with the second gives the third. Swapping two axes changes handedness and reverses orientation-sensitive signs. Dot products and lengths are unaffected, but cross products, oriented surface normals, and signed volumes change sign.
 
-4. Expand:
+The scalar triple product detects orientation consistently. A positive value says the ordered third vector lies on the positive side of the oriented plane formed by the first two; a negative value says the opposite. Cyclic permutations preserve the value, while exchanging any pair reverses it. Remembering these permutation rules is safer than repeatedly expanding a determinant.
 
-$$
-3x-3-y+2+4z=0.
-$$
+Normal direction is often a convention chosen by the problem. A closed surface uses outward normals. A graph can use an upward-pointing normal. A plane by itself has two equally valid unit normals. Calculations of unsigned area or distance erase this choice with an absolute value, whereas flux and torque keep it. Applying an absolute value too early can destroy physical direction information.
 
-5. Simplify:
+## Traces before sketches
 
-$$
-3x-y+4z-1=0.
-$$
+For an unfamiliar surface, first set one coordinate equal to several constants. These traces reduce the equation to familiar plane curves. Then check intercepts, symmetries under sign changes, and which variables can grow without bound. A single perspective sketch can hide disconnected sheets or a narrow saddle direction; traces expose them algebraically.
 
-6. Test $Q=(2,1,1)$:
+Translations and unequal coefficients do not change the basic quadric type. Completing squares finds the center or vertex, and dividing by a positive constant produces a recognizable standard form. A negative right side may signal no real points, or it may be moved across the equation to reveal a hyperboloid with a different axis. Classification should occur only after these normalizations.
 
-$$
-3(2)-1+4(1)-1=8.
-$$
+Equations with cross terms require rotation of coordinates to align principal axes. In matrix language, a symmetric quadratic-form matrix is orthogonally diagonalized. Its eigenvectors give the new axes and its eigenvalues give the signed squared coefficients. The familiar axis-aligned table is therefore the special case in which the coordinate basis already follows the principal directions.
 
-**Checked answer.** The plane is $3x-y+4z-1=0$. Since substituting $Q$ gives $8\ne 0$, the point $Q$ is not on the plane.
+<div className="see-also">
 
-## Worked example 2: projection and distance to a plane
+See also: [Parametric, polar, and conic curves](/math/calculus/parametric-polar-conics) · [Vector functions and motion](/math/calculus/vector-functions-and-motion) · [Partial derivatives and the gradient](/math/calculus/partial-derivatives-and-gradient) · [Vector calculus](/math/calculus/vector-calculus)
 
-**Problem.** Find the distance from $P=(2,0,3)$ to the plane
-
-$$
-2x-y+2z=5.
-$$
-
-**Method.**
-
-1. Identify
-
-$$
-a=2,\qquad b=-1,\qquad c=2,\qquad d=5.
-$$
-
-2. Substitute the point into the numerator:
-
-$$
-|2(2)-0+2(3)-5|=|4+6-5|=5.
-$$
-
-3. Compute the normal magnitude:
-
-$$
-\sqrt{2^2+(-1)^2+2^2}=\sqrt{4+1+4}=3.
-$$
-
-4. Divide:
-
-$$
-\text{distance}=\frac{5}{3}.
-$$
-
-**Checked answer.** The point is $5/3$ units from the plane. The formula uses perpendicular distance because the shortest path to a plane is along its normal vector.
-
-This distance is positive by definition. The signed numerator
-
-$$
-2(2)-0+2(3)-5=5
-$$
-
-also tells which side of the oriented plane the point lies on if the normal $\langle2,-1,2\rangle$ is chosen as positive. Signed distance is useful in geometry and numerical methods, but ordinary distance uses absolute value.
-
-As another check, the denominator $3$ is the length of the normal vector, not the length of a point coordinate. Forgetting this division would measure displacement along a non-unit normal and overstate the actual perpendicular distance.
-
-The closest point on the plane can be found by moving from $P$ in the normal direction by the signed distance measured in normal units. That construction is a projection problem, which is why the same dot product appears in both projection and distance formulas.
-
-Because normals can be scaled without changing the plane, formulas must either use ratios or divide by the normal length. The plane $2x-y+2z=5$ has the same points as $4x-2y+4z=10$, and the distance formula gives the same answer only because numerator and denominator scale together.
-
-## Code
-
-```python
-from math import sqrt
-
-def dot(u, v):
-    return sum(a*b for a, b in zip(u, v))
-
-def cross(u, v):
-    return (
-        u[1]*v[2] - u[2]*v[1],
-        u[2]*v[0] - u[0]*v[2],
-        u[0]*v[1] - u[1]*v[0],
-    )
-
-def norm(v):
-    return sqrt(dot(v, v))
-
-print(dot((3, -1, 4), (1, -1, 1)))
-print(cross((1, 0, 0), (0, 1, 0)))
-print(norm((2, -1, 2)))
-```
-
-## Common pitfalls
-
-- Confusing a direction vector for a line with a normal vector for a plane.
-- Forgetting that the cross product is defined only in three dimensions in this elementary form.
-- Reversing cross product order. $\mathbf{u}\times\mathbf{v}=-(\mathbf{v}\times\mathbf{u})$.
-- Using a non-unit normal in a distance formula without dividing by its magnitude.
-- Treating skew lines in space as if they must intersect.
-- Misclassifying quadric surfaces without checking traces in coordinate planes.
-
-## Connections
-
-- [Parametric Polar and Conic Curves](/math/calculus/parametric-polar-conics): space curves extend parametric ideas.
-- [Vector Functions and Motion](/math/calculus/vector-functions-and-motion): derivatives of vector-valued functions describe motion.
-- [Partial Derivatives and the Gradient](/math/calculus/partial-derivatives-and-gradient): gradients are normal vectors to level surfaces.
-- [Vector Calculus](/math/calculus/vector-calculus): dot and cross products support line, surface, flux, and circulation integrals.
+</div>

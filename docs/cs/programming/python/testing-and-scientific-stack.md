@@ -303,9 +303,8 @@ Dependencies are part of the experiment. Record Python and package versions in a
 - Reusing mutable fixtures so one test contaminates another.
 - Letting a notebook depend on out-of-order cell execution.
 
-## Related pages
+<div className="see-also">
 
-- [Functions, Arguments, and Decorators](/cs/programming/python/functions-arguments-and-decorators)
-- [Errors, Exceptions, and Debugging](/cs/programming/python/errors-exceptions-and-debugging)
-- [Modules, Packages, and Environments](/cs/programming/python/modules-packages-and-environments)
-- [Standard Library Highlights](/cs/programming/python/standard-library-highlights)
+See also: [Functions, Arguments, and Decorators](/cs/programming/python/functions-arguments-and-decorators) · [Errors, Exceptions, and Debugging](/cs/programming/python/errors-exceptions-and-debugging) · [Modules, Packages, and Environments](/cs/programming/python/modules-packages-and-environments) · [Standard Library Highlights](/cs/programming/python/standard-library-highlights)
+
+</div>

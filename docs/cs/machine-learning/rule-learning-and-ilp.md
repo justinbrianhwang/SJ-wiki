@@ -7,81 +7,27 @@ sidebar_position: 12
 
 Learning sets of rules returns to symbolic representations, but with more practical machinery than the early concept-learning chapter. Mitchell covers sequential covering, rule evaluation, FOIL, first-order Horn clauses, and inductive logic programming. The goal is to learn readable if-then rules, sometimes with variables and relations rather than fixed attribute vectors.
 
-This chapter is historically important because it shows machine learning interacting with logic programming. Rules can express relational structure that ordinary feature-vector methods hide. A rule learner can describe family relations, list structure, chemical relations, or database facts when examples are naturally relational.
+The chapter is historically important because it shows machine learning interacting with logic programming. Rules can express relational structure that ordinary feature-vector methods hide. A rule learner can describe family relations, list structure, chemical relations, or database facts when examples are naturally relational.
 
-## Definitions
+## Building a concept one rule at a time
 
-A propositional rule has the form:
+A propositional rule has the form
 
 $$
 IF \; conditions \; THEN \; class.
 $$
 
-For example:
+For example,
 
 $$
 IF \; Outlook=Sunny \land Humidity=Normal \; THEN \; PlayTennis=Yes.
 $$
 
-A sequential covering algorithm learns one rule at a time. After learning a rule that covers some positive examples, it removes those examples and learns another rule for the remaining positives.
-
-A rule covers an example if the example satisfies the rule's conditions.
-
-First-order Horn clauses allow variables and predicates:
-
-$$
-Grandparent(x,z) \leftarrow Parent(x,y) \land Parent(y,z).
-$$
-
-FOIL is a top-down inductive logic programming algorithm. It starts with a general rule and specializes it by adding literals to the rule body. It chooses candidate literals using an information-gain measure adapted to first-order rules.
-
-Inductive logic programming (ILP) studies learning logical rules from examples plus background knowledge. The learner searches a space of logic programs rather than ordinary attribute tests.
-
-## Key results
-
-Sequential covering decomposes a disjunctive concept into a set of conjunctive rules. Each learned rule captures one region of the positive class. The full learned concept is the disjunction of all rules:
+A rule covers an example when the example satisfies the rule's conditions. Sequential covering learns one rule at a time, removes the positive examples covered by that rule, and continues with the remaining positives. The learned concept is the disjunction of the individual rules:
 
 $$
 h(x)=Rule_1(x)\lor Rule_2(x)\lor \cdots \lor Rule_k(x).
 $$
-
-The general strategy is:
-
-1. While positive examples remain, learn one high-precision rule.
-2. Add the rule to the rule set.
-3. Remove positive examples covered by the rule.
-4. Continue until enough positives are covered or stopping criteria apply.
-
-Rule learning often uses a general-to-specific search. A very general rule covers many positives but may cover negatives. Adding conditions specializes the rule, reducing coverage and ideally increasing accuracy.
-
-FOIL extends this idea to first-order logic. Candidate literals may introduce new variables, enabling relational definitions. For example, to learn `Grandparent(x,z)`, FOIL can introduce a variable `y` and connect two `Parent` facts.
-
-The main benefit of first-order rules is expressiveness. The main cost is search. The space of possible literals, variable bindings, and clauses can be enormous, so language restrictions and heuristics are essential.
-
-Rule learners also face a coverage-accuracy tension. A very general rule may cover many positive examples, which is useful for compactness, but it may also cover negatives. A very specific rule may avoid negatives but cover only one or two positives. Sequential covering usually tries to learn rules that are accurate enough to be trusted while broad enough to make progress. This is why rule-quality measures often combine positive coverage, negative coverage, and sometimes description length.
-
-Pruning matters for rules just as it matters for decision trees. A rule can be specialized until it excludes every negative training example, but the last few literals may only describe accidents of the sample. Post-pruning removes conditions when doing so improves validation performance or an estimated quality measure. The result may cover a few training negatives but perform better on future data.
-
-First-order representations make background knowledge central. If the learner knows `Parent`, it can express `Grandparent` compactly. If it lacks the relevant predicates, no amount of FOIL search can invent the intended relational bridge without additional representational support. Thus ILP's power comes from the combination of examples, hypothesis language, and background predicates.
-
-Default predictions are part of the learned rule set. In many sequential covering systems, the learned rules describe one target class, and any example not covered by a rule receives the default negative class. In multiclass settings, the system may learn separate rule sets or ordered rules. This matters because uncovered regions are not "unknown" unless the system is designed to abstain; they usually receive an implicit prediction.
-
-Rule ordering can also change behavior. An unordered rule set may vote or combine all matching rules. An ordered decision list uses the first matching rule, so an early broad rule can prevent later rules from firing. Mitchell's chapter focuses on the mechanics of learning rules, but practical rule systems must specify conflict resolution clearly.
-
-Compared with decision trees, separate-and-conquer rule learning can produce more modular descriptions. A tree path is constrained by earlier splits near the root, while a separately learned rule can use just the conditions needed for one subcase. That modularity is useful, but the greedy removal of covered positives can make later rules depend on earlier choices.
-
-ILP also changes what counts as an example. A single labeled relation can be supported by many background facts, and a candidate rule can have many possible variable bindings. This makes coverage testing more expensive than in propositional rule learning. Efficient implementations depend heavily on indexing facts, restricting candidate literals, and pruning the search.
-
-The reward for that extra cost is expressive clarity. A short first-order rule can state a pattern that would require many propositional features if variables and relations were flattened away.
-
-| Approach | Representation | Search direction | Strength | Risk |
-|---|---|---|---|---|
-| Decision tree rules | Propositional path rules | Tree induction then conversion | Simple and readable | Tree bias controls rule form |
-| Sequential covering | Propositional rule set | Often general to specific | Directly learns disjunctions | Rule ordering and pruning matter |
-| FOIL | First-order Horn clauses | General to specific | Handles relations and variables | Large search space |
-| Inverse resolution | Logic clauses | Inverts deduction | Strong logical foundation | Complex and sensitive to bias |
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -93,11 +39,57 @@ flowchart TD
     More -->|no| Done[Return rule set]
 ```
 
-Sequential covering is greedy. It commits to one rule, removes covered positives, and then searches for the next rule.
+The search is greedy: it commits to one rule before searching for the next. Its basic loop is:
 
-## Worked example 1: Sequential covering for a tiny dataset
+1. Learn a high-precision rule while positive examples remain.
+2. Add the rule to the rule set.
+3. Remove the positive examples it covers.
+4. Stop when enough positives are covered or another stopping criterion applies.
 
-Problem: Learn rules for `Buy=Yes` from two binary attributes, `Student` and `Coupon`.
+Unlike a decision-tree path, a separately learned rule can use only the conditions needed for one subcase. The resulting description can be more modular, though greedy removal means that later rules depend on earlier choices.
+
+## Specializing without memorizing
+
+Rule learning often searches from general to specific. A general rule covers many positives but may also admit negatives. Adding conditions reduces coverage and should improve precision. A useful rule must be accurate enough to trust and broad enough to remove a meaningful part of the positive set, so quality measures commonly combine positive coverage, negative coverage, and sometimes description length.
+
+Specialization can continue until every negative training example is excluded, but the last few conditions may describe sample accidents. Post-pruning removes conditions when that improves validation performance or an estimated quality measure. A pruned rule may cover a few training negatives and still generalize better.
+
+Three implementation details affect the meaning of the final classifier:
+
+- Covered positives are removed during sequential covering; negatives usually remain to constrain subsequent rules.
+- An example left uncovered normally receives a default prediction, often the negative class. It is not automatically treated as unknown unless the system can abstain.
+- Rule order matters in a decision list because the first matching rule wins. Unordered rule sets instead need a voting or conflict-resolution policy.
+
+Coverage alone is therefore a poor objective. A broad rule that covers many positives and many negatives can damage every later decision, while an extremely narrow rule may amount to memorization.
+
+## From attribute tests to relations
+
+First-order Horn clauses introduce variables and predicates:
+
+$$
+Grandparent(x,z) \leftarrow Parent(x,y) \land Parent(y,z).
+$$
+
+Inductive logic programming (ILP) learns logical rules from examples and background knowledge. The learner searches a space of logic programs rather than ordinary attribute tests. FOIL is a top-down ILP algorithm: it begins with a general clause and adds body literals, choosing among candidates with an information-gain measure adapted to first-order rules.
+
+Candidate literals may introduce variables. To learn `Grandparent(x,z)`, for example, FOIL can add an intermediate variable `y` and connect two `Parent` facts. A short clause then states a relational pattern that would require many engineered propositional features if the relations were flattened.
+
+That expressiveness enlarges the search space. Possible literals, variable bindings, and clauses multiply quickly, so ILP systems impose a language bias that limits which predicates and variable patterns may be considered. Unrestricted variables and literals can make the search effectively unbounded.
+
+Background predicates set another hard boundary. Given `Parent`, the learner can express `Grandparent` compactly. Without a predicate that supplies the relevant relation, FOIL cannot discover the intended bridge merely by searching longer. The result depends on the examples, the hypothesis language, and the supplied background knowledge.
+
+Coverage testing is also more expensive than in propositional learning. One labeled relation may depend on many background facts, and a candidate clause can admit many variable bindings. Efficient systems rely on fact indexes, restricted literal generation, and aggressive pruning.
+
+| Approach | Representation | Search direction | Strength | Risk |
+|---|---|---|---|---|
+| Decision tree rules | Propositional path rules | Tree induction then conversion | Simple and readable | Tree bias controls rule form |
+| Sequential covering | Propositional rule set | Often general to specific | Directly learns disjunctions | Rule ordering and pruning matter |
+| FOIL | First-order Horn clauses | General to specific | Handles relations and variables | Large search space |
+| Inverse resolution | Logic clauses | Inverts deduction | Strong logical foundation | Complex and sensitive to bias |
+
+## Covering a small propositional dataset
+
+Suppose the target is `Buy=Yes` and the two attributes are `Student` and `Coupon`.
 
 | Example | Student | Coupon | Buy |
 |---|---|---|---|
@@ -106,35 +98,19 @@ Problem: Learn rules for `Buy=Yes` from two binary attributes, `Student` and `Co
 | 3 | No | Yes | Yes |
 | 4 | No | No | No |
 
-Use a simple covering approach that chooses rules with no negative coverage.
-
-Method:
-
-1. List positive examples: 1, 2, and 3. Negative example: 4.
-
-2. Consider the rule:
+Use a covering procedure that accepts only rules with no negative coverage. The positive examples are 1, 2, and 3; example 4 is negative. Begin with
 
 $$
 IF \; Student=Yes \; THEN \; Buy=Yes.
 $$
 
-   It covers examples 1 and 2. Both are positive. It covers no negative examples.
-
-3. Add the rule and remove covered positives 1 and 2.
-
-   Remaining positive: example 3.
-
-4. Learn another rule for example 3.
+This rule covers examples 1 and 2, both positive, so add it and remove those two positives. Example 3 remains. A second rule covers it:
 
 $$
 IF \; Coupon=Yes \; THEN \; Buy=Yes.
 $$
 
-   It covers examples 1 and 3. Both are positive. It covers no negative examples.
-
-5. Add the rule and remove example 3.
-
-6. No positives remain. The learned rule set is:
+It covers examples 1 and 3 and no negatives. After removing example 3, no positives remain. The rule set is
 
 $$
 Student=Yes \Rightarrow Buy=Yes
@@ -144,70 +120,43 @@ $$
 Coupon=Yes \Rightarrow Buy=Yes.
 $$
 
-7. Check all examples.
+Example 1 satisfies both rules, examples 2 and 3 satisfy one each, and example 4 satisfies neither. With `No` as the default, all four predictions are correct. The learned concept is $Student=Yes \lor Coupon=Yes$.
 
-   - Example 1 satisfies both rules, predict Yes.
-   - Example 2 satisfies the student rule, predict Yes.
-   - Example 3 satisfies the coupon rule, predict Yes.
-   - Example 4 satisfies neither rule, predict No by default.
+## Following FOIL's intermediate variable
 
-Answer: The learned concept is $Student=Yes \lor Coupon=Yes$. It matches all four training examples.
-
-## Worked example 2: FOIL-style literal choice
-
-Problem: Learn `Grandparent(x,z)` using background predicate `Parent`. Positive examples include `Grandparent(Alice,Carol)`. Background facts include `Parent(Alice,Bob)` and `Parent(Bob,Carol)`. Show why adding `Parent(x,y)` and then `Parent(y,z)` is useful.
-
-Method:
-
-1. Start with the most general rule:
+Suppose the target is `Grandparent(x,z)`, a positive example is `Grandparent(Alice,Carol)`, and the background facts include `Parent(Alice,Bob)` and `Parent(Bob,Carol)`. Start with the most general clause:
 
 $$
 Grandparent(x,z) \leftarrow true.
 $$
 
-   This covers every pair $(x,z)$, including many negatives.
-
-2. Add a literal that connects $x$ to an intermediate variable:
+It covers every pair $(x,z)$, including many negatives. Adding a literal that links $x$ to a new variable gives
 
 $$
 Grandparent(x,z) \leftarrow Parent(x,y).
 $$
 
-   For `x=Alice`, this binds `y=Bob`. The rule still does not constrain `z`, so it remains too general.
-
-3. Add a second literal connecting the intermediate variable to $z$:
+For `x=Alice`, the fact `Parent(Alice,Bob)` binds `y=Bob`, but the rule still leaves $z$ unconstrained. A second literal completes the chain:
 
 $$
 Grandparent(x,z) \leftarrow Parent(x,y) \land Parent(y,z).
 $$
 
-4. Test the positive example.
-
-   Substitute $x=Alice$ and $z=Carol$:
+Substituting $x=Alice$ and $z=Carol$ requires
 
 $$
 Parent(Alice,y) \land Parent(y,Carol).
 $$
 
-   With $y=Bob$, both facts are true:
+The binding $y=Bob$ makes both literals true:
 
 $$
 Parent(Alice,Bob) \land Parent(Bob,Carol).
 $$
 
-5. Interpret the specialization.
+The intermediate variable expresses the relational bridge needed for grandparenthood. Its value is determined during coverage testing rather than supplied as a pre-engineered feature.
 
-   The new variable $y$ expresses the relational bridge needed for grandparenthood. A propositional learner would need this relation pre-engineered as a feature.
-
-Answer: The rule
-
-$$
-Grandparent(x,z) \leftarrow Parent(x,y) \land Parent(y,z)
-$$
-
-covers the example through the binding $y=Bob$ and captures the intended relational concept.
-
-## Code
+## Executing the propositional rule set
 
 ```python
 def covers(rule_conditions, example):
@@ -230,19 +179,12 @@ for ex in examples:
     print(ex, "=>", predicted)
 ```
 
-## Common pitfalls
+The `any` expression gives unordered disjunctive semantics: matching either rule predicts `Yes`, and matching neither falls through to the default `No`. An ordered decision list would need to test rules in priority order and stop at the first match.
 
-- Assuming a rule set is unordered when the learning system uses ordered defaults. Some rule learners predict using the first matching rule.
-- Learning rules that cover many positives but also many negatives. Coverage alone is not enough; precision matters.
-- Removing negative examples during sequential covering. Usually covered positive examples are removed; negatives remain to constrain future rules.
-- Letting first-order rule search introduce unlimited variables and literals. ILP needs language bias to keep search finite.
-- Confusing entailment with statistical confidence. A learned logical rule may be syntactically valid but empirically unreliable.
-- Ignoring pruning. Rule learners can overfit by adding conditions that explain accidental quirks of the training set.
+A logical clause and an empirical guarantee should not be confused. A learned clause may be syntactically valid and entail a prediction under the background facts while still having weak statistical support. Coverage estimates, pruning, and held-out evaluation remain necessary.
 
-## Connections
+<div className="see-also">
 
-- [Concept learning](/cs/machine-learning/concept-learning-and-version-spaces)
-- [Decision tree learning](/cs/machine-learning/decision-tree-learning)
-- [Genetic algorithms](/cs/machine-learning/genetic-algorithms)
-- [Analytical learning](/cs/machine-learning/analytical-learning)
-- [Data mining](/cs/data-mining/)
+See also: [Concept learning](/cs/machine-learning/concept-learning-and-version-spaces) · [Decision tree learning](/cs/machine-learning/decision-tree-learning) · [Genetic algorithms](/cs/machine-learning/genetic-algorithms) · [Analytical learning](/cs/machine-learning/analytical-learning) · [Data mining](/cs/data-mining/intro)
+
+</div>

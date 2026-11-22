@@ -380,10 +380,8 @@ The arrow operator is unusual. An overloaded `operator->` must return a pointer 
 
 References cannot represent optional absence, so a function returning “an element if found” needs another design. It may return a pointer, an iterator whose end value signals failure, or an optional reference wrapper. Inventing a sentinel object and returning its reference makes mutation and lifetime semantics unclear.
 
-## Related pages
+<div className="see-also">
 
-- [functions and parameters](/cs/programming/cpp/functions-parameters-and-scope)
-- [classes and encapsulation](/cs/programming/cpp/classes-and-encapsulation)
-- [constructors and copy semantics](/cs/programming/cpp/constructors-and-copy-semantics)
-- [pointers and dynamic memory](/cs/programming/cpp/pointers-and-dynamic-memory)
-- [STL algorithms and iterators](/cs/programming/cpp/stl-algorithms-and-iterators)
+See also: [functions and parameters](/cs/programming/cpp/functions-parameters-and-scope) · [classes and encapsulation](/cs/programming/cpp/classes-and-encapsulation) · [constructors and copy semantics](/cs/programming/cpp/constructors-and-copy-semantics) · [pointers and dynamic memory](/cs/programming/cpp/pointers-and-dynamic-memory) · [STL algorithms and iterators](/cs/programming/cpp/stl-algorithms-and-iterators)
+
+</div>

@@ -21,7 +21,7 @@ Speech processing connects language to sound. Jurafsky and Martin include automa
 
 ASR maps audio to text. TTS maps text to audio. Both tasks involve sequence transduction, uncertainty, and evaluation problems. Speech also forces preprocessing questions to become concrete: numbers, abbreviations, punctuation, disfluencies, speaker variation, dialect, and code switching can change both recognition and synthesis.
 
-## Definitions
+## Two directions across the acoustic-text boundary
 
 **Automatic speech recognition** estimates a word or token sequence $y$ from acoustic input $x$:
 
@@ -55,7 +55,7 @@ where $S$ is substitutions, $D$ deletions, $I$ insertions, and $N$ words in the 
 
 **Text-to-speech** converts text to waveform. Modern systems often predict Mel spectrograms from text and then use a **vocoder** to synthesize waveform audio.
 
-## Key results
+## Alignment, language modeling, and latency
 
 ASR is difficult because the acoustic signal is continuous, variable, and ambiguous. Speakers differ in accent, pitch, speed, microphone, background noise, emotion, health, and dialect. The same sound segment may map to different words depending on context, so language modeling is essential.
 
@@ -81,8 +81,6 @@ Speech also carries information that ordinary transcripts discard: speaker ident
 
 For ASR datasets, transcript conventions are part of the label. Filled pauses, partial words, punctuation, casing, and normalization may be included or excluded. A model trained under one convention can look wrong under another even when the recognized words are essentially correct.
 
-## Visual
-
 ```mermaid
 flowchart LR
   A[Waveform] --> B[Frames]
@@ -107,9 +105,11 @@ flowchart LR
 | TTS normalization | written text | spoken form | ambiguous semiotic classes | accuracy |
 | TTS synthesis | text or phonemes | waveform | prosody and naturalness | MOS, preference |
 
-## Worked example 1: word error rate
+## Checking transcripts and alignments by hand
 
-Problem: reference transcript is `the cat sat down`. ASR hypothesis is `the bat sat`.
+### Computing WER for a short transcript
+
+The reference transcript is `the cat sat down`; the ASR hypothesis is `the bat sat`.
 
 1. Align the strings:
 
@@ -136,11 +136,11 @@ $$
 \mathrm{WER}=100\cdot\frac{1+1+0}{4}=50\%.
 $$
 
-Checked answer: WER is $50\%$. The number can be high for short utterances because each word carries large weight.
+WER is $50\%$. The number can be high for short utterances because each word carries large weight.
 
-## Worked example 2: CTC collapsing
+### Why CTC needs blanks between repeated letters
 
-Problem: apply the CTC collapse function $B$ to this frame-level alignment, where `_` is blank:
+Apply the CTC collapse function $B$ to this frame-level alignment, where `_` is blank:
 
 ```text
 _ h h _ e l l _ o _
@@ -159,9 +159,9 @@ _ h h _ e l l _ o _
 helo
 ```
 
-Checked answer: the alignment collapses to `helo`, not `hello`. To output double `l`, the alignment needs a blank between the two `l` labels, such as `_ h e l _ l o _`.
+The alignment collapses to `helo`, not `hello`. To output double `l`, the alignment needs a blank between the two `l` labels, such as `_ h e l _ l o _`.
 
-## Code
+## Word error rate and CTC collapse in code
 
 ```python
 def edit_distance_words(ref, hyp):
@@ -196,7 +196,7 @@ print(wer("the cat sat down", "the bat sat"))
 print(ctc_collapse("_ h h _ e l _ l o _".split()))
 ```
 
-## Common pitfalls
+## Errors hidden by normalization and aggregation
 
 - Comparing WER across systems with different text normalization.
 - Ignoring punctuation and casing policies when aligning transcripts.
@@ -206,9 +206,8 @@ print(ctc_collapse("_ h h _ e l _ l o _".split()))
 - Reporting one aggregate WER without checking accent, dialect, speaker, and noise subgroups.
 - Assuming ASR output is ground truth for downstream NLP; recognition errors propagate.
 
-## Connections
+<div className="see-also">
 
-- [Regular expressions and normalization](/cs/nlp/regular-expressions-normalization-edit-distance)
-- [RNNs and LSTMs for sequence modeling](/cs/nlp/rnns-lstms-sequence-modeling)
-- [Machine translation](/cs/nlp/machine-translation)
-- [Dialogue and chatbots](/cs/nlp/dialogue-and-chatbots)
+See also: [Regular expressions and normalization](/cs/nlp/regular-expressions-normalization-edit-distance) · [RNNs and LSTMs for sequence modeling](/cs/nlp/rnns-lstms-sequence-modeling) · [Machine translation](/cs/nlp/machine-translation) · [Dialogue and chatbots](/cs/nlp/dialogue-and-chatbots)
+
+</div>

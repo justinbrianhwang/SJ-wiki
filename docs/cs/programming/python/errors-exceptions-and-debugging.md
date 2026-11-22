@@ -282,9 +282,8 @@ Once fixed, write a test that fails for the original bug and passes for the corr
 - Retrying every failure, including invalid input that will never succeed unchanged.
 - Logging the same traceback at every layer before re-raising it.
 
-## Related pages
+<div className="see-also">
 
-- [Files and Context Managers](/cs/programming/python/files-and-context-managers)
-- [Control Flow and Comprehensions](/cs/programming/python/control-flow-and-comprehensions)
-- [Testing and the Scientific Stack](/cs/programming/python/testing-and-scientific-stack)
-- [Standard Library Highlights](/cs/programming/python/standard-library-highlights)
+See also: [Files and Context Managers](/cs/programming/python/files-and-context-managers) · [Control Flow and Comprehensions](/cs/programming/python/control-flow-and-comprehensions) · [Testing and the Scientific Stack](/cs/programming/python/testing-and-scientific-stack) · [Standard Library Highlights](/cs/programming/python/standard-library-highlights)
+
+</div>

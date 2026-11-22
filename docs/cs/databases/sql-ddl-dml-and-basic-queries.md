@@ -7,13 +7,9 @@ sidebar_position: 3
 
 SQL is the standard practical language for relational databases. It is both a data-definition language, because it declares schemas and constraints, and a data-manipulation language, because it inserts, changes, deletes, and queries data. The important shift from relational algebra is that SQL is declarative: a query says what result is wanted, not which physical algorithm should produce it.
 
-![A MySQL console screenshot shows a command-line database session with query output.](https://commons.wikimedia.org/wiki/Special:FilePath/Mysql-screenshot.PNG)
-
-*Figure: SQL pages connect abstract relational operations to the database console used in practice. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mysql-screenshot.PNG), Wikimedia Commons contributors, public domain text.*
-
 Basic SQL is enough to express many useful questions: create tables, declare primary and foreign keys, filter rows, project columns, sort results, and update stored facts. The deeper topics of joins, grouping, views, recursion, and transactions build on these same ideas. A good SQL query is not only syntactically valid; it also states its assumptions about keys, missing values, and duplicate rows clearly.
 
-## Definitions
+## Declaring tables and manipulating rows
 
 **Data Definition Language (DDL)** statements define database objects. Common DDL statements include `CREATE TABLE`, `ALTER TABLE`, `DROP TABLE`, `CREATE INDEX`, and `CREATE VIEW`. The most important DDL object for the relational model is a table declaration with attribute names, data types, and constraints.
 
@@ -26,8 +22,8 @@ A **base table** is physically stored by the database system. A **derived table*
 | `PRIMARY KEY` | `PRIMARY KEY (ID)` | `ID` is unique and not null |
 | `UNIQUE` | `UNIQUE (email)` | no two rows share a non-null email value |
 | `NOT NULL` | `name varchar(40) NOT NULL` | every row must have a name |
-| `CHECK` | `CHECK (credits >= 0)` | row-level predicate must be true |
-| `FOREIGN KEY` | `FOREIGN KEY (dept_name) REFERENCES department` | referenced row must exist |
+| `CHECK` | `CHECK (credits >= 0)` | row-level predicate must not be false |
+| `FOREIGN KEY` | `FOREIGN KEY (dept_name) REFERENCES department` | each non-null reference must match a parent row |
 
 The basic `SELECT` form is:
 
@@ -40,7 +36,7 @@ ORDER BY sort_expression;
 
 SQL uses **bag semantics** by default: duplicate result rows are preserved unless `DISTINCT` is requested. This differs from pure relational algebra. SQL also has a special marker, `NULL`, for unknown or inapplicable values. Comparisons involving `NULL` use three-valued logic: true, false, and unknown.
 
-## Key results
+## How SQL statements get their meaning
 
 The logical order of a simple SQL query is not the same as the written order. Conceptually, the database forms the `FROM` source, applies `WHERE`, groups if needed, filters groups with `HAVING`, computes the `SELECT` list, removes duplicates if `DISTINCT` appears, and then orders with `ORDER BY`. Physical execution may be radically different, but the result must match that logical meaning.
 
@@ -55,8 +51,6 @@ DDL and DML should be designed together. A query that assumes every student has 
 The `DELETE` statement deserves the same care as `UPDATE`. Deleting a parent row can violate foreign keys if child rows still reference it. SQL systems may reject the delete, cascade it, set child references to null, or apply another declared action. The right choice is a design decision: cascading course deletion might be dangerous if enrollment history must be retained, while cascading deletion of short-lived session rows may be exactly what the application needs.
 
 Type choices are also semantic choices. Storing money in a floating-point column can introduce rounding behavior that is unacceptable for accounting; fixed-precision numeric types are usually more appropriate. Storing dates as strings makes ordering, validation, and date arithmetic unreliable. Choosing a wide text column for every attribute may make early loading convenient, but it pushes validation bugs into queries and application code. A schema should encode as many stable facts about the data as the DBMS can enforce.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -78,11 +72,9 @@ flowchart TD
 | `HAVING` | filter groups | using it for simple row predicates |
 | `ORDER BY` | presentation order | assuming stored table order is meaningful |
 
-## Worked example 1: Build a small university schema
+## Building a constrained university schema
 
-Problem: Create tables for departments and students. Each student belongs to an existing department, has a nonnegative credit count, and is identified by `ID`.
-
-Method:
+The schema needs tables for departments and students. Each student belongs to an existing department, has a nonnegative credit count, and is identified by `ID`.
 
 1. Define the parent table first, because the child table will reference it:
 
@@ -118,13 +110,11 @@ Method:
 
 4. Check the constraints. The department row is legal because the budget is nonnegative and `dept_name` is unique. The student row is legal because `ID` is unique, `name` is not null, credits are nonnegative, and `Comp. Sci.` exists in `department`.
 
-Checked answer: the schema prevents two students with `ID = '00128'`, prevents negative total credits, and prevents a student from referencing a department not present in the `department` table.
+The schema prevents two students with `ID = '00128'`, prevents negative total credits, and prevents a student from referencing a department not present in the `department` table.
 
-## Worked example 2: Filter, project, and sort students
+## Filtering and ordering student rows
 
-Problem: Return the names and credit counts of computer-science students with at least 90 credits, sorted from most credits to least.
-
-Method:
+The query should return names and credit counts for computer-science students with at least 90 credits, sorted from most credits to least.
 
 1. Start with the relation:
 
@@ -160,9 +150,9 @@ Method:
    ORDER BY tot_cred DESC, name ASC;
    ```
 
-Checked answer: the `WHERE` clause removes non-CS students and students below 90 credits before output is formed. The `ORDER BY` clause does not change the relation's stored state; it only orders the query result.
+The `WHERE` clause removes non-CS students and students below 90 credits before output is formed. The `ORDER BY` clause does not change the relation's stored state; it only orders the query result.
 
-## Code
+## Updating a course catalog safely
 
 ```sql
 CREATE TABLE course (
@@ -188,7 +178,7 @@ WHERE dept_name = 'Comp. Sci.'
 ORDER BY course_id;
 ```
 
-## Common pitfalls
+## Schema and query habits that prevent surprises
 
 - Writing `SELECT *` in durable application code. It couples the caller to every column and can break when the schema evolves.
 - Forgetting `WHERE` in `UPDATE` or `DELETE`. Always preview the target rows with a `SELECT` first when working interactively.
@@ -197,9 +187,8 @@ ORDER BY course_id;
 - Depending on output order without `ORDER BY`. SQL results are unordered unless an ordering is requested.
 - Expecting primary keys and indexes to be the same concept. A DBMS often creates an index for a primary key, but the logical constraint is separate from the physical structure.
 
-## Connections
+<div className="see-also">
 
-- [Relational Model and Relational Algebra](/cs/databases/relational-model-and-algebra)
-- [SQL Joins, Subqueries, and Set Operations](/cs/databases/sql-joins-subqueries-and-set-operations)
-- [SQL Aggregation, Views, and Window Functions](/cs/databases/sql-aggregation-views-and-window-functions)
-- [Application Architecture and Security](/cs/databases/application-architecture-and-security)
+See also: [Relational Model and Relational Algebra](/cs/databases/relational-model-and-algebra) · [SQL Joins, Subqueries, and Set Operations](/cs/databases/sql-joins-subqueries-and-set-operations) · [SQL Aggregation, Views, and Window Functions](/cs/databases/sql-aggregation-views-and-window-functions) · [Application Architecture and Security](/cs/databases/application-architecture-and-security)
+
+</div>

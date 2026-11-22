@@ -307,10 +307,8 @@ The code keeps the critical values explicit. That makes it easy to change from 9
 - Treating paired data as two independent samples.
 - Reporting a confidence interval without units or context.
 
-## Related pages
+<div className="see-also">
 
-- [Sampling distributions and the central limit theorem](/math/statistics/sampling-distributions-and-clt)
-- [Hypothesis testing logic](/math/statistics/hypothesis-testing-logic)
-- [Tests for means](/math/statistics/tests-for-means)
-- [Proportions and chi-square tests](/math/statistics/proportions-and-chi-square-tests)
-- [Linear regression inference](/math/statistics/linear-regression-inference)
+See also: [Sampling distributions and the central limit theorem](/math/statistics/sampling-distributions-and-clt) · [Hypothesis testing logic](/math/statistics/hypothesis-testing-logic) · [Tests for means](/math/statistics/tests-for-means) · [Proportions and chi-square tests](/math/statistics/proportions-and-chi-square-tests) · [Linear regression inference](/math/statistics/linear-regression-inference)
+
+</div>

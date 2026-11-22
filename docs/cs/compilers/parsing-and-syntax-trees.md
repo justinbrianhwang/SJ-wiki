@@ -7,13 +7,13 @@ sidebar_position: 2
 
 ![An abstract syntax tree for an implementation of the Euclidean algorithm shows nested function-call and arithmetic-expression nodes labeled with operator types.](https://commons.wikimedia.org/wiki/Special:FilePath/Abstract_syntax_tree_for_Euclidean_algorithm.svg)
 
-*Figure: A concrete abstract syntax tree built for a Euclidean-algorithm implementation. Every parser ultimately produces a tree like this for the later compiler or interpreter phases to consume. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Abstract_syntax_tree_for_Euclidean_algorithm.svg), Dcoetzee, public domain.*
+*Figure: An abstract syntax tree for a Euclidean-algorithm implementation. The nodes retain program structure while omitting most concrete punctuation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Abstract_syntax_tree_for_Euclidean_algorithm.svg), Dcoetzee, public domain.*
 
 Parsing turns a token stream into structure. The scanner knows that `print`, `1`, `+`, `2`, and `;` are tokens; the parser knows that `1 + 2` is an expression and that `print 1 + 2;` is a statement. Nystrom emphasizes hand-written recursive descent and Pratt parsing because they are easy to debug and align well with expression syntax [1]. The Dragon Book, Appel, Cooper-Torczon, and Muchnick place that experience inside the wider theory of context-free grammars and LR parsing [2]-[5].
 
 Syntax trees are the main product of parsing in many interpreters and front ends. A parse tree records every grammar rule, while an abstract syntax tree, or AST, discards punctuation and helper productions so that later phases see the program's meaning rather than the grammar's bookkeeping.
 
-## Definitions
+## Grammars, derivations, and ASTs
 
 A **context-free grammar** is a tuple $G=(N,\Sigma,P,S)$, where $N$ is a set of nonterminals, $\Sigma$ is a set of terminals, $P$ is a set of productions, and $S$ is the start symbol. A production such as:
 
@@ -33,42 +33,7 @@ A **bottom-up parser** starts with tokens and reduces them to nonterminals. LR p
 
 An **AST node** represents a meaningful program construct, such as binary expression, variable declaration, call, or block. The **visitor pattern** separates operations over node types from the node classes themselves; Nystrom uses it to keep parsing, printing, resolving, and evaluation code separate [1].
 
-## Key results
-
-The first result is that grammar shape determines parser simplicity. Left recursion such as:
-
-$$
-\mathrm{Expr} \to \mathrm{Expr}\;+\;\mathrm{Term}
-$$
-
-is natural for left-associative operators but unsuitable for direct recursive descent because `expr()` would call itself before consuming input. A top-down grammar often removes left recursion:
-
-$$
-\begin{aligned}
-\mathrm{Expr} &\to \mathrm{Term}\;\mathrm{Expr'} \\
-\mathrm{Expr'} &\to +\;\mathrm{Term}\;\mathrm{Expr'} \mid \epsilon
-\end{aligned}
-$$
-
-The transformed grammar is easier for LL parsing but less direct as an AST model. A hand parser can hide this transformation by using loops to build left-associative trees.
-
-The second result is that precedence and associativity are semantic commitments. In the expression `a - b - c`, subtraction is normally left-associative, so the AST is `(a - b) - c`. Assignment is often right-associative, so `a = b = c` means `a = (b = c)`. Pratt parsing encodes this by comparing the current operator's binding power with the minimum binding power expected by the caller.
-
-The third result is the LR item idea. An LR item places a dot inside a production, such as:
-
-$$
-\mathrm{Expr} \to \mathrm{Expr}\;+\;\bullet\;\mathrm{Term}.
-$$
-
-The dot records how much of the right-hand side has been seen. A set of items is a parser state. If the next token can advance a dot over a terminal, the parser shifts. If an item has the dot at the end, the parser may reduce. A **shift-reduce conflict** occurs when both actions seem valid; a **reduce-reduce conflict** occurs when two completed productions compete. Knuth's LR parsing result shows how viable prefixes can be recognized deterministically with enough state [6].
-
-The fourth result is error recovery. A parser that stops on the first syntax error is easier to write but frustrating to use. Nystrom's Lox parser uses synchronization: after an error, it advances until a likely statement boundary such as `;`, `class`, `fun`, `var`, `for`, `if`, `while`, `print`, or `return` [1]. Parser generators offer panic-mode recovery, error productions, or recovery hooks, but all require language-specific judgment.
-
-The fifth result is that parse trees and ASTs serve different readers. A parse tree is excellent for proving grammar properties. An AST is better for semantic analysis and interpretation. A semicolon token or grouping production may be crucial to parsing but useless after the tree is built; a source span, however, should usually survive in the AST for diagnostics.
-
-The sixth result is that tool choice changes the maintenance problem. A hand-written parser keeps control flow close to the language designer's intent and usually makes custom diagnostics easier. A parser generator makes coverage of a large grammar more systematic, especially for LR-family grammars where table construction is tedious by hand. ANTLR emphasizes grammar readability and parse-tree visitors, while yacc and bison expose conflicts and precedence declarations in the LR tradition [7]. Neither approach removes the need to design an unambiguous language grammar, specify recovery behavior, and decide which concrete syntax details belong in the AST.
-
-## Visual
+The parser strategy changes how grammar decisions are represented, but all routes must produce structure suitable for later semantic passes:
 
 ```mermaid
 flowchart TD
@@ -92,7 +57,48 @@ flowchart TD
 | LALR(1) | Left to right | Reverse rightmost derivation | Production compilers via yacc/bison | Merged lookahead states |
 | LR(1) | Left to right | Reverse rightmost derivation | Most deterministic programming grammars | Larger tables |
 
-## Worked example 1: Removing left recursion
+## Removing left recursion without changing the tree
+
+Grammar shape determines parser simplicity. Left recursion such as:
+
+$$
+\mathrm{Expr} \to \mathrm{Expr}\;+\;\mathrm{Term}
+$$
+
+is natural for left-associative operators but unsuitable for direct recursive descent because `expr()` would call itself before consuming input. A top-down grammar often removes left recursion:
+
+$$
+\begin{aligned}
+\mathrm{Expr} &\to \mathrm{Term}\;\mathrm{Expr'} \\
+\mathrm{Expr'} &\to +\;\mathrm{Term}\;\mathrm{Expr'} \mid \epsilon
+\end{aligned}
+$$
+
+The transformed grammar is easier for LL parsing but less direct as an AST model. A hand parser can hide this transformation by using loops to build left-associative trees.
+
+## Binding power encodes precedence and associativity
+
+Precedence and associativity are semantic commitments. In the expression `a - b - c`, subtraction is normally left-associative, so the AST is `(a - b) - c`. Assignment is often right-associative, so `a = b = c` means `a = (b = c)`. Pratt parsing encodes this by comparing the current operator's binding power with the minimum binding power expected by the caller.
+
+## Reading LR states as sets of items
+
+An LR item places a dot inside a production, such as:
+
+$$
+\mathrm{Expr} \to \mathrm{Expr}\;+\;\bullet\;\mathrm{Term}.
+$$
+
+The dot records how much of the right-hand side has been seen. A set of items is a parser state. If the next token can advance a dot over a terminal, the parser shifts. If an item has the dot at the end, the parser may reduce. A **shift-reduce conflict** occurs when both actions seem valid; a **reduce-reduce conflict** occurs when two completed productions compete. Knuth's LR parsing result shows how viable prefixes can be recognized deterministically with enough state [6].
+
+## Recovering at statement boundaries
+
+A parser that stops on the first syntax error is easier to write but frustrating to use. Nystrom's Lox parser uses synchronization: after an error, it advances until a likely statement boundary such as `;`, `class`, `fun`, `var`, `for`, `if`, `while`, `print`, or `return` [1]. Parser generators offer panic-mode recovery, error productions, or recovery hooks, but all require language-specific judgment.
+
+Parse trees and ASTs serve different readers. A parse tree is excellent for proving grammar properties. An AST is better for semantic analysis and interpretation. A semicolon token or grouping production may be crucial to parsing but useless after the tree is built; a source span, however, should usually survive in the AST for diagnostics.
+
+Tool choice changes the maintenance problem. A hand-written parser keeps control flow close to the language designer's intent and usually makes custom diagnostics easier. A parser generator makes coverage of a large grammar more systematic, especially for LR-family grammars where table construction is tedious by hand. ANTLR emphasizes grammar readability and parse-tree visitors, while yacc and bison expose conflicts and precedence declarations in the LR tradition [7]. Neither approach removes the need to design an unambiguous language grammar, specify recovery behavior, and decide which concrete syntax details belong in the AST.
+
+## Parsing repeated addition with a loop
 
 Problem: convert the left-recursive grammar for addition into a form usable by recursive descent, then parse `n + n + n`.
 
@@ -134,7 +140,7 @@ $$
 
 Checked answer: the transformed grammar accepts the same sequence. To build a left-associative AST, a recursive descent implementation should not build a right-leaning tree from `Expr'`; it should parse the first term, then loop while it sees `+`, replacing `expr` by `Binary(expr, "+", next_term)`. The final AST is `Binary(Binary(n, "+", n), "+", n)`.
 
-## Worked example 2: Pratt parsing `1 + 2 * 3`
+## Pratt parsing `1 + 2 * 3`
 
 Problem: parse `1 + 2 * 3` with `*` binding more tightly than `+`.
 
@@ -161,7 +167,7 @@ Checked answer:
 
 Evaluation gives $1 + (2 \times 3) = 7$, not $(1 + 2) \times 3 = 9$, so precedence was respected.
 
-## Code
+## A two-operator Pratt parser
 
 ```python
 from dataclasses import dataclass
@@ -222,7 +228,7 @@ if __name__ == "__main__":
     print(Pratt(tokenize("1 + 2 * 3")).expr(0))
 ```
 
-## Common pitfalls
+## Grammar changes that alter the language
 
 - Treating the grammar used for parsing as the exact AST shape required by later phases.
 - Leaving direct left recursion in a recursive descent parser.
@@ -240,7 +246,19 @@ if __name__ == "__main__":
 - Forgetting to test malformed inputs, where recovery and diagnostic quality matter more than successful parsing.
 - Assuming an AST pretty-printer is a parser test; it can hide associativity mistakes unless expected trees are checked.
 
-## Connections
+## References
+
+[1] R. Nystrom, *Crafting Interpreters*. Genever Benning, 2021.  
+[2] A. V. Aho, M. S. Lam, R. Sethi, and J. D. Ullman, *Compilers: Principles, Techniques, and Tools*, 2nd ed. Pearson, 2006.  
+[3] A. W. Appel, *Modern Compiler Implementation in ML*. Cambridge University Press, 1998.  
+[4] K. D. Cooper and L. Torczon, *Engineering a Compiler*, 2nd ed. Morgan Kaufmann, 2012.  
+[5] S. S. Muchnick, *Advanced Compiler Design and Implementation*. Morgan Kaufmann, 1997.  
+[6] D. E. Knuth, "On the translation of languages from left to right," *Information and Control*, vol. 8, no. 6, pp. 607-639, 1965.  
+[7] T. Parr, *The Definitive ANTLR 4 Reference*. Pragmatic Bookshelf, 2013.
+
+<div className="see-also">
+
+See also:
 
 - [Lexical Analysis and Scanning](/cs/compilers/lexical-analysis-and-scanning) supplies the tokens and source spans.
 - [Tree-Walking Interpreters](/cs/compilers/tree-walking-interpreters) evaluate AST nodes directly.
@@ -251,12 +269,4 @@ if __name__ == "__main__":
 - [Operating Systems](/cs/operating-systems/intro) is relevant when parsing build scripts, shells, and configuration languages.
 - [Computer Architecture](/cs/computer-architecture/intro) becomes relevant after parsing when code generation targets hardware.
 
-## References
-
-[1] R. Nystrom, *Crafting Interpreters*. Genever Benning, 2021.  
-[2] A. V. Aho, M. S. Lam, R. Sethi, and J. D. Ullman, *Compilers: Principles, Techniques, and Tools*, 2nd ed. Pearson, 2006.  
-[3] A. W. Appel, *Modern Compiler Implementation in ML*. Cambridge University Press, 1998.  
-[4] K. D. Cooper and L. Torczon, *Engineering a Compiler*, 2nd ed. Morgan Kaufmann, 2012.  
-[5] S. S. Muchnick, *Advanced Compiler Design and Implementation*. Morgan Kaufmann, 1997.  
-[6] D. E. Knuth, "On the translation of languages from left to right," *Information and Control*, vol. 8, no. 6, pp. 607-639, 1965.  
-[7] T. Parr, *The Definitive ANTLR 4 Reference*. Pragmatic Bookshelf, 2013.
+</div>

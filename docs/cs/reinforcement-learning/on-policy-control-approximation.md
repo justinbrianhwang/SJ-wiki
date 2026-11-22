@@ -353,9 +353,8 @@ Policy snapshots can reveal oscillation: successive policies may alternate actio
 
 Hyperparameter comparisons need equal interaction budgets. An $n$-step method may perform more arithmetic per transition but should not receive extra environment samples. In physical or expensive simulators, interaction is usually the limiting resource; in cheap vectorized simulation, wall-clock and hardware utilization may dominate instead.
 
-## Related pages
+<div className="see-also">
 
-- [On-policy prediction with approximation](/cs/reinforcement-learning/on-policy-prediction-approximation)
-- [n-step bootstrapping](/cs/reinforcement-learning/n-step-bootstrapping)
-- [Eligibility traces](/cs/reinforcement-learning/eligibility-traces)
-- [Policy gradient methods](/cs/reinforcement-learning/policy-gradient-methods)
+See also: [On-policy prediction with approximation](/cs/reinforcement-learning/on-policy-prediction-approximation) · [n-step bootstrapping](/cs/reinforcement-learning/n-step-bootstrapping) · [Eligibility traces](/cs/reinforcement-learning/eligibility-traces) · [Policy gradient methods](/cs/reinforcement-learning/policy-gradient-methods)
+
+</div>

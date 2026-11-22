@@ -9,7 +9,7 @@ Thermodynamic property relations show that measurable properties are not indepen
 
 Cengel's treatment includes partial derivatives, Maxwell relations, the Clapeyron equation, the Joule-Thomson coefficient, internal-energy and enthalpy departure functions, and the generalized charts used for real gases. The mathematics is compact, but the payoff is large: from $P$-$v$-$T$ data one can infer entropy changes, enthalpy changes, phase-boundary slopes, and throttling temperature behavior.
 
-## Definitions
+## Choosing a potential by its natural variables
 
 - An **exact differential** represents a property change independent of path, such as $du$, $dh$, $ds$, or $dg$.
 - An **inexact differential** represents a path interaction, such as $\delta Q$ or $\delta W$.
@@ -17,17 +17,33 @@ Cengel's treatment includes partial derivatives, Maxwell relations, the Clapeyro
 - A **Maxwell relation** is an equality between cross partial derivatives derived from exact differentials of thermodynamic potentials.
 - The **cyclic relation** for partial derivatives is $(\partial x/\partial y)_z(\partial y/\partial z)_x(\partial z/\partial x)_y=-1$.
 - The **Clapeyron equation** gives the slope of a phase-equilibrium line from latent heat and volume change.
-- The **Clausius-Clapeyron equation** is an approximate integrated form for vapor pressure when vapor behaves ideally and liquid volume is negligible.
+- The **Clausius-Clapeyron approximation** follows when vapor behaves ideally and liquid volume is negligible; it can be integrated in closed form if latent heat is also treated as constant.
 - The **Joule-Thomson coefficient** is $\mu_{JT}=(\partial T/\partial P)_h$, describing temperature change during throttling.
 - **Departure functions** measure how real-gas properties differ from ideal-gas values at the same temperature and pressure.
 - The **compressibility factor** $Z=Pv/(RT)$ is the starting point for generalized departure charts.
 
-The practical method is to select a thermodynamic potential whose natural variables match the measured data. For example, Gibbs free energy is naturally connected to $T$ and $P$, so it is central in phase and chemical equilibrium. Helmholtz free energy is naturally connected to $T$ and $v$, which is useful for equations of state.
-For this topic, a complete engineering model should state the boundary, the time basis, the property model, and the sign convention before any numbers are substituted. In thermodynamic property relations, that habit is especially important because several formulas look similar while answering different physical questions. A closed-system expression, a steady-flow expression, an ideal-gas relation, and a property-table interpolation may all contain pressure, temperature, or enthalpy, but they do not have the same assumptions. The safest workflow is to write the general balance or defining relation first, cancel terms with a written reason, and only then insert table values or constants.
+Select the thermodynamic potential whose natural variables match the measured data. Gibbs free energy is naturally connected to $T$ and $P$, so it is central in phase and chemical equilibrium. Helmholtz free energy is naturally connected to $T$ and $v$, which is useful for equations of state.
 
-The second modeling habit is to keep the basis visible. Some calculations are per unit mass, some per mole, some per kg dry air, and some per unit time. A correct formula on the wrong basis is a common source of errors that look numerically plausible. When a table gives $\mathrm{kJ/kg}$, multiply by $\dot m$ to get $\mathrm{kW}$; when a reaction is balanced in kmol, convert to mass only after the element balance is complete; when a mixture property uses mole fraction, do not substitute mass fraction without conversion.
+| Potential | Definition | Natural variables | Differential |
+|---|---|---|---|
+| Internal energy | $u$ | $s,v$ | $du=Tds-Pdv$ |
+| Enthalpy | $h=u+Pv$ | $s,P$ | $dh=Tds+vdP$ |
+| Helmholtz | $a=u-Ts$ | $T,v$ | $da=-s\,dT-P\,dv$ |
+| Gibbs | $g=h-Ts$ | $T,P$ | $dg=-s\,dT+v\,dP$ |
 
-## Key results
+```mermaid
+flowchart LR
+  A["Exact differentials"] --> B["Thermodynamic potentials"]
+  B --> C["Maxwell relations"]
+  C --> D["Measurable property changes"]
+  B --> E["Equilibrium criteria"]
+```
+
+Several relations below contain the same variables but encode different constraints. State the property model and fixed variables before taking derivatives or substituting table values.
+
+Keep the basis visible. Lowercase $u$, $h$, $s$, $a$, and $g$ usually denote specific properties, while chemical thermodynamics often uses molar quantities. A derivative or tabulated value on one basis cannot be inserted into a relation written on the other without conversion.
+
+## From exact differentials to Maxwell relations
 
 The two $Tds$ equations are
 
@@ -58,11 +74,15 @@ $$
 \left(\frac{\partial v}{\partial T}\right)_P.
 $$
 
+## Following a liquid-vapor coexistence curve
+
 The Clapeyron equation is
 
 $$
 \frac{dP_{sat}}{dT}=\frac{h_{fg}}{T(v_g-v_f)}.
 $$
+
+## Predicting temperature change during throttling
 
 For enthalpy changes of real gases,
 
@@ -78,28 +98,12 @@ $$
 $$
 
 An ideal gas has $v=RT/P$, so $T(\partial v/\partial T)_P-v=0$ and $\mu_{JT}=0$. Real gases cool or warm during throttling depending on the sign of $\mu_{JT}$ and the side of the inversion curve.
-These results should be read as a hierarchy rather than a list of isolated equations. Conservation of mass and energy set the allowed accounting; property relations supply the missing state data; the second law or equilibrium criterion decides direction, limits, and losses. A numerical answer is not finished until it passes three checks: the units reduce to the requested quantity, the sign matches the stated energy or entropy transfer direction, and the magnitude is reasonable compared with a limiting case. Useful limiting cases include zero heat transfer, reversible operation, incompressible behavior, ideal-gas behavior, saturated-liquid or saturated-vapor endpoints, and equal reservoir temperatures.
 
-Because the textbook often moves between exact laws and engineering approximations, the approximation should be named in the solution. Examples include constant specific heats, negligible kinetic energy, negligible pump work, adiabatic devices, isentropic turbomachinery, ideal-gas mixtures, dry-air approximations, and linear interpolation. Naming the approximation makes later refinement straightforward: replace the approximate property model or restore the neglected term without rebuilding the whole analysis.
+Property relations supply state data; conservation laws use those data; equilibrium and stability conditions restrict the admissible states. Check the units, the sign implied by the held variables, and a limiting model. The ideal-gas limit is especially useful here: it gives zero enthalpy departure and zero Joule-Thomson coefficient.
 
-## Visual
+Name approximations where they enter, especially ideal vapor, negligible liquid volume, constant latent heat, and constant heat capacity. Each can be relaxed independently if the required data are available.
 
-| Potential | Definition | Natural variables | Differential |
-|---|---|---|---|
-| Internal energy | $u$ | $s,v$ | $du=Tds-Pdv$ |
-| Enthalpy | $h=u+Pv$ | $s,P$ | $dh=Tds+vdP$ |
-| Helmholtz | $a=u-Ts$ | $T,v$ | $da=-s\,dT-P\,dv$ |
-| Gibbs | $g=h-Ts$ | $T,P$ | $dg=-s\,dT+v\,dP$ |
-
-```mermaid
-flowchart LR
-  A["Exact differentials"] --> B["Thermodynamic potentials"]
-  B --> C["Maxwell relations"]
-  C --> D["Measurable property changes"]
-  B --> E["Equilibrium criteria"]
-```
-
-## Worked example 1: Clapeyron slope near water boiling
+## Estimating the water saturation slope near boiling
 
 **Problem.** Estimate the saturation-pressure slope of water near $100{}^{\circ}C$. Use $T=373.15\ \mathrm{K}$, $h_{fg}=2257\ \mathrm{kJ/kg}$, $v_g=1.694\ \mathrm{m^3/kg}$, and $v_f=0.001\ \mathrm{m^3/kg}$.
 
@@ -133,7 +137,7 @@ $$
 
 **Checked answer.** The saturation pressure rises about $3.57\ \mathrm{kPa}$ per kelvin near $100{}^{\circ}C$, consistent with steam tables around atmospheric pressure.
 
-## Worked example 2: Maxwell relation check for an ideal gas
+## Recovering the ideal-gas entropy pressure term
 
 **Problem.** Show that the Maxwell relation $(\partial s/\partial P)_T=-(\partial v/\partial T)_P$ gives the ideal-gas entropy pressure dependence.
 
@@ -166,7 +170,7 @@ $$
 
 **Checked answer.** This is exactly the pressure term in the ideal-gas entropy relation at constant temperature.
 
-## Code
+## Evaluating the two checks in Python
 
 ```python
 import math
@@ -181,28 +185,22 @@ print(clapeyron_slope(2257, 373.15, 1.694, 0.001) / 1000.0)
 print(ideal_gas_entropy_pressure_term(100, 500))
 ```
 
-## Common pitfalls
+## Derivative and reference-state traps
 
 - Using Maxwell relations without holding the stated variable constant.
 - Forgetting that $g$ and $a$ are specific properties here when using lowercase notation.
 - Applying Clausius-Clapeyron where vapor is not ideal or liquid volume is not negligible.
 - Interpreting a zero ideal-gas Joule-Thomson coefficient as true for real gases.
 - Losing signs when switching between $du=Tds-Pdv$ and $dh=Tds+vdP$.
-- Starting from a special-case equation before checking that its assumptions actually hold. Write the general balance or definition first, then reduce it.
+- Starting from a special-case equation before checking its assumptions. Write the general balance or definition first, then reduce it.
 - Leaving property-table values unlabeled. Record the substance, phase region, pressure or temperature row, interpolation fraction, and units so the result can be audited.
 - Rounding intermediate states too aggressively. Keep extra digits through property lookup, quality calculation, and efficiency ratios, then round the final answer to justified precision.
 - Skipping a limiting-case check. Test the result against reversible operation, zero pressure drop, saturated endpoints, ideal-gas behavior, or equal-temperature reservoirs when those limits are meaningful.
 - Treating a numerical solver or chart as a substitute for physical reasoning. Software can return a precise-looking number even when the selected phase, reference state, or boundary model is wrong.
 - Forgetting to state whether the reported answer is specific, total, or rate based.
 
-## Connections
+<div className="see-also">
 
-- [entropy and entropy balance](/physics/thermodynamics/entropy-and-entropy-balance)
-- [chemical and phase equilibrium](/physics/thermodynamics/chemical-and-phase-equilibrium)
-- [pure substances and property tables](/physics/thermodynamics/pure-substances-and-property-tables)
-- [microscopic foundations](/physics/statistical-mechanics/)
-- [basic thermal physics](/physics/general/)
-- [thermochemistry](/chemistry/general/thermochemistry)
-- [physical chemistry](/chemistry/physical-chemistry/)
-- [engineering mathematics](/math/engineering-math/)
-- [thermal systems control](/cs/control-engineering/)
+See also: [entropy and entropy balance](/physics/thermodynamics/entropy-and-entropy-balance) · [chemical and phase equilibrium](/physics/thermodynamics/chemical-and-phase-equilibrium) · [pure substances and property tables](/physics/thermodynamics/pure-substances-and-property-tables) · [microscopic foundations](/physics/statistical-mechanics/intro) · [basic thermal physics](/physics/general/intro) · [thermochemistry](/chemistry/general/thermochemistry) · [physical chemistry](/chemistry/physical-chemistry/intro) · [engineering mathematics](/math/engineering-math/intro) · [thermal systems control](/cs/control-engineering/intro)
+
+</div>

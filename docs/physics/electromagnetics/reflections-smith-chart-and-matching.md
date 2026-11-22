@@ -7,13 +7,13 @@ sidebar_position: 6
 
 Reflections occur whenever a traveling wave reaches a discontinuity whose impedance differs from the wave impedance it has been carrying. On a transmission line, that discontinuity may be a load, a connector, a width change, a via, or another line section. The reflected wave interferes with the incident wave and creates standing-wave patterns, input-impedance transformations, and sometimes severe power-transfer loss.
 
-Impedance matching is the practical response: choose a network or line section so the source sees the intended impedance and the load receives the intended power. Ulaby treats reflection coefficients, standing-wave ratio, special line lengths, the Smith chart, lumped matching, and single-stub matching. This page organizes those ideas in formula form while keeping the physical picture visible.
+Impedance matching is the engineering response: choose a network or line section so the source sees the intended impedance and the load receives the intended power. Reflection coefficients, standing-wave ratio, special line lengths, the Smith chart, lumped matching, and single-stub matching are different views of that same problem.
 
 ![A Smith chart fills the circle with resistance and reactance coordinate curves.](https://commons.wikimedia.org/wiki/Special:FilePath/Smith_chart.svg)
 
 *Figure: The Smith chart turns reflection coefficients and impedance matching into a navigable geometric construction. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Smith_chart.svg), Cannabic, CC BY-SA 4.0.*
 
-## Definitions
+## Describing a mismatch at the load
 
 For a lossless line terminated by load $Z_L$, the voltage reflection coefficient at the load is
 
@@ -61,7 +61,7 @@ The Smith chart is a plot of constant resistance and reactance circles in the $\
 
 Although computer tools often replace manual chart use, the Smith chart is still valuable because it shows several quantities at once. The distance from the center is $\vert \Gamma\vert $, the angle gives reflection phase, circles around the center correspond to constant SWR, and rotations correspond to lossless line lengths. A matching problem becomes a geometric task: move along a constant-$\vert \Gamma\vert $ circle until a realizable series, shunt, or stub element can bring the point to the chart center.
 
-## Key results
+## Moving along the line and around the Smith chart
 
 Reflection magnitude indicates mismatch severity, while reflection phase locates standing-wave maxima and minima. The voltage magnitude along a lossless line can be expressed as
 
@@ -109,7 +109,7 @@ Voltage maxima and minima are also measurement tools. The distance from a voltag
 
 For passive loads on a lossless line, all physically valid reflection coefficients lie inside or on the unit circle. A calculated point outside the Smith chart's outer circle usually means an algebra or normalization error unless an active load is intentionally being modeled.
 
-## Visual
+### From load impedance to a realizable match
 
 ```mermaid
 flowchart TB
@@ -134,8 +134,6 @@ flowchart TB
   Check --> Result(("reduced reflection at design band"))
 ```
 
-This matching diagram shows the full impedance-matching pipeline from load impedance to reflection coefficient, standing waves, reference-plane transformation, Smith-chart operations, and physical matching networks. The subgraph separates lumped, quarter-wave, and stub methods and routes all of them through bandwidth and parasitic checks. The diagram makes the shortcut goal explicit: a successful match is a reduced $\Gamma$ over the intended band, not just a single algebraic point.
-
 | Load | $\Gamma_L$ | $\vert \Gamma_L\vert $ | SWR | Power behavior |
 |---|---:|---:|---:|---|
 | $Z_L=Z_0$ | $0$ | 0 | 1 | all incident power delivered |
@@ -144,7 +142,7 @@ This matching diagram shows the full impedance-matching pipeline from load imped
 | Pure reactance | phase only | 1 | infinite | stores and returns energy |
 | Real mismatch | $(R_L-Z_0)/(R_L+Z_0)$ | between 0 and 1 | finite | partial delivery |
 
-## Worked example 1: Reflection coefficient and SWR
+## Reflection coefficient and SWR for a complex load
 
 Problem: A $50\ \Omega$ lossless line is terminated by $Z_L=100-j50\ \Omega$. Find $\Gamma_L$ and SWR.
 
@@ -193,7 +191,7 @@ $$
 
 Check: Since $\vert \Gamma_L\vert \lt 1$, the passive load absorbs some power. SWR above 1 indicates mismatch.
 
-## Worked example 2: Quarter-wave transformer design
+## Designing a quarter-wave transformer
 
 Problem: A $50\ \Omega$ line must feed a real $200\ \Omega$ load at $1\ \mathrm{GHz}$. The transformer section has phase velocity $2.0\times10^8\ \mathrm{m/s}$. Find the transformer impedance and physical length.
 
@@ -224,40 +222,23 @@ $$
 
 Check: The source-side line sees its own $Z_0$, so $\Gamma=0$ at the design frequency.
 
-## Code
+## What an exact match can conceal
 
-```python
-import numpy as np
+- With normalized impedance $z_L=Z_L/Z_0$, the reflection formula becomes $\Gamma=(z_L-1)/(z_L+1)$; $Z_0$ must not be divided out twice.
+- Voltage reflection magnitude and reflected power fraction are different: the latter is $\vert \Gamma\vert ^2$ on a lossless line.
+- The simple quarter-wave-transformer formula requires a real load at the transformer input plane.
+- Smith-chart rotation reverses when the reference plane moves toward the load instead of toward the generator.
+- An exact match at one frequency can be poor across the required bandwidth.
+- High SWR is not automatically destructive; the consequence depends on source tolerance, line loss, voltage breakdown, and power level.
+- Connectors, vias, bends, and transitions between the matching network and the device can spoil a match established at another reference plane.
 
-Z0 = 50
-ZL = 100 - 1j * 50
-Gamma = (ZL - Z0) / (ZL + Z0)
-SWR = (1 + abs(Gamma)) / (1 - abs(Gamma))
+<div className="see-also">
 
-print(f"Gamma = {Gamma.real:.3f} {Gamma.imag:+.3f}j")
-print(f"|Gamma| = {abs(Gamma):.3f}")
-print(f"SWR = {SWR:.2f}")
-
-f = 1e9
-vp = 2e8
-Z0t = np.sqrt(50 * 200)
-length = vp / f / 4
-print(f"Quarter-wave transformer: Z0t={Z0t:.1f} ohms, length={length:.3f} m")
-```
-
-## Common pitfalls
-
-- Using $Z_L-Z_0$ over $Z_L+Z_0$ with normalized impedance already substituted incorrectly. If $z_L=Z_L/Z_0$, then $\Gamma=(z_L-1)/(z_L+1)$.
-- Confusing reflection coefficient for voltage with reflected power fraction. Reflected power fraction is $\vert \Gamma\vert ^2$ for a lossless line.
-- Assuming a quarter-wave transformer matches complex loads directly. The simple formula requires a real load at the transformer input plane.
-- Forgetting that Smith-chart rotation depends on whether you move toward the generator or toward the load.
-- Ignoring bandwidth. A match can be exact at one frequency and poor nearby.
-- Treating a high SWR as automatically destructive. The consequence depends on source tolerance, line loss, voltage breakdown, and power level.
-- Forgetting that a perfect match at the load plane can be spoiled by connectors, vias, bends, or transitions placed between the matching network and the actual device.
-
-## Connections
+See also:
 
 - [Transmission-line models and wave equations](/physics/electromagnetics/transmission-line-models-and-wave-equations) for $Z_0$, $\beta$, and traveling waves.
 - [Transmission-line transients and power](/physics/electromagnetics/transmission-line-transients-and-power) for time-domain reflections.
 - [Wave reflection, fibers, and waveguides](/physics/electromagnetics/reflection-transmission-fibers-waveguides) for the plane-wave analogue of impedance mismatch.
 - [Complex functions and analyticity](/math/engineering-math/complex-functions-and-analyticity) for complex arithmetic behind $\Gamma$.
+
+</div>

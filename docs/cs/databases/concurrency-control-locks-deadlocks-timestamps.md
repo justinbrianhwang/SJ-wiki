@@ -9,7 +9,7 @@ Concurrency control lets many transactions run at the same time while preserving
 
 Locking and timestamp protocols are classic approaches. Locking controls access to data items by making transactions wait for incompatible operations. Timestamp ordering assigns transactions a serialization order and rejects operations that violate that order. Both approaches are easier to understand after serializability, because their purpose is to produce schedules that behave like a safe serial order.
 
-## Definitions
+## Lock modes, phases, and ordering rules
 
 A **lock** is a permission to access a data item in a particular mode. A shared lock (`S`) permits reading. An exclusive lock (`X`) permits writing. Multiple transactions can hold shared locks on the same item, but an exclusive lock conflicts with any other lock on that item.
 
@@ -26,7 +26,7 @@ A **deadlock** occurs when transactions wait in a cycle. For example, `T1` waits
 
 **Timestamp ordering** assigns every transaction a timestamp. Each data item tracks the largest read timestamp and largest write timestamp. Operations that would violate timestamp order are rejected or cause aborts.
 
-## Key results
+## What each concurrency protocol guarantees
 
 Basic 2PL guarantees conflict serializability because the order of lock points determines a serial order. A transaction's lock point is the moment it obtains its final lock. If `Ti` conflicts before `Tj`, lock acquisition forces an order consistent with the lock points, preventing cycles in the precedence graph.
 
@@ -48,8 +48,6 @@ Lock upgrades are another source of subtle blocking. A transaction may read a ro
 
 Starvation is different from deadlock. A transaction can be repeatedly delayed or aborted even when no cycle exists. Fair lock queues, victim-selection rules, and aging policies are used to keep high-contention systems from always sacrificing the same long transaction.
 
-## Visual
-
 ```mermaid
 flowchart TD
   A["T1 holds X(A)"] --> B["T2 requests S(A), waits"]
@@ -69,11 +67,9 @@ flowchart TD
 | Timestamp ordering | timestamp-serial schedules | aborts under contention | conceptual and specialized systems |
 | Validation-based | optimistic execution | commit-time aborts | low-conflict workloads |
 
-## Worked example 1: Check two-phase locking behavior
+### Does this schedule obey two-phase locking?
 
-Problem: Transaction `T1` performs `lock-X(A)`, `read(A)`, `write(A)`, `unlock(A)`, `lock-X(B)`, `write(B)`, `unlock(B)`. Does it obey 2PL?
-
-Method:
+Transaction `T1` performs `lock-X(A)`, `read(A)`, `write(A)`, `unlock(A)`, `lock-X(B)`, `write(B)`, `unlock(B)`. To test it against 2PL, mark the acquisitions and releases.
 
 1. Identify lock acquisitions:
 
@@ -93,13 +89,11 @@ Method:
 
 4. The transaction therefore enters the shrinking phase at `unlock(A)`, then tries to grow again at `lock-X(B)`.
 
-Checked answer: `T1` violates two-phase locking. A 2PL version would acquire both `X(A)` and `X(B)` before releasing either, or at least delay `unlock(A)` until after `lock-X(B)`.
+`T1` violates two-phase locking. A 2PL version would acquire both `X(A)` and `X(B)` before releasing either, or at least delay `unlock(A)` until after `lock-X(B)`.
 
-## Worked example 2: Detect a deadlock with a waits-for graph
+### Reading a deadlock from the waits-for graph
 
-Problem: `T1` holds `X(A)` and requests `X(B)`. `T2` holds `X(B)` and requests `X(C)`. `T3` holds `X(C)` and requests `S(A)`. Determine whether there is a deadlock.
-
-Method:
+Suppose `T1` holds `X(A)` and requests `X(B)`, `T2` holds `X(B)` and requests `X(C)`, and `T3` holds `X(C)` and requests `S(A)`. The waits-for edges settle whether the transactions are deadlocked.
 
 1. `T1` requests `X(B)`, but `T2` holds `X(B)`. Add:
 
@@ -127,9 +121,9 @@ Method:
 
 5. This is a directed cycle.
 
-Checked answer: the system is deadlocked. A deadlock detector must choose at least one victim, abort it, release its locks, and let other transactions continue.
+The system is deadlocked. A deadlock detector must choose at least one victim, abort it, release its locks, and let other transactions continue.
 
-## Code
+## A cycle detector and a strict-locking transaction
 
 ```python
 def has_cycle(graph):
@@ -164,7 +158,7 @@ UPDATE account SET balance = balance + 100 WHERE account_id = 'B';
 COMMIT;
 ```
 
-## Common pitfalls
+## Mistakes that break the concurrency argument
 
 - Thinking 2PL means two locks. It means two phases: growing and shrinking.
 - Releasing exclusive locks early under strictness. Strict 2PL holds write locks until commit or abort.
@@ -173,7 +167,7 @@ COMMIT;
 - Assuming timestamp ordering waits like locking. Basic timestamp ordering aborts conflicting operations instead of waiting.
 - Forgetting predicate locks or index-range locks when reasoning about phantoms.
 
-## Connections
+## From schedules to recovery and distribution
 
 - [Transactions, ACID, and Serializability](/cs/databases/transactions-acid-and-serializability)
 - [MVCC and Snapshot Isolation](/cs/databases/mvcc-and-snapshot-isolation)

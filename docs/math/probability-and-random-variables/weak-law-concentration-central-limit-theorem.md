@@ -388,10 +388,8 @@ Nor does the theorem justify replacing the original data distribution by a norma
 
 For confidence intervals based on the sample mean, the unknown variance is usually replaced by a sample estimate. At small sample sizes this changes the reference distribution under normal sampling from standard normal to Student's $t$. The ordinary CLT explains the large-sample return toward normal critical values, but finite-sample calibration is a separate question.
 
-## Related pages
+<div className="see-also">
 
-- [Moment and characteristic functions](/math/probability-and-random-variables/moment-and-characteristic-functions)
-- [Strong law and Jensen's inequality](/math/probability-and-random-variables/strong-law-and-jensens-inequality)
-- [Normal, exponential, gamma, beta, and Cauchy laws](/math/probability-and-random-variables/normal-exponential-gamma-beta-cauchy)
-- [Covariance, correlation, and conditional expectation](/math/probability-and-random-variables/covariance-correlation-conditional-expectation)
-- [Limit theorems](/math/probability/limit-theorems)
+See also: [Moment and characteristic functions](/math/probability-and-random-variables/moment-and-characteristic-functions) · [Strong law and Jensen's inequality](/math/probability-and-random-variables/strong-law-and-jensens-inequality) · [Normal, exponential, gamma, beta, and Cauchy laws](/math/probability-and-random-variables/normal-exponential-gamma-beta-cauchy) · [Covariance, correlation, and conditional expectation](/math/probability-and-random-variables/covariance-correlation-conditional-expectation) · [Limit theorems](/math/probability/limit-theorems)
+
+</div>

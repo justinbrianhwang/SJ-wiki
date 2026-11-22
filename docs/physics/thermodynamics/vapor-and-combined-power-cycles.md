@@ -9,7 +9,7 @@ Vapor power cycles exploit phase change. A pump raises the pressure of liquid wa
 
 Cengel develops the ideal Rankine cycle, actual deviations, reheat, regeneration, cogeneration, and combined gas-vapor cycles. The design logic is temperature management: raise the average temperature of heat addition, lower the average temperature of heat rejection, keep turbine moisture within limits, and recover heat where it has enough temperature to be useful.
 
-## Definitions
+## Tracking water through the Rankine loop
 
 - The **Rankine cycle** is the ideal vapor power cycle: pump, boiler, turbine, condenser.
 - **Pump work** is small because liquid specific volume is small: $w_p\approx v(P_2-P_1)$.
@@ -23,11 +23,25 @@ Cengel develops the ideal Rankine cycle, actual deviations, reheat, regeneration
 - A **combined cycle** uses a gas turbine topping cycle and a steam Rankine bottoming cycle, recovering high-temperature exhaust heat in a heat recovery steam generator.
 
 Real plants include pressure drops, non-isentropic pumps and turbines, heat losses, mechanical losses, and condenser limitations. The ideal cycle remains useful because it isolates the thermodynamic benefit of pressure, temperature, reheat, and regeneration changes before component details are added.
-For this topic, a complete engineering model should state the boundary, the time basis, the property model, and the sign convention before any numbers are substituted. In vapor and combined power cycles, that habit is especially important because several formulas look similar while answering different physical questions. A closed-system expression, a steady-flow expression, an ideal-gas relation, and a property-table interpolation may all contain pressure, temperature, or enthalpy, but they do not have the same assumptions. The safest workflow is to write the general balance or defining relation first, cancel terms with a written reason, and only then insert table values or constants.
 
-The second modeling habit is to keep the basis visible. Some calculations are per unit mass, some per mole, some per kg dry air, and some per unit time. A correct formula on the wrong basis is a common source of errors that look numerically plausible. When a table gives $\mathrm{kJ/kg}$, multiply by $\dot m$ to get $\mathrm{kW}$; when a reaction is balanced in kmol, convert to mass only after the element balance is complete; when a mixture property uses mole fraction, do not substitute mass fraction without conversion.
+The diagram shows one open feedwater heater. Plants with more heaters repeat the extraction and pumping pattern; without regeneration, the condenser pump sends feedwater toward the boiler train directly.
 
-## Key results
+```mermaid
+flowchart LR
+  D["Condenser"] --> A["Condensate pump"]
+  A --> E["Open feedwater heater"]
+  E --> F["Boiler-feed pump"]
+  F --> B["Boiler"]
+  B --> C["Turbine"]
+  C --> D
+  C -.->|Extraction| E
+```
+
+State the plant boundary, time basis, property model, and sign convention before substituting values. Write the steady-flow balance for each component first, justify neglected heat, work, kinetic-energy, and potential-energy terms, and then insert property-table values.
+
+Keep the mass-flow basis visible. Specific turbine work in $\mathrm{kJ/kg}$ becomes power only after multiplication by the mass flow rate. In regenerative cycles, bleed fractions change the flow through downstream turbine stages and the condenser.
+
+## Rankine-cycle enthalpy bookkeeping
 
 For the ideal Rankine cycle,
 
@@ -47,30 +61,9 @@ $$
 x_4=\frac{s_4-s_f}{s_{fg}}.
 $$
 
+## Raising the average heat-addition temperature
+
 Ways to improve Rankine efficiency include lowering condenser pressure, superheating to higher turbine inlet temperature, increasing boiler pressure, reheating, and regenerating feedwater heating. Each has constraints. Lower condenser pressure can increase moisture; high boiler pressure may reduce exit quality; superheat is limited by materials; regeneration improves efficiency but reduces the mass flow through later turbine stages.
-
-For a combined gas-vapor plant, the total thermal efficiency is
-
-$$
-\eta=\frac{\dot W_{gas}+\dot W_{steam}}{\dot Q_{fuel}}.
-$$
-
-The bottoming cycle uses energy that would otherwise leave with gas-turbine exhaust, but only the exergy above the steam-cycle temperature levels can be converted effectively.
-These results should be read as a hierarchy rather than a list of isolated equations. Conservation of mass and energy set the allowed accounting; property relations supply the missing state data; the second law or equilibrium criterion decides direction, limits, and losses. A numerical answer is not finished until it passes three checks: the units reduce to the requested quantity, the sign matches the stated energy or entropy transfer direction, and the magnitude is reasonable compared with a limiting case. Useful limiting cases include zero heat transfer, reversible operation, incompressible behavior, ideal-gas behavior, saturated-liquid or saturated-vapor endpoints, and equal reservoir temperatures.
-
-Because the textbook often moves between exact laws and engineering approximations, the approximation should be named in the solution. Examples include constant specific heats, negligible kinetic energy, negligible pump work, adiabatic devices, isentropic turbomachinery, ideal-gas mixtures, dry-air approximations, and linear interpolation. Naming the approximation makes later refinement straightforward: replace the approximate property model or restore the neglected term without rebuilding the whole analysis.
-
-## Visual
-
-```mermaid
-flowchart LR
-  A["Pump"] --> B["Boiler"]
-  B --> C["Turbine"]
-  C --> D["Condenser"]
-  D --> A
-  C -.-> E["Feedwater heater"]
-  E --> B
-```
 
 | Modification | Main benefit | Main tradeoff |
 |---|---|---|
@@ -80,7 +73,21 @@ flowchart LR
 | Regeneration | raises feedwater temperature | reduces low-pressure turbine flow |
 | Combined cycle | recovers gas-turbine exhaust heat | integration complexity |
 
-## Worked example 1: ideal Rankine-cycle efficiency
+## Using gas-turbine exhaust in a bottoming cycle
+
+For a combined gas-vapor plant, the total thermal efficiency is
+
+$$
+\eta=\frac{\dot W_{gas}+\dot W_{steam}}{\dot Q_{fuel}}.
+$$
+
+The bottoming cycle uses energy that would otherwise leave with gas-turbine exhaust, but only the exergy above the steam-cycle temperature levels can be converted effectively.
+
+Mass and energy balances set the accounting; property tables supply the water and steam states; entropy generation and exergy identify where performance is lost. Check that the component balances close, that pump and turbine work have the intended signs, and that the turbine exit state lies in the region used to evaluate $h_4$.
+
+Name the approximations: incompressible pump work, isentropic turbomachinery, negligible kinetic and potential energy changes, adiabatic mixing, and linear table interpolation. Pressure drop, heat loss, and isentropic efficiencies can then be restored component by component.
+
+## Estimating an ideal Rankine efficiency
 
 **Problem.** An ideal Rankine cycle operates with condenser pressure $10\ \mathrm{kPa}$ and boiler pressure $8\ \mathrm{MPa}$. Saturated liquid leaves the condenser. Steam enters the turbine at $8\ \mathrm{MPa}$ and $480{}^{\circ}C$ with $h_3\approx3335\ \mathrm{kJ/kg}$ and $s_3\approx6.82\ \mathrm{kJ/(kg\,K)}$. At $10\ \mathrm{kPa}$, use $h_f=191.8\ \mathrm{kJ/kg}$, $h_{fg}=2392\ \mathrm{kJ/kg}$, $s_f=0.649\ \mathrm{kJ/(kg\,K)}$, $s_{fg}=7.501\ \mathrm{kJ/(kg\,K)}$, and $v_f=0.00101\ \mathrm{m^3/kg}$. Estimate efficiency.
 
@@ -128,7 +135,7 @@ $$
 
 **Checked answer.** The ideal efficiency is about $37\%$. The turbine exit quality is $82\%$, low enough that reheat or altered pressure choices may be considered.
 
-## Worked example 2: open feedwater heater extraction fraction
+## Solving the bleed fraction for an open heater
 
 **Problem.** In an ideal regenerative Rankine cycle, feedwater enters an open feedwater heater at $h_2=200\ \mathrm{kJ/kg}$, extracted steam enters at $h_6=2700\ \mathrm{kJ/kg}$, and saturated liquid leaves at $h_3=640\ \mathrm{kJ/kg}$. Find the extraction fraction $y$ per kg of boiler flow.
 
@@ -156,7 +163,7 @@ $$
 
 **Checked answer.** About $17.6\%$ of the main steam flow is extracted. This reduces low-pressure turbine work but raises the feedwater temperature and can increase cycle efficiency.
 
-## Code
+## Repeating the cycle calculation in Python
 
 ```python
 def rankine_efficiency(h1, v1, P1, P2, h3, s3, sf, sfg, hfg):
@@ -175,28 +182,22 @@ print(rankine_efficiency(191.8, 0.00101, 10, 8000, 3335, 6.82, 0.649, 7.501, 239
 print(open_fwh_fraction(200, 2700, 640))
 ```
 
-## Common pitfalls
+## Checks before trusting a cycle result
 
 - Forgetting that pump work is small but not always zero in high-pressure cycles.
 - Using turbine exit enthalpy without first determining whether the exit is wet or superheated.
 - Assuming lowering condenser pressure always helps without checking exit quality.
 - Applying a single mass flow rate through all turbine stages in regenerative cycles despite bleed flows.
 - Confusing heat recovery in a combined cycle with perfect conversion of exhaust energy to work.
-- Starting from a special-case equation before checking that its assumptions actually hold. Write the general balance or definition first, then reduce it.
+- Starting from a special-case equation before checking its assumptions. Write the general balance or definition first, then reduce it.
 - Leaving property-table values unlabeled. Record the substance, phase region, pressure or temperature row, interpolation fraction, and units so the result can be audited.
 - Rounding intermediate states too aggressively. Keep extra digits through property lookup, quality calculation, and efficiency ratios, then round the final answer to justified precision.
 - Skipping a limiting-case check. Test the result against reversible operation, zero pressure drop, saturated endpoints, ideal-gas behavior, or equal-temperature reservoirs when those limits are meaningful.
 - Treating a numerical solver or chart as a substitute for physical reasoning. Software can return a precise-looking number even when the selected phase, reference state, or boundary model is wrong.
 - Forgetting to state whether the reported answer is specific, total, or rate based.
 
-## Connections
+<div className="see-also">
 
-- [pure substances and property tables](/physics/thermodynamics/pure-substances-and-property-tables)
-- [exergy and second-law efficiency](/physics/thermodynamics/exergy-and-second-law-efficiency)
-- [gas power cycles](/physics/thermodynamics/gas-power-cycles)
-- [microscopic foundations](/physics/statistical-mechanics/)
-- [basic thermal physics](/physics/general/)
-- [thermochemistry](/chemistry/general/thermochemistry)
-- [physical chemistry](/chemistry/physical-chemistry/)
-- [engineering mathematics](/math/engineering-math/)
-- [thermal systems control](/cs/control-engineering/)
+See also: [pure substances and property tables](/physics/thermodynamics/pure-substances-and-property-tables) · [exergy and second-law efficiency](/physics/thermodynamics/exergy-and-second-law-efficiency) · [gas power cycles](/physics/thermodynamics/gas-power-cycles) · [microscopic foundations](/physics/statistical-mechanics/intro) · [basic thermal physics](/physics/general/intro) · [thermochemistry](/chemistry/general/thermochemistry) · [physical chemistry](/chemistry/physical-chemistry/intro) · [engineering mathematics](/math/engineering-math/intro) · [thermal systems control](/cs/control-engineering/intro)
+
+</div>

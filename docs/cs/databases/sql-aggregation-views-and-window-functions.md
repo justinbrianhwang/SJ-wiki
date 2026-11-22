@@ -7,13 +7,9 @@ sidebar_position: 5
 
 Aggregation turns many rows into summary rows. Views name useful query expressions so that users and applications can work at a higher level of abstraction. Window functions compute values across related rows while still preserving the individual rows. Together, these features move SQL beyond row filtering into reporting, analytics, and reusable logical design.
 
-![A MySQL console screenshot shows a command-line database session with query output.](https://commons.wikimedia.org/wiki/Special:FilePath/Mysql-screenshot.PNG)
-
-*Figure: SQL pages connect abstract relational operations to the database console used in practice. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mysql-screenshot.PNG), Wikimedia Commons contributors, public domain text.*
-
 These features are also where many SQL mistakes become subtle. The difference between `WHERE` and `HAVING`, between grouped rows and original rows, and between aggregate functions and window functions matters. A database system may execute these queries with sorting, hashing, temporary storage, or indexes, but the logical model should be clear before performance tuning begins.
 
-## Definitions
+## Aggregates, views, and windows
 
 An **aggregate function** maps a collection of values to one value. Common aggregates include `COUNT`, `SUM`, `AVG`, `MIN`, and `MAX`. `COUNT(*)` counts rows. `COUNT(attribute)` counts non-null attribute values. Most aggregates ignore `NULL` values; `COUNT(*)` is the major exception.
 
@@ -23,7 +19,7 @@ A **view** is a named query. A standard view is virtual: the DBMS stores its def
 
 A **window function** computes a value over a window of rows related to the current row. It uses `OVER (...)`, usually with `PARTITION BY`, `ORDER BY`, and a frame. Unlike `GROUP BY`, a window function does not collapse rows. Examples include `ROW_NUMBER`, `RANK`, `DENSE_RANK`, running sums, and moving averages.
 
-## Key results
+## Grain, logical order, and row preservation
 
 Grouping changes the level of detail. Before grouping, each row might represent one student, one section, or one enrollment. After grouping by `dept_name`, each row represents a department. Selecting a non-grouped attribute such as `student.name` from a department-level query is undefined in the relational sense because there may be many names per department.
 
@@ -49,8 +45,6 @@ Window frames deserve special attention. `ORDER BY` inside `OVER` defines an ord
 
 Grouping after a join must be checked for accidental multiplication. If a department row joins to instructors and courses at the same time, the result may contain every instructor-course pair before aggregation. Separate pre-aggregations or distinct counts may be needed so the final numbers match the intended facts.
 
-## Visual
-
 ```mermaid
 flowchart TD
   A["Base rows"] --> B["WHERE: remove rows"]
@@ -69,11 +63,9 @@ flowchart TD
 | Window function | no | row-level analytics | rank within department |
 | Materialized view | stores result | fast repeated summaries | daily dashboard table |
 
-## Worked example 1: Department salary report
+## Building a department salary report
 
-Problem: For each department with at least three instructors, return the department name, number of instructors, and average salary. Only consider instructors with non-null salaries.
-
-Method:
+The report needs the department name, instructor count, and average salary for each department with at least three instructors. Only instructors with non-null salaries count.
 
 1. Start from `instructor`:
 
@@ -119,13 +111,11 @@ Method:
    ORDER BY avg_salary DESC;
    ```
 
-Checked answer: `WHERE` removes individual instructors with unknown salaries before the groups are formed. `HAVING` removes departments whose remaining instructor count is below three. The selected columns are legal because `dept_name` is the grouping column and the other two expressions are aggregates.
+`WHERE` removes individual instructors with unknown salaries before the groups are formed. `HAVING` removes departments whose remaining instructor count is below three. The selected columns are legal because `dept_name` is the grouping column and the other two expressions are aggregates.
 
-## Worked example 2: Top two students per department
+## Ranking two students per department
 
-Problem: Return the two highest-credit students in each department, preserving ties by deterministic name order.
-
-Method:
+Here the result should retain the two highest-credit student rows in each department, breaking equal-credit ties deterministically by name and ID.
 
 1. Window functions are appropriate because we need student rows, not one row per department.
 
@@ -163,9 +153,9 @@ Method:
    ORDER BY dept_name, rn;
    ```
 
-Checked answer: each department has its own numbering sequence. The outer query keeps numbers 1 and 2 from every partition. Rows are not collapsed, so the result still contains individual student IDs and names.
+Each department has its own numbering sequence. The outer query keeps numbers 1 and 2 from every partition. Rows are not collapsed, so the result still contains individual student IDs and names.
 
-## Code
+## Feeding a window calculation from a view
 
 ```sql
 CREATE VIEW department_enrollment AS
@@ -184,24 +174,7 @@ WHERE student_count > 0
 ORDER BY size_rank, dept_name;
 ```
 
-```python
-from collections import defaultdict
-
-students = [
-    {"id": "1", "dept": "CS", "credits": 100},
-    {"id": "2", "dept": "CS", "credits": 80},
-    {"id": "3", "dept": "Math", "credits": 95},
-]
-
-groups = defaultdict(list)
-for student in students:
-    groups[student["dept"]].append(student["credits"])
-
-for dept, credits in sorted(groups.items()):
-    print(dept, len(credits), sum(credits) / len(credits))
-```
-
-## Common pitfalls
+## Errors at group and window boundaries
 
 - Using `WHERE COUNT(*) > 1`. Aggregate filters belong in `HAVING`.
 - Selecting a column that is neither grouped nor aggregated. The result has no single well-defined value for that column.
@@ -210,9 +183,8 @@ for dept, credits in sorted(groups.items()):
 - Filtering on a window-function alias in the same query block. Use a subquery or common table expression.
 - Forgetting deterministic tie-breakers in ranking queries. Without them, the top-N result may be unstable among equal values.
 
-## Connections
+<div className="see-also">
 
-- [SQL DDL, DML, and Basic Queries](/cs/databases/sql-ddl-dml-and-basic-queries)
-- [SQL Joins, Subqueries, and Set Operations](/cs/databases/sql-joins-subqueries-and-set-operations)
-- [Query Processing and Join Algorithms](/cs/databases/query-processing-join-algorithms)
-- [Application Architecture and Security](/cs/databases/application-architecture-and-security)
+See also: [SQL DDL, DML, and Basic Queries](/cs/databases/sql-ddl-dml-and-basic-queries) · [SQL Joins, Subqueries, and Set Operations](/cs/databases/sql-joins-subqueries-and-set-operations) · [Query Processing and Join Algorithms](/cs/databases/query-processing-join-algorithms) · [Application Architecture and Security](/cs/databases/application-architecture-and-security)
+
+</div>

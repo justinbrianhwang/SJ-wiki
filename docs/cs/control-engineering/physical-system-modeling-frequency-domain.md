@@ -7,13 +7,9 @@ sidebar_position: 4
 
 After introducing transfer functions, Nise spends substantial effort deriving them from real components: electrical networks, translational and rotational mechanical systems, gears, and electromechanical motors. The goal is not to memorize isolated formulas. It is to recognize a modeling pattern: identify energy-storage and dissipative elements, write physical laws, transform to the $s$-domain, and solve for the chosen input-output ratio.
 
-![A Bode plot shows gain and phase changing with frequency.](https://commons.wikimedia.org/wiki/Special:FilePath/Bodeplot.png)
+The same physical device can produce different transfer functions depending on the selected input and output. A motor can be modeled from armature voltage to angular speed, armature voltage to position, or torque command to load displacement. The variables must be fixed before the equations are written.
 
-*Figure: Bode plots connect frequency-response calculations to a standard engineering visualization. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bodeplot.png), Stw and Vukg, public domain.*
-
-This page collects the modeling rules most often needed before response and design. The same physical device can produce different transfer functions depending on the selected input and output. A motor can be modeled from armature voltage to angular speed, armature voltage to position, or torque command to load displacement. Always state the variables before writing equations.
-
-## Definitions
+## Constitutive laws in three physical domains
 
 For electrical networks, impedance in the $s$-domain is used under zero initial conditions:
 
@@ -59,7 +55,7 @@ e_a(t)=R_ai_a(t)+K_b\dot\theta_m(t),\qquad
 J\ddot\theta_m(t)+D\dot\theta_m(t)=K_t i_a(t).
 $$
 
-## Key results
+## Deriving standard plant models
 
 For a single translational mass-spring-damper driven by force $f(t)$,
 
@@ -130,11 +126,9 @@ Parameter identification is often part of modeling. Some constants can be read f
 
 Loading effects also matter. Connecting a sensor, amplifier, or mechanical load can change the subsystem being modeled. An ideal op-amp or ideal gear assumption removes these interactions for simplicity, but real hardware has finite impedance, compliance, backlash, and bandwidth. If a subsystem model was derived in isolation, verify that interconnection does not invalidate it.
 
-Every model should specify sign conventions for positive displacement, rotation, voltage, current, force, and torque. Consistent signs make feedback polarity clear and prevent accidental conversion of negative feedback into positive feedback during block-diagram assembly.
+Every model should specify sign conventions for positive displacement, rotation, voltage, current, force, and torque next to the schematic. Consistent signs make feedback polarity clear and prevent accidental conversion of negative feedback into positive feedback during block-diagram assembly.
 
-Write the conventions next to the schematic.
-
-## Visual
+## The dc motor signal path and cross-domain analogies
 
 ```mermaid
 flowchart LR
@@ -157,7 +151,7 @@ flowchart LR
 | Rotational | torque $T$ | angular velocity $\dot\theta$ | $J$, $K$ | $D$ |
 | Motor coupling | current $i_a$ | angular velocity $\dot\theta$ | electromechanical conversion | winding resistance and damping |
 
-## Worked example 1: mass-spring-damper transfer function
+## Extracting damping and natural frequency from a mechanical model
 
 Problem: A $2$ kg mass is connected to ground by a $6$ N-s/m damper and an $18$ N/m spring. A force $f(t)$ is applied to the mass. Find $X(s)/F(s)$ and identify the standard second-order parameters.
 
@@ -202,7 +196,7 @@ $$
 
 Checked answer: $X(s)/F(s)=1/(2s^2+6s+18)$, with $\omega_n=3$ rad/s and $\zeta=0.5$.
 
-## Worked example 2: dc motor voltage-to-position model
+## Reducing the dc motor to voltage-to-position form
 
 Problem: A dc motor has $R_a=2\ \Omega$, $K_t=0.4$ N-m/A, $K_b=0.4$ V-s/rad, $J=0.02$ kg-m$^2$, and $D=0.04$ N-m-s/rad. Neglect armature inductance. Find $\Theta_m(s)/E_a(s)$.
 
@@ -248,7 +242,7 @@ $$
 
 Checked answer: $\Theta_m(s)/E_a(s)=10/[s(s+6)]$. The motor has an integrator for position and a real pole at $s=-6$ rad/s.
 
-## Code
+## Checking plant poles from component values
 
 ```python
 import numpy as np
@@ -268,7 +262,7 @@ print("motor transfer function denominator:", motor_sys.den)
 print("motor poles:", np.roots(den))
 ```
 
-## Common pitfalls
+## Modeling choices that change the transfer function
 
 - Selecting coordinates inconsistently. A spring between two moving bodies depends on relative displacement, not either displacement alone.
 - Forgetting reflected inertia or damping through gears. Gear ratios square when reflecting inertias to another shaft.
@@ -277,10 +271,14 @@ print("motor poles:", np.roots(den))
 - Losing sign conventions in gears. Opposite rotation can introduce a minus sign that matters in feedback interconnections.
 - Treating static component gains and dynamic transfer functions as interchangeable. A potentiometer may be modeled as static gain only when its mechanical dynamics are negligible.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Laplace transfer functions](/cs/control-engineering/laplace-transfer-functions-and-linearization) give the transform rules used here.
 - [Block-diagram reduction](/cs/control-engineering/block-diagrams-signal-flow-and-mason) connects component models into complete systems.
 - [Time response](/cs/control-engineering/time-response-first-and-second-order) interprets the poles of these models.
-- [Simulation](/physics/simulation/) extends these models into numerical and Simulink-style experiments.
-- [Embedded control](/cs/embedded/) matters when these continuous models are implemented on real hardware.
+- [Simulation](/physics/simulation/intro) extends these models into numerical and Simulink-style experiments.
+- [Embedded control](/cs/embedded/intro) matters when these continuous models are implemented on real hardware.
+
+</div>

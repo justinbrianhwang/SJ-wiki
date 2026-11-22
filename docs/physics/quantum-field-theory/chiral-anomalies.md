@@ -307,11 +307,8 @@ Several alternatives remain. The symmetry may break spontaneously, with Goldston
 
 Background fields are useful here. A global symmetry is coupled to a nondynamical gauge field, and the anomalous variation of the generating functional is computed. Because no gauge redundancy is being imposed on that background, the anomaly is allowed as a physical response. Promoting the same field to a dynamical gauge field would turn the failed invariance into an inconsistency unless other contributions cancel it.
 
-## Related pages
+<div className="see-also">
 
-- [Dirac Fields and Spinors](/physics/quantum-field-theory/dirac-fields-and-spinors)
-- [Gauge Invariance and QED](/physics/quantum-field-theory/gauge-invariance-and-qed)
-- [Yang--Mills Theory and QCD](/physics/quantum-field-theory/yang-mills-theory-and-qcd)
-- [Electroweak Theory and Grand Unification](/physics/quantum-field-theory/electroweak-theory-and-grand-unification)
-- [Path Integral Formulation](/physics/quantum-field-theory/path-integral-formulation)
+See also: [Dirac Fields and Spinors](/physics/quantum-field-theory/dirac-fields-and-spinors) · [Gauge Invariance and QED](/physics/quantum-field-theory/gauge-invariance-and-qed) · [Yang--Mills Theory and QCD](/physics/quantum-field-theory/yang-mills-theory-and-qcd) · [Electroweak Theory and Grand Unification](/physics/quantum-field-theory/electroweak-theory-and-grand-unification) · [Path Integral Formulation](/physics/quantum-field-theory/path-integral-formulation)
 
+</div>

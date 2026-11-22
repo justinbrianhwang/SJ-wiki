@@ -7,9 +7,9 @@ sidebar_position: 12
 
 Attention lets a model choose which pieces of information to use for each prediction. D2L introduces attention through queries, keys, and values, then builds scoring functions, multi-head attention, self-attention, positional encoding, and the Transformer architecture. This progression explains why attention displaced recurrence for many sequence tasks: it creates direct paths between all positions and parallelizes efficiently.
 
-A Transformer is not just attention. It combines multi-head self-attention, positionwise feed-forward networks, residual connections, layer normalization, masking, and positional information. Each component solves a specific problem: attention mixes tokens, feed-forward layers transform each position, residual paths stabilize optimization, masks preserve causality or ignore padding, and positional encodings restore order information that pure attention does not have.
+A Transformer combines multi-head self-attention, positionwise feed-forward networks, residual connections, layer normalization, masking, and positional information. Each component solves a specific problem: attention mixes tokens, feed-forward layers transform each position, residual paths stabilize optimization, masks preserve causality or ignore padding, and positional encodings restore order information that pure attention does not have.
 
-## Definitions
+## Queries, keys, values, and position
 
 A **query** asks for information, a **key** describes what a value contains, and a **value** is the content to aggregate. Attention computes weights from query-key similarity and returns a weighted sum of values.
 
@@ -39,7 +39,7 @@ $$
 
 A **Transformer encoder block** contains multi-head self-attention and a positionwise feed-forward network. A **Transformer decoder block** adds masked self-attention and encoder-decoder attention.
 
-## Key results
+## Why scaling, heads, and masks matter
 
 Attention pooling generalizes weighted averaging. If a query is similar to a key, the corresponding value receives a larger weight. Since the weights are produced by softmax, they are nonnegative and sum to one along the attended dimension.
 
@@ -53,7 +53,7 @@ Residual connections and layer normalization are not optional details. They keep
 
 The query-key-value view also clarifies shape discipline. If a batch has $n$ examples, $T_q$ query positions, $T_k$ key/value positions, and model width $d$, then attention scores have shape $(n,T_q,T_k)$ for each head. The output has one value vector per query position. Self-attention has $T_q=T_k$ because the same sequence supplies all three roles. Encoder-decoder attention has target positions as queries and source positions as keys and values, so target length and source length may differ.
 
-Multi-head attention is not merely running the same attention several times. Each head has its own learned projections, so one head may focus on local syntax, another on long-distance agreement, and another on delimiter or separator tokens. After concatenation, an output projection lets the model recombine those head-specific views. In practice, each head usually has width $d_{\text{model}}/h$, keeping the total projection size comparable to single-head attention.
+Multi-head attention does more than run the same attention several times. Each head has its own learned projections, so one head may focus on local syntax, another on long-distance agreement, and another on delimiter or separator tokens. After concatenation, an output projection lets the model recombine those head-specific views. Each head usually has width $d_{\text{model}}/h$, keeping the total projection size comparable to single-head attention.
 
 The positionwise feed-forward network is equally important. Attention mixes information across positions, but the feed-forward block applies a nonlinear transformation independently at each position. A Transformer layer therefore alternates "communicate across tokens" and "transform each token representation." This alternating pattern is why removing either attention or feed-forward sublayers severely weakens the architecture.
 
@@ -63,7 +63,9 @@ The encoder-decoder distinction is also practical for debugging. In an encoder b
 
 For small examples, writing the attention matrix by hand is often the fastest way to find mistakes. Rows should correspond to query positions, columns to key positions, and each row should sum to one after softmax except where masking has removed all valid keys, which should be avoided.
 
-## Visual
+## From token mixing to an encoder block
+
+An encoder layer alternates global token mixing with an independent nonlinear transform at each position. The residual paths preserve a direct route through both sublayers, while normalization controls the scale of the intermediate representations.
 
 ```mermaid
 flowchart TD
@@ -86,7 +88,7 @@ flowchart TD
 | Causal self-attention | Past positions only | No, needs positions | Yes during training | Autoregressive decoding |
 | Encoder-decoder attention | Target queries to source keys | Source order via positions | Yes | Translation and seq2seq |
 
-## Worked example 1: scaled dot-product attention
+## A two-key attention calculation
 
 Problem: one query attends to two key-value pairs. Let
 
@@ -136,9 +138,9 @@ $$
 0.5[10,0] + 0.5[0,20] = [5,10].
 $$
 
-Checked answer: the attention output is $[5,10]$. Equal query-key similarity caused equal averaging of the values.
+The attention output is $[5,10]$ because the two query-key similarities are equal.
 
-## Worked example 2: causal mask for decoding
+## Building a causal mask by hand
 
 Problem: construct the valid attention pattern for a target sequence of length $4$ in an autoregressive decoder. Position $t$ may attend only to positions $\le t$.
 
@@ -160,9 +162,9 @@ $$
 \end{bmatrix}.
 $$
 
-Checked answer: the matrix is lower triangular. In implementation, blocked positions are often assigned a large negative score before softmax so their attention weight becomes approximately zero.
+The matrix is lower triangular. Implementations usually assign blocked positions a large negative score before softmax so their attention weight becomes approximately zero.
 
-## Code
+## Checking attention shapes in PyTorch
 
 ```python
 import math
@@ -234,7 +236,7 @@ flowchart TB
     direction TB
     DecIn[" "] --> D_MSA["Masked multi-head self-attention"]
     D_MSA --> D_AN1["Add and LayerNorm (residual)"]
-    D_AN1 --> D_CA["Encoder–decoder cross-attention (Q from decoder, K and V from encoder)"]
+    D_AN1 --> D_CA["Encoder-decoder cross-attention (Q from decoder, K and V from encoder)"]
     D_CA --> D_AN2["Add and LayerNorm (residual)"]
     D_AN2 --> D_FFN["Position-wise feed-forward (FFN)"]
     D_FFN --> D_AN3["Add and LayerNorm (residual)"]
@@ -249,12 +251,12 @@ flowchart TB
 
 ![The original Transformer encoder-decoder architecture shows stacked self-attention, cross-attention, feed-forward layers, residual paths, and output softmax.](https://ar5iv.labs.arxiv.org/html/1706.03762/assets/Figures/ModalNet-21.png)
 
-*Figure: Original Transformer architecture from [Vaswani et al., 2017](https://arxiv.org/abs/1706.03762) — embedded under educational fair use with attribution.*
+*Figure: Original Transformer architecture from [Vaswani et al., 2017](https://arxiv.org/abs/1706.03762), reproduced with attribution.*
 
-The block diagram above shows the canonical encoder–decoder Transformer of Vaswani et al. [1]:
+The block diagram above shows the canonical encoder-decoder Transformer of Vaswani et al. [1]:
 
-- **Encoder layer** (left) has two sublayers — multi-head self-attention and a position-wise feed-forward network — each wrapped in a residual connection followed by layer normalization. Stacked $N$ times.
-- **Decoder layer** (right) adds a third sublayer: masked multi-head self-attention prevents target tokens from attending to future positions, encoder–decoder cross-attention lets each target position read the full encoded source through $Q = X_{\mathrm{dec}} W^Q$ and $K, V$ from the encoder output, and a position-wise FFN finishes the layer. Stacked $N$ times.
+- **Encoder layer** (left) has two sublayers—multi-head self-attention and a position-wise feed-forward network—each wrapped in a residual connection followed by layer normalization. The encoder repeats this layer $N$ times.
+- **Decoder layer** (right) adds a third sublayer: masked multi-head self-attention prevents target tokens from attending to future positions, encoder-decoder cross-attention lets each target position read the full encoded source through $Q = X_{\mathrm{dec}} W^Q$ and $K, V$ from the encoder output, and a position-wise FFN finishes the layer. The decoder also repeats the layer $N$ times.
 - **Output** projects decoder states to the target vocabulary with a linear layer, then softmax produces the next-token distribution.
 - **Embeddings** map discrete tokens to vectors of dimension $d_{\mathrm{model}}$; sinusoidal positional encodings are added so the model can use order despite having no recurrence or convolution.
 
@@ -347,7 +349,7 @@ flowchart LR
 
 ![The Vision Transformer overview splits an image into fixed-size patches, embeds them with positions, prepends a class token, and feeds the sequence into a Transformer encoder.](https://ar5iv.labs.arxiv.org/html/2010.11929/assets/x1.png)
 
-*Figure: Vision Transformer patch-token pipeline from [Dosovitskiy et al., 2020](https://arxiv.org/abs/2010.11929) — embedded under educational fair use with attribution.*
+*Figure: Vision Transformer patch-token pipeline from [Dosovitskiy et al., 2020](https://arxiv.org/abs/2010.11929), reproduced with attribution.*
 
 The tradeoff is data efficiency versus architectural flexibility. CNNs hard-code locality, weight sharing, and translation equivariance, so they are strong on moderate image datasets. A patch-token Transformer has fewer image-specific priors, so it usually needs larger pretraining data or stronger regularization to match CNNs from scratch. The upside is a generic token mixer that scales well when pretraining data is large and that transfers naturally to masked image modeling, multimodal models, and video or high-resolution patch sequences.
 
@@ -395,7 +397,7 @@ z = PatchEmbedding()(x)
 print(z.shape)  # [2, 197, 768]
 ```
 
-## Common pitfalls
+## Attention bugs and misleading diagnostics
 
 - Forgetting positional information and expecting self-attention alone to know token order.
 - Using the wrong mask orientation in a decoder. Future tokens must be blocked.
@@ -405,17 +407,13 @@ print(z.shape)  # [2, 197, 768]
 - Underestimating the memory cost of the $T \times T$ attention matrix for long sequences.
 - Treating patch size as cosmetic in vision Transformers. Halving patch size roughly quadruples image-token count.
 
-## Connections
-
-- [Gated RNNs and sequence-to-sequence](/cs/deep-learning/gated-rnns-seq2seq)
-- [Pretrained transformers and BERT](/cs/deep-learning/pretrained-transformers-nlp)
-- [Computer Vision Applications](/cs/deep-learning/computer-vision-applications)
-- [Efficient Sequence Modeling](/cs/deep-learning/efficient-sequence-modeling)
-- [Natural language processing](/cs/nlp/)
-- [Linear algebra](/math/linear-algebra/)
-- [Machine learning](/cs/machine-learning/)
-
 ## References
 
 [1] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, L. Kaiser, I. Polosukhin. *Attention Is All You Need*. NeurIPS 2017.
 [2] A. Dosovitskiy, L. Beyer, A. Kolesnikov, D. Weissenborn, X. Zhai, T. Unterthiner, M. Dehghani, M. Minderer, G. Heigold, S. Gelly, J. Uszkoreit, N. Houlsby. *An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale*. ICLR 2021.
+
+<div className="see-also">
+
+See also: [Gated RNNs and sequence-to-sequence](/cs/deep-learning/gated-rnns-seq2seq) · [Pretrained transformers and BERT](/cs/deep-learning/pretrained-transformers-nlp) · [Computer Vision Applications](/cs/deep-learning/computer-vision-applications) · [Efficient Sequence Modeling](/cs/deep-learning/efficient-sequence-modeling) · [Natural language processing](/cs/nlp/intro) · [Linear algebra](/math/linear-algebra/intro) · [Machine learning](/cs/machine-learning/intro)
+
+</div>

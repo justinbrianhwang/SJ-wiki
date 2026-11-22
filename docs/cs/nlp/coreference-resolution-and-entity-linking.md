@@ -9,7 +9,7 @@ Coreference resolution links mentions that refer to the same discourse entity. E
 
 These tasks matter because texts refer to the same entity in many ways: `Marie Curie`, `Curie`, `the scientist`, `she`, and `the Nobel laureate`. Downstream systems need to know when these expressions co-refer. Entity linking goes one step further and asks which real-world entity the cluster denotes.
 
-## Definitions
+## Mentions, chains, and knowledge-base identities
 
 A **mention** is a span of text that refers to an entity or event. Mentions include names, pronouns, definite descriptions, and some nominals.
 
@@ -27,7 +27,7 @@ The three bracketed mentions can belong to one cluster.
 
 Common model architectures include **mention-pair** models, which classify pairs; **mention-ranking** models, which choose the best antecedent; and **entity-based** models, which maintain cluster representations. Modern neural models often score all spans as candidate mentions and then score antecedents.
 
-## Key results
+## Ranking antecedents and linking entities
 
 Coreference is hard because it combines syntax, salience, discourse, agreement, semantics, and world knowledge. Pronouns often depend on gender, number, grammatical role, recency, and discourse prominence. Definite noun phrases may require lexical or encyclopedic knowledge.
 
@@ -47,7 +47,7 @@ Entity linking uses surface-form dictionaries, popularity priors, context simila
 
 Bias is a central issue. Coreference systems can reproduce gender stereotypes, for example linking `doctor` more readily with masculine pronouns and `nurse` with feminine pronouns. Counterfactual data augmentation, balanced evaluation sets, and careful corpus analysis are common mitigation tools.
 
-Coreference is also a discourse task. A mention is often resolved not to the nearest compatible noun phrase, but to the most salient discourse entity. Grammatical role, recency, parallelism, topic continuity, and information status all affect salience. This is why simple agreement filters are useful but insufficient. In `The trophy did not fit in the suitcase because it was too large`, compatibility alone does not solve the pronoun; world knowledge about containment does.
+Coreference is also a discourse task. A mention is often resolved not to the nearest compatible noun phrase, but to the most salient discourse entity. Grammatical role, recency, parallelism, topic continuity, and information status all affect salience. Simple agreement filters are therefore useful but insufficient. In `The trophy did not fit in the suitcase because it was too large`, compatibility alone does not solve the pronoun; world knowledge about containment does.
 
 Entity linking adds an external-memory dimension. Surface forms are ambiguous, knowledge bases are incomplete, and context can point to entities at different granularities. `Washington` may be a person, city, state, government, sports team, or metonymic institution. A good linker balances popularity priors with local context, document topic, and coherence among linked entities.
 
@@ -58,8 +58,6 @@ Coreference systems must also decide what not to link. Generic mentions such as 
 Long documents add another scaling problem. A naive span-ranking system may consider every possible span and every previous span as an antecedent, which is quadratic or worse in document length. Practical systems prune candidate mentions, limit antecedent distance, or process documents in segments. These speed choices can remove the correct antecedent, so recall after pruning should be measured.
 
 For entity linking, candidate recall plays the same role. If the correct entity is not generated in the candidate list, no disambiguation model can recover it. Always measure recall@k before blaming the ranking model.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -82,9 +80,11 @@ flowchart TD
 | Entity linking | KB id | same surface form, many entities | accuracy, recall@k |
 | Event coreference | event clusters | same event vs related event | cluster metrics |
 
-## Worked example 1: forming a coreference chain
+## Following identities within and beyond the document
 
-Problem: find likely coreference clusters in:
+### Resolving the mentions around Ada Lovelace
+
+Find likely coreference clusters in:
 
 ```text
 Ada Lovelace wrote notes on the engine. The mathematician understood its promise. She described it clearly.
@@ -102,19 +102,19 @@ Ada Lovelace wrote notes on the engine. The mathematician understood its promise
 2. Link person mentions:
    - `The mathematician` describes Ada Lovelace.
    - `She` is singular feminine and saliently refers to Ada Lovelace.
-   - Cluster: `{Ada Lovelace, The mathematician, She}`.
+   - Cluster: `\{Ada Lovelace, The mathematician, She\}`.
 3. Link machine mentions:
    - `its` likely refers to `the engine`.
    - `it` in `described it clearly` likely refers to `its promise` or the engine's promise depending on interpretation. The direct object of `described` is more naturally `its promise`, but `it` could also refer to the engine in a broader reading.
 4. Conservative cluster:
-   - `{the engine, its}`
-   - `{promise, it}` if interpreting `it` as the promise.
+   - `\{the engine, its\}`
+   - `\{promise, it\}` if interpreting `it` as the promise.
 
-Checked answer: the person cluster is strong. The object cluster requires a semantic decision, illustrating why coreference is not just string matching.
+The person cluster is strong. The object cluster requires a semantic decision; string matching cannot settle it.
 
-## Worked example 2: entity linking disambiguation
+### Disambiguating `Python` against a knowledge base
 
-Problem: link `Python` in `Python added pattern matching in version 3.10`.
+Link `Python` in `Python added pattern matching in version 3.10`.
 
 1. Candidate entities from surface form:
    - Python programming language
@@ -136,9 +136,9 @@ Problem: link `Python` in `Python added pattern matching in version 3.10`.
 Python -> Python (programming language)
 ```
 
-Checked answer: the correct entity is the programming language. Popularity alone may already favor it, but context makes the decision robust.
+The correct entity is the programming language. Popularity alone may already favor it, but context makes the decision robust.
 
-## Code
+## A compatibility-only clustering baseline
 
 ```python
 from collections import defaultdict
@@ -169,7 +169,7 @@ for cluster in clusters:
     print([m[0] for m in cluster])
 ```
 
-## Common pitfalls
+## Cases that agreement and proximity miss
 
 - Treating all anaphora as identity coreference.
 - Ignoring pleonastic `it`, as in `It is raining`, which does not refer to an entity.
@@ -179,9 +179,8 @@ for cluster in clusters:
 - Ignoring gender, dialect, and occupation bias in training data and evaluation.
 - Assuming Wikipedia coverage is universal or culturally neutral.
 
-## Connections
+<div className="see-also">
 
-- [Information extraction](/cs/nlp/information-extraction)
-- [Semantic role labeling and word-sense disambiguation](/cs/nlp/semantic-role-labeling-and-word-sense-disambiguation)
-- [Vector semantics and embeddings](/cs/nlp/vector-semantics-and-embeddings)
-- [Dialogue and chatbots](/cs/nlp/dialogue-and-chatbots)
+See also: [Information extraction](/cs/nlp/information-extraction) · [Semantic role labeling and word-sense disambiguation](/cs/nlp/semantic-role-labeling-and-word-sense-disambiguation) · [Vector semantics and embeddings](/cs/nlp/vector-semantics-and-embeddings) · [Dialogue and chatbots](/cs/nlp/dialogue-and-chatbots)
+
+</div>

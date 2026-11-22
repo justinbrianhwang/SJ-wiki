@@ -9,9 +9,9 @@ Regular expressions and normalization are the front door of most NLP pipelines. 
 
 The practical lesson is that preprocessing is not a harmless detail. Tokenization choices affect vocabulary size, named entity boundaries, speech transcripts, subword models, and evaluation. Edit distance then gives a dynamic programming bridge between surface forms, supporting spelling correction, speech error analysis, approximate matching, and minimum-error alignments.
 
-## Definitions
+## Patterns, tokens, and string distance
 
-A **regular expression** is a pattern language for matching sets of strings. Concatenation joins patterns in sequence, alternation chooses between patterns, character classes describe sets of characters, and repetition operators such as `*`, `+`, and `{m,n}` describe repeated occurrences. A regular expression denotes a regular language, and every regular language can be recognized by some finite-state automaton.
+A **regular expression** is a pattern language for matching sets of strings. Concatenation joins patterns in sequence, alternation chooses between patterns, character classes describe sets of characters, and repetition operators such as `*`, `+`, and `\{m,n\}` describe repeated occurrences. A regular expression denotes a regular language, and every regular language can be recognized by some finite-state automaton.
 
 **Text normalization** converts raw text into a form that is easier to process. Common steps include Unicode normalization, case handling, tokenization, sentence segmentation, lemmatization, stemming, and special handling for numbers, dates, hashtags, URLs, contractions, and disfluencies. A **token** is the unit emitted by a tokenizer; it may be a word, punctuation mark, subword, or special symbol. A **word type** is a distinct vocabulary item, while a **word instance** is one occurrence in a corpus.
 
@@ -30,7 +30,7 @@ $$
 
 Here $c_{\mathrm{sub}}(x_i,y_j)=0$ when the two characters match and is otherwise the substitution cost.
 
-## Key results
+## How preprocessing choices propagate
 
 Regular expressions are efficient because they can be compiled into finite-state machines. Once compiled, many tokenization and extraction patterns can be applied in time linear in the length of the text. That is why production tokenizers often combine regular expression rules, exception lists, and deterministic finite-state logic rather than expensive downstream models.
 
@@ -47,8 +47,6 @@ This matters because a larger corpus continually introduces new word types. Norm
 Minimum edit distance has optimal substructure. The best alignment of two prefixes must end in one of three possibilities: delete the last source character, insert the last target character, or align the last two characters by match or substitution. Filling the table by increasing prefix length gives time $O(\vert x\vert \vert y\vert )$ and space $O(\vert x\vert \vert y\vert )$, or $O(\min(\vert x\vert ,\vert y\vert ))$ if only the distance is needed and backpointers are not stored. If we keep backpointers, the table also gives an alignment, not only a score.
 
 The same dynamic programming idea reappears throughout NLP: Viterbi for HMM tagging, CKY for constituency parsing, CTC for speech recognition, and sequence alignment for evaluation. The preprocessing chapter is therefore also an introduction to a general algorithmic style. One practical check is to ask whether a preprocessing decision changes the label space, the feature space, or only the display form. If it changes labels or features, it is part of the model design and should be versioned with experiments.
-
-## Visual
 
 ```mermaid
 flowchart LR
@@ -70,9 +68,11 @@ flowchart LR
 | TTS normalization | semiotic class | wrong verbalization of numbers | rules plus encoder-decoder models |
 | ASR evaluation | word | inconsistent tokenization | edit distance alignment |
 
-## Worked example 1: tokenizing a noisy sentence
+## Two preprocessing calculations
 
-Problem: tokenize the sentence `Dr. Lee paid $1,250.50 for 3kg of coffee... wow!` for a downstream named entity and information extraction system.
+### Tokenizing a noisy payment sentence
+
+Tokenize the sentence `Dr. Lee paid $1,250.50 for 3kg of coffee... wow!` for a downstream named entity and information extraction system.
 
 1. Decide what must be preserved. The title `Dr.`, the name `Lee`, the money amount, the quantity, and sentence-final punctuation may all be useful. Lowercasing would erase the name cue, so keep case.
 2. Write a priority order. Match special tokens before generic words:
@@ -93,7 +93,7 @@ Problem: tokenize the sentence `Dr. Lee paid $1,250.50 for 3kg of coffee... wow!
    - `wow` matches word.
    - `!` matches punctuation.
 
-Checked answer:
+The resulting token sequence is:
 
 ```text
 ["Dr.", "Lee", "paid", "$1,250.50", "for", "3kg", "of", "coffee", "...", "wow", "!"]
@@ -101,9 +101,9 @@ Checked answer:
 
 The answer is not the only possible tokenization. A parser might prefer `["3", "kg"]`, and a TTS system might classify `$1,250.50` as a money semiotic class before verbalizing it. The important check is that the tokenization is consistent with the task.
 
-## Worked example 2: minimum edit distance for spelling correction
+### Aligning `intention` with `execution`
 
-Problem: compute the Levenshtein distance between `intention` and `execution`.
+Compute the Levenshtein distance between `intention` and `execution`.
 
 Use unit insertion, deletion, and substitution costs. Instead of displaying all $10 \times 10$ cells, show a valid shortest edit script and verify its cost:
 
@@ -114,17 +114,15 @@ Use unit insertion, deletion, and substitution costs. Instead of displaying all 
 5. Substitute `n -> c`: `execetion` with cost $4$.
 6. Substitute `t -> u`: `execution` with cost $5$.
 
-So the edit distance is at most $5$. To check that it is not smaller, note that the two strings have equal length, so an edit script using only insertions and deletions would need pairs of operations and would not beat substitutions for mismatched positions. Comparing aligned positions:
+So the edit distance is at most $5$. Filling the recurrence verifies optimality: the final DP row, for converting all of `intention` to successively longer prefixes of `execution`, is
 
 ```text
-intention
-execution
-^^^^^    
+9 8 8 8 8 8 8 7 6 5
 ```
 
-The last four letters `tion` already match. The first five positions differ, so at least five substitutions or equivalent operations are required. Therefore the minimum edit distance is exactly $5$.
+The bottom-right entry is therefore $D(9,9)=5$, matching the five-substitution script.
 
-## Code
+## A tokenizer and Levenshtein implementation
 
 ```python
 import re
@@ -162,7 +160,7 @@ print(tokenize("Dr. Lee paid $1,250.50 for 3kg of coffee... wow!"))
 print(edit_distance("intention", "execution"))
 ```
 
-## Common pitfalls
+## Choices that silently change the task
 
 - Treating tokenization as universal. A good tokenizer for search may be a poor tokenizer for NER, parsing, or TTS.
 - Lowercasing before deciding whether capitalization is a feature.
@@ -172,9 +170,8 @@ print(edit_distance("intention", "execution"))
 - Computing edit distance recursively without memoization, which turns a simple dynamic program into exponential work.
 - Forgetting that subword tokenization changes the unit of downstream labels; word-level NER labels must be projected to subwords and then reconstructed.
 
-## Connections
+<div className="see-also">
 
-- [N-gram language models](/cs/nlp/n-gram-language-models)
-- [Sequence labeling with HMMs and CRFs](/cs/nlp/sequence-labeling-hmms-crfs)
-- [Speech recognition and synthesis](/cs/nlp/speech-recognition-and-synthesis)
-- [Information extraction](/cs/nlp/information-extraction)
+See also: [N-gram language models](/cs/nlp/n-gram-language-models) · [Sequence labeling with HMMs and CRFs](/cs/nlp/sequence-labeling-hmms-crfs) · [Speech recognition and synthesis](/cs/nlp/speech-recognition-and-synthesis) · [Information extraction](/cs/nlp/information-extraction)
+
+</div>

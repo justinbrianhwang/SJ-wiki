@@ -9,7 +9,7 @@ Natural language processing studies computational methods for analyzing, represe
 
 The notes are organized as a single merged course rather than as per-book summaries. When the books overlap, the pages usually follow Jurafsky and Martin for terminology and topic order, then add Eisenstein's notation or modeling perspective where it sharpens the math. When a topic is covered mainly by one book, the page says so implicitly through its emphasis: speech and modern prompting come mostly from Jurafsky and Martin, while weighted grammars, CRFs, and structured search draw heavily from Eisenstein.
 
-## Definitions
+## Tasks, representations, models, and inference
 
 An **NLP task** maps linguistic input to a useful output: labels, spans, parse trees, entities, translations, answers, speech transcripts, synthetic speech, or generated text. Tasks vary by input and output structure. Classification maps one input to one label; sequence labeling maps tokens to labels; parsing maps a sentence to a tree or graph; generation maps context to a sequence.
 
@@ -21,7 +21,7 @@ An **inference algorithm** searches for the best output under a model. Viterbi s
 
 An **evaluation metric** measures whether the output is useful. Accuracy, precision, recall, $F_1$, perplexity, attachment score, BLEU, chrF, word error rate, and human preference all measure different properties. No single metric captures all behavior.
 
-## Key results
+## Sparsity and structure recur at every scale
 
 The first recurring result is that language is discrete but sparse. Vocabulary grows with corpus size, rare words matter, and exact n-gram histories are often unseen. This motivates smoothing, subword tokenization, embeddings, and pretrained models. It also explains why simple baselines can fail abruptly on domain shift.
 
@@ -31,7 +31,7 @@ The third result is that representation and learning are inseparable. A bag-of-w
 
 The fourth result is that modern systems are layered. A single application may use tokenization, pretrained embeddings, sequence labeling, dependency parsing, entity linking, retrieval, generation, and speech components. Errors compound across layers, so robust engineering requires understanding both the individual algorithms and their interfaces.
 
-The detail pages in this section are:
+Reading order:
 
 | Position | Page | Main sources |
 |---:|---|---|
@@ -54,7 +54,7 @@ The detail pages in this section are:
 | 18 | [Dialogue and Chatbots](/cs/nlp/dialogue-and-chatbots) | J&M Ch. 15, Eisenstein Ch. 19 |
 | 19 | [Speech Recognition and Synthesis](/cs/nlp/speech-recognition-and-synthesis) | J&M Ch. 16, Eisenstein speech overview |
 
-## Visual
+## From raw signals to structured outputs
 
 ```mermaid
 flowchart TD
@@ -81,7 +81,7 @@ flowchart TD
 | Meaning | roles, senses, entities | contextual embeddings and LLMs | surface form underdetermines intent |
 | Evaluation | F1, perplexity, WER | human eval plus benchmarks | metrics capture only slices of quality |
 
-## Worked example 1: choosing a model family
+## Match the model family to the output structure
 
 Problem: decide which family of methods is appropriate for four tasks: spam detection, named entity recognition, machine translation, and word error rate computation.
 
@@ -92,7 +92,7 @@ Problem: decide which family of methods is appropriate for four tasks: spam dete
 
 Checked answer: the tasks map to four different output structures: document label, token labels, generated sequence, and alignment distance. The model choice follows the output structure.
 
-## Worked example 2: tracing one sentence through the wiki
+## One sentence through five layers of analysis
 
 Problem: trace the sentence `Ada wrote code for the engine` through several layers of NLP analysis.
 
@@ -127,39 +127,7 @@ WORKED_ON(person=Ada, artifact=engine, product=code)
 
 Checked answer: each layer adds structure, but each layer also introduces possible ambiguity. `for the engine` could mean purpose, beneficiary, or target artifact depending on context.
 
-## Code
-
-```python
-from pathlib import Path
-
-pages = [
-    "regular-expressions-normalization-edit-distance",
-    "n-gram-language-models",
-    "naive-bayes-sentiment-classification",
-    "logistic-regression-for-text",
-    "vector-semantics-and-embeddings",
-    "neural-networks-for-nlp",
-    "rnns-lstms-sequence-modeling",
-    "transformers-self-attention",
-    "pretrained-language-models",
-    "sequence-labeling-hmms-crfs",
-    "constituency-parsing-cky",
-    "dependency-parsing",
-    "machine-translation",
-    "semantic-role-labeling-and-word-sense-disambiguation",
-    "coreference-resolution-and-entity-linking",
-    "information-extraction",
-    "dialogue-and-chatbots",
-    "speech-recognition-and-synthesis",
-]
-
-docs_root = Path("docs/cs/nlp")
-for index, slug in enumerate(pages, start=2):
-    path = docs_root / f"{slug}.md"
-    print(index, path.name, path.exists())
-```
-
-## Common pitfalls
+## Evaluation and pipeline failures
 
 - Treating NLP as only language modeling; many core tasks require structured outputs and evaluation beyond next-token prediction.
 - Comparing models without matching the task's output structure and data regime.
@@ -169,9 +137,8 @@ for index, slug in enumerate(pages, start=2):
 - Ignoring source differences: Jurafsky and Martin is broader and newer, while Eisenstein is more formal in several probabilistic and structured areas.
 - Building applications without considering fairness, privacy, corpus provenance, and domain shift.
 
-## Connections
+<div className="see-also">
 
-- [Regular expressions, text normalization, and edit distance](/cs/nlp/regular-expressions-normalization-edit-distance)
-- [Pretrained language models](/cs/nlp/pretrained-language-models)
-- [Information extraction](/cs/nlp/information-extraction)
-- [Speech recognition and synthesis](/cs/nlp/speech-recognition-and-synthesis)
+See also: [Regular expressions, text normalization, and edit distance](/cs/nlp/regular-expressions-normalization-edit-distance) · [Pretrained language models](/cs/nlp/pretrained-language-models) · [Information extraction](/cs/nlp/information-extraction) · [Speech recognition and synthesis](/cs/nlp/speech-recognition-and-synthesis)
+
+</div>

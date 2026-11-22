@@ -1,4 +1,4 @@
----
+﻿---
 title: Matchings Hall and Konig
 sidebar_position: 13
 ---
@@ -7,13 +7,9 @@ sidebar_position: 13
 
 Matchings formalize pairing without conflicts. A matching can assign students to projects, workers to jobs, tasks to machines, or vertices in one part of a bipartite graph to compatible vertices in the other part. The central obstruction is local competition: too many vertices may demand too few possible partners.
 
-![The complete bipartite graph K three three connects two groups of three vertices.](https://commons.wikimedia.org/wiki/Special:FilePath/Complete_bipartite_graph_K3%2C3.svg)
-
-*Figure: The graph K3,3 is a classical nonplanar bipartite graph. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Complete_bipartite_graph_K3%2C3.svg), David Benbennick, public domain.*
-
 Hall's theorem gives an exact condition for perfect matching on one side of a bipartite graph. Konig's theorem then links matchings to vertex covers, showing that in bipartite graphs the largest set of disjoint edges has the same size as the smallest set of vertices touching all edges.
 
-## Definitions
+## Matchings, covers, and alternating paths
 
 A **matching** in a graph is a set of pairwise nonadjacent edges: no two selected edges share a vertex. A vertex incident with a matching edge is **saturated**; otherwise it is **unsaturated**.
 
@@ -25,7 +21,7 @@ A **vertex cover** is a set of vertices meeting every edge. A **minimum vertex c
 
 An **augmenting path** relative to a matching $M$ is a path whose edges alternate between not in $M$ and in $M$, starting and ending at unsaturated vertices. Flipping membership along such a path increases the matching size by $1$.
 
-## Key results
+## Bottlenecks and optimality certificates
 
 **Hall's marriage theorem.** A bipartite graph with parts $X$ and $Y$ has a matching saturating $X$ if and only if
 
@@ -53,7 +49,7 @@ $$
 |S|-|N(S)|.
 $$
 
-A positive value means the vertices of $S$ are competing for too few partners. The largest such deficiency controls how far a bipartite graph is from saturating the left side. This is why Hall's theorem is more than a yes/no test: the offending subset identifies the bottleneck.
+A positive value means the vertices of $S$ are competing for too few partners. The largest such deficiency controls how far a bipartite graph is from saturating the left side. The offending subset identifies the bottleneck rather than merely reporting that no saturating matching exists.
 
 **From matching to vertex cover.** The standard constructive proof of Konig's theorem starts with a maximum matching. From unmatched vertices on the left, follow alternating paths that begin with nonmatching edges. Let $Z$ be the set of vertices reached. Then
 
@@ -71,9 +67,7 @@ is a minimum vertex cover. This recipe is also how many matching algorithms cert
 
 **Matching size bounds.** A matching can never be larger than either part of a bipartite graph, and it can never be larger than a vertex cover. Konig's theorem says that in bipartite graphs the best possible upper bound from a vertex cover is always tight. This duality is the matching analogue of max-flow min-cut.
 
-## Visual
-
-The highlighted alternating route suggests an augmenting path from an unmatched left vertex to an unmatched right vertex.
+The heavy edges mark the current matching. The route $x_1-y_2-x_2-y_3-x_3-y_4$ alternates between unmatched and matched edges and joins two unsaturated vertices.
 
 ```mermaid
 graph LR
@@ -81,7 +75,7 @@ graph LR
   x1 --- y2(("y2"))
   x2(("x2")) === y2
   x2 --- y3(("y3"))
-  x3(("x3")) --- y3
+  x3(("x3")) === y3
   x3 --- y4(("y4"))
 ```
 
@@ -92,17 +86,15 @@ graph LR
 | Maximum matching | largest matching | no augmenting path |
 | Vertex cover | vertices touching all edges | equals max matching size in bipartite graphs |
 
-## Worked example 1: Check Hall's condition
+## Checking Hall's condition subset by subset
 
-**Problem.** Let $X=\{a,b,c\}$ and $Y=\{1,2,3\}$ with neighborhoods
+Let $X=\{a,b,c\}$ and $Y=\{1,2,3\}$ with neighborhoods
 
 $$
 N(a)=\{1,2\},\quad N(b)=\{2\},\quad N(c)=\{2,3\}.
 $$
 
 Does there exist a matching saturating $X$?
-
-**Method.**
 
 We check Hall's condition for all subsets of $X$.
 
@@ -138,19 +130,17 @@ $$
 a1,\quad b2,\quad c3.
 $$
 
-**Checked answer.** Yes, the graph has a matching saturating $X$.
+Yes, the graph has a matching saturating $X$.
 
-## Worked example 2: Use an augmenting path
+## Enlarging a matching along an augmenting path
 
-**Problem.** In the bipartite graph with edges
+In the bipartite graph with edges
 
 $$
 x_1y_1,\ x_1y_2,\ x_2y_2,\ x_2y_3,\ x_3y_3,\ x_3y_4,
 $$
 
 start with matching $M=\{x_2y_2,\ x_3y_3\}$. Find a larger matching.
-
-**Method.**
 
 1. The unmatched vertices on the left are $x_1$.
 2. The unmatched vertices on the right are $y_1$ and $y_4$.
@@ -172,11 +162,11 @@ $$
 
 would alternate unmatched, matched, unmatched, matched, unmatched. Flipping along it gives $\{x_3y_3,x_2y_2,x_1y_1\}$.
 
-**Checked answer.** The larger matching has size $3$, which is maximum because it saturates the left part of size $3$.
+The larger matching has size $3$, which is maximum because it saturates the left part of size $3$.
 
 The final sentence is an upper-bound certificate. No matching can contain more edges than there are vertices on the smaller side of the bipartition. Once a matching saturates all three left vertices, it has reached that bound.
 
-## Code
+### Augmenting paths by depth-first search
 
 This is a compact DFS-based bipartite matching implementation.
 
@@ -214,11 +204,11 @@ For small Hall checks, it is usually unnecessary to list all $2^{\vert X\vert }$
 
 When a matching is proposed as maximum, look for a certificate. Either it saturates the smaller side, or it is paired with a vertex cover of the same size, or an augmenting-path search has failed. A large matching without one of these checks may still be improvable.
 
-This certificate habit is the matching analogue of checking an answer with a cut in flow problems.
+The same certificate pattern appears in flow problems, where a cut of equal value certifies a maximum flow.
 
 When a bipartite matching problem is small, draw the two parts in columns and keep matched edges visually distinct from unmatched edges. Alternating paths are much easier to see when matching edges have a different style. After augmenting, recount saturated vertices on both sides, because a successful flip changes several matched partners at once.
 
-## Common pitfalls
+## Claims that need a certificate
 
 - Checking Hall's condition only for single vertices. The obstruction often appears in larger subsets.
 - Forgetting that a matching edge saturates two vertices but conflicts with every other edge incident to either endpoint.
@@ -227,9 +217,8 @@ When a bipartite matching problem is small, draw the two parts in columns and ke
 - Confusing a vertex cover with an independent set. A vertex cover touches all edges; an independent set contains no internal edge.
 - Flipping an alternating path that does not start and end at unsaturated vertices. Only augmenting paths increase matching size.
 
-## Connections
+<div className="see-also">
 
-- [Menger theorem and network flows](/math/graph-theory/menger-theorem-and-network-flows)
-- [Edge colouring and chromatic polynomials](/math/graph-theory/edge-colouring-and-chromatic-polynomials)
-- [Matroids and graph duality](/math/graph-theory/matroids-and-graph-duality)
-- [Algorithms on weighted graphs](/math/graph-theory/algorithms-on-weighted-graphs)
+See also: [Menger theorem and network flows](/math/graph-theory/menger-theorem-and-network-flows) · [Edge colouring and chromatic polynomials](/math/graph-theory/edge-colouring-and-chromatic-polynomials) · [Matroids and graph duality](/math/graph-theory/matroids-and-graph-duality) · [Algorithms on weighted graphs](/math/graph-theory/algorithms-on-weighted-graphs)
+
+</div>

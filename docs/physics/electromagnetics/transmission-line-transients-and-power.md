@@ -7,13 +7,9 @@ sidebar_position: 7
 
 Sinusoidal analysis shows steady standing waves, but real interconnects also carry pulses, steps, and digital edges. In the time domain, a voltage change launched by a source travels with finite velocity, reflects from impedance discontinuities, and may bounce between source and load several times before settling. These effects are central to oscilloscopes, time-domain reflectometry, high-speed digital design, pulse power, and microwave measurement.
 
-Power is the complementary viewpoint. Voltage and current waves carry energy down the line, and reflected waves carry undelivered energy back. The same impedance mismatch that creates standing waves in phasor analysis creates bounce diagrams in transient analysis. This page ties those pictures together.
+Power is the complementary viewpoint. Voltage and current waves carry energy down the line, and reflected waves carry undelivered energy back. The same impedance mismatch that creates standing waves in phasor analysis creates bounce diagrams in transient analysis, so the two pictures should agree on delivered energy and final voltage.
 
-![A coaxial cable cutaway shows conductor, dielectric, shield, and jacket layers.](https://commons.wikimedia.org/wiki/Special:FilePath/Coaxial_cable_cutaway.svg)
-
-*Figure: A coaxial line makes distributed inductance, capacitance, impedance, and guided waves tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Coaxial_cable_cutaway.svg), Tkgd2007, CC BY 3.0.*
-
-## Definitions
+## Traveling steps and boundary reflections
 
 For a lossless line with forward and backward traveling time-domain waves,
 
@@ -68,7 +64,7 @@ when the terminations are resistive.
 
 For nonresistive terminations, the reflection is no longer just a constant multiplier in time. A capacitor, inductor, diode, or nonlinear load produces a response governed by a differential equation at the boundary. The bounce-diagram idea still helps, but each arrival must be processed through the load dynamics rather than multiplied by a fixed $\Gamma_L$. This is one reason high-speed digital interconnect simulation often uses time-domain circuit solvers with distributed line models.
 
-## Key results
+## Reading bounce diagrams as energy accounting
 
 A bounce diagram tracks wave increments. A wave launched from the source reaches the load after one delay $T=l/u_p$, reflects by $\Gamma_L$, returns to the source after another delay, reflects by $\Gamma_S$, and repeats. The load voltage is updated whenever a wave arrives at the load:
 
@@ -108,7 +104,7 @@ Source termination and load termination behave differently. A matched load preve
 
 Loss changes bounce diagrams gradually rather than changing the reflection logic at boundaries. Each traveling increment is attenuated while it propagates, so later bounces are smaller than ideal even if $\vert \Gamma_L\Gamma_S\vert $ is close to one. Real cables also disperse sharp edges, rounding the steps seen in measured TDR traces.
 
-## Visual
+### One round trip through a mismatched line
 
 ```mermaid
 flowchart LR
@@ -126,8 +122,6 @@ flowchart LR
   SourceUpdate --> TDR["TDR interpretation<br/>reflection sign and round-trip time locate discontinuity"]
 ```
 
-The transient transmission-line diagram shows the bounce-diagram architecture in block form. A source launches an incident wave, the load applies $\Gamma_L$, the returning wave meets the source coefficient $\Gamma_S$, and the sequence repeats with one-way delay $T$. The power and TDR nodes show how the same reflection updates explain energy delivery and discontinuity location.
-
 | Termination | Reflection coefficient | Step response tendency |
 |---|---:|---|
 | Matched $R=Z_0$ | $0$ | one arrival, no bounce |
@@ -136,7 +130,7 @@ The transient transmission-line diagram shows the bounce-diagram architecture in
 | High resistance | positive | upward reflected step |
 | Low resistance | negative | downward reflected step |
 
-## Worked example 1: Reflected power from SWR data
+## Recovering delivered power from SWR
 
 Problem: A lossless $50\ \Omega$ line carries $P^+=20\ \mathrm{W}$ toward a load. The measured SWR is $S=3$. Find $\vert \Gamma\vert $, reflected power, and delivered power.
 
@@ -174,7 +168,7 @@ $$
 
 Check: Delivered power is positive and less than incident power, as required for a passive load.
 
-## Worked example 2: First bounces on a step-driven line
+## First arrivals on a step-driven line
 
 Problem: A $10$ V step source with $R_S=25\ \Omega$ drives a $50\ \Omega$ lossless line of one-way delay $T=5$ ns. The line is terminated by $R_L=100\ \Omega$. Find the initially launched wave and the first two load-voltage changes.
 
@@ -225,7 +219,7 @@ $$
 
 Check: The load voltage first jumps to $8.889$ V, then drops to about $7.901$ V. The final dc value should be $10\cdot100/(25+100)=8$ V, so the direction is plausible.
 
-## Code
+## Simulating successive load-voltage updates
 
 ```python
 Vs = 10.0
@@ -247,19 +241,23 @@ for k in range(5):
     wave = Gamma_S * Gamma_L * wave
 ```
 
-## Common pitfalls
+## Timing and normalization checks
 
-- Using voltage reflection coefficient magnitude directly as power reflection fraction. Power uses $\vert \Gamma\vert ^2$.
-- Forgetting the initial source voltage divider with $Z_0$.
-- Adding a reflected wave to the load voltage without multiplying by $(1+\Gamma_L)$ for the total boundary voltage change.
-- Confusing one-way and round-trip delay in TDR distance estimates.
-- Applying ideal lossless bounce diagrams to long lossy cables without accounting for attenuation and dispersion.
-- Assuming transient final value must equal the matched-line first arrival. The final dc value is set by the source and load resistances after all bounces settle.
-- Interpreting a TDR trace without knowing the velocity factor. A timing measurement becomes distance only after the line's propagation velocity is known.
+- Reflected power fraction is $\vert \Gamma\vert ^2$, not $\vert \Gamma\vert$.
+- The initial launched voltage includes the divider formed by $R_S$ and $Z_0$.
+- A wave arriving at the load changes its voltage by $(1+\Gamma_L)$ times the incident increment.
+- TDR distance uses round-trip delay, whereas a source-to-load arrival uses one-way delay.
+- Long, lossy cables attenuate and disperse each increment, so an ideal bounce diagram will overstate later steps and preserve edges too sharply.
+- The final dc value comes from source and load resistances after all bounces settle; it need not equal the first matched-line arrival.
+- A TDR timing measurement becomes distance only after the line's propagation velocity is known.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Transmission-line models and wave equations](/physics/electromagnetics/transmission-line-models-and-wave-equations) for the origin of $Z_0$ and $u_p$.
 - [Reflections, Smith chart, and matching](/physics/electromagnetics/reflections-smith-chart-and-matching) for phasor reflection analysis.
-- [Signals and systems](/physics/signals-systems/) for transient and frequency-domain views of pulses.
+- [Signals and systems](/physics/signals-systems/intro) for transient and frequency-domain views of pulses.
 - [Plane waves in media](/physics/electromagnetics/plane-waves-lossless-lossy-polarization) for power flow through the Poynting vector.
+
+</div>

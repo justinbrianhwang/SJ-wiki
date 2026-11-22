@@ -400,9 +400,8 @@ The target is whether a point lies outside a circle, so no single straight decis
 - Applying strong weight decay to biases and normalization scale parameters without checking whether that policy is intended.
 - Comparing regularizers after giving them unequal training budgets or selecting them on test performance.
 
-## Related pages
+<div className="see-also">
 
-- [Softmax classification and generalization](/cs/deep-learning/softmax-classification-generalization)
-- [Optimization algorithms](/cs/deep-learning/optimization-algorithms)
-- [PyTorch builders guide](/cs/deep-learning/pytorch-builders-guide)
-- [Linear regression and training loops](/cs/deep-learning/linear-regression-training)
+See also: [Softmax classification and generalization](/cs/deep-learning/softmax-classification-generalization) · [Optimization algorithms](/cs/deep-learning/optimization-algorithms) · [PyTorch builders guide](/cs/deep-learning/pytorch-builders-guide) · [Linear regression and training loops](/cs/deep-learning/linear-regression-training)
+
+</div>

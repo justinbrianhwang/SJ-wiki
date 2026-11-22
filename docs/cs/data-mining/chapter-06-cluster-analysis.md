@@ -259,10 +259,8 @@ if len(set(labels)) > 1:
 - Describing clusters only by standardized centroids. Convert summaries back to original units and include within-cluster spread and size.
 - Using a two-dimensional projection to choose clusters, then claiming that the same separation exists in the full feature space.
 
-## Related pages
+<div className="see-also">
 
-- [Advanced Clustering Concepts](/cs/data-mining/chapter-07-advanced-clustering)
-- [Similarity and Distances](/cs/data-mining/chapter-03-similarity-distances)
-- [Outlier Analysis](/cs/data-mining/chapter-08-outlier-analysis)
-- [Mining Data Streams and Big Data](/cs/data-mining/chapter-12-mining-data-streams)
-- [Mining Graph Data](/cs/data-mining/chapter-17-mining-graph-data)
+See also: [Advanced Clustering Concepts](/cs/data-mining/chapter-07-advanced-clustering) · [Similarity and Distances](/cs/data-mining/chapter-03-similarity-distances) · [Outlier Analysis](/cs/data-mining/chapter-08-outlier-analysis) · [Mining Data Streams and Big Data](/cs/data-mining/chapter-12-mining-data-streams) · [Mining Graph Data](/cs/data-mining/chapter-17-mining-graph-data)
+
+</div>

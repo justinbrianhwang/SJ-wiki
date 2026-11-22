@@ -5,50 +5,50 @@ sidebar_position: 15
 
 # NP-Completeness and Classic Reductions
 
-NP-completeness gives a rigorous way to say that a problem is at least as hard as every problem in NP. It does not prove that the problem lacks a polynomial-time algorithm, because that would prove $P\ne NP$. Instead, it provides strong evidence: a polynomial-time algorithm for any NP-complete problem would yield polynomial-time algorithms for all NP problems.
+NP-completeness identifies problems at least as hard as every problem in NP. It does not prove that they lack polynomial-time algorithms; such a proof would separate P from NP. It does show that one polynomial-time algorithm for any NP-complete problem would put all of NP in P.
 
-The engine is polynomial-time reducibility. To prove a new problem NP-complete, show it is in NP and transform a known NP-complete problem into it. The transformation must preserve yes/no answers and run in polynomial time. Classic reductions build a network of hard problems from SAT to CLIQUE, VERTEX-COVER, HAMPATH, SUBSETSUM, and many others.
+The main tool is a polynomial-time transformation that preserves yes and no answers. Starting from SAT, these reductions connect logical formulas to cliques, paths, covers, and arithmetic selection problems.
 
-## Definitions
+## Certificates place a problem in NP
 
-A **polynomial-time mapping reduction** from language $A$ to language $B$, written $A\le_p B$, is a function $f$ computable in polynomial time such that $w\in A$ if and only if $f(w)\in B$.
+A language is in NP when every yes-instance has a polynomial-length certificate verifiable in polynomial time. The certificate depends on the problem, but verification checks a proposed solution rather than discovering one.
 
-A language $B$ is **NP-hard** if every language in NP reduces to $B$ by polynomial-time reductions. A language is **NP-complete** if it is NP-hard and also belongs to NP.
+| Problem | Certificate | Polynomial check |
+|---|---|---|
+| SAT | truth assignment | evaluate the formula |
+| CLIQUE | $k$ selected vertices | check every selected pair is adjacent |
+| VERTEX-COVER | at most $k$ vertices | check every edge has a selected endpoint |
+| HAMPATH | ordering of all vertices | check uniqueness and consecutive edges |
+| SUBSETSUM | selected indices | add the selected numbers and compare with the target |
 
-The **SAT** problem asks whether a Boolean formula has a satisfying assignment. The **3SAT** problem restricts formulas to conjunctions of clauses, each with at most or exactly three literals depending on convention.
+A language $B$ is **NP-hard** if every language in NP reduces to it in polynomial time. It is **NP-complete** when it is both NP-hard and in NP. Membership cannot be omitted: problems involving universal reasoning or exponentially large strategy trees may be PSPACE-complete instead.
 
-The **Cook-Levin theorem** states that SAT is NP-complete. It encodes the accepting computation tableau of a nondeterministic polynomial-time machine as a Boolean formula.
+**SAT** asks whether a Boolean formula has a satisfying assignment. **3SAT** restricts the input to a conjunction of clauses with three literals each, or at most three under another common convention. **CLIQUE** asks whether a graph contains $k$ pairwise adjacent vertices; **HAMPATH** asks for a path visiting every vertex exactly once; and **SUBSETSUM** asks whether some subset of the given integers sums to a target.
 
-Classic graph and number problems include **CLIQUE**, asking whether a graph has $k$ pairwise adjacent vertices; **HAMPATH**, asking whether a graph has a Hamiltonian path; and **SUBSETSUM**, asking whether some subset of given integers sums to a target.
+The standard proof therefore has two independent parts:
 
-## Key results
+1. Give a polynomial-size certificate and polynomial-time verifier for $B$.
+2. Choose a known NP-complete language $A$ and prove $A\le_p B$.
 
-To prove $B$ NP-complete, the standard template has two parts. First prove $B\in NP$ by giving a polynomial certificate and verifier. Second choose a known NP-complete language $A$ and prove $A\le_p B$. The second part proves NP-hardness because every NP language reduces to $A$, and reductions compose.
+Reductions compose, so the second step transfers hardness from every NP language through $A$ to $B$.
 
-Cook-Levin is the root theorem. For any NP computation, create variables describing which symbol, state, and head position occur in each cell and time step of the computation tableau. Add clauses enforcing a valid start, legal local transitions, exactly one symbol/state condition where needed, and an accepting configuration. The formula is satisfiable exactly when an accepting computation exists.
+## Reading the reduction arrow in the solver direction
 
-The reduction from 3SAT to CLIQUE uses one vertex for each literal occurrence in each clause. Connect vertices from different clauses when their literals are not contradictory. A clique with one vertex per clause corresponds to a consistent choice of one true literal in every clause.
+A **polynomial-time mapping reduction** $A\le_p B$ is a polynomial-time computable function $f$ satisfying
 
-SUBSETSUM demonstrates that NP-completeness is not only about graphs and logic. Reductions can encode combinatorial choices into arithmetic digits, using place values to prevent carries from mixing independent constraints.
+$$
+w\in A\quad\Longleftrightarrow\quad f(w)\in B.
+$$
 
-The direction of an NP-hardness reduction encodes a solver implication. To prove that $B$ is hard, start from a problem $A$ already known to be hard and transform instances of $A$ into instances of $B$. If a polynomial-time solver for $B$ existed, then the transformation followed by that solver would solve $A$. This is why the arrow is $A\le_p B$. Reversing the arrow proves that $B$ is no harder than $A$, which is usually not the desired claim.
+To prove the target $B$ hard, reduce a problem already known to be hard *to* $B$. A hypothetical solver for $B$ can then be placed after $f$ to solve $A$. Reversing the arrow shows only that $B$ is no harder than $A$.
 
-The Cook-Levin theorem is conceptually a local-consistency proof. A full accepting computation is a large tableau: rows are time steps and columns are tape cells. Boolean variables describe which symbol and state information appear in each cell. Clauses enforce that the first row is the start configuration, some row is accepting, each cell has one valid content, and each small window of neighboring cells evolves according to the transition function. Local constraints are enough because Turing-machine transitions are local.
+Both directions of the equivalence need proof. The forward direction builds a target solution from a source solution. The reverse direction decodes an arbitrary target solution and must rule out unintended shortcuts in the construction.
 
-Classic reductions preserve structure by building gadgets. In 3SAT to CLIQUE, a gadget group represents a clause and choosing a vertex represents choosing a literal to satisfy that clause. Edges enforce compatibility between choices. In reductions to HAMPATH, graph gadgets force a path to make choices corresponding to truth assignments. In SUBSETSUM, digit positions enforce clause satisfaction and variable consistency without unwanted carries. A gadget proof must explain both how satisfying assignments create solutions and how solutions decode back into satisfying assignments.
+Size is part of correctness. The output graph, formula, or list of numbers must have polynomially many bits. A mathematically accurate transformation that emits exponentially large instances is not a polynomial-time reduction.
 
-Membership in NP should never be skipped. Some hard-looking problems are not known to be in NP because a solution may require exponential length or universal reasoning. For NP-completeness, the target must have short certificates. For example, "does this game position have a winning strategy?" may be PSPACE-complete rather than NP-complete because the strategy tree can be exponentially large.
+## Cook–Levin as a local-consistency construction
 
-NP-completeness is a worst-case classification. It does not say that every instance is hard, that small instances are hard, or that heuristics are useless. It says that a polynomial-time exact algorithm for all instances would collapse the entire class NP to P. This is why NP-completeness guides expectations while still leaving room for approximation, parameterized algorithms, special cases, and practical solvers.
-
-Reductions compose. Once SAT reduces to 3SAT and 3SAT reduces to CLIQUE, any NP problem reduces to CLIQUE through that chain. This compositionality is what turns a single root theorem into a large map of complete problems.
-
-A reduction should be size controlled. In 3SAT to CLIQUE, a formula with $m$ clauses and at most three literals per clause produces at most $3m$ vertices and $O(m^2)$ possible inter-clause edges. That is polynomial in the formula size. In more elaborate reductions, gadget counts, edge counts, and numeric bit lengths must all be bounded. A construction that creates exponentially large objects is not a polynomial-time reduction even if it is conceptually correct.
-
-The two directions of a gadget proof usually have different flavors. The forward direction starts with a satisfying assignment or valid solution to the source problem and shows how to choose pieces of the constructed instance. The reverse direction starts with an arbitrary solution to the target instance and decodes it back into a source solution. Reverse directions catch most flawed reductions because target solutions may exploit unintended shortcuts unless the gadgets prevent them.
-
-Optimization versions should be separated from decision versions. NP-completeness is formally about languages, so CLIQUE asks whether a clique of size at least $k$ exists, not "find the largest clique." The search and optimization versions are closely related for many classic problems, but the decision version is the one used in reductions. When writing proofs, include the threshold parameter because it is part of the encoded input.
-## Visual
+The **Cook–Levin theorem** proves that SAT is NP-complete. Given an NP verifier and input $x$, it encodes an accepting polynomial-time computation as a Boolean formula.
 
 ```mermaid
 flowchart TB
@@ -58,7 +58,7 @@ flowchart TB
     Cert --> Verifier["Polynomial-time verifier M(x,y), running T = n^k steps"]
     Verifier --> Tableau["Computation tableau: rows time 0..T, columns tape cells 0..T"]
     Tableau --> Vars["Boolean variables: Cell(t,i,s), Head(t,i), State(t,q)"]
-    Vars --> Clauses["CNF clauses: start row, exactly-one contents, legal local windows, accepting row"]
+    Vars --> Clauses["CNF clauses: start row, unique contents, legal local windows, accepting row"]
     Clauses --> SAT["SAT formula phi(M,x)"]
   end
 
@@ -69,68 +69,61 @@ flowchart TB
     C1["Clause C1: one vertex per literal occurrence"]
     C2["Clause C2: one vertex per literal occurrence"]
     C3["Clause C3: one vertex per literal occurrence"]
-    Edges["Edges only between different clauses and non-contradictory literals"]
+    Edges["Edges join different clauses with noncontradictory literals"]
     K["Target k = number of clauses"]
     C1 --> Edges
     C2 --> Edges
     C3 --> Edges
     Edges --> K
-    K --> CliqueOut(("k-clique chooses one consistent true literal per clause"))
+    K --> CliqueOut(("k-clique selects consistent literals"))
   end
 
   ThreeSAT --> Clique
-  ThreeSAT --> HAMPATH["HAMPATH gadgets: force assignment choices through graph paths"]
-  ThreeSAT --> SUBSETSUM["SUBSETSUM digits: encode variables and clauses without carries"]
-  CliqueOut --> VertexCover["VERTEX-COVER via complement of a clique"]
-  VertexCover --> SetCover["SET-COVER via element-and-subset incidence"]
+  ThreeSAT --> HAMPATH["HAMPATH gadgets force assignment choices through graph paths"]
+  ThreeSAT --> SUBSETSUM["SUBSETSUM digits encode variables and clauses without carries"]
+  CliqueOut --> VertexCover["VERTEX-COVER through graph complementation and threshold change"]
+  VertexCover --> SetCover["SET-COVER through element-subset incidence"]
 
-  Solver["Hypothetical polynomial solver for any target problem"] -. "composed after reduction" .-> SourceSolved(("polynomial solver for the source NP-complete problem"))
+  Solver["Hypothetical polynomial solver for a target problem"] -. "composed after its reduction" .-> SourceSolved(("polynomial solver for the source problem"))
 ```
 
-The diagram starts at Cook-Levin, where a polynomial verifier becomes a tableau and then a SAT formula whose clauses enforce local computation consistency. The lower gadgets show how 3SAT instances are reshaped into CLIQUE, HAMPATH, SUBSETSUM, and later covering problems while preserving yes/no answers and polynomial size; the dotted solver arrow is the reason the reduction direction matters.
+The tableau has one row per time step and columns for the tape region reached within the polynomial bound. Boolean variables describe symbols, state, and head position. Clauses enforce the initial configuration, unique cell contents, a legal accepting configuration, and local consistency between neighboring cells in consecutive rows.
 
-| Problem | Certificate | Verification |
-|---|---|---|
-| SAT | truth assignment | evaluate formula |
-| CLIQUE | set of $k$ vertices | check all pairs are edges |
-| VERTEX-COVER | set of $k$ vertices | check every edge is covered |
-| HAMPATH | vertex ordering | check uniqueness and edges |
-| SUBSETSUM | chosen indices | add selected numbers and compare target |
+Local constraints suffice because one Turing-machine transition affects only a bounded neighborhood. The formula is satisfiable exactly when some certificate makes the verifier accept $x$.
 
-## Worked example 1: 3SAT to CLIQUE
+## Building the 3SAT-to-CLIQUE graph
 
-**Problem.** Reduce the formula $(x\lor y\lor z)\land(\neg x\lor y\lor \neg z)\land(x\lor\neg y\lor z)$ to a CLIQUE instance.
+For each literal occurrence in each clause, create one vertex. Join two vertices exactly when they come from different clauses and their literals are not contradictory. If the formula has $m$ clauses, ask for a clique of size $m$.
 
-**Method.** Make one vertex per literal occurrence and connect consistent choices from different clauses.
+Consider
 
-1. Create three groups of vertices, one group per clause.
-2. Group 1 has vertices $x_1,y_1,z_1$.
-3. Group 2 has vertices $\neg x_2,y_2,\neg z_2$.
-4. Group 3 has vertices $x_3,\neg y_3,z_3$.
-5. Connect vertices only between different groups.
-6. Do not connect contradictory literal pairs such as $x_1$ with $\neg x_2$, or $y_1$ with $\neg y_3$.
-7. Set clique size $k=3$.
-8. A size-3 clique selects one mutually consistent literal from each clause.
+$$
+(x\lor y\lor z)
+\land(\neg x\lor y\lor\neg z)
+\land(x\lor\neg y\lor z).
+$$
 
-**Checked answer.** The assignment $x=\text{true}$, $y=\text{true}$, $z=\text{true}$ satisfies the formula, and vertices $x_1,y_2,z_3$ form a consistent 3-clique.
+The three vertex groups are
 
-## Worked example 2: Verifying a SUBSETSUM certificate
+$$
+\{x_1,y_1,z_1\},
+\qquad
+\{\neg x_2,y_2,\neg z_2\},
+\qquad
+\{x_3,\neg y_3,z_3\}.
+$$
 
-**Problem.** Given numbers $[3,5,9,10,12]$ and target $22$, verify certificate indices $[1,2,4]$ using zero-based indexing.
+No edge is placed within a group, and contradictory pairs such as $x_1$ and $\neg x_2$ are left nonadjacent. Set $k=3$.
 
-**Method.** Add the selected numbers and compare with the target.
+If an assignment satisfies the formula, choose one true literal from each clause. The selected literals are mutually consistent, so their vertices form a 3-clique. Conversely, a 3-clique must take one vertex from each clause and cannot contain contradictory literals. Its choices extend to a satisfying assignment. For example, $x=y=z=\text{true}$ satisfies the formula, and $x_1,y_2,z_3$ form a clique.
 
-1. Index `1` selects `5`.
-2. Index `2` selects `9`.
-3. Index `4` selects `12`.
-4. The sum is $5+9+12=26$.
-5. Since $26\ne22$, this certificate is invalid.
-6. Try certificate `[3,4]`: selected numbers are `10` and `12`.
-7. The sum is $10+12=22$.
+With at most three vertices per clause, the graph has at most $3m$ vertices and $O(m^2)$ possible inter-clause edges. The construction is polynomial in the formula size.
 
-**Checked answer.** `[1,2,4]` does not verify, but `[3,4]` is a valid certificate. This illustrates why SUBSETSUM is in NP.
+## Arithmetic choices in SUBSETSUM
 
-## Code
+**SUBSETSUM** asks whether a subset of the input integers sums to a target. Its NP certificate is a list of selected indices. For numbers `[3, 5, 9, 10, 12]` and target `22`, certificate `[1, 2, 4]` selects $5+9+12=26$ and fails. Certificate `[3, 4]` selects $10+12=22$ and succeeds.
+
+### Verifying an index certificate
 
 ```python
 def verify_subset_sum(numbers, target, certificate):
@@ -145,17 +138,34 @@ print(verify_subset_sum(nums, 22, [1, 2, 4]))
 print(verify_subset_sum(nums, 22, [3, 4]))
 ```
 
-## Common pitfalls
+NP-hardness reductions to SUBSETSUM encode combinatorial choices into digit positions. Separate positions can enforce variable consistency and clause satisfaction, while chosen place values prevent carries from mixing the constraints. Numeric reductions must bound bit length, not merely the count of integers.
 
-- Proving only that a problem is in NP and calling it NP-complete. Membership and hardness are separate.
-- Reducing from the target problem to a known NP-complete problem. That proves the target is no harder than the known problem, not NP-hard.
-- Ignoring polynomial-time construction cost. The reduction must be efficient.
-- Forgetting the if-and-only-if condition. Yes-instances and no-instances must both be preserved.
-- Assuming NP-complete means unsolvable. NP-complete problems are decidable and often solvable on many practical instances.
+## Gadget proofs need an inverse reading
 
-## Connections
+Graph reductions commonly use gadgets whose local choices represent truth assignments or other source decisions. HAMPATH gadgets force a path through one of several routes; cover gadgets force selected vertices or sets to account for specified elements.
+
+The reverse proof is usually where a faulty reduction appears. A target solution may exploit an edge, path, carry, or gadget interaction that was absent from the intended story. A complete proof shows:
+
+- how every source solution selects legal gadget behavior;
+- why every target solution has only the intended forms;
+- how to decode those forms into a source solution; and
+- why the construction and all encoded values remain polynomial in size.
+
+Optimization and decision formulations should also stay separate. NP-completeness is a classification of languages, so CLIQUE asks whether a clique of size at least $k$ exists; the threshold $k$ is part of the input. Search and optimization versions are closely related for many classic problems, but the reduction statement concerns the decision version.
+
+## What the classification does and does not predict
+
+NP-completeness is a worst-case statement. It does not claim that every instance is hard, that small instances resist exact solution, or that heuristics are useless. It rules out a polynomial-time exact algorithm for all instances unless $P=NP$.
+
+That leaves room for strong SAT solvers, approximation, parameterized algorithms, restricted graph families, and domain-specific structure. “NP-complete” means decidable and efficiently verifiable, with worst-case hardness shared across NP; it does not mean unsolvable.
+
+<div className="see-also">
+
+See also:
 
 - P and NP are defined in [time complexity, P, and NP](/cs/theory/time-complexity-p-and-np).
 - Mapping reductions for undecidability are in [reductions and the recursion theorem](/cs/theory/reductions-and-the-recursion-theorem).
 - PSPACE-completeness extends the idea in [space complexity](/cs/theory/space-complexity).
 - Randomization and approximation are surveyed in [advanced complexity topics](/cs/theory/advanced-complexity-topics).
+
+</div>

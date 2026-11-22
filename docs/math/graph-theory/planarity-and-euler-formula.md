@@ -1,4 +1,4 @@
----
+﻿---
 title: Planarity and Euler Formula
 sidebar_position: 8
 ---
@@ -17,7 +17,7 @@ Euler's formula is the main counting tool for plane graphs. It connects vertices
 
 *Figure: The complete bipartite graph $K_{3,3}$, the other classical minimal nonplanar graph. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Complete_bipartite_graph_K3%2C3.svg), David Benbennick, public domain.*
 
-## Definitions
+## Drawings, embeddings, and forbidden subdivisions
 
 A graph is **planar** if it has a drawing in the plane with no edge crossings except at common endpoints. A particular crossing-free drawing is a **plane graph**. The connected regions into which a plane graph divides the plane are its **faces**, including the unbounded outer face.
 
@@ -27,7 +27,7 @@ A graph $H$ is a **subdivision** of a graph $G$ if it is obtained by replacing e
 
 The complete graph $K_5$ and the complete bipartite graph $K_{3,3}$ are the classical minimal nonplanar graphs in Kuratowski's theorem.
 
-## Key results
+## Counting faces and bounding edges
 
 **Euler's formula.** If $G$ is a connected plane graph with $n$ vertices, $m$ edges, and $f$ faces, then
 
@@ -63,7 +63,7 @@ $$
 
 This is a useful diagnostic. If a simple planar drawing has a face with boundary length at least $4$ and two nonadjacent vertices on that face, an edge can often be added inside the face. Maximality fails unless every possible such chord is already present or would violate simplicity.
 
-**Subdivisions preserve planarity.** Replacing an edge by a path does not change the essential crossing behavior. If a graph is planar, every subdivision is planar. If a subdivision of $K_5$ or $K_{3,3}$ appears inside a graph, the larger graph is nonplanar by Kuratowski's theorem. This is why planarity proofs often search for stretched versions of the two forbidden graphs rather than exact copies.
+**Subdivisions preserve planarity.** Replacing an edge by a path does not change the essential crossing behavior. If a graph is planar, every subdivision is planar. If a subdivision of $K_5$ or $K_{3,3}$ appears inside a graph, the larger graph is nonplanar by Kuratowski's theorem. Planarity proofs therefore search for stretched versions of the two forbidden graphs rather than exact copies.
 
 **Face-bound variants.** The inequality $m\le 3n-6$ is only the first member of a family. If a simple plane graph has girth $g$, meaning its shortest cycle has length $g$, then every face boundary has length at least $g$ when bridges are absent and the graph is connected enough for the usual counting argument. Counting edge-face incidences gives
 
@@ -80,8 +80,6 @@ $$
 For bipartite planar graphs the girth is at least $4$, so this recovers $m\le 2n-4$. For triangle-free planar graphs the same inequality is often the main tool.
 
 **Planarity algorithms.** The theorems above are structural, but practical planarity testing is algorithmic. Modern planarity algorithms can decide planarity in linear time and, when the graph is planar, produce an embedding. For hand calculations, however, Euler bounds, subdivisions of $K_5$ and $K_{3,3}$, and constructive drawings remain the most useful tools.
-
-## Visual
 
 The wheel $W_5$ is planar. Its center connects to all four vertices of an outer cycle, producing four triangular inner faces and one outer face.
 
@@ -104,11 +102,9 @@ graph TD
 | $W_5$ | 5 | 8 | satisfies $m\le 9$ |
 | Cube graph $Q_3$ | 8 | 12 | satisfies $m\le 18$ and is planar |
 
-## Worked example 1: Count faces in a planar drawing
+## Counting the faces of $W_5$
 
-**Problem.** The wheel $W_5$ has an outer cycle on four vertices and one center joined to all outer vertices. Use Euler's formula to find the number of faces.
-
-**Method.**
+The wheel $W_5$ has an outer cycle on four vertices and one center joined to all outer vertices. Use Euler's formula to find the number of faces.
 
 1. Count vertices: four outer vertices plus one center gives
 
@@ -140,13 +136,11 @@ $$
 f=2-5+8=5.
 $$
 
-**Checked answer.** $W_5$ has $5$ faces in this plane drawing: four bounded triangular faces and one unbounded outer face.
+$W_5$ has $5$ faces in this plane drawing: four bounded triangular faces and one unbounded outer face.
 
-## Worked example 2: Prove $K_{3,3}$ is nonplanar by counting
+## The bipartite obstruction for $K_{3,3}$
 
-**Problem.** Show that $K_{3,3}$ is not planar.
-
-**Method.**
+Show that $K_{3,3}$ is not planar.
 
 1. $K_{3,3}$ has $n=3+3=6$ vertices.
 2. It has $m=3\cdot 3=9$ edges.
@@ -184,11 +178,11 @@ $$
 
 Since $f$ must be an integer, $f\le 4$, contradicting $f=5$.
 
-**Checked answer.** $K_{3,3}$ is nonplanar.
+$K_{3,3}$ is nonplanar.
 
 The contradiction used the stronger bipartite face bound, not just the ordinary planar edge bound. The ordinary bound gives $9\le 12$, which says nothing. Recognizing that $K_{3,3}$ has no triangles is the key step because it raises the minimum face boundary length from $3$ to $4$.
 
-## Code
+## Edge-count obstruction checks
 
 This code checks the two standard edge-count obstructions. Passing these tests does not prove planarity; failing one proves nonplanarity under the stated hypotheses.
 
@@ -222,7 +216,7 @@ For example, write "simple, planar, bipartite" before using $m\le 2n-4$; omittin
 
 A reliable planarity solution usually contains both a local and a global check. The local check identifies face lengths, bipartiteness, or a forbidden subdivision. The global check applies Euler's formula or an edge bound. If the graph is claimed planar, the drawing should make the face count visible. If it is claimed nonplanar, the contradiction should state exactly which hypothesis fails.
 
-## Common pitfalls
+### What an edge bound can and cannot prove
 
 - Treating a drawing with crossings as proof of nonplanarity. You must rule out every possible drawing.
 - Forgetting the outer face in Euler's formula.
@@ -231,9 +225,8 @@ A reliable planarity solution usually contains both a local and a global check. 
 - Thinking the edge bound is sufficient. Many nonplanar graphs satisfy $m\le 3n-6$.
 - Writing Euler's formula as $n-m+f=1$ for connected plane graphs. The planar connected formula is $2$.
 
-## Connections
+<div className="see-also">
 
-- [Definitions and examples](/math/graph-theory/definitions-and-examples)
-- [Trees and spanning trees](/math/graph-theory/trees-and-spanning-trees)
-- [Duality surfaces and infinite graphs](/math/graph-theory/duality-surfaces-and-infinite-graphs)
-- [Vertex and map colouring](/math/graph-theory/vertex-and-map-colouring)
+See also: [Definitions and examples](/math/graph-theory/definitions-and-examples) · [Trees and spanning trees](/math/graph-theory/trees-and-spanning-trees) · [Duality surfaces and infinite graphs](/math/graph-theory/duality-surfaces-and-infinite-graphs) · [Vertex and map colouring](/math/graph-theory/vertex-and-map-colouring)
+
+</div>

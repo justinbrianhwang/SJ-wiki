@@ -13,7 +13,7 @@ Derivatives turn local rate information into global conclusions about a function
 
 The central theme is that signs carry meaning. The sign of $f'$ describes whether the graph rises or falls. The sign of $f''$ describes how the slope itself changes. Theorems such as Rolle's Theorem and the Mean Value Theorem justify moving from pointwise derivative information to interval-level conclusions.
 
-## Definitions
+## Reading a graph through its derivatives
 
 A critical number of $f$ is a number $c$ in the domain of $f$ where
 
@@ -43,7 +43,7 @@ $$
 
 Rolle's Theorem is the special case where $f(a)=f(b)$, so some $c$ satisfies $f'(c)=0$.
 
-## Key results
+## From local signs to interval behavior
 
 The First Derivative Test classifies local extrema by sign changes in $f'$:
 
@@ -89,8 +89,6 @@ For concavity, the second derivative should be interpreted as the rate of change
 
 When using L'Hopital's Rule, other algebra may be preferable. Factoring, rationalizing, standard trigonometric limits, or Taylor polynomials can give more insight. L'Hopital's Rule is powerful, but it is not a substitute for recognizing the form of the expression. It also does not apply to a quotient whose denominator derivative is zero in a way that violates the theorem's hypotheses.
 
-## Visual
-
 ```mermaid
 graph TD
   A[Start with f] --> B[Find domain and intercepts]
@@ -112,7 +110,7 @@ graph TD
 | $f''\lt 0$ | concave down | slopes decreasing |
 | $f''=0$ | inflection candidate | concavity must actually change |
 
-## Worked example 1: curve sketching with derivative tests
+## Reconstructing a cubic from sign charts
 
 **Problem.** Analyze
 
@@ -180,7 +178,7 @@ $$
 
 **Checked answer.** The function increases on $(-\infty,-1)$ and $(3,\infty)$, decreases on $(-1,3)$, has a local maximum at $(-1,10)$, a local minimum at $(3,-22)$, is concave down on $(-\infty,1)$, concave up on $(1,\infty)$, and has inflection point $(1,-6)$.
 
-## Worked example 2: L'Hopital's Rule with an indeterminate limit
+## Resolving an indeterminate exponential limit
 
 **Problem.** Evaluate
 
@@ -246,34 +244,22 @@ In a curve-sketching context, derivative tests should be combined with actual fu
 
 Derivative applications are also approximation tools. If $f'(a)$ is known, then $f(a+h)\approx f(a)+f'(a)h$ for small $h$. If $f''$ is known, concavity tells whether the tangent-line estimate tends to lie above or below the graph. For a concave-up function, tangent lines usually sit below the graph near the tangent point; for concave-down functions, they usually sit above. This makes derivative information useful even before an exact graph is drawn carefully by hand or software.
 
-## Code
+## Checks that keep the sketch honest
 
-```python
-def f(x):
-    return x**3 - 3*x**2 - 9*x + 5
+- A critical number is only a candidate for an extremum; classification still requires a sign change or a conclusive second-derivative test.
+- Endpoints can be absolute extrema even though the derivative there is not zero or is not defined two-sidedly.
+- The equation $f''(c)=0$ produces an inflection candidate. Concavity must actually change across $c$.
+- L'Hopital's Rule starts only after the limit has been shown to have an indeterminate form covered by the theorem.
+- Domain restrictions belong on the sign chart from the beginning.
+- Increasing and concave up answer different questions. A graph may be increasing while concave down.
 
-def fp(x):
-    return 3*x**2 - 6*x - 9
+<div className="see-also">
 
-def fpp(x):
-    return 6*x - 6
-
-for x in [-2, -1, 0, 1, 3, 4]:
-    print(x, f(x), fp(x), fpp(x))
-```
-
-## Common pitfalls
-
-- Treating every critical number as an extremum. Use a sign change or second derivative test.
-- Forgetting that endpoints can be absolute extrema even though $f'$ may not be zero there.
-- Calling $f''(c)=0$ an inflection point without checking a concavity change.
-- Using L'Hopital's Rule on a non-indeterminate form.
-- Losing domain restrictions before building sign charts.
-- Confusing increasing with concave up. A graph can be increasing and concave down at the same time.
-
-## Connections
+See also:
 
 - [Derivatives and Rates](/math/calculus/derivatives-and-rates): applications rely on derivative meaning and units.
 - [Differentiation Rules](/math/calculus/differentiation-rules): accurate derivative computation is required before sign analysis.
 - [Optimization Newton and Antiderivatives](/math/calculus/optimization-newton-antiderivatives): optimization is a focused derivative application.
 - [Power Series and Taylor Polynomials](/math/calculus/power-series-and-taylor-polynomials): Taylor expansions provide another route to limits and approximation.
+
+</div>

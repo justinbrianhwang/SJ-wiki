@@ -7,13 +7,13 @@ sidebar_position: 3
 
 The First Law is the bookkeeping rule for energy. It says that energy can cross a system boundary as heat or work, but the system's internal energy changes only by the net amount transferred. In physical chemistry, this turns calorimetry, expansion work, reaction enthalpies, and heat capacities into one coherent language.
 
-Atkins uses the First Law to connect molecular changes with measurable thermal effects. The same formalism explains why a gas cools or warms during expansion, why reactions at constant pressure are reported as enthalpies, and why Hess's law works.
+The same energy accounting covers temperature changes during expansion, reaction heat at constant pressure, and Hess cycles. The work lies in defining the boundary and keeping the heat and work signs consistent.
 
 ![A schematic calorimeter shows an insulated vessel, thermometer, and stirrer used to measure heat transfer.](https://commons.wikimedia.org/wiki/Special:FilePath/Calorimeter.svg)
 
 *Figure: Calorimeter apparatus as the laboratory setting for First Law energy accounting. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Calorimeter.svg), Li-on, public domain.*
 
-## Definitions
+## Drawing the system boundary
 
 A **system** is the part of the universe under study; the **surroundings** are everything else. A **closed system** exchanges energy but not matter. An **isolated system** exchanges neither matter nor energy. The internal energy $U$ is a state function, so $\Delta U$ depends only on initial and final states.
 
@@ -75,7 +75,7 @@ $$
 C_{p,m}-C_{V,m}=R
 $$
 
-## Key results
+## Work paths, enthalpy, and calorimetry
 
 For reversible isothermal expansion of a perfect gas,
 
@@ -148,7 +148,7 @@ The First Law is often summarized as conservation of energy, but its practical u
 
 The distinction between reversible and irreversible work is central. Reversible expansion supplies the maximum work for a chosen isothermal path because the external pressure is matched to the internal pressure at every stage. Irreversible expansion wastes some potential work whenever the pressure difference is finite. This does not violate energy conservation; it means that the same initial and final states can involve different amounts of heat exchanged with the surroundings. Work is therefore not a property stored in the system. It is a record of how the change was performed.
 
-Calorimetry gives the experimental bridge from thermal observation to state functions. At constant volume, no expansion work is possible, so heat measured by a bomb calorimeter equals $\Delta U$ when additional work is absent. At constant pressure, heat equals $\Delta H$ under the same restriction. This is why chemical tables usually list enthalpies rather than internal energies: many reactions are performed open to the atmosphere, and $q_p$ is directly accessible. The enthalpy definition $H=U+pV$ packages the expansion work needed to make room for products into a convenient state function.
+Calorimetry gives the experimental bridge from thermal observation to state functions. At constant volume, no expansion work is possible, so heat measured by a bomb calorimeter equals $\Delta U$ when additional work is absent. At constant pressure, heat equals $\Delta H$ under the same restriction. Chemical tables usually list enthalpies rather than internal energies because many reactions are performed open to the atmosphere and $q_p$ is directly accessible. The enthalpy definition $H=U+pV$ packages the expansion work needed to make room for products into a convenient state function.
 
 The relation between $\Delta H$ and $\Delta U$ is especially simple for gas-producing or gas-consuming reactions:
 
@@ -176,8 +176,6 @@ Heat capacities connect calorimetry with temperature changes. They are slopes of
 
 Adiabatic processes provide a good test of the formalism. In an adiabatic expansion, $q=0$, so the system's internal energy changes through work alone. For a perfect gas, expansion lowers $T$ because $U$ depends on $T$. Reversible adiabatic relations such as $pV^\gamma=\mathrm{constant}$ apply only under restrictive assumptions: perfect-gas behavior, constant heat capacities, and reversibility. A rapid expansion may be approximately adiabatic but not reversible, so it need not follow the same path equation.
 
-## Visual
-
 ```mermaid
 flowchart TD
   A[Energy transfer] --> B{Boundary mode}
@@ -200,7 +198,7 @@ flowchart TD
 | Reversible adiabatic | $q=0$ | $\Delta U$ | $TV^{\gamma-1}=\mathrm{constant}$ |
 | Constant pressure reaction | $p$ fixed | often $-p\Delta V$ | $q_p=\Delta H$ |
 
-## Worked example 1: Reversible isothermal expansion work
+## Reversible isothermal expansion of a perfect gas
 
 **Problem.** Calculate $w$, $q$, and $\Delta U$ when $2.00\ \mathrm{mol}$ of a perfect gas expands reversibly and isothermally at $298.15\ \mathrm{K}$ from $10.0\ \mathrm{L}$ to $25.0\ \mathrm{L}$.
 
@@ -240,7 +238,7 @@ $$
 
 **Checked answer.** $w=-4.54\ \mathrm{kJ}$, $q=+4.54\ \mathrm{kJ}$, and $\Delta U=0$. Expansion work is negative because the system does work on the surroundings.
 
-## Worked example 2: Kirchhoff correction for reaction enthalpy
+## Carrying a reaction enthalpy to 700 K
 
 **Problem.** At $298.15\ \mathrm{K}$, suppose a reaction has $\Delta_rH^\circ=-92.2\ \mathrm{kJ\ mol^{-1}}$ and $\Delta_rC_p^\circ=-40.0\ \mathrm{J\ K^{-1}\ mol^{-1}}$. Estimate $\Delta_rH^\circ$ at $700.0\ \mathrm{K}$.
 
@@ -273,29 +271,7 @@ $$
 
 **Checked answer.** The reaction becomes more exothermic at the higher temperature because the products have lower heat capacity than the reactants.
 
-## Code
-
-```python
-import numpy as np
-
-R = 8.314462618
-
-def reversible_isothermal_work(n, T, Vi, Vf):
-    return -n * R * T * np.log(Vf / Vi)
-
-def kirchhoff(delta_h_298_kj, delta_cp_j, T2, T1=298.15):
-    return delta_h_298_kj + delta_cp_j * (T2 - T1) / 1000.0
-
-n, T = 2.0, 298.15
-for Vf in [15.0, 25.0, 50.0]:
-    w = reversible_isothermal_work(n, T, 10.0, Vf)
-    print(f"Vf={Vf:5.1f} L, w={w/1000:7.3f} kJ, q={-w/1000:7.3f} kJ")
-
-for T2 in [350, 500, 700]:
-    print(T2, kirchhoff(-92.2, -40.0, T2))
-```
-
-## Common pitfalls
+## Sign checks and limits of the formulas
 
 - Confusing state functions with path functions. $\Delta U$ and $\Delta H$ are state changes; $q$ and $w$ depend on the path.
 - Using system pressure instead of external pressure for irreversible expansion work. Only reversible expansion lets you set $p_{\mathrm{ex}}=p$ throughout.
@@ -309,9 +285,8 @@ Calorimeter sign conventions also deserve care. The heat released by a reaction 
 
 When using average bond enthalpies, remember that they are approximations over many molecular environments. They are useful for estimates and trends, but Hess's law with formation enthalpies or calorimetric data is more reliable. Bond enthalpy calculations also usually refer to gas-phase bond breaking, so phase changes may need to be included for comparison with condensed-phase reactions.
 
-## Connections
+<div className="see-also">
 
-- [Properties of gases](/chemistry/physical-chemistry/properties-of-gases)
-- [Second law and entropy](/chemistry/physical-chemistry/second-law-and-entropy)
-- [General chemistry thermochemistry](/chemistry/general/thermochemistry)
-- [Physics energy and heat](/physics/general/thermodynamics)
+See also: [Properties of gases](/chemistry/physical-chemistry/properties-of-gases) · [Second law and entropy](/chemistry/physical-chemistry/second-law-and-entropy) · [General chemistry thermochemistry](/chemistry/general/thermochemistry) · [Physics energy and heat](/physics/thermodynamics/energy-heat-work-and-first-law)
+
+</div>

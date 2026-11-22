@@ -9,7 +9,7 @@ Deep learning performance is not only about choosing a good model. D2L devotes a
 
 The central performance question is where time and memory go. Computation happens in kernels, data moves across device boundaries, gradients synchronize across workers, and framework execution may be lazy or asynchronous. Good engineering overlaps work where possible, batches small operations into larger ones, keeps tensors on the right device, and uses parallelism only when communication costs justify it.
 
-## Definitions
+## Execution models, metrics, and parallel layouts
 
 A **compiler** transforms code into a lower-level representation that may run faster. In deep learning frameworks, graph capture and compilation can fuse operations, remove overhead, and improve layout choices.
 
@@ -25,7 +25,7 @@ A **parameter server** is a distributed architecture where workers compute gradi
 
 **Throughput** measures examples processed per second. **Latency** measures time for one request or batch. Training usually cares about throughput; interactive inference often cares about latency.
 
-## Key results
+## Where training time and memory go
 
 Vectorization improves performance because large tensor operations amortize overhead and use optimized kernels. A Python loop over examples blocks the framework from using parallel hardware effectively. This is one reason D2L repeatedly writes batched code.
 
@@ -47,7 +47,7 @@ Memory is often the limiting resource. Parameters, optimizer state, activations,
 
 Performance work should start with measurement. A slow training job can be limited by the model, the input pipeline, synchronization, memory allocation, or logging. Looking only at wall-clock epoch time hides the cause. A useful breakdown separates data time, forward time, backward time, optimizer time, and evaluation time. D2L's emphasis on benchmarking small pieces reflects the same principle: optimize the bottleneck that actually exists.
 
-Compilation and graph capture help most when the program contains many framework operations whose overhead or memory traffic can be reduced. Fusion can combine adjacent elementwise operations so tensors are read and written fewer times. It may help less when runtime is dominated by one already-optimized matrix multiplication or convolution. This is why compilation should be treated as a measured optimization, not a guaranteed speedup.
+Compilation and graph capture help most when the program contains many framework operations whose overhead or memory traffic can be reduced. Fusion can combine adjacent elementwise operations so tensors are read and written fewer times. It may help less when runtime is dominated by one already-optimized matrix multiplication or convolution. Compilation should therefore be measured rather than assumed to provide a speedup.
 
 Mixed precision is another common performance tool, even though it must be used carefully. Lower-precision arithmetic can improve throughput and reduce memory, especially on accelerators with specialized tensor cores. Loss scaling may be needed to avoid underflow in gradients. The conceptual lesson matches D2L's systems discussion: numerical format, memory bandwidth, and hardware kernels interact with the mathematical model.
 
@@ -59,7 +59,7 @@ Inference performance has a different objective from training performance. Train
 
 The simplest reliable performance habit is to change one variable at a time. Batch size, number of data workers, precision, compilation, and device count interact, so uncontrolled changes make timing results hard to interpret. Record throughput, memory use, and final validation quality together.
 
-## Visual
+## Choosing how to split the work
 
 ```mermaid
 flowchart TB
@@ -134,7 +134,7 @@ The mixed-precision flow separates arithmetic precision from the master copy of 
 | Communication | Multi-GPU speedup poor | Larger per-GPU batch, efficient all-reduce |
 | Memory | Out-of-memory errors | Smaller batch, checkpointing, mixed precision |
 
-## Worked example 1: Amdahl speedup limit
+## Estimating the ceiling from Amdahl's law
 
 Problem: a training job spends $10\%$ of time in serial data preparation and $90\%$ in parallelizable computation. What is the maximum ideal speedup on $4$ workers?
 
@@ -174,9 +174,9 @@ $$
 \frac{1}{0.325} \approx 3.08.
 $$
 
-Checked answer: even with perfect parallel compute, the job cannot exceed about $3.08$ times speedup on $4$ workers because of the serial component.
+Even with perfect parallel compute, the job cannot exceed about $3.08$ times speedup on $4$ workers because of the serial component.
 
-## Worked example 2: data-parallel gradient averaging
+## Averaging gradients across two devices
 
 Problem: two GPUs process equal minibatch shards and compute scalar gradients $g_1=2$ and $g_2=6$ for the same parameter. What gradient should synchronous data parallelism apply for the full minibatch?
 
@@ -202,9 +202,9 @@ $$
 
 4. The parameter decreases by $0.4$.
 
-Checked answer: the synchronized gradient is $4$. If shard sizes differ, use a weighted average by number of examples rather than a simple average.
+The synchronized gradient is $4$. If shard sizes differ, use a weighted average by number of examples rather than a simple average.
 
-## Code
+## Timing accelerator kernels without measuring the queue
 
 ```python
 import time
@@ -234,7 +234,7 @@ print(f"average matmul time: {elapsed / 10:.4f} seconds")
 print("result norm:", y.norm().item())
 ```
 
-## Common pitfalls
+## Measurement mistakes that hide the bottleneck
 
 - Timing CUDA operations without synchronization.
 - Moving tensors between CPU and GPU inside the inner training loop unnecessarily.
@@ -243,10 +243,8 @@ print("result norm:", y.norm().item())
 - Using many small tensor operations where one batched operation would be clearer and faster.
 - Forgetting optimizer-state memory when estimating how large a model or batch can fit.
 
-## Connections
+<div className="see-also">
 
-- [Optimization algorithms](/cs/deep-learning/optimization-algorithms)
-- [PyTorch builders guide](/cs/deep-learning/pytorch-builders-guide)
-- [Modern CNNs](/cs/deep-learning/modern-cnns)
-- [Computer architecture](/cs/computer-architecture/)
-- [Machine learning](/cs/machine-learning/)
+See also: [Optimization algorithms](/cs/deep-learning/optimization-algorithms) · [PyTorch builders guide](/cs/deep-learning/pytorch-builders-guide) · [Modern CNNs](/cs/deep-learning/modern-cnns) · [Computer architecture](/cs/computer-architecture/intro) · [Machine learning](/cs/machine-learning/intro)
+
+</div>

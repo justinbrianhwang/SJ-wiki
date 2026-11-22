@@ -7,19 +7,15 @@ sidebar_position: 1
 
 Autonomous driving is a system-of-systems problem: sensors measure the world, perception turns measurements into objects and free space, prediction estimates what other agents may do, planning chooses a safe and useful maneuver, control tracks the motion, and safety engineering constrains the whole stack inside a defined operational design domain. A self-driving vehicle is not a single model, a single sensor, or a single benchmark score. It is an integrated cyber-physical system that must work under uncertainty, latency, hardware faults, ambiguous road rules, unusual human behavior, and changing weather.
 
-![A Tesla driver-assistance display shows lane centering and following behavior in traffic.](https://commons.wikimedia.org/wiki/Special:FilePath/Tesla_Autopilot_Engaged_in_Model_X.jpg)
-
-*Figure: Driver-assistance interfaces show how perception and control reach the driver-facing product. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tesla_Autopilot_Engaged_in_Model_X.jpg), Ian Maddox, CC BY-SA 4.0.*
-
 ![A UniAD architecture diagram connects perception, prediction, mapping, occupancy, and planning around an ego trajectory.](https://ar5iv.labs.arxiv.org/html/2212.10156/assets/x1.png)
 
 *Figure: UniAD illustrates planning-oriented autonomous-driving architecture. Image: [ar5iv](https://arxiv.org/abs/2212.10156), Hu et al., educational use with attribution.*
 
-This foundational section gives SJ Wiki a stable base for later paper and textbook deep-dives. The emphasis is practical and architectural: what each layer does, what math it relies on, what can go wrong, and how the layers connect. The pages use standard public terminology such as SAE J3016 automation levels, ODD, ISO 26262, SOTIF, sensor fusion, BEV representations, motion forecasting, model predictive control, and scenario-based validation.
+The emphasis is architectural: what each layer does, what mathematics it relies on, what can go wrong, and how the layers connect. The reading sequence uses standard terms such as SAE J3016 automation levels, ODD, ISO 26262, SOTIF, sensor fusion, BEV representations, motion forecasting, model predictive control, and scenario-based validation.
 
-## Definitions
+## Responsibility, domain, and stack boundaries
 
-An **autonomous vehicle**, in this section, is a road vehicle with software and hardware that can perform some or all of the dynamic driving task under specified conditions. The phrase is informal; precise responsibility depends on the SAE automation level and the operational design domain.
+An **autonomous vehicle** here means a road vehicle with software and hardware that can perform some or all of the dynamic driving task under specified conditions. The phrase is informal; precise responsibility depends on the SAE automation level and the operational design domain.
 
 The **ego vehicle** is the vehicle whose autonomy stack is being designed or analyzed. Other road users are **agents**: vehicles, pedestrians, cyclists, scooters, emergency vehicles, construction workers, and sometimes animals or unusual moving objects.
 
@@ -41,7 +37,7 @@ An **operational design domain**, or ODD, is the set of conditions under which a
 
 **Perception** estimates the current scene. **Prediction** estimates possible future agent motion. **Planning** chooses what the ego should do. **Control** sends commands to track the chosen trajectory. **Safety engineering** defines the constraints, evidence, and fallback behavior that keep the stack from being only a demo.
 
-## Key results
+## Closed-loop estimation and control
 
 The central architectural result is that autonomy is a closed-loop estimation and control problem under uncertainty:
 
@@ -107,7 +103,7 @@ Beyond the foundational layer above, these pages are focused deep-dives into lan
 - [TUMTraf V2X Cooperative Perception Dataset](/cs/autonomous-driving/tumtraf-v2x-dataset) — infrastructure + vehicle cooperative dataset and benchmark (Zimmer et al., 2024).
 - [Shield Synthesis: Runtime Enforcement](/cs/autonomous-driving/shield-synthesis-runtime-enforcement) — synthesized safety shields wrapping reactive controllers (Bloem et al., 2015).
 
-## Visual
+## Signals around the driving loop
 
 ```mermaid
 flowchart TB
@@ -193,7 +189,7 @@ flowchart TB
 
 This diagram shows the modular AV stack as a typed data pipeline: raw sensor streams become calibrated features, BEV tensors, object tracks, pose estimates, multimodal forecasts, planned trajectories, and finally actuator commands. The dotted supervisor paths show that ODD and safety logic are not a postprocessing report; they can constrain planning, override control, or force fallback while logged scenarios feed the safety case.
 
-## Worked example 1: Classifying an AV feature claim
+## Classifying a highway-assistance claim
 
 Problem: A vehicle feature is advertised as handling highway driving. It centers in the lane, maintains distance, changes lanes after driver confirmation, and requires the driver to keep eyes on the road. It disengages if lane markings disappear. Classify the automation responsibility and identify the ODD dimensions that should be stated.
 
@@ -207,7 +203,7 @@ Answer: this is a Level 2 driver-support feature, not a Level 3 or Level 4 autom
 
 Check: The key evidence is not that the vehicle steers smoothly. The key evidence is that monitoring and fallback remain the driver's responsibility.
 
-## Worked example 2: Tracing one stack cycle
+## Braking for an uncertain crosswalk crossing
 
 Problem: The ego vehicle approaches a crosswalk at 12 m/s. Cameras detect a pedestrian near the curb, lidar gives a range of 28 m, radar has no useful return, the map says the crosswalk begins 25 m ahead, and prediction assigns 60 percent probability that the pedestrian will enter the crosswalk. Trace one stack-level decision.
 
@@ -232,7 +228,7 @@ Answer: the stack should prepare to stop because the crosswalk starts 25 m ahead
 
 Check: If the pedestrian does not cross, the planner can release braking later. If the pedestrian does cross, waiting too long may leave no comfortable stopping margin.
 
-## Code
+## A minimal crosswalk behavior rule
 
 ```python
 from dataclasses import dataclass
@@ -269,7 +265,7 @@ scene = SceneSummary(
 print(choose_crosswalk_behavior(scene))
 ```
 
-## Common pitfalls
+## Failure modes that cross module boundaries
 
 - Treating autonomy as one neural-network score. Real systems require sensing, estimation, planning, control, validation, fallback, and operations.
 - Talking about SAE levels without ODD. Level claims are meaningless without operating conditions and fallback responsibility.
@@ -279,16 +275,12 @@ print(choose_crosswalk_behavior(scene))
 - Assuming safety is proven by miles. Scenario coverage, safety cases, standards, edge-case mining, and field monitoring are all needed.
 - Overstating public knowledge of commercial systems. Use public materials as design examples, not as complete architecture documentation.
 
-## Connections
+## Further reading
 
-- [SAE levels and operational design domain](/cs/autonomous-driving/sae-levels-and-operational-design-domain)
-- [Sensors, cameras, LiDAR, radar, and IMU](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu)
-- [Sensor fusion](/cs/autonomous-driving/sensor-fusion)
-- [Motion planning](/cs/autonomous-driving/motion-planning)
-- [Safety, ISO 26262, SOTIF, and scenario testing](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing)
-- [Deep learning](/cs/deep-learning/)
-- [Reinforcement learning](/cs/reinforcement-learning/)
-- [Embedded systems](/cs/embedded/)
-- [Engineering math](/math/engineering-math/)
-- [Signals and systems](/physics/signals-systems/)
-- Further reading: SAE J3016, Thrun et al. *Probabilistic Robotics*, Pomerleau's ALVINN, NVIDIA PilotNet, Mobileye RSS, CARLA, Waymo Open Dataset, Argoverse, nuScenes, ISO 26262, and ISO 21448.
+SAE J3016, Thrun et al. *Probabilistic Robotics*, Pomerleau's ALVINN, NVIDIA PilotNet, Mobileye RSS, CARLA, Waymo Open Dataset, Argoverse, nuScenes, ISO 26262, and ISO 21448.
+
+<div className="see-also">
+
+See also: [SAE levels and operational design domain](/cs/autonomous-driving/sae-levels-and-operational-design-domain) · [Sensors, cameras, LiDAR, radar, and IMU](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu) · [Sensor fusion](/cs/autonomous-driving/sensor-fusion) · [Motion planning](/cs/autonomous-driving/motion-planning) · [Safety, ISO 26262, SOTIF, and scenario testing](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing) · [Deep learning](/cs/deep-learning/intro) · [Reinforcement learning](/cs/reinforcement-learning/intro) · [Embedded systems](/cs/embedded/intro) · [Engineering math](/math/engineering-math/intro) · [Signals and systems](/physics/signals-systems/intro)
+
+</div>

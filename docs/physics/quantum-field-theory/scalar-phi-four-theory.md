@@ -9,11 +9,7 @@ Real scalar $\phi^4$ theory is the laboratory model of perturbative quantum fiel
 
 The theory is also physically flexible. In relativistic particle physics it models contact scattering and spontaneous symmetry breaking. In condensed matter, its Euclidean version becomes the Landau-Ginzburg theory of critical phenomena. Zee uses this kind of model repeatedly because it is simple enough to calculate with and rich enough to display the logic of QFT.
 
-![A Mexican-hat potential surface has a central peak surrounded by a circular valley.](https://commons.wikimedia.org/wiki/Special:FilePath/Mexican_hat_potential_polar.svg)
-
-*Figure: The Mexican-hat potential visualizes spontaneous symmetry breaking as a choice among degenerate minima. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mexican_hat_potential_polar.svg), Rupert Millard, public domain.*
-
-## Definitions
+## The action, propagator, and potential
 
 The Lagrangian density for a real scalar with quartic interaction is
 
@@ -54,7 +50,7 @@ Z[J]=
 \right]\right).
 $$
 
-## Key results
+## Power counting and renormalization
 
 The field equation is nonlinear:
 
@@ -70,7 +66,7 @@ $$
 D=4-E,
 $$
 
-where $E$ is the number of external legs. This follows from $D=4L-2I$ and the graph identities for quartic vertices. It means that the two-point function is quadratically divergent by power counting, the four-point function logarithmically divergent, and higher-point functions superficially convergent. This is why only a finite list of counterterms is needed:
+where $E$ is the number of external legs. This follows from $D=4L-2I$ and the graph identities for quartic vertices. The two-point function is quadratically divergent by power counting, the four-point function logarithmically divergent, and higher-point functions superficially convergent. A finite counterterm basis suffices:
 
 $$
 \delta\mathcal{L}=
@@ -87,9 +83,7 @@ Renormalization conditions can be stated directly in this model. One may demand 
 
 The model also illustrates why "simple" does not mean "trivial." In four dimensions the coupling is marginal at tree level, so loop effects decide its scale dependence. In dimensions below four, the quartic coupling becomes relevant and drives nontrivial critical behavior. In dimensions above four, it becomes irrelevant in the RG sense, and the free Gaussian fixed point dominates long-distance behavior unless other scales intervene.
 
-Finally, $\phi^4$ theory is a warning about notation. The same symbol $\lambda$ may denote a bare coupling, a renormalized coupling at scale $\mu$, or a measured low-energy parameter. A calculation is incomplete until it states which one is being used and how it is fixed.
-
-## Visual
+The same symbol $\lambda$ may denote a bare coupling, a renormalized coupling at scale $\mu$, or a measured low-energy parameter. The renormalization condition identifies which quantity appears in a calculation and how the alternatives are related.
 
 ```mermaid
 flowchart TD
@@ -110,30 +104,28 @@ flowchart TD
 | Potential | $V(\phi)$ | $m^2\phi^2/2+\lambda\phi^4/4!$ | effective potential |
 | Counterterms | $\delta Z,\delta m^2,\delta\lambda$ | absent in bare tree theory | chosen by renormalization conditions |
 
-## Worked example 1: Classical minima and small oscillations
+## Minima and the fluctuation mass
 
-Problem: Let
+Consider
 
 $$
 V(\phi)=-\frac{1}{2}\mu^2\phi^2+\frac{\lambda}{4!}\phi^4,
 \qquad \mu^2>0,\quad \lambda>0.
 $$
 
-Find the minima and the mass of small fluctuations about one minimum.
-
-Step 1: Differentiate the potential:
+Differentiating gives
 
 $$
 \frac{dV}{d\phi}=-\mu^2\phi+\frac{\lambda}{3!}\phi^3.
 $$
 
-Step 2: Set this equal to zero:
+The stationary-point equation is
 
 $$
 \phi\left(-\mu^2+\frac{\lambda}{6}\phi^2\right)=0.
 $$
 
-Step 3: The stationary points are
+Its solutions are
 
 $$
 \phi=0,
@@ -147,7 +139,7 @@ $$
 v=\sqrt{\frac{6\mu^2}{\lambda}}.
 $$
 
-Step 4: Use the second derivative:
+Their stability follows from the second derivative,
 
 $$
 \frac{d^2V}{d\phi^2}=-\mu^2+\frac{\lambda}{2}\phi^2.
@@ -161,25 +153,23 @@ $$
 =2\mu^2.
 $$
 
-Step 5: The small fluctuation $\phi=v+\eta$ has mass squared
+Writing $\phi=v+\eta$, the small fluctuation has mass squared
 
 $$
 m_\eta^2=2\mu^2.
 $$
 
-The checked result is two degenerate minima at $\phi=\pm v$ and a stable excitation of mass $\sqrt{2}\mu$ around either one.
+The two minima at $\phi=\pm v$ are degenerate, and the stable excitation around either one has mass $\sqrt{2}\mu$.
 
-## Worked example 2: Superficial divergence in phi-four theory
+## Deriving $D=4-E$
 
-Problem: Derive $D=4-E$ for a connected $\phi^4$ graph in four spacetime dimensions.
-
-Step 1: Each loop integral contributes four powers of momentum:
+For a connected $\phi^4$ graph in four spacetime dimensions, each loop integral contributes four powers of momentum,
 
 $$
 4L.
 $$
 
-Step 2: Each internal scalar propagator behaves as $1/p^2$ at large momentum, contributing
+while each internal scalar propagator behaves as $1/p^2$ at large momentum and contributes
 
 $$
 -2I.
@@ -191,7 +181,7 @@ $$
 D=4L-2I.
 $$
 
-Step 3: For a connected graph,
+For a connected graph,
 
 $$
 L=I-V+1.
@@ -203,7 +193,7 @@ $$
 D=4(I-V+1)-2I=2I-4V+4.
 $$
 
-Step 4: Count line ends:
+Counting line ends gives
 
 $$
 4V=2I+E.
@@ -215,29 +205,15 @@ $$
 2I=4V-E.
 $$
 
-Step 5: Substitute:
+The final substitution yields
 
 $$
 D=(4V-E)-4V+4=4-E.
 $$
 
-The checked answer is $D=4-E$. A two-point graph has $D=2$, a four-point graph has $D=0$, and a six-point graph has $D=-2$.
+Thus $D=4-E$. A two-point graph has $D=2$, a four-point graph has $D=0$, and a six-point graph has $D=-2$.
 
-## Code
-
-```python
-def superficial_degree_phi4(external_legs, spacetime_dim=4):
-    if spacetime_dim != 4:
-        raise ValueError("this shortcut is for four spacetime dimensions")
-    return 4 - external_legs
-
-for external in [2, 4, 6, 8]:
-    degree = superficial_degree_phi4(external)
-    verdict = "divergent" if degree >= 0 else "superficially convergent"
-    print(f"E={external}: D={degree}, {verdict}")
-```
-
-## Common pitfalls
+## Sign, scheme, and expansion-point checks
 
 - Forgetting the $4!$ in the interaction and then assigning the wrong vertex factor.
 - Treating $\lambda\gt 0$ as optional for a stable potential. Without higher stabilizing terms, negative $\lambda$ makes the potential unbounded.
@@ -250,11 +226,8 @@ for external in [2, 4, 6, 8]:
 - Assuming the classical potential alone determines the quantum phase diagram. Loop corrections can shift masses, couplings, and the effective potential.
 - Expanding around an unstable point and then interpreting the resulting negative mass squared as a particle mass.
 
-## Connections
+<div className="see-also">
 
-Use this page as the controlled sandbox for the rest of the subject. Nearly every later complication has a scalar prototype: propagators come from the quadratic term, vertices from the quartic term, counterterms from divergent loops, symmetry breaking from the sign of $m^2$, and RG flow from the scale dependence of $\lambda$. Once these mechanisms are clear in $\phi^4$ theory, spinors and gauge fields add structure without changing the basic perturbative logic.
+See also: [Perturbation Theory and Feynman Diagrams](/physics/quantum-field-theory/perturbation-and-feynman-diagrams) · [Renormalization and Counterterms](/physics/quantum-field-theory/renormalization-and-counterterms) · [Renormalization Group](/physics/quantum-field-theory/renormalization-group) · [Symmetry Breaking, Goldstone Bosons, and Higgs Physics](/physics/quantum-field-theory/symmetry-breaking-goldstone-higgs)
 
-- [Perturbation Theory and Feynman Diagrams](/physics/quantum-field-theory/perturbation-and-feynman-diagrams)
-- [Renormalization and Counterterms](/physics/quantum-field-theory/renormalization-and-counterterms)
-- [Renormalization Group](/physics/quantum-field-theory/renormalization-group)
-- [Symmetry Breaking, Goldstone Bosons, and Higgs Physics](/physics/quantum-field-theory/symmetry-breaking-goldstone-higgs)
+</div>

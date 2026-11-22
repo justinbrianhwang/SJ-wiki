@@ -9,7 +9,7 @@ Bayesian learning is both an algorithmic family and an analytical lens. Mitchell
 
 Historically, this treatment is important because it places machine learning inside probability theory rather than only symbolic search or numerical optimization. Modern probabilistic modeling, Bayesian networks, topic models, Gaussian mixtures, and calibrated classifiers all build on the same foundations, even when implemented with newer algorithms.
 
-## Definitions
+## Priors, likelihoods, and posterior decisions
 
 Bayes' theorem states:
 
@@ -54,7 +54,7 @@ $$
 
 The Gibbs algorithm samples one hypothesis from the posterior and uses it to classify. Mitchell presents it because, under suitable assumptions, it has an expected error at most twice that of the Bayes optimal classifier.
 
-## Key results
+## Choosing, averaging, and encoding hypotheses
 
 Bayesian analysis clarifies concept learning. If the learner assumes deterministic, noise-free labels and assigns equal prior probability to each hypothesis, then all consistent hypotheses have equal posterior probability and all inconsistent hypotheses have posterior probability zero. Under those assumptions, the version space is precisely the set of hypotheses with nonzero posterior probability.
 
@@ -86,7 +86,7 @@ This connects Occam's razor to probability: simpler hypotheses are preferred whe
 
 Bayesian learning also clarifies what it means to combine prior knowledge with data. The prior $P(h)$ can encode a preference for simpler hypotheses, smoother functions, smaller weights, known causal structures, or expert rules. The likelihood $P(D \mid h)$ measures how well each hypothesis predicts the observed evidence. A strong prior can dominate when data are scarce; abundant data can overwhelm a weak prior when the likelihood strongly favors another hypothesis.
 
-The difference between MAP and Bayes optimal prediction is a difference between choosing and averaging. MAP chooses the single most probable hypothesis and predicts with it. Bayes optimal prediction averages over the posterior distribution of hypotheses. Averaging accounts for uncertainty, but it is often computationally expensive because it requires summing or integrating over many hypotheses. This is why MAP and approximations such as Gibbs sampling appear in practical discussions.
+The difference between MAP and Bayes optimal prediction is a difference between choosing and averaging. MAP chooses the single most probable hypothesis and predicts with it. Bayes optimal prediction averages over the posterior distribution of hypotheses. Averaging accounts for uncertainty, but it is often computationally expensive because it requires summing or integrating over many hypotheses. MAP and approximations such as Gibbs sampling are used when full averaging is too costly.
 
 Mitchell's connection between likelihood and squared error is a recurring bridge across chapters. The LMS rule from Chapter 1 and the delta rule from Chapter 4 can be interpreted as optimizing a likelihood under Gaussian noise assumptions. This does not mean squared error is always right. It means each loss function carries an implicit noise model. Choosing a loss is partly choosing a belief about how targets are generated around the ideal function.
 
@@ -94,9 +94,7 @@ Bayesian classifiers also invite a distinction between decision making and proba
 
 The assumption that the hypothesis space is known is another important simplification. In practice, model structure, features, and priors are designed by the engineer. A Bayesian calculation can be exact relative to those choices and still miss the real data-generating process. That is why the Bayesian view complements, rather than replaces, evaluation on held-out data.
 
-This is also why Bayesian results in the book often serve two roles at once. They give algorithms for learners that explicitly manipulate probabilities, and they give explanations for why other algorithms behave sensibly under certain assumptions. Reading the chapter both ways helps connect symbolic consistency, squared-error training, probabilistic classification, and Occam-style simplicity.
-
-## Visual
+Bayesian results in the book often serve two roles at once. They give algorithms for learners that explicitly manipulate probabilities, and they explain why other algorithms behave sensibly under certain assumptions. Reading the chapter both ways connects symbolic consistency, squared-error training, probabilistic classification, and Occam-style simplicity.
 
 | Principle | Optimization form | Intuition | Mitchell connection |
 |---|---|---|---|
@@ -106,9 +104,9 @@ This is also why Bayesian results in the book often serve two roles at once. The
 | Gibbs | Sample from posterior | Cheaper randomized approximation | Error bound relative to Bayes optimal |
 | MDL | $\min_h L(h)+L(D \mid h)$ | Prefer concise total explanations | Occam-style bias and pruning |
 
-## Worked example 1: Compute a MAP hypothesis
+### Computing a MAP hypothesis
 
-Problem: Two hypotheses can explain a dataset $D$.
+Two hypotheses can explain a dataset $D$.
 
 | Hypothesis | Prior $P(h)$ | Likelihood $P(D \mid h)$ |
 |---|---:|---:|
@@ -116,8 +114,6 @@ Problem: Two hypotheses can explain a dataset $D$.
 | $h_2$ | 0.30 | 0.60 |
 
 Find the MAP hypothesis and normalized posterior probabilities.
-
-Method:
 
 1. Compute unnormalized posterior scores.
 
@@ -151,13 +147,11 @@ $$
 h_{MAP}=h_2.
 $$
 
-Answer: $h_2$ is the MAP hypothesis with posterior probability $0.5625$. The data favor $h_2$ enough to overcome its smaller prior.
+$h_2$ is the MAP hypothesis with posterior probability $0.5625$. The data favor $h_2$ enough to overcome its smaller prior.
 
-## Worked example 2: Show why Gaussian noise gives squared error
+## Deriving squared error from Gaussian noise
 
-Problem: Suppose $D=\{(x_i,t_i)\}_{i=1}^n$ and $t_i=h(x_i)+\epsilon_i$ with independent Gaussian noise $\epsilon_i \sim \mathcal{N}(0,\sigma^2)$. Show why maximizing likelihood is equivalent to minimizing squared error.
-
-Method:
+Suppose $D=\{(x_i,t_i)\}_{i=1}^n$ and $t_i=h(x_i)+\epsilon_i$ with independent Gaussian noise $\epsilon_i \sim \mathcal{N}(0,\sigma^2)$. Show why maximizing likelihood is equivalent to minimizing squared error.
 
 1. Write the likelihood for one example.
 
@@ -207,9 +201,9 @@ $$
 \sum_i(t_i-h(x_i))^2.
 $$
 
-Answer: Under independent constant-variance Gaussian noise, maximum likelihood learning is least-squares learning.
+Under independent constant-variance Gaussian noise, maximum likelihood learning is least-squares learning.
 
-## Code
+## Normalizing posterior scores
 
 ```python
 import numpy as np
@@ -225,19 +219,17 @@ print("posterior probabilities:", posteriors)
 print("MAP hypothesis:", f"h{map_index + 1}")
 ```
 
-## Common pitfalls
+## Probability statements that are easy to confuse
 
 - Confusing $P(h \mid D)$ with $P(D \mid h)$. The posterior and likelihood answer different questions.
 - Dropping the prior without noticing. Maximum likelihood is not always appropriate when prior knowledge is meaningful.
 - Treating the evidence $P(D)$ as irrelevant in all contexts. It is irrelevant for comparing fixed hypotheses by MAP, but important for normalized probabilities and model comparison.
 - Saying "Bayesian" when only a point estimate is used. MAP is Bayesian in its objective, but it still returns one hypothesis.
 - Interpreting MDL as "shortest hypothesis wins." MDL minimizes the code length of hypothesis plus remaining data, so an overly simple hypothesis can lose if it fails to explain the data.
-- Assuming all posterior computations are tractable. Bayes optimal classification is often a theoretical standard rather than a practical algorithm.
+- Assuming all posterior computations are tractable. Bayes optimal classification is often a theoretical standard rather than a deployable algorithm.
 
-## Connections
+<div className="see-also">
 
-- [Concept learning](/cs/machine-learning/concept-learning-and-version-spaces)
-- [Bayesian classifiers, networks, and EM](/cs/machine-learning/bayesian-classifiers-networks-and-em)
-- [Evaluating hypotheses](/cs/machine-learning/evaluating-hypotheses)
-- [Probability](/math/probability/)
-- [Probability and random variables](/math/probability-and-random-variables/)
+See also: [Concept learning](/cs/machine-learning/concept-learning-and-version-spaces) · [Bayesian classifiers, networks, and EM](/cs/machine-learning/bayesian-classifiers-networks-and-em) · [Evaluating hypotheses](/cs/machine-learning/evaluating-hypotheses) · [Probability](/math/probability/intro) · [Probability and random variables](/math/probability-and-random-variables/intro)
+
+</div>

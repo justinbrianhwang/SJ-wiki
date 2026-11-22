@@ -9,7 +9,7 @@ A system maps an input signal to an output signal. It can represent an electrica
 
 The most important later theory, linear time-invariant analysis, is built from two of these properties. Linearity gives superposition. Time invariance says the system behaves the same way regardless of the absolute time origin. Together they imply that the response to any signal can be assembled from shifted impulse responses, producing convolution.
 
-## Definitions
+## Six independent classification questions
 
 A continuous-time system $T$ maps an input $x(t)$ to an output
 
@@ -23,17 +23,19 @@ $$
 y[n]=T\{x[n]\}.
 $$
 
-A system is memoryless if the output at a time depends only on the input value at that same time. In continuous time, a memoryless system has the form
+A system is memoryless if the output at a time depends only on the input value at that same time. A continuous-time memoryless system can have the form
 
 $$
-y(t)=f(x(t))
+y(t)=f(t,x(t)),
 $$
 
-for some function $f$. In discrete time,
+and in discrete time,
 
 $$
-y[n]=f(x[n]).
+y[n]=f(n,x[n]).
 $$
+
+The explicit time argument allows a memoryless system to be time-varying; $y(t)=t x(t)$ is one example.
 
 A system has memory if the output depends on past, future, or accumulated values of the input. Examples include
 
@@ -89,7 +91,7 @@ $$
 T^{-1}\{T\{x\}\}=x.
 $$
 
-## Key results
+## Testing a formula without guessing
 
 To prove linearity, test the combined input directly. Compute the output produced by $a x_1+b x_2$, and compare it with $a y_1+b y_2$. A single counterexample is enough to disprove linearity. Systems that add constants, multiply signals by themselves, take magnitudes, or contain fixed thresholds are usually nonlinear.
 
@@ -128,8 +130,6 @@ When several properties are requested, test them independently and record the re
 
 For systems described by formulas, it is helpful to classify the location of input samples or values first. Terms like $x(t-3)$ or $x[n-1]$ point to the past. Terms like $x(t+3)$ or $x[n+1]$ point to the future. Terms like $\int_{-\infty}^{t}x(\tau)d\tau$ use accumulated past information, while $\int_{t}^{\infty}x(\tau)d\tau$ uses future information. This quick scan makes the causality and memory tests less error-prone before moving to linearity and time invariance.
 
-## Visual
-
 | Property | Question to ask | Typical test | Common counterexample |
 |---|---|---|---|
 | Memoryless | Does output use only current input? | inspect dependence on $x(t_0)$ or $x[n_0]$ | $y[n]=x[n-1]$ |
@@ -141,18 +141,29 @@ For systems described by formulas, it is helpful to classify the location of inp
 
 ```mermaid
 flowchart TD
-  A[Given system T] --> B{"Uses future input?"}
-  B -->|yes| C[Noncausal]
-  B -->|no| D[Causal candidate]
-  D --> E{"Superposition holds?"}
-  E -->|no| F[Nonlinear]
-  E -->|yes| G[Linear]
-  G --> H{"Shift test holds?"}
-  H -->|yes| I[LTI candidate]
-  H -->|no| J[Linear time-varying]
+  A["Given system T"] --> M{"Uses only the current input?"}
+  A --> L{"Superposition holds?"}
+  A --> TI{"Input and output shifts commute?"}
+  A --> C{"Uses future input?"}
+  A --> S{"Every bounded input stays bounded?"}
+  A --> I{"Can the input be recovered uniquely?"}
+  M -- "yes" --> M0["memoryless"]
+  M -- "no" --> M1["has memory"]
+  L -- "yes" --> L0["linear"]
+  L -- "no" --> L1["nonlinear"]
+  TI -- "yes" --> TI0["time-invariant"]
+  TI -- "no" --> TI1["time-varying"]
+  C -- "yes" --> C0["noncausal"]
+  C -- "no" --> C1["causal"]
+  S -- "yes" --> S0["BIBO stable"]
+  S -- "no" --> S1["unstable"]
+  I -- "yes" --> I0["invertible"]
+  I -- "no" --> I1["not invertible"]
 ```
 
-## Worked example 1: classifying a continuous-time system
+The branches are independent. A result on one branch generally says nothing about the others; only the memoryless branch immediately guarantees causality.
+
+## A delayed input with an explicit time factor
 
 Problem: Classify
 
@@ -225,7 +236,7 @@ They are not equal for arbitrary $t_0$ and $x$. Therefore the system is time-var
 
 Checked answer: The system has memory, is linear, is time-varying, and is causal.
 
-## Worked example 2: testing BIBO stability and invertibility
+## Squaring: stable but not invertible
 
 Problem: Consider the discrete-time system
 
@@ -291,7 +302,9 @@ Unless the domain is restricted to nonnegative signals, the input cannot be reco
 
 Checked answer: The system is memoryless, nonlinear, time-invariant, BIBO stable, and not invertible over all real sequences.
 
-## Code
+## Checking the square system on a finite sequence
+
+The algebraic test above is the proof; this finite-array check is a quick confirmation on one sequence.
 
 ```python
 import numpy as np
@@ -299,7 +312,6 @@ import numpy as np
 def system_square(x):
     return x**2
 
-n = np.arange(-4, 5)
 x = np.array([-2, -1, 0, 1, 2, 1, 0, -1, -2], dtype=float)
 shift = 2
 
@@ -312,7 +324,7 @@ print("bounded input max:", np.max(np.abs(x)))
 print("bounded output max:", np.max(np.abs(system_square(x))))
 ```
 
-## Common pitfalls
+## False implications to watch for
 
 - Treating nonlinear as equivalent to time-varying. These are separate properties.
 - Calling a delayed system memoryless. Any dependence on $x(t-t_0)$ with $t_0\ne 0$ is memory.
@@ -320,9 +332,8 @@ print("bounded output max:", np.max(np.abs(system_square(x))))
 - Using LTI impulse-response tests for systems that have not been proven LTI.
 - Forgetting that invertibility depends on the allowed input set. Squaring is not invertible on all real signals, but it is invertible on nonnegative signals.
 
-## Connections
+<div className="see-also">
 
-- [Signals and Time Transformations](/physics/signals-systems/signals-time-transformations)
-- [LTI Systems and Convolution](/physics/signals-systems/lti-systems-convolution)
-- [Frequency Response and Filtering](/physics/signals-systems/frequency-response-filtering)
-- [State-Space Introduction](/physics/signals-systems/state-space-introduction)
+See also: [Signals and Time Transformations](/physics/signals-systems/signals-time-transformations) · [LTI Systems and Convolution](/physics/signals-systems/lti-systems-convolution) · [Frequency Response and Filtering](/physics/signals-systems/frequency-response-filtering) · [State-Space Introduction](/physics/signals-systems/state-space-introduction)
+
+</div>

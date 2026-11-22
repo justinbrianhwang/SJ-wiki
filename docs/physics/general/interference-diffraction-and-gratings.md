@@ -5,128 +5,363 @@ sidebar_position: 24
 
 # Interference, Diffraction, and Gratings
 
-Interference, Diffraction, and Gratings covers wave optics, phase, Young's experiment, single-slit diffraction, and gratings. The goal is to recognize the physical structure before choosing equations. In the HRW progression, this topic extends earlier mechanics and prepares later field, wave, or modern-physics reasoning by reusing the same habits: define the system, choose signs and variables, state assumptions, and check dimensions.
+Wave optics tracks phase differences. Two or more coherent contributions can reinforce or cancel, while a finite aperture causes different parts of the same wavefront to interfere. Double-slit fringes, single-slit diffraction, and grating spectra are three versions of that one superposition principle.
 
-The core idea is not a list of formulas but a model. Once the model is chosen, the equations express conservation, response, geometry, or symmetry. If the physical assumptions change, the algebra must be revisited. This is especially important here because many formulas are compact but have narrow domains of validity.
+## Path difference sets the phase
 
-## Definitions
+For two coherent waves of wavelength $\lambda$, a path difference $\delta$ corresponds to phase difference
 
-- **Scope:** wave optics, phase, Young's experiment, single-slit diffraction, and gratings.
-- **Primary symbols:** $d$, $a$, $\lambda$, $\theta$, $m$, $L$.
-- **Reference equations:** $d\sin\theta=m\lambda$, $d\sin\theta=(m+1/2)\lambda$, $a\sin\theta=m\lambda$, $\Delta y=\lambda L/d$.
-- A **system** is the object, field region, circuit, gas, optical element, or particle collection being modeled.
-- A **state** is specified by the variables that determine the relevant energy, momentum, phase, field, or thermodynamic condition.
-- A **constraint** is a physical restriction such as no slip, fixed length, constant temperature, steady flow, fixed boundary, or symmetry.
-- A **limiting case** is a simplified parameter choice used to test whether the result behaves sensibly.
+$$
+\Delta\phi=\frac{2\pi}{\lambda}\delta.
+$$
 
-The definitions in this page are meant to be operational. A symbol is useful only after you know how it would be measured, what units it carries, what sign convention is being used, and which idealizations are being assumed. Before substituting numbers, identify the system boundary and the relevant state variables. For a particle problem the state variables might be position and velocity; for a circuit they might be charge, current, and potential difference; for a thermodynamic process they might be pressure, volume, temperature, and internal energy.
+Equal-phase contributions interfere constructively; contributions separated by an odd multiple of $\pi$ interfere destructively.
 
-A second habit is to separate model statements from algebra. A model statement says something physical, such as "air resistance is negligible", "the string is massless", "the gas is ideal", "the process is quasistatic", or "the field is uniform". Algebra then follows from those statements. If the model changes, the algebra may still look familiar but the result can become invalid. Write the model assumptions as part of the solution, not as an afterthought.
+For two narrow slits separated by $d$,
 
-## Key results
+$$
+\delta=d\sin\theta.
+$$
 
-The main relationships are
+Bright fringes occur when
+
+$$
+d\sin\theta=m\lambda,
+\qquad m=0,\pm1,\pm2,\ldots,
+$$
+
+and dark fringes occur when
+
+$$
+d\sin\theta=\left(m+\frac12\right)\lambda.
+$$
+
+The sources must maintain a stable phase relation for a stationary pattern. Ordinary independent light sources do not usually provide that coherence.
+
+## Adding amplitudes before intensities
+
+Interference comes from superposition of wave amplitudes. For two sinusoidal electric fields of equal amplitude,
+
+$$
+E_1=E_0\cos\omega t,
+\qquad
+E_2=E_0\cos(\omega t+\Delta\phi),
+$$
+
+the trigonometric sum is
+
+$$
+E_1+E_2
+=2E_0\cos\left(\frac{\Delta\phi}{2}\right)
+\cos\left(\omega t+\frac{\Delta\phi}{2}\right).
+$$
+
+Intensity is proportional to the time average of the squared total field, so
+
+$$
+I=4I_0\cos^2\left(\frac{\Delta\phi}{2}\right).
+$$
+
+Here $I_0$ is the intensity from either source alone. At zero phase difference the intensity is $4I_0$, not $2I_0$, because equal amplitudes double before squaring. At phase difference $\pi$, the ideal equal-amplitude fields cancel.
+
+For unequal source intensities,
+
+$$
+I=I_1+I_2+2\sqrt{I_1I_2}\cos\Delta\phi.
+$$
+
+The minimum is $(\sqrt{I_1}-\sqrt{I_2})^2$, so complete darkness requires equal amplitudes as well as opposite phase. Conditions written only in terms of path difference silently assume those amplitudes match.
+
+Coherence describes whether the phase relation remains predictable. Temporal coherence is limited by the range of frequencies in the source; a narrow spectral width gives a longer coherence time and length. Spatial coherence describes phase correlation across a wavefront. Illuminating two slits from one small or distant source gives them a shared phase history, while two unrelated lamps fluctuate too independently to leave stationary optical fringes.
+
+Fringe contrast can be summarized by visibility
+
+$$
+\mathcal V=\frac{I_{\max}-I_{\min}}{I_{\max}+I_{\min}}.
+$$
+
+Unequal illumination, finite source size, polarization mismatch, and phase fluctuations all reduce $\mathcal V$. They can wash out a pattern even though each opening still diffracts light.
+
+## Young fringes on a distant screen
+
+When the screen distance $L$ is much larger than the fringe displacement $y$, the small-angle approximation gives $\sin\theta\approx\tan\theta\approx y/L$. Adjacent bright fringes are then separated by
+
+$$
+\Delta y=\frac{\lambda L}{d}.
+$$
+
+For $\lambda=600\,\mathrm{nm}$, $d=0.20\,\mathrm{mm}$, and $L=2.0\,\mathrm m$,
+
+$$
+\Delta y
+=\frac{(600\times10^{-9})(2.0)}{0.20\times10^{-3}}
+=6.0\times10^{-3}\,\mathrm m
+=6.0\,\mathrm{mm}.
+$$
+
+Wider slit separation produces more closely spaced fringes; a longer wavelength or more distant screen spreads them apart.
+
+The spacing formula measures adjacent bright fringes. Since the center is order zero, the fifth bright fringe above it has $y_5=5\Delta y$. If the apparatus is immersed in a medium of index $n$, wavelength becomes $\lambda_0/n$ while frequency remains fixed:
+
+$$
+\Delta y=\frac{\lambda_0L}{nd}.
+$$
+
+For the same apparatus in water with $n=1.33$, the $6.0\,\mathrm{mm}$ air spacing becomes
+
+$$
+\Delta y_{\text{water}}=\frac{6.0\,\mathrm{mm}}{1.33}
+=4.5\,\mathrm{mm}.
+$$
+
+| Pattern | Geometric scale | Condition |
+|---|---|---|
+| Double-slit bright fringe | separation $d$ | $d\sin\theta=m\lambda$ |
+| Double-slit dark fringe | separation $d$ | $d\sin\theta=(m+\tfrac12)\lambda$ |
+| Single-slit minimum | width $a$ | $a\sin\theta=m\lambda$, $m=1,2,\ldots$ |
+| Grating principal maximum | spacing $d$ | $d\sin\theta=m\lambda$ |
+
+## Why a single slit produces minima
+
+A slit of finite width $a$ contains a continuous range of secondary wave contributions. At angles satisfying
+
+$$
+a\sin\theta=m\lambda,
+\qquad m=1,2,3,\ldots,
+$$
+
+those contributions pair off and cancel. The central maximum lies between the first minima and is twice as wide as the secondary maxima in the small-angle screen geometry.
+
+For the first minimum, divide the slit into two equal halves. When the full path difference across the slit is one wavelength, corresponding points in the halves differ by half a wavelength and cancel pairwise. For the second minimum, four equal strips cancel in adjacent pairs. Integration gives the complete Fraunhofer profile:
+
+$$
+I(\theta)=I(0)\left(\frac{\sin\beta}{\beta}\right)^2,
+\qquad
+\beta=\frac{\pi a\sin\theta}{\lambda}.
+$$
+
+Zeros occur at $\beta=m\pi$. Secondary maxima are weaker than the center and are not exactly halfway between zeros. The central lobe spans from the first negative-angle minimum to the first positive-angle minimum, so it is twice the width of an outer lobe measured between successive minima.
+
+For $a=0.10\,\mathrm{mm}$ and $\lambda=500\,\mathrm{nm}$, the first minimum satisfies
+
+$$
+\sin\theta_1=\frac{\lambda}{a}
+=\frac{500\times10^{-9}}{0.10\times10^{-3}}
+=0.0050,
+$$
+
+so
+
+$$
+\theta_1=0.286^\circ.
+$$
+
+On a screen $3.00\,\mathrm m$ away, the first minima lie at
+
+$$
+y_1=L\tan\theta_1\approx(3.00)(0.00500)
+=0.0150\,\mathrm m.
+$$
+
+The central maximum width is therefore
+
+$$
+w_{\text{central}}=2y_1=3.00\,\mathrm{cm}.
+$$
+
+The equation for single-slit minima resembles the equation for double-slit maxima, but $a$ is slit width and $d$ is slit separation. Interchanging them predicts the wrong angular scale.
+
+Diffraction grows when an aperture narrows, directly from $\sin\theta_1=\lambda/a$. This behavior sets a resolution limit for optical instruments. Closing an aperture may reduce geometric aberrations, yet eventually each point source spreads into a broader diffraction pattern.
+
+## Interference fringes inside a diffraction envelope
+
+Real double slits have finite width. Their narrow interference fringes are multiplied by a broad single-slit diffraction envelope. A nominal double-slit maximum can disappear when it lands at a single-slit minimum. Treating the two effects as alternatives misses this combined pattern.
+
+For identical slits of width $a$ and center separation $d$, the far-field intensity has the form
+
+$$
+I(\theta)=I_{\max}
+\left(\frac{\sin\beta}{\beta}\right)^2
+\cos^2\alpha,
+$$
+
+where
+
+$$
+\beta=\frac{\pi a\sin\theta}{\lambda},
+\qquad
+\alpha=\frac{\pi d\sin\theta}{\lambda}.
+$$
+
+The cosine factor creates the fine fringes; the sinc-squared factor changes their heights. A missing order occurs when an interference maximum and a diffraction minimum coincide:
+
+$$
+d\sin\theta=m\lambda,
+\qquad
+a\sin\theta=p\lambda.
+$$
+
+Thus $m/p=d/a$. If $d=3a$, every third interference order lies at a diffraction zero and disappears.
+
+This expression assumes equal, uniformly illuminated rectangular slits in the far field. Fresnel diffraction retains wavefront curvature and depends on propagation distance more intricately. A lens can map far-field angles to points in its focal plane, making a Fraunhofer pattern accessible without an extremely distant screen.
+
+## Aperture shape and resolution
+
+The single-slit formula belongs to a rectangular one-dimensional aperture. A circular opening produces an Airy pattern: a bright central disk surrounded by weaker rings. The first dark ring occurs at
+
+$$
+\sin\theta_1\approx1.22\frac{\lambda}{D},
+$$
+
+where $D$ is aperture diameter. Under the Rayleigh criterion, two equally bright point sources are barely resolved when the central maximum of one falls on the first minimum of the other:
+
+$$
+\theta_R\approx1.22\frac{\lambda}{D}.
+$$
+
+Larger apertures therefore improve diffraction-limited angular resolution. Magnification alone cannot recover detail that the aperture has already blended.
+
+For a telescope with diameter $D=0.100\,\mathrm m$ observing at $\lambda=550\,\mathrm{nm}$,
 
 $$
 \begin{aligned}
-\text{core formulas} &: $d\sin\theta=m\lambda$, $d\sin\theta=(m+1/2)\lambda$, $a\sin\theta=m\lambda$, $\Delta y=\lambda L/d$.
+\theta_R
+&=1.22\frac{550\times10^{-9}}{0.100}\\
+&=6.71\times10^{-6}\,\mathrm{rad}.
 \end{aligned}
 $$
 
-Use these relationships only after identifying which variables are known and which conditions are being assumed. Many problems can be solved by matching a physical phrase to a mathematical operation: balance forces or torques for equilibrium, integrate a rate for accumulated change, conserve a quantity when external transfer is absent, or apply a boundary condition when waves or fields must fit a geometry.
+Multiplying by $206\,265$ arcseconds per radian gives about $1.38$ arcseconds. Atmospheric turbulence often broadens ground-based images beyond this ideal limit, while aberrations and detector sampling can add other constraints.
 
-A useful solution pattern is: write the governing equation, substitute symbolic constraints, solve for the unknown, and only then insert numbers. This prevents units from becoming decorative and keeps the answer interpretable.
+The far-field diffraction pattern is mathematically related to the Fourier transform of the aperture. A narrow feature in the aperture corresponds to a broad angular distribution; repeated features produce sharply selected spatial frequencies. This viewpoint unifies the broad single-slit envelope, the fine double-slit fringes, and the narrow peaks of a many-groove grating without treating them as unrelated formulas.
 
-These formulas are conditional statements. Each equation is powerful inside its domain and misleading outside it. Constant-acceleration kinematics requires constant acceleration. Conservation of mechanical energy requires either no nonconservative work or an explicit accounting of it. Gauss's law is always true, but it directly gives an electric field only when symmetry lets the flux integral simplify. Bernoulli's equation assumes steady, incompressible, nonviscous flow along a streamline. Keeping the conditions attached to the formula is part of the formula.
+## Polarization can remove interference
 
-For numerical work, solve symbolically before inserting values whenever possible. A symbolic expression exposes dimensions and limiting behavior. If a mass should cancel, it should cancel before arithmetic. If an answer should decrease when distance grows, the final expression should show that trend. If an answer becomes infinite in an unphysical limit, that usually marks the boundary where the model has stopped applying.
+Two waves interfere through the dot product of their electric-field amplitudes. If the slits produce mutually perpendicular linear polarizations, the detector records the sum of their intensities without a cross term, and the fringes vanish. Placing a polarizer after the slits at an angle that projects both fields onto the same axis can restore fringes, at reduced intensity.
 
-## Visual
+This is a useful warning about “which-path” information. Orthogonal polarization can label the paths even when no observer reads the label. Once the alternatives are distinguishable in principle, their amplitudes no longer contribute the same interference cross term at an ordinary polarization-insensitive detector. Erasing the distinguishing polarization by a common projection makes the alternatives indistinguishable again.
 
-```mermaid
-graph LR
-  A[Physical situation] --> B[Choose model]
-  B --> C[Define variables]
-  C --> D[Apply key law]
-  D --> E[Solve symbolically]
-  E --> F[Check units and limits]
-```
+The observation also separates coherence from mere overlap. Beams can occupy the same region, have the same frequency, and still fail to form visible fringes if their polarizations are orthogonal or their phase relation wanders during the detector's averaging time.
 
-| Quantity or idea | Use | Check |
-|---|---|---|
-| Main model | wave optics, phase, Young's experiment, single-slit diffraction, and gratings | assumptions must match the formula |
-| Symbols | $d$, $a$, $\lambda$, $\theta$, $m$, $L$ | define each before use |
-| Key formulas | $d\sin\theta=m\lambda$, $d\sin\theta=(m+1/2)\lambda$, $a\sin\theta=m\lambda$, $\Delta y=\lambda L/d$ | check dimensions term by term |
-| Limiting case | simplify one parameter | result should match intuition |
+## Historical route to wave optics
 
-## Worked example 1
+Young's two-source interference supplied strong evidence that light behaves as a wave. Fresnel developed the quantitative diffraction theory, while Fraunhofer studied the far-field limit and spectral lines. Later electromagnetic theory identified light as an electromagnetic wave. Quantum experiments retain the same interference equations for detection probabilities, even when particles arrive one at a time; the accumulated distribution follows the wave-amplitude pattern.
 
-**Problem.** Light of $600\,\mathrm{nm}$ passes through slits separated by $0.20\,\mathrm{mm}$ onto a screen $2.0\,\mathrm{m}$ away. Find bright-fringe spacing.
+The classical formulas remain appropriate whenever source statistics and detector response allow intensity to be treated continuously. At very low light levels, individual detections are discrete, but the probability distribution builds the same fringes. Blocking one slit changes the available amplitudes and leaves the single-aperture diffraction pattern.
 
-**Method.** Select the listed governing relationship and solve symbolically before substituting numbers.
-
-1. Write the relevant relation.
-2. Substitute the known quantities with SI units or consistent derived units.
-3. Solve algebraically for the requested quantity.
-4. The calculation gives
+The small-angle expression $y\approx L\theta$ is convenient near the center. At larger angles, keep
 
 $$
-$\Delta y=\lambda L/d=(600\times10^{-9})(2.0)/(0.20\times10^{-3})=6.0\,\mathrm{mm}$..
+y=L\tan\theta
 $$
 
-5. Interpret the magnitude and sign in the original physical situation.
+and solve the exact sine condition first.
 
-**Checked answer.** The result has the expected units and changes in the expected direction when the main input is increased.
+## Gratings sharpen wavelength separation
 
-## Worked example 2
-
-**Problem.** A slit width $0.10\,\mathrm{mm}$ is illuminated by $500\,\mathrm{nm}$ light. Find first minimum angle.
-
-**Method.** Use the same modeling routine with a different unknown so the equation is not memorized in only one direction.
-
-1. Identify the system and the applicable approximation.
-2. Start from the governing equation.
-3. Rearrange before substituting values.
-4. The numerical work is
+A diffraction grating has many evenly spaced slits. Its principal maxima obey the same condition as two-slit maxima,
 
 $$
-$\sin\theta=\lambda/a=500\times10^{-9}/(0.10\times10^{-3})=0.0050$, so $\theta=0.286^\circ$..
+d\sin\theta=m\lambda,
 $$
 
-5. Compare with a nearby limiting case or a familiar scale.
+but increasing the number of illuminated slits narrows the peaks. Different wavelengths then appear at different angles, which allows a grating to resolve spectral lines.
 
-**Checked answer.** The answer is consistent with the qualitative trend predicted by the formula.
+For $N$ equally spaced narrow slits, the interference factor is
 
-## Code
+$$
+\left(\frac{\sin N\alpha}{\sin\alpha}\right)^2.
+$$
 
-```python
-import math
-spacing=600e-9*2.0/(0.20e-3)
-theta=math.degrees(math.asin(500e-9/(0.10e-3)))
-print(spacing,theta)
-```
+At a principal maximum, all $N$ amplitudes add, so peak intensity scales as $N^2$ relative to one slit. Peak width shrinks roughly as $1/N$. More illuminated grooves produce narrow, bright spectral lines rather than merely increasing total light.
 
-## Common pitfalls
+Angular dispersion measures how rapidly diffraction angle changes with wavelength. Differentiating the grating equation at fixed order gives
 
-- Mixing slit separation $d$ and slit width $a$.
-- Using small-angle formulas for large angles.
-- Ignoring unit conversions.
-- Forgetting diffraction and interference can coexist.
-- Always check units, signs, and limiting cases before treating a numerical result as finished.
+$$
+d\cos\theta\,\frac{d\theta}{d\lambda}=m,
+$$
 
-A final check is to perturb one input mentally. Doubling a distance, mass, charge, stiffness, frequency, or temperature should change the answer in a way that matches the physical story. If the algebra says the opposite, revisit the setup before blaming arithmetic. Also remember that a negative answer is often information: it may indicate direction opposite to the chosen axis, work done by a system rather than on it, or a potential change that lowers the energy of a positive or negative charge differently.
+or
 
-When a problem feels difficult, the hidden issue is often not the last algebraic step but the first modeling decision. Re-read the words and mark what is being idealized: frictionless surface, ideal string, point charge, thin lens, small angle, steady flow, reversible process, nonrelativistic particle, or uniform field. Then mark what is conserved, if anything. Energy conservation, momentum conservation, angular momentum conservation, charge conservation, and entropy constraints are not interchangeable; each one has a system boundary and a transfer condition. If an external impulse acts, momentum may not be conserved for the chosen system. If friction acts within a block-floor system, mechanical energy is not conserved even though total energy is. If a Gaussian surface encloses no net charge, flux is zero, but the field at points on the surface need not be zero.
+$$
+\frac{d\theta}{d\lambda}=\frac{m}{d\cos\theta}.
+$$
 
-Another common pitfall is using a memorized equation in only its most familiar direction. A formula is a relationship, so practice solving it for different unknowns. In kinematics, solve for time, acceleration, or displacement depending on what the data support. In circuits, solve Ohm's law for voltage, current, or resistance and then check power. In optics, solve the thin-lens equation for image distance, object distance, or focal length and compare the sign with a ray diagram. In thermodynamics, rearrange the first law only after deciding whether work is done by the system or on the system. This flexibility prevents formula matching from replacing reasoning.
+Higher orders and smaller groove spacing spread wavelengths through larger angles, although high orders may fail to exist or may overlap other wavelengths.
 
-Finally, keep scale awareness. Introductory physics problems often use idealized numbers, but the answers should still sit on recognizable scales: walking speeds are meters per second, orbital speeds are kilometers per second, visible wavelengths are hundreds of nanometers, household currents are often amperes or less, and thermal energies per molecule at room temperature are small in joules but meaningful in electron-volts. When an answer is many orders of magnitude away from these anchors, check unit conversions first. Prefix errors such as nano versus micro, centimeters versus meters, and milliseconds versus seconds are among the fastest ways to turn correct physics into a wrong result.
+The order is limited by $\lvert\sin\theta\rvert\le1$, so
 
-For exam preparation, make the worked examples bidirectional. After solving a forward problem, change the target: ask what initial speed, resistance, angle, charge, temperature change, or wavelength would have produced the stated answer. This exposes whether you understand the structure or only followed the arithmetic once. Then make one assumption false and describe what would change. If air resistance is no longer negligible, projectile motion no longer separates into a constant horizontal speed. If a pulley has rotational inertia, the two string tensions need not match. If a lens is not thin, the thin-lens equation becomes an approximation. If a gas process is not reversible, entropy must be found from a reversible path connecting the same states, not from the literal irreversible path. These small variations turn a page of notes into a usable problem-solving tool.
+$$
+\lvert m\rvert\le\frac{d}{\lambda}.
+$$
 
-Before leaving the problem, write one complete sentence that states the result in physical language. That sentence should name the object or system, the direction or sign when relevant, and the assumption under which the answer was obtained.
+Higher algebraic orders that violate this bound do not correspond to propagating beams.
 
-## Connections
+Consider a grating with $600$ lines per millimeter used with $500\,\mathrm{nm}$ light. Its groove spacing is
 
-- [Waves and Sound](/physics/general/waves-sound-standing-waves-and-doppler)
-- [Quantum Intro](/physics/general/quantum-intro-photons-and-matter-waves)
+$$
+d=\frac{1.00\,\mathrm{mm}}{600}
+=1.67\times10^{-6}\,\mathrm m.
+$$
+
+For first order,
+
+$$
+\sin\theta_1=\frac{\lambda}{d}
+=\frac{500\times10^{-9}}{1.67\times10^{-6}}
+=0.300,
+$$
+
+so $\theta_1=17.5^\circ$. The order bound is
+
+$$
+m\le\frac{d}{\lambda}=3.33,
+$$
+
+which gives $m_{\max}=3$. The integer floor is required; fractional diffraction orders do not exist.
+
+Under the Rayleigh criterion, the ideal resolving power is
+
+$$
+\mathcal R=\frac{\lambda}{\Delta\lambda}=mN.
+$$
+
+Resolution improves with order and the number of illuminated grooves. Dispersion and resolution answer different questions. A grating can spread wavelengths through a large angle while each line remains too broad to distinguish a close neighbor.
+
+## Thin films and reflection phase
+
+Rays reflected from the two surfaces of a thin film can interfere. Their geometric round-trip optical path within a film of thickness $t$ and index $n$ is $2nt\cos\theta_t$, where $\theta_t$ is the internal angle. A reflection toward a medium of higher index adds a phase shift of $\pi$, equivalent to half a wavelength. Reflection toward lower index adds no such shift.
+
+The number of reflection phase reversals decides whether $2nt=m\lambda$ is bright or dark. Drawing the index sequence is safer than carrying one memorized rule between different coatings. If exactly one of the two reflected rays receives a $\pi$ shift, constructive reflected interference at normal incidence requires
+
+$$
+2nt=\left(m+\frac12\right)\lambda_0.
+$$
+
+For the thinnest such coating that reflects $\lambda_0=550\,\mathrm{nm}$ strongly with $n=1.38$, take $m=0$:
+
+$$
+t=\frac{\lambda_0}{4n}
+=\frac{550\,\mathrm{nm}}{4(1.38)}
+=99.6\,\mathrm{nm}.
+$$
+
+If both reflections receive the same phase shift, their relative reflection phase is zero and the conditions swap. Anti-reflection coatings use thickness and index choices that make leading reflected rays cancel while transmitting most of the light. Broadband coatings require multiple layers because a single quarter-wave layer is optimized around a limited wavelength and angle range.
+
+Interference colors in soap films arise because thickness varies across the film and the constructive wavelength changes with position. When the film is comparable to the coherence length, multiple reflected contributions can remain correlated. Very thick or uneven films average over phase and lose clear color bands.
+
+## Pattern checks
+
+- Convert nanometers and millimeters to the same units before taking ratios.
+- Use slit separation for interference spacing and slit width for the diffraction envelope.
+- Verify the small-angle condition rather than assuming it for every fringe.
+- Count the central maximum as $m=0$ for interference; single-slit minima begin at $m=1$.
+- A finite-width multi-slit pattern contains both interference and diffraction structure.
+- Add field amplitudes before computing intensity.
+- For thin films, count phase shifts at both reflecting boundaries.
+
+<div className="see-also">
+
+See also: [Waves and Sound](/physics/general/waves-sound-standing-waves-and-doppler) · [Quantum Intro](/physics/general/quantum-intro-photons-and-matter-waves)
+
+</div>

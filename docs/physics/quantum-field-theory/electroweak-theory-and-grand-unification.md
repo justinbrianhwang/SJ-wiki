@@ -483,11 +483,8 @@ No physical degree of freedom has disappeared. In unitary gauge the absorbed Gol
 
 The longitudinal polarization of a high-energy massive vector is closely related to the corresponding Goldstone mode. This equivalence organizes high-energy amplitudes and exposes why Higgs exchange is required to control the growth of longitudinal weak-boson scattering. The statement is an asymptotic relation with normalization and correction terms, not permission to replace vectors by scalars at arbitrary energy.
 
-## Related pages
+<div className="see-also">
 
-- [Symmetry Breaking, Goldstone Bosons, and Higgs Physics](/physics/quantum-field-theory/symmetry-breaking-goldstone-higgs)
-- [Chiral Anomalies](/physics/quantum-field-theory/chiral-anomalies)
-- [Yang--Mills Theory and QCD](/physics/quantum-field-theory/yang-mills-theory-and-qcd)
-- [Renormalization Group](/physics/quantum-field-theory/renormalization-group)
-- [Effective Field Theory](/physics/quantum-field-theory/effective-field-theory)
+See also: [Symmetry Breaking, Goldstone Bosons, and Higgs Physics](/physics/quantum-field-theory/symmetry-breaking-goldstone-higgs) · [Chiral Anomalies](/physics/quantum-field-theory/chiral-anomalies) · [Yang--Mills Theory and QCD](/physics/quantum-field-theory/yang-mills-theory-and-qcd) · [Renormalization Group](/physics/quantum-field-theory/renormalization-group) · [Effective Field Theory](/physics/quantum-field-theory/effective-field-theory)
 
+</div>

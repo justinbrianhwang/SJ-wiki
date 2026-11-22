@@ -311,9 +311,8 @@ Missing values also need a policy before fitting. Dropping incomplete rows can b
 
 Linear regression is also a useful baseline. If a deeper model cannot beat a well-preprocessed linear fit, architecture may not be the limiting factor. Target noise, leakage, evaluation mistakes, or poor optimization deserve investigation before adding layers.
 
-## Related pages
+<div className="see-also">
 
-- [Tensors and Data Preprocessing](/cs/deep-learning/tensors-data-preprocessing)
-- [Math for Deep Learning](/cs/deep-learning/math-for-deep-learning)
-- [Optimization Algorithms](/cs/deep-learning/optimization-algorithms)
-- [Multilayer Perceptrons and Regularization](/cs/deep-learning/multilayer-perceptrons-regularization)
+See also: [Tensors and Data Preprocessing](/cs/deep-learning/tensors-data-preprocessing) · [Math for Deep Learning](/cs/deep-learning/math-for-deep-learning) · [Optimization Algorithms](/cs/deep-learning/optimization-algorithms) · [Multilayer Perceptrons and Regularization](/cs/deep-learning/multilayer-perceptrons-regularization)
+
+</div>

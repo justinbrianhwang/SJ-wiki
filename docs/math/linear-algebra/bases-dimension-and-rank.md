@@ -9,7 +9,7 @@ A basis is a coordinate system for a vector space. It is small enough to avoid r
 
 These ideas connect computation with structure. Row reduction finds pivots, pivots identify independent columns, independent columns form bases for column spaces, and free variables describe null spaces. Dimension turns these observations into exact counts rather than vague descriptions.
 
-## Definitions
+## Bases, coordinates, and the four fundamental subspaces
 
 A basis for a vector space $V$ is a set of vectors that spans $V$ and is linearly independent. If $B=\{\mathbf{v}_1,\ldots,\mathbf{v}_n\}$ is a basis and
 
@@ -38,7 +38,7 @@ $$
 
 The rank of $A$ is the dimension of its column space. The nullity of $A$ is the dimension of its null space. Pivot columns are the columns of the original matrix corresponding to leading columns in an echelon form.
 
-## Key results
+## How pivots account for dimension
 
 All bases of a finite-dimensional vector space have the same number of vectors. This makes dimension well-defined. The proof idea is the exchange principle: an independent set cannot contain more vectors than a spanning set, because each independent vector consumes one necessary direction.
 
@@ -50,7 +50,7 @@ $$
 
 This is the rank-nullity theorem for matrices. Row reduction proves it: each of the $n$ variables is either a pivot variable or a free variable. Pivot variables count rank; free variables count nullity.
 
-The pivot columns of the original matrix form a basis for the column space. The nonzero rows of an echelon form form a basis for the row space. Row operations preserve row space only up to row-equivalent span, but they do not preserve the original column vectors, so column-space bases must be selected from the original columns.
+The pivot columns of the original matrix form a basis for the column space. The nonzero rows of an echelon form form a basis for the row space. Row operations preserve the row space, but they do not preserve the original column vectors, so column-space bases must be selected from the original columns.
 
 If $A$ is an $m\times n$ matrix, then
 
@@ -59,8 +59,6 @@ $$
 $$
 
 The rank is also the dimension of the row space. This equality of row rank and column rank is one of the fundamental structural results of matrix theory.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -82,7 +80,7 @@ flowchart TD
 | Null space | solve $A\mathbf{x}=\mathbf{0}$ | nullity |
 | Basis for $V$ | independent spanning set | $\dim(V)$ |
 
-## Worked example 1: Find bases and rank
+## Extracting bases and rank from one reduction
 
 Problem: find bases for the column space, row space, and null space of
 
@@ -142,7 +140,7 @@ $$
 
 The rank is $2$.
 
-## Worked example 2: Find a null-space basis and verify rank-nullity
+## Parameterizing the corresponding null space
 
 Continue with the same matrix. The reduced equations are
 
@@ -202,7 +200,7 @@ $$
 
 Checked answer: the dimension count is consistent.
 
-## Code
+## Exact basis calculations in SymPy
 
 ```python
 import sympy as sp
@@ -220,7 +218,7 @@ print("nullspace:", A.nullspace())
 
 SymPy returns exact rational row reduction and exact bases. This is useful for studying rank and nullity because floating-point row reduction can obscure exact dependence.
 
-## Common pitfalls
+## Choosing bases without losing the original structure
 
 - Taking pivot columns from the row-reduced matrix as a column-space basis. Use the pivot column positions, but take the columns from the original matrix.
 - Confusing rank with the number of rows. Rank counts independent directions, not raw matrix size.
@@ -239,7 +237,7 @@ Coordinates relative to a basis are not universal. The same vector can have diff
 
 When a matrix is used as a linear transformation, rank is the dimension of the range. This gives a geometric interpretation to column space: it is the set of all outputs the transformation can produce. Nullity is the dimension of the kernel: it counts independent directions in the input that are sent to zero. The rank-nullity theorem says the domain dimension splits into visible output directions and lost directions.
 
-Basis selection is not unique. A vector space has many possible bases, and a subspace often has many possible basis lists. What is invariant is the number of vectors in any basis. This is why dimension is meaningful even though the basis itself can be chosen for convenience. In computation, one basis may be sparse, another orthogonal, and another adapted to eigenvectors.
+Basis selection is not unique. A vector space has many possible bases, and a subspace often has many possible basis lists. What is invariant is the number of vectors in any basis, so dimension remains meaningful even though the basis itself can be chosen for convenience. In computation, one basis may be sparse, another orthogonal, and another adapted to eigenvectors.
 
 A final check on basis answers is reconstruction. If you claim a list spans a space, choose a typical vector in that space and show how it is expressed as a linear combination. If you claim independence, set a general linear combination equal to zero and show every coefficient must vanish. These two tests are the definition, and they remain reliable even when the space consists of polynomials, matrices, or functions.
 
@@ -247,13 +245,10 @@ In applications, rank often measures effective complexity. A data matrix with lo
 
 Dimension arguments are also useful for impossibility claims. Four vectors in $\mathbb{R}^3$ cannot be independent. Two vectors cannot span $\mathbb{R}^3$. A linear map from $\mathbb{R}^5$ to $\mathbb{R}^3$ cannot be one-to-one. These conclusions follow from dimension before any detailed arithmetic is done.
 
-When stuck, count dimensions first. Dimension counts do not solve every problem, but they often tell you what kind of answer is possible.
+When stuck, count dimensions first. The count often tells you what kind of answer is possible; row reduction or a spanning argument then finds vectors that realize it.
 
-Then use row reduction or a spanning argument to find the actual vectors that realize that count.
+<div className="see-also">
 
-## Connections
+See also: [Gaussian Elimination](/math/linear-algebra/gaussian-elimination) · [General Vector Spaces](/math/linear-algebra/vector-spaces) · [Matrix Inverses and Elementary Matrices](/math/linear-algebra/matrix-inverses-and-elementary-matrices) · [Linear Transformations](/math/linear-algebra/linear-transformations)
 
-- [Gaussian Elimination](/math/linear-algebra/gaussian-elimination)
-- [General Vector Spaces](/math/linear-algebra/vector-spaces)
-- [Matrix Inverses and Elementary Matrices](/math/linear-algebra/matrix-inverses-and-elementary-matrices)
-- [Linear Transformations](/math/linear-algebra/linear-transformations)
+</div>

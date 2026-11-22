@@ -319,9 +319,8 @@ Creating the temporary file in the target directory keeps replacement on the sam
 - Checking existence and assuming a later open cannot race with another process.
 - Loading valid JSON or CSV and skipping application-level schema validation.
 
-## Related pages
+<div className="see-also">
 
-- [Strings and Text Processing](/cs/programming/python/strings-and-text-processing)
-- [Errors, Exceptions, and Debugging](/cs/programming/python/errors-exceptions-and-debugging)
-- [Modules, Packages, and Environments](/cs/programming/python/modules-packages-and-environments)
-- [Standard Library Highlights](/cs/programming/python/standard-library-highlights)
+See also: [Strings and Text Processing](/cs/programming/python/strings-and-text-processing) · [Errors, Exceptions, and Debugging](/cs/programming/python/errors-exceptions-and-debugging) · [Modules, Packages, and Environments](/cs/programming/python/modules-packages-and-environments) · [Standard Library Highlights](/cs/programming/python/standard-library-highlights)
+
+</div>

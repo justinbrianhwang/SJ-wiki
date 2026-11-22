@@ -7,7 +7,7 @@ sidebar_position: 4
 
 Searching asks where an item is, whether it exists, or which item has a specified rank. The problem looks elementary, but its variants cover a large part of algorithms: sequential scans, binary decisions over sorted order, selection by partitioning, hash-table lookup, balanced search trees, external-memory indexes, and probabilistic skip structures [1], [2].
 
-The right search method depends on what structure is available before the query arrives. If the data is unsorted and not indexed, a linear scan is unavoidable in the worst case. If the data is sorted, comparison search can discard half or more of the remaining candidates per step. If many queries arrive over a changing set, hash tables and balanced trees shift work into an updateable index. This page connects these options and emphasizes the invariants that make search code correct.
+The right search method depends on what structure is available before the query arrives. If the data is unsorted and not indexed, a linear scan is unavoidable in the worst case. If the data is sorted, comparison search can discard half or more of the remaining candidates per step. If many queries arrive over a changing set, hash tables and balanced trees shift work into an updateable index. The choice follows from the query contract, update pattern, and available ordering.
 
 ![Binary search example over an array.](https://commons.wikimedia.org/wiki/Special:FilePath/Binary_search_into_array_-_example.svg)
 
@@ -17,7 +17,7 @@ The right search method depends on what structure is available before the query 
 
 *Figure: Logarithmic search grows slowly as the array grows. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Binary_search_complexity.svg), public domain or CC-BY-SA via Wikimedia Commons.*
 
-## Definitions
+## Search contracts and indexes
 
 The basic dictionary search problem maintains a set $S$ of keys and supports `find(x)`, which returns whether $x\in S$ and often returns the associated record. A **static** search structure is built once and queried many times. A **dynamic** search structure also supports insertions and deletions.
 
@@ -27,7 +27,7 @@ An **order statistic** is the element of rank $k$ in sorted order. The minimum i
 
 A **hash table** maps keys to array positions through a hash function $h$. With chaining, each table slot stores a list or small bucket of keys. With open addressing, all keys live directly in the table and collisions are resolved by probing. The **load factor** $\alpha=n/m$ is the ratio between stored keys and table slots; it controls expected lookup cost under ordinary hashing assumptions. Cuckoo hashing uses two or more possible positions per key and moves existing keys when necessary [9].
 
-## Key results
+## From scans to dynamic dictionaries
 
 Linear search scans each element until it finds the target or exhausts the input. It is optimal when nothing is known about the array: an adversary can place the target in the final unchecked position. Its cost is $O(n)$ time and $O(1)$ space, and it is the fallback inside many more structured algorithms for tiny subproblems.
 
@@ -46,8 +46,6 @@ Selection asks for rank rather than membership. Quickselect uses the same partit
 Hash-based search gives expected $O(1)$ lookup when the hash function spreads keys well and the load factor is controlled. Chaining is simple and robust under deletion. Open addressing improves locality but requires careful handling of tombstones and resizing. Linear probing has cache-friendly runs but suffers from primary clustering; quadratic probing and double hashing reduce some clustering effects. Cuckoo hashing offers worst-case constant lookup after successful insertion because each key has a small fixed set of candidate cells, but insertion can trigger cycles and table rebuilds [9].
 
 Tree-based search preserves sorted order. A plain binary search tree can degrade to a linked list, but AVL trees and red-black trees maintain height $O(\log n)$ through rotations. B-trees and B+ trees store many keys per node so a search visits few disk pages or cache lines; they are the standard structure behind database and filesystem indexes. Skip lists use random levels to simulate balanced search paths with simpler code and expected $O(\log n)$ time [10].
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -74,7 +72,9 @@ flowchart TD
 | Hash table | hashable keys | expected $O(1)$ | $O(n)$ | Dynamic dictionaries |
 | Balanced tree | ordered keys | $O(\log n)$ | $O(n)$ | Range queries and ordered iteration |
 
-## Worked example 1: binary search for first occurrence
+## Search invariants by hand
+
+### Binary search for the first occurrence
 
 **Problem.** Find the first occurrence of $4$ in
 
@@ -90,7 +90,7 @@ $$A=[1,2,4,4,4,7,9].$$
 
 **Checked answer.** The lower bound is index $2$. Because $2\lt n$ and $A[2]=4$, the first occurrence exists and is at index $2$. If the target had been $5$, the same search would return insertion position $5$, and the equality check would reject it.
 
-## Worked example 2: Quickselect for the k-th smallest
+### Quickselect for the fourth-smallest element
 
 **Problem.** Find the 4th smallest element of
 
@@ -110,7 +110,7 @@ Use 1-based rank $k=4$.
 
 **Checked answer.** Sorting the original array gives $[1,2,3,4,5,6,7,8]$, whose 4th element is $4$. Quickselect found it without sorting the right side of the first partition.
 
-## Code
+## Lower bounds and randomized selection
 
 ```python
 from random import randrange
@@ -155,7 +155,7 @@ if __name__ == "__main__":
     print(quickselect([8, 3, 2, 7, 4, 1, 6, 5], 3))
 ```
 
-## Common pitfalls
+## Boundary and indexing failures
 
 - Writing binary search without a clear invariant, then patching off-by-one errors by trial.
 - Returning the first equality seen when the required contract is first occurrence.
@@ -169,15 +169,6 @@ if __name__ == "__main__":
 - Deleting from open-addressed hash tables without tombstones or cluster repair.
 - Using a plain BST when adversarial insertion order can make height $n$.
 - Choosing a B-tree minimum degree without considering cache-line and page size.
-
-## Connections
-
-- [Sorting Algorithms](/cs/algorithms/sorting-algorithms) because sorted order enables binary, interpolation, and exponential search.
-- [Randomized Algorithms](/cs/algorithms/randomized-algorithms) for randomized quickselect, skip lists, and hashing assumptions.
-- [Data Structures](/cs/data-structures/intro) for hash tables, balanced trees, B-trees, and skip lists.
-- [Divide and Conquer](/cs/algorithms/divide-and-conquer) for binary search and selection recurrences.
-- [Approximation Algorithms](/cs/algorithms/approximation-algorithms) where binary search over an answer is often paired with feasibility tests.
-- [Discrete Math](/math/discrete/intro) for order, predicates, and proof by invariant.
 
 ## References
 
@@ -204,3 +195,16 @@ if __name__ == "__main__":
 [11] G. M. Adelson-Velsky and E. M. Landis, "An algorithm for the organization of information," *Soviet Mathematics Doklady*, vol. 3, pp. 1259-1263, 1962.
 
 [12] R. Bayer and E. M. McCreight, "Organization and maintenance of large ordered indexes," *Acta Informatica*, vol. 1, pp. 173-189, 1972.
+
+<div className="see-also">
+
+See also:
+
+- [Sorting Algorithms](/cs/algorithms/sorting-algorithms) because sorted order enables binary, interpolation, and exponential search.
+- [Randomized Algorithms](/cs/algorithms/randomized-algorithms) for randomized quickselect, skip lists, and hashing assumptions.
+- [Data Structures](/cs/data-structures/intro) for hash tables, balanced trees, B-trees, and skip lists.
+- [Divide and Conquer](/cs/algorithms/divide-and-conquer) for binary search and selection recurrences.
+- [Approximation Algorithms](/cs/algorithms/approximation-algorithms) where binary search over an answer is often paired with feasibility tests.
+- [Discrete Math](/math/discrete/intro) for order, predicates, and proof by invariant.
+
+</div>

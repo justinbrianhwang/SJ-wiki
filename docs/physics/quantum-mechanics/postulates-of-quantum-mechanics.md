@@ -9,7 +9,7 @@ The postulates are the grammar that lets experiments, probabilities, and time ev
 
 Sakurai builds this grammar from Stern-Gerlach experiments and Dirac notation, so the postulates feel operational rather than decorative. Ballentine states the same mathematics with more emphasis on ensembles and probability distributions, warning that a state vector need not be read as a literal property list for one individual system. The Gottfried-named notes use a conventional postulate-first structure. Schiff's older wave-mechanics style is best treated here as the coordinate-representation version of the same rules.
 
-## Definitions
+## The mathematical contract
 
 A **pure state** is represented by a normalized vector $\vert \psi\rangle$ in a complex Hilbert space, with physically identical rays $\vert \psi\rangle$ and $e^{i\alpha}\vert \psi\rangle$. Normalization means
 
@@ -67,7 +67,7 @@ $$
 
 conditioned on obtaining the result $a$. This is a rule for idealized sharp measurement. Ballentine's ensemble reading keeps the same probability formula but treats "collapse" more cautiously, as a change in the statistical description after selection.
 
-## Key results
+## Spectra, compatibility, and unitary evolution
 
 The spectral decomposition of a discrete self-adjoint observable is
 
@@ -132,8 +132,6 @@ $$
 
 Thus the postulates are not independent slogans. Hilbert space gives superposition, self-adjoint operators give possible values, the Born rule gives probabilities, projection gives ideal state update, and unitary time evolution tells how amplitudes change between measurements.
 
-## Visual
-
 ```mermaid
 flowchart TB
   Prep["Preparation<br/>repeatable lab procedure or ensemble filter"] --> State{"State representation"}
@@ -158,7 +156,7 @@ flowchart TB
   Next -. "new observable" .-> Obs
 ```
 
-This postulates diagram spells out every operational block: preparation, state representation, observable, spectral projectors, Born probabilities, state update, and unitary dynamics. Pure and mixed states share the same measurement architecture once probabilities are written with projectors or traces. The feedback arrow shows sequential measurement structure, where the output state of one measurement becomes the input state for the next observable.
+The diagram follows a preparation through state representation, spectral projectors, Born probabilities, state update, and unitary dynamics. Pure and mixed states share the same measurement architecture once probabilities are written with projectors or traces. The feedback arrow shows the sequential structure: the output state of one measurement becomes the input state for the next observable.
 
 | Postulate | Mathematical form | Sakurai emphasis | Ballentine emphasis |
 |---|---|---|---|
@@ -167,7 +165,7 @@ This postulates diagram spells out every operational block: preparation, state r
 | Measurement | $P(a)=\langle\psi\vert P_a\vert \psi\rangle$ | sequential measurement changes state | selection changes ensemble description |
 | Dynamics | $i\hbar d\vert \psi\rangle/dt=H\vert \psi\rangle$ | unitary operator first | transformation and symmetry structure |
 
-## Worked example 1: Spin-z measurement from a tilted state
+## Reading a tilted spin state in the $z$ basis
 
 **Problem.** A spin-1/2 particle is prepared in
 
@@ -214,7 +212,7 @@ $$
 
 **Checked answer.** The phase $\phi$ does not affect an $S_z$ measurement, and the limiting cases work: $\theta=0$ gives $P(+)=1$, while $\theta=\pi$ gives $P(-)=1$.
 
-## Worked example 2: Compatibility and a repeated measurement
+## Why an ideal measurement repeats
 
 **Problem.** A system is prepared in
 
@@ -260,27 +258,7 @@ $$
 
 **Checked answer.** The certainty of the repeated result is a feature of ideal projective measurement, not of arbitrary real measuring devices. Ballentine would describe the selected subensemble as now represented by $\vert a_2\rangle$.
 
-## Code
-
-```python
-import numpy as np
-
-hbar = 1.0
-theta = np.pi / 3
-phi = np.pi / 5
-
-psi = np.array([np.cos(theta / 2), np.exp(1j * phi) * np.sin(theta / 2)])
-sz = 0.5 * hbar * np.array([[1, 0], [0, -1]], dtype=complex)
-
-prob_plus = abs(psi[0]) ** 2
-prob_minus = abs(psi[1]) ** 2
-expectation = np.vdot(psi, sz @ psi).real
-
-print(prob_plus, prob_minus, prob_plus + prob_minus)
-print(expectation)
-```
-
-## Common pitfalls
+## Reading the postulates without losing the experiment
 
 - Treating a global phase $e^{i\alpha}$ as observable. It changes the vector but not the physical ray.
 - Squaring an amplitude without taking its complex modulus. The probability is $\vert c\vert ^2$, not $c^2$.
@@ -295,14 +273,12 @@ When using the postulates in a calculation, separate three layers that are easy 
 
 A good diagnostic for measurement problems is to ask whether the outcome is selected or ignored. If the outcome is selected, use a conditional projected state. If the apparatus interacts with the system but the record is discarded, sum over all possible outcomes in the density-matrix description. These two procedures produce different final states. This distinction becomes important in decoherence, spin echo, and any problem where a later interference experiment asks whether phase information survived.
 
-Another frequent source of mistakes is the phrase "the system is in an eigenstate after measurement." That statement is incomplete when the measured eigenvalue is degenerate. The ideal measurement places the state in the eigenspace associated with the result; it does not necessarily choose a unique vector inside that eigenspace. Additional compatible observables are needed to refine the state further. This is why complete sets of commuting observables matter in atomic and angular-momentum problems.
+Another frequent source of mistakes is the phrase "the system is in an eigenstate after measurement." That statement is incomplete when the measured eigenvalue is degenerate. The ideal measurement places the state in the eigenspace associated with the result; it does not necessarily choose a unique vector inside that eigenspace. Additional compatible observables are needed to refine the state further. Complete sets of commuting observables supply that refinement in atomic and angular-momentum problems.
 
 The four-source synthesis is useful here because the books put pressure on different assumptions. Sakurai makes the postulates feel like rules inferred from sequential analyzer experiments. Ballentine insists that probability language be taken seriously and not replaced by vague individual-particle imagery. The Gottfried-style postulate list is efficient for reference. Schiff's wave-mechanics approach reminds you that the same postulates must reproduce familiar differential-equation boundary-value problems.
 
-## Connections
+<div className="see-also">
 
-- [Dirac notation and Hilbert spaces](/physics/quantum-mechanics/dirac-notation-hilbert-spaces)
-- [Spin-1/2 systems](/physics/quantum-mechanics/spin-one-half-systems)
-- [Quantum dynamics and pictures](/physics/quantum-mechanics/quantum-dynamics-pictures)
-- [Density operator, entanglement, and decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence)
-- [Measurement and interpretation](/physics/quantum-mechanics/measurement-interpretation)
+See also: [Dirac notation and Hilbert spaces](/physics/quantum-mechanics/dirac-notation-hilbert-spaces) · [Spin-1/2 systems](/physics/quantum-mechanics/spin-one-half-systems) · [Quantum dynamics and pictures](/physics/quantum-mechanics/quantum-dynamics-pictures) · [Density operator, entanglement, and decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence) · [Measurement and interpretation](/physics/quantum-mechanics/measurement-interpretation)
+
+</div>

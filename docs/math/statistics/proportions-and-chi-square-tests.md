@@ -384,10 +384,8 @@ The chi-square function returns the expected-count table. Always inspect it; a p
 - Using chi-square tests for percentages without the underlying counts.
 - Reporting association as causation in an observational contingency table.
 
-## Related pages
+<div className="see-also">
 
-- [Probability basics](/math/statistics/probability-basics)
-- [Random variables and probability distributions](/math/statistics/random-variables-and-distributions)
-- [Normal, t, chi-square, and F distributions](/math/statistics/normal-t-chi-square-and-f-distributions)
-- [Hypothesis testing logic](/math/statistics/hypothesis-testing-logic)
-- [Effect size, nonparametric methods, and resampling](/math/statistics/effect-size-nonparametric-and-resampling)
+See also: [Probability basics](/math/statistics/probability-basics) · [Random variables and probability distributions](/math/statistics/random-variables-and-distributions) · [Normal, t, chi-square, and F distributions](/math/statistics/normal-t-chi-square-and-f-distributions) · [Hypothesis testing logic](/math/statistics/hypothesis-testing-logic) · [Effect size, nonparametric methods, and resampling](/math/statistics/effect-size-nonparametric-and-resampling)
+
+</div>

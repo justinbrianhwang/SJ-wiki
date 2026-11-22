@@ -9,11 +9,7 @@ The variational principle and WKB approximation are complementary tools for prob
 
 Sakurai introduces WKB among elementary solutions of the Schrodinger equation and uses variational ideas in approximation methods. Ballentine gives a substantial variational-method treatment in the bound-state chapter and discusses semiclassical limits separately. The Gottfried-named notes include WKB and perturbative comparisons in approximation methods. Schiff's classic presentation is especially close to the traditional one-dimensional WKB connection-formula style.
 
-![A particle-in-a-box diagram shows standing-wave probability structure between hard walls.](https://commons.wikimedia.org/wiki/Special:FilePath/Particle_in_a_box.svg)
-
-*Figure: The infinite square well is the simplest visual example of confinement producing discrete energy levels. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Particle_in_a_box.svg), Pieter Kuiper, public domain.*
-
-## Definitions
+## Two approximations with different control parameters
 
 For a normalized trial state $\vert \alpha\rangle$, the variational energy is
 
@@ -67,7 +63,7 @@ $$
 \exp\left(\pm {1\over\hbar}\int^x \kappa(x')\,dx'\right).
 $$
 
-## Key results
+## Upper bounds, quantization, and tunneling
 
 The variational principle proof is short. Expand a normalized trial state in exact energy eigenstates:
 
@@ -87,7 +83,7 @@ $$
 \langle H\rangle\geq E_0\sum_n |c_n|^2=E_0.
 $$
 
-This is why a bad trial state still gives an upper bound for the ground energy, assuming the Hamiltonian is bounded below and the trial state is in the domain of $H$.
+Even a poor trial state gives an upper bound for the ground energy, provided the Hamiltonian is bounded below and the trial state lies in the domain of $H$.
 
 For one-dimensional bound states with two classical turning points $x_1,x_2$, WKB quantization gives
 
@@ -102,8 +98,6 @@ T\sim \exp\left[-{2\over\hbar}\int_{x_1}^{x_2}\sqrt{2m(V(x)-E)}\,dx\right].
 $$
 
 Variational methods are global and energy-focused; WKB is local and phase-focused. Ballentine's treatment highlights variational control for bound-state estimates, while Sakurai's path from WKB to propagators helps connect semiclassical phases with action.
-
-## Visual
 
 ```text
 WKB regions for a barrier
@@ -128,7 +122,7 @@ forbidden:  exponential decay/growth exp(+- integral kappa dx / hbar)
 | WKB tunneling | forbidden-region action | exponential transmission scale | best when action is large vs $\hbar$ |
 | Perturbation | small operator change | series corrections | fails near degeneracy or large coupling |
 
-## Worked example 1: Variational estimate for hydrogen ground energy
+## Why an exponential trial state solves hydrogen exactly
 
 **Problem.** Use the trial wave function
 
@@ -186,7 +180,7 @@ for hydrogen to standard precision.
 
 **Checked answer.** The chosen trial family contains the exact ground-state shape, so the variational estimate reaches the exact nonrelativistic ground energy.
 
-## Worked example 2: WKB quantization of the harmonic oscillator
+## The oscillator action integral
 
 **Problem.** Use WKB quantization for
 
@@ -237,7 +231,7 @@ $$
 
 **Checked answer.** WKB gives the exact oscillator spectrum because the quadratic potential is unusually friendly to the semiclassical quantization rule.
 
-## Code
+## Scanning a variational parameter numerically
 
 ```python
 import numpy as np
@@ -253,7 +247,7 @@ print("best alpha:", alphas[best])
 print("best energy:", energies[best])
 ```
 
-## Common pitfalls
+## Choosing the trial family and the WKB region
 
 - Forgetting that the variational estimate is an upper bound only for the ground state, not automatically for excited states without extra orthogonality constraints.
 - Minimizing an unnormalized expectation $\langle\psi\vert H\vert \psi\rangle$ without dividing by $\langle\psi\vert \psi\rangle$.
@@ -271,14 +265,12 @@ WKB should be read as an expansion in slowly varying phase. The approximation is
 
 The two methods can also check each other. Variational estimates give upper bounds for bound-state energies, while WKB often gives accurate high-quantum-number spectra and tunneling exponents. If both methods are applicable and disagree strongly, examine whether the trial family is too restrictive or whether the WKB action is too small for semiclassical reasoning. Ballentine's separation of variational and classical-limit topics helps keep these domains distinct.
 
-For multidimensional systems, variational thinking often generalizes more directly than elementary WKB. A trial wave function can include correlations, anisotropic widths, or basis expansions, and the same Rayleigh quotient applies. WKB in several dimensions requires more geometric machinery because classical trajectories, caustics, and phases replace a single one-dimensional action integral. This is why introductory courses usually teach WKB in one dimension but use variational estimates broadly.
+For multidimensional systems, variational thinking often generalizes more directly than elementary WKB. A trial wave function can include correlations, anisotropic widths, or basis expansions, and the same Rayleigh quotient applies. WKB in several dimensions requires more geometric machinery because classical trajectories, caustics, and phases replace a single one-dimensional action integral. Introductory treatments therefore tend to keep WKB in one dimension while using variational estimates more broadly.
 
 Numerically, variational methods become the Rayleigh-Ritz method: choose a finite basis, build the Hamiltonian matrix, and diagonalize it. The lowest eigenvalue in the chosen subspace is an upper bound to the true ground energy. Enlarging the basis can only improve or leave unchanged that variational estimate. This connects hand trial functions to practical computational quantum mechanics.
 
-## Connections
+<div className="see-also">
 
-- [One-dimensional Schrodinger systems](/physics/quantum-mechanics/one-dimensional-schrodinger-systems)
-- [Central potentials and the hydrogen atom](/physics/quantum-mechanics/central-potentials-hydrogen-atom)
-- [Time-independent perturbation theory](/physics/quantum-mechanics/time-independent-perturbation-theory)
-- [Path integral formulation](/physics/quantum-mechanics/path-integral-formulation)
-- [Scattering theory](/physics/quantum-mechanics/scattering-theory)
+See also: [One-dimensional Schrodinger systems](/physics/quantum-mechanics/one-dimensional-schrodinger-systems) · [Central potentials and the hydrogen atom](/physics/quantum-mechanics/central-potentials-hydrogen-atom) · [Time-independent perturbation theory](/physics/quantum-mechanics/time-independent-perturbation-theory) · [Path integral formulation](/physics/quantum-mechanics/path-integral-formulation) · [Scattering theory](/physics/quantum-mechanics/scattering-theory)
+
+</div>

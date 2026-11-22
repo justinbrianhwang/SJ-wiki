@@ -7,13 +7,9 @@ sidebar_position: 16
 
 Statistical significance asks whether data are surprising under a null model. It does not say whether an effect is large, important, stable, or useful. Effect sizes, meta-analytic thinking, nonparametric methods, and resampling all push analysis beyond a single p-value. The Lane text includes power, effect size, and distribution-free tests near the end because they refine how statistical evidence should be judged.
 
-![Anscombe's quartet shows four scatterplots with similar summary statistics.](https://commons.wikimedia.org/wiki/Special:FilePath/AnscombeQuartet.svg)
+These tools answer different but related questions. Effect sizes put results on interpretable scales. Meta-analysis combines evidence across studies. Rank and sign tests reduce reliance on particular distributional or measurement assumptions. Bootstrap intervals estimate uncertainty by resampling the observed data. Permutation tests build a null distribution by rearranging labels according to the null hypothesis.
 
-*Figure: Anscombe's quartet shows why visualization matters even when numerical summaries agree. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:AnscombeQuartet.svg), Gabry, CC BY-SA 3.0.*
-
-These tools answer different but related questions. Effect sizes put results on interpretable scales. Meta-analysis combines evidence across studies. Nonparametric tests reduce reliance on normality or interval-scale assumptions. Bootstrap intervals estimate uncertainty by resampling the observed data. Permutation tests build a null distribution by rearranging labels according to the null hypothesis. Together, they encourage a more complete view of evidence.
-
-## Definitions
+## Putting magnitude on an interpretable scale
 
 An **effect size** is a numerical measure of the magnitude of a phenomenon. For a one-sample or paired mean difference, a standardized effect size may be
 
@@ -59,6 +55,17 @@ $$
 
 for a $2\times2$ table with cell counts $a,b,c,d$.
 
+Effect sizes are not context-free labels. Cohen's $d$ depends on the standard deviation used, the measurement scale, and the population. A value called "small" in one field may be practically large in another. Report units when possible; standardized units help compare studies but can hide practical meaning.
+
+| Measure | Main question | Interpretive caution |
+|---|---|---|
+| Cohen's $d$ | How large is a mean difference in SD units? | Its magnitude depends on the chosen SD and context |
+| Risk difference | How many more outcomes occur on an absolute probability scale? | Baseline risk matters |
+| Relative risk | How many times as likely is the outcome? | The same ratio can represent very different absolute changes |
+| Odds ratio | How much larger are the odds? | It can exaggerate the risk ratio when outcomes are common |
+
+## Combining estimates across studies
+
 A **meta-analysis** combines effect estimates from multiple studies, often weighting more precise studies more heavily. A simple fixed-effect weighted mean is
 
 $$
@@ -72,21 +79,21 @@ $$
 w_i=\frac{1}{SE_i^2}.
 $$
 
-A **nonparametric method** is a method that does not assume a specific parametric form such as normality. The sign test uses only directions of paired differences. The Wilcoxon signed-rank test uses ranks of absolute paired differences with signs. The Mann-Whitney test, also called Wilcoxon rank-sum, compares two independent groups using ranks.
+Inverse-variance weighting is a model choice, not a guarantee that studies estimate one common effect. Differences in populations, protocols, and measurements can create heterogeneity that a fixed-effect average does not represent.
+
+## Choosing ranks, signs, or resampling
+
+A **nonparametric method** does not specify a finite-dimensional parametric model for the full population distribution. Such methods still make assumptions about sampling, dependence, exchangeability, symmetry, or distributional shape. The sign test uses only directions of paired differences. The Wilcoxon signed-rank test uses ranks of absolute paired differences with signs. The Mann-Whitney test, also called Wilcoxon rank-sum, compares two independent groups using ranks.
 
 A **bootstrap** resamples cases with replacement from the observed data to approximate the sampling distribution of a statistic. A **permutation test** rearranges labels or signs in a way that represents the null hypothesis, then compares the observed statistic with the randomization distribution.
-
-## Key results
-
-Effect sizes are not assumption-free labels. Cohen's $d$ depends on the standard deviation used, the measurement scale, and the population. A value called "small" in one field may be practically large in another. Report units when possible; standardized units help compare studies but can hide practical meaning.
 
 Nonparametric tests often test hypotheses about distributions or typical ranks, not always exactly the same mean hypothesis as a $t$ test. The sign test is robust but may have low power because it ignores magnitudes. Wilcoxon signed-rank uses more information but assumes the distribution of paired differences is reasonably symmetric for its usual median-difference interpretation. Mann-Whitney is often described as a median test, but that interpretation is clean only under similar distribution shapes; more generally it tests stochastic ordering.
 
 Bootstrap methods are powerful because they can estimate uncertainty for statistics with complicated formulas. The basic percentile bootstrap interval takes the middle percentiles of bootstrap statistics. However, the bootstrap depends on the observed sample representing the population well. It cannot fix biased sampling, extreme dependence, or severe undercoverage of rare population features.
 
-Permutation tests are attractive because their null distribution is generated from the actual data and randomization structure. For a two-group randomized experiment under a sharp null of no treatment effect, treatment labels are exchangeable. Shuffling labels repeatedly gives a valid reference distribution for the difference in means. The p-value is the fraction of shuffled statistics at least as extreme as the observed statistic, with a small adjustment often used to avoid zero p-values in simulation.
+Permutation tests are attractive because their null distribution follows the data and randomization structure. For a two-group randomized experiment under a sharp null of no treatment effect, treatment labels are exchangeable. Shuffling labels repeatedly gives a valid reference distribution for the difference in means. With $B$ simulated permutations and $b$ statistics at least as extreme as the observation, $(b+1)/(B+1)$ avoids reporting a zero Monte Carlo p-value.
 
-## Visual
+The method choice depends on what the design permits and what quantity needs uncertainty:
 
 ```mermaid
 flowchart TD
@@ -112,7 +119,7 @@ flowchart TD
 | Bootstrap | How variable is a statistic? | Flexible | Needs representative sample |
 | Permutation test | Is observed statistic extreme under relabeling null? | Design-based | Exchangeability must be justified |
 
-## Worked example 1: Effect size and meta-analytic weighted average
+## Reaction-time effect and inverse-variance synthesis
 
 Problem: Two independent groups complete a reaction-time task. Group A has $n_1=24$, $\bar{x}_1=510$ ms, $s_1=80$ ms. Group B has $n_2=22$, $\bar{x}_2=455$ ms, $s_2=70$ ms. Compute Cohen's $d$ for A minus B. Then combine three study estimates of the same standardized effect: 0.40 with $SE=0.20$, 0.55 with $SE=0.25$, and 0.20 with $SE=0.10$ using inverse-variance weights.
 
@@ -197,7 +204,7 @@ Answer: The reaction-time standardized difference is about $d=0.73$, with Group 
 
 Checked answer: The largest weight is 100 for $SE=0.10$, so the combined estimate should be pulled toward 0.20. The computed value 0.275 confirms that behavior.
 
-## Worked example 2: Sign test and permutation-test logic
+## Paired changes by signs and relabeling
 
 Problem: Ten patients record pain score before and after a therapy. The paired differences after minus before are
 
@@ -251,7 +258,7 @@ Answer: The sign-test p-value is about 0.0195, giving evidence that pain tends t
 
 Checked answer: The result is plausible because 8 of 9 nonzero changes are decreases. The sign test ignores that some decreases are larger than others; the permutation mean-difference test would use those magnitudes.
 
-## Code
+## Computing the three resampling analyses
 
 ```python
 import numpy as np
@@ -274,7 +281,8 @@ for _ in range(20_000):
     signs = rng.choice([-1, 1], size=n)
     stats_null.append((np.abs(nonzero) * signs).mean())
 stats_null = np.array(stats_null)
-p_perm = np.mean(stats_null <= observed)
+b = np.sum(stats_null <= observed)
+p_perm = (b + 1) / (len(stats_null) + 1)
 print(f"observed mean diff = {observed:.3f}, permutation p = {p_perm:.4f}")
 
 # Bootstrap confidence interval for the median difference
@@ -285,21 +293,19 @@ for _ in range(20_000):
 print(np.percentile(boot_medians, [2.5, 97.5]))
 ```
 
-The sign test uses an exact binomial tail. The permutation test simulates the null distribution by sign-flipping paired differences. The bootstrap interval resamples observed pairs and summarizes uncertainty for the median difference.
+The sign test uses an exact binomial tail. The permutation test simulates the null distribution by sign-flipping paired differences and includes the observed arrangement in the Monte Carlo p-value. The bootstrap interval resamples observed pairs and summarizes uncertainty for the median difference.
 
-## Common pitfalls
+## Assumptions that still matter
 
 - Treating p-values as effect sizes.
 - Calling a standardized effect "large" without domain context.
 - Using odds ratios as if they were risk ratios when outcomes are common.
-- Thinking nonparametric means assumption-free. Rank and sign methods still have design and interpretation assumptions.
+- Calling a method nonparametric does not remove its design and interpretation assumptions.
 - Bootstrapping a biased or unrepresentative sample and expecting the resampling to fix the bias.
 - Permuting labels when the design does not make labels exchangeable.
 
-## Connections
+<div className="see-also">
 
-- [Hypothesis testing logic](/math/statistics/hypothesis-testing-logic)
-- [Tests for means](/math/statistics/tests-for-means)
-- [ANOVA](/math/statistics/anova)
-- [Proportions and chi-square tests](/math/statistics/proportions-and-chi-square-tests)
-- [Linear regression inference](/math/statistics/linear-regression-inference)
+See also: [Hypothesis testing logic](/math/statistics/hypothesis-testing-logic) · [Tests for means](/math/statistics/tests-for-means) · [ANOVA](/math/statistics/anova) · [Proportions and chi-square tests](/math/statistics/proportions-and-chi-square-tests) · [Linear regression inference](/math/statistics/linear-regression-inference)
+
+</div>

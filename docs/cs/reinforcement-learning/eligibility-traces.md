@@ -9,7 +9,7 @@ Eligibility traces provide a bridge between one-step TD methods and Monte Carlo 
 
 Sutton and Barto use eligibility traces to unify many earlier ideas. TD($\lambda$), SARSA($\lambda$), true online TD($\lambda$), Watkins's Q($\lambda$), and tree-backup traces differ in how traces are accumulated, cleared, or weighted, but they share the idea that credit assignment should extend over time without waiting for a full episode.
 
-## Definitions
+## The forward view: mixing return horizons
 
 The $\lambda$-return is a geometrically weighted average of n-step returns:
 
@@ -19,6 +19,8 @@ G_t^\lambda =
 $$
 
 in the continuing case, with appropriate truncation in episodic tasks. The parameter $0\le\lambda\le1$ controls how much weight goes to longer returns. $\lambda=0$ gives the one-step TD target. $\lambda=1$ approaches the Monte Carlo return in episodic tasks.
+
+## The backward view: traces in parameter space
 
 For linear value prediction, the accumulating eligibility trace is
 
@@ -51,13 +53,13 @@ Watkins's Q($\lambda$) is an off-policy control method that cuts traces when a n
 
 True online TD($\lambda$) modifies the backward view so that it more exactly matches the online forward view at every time step, not only approximately or at episode end.
 
-## Key results
+## Credit assignment across time
 
-Eligibility traces solve a practical credit-assignment problem. One-step TD propagates information one step per update. Monte Carlo propagates complete returns but waits until episode end and can have high variance. TD($\lambda$) can propagate a TD error backward through many recent states immediately, with influence decaying according to $\gamma\lambda$.
+Eligibility traces address credit assignment across several time steps. One-step TD propagates information one step per update. Monte Carlo propagates complete returns but waits until episode end and can have high variance. TD($\lambda$) can propagate a TD error backward through many recent states immediately, with influence decaying according to $\gamma\lambda$.
 
 The forward view is conceptually clean: update toward $G_t^\lambda$. The backward view is computationally useful: update with $\delta_t\mathbf{z}_t$. Under appropriate conditions, these views are equivalent for offline updates, and true online TD($\lambda$) sharpens the equivalence for online learning with changing weights.
 
-The trace parameter $\lambda$ is not just "memory length." The effective decay is $\gamma\lambda$, so discounting also shortens credit assignment. With $\gamma=0.9$ and $\lambda=0.8$, a trace decays by $0.72$ each step before any new activation.
+The trace parameter $\lambda$ does not by itself specify a "memory length." The effective decay is $\gamma\lambda$, so discounting also shortens credit assignment. With $\gamma=0.9$ and $\lambda=0.8$, a trace decays by $0.72$ each step before any new activation.
 
 Accumulating traces can exceed $1$ for repeatedly visited states or features. Replacing traces set the active trace to $1$ instead of adding $1$, which can improve behavior in some tabular tasks by preventing repeated visits from producing very large traces. With function approximation, trace variants require more care.
 
@@ -68,8 +70,6 @@ Eligibility traces can be understood as a memory of responsibility. A state visi
 In function approximation, the trace vector lives in parameter space rather than as a table over states. If $\hat v(s,\mathbf{w})$ is linear, the trace accumulates feature vectors. If the approximator is nonlinear, the trace accumulates gradients. This makes traces compatible with approximation in principle, but it also means that feature scaling and changing gradients affect how credit is distributed.
 
 True online TD($\lambda$) is important because ordinary accumulating-trace TD can diverge from the intended online forward view as weights change during an episode. The true-online correction keeps the computational advantages of the backward view while matching the forward-view target more faithfully at each step.
-
-## Visual
 
 ```mermaid
 flowchart TB
@@ -100,7 +100,7 @@ flowchart TB
   Update -. "same mechanism with variant trace rules" .-> Control
 ```
 
-This eligibility-trace diagram shows the online backward view in parameter order: decay traces, accumulate the current state's feature gradient, compute the TD error, and update every eligible weight. The forward-view subgraph names the lambda-return as a weighted mixture of n-step returns, while the control-variant subgraph distinguishes SARSA(lambda), replacing traces, and Watkins's trace cutting. The key shape transition is from one visited state-action to a trace vector `z` that distributes the current TD error over recent history.
+The online backward view proceeds in parameter order: decay traces, accumulate the current state's feature gradient, compute the TD error, and update every eligible weight. The forward-view subgraph treats the lambda-return as a weighted mixture of n-step returns, while the control-variant subgraph distinguishes SARSA(lambda), replacing traces, and Watkins's trace cutting. A trace vector `z` distributes the current TD error over recent history.
 
 | $\lambda$ value | Target behavior | Credit assignment | Typical effect |
 |---:|---|---|---|
@@ -109,7 +109,7 @@ This eligibility-trace diagram shows the online backward view in parameter order
 | $1$ episodic | Monte Carlo-like | Long credit assignment to episode start | Less bootstrap bias, higher variance |
 | With trace cutting | Greedy off-policy consistency | Stops credit after nongreedy actions | Useful for Watkins's Q($\lambda$) |
 
-## Worked example 1: Tabular TD(lambda) trace and update
+## Tracing one tabular TD($\lambda$) update
 
 Problem: Three states $A,B,C$ have current values $V(A)=0$, $V(B)=1$, $V(C)=2$. The agent is in $B$, the previous traces are $z(A)=0.5$, $z(B)=0$, $z(C)=0$, and it receives reward $R_{t+1}=3$ before moving to $C$. Let $\gamma=0.9$, $\lambda=0.8$, and $\alpha=0.1$. Use accumulating traces and compute the updates.
 
@@ -158,7 +158,7 @@ $$
 
 Check: The current state receives the largest update, but the previously eligible state $A$ also receives credit.
 
-## Worked example 2: Lambda-return as a weighted mixture
+## Computing a truncated lambda-return
 
 Problem: Suppose the one-step, two-step, and three-step returns from a time $t$ are $G_{t:t+1}=2$, $G_{t:t+2}=5$, and $G_{t:t+3}=9$, and the episode ends at $t+3$. Let $\lambda=0.5$. Compute the truncated episodic $\lambda$-return:
 
@@ -188,7 +188,7 @@ $$
 
 Check: The weights sum to $1$, and the result lies between the smallest and largest component return. The checked answer is $4.5$.
 
-## Code
+## A random-walk experiment with accumulating traces
 
 ```python
 import numpy as np
@@ -224,19 +224,17 @@ for _ in range(1000):
 print(np.round(V[1:6], 3))
 ```
 
-## Common pitfalls
+## Trace bookkeeping that easily goes wrong
 
-- Treating $\lambda$ as the only decay factor. Traces decay by $\gamma\lambda$, not just $\lambda$.
+- Treating $\lambda$ as the only decay factor. Traces decay by the product $\gamma\lambda$.
 - Forgetting to reset traces at episode boundaries.
 - Mixing forward-view and backward-view formulas without checking whether the algorithm is offline, online, accumulating, replacing, or true online.
 - Letting traces grow unintentionally in loops with accumulating traces. Replacing traces may be more appropriate in some tabular control tasks.
 - Failing to cut traces in Watkins's Q($\lambda$) after nongreedy actions.
 - Assuming traces remove the need for exploration. They improve credit assignment after experience occurs; they do not guarantee useful experience.
 
-## Connections
+<div className="see-also">
 
-- [n-step bootstrapping](/cs/reinforcement-learning/n-step-bootstrapping)
-- [Temporal-difference learning](/cs/reinforcement-learning/temporal-difference-learning)
-- [On-policy control with approximation](/cs/reinforcement-learning/on-policy-control-approximation)
-- [Off-policy methods with approximation](/cs/reinforcement-learning/off-policy-approximation)
-- [Linear algebra](/math/linear-algebra/)
+See also: [n-step bootstrapping](/cs/reinforcement-learning/n-step-bootstrapping) · [Temporal-difference learning](/cs/reinforcement-learning/temporal-difference-learning) · [On-policy control with approximation](/cs/reinforcement-learning/on-policy-control-approximation) · [Off-policy methods with approximation](/cs/reinforcement-learning/off-policy-approximation) · [Linear algebra](/math/linear-algebra/intro)
+
+</div>

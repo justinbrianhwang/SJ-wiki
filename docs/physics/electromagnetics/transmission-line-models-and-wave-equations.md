@@ -7,13 +7,13 @@ sidebar_position: 5
 
 Transmission lines are the bridge from circuit theory to field theory. When a wire pair, coaxial cable, or microstrip is electrically short, the entire interconnect can be approximated by a lumped impedance. When its physical length is a significant fraction of wavelength, voltage and current vary along the structure, propagation delay matters, and reflections can dominate behavior. That is the moment when a wire stops being a simple node connection and becomes a distributed electromagnetic system.
 
-The transmission-line model keeps the circuit variables $v(z,t)$ and $i(z,t)$, but lets them depend on position. Its distributed parameters $R'$, $L'$, $G'$, and $C'$ summarize the fields around the conductors per unit length. This page develops the telegrapher equations, wave propagation, characteristic impedance, and the lossless-line formulas used later for standing waves and matching.
+The transmission-line model keeps the circuit variables $v(z,t)$ and $i(z,t)$, but lets them depend on position. Its distributed parameters $R'$, $L'$, $G'$, and $C'$ summarize the fields around the conductors per unit length. From them come the telegrapher equations, characteristic impedance, propagation delay, and the lossless-line formulas used for standing waves and matching.
 
 ![A coaxial cable cutaway shows conductor, dielectric, shield, and jacket layers.](https://commons.wikimedia.org/wiki/Special:FilePath/Coaxial_cable_cutaway.svg)
 
 *Figure: A coaxial line makes distributed inductance, capacitance, impedance, and guided waves tangible. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Coaxial_cable_cutaway.svg), Tkgd2007, CC BY 3.0.*
 
-## Definitions
+## Replacing a cable with distributed parameters
 
 A uniform transmission line is modeled by per-unit-length parameters:
 
@@ -74,7 +74,7 @@ The $+$ superscript denotes a wave traveling in the $+z$ direction; the $-$ supe
 
 The current expression is not symmetric with the voltage expression because a backward voltage wave carries current in the negative $z$ direction. This sign convention is the source of many later formulas, including the reflection coefficient and input impedance. A forward wave alone has $\tilde V/\tilde I=Z_0$; a backward wave alone has $\tilde V/\tilde I=-Z_0$ when current is defined positive in the $+z$ direction.
 
-## Key results
+## What the telegrapher equations imply
 
 The telegrapher equations come from applying Kirchhoff voltage and current laws to a differential segment $\Delta z$ and then taking the limit $\Delta z\to 0$. Although the derivation looks like circuit theory, the parameters represent electromagnetic storage and loss:
 
@@ -107,11 +107,11 @@ The distributed model is also an energy model. In a small section $\Delta z$, ma
 
 A lossy line changes the interpretation of $Z_0$. It can become complex because voltage and current are no longer exactly in phase for a single traveling wave. The attenuation constant $\alpha$ accounts for conductor heating through $R'$ and dielectric leakage through $G'$. At high frequency, practical lines may also have frequency-dependent $R'$ and $G'$, producing dispersion and waveform distortion even when the telegrapher form still applies locally.
 
-The distributed viewpoint also changes how "ground" and "return current" are understood. A signal on a two-conductor line is not carried by one conductor alone; the electromagnetic field occupies the space between and around conductors, and the return path shapes both $L'$ and $C'$. In microstrip, for example, some field exists in the substrate and some in air, so an effective permittivity is used rather than simply the substrate permittivity. This is why layout geometry is part of the circuit at high frequency.
+The distributed viewpoint also changes how "ground" and "return current" are understood. A signal on a two-conductor line occupies the electromagnetic field between and around both conductors, and the return path shapes $L'$ and $C'$. In microstrip, some field exists in the substrate and some in air, so the model uses an effective permittivity rather than the substrate value alone. Layout geometry is therefore part of the high-frequency circuit.
 
-A line can be electrically long even in ordinary digital hardware. The fastest spectral content of an edge, not just the clock frequency, sets the shortest relevant wavelength. Controlled impedance, continuous return planes, and careful transitions keep the distributed parameters predictable so the telegrapher model remains useful.
+A line can be electrically long even in ordinary digital hardware. The fastest spectral content of an edge, rather than the clock frequency alone, sets the shortest relevant wavelength. Controlled impedance, continuous return planes, and careful transitions keep the distributed parameters predictable so the telegrapher model remains useful.
 
-## Visual
+### Deriving propagation from an infinitesimal segment
 
 ```mermaid
 flowchart LR
@@ -131,8 +131,6 @@ flowchart LR
   Match --> Result
 ```
 
-The transmission-line diagram starts from the per-unit-length equivalent circuit and derives the telegrapher equations through KVL and KCL. The wave-equation layer then exposes the propagation constant, attenuation, phase, characteristic impedance, delay, wavelength, and matching condition. The labeled branches make the energy-storage roles of $L'$ and $C'$ and the loss roles of $R'$ and $G'$ explicit.
-
 | Case | $\gamma$ | $Z_0$ | Main behavior |
 |---|---|---|---|
 | General lossy | $\sqrt{(R'+j\omega L')(G'+j\omega C')}$ | $\sqrt{(R'+j\omega L')/(G'+j\omega C')}$ | attenuation plus phase |
@@ -140,7 +138,7 @@ The transmission-line diagram starts from the per-unit-length equivalent circuit
 | Low-loss | $\alpha+j\beta$ with small $\alpha$ | nearly real | weak attenuation |
 | Matched load | same line $\gamma$ | $Z_L=Z_0$ | no reflected wave |
 
-## Worked example 1: Lossless line parameters
+## Extracting lossless-line parameters
 
 Problem: A lossless transmission line has $L'=250\ \mathrm{nH/m}$ and $C'=100\ \mathrm{pF/m}$. Find $Z_0$, phase velocity, wavelength at $100\ \mathrm{MHz}$, and electrical length of a $0.75$ m section.
 
@@ -177,7 +175,7 @@ $$
 
 Check: The line is much longer than $\lambda/10=0.2$ m, so distributed effects cannot be ignored.
 
-## Worked example 2: Time delay and phase shift
+## Separating cable delay from sinusoidal phase
 
 Problem: A $3$ m cable has phase velocity $2.4\times 10^8\ \mathrm{m/s}$. A $200\ \mathrm{MHz}$ sinusoid enters the cable. Find the one-way delay and phase shift.
 
@@ -207,7 +205,7 @@ $$
 
 Check: The absolute propagation delay is still $12.5$ ns. The reduced phase only describes a steady sinusoid, not the arrival time of a modulation envelope.
 
-## Code
+## Checking impedance, velocity, and electrical length
 
 ```python
 import numpy as np
@@ -229,19 +227,23 @@ print(f"lambda = {wavelength:.3f} m")
 print(f"electrical length = {theta_deg:.1f} degrees")
 ```
 
-## Common pitfalls
+## Distributed quantities that invite lumped-circuit mistakes
 
-- Treating a long line as a lumped wire because its dc resistance is small. Propagation delay and reflection are separate from resistance.
-- Confusing $Z_0$ with the actual input impedance. $Z_0$ is a property of the line; input impedance also depends on load and length.
-- Forgetting that the current expression has a minus sign for the reflected wave.
-- Using free-space wavelength when the wave travels in a dielectric line.
-- Assuming a matched line means no voltage or current. It means no reflected wave; power still travels to the load.
-- Applying lossless formulas to a line where conductor or dielectric loss is important.
-- Forgetting that $R'$, $L'$, $G'$, and $C'$ are per-unit-length values. Multiplying or dividing by length incorrectly changes units and physical meaning.
+- Low dc resistance does not make an electrically long interconnect a lumped wire; propagation delay and reflection are separate effects.
+- $Z_0$ is a property of the line, whereas input impedance also depends on load and length.
+- The reflected-wave term in the current expression carries a minus sign under the stated current convention.
+- Wavelength must be computed with the line's phase velocity, not the free-space value.
+- A matched line still carries voltage, current, and power; it has no reflected wave.
+- Lossless formulas can fail when conductor or dielectric loss matters.
+- $R'$, $L'$, $G'$, and $C'$ are per-unit-length quantities; mishandling the length factor changes both units and meaning.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Waves, phasors, and spectrum](/physics/electromagnetics/waves-phasors-spectrum) for sinusoidal traveling-wave notation.
 - [Reflections, Smith chart, and matching](/physics/electromagnetics/reflections-smith-chart-and-matching) for load effects.
 - [Transmission-line transients and power](/physics/electromagnetics/transmission-line-transients-and-power) for bounce diagrams and time-domain behavior.
 - [Plane waves in media](/physics/electromagnetics/plane-waves-lossless-lossy-polarization) for the field analogue of guided propagation.
+
+</div>

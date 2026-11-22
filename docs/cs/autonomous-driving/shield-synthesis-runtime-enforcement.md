@@ -9,7 +9,7 @@ Roderick Bloem, Bettina Koenighofer, Robert Koenighofer, and Chao Wang's "Shield
 
 The key promise is narrow but powerful. The shield is not a full verified self-driving stack. It enforces a small set of critical safety properties, such as "do not command acceleration when a protected stop condition is active" or "do not switch directly between mutually exclusive maneuver states without a neutral transition." Because the shield is synthesized from the safety specification rather than from the whole controller implementation, it can be much smaller and easier to certify than the controller it guards.
 
-## Problem & motivation
+## Why runtime enforcement sits between checking and synthesis
 
 Model checking can prove that a design satisfies a temporal specification, but the complete controller may be too large, proprietary, learned, or underspecified to verify directly [2]. Reactive synthesis goes further by generating a correct implementation from a complete specification [3], but writing a complete specification for a complex system can be as hard as building the system. Bloem et al. propose a middle path: specify only the safety-critical properties, synthesize a shield from those properties, and attach the shield at runtime [1].
 
@@ -17,7 +17,7 @@ Runtime enforcement already existed before this paper, but reactive systems have
 
 For autonomous driving, this distinction matters. A vehicle stack is reactive: each perception update produces state estimates, a planner produces trajectories or control targets, and the actuator interface expects a command now. A safety shield for AVs would sit near the boundary between [decision making](/cs/autonomous-driving/decision-making-and-behavior-planning), [motion planning](/cs/autonomous-driving/motion-planning), and low-level [control](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley). It would enforce a small contract tied to the ODD, safety case, and fallback policy described in [Safety, ISO 26262, SOTIF, and Scenario Testing](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing).
 
-## Method
+## Mealy machines, safety automata, and $k$-stabilizing shields
 
 The paper models a reactive design as a Mealy machine
 
@@ -71,7 +71,7 @@ $$
 
 time if one exists, where $R$ and $V$ summarize the relevant product automata sizes [1]. The exponential term comes from the subset construction and safety-game state space, which is why shield specifications should stay small and safety-critical rather than trying to encode a whole planner.
 
-## Architecture diagram
+### Runtime placement of the synthesized shield
 
 ```mermaid
 flowchart LR
@@ -86,7 +86,7 @@ flowchart LR
   Vehicle --> Sensors
 ```
 
-## Architecture details
+## From traffic lights to AV command interfaces
 
 The original paper's examples are hardware-style reactive systems, not AV planners. The main running example is a traffic-light controller with input $p$ indicating an approaching emergency vehicle and outputs $h,f$ for highway and farm-road lights. The critical properties are: never output both lights green; if emergency preemption is active, both lights must be red; and never switch directly from highway-green/farm-red to highway-red/farm-green or vice versa without passing through all-red [1].
 
@@ -107,7 +107,7 @@ For AV use, the same architecture would usually guard a smaller command interfac
 
 This AV framing is supplementary to the paper, but it is the reason the method belongs in an autonomous-driving safety section. It provides a formal wrapper around complex planning software, including learned systems, without pretending that the whole stack has been synthesized from a complete specification.
 
-## Datasets & results
+## What the prototype synthesized
 
 The paper evaluates a proof-of-concept Python implementation using CUDD BDDs, with output in Verilog and SMV and optional checking with VIS [1]. The benchmark groups are selected traffic-light properties, selected ARM AMBA bus-arbiter properties, and selected LTL specification patterns from Dwyer et al. [6]. These are formal-methods benchmarks, not driving datasets.
 
@@ -123,11 +123,11 @@ The traffic-light execution trace is especially instructive. A buggy controller 
 
 The AMBA example shows the same principle in bus-control form. A design incorrectly believes a burst has advanced because it mishandles an input condition. The shield blocks a forbidden subsequent burst-start signal, waits until the design and shield can resynchronize, and then lets normal operation continue [1].
 
-## Worked example
+## Stepping through minimal correction and recovery
 
 ### Example 1: Minimal correction for a traffic-light output
 
-Problem: Use the paper's traffic-light rules for the simple invariant case. Encode red as $0$ and green as $1$. The emergency input is $p$, and the controller outputs $(h,f)$ for highway and farm-road lights. Enforce:
+For the paper's simple invariant case, encode red as $0$ and green as $1$. The emergency input is $p$, and the controller outputs $(h,f)$ for highway and farm-road lights. Enforce:
 
 $$
 \begin{aligned}
@@ -168,7 +168,7 @@ $$
 
 and $p=0$, so the emergency rule is inactive.
 
-Answer: a minimally interfering correction is $(1,0)$. The shield changes only the farm-road light from green to red.
+A minimally interfering correction is $(1,0)$. The shield changes only the farm-road light from green to red.
 
 Now consider $p=1$ and design output $(h,f)=(1,0)$.
 
@@ -184,11 +184,11 @@ $$
 d((1,0),(0,0))=1.
 $$
 
-Answer: the shield must output all-red. Even though the design already made one road red, emergency preemption requires both roads red.
+The shield must output all-red. Even though the design already made one road red, emergency preemption requires both roads red.
 
 ### Example 2: A $k$-stabilization counter
 
-Problem: Suppose $k=2$. A shield detects that the design leaves the winning region at step $t=5$. Another violation appears at step $t=6$. Track whether the shield is in normal, recovery, or fail-safe mode under the paper's default rule.
+Suppose $k=2$. A shield detects that the design leaves the winning region at step $t=5$, and another violation appears at step $t=6$. The mode evolves as follows under the paper's default rule.
 
 1. Before the violation:
 
@@ -222,9 +222,9 @@ $$
 
 However, minimum-interference guarantees are relaxed. The shield may now deviate as much as needed to keep the critical safety specification true.
 
-Answer: with $k=2$, the first violation starts a two-step recovery window. A second violation inside that window causes fail-safe mode, where the shield still enforces safety but no longer promises minimal deviation.
+With $k=2$, the first violation starts a two-step recovery window. A second violation inside that window causes fail-safe mode, where the shield still enforces safety but no longer promises minimal deviation.
 
-## Code
+## A small traffic-light shield
 
 ```python
 from dataclasses import dataclass
@@ -268,7 +268,7 @@ for emergency, proposed in trace:
     print(proposed, "=>", shield.correct(emergency, proposed))
 ```
 
-## Common pitfalls
+## What a shield does not prove
 
 - Treating a shield as proof that the whole controller is correct. The shield enforces the specified critical properties; unspecified behavior can still be wrong.
 - Writing an overlarge safety specification. Shield synthesis is attractive because the critical property set is small; encoding the whole AV stack can recreate the original scalability problem.
@@ -278,20 +278,7 @@ for emergency, proposed in trace:
 - Applying the method to vague policies. "Drive safely" is not a safety automaton; usable shields need precise state variables, inputs, outputs, and forbidden transitions.
 - Confusing fail-safe mode with failure. Fail-safe mode means the shield stops optimizing deviation, not that it stops enforcing the critical properties.
 
-## Connections
-
-- [Safety, ISO 26262, SOTIF, and Scenario Testing](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing)
-- [Simulation and Data](/cs/autonomous-driving/simulation-and-data)
-- [Sensors, Cameras, LiDAR, Radar, and IMU](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu)
-- [Decision Making and Behavior Planning](/cs/autonomous-driving/decision-making-and-behavior-planning)
-- [Motion Planning](/cs/autonomous-driving/motion-planning)
-- [Control: PID, MPC, Pure Pursuit, and Stanley](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley)
-- [Finite Automata and DFAs](/cs/theory/finite-automata-and-dfas)
-- [Invariants and Temporal Logic](/cs/embedded/invariants-and-temporal-logic)
-- [Reachability and Model Checking](/cs/embedded/reachability-and-model-checking)
-- [Adversarial Attacks](/cs/adversarial-attacks/)
-
-## References
+## Sources for shield synthesis
 
 [1] R. Bloem, B. Koenighofer, R. Koenighofer, and C. Wang, "Shield Synthesis: Runtime Enforcement for Reactive Systems," in *Proc. Computer Aided Verification*, 2015.
 
@@ -304,3 +291,9 @@ for emergency, proposed in trace:
 [5] R. Mazala, "Infinite Games," in *Automata, Logics, and Infinite Games: A Guide to Current Research*, LNCS 2500, Springer, 2001, pp. 23-42.
 
 [6] M. B. Dwyer, G. S. Avrunin, and J. C. Corbett, "Patterns in Property Specifications for Finite-State Verification," in *Proc. ICSE*, 1999, pp. 411-420.
+
+<div className="see-also">
+
+See also: [Safety, ISO 26262, SOTIF, and Scenario Testing](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing) · [Simulation and Data](/cs/autonomous-driving/simulation-and-data) · [Sensors, Cameras, LiDAR, Radar, and IMU](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu) · [Decision Making and Behavior Planning](/cs/autonomous-driving/decision-making-and-behavior-planning) · [Motion Planning](/cs/autonomous-driving/motion-planning) · [Control: PID, MPC, Pure Pursuit, and Stanley](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley) · [Finite Automata and DFAs](/cs/theory/finite-automata-and-dfas) · [Invariants and Temporal Logic](/cs/embedded/invariants-and-temporal-logic) · [Reachability and Model Checking](/cs/embedded/reachability-and-model-checking) · [Adversarial Attacks](/cs/adversarial-attacks/intro)
+
+</div>

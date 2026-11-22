@@ -7,9 +7,9 @@ sidebar_position: 8
 
 An algorithm is a finite, precise procedure for solving a class of problems. Discrete mathematics studies algorithms at two levels: correctness and cost. Correctness asks whether the algorithm always returns the intended answer. Complexity asks how resource use grows as the input size grows.
 
-The subject is not just about writing code. It is about describing a procedure independently of a programming language, proving that the procedure terminates with the right result, and estimating the amount of work needed for large inputs. This is why algorithms connect proof techniques, functions, sums, recurrence relations, number theory, graphs, and computation theory.
+The subject goes beyond writing code: a procedure must be described independently of a programming language, proved to terminate with the right result, and assigned a cost that remains meaningful for large inputs. Algorithm analysis therefore draws on proof techniques, functions, sums, recurrence relations, number theory, graphs, and computation theory.
 
-## Definitions
+## What an algorithm analysis records
 
 An **algorithm** has specified input, specified output, definiteness of each step, correctness, finiteness, and effectiveness. Pseudocode abstracts away machine details while keeping the logical structure. A step is effective when it can be carried out exactly in a finite amount of time by the intended model of computation.
 
@@ -25,7 +25,7 @@ Worst-case complexity bounds the maximum cost over all inputs of size $n$. Best-
 
 A **loop invariant** is a statement true before and after each loop iteration. It is the standard tool for proving iterative algorithms correct. A recursive algorithm is usually proved correct by induction on the input size or on the recursive structure.
 
-## Key results
+## From exact operation counts to growth rates
 
 If
 
@@ -61,7 +61,7 @@ For powers of two, the recursion tree has $\log_2 n$ nontrivial levels, and each
 
 Polynomial time is usually treated as feasible in theoretical computer science, while exponential time often becomes infeasible quickly. This is a classification, not a stopwatch. Constants, memory locality, implementation details, and input distribution still matter in real programs.
 
-## Visual
+An analysis typically moves back and forth between design, proof, and cost. A poor bound may point back to structure the first design failed to exploit.
 
 ```mermaid
 flowchart TD
@@ -86,7 +86,7 @@ flowchart TD
 | $O(2^n)$ | all subsets | exponential |
 | $O(n!)$ | all permutations | factorial |
 
-## Worked example 1: Count comparisons in binary search
+## How many comparisons binary search needs
 
 **Problem.** A sorted list has $1000$ elements. What is the maximum number of comparisons binary search needs to decide whether a target is present?
 
@@ -115,7 +115,7 @@ $$
 
 **Checked answer.** The worst-case number of comparisons is $\lceil\log_2 1000\rceil=10$. This count is independent of the target value; it depends on the repeated-halving structure.
 
-## Worked example 2: Analyze a brute-force closest-pair algorithm
+## Cost of brute-force closest pair
 
 **Problem.** Given $n$ points in the plane, analyze the brute-force algorithm that computes the squared distance between every pair and returns a closest pair.
 
@@ -140,7 +140,7 @@ $$
 
 **Checked answer.** The algorithm performs $\binom{n}{2}$ distance computations, so the time is $\Theta(n^2)$ under the usual unit-cost model. It uses $O(1)$ extra space beyond the input if it stores only the current best pair and current best squared distance.
 
-## Code
+## Reference implementations and their invariants
 
 ```python
 def binary_search(xs, target):
@@ -174,7 +174,7 @@ print(closest_pair([(0, 0), (3, 4), (1, 1), (8, 8)]))
 
 The binary-search loop invariant is that if the target is present, it is always within `xs[lo:hi+1]`. The closest-pair loop invariant is that after each completed pair check, `best` stores a pair with minimum squared distance among all pairs checked so far.
 
-## Common pitfalls
+## Where complexity arguments go wrong
 
 - Measuring integer algorithms by the value of the integer when the input size is the number of bits.
 - Ignoring loop bounds that depend on the outer loop index.
@@ -195,10 +195,14 @@ When comparing algorithms, keep the problem fixed. Linear search and binary sear
 
 For loops, derive counts from bounds rather than from visual nesting alone. Two nested loops are not automatically $\Theta(n^2)$: the inner loop might halve a variable, stop early, or depend on sparse graph degree. Summation notation is the bridge between pseudocode and asymptotic classification.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Functions, sequences, and sums](/math/discrete/functions-sequences-sums) supplies the summations used in operation counts.
 - [Proof techniques](/math/discrete/proof-techniques) supplies loop invariants, contradiction, and induction-style correctness proofs.
 - [Recurrence relations](/math/discrete/recurrence-relations) solves divide-and-conquer running times.
 - [Number theory basics](/math/discrete/number-theory-basics) gives algorithms such as Euclid's algorithm and trial division.
 - [Graph paths, connectivity, and shortest paths](/math/discrete/graph-paths-connectivity-shortest-paths) studies BFS, DFS, and shortest-path algorithms.
+
+</div>

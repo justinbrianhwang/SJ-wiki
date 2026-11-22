@@ -9,7 +9,7 @@ Information extraction turns unstructured text into structured records. Jurafsky
 
 IE is useful when the goal is not to understand every sentence completely but to populate a database, knowledge graph, alert, timeline, or report. It asks targeted questions: Which entities are mentioned? What relation holds between them? Did an event happen? Who participated? When? Was it negated, hypothetical, or certain?
 
-## Definitions
+## From mentions to relations and event records
 
 An **entity mention** is a text span referring to an entity, such as a person, organization, location, product, or date. Named entity recognition detects and classifies such mentions.
 
@@ -33,7 +33,7 @@ This expresses a `PERSON-BIRTHPLACE` relation.
 
 **Distant supervision** uses an existing knowledge base to label sentences automatically: if a KB contains relation $(e_1,r,e_2)$, sentences mentioning $e_1$ and $e_2$ are treated as noisy evidence for $r$.
 
-## Key results
+## Choosing patterns, classifiers, and open extraction
 
 Pattern-based IE is precise when language is formulaic. Hearst-style lexico-syntactic patterns can identify relations such as hyponymy, and regular expressions or finite-state transducers work well for dates, money, citations, and domain forms. The weakness is recall: natural language expresses the same relation in many ways.
 
@@ -55,7 +55,7 @@ IE evaluation can be mention-level, sentence-level, relation-level, or KB-level.
 
 A useful design distinction is closed-schema versus open-schema extraction. Closed-schema IE knows the relation or event types in advance, so it can use supervised classifiers and precise templates. OpenIE is more flexible and can discover relation phrases from text, but the resulting triples may be redundant, vague, or hard to canonicalize. Knowledge-base construction usually needs normalization after extraction: entity linking, relation clustering, type checking, and conflict resolution.
 
-The best features depend on the relation. A birthplace relation may be expressed with prepositions such as `in` or verbs such as `born`; an employment relation may require organization names and titles; a drug-side-effect relation may rely on biomedical terminology. This is why IE systems are often domain-specific. A news-trained extractor may not work on clinical notes, legal contracts, scientific papers, or social media without adaptation.
+The best features depend on the relation. A birthplace relation may be expressed with prepositions such as `in` or verbs such as `born`; an employment relation may require organization names and titles; a drug-side-effect relation may rely on biomedical terminology. IE systems are therefore often domain-specific. A news-trained extractor may not work on clinical notes, legal contracts, scientific papers, or social media without adaptation.
 
 IE should preserve provenance. A structured fact is more trustworthy when it points back to the sentence, document, date, source, and extraction confidence that produced it. Provenance supports error analysis, human review, temporal updates, and conflict handling. Without provenance, a knowledge base becomes hard to debug when the world changes or when extraction rules are revised.
 
@@ -66,8 +66,6 @@ Aggregation can improve precision but also introduce bias. If a relation is ment
 Schema design is another source of errors. If the schema lacks a slot for uncertainty, planned events, or source attribution, the system may force nuanced language into an overconfident fact. Good schemas reflect the decisions users actually need to make.
 
 Finally, IE is rarely finished at extraction time. Users need search, filtering, deduplication, confidence display, and correction workflows so extracted structure can be inspected and improved over time.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -89,9 +87,11 @@ flowchart TD
 | OpenIE | sentence | textual triples | shallow syntax patterns |
 | Template filling | document set | slot values | aggregation across mentions |
 
-## Worked example 1: relation extraction from a dependency cue
+## Two extraction decisions
 
-Problem: extract a relation from:
+### Reading relations from dependency cues
+
+Extract a relation from:
 
 ```text
 Ada Lovelace worked with Charles Babbage on the Analytical Engine.
@@ -113,11 +113,11 @@ Ada Lovelace worked with Charles Babbage on the Analytical Engine.
    - `(Ada Lovelace, Analytical Engine)`: `WORKED_ON`
    - `(Charles Babbage, Analytical Engine)`: likely `WORKED_ON`, though the sentence directly says Lovelace worked with him on it; a cautious extractor may require stronger evidence.
 
-Checked answer: at minimum, extract `COLLABORATED_WITH(Ada Lovelace, Charles Babbage)` and `WORKED_ON(Ada Lovelace, Analytical Engine)`.
+At minimum, extract `COLLABORATED_WITH(Ada Lovelace, Charles Babbage)` and `WORKED_ON(Ada Lovelace, Analytical Engine)`.
 
-## Worked example 2: template filling with negation
+### Keeping a negated acquisition out of the fact table
 
-Problem: decide whether to fill an acquisition template from:
+Decide whether to fill an acquisition template from:
 
 ```text
 Northstar said it would not acquire Bluefin in 2025.
@@ -138,9 +138,9 @@ Template slots are buyer, acquired company, and date.
    - Do not insert as a completed acquisition.
    - Store as a negated or denied acquisition statement if the schema supports factuality.
 
-Checked answer: a fact KB should not add `ACQUIRED(Northstar, Bluefin, 2025)`. The extracted event is negated.
+A fact KB should not add `ACQUIRED(Northstar, Bluefin, 2025)`. The extracted event is negated.
 
-## Code
+## A regex extractor that preserves factuality
 
 ```python
 import re
@@ -172,7 +172,7 @@ for s in [
     print(extract_acquisition(s))
 ```
 
-## Common pitfalls
+## Where structured records go wrong
 
 - Confusing entity mentions with canonical entities; coreference and linking may be needed.
 - Extracting relations from sentences where the relation is negated, hypothetical, questioned, or attributed to an unreliable source.
@@ -182,9 +182,8 @@ for s in [
 - Letting duplicate mentions create duplicate facts.
 - Ignoring temporal scope; `formerly worked at` and `currently works at` should not populate the same current-employment slot.
 
-## Connections
+<div className="see-also">
 
-- [Sequence labeling with HMMs and CRFs](/cs/nlp/sequence-labeling-hmms-crfs)
-- [Dependency parsing](/cs/nlp/dependency-parsing)
-- [Coreference resolution and entity linking](/cs/nlp/coreference-resolution-and-entity-linking)
-- [Semantic role labeling and word-sense disambiguation](/cs/nlp/semantic-role-labeling-and-word-sense-disambiguation)
+See also: [Sequence labeling with HMMs and CRFs](/cs/nlp/sequence-labeling-hmms-crfs) · [Dependency parsing](/cs/nlp/dependency-parsing) · [Coreference resolution and entity linking](/cs/nlp/coreference-resolution-and-entity-linking) · [Semantic role labeling and word-sense disambiguation](/cs/nlp/semantic-role-labeling-and-word-sense-disambiguation)
+
+</div>

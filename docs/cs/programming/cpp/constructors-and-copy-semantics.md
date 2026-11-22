@@ -368,10 +368,8 @@ Self-assignment guards are useful in direct resource-managing code, but they are
 
 Object slicing is also a copy-semantic problem. Copying a derived object into a base object by value copies only the base subobject; derived state and overriding behavior are gone. Polymorphic hierarchies normally pass objects by reference or pointer and, when value-like copying is required, provide a virtual `clone` operation returning an owning smart pointer.
 
-## Related pages
+<div className="see-also">
 
-- [classes and encapsulation](/cs/programming/cpp/classes-and-encapsulation)
-- [pointers and dynamic memory](/cs/programming/cpp/pointers-and-dynamic-memory)
-- [references and operator overloading](/cs/programming/cpp/references-and-operator-overloading)
-- [inheritance](/cs/programming/cpp/inheritance)
-- [polymorphism](/cs/programming/cpp/polymorphism-and-virtual-functions)
+See also: [classes and encapsulation](/cs/programming/cpp/classes-and-encapsulation) · [pointers and dynamic memory](/cs/programming/cpp/pointers-and-dynamic-memory) · [references and operator overloading](/cs/programming/cpp/references-and-operator-overloading) · [inheritance](/cs/programming/cpp/inheritance) · [polymorphism](/cs/programming/cpp/polymorphism-and-virtual-functions)
+
+</div>

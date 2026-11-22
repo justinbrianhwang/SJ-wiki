@@ -5,11 +5,11 @@ sidebar_position: 63
 
 # Equivalence and Refinement
 
-Equivalence and refinement answer a practical engineering question: when can one model safely replace another? In embedded-system design, an abstract model may be a specification, a detailed model may be an implementation, and an optimized model may be a later redesign. We need precise ways to say whether the new model preserves the behaviors that matter.
+Equivalence and refinement answer an engineering question: when can one model safely replace another? In embedded-system design, an abstract model may be a specification, a detailed model may be an implementation, and an optimized model may be a later redesign. The comparison must say precisely which behaviors the replacement preserves.
 
 Lee and Seshia present a ladder of increasingly strong comparisons: type refinement, language containment, simulation, and bisimulation. Each level cares about more information. Type refinement checks ports and data types. Language containment checks observable input/output behaviors. Simulation checks step-by-step state correspondence. Bisimulation checks mutual step-by-step indistinguishability, especially important for nondeterministic machines.
 
-## Definitions
+## Four levels of comparison
 
 A **specification model** describes allowed behavior. It may be more abstract and more nondeterministic than an implementation.
 
@@ -39,7 +39,21 @@ A **simulation relation** connects states of two machines so that one machine ca
 
 **Bisimulation** is mutual simulation in a stronger game where either machine may move first at each round.
 
-## Key results
+## From compatible ports to indistinguishable behavior
+
+```mermaid
+flowchart TD
+  T["Type refinement<br/>ports and values"] --> L["Language containment<br/>observable traces"]
+  L --> S["Simulation<br/>state-by-state matching"]
+  S --> B["Bisimulation<br/>mutual matching"]
+```
+
+| Relation | Compares | Good for | Too weak for |
+|---|---|---|---|
+| Type refinement | Ports and value sets | Interface compatibility | Behavioral correctness |
+| Language containment | Input/output behaviors | Trace/spec conformance | Some nondeterministic interaction |
+| Simulation | State trajectories plus outputs | Stepwise implementation checking | Full mutual substitutability |
+| Bisimulation | Mutual simulations | Observational equivalence | Intentional implementation refinement |
 
 Type refinement is necessary but weak. It prevents plugging an actor into an incompatible environment, but it says nothing about the sequence of outputs or internal states.
 
@@ -65,23 +79,7 @@ Equivalence should be used sparingly. Engineers often do not need a new model to
 
 The proof obligation should match the risk. For a private helper function, tests and type checks may be enough. For a safety-critical mode controller, a language-containment or simulation argument may be justified. For a reusable protocol component that interacts with arbitrary environments, bisimulation or a similarly strong equivalence may be worth the cost.
 
-## Visual
-
-```mermaid
-flowchart TD
-  T["Type refinement<br/>ports and values"] --> L["Language containment<br/>observable traces"]
-  L --> S["Simulation<br/>state-by-state matching"]
-  S --> B["Bisimulation<br/>mutual matching"]
-```
-
-| Relation | Compares | Good for | Too weak for |
-|---|---|---|---|
-| Type refinement | Ports and value sets | Interface compatibility | Behavioral correctness |
-| Language containment | Input/output behaviors | Trace/spec conformance | Some nondeterministic interaction |
-| Simulation | State trajectories plus outputs | Stepwise implementation checking | Full mutual substitutability |
-| Bisimulation | Mutual simulations | Observational equivalence | Intentional implementation refinement |
-
-## Worked example 1: Type refinement check
+## Checking a replacement at its interface
 
 Problem: Specification actor $A$ has one input `cmd` of type $\{stop,start\}$ and one output `speed` of type $\{0,1,2\}$. Implementation actor $B$ has input `cmd` of type $\{stop,start,pause\}$ and output `speed` of type $\{0,1\}$. Can $B$ type-refine $A$?
 
@@ -109,7 +107,7 @@ $$
 
 Answer: Yes. $B$ is a type refinement of $A$. The extra accepted input does not hurt, and the narrower output range is acceptable to an environment prepared for $A$.
 
-## Worked example 2: Language containment for a traffic light
+## Refining an untimed traffic-light specification
 
 Problem: Specification $S$ permits any finite or infinite sequence of light outputs that cycles in the order green, yellow, red, green, and so on, with possible stuttering between changes. Implementation $I$ produces exactly green for 60 ticks, yellow for 5 ticks, red for 55 ticks, then repeats. Does $I$ language-refine $S$ with respect to light outputs?
 
@@ -139,7 +137,7 @@ $$
 
 Answer: Yes. The timed implementation is a language refinement of the abstract ordering specification for the observable light outputs.
 
-## Code
+### Checking the observed light trace
 
 ```python
 def allowed_cycle(sequence):
@@ -159,7 +157,7 @@ print(allowed_cycle(impl))
 print(allowed_cycle(bad))
 ```
 
-## Common pitfalls
+## Where refinement arguments go wrong
 
 - Confusing "more detailed" with "refinement." A detailed model that admits forbidden behavior is not a valid refinement.
 - Checking only port names and ignoring type variance. Replacement has direction.
@@ -168,10 +166,8 @@ print(allowed_cycle(bad))
 - Forgetting that simulation relations are not necessarily unique.
 - Using bisimulation when ordinary refinement is intended; implementations often deliberately remove nondeterminism.
 
-## Connections
+<div className="see-also">
 
-- [discrete dynamics](/cs/embedded/discrete-dynamics)
-- [invariants and temporal logic](/cs/embedded/invariants-and-temporal-logic)
-- [reachability and model checking](/cs/embedded/reachability-and-model-checking)
-- [finite automata and DFAs](/cs/theory/finite-automata-and-dfas)
-- [composition of state machines](/cs/embedded/composition-of-state-machines)
+See also: [discrete dynamics](/cs/embedded/discrete-dynamics) · [invariants and temporal logic](/cs/embedded/invariants-and-temporal-logic) · [reachability and model checking](/cs/embedded/reachability-and-model-checking) · [finite automata and DFAs](/cs/theory/finite-automata-and-dfas) · [composition of state machines](/cs/embedded/composition-of-state-machines)
+
+</div>

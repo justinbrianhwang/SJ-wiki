@@ -7,17 +7,9 @@ sidebar_position: 1
 
 Cryptography studies mathematical techniques for protecting information against adversaries. Historically it meant secret writing, but modern cryptography is broader: encryption, authentication, key exchange, digital signatures, hash functions, secure channels, zero-knowledge proofs, and post-quantum migration. The organizing question is not "does this look scrambled?" but "what can a precisely defined adversary achieve in a precisely defined experiment?"
 
-![An Enigma cipher machine shows historical cryptography as electromechanical hardware.](https://commons.wikimedia.org/wiki/Special:FilePath/Enigma-Machine.jpg)
-
-*Figure: Enigma provides historical context for classical ciphers and cryptanalysis. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Enigma-Machine.jpg), United States Central Intelligence Agency, public domain.*
-
-![An Alice and Bob quantum-cryptography setup exchanges polarized photons over a channel.](https://commons.wikimedia.org/wiki/Special:FilePath/Alice_e_Bob_%28crittografia_quantistica%29.png)
-
-*Figure: Alice and Bob diagrams make communication and adversary models easier to track. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Alice_e_Bob_%28crittografia_quantistica%29.png), Ft1 at Italian Wikipedia, public domain.*
-
 These notes combine two complementary sources. Katz and Lindell's *Introduction to Modern Cryptography*, 2nd edition, is the canonical source for formal definitions, provable-security style, reductions, symmetric and public-key constructions, and security experiments. `IntroToCrypto.pdf` is Nigel Smart's *Cryptography: An Introduction*, a different textbook with a more applied and historical presentation; it is especially useful for hand examples, classical ciphers, Enigma-era intuition, finite-field algorithms, implementation concerns, hybrid encryption, certificates, and zero-knowledge. The post-quantum page goes beyond both books because they predate the current NIST post-quantum standards.
 
-## Definitions
+## Syntax, experiments, and reductions
 
 A **cryptographic primitive** is a basic tool with a security goal: encryption hides messages, a MAC authenticates messages under a shared key, a digital signature authenticates messages under a public key, a hash function compresses data with collision resistance, and a key exchange protocol establishes shared secrets.
 
@@ -51,7 +43,7 @@ $$
 \text{efficient attack on assumption}.
 $$
 
-The notes use the following generated chapter list:
+Reading order:
 
 | Position | Page | Main scope |
 |---:|---|---|
@@ -72,7 +64,7 @@ The notes use the following generated chapter list:
 | 16 | [Zero-knowledge proofs](/cs/cryptography/zero-knowledge-proofs) | simulation, Sigma protocols, Schnorr proof |
 | 17 | [Post-quantum cryptography](/cs/cryptography/post-quantum-cryptography) | ML-KEM, ML-DSA, SLH-DSA, migration |
 
-## Key results
+## What a security claim must say
 
 The first result is methodological: security needs formal definitions. Classical ciphers failed not merely because their designers were less clever, but because there was no precise definition forcing the designer to account for ciphertext-only attacks, repeated messages, known plaintext, chosen plaintext, chosen ciphertext, or public algorithms. Modern cryptography starts by saying what the adversary sees and what counts as a win.
 
@@ -86,9 +78,9 @@ The fifth result is that composition matters. A secure block cipher in ECB mode 
 
 These pages are proof-aware rather than proof-complete. They state the experiments, assumptions, reductions, and failure modes students need before reading full textbook proofs. Where the books differ in emphasis, the notes name the difference: Katz and Lindell supply the more rigorous provable-security path; Smart supplies more historical, applied, and implementation-facing examples.
 
-The practical habit to build while reading is to ask four questions of every construction: what is the syntax, what is the correctness statement, what is the adversary allowed to do, and what assumption would be contradicted by a successful attack? Those four questions turn a list of algorithms into a coherent subject.
+Ask four questions of every construction: what is the syntax, what is the correctness statement, what is the adversary allowed to do, and what assumption would a successful attack contradict? Those questions turn a list of algorithms into a coherent subject.
 
-## Visual
+## From classical ciphers to secure channels
 
 ```mermaid
 flowchart TD
@@ -116,7 +108,7 @@ flowchart TD
 | Key establishment | pre-shared keys, KDFs | DH, KEMs | TLS handshakes |
 | Commitment/proofs | hash commitments | zero-knowledge protocols | voting, identity, privacy systems |
 
-## Worked example 1: choosing a primitive for a secure channel
+## Building a secure channel from several primitives
 
 Problem: Alice wants to connect to a server, authenticate that it is really `example.com`, agree on fresh traffic keys, and send private application data. Which cryptographic tools appear?
 
@@ -148,7 +140,7 @@ $$
 
 Checked answer: the channel combines certificates and signatures, ephemeral key exchange, KDFs, AEAD, transcript binding, and record sequencing. No single primitive is enough.
 
-## Worked example 2: reading a security claim
+## Unpacking a reduction claim
 
 Problem: a paper claims, "If $F$ is a PRF, then construction $\Pi$ is CPA secure." What should a reader extract from that sentence?
 
@@ -166,29 +158,7 @@ Method:
 
 Checked answer: the sentence is a conditional theorem, not a blanket guarantee. It depends on exact syntax, nonce rules, proof loss, and whether the deployment matches the CPA model.
 
-## Code
-
-```python
-def choose_tool(goal: str, public_verification: bool = False) -> str:
-    goal = goal.lower()
-    if goal == "hide data":
-        return "Use AEAD with unique nonces after key establishment."
-    if goal == "authenticate message" and public_verification:
-        return "Use a digital signature scheme with verified public keys."
-    if goal == "authenticate message":
-        return "Use a MAC such as HMAC or an AEAD tag under a shared key."
-    if goal == "establish key":
-        return "Use authenticated key exchange or a KEM/DEM protocol."
-    if goal == "prove without revealing":
-        return "Use a zero-knowledge proof for a precisely defined relation."
-    return "Define the adversary and security experiment before choosing tools."
-
-for query in ["hide data", "authenticate message", "establish key"]:
-    print(query, "->", choose_tool(query))
-print(choose_tool("authenticate message", public_verification=True))
-```
-
-## Common pitfalls
+## Construction and deployment failures
 
 - Treating cryptography as a collection of interchangeable algorithms instead of definitions plus constructions.
 - Using encryption when authentication is needed, or signatures when a MAC would be enough.
@@ -199,10 +169,8 @@ print(choose_tool("authenticate message", public_verification=True))
 - Using textbook RSA, raw hashes as MACs, ECB mode, or unauthenticated CBC/CTR in new designs.
 - Reading a random-oracle proof as if it were automatically a proof for every concrete hash function.
 
-## Connections
+<div className="see-also">
 
-- [Classical ciphers and cryptanalysis](/cs/cryptography/classical-ciphers-and-cryptanalysis)
-- [Computational security definitions](/cs/cryptography/computational-security-definitions)
-- [Authenticated encryption and GCM](/cs/cryptography/authenticated-encryption-gcm)
-- [TLS protocol overview](/cs/cryptography/tls-protocol-overview)
-- [Post-quantum cryptography](/cs/cryptography/post-quantum-cryptography)
+See also: [Classical ciphers and cryptanalysis](/cs/cryptography/classical-ciphers-and-cryptanalysis) · [Computational security definitions](/cs/cryptography/computational-security-definitions) · [Authenticated encryption and GCM](/cs/cryptography/authenticated-encryption-gcm) · [TLS protocol overview](/cs/cryptography/tls-protocol-overview) · [Post-quantum cryptography](/cs/cryptography/post-quantum-cryptography)
+
+</div>

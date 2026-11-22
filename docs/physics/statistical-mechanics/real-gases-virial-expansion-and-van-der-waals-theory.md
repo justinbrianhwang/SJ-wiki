@@ -397,10 +397,8 @@ The hard core contributes positively and the well negatively. Increasing the wel
 - Van der Waals critical exponents are mean-field values. Density fluctuations close to a real fluid critical point change them.
 - $a$ and $b$ are model parameters whose numerical convention depends on whether $v$ is per particle or per mole.
 
-## Related pages
+<div className="see-also">
 
-- [Thermodynamic potentials and phase equilibrium](/physics/statistical-mechanics/thermodynamic-potentials-and-phase-equilibrium)
-- [Phase transitions and order parameters](/physics/statistical-mechanics/phase-transitions-and-order-parameters)
-- [Mean-field and Landau theory](/physics/statistical-mechanics/mean-field-and-landau-theory)
-- [Classical ideal gas and Maxwell distribution](/physics/statistical-mechanics/classical-ideal-gas-and-maxwell-distribution)
-- [Thermodynamics](/physics/thermodynamics/intro)
+See also: [Thermodynamic potentials and phase equilibrium](/physics/statistical-mechanics/thermodynamic-potentials-and-phase-equilibrium) · [Phase transitions and order parameters](/physics/statistical-mechanics/phase-transitions-and-order-parameters) · [Mean-field and Landau theory](/physics/statistical-mechanics/mean-field-and-landau-theory) · [Classical ideal gas and Maxwell distribution](/physics/statistical-mechanics/classical-ideal-gas-and-maxwell-distribution) · [Thermodynamics](/physics/thermodynamics/intro)
+
+</div>

@@ -473,9 +473,8 @@ Complex signals are often bookkeeping devices for real systems. The analytic rep
 - Forgetting that $x[2n]$ is not a compressed version containing every sample. It reads only even-indexed samples of $x[n]$.
 - Assuming discrete-time frequencies are unique. Frequencies separated by $2\pi$ produce the same sequence.
 
-## Related pages
+<div className="see-also">
 
-- [Periodicity, Energy, and Power](/physics/signals-systems/periodicity-energy-power)
-- [System Properties](/physics/signals-systems/system-properties)
-- [LTI Systems and Convolution](/physics/signals-systems/lti-systems-convolution)
-- [Discrete-Time Fourier Transform](/physics/signals-systems/discrete-time-fourier-transform)
+See also: [Periodicity, Energy, and Power](/physics/signals-systems/periodicity-energy-power) · [System Properties](/physics/signals-systems/system-properties) · [LTI Systems and Convolution](/physics/signals-systems/lti-systems-convolution) · [Discrete-Time Fourier Transform](/physics/signals-systems/discrete-time-fourier-transform)
+
+</div>

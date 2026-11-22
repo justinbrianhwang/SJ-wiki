@@ -7,9 +7,9 @@ sidebar_position: 15
 
 Vehicle-to-everything communication, or V2X, lets vehicles exchange information with other vehicles, infrastructure, pedestrians, networks, and cloud services. It can extend perception beyond line of sight, coordinate traffic signals, warn about hazards, and improve efficiency. But V2X is not a substitute for onboard autonomy because messages can be delayed, absent, spoofed, jammed, misconfigured, or unavailable across fleets and regions.
 
-This page introduces DSRC, C-V2X, V2V, V2I, V2P, V2N, cooperative perception, security, privacy, latency budgets, and deployment constraints. It connects [sensor fusion](/cs/autonomous-driving/sensor-fusion), [prediction](/cs/autonomous-driving/prediction-and-motion-forecasting), [safety](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing), and [adversarial attacks](/cs/autonomous-driving/adversarial-and-physical-attacks-on-av).
+DSRC and C-V2X carry several distinct relationships—V2V, V2I, V2P, and V2N—each with its own latency, trust, privacy, and deployment constraints. Their outputs eventually meet [sensor fusion](/cs/autonomous-driving/sensor-fusion), [prediction](/cs/autonomous-driving/prediction-and-motion-forecasting), [safety](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing), and defenses against [adversarial attacks](/cs/autonomous-driving/adversarial-and-physical-attacks-on-av).
 
-## Definitions
+## Communication modes and message types
 
 **V2X** means vehicle-to-everything communication. It includes several subtypes.
 
@@ -27,7 +27,7 @@ This page introduces DSRC, C-V2X, V2V, V2I, V2P, V2N, cooperative perception, se
 
 **SPaT** means signal phase and timing. A traffic signal can broadcast current phase and time to next phase. **MAP** messages can describe intersection geometry.
 
-## Key results
+## What a V2X message can and cannot establish
 
 V2X improves information but does not remove uncertainty. A connected traffic light may tell the vehicle when it will turn red, but the vehicle still needs to see pedestrians, construction workers, emergency vehicles, and non-connected road users. A connected vehicle may broadcast hard braking, but the ego vehicle must still verify with onboard sensors when possible.
 
@@ -55,11 +55,11 @@ Latency budgets differ by message type. A hard-braking V2V alert may need tens o
 
 V2X also raises human-factors questions. A vehicle might receive a priority request from an emergency vehicle before occupants hear a siren, or a connected work zone might request a merge earlier than visible cones. The autonomy stack can use those messages internally, but external behavior still needs to be legible to human drivers, pedestrians, police, and road workers. Connected intelligence that produces surprising motion can create risk even when the message itself is correct.
 
-Privacy controls can affect technical design. Rotating identifiers protect against long-term tracking, but rotation must not break short-term safety association. Certificates, pseudonyms, and misbehavior reporting need a balance between accountability and anonymity. For AV engineering, the important point is that V2X data is not just another sensor feed; it carries policy, trust, and governance assumptions.
+Privacy controls affect technical design. Rotating identifiers protect against long-term tracking, but rotation must not break short-term safety association. Certificates, pseudonyms, and misbehavior reporting need a balance between accountability and anonymity. V2X data carries policy, trust, and governance assumptions alongside its measurements.
 
 Operational monitoring should include communication health. Packet loss, certificate failures, clock drift, roadside-unit outages, and unusual message rates are not merely networking details; they can change whether the vehicle is still inside a V2X-dependent ODD.
 
-## Visual
+### Information paths into fusion and planning
 
 ```mermaid
 flowchart TD
@@ -77,9 +77,9 @@ flowchart TD
   I --> J
 ```
 
-## Worked example 1: Staleness from message latency
+## Estimating position staleness from latency
 
-Problem: A connected vehicle broadcasts its position while traveling at 27 m/s. The ego vehicle receives the message 150 ms later. Estimate how far the sender may have moved during that latency.
+A connected vehicle broadcasts its position while traveling at 27 m/s, and the ego vehicle receives the message 150 ms later. Estimate the sender's motion during that latency.
 
 1. Convert latency:
 
@@ -99,13 +99,13 @@ $$
 \Delta x = 27(0.150)=4.05\ \mathrm{m}.
 $$
 
-Answer: the sender may have moved about 4.05 m during the message delay.
+The sender may have moved about 4.05 m during the message delay.
 
-Check: At highway speeds, even subsecond latency creates vehicle-length position errors. Fusion should use timestamps and motion compensation.
+At highway speed, a subsecond delay can create a vehicle-length position error; fusion therefore needs timestamps and motion compensation.
 
-## Worked example 2: Bandwidth for cooperative perception
+## Budgeting object-list bandwidth
 
-Problem: A roadside unit sends 50 object detections at 10 Hz. Each detection message uses 64 bytes after packing. Estimate raw payload bandwidth in kilobytes per second.
+A roadside unit sends 50 object detections at 10 Hz, with 64 packed bytes per detection. The raw payload budget follows directly.
 
 1. Bytes per update:
 
@@ -131,11 +131,11 @@ $$
 32000 / 1000 = 32\ \mathrm{kB/s}.
 $$
 
-Answer: the raw payload is about 32 kB/s before protocol overhead, signatures, retries, or compression.
+The raw payload is about 32 kB/s before protocol overhead, signatures, retries, or compression.
 
-Check: Cooperative perception can become bandwidth-heavy if it sends dense point clouds or images. Object-level messages are cheaper but less rich.
+Dense point clouds or images cost far more bandwidth. Object-level messages are cheaper but discard evidence that feature- or sensor-level fusion could use.
 
-## Code
+## Authenticating, aging, and motion-compensating a message
 
 ```python
 from dataclasses import dataclass
@@ -166,11 +166,11 @@ msg = V2XMessage("veh-12", 100.0, 10.0, 2.0, 27.0, 0.0, True)
 print(compensate_message(msg, receive_time_s=100.15))
 ```
 
-## Recent systems and papers
+## A cooperative BEV detector on TUMTraf V2X
 
 Shahbaz and Agarwal's TUMTraf V2X system is a concrete cooperative-perception example for V2I camera-LiDAR fusion rather than just a communication protocol case study [1]. In the DriveX 2026 cooperative 3D object detection setting, the detector uses three infrastructure cameras together with a dataset-provided, pre-registered infrastructure-plus-vehicle point cloud from the [TUMTraf V2X dataset](/cs/autonomous-driving/tumtraf-v2x-dataset), then fuses evidence in a shared BEV representation [1]. The LiDAR side voxelizes the fused point cloud and builds BEV features with an attention-style pillar encoder and large-kernel BEV backbone, while the camera side lifts EfficientNet/FPN image features into BEV using calibration and a small set of sampled heights [1]. Fusion is mid-level: camera BEV features predict a squeeze-and-excitation gate over LiDAR BEV channels, the gated LiDAR and camera maps are concatenated, and a CenterPoint-style head predicts 3D boxes with an IoU-quality score used to rerank detections [1]. For V2X engineering, the important limitation is that the benchmark input already supplies a registered fused point cloud, so packet loss, online registration, clock drift, bandwidth scheduling, and trust management are mostly outside the experiment; a deployed version would still need to decide whether raw points, BEV features, boxes, or tracks cross the V2I link [1]. The paper also reports that 44 of 50 public test frames overlapped released train or validation data, so its 0.85 public score is best read as a useful architecture result with benchmark-leakage caveats, while higher overlap-focused studies are diagnostics rather than clean generalization evidence [1].
 
-## Common pitfalls
+## Failure modes beyond the radio link
 
 - Treating V2X as guaranteed infrastructure. Many roads and agents will be unequipped.
 - Trusting messages without authentication and plausibility checks. Spoofed or faulty messages can create unsafe behavior.
@@ -179,16 +179,14 @@ Shahbaz and Agarwal's TUMTraf V2X system is a concrete cooperative-perception ex
 - Forgetting non-connected vulnerable road users. Pedestrians and cyclists must remain safe without devices.
 - Overlooking privacy. Persistent identifiers can turn safety beacons into tracking infrastructure.
 
-## Connections
+## Standards and references
 
-- [Sensor fusion](/cs/autonomous-driving/sensor-fusion)
-- [Prediction and motion forecasting](/cs/autonomous-driving/prediction-and-motion-forecasting)
-- [Safety, ISO 26262, SOTIF, and scenario testing](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing)
-- [Adversarial and physical attacks on AV](/cs/autonomous-driving/adversarial-and-physical-attacks-on-av)
-- [Embedded systems](/cs/embedded/)
-- [Physics of signals and systems](/physics/signals-systems/)
-- Further reading: IEEE 802.11p and DSRC materials, 3GPP C-V2X specifications, ETSI and SAE V2X message standards, cooperative perception papers, and vehicular PKI literature.
-
-## References
+Relevant primary material includes IEEE 802.11p and DSRC documents, 3GPP C-V2X specifications, ETSI and SAE message standards, cooperative-perception research, and vehicular-PKI literature.
 
 [1] M. Shahbaz and S. Agarwal, "Camera and LiDAR BEV Fusion for Cooperative 3D Object Detection on TUMTraf V2X," arXiv:2606.12981, 2026.
+
+<div className="see-also">
+
+See also: [Sensor fusion](/cs/autonomous-driving/sensor-fusion) · [Prediction and motion forecasting](/cs/autonomous-driving/prediction-and-motion-forecasting) · [Safety, ISO 26262, SOTIF, and scenario testing](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing) · [Adversarial and physical attacks on AV](/cs/autonomous-driving/adversarial-and-physical-attacks-on-av) · [Embedded systems](/cs/embedded/intro) · [Physics of signals and systems](/physics/signals-systems/intro)
+
+</div>

@@ -5,15 +5,11 @@ sidebar_position: 1
 
 # Data Mining
 
-Data mining is the study of collecting, preparing, modeling, and interpreting data so that large raw data sets yield useful structure. In Charu C. Aggarwal's organization, the subject is built around a practical pipeline and a small number of reusable analytical building blocks: association pattern mining, clustering, outlier detection, and classification. The same building blocks are then adapted to text, time series, discrete sequences, spatial data, graphs, web data, social networks, streams, and privacy-sensitive settings.
+Data mining is the study of collecting, preparing, modeling, and interpreting data so that large raw data sets yield useful structure. In Charu C. Aggarwal's organization, the subject is built around an iterative workflow and a small number of reusable analytical building blocks: association pattern mining, clustering, outlier detection, and classification. The same building blocks are then adapted to text, time series, discrete sequences, spatial data, graphs, web data, social networks, streams, and privacy-sensitive settings.
 
-![A k-means animation shows centroids and cluster boundaries moving until assignments stabilize.](https://commons.wikimedia.org/wiki/Special:FilePath/K-means_convergence.gif)
+These notes follow Aggarwal's *Data Mining: The Textbook*. They emphasize algorithmic ideas, worked numerical examples, pseudocode, and Python, while tracing the concepts that recur across chapters.
 
-*Figure: K-means alternates assignments and centroid updates until the partition stops changing. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:K-means_convergence.gif), Chire, CC BY-SA 4.0.*
-
-These notes are detailed study pages for Aggarwal's *Data Mining: The Textbook*. They emphasize definitions, algorithmic ideas, worked numerical examples, pseudocode, and Python snippets. The goal is not to replace the book's full treatment, but to give a structured wiki path through the concepts that recur across chapters.
-
-## Definitions
+## Objects, representations, and four core tasks
 
 **Data mining** is the process of collecting, cleaning, transforming, analyzing, and interpreting data to discover useful patterns, build predictive models, or identify unusual behavior.
 
@@ -53,7 +49,7 @@ The generated chapter pages are:
 | 19. Social Network Analysis | [Social Network Analysis](/cs/data-mining/chapter-19-social-network-analysis) |
 | 20. Privacy-Preserving Data Mining | [Privacy-Preserving Data Mining](/cs/data-mining/chapter-20-privacy-preserving-data-mining) |
 
-## Key results
+## One pipeline across many data types
 
 **The mining pipeline is iterative.** Data collection, feature extraction, cleaning, transformation, modeling, and interpretation are not one-way stages. A model can reveal that a feature is malformed, a cleaning rule is too aggressive, or a label definition is inconsistent. Good data mining practice loops back.
 
@@ -61,11 +57,15 @@ The generated chapter pages are:
 
 **Pattern mining, clustering, outlier detection, and classification are reusable components.** Web recommendation can use association patterns and matrix factorization. Fraud detection can use outlier scores and supervised classifiers. Text mining can use clustering, classification, and topic models. Graph mining can use frequent patterns, clustering, and classification after topology-aware feature construction.
 
+![A k-means animation shows centroids and cluster boundaries moving until assignments stabilize.](https://commons.wikimedia.org/wiki/Special:FilePath/K-means_convergence.gif)
+
+*K-means alternates assignments and centroid updates until the partition stops changing. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:K-means_convergence.gif), Chire, CC BY-SA 4.0.*
+
 **Scalability is not only an implementation detail.** Batch, disk-resident, distributed, and streaming settings create different algorithmic constraints. A method that needs repeated random access to all data may be unsuitable for a stream, even if it is mathematically correct.
 
 **Evaluation depends on the task.** Clustering can be judged by compactness, separation, stability, or external labels. Classification can be judged by accuracy, precision, recall, cost, calibration, or ranking quality. Outlier detection often needs top-$k$ review or delayed labels. Association rules need interest measures beyond raw support and confidence.
 
-## Visual
+## Choosing a task from the question
 
 ```mermaid
 flowchart TD
@@ -95,7 +95,7 @@ flowchart TD
 | Graphs/social networks | Nodes, edges, attributes | Communities, link prediction, graph classification |
 | Streams | Samples, sketches, microclusters | Online counts, drift-aware models, alerts |
 
-## Worked example 1: Choosing a mining task
+## Three formulations of clickstream data
 
 **Problem.** A site records user sessions:
 
@@ -126,7 +126,7 @@ Choose three different data mining formulations.
 
 **Checked answer.** The same raw data can support at least three tasks. The correct formulation depends on the question: co-occurrence, ordered navigation, or checkout prediction.
 
-## Worked example 2: Core building blocks on one toy table
+## Reading one customer table three ways
 
 **Problem.** Consider four customers:
 
@@ -161,7 +161,7 @@ Show how clustering, classification, and outlier detection would view the table.
 
 **Checked answer.** The table does not have one inherent "mining result." Each task asks a different question and may require different preprocessing.
 
-## Code
+## From a question to an executable formulation
 
 Pseudocode for selecting a data mining formulation:
 
@@ -204,7 +204,7 @@ print(dict(zip(df["customer"], clusters)))
 print(export_text(tree, feature_names=["age", "visits"]))
 ```
 
-## Common pitfalls
+## Errors in formulation and evaluation
 
 - Treating data mining as only algorithm selection rather than problem formulation plus preparation.
 - Using the same representation for every data type.
@@ -214,13 +214,8 @@ print(export_text(tree, feature_names=["age", "visits"]))
 - Treating privacy as an afterthought when data integration has already increased reidentification risk.
 - Reading advanced application chapters without first understanding similarity, preparation, and the core building blocks.
 
-## Connections
+<div className="see-also">
 
-- [Data Mining Process and Data Types](/cs/data-mining/chapter-01-process-data-types)
-- [Data Preparation](/cs/data-mining/chapter-02-data-preparation)
-- [Similarity and Distances](/cs/data-mining/chapter-03-similarity-distances)
-- [Association Pattern Mining](/cs/data-mining/chapter-04-association-pattern-mining)
-- [Cluster Analysis](/cs/data-mining/chapter-06-cluster-analysis)
-- [Outlier Analysis](/cs/data-mining/chapter-08-outlier-analysis)
-- [Data Classification](/cs/data-mining/chapter-10-data-classification)
-- [Mining Data Streams and Big Data](/cs/data-mining/chapter-12-mining-data-streams)
+See also: [Data mining process and data types](/cs/data-mining/chapter-01-process-data-types) · [Data preparation](/cs/data-mining/chapter-02-data-preparation) · [Similarity and distances](/cs/data-mining/chapter-03-similarity-distances) · [Association pattern mining](/cs/data-mining/chapter-04-association-pattern-mining) · [Cluster analysis](/cs/data-mining/chapter-06-cluster-analysis) · [Outlier analysis](/cs/data-mining/chapter-08-outlier-analysis) · [Data classification](/cs/data-mining/chapter-10-data-classification) · [Mining data streams and big data](/cs/data-mining/chapter-12-mining-data-streams)
+
+</div>

@@ -1,4 +1,4 @@
----
+﻿---
 title: Digraphs Tournaments and Markov Chains
 sidebar_position: 12
 ---
@@ -13,7 +13,7 @@ Tournaments and Markov chains are two important directed examples. A tournament 
 
 *Figure: Transitive tournament on eight vertices. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:8-tournament-transitive.svg), Booyabazooka, public domain.*
 
-## Definitions
+## Arcs, scores, and transition probabilities
 
 A **directed graph** or **digraph** $D$ has a vertex set $V(D)$ and a set of ordered pairs called **arcs**. An arc from $u$ to $v$ is written $u\to v$.
 
@@ -23,7 +23,7 @@ A **tournament** is an orientation of a complete graph: for every distinct pair 
 
 A finite **Markov chain** has states and transition probabilities $p_{ij}$, where $p_{ij}$ is the probability of moving from state $i$ to state $j$ in one step. Its transition matrix $P$ has nonnegative entries and each row sums to $1$.
 
-## Key results
+## Reachability, tournaments, and stochastic evolution
 
 **Directed handshaking.** In every finite digraph,
 
@@ -65,8 +65,6 @@ A stationary distribution satisfies $\pi=\pi P$.
 
 **Stationary distributions as eigenvectors.** With row-vector convention, a stationary distribution satisfies $\pi P=\pi$, so it is a left eigenvector of $P$ with eigenvalue $1$. The entries must be nonnegative and sum to $1$, which makes the eigenvector probabilistic rather than merely algebraic.
 
-## Visual
-
 ```mermaid
 graph LR
   A(("A")) --> B(("B"))
@@ -84,17 +82,15 @@ graph LR
 | Euler condition | all degrees even | indegree equals outdegree |
 | Matrix | symmetric adjacency for simple graph | generally nonsymmetric adjacency or transition matrix |
 
-## Worked example 1: Find a Hamiltonian path in a tournament
+## Inserting vertices into a tournament path
 
-**Problem.** Consider the tournament on vertices $\{A,B,C,D\}$ with arcs
+Consider the tournament on vertices $\{A,B,C,D\}$ with arcs
 
 $$
 A\to B,\ C\to A,\ A\to D,\ B\to C,\ D\to B,\ C\to D.
 $$
 
 Find a directed Hamiltonian path.
-
-**Method.**
 
 1. Start with a path containing $A$: simply $A$.
 2. Insert $B$. Since $A\to B$, the path is $A\to B$.
@@ -116,9 +112,9 @@ $$
 
 **Check.** The arcs $C\to A$, $A\to D$, and $D\to B$ are all in the tournament, and every vertex appears exactly once.
 
-## Worked example 2: Iterate a Markov chain
+## Two steps of a weather chain
 
-**Problem.** A weather model has states Sunny $S$ and Rainy $R$ with transition matrix
+A weather model has states Sunny $S$ and Rainy $R$ with transition matrix
 
 $$
 P=\begin{pmatrix}
@@ -128,8 +124,6 @@ P=\begin{pmatrix}
 $$
 
 If today is certainly sunny, find the distribution after two days.
-
-**Method.**
 
 The initial distribution is
 
@@ -164,11 +158,11 @@ $$
 \end{aligned}
 $$
 
-**Checked answer.** After two days the model gives probability $0.72$ of sunny and $0.28$ of rainy.
+After two days the model gives probability $0.72$ of sunny and $0.28$ of rainy.
 
 As a row-sum check, $0.72+0.28=1$. Every probability distribution produced by multiplying by a row-stochastic matrix should still sum to $1$; if it does not, either the matrix rows were not normalized or the multiplication convention was mixed up.
 
-## Code
+## Iterating distributions and counting arcs
 
 ```python
 def step(dist, P):
@@ -202,7 +196,7 @@ For Markov-chain calculations, keep the state order fixed from the matrix to eve
 
 For directed examples, write arrows in every path you claim. A sequence of adjacent vertices in the underlying undirected graph is not necessarily a directed path. For Markov chains, check row sums or column sums according to the convention before doing any long calculation. A valid stochastic matrix should preserve total probability after one step.
 
-## Common pitfalls
+### Direction and matrix-convention checks
 
 - Treating a directed edge $u\to v$ as if it also allows travel from $v$ to $u$.
 - Confusing weak connectedness with strong connectedness.
@@ -211,9 +205,8 @@ For directed examples, write arrows in every path you claim. A sequence of adjac
 - Multiplying Markov distributions on the wrong side. Row-vector notation uses $\pi_{t+1}=\pi_tP$; column-vector notation uses $x_{t+1}=P^Tx_t$ or a column-stochastic convention.
 - Accepting a transition matrix whose rows do not sum to $1$.
 
-## Connections
+<div className="see-also">
 
-- [Eulerian and Hamiltonian graphs](/math/graph-theory/eulerian-and-hamiltonian-graphs)
-- [Algebraic graph theory basics](/math/graph-theory/algebraic-graph-theory-basics)
-- [Menger theorem and network flows](/math/graph-theory/menger-theorem-and-network-flows)
-- [Random graphs basics](/math/graph-theory/random-graphs-basics)
+See also: [Eulerian and Hamiltonian graphs](/math/graph-theory/eulerian-and-hamiltonian-graphs) · [Algebraic graph theory basics](/math/graph-theory/algebraic-graph-theory-basics) · [Menger theorem and network flows](/math/graph-theory/menger-theorem-and-network-flows) · [Random graphs basics](/math/graph-theory/random-graphs-basics)
+
+</div>

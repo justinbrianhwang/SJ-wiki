@@ -13,7 +13,7 @@ This cluster of ideas is central to both particle physics and condensed matter. 
 
 *Figure: Mexican-hat potential used to visualize spontaneous symmetry breaking. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mexican_hat_potential_polar.svg), Rupert Millard, public domain.*
 
-## Definitions
+## The vacuum manifold and its fluctuations
 
 A symmetry transformation maps fields to fields while preserving the action:
 
@@ -60,7 +60,7 @@ $$
 \partial_\mu\phi\to D_\mu\phi=(\partial_\mu+ieA_\mu)\phi.
 $$
 
-## Key results
+## Goldstone counting and Higgs reorganization
 
 Goldstone's theorem states that every spontaneously broken continuous global symmetry generator produces a massless excitation, subject to standard assumptions such as locality and Lorentz invariance. The intuitive proof is that moving along the degenerate vacuum manifold costs no potential energy, so the angular fluctuation has no mass term.
 
@@ -110,7 +110,7 @@ $$
 V_{\text{eff}}(\varphi),
 $$
 
-whose derivatives generate zero-momentum one-particle-irreducible diagrams. The curvature of $V_{\text{eff}}$ at its minimum gives loop-corrected masses, while its shape can reveal radiative symmetry breaking or metastable vacua.
+whose derivatives generate zero-momentum one-particle-irreducible diagrams. The curvature of $V_{\text{eff}}$ at its minimum gives the zero-momentum mass matrix; pole masses also require the momentum-dependent self-energy. The shape of the potential can reveal radiative symmetry breaking or metastable vacua.
 
 In gauge theories, gauge choice can obscure the counting of degrees of freedom. Before symmetry breaking, a massless vector in four dimensions has two physical polarizations, and a complex scalar has two real degrees of freedom. After the Higgs mechanism, a massive vector has three polarizations and one real Higgs scalar remains. The number of physical degrees of freedom is unchanged:
 
@@ -118,11 +118,9 @@ $$
 2+2=3+1.
 $$
 
-This accounting is the cleanest way to remember what happened to the Goldstone mode.
+Both descriptions therefore contain four physical degrees of freedom.
 
 Approximate symmetry breaking is also common. If a symmetry is nearly exact but explicitly broken by small terms, the Goldstone boson becomes a pseudo-Goldstone boson. Its mass is controlled by the explicit breaking, which is why light pions indicate approximate chiral symmetry rather than exact masslessness.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -142,29 +140,27 @@ flowchart TD
 | Local gauge | Higgs mechanism | massive vector boson | electroweak $W^\pm,Z$ |
 | Approximate global | pseudo-Goldstone boson | light but not massless | pions |
 
-## Worked example 1: Goldstone mode in a complex scalar
+## Separating radial and angular modes
 
-Problem: For
+For
 
 $$
 V(\phi)=-\mu^2|\phi|^2+\lambda|\phi|^4,
 $$
 
-find the vacuum radius and identify radial and angular masses.
-
-Step 1: Let $r=\vert \phi\vert $. Then
+let $r=\vert \phi\vert $, so that
 
 $$
 V(r)=-\mu^2r^2+\lambda r^4.
 $$
 
-Step 2: Differentiate:
+Differentiation gives
 
 $$
 \frac{dV}{dr}=-2\mu^2r+4\lambda r^3.
 $$
 
-Step 3: Set equal to zero:
+The stationary-point equation is
 
 $$
 2r(-\mu^2+2\lambda r^2)=0.
@@ -178,7 +174,7 @@ r=0
 r^2=\frac{\mu^2}{2\lambda}.
 $$
 
-Step 4: The nonzero circle is the minimum. Choose
+The nonzero circle is the minimum. Parameterize a neighborhood of one point on it as
 
 $$
 \phi=\frac{1}{\sqrt{2}}(v+\rho+i\pi),
@@ -192,13 +188,13 @@ $$
 v^2=\frac{\mu^2}{\lambda}.
 $$
 
-Step 5: The potential depends only on $\vert \phi\vert $, so moving in the angular $\pi$ direction along the circle does not change $V$ to quadratic order:
+Because the potential depends only on $\vert \phi\vert $, motion in the angular $\pi$ direction does not change $V$ to quadratic order:
 
 $$
 m_\pi^2=0.
 $$
 
-Step 6: The radial curvature is nonzero. Using the radial second derivative,
+The radial curvature is nonzero:
 
 $$
 \frac{d^2V}{dr^2}=-2\mu^2+12\lambda r^2.
@@ -210,11 +206,25 @@ $$
 \frac{d^2V}{dr^2}=4\mu^2.
 $$
 
-With canonical normalization this corresponds to a massive radial mode; convention choices set the precise factor. The checked qualitative result is one massive radial mode and one massless Goldstone mode.
+Since $r=(v+\rho)/\sqrt{2}$ near the chosen vacuum, $\delta r=\rho/\sqrt{2}$. Hence
 
-## Worked example 2: Gauge boson mass from a Higgs vacuum
+$$
+V\supset
+\frac{1}{2}(4\mu^2)(\delta r)^2
+=\frac{1}{2}(2\mu^2)\rho^2,
+$$
 
-Problem: In a $U(1)$ gauge theory with
+and the canonically normalized fields have
+
+$$
+m_\rho^2=2\mu^2,
+\qquad
+m_\pi^2=0.
+$$
+
+## Reading the gauge-boson mass from $\vert D_\mu\phi\vert ^2$
+
+In a $U(1)$ gauge theory with
 
 $$
 D_\mu=\partial_\mu+ieA_\mu,
@@ -222,34 +232,32 @@ D_\mu=\partial_\mu+ieA_\mu,
 \phi=\frac{1}{\sqrt{2}}(v+h)
 $$
 
-in unitary gauge, find the gauge boson mass term.
-
-Step 1: Write the kinetic term:
+in unitary gauge, the relevant kinetic term is
 
 $$
 |D_\mu\phi|^2.
 $$
 
-Step 2: For the constant vacuum part, $\partial_\mu v=0$, so
+For the constant vacuum part, $\partial_\mu v=0$, so
 
 $$
 D_\mu\phi\supset ieA_\mu\frac{v}{\sqrt{2}}.
 $$
 
-Step 3: Square the vacuum contribution:
+Squaring the vacuum contribution gives
 
 $$
 |D_\mu\phi|^2\supset
 \frac{e^2v^2}{2}A_\mu A^\mu.
 $$
 
-Step 4: Compare with the Proca mass form:
+Comparison with the Proca mass term
 
 $$
 \frac{1}{2}m_A^2A_\mu A^\mu.
 $$
 
-Step 5: Match coefficients:
+fixes the coefficient:
 
 $$
 \frac{1}{2}m_A^2=\frac{1}{2}e^2v^2.
@@ -261,25 +269,9 @@ $$
 m_A=ev.
 $$
 
-The checked answer is that the gauge boson becomes massive while the angular scalar degree of freedom supplies its longitudinal polarization.
+The angular scalar supplies the longitudinal polarization of the resulting massive gauge boson.
 
-## Code
-
-```python
-import math
-
-def mexican_hat_parameters(mu, lam, e=0.0):
-    v = mu / math.sqrt(lam)
-    radial_mass = math.sqrt(2) * mu
-    gauge_mass = e * v
-    return v, radial_mass, gauge_mass
-
-for e in [0.0, 0.3, 0.7]:
-    v, mh, mA = mexican_hat_parameters(mu=2.0, lam=0.5, e=e)
-    print(f"e={e}: v={v:.3f}, radial mass={mh:.3f}, gauge mass={mA:.3f}")
-```
-
-## Common pitfalls
+## Distinguishing global, gauge, and approximate symmetry
 
 - Saying the symmetry of the Lagrangian is broken explicitly when the vacuum is what fails to respect it.
 - Expecting a Goldstone boson for a broken discrete symmetry. Goldstone's theorem requires a continuous symmetry.
@@ -290,11 +282,8 @@ for e in [0.0, 0.3, 0.7]:
 - Assuming every flat direction is exact. Quantum corrections, explicit breaking terms, gauge interactions, or boundary conditions can lift a classical degeneracy.
 - Confusing the order parameter with a directly observable particle. The vacuum expectation value labels the phase; excitations are fluctuations around it.
 
-## Connections
+<div className="see-also">
 
-Symmetry breaking connects the scalar model, gauge theory, condensed matter, and electroweak physics. The real scalar double well teaches discrete breaking; the complex scalar teaches Goldstone modes; the gauged complex scalar teaches the Higgs mechanism; superconductivity gives a material realization; the electroweak theory gives the particle-physics realization. Keep track of whether the symmetry is global, local, exact, or approximate, because the spectrum changes in each case.
+See also: [Scalar Phi-Four Theory](/physics/quantum-field-theory/scalar-phi-four-theory) · [Gauge Invariance and QED](/physics/quantum-field-theory/gauge-invariance-and-qed) · [Electroweak Theory and Grand Unification](/physics/quantum-field-theory/electroweak-theory-and-grand-unification) · [Collective and Condensed Matter Field Theory](/physics/quantum-field-theory/collective-and-condensed-matter-field-theory)
 
-- [Scalar Phi-Four Theory](/physics/quantum-field-theory/scalar-phi-four-theory)
-- [Gauge Invariance and QED](/physics/quantum-field-theory/gauge-invariance-and-qed)
-- [Electroweak Theory and Grand Unification](/physics/quantum-field-theory/electroweak-theory-and-grand-unification)
-- [Collective and Condensed Matter Field Theory](/physics/quantum-field-theory/collective-and-condensed-matter-field-theory)
+</div>

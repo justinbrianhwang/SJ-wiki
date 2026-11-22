@@ -5,15 +5,25 @@ sidebar_position: 10
 
 # Error Handling
 
-Rust separates errors into two broad categories: unrecoverable errors, handled with `panic!`, and recoverable errors, represented by `Result<T, E>`. This distinction is central to Rust's reliability story. If a bug violates a program invariant, panicking may be appropriate. If failure is expected as part of the environment, such as a missing file or invalid input, the type system should make callers handle it.
+Rust separates failures that callers can reasonably respond to from failures that mean the program's assumptions have already broken. Recoverable failures use `Result<T, E>`; violated invariants usually use `panic!`, assertions, or an explicit process exit at the application boundary. The distinction is about policy, not severity. A missing configuration file may be recoverable for an interactive program and fatal for a batch job, while an impossible internal state remains a bug in both.
 
-This page builds on [pattern matching](/cs/programming/rust/pattern-matching) because `Result` is an enum, and on [collections](/cs/programming/rust/common-collections) because indexing can panic while safe access returns `Option`. It also prepares for project pages such as [closures and iterators](/cs/programming/rust/closures-and-iterators), where command-line programs often return `Result` from `main`.
+## The error decision belongs high enough in the call stack
 
-## Definitions
+A file-reading helper cannot know whether a missing file should be created, reported, retried, or ignored. Returning `Result<String, io::Error>` leaves that decision to code with more context. Each layer should repair the failure it understands, add useful context and propagate it, or translate it into its own public error vocabulary.
 
-`panic!` is a macro that stops normal execution. When a panic occurs, Rust either unwinds the stack and runs cleanup code or aborts immediately, depending on the panic strategy. Panics are for unrecoverable states: violated assumptions, impossible branches, or programmer errors.
+```mermaid
+flowchart TD
+  A["Operation returns Result<T, E>"] --> B{"Can this layer recover?"}
+  B -->|yes| C["Handle the relevant Err variant"]
+  B -->|no| D{"Does the public boundary use another error type?"}
+  D -->|yes| E["Convert and add context"]
+  D -->|no| F["Propagate with ?"]
+  C --> G["Continue or return a fallback"]
+  E --> H["Caller receives a domain error"]
+  F --> H
+```
 
-`Result<T, E>` is an enum with two variants:
+The standard enum is ordinary Rust data:
 
 ```rust
 enum Result<T, E> {
@@ -22,186 +32,225 @@ enum Result<T, E> {
 }
 ```
 
-`Ok(T)` contains a success value. `Err(E)` contains an error value. Because `Result` is part of the prelude, it is available without import.
+Pattern matching therefore gives complete control over both outcomes. Combinators such as `map`, `and_then`, and `unwrap_or_else` are compact expressions of common matches; they are not a separate exception mechanism.
 
-`unwrap` extracts the success value or panics on error. `expect` does the same but lets the programmer supply a panic message. They are useful in examples, tests, prototypes, and situations where failure truly violates an invariant, but they are not a substitute for designed error handling.
-
-The `?` operator propagates errors. When applied to a `Result`, it returns the success value if the result is `Ok`, or returns early from the current function with the error if the result is `Err`.
-
-`Box<dyn std::error::Error>` is a trait-object error type often used in small applications when several different error types may be returned and the program does not need a custom error enum.
-
-## Key results
-
-The first key result is that recoverable failure belongs in function signatures. A function that reads a file should usually return `Result<String, io::Error>`, not panic when the file is absent.
-
-The second key result is that `?` keeps error-handling code linear. It is equivalent to matching on the result and returning early on `Err`, but it avoids repetitive boilerplate.
-
-The third key result is that `panic!` is still useful. Examples include indexing past the end of a vector, failing an assertion in a test, or detecting a broken internal invariant. The important distinction is whether the caller can reasonably recover.
-
-The fourth key result is that error conversion can happen during propagation. The `?` operator uses the `From` trait to convert error types when the function's return error type supports it.
-
-Proof sketch for `?`: suppose a function returns `Result<String, io::Error>`. Inside it, `File::open(path)?` is valid because `File::open` returns `Result<File, io::Error>`. If opening succeeds, the expression yields the `File`. If opening fails, the whole function immediately returns `Err(error)`. Therefore later code only runs in the success case.
-
-The book also distinguishes examples from production-facing decisions. In a teaching example, `expect("Failed to read line")` is acceptable because it keeps attention on the concept being introduced. In a library, the same choice would be too forceful because it ends the caller's program. A useful rule is to ask who has enough context to decide what should happen. If the current function can repair the problem, handle it locally. If the caller knows the policy, return `Result`. If the state proves a bug in the program itself, panic may be the clearest signal. This question keeps error handling from becoming mechanical.
-
-Another practical result is that error messages are part of the interface for command-line tools. `eprintln!` sends diagnostics to standard error, allowing standard output to remain machine-readable or pipe-friendly. This small distinction becomes important in the `minigrep` project, where successful search results and failure messages should not be mixed.
-
-The `Result` type also composes with other language features. It can be matched directly, converted with methods such as `map_err`, returned from tests, and used as the return type of `main`. This makes error handling a normal part of expression-oriented Rust rather than a separate exception mechanism. The code path that succeeds and the code path that fails are both visible in types.
-
-Choosing an error type is therefore a design step. Small binaries can often return `Box<dyn Error>` from top-level functions to keep examples compact. Libraries usually benefit from a specific error enum or structured error type so callers can react to different failures without string matching.
-
-When reading Rust code, follow the `Result` outward. The place where an error is created, enriched, propagated, logged, or converted often reveals which layer owns the recovery policy.
-
-That layer is where the user-facing decision belongs.
-
-Lower layers should preserve enough context for that decision.
-
-Do not discard causes too early.
-
-Keep context intact.
-
-## Visual
-
-```mermaid
-flowchart TD
-  A[Operation that may fail] --> B{"Failure recoverable?"}
-  B -->|"No, invariant broken"| C[panic or assertion]
-  B -->|"Yes, caller can decide"| D[Return Result]
-  D --> E{"Local handling?"}
-  E -->|yes| F[match or combinators]
-  E -->|no| G["use ? to propagate"]
-  G --> H[Caller receives Err]
-  F --> I[Continue with chosen behavior]
-```
-
-| Tool | On success | On failure | Best use |
+| Form | Success path | Failure path | Good fit |
 |---|---|---|---|
-| `match` | explicit branch | explicit branch | Full custom handling |
-| `unwrap` | extract value | panic | quick examples or impossible errors |
-| `expect` | extract value | panic with message | tests and invariant checks |
-| `?` | extract value | return early | propagate recoverable errors |
-| `panic!` | not applicable | stop normal execution | unrecoverable bugs |
+| `match` | explicit branch | explicit branch | recovery depends on the error variant |
+| `?` | unwraps `Ok` | returns early after conversion | a caller should decide |
+| `map` | transforms the value | preserves the error | only the success value changes |
+| `map_err` | preserves the value | transforms the error | crossing an API boundary |
+| `unwrap_or` | uses the value | computes or supplies a fallback | every failure has the same harmless fallback |
+| `expect` | unwraps the value | panics with a message | an established invariant or a test |
 
-## Worked example 1: opening or creating a file
+## What a panic promises
 
-Problem: open `hello.txt`; if it does not exist, create it; if another error occurs, panic.
+`panic!` says that normal execution cannot continue along the current path. Bounds checks, failed assertions, and `unreachable!` are common panic sites because reaching them indicates a programming error or a broken invariant. A panic is not the Rust equivalent of a checked exception and should not carry routine control flow.
 
-1. Call `File::open`:
+The compilation profile chooses one of two broad panic strategies. With unwinding, Rust walks back through stack frames and drops local values. With aborting, the process ends immediately and no unwinding cleanup occurs. Neither strategy is a recovery interface for library callers. Code that must release an external resource reliably should use ownership and `Drop`, while code requiring process-wide recovery needs an explicit architectural boundary.
+
+`unwrap` and `expect` are concise panic adapters. They are reasonable when a preceding check proves success, in tests where failure should fail the test, and during a short experiment. `expect` should explain the invariant rather than repeat the underlying operation:
 
 ```rust
-let greeting_file_result = File::open("hello.txt");
+let home = std::env::var("HOME")
+    .expect("HOME must be set by the launcher");
 ```
 
-The type is `Result<File, io::Error>`.
+For a reusable library, panicking because a user-supplied path is absent takes the policy decision away from the caller. Indexing a slice has the same distinction: use `values[index]` when an invalid index is a bug, and `values.get(index)` when absence is an expected possibility.
 
-2. Match the result:
+## Worked example: open a file, create only when absent
+
+Suppose an application needs `settings.txt`. An absent file should be initialized, but a permissions error must remain an error. Treating every `File::open` failure as absence would hide the difference.
 
 ```rust
-let greeting_file = match greeting_file_result {
-    Ok(file) => file,
-    Err(error) => match error.kind() {
-        ErrorKind::NotFound => match File::create("hello.txt") {
-            Ok(fc) => fc,
-            Err(e) => panic!("Problem creating the file: {e:?}"),
-        },
-        other_error => panic!("Problem opening the file: {other_error:?}"),
-    },
-};
+use std::fs::{File, OpenOptions};
+use std::io::{self, ErrorKind, Write};
+
+fn open_settings(path: &str) -> Result<File, io::Error> {
+    match OpenOptions::new().read(true).write(true).open(path) {
+        Ok(file) => Ok(file),
+        Err(error) if error.kind() == ErrorKind::NotFound => {
+            let mut file = OpenOptions::new()
+                .read(true)
+                .write(true)
+                .create_new(true)
+                .open(path)?;
+            file.write_all(b"theme=light\n")?;
+            Ok(file)
+        }
+        Err(error) => Err(error),
+    }
+}
 ```
 
-3. Trace the missing-file case. `File::open` returns `Err(error)`. The outer match enters the `Err` arm. `error.kind()` is `ErrorKind::NotFound`, so the program tries `File::create`.
+Follow the two main executions step by step.
 
-4. If create succeeds, its `Ok(fc)` arm returns the new file handle.
+1. If the file exists and is readable, `open` returns `Ok(file)`. The first arm returns that handle without changing the file.
+2. If the operating system reports `NotFound`, the guard selects the second arm. `create_new(true)` requests atomic creation and fails if another process creates the path first.
+3. The first `?` returns a creation error immediately. It does not turn a permission failure into a panic.
+4. After creation, `write_all` either writes the entire default document or propagates its I/O error.
+5. Any original error other than `NotFound` reaches the final arm unchanged. The caller can still inspect its `ErrorKind`.
 
-5. Check the answer. The final `greeting_file` binding contains an open file whether the file already existed or was successfully created. Permission errors or other unexpected errors panic with diagnostic information.
+There is a race between the first failed open and creation. `create_new` handles it safely by refusing to overwrite a file that appeared in between. A caller may choose to retry the initial open after an `AlreadyExists` creation error. Whether that retry is desirable depends on the application, so the helper does not silently invent it.
 
-This example is verbose, but it shows that `Result` handling is ordinary pattern matching.
+## `?` is early return plus conversion
 
-## Worked example 2: simplifying file reading with `?`
-
-Problem: write a function that reads a username from a file and propagates any I/O error to the caller.
-
-1. Start with the signature:
+The `?` operator keeps the successful path linear. For a `Result`, it extracts the `Ok` value. On `Err`, it returns from the enclosing function after converting the error with `From` when necessary. Conceptually, though not as an exact macro expansion, `operation()?` behaves like:
 
 ```rust
-fn read_username_from_file() -> Result<String, io::Error>
+match operation() {
+    Ok(value) => value,
+    Err(error) => return Err(From::from(error)),
+}
 ```
 
-The caller must handle either a `String` or an `io::Error`.
-
-2. Open the file with `?`:
+The enclosing function must return a compatible type. A function returning `Result<_, AppError>` can use `?` on `Result<_, io::Error>` only when `AppError` implements `From<io::Error>`. The same operator works with `Option`: it extracts `Some` and returns `None` early. It does not automatically cross from `Option` to `Result`; `ok_or` or `ok_or_else` states which error absence should become.
 
 ```rust
-let mut username_file = File::open("hello.txt")?;
+fn first_number(text: &str) -> Result<i32, &'static str> {
+    let token = text.split_whitespace().next().ok_or("input was empty")?;
+    token.parse().map_err(|_| "first token was not an integer")
+}
 ```
 
-If opening fails, the function returns `Err(error)` immediately.
+Here absence and invalid syntax are different failures. The conversions preserve that distinction even though the small example uses static strings.
 
-3. Read into a string:
+## Worked example: a domain error with two sources
 
-```rust
-let mut username = String::new();
-username_file.read_to_string(&mut username)?;
-```
-
-If reading fails, the function returns that error immediately.
-
-4. Return success:
+A configuration loader may fail while reading a file or while parsing a port. Exposing only `io::Error` cannot describe the second case, and returning a bare `String` loses structured causes. A small enum keeps the public states explicit.
 
 ```rust
-Ok(username)
-```
+use std::error::Error;
+use std::fmt;
+use std::fs;
+use std::num::ParseIntError;
 
-5. Check the answer. The function has only one explicit success return, but two possible early error returns. This is exactly what the signature promises.
-
-The standard library also provides `std::fs::read_to_string`, which packages this common pattern into one call. The hand-written version is useful for understanding `?`.
-
-## Code
-
-```rust
-use std::fs::File;
-use std::io::{self, Read};
-
-fn read_username_from_file(path: &str) -> Result<String, io::Error> {
-    let mut file = File::open(path)?;
-    let mut username = String::new();
-    file.read_to_string(&mut username)?;
-    Ok(username.trim().to_string())
+#[derive(Debug)]
+enum ConfigError {
+    Read(std::io::Error),
+    InvalidPort(ParseIntError),
+    MissingPort,
 }
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    match read_username_from_file("hello.txt") {
-        Ok(username) if !username.is_empty() => {
-            println!("Hello, {username}!");
-        }
-        Ok(_) => {
-            println!("The username file was empty.");
-        }
-        Err(error) => {
-            eprintln!("Could not read username: {error}");
+impl fmt::Display for ConfigError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Read(_) => write!(f, "could not read configuration"),
+            Self::InvalidPort(_) => write!(f, "port was not an unsigned integer"),
+            Self::MissingPort => write!(f, "configuration had no port entry"),
         }
     }
+}
 
-    Ok(())
+impl Error for ConfigError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            Self::Read(error) => Some(error),
+            Self::InvalidPort(error) => Some(error),
+            Self::MissingPort => None,
+        }
+    }
+}
+
+impl From<std::io::Error> for ConfigError {
+    fn from(error: std::io::Error) -> Self { Self::Read(error) }
+}
+
+impl From<ParseIntError> for ConfigError {
+    fn from(error: ParseIntError) -> Self { Self::InvalidPort(error) }
+}
+
+fn load_port(path: &str) -> Result<u16, ConfigError> {
+    let text = fs::read_to_string(path)?;
+    let value = text
+        .lines()
+        .find_map(|line| line.strip_prefix("port="))
+        .ok_or(ConfigError::MissingPort)?;
+    Ok(value.trim().parse()?)
 }
 ```
 
-The `main` function returns `Result`, which lets larger programs use `?` at top level if desired. This example chooses to handle the custom function's error locally so it can print a friendly message.
+For a file containing `name=demo` followed by `port=8080`, the read succeeds, `find_map` skips the first line, `strip_prefix` extracts `8080`, and `parse` produces `8080u16`. The function returns `Ok(8080)`.
 
-## Common pitfalls
+For `port=eighty`, the read and lookup still succeed. `parse` returns `ParseIntError`; the final `?` invokes `ConfigError::from`, producing `InvalidPort`. A nonexistent path follows the other `From` implementation and becomes `Read`. `Display` supplies a stable outer message, while `source` retains the lower-level cause for diagnostics. Code can match the enum variants without parsing text.
 
-- Using `panic!` for ordinary environmental failures such as missing user input or unavailable files.
-- Calling `unwrap` in library code where callers should be allowed to recover.
-- Writing `?` in a function that does not return `Result`, `Option`, or another compatible type.
-- Losing context by converting all errors to strings too early.
-- Ignoring a `Result` and assuming the operation succeeded. Rust warns about unused `Result` values.
-- Treating panic as exception-style control flow. Rust's recoverable path is `Result`.
-- Forgetting that vector indexing can panic; use `get` when absence is expected.
+The enum can grow when callers need another meaningful distinction. It should not mirror every internal operation. If two internal parsing failures have the same recovery policy, one public variant may be enough.
 
-## Connections
+## Error types are part of an API
 
-- [Pattern matching](/cs/programming/rust/pattern-matching)
-- [Common collections](/cs/programming/rust/common-collections)
-- [Generics, traits, and lifetimes](/cs/programming/rust/generics-traits-lifetimes)
-- [Automated tests](/cs/programming/rust/automated-tests)
-- [Closures and iterators](/cs/programming/rust/closures-and-iterators)
+Applications and libraries often want different outer error types. A binary's `main` may return `Result<(), Box<dyn Error>>` when its only policy is to report any error and exit. Dynamic dispatch is acceptable there because no caller needs to exhaustively inspect variants. A library usually gains more from a concrete enum: callers can retry an I/O case, reject malformed input, or display their own message.
+
+Converting errors to strings too early removes the source type and any structured fields. Logging and returning the same error at every layer also produces duplicated diagnostics. A useful division is:
+
+- leaf code returns the specific failure it encounters;
+- intermediate code converts it when crossing a domain boundary and adds information the lower layer could not know;
+- the application boundary chooses presentation, logging, and exit status.
+
+Standard output and standard error should remain separate in command-line programs. Results intended for a pipe go through `println!`; diagnostics go through `eprintln!`. A process that reports failure should also return a nonzero exit status, either by returning an error from `main` or by calling `std::process::exit` after printing a controlled message.
+
+## Errors that compile but communicate poorly
+
+- `unwrap` in a parsing library converts user input into a process-ending bug report. Return the parsing error or a domain variant instead.
+- `unwrap_or(default)` treats every error alike. It is suitable only when all errors genuinely permit the same fallback; it can otherwise hide permissions failures and corrupted data.
+- A catch-all `Err(_)` discards information. It is fine when the policy truly ignores every error, but suspicious around I/O or persistence.
+- Error text should add context not already obvious from the source. “Could not load profile `alice`” helps; wrapping “No such file” in another “I/O error” contributes little.
+- Assertions should check programmer-controlled invariants. Invalid network input and missing user files are normal environmental states, even when the program cannot proceed.
+- A `Result` marked `must_use` should be handled, propagated, or deliberately assigned to `_`. Silently dropping a write error can lose data.
+
+## Combinators without unreadable chains
+
+`Result` and `Option` provide adapters for small transformations. `map` changes only a successful value, `map_err` changes only an error, and `and_then` sequences a second fallible operation. Their usefulness comes from keeping a short data flow in one expression. Once recovery has several branches or needs intermediate names, a `match` is usually clearer.
+
+Consider parsing a positive timeout:
+
+```rust
+#[derive(Debug, PartialEq)]
+enum TimeoutError {
+    Missing,
+    NotANumber,
+    Zero,
+}
+
+fn parse_timeout(input: Option<&str>) -> Result<u64, TimeoutError> {
+    input
+        .ok_or(TimeoutError::Missing)
+        .and_then(|text| text.parse().map_err(|_| TimeoutError::NotANumber))
+        .and_then(|seconds| {
+            if seconds == 0 {
+                Err(TimeoutError::Zero)
+            } else {
+                Ok(seconds)
+            }
+        })
+}
+```
+
+For `Some("30")`, `ok_or` produces `Ok("30")`; the first `and_then` parses it to `Ok(30)`; the second verifies that it is nonzero. For `None`, `ok_or` produces `Missing` and neither closure runs. For `Some("fast")`, parsing produces `NotANumber` and the range check is skipped. The chain works because each stage has one narrow responsibility and all stages share the same final error type.
+
+Several similarly named methods differ in when they evaluate fallback work. `unwrap_or(value)` evaluates `value` before the call, while `unwrap_or_else(closure)` calls the closure only on failure. `ok_or(error)` eagerly constructs the error; `ok_or_else` delays construction. The lazy forms matter when computing a default allocates, logs, reads another file, or otherwise has observable cost. For a constant enum variant, the eager form is simpler.
+
+## Reporting, testing, and preserving evidence
+
+Tests should assert the error category that callers depend on, not the exact wording of an operating-system message. The latter may vary by platform. A unit test for the timeout parser can state the contract directly:
+
+```rust
+assert_eq!(parse_timeout(None), Err(TimeoutError::Missing));
+assert_eq!(parse_timeout(Some("0")), Err(TimeoutError::Zero));
+assert_eq!(parse_timeout(Some("15")), Ok(15));
+```
+
+For filesystem code, create an isolated temporary location through the test framework or a small fixture directory and assert the observable result. Tests that rely on a developer's current directory, home directory, or existing permissions tend to fail for reasons unrelated to the error policy.
+
+Errors should normally be formatted only at the outer boundary. `Display` is for a concise user-facing description; `Debug` may include variant names and internal fields useful to a developer. The `Error::source` chain permits a reporter to print both levels without flattening them. A top-level diagnostic might therefore say that configuration loading failed, followed by an I/O cause from the operating system. The inner source retains details such as the error kind and raw OS code.
+
+Retries deserve a separate decision. Only transient failures should be retried, and a retry loop needs a limit or cancellation path. Repeating a parse after invalid syntax cannot change the outcome. Repeating a network operation may duplicate a request unless the operation is idempotent. The presence of `Result` identifies failure in the type; it does not decide whether another attempt is safe.
+
+Panic catching through `std::panic::catch_unwind` exists, but it is a narrow containment tool rather than general error handling. Not every value is unwind-safe, aborting profiles cannot be caught, and foreign-function boundaries have their own rules. Ordinary expected failures remain clearer as typed results.
+
+Good error boundaries preserve the facts needed for the next decision.
+
+<div className="see-also">
+
+See also: [Pattern matching](/cs/programming/rust/pattern-matching) · [I/O project: minigrep](/cs/programming/rust/io-project-minigrep) · [Generics, traits, and lifetimes](/cs/programming/rust/generics-traits-lifetimes) · [Automated tests](/cs/programming/rust/automated-tests) · [Packages, crates, and modules](/cs/programming/rust/packages-crates-modules)
+
+</div>

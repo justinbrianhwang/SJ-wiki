@@ -5,135 +5,231 @@ sidebar_position: 25
 
 # Biochemistry and Polymer Materials
 
-Polymer and biological chemistry apply bonding, structure, and intermolecular forces to very large molecules. Synthetic polymers show how repeating covalent units create materials, while biological polymers such as proteins and nucleic acids show how sequence, shape, and noncovalent interactions store information and perform functions.
+Macromolecules link small building blocks into structures whose behavior depends on far more than the repeat-unit formula. Chain length, sequence, branching, cross-links, stereochemistry, and packing all matter. Synthetic polymers exploit those variables to make materials; biological macromolecules use sequence and folding to store information, recognize partners, and catalyze reactions.
 
-In the Ebbing and Gammon sequence this topic sits near synthetic polymers, electrically conducting polymers, proteins, nucleic acids, and introductory biological macromolecules. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
+The useful common idea is constrained flexibility. A long chain has many possible conformations, but covalent geometry and interactions with neighboring groups or solvent make some conformations much more favorable than others.
 
-![A DNA double helix model shows two spiraling strands joined by base pairs.](https://commons.wikimedia.org/wiki/Special:FilePath/DNA_double_helix_vertikal.PNG)
+## Monomers, repeat units, and polymerization routes
 
-*Figure: DNA double helix as a biological polymer whose function depends on molecular structure. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:DNA_double_helix_vertikal.PNG), Jerome Walker and Dennis Myts, public domain.*
+A **monomer** is a small molecule capable of entering a polymerization. The **repeat unit** is the structural pattern repeated in the finished chain. They are not always written identically. Ethene is $\mathrm{CH_2{=}CH_2}$, but its polyethylene repeat unit is $\mathrm{-CH_2-CH_2-}$ because the carbon-carbon double bond has been consumed.
 
-## Definitions
+Chain-growth polymerization commonly proceeds through initiation, propagation, and termination. In free-radical polymerization, an initiator produces a radical, the radical adds across a monomer double bond, and the new chain-end radical adds further monomers. Termination removes the active center by combination or disproportionation. Monomer disappears gradually while high-molar-mass chains can appear early.
 
-The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.
+Step-growth polymerization allows any two molecules bearing suitable functional groups to react: monomer with monomer, oligomer with monomer, or oligomer with oligomer. Polyesters can form when diols react with dicarboxylic acids, eliminating water as ester links form. High conversion is needed before very long chains become abundant because every missed functional-group reaction leaves chains shorter.
 
-- Monomer is a small molecule that can become part of a polymer chain.
-- Polymer is a macromolecule made from repeating units.
-- Degree of polymerization is the number of repeat units in an average chain.
-- Addition polymerization joins monomers without eliminating a small molecule.
-- Condensation polymerization joins monomers while eliminating a small molecule such as water.
-- Protein is a polymer of amino acids connected by peptide bonds.
-- Nucleic acid is a polymer of nucleotides that stores and transfers genetic information.
-- Carbohydrates and lipids are major biomolecular classes; carbohydrates often store energy or structure, while lipids are hydrophobic membrane and energy-storage molecules.
+The older labels **addition polymer** and **condensation polymer** describe whether the repeat-unit formation retains all monomer atoms or eliminates a small molecule. They overlap imperfectly with the kinetic labels chain-growth and step-growth. Some step-growth reactions add without eliminating a small molecule, so it is safer to state which feature is being classified.
 
-Definitions in chemistry often connect a symbolic representation to a physical sample. A formula such as $\mathrm{H_2O}$ names a substance, gives the atomic ratio inside one molecule, and supplies the molar mass used in a macroscopic calculation. A state symbol such as $\mathrm{(aq)}$ is not cosmetic; it says the species is dispersed in water and may be treated as ions when writing a net ionic equation. In the same way, constants such as $R$, $K_w$, $F$, or $N_A$ are compact definitions of the measurement system being used.
+| Feature | Typical chain-growth case | Typical step-growth case |
+|---|---|---|
+| Reactive site | active chain end | functional groups on many species |
+| Growth event | monomer adds to active chain | any compatible molecules join |
+| High molar mass | can appear at low conversion | requires very high conversion |
+| Common example | polyethylene from ethene | polyester from a diol and diacid |
 
-## Key results
+## A polymer sample contains a distribution
 
-The central results are:
+Except for specially controlled systems, polymer molecules do not all have the same length. The number-average molar mass weights every molecule equally:
 
-- Number-average molar mass approximation: $M_n\approx(\mathrm{degree\ of\ polymerization})(M_{repeat})$.
-- Peptide bond formation is a condensation reaction between carboxyl and amino groups.
-- Protein primary structure is amino acid sequence; higher structures depend on hydrogen bonding, ionic interactions, hydrophobic effects, disulfide bonds, and metal coordination.
-- DNA base pairing: A pairs with T, and G pairs with C in standard double-stranded DNA.
-- Hydrophobic effect helps drive folding and membrane formation in water.
-- Conducting polymers require extended conjugation and appropriate charge carriers.
+$$
+M_n=\frac{\sum_i N_iM_i}{\sum_i N_i},
+$$
 
-Macromolecular properties are emergent. A single covalent repeat unit does not have the toughness of a polymer sample, and a single peptide bond does not explain enzyme specificity. Chain length, branching, cross-linking, sequence, stereochemistry, and noncovalent interactions collectively determine the material or biological function.
+where $N_i$ molecules have molar mass $M_i$. The weight-average molar mass gives heavier molecules more influence:
 
-A good way to use these results is to state the chemical model first, then substitute numbers second. For biochemistry and polymer materials, the model usually answers questions such as what particles are present, what is conserved, which process is idealized, and which measurement is being interpreted. Once that sentence is clear, the algebra becomes a bookkeeping problem rather than a search for a memorized pattern.
+$$
+M_w=\frac{\sum_i N_iM_i^2}{\sum_i N_iM_i}.
+$$
 
-Units are part of the result, not decoration. Whenever a formula contains an empirical constant, a tabulated value, or a ratio of measured quantities, the units tell you whether the expression has been used in the intended form. This is especially important in general chemistry because several equations have nearly identical algebra but different meanings: pressure can be a measured state variable, an equilibrium correction, or a colligative effect; energy can be heat flow, enthalpy, internal energy, or free energy.
+The dispersity is
 
-The strongest check is an independent chemical interpretation. Ask whether the sign agrees with direction, whether a concentration can be negative, whether a mole ratio follows the balanced equation, whether an equilibrium shift opposes the stress, and whether a microscopic description explains the macroscopic number. These checks connect biochemistry and polymer materials to neighboring topics instead of leaving it as an isolated technique.
+$$
+Đ=\frac{M_w}{M_n}.
+$$
 
-A second check is to compare the limiting cases. If a reactant amount goes to zero, a product amount cannot remain large. If temperature rises in a gas sample at fixed volume, pressure should not fall in an ideal model. If an acid is diluted, hydronium concentration should normally decrease unless a coupled equilibrium supplies more. Limiting cases often reveal algebra that has been rearranged correctly but applied to the wrong chemical situation.
+For any nonnegative distribution, $M_w\ge M_n$, so $Đ\ge1$. A value of exactly 1 would mean all chains have the same molar mass. Reporting a single “molecular weight” without the averaging method can hide important differences between samples.
 
-Finally, keep symbolic and particulate representations side by side. A balanced equation, an equilibrium expression, an orbital diagram, or a polymer repeat unit is a compact symbol for a population of particles. Translating that symbol into words forces you to say what is reacting, what is being counted, and what is being held constant. That translation is usually the difference between a calculation that can be adapted to a new problem and one that only imitates a worked example.
+For a long linear chain, the number-average degree of polymerization is approximately
 
-## Visual
+$$
+DP_n\approx\frac{M_n}{M_{\mathrm{repeat}}}.
+$$
 
-```mermaid
-graph LR
-  A[Monomers] --> B[Polymerization]
-  B --> C[Chain length distribution]
-  C --> D[Bulk material properties]
-  E[Amino acid sequence] --> F[Protein folding]
-  F --> G[Binding and catalysis]
-  H[Nucleotide sequence] --> I[Base pairing]
-  I --> J[Information storage]
-```
+End-group masses have been neglected. That is harmless for thousands of repeat units but significant for a short oligomer.
 
-| Biomolecular class | Building blocks | Important bonds or forces | General role |
+### Worked example: average molar masses from a distribution
+
+Suppose a sample contains 100 chains of $10{,}000\ \mathrm{g\,mol^{-1}}$ and 50 chains of $30{,}000\ \mathrm{g\,mol^{-1}}$.
+
+The number average is
+
+$$
+\begin{aligned}
+M_n&=\frac{100(10{,}000)+50(30{,}000)}{100+50}\\
+&=\frac{2{,}500{,}000}{150}\\
+&=16{,}667\ \mathrm{g\,mol^{-1}}.
+\end{aligned}
+$$
+
+The weight average is
+
+$$
+\begin{aligned}
+M_w&=\frac{100(10{,}000)^2+50(30{,}000)^2}
+{100(10{,}000)+50(30{,}000)}\\
+&=\frac{5.50\times10^{10}}{2.50\times10^6}\\
+&=22{,}000\ \mathrm{g\,mol^{-1}}.
+\end{aligned}
+$$
+
+Therefore,
+
+$$
+Đ=\frac{22{,}000}{16{,}667}=1.32.
+$$
+
+The heavy chains are only one third of the molecules but contribute more strongly to $M_w$ because mass appears squared in its numerator.
+
+### Worked example: polyethylene chain length
+
+The polyethylene repeat-unit molar mass is
+
+$$
+M_{\mathrm{C_2H_4}}=2(12.01)+4(1.008)=28.05\ \mathrm{g\,mol^{-1}}.
+$$
+
+For $M_n=7.01\times10^4\ \mathrm{g\,mol^{-1}}$,
+
+$$
+DP_n\approx\frac{7.01\times10^4}{28.05}=2.50\times10^3.
+$$
+
+An average chain therefore contains about 2500 repeat units. Its contour length is not its ordinary end-to-end size: carbon-carbon bonds rotate, so an unconstrained chain coils rather than remaining fully extended.
+
+## How molecular architecture becomes a material property
+
+Linear chains can align and crystallize in ordered regions, although most common polymers are partly crystalline and partly amorphous. Branching can hinder close packing. Cross-links join chains into a network and prevent them from sliding freely past one another. A lightly cross-linked rubber can stretch and recover; a densely cross-linked thermoset is rigid and does not melt into independently flowing chains.
+
+Thermoplastics soften on heating because their chains are held together mainly by intermolecular forces and can eventually move past one another. Thermosets contain covalent networks and generally degrade rather than melt cleanly. Elastomers combine flexible chains with enough cross-linking to restore shape after deformation.
+
+The glass-transition temperature, $T_g$, marks a change in mobility of amorphous chain segments. Below $T_g$, segmental motion is slow and the material tends to be glassy; above it, the amorphous regions are more rubbery. $T_g$ is not the same as a crystalline melting point. A partly crystalline polymer may show both a glass transition for amorphous regions and melting of crystallites at a higher temperature.
+
+Strong intermolecular attractions, stiff backbones, and bulky groups that restrict rotation often raise $T_g$. Flexible linkages and some plasticizers lower it by increasing segmental mobility. Molar mass matters strongly at low chain length and less once chains are sufficiently long.
+
+Stereochemistry also changes packing. Different arrangements of side groups along a chain can make an otherwise identical repeat-unit composition crystallize differently. Copolymer sequence—random, alternating, block, or graft—can create separate nanoscale domains or distribute properties along a chain.
+
+Conducting polymers need a conjugated backbone with overlapping orbitals, but conjugation alone is insufficient for high conductivity. Charge carriers are introduced by oxidation or reduction, often called doping in this context, and morphology controls how readily charge moves between chains.
+
+## Biomolecules use the same chemistry with sequence control
+
+Four broad classes recur in biochemistry:
+
+| Class | Main building blocks | Characteristic linkage or organization | Selected roles |
 |---|---|---|---|
-| Carbohydrates | monosaccharides | glycosidic bonds, hydrogen bonding | energy and structure |
-| Lipids | fatty acids, glycerol, sterol units | hydrophobic interactions, ester bonds | membranes and energy storage |
-| Proteins | amino acids | peptide bonds, folding interactions | catalysis, structure, transport |
-| Nucleic acids | nucleotides | phosphodiester bonds, base pairing | genetic information |
+| carbohydrates | monosaccharides | glycosidic bonds | fuel, storage, structural fibers, recognition |
+| lipids | fatty acids, glycerol, sterol frameworks | ester bonds and hydrophobic assembly | membranes, energy storage, signaling |
+| proteins | amino acids | peptide bonds | catalysis, transport, mechanics, signaling |
+| nucleic acids | nucleotides | phosphodiester bonds | information storage and transfer |
 
-## Worked example 1: Average molar mass from degree of polymerization
+Lipids are grouped by solubility and biological role rather than by one polymer architecture. A triacylglycerol is not a long sequence polymer like a protein. Phospholipids self-assemble into bilayers because their polar head groups interact with water while their nonpolar tails avoid it.
 
-Problem. A polyethylene sample has average degree of polymerization 2500. Estimate number-average molar mass using repeat unit $\mathrm{C_2H_4}$.
+The hydrophobic effect is not a special bond between nonpolar groups. Water forms an organized environment around exposed nonpolar surfaces; aggregation reduces the total nonpolar surface in contact with water and releases some constrained water molecules. The resulting free-energy change helps drive membrane assembly and protein folding.
 
-    Method.
+## Proteins: sequence becomes a folded chemical environment
 
-    1. Compute repeat-unit molar mass: $2(12.01)+4(1.008)=28.05\ \mathrm{g\ mol^{-1}}$.
-2. Use $M_n\approx DP\times M_{repeat}$.
-3. Substitute: $M_n=2500(28.05)=70125\ \mathrm{g\ mol^{-1}}$.
-4. Write in scientific notation: $7.01\times10^4\ \mathrm{g\ mol^{-1}}$.
-5. This ignores end-group mass, which is negligible for such a long chain in an introductory estimate.
+An amino acid contains an amino group, a carboxyl group, and a side chain attached to the alpha carbon. Near neutral pH, free amino acids commonly exist as zwitterions with a protonated amino group and deprotonated carboxyl group.
 
-    Checked answer. $M_n\approx7.01\times10^4\ \mathrm{g\ mol^{-1}}$. Thousands of repeat units should give tens of thousands of grams per mole.
+A peptide bond forms between the carboxyl group of one amino acid and the amino group of another. The backbone has direction: sequences are conventionally written from the amino, or N, terminus to the carboxyl, or C, terminus. Because resonance gives the peptide C–N bond partial double-bond character, the peptide unit is approximately planar and rotation is restricted.
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+Protein structure is described at several levels. Primary structure is amino-acid sequence. Secondary structures such as alpha helices and beta sheets arise largely from backbone hydrogen bonding. Tertiary structure is the three-dimensional arrangement of one polypeptide chain. Quaternary structure describes the association of multiple chains.
 
-## Worked example 2: DNA complement and base counts
+No single force “causes” folding. Hydrophobic burial, hydrogen bonds, ionic interactions, dispersion forces, disulfide bonds, and metal coordination can all contribute. Folding is a free-energy balance that includes the protein and solvent. The native structure is dynamic rather than a rigid model.
 
-Problem. A DNA strand has sequence 5'-ATGCCGA-3'. Write the complementary strand and count hydrogen-bond categories.
+Enzymes accelerate reactions by lowering the activation free energy. Binding positions reacting groups, stabilizes charge distributions, and can supply acidic, basic, nucleophilic, or metal-ion chemistry. An enzyme changes the rates of forward and reverse reactions but does not change the reaction's equilibrium constant.
 
-    Method.
+Denaturation disrupts higher-order structure without necessarily cleaving peptide bonds. Heat, extreme pH, or solvents can disturb the interactions maintaining the fold. Loss of structure often means loss of activity, even though the amino-acid sequence remains intact.
 
-    1. Use base-pairing rules: A pairs with T, and G pairs with C.
-2. Read each base on the given strand and write its partner: A->T, T->A, G->C, C->G, C->G, G->C, A->T.
-3. The complementary sequence aligned antiparallel is 3'-TACGGCT-5'.
-4. Count A-T pairs: positions 1, 2, and 7 give three A-T pairs.
-5. Count G-C pairs: positions 3, 4, 5, and 6 give four G-C pairs.
-6. A-T pairs have two hydrogen bonds each and G-C pairs have three each, so total hydrogen bonds are $3(2)+4(3)=18$.
+## Carbohydrates and lipids
 
-    Checked answer. Complement is 3'-TACGGCT-5', with three A-T pairs, four G-C pairs, and 18 base-pair hydrogen bonds. The complement has the same length and every base has exactly one partner.
+Monosaccharides contain several hydroxyl groups and a carbonyl group in their open-chain form. In water, many cyclize to hemiacetals or hemiketals. Glycosidic bonds join sugar units, and their stereochemistry changes biological properties. Starch and cellulose are both glucose polymers, but their different glycosidic linkages produce different shapes and digestibility.
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+Fatty acids contain a carboxyl group and hydrocarbon chain. Double bonds, especially cis double bonds, introduce bends that disrupt tight packing and often lower melting temperature. Saturated chains pack more regularly. In phospholipid bilayers, tail composition helps tune membrane fluidity along with sterols and temperature.
 
-## Code
+Hydrolysis reverses many biological condensation linkages by adding the elements of water. The reaction may be thermodynamically favorable yet slow without acid, base, or an enzyme. Favorability and rate remain separate questions.
 
-```python
-def polymer_molar_mass(degree_polymerization, repeat_mass):
-    return degree_polymerization * repeat_mass
+## DNA and RNA: direction, complementarity, and information
 
-def dna_complement(seq):
-    pairs = {"A": "T", "T": "A", "G": "C", "C": "G"}
-    return "".join(pairs[base] for base in seq)
+A nucleotide contains a sugar, phosphate, and nitrogenous base. Phosphodiester bonds connect the $3'$ hydroxyl of one sugar to the $5'$ phosphate of the next, giving every nucleic-acid strand a $5'\rightarrow3'$ direction. Standard double-stranded DNA uses antiparallel strands: one runs $5'\rightarrow3'$ while its partner runs $3'\rightarrow5'$.
 
-def dna_h_bonds(seq):
-    return sum(2 if base in "AT" else 3 for base in seq)
+Watson–Crick pairing places A with T and G with C in DNA. RNA generally uses U in place of T. For
 
-repeat_mass = 2 * 12.01 + 4 * 1.008
-print(polymer_molar_mass(2500, repeat_mass))
-print(dna_complement("ATGCCGA"), dna_h_bonds("ATGCCGA"))
-```
+$$
+5'\text{-ATGCCGA-}3',
+$$
 
-## Common pitfalls
+the aligned DNA complement is
 
-- Treating polymers as single-molar-mass small molecules. Avoid it by remembering real samples have chain length distributions.
-- Ignoring end groups for short oligomers. Avoid it by checking whether degree of polymerization is large enough for approximation.
-- Confusing addition and condensation polymerization. Avoid it by looking for loss of a small molecule such as water or HCl.
-- Saying all biomolecular structure is covalent. Avoid it by including hydrogen bonding, ionic, hydrophobic, and dispersion interactions.
-- Writing DNA complements in the wrong direction. Avoid it by marking 5' and 3' ends explicitly.
-- Treating lipids as polymers in the same sense as proteins or nucleic acids. Avoid it by recognizing lipids as a broad hydrophobic class rather than sequence polymers.
+$$
+3'\text{-TACGGCT-}5'.
+$$
 
-## Connections
+If the complement must also be written $5'\rightarrow3'$, reverse the aligned sequence:
 
-- [organic chemistry](/chemistry/general/organic-chemistry)
-- [molecular geometry and bonding theory](/chemistry/general/molecular-geometry-and-bonding-theory)
-- [solutions and colligative properties](/chemistry/general/solutions-and-colligative-properties)
-- [transition metals and coordination compounds](/chemistry/general/transition-metals-and-coordination-compounds)
+$$
+5'\text{-TCGGCAT-}3'.
+$$
+
+There are three A–T pairs and four G–C pairs. Counting two hydrogen bonds for each A–T pair and three for each G–C pair gives
+
+$$
+3(2)+4(3)=18
+$$
+
+hydrogen bonds in the idealized pairing picture. Duplex stability cannot be inferred from that count alone. Base stacking, neighboring sequence, salt concentration, strand length, mismatches, and temperature all contribute.
+
+Replication and transcription depend on complementarity, but base pairing does not copy information by itself. Enzymes select substrates, catalyze phosphodiester-bond formation, and proofread to varying degrees. The sequence is stored in covalent structure; hydrogen bonding allows the strands to recognize complementary partners reversibly.
+
+## Boundaries of the simplified models
+
+- A repeat unit is not automatically identical to the monomer. Check which bonds were broken or formed during polymerization.
+- Molar mass is an average over a distribution. State whether it is $M_n$, $M_w$, or another measured average.
+- Similar molar mass does not guarantee similar material behavior. Branching, crystallinity, tacticity, additives, and processing history can dominate.
+- Condensation and step-growth are related terms but not exact synonyms. One refers to atom balance; the other refers to the growth mechanism.
+- Biomolecular shape cannot be predicted from covalent connectivity alone. Solvent and many weak interactions contribute to the favored ensemble.
+- Nucleic-acid complements need direction labels. An aligned antiparallel complement and a reverse complement contain the same bases in opposite written order.
+- Enzymes affect rate, not the equilibrium position. More product at a fixed early time does not imply a changed equilibrium constant.
+
+## Degradation, recycling, and lifetime
+
+Polymer lifetime depends on which bonds are vulnerable and whether water, oxygen, light, heat, or mechanical stress can reach them. Polyesters and polyamides contain hydrolyzable links, though useful degradation may still be slow in a dry or cool environment. Carbon-carbon backbones resist hydrolysis but can undergo oxidation or photochemical chain scission.
+
+Chain scission lowers molar mass and often weakens a material before much mass is lost. Cross-linking during aging can instead make a polymer harder and more brittle. Additives such as antioxidants and ultraviolet absorbers slow selected pathways but may migrate or be consumed.
+
+Mechanical recycling melts and reshapes suitable thermoplastics, but mixed polymers, pigments, fillers, and prior degradation reduce product quality. Chemical recycling aims to recover monomers or other feedstocks by depolymerization or conversion. Its feasibility depends on separation, energy use, reaction selectivity, and product value; a polymer being chemically degradable does not guarantee an efficient recycling process.
+
+Biodegradation requires organisms or enzymes able to attack the material under the disposal conditions. A polymer that degrades in an industrial composting facility may persist in cold soil or seawater. Labels such as biodegradable therefore need a specified environment and time scale.
+
+## Free energy links self-assembly and folding
+
+Macromolecular organization is governed by Gibbs energy,
+
+$$
+\Delta G=\Delta H-T\Delta S.
+$$
+
+Folding a chain reduces its conformational entropy, which opposes a unique compact structure. Favorable interactions within the chain and changes in solvent organization compensate. The resulting folded state is favored only when the total free-energy balance is negative under the given conditions.
+
+Self-assembly remains dynamic. Lipids exchange, protein conformations fluctuate, and nucleic-acid base pairs open transiently. Cooperative behavior can make a transition appear sharp even though individual molecular events remain reversible. Heating a protein or DNA duplex shifts the ensemble rather than flipping every molecule at one identical temperature.
+
+Crowding, salt, pH, and cosolvents alter the balance by changing electrostatic screening, solvent activity, or exposed surface. A sequence that folds in one buffer may aggregate or unfold in another. Structural claims therefore belong with conditions.
+
+## Sequence errors have different consequences
+
+A substitution in a protein sequence may change little if it preserves size and chemical character at an exposed position, or it may destroy function if it disrupts an active site or buried packing. Insertions and deletions can be more disruptive because they alter every downstream position in a translated reading frame when the nucleotide count is not a multiple of three.
+
+For synthetic copolymers, sequence is usually less exact but still consequential. A block copolymer can segregate into domains because long runs of unlike units avoid one another, whereas a random copolymer distributes the same compositions along each chain. Composition alone cannot predict morphology without sequence architecture.
+
+<div className="see-also">
+
+See also: [organic chemistry](/chemistry/general/organic-chemistry) · [molecular geometry and bonding theory](/chemistry/general/molecular-geometry-and-bonding-theory) · [chemical kinetics](/chemistry/general/chemical-kinetics) · [thermodynamics and free energy](/chemistry/general/thermodynamics-and-free-energy)
+
+</div>

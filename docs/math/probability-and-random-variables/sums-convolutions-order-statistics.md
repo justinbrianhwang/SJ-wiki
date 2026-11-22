@@ -423,10 +423,8 @@ Support still remembers the finite sum: the unscaled distribution lives on $[0,n
 
 Convolution is associative, so numerical algorithms can combine balanced pairs rather than convolving one distribution at a time. For lattice distributions, fast Fourier transforms turn convolution into pointwise multiplication. Padding is needed to prevent circular wraparound from contaminating the linear convolution.
 
-## Related pages
+<div className="see-also">
 
-- [Joint distributions, transformations, and independence](/math/probability-and-random-variables/joint-distributions-transformations-independence)
-- [Normal, exponential, gamma, beta, and Cauchy laws](/math/probability-and-random-variables/normal-exponential-gamma-beta-cauchy)
-- [Covariance, correlation, and conditional expectation](/math/probability-and-random-variables/covariance-correlation-conditional-expectation)
-- [Moment and characteristic functions](/math/probability-and-random-variables/moment-and-characteristic-functions)
-- [Transformations of random variables](/math/probability/transformations-random-variables)
+See also: [Joint distributions, transformations, and independence](/math/probability-and-random-variables/joint-distributions-transformations-independence) · [Normal, exponential, gamma, beta, and Cauchy laws](/math/probability-and-random-variables/normal-exponential-gamma-beta-cauchy) · [Covariance, correlation, and conditional expectation](/math/probability-and-random-variables/covariance-correlation-conditional-expectation) · [Moment and characteristic functions](/math/probability-and-random-variables/moment-and-characteristic-functions) · [Transformations of random variables](/math/probability/transformations-random-variables)
+
+</div>

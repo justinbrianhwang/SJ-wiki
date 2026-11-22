@@ -316,9 +316,8 @@ Initial weights also affect transient learning. Zero initialization encodes zero
 
 Reproducibility requires saving the feature transformation with the weights. Tile offsets, hash seeds, normalization statistics, Fourier orders, and radial-basis centers define the coordinate system. Reconstructing any of them differently turns a valid weight vector into predictions for another model. Versioning only the numeric parameters is therefore incomplete.
 
-## Related pages
+<div className="see-also">
 
-- [Temporal-difference learning](/cs/reinforcement-learning/temporal-difference-learning)
-- [On-policy control with approximation](/cs/reinforcement-learning/on-policy-control-approximation)
-- [Off-policy approximation](/cs/reinforcement-learning/off-policy-approximation)
-- [Eligibility traces](/cs/reinforcement-learning/eligibility-traces)
+See also: [Temporal-difference learning](/cs/reinforcement-learning/temporal-difference-learning) · [On-policy control with approximation](/cs/reinforcement-learning/on-policy-control-approximation) · [Off-policy approximation](/cs/reinforcement-learning/off-policy-approximation) · [Eligibility traces](/cs/reinforcement-learning/eligibility-traces)
+
+</div>

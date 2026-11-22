@@ -9,7 +9,7 @@ Most useful Hamiltonians cannot be solved exactly. Time-independent perturbation
 
 Sakurai presents nondegenerate and degenerate perturbation theory, then applies it to hydrogenlike atoms, fine structure, and electromagnetic-field interactions. Ballentine gives a careful stationary-state perturbation chapter with variational comparison. The Gottfried-named notes emphasize Rayleigh-Schrodinger expansions and hydrogen in fields. Schiff's classic treatment is often more coordinate-based and calculation-heavy.
 
-## Definitions
+## Setting up the expansion
 
 Write the Hamiltonian as
 
@@ -51,7 +51,7 @@ $$
 
 For a degenerate subspace, one must first diagonalize $V$ inside that subspace. Ordinary nondegenerate formulas fail because denominators become zero.
 
-## Key results
+## Nondegenerate formulas and degenerate subspaces
 
 For a nondegenerate level,
 
@@ -105,8 +105,6 @@ $$
 
 with spin and fine-structure refinements depending on coupling regime. Sakurai's treatment makes the angular-momentum basis choice explicit.
 
-## Visual
-
 ```mermaid
 flowchart TD
   A[Choose solvable H0] --> B{"Level degenerate?"}
@@ -126,7 +124,7 @@ flowchart TD
 | Parity-odd perturbation on even state | check symmetry | often zero | missing second-order effect |
 | Magnetic splitting | choose angular-momentum basis | projection-dependent | mixing weak/strong field regimes |
 
-## Worked example 1: Two-level nondegenerate perturbation
+## Level repulsion in a two-state model
 
 **Problem.** Let
 
@@ -175,7 +173,7 @@ $$
 
 **Checked answer.** The lower level moves downward. Exact diagonalization gives $E_-=(\Delta-\sqrt{\Delta^2+4v^2})/2\approx -v^2/\Delta$ for small $v/\Delta$.
 
-## Worked example 2: Degenerate perturbation in a two-state subspace
+## Splitting a degenerate doublet
 
 **Problem.** Two unperturbed states $\vert a\rangle,\vert b\rangle$ have the same energy $E_0$. In this subspace,
 
@@ -218,7 +216,7 @@ $$
 
 **Checked answer.** The perturbation splits the degeneracy linearly, and the correct starting states are symmetric and antisymmetric combinations.
 
-## Code
+## Checking the series against exact diagonalization
 
 ```python
 import numpy as np
@@ -234,7 +232,7 @@ print("second-order estimate:", perturbative)
 print("relative error:", abs((exact - perturbative) / exact))
 ```
 
-## Common pitfalls
+## When the expansion stops being controlled
 
 - Using nondegenerate formulas inside a degenerate subspace. Zero denominators are not a minor algebra issue; the basis is wrong.
 - Forgetting symmetry selection rules. Parity can make matrix elements vanish before integration.
@@ -244,7 +242,7 @@ print("relative error:", abs((exact - perturbative) / exact))
 - Mixing exact eigenstates of the full Hamiltonian with unperturbed states inside matrix elements.
 - Applying weak-field Zeeman formulas in regimes where spin-orbit coupling is no longer the dominant internal interaction.
 
-Perturbation theory begins with a modeling decision: what is $H_0$, and what is small? The best $H_0$ is not always the most obvious algebraic split; it should capture the dominant physics and leave a perturbation whose matrix elements are small compared with relevant level spacings. If the perturbation connects nearly degenerate states, the expansion parameter is effectively large even when the operator looks small. This is why level spacing appears in denominators.
+Perturbation theory begins with a modeling decision: what is $H_0$, and what is small? The best $H_0$ is not always the most obvious algebraic split; it should capture the dominant physics and leave a perturbation whose matrix elements are small compared with relevant level spacings. If the perturbation connects nearly degenerate states, the expansion parameter is effectively large even when the operator looks small. The energy denominators measure precisely this sensitivity to level spacing.
 
 Symmetry should be used before summing states. If $V$ is odd under parity, its diagonal matrix element in a parity eigenstate vanishes. If $V$ is rotationally invariant, it cannot mix states with different total angular momentum labels in the usual way. Selection rules reduce both computation and error. Sakurai's angular-momentum-first structure pays off here because perturbation theory in atoms is often mostly a problem of choosing the right coupled basis.
 
@@ -260,14 +258,10 @@ Finally, perturbation theory is an asymptotic tool, not always a convergent one.
 
 For operator perturbations in infinite-dimensional spaces, convergence of sums over intermediate states is another hidden assumption. Selection rules, closure relations, or sum rules can simplify these expressions, but they do not remove the need to check whether the perturbation and states are physically admissible. Formal sums that diverge signal missing physics, an invalid approximation, or the need for renormalized parameters in more advanced settings.
 
-This is why perturbative answers should always be paired with stated small parameters and validity conditions.
+Perturbative answers should therefore state the small parameters and validity conditions alongside any numerical agreement.
 
-State those assumptions explicitly before trusting numerical agreement.
+<div className="see-also">
 
-## Connections
+See also: [Harmonic oscillator with ladder operators](/physics/quantum-mechanics/harmonic-oscillator-ladder-operators) · [Central potentials and the hydrogen atom](/physics/quantum-mechanics/central-potentials-hydrogen-atom) · [Addition of angular momentum](/physics/quantum-mechanics/addition-of-angular-momentum) · [Time-dependent perturbation theory](/physics/quantum-mechanics/time-dependent-perturbation-theory) · [Variational principle and WKB](/physics/quantum-mechanics/variational-principle-wkb)
 
-- [Harmonic oscillator with ladder operators](/physics/quantum-mechanics/harmonic-oscillator-ladder-operators)
-- [Central potentials and the hydrogen atom](/physics/quantum-mechanics/central-potentials-hydrogen-atom)
-- [Addition of angular momentum](/physics/quantum-mechanics/addition-of-angular-momentum)
-- [Time-dependent perturbation theory](/physics/quantum-mechanics/time-dependent-perturbation-theory)
-- [Variational principle and WKB](/physics/quantum-mechanics/variational-principle-wkb)
+</div>

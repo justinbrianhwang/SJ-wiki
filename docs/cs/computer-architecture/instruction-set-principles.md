@@ -7,9 +7,9 @@ sidebar_position: 4
 
 An instruction set architecture, or ISA, is the contract between software and hardware. Compilers, assemblers, operating systems, debuggers, and binary tools depend on it. Microarchitectures can change radically underneath the same ISA: a simple in-order core, an out-of-order superscalar core, and a translated internal core can all implement the same programmer-visible instructions.
 
-H&P treats ISA design as one part of architecture, not the whole field. That distinction matters. A clean load-store ISA can simplify pipelining and compiler reasoning, but performance also depends on branch prediction, caches, memory systems, and implementation technology. This page focuses on ISA concepts using MIPS-like and RISC-V-like examples, while contrasting them with more complex CISC styles such as x86.
+H&P treats ISA design as one part of architecture, not the whole field. That distinction matters. A clean load-store ISA can simplify pipelining and compiler reasoning, but performance also depends on branch prediction, caches, memory systems, and implementation technology. MIPS-like and RISC-V-like examples expose the ISA concepts clearly; x86 provides a contrasting CISC design.
 
-## Definitions
+## The contract software sees
 
 An ISA specifies the programmer-visible behavior of a processor:
 
@@ -43,7 +43,7 @@ $$
 
 Control-flow instructions alter the program counter. Conditional branches choose between fall-through and target addresses. Calls save a return address and transfer control. Returns jump to the saved address.
 
-## Key results
+## Regular encodings and their implementation costs
 
 ISA choices strongly affect implementation complexity. Fixed-length instructions simplify fetch and decode because instruction boundaries are obvious. Variable-length instructions can improve code density, reducing instruction-cache pressure, but they need more complex decoders and length prediction. More registers reduce memory traffic and make compiler allocation easier, but increase instruction bits needed to name registers and can lengthen register-file access.
 
@@ -59,15 +59,13 @@ That stage regularity is one reason MIPS was historically useful for teaching ar
 
 CISC encodings illustrate a different trade-off. A single x86 instruction may do work that takes multiple RISC instructions, and the binary may be smaller. But the processor must handle variable length, more addressing cases, and more complex side effects. High-performance x86 cores spend area and power translating the architected ISA into internal operations that can be renamed, scheduled, and speculated.
 
-The best ISA is not always the one with the fewest instructions. It is the one whose visible contract lets software express important operations while allowing efficient implementations across many generations. Compatibility has enormous economic value; this is why old ISAs persist long after their original implementation assumptions have changed.
+The best ISA is not always the one with the fewest instructions. It is the one whose visible contract lets software express important operations while allowing efficient implementations across many generations. Compatibility has enormous economic value, so old ISAs persist long after their original implementation assumptions have changed.
 
 A useful ISA design rule is to keep the common case regular and make uncommon complexity explicit. For example, a base-plus-offset load handles stack slots, fields in records, and array elements with a compact encoding. More elaborate modes can reduce instruction count in special cases, but they may lengthen address-generation logic for every implementation. The cost is paid repeatedly by future microarchitectures, compilers, verifiers, and operating systems.
 
 The ISA also defines what the compiler can assume. If condition codes are implicit side effects of arithmetic, instruction scheduling must preserve those side effects until the branch or conditional operation consumes them. If comparisons write ordinary registers, there may be more flexibility but also more register pressure. If the ISA has predicated instructions, short branches can sometimes be removed, but useless work may execute under false predicates. These details connect ISA design directly to pipelining, branch prediction, and ILP.
 
 RISC-V-style teaching examples are useful because the visible rules are simple, but real systems include privileged instructions, page-table formats, atomic memory operations, floating-point state, vector extensions, and debug facilities. An ISA is not only the integer instructions shown in a datapath diagram; it is the full software-hardware contract needed to boot, isolate, interrupt, virtualize, and debug programs.
-
-## Visual
 
 ```mermaid
 flowchart TB
@@ -97,7 +95,7 @@ flowchart TB
     Priv --> OS["OS trap/interrupt/virtualization interface"]
 ```
 
-This ISA diagram separates the programmer-visible contract from the microarchitecture that implements it. Encodings, registers, memory operations, control flow, privilege rules, atomics, and fences are stable ISA facts, while decode, micro-op formation, renaming, execution, and retirement are implementation choices. The side paths show why addressing modes, branch semantics, and privileged operations directly affect cache/TLB access, prediction, and operating-system control.
+Encodings, registers, memory operations, control flow, privilege rules, atomics, and fences belong to the programmer-visible contract. Decode, micro-op formation, renaming, execution, and retirement are implementation choices. Addressing modes, branch semantics, and privileged operations still reach into cache/TLB access, prediction, and operating-system control.
 
 | Design choice | RISC-style tendency | CISC-style tendency | Main trade-off |
 |---|---|---|---|
@@ -107,7 +105,7 @@ This ISA diagram separates the programmer-visible contract from the microarchite
 | Register count | Often larger | Historically smaller | Fewer spills versus encoding bits |
 | Implementation | Direct pipeline-friendly decode | Decode into internal operations | Simpler front end versus compatibility |
 
-## Worked example 1: Encoding a MIPS-style register instruction
+## Packing a MIPS-style register instruction
 
 Problem: Encode a simplified MIPS-style instruction `add r9, r10, r11`. Use an R-format layout with fields `opcode(6) rs(5) rt(5) rd(5) shamt(5) funct(6)`. For `add`, assume `opcode=0`, `funct=32`, `rs=r10`, `rt=r11`, `rd=r9`, and `shamt=0`.
 
@@ -146,7 +144,7 @@ $$
 
 Checked answer: The encoded instruction is `0x014B4820` under this simplified MIPS-style layout. The result is checkable because the low six bits are `100000`, the expected function code for add.
 
-## Worked example 2: Comparing load-store and memory-memory code
+## Counting load-store versus memory-memory instructions
 
 Problem: Compute `A[i] = B[i] + C[i]` for 64-bit integers. Assume base addresses are in `r1`, `r2`, `r3`, index byte offset is in `r4`, and temporaries are `r5`, `r6`, `r7`. Count dynamic instructions in a RISC load-store sequence, then compare with a hypothetical memory-memory instruction.
 
@@ -183,7 +181,7 @@ But the RISC pipeline sees explicit memory operations and a simple register-regi
 
 Checked answer: Instruction count alone favors the memory-memory ISA, but implementation simplicity and scheduling visibility favor the load-store sequence. The correct design choice depends on CPI, code density, cache behavior, and compiler support, not on instruction count alone.
 
-## Code
+## Encoding a fixed-width instruction
 
 ```python
 def encode_r_type(opcode, rs, rt, rd, shamt, funct):
@@ -207,11 +205,11 @@ print(f"0x{inst:08X}")
 print(f"binary={inst:032b}")
 ```
 
-This encoder is intentionally small, but it illustrates why fixed fields simplify hardware. The decoder can select bit slices for register numbers and operation fields without first finding instruction boundaries. Variable-length ISAs can still be fast, but they need more front-end machinery: length decoding, instruction alignment, queues, and often translation into internal operations.
+The small encoder illustrates how fixed fields simplify hardware. The decoder can select bit slices for register numbers and operation fields without first finding instruction boundaries. Variable-length ISAs can still be fast, but they need more front-end machinery: length decoding, instruction alignment, queues, and often translation into internal operations.
 
 Encoding space is a scarce resource. Adding more registers, larger immediates, predication bits, or addressing modes consumes bits. If the ISA keeps a fixed 32-bit base instruction, every field competes with every other field. Compressed instruction extensions make a different trade-off by adding shorter encodings for common cases, improving code density while preserving a regular full-size base format.
 
-## Common pitfalls
+## What instruction counts leave out
 
 - Treating ISA and microarchitecture as the same thing.
 - Assuming RISC always means faster or CISC always means slower.
@@ -220,9 +218,8 @@ Encoding space is a scarce resource. Adding more registers, larger immediates, p
 - Adding addressing modes that look convenient but lengthen the critical decode or execute path.
 - Ignoring compiler quality when evaluating an ISA.
 
-## Connections
+<div className="see-also">
 
-- [Pipelining and Hazards](/cs/computer-architecture/pipelining-hazards)
-- [Dynamic Scheduling and Tomasulo](/cs/computer-architecture/dynamic-scheduling-tomasulo)
-- [Virtual Memory, TLBs, and VMs](/cs/computer-architecture/virtual-memory-tlb-vms)
-- [Domain-Specific Accelerators](/cs/computer-architecture/domain-specific-accelerators)
+See also: [Pipelining and Hazards](/cs/computer-architecture/pipelining-hazards) · [Dynamic Scheduling and Tomasulo](/cs/computer-architecture/dynamic-scheduling-tomasulo) · [Virtual Memory, TLBs, and VMs](/cs/computer-architecture/virtual-memory-tlb-vms) · [Domain-Specific Accelerators](/cs/computer-architecture/domain-specific-accelerators)
+
+</div>

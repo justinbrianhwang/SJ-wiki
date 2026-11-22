@@ -5,11 +5,11 @@ sidebar_position: 1
 
 # Database Systems
 
-Database systems are the software layer that lets people store, query, update, protect, and share large collections of data. A database-management system is not just a file format. It includes data models, query languages, storage structures, indexing methods, query optimizers, transaction managers, recovery logic, authorization, and distributed coordination. The central promise is data independence: users should describe the information they need, while the system decides how to store and retrieve it efficiently and safely.
+Database systems are the software layer that lets people store, query, update, protect, and share large collections of data. A database-management system combines a file representation with data models, query languages, storage structures, indexes, optimizers, transaction managers, recovery logic, authorization, and distributed coordination. Its central promise is data independence: users describe the information they need, while the system decides how to store and retrieve it efficiently and safely.
 
 These notes follow the structure and emphasis of Silberschatz, Korth, and Sudarshan's *Database System Concepts*, 7th edition, using the local source PDF's extracted table of contents as the roadmap. The pages are written as study notes rather than a replacement for the book: they compress the core definitions, algorithms, trade-offs, and worked examples needed to connect SQL practice with database internals.
 
-## Definitions
+## The logical contract and the physical system
 
 A **database** is an organized collection of related data representing some part of the real world or an enterprise. A **database-management system (DBMS)** is the software system that defines, stores, queries, updates, protects, and administers that data. A **database system** is the DBMS plus the data, applications, users, and operating environment around it.
 
@@ -23,13 +23,13 @@ A **transaction** is a unit of work that should be atomic, isolated, durable, an
 
 A **physical database design** chooses storage layouts, indexes, partitioning, replication, and related implementation choices. It should serve the workload without changing the logical meaning of the data.
 
-## Key results
+## From declarative queries to durable state
 
 The extracted source table of contents organizes the subject into a sequence that is useful for study:
 
-| Source part | Main chapters in the extracted TOC | Notes in this wiki |
+| Source part | Main chapters in the extracted TOC | Notes coverage |
 | --- | --- | --- |
-| Overview | Introduction | this page |
+| Overview | Introduction | introductory concepts above |
 | Relational languages | relational model, SQL, intermediate SQL, advanced SQL | relational algebra and SQL pages |
 | Database design | E-R model and relational design | E-R mapping and normalization pages |
 | Application development | complex data types and application development | application architecture/security and NoSQL overview |
@@ -48,7 +48,7 @@ Several themes recur across the whole subject:
 - Performance trade-offs are usually workload-specific. An index that helps reads can slow writes. Denormalization can speed a dashboard but complicate updates. Replication can improve availability but complicate consistency.
 - Correctness must survive concurrency and failure. Serializability, recoverability, write-ahead logging, checkpoints, and commit protocols exist because real systems crash and real users act at the same time.
 
-## Visual
+## Following a query through the DBMS
 
 ```mermaid
 flowchart TD
@@ -99,7 +99,7 @@ This DBMS architecture diagram follows a query from SQL text to a physical plan 
 | why distributed databases are difficult | transactions and recovery | replication, partitioning, 2PC, CAP |
 | why analytics use different systems | storage layouts | NoSQL, big data, and warehousing |
 
-## Worked example 1: Trace one SQL query through the DBMS
+## Tracing a filtered query through the engine
 
 Problem: A user asks for high-credit computer-science students:
 
@@ -135,7 +135,7 @@ $$
 
 Checked answer: even a short SQL query touches schema metadata, algebraic meaning, statistics, access paths, physical operators, buffer management, and isolation. The user sees a table of results, but the DBMS coordinates many layers to produce it.
 
-## Worked example 2: Choose a safe design for course enrollment
+## Enforcing enrollment under concurrency
 
 Problem: A university application must enroll students into sections while enforcing these rules: the student must exist, the section must exist, a student cannot enroll twice in the same section, and section capacity must not be exceeded.
 
@@ -171,7 +171,7 @@ $$
 
 Checked answer: schema constraints handle identity and references; transaction isolation handles the concurrent capacity race; recovery handles crashes. No single feature is enough for the whole enrollment rule.
 
-## Code
+## Encoding the enrollment constraints in SQL
 
 ```sql
 CREATE TABLE section (
@@ -198,31 +198,7 @@ CREATE TABLE takes (
 );
 ```
 
-```python
-def recommended_path(goal):
-    paths = {
-        "sql": [
-            "/cs/databases/relational-model-and-algebra",
-            "/cs/databases/sql-ddl-dml-and-basic-queries",
-            "/cs/databases/sql-joins-subqueries-and-set-operations",
-        ],
-        "internals": [
-            "/cs/databases/storage-records-blocks-and-files",
-            "/cs/databases/indexing-bplus-hash-bitmap",
-            "/cs/databases/query-processing-join-algorithms",
-        ],
-        "transactions": [
-            "/cs/databases/transactions-acid-and-serializability",
-            "/cs/databases/concurrency-control-locks-deadlocks-timestamps",
-            "/cs/databases/recovery-wal-aries-checkpoints",
-        ],
-    }
-    return paths.get(goal, paths["sql"])
-
-print(recommended_path("transactions"))
-```
-
-## Common pitfalls
+## Where logical and physical reasoning diverge
 
 - Treating a DBMS as only persistent storage. Query processing, constraints, transactions, recovery, and authorization are equally central.
 - Learning SQL syntax without the relational model. Algebra clarifies joins, subqueries, duplicate handling, and optimization.
@@ -231,11 +207,8 @@ print(recommended_path("transactions"))
 - Assuming default isolation is serializable. Many systems default to weaker levels for throughput.
 - Treating distributed replication as backup or as automatic consistency. Replicas need explicit consistency and recovery design.
 
-## Connections
+<div className="see-also">
 
-- [Relational Model and Relational Algebra](/cs/databases/relational-model-and-algebra)
-- [SQL DDL, DML, and Basic Queries](/cs/databases/sql-ddl-dml-and-basic-queries)
-- [E-R Modeling and Relational Mapping](/cs/databases/er-modeling-and-relational-mapping)
-- [Storage, Records, Blocks, and Files](/cs/databases/storage-records-blocks-and-files)
-- [Transactions, ACID, and Serializability](/cs/databases/transactions-acid-and-serializability)
-- [Distributed Databases, Replication, Partitioning, and 2PC](/cs/databases/distributed-databases-replication-partitioning-2pc)
+See also: [Relational model and relational algebra](/cs/databases/relational-model-and-algebra) · [SQL DDL, DML, and basic queries](/cs/databases/sql-ddl-dml-and-basic-queries) · [E-R modeling and relational mapping](/cs/databases/er-modeling-and-relational-mapping) · [Storage, records, blocks, and files](/cs/databases/storage-records-blocks-and-files) · [Transactions, ACID, and serializability](/cs/databases/transactions-acid-and-serializability) · [Distributed databases, replication, partitioning, and 2PC](/cs/databases/distributed-databases-replication-partitioning-2pc)
+
+</div>

@@ -7,9 +7,9 @@ sidebar_position: 8
 
 Prediction estimates how other agents may move over the next few seconds. It is harder than extrapolation because road users respond to maps, signals, social context, hidden intentions, and the ego vehicle's planned motion. A pedestrian near a crosswalk, a cyclist approaching a parked car, and a vehicle edging into an unprotected left turn all require multiple plausible futures rather than one deterministic path.
 
-This page introduces constant-velocity baselines, map-aware trajectory forecasting, social interaction models, multimodal prediction, scene-level prediction, and common datasets. Prediction consumes [perception](/cs/autonomous-driving/perception-object-detection-and-segmentation), [sensor fusion](/cs/autonomous-driving/sensor-fusion), and [localization/map](/cs/autonomous-driving/localization-and-hd-maps) outputs, then informs [behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning) and [motion planning](/cs/autonomous-driving/motion-planning).
+Useful forecasts combine recent kinematics with map topology, agent interaction, ego intent, and calibrated uncertainty. The planner needs plausible modes and their likelihoods rather than one smooth average.
 
-## Definitions
+## Representing future road use
 
 An **agent** is a road user whose state and future behavior may affect the ego vehicle: car, truck, bus, motorcycle, pedestrian, cyclist, scooter, emergency vehicle, or construction worker.
 
@@ -29,7 +29,7 @@ $$
 
 **Argoverse** and **Waymo Open Motion Dataset** are influential motion forecasting datasets. They provide standardized scenarios, agent histories, map context, and future labels for benchmark evaluation.
 
-## Key results
+## Baselines, modes, and calibration
 
 A constant-velocity baseline predicts:
 
@@ -154,7 +154,7 @@ Dataset metrics should be sliced by scenario. A model can have excellent average
 
 Forecast freshness is another interface requirement: a good old prediction may be less useful than a rough current one when traffic changes quickly.
 
-## Visual
+### From vectorized history to multimodal futures
 
 ```mermaid
 flowchart TB
@@ -204,7 +204,7 @@ flowchart TB
 
 This diagram shows two common forecasting architectures at sublayer level. VectorNet builds polyline embeddings and a global graph, while HiVT uses hierarchical temporal, map, local-interaction, and global-interaction attention; both produce multimodal future trajectories with probabilities for planning.
 
-## Worked example 1: Constant-velocity forecast
+## Establishing a constant-velocity baseline
 
 Problem: A tracked car is at position $(x,y)=(12,4)$ m in the ego frame and has velocity $(v_x,v_y)=(8,0)$ m/s. Predict its position after 0.5 s, 1.0 s, and 2.0 s using constant velocity.
 
@@ -236,7 +236,7 @@ Answer: predicted positions are $(16,4)$ m, $(20,4)$ m, and $(28,4)$ m.
 
 Check: The car advances 8 m each second along $x$ and stays in the same lateral position. If it is approaching a curve or red light, this baseline may become wrong quickly.
 
-## Worked example 2: Evaluating two predicted trajectories
+## Comparing ADE and FDE
 
 Problem: Ground-truth future positions at three seconds are $(5,0)$, $(10,0)$, and $(15,0)$. Predictor A gives $(4,0)$, $(9,0)$, $(14,0)$. Predictor B gives $(5,1)$, $(10,2)$, $(15,3)$. Compute ADE and FDE for both.
 
@@ -276,7 +276,7 @@ Answer: Predictor A has ADE 1 m and FDE 1 m; Predictor B has ADE 2 m and FDE 3 m
 
 Check: B becomes increasingly laterally wrong, so its final error is worse. For planning, that may matter if B incorrectly predicts lane occupancy.
 
-## Code
+## Forecasting and scoring trajectories
 
 ```python
 import numpy as np
@@ -298,7 +298,7 @@ truth = np.array([[16.0, 4.0], [20.0, 4.0], [24.0, 4.0], [28.0, 4.0]])
 print("ADE, FDE:", ade_fde(forecast, truth))
 ```
 
-## Common pitfalls
+## When a low displacement error misleads
 
 - Averaging incompatible futures. The mean of "turn left" and "go straight" may leave the road.
 - Evaluating forecasts without map context. A low ADE path can still violate lane direction, curbs, or traffic rules.
@@ -307,19 +307,15 @@ print("ADE, FDE:", ade_fde(forecast, truth))
 - Ignoring ego influence. Other agents react to the ego vehicle's speed, position, turn signals, and assertiveness.
 - Optimizing benchmark minADE while neglecting probability calibration. Planning needs the likelihood of modes, not only a best-case candidate.
 
-## Connections
-
-- [Perception, object detection, and segmentation](/cs/autonomous-driving/perception-object-detection-and-segmentation)
-- [Sensor fusion](/cs/autonomous-driving/sensor-fusion)
-- [Motion planning](/cs/autonomous-driving/motion-planning)
-- [Decision making and behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning)
-- [Deep learning](/cs/deep-learning/)
-- [Reinforcement learning](/cs/reinforcement-learning/)
-- Further reading: Social-LSTM, Trajectron++, VectorNet, TNT, LaneGCN, Argoverse forecasting, and Waymo Open Motion Dataset papers.
-
-## References
+## Sources cited
 
 [1] J. Gao, C. Sun, H. Zhao, Y. Shen, D. Anguelov, C. Li, C. Schmid. *VectorNet: Encoding HD Maps and Agent Dynamics from Vectorized Representation*. CVPR 2020.
 [2] M. Liang, B. Yang, R. Hu, Y. Chen, R. Liao, S. Feng, R. Urtasun. *Learning Lane Graph Representations for Motion Forecasting*. ECCV 2020.
 [3] Z. Zhou, L. Ye, J. Wang, K. Wu, K. Lu. *HiVT: Hierarchical Vector Transformer for Multi-Agent Motion Prediction*. CVPR 2022.
 [4] M. Liang, B. Yang, S. Zeng, Y. Chen, R. Hu, S. Casas, R. Urtasun. *PnPNet: End-to-End Perception and Prediction with Tracking in the Loop*. CVPR 2020.
+
+<div className="see-also">
+
+See also: [Perception, object detection, and segmentation](/cs/autonomous-driving/perception-object-detection-and-segmentation) · [Sensor fusion](/cs/autonomous-driving/sensor-fusion) · [Motion planning](/cs/autonomous-driving/motion-planning) · [Decision making and behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning) · [Deep learning](/cs/deep-learning/intro) · [Reinforcement learning](/cs/reinforcement-learning/intro)
+
+</div>

@@ -9,41 +9,39 @@ Exceptions separate ordinary control flow from unexpected failure. A method can 
 
 Assertions serve a different purpose. An assertion checks a condition that should be true if the program logic is correct, such as an invariant, precondition, or postcondition. Assertions can be enabled or disabled, so they are a debugging and validation aid rather than a substitute for required argument checks in public APIs.
 
-## Definitions
+## Four kinds of failure signal
 
-The source basis for this page is Chapter 12 on exception types, `throw`, `throws`, `try`, `catch`, `finally`, exception chaining, stack traces, when to use exceptions, assertions, and enabling assertions. The terms below are written as contracts: each one tells you what the compiler can check, what the runtime must preserve, and what a reader of the program may rely on.
+Chapter 12 covers exception types, `throw`, `throws`, `try`, `catch`, `finally`, chaining, stack traces, and assertions. The central question is whether a condition belongs to ordinary control flow, a recoverable API failure, a programming error, or an internal invariant check.
 
-**Exception.** An exception is an object representing an abnormal condition that interrupts normal control flow. It is thrown and may be caught by matching handlers. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Exception.** An object representing an abnormal condition that interrupts normal control flow. It is thrown and may be caught by a matching handler.
 
-**Checked exception.** A checked exception must be declared or caught, except for subclasses of unchecked categories. The compiler enforces handling so callers cannot ignore declared recoverable failures accidentally. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Checked exception.** An exception that must be declared or caught. The compiler prevents callers from accidentally ignoring declared recoverable failures.
 
-**Unchecked exception.** An unchecked exception is a `RuntimeException` or `Error` subclass. It usually represents programming errors or conditions not intended for ordinary recovery. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Unchecked exception.** A `RuntimeException` or `Error` subclass, usually representing a programming error or a condition not intended for ordinary recovery.
 
-**`throw`.** `throw` transfers control by throwing an exception object. Execution resumes only if a matching handler is found during stack unwinding. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**`throw`.** A transfer of control using an exception object. Execution resumes only if stack unwinding finds a matching handler.
 
-**`throws` clause.** A `throws` clause declares checked exceptions that a method or constructor may let escape. It is part of the method contract. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**`throws` clause.** The checked exceptions that a method or constructor may let escape; part of its contract.
 
-**`try`, `catch`, `finally`.** `try` protects a block, `catch` handles selected exceptions, and `finally` runs cleanup code regardless of normal completion, exception, or many control transfers. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**`try`, `catch`, `finally`.** `try` protects a block, `catch` handles selected exceptions, and `finally` runs cleanup after normal completion, exception, or most control transfers.
 
-**Exception chaining.** Exception chaining records an underlying cause when one exception is translated into another. It preserves diagnostic information across abstraction boundaries. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Exception chaining.** Recording an underlying cause when translating one exception into another, preserving diagnostic information across abstraction boundaries.
 
-**Assertion.** An assertion checks a boolean condition and throws `AssertionError` if assertions are enabled and the condition is false. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Assertion.** A boolean check that throws `AssertionError` when assertions are enabled and the condition is false.
 
-## Key results
+## Choosing between returns, exceptions, and assertions
 
-**Use exceptions for exceptional contract failure, not ordinary loop endings.** The source explicitly contrasts using a return flag for expected end-of-input with throwing an exception for reading past the end. If a condition is part of normal control flow and easy to test, a direct condition is usually clearer than exception-driven looping. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Use exceptions for exceptional contract failure, not ordinary loop endings.** The source contrasts a return flag for expected end-of-input with an exception for reading past the end. If a condition is normal and easy to test, a direct condition is clearer than exception-driven looping.
 
-**Checked exceptions document recoverable obligations.** A checked exception in a `throws` clause tells the caller that the method may fail in a way the caller should address or propagate. This can make APIs more honest, but it also requires careful design so callers are not forced to catch failures they cannot meaningfully handle. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Checked exceptions document recoverable obligations.** A checked exception in a `throws` clause tells the caller to address or propagate a possible failure. The API should not force callers to catch failures they cannot meaningfully handle.
 
-**`finally` preserves cleanup across exits.** A `finally` block runs when the `try` block completes normally, throws, returns, breaks, or continues, unless the VM itself is terminated. The source-era cleanup idiom for resources such as streams is therefore `try` plus `finally`. Java's later try-with-resources feature is outside this book. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**`finally` preserves cleanup across exits.** A `finally` block runs when the `try` block completes normally, throws, returns, breaks, or continues, unless the VM terminates. The source-era cleanup idiom is therefore `try` plus `finally`; try-with-resources came later.
 
-**Do not let `finally` hide the original reason for exit.** If a `finally` block throws a new exception or returns a value, it can replace the original exception or return reason. Cleanup code should usually avoid creating a new control transfer unless that is truly intended. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Do not let `finally` hide the original reason for exit.** If a `finally` block throws or returns, it can replace the original exception or return reason. Cleanup should avoid a new control transfer unless that replacement is intended.
 
-**Assertions are for internal truth, not user input validation.** A public method should check invalid arguments even when assertions are disabled. Assertions are better for conditions that should be impossible if the code is correct, such as postconditions after an internal calculation. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Assertions are for internal truth, not user input validation.** A public method must reject invalid arguments even when assertions are disabled. Assertions suit conditions that should be impossible in correct code, such as an internal postcondition.
 
 When designing error handling, classify each condition before writing code. Is it expected and common, like reaching the end of a token stream? Use a normal condition or return value. Is it a recoverable failure that the caller can address, like an I/O problem? A checked exception may make the contract explicit. Is it a programming error, like passing `null` where the contract forbids it? An unchecked exception may be appropriate. Is it an invariant that should never fail inside correct code? Use an assertion during development. This classification is more important than memorizing exception class names.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -65,7 +63,7 @@ flowchart TD
 | `finally` | Cleanup after any exit | Returning over an existing exception |
 | Assertion | Internal invariant checks | Required public validation |
 
-## Worked example 1: choosing end-of-input behavior
+## End-of-input belongs in the loop condition
 
 Problem: A token reader reaches the end of input. Should `next()` throw an exception to end a loop?
 
@@ -79,7 +77,7 @@ Method:
 
 Checked answer: Normal end-of-input should not be exception-driven. A visible condition is clearer; an exception is appropriate for misuse such as reading after the end.
 
-## Worked example 2: resource cleanup with `finally`
+## Closing a stream through every exit
 
 Problem: Open a stream, read data, and ensure the stream is closed if reading succeeds, fails, or returns early.
 
@@ -93,7 +91,7 @@ Method:
 
 Checked answer: The checked source-era idiom is `try` plus `finally` with a null check. Later Java try-with-resources automates this pattern, but it is not covered by the source book.
 
-## Code
+## Source-era cleanup with `finally`
 
 ```java
 import java.io.ByteArrayInputStream;
@@ -124,7 +122,7 @@ public class ExceptionDemo {
 }
 ```
 
-## Common pitfalls
+## Lost causes and hidden exits
 
 - Do not use exceptions to hide ordinary control flow such as an expected loop ending.
 - Do not catch an exception and discard it silently unless the contract explicitly says the failure is irrelevant.
@@ -132,9 +130,13 @@ public class ExceptionDemo {
 - Do not use assertions to validate public method arguments that must be checked in production.
 - Do not translate exceptions without preserving the cause when the lower-level failure is diagnostically important.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [I/O Streams, Files, Serialization, and NIO](/cs/programming/java/io-streams-files-serialization-nio): uses checked `IOException` and cleanup idioms.
 - [Classes, Objects, and Encapsulation](/cs/programming/java/classes-objects-encapsulation): uses exceptions to enforce object contracts.
 - [Control Flow, Arrays, and Strings](/cs/programming/java/control-flow-arrays-strings): contrasts normal branch/loop control with exceptional transfer.
 - [Threads, Synchronization, and the Memory Model](/cs/programming/java/threads-synchronization-memory-model): explains exceptions crossing thread boundaries and synchronization cleanup.
+
+</div>

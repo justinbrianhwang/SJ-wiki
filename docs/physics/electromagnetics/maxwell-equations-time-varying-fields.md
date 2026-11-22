@@ -437,9 +437,13 @@ Here $\hat n$ points from medium 1 into medium 2. Reversing the normal reverses 
 - Assuming time-varying fields can always be represented by scalar potential only. In general, vector potential is needed too.
 - Forgetting that constitutive relations are material models, not additional Maxwell equations.
 
-## Related pages
+<div className="see-also">
+
+See also:
 
 - [Gradient, divergence, curl, and integral theorems](/physics/electromagnetics/gradient-divergence-curl-integral-theorems) for Stokes and divergence theorem links.
 - [Magnetostatic forces, Biot-Savart law, and Ampere law](/physics/electromagnetics/magnetostatic-forces-biot-savart-ampere) for the static form of Ampere's law.
 - [Plane waves in media](/physics/electromagnetics/plane-waves-lossless-lossy-polarization) for waves derived from Maxwell's equations.
 - [Complex functions and analyticity](/math/engineering-math/complex-functions-and-analyticity) for phasor notation in time-harmonic fields.
+
+</div>

@@ -297,9 +297,8 @@ Inspecting errors by subgroup or source often teaches more than a ranked coeffic
 
 The linear decision can be decomposed for one document by listing $w_jx_j$ contributions. That local accounting is exact for the logit and useful for debugging. It still says what raised the fitted score, not what would happen in the world if the phrase were changed. Keeping those two claims separate avoids most overinterpretation.
 
-## Related pages
+<div className="see-also">
 
-- [Naive Bayes sentiment classification](/cs/nlp/naive-bayes-sentiment-classification)
-- [Neural networks for NLP](/cs/nlp/neural-networks-for-nlp)
-- [Sequence labeling with HMMs and CRFs](/cs/nlp/sequence-labeling-hmms-crfs)
-- [Pretrained language models](/cs/nlp/pretrained-language-models)
+See also: [Naive Bayes sentiment classification](/cs/nlp/naive-bayes-sentiment-classification) · [Neural networks for NLP](/cs/nlp/neural-networks-for-nlp) · [Sequence labeling with HMMs and CRFs](/cs/nlp/sequence-labeling-hmms-crfs) · [Pretrained language models](/cs/nlp/pretrained-language-models)
+
+</div>

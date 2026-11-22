@@ -369,10 +369,8 @@ Low-level memory tools and compiler sanitizers are useful because undefined beha
 
 Valgrind-style leak checkers can also report allocations that remain reachable or are lost at process exit. A clean report is useful evidence, but only exercised paths are observed. Unit tests should cover early returns, failed allocations where controllable, copy and move paths, and destruction after partial work.
 
-## Related pages
+<div className="see-also">
 
-- [arrays](/cs/programming/cpp/arrays)
-- [strings](/cs/programming/cpp/strings)
-- [constructors and copy semantics](/cs/programming/cpp/constructors-and-copy-semantics)
-- [linked data structures](/cs/programming/cpp/linked-data-structures)
-- [polymorphism](/cs/programming/cpp/polymorphism-and-virtual-functions)
+See also: [arrays](/cs/programming/cpp/arrays) · [strings](/cs/programming/cpp/strings) · [constructors and copy semantics](/cs/programming/cpp/constructors-and-copy-semantics) · [linked data structures](/cs/programming/cpp/linked-data-structures) · [polymorphism](/cs/programming/cpp/polymorphism-and-virtual-functions)
+
+</div>

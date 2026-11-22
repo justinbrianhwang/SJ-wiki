@@ -7,9 +7,9 @@ sidebar_position: 9
 
 Sampling connects continuous-time signals to discrete-time sequences. A sampler records values $x(nT)$ at equally spaced times, where $T$ is the sampling period and $\omega_s=2\pi/T$ is the sampling angular frequency. The central question is whether those samples contain enough information to recover the original continuous-time signal.
 
-The sampling theorem says exact reconstruction is possible for bandlimited signals when the sampling rate is high enough. If the sampling rate is too low, shifted copies of the spectrum overlap. That overlap is aliasing, and it is not merely a plotting artifact: different continuous-time frequencies produce the same discrete-time samples.
+The sampling theorem says exact reconstruction is possible for bandlimited signals when the sampling rate is high enough. If the sampling rate is too low, shifted copies of the spectrum overlap. That overlap is aliasing, not a plotting artifact: different continuous-time frequencies produce the same discrete-time samples.
 
-## Definitions
+## Sampling as spectral replication
 
 Uniform sampling of a continuous-time signal $x_c(t)$ with sampling period $T$ produces the sequence
 
@@ -69,7 +69,16 @@ $$
 
 Because DT frequency is periodic with period $2\pi$, continuous-time frequencies separated by integer multiples of $\omega_s$ map to the same discrete-time frequency.
 
-## Key results
+| Quantity | Meaning | Formula |
+|---|---|---|
+| Sampling period | seconds per sample | $T$ |
+| Sampling angular frequency | radians per second | $\omega_s=2\pi/T$ |
+| Bandlimit | largest nonzero CT frequency | $\omega_M$ |
+| Nyquist rate | minimum ideal sampling rate | $2\omega_M$ |
+| DT frequency mapping | CT to DT frequency | $\Omega=\omega T$ |
+| Spectrum copies | sampled CT spectrum | $\frac{1}{T}\sum_k X_c(j(\omega-k\omega_s))$ |
+
+## Separating replicas for reconstruction
 
 The Nyquist sampling condition for a bandlimited signal is
 
@@ -109,6 +118,8 @@ $$
 \operatorname{sinc}(u)=\frac{\sin(\pi u)}{\pi u}.
 $$
 
+## Where aliasing enters
+
 Aliasing occurs when the spectral copies overlap:
 
 $$
@@ -135,7 +146,7 @@ $$
 
 or from sign-reflected equivalents created by cosine symmetry. That is why antialiasing filters are placed before analog-to-digital conversion: information lost to aliasing cannot be recovered by later digital processing.
 
-The practical sampling workflow has three stages. First, limit the analog input bandwidth with an antialiasing filter. Second, sample at a rate high enough that the remaining spectral copies do not overlap. Third, if a continuous-time output is needed, use a reconstruction filter to isolate the baseband copy. Each stage has a different job. The sampler creates copies; it does not decide which copy is the original. The reconstruction filter can select a copy only if the copies are separated.
+The sampling workflow has three stages. First, limit the analog input bandwidth with an antialiasing filter. Second, sample at a rate high enough that the remaining spectral copies do not overlap. Third, if a continuous-time output is needed, use a reconstruction filter to isolate the baseband copy. Each stage has a different job. The sampler creates copies; it does not decide which copy is the original. The reconstruction filter can select a copy only if the copies are separated.
 
 The strict inequality $\omega_s\gt 2\omega_M$ is the clean textbook condition. At exactly $\omega_s=2\omega_M$, edge cases depend on whether the spectrum is zero at the band edge and on the realizability of the reconstruction filter. In engineering practice, sampling rates are chosen with guard bands because real filters have transition regions and cannot switch from passband to stopband instantly.
 
@@ -145,9 +156,7 @@ Aliasing can sometimes be used intentionally, as in bandpass sampling, but only 
 
 A final check in sampling problems is to compare pictures in both units. On the continuous-time axis, copies are spaced by $\omega_s$ rad/s. On the discrete-time axis, all frequencies are folded into a $2\pi$-periodic interval. A continuous-time frequency near $\omega_s$ may appear near zero after sampling, while a frequency just above $\omega_s/2$ may appear as a lower-frequency sinusoid with reversed sign convention. Drawing both axes prevents the mistaken belief that high sampled frequencies always remain high in the sequence.
 
-The sample values alone do not contain the sampling rate. The same numerical sequence can represent different analog frequencies if it is played back or interpreted with a different $T$. Always keep the sampling period attached to the data when moving between continuous-time and discrete-time descriptions.
-
-## Visual
+The sample values alone do not contain the sampling rate. The same numerical sequence can represent different analog frequencies if it is played back or interpreted with a different $T$. Keep the sampling period attached to the data when moving between continuous-time and discrete-time descriptions.
 
 ```mermaid
 flowchart TB
@@ -174,18 +183,9 @@ flowchart TB
   Loss --> Output
 ```
 
-The sampling diagram shows the full continuous-to-discrete-to-continuous contract. An anti-alias filter and sampler create spectral replicas spaced by $\omega_s$; if those replicas overlap, the aliasing branch records irreversible information loss. The reconstruction branch distinguishes ideal sinc/lowpass recovery from practical holds and filters that trade accuracy for realizability.
+The anti-alias filter and sampler create spectral replicas spaced by $\omega_s$. Once those replicas overlap, ideal interpolation cannot recover the lost distinction between the contributing continuous-time frequencies. When they remain separate, a lowpass reconstruction filter can select the baseband copy.
 
-| Quantity | Meaning | Formula |
-|---|---|---|
-| Sampling period | seconds per sample | $T$ |
-| Sampling angular frequency | radians per second | $\omega_s=2\pi/T$ |
-| Bandlimit | largest nonzero CT frequency | $\omega_M$ |
-| Nyquist rate | minimum ideal sampling rate | $2\omega_M$ |
-| DT frequency mapping | CT to DT frequency | $\Omega=\omega T$ |
-| Spectrum copies | sampled CT spectrum | $\frac{1}{T}\sum_k X_c(j(\omega-k\omega_s))$ |
-
-## Worked example 1: checking the sampling theorem
+## Can a 2 kHz-bandlimited signal be recovered at 3 kHz?
 
 Problem: A continuous-time signal is bandlimited to
 
@@ -233,7 +233,7 @@ $$
 
 before sampling.
 
-## Worked example 2: finding an aliased sinusoid
+## How a 700 Hz tone becomes a 300 Hz alias
 
 Problem: The signal
 
@@ -295,7 +295,7 @@ $$
 x[n]=\cos(1.4\pi n)=\cos(0.6\pi n).
 $$
 
-## Code
+## Plotting two analog tones with identical samples
 
 ```python
 import numpy as np
@@ -323,7 +323,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-## Common pitfalls
+## Frequency bookkeeping that often goes wrong
 
 - Confusing Nyquist rate with Nyquist frequency. The Nyquist rate is $2f_M$; the Nyquist frequency for a sampler is $f_s/2$.
 - Forgetting that an ideal reconstruction theorem requires bandlimiting before sampling.
@@ -331,9 +331,8 @@ plt.show()
 - Mixing angular frequency $\omega$ in rad/s with ordinary frequency $f$ in Hz without the factor $2\pi$.
 - Thinking sample values remember the original continuous-time frequency. Frequencies separated by multiples of $f_s$ produce identical samples.
 
-## Connections
+<div className="see-also">
 
-- [Continuous-Time Fourier Transform](/physics/signals-systems/continuous-time-fourier-transform)
-- [Discrete-Time Fourier Transform](/physics/signals-systems/discrete-time-fourier-transform)
-- [Frequency Response and Filtering](/physics/signals-systems/frequency-response-filtering)
-- [Modulation and Communication Systems](/physics/signals-systems/modulation-communication-systems)
+See also: [Continuous-Time Fourier Transform](/physics/signals-systems/continuous-time-fourier-transform) · [Discrete-Time Fourier Transform](/physics/signals-systems/discrete-time-fourier-transform) · [Frequency Response and Filtering](/physics/signals-systems/frequency-response-filtering) · [Modulation and Communication Systems](/physics/signals-systems/modulation-communication-systems)
+
+</div>

@@ -9,7 +9,7 @@ Physical-world attacks ask whether adversarial examples survive outside a saved 
 
 This topic is where adversarial ML most clearly meets deployment. The correct mathematical object is no longer just $x+\delta$; it is a transformation pipeline from a physical modification to the model's observed input. The standard tool is expectation over transformations, and the standard warning is that digital $\ell_p$ robustness is not automatically physical robustness.
 
-## Definitions
+## Modeling the sensor path and attack support
 
 A **physical-world attack** creates an adversarial effect after a real-world sensing process. If $x$ is a clean scene and $p$ is a physical perturbation, the model observes:
 
@@ -59,7 +59,7 @@ $$
 \right].
 $$
 
-## Key results
+## An attack must survive its own channel
 
 The key difference between digital and physical attacks is robustness of the attack itself. A digital adversarial example may fail after a one-pixel translation or JPEG compression; a physical attack must remain effective across a distribution of transformations. EOT directly addresses this by optimizing the average loss across sampled transformations. In practice, each gradient step samples a mini-batch of transformations and backpropagates through the differentiable rendering or augmentation pipeline.
 
@@ -166,7 +166,7 @@ Patch reports should state area, shape, allowed locations, transformation distri
 
 ### Robust physical road-sign markings
 
-Eykholt et al. [3] developed robust physical perturbations for road-sign classifiers, including sticker-like and poster-like stop-sign attacks. The key contribution was not just a stop-sign demo; it was the RP2 pattern of optimizing a printable, masked perturbation over a distribution of physical viewing conditions.
+Eykholt et al. [3] developed robust physical perturbations for road-sign classifiers, including sticker-like and poster-like stop-sign attacks. The contribution went beyond a stop-sign demo: RP2 optimized a printable, masked perturbation over a distribution of physical viewing conditions.
 
 For target class $y_t$, an RP2-style objective is:
 
@@ -193,7 +193,7 @@ Worked micro-example: if three transformed views have target losses $0.8$, $1.1$
 
 This attack family illustrates why physical evaluation must report distance, angle, lighting, camera, print medium, number of trials, and failed attempts. A cropped sign classifier result is not automatically a result for a full driving stack.
 
-## Visual
+### The EOT patch-optimization loop
 
 ```mermaid
 flowchart TB
@@ -241,7 +241,7 @@ flowchart TB
   FinalPatch --> Field["Field evaluation: distance, angle, lighting, failed trials"]
 ```
 
-This diagram makes the physical patch attack loop explicit: a trainable patch is placed into many transformed scenes, passed through the real or differentiable sensor/model pipeline, and updated from the expected loss. The projection step enforces physical constraints such as printable color and patch area, while the final field-evaluation block records the real-world conditions that digital success alone cannot prove.
+A trainable patch is placed into many transformed scenes, passed through the real or differentiable sensor/model pipeline, and updated from the expected loss. Projection enforces physical constraints such as printable color and patch area; the final field evaluation records the conditions that digital success alone cannot establish.
 
 | Attack type | Perturbation budget | Transformation concern | Example domain |
 |---|---|---|---|
@@ -251,9 +251,9 @@ This diagram makes the physical patch attack loop explicit: a trainable patch is
 | Audio perturbation | Loudness, psychoacoustic masking, playback channel | Room acoustics, speakers, microphones | Speech recognition |
 | 3D object texture | Surface texture, material, renderer | Viewpoint, lighting, mesh geometry | 3D printed objects |
 
-## Worked example 1: EOT objective with three transformations
+## Averaging a targeted loss over three views
 
-Problem: A targeted patch attack samples three transformations in one optimization step. The target-class cross-entropy losses are:
+A targeted patch attack samples three transformations in one optimization step, producing target-class cross-entropy losses:
 
 $$
 0.9,\quad 1.2,\quad 0.6.
@@ -286,11 +286,11 @@ $$
 p \leftarrow p - \alpha \nabla_p \hat{L}_{\mathrm{EOT}}.
 $$
 
-Checked answer: the estimated EOT loss is $0.9$, and a targeted gradient attack descends this average so the target class becomes more likely across transformations, not just in one view.
+The estimated EOT loss is $0.9$. A targeted gradient attack descends this average so the target class becomes more likely across transformations rather than in only one view.
 
-## Worked example 2: Patch-area budget
+## Expressing a patch budget as image area
 
-Problem: A detector input is $640 \times 480$ pixels. An attack uses a square patch of side length 80 pixels. Compute the patch area fraction.
+A detector receives a $640 \times 480$ image containing a square adversarial patch 80 pixels on each side. Compute the patch area fraction.
 
 1. Image area:
 
@@ -323,9 +323,9 @@ $$
 0.020833\ldots \cdot 100\% \approx 2.08\%.
 $$
 
-Checked answer: the patch covers about $2.08\%$ of the image. This budget is not comparable to an $\ell_\infty$ budget such as $8/255$; it measures localized area rather than per-pixel amplitude.
+The patch covers about $2.08\%$ of the image. This area budget cannot be compared directly with an $\ell_\infty$ budget such as $8/255$, which measures per-pixel amplitude.
 
-## Code
+## Optimizing one patch across sampled views
 
 ```python
 import torch
@@ -357,7 +357,7 @@ def optimize_patch_step(model, x, y_target, patch, optimizer, transforms):
 
 This sketch shows the EOT pattern: apply the same learnable patch under several transformations, average the target loss, update the patch, and clamp it to a printable pixel range. Real physical attacks need a more realistic transform distribution and often a printability penalty.
 
-## Common pitfalls
+## When a digital success does not survive deployment
 
 - Treating digital $\ell_p$ robustness as evidence of sticker, camera, or audio robustness.
 - Reporting a physical demo without the transformation range, number of trials, distances, angles, and failed attempts.
@@ -367,15 +367,7 @@ This sketch shows the EOT pattern: apply the same learnable patch under several 
 - Using nondifferentiable transformations in training but not adapting the attack with approximations or score-based search.
 - Comparing patch attacks to imperceptible-noise attacks without saying that their threat models are different.
 
-## Connections
-
-- [Threat models and attack taxonomy](/cs/adversarial-attacks/threat-models-and-attack-taxonomy) explains why physical attacks require different capability and budget definitions.
-- [Mathematical formulation](/cs/adversarial-attacks/mathematical-formulation) gives the constrained-optimization view behind EOT.
-- [White-box attacks](/cs/adversarial-attacks/white-box-attacks) provides the gradient methods used inside differentiable EOT.
-- [Evaluation and benchmarks](/cs/adversarial-attacks/evaluation-and-benchmarks) discusses adaptive evaluation and reporting.
-- [Attacks on LLMs and other modalities](/cs/adversarial-attacks/attacks-on-llms-and-other-modalities) broadens the idea of perturbation beyond images.
-
-## Further reading
+## Landmark physical-attack papers
 
 - Kurakin, Goodfellow, and Bengio, "Adversarial Examples in the Physical World."
 - Athalye et al., "Synthesizing Robust Adversarial Examples."
@@ -383,8 +375,20 @@ This sketch shows the EOT pattern: apply the same learnable patch under several 
 - Brown et al., "Adversarial Patch."
 - Sharif et al., work on adversarial eyeglass frames for face recognition.
 
-## References
+## Cited physical attacks
 
 [1] S.-M. Moosavi-Dezfooli, A. Fawzi, O. Fawzi, P. Frossard. *Universal Adversarial Perturbations*. CVPR 2017.
 [2] T. B. Brown, D. Mane, A. Roy, M. Abadi, J. Gilmer. *Adversarial Patch*. arXiv 2017.
 [3] K. Eykholt, I. Evtimov, E. Fernandes, B. Li, A. Rahmati, C. Xiao, A. Prakash, T. Kohno, D. Song. *Robust Physical-World Attacks on Deep Learning Visual Classification*. CVPR 2018.
+
+<div className="see-also">
+
+See also:
+
+- [Threat models and attack taxonomy](/cs/adversarial-attacks/threat-models-and-attack-taxonomy) explains why physical attacks require different capability and budget definitions.
+- [Mathematical formulation](/cs/adversarial-attacks/mathematical-formulation) gives the constrained-optimization view behind EOT.
+- [White-box attacks](/cs/adversarial-attacks/white-box-attacks) provides the gradient methods used inside differentiable EOT.
+- [Evaluation and benchmarks](/cs/adversarial-attacks/evaluation-and-benchmarks) discusses adaptive evaluation and reporting.
+- [Attacks on LLMs and other modalities](/cs/adversarial-attacks/attacks-on-llms-and-other-modalities) broadens the idea of perturbation beyond images.
+
+</div>

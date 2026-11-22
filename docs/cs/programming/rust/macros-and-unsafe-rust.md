@@ -5,51 +5,11 @@ sidebar_position: 19
 
 # Macros and Unsafe Rust
 
-Macros and unsafe Rust are advanced tools for cases where ordinary functions and safe abstractions are not enough. Macros write code that writes code, reducing repetition or creating syntax-like APIs. Unsafe Rust permits a small set of operations the compiler cannot fully verify, such as dereferencing raw pointers or calling unsafe functions. The book presents both topics carefully: they are powerful, but they should be isolated behind safe, well-tested interfaces whenever possible.
+Macros and `unsafe` solve different problems at Rust's ordinary boundaries. A macro transforms token syntax into code. An `unsafe` operation asserts a memory or concurrency invariant the compiler cannot verify. Both tools increase the amount a human reviewer must establish, so their scope should stay small.
 
-This page builds on [advanced traits and object-oriented features](/cs/programming/rust/object-oriented-and-advanced-features), [ownership](/cs/programming/rust/ownership-references-slices), and [concurrency](/cs/programming/rust/concurrency-and-shared-state). Unsafe code is not a way to turn off all Rust checks; it opens specific extra capabilities while the rest of the language remains checked.
+## First identify which boundary is blocked
 
-## Definitions
-
-Unsafe Rust is enabled inside an `unsafe` block or unsafe item. It allows five extra capabilities: dereferencing raw pointers, calling unsafe functions or methods, accessing or modifying mutable static variables, implementing unsafe traits, and accessing fields of unions.
-
-A raw pointer has type `*const T` or `*mut T`. Raw pointers may be null, may point to invalid memory, and are not automatically checked by the borrow checker. Creating raw pointers is safe; dereferencing them is unsafe.
-
-An unsafe function has preconditions the compiler cannot verify. Calling it requires an unsafe block because the caller must uphold those preconditions.
-
-An unsafe trait is a trait whose implementation carries invariants the compiler cannot check. Implementing it requires `unsafe impl`.
-
-A declarative macro is written with `macro_rules!`. It matches input token patterns and expands to Rust code. `vec!` is a familiar standard macro in this style.
-
-Procedural macros operate on Rust token streams. The book distinguishes three kinds: custom derive macros, attribute-like macros, and function-like macros.
-
-Macro expansion happens before much of ordinary type checking. This is why macro errors can feel different from function errors: the compiler first has to expand generated code.
-
-## Key results
-
-The first key result is that unsafe blocks do not disable the borrow checker globally. They only permit specific operations inside the block. Safe code around the block is still checked normally.
-
-The second key result is that unsafe code should usually be wrapped in a safe abstraction. The standard library's `split_at_mut` is the book's key example: its implementation needs unsafe pointer work, but its public API is safe because it enforces valid behavior through arguments and checks.
-
-The third key result is that raw pointer dereference safety depends on programmer-maintained invariants: alignment, validity, aliasing, initialization, and lifetime must all be correct.
-
-The fourth key result is that macros differ from functions because they operate on syntax. A macro can accept a variable number of arguments or create items, but it is harder to read and debug than an ordinary function.
-
-Proof sketch for safe wrappers: if a function checks that `mid <= len`, obtains a raw pointer to a slice's buffer, and then constructs two mutable slices covering disjoint ranges, callers cannot create overlapping mutable references through the safe API. The unsafe implementation is justified by the disjointness invariant.
-
-Another key result is that unsafe code creates a documentation obligation. The compiler can no longer verify every condition, so the programmer must write down what must be true. Common comments identify why a pointer is non-null, why it is aligned, why two ranges do not overlap, or why a global value is accessed safely. These comments should be attached to the unsafe operation, not placed far away as general reassurance. The smaller the unsafe block, the easier it is to audit the claim.
-
-For macros, the corresponding obligation is to explain the generated shape. Declarative macros can hide repetition, but they can also hide control flow and evaluation order. A macro that evaluates an expression more than once can surprise callers if that expression has side effects. A macro that introduces names can create confusing error messages unless it is written carefully. When an ordinary function, generic function, or trait method can express the behavior clearly, that is usually preferable.
-
-Unsafe traits connect the unsafe and trait systems. A trait such as `Send` or `Sync` communicates a property that other unsafe code may rely on. Implementing such a trait manually is a promise that the type upholds the required invariants in every valid use. That is why unsafe trait implementations should be rare, small, and justified by a clear representation argument.
-
-The safest mental model is to treat unsafe code as a small kernel inside a safe module. The public API should make invalid use impossible or clearly mark the remaining unsafe preconditions. Tests are necessary, but tests cannot prove the absence of undefined behavior; the invariant argument is the core evidence.
-
-Macro-heavy code deserves the same restraint: generate the repetitive part, but keep the generated contract understandable from the call site.
-
-Readable expansion boundaries matter.
-
-## Visual
+An ordinary function or trait is easier to type-check, read, and debug. Reach for a macro when the required abstraction operates on syntax or declares items; reach for `unsafe` only when a valid low-level operation lies beyond the safe language's proof rules.
 
 ```mermaid
 flowchart TD
@@ -62,63 +22,83 @@ flowchart TD
   G --> H[Test boundary cases]
 ```
 
-| Tool | What it enables | Main risk | Safer practice |
+| Tool | What it enables | Main risk | Restrained use |
 |---|---|---|---|
 | `unsafe` block | Raw pointer dereference, unsafe calls | Undefined behavior if invariants are wrong | Minimize and document invariants |
-| Unsafe function | Caller-checked preconditions | Easy to call incorrectly | Prefer safe wrapper |
-| `macro_rules!` | Pattern-based code generation | Harder diagnostics and readability | Use when functions cannot express shape |
-| Derive macro | Generate trait impls | Hidden generated code | Keep derive behavior documented |
-| Attribute macro | Transform annotated item | Surprising expansion | Use clear attribute names |
+| Unsafe function | Caller-checked preconditions | Easy to call incorrectly | Prefer a safe wrapper when possible |
+| `macro_rules!` | Pattern-based code generation | Harder diagnostics and readability | Use when functions cannot express the shape |
+| Derive macro | Generated trait implementations | Hidden generated code | Document generated behavior |
+| Attribute macro | Transformation of an annotated item | Surprising expansion | Use clear attribute names and scope |
 
-## Worked example 1: why `split_at_mut` needs unsafe internally
+Macro expansion occurs before much ordinary type checking, which accounts for its different error messages. Unsafe code is still type-checked; only a fixed set of extra operations becomes available.
 
-Problem: split one mutable slice into two disjoint mutable slices.
+## The five capabilities opened by `unsafe`
 
-1. Desired safe signature:
+Within an `unsafe` block or item, Rust permits:
+
+1. Dereferencing a raw pointer.
+2. Calling an unsafe function or method.
+3. Accessing or modifying a mutable static variable.
+4. Implementing an unsafe trait.
+5. Accessing fields of a union.
+
+The borrow checker and all other language rules continue to operate around those capabilities. `unsafe` does not disable checking for an entire function or module.
+
+Raw pointers use `*const T` and `*mut T`. Creating one is safe; dereferencing it is unsafe because the pointer may be null, dangling, misaligned, uninitialized, or aliased in a way that violates Rust's reference rules. An unsafe function shifts unverifiable preconditions to its caller. An `unsafe impl` makes a comparable promise for a trait whose consumers may rely on those invariants, as with manual `Send` or `Sync` implementations.
+
+## Deriving `split_at_mut` from a disjointness invariant
+
+The desired API takes one mutable slice and safely returns two:
 
 ```rust
-fn split_at_mut(values: &mut [i32], mid: usize) -> (&mut [i32], &mut [i32])
+fn split_at_mut_i32(values: &mut [i32], mid: usize) -> (&mut [i32], &mut [i32])
 ```
 
-This says callers pass one mutable slice and receive two mutable slices.
-
-2. The borrow checker cannot prove this direct version:
+The direct construction is rejected because both returned slices appear to mutably borrow `values` at once:
 
 ```rust
 let len = values.len();
 (&mut values[..mid], &mut values[mid..])
 ```
 
-Both outputs borrow from `values` mutably. A human sees the ranges are disjoint when `mid <= len`, but the compiler does not use that reasoning here.
-
-3. The standard pattern is to use raw parts:
+A human can establish a stronger fact: when `mid <= len`, the ranges `0..mid` and `mid..len` do not overlap. The implementation converts that argument into one checked precondition and a small raw-pointer block:
 
 ```rust
-let ptr = values.as_mut_ptr();
-let len = values.len();
-assert!(mid <= len);
-```
+fn split_at_mut_i32(values: &mut [i32], mid: usize) -> (&mut [i32], &mut [i32]) {
+    let len = values.len();
+    let ptr = values.as_mut_ptr();
 
-4. Build slices from disjoint ranges inside `unsafe`:
+    assert!(mid <= len);
 
-```rust
-unsafe {
-    (
-        std::slice::from_raw_parts_mut(ptr, mid),
-        std::slice::from_raw_parts_mut(ptr.add(mid), len - mid),
-    )
+    // SAFETY: mid is in bounds, and the two ranges are adjacent and disjoint.
+    unsafe {
+        (
+            std::slice::from_raw_parts_mut(ptr, mid),
+            std::slice::from_raw_parts_mut(ptr.add(mid), len - mid),
+        )
+    }
 }
 ```
 
-5. Check the invariant. The assertion prevents `mid` from exceeding length. The first slice covers indices `0..mid`. The second covers `mid..len`. They do not overlap.
+The first slice covers exactly `0..mid`; the second begins at `ptr.add(mid)` and covers the remaining `len - mid` elements. The original slice guarantees a valid, aligned allocation, and the assertion keeps pointer arithmetic within that allocation. Because callers cannot bypass the range check, the public function remains safe.
 
-The checked answer is a safe function whose internal unsafe block is justified by a precise disjointness argument.
+```rust
+fn main() {
+    let mut values = [1, 2, 3, 4, 5, 6];
+    let (left, right) = split_at_mut_i32(&mut values, 3);
 
-## Worked example 2: expanding a simple declarative macro
+    left[0] = 10;
+    right[0] = 40;
 
-Problem: write a macro that builds a vector from any number of expressions.
+    println!("{values:?}");
+}
+```
 
-1. Macro shape:
+An unsafe block should sit beside a `SAFETY` comment that states the specific validity, alignment, aliasing, initialization, or lifetime argument. General reassurance elsewhere in the module is harder to audit.
+
+## A declarative macro operates on token patterns
+
+`macro_rules!` matches syntax and emits Rust code. A small vector-building macro can accept a variable number of expressions, a call shape an ordinary Rust function cannot provide:
 
 ```rust
 macro_rules! my_vec {
@@ -132,17 +112,11 @@ macro_rules! my_vec {
         }
     };
 }
-```
 
-2. Interpret the pattern. `$x:expr` matches an expression. `$( ... ),*` means zero or more expressions separated by commas.
-
-3. Call it:
-
-```rust
 let v = my_vec![1, 2, 3];
 ```
 
-4. Conceptual expansion:
+`$x:expr` matches an expression, and `$( ... ),*` accepts zero or more comma-separated matches. The conceptual expansion is:
 
 ```rust
 {
@@ -154,52 +128,110 @@ let v = my_vec![1, 2, 3];
 }
 ```
 
-5. Check the answer. The final value is a vector containing `[1, 2, 3]`. A function could not accept an arbitrary number of arguments in this syntax; the macro can because it matches tokens before type checking.
+The result is `[1, 2, 3]`. Because a macro controls expansion, it must also avoid surprising evaluation order, repeated evaluation of side-effecting inputs, or confusing introduced names. Use a generic function or trait when it can express the same interface cleanly.
 
-## Code
+## Procedural macros transform token streams
+
+Rust has three main procedural macro forms:
+
+- Custom derive macros generate implementations for `#[derive(...)]`.
+- Attribute-like macros transform an item carrying an attribute.
+- Function-like procedural macros accept tokens with function-call-like syntax.
+
+All three operate on token streams rather than already type-checked runtime values. Their generated public shape, accepted syntax, and failure messages are part of the API and need documentation.
+
+## What tests cannot establish
+
+Boundary tests are necessary for both macro expansion and unsafe wrappers, but tests cannot prove the absence of undefined behavior. The decisive evidence for unsafe code is the invariant argument: every valid caller must satisfy the conditions needed by the unsafe operations. Safe wrappers should make invalid use impossible; otherwise the remaining preconditions belong on an explicitly unsafe API.
+
+Macro-heavy modules need a similar review of expansion boundaries. Generate the repetitive syntax while keeping evaluation and control flow understandable from the call site.
+
+## Worked example: audit every premise of `split_at_mut`
+
+For `values = [1, 2, 3, 4, 5, 6]` and `mid = 3`, the allocation contains six initialized, aligned `i32` elements. `as_mut_ptr` points to element zero. The assertion establishes `3 <= 6` before any pointer arithmetic occurs.
+
+The first `from_raw_parts_mut(ptr, 3)` describes elements with indices `0`, `1`, and `2`. `ptr.add(3)` points to element three, and the second length is `6 - 3 = 3`, so the second slice describes indices `3`, `4`, and `5`. The index sets are disjoint. Both slice lifetimes are inferred from the original `&mut [i32]`, so neither can outlive the source borrow. The function returns no other route to the original slice while those borrows are active.
+
+Boundary cases matter. With `mid = 0`, the left slice has length zero and the right covers all six elements. With `mid = 6`, the left covers all elements and the right is empty at the one-past-the-end pointer, which is permitted for a zero-length slice when its pointer meets the API's requirements. With `mid = 7`, the assertion panics before `ptr.add(7)` or subtraction. Moving the assertion below the unsafe operations would be too late.
+
+The standard library already supplies `[T]::split_at_mut`; the hand-written version is for studying the proof obligation. Production code should call the existing safe method. Reimplementing a sound primitive adds audit work without new behavior.
+
+## Unsafe functions put part of the proof on the caller
+
+Sometimes preconditions cannot be encoded in a safe signature. Marking the function `unsafe` announces that callers must establish them:
 
 ```rust
-fn split_at_mut_i32(values: &mut [i32], mid: usize) -> (&mut [i32], &mut [i32]) {
-    let len = values.len();
-    let ptr = values.as_mut_ptr();
-
-    assert!(mid <= len);
-
-    unsafe {
-        (
-            std::slice::from_raw_parts_mut(ptr, mid),
-            std::slice::from_raw_parts_mut(ptr.add(mid), len - mid),
-        )
-    }
-}
-
-fn main() {
-    let mut values = [1, 2, 3, 4, 5, 6];
-    let (left, right) = split_at_mut_i32(&mut values, 3);
-
-    left[0] = 10;
-    right[0] = 40;
-
-    println!("{values:?}");
+/// Reads one initialized element from `ptr`.
+///
+/// # Safety
+/// `ptr` must be non-null, aligned for `T`, valid for reads, and point to a
+/// properly initialized `T`. No concurrent mutation may violate the read.
+unsafe fn read_copy<T: Copy>(ptr: *const T) -> T {
+    // SAFETY: the caller promises the requirements documented above.
+    unsafe { *ptr }
 }
 ```
 
-The public function is safe because it checks the split point and returns non-overlapping mutable slices. The unsafe block is small and directly tied to the documented invariant.
+The `unsafe fn` declaration does not make every operation in its body implicitly justified. Keeping an explicit inner block identifies the exact dereference and forces the implementation to acknowledge it. The caller must use its own unsafe block and explain how the pointer satisfies the contract.
 
-## Common pitfalls
+Prefer safe inputs that carry their own evidence. A function taking `&T` already receives a non-null, aligned, initialized value with a borrow lifetime. Changing it to `*const T` throws away compiler-checked facts and creates no benefit unless raw-pointer interoperability is required. Similarly, indices and slice lengths often express a boundary more safely than pointer pairs.
 
-- Treating unsafe as permission to ignore all Rust rules. Only specific extra operations are allowed.
-- Writing large unsafe blocks where the invariant is hard to audit.
-- Exposing unsafe requirements through a safe API without actually enforcing them.
-- Dereferencing raw pointers without proving validity, alignment, and aliasing conditions.
-- Using macros where a generic function or trait would be simpler.
-- Forgetting that macro input is token syntax, not already type-checked values.
-- Assuming generated macro code is obvious to future readers. Keep macro APIs small and documented.
+Foreign-function interfaces are a common source of legitimate raw pointers. The Rust wrapper must check nullability, lengths, ownership transfer, and the foreign API's lifetime rules before constructing references or slices. A C function returning a pointer does not by itself say who frees the allocation or how long it remains valid. Those facts belong in the wrapper's contract.
 
-## Connections
+## Worked example: expand a macro call and count evaluation
 
-- [Object-oriented and advanced features](/cs/programming/rust/object-oriented-and-advanced-features)
-- [Ownership, references, and slices](/cs/programming/rust/ownership-references-slices)
-- [Concurrency and shared state](/cs/programming/rust/concurrency-and-shared-state)
-- [Cargo and crates.io workflow](/cs/programming/rust/cargo-crates-io-workflow)
-- [Multithreaded web server](/cs/programming/rust/multithreaded-web-server)
+Consider a macro that returns the smaller expression:
+
+```rust
+macro_rules! min_once {
+    ($left:expr, $right:expr) => {{
+        let left_value = $left;
+        let right_value = $right;
+        if left_value < right_value { left_value } else { right_value }
+    }};
+}
+```
+
+For `min_once!(next(), limit())`, expansion creates one call to `next` and one call to `limit`, in that order. Their results are stored before comparison. A naive expansion that inserted `$left` into both the condition and the result could call `next()` twice, changing behavior when it consumes input or increments a counter.
+
+The doubled braces create an expression block and a nested scope. Introduced temporary names do not leak to the caller. Macro hygiene also prevents many accidental identifier captures, but it does not make the call's runtime semantics obvious. Documentation should say whether arguments may be evaluated, how often, and in what broad order when callers could observe it.
+
+The repetition in `my_vec!` can accept a trailing comma with a slightly broader pattern:
+
+```rust
+macro_rules! my_vec {
+    ( $( $x:expr ),* $(,)? ) => {{
+        let mut result = Vec::new();
+        $( result.push($x); )*
+        result
+    }};
+}
+```
+
+`$(,)?` matches zero or one final comma. For `my_vec![a(), b(),]`, the first repetition captures two expressions. Expansion emits two `push` statements; `a()` runs before `b()`. For `my_vec![]`, the repetition matches zero times and returns an empty vector whose element type must be inferred from context.
+
+## Choosing among a function, a declarative macro, and a derive
+
+A function accepts values after Rust has parsed and typed the call. It supports ordinary generics, can be passed as a value, and produces direct diagnostics. Use it when the number and shape of arguments are fixed.
+
+A declarative macro accepts Rust syntax fragments and can vary the number of arguments, introduce statements, or generate item declarations. Its patterns should stay narrow enough that invalid calls fail near the macro invocation. A catch-all token pattern followed by a complex private parser often produces poor diagnostics.
+
+A custom derive is suitable when a trait implementation follows from a type declaration. It can inspect fields and variants and emit an `impl`, but it lives in a procedural-macro crate and adds compilation and maintenance cost. Handwritten implementations are clearer when only one or two types need special behavior.
+
+Generated code is checked after expansion, so a macro cannot bypass type rules or make unsafe operations safe. If an expansion contains unsafe code, the macro author still owes the invariant proof, and the call-site syntax must not let safe callers violate it.
+
+## Unsafe code review follows the data, not the keyword count
+
+A tiny unsafe block can depend on a large amount of safe setup. Review starts where the raw pointer or invariant originates and follows every mutation that could invalidate it. Relevant questions include whether an allocation can move, whether a length was measured in bytes or elements, whether arithmetic can overflow, and whether aliases remain live during mutation.
+
+The usual hazards have precise meanings. A dangling pointer refers to storage whose lifetime ended. An unaligned pointer does not meet the target type's alignment. Reading uninitialized bytes as a type may be invalid even when the address lies in an allocation. Creating two mutable references to overlapping data violates exclusivity. A data race is undefined behavior even if a test usually prints the expected result.
+
+`Send` and `Sync` are unsafe traits because other safe code relies on their correctness. Manually implementing them based only on the fields one happens to see can become unsound when representation changes. Auto-trait behavior should be left to the compiler unless a type has a reviewed synchronization or ownership argument that the compiler cannot derive.
+
+Tests should cover empty inputs, bounds, alias-sensitive operations, panics before unsafe entry, and representative macro expansions. Tools that interpret Rust's memory model can catch some invalid executions, but passing them does not prove that every caller and platform satisfies the contract. The safety comment remains a proof sketch that must survive refactoring.
+
+<div className="see-also">
+
+See also: [Object-oriented and advanced features](/cs/programming/rust/object-oriented-and-advanced-features) · [Ownership, references, and slices](/cs/programming/rust/ownership-references-slices) · [Concurrency and shared state](/cs/programming/rust/concurrency-and-shared-state) · [Cargo and crates.io workflow](/cs/programming/rust/cargo-crates-io-workflow) · [Multithreaded web server](/cs/programming/rust/multithreaded-web-server)
+
+</div>

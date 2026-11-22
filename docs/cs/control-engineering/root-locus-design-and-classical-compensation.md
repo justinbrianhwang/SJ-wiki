@@ -9,7 +9,7 @@ Root-locus design asks whether the existing closed-loop pole paths can meet spec
 
 The engineering pattern is consistent: translate specifications into desired dominant pole locations and error constants, inspect the uncompensated root locus, then add poles and zeros to reshape the locus and low-frequency gain. The compensator is not a mathematical decoration. It represents hardware or software that must be physically realized and must not demand impossible actuator behavior.
 
-## Definitions
+## Lead and lag in the $s$-plane
 
 A **cascade compensator** is placed in series with the plant:
 
@@ -47,7 +47,7 @@ $$
 s_d=-\zeta\omega_n+j\omega_n\sqrt{1-\zeta^2}.
 $$
 
-## Key results
+## Designing from angle deficiency and static error
 
 Root-locus compensation uses the angle deficiency. Suppose the desired pole $s_d$ does not lie on the uncompensated root locus. Compute
 
@@ -87,9 +87,9 @@ Gain-only design should be checked first because it is the simplest possible con
 
 Lead compensation is often interpreted geometrically. The desired pole is short of the angle condition by some amount. A lead zero is placed so it contributes a helpful positive angle, and the lead pole is placed farther left so its negative angle is smaller at the desired point. The separation between pole and zero controls the amount of phase lead. The pole cannot be moved arbitrarily far left without increasing high-frequency gain and implementation burden.
 
-Lag compensation is deliberately subtle at the dominant poles. The lag pole and zero are placed near the origin so their angles at the desired dominant pole nearly cancel. Their magnitudes at low frequency do not cancel, however, so the static error constant improves. This is why lag design is usually described as improving steady-state error while approximately preserving transient response. The word "approximately" matters; the added slow pole may still be visible.
+Lag compensation is deliberately subtle at the dominant poles. The lag pole and zero are placed near the origin so their angles at the desired dominant pole nearly cancel. Their magnitudes at low frequency do not cancel, however, so the static error constant improves. Lag design therefore improves steady-state error while approximately preserving transient response. The word "approximately" matters; the added slow pole may still be visible.
 
-Lag-lead design is not just "lag plus lead" in any order. The lead portion is normally selected to satisfy transient requirements and phase or angle deficiency. The lag portion is then selected to meet the error constant while disturbing the chosen dominant poles as little as possible. The final gain is recomputed after both pieces are included, and the full closed-loop response is checked for extra modes introduced by the compensator.
+Lag-lead design requires an order of decisions. The lead portion is normally selected to satisfy transient requirements and phase or angle deficiency. The lag portion is then selected to meet the error constant while disturbing the chosen dominant poles as little as possible. The final gain is recomputed after both pieces are included, and the full closed-loop response is checked for extra modes introduced by the compensator.
 
 Physical realization closes the loop between algebra and hardware. An analog lead or lag network can be implemented with resistors, capacitors, and operational amplifiers; a digital compensator implements the same transfer function as a difference equation. Component tolerances, finite sampling, quantization, saturation, and noise all change the ideal design. A compensator that meets a pencil-and-paper specification but cannot be implemented robustly is not a finished controller.
 
@@ -97,7 +97,7 @@ A useful final check is sensitivity to compensator placement. If a design works 
 
 Designs should also be checked against the full characteristic equation, not only the intended dominant poles. Additional compensator poles can introduce slow modes or lightly damped modes. If those modes are not sufficiently far left or have large residues, the actual response will not match the dominant second-order prediction.
 
-## Visual
+## A design sequence from specifications to verification
 
 ```mermaid
 flowchart TD
@@ -120,7 +120,7 @@ flowchart TD
 | lag | increase low-frequency gain | strong improvement | slow pole tail |
 | lag-lead | satisfy both transient and error specs | strong improvement | more tuning complexity |
 
-## Worked example 1: desired pole from overshoot and settling time
+## Converting overshoot and settling time into a pole target
 
 Problem: A design requires percent overshoot $\%OS=10\%$ and $2\%$ settling time $T_s=2$ s. Find the desired dominant pole location using standard second-order approximations.
 
@@ -189,7 +189,7 @@ $$
 
 Checked answer: desired dominant poles are approximately $s=-2\pm j2.73$.
 
-## Worked example 2: lag ratio for error improvement
+## Sizing a lag ratio from the ramp-error requirement
 
 Problem: A Type 1 unity-feedback system has $K_v=4$, but the specification requires ramp error no larger than $0.05$. Estimate the low-frequency lag compensation ratio needed if the transient pole location should remain nearly unchanged.
 
@@ -241,7 +241,7 @@ $$
 
 Checked answer: a lag ratio of about $5$ is required. The exact design must still verify transient response because the added pole can introduce a slow mode.
 
-## Code
+## Calculating the dominant pole and lag ratio
 
 ```python
 import numpy as np
@@ -266,7 +266,7 @@ lag_ratio = Kv_required / Kv_old
 print("lag ratio:", lag_ratio)
 ```
 
-## Common pitfalls
+## Designs that satisfy the sketch but fail the system
 
 - Designing a compensator before translating specifications into pole and error targets.
 - Assuming a lag compensator never changes transients. It should be checked because its pole may add a slow mode.
@@ -275,10 +275,14 @@ print("lag ratio:", lag_ratio)
 - Meeting dominant pole specs while ignoring closed-loop zeros and nondominant poles.
 - Treating physical realization as automatic. Analog circuits, digital filters, and actuators impose constraints.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Root-locus sketching](/cs/control-engineering/root-locus-sketching-and-analysis) gives the angle and magnitude conditions.
 - [Steady-state errors](/cs/control-engineering/steady-state-errors-and-sensitivity) supplies $K_p$, $K_v$, and $K_a$ targets.
 - [PID and compensators](/cs/control-engineering/pid-lead-lag-and-lag-lead-compensators) compares classical controller structures.
 - [Frequency-response design](/cs/control-engineering/frequency-response-compensator-design) designs similar compensators using phase and gain margins.
 - [Applied vehicle control](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley) uses related compensation ideas in motion control.
+
+</div>

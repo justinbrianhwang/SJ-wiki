@@ -11,9 +11,9 @@ Foundation models for driving use large multimodal models, vision-language model
 
 *Figure: UniAD illustrates planning-oriented autonomous-driving architecture. Image: [ar5iv](https://arxiv.org/abs/2212.10156), Hu et al., educational use with attribution.*
 
-This page covers multimodal large language models for driving, vision-language-action models, action interfaces, hybrid VLM-plus-planner designs, and closed-loop evaluation for language agents. It complements [end-to-end driving](/cs/autonomous-driving/end-to-end-driving), [decision making](/cs/autonomous-driving/decision-making-and-behavior-planning), [motion planning](/cs/autonomous-driving/motion-planning), [simulation and data](/cs/autonomous-driving/simulation-and-data), and [safety](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing).
+Their role changes sharply with the output interface: a caption, a maneuver suggestion, and a trajectory token carry very different authority and validation burdens.
 
-## Definitions
+## Language, grounding, and action authority
 
 A **large language model** maps text tokens to text tokens. A **multimodal large language model**, or MLLM, also consumes images, video, map features, object tracks, LiDAR-derived tokens, or tool outputs. The driving surveys emphasize that MLLMs can help with scene understanding, map and transportation tasks, user interaction, data generation, and planning support [1].
 
@@ -31,13 +31,13 @@ An **action interface** is the authority boundary between a foundation model and
 
 **Grounding** means tying a language claim to sensor or tool evidence. "The left lane is clear" should be supported by tracked objects, lane geometry, blind-spot state, and uncertainty, not only by a fluent model response.
 
-## Key Results
+## Where foundation models fit in a driving stack
 
 ### Semantic reasoning with metric grounding
 
 Driving MLLMs are most credible when they improve the semantic layer of autonomy without pretending to be metric sensors. The survey literature [1] groups useful roles into scene captioning, driving question answering, risk explanation, map or route assistance, planner advice, and data-engine support. These tasks are valuable because boxes and lanes do not always capture why a scene matters: a blocked lane, a worker gesture, a temporary sign, or a confusing intersection may need semantic interpretation.
 
-The risk is hallucination and weak spatial grounding. A model can produce a confident answer that is unsupported by the calibrated scene state. A practical system should attach provenance to claims:
+The risk is hallucination and weak spatial grounding. A model can produce a confident answer that is unsupported by the calibrated scene state. A deployed system should attach provenance to claims:
 
 $$
 \text{claim} \rightarrow \{\text{sensor evidence},\text{map fact},\text{rule check},\text{uncertainty}\}.
@@ -150,7 +150,7 @@ metrics.update(sim.state)
 
 This wrapper is not a safety proof. It states the engineering shape of the problem: language decisions need grounding, conversion to motion, feasibility checks, independent risk checks, and fallback behavior.
 
-## Visual
+### Grounding model outputs before actuation
 
 ```mermaid
 flowchart TD
@@ -168,7 +168,7 @@ flowchart TD
   J --> K
 ```
 
-## Worked Example: Fast Versus Slow Reasoning
+## Pricing the latency of slow reasoning
 
 Problem: in a simple lane-following scene, a fast VLA mode gets planning reward $0.92$ using 5 generated tokens. A slow reasoning mode gets planning reward $0.94$ using 45 generated tokens. The efficiency-adjusted reward is:
 
@@ -190,7 +190,7 @@ $$
 
 Answer: fast mode is preferred for this simple scene. In a rare or ambiguous scene, the raw planning improvement from slow reasoning would need to exceed the latency and token-cost penalty.
 
-## Common Pitfalls
+## Failure modes hidden by fluent language
 
 - Treating fluent explanations as perception ground truth. Language must be grounded in sensors, maps, and uncertainty.
 - Giving an MLLM direct action authority before defining latency, fallback, and safety-monitor boundaries.
@@ -200,20 +200,16 @@ Answer: fast mode is preferred for this simple scene. In a rare or ambiguous sce
 - Letting passenger instructions override traffic law or safety constraints.
 - Treating closed-loop simulator success as public-road validation. It is necessary evidence, not sufficient evidence.
 
-## Connections
-
-- [End-to-end driving](/cs/autonomous-driving/end-to-end-driving)
-- [Decision making and behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning)
-- [Motion planning](/cs/autonomous-driving/motion-planning)
-- [Simulation and data](/cs/autonomous-driving/simulation-and-data)
-- [Safety, ISO 26262, SOTIF, and scenario testing](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing)
-- [V2X and connected vehicles](/cs/autonomous-driving/v2x-and-connected-vehicles)
-- Further reading: DriveLM, NuScenes-QA, Talk2Car, BDD-X, GPT-Driver, DriveAgent, Senna, OpenDriveVLA, DiffVLA, and language-conditioned planning.
-
-## References
+## Sources cited
 
 [1] C. Cui et al. *A Survey on Multimodal Large Language Models for Autonomous Driving*. WACV Workshops, 2024.
 [2] A. Jiang et al. *A Survey on Vision-Language-Action Models for Autonomous Driving*. 2025.
 [3] X. Tian, J. Gu, B. Li, Y. Liu, Y. Wang, Z. Zhao, Y. Zhan, P. Jia, X. Lang, H. Zhao. *DriveVLM: The Convergence of Autonomous Driving and Large Vision-Language Models*. 2024.
 [4] X. Zhou, X. Cai, Y. Zhao, B. Zhang, S. Huang, J. Zhou, Y. Ma. *AutoVLA: A Vision-Language-Action Model for End-to-End Autonomous Driving with Adaptive Reasoning and Reinforcement Fine-Tuning*. NeurIPS 2025.
 [5] Y. Fu, Y. Lei, L. Wen, P. Cai, J. Mao, M. Dou, B. Shi, Y. Qiao. *LimSim++: A Closed-Loop Platform for Deploying Multimodal LLM-Driven Autonomous Driving Agents*. IEEE Intelligent Vehicles Symposium, 2024.
+
+<div className="see-also">
+
+See also: [End-to-end driving](/cs/autonomous-driving/end-to-end-driving) · [Decision making and behavior planning](/cs/autonomous-driving/decision-making-and-behavior-planning) · [Motion planning](/cs/autonomous-driving/motion-planning) · [Simulation and data](/cs/autonomous-driving/simulation-and-data) · [Safety, ISO 26262, SOTIF, and scenario testing](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing) · [V2X and connected vehicles](/cs/autonomous-driving/v2x-and-connected-vehicles)
+
+</div>

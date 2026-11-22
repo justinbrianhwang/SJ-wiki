@@ -364,10 +364,8 @@ so its variance exceeds its mean when $p\lt 1$. Reparameterizing by a desired me
 
 Approximation does not repair a bad trial model. If success probabilities vary greatly or outcomes cluster, a normal or Poisson approximation to a binomial still inherits the wrong independence and constant-$p$ assumptions. Checking the empirical mean–variance relationship and the sampling mechanism comes before choosing a convenient limit formula.
 
-## Related pages
+<div className="see-also">
 
-- [Counting and combinatorics](/math/probability-and-random-variables/counting-and-combinatorics)
-- [Discrete random variables, expectation, and variance](/math/probability-and-random-variables/discrete-random-variables-expectation-variance)
-- [Poisson random variables and processes](/math/probability-and-random-variables/poisson-random-variables-and-processes)
-- [Moment and characteristic functions](/math/probability-and-random-variables/moment-and-characteristic-functions)
-- [Normal, exponential, gamma, beta, and Cauchy laws](/math/probability-and-random-variables/normal-exponential-gamma-beta-cauchy)
+See also: [Counting and combinatorics](/math/probability-and-random-variables/counting-and-combinatorics) · [Discrete random variables, expectation, and variance](/math/probability-and-random-variables/discrete-random-variables-expectation-variance) · [Poisson random variables and processes](/math/probability-and-random-variables/poisson-random-variables-and-processes) · [Moment and characteristic functions](/math/probability-and-random-variables/moment-and-characteristic-functions) · [Normal, exponential, gamma, beta, and Cauchy laws](/math/probability-and-random-variables/normal-exponential-gamma-beta-cauchy)
+
+</div>

@@ -1,4 +1,4 @@
----
+﻿---
 title: Definitions and Examples
 sidebar_position: 2
 ---
@@ -7,13 +7,9 @@ sidebar_position: 2
 
 Graphs are a way to keep only the incidence pattern of a network: which objects are present, and which pairs are joined. A road map, a molecule, a tournament schedule, a circuit diagram, and a friendship relation may look very different in the plane, but the graph-theoretic data are the same kind of data: vertices and edges. This separation is one of the main themes in introductory graph theory. Geometry may help us draw the object, but adjacency is what the graph records.
 
-This page fixes the vocabulary used throughout the graph theory section. The point is not to memorize names in isolation, but to recognize which features survive under redrawing, relabelling, deletion, contraction, and passage to standard families such as complete graphs, cycles, wheels, and bipartite graphs.
+The useful vocabulary tracks features that survive redrawing, relabelling, deletion, contraction, and passage to standard families such as complete graphs, cycles, wheels, and bipartite graphs.
 
-![The Petersen graph is drawn with five outer vertices and five inner vertices connected in a star pattern.](https://commons.wikimedia.org/wiki/Special:FilePath/Petersen_graph.svg)
-
-*Figure: The Petersen graph, a standard example in graph theory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Petersen_graph.svg), David Benbennick, public domain.*
-
-## Definitions
+## Vertices, edges, and the choice of graph class
 
 A **graph** $G$ consists of a vertex set $V(G)$ and an edge family $E(G)$ whose members join vertices. In a **simple graph**, every edge is an unordered pair of two distinct vertices, and no pair occurs more than once. Thus a simple graph has no loops and no multiple edges. In a more general graph, a **loop** has both ends at the same vertex, and **parallel edges** are two or more edges with the same pair of endpoints.
 
@@ -38,7 +34,7 @@ For a simple graph $G$, the **complement** $\overline{G}$ has the same vertex se
 
 A useful convention when reading examples is to ask which category the graph belongs to before applying a formula. Complete-graph, complete-bipartite, path, cycle, wheel, cube, and null-graph formulas have different hypotheses. Most counting mistakes on early exercises come from recognizing the drawing visually but then applying the wrong family name.
 
-## Key results
+## Counts forced by incidence
 
 **Handshaking lemma.** For any finite graph,
 
@@ -68,8 +64,6 @@ $$
 
 Each vertex has $n-1$ possible neighbors. The complement supplies exactly the missing adjacencies.
 
-## Visual
-
 The same abstract graph can be drawn in different ways. The diagram below records adjacency only; the layout and edge lengths are not part of the graph.
 
 ```mermaid
@@ -94,11 +88,9 @@ For this graph,
 
 The degree sum is $2+3+2+3+2=12$, so the graph has $12/2=6$ edges.
 
-## Worked example 1: Count edges and degrees in $K_{3,4}$
+## Degrees and edges in $K_{3,4}$
 
-**Problem.** Find the number of vertices, number of edges, and degree sequence of the complete bipartite graph $K_{3,4}$.
-
-**Method.**
+Find the number of vertices, number of edges, and degree sequence of the complete bipartite graph $K_{3,4}$.
 
 1. Split the vertex set into two parts: $A$ with $3$ vertices and $B$ with $4$ vertices.
 2. In $K_{3,4}$, every vertex of $A$ is adjacent to every vertex of $B$.
@@ -132,17 +124,15 @@ $$
 
 and $2\vert E\vert =2\cdot 12=24$. This agrees with the handshaking lemma.
 
-## Worked example 2: Compare a graph with its complement
+## Recovering a complement from missing pairs
 
-**Problem.** Let $G$ be the graph on vertices $\{1,2,3,4,5\}$ with edges
+Let $G$ be the graph on vertices $\{1,2,3,4,5\}$ with edges
 
 $$
 12,\ 23,\ 34,\ 45,\ 51,\ 13.
 $$
 
 Find the degree sequence of $G$, then find the degree sequence and edge set of $\overline{G}$.
-
-**Method.**
 
 1. Count the degree of each vertex in $G$.
    - Vertex $1$ is incident with $12,51,13$, so $\deg_G(1)=3$.
@@ -179,7 +169,7 @@ $$
 
 **Check.** The complement degree sum is $8$, so $\overline{G}$ has $8/2=4$ edges, matching the missing-pair count.
 
-## Code
+## Checking adjacency data in Python
 
 The following pure Python code stores a simple graph as adjacency sets and checks the handshaking lemma, complement formula, and edge count.
 
@@ -217,7 +207,7 @@ assert sum(len(nbrs) for nbrs in G.values()) == 2 * edge_count(G)
 
 Before moving on, practice translating each drawing into three forms: a vertex set, an edge set, and an adjacency list. These representations force precision. The vertex and edge sets are best for definitions and counting; the adjacency list is best for computing degrees and neighborhoods; the drawing is best for intuition. If all three agree, most basic graph questions become routine.
 
-## Common pitfalls
+## Distinctions that matter later
 
 - Treating a drawing as part of the graph. Unless the topic is planarity or geometry, crossings and edge lengths in a drawing usually do not matter.
 - Forgetting that a loop contributes $2$ to degree in a general graph.
@@ -226,9 +216,8 @@ Before moving on, practice translating each drawing into three forms: a vertex s
 - Counting edges of $K_{r,s}$ as $\binom{r+s}{2}$. Only cross-part pairs are edges, so the count is $rs$.
 - Writing complement formulas for graphs with loops or multiple edges. The usual complement is a simple-graph operation.
 
-## Connections
+<div className="see-also">
 
-- [Walks, paths, and connectedness](/math/graph-theory/walks-paths-and-connectedness)
-- [Trees and spanning trees](/math/graph-theory/trees-and-spanning-trees)
-- [Planarity and Euler formula](/math/graph-theory/planarity-and-euler-formula)
-- [Vertex and map colouring](/math/graph-theory/vertex-and-map-colouring)
+See also: [Walks, paths, and connectedness](/math/graph-theory/walks-paths-and-connectedness) · [Trees and spanning trees](/math/graph-theory/trees-and-spanning-trees) · [Planarity and Euler formula](/math/graph-theory/planarity-and-euler-formula) · [Vertex and map colouring](/math/graph-theory/vertex-and-map-colouring)
+
+</div>

@@ -9,7 +9,7 @@ R's apply family is a set of tools for repeated work without writing explicit lo
 
 The apply family is most useful when each iteration is independent and produces a predictable result. It is less useful when iterations depend heavily on previous iterations, in which case a clear `for` or `while` loop may be better. The goal is readable, reliable iteration, not avoiding the word `for` at all costs.
 
-## Definitions
+## Five iteration patterns
 
 `apply(X, MARGIN, FUN, ...)` applies a function to the rows, columns, or higher-dimensional margins of an array or matrix. `MARGIN = 1` means rows; `MARGIN = 2` means columns.
 
@@ -23,7 +23,7 @@ The apply family is most useful when each iteration is independent and produces 
 
 An **anonymous function** is a function written inline, such as `function(x) mean(x, na.rm = TRUE)`.
 
-## Key results
+## Selecting by input and output shape
 
 The apply functions differ mainly in input expectation and output simplification:
 
@@ -44,8 +44,6 @@ vapply(mtcars, mean, numeric(1))
 This says every column summary must be one numeric value. If a column cannot produce that, R raises an error instead of silently returning an awkward list.
 
 `apply` coerces data frames to matrices if given a data frame. Because matrices require one type, this can accidentally turn numbers into character strings. For data frames, prefer `lapply`, `vapply`, or column-specific code unless every selected column is safely numeric.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -70,11 +68,11 @@ row3      3    6    9
           MARGIN = 2 applies down columns
 ```
 
-## Worked example 1: Column summaries with `vapply`
+## Typed iteration in two settings
 
-Problem: compute the mean and standard deviation for numeric columns `mpg`, `hp`, and `wt` in `mtcars`, returning a clean summary table.
+### Enforcing scalar summaries with `vapply`
 
-Method:
+Compute the mean and standard deviation for numeric columns `mpg`, `hp`, and `wt` in `mtcars`, returning a clean summary table.
 
 1. Select the numeric columns.
 2. Use `vapply` for means, requiring one numeric result per column.
@@ -102,15 +100,13 @@ summary_table
 # 3       wt   3.217250   0.978457
 ```
 
-Checked answer: `vapply(cars, mean, numeric(1))` calls `mean` once for each column and requires each call to return one numeric value. The mpg mean is the same value returned by `mean(mtcars$mpg)`, so the apply result matches the direct calculation.
+`vapply(cars, mean, numeric(1))` calls `mean` once for each column and requires each call to return one numeric value. The mpg mean is the same value returned by `mean(mtcars$mpg)`, so the apply result matches the direct calculation.
 
 The benefit over `sapply` is the contract. If one selected column were character, `vapply` would fail clearly instead of simplifying unpredictably.
 
-## Worked example 2: Pairwise simulation with `mapply`
+### Pairing simulation arguments with `mapply`
 
-Problem: simulate three binomial experiments with different numbers of trials and different success probabilities. For each experiment, compute the observed number of successes with a fixed random seed.
-
-Method:
+Simulate three binomial experiments with different numbers of trials and different success probabilities. For each experiment, compute the observed number of successes with a fixed random seed.
 
 1. Store trial counts in one vector.
 2. Store probabilities in another vector of the same length.
@@ -135,11 +131,11 @@ length(successes)
 # [1] 3
 ```
 
-Checked answer: there are three experiments, so there are three simulated counts. Each count is possible for its trial size: 4 is between 0 and 10, 13 is between 0 and 20, and 39 is between 0 and 50. With the seed fixed, the result is reproducible.
+There are three experiments, so there are three simulated counts. Each count is possible for its trial size: 4 is between 0 and 10, 13 is between 0 and 20, and 39 is between 0 and 50. With the seed fixed, the result is reproducible.
 
 This pattern is clearer than manually indexing inside a loop when the conceptual operation is "call the same function with parallel argument vectors."
 
-## Code
+## Composing `lapply` and `vapply`
 
 ```r
 # Apply several summary functions to selected columns.
@@ -172,13 +168,13 @@ Apply functions are not a substitute for understanding data shape. Before choosi
 
 For teaching and debugging, an explicit `for` loop can be clearer than a dense anonymous function. Once the loop body is stable, replacing it with an apply function may reduce boilerplate. Clarity is the standard, not cleverness.
 
-A practical comparison is to write the same operation both ways. First, use a `for` loop with a preallocated result vector and comments. Second, use `vapply` with the same helper function. If both produce identical output, the apply version is a compact expression of the same loop. If the apply version is hard to read, keep the loop. R style favors vectorization, but maintainable analysis favors code that future readers can verify.
+One useful comparison is to write the same operation both ways. First, use a `for` loop with a preallocated result vector and comments. Second, use `vapply` with the same helper function. If both produce identical output, the apply version is a compact expression of the same loop. If the apply version is hard to read, keep the loop. R style favors vectorization, but maintainable analysis favors code that future readers can verify.
 
 Be especially careful when applying functions that return models, plots, or tests. Those results are complex objects, so `lapply` is usually the right first container. Afterward, extract the specific scalar summaries needed for a report with `vapply`. This two-stage approach avoids premature simplification while still producing clean summary tables.
 
 When an apply call is confusing, rewrite it as a loop on paper. Identify the first input, the function call made for that input, and the first returned value. Then generalize. This small exercise turns apply syntax from magic into ordinary repeated evaluation.
 
-## Common pitfalls
+## Coercion, simplification, and false economy
 
 - Using `apply` on a data frame with mixed types and accidentally coercing everything to character.
 - Assuming `sapply` always returns the same shape. It simplifies when it can, which can surprise program code.
@@ -187,9 +183,8 @@ When an apply call is confusing, rewrite it as a loop on paper. Identify the fir
 - Making anonymous functions so dense that a simple named helper would be clearer.
 - Treating apply functions as automatically faster. They are often clearer, but performance depends on the operation.
 
-## Connections
+<div className="see-also">
 
-- [Control flow, functions, and scoping](/cs/programming/r/control-flow-functions-scoping)
-- [Matrices and arrays](/cs/programming/r/matrices-and-arrays)
-- [Lists and data frames](/cs/programming/r/lists-and-data-frames)
-- [Probability distributions](/cs/programming/r/probability-distributions)
+See also: [Control flow, functions, and scoping](/cs/programming/r/control-flow-functions-scoping) · [Matrices and arrays](/cs/programming/r/matrices-and-arrays) · [Lists and data frames](/cs/programming/r/lists-and-data-frames) · [Probability distributions](/cs/programming/r/probability-distributions)
+
+</div>

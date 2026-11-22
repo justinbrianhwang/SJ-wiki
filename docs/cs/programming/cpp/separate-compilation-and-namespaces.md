@@ -361,10 +361,8 @@ Macros cross namespace boundaries because the preprocessor runs before C++ name 
 
 Binary compatibility is stricter than source compatibility. Changing class layout, virtual function order, calling conventions, or inline definitions can require rebuilding consumers even when their source still compiles. Within a single project, a clean dependency-aware rebuild handles this. Distributed binary libraries need explicit ABI policy beyond the basic header/source split.
 
-## Related pages
+<div className="see-also">
 
-- [classes and encapsulation](/cs/programming/cpp/classes-and-encapsulation)
-- [constructors and copy semantics](/cs/programming/cpp/constructors-and-copy-semantics)
-- [streams and file I/O](/cs/programming/cpp/streams-and-file-io)
-- [templates](/cs/programming/cpp/templates)
-- [STL containers](/cs/programming/cpp/stl-containers)
+See also: [classes and encapsulation](/cs/programming/cpp/classes-and-encapsulation) · [constructors and copy semantics](/cs/programming/cpp/constructors-and-copy-semantics) · [streams and file I/O](/cs/programming/cpp/streams-and-file-io) · [templates](/cs/programming/cpp/templates) · [STL containers](/cs/programming/cpp/stl-containers)
+
+</div>

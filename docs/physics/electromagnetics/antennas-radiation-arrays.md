@@ -5,15 +5,15 @@ sidebar_position: 16
 
 # Antennas, Radiation, and Arrays
 
-Antennas convert guided electromagnetic energy into radiated waves and convert incoming waves into terminal voltages and currents. A transmitting antenna is not just a wire carrying current; it is a current distribution arranged so that time-varying fields detach and carry power into space. A receiving antenna samples the incoming field and delivers power to a load according to its effective area and polarization match.
+Antennas convert guided electromagnetic energy into radiated waves and convert incoming waves into terminal voltages and currents. A transmitting antenna is a current distribution arranged so that time-varying fields detach and carry power into space. A receiving antenna samples the incoming field and delivers power to a load according to its effective area and polarization match.
 
-Ulaby's antenna chapter develops the Hertzian dipole, half-wave dipole, radiation characteristics, Friis transmission, large apertures, and arrays. These topics are a practical culmination of Maxwell's equations, plane waves, power density, and boundary/guiding ideas from earlier pages.
+Ulaby's antenna chapter develops the Hertzian dipole, half-wave dipole, radiation characteristics, Friis transmission, large apertures, and arrays. Together they apply Maxwell's equations, plane waves, power density, and boundary and guiding ideas from earlier notes.
 
 ![A Yagi-Uda antenna diagram labels reflector, driven element, director, and wavelength-scaled spacing.](https://commons.wikimedia.org/wiki/Special:FilePath/Yagi-Uda_diagram.svg)
 
 *Figure: The Yagi-Uda antenna is a compact real-world example of phased current elements producing directional radiation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Yagi-Uda_diagram.svg), Ktims, CC BY-SA 3.0/GFDL.*
 
-## Definitions
+## From radiated fields to link quantities
 
 The radiation pattern describes angular variation of radiated field or power. For a far-zone field, power density often has the form
 
@@ -75,13 +75,13 @@ $$
 
 where $D$ is the largest antenna dimension. Small dipoles may enter the far-field regime at shorter distances, but aperture antennas and arrays require care because their physical size can be many wavelengths.
 
-## Key results
+## Pattern shape, efficiency, and terminal behavior
 
 The far field of a small current element falls as $1/r$, not $1/r^2$. Its power density falls as $1/r^2$ because it is proportional to field magnitude squared. Near-field terms fall faster and store energy around the antenna, but the far-field term carries net radiated power.
 
 Beamwidth describes the angular width of the main lobe, often measured between half-power points. Sidelobes are secondary maxima. Directivity increases when radiation is concentrated into a smaller angular region, but high directivity usually requires an antenna electrically larger than a wavelength or an array/aperture.
 
-A half-wave dipole is a practical resonant antenna with directivity about $1.64$ (2.15 dBi) and radiation resistance about $73\ \Omega$ in free space. A quarter-wave monopole above a perfect ground plane behaves like half of a dipole plus its image; it has half the radiation resistance of the corresponding dipole and radiates into half-space.
+A half-wave dipole is a widely used resonant antenna with directivity about $1.64$ (2.15 dBi) and radiation resistance about $73\ \Omega$ in free space. A quarter-wave monopole above a perfect ground plane behaves like half of a dipole plus its image; it has half the radiation resistance of the corresponding dipole and radiates into half-space.
 
 Arrays control direction by phase. For $N$ isotropic elements spaced $d$ along $z$ with progressive phase $\alpha$, the array factor is
 
@@ -113,7 +113,7 @@ Antenna polarization is part of the pattern. A field pattern can have co-polariz
 
 Input impedance is the terminal view of the same radiating structure. At resonance the reactive part may be small, making matching easier, but the resistance includes both radiation resistance and loss resistance. A good antenna design therefore checks the field pattern, polarization, gain, efficiency, and feed match together. Optimizing only $S_{11}$ can produce a well-matched heater rather than an effective radiator.
 
-## Visual
+### Following power through an antenna system
 
 ```mermaid
 flowchart TB
@@ -139,8 +139,6 @@ flowchart TB
   Link --> Result(("antenna system performance"))
 ```
 
-The antenna diagram follows energy from the feed into a current distribution, near fields, far fields, radiation pattern, gain metrics, and link budget. The array subgraph expands the multi-element case into element spacing, amplitude/phase weights, array factor, beam steering, sidelobes, and grating-lobe constraints. Feed match, polarization, gain, and pattern are shown as coupled parts of one antenna system rather than separate formulas.
-
 | Antenna concept | Meaning | Key formula |
 |---|---|---|
 | Directivity | concentration of radiation | $D=4\pi U_{\max}/P_{\mathrm{rad}}$ |
@@ -149,7 +147,7 @@ The antenna diagram follows energy from the feed into a current distribution, ne
 | Friis link | received power in free space | $P_r=P_tG_tG_r(\lambda/4\pi R)^2$ |
 | Array steering | phase-controlled main beam | $kd\cos\theta_0+\alpha=0$ |
 
-## Worked example 1: Friis received power
+## Friis received power at 2.4 GHz
 
 Problem: A transmitter radiates $P_t=10$ W at $f=2.4$ GHz with gain $G_t=6$ dBi. A receiver $R=100$ m away has gain $G_r=2$ dBi. Assume free-space propagation and polarization match. Find received power in watts and dBm.
 
@@ -202,7 +200,7 @@ $$
 
 Check: A sub-microwatt received power at 100 m is plausible for this frequency and modest gains.
 
-## Worked example 2: Steering a two-element array
+## Steering a two-element array
 
 Problem: Two identical elements are spaced $d=\lambda/2$ along the $z$ axis. Find the progressive phase $\alpha$ needed to steer the main beam to $\theta_0=60^\circ$ from the $+z$ axis.
 
@@ -236,7 +234,7 @@ Step 5: Interpret: each successive element along $+z$ must lag the previous elem
 
 Check: If $\alpha=0$, the beam is broadside at $\theta=90^\circ$ for this coordinate convention, so a negative phase shifts the beam toward smaller $\theta$.
 
-## Code
+## Plotting the steered array factor
 
 ```python
 import numpy as np
@@ -263,19 +261,22 @@ plt.grid(True)
 plt.show()
 ```
 
-## Common pitfalls
+## Assumptions worth checking
 
-- Mixing dB and linear gain in Friis formula. Convert dBi to linear unless using the full dB link equation.
-- Forgetting polarization mismatch. Friis assumes compatible polarization.
-- Applying far-field formulas too close to an antenna. Near-field terms and aperture size matter.
-- Confusing directivity and gain. Gain includes radiation efficiency; directivity is purely pattern concentration.
-- Assuming a larger array always improves every direction. It narrows beams but also creates sidelobe and grating-lobe design issues.
-- Using array steering formulas without stating the coordinate convention for $\theta$ and element indexing.
-- Comparing antenna gains without checking whether values are dBi, dBd, or linear ratios.
+- Friis needs linear gains unless the entire link equation is written in decibels, and it assumes compatible polarization.
+- Far-field formulas do not apply inside the reactive or radiating near field; aperture size sets the relevant distance scale.
+- Gain includes radiation efficiency, whereas directivity measures pattern concentration alone.
+- A larger array narrows its main beam but can also introduce sidelobes and grating lobes.
+- Array-steering formulas are ambiguous unless the coordinate convention for $\theta$ and the element indexing are stated.
+- Antenna gain comparisons must distinguish dBi, dBd, and linear ratios.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Plane waves, loss, polarization, and power](/physics/electromagnetics/plane-waves-lossless-lossy-polarization) for far-field wave and Poynting vector concepts.
 - [Maxwell equations for time-varying fields](/physics/electromagnetics/maxwell-equations-time-varying-fields) for radiation as a consequence of time-varying currents.
 - [Reflection, transmission, fibers, and waveguides](/physics/electromagnetics/reflection-transmission-fibers-waveguides) for aperture and guided-wave connections.
 - [Radar, satellite links, and remote sensing](/physics/electromagnetics/radar-satellite-remote-sensing) for link budgets and radar range equations.
+
+</div>

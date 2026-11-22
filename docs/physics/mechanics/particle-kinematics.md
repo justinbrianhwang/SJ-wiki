@@ -524,9 +524,8 @@ Coordinate choice does not change the physical vector. Results obtained in two s
 - Use radians for angular rates in derivative formulas.
 - Differentiate a final position expression to recover velocity, and differentiate velocity to recover acceleration. Initial conditions and units should survive both checks.
 
-## Related pages
+<div className="see-also">
 
-- [Particle kinetics with Newton's second law](/physics/mechanics/particle-kinetics-newton)
-- [Work-energy methods](/physics/mechanics/work-energy-methods)
-- [Planar rigid-body motion](/physics/mechanics/planar-rigid-body-motion)
-- [Two-dimensional motion](/physics/general/two-dimensional-motion)
+See also: [Particle kinetics with Newton's second law](/physics/mechanics/particle-kinetics-newton) · [Work-energy methods](/physics/mechanics/work-energy-methods) · [Planar rigid-body motion](/physics/mechanics/planar-rigid-body-motion) · [Two-dimensional motion](/physics/general/two-dimensional-motion)
+
+</div>

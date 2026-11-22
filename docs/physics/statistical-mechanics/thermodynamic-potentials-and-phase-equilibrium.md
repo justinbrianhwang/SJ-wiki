@@ -9,7 +9,7 @@ Thermodynamic potentials are Legendre transforms of the internal energy. Statist
 
 Phase equilibrium is where the formalism becomes geometric. A stable phase minimizes the appropriate potential under the imposed constraints; coexistence means two phases have equal chemical potential or equal Gibbs free energy per particle. Slopes of coexistence curves follow from derivative identities rather than from microscopic details.
 
-## Definitions
+## Choosing a potential for the imposed constraints
 
 The fundamental thermodynamic differential for a simple single-component system is
 
@@ -53,7 +53,7 @@ $$
 S\,dT - V\,dp + N\,d\mu=0.
 $$
 
-## Key results
+## Stability and coexistence from derivatives
 
 Maxwell relations follow from equality of mixed partial derivatives. From $dF=-S\,dT-p\,dV$ at fixed $N$,
 
@@ -129,15 +129,13 @@ This compact formula underlies coexistence slopes, chemical-potential matching, 
 
 Jacobians are often the safest way to transform derivatives. If an equation of state is known in variables $(T,V,N)$ but an experiment fixes $(T,p,N)$, direct substitution can silently hold the wrong variable constant. Writing derivatives as Jacobian ratios keeps the constraints explicit and prevents common sign mistakes in heat-capacity and compressibility identities.
 
-Phase diagrams are maps of which potential minimum is global under each set of intensive variables. Metastable extensions may be drawn, but equilibrium curves are determined by equality of the appropriate potentials. This is why the same microscopic model can show smooth behavior in one path through parameter space and a discontinuity along another.
+Phase diagrams map which potential minimum is global under each set of intensive variables. Metastable extensions may be drawn, but equilibrium curves are determined by equality of the appropriate potentials. The same microscopic model can therefore show smooth behavior along one path through parameter space and a discontinuity along another.
 
 In multicomponent systems, the same logic operates in a higher-dimensional composition space. Tie lines, coexistence surfaces, and reaction constraints are geometric expressions of minimizing free energy under conservation laws. Gibbs' phase rule is a dimension count of this constrained minimization problem, not a separate empirical rule.
 
-The statistical-mechanical role of these potentials is to summarize many microscopic states into a surface whose derivatives are observable quantities. Once $F$, $G$, or $\Phi_G$ is known, equations of state, stability tests, and coexistence conditions are obtained by calculus. That is why partition functions are so central.
+The statistical-mechanical role of these potentials is to summarize many microscopic states into a surface whose derivatives are observable quantities. Once $F$, $G$, or $\Phi_G$ is known, equations of state, stability tests, and coexistence conditions follow by calculus; partition functions provide those potentials from the microscopic theory.
 
-This calculus-first discipline is what keeps signs, constraints, and physical interpretations aligned.
-
-## Visual
+Keeping the natural variables explicit aligns the derivative signs, constraints, and physical interpretation.
 
 ```text
 p
@@ -160,9 +158,9 @@ p
 | $G=E-TS+pV$ | $T,p,N$ | minimized at fixed $T,p,N$ |
 | $\Phi_G=E-TS-\mu N$ | $T,V,\mu$ | minimized at fixed $T,V,\mu$ |
 
-## Worked example 1: A Maxwell relation from the Helmholtz free energy
+## Deriving a Maxwell relation from $F(T,V)$
 
-Problem: Derive
+Starting from $F(T,V)$, derive
 
 $$
 \left({\partial S\over \partial V}\right)_T
@@ -170,9 +168,7 @@ $$
 \left({\partial p\over \partial T}\right)_V
 $$
 
-from $F(T,V)$.
-
-Method:
+by comparing mixed derivatives.
 
 1. Start with
 
@@ -204,13 +200,11 @@ $$
 
 5. Equality of mixed partial derivatives gives the result.
 
-Checked answer: the signs match because both $S$ and $p$ enter $dF$ with minus signs.
+The signs match because both $S$ and $p$ enter $dF$ with minus signs.
 
-## Worked example 2: Slope of a vapor-pressure curve
+## Estimating the slope of a vapor-pressure curve
 
-Problem: Estimate $dp/dT$ for a liquid-vapor transition at $T=373\,\mathrm K$ with molar latent heat $L_m=40.7\,\mathrm{kJ/mol}$ and vapor molar volume $v_g=3.06\times 10^{-2}\,\mathrm{m^3/mol}$. Neglect the liquid molar volume.
-
-Method:
+For a liquid-vapor transition at $T=373\,\mathrm K$, take molar latent heat $L_m=40.7\,\mathrm{kJ/mol}$ and vapor molar volume $v_g=3.06\times 10^{-2}\,\mathrm{m^3/mol}$. Neglecting the liquid molar volume gives the local slope directly.
 
 1. Use the molar Clausius-Clapeyron formula:
 
@@ -239,23 +233,9 @@ $$
 \approx 3.57\times 10^3\,\mathrm{Pa/K}.
 $$
 
-Checked answer: near the normal boiling point, vapor pressure changes by several kilopascals per kelvin, consistent with the steep liquid-vapor curve.
+Near the normal boiling point, vapor pressure changes by several kilopascals per kelvin, consistent with the steep liquid-vapor curve.
 
-## Code
-
-```python
-def clapeyron_slope(T, latent_heat_molar, v_gas_molar, v_liquid_molar=0.0):
-    return latent_heat_molar / (T * (v_gas_molar - v_liquid_molar))
-
-def gibbs_phase_rule(components, phases):
-    return components - phases + 2
-
-print(clapeyron_slope(373.0, 40.7e3, 3.06e-2), "Pa/K")
-for C, P in [(1, 1), (1, 2), (1, 3), (2, 2)]:
-    print(C, P, gibbs_phase_rule(C, P))
-```
-
-## Common pitfalls
+## Constraints that prevent sign and unit errors
 
 - Mixing natural variables when differentiating a potential. Each potential has its own correct independent variables.
 - Forgetting that phase coexistence for one component means equal chemical potentials, not merely equal pressures.
@@ -263,10 +243,8 @@ for C, P in [(1, 1), (1, 2), (1, 3), (2, 2)]:
 - Treating the critical point as a triple point. At a critical point two phases become indistinguishable; at a triple point three coexist.
 - Ignoring stability conditions when an equation of state gives negative compressibility.
 
-## Connections
+<div className="see-also">
 
-- [Canonical ensemble and fluctuations](/physics/statistical-mechanics/canonical-ensemble-and-fluctuations)
-- [Grand canonical ensemble and particle exchange](/physics/statistical-mechanics/grand-canonical-ensemble-and-particle-exchange)
-- [Real gases, virial expansion, and van der Waals theory](/physics/statistical-mechanics/real-gases-virial-expansion-and-van-der-waals-theory)
-- [Phase transitions and order parameters](/physics/statistical-mechanics/phase-transitions-and-order-parameters)
-- [Thermodynamics](/physics/thermodynamics/intro)
+See also: [Canonical ensemble and fluctuations](/physics/statistical-mechanics/canonical-ensemble-and-fluctuations) · [Grand canonical ensemble and particle exchange](/physics/statistical-mechanics/grand-canonical-ensemble-and-particle-exchange) · [Real gases, virial expansion, and van der Waals theory](/physics/statistical-mechanics/real-gases-virial-expansion-and-van-der-waals-theory) · [Phase transitions and order parameters](/physics/statistical-mechanics/phase-transitions-and-order-parameters) · [Thermodynamics](/physics/thermodynamics/intro)
+
+</div>

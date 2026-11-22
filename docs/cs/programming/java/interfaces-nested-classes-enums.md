@@ -9,41 +9,39 @@ Interfaces define contracts independent of a single class hierarchy. A class can
 
 Nested classes and enums add structure. A nested type can keep helper code close to the class that uses it, while an enum defines a fixed set of named instances with type safety. These features reduce loose conventions: instead of passing arbitrary integers for a mode, use an enum; instead of exposing a helper class globally, nest it where its relationship is clear.
 
-## Definitions
+## Roles, enclosing instances, and closed sets
 
-The source basis for this page is Chapters 4, 5, and 6 on interfaces, marker interfaces, nested types, inner classes, local and anonymous classes, nesting in interfaces, enum declarations, enum constants, and `java.lang.Enum`. The terms below are written as contracts: each one tells you what the compiler can check, what the runtime must preserve, and what a reader of the program may rely on.
+Chapters 4, 5, and 6 cover interfaces, marker interfaces, nested types, inner classes, local and anonymous classes, enum declarations, enum constants, and `java.lang.Enum`. These constructs describe roles, lexical ownership, or a fixed value domain without forcing everything into one class hierarchy.
 
-**Interface.** An interface declares a contract that classes can implement. Source-era interfaces declare constants and abstract methods, with later Java default methods outside this textbook's coverage. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Interface.** A contract that classes can implement. Source-era interfaces declare constants and abstract methods; default methods came later.
 
-**Implementation.** A class implements an interface by providing concrete methods matching the interface contract. A value of interface type can refer to an object of any implementing class. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Implementation.** A class's concrete methods satisfying an interface contract. An interface variable can refer to an object of any implementing class.
 
-**Marker interface.** A marker interface has no methods and marks a class as having a property recognized by library code, such as `Serializable` or `Cloneable`. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Marker interface.** An interface with no methods that marks a property recognized by library code, such as `Serializable` or `Cloneable`.
 
-**Static nested class.** A static nested class is a nested type associated with its enclosing class name but without an implicit enclosing object reference. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Static nested class.** A nested type associated with its enclosing class name but without an implicit enclosing-object reference.
 
-**Inner class.** An inner class is a non-static nested class whose instances are associated with an enclosing instance. It can access members of that enclosing object. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Inner class.** A non-static nested class whose instances are associated with, and can access, an enclosing instance.
 
-**Anonymous class.** An anonymous class declares and instantiates a class expression in one place, often to implement a small interface or extend a simple class. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Anonymous class.** A class declared and instantiated in one expression, often for a small interface implementation or simple extension.
 
-**Enum.** An enum declares a type with a fixed set of named constants. Enum constants are objects of the enum type and may have fields, constructors, and methods. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Enum.** A type with a fixed set of named constants. Its constants are objects and may have fields, constructors, and methods.
 
-**Functional-interface boundary.** The source uses interfaces such as `Runnable`, but Java 8's lambda expressions and `@FunctionalInterface` annotation are later features and are not taught by this book. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
+**Functional-interface boundary.** The source uses interfaces such as `Runnable`; Java 8 lambda expressions and `@FunctionalInterface` came later.
 
-## Key results
+## Choosing a relationship that says enough
 
-**Interfaces express capability without forcing superclass choice.** A class may already extend a useful superclass and still implement interfaces. This makes interfaces the source-era answer to many multiple-inheritance design needs: a type can promise several roles while inheriting implementation from only one class. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Interfaces express capability without forcing superclass choice.** A class may extend one useful superclass and still implement several interfaces. It can promise multiple roles while inheriting implementation from only one class.
 
-**Interface variables support polymorphism.** A variable of interface type can hold a reference to any object whose class implements that interface. Method calls through the interface are dynamically dispatched to the object's implementation, just as overridden class methods are. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Interface variables support polymorphism.** A variable of interface type can hold any implementing object. Calls through it dispatch to the object's implementation just as overridden class methods do.
 
-**Anonymous classes are concise but can become unreadable.** The source explicitly warns that anonymous classes are best when small. Nesting future behavior inside current method code can be convenient, but long anonymous classes hide control flow and make debugging harder. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Anonymous classes work best when small.** Keeping a short implementation beside its use can help, but a long anonymous class hides control flow and makes debugging harder.
 
-**Enums are stronger than integer constants.** An enum type limits possible values to declared constants, supports `switch`, provides useful inherited methods from `Enum`, and prevents mixing unrelated sets of constants. It makes illegal states harder to represent than `int` constants do. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Enums are stronger than integer constants.** An enum limits values to declared constants, supports `switch`, inherits useful methods from `Enum`, and prevents unrelated constant sets from being mixed.
 
-**Default methods and lambdas are outside the source.** Modern Java interfaces can include default methods, static methods, and lambda-friendly functional interfaces. Those are important in current Java, but they are not part of this Java 5 source. These notes therefore explain the older mechanisms that later features build on. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
+**Default methods and lambdas are outside the source.** Modern Java interfaces add default and static methods and work with lambdas. The mechanisms here are the Java 5 foundation those features build on.
 
 When choosing among a class, interface, nested type, anonymous class, and enum, ask what kind of relationship you are representing. Use a class for shared implementation and object state. Use an interface for a role that unrelated classes can implement. Use a static nested class when a helper belongs conceptually under an outer type but does not need an outer object. Use an inner class when it genuinely needs enclosing instance state. Use an enum when the set of values is closed and named. Use anonymous classes only when the implementation is short enough that naming it would add more noise than clarity.
-
-## Visual
 
 ```mermaid
 classDiagram
@@ -74,21 +72,21 @@ classDiagram
 | Inner class | Helper tied to enclosing object | Has access to enclosing instance |
 | Enum | Closed set of typed constants | Can have fields and methods |
 
-## Worked example 1: replacing integer modes with an enum
+## Replacing numeric job states with an enum
 
 Problem: A program uses `0`, `1`, and `2` to represent job states. Replace them with a safer enum.
 
 Method:
 
 1. Name the concept: the values are not arbitrary numbers; they are states.
-2. Declare `enum JobState { NEW, RUNNING, DONE }` so only those constants are valid values.
+2. Declare `enum JobState \{ NEW, RUNNING, DONE \}` so only those constants are valid values.
 3. Change variables from `int state` to `JobState state`.
 4. Replace comparisons such as `state == 1` with `state == JobState.RUNNING`.
 5. Use a `switch` or methods on the enum if behavior depends on the state.
 
 Checked answer: The checked result is a typed state model. Code cannot accidentally assign `17` as a state, and readers see the domain names instead of decoding numbers.
 
-## Worked example 2: choosing an interface variable
+## Depending on comparison rather than representation
 
 Problem: A method needs to sort objects that can compare themselves. Should it require a specific class or an interface?
 
@@ -102,7 +100,7 @@ Method:
 
 Checked answer: The checked design depends on an interface role. This reduces coupling and lets unrelated classes participate if they satisfy the comparison contract.
 
-## Code
+## One job exposed through two interface roles
 
 ```java
 public class InterfaceEnumDemo {
@@ -139,7 +137,7 @@ public class InterfaceEnumDemo {
 }
 ```
 
-## Common pitfalls
+## Leaky nesting and weak domain models
 
 - Do not treat interfaces as weak classes. They are contracts and should be designed around meaningful roles.
 - Do not write long anonymous classes inside complex methods. Name the class when the behavior needs explanation.
@@ -147,9 +145,13 @@ public class InterfaceEnumDemo {
 - Do not assume source-era interfaces include default methods. That is a later Java feature outside this book.
 - Do not confuse a static nested class with an inner class. Only the inner class carries an enclosing instance relationship.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Inheritance, Polymorphism, and Object](/cs/programming/java/inheritance-polymorphism-object): compares class extension with interface roles.
 - [Generics, Wildcards, and Erasure](/cs/programming/java/generics-wildcards-erasure): explains generic interfaces such as `Comparable<T>` and `Iterable<E>`.
 - [Threads, Synchronization, and the Memory Model](/cs/programming/java/threads-synchronization-memory-model): uses `Runnable` as a core thread task interface.
 - [Collections, Iteration, and Maps](/cs/programming/java/collections-iteration-maps): uses interfaces for collection contracts.
+
+</div>

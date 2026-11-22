@@ -377,10 +377,8 @@ Recursive destruction that lets each node delete its successor looks compact, bu
 
 A queue implemented with head and tail pointers exposes a useful empty-state edge case. Enqueueing the first node must set both pointers to that node. Dequeueing the final node advances the head to null and must also reset the tail to null; otherwise the tail dangles. Between those cases, enqueue changes the old tail's next link and then advances tail, while dequeue changes only head and deletes the former first node.
 
-## Related pages
+<div className="see-also">
 
-- [pointers and dynamic memory](/cs/programming/cpp/pointers-and-dynamic-memory)
-- [constructors and copy semantics](/cs/programming/cpp/constructors-and-copy-semantics)
-- [recursion](/cs/programming/cpp/recursion)
-- [stl containers](/cs/programming/cpp/stl-containers)
-- [classes and encapsulation](/cs/programming/cpp/classes-and-encapsulation)
+See also: [pointers and dynamic memory](/cs/programming/cpp/pointers-and-dynamic-memory) · [constructors and copy semantics](/cs/programming/cpp/constructors-and-copy-semantics) · [recursion](/cs/programming/cpp/recursion) · [stl containers](/cs/programming/cpp/stl-containers) · [classes and encapsulation](/cs/programming/cpp/classes-and-encapsulation)
+
+</div>

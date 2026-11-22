@@ -5,11 +5,11 @@ sidebar_position: 17
 
 # Digital Control, Sampling, and the z-Transform
 
-Digital controllers place a computer in the loop. Nise's final chapter shows how continuous signals, sampled data, zero-order holds, and pulse transfer functions let classical control ideas move from the $s$-plane to the $z$-plane. The practical motivation is strong: software can implement compensators, schedule multiple loops, change parameters, and integrate diagnostics more flexibly than fixed analog hardware.
+Digital controllers place a computer in the loop. Continuous signals, sampled data, zero-order holds, and pulse transfer functions carry classical control ideas from the $s$-plane to the $z$-plane. Software can implement compensators, schedule multiple loops, change parameters, and integrate diagnostics more flexibly than fixed analog hardware.
 
-Sampling also adds new design constraints. The controller sees signals only at sampling instants, the hold reconstructs an actuator command between samples, and computational delay can reduce phase margin. Digital control is not just analog control typed into a processor; it is a sampled-data system with its own transform and stability geometry.
+Sampling also adds new design constraints. The controller sees signals only at sampling instants, the hold reconstructs an actuator command between samples, and computational delay can reduce phase margin. A digital loop is a sampled-data system with its own transform and stability geometry, not an analog controller transcribed into software.
 
-## Definitions
+## From samples to pulse transfer functions
 
 The one-sided z-transform of a sequence $x[n]$ is
 
@@ -51,7 +51,7 @@ $$
 |z_i|<1.
 $$
 
-## Key results
+## Translating the $s$-plane into the $z$-plane
 
 The $s$-plane and $z$-plane correspond as follows:
 
@@ -84,6 +84,8 @@ $$
 
 Digital steady-state error parallels analog steady-state error. Poles at $z=1$ play the role of integrators. A discrete Type 1 loop has one pole at $z=1$ in the forward pulse transfer function and can track a step with zero error under the usual stability assumptions.
 
+## Timing, holds, quantization, and aliasing
+
 Sampling period matters. Very slow sampling can distort transient response, reduce stability margin, and create aliasing. Very fast sampling improves approximation to continuous control but increases computation, noise sensitivity, and hardware demands. A common engineering starting point is to sample many times faster than the desired closed-loop bandwidth, then verify with the actual implementation.
 
 The zero-order hold is not a minor implementation detail. It makes the actuator command piecewise constant, which introduces effective delay and changes the plant seen by the digital controller. A continuous plant discretized with zero-order hold generally has a different pulse transfer function from one obtained by merely replacing $s$ with a finite-difference expression. For accurate sampled-data design, the hold and sampling assumptions should match the real hardware.
@@ -104,17 +106,9 @@ Sampling also affects what "overshoot" means. The true continuous output between
 
 Finally, the sampling period is part of the controller design. Changing $T$ moves every mapped pole $z=e^{sT}$ and changes the discrete equivalent of the plant. A controller tuned for $T=0.01$ s is not the same controller at $T=0.05$ s, even if the difference equation looks similar. Timing must be treated as a specified design parameter.
 
-The discrete model should also state whether signals are indexed before or after the control update. Some texts use $u[n]$ as the command computed from $e[n]$ and held immediately; real processors may apply that value one sample later. A single indexing convention prevents hidden delays.
+The discrete model should also state whether signals are indexed before or after the control update. Some texts use $u[n]$ as the command computed from $e[n]$ and held immediately; real processors may apply that value one sample later. The indexing convention should match the firmware timing diagram and test logs so analysis and implementation do not differ by a hidden delay.
 
-That convention should match the firmware timing diagram and test logs.
-
-Otherwise analysis and implementation silently diverge.
-
-Record it explicitly.
-
-Then test it.
-
-## Visual
+### The complete sampled-data loop
 
 ```mermaid
 flowchart LR
@@ -143,7 +137,7 @@ flowchart LR
 
 This diagram shows the sampled-data loop with the sampler, digital controller, computation delay, DAC/PWM quantization, zero-order hold, continuous plant, anti-alias filter, and ADC feedback all in the signal path. The shape transition is explicit: continuous signals `r(t)` and `y(t)` become sequences `r[n]`, `e[n]`, and `y[n]`, while the hold converts the digital command back into a piecewise-constant continuous input.
 
-## Worked example 1: mapping continuous poles to the z-plane
+## Mapping a continuous pole pair into the unit circle
 
 Problem: Continuous closed-loop poles are
 
@@ -194,7 +188,7 @@ $$
 
 Checked answer: the poles are approximately $0.782\pm j0.242$, inside the unit circle.
 
-## Worked example 2: z-transform of a difference equation
+## Recovering $G(z)$ from a difference equation
 
 Problem: Find the transfer function for
 
@@ -236,7 +230,7 @@ $$
 
 Checked answer: $G(z)=(2z-1)/(z-0.6)$ with a stable pole at $z=0.6$.
 
-## Code
+## Verifying pole mapping and a step sequence
 
 ```python
 import numpy as np
@@ -256,7 +250,7 @@ t, y = signal.dstep(system, n=20)
 print("first step samples:", np.squeeze(y)[:8])
 ```
 
-## Common pitfalls
+## Discrete-time mistakes that alter the design
 
 - Checking digital stability with left-half-plane rules instead of the unit circle.
 - Forgetting that $s=0$ maps to $z=1$, not $z=0$.
@@ -265,10 +259,14 @@ print("first step samples:", np.squeeze(y)[:8])
 - Confusing $z^{-1}$ notation with $z$ polynomial notation.
 - Assuming a discrete simulation exactly represents intersample continuous behavior.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Digital compensator implementation](/cs/control-engineering/z-plane-design-and-digital-compensators) continues into gain design and software realization.
 - [Laplace transfer functions](/cs/control-engineering/laplace-transfer-functions-and-linearization) are the continuous-domain counterpart.
 - [Frequency-response design](/cs/control-engineering/frequency-response-compensator-design) motivates sampling-rate and delay checks.
-- [Embedded systems](/cs/embedded/) covers the hardware context for real digital controllers.
-- [Signals and systems](/physics/signals-systems/) includes sampling and transform theory.
+- [Embedded systems](/cs/embedded/intro) covers the hardware context for real digital controllers.
+- [Signals and systems](/physics/signals-systems/intro) includes sampling and transform theory.
+
+</div>

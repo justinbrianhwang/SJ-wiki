@@ -13,7 +13,7 @@ The technique is also a way to think about recurrences. CLRS presents the Master
 
 *Figure: Strassen's algorithm replaces eight block multiplications by seven carefully chosen products. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Strassen_algorithm.svg), public domain or CC-BY-SA via Wikimedia Commons.*
 
-## Definitions
+## Split, solve, combine
 
 A divide-and-conquer algorithm has three phases:
 
@@ -29,7 +29,7 @@ where $a$ is the number of subproblems, $n/b$ is each subproblem size, and $f(n)
 
 The **substitution method** proves a guessed bound by induction. The **recursion-tree method** sums work level by level. The **Master Theorem** handles many balanced recurrences. The **Akra-Bazzi theorem** extends the method to recurrences such as $T(n)=T(n/3)+T(2n/3)+n$, where subproblem sizes need not be equal [1].
 
-## Key results
+## Reading the recurrence
 
 The Master Theorem for $T(n)=aT(n/b)+f(n)$, with constants $a\ge1$ and $b\gt 1$, has three standard cases [1, Ch. 4].
 
@@ -61,8 +61,6 @@ $$X_k=\sum_{n=0}^{N-1}x_ne^{-2\pi i kn/N}.$$
 
 It recursively computes two $N/2$-point transforms and combines them with twiddle factors in linear time, yielding $O(N\log N)$ [9].
 
-## Visual
-
 ```mermaid
 flowchart TD
   A["Problem of size n"] --> B["Divide into subproblems"]
@@ -87,7 +85,7 @@ flowchart TD
 | $T(n)=2T(n/2)+O(1)$ | Min and max pair variants | leaves | $O(n)$ |
 | $T(n)=T(n-1)+O(n)$ | Bad quicksort | root-to-leaf path | $O(n^2)$ |
 
-## Worked example 1: Master Theorem with logarithmic combine cost
+## A Master-Theorem case with logarithmic combine work
 
 **Problem.** Solve
 
@@ -114,7 +112,7 @@ $$T(n)=\Theta(n\log n).$$
 
 The answer is not $\Theta(n^{\log_4 3})$ because the combine work is larger than the total leaf growth.
 
-## Worked example 2: Karatsuba multiplication of two 4-digit numbers
+## One Karatsuba split by hand
 
 **Problem.** Multiply $1234$ by $5678$ using one Karatsuba split.
 
@@ -150,7 +148,9 @@ $$xy=672\cdot10000+2840\cdot100+2652=6{,}720{,}000+284{,}000+2{,}652=7{,}006{,}6
 
 **Checked answer.** Ordinary multiplication also gives $1234\cdot5678=7{,}006{,}652$. Karatsuba saved one half-size multiplication; at scale, that changes the exponent.
 
-## Code
+## Karatsuba and closest-pair implementations
+
+The closest-pair routine keeps the divide-and-conquer structure explicit but re-sorts each strip by $y$, giving $O(n\log^2 n)$ time. An implementation that carries $y$-sorted subarrays through recursion reaches $O(n\log n)$.
 
 ```python
 from math import hypot
@@ -203,7 +203,7 @@ def closest_pair(points):
     return solve(px)
 ```
 
-## Common pitfalls
+## When the recurrence lies
 
 - Applying the Master Theorem before checking that the recurrence matches its assumptions.
 - Comparing $f(n)$ with $n$ instead of with $n^{\log_b a}$.
@@ -217,15 +217,6 @@ def closest_pair(points):
 - Using recursion so deep that language stack limits dominate the theoretical cost.
 - Thinking divide and conquer requires independent subproblems; some algorithms share preprocessing or combine state.
 - Replacing a simple linear algorithm with a divide-and-conquer version that has the same or worse asymptotic cost.
-
-## Connections
-
-- [Sorting Algorithms](/cs/algorithms/sorting-algorithms) for merge sort and quicksort.
-- [Searching Algorithms](/cs/algorithms/searching-algorithms) for binary search and selection.
-- [Dynamic Programming](/cs/algorithms/dynamic-programming) contrasts overlapping subproblems with independent subproblems.
-- [Computational Geometry](/cs/algorithms/computational-geometry) for closest pair, convex hull, and sweep-line preprocessing.
-- [Number-Theoretic and Algebraic Algorithms](/cs/algorithms/number-theoretic-and-algebraic-algorithms) for FFT, Karatsuba, matrix exponentiation, and modular transforms.
-- [Discrete Math](/math/discrete/intro) for recurrence solving and induction.
 
 ## References
 
@@ -252,3 +243,16 @@ def closest_pair(points):
 [11] M. Akra and L. Bazzi, "On the solution of linear recurrence equations," *Computational Optimization and Applications*, vol. 10, pp. 195-210, 1998.
 
 [12] C. A. R. Hoare, "Quicksort," *The Computer Journal*, vol. 5, no. 1, pp. 10-16, 1962. https://doi.org/10.1093/comjnl/5.1.10
+
+<div className="see-also">
+
+See also:
+
+- [Sorting Algorithms](/cs/algorithms/sorting-algorithms) for merge sort and quicksort.
+- [Searching Algorithms](/cs/algorithms/searching-algorithms) for binary search and selection.
+- [Dynamic Programming](/cs/algorithms/dynamic-programming) contrasts overlapping subproblems with independent subproblems.
+- [Computational Geometry](/cs/algorithms/computational-geometry) for closest pair, convex hull, and sweep-line preprocessing.
+- [Number-Theoretic and Algebraic Algorithms](/cs/algorithms/number-theoretic-and-algebraic-algorithms) for FFT, Karatsuba, matrix exponentiation, and modular transforms.
+- [Discrete Math](/math/discrete/intro) for recurrence solving and induction.
+
+</div>

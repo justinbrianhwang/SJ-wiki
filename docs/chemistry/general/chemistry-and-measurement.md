@@ -5,135 +5,297 @@ sidebar_position: 2
 
 # Chemistry and Measurement
 
-Measurement is the entry point into chemistry because chemical explanations must be tied to observations that can be repeated. A color change may suggest reaction, but mass, volume, temperature, pressure, and composition let the observation become evidence. This page emphasizes the measurement habits that make later chemical calculations reliable.
+Chemistry connects molecular claims to observations that other people can repeat. A color change may suggest reaction, but mass, temperature, pressure, spectrum, or composition gives the observation a scale. Every reported number combines a magnitude, a unit, and some statement—explicit or implicit—about uncertainty.
 
-In the Ebbing and Gammon sequence this topic sits near the scientific method, matter classification, significant figures, SI units, derived units, and dimensional analysis. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
+Measurement is therefore part of the chemical argument. An answer with no units is incomplete; an answer with more digits than the experiment supports is misleading; an answer with correct arithmetic but an uncalibrated instrument may still be wrong.
 
-![Four Bunsen burner flames show how controlled air flow changes the flame used for heating samples.](https://commons.wikimedia.org/wiki/Special:FilePath/Bunsen_burner_flame_types.jpg)
+## From observation to a testable claim
 
-*Figure: Bunsen burner flame types as a laboratory context for controlled observation. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bunsen_burner_flame_types.jpg), Arthur Jan Fijalkowski, CC BY-SA 3.0/GFDL.*
+A qualitative observation describes a property without assigning a numerical value: a solid forms, the solution becomes blue, or gas bubbles appear. A quantitative observation includes a measurement, such as a $2.31\ \mathrm g$ mass increase or a $6.4\ ^\circ\mathrm C$ temperature rise.
 
-![A schematic mass spectrometer shows ionization, acceleration, magnetic deflection, and detection.](https://commons.wikimedia.org/wiki/Special:FilePath/Mass_Spectrometer_Schematic.svg)
+A hypothesis is a testable proposed explanation. It should lead to predictions that could fail. Experiments compare those predictions with observations while controlling alternative causes. Repeated agreement strengthens support but does not turn a hypothesis into logical certainty.
 
-*Figure: Mass spectrometer schematic connecting measurement to atomic and molecular mass. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mass_Spectrometer_Schematic.svg), Devon Fyson and USGS, public domain.*
+A scientific law summarizes a reproducible relationship, often mathematically. A theory provides a broad explanatory framework. One does not mature into the other: a gas law describes a relationship among variables, while kinetic molecular theory explains that relationship using particle motion.
 
-## Definitions
+Models deliberately omit detail. The ideal-gas model works well under many conditions even though real molecules attract one another and occupy volume. A model is judged by the range and accuracy of its predictions, not by whether every part is literally exact.
 
-The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.
+## Classifying what is being measured
 
-- A hypothesis is a tentative explanation that can be tested against observations.
-- A scientific law summarizes a reproducible pattern, such as conservation of mass.
-- A theory explains why a broad collection of observations behaves as it does.
-- A significant figure is a digit known from measurement plus one estimated digit.
-- Accuracy describes closeness to an accepted or true value; precision describes reproducibility.
-- An SI base unit is an agreed measurement unit such as meter, kilogram, second, kelvin, mole, and ampere.
-- A derived unit combines base units, such as density in $\mathrm{g\ cm^{-3}}$ or pressure in pascals.
-- Dimensional analysis uses conversion factors equal to one to transform units without changing the physical quantity.
+Matter is anything with mass and volume. A pure substance has a fixed chemical identity and composition; a mixture contains more than one substance with variable proportions. Elements cannot be decomposed into simpler substances by ordinary chemical means. Compounds contain elements in fixed ratios and can be chemically decomposed.
 
-Definitions in chemistry often connect a symbolic representation to a physical sample. A formula such as $\mathrm{H_2O}$ names a substance, gives the atomic ratio inside one molecule, and supplies the molar mass used in a macroscopic calculation. A state symbol such as $\mathrm{(aq)}$ is not cosmetic; it says the species is dispersed in water and may be treated as ions when writing a net ionic equation. In the same way, constants such as $R$, $K_w$, $F$, or $N_A$ are compact definitions of the measurement system being used.
+Homogeneous mixtures have uniform macroscopic composition and are called solutions. Heterogeneous mixtures contain distinct regions or phases. Classification depends on scale: milk looks uniform to the eye but is a colloidal dispersion under closer examination.
 
-## Key results
+Physical properties can be observed without changing chemical identity: density, melting point, and electrical conductivity are examples. Chemical properties describe the ability to undergo chemical change, such as combustion or reaction with acid. A phase change is physical; electrolysis of water is chemical because new substances form.
 
-The central results are:
+An **intensive** property does not scale with sample amount, while an **extensive** property does. Temperature and density are intensive; mass and volume are extensive. Ratios of extensive properties can be intensive: doubling a uniform sample doubles both mass and volume but leaves $m/V$ unchanged.
 
-- Density: $d = m/V$.
-- Percent error: $\%\ \mathrm{error}=\vert \mathrm{measured}-\mathrm{accepted}\vert /\mathrm{accepted}\times 100\%$.
-- Kelvin conversion: $T_K = T_{^\circ C}+273.15$.
-- Scientific notation: $a\times 10^n$ with $1 \leq a \lt  10$.
-- Multiplication and division keep the least number of significant figures among measured factors.
-- Addition and subtraction keep the least precise decimal place among measured terms.
+## Units carry the physical meaning
 
-Dimensional analysis is more than a unit trick. It is a disciplined way to encode what is known, what is being asked, and what relationships connect the two. If every conversion factor is written as a ratio, the units cancel in a visible chain and the remaining unit becomes a check on the answer. Significant figures then report the quality of the measurement rather than the number of digits a calculator displayed.
+The International System of Units provides a coherent base. Chemistry often uses convenient accepted units such as liters and degrees Celsius alongside SI units.
 
-A good way to use these results is to state the chemical model first, then substitute numbers second. For chemistry and measurement, the model usually answers questions such as what particles are present, what is conserved, which process is idealized, and which measurement is being interpreted. Once that sentence is clear, the algebra becomes a bookkeeping problem rather than a search for a memorized pattern.
+| Quantity | SI unit | Common chemistry units | Comment |
+|---|---|---|---|
+| mass | kilogram, kg | gram, milligram | balances commonly read in grams |
+| length | meter, m | centimeter, nanometer | molecular dimensions are often nanometers |
+| time | second, s | minute, hour | conversion may be needed in rate constants |
+| temperature | kelvin, K | degree Celsius | proportional laws require kelvin |
+| amount | mole, mol | millimole | counts entities through Avogadro's constant |
+| volume | cubic meter, $\mathrm{m^3}$ | liter, milliliter | $1\ \mathrm{mL}=1\ \mathrm{cm^3}$ exactly |
+| pressure | pascal, Pa | bar, atmosphere, torr | match the gas constant to the pressure unit |
 
-Units are part of the result, not decoration. Whenever a formula contains an empirical constant, a tabulated value, or a ratio of measured quantities, the units tell you whether the expression has been used in the intended form. This is especially important in general chemistry because several equations have nearly identical algebra but different meanings: pressure can be a measured state variable, an equilibrium correction, or a colligative effect; energy can be heat flow, enthalpy, internal energy, or free energy.
+Metric prefixes are powers of ten: kilo is $10^3$, centi is $10^{-2}$, milli is $10^{-3}$, micro is $10^{-6}$, and nano is $10^{-9}$. Prefixes attach to the unit before powers are applied. Thus
 
-The strongest check is an independent chemical interpretation. Ask whether the sign agrees with direction, whether a concentration can be negative, whether a mole ratio follows the balanced equation, whether an equilibrium shift opposes the stress, and whether a microscopic description explains the macroscopic number. These checks connect chemistry and measurement to neighboring topics instead of leaving it as an isolated technique.
+$$
+1\ \mathrm{cm^3}=(10^{-2}\ \mathrm m)^3=10^{-6}\ \mathrm{m^3},
+$$
 
-A second check is to compare the limiting cases. If a reactant amount goes to zero, a product amount cannot remain large. If temperature rises in a gas sample at fixed volume, pressure should not fall in an ideal model. If an acid is diluted, hydronium concentration should normally decrease unless a coupled equilibrium supplies more. Limiting cases often reveal algebra that has been rearranged correctly but applied to the wrong chemical situation.
+not $10^{-2}\ \mathrm{m^3}$.
 
-Finally, keep symbolic and particulate representations side by side. A balanced equation, an equilibrium expression, an orbital diagram, or a polymer repeat unit is a compact symbol for a population of particles. Translating that symbol into words forces you to say what is reacting, what is being counted, and what is being held constant. That translation is usually the difference between a calculation that can be adapted to a new problem and one that only imitates a worked example.
+Temperature needs special care. Celsius and kelvin increments have the same size, but their zero points differ:
 
-## Visual
+$$
+T_K=T_{^\circ C}+273.15.
+$$
 
-| Quantity | Common unit | SI or derived unit | Typical chemistry use |
-|---|---:|---:|---|
-| Mass | g | kg | sample amount, conservation checks |
-| Length | cm, nm | m | atomic scale, lab apparatus dimensions |
-| Volume | mL, L | $\mathrm{m^3}$ | solutions and gases |
-| Temperature | $^\circ\mathrm{C}$ | K | gas laws and thermodynamics |
-| Amount | mol | mol | particle counting and stoichiometry |
-| Density | $\mathrm{g\ mL^{-1}}$ | $\mathrm{kg\ m^{-3}}$ | identifying substances |
+A temperature difference of $10\ ^\circ\mathrm C$ equals a difference of $10\ \mathrm K$, yet $20\ ^\circ\mathrm C$ is not twice as hot as $10\ ^\circ\mathrm C$. Ratios and reciprocal temperatures require an absolute scale.
 
-```mermaid
-flowchart LR
-  A[Question] --> B[Known measured values]
-  B --> C[Conversion factors]
-  C --> D[Unit cancellation]
-  D --> E[Significant figures]
-  E --> F[Chemical reasonableness check]
-```
+## Dimensional analysis as equation checking
 
-## Worked example 1: Density with significant figures
+A conversion factor is a ratio of equal quantities and therefore has numerical value one. Orient each factor so unwanted units cancel. The remaining unit should match the requested quantity.
 
-Problem. A metal sample has mass 37.50 g and displaces water from 21.30 mL to 26.06 mL. Find its density.
+For example, convert $72.0\ \mathrm{km\,h^{-1}}$ to meters per second:
 
-    Method.
+$$
+72.0\ \frac{\mathrm{km}}{\mathrm h}
+\left(\frac{1000\ \mathrm m}{1\ \mathrm{km}}\right)
+\left(\frac{1\ \mathrm h}{3600\ \mathrm s}\right)
+=20.0\ \mathrm{m\,s^{-1}}.
+$$
 
-    1. Find the sample volume by subtraction: $26.06-21.30=4.76\ \mathrm{mL}$.
-2. The subtraction result has two decimal places because both readings were recorded to hundredths of a milliliter.
-3. Use density: $d=m/V=37.50\ \mathrm{g}/4.76\ \mathrm{mL}$.
-4. Calculate: $37.50/4.76=7.878...\ \mathrm{g\ mL^{-1}}$.
-5. The limiting measured factor has three significant figures, so round to $7.88\ \mathrm{g\ mL^{-1}}$.
+Kilometers and hours cancel. A factor reversed by mistake leaves an obviously unsuitable compound unit. Dimensional consistency cannot prove that an equation is physically correct, but inconsistency proves that it is wrong.
 
-    Checked answer. $d=7.88\ \mathrm{g\ mL^{-1}}$. The density is metal-like and greater than water, so a sinking metal sample is plausible.
+Units also reveal missing powers. Area conversion requires squaring the length conversion; volume requires cubing it. A density conversion from $\mathrm{g\,mL^{-1}}$ to $\mathrm{kg\,m^{-3}}$ changes both numerator and denominator.
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+### Worked example: a concentration conversion chain
 
-## Worked example 2: Dimensional analysis across unit systems
+A solution contains $25.0\ \mathrm{mg}$ solute per $5.00\ \mathrm{mL}$. Express the concentration in $\mathrm{g\,L^{-1}}$.
 
-Problem. A medicine solution contains 25.0 mg of solute per 5.00 mL. Convert the concentration to grams per liter.
+Start with the measured ratio and choose factors that remove milligrams and milliliters:
 
-    Method.
+$$
+\frac{25.0\ \mathrm{mg}}{5.00\ \mathrm{mL}}
+\left(\frac{1\ \mathrm g}{1000\ \mathrm{mg}}\right)
+\left(\frac{1000\ \mathrm{mL}}{1\ \mathrm L}\right).
+$$
 
-    1. Write the given concentration as $25.0\ \mathrm{mg}/5.00\ \mathrm{mL}$.
-2. Convert milligrams to grams: $1\ \mathrm{g}/1000\ \mathrm{mg}$.
-3. Convert milliliters to liters by multiplying by $1000\ \mathrm{mL}/1\ \mathrm{L}$ because milliliters are in the denominator.
-4. Combine: $(25.0/5.00)(1/1000)(1000)=5.00\ \mathrm{g\ L^{-1}}$.
-5. All measured values have three significant figures, so keep three.
+Cancel the units:
 
-    Checked answer. $5.00\ \mathrm{g\ L^{-1}}$. The factors of 1000 cancel, so 5 mg/mL equals 5 g/L.
+$$
+\frac{\cancel{\mathrm{mg}}}{\cancel{\mathrm{mL}}}
+\frac{\mathrm g}{\cancel{\mathrm{mg}}}
+\frac{\cancel{\mathrm{mL}}}{\mathrm L}
+=\mathrm{g\,L^{-1}}.
+$$
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+Numerically, the powers of 1000 cancel:
 
-## Code
+$$
+\frac{25.0}{5.00}=5.00\ \mathrm{g\,L^{-1}}.
+$$
 
-```python
-def density_from_displacement(mass_g, initial_ml, final_ml):
-    volume_ml = final_ml - initial_ml
-    return mass_g / volume_ml
+Both measured values have three significant figures, so the result has three. The cancellation also gives a quick scale check: $1\ \mathrm{mg\,mL^{-1}}=1\ \mathrm{g\,L^{-1}}$.
 
-def mg_per_ml_to_g_per_l(mg, ml):
-    return (mg / ml) * (1e-3) * 1000.0
+## Precision, accuracy, and kinds of error
 
-rho = density_from_displacement(37.50, 21.30, 26.06)
-conc = mg_per_ml_to_g_per_l(25.0, 5.00)
-print(round(rho, 3), round(conc, 3))
-```
+**Precision** describes agreement among repeated measurements. **Accuracy** describes agreement with an accepted or reference value. A set can be tightly clustered but shifted from the correct value, giving high precision and poor accuracy.
 
-## Common pitfalls
+Random error changes unpredictably among trials and causes scatter. Repeating measurements and averaging can reduce its influence on the mean. Systematic error biases results in a consistent direction: a balance with a zero offset or a volumetric pipette calibrated incorrectly. Repetition does not remove systematic bias; calibration, blanks, standards, and method comparison are needed.
 
-- Rounding after every intermediate step. Avoid it by keeping guard digits until the final answer.
-- Confusing accuracy with precision. Avoid it by separating closeness to true value from repeatability.
-- Using Celsius directly in gas or thermodynamic equations. Avoid it by converting to kelvin before substitution.
-- Writing conversion factors in the wrong direction. Avoid it by checking unit cancellation line by line.
-- Counting exact conversion factors as limiting significant figures. Avoid it by identifying counted and defined quantities separately.
-- Forgetting that density changes with temperature for many substances. Avoid it by recording experimental conditions with measured values.
+Percent error compares one measured result with an accepted value:
 
-## Connections
+$$
+\%\ \mathrm{error}
+=\frac{|\mathrm{measured}-\mathrm{accepted}|}
+{\mathrm{accepted}}\times100\%.
+$$
 
-- [atoms, molecules, and ions](/chemistry/general/atoms-molecules-and-ions)
-- [stoichiometry](/chemistry/general/stoichiometry)
-- [gases](/chemistry/general/gases)
-- [thermochemistry](/chemistry/general/thermochemistry)
+Absolute value reports magnitude. If the direction of bias matters, signed relative error may be more informative. Percent difference is used when comparing two experimental values without treating either as accepted; it commonly divides their absolute difference by their average.
+
+Uncertainty is not identical to error. Error is the unknowable exact difference from the true value; uncertainty estimates the plausible range associated with a result. A complete high-quality report may use notation such as $(10.42\pm0.03)\ \mathrm{mL}$ and state the confidence or method used to obtain the uncertainty.
+
+### Worked example: accuracy and precision in a calibration check
+
+Four measurements of a $10.00\ \mathrm g$ reference mass are $9.82$, $9.83$, $9.82$, and $9.83\ \mathrm g$.
+
+Their mean is
+
+$$
+\bar x=\frac{9.82+9.83+9.82+9.83}{4}=9.825\ \mathrm g.
+$$
+
+The range is only
+
+$$
+9.83-9.82=0.01\ \mathrm g,
+$$
+
+so the readings are closely grouped. The mean percent error is
+
+$$
+\frac{|9.825-10.00|}{10.00}\times100\%=1.75\%.
+$$
+
+The measurements are precise relative to their spread but inaccurate relative to the reference. A persistent calibration or tare error is more plausible than random scatter. Averaging hundreds of similarly biased readings would give a more precise estimate of the wrong value.
+
+## Significant figures are a reporting convention
+
+Digits known from the instrument plus one estimated digit are recorded in an analog reading. A digital instrument reports to its displayed resolution, though the true uncertainty may be larger than the last digit. Significant figures communicate resolution compactly when a full uncertainty analysis is unavailable.
+
+The main counting conventions are:
+
+- Nonzero digits are significant.
+- Zeros between nonzero digits are significant.
+- Leading zeros locate the decimal and are not significant.
+- Trailing zeros after a decimal point are significant.
+- Trailing zeros in an integer without a decimal marker are ambiguous; scientific notation resolves the ambiguity.
+
+Thus $0.00450$ has three significant figures. Writing $1.20\times10^3$ states three significant figures, whereas $1.2\times10^3$ states two.
+
+For multiplication and division, the result is normally rounded to the fewest significant figures among measured inputs. For addition and subtraction, it is rounded to the least precise decimal place. These different rules reflect the operations: addition combines absolute place resolution, while multiplication combines relative resolution.
+
+Exact counts and defined conversions do not limit significant figures. There are exactly three samples if they were counted, and $1\ \mathrm m=100\ \mathrm{cm}$ by definition. A measured “3 m” length, however, may have only one significant figure; context determines whether a number is counted, defined, or measured.
+
+Keep guard digits through intermediate steps and round once at the end. Repeated rounding can shift the final answer. When the discarded digits begin with exactly 5 and nothing else, different rounding conventions exist; scientific software may use round-to-even to reduce aggregate bias.
+
+### Worked example: mixed arithmetic and reporting
+
+Suppose a mass is found by difference:
+
+$$
+m=18.462\ \mathrm g-12.1\ \mathrm g.
+$$
+
+The unrounded difference is $6.362\ \mathrm g$, but subtraction is limited to the tenths place by $12.1\ \mathrm g$, so the report is
+
+$$
+m=6.4\ \mathrm g.
+$$
+
+If that mass is divided by a measured volume of $2.35\ \mathrm{mL}$, use the unrounded difference as a guard value:
+
+$$
+d=\frac{6.362\ \mathrm g}{2.35\ \mathrm{mL}}
+=2.707\ldots\ \mathrm{g\,mL^{-1}}.
+$$
+
+The mass difference is effectively known only to about two significant figures after the subtraction rule, so a conservative final report is
+
+$$
+d=2.7\ \mathrm{g\,mL^{-1}}.
+$$
+
+Writing $2.70723\ \mathrm{g\,mL^{-1}}$ would preserve calculator output rather than experimental information.
+
+## Density combines two measurements
+
+Density is
+
+$$
+d=\frac{m}{V}.
+$$
+
+It is temperature dependent because volume changes with temperature. The density of a pure substance under stated conditions can help identify it, but a match alone is not conclusive when several materials have similar values.
+
+### Worked example: volume by displacement
+
+A metal sample has mass $37.50\ \mathrm g$. In a graduated cylinder, water rises from $21.30\ \mathrm{mL}$ to $26.06\ \mathrm{mL}$ when the sample is fully submerged.
+
+The sample volume is the displacement:
+
+$$
+V=26.06-21.30=4.76\ \mathrm{mL}.
+$$
+
+Both cylinder readings extend to the hundredths place, so their difference does too. Density is
+
+$$
+d=\frac{37.50\ \mathrm g}{4.76\ \mathrm{mL}}
+=7.878\ldots\ \mathrm{g\,mL^{-1}}.
+$$
+
+The volume has three significant figures and limits the division:
+
+$$
+d=7.88\ \mathrm{g\,mL^{-1}}.
+$$
+
+The result is plausible for a dense metal and predicts sinking in water. Air bubbles attached to the sample would increase apparent displaced volume and bias the calculated density low. Dissolution or reaction with water would invalidate the method altogether.
+
+## Calibration and experimental records
+
+Calibration compares an instrument response with standards traceable to known values. A calibration curve should cover the sample range; extrapolating far beyond the standards assumes response behavior that has not been tested. A blank measures background from solvents, reagents, and the container so it can be separated from the analyte signal.
+
+Glassware is chosen by the required task. A beaker gives rough volume, a graduated cylinder gives moderate precision, a volumetric pipette delivers one calibrated volume accurately, and a burette measures variable delivered volume from the difference of two readings. More digits written from inappropriate glassware do not create more information.
+
+Record raw observations, units, instrument identity, calibration state, temperature where relevant, and any deviations while the experiment is running. Reconstructing details later invites selective memory. Unexpected results should be retained and investigated rather than silently deleted; excluding a value needs a stated technical reason.
+
+## Final checks on a numerical result
+
+- Carry units through every line. Correct cancellation is an independent check on setup.
+- Estimate the order of magnitude before calculating. Prefix mistakes often shift an answer by factors of $10^3$ or more.
+- Separate random scatter from systematic bias. Replication addresses the former more readily than the latter.
+- Do not infer uncertainty solely from the number of displayed digits. Resolution, calibration, and method variability all contribute.
+- Use kelvin in ratios, reciprocal temperatures, gas laws, and thermodynamic equations. Celsius is suitable for many reported conditions and temperature differences.
+- Round at the end and preserve guard digits internally. The reported precision should follow the least informative measurement, not the calculator display.
+
+## Combining uncertainties
+
+Significant-figure rules are a compact classroom convention. When numerical uncertainties are available, propagation gives a clearer result. For independent quantities added or subtracted, absolute variances add approximately:
+
+$$
+u_z=\sqrt{u_x^2+u_y^2}.
+$$
+
+For multiplication or division, relative variances add approximately:
+
+$$
+\left(\frac{u_z}{z}\right)^2
+=
+\left(\frac{u_x}{x}\right)^2
++
+\left(\frac{u_y}{y}\right)^2.
+$$
+
+Suppose mass is $(12.50\pm0.01)\ \mathrm g$ and volume is $(5.00\pm0.02)\ \mathrm{mL}$. Density is $2.500\ \mathrm{g\,mL^{-1}}$. Its relative uncertainty is
+
+$$
+\sqrt{(0.01/12.50)^2+(0.02/5.00)^2}=0.00408.
+$$
+
+The absolute uncertainty is
+
+$$
+u_d=(2.500)(0.00408)=0.0102\ \mathrm{g\,mL^{-1}}.
+$$
+
+A sensible report is $(2.50\pm0.01)\ \mathrm{g\,mL^{-1}}$. Correlated inputs require covariance terms; the independent-error formula cannot be used blindly when the same calibration affects both quantities.
+
+## Separating a signal from a detection claim
+
+Analytical measurements include background noise and blanks. A small positive response does not automatically prove that analyte is present. A detection limit concerns whether a signal can be distinguished from background with a stated error rate; a quantitation limit is higher and concerns whether an amount can be estimated with acceptable precision.
+
+Replicate blanks characterize background variation. Calibration standards establish sensitivity. Samples outside the calibrated range should be diluted or measured with a suitable range rather than extrapolated casually. Reporting “zero” when a signal is below detection is also inaccurate; the defensible statement is that the analyte was not detected above the method limit.
+
+Reference materials and spiked samples test different failure modes. A reference material checks the full method against a known composition. A spike adds a known amount to the actual sample and reveals matrix suppression or enhancement. Good agreement on clean standards alone does not show that a complex sample behaves the same way.
+
+## Reproducibility in the notebook
+
+A result can be repeated only if the record preserves sample identity, reagent lots or concentrations, instrument settings, calibration data, environmental conditions that matter, and the calculation path from raw signal to reported value. Units and unrounded values should remain in the record even when the final report is rounded.
+
+Corrections should leave the original entry readable and state why it changed. Selective removal of inconvenient trials biases the record. If a trial is excluded because of a spill, bubble, instrument fault, or failed control, note that reason before looking at whether exclusion improves the desired result.
+
+<div className="see-also">
+
+See also: [atoms, molecules, and ions](/chemistry/general/atoms-molecules-and-ions) · [stoichiometry](/chemistry/general/stoichiometry) · [gases](/chemistry/general/gases) · [thermochemistry](/chemistry/general/thermochemistry)
+
+</div>

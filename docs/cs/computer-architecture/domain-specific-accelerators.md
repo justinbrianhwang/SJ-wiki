@@ -9,7 +9,7 @@ Domain-specific accelerators trade generality for efficiency. Instead of spendin
 
 The key architectural question is not whether special hardware can be faster. It usually can. The question is whether the speedup, energy reduction, and cost justify the loss of flexibility, programming effort, data-movement overhead, and integration complexity.
 
-## Definitions
+## What gets specialized
 
 An accelerator is a hardware unit optimized for a narrower class of tasks than a general-purpose CPU. It may be integrated on the same chip, attached over an I/O interconnect, or deployed as a separate device in a server.
 
@@ -38,7 +38,7 @@ where $O$ is overhead as a fraction of original execution time. For accelerators
 
 Operational intensity, reuse, and precision are central. Many accelerators win by keeping data near compute units, using lower precision where acceptable, and organizing computation as regular arrays or pipelines.
 
-## Key results
+## Where accelerators win—and where they stall
 
 Accelerators save energy by reducing instruction overhead. A CPU may spend substantial energy fetching, decoding, predicting, renaming, scheduling, and committing instructions. A fixed-function or systolic accelerator can perform many operations with simpler control. This is effective when the domain has stable kernels and enough volume to amortize design cost.
 
@@ -57,8 +57,6 @@ Another pattern is a streaming pipeline. Video, compression, and packet-processi
 The host interface is part of the accelerator. If the CPU must copy data into a special buffer, flush caches, start the accelerator, wait, and copy results back, overhead may dominate small tasks. Integrated accelerators can share virtual memory or coherent caches to reduce copying, but coherence support costs area and verification effort. Discrete accelerators may have more power and area but pay interconnect latency.
 
 Accelerator evaluation should include utilization. A unit advertised at high peak operations per second may spend time waiting for memory, waiting for the host, handling boundary cases, or running unsupported operations on the CPU. The useful metric is sustained application speedup or energy reduction for realistic workloads.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -81,7 +79,9 @@ flowchart TD
 | Systolic/tensor array | Matrix and tensor operations | High reuse and low control cost | Poor fit for irregular work |
 | FPGA | Custom pipelines at lower volume | Reconfigurable hardware | Harder programming and timing closure |
 
-## Worked example 1: Accelerator speedup with transfer overhead
+The decision path starts with a stable hot kernel, then asks whether its parallelism and data movement fit specialized hardware. Failing either test usually leaves the CPU, or a more general parallel machine, as the better target.
+
+## End-to-end speedup with transfer overhead
 
 Problem: A program spends 70% of its time in an image filter. A GPU runs the filter $20\times$ faster than the CPU, but transferring images and launching kernels costs 5% of the original program time. What is the total speedup?
 
@@ -125,7 +125,7 @@ $$
 
 Checked answer: The total speedup is about $2.60\times$, not $20\times$. Transfer and the unaccelerated 30% dominate the final result.
 
-## Worked example 2: Reuse in tiled matrix multiplication
+## Arithmetic intensity of a matrix tile
 
 Problem: A tensor-style accelerator multiplies two $64 \times 64$ matrix tiles of 16-bit values and accumulates into a $64 \times 64$ output tile. Estimate multiply-add operations and input bytes loaded if each input tile is loaded once. Ignore output traffic.
 
@@ -167,9 +167,9 @@ $$
 \frac{262144 \times 2}{16384}=32\ \mathrm{operations/byte}
 $$
 
-Checked answer: The tile performs 262,144 multiply-adds from 16 KiB of input data, or about 32 arithmetic operations per input byte when counting multiply and add separately. This high reuse is why tiled matrix engines can be efficient.
+Checked answer: The tile performs 262,144 multiply-adds from 16 KiB of input data, or about 32 arithmetic operations per input byte when counting multiply and add separately. That reuse supports an efficient tiled matrix engine.
 
-## Code
+## Small models for speedup and reuse
 
 ```python
 def accelerator_speedup(fraction, local_speedup, overhead):
@@ -191,9 +191,9 @@ The speedup function shows why accelerator proposals should include an end-to-en
 
 The matrix-intensity calculation assumes perfect reuse of the two input tiles. Real accelerators need buffers and scheduling rules that actually preserve that reuse. If a tile is too large for on-chip storage, the computation spills to slower memory. If it is too small, the array may be underutilized and boundary overhead rises. This is the same locality trade-off seen in cache blocking, but expressed in an accelerator memory hierarchy.
 
-The same analysis should be repeated for energy, not only time. A kernel can speed up by using more total power, or it can save energy by finishing quickly with simpler datapaths. The stronger accelerator result reports both application speedup and joules per completed task.
+The same analysis should be repeated for energy, not only time. A kernel can speed up by using more total power, or it can save energy by finishing quickly with simpler datapaths. Application speedup and joules per completed task capture different parts of the result.
 
-## Common pitfalls
+## Evaluating claims beyond peak throughput
 
 - Reporting accelerator kernel speedup while omitting transfer and setup overhead.
 - Accelerating a small fraction of total execution time.
@@ -202,9 +202,8 @@ The same analysis should be repeated for energy, not only time. A kernel can spe
 - Underestimating software stack cost: compilers, libraries, drivers, profiling, and debugging.
 - Treating GPUs, SIMD units, and tensor arrays as interchangeable just because all exploit data parallelism.
 
-## Connections
+<div className="see-also">
 
-- [Vector, SIMD, and GPU Architectures](/cs/computer-architecture/vector-simd-gpu)
-- [Power, Energy, Cost, and Dependability](/cs/computer-architecture/power-energy-cost-dependability)
-- [Cache Optimization and Prefetching](/cs/computer-architecture/cache-optimization-and-prefetching)
-- [Quantitative Design and Performance](/cs/computer-architecture/quantitative-design-and-performance)
+See also: [Vector, SIMD, and GPU Architectures](/cs/computer-architecture/vector-simd-gpu) · [Power, Energy, Cost, and Dependability](/cs/computer-architecture/power-energy-cost-dependability) · [Cache Optimization and Prefetching](/cs/computer-architecture/cache-optimization-and-prefetching) · [Quantitative Design and Performance](/cs/computer-architecture/quantitative-design-and-performance)
+
+</div>

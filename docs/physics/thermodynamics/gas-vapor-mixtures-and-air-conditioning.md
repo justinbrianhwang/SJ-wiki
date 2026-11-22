@@ -5,210 +5,382 @@ sidebar_position: 14
 
 # Gas-Vapor Mixtures and Air Conditioning
 
-Air-conditioning analysis treats atmospheric air as a mixture of dry air and water vapor. The dry-air component behaves nearly as an ideal gas, while the water vapor amount is limited by saturation pressure at the mixture temperature. This coupling creates humidity, dew point, wet-bulb behavior, cooling with dehumidification, evaporative cooling, and cooling-tower performance.
+Moist air is a gas mixture in which one constituent, water, can condense at ordinary temperatures. Dry air and water vapor are both modeled nearly as ideal gases at atmospheric pressure, but the vapor partial pressure cannot exceed water's saturation pressure at the mixture temperature. That phase-equilibrium limit produces dew point, condensation on cooling coils, evaporative cooling, and the curved saturation boundary of a psychrometric chart.
 
-Cengel's psychrometric chapter is highly practical. The psychrometric chart is a graphical property table for moist air at a specified pressure. It organizes dry-bulb temperature, humidity ratio, relative humidity, enthalpy, specific volume, dew-point temperature, and wet-bulb temperature so that HVAC processes can be solved by mass and energy balances.
+HVAC calculations are usually normalized by kilograms of dry air. Dry air passes through a heater, humidifier, cooling coil, or mixing box without condensing, while water may enter as liquid or steam and leave as vapor or condensate. A dry-air basis keeps one conserved denominator throughout the equipment train.
 
-## Definitions
+## Humidity ratio from partial pressure
 
-- **Dry air** is the mixture of noncondensing gases in atmospheric air, treated as one ideal gas.
-- **Atmospheric air** or **moist air** is dry air plus water vapor.
-- **Humidity ratio** is $\omega=m_v/m_a$, the mass of water vapor per mass of dry air.
-- **Relative humidity** is $\phi=P_v/P_g$, the ratio of water-vapor partial pressure to saturation pressure at the same temperature.
-- **Dew-point temperature** is the temperature at which water vapor begins to condense when moist air is cooled at constant pressure and humidity ratio.
-- **Specific humidity** and **humidity ratio** are often used in similar ways in HVAC contexts, but Cengel's psychrometric formulas typically use $\omega$.
-- **Dry-bulb temperature** is the ordinary air temperature. **Wet-bulb temperature** includes evaporative cooling effects at a wetted thermometer.
-- **Adiabatic saturation** is a process in which unsaturated air contacts liquid water in an insulated device and approaches saturation.
-- **Cooling and dehumidification** occurs when moist air is cooled below its dew point and water condenses out.
-- **Evaporative cooling** lowers dry-bulb temperature by evaporating water into air, approximately at constant enthalpy for simple idealized devices.
-
-Balances are usually written per kg of dry air because dry air is conserved through humidification, cooling, and dehumidification devices while water vapor may be added or removed. This convention prevents moving denominators as condensation changes the water-vapor mass.
-For this topic, a complete engineering model should state the boundary, the time basis, the property model, and the sign convention before any numbers are substituted. In gas-vapor mixtures and air conditioning, that habit is especially important because several formulas look similar while answering different physical questions. A closed-system expression, a steady-flow expression, an ideal-gas relation, and a property-table interpolation may all contain pressure, temperature, or enthalpy, but they do not have the same assumptions. The safest workflow is to write the general balance or defining relation first, cancel terms with a written reason, and only then insert table values or constants.
-
-The second modeling habit is to keep the basis visible. Some calculations are per unit mass, some per mole, some per kg dry air, and some per unit time. A correct formula on the wrong basis is a common source of errors that look numerically plausible. When a table gives $\mathrm{kJ/kg}$, multiply by $\dot m$ to get $\mathrm{kW}$; when a reaction is balanced in kmol, convert to mass only after the element balance is complete; when a mixture property uses mole fraction, do not substitute mass fraction without conversion.
-
-## Key results
-
-For ideal-gas dry air and water vapor,
+Let $m_a$ denote dry-air mass and $m_v$ water-vapor mass. The humidity ratio is
 
 $$
-\omega=0.622\frac{P_v}{P-P_v}.
+\omega=\frac{m_v}{m_a}.
 $$
 
-Relative humidity gives
+Apply the ideal-gas equation separately to vapor and dry air in the same volume at the same absolute temperature:
 
 $$
-P_v=\phi P_g(T),
+P_vV=m_vR_vT,
+\qquad
+P_aV=m_aR_aT.
 $$
 
-where $P_g(T)$ is the saturation pressure of water at the dry-bulb temperature. The moist-air enthalpy per kg dry air is commonly approximated by
+Taking the ratio and using $P_a=P-P_v$ gives
 
 $$
-h \approx 1.005T + \omega(2500+1.88T)
+\omega
+=\frac{R_a}{R_v}\frac{P_v}{P-P_v}
+=0.622\frac{P_v}{P-P_v}.
 $$
 
-with $T$ in $^{\circ}C$ and $h$ in $\mathrm{kJ/kg_{dry\ air}}$.
+The factor $0.622$ is the molar-mass ratio $M_v/M_a$, approximately $18.015/28.97$. Humidity ratio has units of kilograms of vapor per kilogram of dry air, though it is dimensionless as a mass ratio.
 
-Specific volume per kg dry air can be estimated by
+Meteorology also uses *specific humidity*,
+
+$$
+q=\frac{m_v}{m_a+m_v}
+=\frac{\omega}{1+\omega}.
+$$
+
+The two numbers are close for ordinary atmospheric moisture levels but are not identical. A formula or chart labeled $\omega$ uses the dry-air denominator.
+
+Relative humidity compares the actual vapor partial pressure with the saturation pressure of water at the dry-bulb temperature:
+
+$$
+\phi=\frac{P_v}{P_{\mathrm{sat}}(T)}.
+$$
+
+At saturation, $\phi=1$ and $P_v=P_{\mathrm{sat}}(T)$. Relative humidity can change when air is heated even though no water is added: $P_v$ and $\omega$ stay nearly constant at fixed total pressure, while $P_{\mathrm{sat}}(T)$ rises rapidly.
+
+## Dew point and the onset of condensation
+
+Cool an unsaturated moist-air sample at constant total pressure without adding or removing water. Its humidity ratio and vapor partial pressure remain constant until the saturation curve is reached. The dew-point temperature $T_{dp}$ satisfies
+
+$$
+P_{\mathrm{sat}}(T_{dp})=P_v.
+$$
+
+Further cooling cannot retain the original vapor mass in equilibrium. Water condenses, $\omega$ decreases, and the remaining air follows the saturation boundary. Dew point depends on the vapor partial pressure, not directly on the current dry-bulb temperature. Two air samples with different dry-bulb temperatures but the same $P_v$ have the same dew point.
+
+### Worked example: humidity ratio and dew point
+
+Atmospheric air is at $30{}^{\circ}\mathrm{C}$, $P=101.325\ \mathrm{kPa}$, and $60\%$ relative humidity. At $30{}^{\circ}\mathrm{C}$, $P_{\mathrm{sat}}=4.246\ \mathrm{kPa}$. Find its vapor pressure and humidity ratio.
+
+The vapor partial pressure is
+
+$$
+P_v=\phi P_{\mathrm{sat}}
+=0.60(4.246)
+=2.548\ \mathrm{kPa}.
+$$
+
+Then
+
+$$
+\begin{aligned}
+\omega
+&=0.622\frac{2.548}{101.325-2.548}\\
+&=0.01604\ \mathrm{kg_v/kg_{da}}.
+\end{aligned}
+$$
+
+The dew point is the saturation temperature corresponding to $2.548\ \mathrm{kPa}$. A water saturation table places it at about $21.2{}^{\circ}\mathrm{C}$. Sensible cooling from $30{}^{\circ}\mathrm{C}$ to $25{}^{\circ}\mathrm{C}$ would leave $\omega$ unchanged; cooling below about $21.2{}^{\circ}\mathrm{C}$ would begin removing liquid water.
+
+At the same temperature and relative humidity but a lower barometric pressure, $P_v$ is unchanged while $P-P_v$ decreases. The humidity ratio is therefore larger. Psychrometric charts belong to a specified total pressure, commonly one standard atmosphere.
+
+## Enthalpy and volume on a dry-air basis
+
+Choose liquid water at $0{}^{\circ}\mathrm{C}$ as a common approximate enthalpy reference. Per kilogram of dry air, the moist-air enthalpy is the dry-air contribution plus $\omega$ times the water-vapor contribution:
+
+$$
+h=h_a+\omega h_v.
+$$
+
+For ordinary HVAC temperatures,
+
+$$
+h\approx1.005T+\omega(2500+1.88T),
+$$
+
+where $T$ is in degrees Celsius and $h$ is in $\mathrm{kJ/kg_{da}}$. The $2500\ \mathrm{kJ/kg}$ term is the approximate vaporization enthalpy at the reference temperature. Because $h$ is quoted per kilogram of dry air, it must be multiplied by dry-air mass flow, not total moist-air mass flow.
+
+The specific volume per kilogram of dry air is obtained from the dry-air partial pressure:
 
 $$
 v=\frac{R_aT_K}{P-P_v}.
 $$
 
-For a steady-flow air-conditioning device with condensate leaving as liquid water,
+Using the humidity-ratio relation, an equivalent form is
 
 $$
-\dot m_a\omega_1=\dot m_a\omega_2+\dot m_w,
+v=\frac{R_aT_K}{P}(1+1.608\omega).
 $$
 
-and an energy balance, neglecting fan work and kinetic-potential changes, is
+This volume includes both constituents but uses only dry-air mass in its denominator. Thus a volumetric flow rate converts to dry-air mass flow as $\dot m_a=\dot V/v$.
 
-$$
-\dot Q=\dot m_a(h_2-h_1)+\dot m_w h_w
-$$
+## What the psychrometric chart encodes
 
-with sign depending on whether heat is added to or removed from the air stream. Psychrometric charts encode these formulas graphically and are often faster than repeated table lookup.
-These results should be read as a hierarchy rather than a list of isolated equations. Conservation of mass and energy set the allowed accounting; property relations supply the missing state data; the second law or equilibrium criterion decides direction, limits, and losses. A numerical answer is not finished until it passes three checks: the units reduce to the requested quantity, the sign matches the stated energy or entropy transfer direction, and the magnitude is reasonable compared with a limiting case. Useful limiting cases include zero heat transfer, reversible operation, incompressible behavior, ideal-gas behavior, saturated-liquid or saturated-vapor endpoints, and equal reservoir temperatures.
-
-Because the textbook often moves between exact laws and engineering approximations, the approximation should be named in the solution. Examples include constant specific heats, negligible kinetic energy, negligible pump work, adiabatic devices, isentropic turbomachinery, ideal-gas mixtures, dry-air approximations, and linear interpolation. Naming the approximation makes later refinement straightforward: replace the approximate property model or restore the neglected term without rebuilding the whole analysis.
-
-## Visual
-
-ASCII sketch of a psychrometric chart:
+A psychrometric chart is a graphical property table at fixed pressure. Dry-bulb temperature lies on the horizontal axis and humidity ratio on the vertical axis. The upper curved boundary is saturated air. Curves below it mark constant relative humidity; oblique lines usually represent nearly constant wet-bulb temperature and enthalpy; another family gives specific volume.
 
 ```text
 humidity ratio
 omega
-|                 saturation curve phi = 100%
-|             ___/
-|         ___/     curved relative humidity lines
-|     ___/
-| ___/________________________ dry-bulb temperature
-       dew point moves horizontally at constant omega
+|                    saturation, phi = 100%
+|                ___/
+|            ___/      relative-humidity curves
+|        ___/
+|    ___/
+|___/________________________________ dry-bulb temperature
 ```
 
-| Process | Approximate chart path | What changes |
+Any two independent properties usually locate a state once total pressure is fixed. Relative humidity and dew point are not independent if dry-bulb temperature is already given because all three determine the same $P_v$. Values read from different chart families should agree only within graphical resolution and the property correlations used to draw the chart.
+
+| Process | Idealized chart direction | Main balance consequence |
 |---|---|---|
-| Sensible heating | horizontal right | $T$ rises, $\omega$ constant |
-| Sensible cooling above dew point | horizontal left | $T$ falls, $\omega$ constant |
-| Cooling with dehumidification | left and downward | $T$ falls, water condenses |
-| Humidification with steam | upward and right | $\omega$ and enthalpy rise |
-| Evaporative cooling | up and left near constant $h$ | $T$ falls, $\omega$ rises |
+| Sensible heating | right at constant $\omega$ | heat added, no water added |
+| Sensible cooling above dew point | left at constant $\omega$ | heat removed, no condensate |
+| Cooling and dehumidification | down and left | condensate leaves |
+| Steam humidification | up and usually right | vapor mass and enthalpy added |
+| Evaporative cooling | up and left near constant $h$ | liquid evaporates into air |
+| Mixing two air streams | state lies on joining line | dry-air, water, and energy balances |
 
-## Worked example 1: humidity ratio from relative humidity
+The apparent straight paths assume negligible pressure change and steady operation. A real cooling coil can have a pressure drop and may not produce a spatially uniform outlet state.
 
-**Problem.** Atmospheric air is at $30{}^{\circ}C$, $P=101.325\ \mathrm{kPa}$, and $60\%$ relative humidity. The saturation pressure of water at $30{}^{\circ}C$ is $4.246\ \mathrm{kPa}$. Find the humidity ratio.
+## Cooling coils and condensate bookkeeping
 
-**Method.**
-
-1. Compute water-vapor partial pressure:
-
-$$
-P_v=\phi P_g=0.60(4.246)=2.548\ \mathrm{kPa}.
-$$
-
-2. Use the humidity-ratio formula:
+For a steady cooling coil with one moist-air inlet, one moist-air outlet, and liquid condensate outlet, dry air is conserved:
 
 $$
-\omega=0.622\frac{P_v}{P-P_v}.
+\dot m_{a,1}=\dot m_{a,2}=\dot m_a.
 $$
 
-3. Substitute:
+The water balance is
 
 $$
-\omega=0.622\frac{2.548}{101.325-2.548}
-=0.0160\ \mathrm{kg_v/kg_{da}}.
+\dot m_a\omega_1
+=\dot m_a\omega_2+\dot m_w,
 $$
 
-**Checked answer.** The humidity ratio is about $0.016\ \mathrm{kg}$ water vapor per kg dry air. It is below the saturated value at $30{}^{\circ}C$, as expected for $60\%$ relative humidity.
-
-## Worked example 2: cooling and dehumidification load
-
-**Problem.** Moist air flows at $1.0\ \mathrm{kg_{dry\ air}/s}$ from $30{}^{\circ}C$, $50\%$ relative humidity to $15{}^{\circ}C$ saturated air. Use $P=101.325\ \mathrm{kPa}$, $P_g(30{}^{\circ}C)=4.246\ \mathrm{kPa}$, and $P_g(15{}^{\circ}C)=1.705\ \mathrm{kPa}$. Estimate condensate rate and cooling load using $h=1.005T+\omega(2500+1.88T)$.
-
-**Method.**
-
-1. Inlet vapor pressure:
+so
 
 $$
-P_{v1}=0.50(4.246)=2.123\ \mathrm{kPa}.
+\dot m_w=\dot m_a(\omega_1-\omega_2).
 $$
 
-2. Inlet humidity ratio:
+Neglecting fan work and kinetic and potential changes, with heat into the control volume positive,
 
 $$
-\omega_1=0.622\frac{2.123}{101.325-2.123}=0.0133.
+\dot Q
+=\dot m_a(h_2-h_1)+\dot m_wh_f(T_w).
 $$
 
-3. Exit saturated vapor pressure is $P_{v2}=1.705\ \mathrm{kPa}$:
+The condensate enthalpy term follows from the chosen water reference. It is often small relative to the moist-air enthalpy change, but including it keeps the balance explicit.
+
+### Worked example: coil load with dehumidification
+
+Moist air enters a coil at $30{}^{\circ}\mathrm{C}$ and $50\%$ relative humidity and leaves at $15{}^{\circ}\mathrm{C}$ saturated. The dry-air flow is $1.0\ \mathrm{kg_{da}/s}$ and $P=101.325\ \mathrm{kPa}$. Use $P_{\mathrm{sat}}(30{}^{\circ}\mathrm{C})=4.246\ \mathrm{kPa}$ and $P_{\mathrm{sat}}(15{}^{\circ}\mathrm{C})=1.705\ \mathrm{kPa}$.
+
+At the inlet,
 
 $$
-\omega_2=0.622\frac{1.705}{101.325-1.705}=0.01065.
-$$
-
-4. Condensate rate:
-
-$$
-\dot m_w=\dot m_a(\omega_1-\omega_2)=1.0(0.0133-0.01065)=0.00265\ \mathrm{kg/s}.
-$$
-
-5. Enthalpies:
-
-$$
-h_1=1.005(30)+0.0133[2500+1.88(30)]=64.2\ \mathrm{kJ/kg_{da}},
+P_{v1}=0.50(4.246)=2.123\ \mathrm{kPa},
 $$
 
 $$
-h_2=1.005(15)+0.01065[2500+1.88(15)]=42.0\ \mathrm{kJ/kg_{da}}.
+\omega_1=0.622\frac{2.123}{101.325-2.123}
+=0.01331.
 $$
 
-6. Cooling load, neglecting condensate liquid enthalpy correction:
+The saturated outlet has
 
 $$
-\dot Q_{out}=\dot m_a(h_1-h_2)=22.2\ \mathrm{kW}.
+\omega_2=0.622\frac{1.705}{101.325-1.705}
+=0.01065.
 $$
 
-**Checked answer.** The coil removes about $22\ \mathrm{kW}$ and condenses $0.00265\ \mathrm{kg/s}$ of water.
+Therefore the condensate rate is
 
-## Code
+$$
+\dot m_w=1.0(0.01331-0.01065)
+=0.00266\ \mathrm{kg/s}.
+$$
 
-```python
-def humidity_ratio(Pv, P=101.325):
-    return 0.622 * Pv / (P - Pv)
+Using the moist-air enthalpy correlation,
 
-def moist_air_h(T_C, omega):
-    return 1.005 * T_C + omega * (2500.0 + 1.88 * T_C)
+$$
+\begin{aligned}
+h_1
+&=1.005(30)+0.01331[2500+1.88(30)]\\
+&=64.17\ \mathrm{kJ/kg_{da}},
+\end{aligned}
+$$
 
-w1 = humidity_ratio(0.50 * 4.246)
-w2 = humidity_ratio(1.705)
-h1 = moist_air_h(30.0, w1)
-h2 = moist_air_h(15.0, w2)
-print(w1, w2, w1 - w2)
-print(h1, h2, h1 - h2)
-```
+$$
+\begin{aligned}
+h_2
+&=1.005(15)+0.01065[2500+1.88(15)]\\
+&=42.00\ \mathrm{kJ/kg_{da}}.
+\end{aligned}
+$$
 
-## Common pitfalls
+If condensate leaves at $15{}^{\circ}\mathrm{C}$, take $h_f\approx4.18(15)=62.7\ \mathrm{kJ/kg}$. Then
 
-- Using total air mass instead of dry-air mass as the basis for humidity ratio.
-- Confusing relative humidity with humidity ratio.
-- Assuming cooling always dehumidifies; condensation begins only below the dew point.
-- Reading a psychrometric chart at the wrong barometric pressure.
-- Ignoring condensate mass and enthalpy when dehumidification is large.
-- Starting from a special-case equation before checking that its assumptions actually hold. Write the general balance or definition first, then reduce it.
-- Leaving property-table values unlabeled. Record the substance, phase region, pressure or temperature row, interpolation fraction, and units so the result can be audited.
-- Rounding intermediate states too aggressively. Keep extra digits through property lookup, quality calculation, and efficiency ratios, then round the final answer to justified precision.
-- Skipping a limiting-case check. Test the result against reversible operation, zero pressure drop, saturated endpoints, ideal-gas behavior, or equal-temperature reservoirs when those limits are meaningful.
-- Treating a numerical solver or chart as a substitute for physical reasoning. Software can return a precise-looking number even when the selected phase, reference state, or boundary model is wrong.
-- Forgetting to state whether the reported answer is specific, total, or rate based.
+$$
+\begin{aligned}
+\dot Q
+&=1.0(42.00-64.17)+0.00266(62.7)\\
+&=-22.00\ \mathrm{kW}.
+\end{aligned}
+$$
 
-## Connections
+The negative sign means heat leaves the control volume; the required cooling capacity is about $22.0\ \mathrm{kW}$. Neglecting condensate enthalpy would give $22.17\ \mathrm{kW}$, close here but not algebraically identical.
 
-- [gas mixtures](/physics/thermodynamics/gas-mixtures)
-- [refrigeration cycles](/physics/thermodynamics/refrigeration-cycles)
-- [control-volume mass and energy analysis](/physics/thermodynamics/control-volume-mass-and-energy-analysis)
-- [microscopic foundations](/physics/statistical-mechanics/)
-- [basic thermal physics](/physics/general/)
-- [thermochemistry](/chemistry/general/thermochemistry)
-- [physical chemistry](/chemistry/physical-chemistry/)
-- [engineering mathematics](/math/engineering-math/)
-- [thermal systems control](/cs/control-engineering/)
+A coil surface below the inlet dew point can be partly dry and partly wet. The outlet may be unsaturated because some air effectively bypasses intimate contact with the cold surface. HVAC models often describe this with a bypass factor and an apparatus dew point rather than assuming a saturated outlet.
+
+## Mixing two moist-air streams
+
+For an adiabatic mixing chamber with no condensation, dry-air conservation, water conservation, and energy conservation give
+
+$$
+\dot m_{a3}=\dot m_{a1}+\dot m_{a2},
+$$
+
+$$
+\dot m_{a3}\omega_3
+=\dot m_{a1}\omega_1+\dot m_{a2}\omega_2,
+$$
+
+$$
+\dot m_{a3}h_3
+=\dot m_{a1}h_1+\dot m_{a2}h_2.
+$$
+
+Thus both $\omega_3$ and $h_3$ are dry-air-flow-weighted averages. On a chart, state 3 lies on the straight line joining states 1 and 2, and its position divides the line in the inverse ratio of the dry-air flow rates.
+
+### Worked example: outdoor and return air
+
+Mix $1\ \mathrm{kg_{da}/s}$ of outdoor air with $\omega_1=0.012$ and $h_1=58\ \mathrm{kJ/kg_{da}}$ with $3\ \mathrm{kg_{da}/s}$ of return air at $\omega_2=0.008$ and $h_2=42\ \mathrm{kJ/kg_{da}}$.
+
+The total dry-air flow is
+
+$$
+\dot m_{a3}=1+3=4\ \mathrm{kg_{da}/s}.
+$$
+
+Water balance gives
+
+$$
+\omega_3
+=\frac{1(0.012)+3(0.008)}{4}
+=0.0090\ \mathrm{kg_v/kg_{da}}.
+$$
+
+Energy balance gives
+
+$$
+h_3
+=\frac{1(58)+3(42)}{4}
+=46.0\ \mathrm{kJ/kg_{da}}.
+$$
+
+The dry-bulb temperature can be recovered from the enthalpy correlation:
+
+$$
+46.0=1.005T_3+0.0090(2500+1.88T_3).
+$$
+
+Collecting terms,
+
+$$
+46.0-22.5=(1.005+0.01692)T_3,
+$$
+
+$$
+T_3=\frac{23.5}{1.02192}=23.0{}^{\circ}\mathrm{C}.
+$$
+
+The result must still be checked against saturation at $23{}^{\circ}\mathrm{C}$. If the averaged state lies beyond the saturation boundary, condensation occurs and the simple no-condensation balances need a liquid-water outlet term.
+
+## Sensible and latent loads in an HVAC process
+
+Room loads are often divided into a sensible part associated mainly with temperature change and a latent part associated with water removal. The split is useful for equipment selection because a coil that supplies enough total cooling may still leave a space too humid if its surface temperature is too high.
+
+For a moist-air stream whose humidity ratio remains fixed, the sensible enthalpy change is approximately
+
+$$
+\Delta h_s\approx(c_{p,a}+\omega c_{p,v})\Delta T.
+$$
+
+At ordinary humidity levels, the coefficient is close to $1.02\ \mathrm{kJ/(kg_{da}\,K)}$. A change in humidity ratio carries a much larger latent contribution, approximately
+
+$$
+\Delta h_l\approx h_{fg}\Delta\omega.
+$$
+
+Because $h_{fg}$ is around $2500\ \mathrm{kJ/kg}$ near room conditions, removing only $0.001\ \mathrm{kg}$ of vapor per kilogram of dry air requires roughly $2.5\ \mathrm{kJ/kg_{da}}$ beyond the sensible load.
+
+The sensible heat factor is commonly defined as
+
+$$
+\mathrm{SHF}=\frac{\dot Q_s}{\dot Q_s+\dot Q_l}.
+$$
+
+It corresponds to a process-line slope on a psychrometric chart. A value near one indicates mostly temperature control; a lower value requires more dehumidification. Exact definitions vary with whether fan heat, ventilation air, and equipment gains are counted, so the boundary should accompany a reported SHF.
+
+Summer conditioning often follows a sequence rather than one direct path. Outdoor air is mixed with return air, the mixture is cooled below its dew point to remove moisture, and the supply may then be reheated at constant humidity ratio. Reheat raises dry-bulb temperature without undoing dehumidification. It consumes energy if no recovered heat source is available, but it can be required when the latent load calls for a cold coil and the sensible load does not permit equally cold supply air.
+
+Winter conditioning may sensibly heat cold air and then humidify it. Heating alone lowers relative humidity because saturation pressure rises while $\omega$ stays fixed. Injecting steam raises both humidity ratio and enthalpy; spraying liquid water can raise humidity while cooling the air through evaporation. Treating both methods as the same vertical chart move ignores the very different enthalpy carried by steam and liquid water.
+
+## Wet-bulb temperature and evaporative cooling
+
+A wetted thermometer reaches a temperature below the dry-bulb temperature when water evaporates into unsaturated air. The exact thermodynamic wet-bulb temperature is associated with adiabatic saturation: air contacts liquid water in an insulated device long enough to leave saturated, while the makeup water enters at the final temperature.
+
+An adiabatic saturator obeys
+
+$$
+h_1+(\omega_2-\omega_1)h_f(T_2)=h_2,
+$$
+
+where state 2 is saturated. At ordinary HVAC conditions the liquid-water correction is modest, so constant wet-bulb lines lie close to constant-enthalpy lines on the chart. They are not mathematically identical. Sling-psychrometer readings also depend on ventilation, radiation, and wick condition.
+
+Direct evaporative cooling adds water and lowers dry-bulb temperature with little change in moist-air enthalpy under the ideal adiabatic model. It cannot cool below the entering wet-bulb temperature, and it works best in dry climates. Cooling with dehumidification instead requires a surface below the dew point and removes both sensible and latent heat.
+
+## Cooling towers as coupled air-water devices
+
+A cooling tower exposes warm circulating water to an air stream. A small part of the water evaporates, taking energy from the remaining liquid; the air leaves warmer and more humid. The process is governed by separate dry-air, total-water, and energy balances.
+
+Let liquid water enter at rate $\dot m_{w,in}$ and leave at $\dot m_{w,out}$, while dry air flows at $\dot m_a$. Neglecting drift droplets for the moment, the evaporated water rate is
+
+$$
+\dot m_{\mathrm{evap}}
+=\dot m_a(\omega_2-\omega_1)
+=\dot m_{w,in}-\dot m_{w,out}.
+$$
+
+An approximately adiabatic tower satisfies
+
+$$
+\dot m_{w,in}h_{f,in}+\dot m_a h_1
+=\dot m_{w,out}h_{f,out}+\dot m_a h_2.
+$$
+
+Makeup water replaces evaporation, deliberate blowdown, and drift losses. Blowdown controls dissolved-solids concentration because evaporation removes nearly pure water while leaving salts behind. It should not be confused with the evaporation rate in the psychrometric balance.
+
+The lowest plausible cold-water temperature is tied to the entering-air wet-bulb temperature, not its dry-bulb temperature. Tower *range* is the hot-water inlet temperature minus cold-water outlet temperature. Tower *approach* is the cold-water outlet temperature minus entering-air wet-bulb temperature. A smaller approach demands more transfer area and airflow; a zero approach would require a reversible limiting device of unbounded size.
+
+Evaporative cooling towers may release visible plumes when warm moist exhaust mixes with colder ambient air and becomes supersaturated. The plume is condensed water droplets formed after discharge, not smoke and not necessarily tower drift. Its appearance depends on ambient state and mixing, which can be checked on a psychrometric chart by following the mixture line between exhaust and outdoor air.
+
+## Checks before trusting a chart result
+
+- State the total pressure. Elevation changes the relation among vapor pressure, humidity ratio, and chart position.
+- Keep all moist-air enthalpies and volumes on the dry-air basis. Total moist-air mass flow is $(1+\omega)\dot m_a$.
+- Sensible cooling does not remove moisture until the dew point is reached. Relative humidity rises along that constant-$\omega$ cooling path.
+- Every equilibrium state must lie on or below the saturation curve. An algebraic result above it implies condensation was omitted.
+- Steam injection and liquid-water evaporation have different inlet enthalpies. A water mass balance alone cannot determine their outlet temperatures.
+- Chart readings, saturation tables, and empirical correlations may differ slightly. Carrying more digits than the source property data does not increase accuracy.
+
+<div className="see-also">
+
+See also: [gas mixtures](/physics/thermodynamics/gas-mixtures) · [refrigeration cycles](/physics/thermodynamics/refrigeration-cycles) · [control-volume mass and energy analysis](/physics/thermodynamics/control-volume-mass-and-energy-analysis) · [pure substances and property tables](/physics/thermodynamics/pure-substances-and-property-tables) · [entropy and entropy balance](/physics/thermodynamics/entropy-and-entropy-balance)
+
+</div>

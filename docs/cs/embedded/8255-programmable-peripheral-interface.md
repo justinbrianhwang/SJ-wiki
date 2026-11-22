@@ -9,7 +9,7 @@ The 8255 programmable peripheral interface is the bridge between a processor bus
 
 The key learning value of the 8255 is configurability. The same chip can provide simple input and output ports, handshaked input, handshaked output, bidirectional transfer, or single-bit set/reset on Port C. Correct use depends on decoding its internal addresses, writing the right control word, and matching the external device's timing expectations.
 
-## Definitions
+## Ports, groups, and the control register
 
 The **8255A** is a programmable peripheral interface with three 8-bit ports: Port A, Port B, and Port C. Port C can also be split into upper and lower nibbles for control and handshake lines.
 
@@ -36,25 +36,23 @@ The internal register selection is usually:
 
 **Bit set/reset (BSR) mode** changes a single Port C bit without changing the I/O mode configuration.
 
-## Key results
+## What the control word changes
 
-The first key result is that the most significant bit of the control word selects the control-word type. If bit 7 is `1`, the word is an I/O mode control word. If bit 7 is `0`, the word is a BSR command for Port C.
+The most significant bit selects the control-word type. If bit 7 is `1`, the word is an I/O mode control word. If bit 7 is `0`, the word is a BSR command for Port C.
 
-The second key result is that Port C has two roles. In Mode 0 it can be an ordinary 8-bit I/O port or two 4-bit ports. In Mode 1 and Mode 2, some Port C pins are no longer general I/O because they become handshake/status lines. A common design error is to connect LEDs or switches to Port C bits that the selected mode needs for handshaking.
+Port C has two roles. In Mode 0 it can be an ordinary 8-bit I/O port or two 4-bit ports. In Modes 1 and 2, some of its pins become handshake and status lines. LEDs or switches connected to those bits will conflict with the selected mode.
 
-The third key result is that the 8255 does not automatically know whether a connected peripheral is ready. In Mode 0, software must coordinate timing by polling or fixed delays. In Mode 1 and Mode 2, hardware handshake lines make the transfer more reliable.
+The 8255 does not automatically know whether a connected peripheral is ready. In Mode 0, software coordinates timing by polling or fixed delays. Modes 1 and 2 use hardware handshake lines for devices with variable response time.
 
-The fourth key result is that address decoding and internal selection are different tasks. External decoding selects the 8255 chip; `A1` and `A0` select one of its internal ports or the control register. The CPU address used for Port A, Port B, Port C, and control therefore differs only in the low internal select bits if the board is arranged that way.
+Address decoding and internal selection are different tasks. External decoding selects the 8255 chip; `A1` and `A0` select one of its internal ports or the control register. On the usual board arrangement, the four CPU addresses differ only in the low internal-select bits.
 
-The fifth key result is that BSR mode is useful for control pins such as chip-selects, strobes, relay bits, or LCD control lines. It changes one Port C bit without rewriting the full Port C output value.
+BSR mode suits control pins such as chip-selects, strobes, relay bits, or LCD control lines. It changes one Port C bit without rewriting the full Port C output value.
 
-The sixth key result is that the control word should be written during initialization before ordinary port access. Reset places ports in a known input state on typical 8255-style behavior, but useful operation begins only after mode configuration.
+Write the control word during initialization before ordinary port access. Reset configures all ports as inputs; useful operation begins after the mode has been set.
 
-The seventh key result is that handshaking changes both software and wiring. In Mode 1 input, for example, the external device does not merely place a byte on Port A; it also asserts a strobe, the 8255 records that data is available, and software or an interrupt routine reads the port. In Mode 1 output, the peripheral acknowledges that it accepted data. These signals are the reason Mode 1 is more reliable than fixed delays for devices with variable response time.
+Handshaking changes both software and wiring. In Mode 1 input, the external device places a byte on Port A and asserts a strobe; the 8255 records that data is available, and software or an interrupt routine reads the port. In Mode 1 output, the peripheral acknowledges that it accepted data. The handshake accommodates devices whose response time varies.
 
-The eighth key result is that the 8255 is not a power driver. Its ports are logic interfaces. LEDs need current-limiting resistors and sometimes drivers; relays and motors need transistor or driver IC stages; long cables need buffering and protection. The control word decides logic direction, not electrical load capacity.
-
-## Visual
+The 8255 is a logic interface, not a power driver. LEDs need current-limiting resistors and sometimes drivers; relays and motors need transistor or driver-IC stages; long cables need buffering and protection. The control word decides logic direction, not electrical load capacity.
 
 ```mermaid
 flowchart TB
@@ -90,7 +88,7 @@ flowchart TB
   PCLower --> Mode1
 ```
 
-This 8255 diagram separates the CPU bus interface, internal register selection, control-word decoding, group controls, port latches, and handshake roles. The `A1 A0` branch shows how Port A, Port B, Port C, and the control register are selected, while bit 7 of the control word separates I/O mode from bit set/reset mode. The Mode 1 subgraph makes clear that Port C bits may become handshake/status lines rather than ordinary GPIO pins.
+The `A1 A0` branch records how Port A, Port B, Port C, and the control register are selected. Bit 7 then separates I/O mode from bit set/reset mode, and the Mode 1 branch tracks the Port C pins reassigned as handshake and status lines.
 
 | Mode | Port behavior | Port C role | Typical application |
 |---|---|---|---|
@@ -100,7 +98,7 @@ This 8255 diagram separates the CPU bus interface, internal register selection, 
 | Mode 2 | Bidirectional Port A | Handshake for both directions | Shared data bus peripheral |
 | BSR | One Port C bit set/reset | Single selected bit | LCD enable, relay control, chip select |
 
-## Worked example 1: Building an 8255 mode control word
+### Building a Mode 0 control word
 
 Problem: Configure an 8255 for Mode 0 with Port A as output, Port B as input, Port C upper as output, and Port C lower as input. Find the I/O mode control word.
 
@@ -137,7 +135,7 @@ Answer: write control word `83H` to the 8255 control register.
 
 Check: If `D7` were `0`, the same lower bits would be interpreted as a BSR command, not as a mode setup.
 
-## Worked example 2: Using BSR to set one Port C bit
+### Setting `PC3` without rewriting Port C
 
 Problem: After the 8255 is configured, set Port C bit 3 using BSR mode without disturbing other Port C bits. Find the BSR control word.
 
@@ -172,7 +170,7 @@ Answer: write `07H` to the control register to set `PC3`.
 
 Check: To reset `PC3`, the bit-select field stays the same but `D0 = 0`, giving `06H`.
 
-## Code
+## Mirroring switches onto LEDs
 
 ```asm
 ; 8085 with I/O-mapped 8255:
@@ -192,7 +190,7 @@ MAIN:   IN PORTB        ; read switches
         JMP MAIN
 ```
 
-## Common pitfalls
+## Control-word and wiring mismatches
 
 - Writing a BSR control word when an I/O mode control word was intended, usually because bit 7 was left as zero.
 - Using Port C pins as general outputs after selecting a handshaking mode that needs those pins.
@@ -202,9 +200,8 @@ MAIN:   IN PORTB        ; read switches
 - Assuming Mode 0 includes handshaking. Mode 0 is simple I/O; ready/busy coordination must be handled separately.
 - Decoding only the 8255 chip select and not the internal address lines, causing writes to reach the wrong register.
 
-## Connections
+<div className="see-also">
 
-- [8085 I/O, memory, and DMA interfacing](/cs/embedded/8085-io-memory-dma-interfacing)
-- [8051 external-world interfacing](/cs/embedded/8051-external-world-interfacing)
-- [8051 timers, serial port, and interrupts](/cs/embedded/8051-timers-serial-interrupts)
-- [Serial buses and embedded protocols](/cs/embedded/serial-buses-embedded-protocols)
+See also: [8085 I/O, memory, and DMA interfacing](/cs/embedded/io-memory-dma-interfacing) · [8051 external-world interfacing](/cs/embedded/external-world-interfacing) · [8051 timers, serial port, and interrupts](/cs/embedded/timers-serial-interrupts) · [Serial buses and embedded protocols](/cs/embedded/serial-buses-embedded-protocols)
+
+</div>

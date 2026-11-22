@@ -9,7 +9,7 @@ Sets are the basic containers of discrete mathematics. Relations are sets of ord
 
 Set notation gives a compact way to describe large or infinite collections. Instead of listing every object, we can define a set by a property, combine sets with operations, and prove two descriptions match by checking membership element by element. This makes set theory the bridge between logic and the rest of the subject.
 
-## Definitions
+## Membership, subsets, and constructions
 
 A **set** is an unordered collection of distinct elements. Write $a\in A$ when $a$ is an element of $A$, and $a\notin A$ otherwise. The same set can be described by roster notation, such as $\{1,2,3\}$, or set-builder notation, such as $\{x\in\mathbb{Z}:1\le x\le3\}$.
 
@@ -38,7 +38,7 @@ For sets within a universal set $U$:
 
 Sets can contain other sets. For example, if $A=\{1,2\}$, then $\mathcal{P}(A)=\{\emptyset,\{1\},\{2\},\{1,2\}\}$. Notice that $1\in A$, but $\{1\}\subseteq A$ and $\{1\}\in\mathcal{P}(A)$.
 
-## Key results
+## Set identities as logical equivalences
 
 Set identities mirror logical equivalences. De Morgan's laws for sets are:
 
@@ -85,8 +85,6 @@ $$
 
 The subtraction corrects the double count of elements lying in both sets. This same idea grows into the larger inclusion-exclusion formulas used in counting.
 
-## Visual
-
 ```text
 Universal set U
 
@@ -108,7 +106,7 @@ Universal set U
 | $A\cap(B\cup C)=(A\cap B)\cup(A\cap C)$ | in $A$ and one of $B,C$ | distributive law |
 | $A\cup(A\cap B)=A$ | $A$ already contains $A\cap B$ | absorption law |
 
-## Worked example 1: Compute operations and check inclusion-exclusion
+## Union, intersection, and complement in one finite universe
 
 **Problem.** Let
 
@@ -117,8 +115,6 @@ U=\{1,2,3,4,5,6,7,8\},\quad A=\{1,2,3,5,8\},\quad B=\{2,4,5,6\}.
 $$
 
 Find $A\cup B$, $A\cap B$, $A-B$, $\overline{A}$, and verify inclusion-exclusion.
-
-**Method.**
 
 1. The union contains elements appearing in either set:
 
@@ -155,17 +151,15 @@ $$
 \end{aligned}
 $$
 
-**Checked answer.** The operations are correct, and the count agrees. Element $7$ is in neither $A$ nor $B$, which is why it does not appear in the union even though it is in the universal set.
+The operations are correct, and the count agrees. Element $7$ is in neither $A$ nor $B$, so it does not appear in the union even though it is in the universal set.
 
-## Worked example 2: Prove a set identity by element chasing
+## Proving a difference identity by element chasing
 
 **Problem.** Prove
 
 $$
 A-(B\cup C)=(A-B)\cap(A-C).
 $$
-
-**Method.**
 
 1. Let $x$ be an arbitrary element.
 2. Translate membership in the left side:
@@ -192,9 +186,9 @@ $$
 
 4. Both sides have the same membership condition for arbitrary $x$.
 
-**Checked answer.** Since every element belongs to the left side exactly when it belongs to the right side, the sets are equal. This proof also shows why the formula is a set version of De Morgan's law.
+Since every element belongs to the left side exactly when it belongs to the right side, the sets are equal. The calculation also identifies the formula as a set version of De Morgan's law.
 
-## Code
+## Finite set operations in Python
 
 ```python
 from itertools import chain, combinations
@@ -218,7 +212,7 @@ print("powerset size", len(list(powerset(A))))
 
 Python sets implement union, intersection, difference, and symmetric difference directly. The `powerset` function uses combinations of all possible subset sizes.
 
-## Common pitfalls
+## Membership, types, and the surrounding universe
 
 - Confusing $\in$ and $\subseteq$. An element belongs to a set; a set can be a subset of another set.
 - Forgetting the universal set when taking complements. $\overline{A}$ depends on the surrounding $U$.
@@ -243,10 +237,14 @@ When a problem involves several operations, add parentheses before simplifying. 
 
 For finite sets, cardinality checks are useful but not complete proofs of equality unless one subset relation is already known. Two sets can have the same size and different elements. If you prove $A\subseteq B$ and $\vert A\vert =\vert B\vert $ for finite sets, then equality follows; without the subset relation, equal size alone is not enough.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Propositional logic](/math/discrete/propositional-logic) explains the logical laws behind set identities.
 - [Predicates and quantifiers](/math/discrete/predicates-and-quantifiers) gives the formal language for subset and equality proofs.
 - [Counting principles](/math/discrete/counting-principles) uses set sizes, products, and unions.
 - [Pigeonhole and inclusion-exclusion](/math/discrete/pigeonhole-and-inclusion-exclusion) extends the counting formula for unions.
 - [Relations](/math/discrete/relations) treats relations as sets of ordered pairs.
+
+</div>

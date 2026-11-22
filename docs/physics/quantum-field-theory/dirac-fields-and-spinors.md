@@ -541,11 +541,8 @@ The operator on the right is Hermitian under suitable boundary conditions. Loren
 
 For external potentials, Hermiticity and gauge coupling can be checked in this form. A real electrostatic potential contributes $qA_0$, while the spatial potential enters through $\mathbf p-q\mathbf A$. Squaring the minimally coupled operator generates not only the kinetic momentum but also a spin coupling to the magnetic field, explaining why the Dirac equation predicts the leading magnetic moment before loop corrections.
 
-## Related pages
+<div className="see-also">
 
-- [Motivation, Fields, and Quanta](/physics/quantum-field-theory/motivation-fields-and-quanta)
-- [Gauge Invariance and QED](/physics/quantum-field-theory/gauge-invariance-and-qed)
-- [Path Integral Formulation](/physics/quantum-field-theory/path-integral-formulation)
-- [Chiral Anomalies](/physics/quantum-field-theory/chiral-anomalies)
-- [Electroweak Theory and Grand Unification](/physics/quantum-field-theory/electroweak-theory-and-grand-unification)
+See also: [Motivation, Fields, and Quanta](/physics/quantum-field-theory/motivation-fields-and-quanta) · [Gauge Invariance and QED](/physics/quantum-field-theory/gauge-invariance-and-qed) · [Path Integral Formulation](/physics/quantum-field-theory/path-integral-formulation) · [Chiral Anomalies](/physics/quantum-field-theory/chiral-anomalies) · [Electroweak Theory and Grand Unification](/physics/quantum-field-theory/electroweak-theory-and-grand-unification)
 
+</div>

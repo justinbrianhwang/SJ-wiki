@@ -499,9 +499,8 @@ plt.show()
 - Forgetting that the ROC of a rational transform cannot include poles.
 - Mixing powers of $z$ and $z^{-1}$ when finding poles. Clear denominators before solving.
 
-## Related pages
+<div className="see-also">
 
-- [Discrete-Time Fourier Transform](/physics/signals-systems/discrete-time-fourier-transform)
-- [LTI Systems and Convolution](/physics/signals-systems/lti-systems-convolution)
-- [Frequency Response and Filtering](/physics/signals-systems/frequency-response-filtering)
-- [State-Space Introduction](/physics/signals-systems/state-space-introduction)
+See also: [Discrete-Time Fourier Transform](/physics/signals-systems/discrete-time-fourier-transform) · [LTI Systems and Convolution](/physics/signals-systems/lti-systems-convolution) · [Frequency Response and Filtering](/physics/signals-systems/frequency-response-filtering) · [State-Space Introduction](/physics/signals-systems/state-space-introduction)
+
+</div>

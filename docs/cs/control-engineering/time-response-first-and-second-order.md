@@ -9,7 +9,7 @@ Time response connects the algebraic model to what an engineer sees on an oscill
 
 The most important habit is to read the response from pole locations. A real pole gives exponential decay. A complex conjugate pair gives oscillation under an exponential envelope. Poles near the imaginary axis decay slowly; poles far to the left decay quickly. Zeros do not determine stability by themselves, but they can strongly change shape, overshoot, and apparent speed.
 
-## Definitions
+## Standard first- and second-order forms
 
 A first-order transfer function in standard form is
 
@@ -59,7 +59,7 @@ $$
 T_s\approx \frac{4}{\zeta\omega_n}.
 $$
 
-## Key results
+## Reading transient behavior from the poles
 
 The output response of a linear system can be decomposed into forced and natural components. In transfer-function analysis, input poles generate the forced response and system poles generate the natural response. For a stable system, the natural response decays and the forced response remains.
 
@@ -88,15 +88,13 @@ Nise's response formulas are design approximations, not replacements for simulat
 
 Rise time is less universal than peak time or settling time because textbooks and industries define it differently. Some use the time from $10\%$ to $90\%$ of final value; others use $0\%$ to $100\%$ for underdamped second-order systems. When comparing specifications, state the definition. Otherwise two engineers can compute different rise times from the same response and both be following a legitimate convention.
 
-The time constant idea extends beyond first-order systems as an envelope approximation. For a complex pole pair $-\sigma\pm j\omega_d$, the oscillation amplitude decays like $e^{-\sigma t}$. The envelope time constant is $1/\sigma$. This is why vertical movement of poles in the $s$-plane changes oscillation frequency while horizontal movement changes decay rate.
+The time constant idea extends beyond first-order systems as an envelope approximation. For a complex pole pair $-\sigma\pm j\omega_d$, the oscillation amplitude decays like $e^{-\sigma t}$. The envelope time constant is $1/\sigma$. Vertical movement of poles in the $s$-plane changes oscillation frequency, while horizontal movement changes decay rate.
 
 Transient specifications should be tied to the actual output variable. A motor position response, current response, and control effort response may have different peaks and settling behavior. A design that gives acceptable output overshoot may still require an unacceptable actuator pulse. Complete time-response analysis often checks several signals, not only $c(t)$.
 
-Always state whether settling time uses a $2\%$ or $5\%$ band.
+Always state whether settling time uses a $2\%$ or $5\%$ band because the numeric difference can change design acceptance.
 
-The numeric difference can change design acceptance.
-
-## Visual
+### Pole geometry and the usual specifications
 
 ```text
 Imaginary axis
@@ -119,17 +117,15 @@ Imaginary axis
 | Settling time | $T_s\approx 4/(\zeta\omega_n)$ | real part |
 | Time constant envelope | $1/(\zeta\omega_n)$ | real part |
 
-## Worked example 1: first-order step response
+## Timing a first-order step response
 
-Problem: A system has
+A system has
 
 $$
 G(s)=\frac{5}{2s+1}.
 $$
 
 Find the time constant, pole, final value for a unit-step input, and output at $t=4$ s.
-
-Method:
 
 1. Match to $K/(\tau s+1)$:
 
@@ -167,19 +163,17 @@ $$
 c(4)=5(0.8647)=4.3235.
 $$
 
-Checked answer: $\tau=2$ s, pole $-0.5$, final value $5$, and $c(4)\approx 4.32$.
+The result is $\tau=2$ s, pole $-0.5$, final value $5$, and $c(4)\approx 4.32$.
 
-## Worked example 2: second-order transient specifications
+## Extracting specifications from a complex pole pair
 
-Problem: A closed-loop system has dominant poles at
+A closed-loop system has dominant poles at
 
 $$
 s=-3\pm j4.
 $$
 
 Find $\omega_n$, $\zeta$, $\omega_d$, $T_p$, $\%OS$, and the approximate $2\%$ settling time.
-
-Method:
 
 1. The real part gives
 
@@ -230,9 +224,9 @@ $$
 T_s\approx \frac{4}{\zeta\omega_n}=\frac{4}{3}=1.33\ \text{s}.
 $$
 
-Checked answer: $\omega_n=5$, $\zeta=0.6$, $\omega_d=4$, $T_p=0.785$ s, $\%OS\approx9.5\%$, $T_s\approx1.33$ s.
+The poles give $\omega_n=5$, $\zeta=0.6$, $\omega_d=4$, $T_p=0.785$ s, $\%OS\approx9.5\%$, and $T_s\approx1.33$ s.
 
-## Code
+## Checking the complete step response numerically
 
 ```python
 import numpy as np
@@ -257,7 +251,7 @@ print(f"overshoot approx: {overshoot:.2f}%")
 print(f"settling estimate: {4/(zeta*wn):.3f} s")
 ```
 
-## Common pitfalls
+## When the textbook formulas stop applying
 
 - Applying underdamped formulas when $\zeta\ge 1$. Peak time and overshoot formulas assume complex poles.
 - Using $\omega_n$ where $\omega_d$ is required. The sinusoidal oscillation frequency is $\omega_d$, not $\omega_n$, for damped systems.
@@ -266,10 +260,14 @@ print(f"settling estimate: {4/(zeta*wn):.3f} s")
 - Confusing $T_s\approx4/(\zeta\omega_n)$ with an exact theorem. It is a common $2\%$ rule of thumb.
 - Reading final value from numerator gain alone without applying the final value theorem or evaluating dc gain.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Physical system modeling](/cs/control-engineering/physical-system-modeling-frequency-domain) produces the poles analyzed here.
 - [Root locus](/cs/control-engineering/root-locus-sketching-and-analysis) moves closed-loop poles to meet these specifications.
 - [Frequency response](/cs/control-engineering/bode-plots-and-frequency-response) links bandwidth and resonant peak to time response.
 - [Steady-state error](/cs/control-engineering/steady-state-errors-and-sensitivity) covers the final-value accuracy side of performance.
-- [Signals and systems](/physics/signals-systems/) gives broader response decomposition tools.
+- [Signals and systems](/physics/signals-systems/intro) gives broader response decomposition tools.
+
+</div>

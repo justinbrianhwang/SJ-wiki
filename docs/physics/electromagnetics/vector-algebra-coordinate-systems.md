@@ -484,9 +484,13 @@ The preserved norm confirms that the transformation changed only the component d
 - Reversing cross-product order. $\vec A\times\vec B=-(\vec B\times\vec A)$.
 - Assuming a coordinate transformation changes the physical vector. Only the basis and component representation change.
 
-## Related pages
+<div className="see-also">
+
+See also:
 
 - [Vector differential calculus](/math/engineering-math/vector-differential-calculus) for gradient, divergence, and curl.
 - [Vector integral calculus](/math/engineering-math/vector-integral-calculus) for line, surface, and volume integrals.
 - [Electrostatic fields and potential](/physics/electromagnetics/electrostatic-fields-and-potential) for source-to-observer vectors in Coulomb integrals.
 - [Magnetostatic forces and Ampere law](/physics/electromagnetics/magnetostatic-forces-biot-savart-ampere) for cross products in magnetic force and Biot-Savart law.
+
+</div>

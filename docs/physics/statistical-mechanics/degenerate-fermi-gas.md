@@ -391,10 +391,8 @@ for T in [10, 100, 300]:
 - Degeneracy pressure needs no interparticle force. Coulomb and lattice effects in real matter add corrections rather than creating the ideal-gas pressure.
 - At nonzero temperature, distinguish $\mu(T)$ from the zero-temperature $\epsilon_F$ and state whether density or chemical potential is held fixed.
 
-## Related pages
+<div className="see-also">
 
-- [Quantum statistics and ideal quantum gases](/physics/statistical-mechanics/quantum-statistics-and-ideal-quantum-gases)
-- [Grand canonical ensemble and particle exchange](/physics/statistical-mechanics/grand-canonical-ensemble-and-particle-exchange)
-- [Bose gases, photons, and phonons](/physics/statistical-mechanics/bose-gases-photons-and-phonons)
-- [Identical particles in quantum mechanics](/physics/quantum-mechanics/identical-particles-symmetrization)
-- [Collective and condensed-matter field theory](/physics/quantum-field-theory/collective-and-condensed-matter-field-theory)
+See also: [Quantum statistics and ideal quantum gases](/physics/statistical-mechanics/quantum-statistics-and-ideal-quantum-gases) · [Grand canonical ensemble and particle exchange](/physics/statistical-mechanics/grand-canonical-ensemble-and-particle-exchange) · [Bose gases, photons, and phonons](/physics/statistical-mechanics/bose-gases-photons-and-phonons) · [Identical particles in quantum mechanics](/physics/quantum-mechanics/identical-particles-symmetrization) · [Collective and condensed-matter field theory](/physics/quantum-field-theory/collective-and-condensed-matter-field-theory)
+
+</div>

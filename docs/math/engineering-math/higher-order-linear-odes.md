@@ -7,13 +7,9 @@ sidebar_position: 6
 
 Higher-order linear ODEs generalize the second-order models used for vibration and circuits. They arise directly in beam theory and indirectly when systems are reduced to a single scalar equation. The order tells how many independent pieces of initial data are required and how many independent homogeneous modes must be found.
 
-![An inverted pendulum is balanced above a movable base.](https://commons.wikimedia.org/wiki/Special:FilePath/2-D_inverted_pendulum.svg)
-
-*Figure: The inverted pendulum is a compact physical model for stability, linearization, and control. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:2-D_inverted_pendulum.svg), Arne Nordmann, CC BY-SA 3.0.*
-
 The algebra is familiar: linearity gives superposition, constant coefficients lead to a characteristic polynomial, repeated roots produce powers of $x$, and nonhomogeneous terms require a particular solution. The main new issue is bookkeeping. A third-order or fourth-order equation has more roots, more constants, and more possible combinations of real, complex, and repeated factors.
 
-## Definitions
+## Order, initial data, and homogeneous modes
 
 An $n$th-order linear ODE has the form
 
@@ -59,7 +55,7 @@ $$
 
 with the same power factors if the root is repeated.
 
-## Key results
+## Root multiplicity controls the mode list
 
 If the normalized coefficient functions and $g(x)$ are continuous on an interval, then an initial value problem with data
 
@@ -79,6 +75,8 @@ $$
 
 Undetermined coefficients extends directly when the coefficients are constant and the forcing belongs to the usual finite family of exponentials, polynomials, sines, and cosines. If a trial term overlaps with any homogeneous mode, multiply by $x$ enough times to make it independent. For an $n$th-order equation, overlap can occur with higher multiplicity, so the exponent on $x$ must match the multiplicity of the corresponding root.
 
+## From one high-order equation to a first-order system
+
 The companion-system viewpoint is often the clearest way to understand order. Define
 
 $$
@@ -89,9 +87,11 @@ Then a scalar $n$th-order equation becomes a first-order system in $n$ variables
 
 Stability is governed by the real parts of the characteristic roots. If every root has negative real part, all homogeneous modes decay. If any root has positive real part, some homogeneous mode grows. If roots lie on the imaginary axis, repeated roots or forcing can produce polynomial growth even when pure exponential growth is absent. Engineering design often focuses on moving roots into the left half-plane.
 
+## Initial conditions are not boundary conditions
+
 Boundary conditions can be more delicate than initial conditions. A fourth-order beam equation, for instance, may need displacement and slope conditions at both ends. These conditions create a linear system for the constants. Depending on the load and boundary setup, the system may be well conditioned, singular, or physically meaningful only under compatibility conditions.
 
-The order of an equation should not be confused with the degree of algebraic expressions inside it. The equation $y''+(y')^3=0$ is second order but nonlinear, while $y^{(5)}+2y=0$ is fifth order and linear. The linear theory on this page depends on the unknown function and its derivatives appearing only to the first power and not multiplied together. Once products such as $yy'$ or powers such as $(y'')^2$ appear, superposition no longer applies.
+The order of an equation should not be confused with the degree of algebraic expressions inside it. The equation $y''+(y')^3=0$ is second order but nonlinear, while $y^{(5)}+2y=0$ is fifth order and linear. Linear theory requires the unknown function and its derivatives to appear only to the first power and never multiply one another. Products such as $yy'$ or powers such as $(y'')^2$ destroy superposition.
 
 Factoring the characteristic polynomial is the main algebraic bottleneck. Low-degree polynomials may factor by inspection, but higher-degree equations often require numerical roots. That does not change the structure of the solution. A numerical root with small imaginary part should be interpreted carefully, especially if the original coefficients are exact and the imaginary part may be roundoff error. In engineering computation, root locations are often more important than closed forms for the roots.
 
@@ -103,7 +103,7 @@ Nonhomogeneous higher-order equations follow the same pattern as second-order eq
 
 In design problems, coefficients may depend on parameters. The characteristic roots then move as the parameter changes. A repeated root often marks a transition between qualitatively different behavior, such as overdamped to underdamped response. A root crossing the imaginary axis marks possible onset of instability. This root-locus viewpoint is a bridge from elementary ODEs to control theory.
 
-## Visual
+## Building the solution from characteristic roots
 
 ```mermaid
 flowchart TD
@@ -124,99 +124,79 @@ flowchart TD
 | Complex $\alpha\pm i\beta$ | $1$ | $e^{\alpha x}\cos\beta x$, $e^{\alpha x}\sin\beta x$ |
 | Complex repeated | $m$ | Multiply both sine and cosine modes by $1,x,\ldots,x^{m-1}$ |
 
-## Worked example 1: Third-order homogeneous equation
+## A triple real root
 
-Problem. Solve
+Consider
 
 $$
 y'''-3y''+3y'-y=0.
 $$
 
-Method.
-
-1. Form the characteristic polynomial:
+The characteristic polynomial is
 
 $$
 P(\lambda)=\lambda^3-3\lambda^2+3\lambda-1.
 $$
 
-2. Recognize the binomial factor:
+and factors as
 
 $$
 P(\lambda)=(\lambda-1)^3.
 $$
 
-3. The root $\lambda=1$ has multiplicity $3$.
-
-4. Therefore the independent modes are
+Thus $\lambda=1$ has multiplicity $3$, producing the independent modes
 
 $$
 e^x,\qquad xe^x,\qquad x^2e^x.
 $$
 
-5. Write the general solution:
-
-$$
-y=(c_1+c_2x+c_3x^2)e^x.
-$$
-
-Answer.
-
 $$
 y=c_1e^x+c_2xe^x+c_3x^2e^x.
 $$
 
-Check. There are three arbitrary constants, matching the third order. Also, the operator is $(D-1)^3$, and each listed mode is killed by three applications of $D-1$.
+There are three arbitrary constants, matching the order. The operator is $(D-1)^3$, and each listed mode is killed by three applications of $D-1$.
 
-This example also shows why multiplicity matters physically. The three modes all grow like $e^x$, but the factors $1$, $x$, and $x^2$ give different polynomial weights. For large $x$, the $x^2e^x$ term dominates unless its coefficient is zero.
+All three modes grow like $e^x$, but the factors $1$, $x$, and $x^2$ supply different polynomial weights. For large $x$, the $x^2e^x$ term dominates unless its coefficient is zero.
 
-## Worked example 2: Fourth-order equation with complex roots
+## Repeated imaginary roots and growing envelopes
 
-Problem. Solve
+Now consider
 
 $$
 y^{(4)}+4y''+4y=0.
 $$
 
-Method.
-
-1. The characteristic equation is
+The characteristic equation
 
 $$
 \lambda^4+4\lambda^2+4=0.
 $$
 
-2. Factor as a square:
+factors as
 
 $$
 \lambda^4+4\lambda^2+4=(\lambda^2+2)^2.
 $$
 
-3. The roots are
+so the roots
 
 $$
 \lambda=\pm i\sqrt{2},
 $$
 
-each with multiplicity $2$.
-
-4. For the pair $\pm i\sqrt{2}$ with multiplicity $2$, include sine and cosine modes and multiply by $x$ for the repeated level:
+each have multiplicity $2$. Both sine and cosine modes therefore appear at two polynomial levels:
 
 $$
 \cos(\sqrt{2}x),\quad \sin(\sqrt{2}x),\quad x\cos(\sqrt{2}x),\quad x\sin(\sqrt{2}x).
 $$
 
-Answer.
-
 $$
 y=c_1\cos(\sqrt{2}x)+c_2\sin(\sqrt{2}x)+c_3x\cos(\sqrt{2}x)+c_4x\sin(\sqrt{2}x).
 $$
 
-Check. The four modes match the fourth order. The factors $x\cos(\sqrt{2}x)$ and $x\sin(\sqrt{2}x)$ are required because the quadratic factor is repeated.
+The four modes match the fourth order. Because the quadratic factor is repeated, the $x\cos(\sqrt{2}x)$ and $x\sin(\sqrt{2}x)$ terms are required. Their amplitudes grow linearly, so the response is not bounded even though every root has zero real part.
 
-The repeated imaginary roots mean the solution is not merely bounded oscillation. The terms multiplied by $x$ have amplitudes that grow linearly, so a model with these roots is not stable in the bounded-response sense.
-
-## Code
+## Checking multiplicities and modes with a CAS
 
 ```python
 import sympy as sp
@@ -238,7 +218,7 @@ for mode in modes:
     print(sp.simplify(residual))
 ```
 
-## Common pitfalls
+## Bookkeeping failures to catch early
 
 - Writing only one solution for a repeated root of multiplicity greater than one.
 - Forgetting that repeated complex roots produce repeated sine and cosine modes.
@@ -248,9 +228,8 @@ for mode in modes:
 - Treating a boundary-value problem as if it has the same automatic uniqueness behavior as an initial value problem.
 - Missing the companion-system connection, which is often the easiest way to interpret stability.
 
-## Connections
+<div className="see-also">
 
-- [Second-Order Linear ODEs](/math/engineering-math/second-order-linear-odes)
-- [Nonhomogeneous ODEs and Applications](/math/engineering-math/nonhomogeneous-odes-and-applications)
-- [Systems of ODEs and Phase Planes](/math/engineering-math/systems-of-odes-and-phase-plane)
-- [Eigenvalues and Diagonalization](/math/engineering-math/eigenvalues-and-diagonalization)
+See also: [Second-Order Linear ODEs](/math/engineering-math/second-order-linear-odes) · [Nonhomogeneous ODEs and Applications](/math/engineering-math/nonhomogeneous-odes-and-applications) · [Systems of ODEs and Phase Planes](/math/engineering-math/systems-of-odes-and-phase-plane) · [Eigenvalues and Diagonalization](/math/engineering-math/eigenvalues-and-diagonalization)
+
+</div>

@@ -9,7 +9,7 @@ Identical particles force a change in what counts as a physical state. If two el
 
 Sakurai places identical particles after scattering, using permutation symmetry, the symmetrization postulate, and second-quantized notation. Ballentine gives a careful account of permutation symmetry and indistinguishability, then connects it to many-fermion systems. The Gottfried-named notes relate identical particles to symmetries and spin-statistics. Schiff's traditional examples include helium, exchange degeneracy, and atomic shell structure.
 
-## Definitions
+## Exchange operators and allowed state sectors
 
 For two particles, the exchange operator $P_{12}$ acts as
 
@@ -56,7 +56,7 @@ $$
 
 where bosons allow $n_i=0,1,2,\ldots$ and fermions allow only $n_i=0$ or $1$.
 
-## Key results
+## From antisymmetry to exclusion
 
 The **Pauli exclusion principle** follows immediately from antisymmetry. If two fermions occupy the same one-particle state, the antisymmetrized state is
 
@@ -92,8 +92,6 @@ Exchange symmetry also changes scattering. For identical spinless bosons, amplit
 
 Sakurai and Ballentine both stress that symmetrization is a postulate of nonrelativistic quantum mechanics. The deep spin-statistics theorem belongs to relativistic quantum field theory, but ordinary quantum mechanics imports the result: integer-spin particles are bosons and half-integer-spin particles are fermions.
 
-## Visual
-
 ```mermaid
 flowchart TD
   A[Two identical particles] --> B{Exchange sign}
@@ -111,7 +109,7 @@ flowchart TD
 | Fermion | antisymmetric | $n=0$ or $1$ | electrons, protons, neutrons |
 | Distinguishable model | no required symmetry | labels matter | different species or tracked particles |
 
-## Worked example 1: Normalizing a two-boson state
+## Normalizing an exchanged pair
 
 **Problem.** Let $\vert \alpha\rangle$ and $\vert \beta\rangle$ be orthonormal one-particle states. Normalize the symmetric two-particle state.
 
@@ -154,7 +152,7 @@ $$
 
 **Checked answer.** The normalization factor changes if $\alpha=\beta$; then the correctly normalized two-boson state is simply $\vert \alpha\rangle_1\vert \alpha\rangle_2$ in first-quantized notation.
 
-## Worked example 2: Spin symmetry for two electrons in the same orbital
+## Two electrons in one orbital
 
 **Problem.** Two electrons occupy the same spatial orbital $\varphi(\mathbf r)$. Which spin state is allowed?
 
@@ -187,27 +185,7 @@ $$
 
 **Checked answer.** Two electrons in the same orbital must have opposite spin combined into the singlet state. This is the shell-structure version of the Pauli principle.
 
-## Code
-
-```python
-import numpy as np
-
-alpha_beta = np.array([1, 0, 0, 0], dtype=complex)  # |alpha>|beta>
-beta_alpha = np.array([0, 0, 1, 0], dtype=complex)  # |beta>|alpha>
-
-boson = (alpha_beta + beta_alpha) / np.sqrt(2)
-fermion = (alpha_beta - beta_alpha) / np.sqrt(2)
-
-swap = np.array([[0, 0, 1, 0],
-                 [0, 1, 0, 0],
-                 [1, 0, 0, 0],
-                 [0, 0, 0, 1]], dtype=complex)
-
-print(np.allclose(swap @ boson, boson))
-print(np.allclose(swap @ fermion, -fermion))
-```
-
-## Common pitfalls
+## Bookkeeping without fictitious particle labels
 
 - Symmetrizing only the spin part. The total state, including spatial and spin coordinates, must have the required exchange symmetry.
 - Treating particle labels as observables for identical particles. Labels in first-quantized notation are bookkeeping devices.
@@ -217,7 +195,7 @@ print(np.allclose(swap @ fermion, -fermion))
 - Confusing exchange symmetry with ordinary spatial parity. They are different operations.
 - Assuming the spin-statistics connection is proved inside elementary nonrelativistic quantum mechanics. In this setting it is imposed as a postulate informed by relativistic theory and experiment.
 
-The phrase "particle 1" and "particle 2" in first-quantized notation should be read as coordinate slots, not observable name tags. For identical particles, swapping the slots cannot produce a new measurable arrangement. The only physically allowed sectors are the symmetric and antisymmetric ones. This is why an unsymmetrized product such as $\phi_a(x_1)\phi_b(x_2)$ is not a valid final description for two identical particles unless it is combined with its exchanged partner.
+The phrase "particle 1" and "particle 2" in first-quantized notation should be read as coordinate slots, not observable name tags. For identical particles, swapping the slots cannot produce a new measurable arrangement. The only physically allowed sectors are the symmetric and antisymmetric ones. An unsymmetrized product such as $\phi_a(x_1)\phi_b(x_2)$ is therefore not a valid final description for two identical particles unless it is combined with its exchanged partner.
 
 Spin and spatial symmetry must be considered together. Two electrons in the same spatial orbital require a symmetric spatial state, so their spin state must be antisymmetric. Two electrons in different orbitals can form either symmetric or antisymmetric spatial combinations, paired with the opposite spin symmetry. This is the basis for singlet-triplet splittings and exchange effects. Calling the effect a force is misleading; it is a restriction on the allowed state space that changes energy expectations when interactions are present.
 
@@ -231,10 +209,8 @@ Occupation-number notation helps with this bookkeeping, but it can hide the wave
 
 In applications, always specify what one-particle state means. It may include spatial orbital, spin projection, band index, or another internal label. Pauli exclusion forbids two fermions from occupying the same complete one-particle state, not merely the same spatial region. This precision is essential for atomic shells and solid-state bands.
 
-## Connections
+<div className="see-also">
 
-- [Addition of angular momentum](/physics/quantum-mechanics/addition-of-angular-momentum)
-- [Density operator, entanglement, and decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence)
-- [Scattering theory](/physics/quantum-mechanics/scattering-theory)
-- [Central potentials and the hydrogen atom](/physics/quantum-mechanics/central-potentials-hydrogen-atom)
-- [Measurement and interpretation](/physics/quantum-mechanics/measurement-interpretation)
+See also: [Addition of angular momentum](/physics/quantum-mechanics/addition-of-angular-momentum) · [Density operator, entanglement, and decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence) · [Scattering theory](/physics/quantum-mechanics/scattering-theory) · [Central potentials and the hydrogen atom](/physics/quantum-mechanics/central-potentials-hydrogen-atom) · [Measurement and interpretation](/physics/quantum-mechanics/measurement-interpretation)
+
+</div>

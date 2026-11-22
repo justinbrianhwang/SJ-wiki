@@ -9,7 +9,7 @@ Root locus is a graphical method for seeing how closed-loop poles move as a para
 
 The method is built around the characteristic equation $1+KG(s)H(s)=0$. Points on the root locus are candidate closed-loop pole locations. Once a point is chosen, the gain required to place a pole there is found from the magnitude condition. This makes root locus a design tool, not only an analysis tool.
 
-## Definitions
+## The angle and magnitude tests
 
 For negative feedback with loop transfer function
 
@@ -55,7 +55,7 @@ $$
 \theta_q=\frac{(2q+1)180^\circ}{n-m},\qquad q=0,1,\ldots,n-m-1.
 $$
 
-## Key results
+## Rules that fix the shape of the locus
 
 The standard sketching rules are:
 
@@ -90,7 +90,7 @@ Pole sensitivity is another reason to inspect the locus shape. Where branches ar
 
 The gain value should be marked on any design point. A pole location without its associated gain is incomplete because the controller must realize that gain and the resulting actuator effort.
 
-## Visual
+### Reading transient constraints on the $s$-plane sketch
 
 ```text
 Example root-locus skeleton
@@ -114,7 +114,7 @@ x = open-loop pole, o = open-loop zero
 | shorter peak time | larger imaginary part | choose pole farther from real axis |
 | stable closed loop | all poles in LHP | keep gain before RHP crossing |
 
-## Worked example 1: real-axis segments and asymptotes
+## Sketching the branches and asymptotes
 
 Problem: Sketch the structural features for
 
@@ -165,7 +165,7 @@ $$
 
 Checked answer: Real-axis locus on $(-2,0)$ and $(-\infty,-6)$, centroid $-8/3$, asymptotes at $60^\circ$, $180^\circ$, and $300^\circ$.
 
-## Worked example 2: gain from the magnitude condition
+## Recovering gain at a point on the locus
 
 Problem: For the same system,
 
@@ -173,7 +173,13 @@ $$
 G(s)H(s)=\frac{K}{s(s+2)(s+6)},
 $$
 
-find the gain required for a closed-loop pole at $s=-1+j2$ if the point satisfies the angle condition.
+find the gain required for a closed-loop pole at
+
+$$
+s=-\frac{1}{2}+j\frac{\sqrt{19}}{2},
+$$
+
+which satisfies the angle condition.
 
 Method:
 
@@ -183,35 +189,29 @@ $$
 K=|s(s+2)(s+6)|.
 $$
 
-2. Compute each vector magnitude at $s=-1+j2$:
+2. Compute each vector magnitude at $s=-\frac{1}{2}+j\frac{\sqrt{19}}{2}$:
 
 $$
-|s|=|-1+j2|=\sqrt{(-1)^2+2^2}=\sqrt5.
-$$
-
-$$
-|s+2|=|1+j2|=\sqrt{1^2+2^2}=\sqrt5.
+|s|=\sqrt{\left(-\frac12\right)^2+\left(\frac{\sqrt{19}}2\right)^2}=\sqrt5.
 $$
 
 $$
-|s+6|=|5+j2|=\sqrt{5^2+2^2}=\sqrt{29}.
+|s+2|=\sqrt{\left(\frac32\right)^2+\left(\frac{\sqrt{19}}2\right)^2}=\sqrt7.
+$$
+
+$$
+|s+6|=\sqrt{\left(\frac{11}2\right)^2+\left(\frac{\sqrt{19}}2\right)^2}=\sqrt{35}.
 $$
 
 3. Multiply:
 
 $$
-K=\sqrt5\sqrt5\sqrt{29}=5\sqrt{29}.
+K=\sqrt5\sqrt7\sqrt{35}=35.
 $$
 
-4. Approximate:
+Checked answer: the required gain is $K=35$.
 
-$$
-\sqrt{29}\approx5.385,\qquad K\approx26.93.
-$$
-
-Checked answer: If $-1+j2$ lies on the locus, the required gain is $K=5\sqrt{29}\approx26.9$.
-
-## Code
+## Checking the geometry and closed-loop roots
 
 ```python
 import numpy as np
@@ -221,7 +221,7 @@ zeros = np.array([], dtype=complex)
 
 centroid = (np.sum(poles) - np.sum(zeros)) / (len(poles) - len(zeros))
 angles = [(2*q + 1) * 180 / (len(poles) - len(zeros)) for q in range(3)]
-point = -1 + 2j
+point = -0.5 + 0.5j * np.sqrt(19)
 K = np.prod(np.abs(point - poles))
 
 print("centroid:", centroid)
@@ -229,12 +229,12 @@ print("asymptote angles:", angles)
 print("gain at point:", K)
 
 # Closed-loop roots for several gains: s(s+2)(s+6)+K = 0
-for gain in [1, 10, 26.93, 60]:
+for gain in [1, 10, 35, 60]:
     coeffs = [1, 8, 12, gain]
     print(gain, np.roots(coeffs))
 ```
 
-## Common pitfalls
+## Sketching errors that invalidate the design
 
 - Drawing real-axis branches to the right of an even number of poles and zeros.
 - Using closed-loop poles instead of open-loop poles and zeros to sketch the locus.
@@ -243,10 +243,14 @@ for gain in [1, 10, 26.93, 60]:
 - Assuming gain adjustment can place poles anywhere in the plane. It can only place them on the locus.
 - Ignoring closed-loop zeros when judging whether a second-order approximation is valid.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Time response](/cs/control-engineering/time-response-first-and-second-order) maps desired transient specs to pole locations.
 - [Routh-Hurwitz stability](/cs/control-engineering/routh-hurwitz-stability) finds imaginary-axis crossings and gain ranges.
 - [Root-locus design](/cs/control-engineering/root-locus-design-and-classical-compensation) uses the locus to choose compensators.
 - [PID and compensators](/cs/control-engineering/pid-lead-lag-and-lag-lead-compensators) explains how added poles and zeros reshape the locus.
 - [Frequency-response design](/cs/control-engineering/frequency-response-compensator-design) is the complementary classical design method.
+
+</div>

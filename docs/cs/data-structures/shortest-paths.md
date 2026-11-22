@@ -292,10 +292,8 @@ Early termination is sound in Dijkstra when the requested target is extracted wi
 
 For floating-point weights, comparisons near equality can make tie behavior platform-dependent. Negative zero and NaN also need a policy. Many graph applications avoid those questions by storing scaled integer costs when the domain permits it.
 
-## Related pages
+<div className="see-also">
 
-- [graph representation](/cs/data-structures/graph-representation)
-- [graph traversals](/cs/data-structures/graph-traversals)
-- [heaps and priority queues](/cs/data-structures/heaps-priority-queues)
-- [minimum spanning trees](/cs/data-structures/minimum-spanning-trees)
-- [queues](/cs/data-structures/queues)
+See also: [graph representation](/cs/data-structures/graph-representation) · [graph traversals](/cs/data-structures/graph-traversals) · [heaps and priority queues](/cs/data-structures/heaps-priority-queues) · [minimum spanning trees](/cs/data-structures/minimum-spanning-trees) · [queues](/cs/data-structures/queues)
+
+</div>

@@ -5,15 +5,15 @@ sidebar_position: 14
 
 # Power Series and Taylor Polynomials
 
-Power series represent functions as infinite polynomials. Taylor polynomials use derivatives at a point to build finite polynomial approximations. Together they turn difficult functions into algebraic objects that can be differentiated, integrated, and evaluated approximately.
+Power series represent functions as infinite polynomials. Taylor polynomials use derivatives at a point to build finite polynomial approximations. Both turn difficult functions into algebraic objects that can be differentiated, integrated, and evaluated approximately.
 
-The key idea is local representation. A Taylor polynomial near $a$ is designed to match a function's value and derivatives at $a$. A Taylor series asks whether the infinite version actually converges back to the function, and on which interval that is true.
+Both constructions begin locally. A Taylor polynomial near $a$ matches a function's value and derivatives at $a$. A Taylor series asks whether the infinite version converges back to the function, and on which interval.
 
 ![Several Taylor polynomial curves approximate the sine function near the origin.](https://commons.wikimedia.org/wiki/Special:FilePath/Taylor_Approximation_of_sin%28x%29.svg)
 
 *Figure: Taylor polynomial approximations to $\sin x$. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Taylor_Approximation_of_sin%28x%29.svg), MikeRun, CC BY-SA 4.0.*
 
-## Definitions
+## From local polynomial data to an infinite series
 
 A power series centered at $a$ has form
 
@@ -48,7 +48,7 @@ e^x &= \sum_{n=0}^{\infty}\frac{x^n}{n!},\\
 \end{aligned}
 $$
 
-## Key results
+## Convergence radius and legitimate operations
 
 The Ratio Test often finds the radius of convergence. For
 
@@ -119,7 +119,7 @@ $$
 \arctan x=\sum_{n=0}^{\infty}(-1)^n\frac{x^{2n+1}}{2n+1}.
 $$
 
-Endpoint behavior can change after integration. The geometric series $\sum x^n$ diverges at $x=1$, but the integrated series for $\ln(1+x)$ can converge at $x=1$. This is why endpoints must always be tested separately for the specific series, not copied from a related series without checking.
+Endpoint behavior can change after integration. The geometric series $\sum x^n$ diverges at $x=1$, but the integrated series for $\ln(1+x)$ can converge at $x=1$. Endpoints must therefore be tested for the specific series rather than copied from a related series.
 
 Taylor polynomials are local approximations. The center $a$ is the point where the polynomial matches the function most tightly. Moving farther from $a$ usually increases error. Choosing a center near the input value can dramatically reduce the number of terms needed. For example, approximating $\ln(1.02)$ with a series centered near $1$ is much faster than using a series far from the value.
 
@@ -129,7 +129,7 @@ $$
 T_N(a)=f(a),\quad T_N'(a)=f'(a),\quad \dots,\quad T_N^{(N)}(a)=f^{(N)}(a).
 $$
 
-The polynomial is not just close in value; its first $N$ derivatives match at the center.
+The agreement is stronger than a close function value: the first $N$ derivatives also match at the center.
 
 Radius of convergence is controlled by coefficient growth. Factorials in the denominator, as in $e^x$, usually lead to convergence for all real $x$. Powers such as $3^n$ in the denominator often lead to a finite radius. Coefficients that grow too quickly can make the radius zero. The Ratio Test turns these growth rates into an explicit interval.
 
@@ -151,11 +151,9 @@ Remainder bounds should be tied to the requested accuracy. If a problem asks for
 
 Algebraic manipulation of series should stay inside common convergence intervals. If two series are multiplied, the resulting expression is guaranteed by the standard power-series rules only where both original series converge absolutely. Endpoint questions may need fresh testing after the manipulation.
 
-A clean final answer should state center, radius, interval, approximation, and error bound when those items are relevant to the problem being solved.
+Record the center, radius, interval, approximation, and error bound whenever they are relevant to the problem.
 
-This prevents local approximations from being mistaken for global identities later on.
-
-## Visual
+Recording those items prevents a local approximation from later being mistaken for a global identity.
 
 ```mermaid
 graph LR
@@ -176,7 +174,7 @@ graph LR
 | Cosine | $\sum (-1)^n x^{2n}/(2n)!$ | all real $x$ | oscillation approximation |
 | Logarithm | $\sum (-1)^{n-1}x^n/n$ for $\ln(1+x)$ | $-1\lt x\le 1$ | slow-growth approximation |
 
-## Worked example 1: radius and interval of convergence
+## Radius first, endpoints second
 
 **Problem.** Find the radius and interval of convergence of
 
@@ -247,7 +245,7 @@ which diverges.
 
 **Checked answer.** The radius is $R=3$, and the interval of convergence is $[-1,5)$.
 
-## Worked example 2: Taylor approximation for $\sin x$
+## How many sine terms are enough?
 
 **Problem.** Use a Taylor polynomial to approximate $\sin(0.2)$ with error less than $0.00001$.
 
@@ -309,7 +307,7 @@ The approximation is efficient because $0.2$ is close to the center $0$ and fact
 
 For a nonalternating series, Taylor's theorem with remainder or another bound on derivatives may be needed instead. The method changes, but the goal is the same: control the part of the function not captured by the finite polynomial.
 
-## Code
+## Checking the approximation numerically
 
 ```python
 from math import factorial, sin
@@ -325,19 +323,22 @@ approx = sin_taylor(x, 5)
 print(approx, sin(x), abs(approx - sin(x)))
 ```
 
-## Common pitfalls
+## What the convergence calculation must record
 
-- Finding the radius of convergence but forgetting to test endpoints separately.
-- Assuming a power series converges at both endpoints because it converges inside the radius.
-- Applying term-by-term differentiation at an endpoint without checking endpoint behavior.
-- Confusing Taylor polynomial degree with number of nonzero terms.
-- Forgetting factorials in Taylor coefficients.
-- Using an alternating error bound when the term magnitudes are not decreasing.
-- Assuming every smooth function equals its Taylor series everywhere.
+- A radius of convergence says nothing by itself about either endpoint. Each endpoint becomes a new numerical series and needs its own test.
+- Term-by-term differentiation is safe in the open interval of convergence; endpoint behavior needs a fresh check.
+- Polynomial degree and number of nonzero terms are different for sparse series such as those for sine and cosine.
+- Taylor coefficients include $n!$ in the denominator.
+- The alternating-series error bound requires decreasing term magnitudes, not merely alternating signs.
+- Smoothness alone does not guarantee that a function equals its Taylor series away from the center.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Sequences and Series](/math/calculus/sequences-and-series): power series convergence uses series tests.
 - [Applications of Derivatives](/math/calculus/applications-of-derivatives): Taylor polynomials refine linear approximation and L'Hopital-style limits.
 - [Integration Techniques and Improper Integrals](/math/calculus/integration-techniques-improper-integrals): power series can approximate integrals without elementary antiderivatives.
 - [Exponential Log and Inverse Functions](/math/calculus/exponential-log-inverse-functions): standard Taylor series include $e^x$, $\ln(1+x)$, sine, and cosine.
+
+</div>

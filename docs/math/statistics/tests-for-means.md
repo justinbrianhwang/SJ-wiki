@@ -331,10 +331,8 @@ The independent-group call uses only summary statistics; the paired call uses ra
 - Ignoring outliers in small samples, where a single value can dominate the mean and standard deviation.
 - Reporting the p-value without the observed mean difference and confidence interval.
 
-## Related pages
+<div className="see-also">
 
-- [Estimation and confidence intervals](/math/statistics/estimation-and-confidence-intervals)
-- [Hypothesis testing logic](/math/statistics/hypothesis-testing-logic)
-- [ANOVA](/math/statistics/anova)
-- [Effect size, nonparametric methods, and resampling](/math/statistics/effect-size-nonparametric-and-resampling)
-- [Sampling distributions and the central limit theorem](/math/statistics/sampling-distributions-and-clt)
+See also: [Estimation and confidence intervals](/math/statistics/estimation-and-confidence-intervals) · [Hypothesis testing logic](/math/statistics/hypothesis-testing-logic) · [ANOVA](/math/statistics/anova) · [Effect size, nonparametric methods, and resampling](/math/statistics/effect-size-nonparametric-and-resampling) · [Sampling distributions and the central limit theorem](/math/statistics/sampling-distributions-and-clt)
+
+</div>

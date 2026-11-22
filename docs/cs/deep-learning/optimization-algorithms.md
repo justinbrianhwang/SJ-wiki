@@ -356,9 +356,8 @@ Training and validation curves answer different questions. Flat high training lo
 - Stepping a scheduler at the wrong frequency or resuming it with a reset step counter.
 - Restoring model weights without momentum, moment buffers, gradient-scaler state, and random-number state when exact continuation matters.
 
-## Related pages
+<div className="see-also">
 
-- [Linear regression and training loops](/cs/deep-learning/linear-regression-training)
-- [Multilayer perceptrons and regularization](/cs/deep-learning/multilayer-perceptrons-regularization)
-- [Computational performance](/cs/deep-learning/computational-performance)
-- [Math for deep learning](/cs/deep-learning/math-for-deep-learning)
+See also: [Linear regression and training loops](/cs/deep-learning/linear-regression-training) · [Multilayer perceptrons and regularization](/cs/deep-learning/multilayer-perceptrons-regularization) · [Computational performance](/cs/deep-learning/computational-performance) · [Math for deep learning](/cs/deep-learning/math-for-deep-learning)
+
+</div>

@@ -320,10 +320,8 @@ Memoization changes the state model. A cache key must contain every input that a
 
 Divide-and-conquer recursion also needs a combine-cost analysis. Merge sort makes two half-size calls, then merges in linear time, giving $T(n)=2T(n/2)+O(n)=O(n\log n)$. Halving the input does not alone guarantee logarithmic total time when both halves are explored.
 
-## Related pages
+<div className="see-also">
 
-- [functions and parameters](/cs/programming/cpp/functions-parameters-and-scope)
-- [arrays](/cs/programming/cpp/arrays)
-- [linked data structures](/cs/programming/cpp/linked-data-structures)
-- [STL algorithms and iterators](/cs/programming/cpp/stl-algorithms-and-iterators)
-- [templates](/cs/programming/cpp/templates)
+See also: [functions and parameters](/cs/programming/cpp/functions-parameters-and-scope) · [arrays](/cs/programming/cpp/arrays) · [linked data structures](/cs/programming/cpp/linked-data-structures) · [STL algorithms and iterators](/cs/programming/cpp/stl-algorithms-and-iterators) · [templates](/cs/programming/cpp/templates)
+
+</div>

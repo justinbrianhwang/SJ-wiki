@@ -9,7 +9,7 @@ Simulink represents dynamic systems as executable block diagrams. Instead of wri
 
 A block diagram is still a mathematical model. Every connection should correspond to a variable with units, every Integrator block should correspond to a state, and every feedback path should represent a real dependency or algorithmic relation. The diagram is most valuable when it clarifies structure rather than hiding equations behind unlabeled blocks.
 
-## Definitions
+## What the main blocks mean mathematically
 
 An Integrator block implements
 
@@ -35,7 +35,7 @@ Subsystems group blocks behind an interface. They are essential for large models
 
 An algebraic loop occurs when Simulink must determine a signal value that depends instantaneously on itself, with no dynamic state or delay in the loop. Algebraic loops can be valid mathematical constraints, but they often slow simulation or indicate a missing dynamic element.
 
-## Key results
+## Build derivatives first, then store states
 
 The most reliable Simulink construction pattern is derivative first, integrator second. For each state $x_i$, build a signal representing $\dot{x}_i$ from current states, inputs, and parameters, then connect it to an Integrator whose output is $x_i$. This mirrors state-space form and makes initialization clear.
 
@@ -56,8 +56,6 @@ A time-response plot from Simulink should be interpreted with the solver configu
 A block diagram should also distinguish physical signals from diagnostic signals. A feedback line used by the model and a logged residual used for validation may both appear as wires, but they serve different purposes. Keeping diagnostics in a clearly named subsystem or logging configuration prevents accidental feedback changes and makes it easier to remove diagnostic code without altering model behavior.
 
 Model initialization deserves the same care as wiring. Integrator initial conditions, block parameters, workspace variables, and mask values together define the starting state. A diagram can be structurally correct and still produce the wrong transient if one initial value is left at its default.
-
-## Visual
 
 ```mermaid
 flowchart LR
@@ -94,7 +92,7 @@ The Simulink diagram shows an integrator-centered realization rather than a gene
 | Transfer Fcn | Compact LTI system | Losing state interpretation |
 | Unit Delay | Discrete state | Confusing sample time with solver step |
 
-## Worked example 1: Build a mass-spring-damper diagram
+## Wiring the mass-spring-damper balance
 
 Problem: Create a Simulink diagram for
 
@@ -140,7 +138,7 @@ A=\begin{bmatrix}0&1\\-4&-1.5\end{bmatrix},
 B=\begin{bmatrix}0\\0.5\end{bmatrix}.
 $$
 
-## Worked example 2: Identify and remove an algebraic loop
+## Replacing an instantaneous actuator loop with dynamics
 
 Problem: A static nonlinear actuator is modeled as
 
@@ -188,7 +186,7 @@ Checked answer: the dynamic model has a physical time constant and a state initi
 
 MATLAB comparison: simulate the first-order actuator with `ode45`. If $\tau$ is very small, the response approaches the static algebraic behavior but becomes stiff.
 
-## Code
+## MATLAB references for the two diagrams
 
 ```matlab
 clear; clc; close all;
@@ -222,7 +220,7 @@ title('Dynamic actuator with saturation');
 
 The first figure should match the Simulink scope if solver settings and initial conditions match. The second figure should show a fast but continuous actuator transient. In a Simulink model, the saturation block sits inside the derivative calculation rather than defining an instantaneous equation for its own output.
 
-## Common pitfalls
+## Diagram choices that hide model errors
 
 - Building a diagram from left to right without first identifying states and derivatives.
 - Leaving Gain blocks unlabeled so the diagram becomes impossible to audit.
@@ -231,9 +229,8 @@ The first figure should match the Simulink scope if solver settings and initial 
 - Mixing continuous and discrete blocks without explicit sample-time thinking.
 - Comparing Simulink and MATLAB runs while using different solver tolerances or input definitions.
 
-## Connections
+<div className="see-also">
 
-- [State-Space Representation](/physics/simulation/state-space-representation)
-- [Nonlinear Systems and Linearization](/physics/simulation/nonlinear-systems-linearization)
-- [Hybrid Systems and Event Handling](/physics/simulation/hybrid-systems-event-handling)
-- [MATLAB Scripting for Simulation](/physics/simulation/matlab-scripting-for-simulation)
+See also: [State-Space Representation](/physics/simulation/state-space-representation) · [Nonlinear Systems and Linearization](/physics/simulation/nonlinear-systems-linearization) · [Hybrid Systems and Event Handling](/physics/simulation/hybrid-systems-event-handling) · [MATLAB Scripting for Simulation](/physics/simulation/matlab-scripting-for-simulation)
+
+</div>

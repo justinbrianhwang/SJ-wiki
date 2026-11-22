@@ -504,9 +504,8 @@ After sampling, aliases create another kind of image because discrete-time frequ
 - Treating FM bandwidth as just the message bandwidth. Frequency deviation also matters.
 - Missing the connection between sampling and modulation by an impulse train.
 
-## Related pages
+<div className="see-also">
 
-- [Continuous-Time Fourier Transform](/physics/signals-systems/continuous-time-fourier-transform)
-- [Sampling, Aliasing, and Reconstruction](/physics/signals-systems/sampling-aliasing-reconstruction)
-- [Frequency Response and Filtering](/physics/signals-systems/frequency-response-filtering)
-- [Fourier Series for Periodic Signals](/physics/signals-systems/fourier-series-periodic-signals)
+See also: [Continuous-Time Fourier Transform](/physics/signals-systems/continuous-time-fourier-transform) · [Sampling, Aliasing, and Reconstruction](/physics/signals-systems/sampling-aliasing-reconstruction) · [Frequency Response and Filtering](/physics/signals-systems/frequency-response-filtering) · [Fourier Series for Periodic Signals](/physics/signals-systems/fourier-series-periodic-signals)
+
+</div>

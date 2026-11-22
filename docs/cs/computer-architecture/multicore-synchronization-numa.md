@@ -9,7 +9,7 @@ When single-core performance scaling slowed, architects turned to multiple cores
 
 Shared-memory multiprocessors are attractive because threads can communicate by reading and writing ordinary addresses. That convenience hides complexity. Locks, barriers, atomic instructions, cache coherence, memory consistency, and nonuniform memory access all determine whether a parallel program scales.
 
-## Definitions
+## What the shared-memory abstraction hides
 
 Thread-level parallelism, TLP, is parallelism across multiple instruction streams. A multicore processor places multiple cores on one chip. A symmetric multiprocessor, SMP, provides multiple processors or cores with a shared memory abstraction and roughly similar access to I/O and OS services.
 
@@ -38,7 +38,7 @@ $$
 \mathrm{Efficiency}(N)=\frac{\mathrm{Speedup}(N)}{N}
 $$
 
-## Key results
+## Serial work, contention, and placement
 
 Amdahl's law limits strong scaling for a fixed problem size:
 
@@ -66,8 +66,6 @@ Synchronization primitives must be matched to contention. A simple test-and-set 
 NUMA systems reward data ownership. A thread that initializes a data partition often causes the OS to allocate the pages in that socket's local memory. If another socket later processes those pages, every access may become remote. Parallel programs should therefore align initialization, placement, and computation. The architecture exposes a shared address space, but performance follows physical locality.
 
 Scalability should be measured over a range of core counts. A program that scales from one to four cores may flatten at eight because memory bandwidth saturates. Another may scale until a lock becomes hot. Plotting speedup, efficiency, cache misses, remote accesses, and lock time together usually explains the limit better than a single final speedup number.
-
-## Visual
 
 ```mermaid
 flowchart LR
@@ -97,7 +95,9 @@ flowchart LR
 | False sharing | Slow independent counters | Same cache block | Padding and layout |
 | NUMA misses | Remote memory latency | Poor placement | First-touch and affinity |
 
-## Worked example 1: Parallel speedup with overhead
+The two sockets share an address space, but each core reaches its socket-local memory without crossing the interconnect. Thread placement and page placement determine how much traffic takes the remote path.
+
+## Putting overhead into Amdahl's law
 
 Problem: A program has 92% parallel work and 8% serial work. On 8 cores, synchronization and communication overhead add 4% of the original single-core time. Compute speedup and efficiency.
 
@@ -141,7 +141,7 @@ $$
 
 Checked answer: Speedup is about $4.26\times$ and efficiency is about $53.2\%$. The overhead is only 4% of original time, but it substantially reduces scaling.
 
-## Worked example 2: Lock contention and atomic traffic
+## Replacing a global lock with private counters
 
 Problem: Four threads each perform 100,000 updates. With one global lock, each update enters a critical section taking 80 ns and lock acquire/release overhead averages 120 ns under contention. With four private counters and one final reduction, each update takes 20 ns, and the final reduction costs 1,000 ns. Compare total time assuming perfect parallel execution within each design except the shared lock serializes all updates.
 
@@ -185,7 +185,7 @@ $$
 
 Checked answer: The private-counter design is about $40\times$ faster in this simplified model. The large win comes from removing per-update serialization and coherence traffic.
 
-## Code
+## Modeling scaling curves
 
 ```python
 def parallel_time(parallel_fraction, cores, overhead_fraction=0.0):
@@ -210,7 +210,7 @@ For shared-memory programs, a useful debugging question is "what cache line is m
 
 The same question applies to locks: the lock variable itself is a cache line that many cores may fight over repeatedly.
 
-## Common pitfalls
+## Diagnosing where scaling stops
 
 - Reporting speedup without saying whether the problem size is fixed.
 - Ignoring synchronization and communication overhead in Amdahl calculations.
@@ -219,9 +219,8 @@ The same question applies to locks: the lock variable itself is a cache line tha
 - Forgetting that atomic operations are also coherence operations.
 - Measuring with thread migration enabled when locality matters.
 
-## Connections
+<div className="see-also">
 
-- [Coherence, Consistency, and MESI](/cs/computer-architecture/coherence-consistency-mesi)
-- [Warehouse-Scale Computers](/cs/computer-architecture/warehouse-scale-computers)
-- [Vector, SIMD, and GPU Architectures](/cs/computer-architecture/vector-simd-gpu)
-- [Power, Energy, Cost, and Dependability](/cs/computer-architecture/power-energy-cost-dependability)
+See also: [Coherence, Consistency, and MESI](/cs/computer-architecture/coherence-consistency-mesi) · [Warehouse-Scale Computers](/cs/computer-architecture/warehouse-scale-computers) · [Vector, SIMD, and GPU Architectures](/cs/computer-architecture/vector-simd-gpu) · [Power, Energy, Cost, and Dependability](/cs/computer-architecture/power-energy-cost-dependability)
+
+</div>

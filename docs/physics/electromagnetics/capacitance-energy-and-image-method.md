@@ -7,13 +7,13 @@ sidebar_position: 10
 
 Capacitance is the ability of a conductor arrangement to store charge for a given voltage difference. Its value depends only on geometry and material permittivity for linear electrostatic systems. In circuit diagrams a capacitor is a lumped element, but in electromagnetics it is a field configuration: charge on conductors creates $\vec E$, the field stores energy, and the potential difference is a line integral of that field.
 
-The image method is a different but related tool. Conducting planes and spheres impose equipotential boundary conditions that can sometimes be satisfied by replacing the conductor with fictitious image charges. The field in the physical region is then computed with ordinary Coulomb methods. This page brings together capacitance, electrostatic energy, dielectric breakdown, and image-charge reasoning.
+The image method is a different but related tool. Conducting planes and spheres impose equipotential boundary conditions that can sometimes be satisfied by replacing the conductor with fictitious image charges. The field in the physical region is then computed with ordinary Coulomb methods. Capacitance, electrostatic energy, dielectric breakdown, and image-charge reasoning all follow from the same field description.
 
 ![A parallel-plate capacitor diagram marks plate area, separation, and dielectric region.](https://commons.wikimedia.org/wiki/Special:FilePath/Parallel_plate_capacitor.svg)
 
 *Figure: The parallel-plate capacitor is the basic field-storage apparatus behind electrostatic energy and lumped capacitance. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Parallel_plate_capacitor.svg), Inductiveload, public domain.*
 
-## Definitions
+## Capacitance as a field quantity
 
 Capacitance is
 
@@ -60,7 +60,7 @@ Capacitance is always positive for a passive two-conductor system, even though o
 
 Real capacitors also have limits not present in the ideal electrostatic definition. Conductors have resistance, dielectrics have loss tangent and breakdown strength, and geometry has fringing. The ideal formulas are still essential because they provide the baseline field distribution and scaling before corrections, safety factors, and manufacturing constraints are added.
 
-## Key results
+## Geometry, energy, and conductor boundaries
 
 The standard capacitance workflow is:
 
@@ -119,7 +119,7 @@ The image method has a similar limitation: it gives exact fields only for geomet
 
 For any capacitance result, two limiting checks are useful. Increasing conductor area or permittivity should increase capacitance, while increasing separation should decrease it. If a formula fails these monotonic checks, the voltage integral or logarithmic geometry factor should be reexamined before using the result in an energy or breakdown calculation.
 
-## Visual
+### Two routes through an electrostatic problem
 
 ```mermaid
 flowchart TD
@@ -146,7 +146,7 @@ ASCII image-charge sketch:
              -q       image charge, not physically present
 ```
 
-## Worked example 1: Coaxial capacitance per unit length
+## Capacitance per unit length of a coaxial structure
 
 Problem: A coaxial structure has inner radius $a=1$ mm, outer conductor inner radius $b=5$ mm, and dielectric $\epsilon_r=2.25$. Find capacitance per unit length.
 
@@ -184,7 +184,7 @@ $$
 
 Check: Coaxial cables commonly have capacitance on the order of tens to hundreds of pF/m, so the result is reasonable.
 
-## Worked example 2: Image force on a charge above a ground plane
+## Force on a charge above a grounded plane
 
 Problem: A charge $q=2\ \mathrm{nC}$ is located $d=4$ cm above an infinite grounded conducting plane in air. Find the magnitude and direction of the force on the charge.
 
@@ -223,37 +223,23 @@ Step 5: Direction is toward the image charge, hence downward toward the conducti
 
 Check: The equivalent compact formula gives $q^2/(16\pi\epsilon_0d^2)$, which is the same because $R=2d$.
 
-## Code
+## Where electrostatic shortcuts fail
 
-```python
-import numpy as np
+- Capacitance comes from the conductor voltage difference, not the peak electric field.
+- The parallel-plate formula loses accuracy when the separation is not small compared with the plate dimensions because fringing is no longer negligible.
+- Stored energy is $W=\frac{1}{2}CV^2$, not $CV^2$.
+- Image charges are mathematical sources valid only in the chosen physical region. They are not charges inside the conductor.
+- A grounded-plane image solution does not automatically apply to an isolated, ungrounded conductor.
+- Meeting a capacitance target says nothing about dielectric survival at the required voltage; the peak field must also be checked.
+- Dielectric interfaces and finite conductor edges generally invalidate the simplest image constructions.
 
-eps0 = 8.8541878128e-12
+<div className="see-also">
 
-def coax_cap_per_m(a, b, eps_r=1.0):
-    return 2 * np.pi * eps0 * eps_r / np.log(b / a)
-
-def image_force(q, d, eps_r=1.0):
-    eps = eps0 * eps_r
-    return q**2 / (16 * np.pi * eps * d**2)
-
-print("C' =", coax_cap_per_m(1e-3, 5e-3, 2.25), "F/m")
-print("image force =", image_force(2e-9, 0.04), "N")
-```
-
-## Common pitfalls
-
-- Computing capacitance with the peak electric field instead of the conductor voltage difference.
-- Forgetting fringing fields when plate separation is not small compared with plate dimensions.
-- Using $W=CV^2$ instead of $W=\frac{1}{2}CV^2$.
-- Treating image charges as real charges in the conductor. They are a mathematical device valid only in the physical region of interest.
-- Applying a grounded-plane image solution to an isolated ungrounded conductor without checking the boundary condition.
-- Ignoring dielectric breakdown after computing capacitance. A design can have the desired capacitance but fail at the required voltage.
-- Using image methods after adding dielectric interfaces or finite conductor edges without rechecking the boundary conditions.
-
-## Connections
+See also:
 
 - [Electrostatic fields and potential](/physics/electromagnetics/electrostatic-fields-and-potential) for potential and field integrals.
 - [Gauss law, dielectrics, and boundaries](/physics/electromagnetics/gauss-law-dielectrics-and-boundaries) for conductor and dielectric boundary conditions.
 - [Transmission-line models and wave equations](/physics/electromagnetics/transmission-line-models-and-wave-equations) for capacitance per unit length in distributed lines.
-- [General electromagnetism](/physics/general/) for introductory capacitor concepts.
+- [General electromagnetism](/physics/general/intro) for introductory capacitor concepts.
+
+</div>

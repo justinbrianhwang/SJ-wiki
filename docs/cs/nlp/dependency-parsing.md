@@ -9,7 +9,7 @@ Dependency parsing represents syntax as directed relations between words. Jurafs
 
 Dependency syntax is often more compact than constituency syntax and is widely used across languages through Universal Dependencies. It directly identifies who depends on whom: subjects attach to predicates, objects attach to verbs, modifiers attach to heads, and function words receive language-specific analyses. These arcs are useful for information extraction, semantic role labeling, relation extraction, and downstream interpretation.
 
-## Definitions
+## Trees made of headed words
 
 A **dependency parse** is a directed graph over the tokens of a sentence, usually a tree rooted at a special `ROOT` node. Each word except the root has exactly one head. An arc may be labeled, for example `nsubj`, `obj`, `amod`, or `obl`.
 
@@ -33,7 +33,7 @@ $$
 
 An **arc-factored** model assumes the score of a tree decomposes as a sum of independent arc scores.
 
-## Key results
+## Greedy transitions versus global tree search
 
 Dependency parsing is a structured prediction problem. The number of possible trees grows rapidly with sentence length, but useful decompositions make search tractable.
 
@@ -64,8 +64,6 @@ Projectivity is a useful diagnostic. If a language or domain has many non-projec
 Dependency parsing also depends heavily on tokenization and multiword conventions. A contraction, compound name, or fixed expression may be represented as one token, several syntactic words, or a multiword token with internal structure. Universal Dependencies makes these conventions explicit, but downstream users often see only the final arcs. If relation extraction relies on dependency paths, a tokenization mismatch can change the path and therefore the extracted relation.
 
 Error analysis should distinguish head errors from label errors. A parser may attach a modifier to the correct head but choose `obl` instead of `nmod`, or choose the wrong head with a plausible label. These two failures affect downstream systems differently. Relation extraction often cares more about the path topology, while grammar feedback may care strongly about the label.
-
-## Visual
 
 ```mermaid
 flowchart TB
@@ -118,9 +116,9 @@ The upper tree shows the final labeled arcs, while the transition parser expands
 | Higher-order graph-based | arcs plus siblings or grandparents | richer structure | expensive inference |
 | Neural biaffine | contextual pair scores | strong modern accuracy | needs labeled treebanks |
 
-## Worked example 1: arc-standard transition parsing
+### Building `I saw dogs` with arc-standard actions
 
-Problem: parse `I saw dogs` with arcs `saw -> I` as `nsubj`, `saw -> dogs` as `obj`, and `ROOT -> saw` as `root`. Use an arc-standard style stack and buffer. Initial state has stack `[ROOT]`, buffer `[I, saw, dogs]`, arcs `{}`.
+Parse `I saw dogs` with arcs `saw -> I` as `nsubj`, `saw -> dogs` as `obj`, and `ROOT -> saw` as `root`. Use an arc-standard style stack and buffer. Initial state has stack `[ROOT]`, buffer `[I, saw, dogs]`, arcs `\{\}`.
 
 1. `SHIFT` moves `I` to the stack:
    - Stack: `[ROOT, I]`
@@ -131,22 +129,22 @@ Problem: parse `I saw dogs` with arcs `saw -> I` as `nsubj`, `saw -> dogs` as `o
 3. `LEFT-ARC(nsubj)` adds `saw -> I` and removes `I`:
    - Stack: `[ROOT, saw]`
    - Buffer: `[dogs]`
-   - Arcs: `{saw -> I}`
+   - Arcs: `\{saw -> I\}`
 4. `SHIFT` moves `dogs`:
    - Stack: `[ROOT, saw, dogs]`
    - Buffer: `[]`
 5. `RIGHT-ARC(obj)` adds `saw -> dogs` and removes `dogs`:
    - Stack: `[ROOT, saw]`
-   - Arcs: `{saw -> I, saw -> dogs}`
+   - Arcs: `\{saw -> I, saw -> dogs\}`
 6. `RIGHT-ARC(root)` adds `ROOT -> saw` and removes `saw`:
    - Stack: `[ROOT]`
    - Buffer: `[]`
 
-Checked answer: the final arc set matches the intended parse.
+The final arc set matches the intended parse.
 
-## Worked example 2: choosing a graph-based parse
+## Selecting the highest-scoring dependency tree
 
-Problem: choose heads for `I saw dogs` from these unlabeled arc scores:
+Choose heads for `I saw dogs` from these unlabeled arc scores:
 
 | Arc | Score |
 |---|---:|
@@ -177,9 +175,9 @@ $$
 5+4+3=12.
 $$
 
-Checked answer: choose the three arcs above. In more complex cases, locally best incoming arcs can create cycles, so a maximum spanning tree algorithm is needed.
+Choose the three arcs above. In more complex cases, locally best incoming arcs can create cycles, so a maximum spanning tree algorithm is needed.
 
-## Code
+## Exhaustive tree search for the three-word example
 
 ```python
 tokens = ["ROOT", "I", "saw", "dogs"]
@@ -198,6 +196,19 @@ scores = {
 # Tiny exhaustive search for demonstration only.
 words = tokens[1:]
 best = None
+
+def is_tree(arcs):
+    parent = {modifier: head for head, modifier in arcs}
+    for word in words:
+        seen = set()
+        node = word
+        while node != "ROOT":
+            if node in seen or node not in parent:
+                return False
+            seen.add(node)
+            node = parent[node]
+    return True
+
 for h_i in tokens:
     if h_i == "I":
         continue
@@ -210,6 +221,8 @@ for h_i in tokens:
             arcs = [(h_i, "I"), (h_saw, "saw"), (h_dogs, "dogs")]
             if sum(1 for h, m in arcs if h == "ROOT") != 1:
                 continue
+            if not is_tree(arcs):
+                continue
             total = sum(scores.get(arc, -99) for arc in arcs)
             if best is None or total > best[0]:
                 best = (total, arcs)
@@ -217,7 +230,7 @@ for h_i in tokens:
 print(best)
 ```
 
-## Common pitfalls
+## What attachment scores can hide
 
 - Assuming every dependency annotation scheme chooses the same head.
 - Ignoring non-projective constructions in languages where they are common.
@@ -227,9 +240,8 @@ print(best)
 - Comparing parsers across treebanks with different tokenization or punctuation conventions.
 - Treating dependency parses as complete semantics; they are syntactic structures, not full meaning representations.
 
-## Connections
+<div className="see-also">
 
-- [Constituency parsing with CKY](/cs/nlp/constituency-parsing-cky)
-- [Information extraction](/cs/nlp/information-extraction)
-- [Semantic role labeling and word-sense disambiguation](/cs/nlp/semantic-role-labeling-and-word-sense-disambiguation)
-- [Sequence labeling with HMMs and CRFs](/cs/nlp/sequence-labeling-hmms-crfs)
+See also: [Constituency parsing with CKY](/cs/nlp/constituency-parsing-cky) · [Information extraction](/cs/nlp/information-extraction) · [Semantic role labeling and word-sense disambiguation](/cs/nlp/semantic-role-labeling-and-word-sense-disambiguation) · [Sequence labeling with HMMs and CRFs](/cs/nlp/sequence-labeling-hmms-crfs)
+
+</div>

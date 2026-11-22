@@ -9,9 +9,9 @@ Partitioning, often called sharding in application architecture, splits data acr
 
 The hard part is not computing `hash(key) mod n`. The hard part is preserving availability, latency, locality, and correctness while nodes are added, nodes fail, workloads skew, and queries need data from more than one partition.
 
-## Definitions
+## Keys, ranges, and routing metadata
 
-A **partition** is a subset of data assigned to a node or group of replicas. A **shard** is a practical partition unit, often with its own primary replica and followers. A **tablet**, **range**, or **bucket** is a smaller partition-management unit that can be moved independently.
+A **partition** is a subset of data assigned to a node or group of replicas. A **shard** is an operational partition unit, often with its own primary replica and followers. A **tablet**, **range**, or **bucket** is a smaller partition-management unit that can be moved independently.
 
 **Key-range partitioning** assigns contiguous key ranges to partitions. It supports efficient range scans and ordered access, but can create hot spots when writes target nearby keys, such as timestamps or sequential IDs. **Hash partitioning** hashes keys and assigns hash ranges or buckets to partitions. It spreads load more evenly but destroys natural key order. **Composite partitioning** combines both, for example hash by tenant and range by time inside each tenant.
 
@@ -29,25 +29,25 @@ A **split point** divides an overloaded or oversized range into two ranges. A **
 
 A **scatter key** deliberately spreads writes that would otherwise cluster. For time-series workloads, a key might begin with a hash bucket and then include time, such as `(bucket, day, timestamp)`. The trade-off is read fanout: querying one logical time range must read multiple buckets and merge results. A **directory service** stores placement metadata for shards, tablets, or ranges. If the directory is strongly consistent, routing updates are simpler; if it is cached and eventually propagated, stale-route handling becomes part of the write path.
 
-## Key results
+## Partition keys set the scaling limit
 
-The first key result is that the partition key determines scalability more than the number of nodes. A poor key can funnel all writes to one partition even if the cluster has hundreds of machines. A good key distributes load, preserves important locality, supports common queries, and limits cross-partition transactions.
+The partition key determines scalability more than the number of nodes. A poor key can funnel all writes to one partition even if the cluster has hundreds of machines. A good key distributes load, preserves important locality, supports common queries, and limits cross-partition transactions.
 
-The second result is the movement advantage of consistent hashing. With modulo hashing, changing from $n$ to $n+1$ buckets remaps many keys. With consistent hashing, adding one node ideally moves about $1/(n+1)$ of the key space to the new node, plus virtual-node smoothing [4]. This is why Dynamo-style systems and many caches use ring-like partitioning.
+Consistent hashing sharply reduces movement. With modulo hashing, changing from $n$ to $n+1$ buckets remaps many keys. With consistent hashing, adding one node ideally moves about $1/(n+1)$ of the key space to the new node, plus virtual-node smoothing [4]. Dynamo-style systems and many caches therefore use ring-like partitioning.
 
-The third result is that secondary indexes change the partitioning problem. If data is partitioned by `user_id`, a query by `email` or `status` either fans out to every partition or uses a separate index partitioned by that attribute. Local indexes optimize writes and partition-local queries; global indexes optimize selective reads but create distributed write paths and consistency choices.
+Secondary indexes change the partitioning problem. If data is partitioned by `user_id`, a query by `email` or `status` either fans out to every partition or uses a separate index partitioned by that attribute. Local indexes optimize writes and partition-local queries; global indexes optimize selective reads but create distributed write paths and consistency choices.
 
-The fourth result is that resharding without downtime requires a handoff protocol. A common approach is: create target shard; copy a snapshot; stream or dual-write changes; mark source range as moving; update routing metadata through consensus; reject or forward stale writes; validate; then retire the source copy. Each step must handle retries and crashes.
+Resharding without downtime requires a handoff protocol. A common approach is: create target shard; copy a snapshot; stream or dual-write changes; mark source range as moving; update routing metadata through consensus; reject or forward stale writes; validate; then retire the source copy. Each step must handle retries and crashes.
 
 Algorithmic proof sketch for consistent hashing movement: place keys uniformly on a unit ring and nodes uniformly as boundaries. A key moves after adding a new node only if the new node falls between the key and its previous successor. The expected fraction of the ring owned by the new node is $1/(n+1)$ by symmetry, so that is the expected moved fraction.
 
-The fifth result is that cross-partition operations are coordination operations. A query that touches one shard can be routed, executed, and retried locally. A query that touches many shards needs fanout, partial failure handling, result merging, and often a timeout policy. A transaction that writes multiple shards needs distributed concurrency control or a saga. This is why partition-key design and transaction design should be done together, not as separate database and application decisions.
+Cross-partition operations are coordination operations. A query that touches one shard can be routed, executed, and retried locally. A query that touches many shards needs fanout, partial failure handling, result merging, and often a timeout policy. A transaction that writes multiple shards needs distributed concurrency control or a saga. Partition-key design and transaction design therefore belong in the same design review.
 
-The sixth result is that rebalancing changes failure risk. While a shard is moving, there may be source replicas, target replicas, backfill streams, and forwarding rules all active at once. If the system acknowledges writes before both sides agree on ownership, it can lose or duplicate updates. If it freezes the shard for the whole copy, availability suffers. Correct online movement normally uses epochs: every owner decision is tagged with a monotonically increasing configuration version, and stale writers are rejected or redirected.
+Rebalancing changes failure risk. While a shard is moving, there may be source replicas, target replicas, backfill streams, and forwarding rules all active at once. If the system acknowledges writes before both sides agree on ownership, it can lose or duplicate updates. If it freezes the shard for the whole copy, availability suffers. Correct online movement normally uses epochs: every owner decision is tagged with a monotonically increasing configuration version, and stale writers are rejected or redirected.
 
-Finally, partitioning interacts with observability. A cluster-wide average latency can hide one overloaded shard. Useful dashboards show per-shard request rate, storage bytes, compaction debt, queue depth, replica lag, split/merge activity, and top keys or tenants. Without that visibility, teams often add nodes to a cluster even though the real problem is one hot partition.
+Partitioning also changes what must be observed. A cluster-wide average latency can hide one overloaded shard. Useful dashboards show per-shard request rate, storage bytes, compaction debt, queue depth, replica lag, split/merge activity, and top keys or tenants. Without that visibility, teams often add nodes to a cluster even though the real problem is one hot partition.
 
-## Visual
+## Following one key through the routing layer
 
 ```mermaid
 flowchart LR
@@ -62,6 +62,10 @@ flowchart LR
   P --> Index["Local secondary index"]
 ```
 
+The routing epoch identifies the ownership map used for the request. A stale client can be redirected to epoch 17 without allowing two shards to accept the same key range as current owners.
+
+## Choosing a partitioning strategy
+
 | Strategy | Strength | Weakness | Good fit |
 | --- | --- | --- | --- |
 | Key range | range scans, locality | hot sequential ranges | ordered data, time windows with bucketing |
@@ -70,11 +74,11 @@ flowchart LR
 | Directory/tablet map | precise placement control | metadata service dependency | databases with range splits |
 | Composite key | balances and preserves some locality | key design complexity | multi-tenant workloads |
 
-## Worked example 1: Compare modulo hashing and consistent hashing movement
+## How much data moves when a node joins
 
-Problem: A cache has 100 million keys and 10 nodes. You add one node. Estimate how many keys move under naive modulo hashing and under ideal consistent hashing.
+A cache has 100 million keys and 10 nodes. After one node is added, how many keys move under naive modulo hashing and under ideal consistent hashing?
 
-Method:
+For a uniform hash:
 
 1. Under modulo hashing, assignment is:
 
@@ -88,12 +92,12 @@ $$
 node = hash(key) \bmod 11.
 $$
 
-2. For most hash values, the remainder modulo 10 differs from the remainder modulo 11. A rough estimate is that about $1 - 1/11$ or more of the keys may move in practice; the exact fraction depends on the hash range, but it is very large.
+2. Over a uniformly distributed hash range, only about $1/11$ of assignments retain the same bucket number. About $10/11$ move.
 
 3. Approximate moved keys:
 
 $$
-100,000,000 \times 0.9 \approx 90,000,000.
+100,000,000 \times \frac{10}{11} \approx 90,909,091.
 $$
 
 4. Under ideal consistent hashing, the new node owns about:
@@ -110,13 +114,13 @@ $$
 100,000,000 \times 0.0909 \approx 9,090,909.
 $$
 
-Checked answer: modulo hashing may move on the order of 90 million keys, while ideal consistent hashing moves about 9.1 million. That reduction is why membership changes are much less disruptive with consistent hashing.
+Modulo hashing moves about 90.9 million keys, while ideal consistent hashing moves about 9.1 million. Membership changes are therefore much less disruptive with consistent hashing.
 
-## Worked example 2: Design a partition key for time-series events
+## Designing a key for ordered time-series writes
 
-Problem: An analytics service stores events with fields `(tenant_id, timestamp, event_id)`. Most queries read one tenant for a time range. Writes are heavy and arrive in timestamp order. Choose a partitioning strategy.
+An analytics service stores events with fields `(tenant_id, timestamp, event_id)`. Most queries read one tenant for a time range. Writes are heavy and arrive in timestamp order. Which partitioning strategy fits?
 
-Method:
+The workload points toward a composite key:
 
 1. Partitioning by raw timestamp is bad because all current writes go to the newest range, creating a hot spot.
 
@@ -138,9 +142,9 @@ $$
 
 6. Queries for a tenant and day read the known bucket set for that tenant and merge ordered results.
 
-Checked answer: composite partitioning balances write load while preserving bounded fanout for the dominant query. The design needs tenant-size metadata and a plan for changing `k_tenant` without losing routing correctness.
+Composite partitioning balances write load while preserving bounded fanout for the dominant query. The design needs tenant-size metadata and a plan for changing `k_tenant` without losing routing correctness.
 
-## Code
+## A consistent-hash ring with virtual nodes
 
 ```python
 import bisect
@@ -176,7 +180,7 @@ for key in ["user:1", "user:2", "order:9"]:
     print(key, "->", ring.owner(key))
 ```
 
-## Common pitfalls
+## Failure modes of otherwise even partitions
 
 - Choosing a partition key from the data model without checking the workload.
 - Hashing timestamps or sequential IDs too late, after they already create hot write ranges.
@@ -191,18 +195,6 @@ for key in ["user:1", "user:2", "order:9"]:
 - Under-sharding so future growth requires disruptive migrations.
 - Treating partitioning as a replacement for replication; they solve different problems.
 
-## Connections
-
-- [Replication and Consistency](/cs/distributed-systems/replication-and-consistency)
-- [Distributed Storage and CAP](/cs/distributed-systems/distributed-storage-and-cap)
-- [Transactions and Isolation Levels](/cs/distributed-systems/transactions-and-isolation-levels)
-- [Stream Processing and Event-Driven Systems](/cs/distributed-systems/stream-processing-and-event-driven-systems)
-- [Fault Tolerance and Failure Detection](/cs/distributed-systems/fault-tolerance-and-failure-detection)
-- [Computer Networks](/cs/computer-networks/intro)
-- [Operating Systems](/cs/operating-systems/intro)
-- [Databases](/cs/databases/intro)
-- [Cryptography](/cs/cryptography/intro)
-
 ## References
 
 [1] M. Kleppmann, *Designing Data-Intensive Applications*. Sebastopol, CA: O'Reilly, 2017.  
@@ -212,3 +204,9 @@ for key in ["user:1", "user:2", "order:9"]:
 [5] G. DeCandia et al., "Dynamo: Amazon's highly available key-value store," in *SOSP*, 2007.  
 [6] A. Lakshman and P. Malik, "Cassandra: a decentralized structured storage system," *ACM SIGOPS Operating Systems Review*, vol. 44, no. 2, pp. 35-40, 2010.  
 [7] F. Chang et al., "Bigtable: a distributed storage system for structured data," in *OSDI*, 2006.
+
+<div className="see-also">
+
+See also: [Replication and Consistency](/cs/distributed-systems/replication-and-consistency) · [Distributed Storage and CAP](/cs/distributed-systems/distributed-storage-and-cap) · [Transactions and Isolation Levels](/cs/distributed-systems/transactions-and-isolation-levels) · [Stream Processing and Event-Driven Systems](/cs/distributed-systems/stream-processing-and-event-driven-systems) · [Fault Tolerance and Failure Detection](/cs/distributed-systems/fault-tolerance-and-failure-detection) · [Computer Networks](/cs/computer-networks/intro) · [Operating Systems](/cs/operating-systems/intro) · [Databases](/cs/databases/intro) · [Cryptography](/cs/cryptography/intro)
+
+</div>

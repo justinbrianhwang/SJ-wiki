@@ -328,10 +328,8 @@ Graph mutation also needs an invariant. If `add_undirected_edge` allocates the f
 
 Finally, vertex indices are a trust boundary. Every public insertion routine should reject negative or out-of-range endpoints before indexing arrays. Hard-coded classroom examples can omit this check; input-driven code cannot.
 
-## Related pages
+<div className="see-also">
 
-- [graph traversals](/cs/data-structures/graph-traversals)
-- [minimum spanning trees](/cs/data-structures/minimum-spanning-trees)
-- [shortest paths](/cs/data-structures/shortest-paths)
-- [linked lists](/cs/data-structures/linked-lists)
-- [arrays and array operations](/cs/data-structures/arrays)
+See also: [graph traversals](/cs/data-structures/graph-traversals) · [minimum spanning trees](/cs/data-structures/minimum-spanning-trees) · [shortest paths](/cs/data-structures/shortest-paths) · [linked lists](/cs/data-structures/linked-lists) · [arrays and array operations](/cs/data-structures/arrays)
+
+</div>

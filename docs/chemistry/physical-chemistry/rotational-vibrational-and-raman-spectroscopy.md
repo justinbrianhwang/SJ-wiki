@@ -13,11 +13,7 @@ Atkins treats spectroscopy as quantum mechanics made observable: photons are abs
 
 *Figure: Molecular energy-level diagram for Raman scattering and infrared absorption. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Raman_energy_levels.svg), Moxfyre based on work by Pavlina2.0, CC BY-SA 3.0.*
 
-![A laboratory Raman spectrometer sits on an optical bench for material and molecular analysis.](https://commons.wikimedia.org/wiki/Special:FilePath/Raman-Spektrometer.jpg)
-
-*Figure: Raman spectrometer as real instrumentation behind scattering spectra. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Raman-Spektrometer.jpg), IOM Leipzig, CC BY 4.0.*
-
-## Definitions
+## Quantized rotation and vibration
 
 For a rigid linear rotor,
 
@@ -73,7 +69,26 @@ $$
 \tilde\nu=\frac{1}{2\pi c}\sqrt{\frac{k}{\mu}}
 $$
 
-## Key results
+## What microwave, IR, and Raman spectra measure
+
+```mermaid
+graph TD
+  A[Photon interaction] --> B{"Absorption or scattering?"}
+  B -->|microwave absorption| C[rotational transitions]
+  B -->|infrared absorption| D[vibrational transitions]
+  B -->|Raman scattering| E[polarizability transitions]
+  C --> F[moment of inertia]
+  F --> G[bond length]
+  D --> H[force constants]
+  E --> I[symmetry and structure]
+```
+
+| Spectroscopy | Energy scale | Selection condition | Structural information |
+|---|---|---|---|
+| Pure rotational | microwave | permanent dipole, $\Delta J=\pm1$ | bond lengths, moments of inertia |
+| Infrared vibrational | IR | changing dipole moment | force constants, functional groups |
+| Vibration-rotation | IR with fine structure | vibrational and rotational rules | bond length and anharmonicity |
+| Raman | scattered visible/near-IR | changing polarizability | symmetric modes, molecular symmetry |
 
 Rotational transition wavenumbers for a rigid rotor are
 
@@ -132,32 +147,11 @@ The intensity of an IR band depends on the dipole derivative with respect to the
 
 Vibration-rotation spectra show the coupling of vibrational and rotational energy. The $P$ and $R$ branches flank the band origin, and their spacing contains rotational constants in the lower and upper vibrational states. Because bond length changes slightly with vibrational excitation, $B$ differs between states. Careful analysis gives both equilibrium bond lengths and anharmonic corrections.
 
-For polyatomic molecules, normal coordinates are collective motions, not independent local bonds. A "C=O stretch" label is often useful, but the true normal mode can include motion of several atoms. Coupling is strongest when local motions have similar frequencies and compatible symmetry. This is why isotopic substitution can shift and mix bands, helping assign spectra.
+For polyatomic molecules, normal coordinates are collective motions, not independent local bonds. A "C=O stretch" label is often useful, but the true normal mode can include motion of several atoms. Coupling is strongest when local motions have similar frequencies and compatible symmetry. Isotopic substitution can therefore shift and mix bands, helping assign spectra.
 
 Astrophysical and environmental applications rely heavily on rotational and vibrational spectra. Rotational spectra identify small molecules in interstellar space because cold gas populates low $J$ states. Infrared spectra identify greenhouse gases because vibrational transitions absorb terrestrial radiation. The same selection rule that makes a molecule IR active in the lab makes it relevant to atmospheric radiative balance.
 
-## Visual
-
-```mermaid
-graph TD
-  A[Photon interaction] --> B{"Absorption or scattering?"}
-  B -->|microwave absorption| C[rotational transitions]
-  B -->|infrared absorption| D[vibrational transitions]
-  B -->|Raman scattering| E[polarizability transitions]
-  C --> F[moment of inertia]
-  F --> G[bond length]
-  D --> H[force constants]
-  E --> I[symmetry and structure]
-```
-
-| Spectroscopy | Energy scale | Selection condition | Structural information |
-|---|---|---|---|
-| Pure rotational | microwave | permanent dipole, $\Delta J=\pm1$ | bond lengths, moments of inertia |
-| Infrared vibrational | IR | changing dipole moment | force constants, functional groups |
-| Vibration-rotation | IR with fine structure | vibrational and rotational rules | bond length and anharmonicity |
-| Raman | scattered visible/near-IR | changing polarizability | symmetric modes, molecular symmetry |
-
-## Worked example 1: Bond length from rotational spacing
+## Recovering a bond length from rotational spacing
 
 **Problem.** A diatomic molecule has adjacent pure rotational lines separated by $20.0\ \mathrm{cm^{-1}}$. Its reduced mass is $1.14\times10^{-26}\ \mathrm{kg}$. Estimate the bond length.
 
@@ -201,7 +195,7 @@ $$
 
 **Checked answer.** The value is very short, consistent with a light molecule and large rotational spacing.
 
-## Worked example 2: Force constant from IR wavenumber
+## Recovering a force constant from an IR band
 
 **Problem.** A diatomic molecule with reduced mass $1.05\times10^{-26}\ \mathrm{kg}$ has an IR stretch at $2140\ \mathrm{cm^{-1}}$. Estimate the force constant.
 
@@ -241,7 +235,7 @@ $$
 
 **Checked answer.** A high wavenumber and large force constant are consistent with a multiple bond such as CO.
 
-## Code
+## Converting spectral observables to structure
 
 ```python
 import numpy as np
@@ -262,7 +256,7 @@ print("r pm:", bond_length_from_spacing(20.0, 1.14e-26) * 1e12)
 print("k N/m:", force_constant_from_wavenumber(2140.0, 1.05e-26))
 ```
 
-## Common pitfalls
+## Interpreting lines without overreading them
 
 - Forgetting to convert $\mathrm{cm^{-1}}$ to $\mathrm{m^{-1}}$ when using SI constants.
 - Expecting homonuclear diatomics to show pure rotational microwave spectra. They have no permanent dipole.
@@ -282,15 +276,10 @@ Temperature also changes spectra through populations. Rotational envelopes broad
 
 Instrument resolution should be compared with expected line spacing. If the resolution is too low, rotational fine structure or isotope splitting may be hidden inside a broad envelope.
 
-Report whether peak positions are quoted as wavelength, frequency, or wavenumber, because equal spacings in one scale are not equal in another.
+Report whether peak positions are quoted as wavelength, frequency, or wavenumber, because equal spacings in one scale are not equal in another. Stating the scale prevents misleading spectral comparisons.
 
-This prevents misleading spectral comparisons.
+<div className="see-also">
 
-State the scale.
+See also: [Quantum models of motion](/chemistry/physical-chemistry/quantum-models-of-motion) · [Molecular symmetry and group theory](/chemistry/physical-chemistry/molecular-symmetry-and-group-theory) · [Molecular partition functions](/chemistry/physical-chemistry/molecular-partition-functions) · [Engineering math complex analysis](/math/engineering-math/intro)
 
-## Connections
-
-- [Quantum models of motion](/chemistry/physical-chemistry/quantum-models-of-motion)
-- [Molecular symmetry and group theory](/chemistry/physical-chemistry/molecular-symmetry-and-group-theory)
-- [Molecular partition functions](/chemistry/physical-chemistry/molecular-partition-functions)
-- [Engineering math complex analysis](/math/engineering-math/)
+</div>

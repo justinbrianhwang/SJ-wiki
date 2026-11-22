@@ -9,7 +9,7 @@ Feynman diagrams are not cartoons added after a calculation. They are a compact 
 
 The physical value of the diagrammatic language is that it separates universal structure from algebra. Once the propagators and vertices are known, scattering amplitudes can be organized by the number of vertices or loops. Zee's early discussion of diagrams is meant to make this organization feel natural: forces arise because fields propagate between interaction events, and perturbation theory enumerates those events.
 
-## Definitions
+## Reading the ingredients of a diagram
 
 For a theory split into free and interacting parts,
 
@@ -43,7 +43,7 @@ $$
 
 A connected diagram contributes to a connected scattering amplitude. Vacuum bubbles cancel in normalized correlators or are absorbed into vacuum energy.
 
-## Key results
+## From Feynman rules to an amplitude
 
 The basic algorithm for scalar perturbation theory is:
 
@@ -79,13 +79,11 @@ Diagrams also encode conservation laws. Translational invariance gives momentum 
 
 There are several layers of diagrammatic organization. Ordinary connected diagrams contribute to connected correlation functions. Amputated connected diagrams, with external propagators removed, enter scattering amplitudes through the LSZ reduction idea. One-particle-irreducible diagrams, which cannot be disconnected by cutting a single internal line, build the effective action and self-energies. Keeping these categories separate prevents confusion when the same drawing appears in different formulas with different external factors.
 
-Power counting gives a quick estimate before any integral is evaluated. A tree diagram has no loop integral and is usually algebraic once momentum conservation is imposed. A one-loop diagram has one independent momentum integration and is the first place ultraviolet divergences, thresholds, and imaginary parts appear. Higher-loop diagrams are not merely harder versions of the same calculation; they test whether counterterms introduced at lower order were sufficient and whether the renormalization scheme has been applied consistently.
+Power counting gives a quick estimate before any integral is evaluated. A tree diagram has no loop integral and is usually algebraic once momentum conservation is imposed. A one-loop diagram has one independent momentum integration and is the first place ultraviolet divergences, thresholds, and imaginary parts appear. Higher-loop diagrams add a consistency test: counterterms introduced at lower order must still suffice, and the renormalization scheme must be applied coherently.
 
 External states also matter. A correlation function with fields inserted at arbitrary spacetime points is not yet an experiment. A scattering amplitude assumes asymptotic states, wavefunction normalization, and on-shell external momenta. For stable particles this is straightforward. For confined particles, unstable resonances, or finite-temperature systems, the diagrammatic expansion still exists, but its direct interpretation as a particle scattering process needs more care.
 
-The most useful habit is to read every diagram twice: once as a mathematical recipe and once as a physical process allowed by the symmetries. The mathematical reading writes denominators, numerators, integrals, and delta functions. The physical reading asks which quanta propagate, which charges flow, what intermediate states can go on shell, and which conservation laws constrain the answer.
-
-## Visual
+Every diagram has two readings. As a mathematical recipe it specifies denominators, numerators, integrals, and delta functions. As a physical process it identifies the quanta and charge flow, the intermediate states that can go on shell, and the applicable conservation laws.
 
 ```mermaid
 flowchart TB
@@ -122,7 +120,7 @@ flowchart TB
   Amp --> Obs["observable prediction<br/>cross section, decay rate, correlation function"]
 ```
 
-This perturbation-theory diagram turns a Lagrangian into a calculation pipeline. The rule-lookup subgraph separates propagators, vertices, and external legs, while the integrand subgraph shows momentum assignment, delta functions, loop integration, numerator factors, and symmetry factors. The divergence branch makes regularization and counterterms part of the architecture whenever loop integrals are ultraviolet sensitive.
+The rule-lookup subgraph separates propagators, vertices, and external legs. The integrand subgraph then tracks momentum assignment, delta functions, loop integration, numerator factors, and symmetry factors. Ultraviolet-sensitive loop integrals take the regularization and counterterm branch.
 
 ASCII sketch of common scalar diagrams:
 
@@ -149,29 +147,27 @@ one-loop bubble:
 | Loop | unconstrained momentum integral | quantum fluctuation summed over |
 | Symmetry factor | combinatorial division | avoids overcounting identical contractions |
 
-## Worked example 1: Tree-level phi-four scattering
+## The tree-level contact amplitude
 
-Problem: Compute the leading amplitude for $\phi(p_1)+\phi(p_2)\to\phi(p_3)+\phi(p_4)$ in real scalar $\phi^4$ theory.
-
-Step 1: Identify the interaction:
+For $\phi(p_1)+\phi(p_2)\to\phi(p_3)+\phi(p_4)$ in real scalar $\phi^4$ theory, the interaction is
 
 $$
 \mathcal{L}_{\text{int}}=-\frac{\lambda}{4!}\phi^4.
 $$
 
-Step 2: Read off the four-point vertex. The factor $4!$ cancels the number of ways four identical fields can be contracted with four external particles:
+The factor $4!$ cancels the number of contractions of the four identical fields with the external particles, leaving the four-point vertex
 
 $$
 \text{vertex}=-i\lambda.
 $$
 
-Step 3: There is one tree diagram with one four-leg vertex and no internal propagator. Momentum conservation supplies
+There is one tree diagram, with one four-leg vertex and no internal propagator. Momentum conservation supplies
 
 $$
 (2\pi)^4\delta^{(4)}(p_1+p_2-p_3-p_4).
 $$
 
-Step 4: The $S$-matrix convention writes
+The $S$-matrix convention writes the connected contribution as
 
 $$
 i\mathcal{M}(2\pi)^4\delta^{(4)}(\sum p_{\text{in}}-\sum p_{\text{out}})
@@ -179,7 +175,7 @@ $$
 
 for the connected amplitude.
 
-Step 5: Therefore
+Therefore
 
 $$
 i\mathcal{M}_{\text{tree}}=-i\lambda,
@@ -187,13 +183,11 @@ i\mathcal{M}_{\text{tree}}=-i\lambda,
 \mathcal{M}_{\text{tree}}=-\lambda.
 $$
 
-The checked answer has no momentum dependence at this order because the interaction is a contact interaction.
+There is no momentum dependence at this order because the interaction is local and contains no derivatives.
 
-## Worked example 2: Counting loops from graph data
+## Counting internal lines and loops
 
-Problem: A connected scalar diagram has $V=3$ quartic vertices and $E=4$ external legs. How many internal lines $I$ and loops $L$ does it have?
-
-Step 1: Count line ends. Each quartic vertex has four field ends, so three vertices give
+A connected scalar diagram has $V=3$ quartic vertices and $E=4$ external legs. Each quartic vertex has four field ends, so the vertices supply
 
 $$
 4V=12
@@ -201,13 +195,13 @@ $$
 
 line ends.
 
-Step 2: External lines consume one line end each:
+The external lines consume one end each:
 
 $$
 E=4.
 $$
 
-Step 3: Internal lines consume two line ends each. Therefore
+Internal lines consume two ends each. Therefore
 
 $$
 4V=E+2I.
@@ -219,13 +213,13 @@ $$
 12=4+2I.
 $$
 
-Step 4: Solve:
+Solving gives
 
 $$
 2I=8,\qquad I=4.
 $$
 
-Step 5: For a connected graph, the number of independent loops is
+For a connected graph, the number of independent loops is
 
 $$
 L=I-V+1.
@@ -237,17 +231,19 @@ $$
 L=4-3+1=2.
 $$
 
-The checked answer is $I=4$ internal lines and $L=2$ loops. A third-order four-point diagram in $\phi^4$ theory is therefore a two-loop correction.
+Thus $I=4$ and $L=2$: a third-order four-point diagram in $\phi^4$ theory is a two-loop correction.
 
-## Code
+## Checking $\phi^4$ graph counts
 
 ```python
-def phi4_graph_counts(vertices, external_legs, connected=True):
+def phi4_graph_counts(vertices, external_legs):
     ends = 4 * vertices
+    if external_legs > ends:
+        raise ValueError("more external legs than available line ends")
     if (ends - external_legs) % 2 != 0:
         raise ValueError("line ends do not pair into internal lines")
     internal_lines = (ends - external_legs) // 2
-    loops = internal_lines - vertices + (1 if connected else 0)
+    loops = internal_lines - vertices + 1
     return internal_lines, loops
 
 for vertices in range(1, 5):
@@ -255,7 +251,7 @@ for vertices in range(1, 5):
     print(f"V={vertices}: I={internal}, L={loops}")
 ```
 
-## Common pitfalls
+## What the drawings do—and do not—mean
 
 - Reading diagrams as literal particle trajectories. Internal lines represent terms in an amplitude, not directly observed paths.
 - Omitting the momentum-conserving delta function and then double-counting momentum constraints.
@@ -267,11 +263,8 @@ for vertices in range(1, 5):
 - Forgetting that diagrams are constrained by every symmetry of the Lagrangian. Charge flow, momentum conservation, spinor structure, and gauge identities are as much a part of the diagram as its topology.
 - Drawing all topologies but forgetting permutations of external assignments. For identical particles this may be hidden in symmetry factors; for distinct particles it can change the channel structure.
 
-## Connections
+<div className="see-also">
 
-This page is the practical bridge from formal QFT to calculations. It should be read with the scalar and QED pages open, because diagrams become meaningful only after the field content and Lagrangian are specified. The graph-counting rules also prepare the renormalization pages: once a diagram contains loops, one must ask about ultraviolet behavior, counterterms, and physical normalization conditions. In gauge theories, the same diagrams must satisfy Ward or Slavnov-Taylor identities, so diagrammatics and symmetry are inseparable.
+See also: [Path Integral Formulation](/physics/quantum-field-theory/path-integral-formulation) · [Scalar Phi-Four Theory](/physics/quantum-field-theory/scalar-phi-four-theory) · [Renormalization and Counterterms](/physics/quantum-field-theory/renormalization-and-counterterms) · [Gauge Invariance and QED](/physics/quantum-field-theory/gauge-invariance-and-qed)
 
-- [Path Integral Formulation](/physics/quantum-field-theory/path-integral-formulation)
-- [Scalar Phi-Four Theory](/physics/quantum-field-theory/scalar-phi-four-theory)
-- [Renormalization and Counterterms](/physics/quantum-field-theory/renormalization-and-counterterms)
-- [Gauge Invariance and QED](/physics/quantum-field-theory/gauge-invariance-and-qed)
+</div>

@@ -7,9 +7,9 @@ sidebar_position: 16
 
 Appendix B of K&R summarizes the ANSI C standard library: headers, types, macros, and functions that a conforming hosted implementation supplies. The library is not the core language, but it is the practical environment in which most C programs live. K&R focuses on the facilities a working programmer reaches for: I/O, character classification, strings, math, utilities, diagnostics, variable arguments, non-local jumps, signals, time, and implementation limits.
 
-This page is a selected reference rather than a replacement for a standard manual. It follows K&R's scope while emphasizing safe usage patterns, common return values, and how the headers relate to earlier chapters.
+The selection follows K&R's scope and emphasizes safe usage patterns, common return values, and the connections between headers and earlier chapters. A current standard manual remains the authority for complete signatures and version-specific details.
 
-## Definitions
+## Mapping headers to services
 
 Standard headers declare library interfaces. Common K&R-relevant headers include:
 
@@ -38,7 +38,7 @@ Standard headers declare library interfaces. Common K&R-relevant headers include
 
 `<limits.h>` and `<float.h>` expose implementation limits such as `INT_MAX`, `CHAR_BIT`, `ULONG_MAX`, `DBL_DIG`, and `FLT_EPSILON`.
 
-## Key results
+## Contracts hidden in types and return values
 
 Include the right header before using a library function. In pre-ANSI C, undeclared functions could be assumed to return `int`; modern C rejects or warns about this because it breaks type checking, especially for pointers and floating-point return values.
 
@@ -70,7 +70,7 @@ Mathematical functions in `<math.h>` generally operate on floating values and ma
 
 Limit headers are not trivia. They are how a program asks the implementation what it can represent. Using `INT_MAX`, `CHAR_BIT`, or `DBL_DIG` is better than assuming the machine has the same widths and precision as the development computer.
 
-## Visual
+## Choosing a header by operation
 
 | Header | Main purpose | Representative functions/macros | Closely related page |
 |---|---|---|---|
@@ -81,7 +81,7 @@ Limit headers are not trivia. They are how a program asks the implementation wha
 | `<stdarg.h>` | variable arguments | `va_start`, `va_arg`, `va_end` | [Standard I/O](/cs/programming/c/standard-io-formatted-io) |
 | `<limits.h>` | integer limits | `INT_MAX`, `CHAR_BIT` | [Modern C](/cs/programming/c/modern-c-considerations) |
 | `<float.h>` | floating limits | `DBL_DIG`, `FLT_EPSILON` | [Types and Expressions](/cs/programming/c/types-operators-expressions) |
-| `<time.h>` | date and time | `time`, `clock`, `strftime` | this page |
+| `<time.h>` | date and time | `time`, `clock`, `strftime` | — |
 
 ```mermaid
 flowchart TD
@@ -97,11 +97,9 @@ flowchart TD
   J -->|yes| K[limits.h / float.h]
 ```
 
-## Worked example 1: Robust integer conversion with `strtol`
+## Finding where `strtol` stopped
 
-Problem: parse `"123abc"` as a decimal long and detect the unconverted suffix.
-
-Method:
+Parse `"123abc"` as a decimal `long` while retaining the unconverted suffix:
 
 ```c
 char *end;
@@ -111,7 +109,9 @@ long n = strtol("123abc", &end, 10);
 1. `strtol` skips leading whitespace; none is present.
 2. It reads decimal digits:
 
-   $$1,\ 2,\ 3.$$
+$$
+1,\ 2,\ 3.
+$$
 
 3. It stops at `a`, the first non-digit for base 10.
 4. It stores a pointer to that `a` in `end`.
@@ -126,13 +126,11 @@ $$
 
 6. Since `*end == 'a'`, the whole string was not consumed.
 
-Checked answer: `n` is `123`, and `end` points to `"abc"`. This is more informative than `atoi`, which would return `123` without showing where conversion stopped.
+`n` is `123`, and `end` points to `"abc"`. By contrast, `atoi` would return `123` without reporting where conversion stopped.
 
-## Worked example 2: Writing a `qsort` comparison correctly
+## Comparing integers for `qsort` without overflow
 
-Problem: sort `int v[] = { 4, 1, 10 }` with `qsort`.
-
-Method:
+Suppose `qsort` must order an array containing `4`, `1`, and `10`.
 
 1. `qsort` passes pointers to array elements as `const void *`.
 2. The comparison function casts each argument to `const int *`:
@@ -150,17 +148,19 @@ Method:
 
 4. The sorted order is:
 
-   $$1,\ 4,\ 10.$$
+$$
+1,\ 4,\ 10.
+$$
 
-Checked answer: the output array is `{1, 4, 10}`. Do not subtract blindly with `return *ia - *ib;` for general integers, because subtraction can overflow.
+The output array is `\{1, 4, 10\}`. Returning `*ia - *ib` is unsafe for general integers because the subtraction can overflow.
 
-## Code
+## Parsing and sorting command-line integers
 
 ```c
-#include <ctype.h>
+#include <errno.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 static int intcmp(const void *a, const void *b)
 {
@@ -177,9 +177,11 @@ int main(int argc, char *argv[])
 
     for (int i = 1; i < argc && n < 32; ++i) {
         char *end;
+        errno = 0;
         long v = strtol(argv[i], &end, 10);
 
-        if (*end == '\0')
+        if (end != argv[i] && *end == '\0' && errno != ERANGE &&
+            v >= INT_MIN && v <= INT_MAX)
             values[n++] = (int)v;
     }
 
@@ -192,7 +194,7 @@ int main(int argc, char *argv[])
 }
 ```
 
-## Common pitfalls
+## Library calls whose edge cases change the contract
 
 - Calling library functions without including their headers.
 - Passing negative `char` values directly to `<ctype.h>` functions.
@@ -203,10 +205,8 @@ int main(int argc, char *argv[])
 - Writing `assert(i++)` or any assertion with required side effects, because `NDEBUG` can remove it.
 - Returning subtraction from a comparison function where overflow is possible.
 
-## Connections
+<div className="see-also">
 
-- [Standard I/O and Formatted I/O](/cs/programming/c/standard-io-formatted-io)
-- [File Access and Error Handling](/cs/programming/c/file-access-error-handling)
-- [Function Pointers and Complex Declarations](/cs/programming/c/function-pointers-complex-declarations)
-- [Storage Allocation](/cs/programming/c/storage-allocation)
-- [Modern C Considerations](/cs/programming/c/modern-c-considerations)
+See also: [Standard I/O and Formatted I/O](/cs/programming/c/standard-io-formatted-io) · [File Access and Error Handling](/cs/programming/c/file-access-error-handling) · [Function Pointers and Complex Declarations](/cs/programming/c/function-pointers-complex-declarations) · [Storage Allocation](/cs/programming/c/storage-allocation) · [Modern C Considerations](/cs/programming/c/modern-c-considerations)
+
+</div>

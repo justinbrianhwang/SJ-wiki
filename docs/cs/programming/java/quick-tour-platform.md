@@ -5,111 +5,13 @@ sidebar_position: 2
 
 # Quick Tour, Platform, and First Programs
 
-A first Java program is small, but it already shows the major design of the language. A class contains a `main` method, the method executes statements, objects receive method invocations, and the standard library provides objects such as `System.out`. The quick tour in the source book deliberately moves fast because it wants the reader to see the whole shape before studying each rule.
+A small Java program already exposes the language's main structure. A class contains a `main` method, the method executes statements, objects receive method calls, and the standard library supplies objects such as `System.out`. The source book moves through these ideas quickly before returning to their precise rules in later chapters.
 
-The platform matters as much as the syntax. Java source is compiled to bytecode, bytecode is loaded and verified by a virtual machine, and the runtime system connects the running program to services such as standard streams, security checks, class loading, and garbage collection. That architecture is why Java can talk about portability, safety checks, and a large standard API as one platform rather than as a thin language over an operating system.
+The platform matters as much as the syntax. Java source is compiled to bytecode, a virtual machine loads and verifies that bytecode, and the runtime connects the program to class loading, memory management, threads, security checks, and standard services. Portability depends on that shared execution model as well as on the source language.
 
-## Definitions
+Historically, the **JDK** is the development kit: compiler, launcher, documentation tools, and the components needed to run Java programs. The **JVM** is the abstract machine that executes class files. “Java runtime” refers more broadly to the VM plus standard libraries and supporting files. Product packaging has changed across releases, but these roles remain a useful mental split when diagnosing whether a problem belongs to source compilation, launching, or execution.
 
-The source basis for this page is Chapter 1, especially the quick tour sections on getting started, variables, comments, constants, flow of control, classes, arrays, strings, exceptions, annotations, packages, and the Java platform. The terms below are written as contracts: each one tells you what the compiler can check, what the runtime must preserve, and what a reader of the program may rely on.
-
-**Class.** A class is the basic unit that declares fields, methods, constructors, nested types, and initialization behavior. Even a minimal first program is placed inside a class declaration because Java does not have free-standing functions. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
-
-**`main` method.** The conventional application entry point is a public static method named `main` that receives a `String[]` argument. It belongs to a class, and the virtual machine invokes it to start the program. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
-
-**Object reference.** A reference is a value that lets a program interact with an object. Variables of class, interface, array, enum, and annotation-related types hold references rather than containing the full object inline. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
-
-**Bytecode.** Bytecode is the instruction form stored in class files after compilation. The virtual machine interprets or compiles it while enforcing class file and runtime rules. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
-
-**Virtual machine.** The Java virtual machine provides the execution environment for bytecode. It loads classes, checks bytecode validity, manages memory, coordinates threads, and exposes runtime services. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
-
-**Package.** A package groups related types under a name and creates a namespace. Chapter 1 introduces packages briefly, and later chapters return to naming, importing, access, and package documentation. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
-
-**Standard output stream.** `System.out` is a library-provided object used by early examples to print text. It is not special syntax; it is a static field whose object has methods such as `print` and `println`. In Java, this is rarely just vocabulary. It controls which operations are legal, when a value exists, what names are visible, or which object receives a message. When reading code, ask what the term promises before asking how the implementation happens to work.
-
-## Key results
-
-**A Java program starts as a class, not as a loose script.** The first source file normally declares a class and a `main` method. That design choice reinforces the rest of Java: behavior is named through methods, methods are members of types, and type names participate in packages. Even when a program feels procedural, it is still running through class and method declarations. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
-
-**The dot operator expresses selection.** Code such as `System.out.println("Hello")` has two selections. `System.out` selects a static field from `System`, then `.println` selects a method from the object referenced by `out`. Tracing dots is one of the fastest ways to understand Java examples because it reveals which type or object supplies each operation. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
-
-**The platform enforces more than syntax.** A source program may compile, but the runtime still loads classes, verifies bytecode, initializes classes, checks access in reflective or security-sensitive operations, and manages object storage. The book stresses this platform view so that portability and safety are not treated as magical properties of source text. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
-
-**Early examples preview later chapters.** The quick tour mentions variables, constants, Unicode, control flow, classes, methods, arrays, strings, inheritance, interfaces, generics, exceptions, annotations, and packages. Each preview is shallow by design. The correct reading strategy is to notice the feature, run the example, and expect precise rules later. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
-
-**Comments and names are part of communication.** The quick tour includes comments and named constants because Java programs are read by people as well as compilers. Good names and useful comments reduce the distance between source code and the contract it is meant to express. A good check is to rewrite the idea as a rule a compiler, library, or maintainer can enforce. If the rule cannot be stated clearly, the design is probably relying on habit instead of a contract.
-
-When studying the quick tour, separate three layers on every line. The syntax layer asks whether the tokens form a legal declaration, statement, or expression. The type layer asks what each name denotes and what operations are permitted on that type. The platform layer asks what happens at runtime: loading, initialization, object creation, method invocation, exception propagation, output, and program termination. This three-layer habit prevents a common beginner mistake: assuming that a printed line is special because it appears in every first example. It is ordinary Java object interaction, and that ordinariness is the point.
-
-## Visual
-
-```mermaid
-flowchart TD
-  Source["Java source file: .java"] --> Javac["javac compiler: parse, type-check, generate bytecode"]
-  Javac --> ClassFile[".class file: constant pool, fields, methods, bytecode, attributes"]
-  ClassFile --> Loader["Class loader: locate, load, link, initialize classes"]
-  Loader --> Verify["Bytecode verifier: stack maps, type safety, access rules"]
-  Verify --> Runtime["JVM runtime data areas"]
-
-  subgraph Areas["Runtime data areas"]
-    direction TB
-    Heap["Heap: objects and arrays"]
-    Stacks["Per-thread Java stacks: frames, locals, operand stacks"]
-    Meta["Class metadata and constant pools"]
-    Native["Native method interface and stacks"]
-  end
-
-  Runtime --> Areas
-  Areas --> Main["Invoke public static void main(String#lsqb;"] args)"]
-  Main --> Interpreter["Interpreter executes bytecode initially"]
-  Interpreter --> Hot{"Hot method or loop?"}
-  Hot -- "yes" --> JIT["JIT compiler emits optimized native code"]
-  Hot -- "no" --> Interpreter
-  JIT --> NativeCode["Native machine code runs under JVM safepoints"]
-  NativeCode --> GC["Garbage collector traces reachable heap objects"]
-  Interpreter --> GC
-  GC --> Heap
-  Main --> Stdlib["Standard library objects: System.out, collections, I/O"]
-```
-
-This Java platform diagram shows the complete path from source to execution. `javac` emits class-file bytecode, the class loader and verifier prepare it, the JVM stores class metadata, stacks, and heap objects, then interpretation and JIT compilation execute the program. The GC and standard-library edges show that memory management and library services are runtime architecture, not syntax-level conveniences.
-
-| Quick tour feature | Later detailed page |
-|---|---|
-| Variables, primitive values, operators | [Tokens, Values, and Variables](/cs/programming/java/tokens-values-variables), [Primitives, Operators, and Conversions](/cs/programming/java/primitives-operators-conversions) |
-| `if`, loops, arrays, strings | [Control Flow, Arrays, and Strings](/cs/programming/java/control-flow-arrays-strings) |
-| Classes, methods, constructors | [Classes, Objects, and Encapsulation](/cs/programming/java/classes-objects-encapsulation), [Constructors, Methods, and Overloading](/cs/programming/java/constructors-methods-overloading) |
-| Inheritance and interfaces | [Inheritance, Polymorphism, and Object](/cs/programming/java/inheritance-polymorphism-object), [Interfaces, Nested Classes, and Enums](/cs/programming/java/interfaces-nested-classes-enums) |
-
-## Worked example 1: tracing a first program
-
-Problem: Explain exactly what happens in `System.out.println("Hello")` inside a `main` method.
-
-Method:
-
-1. Identify `System` as a class from `java.lang`, which is automatically available without an explicit import.
-2. Read `out` as a static field selected from `System`. The field value is a reference to a `PrintStream` object connected to standard output.
-3. Read `println` as a method selected from that `PrintStream` object. The string literal is passed as an argument.
-4. The method writes the characters and a line separator to the output destination. The call then returns to the next statement in `main`.
-5. No new language rule was needed for printing. The example uses ordinary field selection, method invocation, object references, and a library class.
-
-Checked answer: The checked answer is: class field selection produces `System.out`, object method selection invokes `println`, and the library object performs output. Printing is library behavior reached through normal Java syntax.
-
-## Worked example 2: mapping source, bytecode, and runtime
-
-Problem: A file `Welcome.java` contains class `Welcome` with a `main` method. Determine the path from source text to execution.
-
-Method:
-
-1. Compile `Welcome.java`. The compiler checks syntax and types and writes bytecode to `Welcome.class` if the source is valid.
-2. Start the virtual machine with class name `Welcome`. The VM locates the class file through its class loading mechanism.
-3. The bytecode verifier checks that the class file is well formed and respects safety rules, such as not treating an integer as an object reference.
-4. The VM initializes the class as required, finds `public static void main(String[] args)`, and invokes it.
-5. During execution, library calls may create objects, print text, throw exceptions, or load additional classes.
-
-Checked answer: The checked path is source -> class file -> class loader -> verifier -> initialized class -> `main` invocation. Each stage has its own responsibility, so a failure message should be read in terms of the stage that produced it.
-
-## Code
+## Reading the first class
 
 ```java
 public class QuickTourDemo {
@@ -124,17 +26,171 @@ public class QuickTourDemo {
 }
 ```
 
-## Common pitfalls
+A **class** declares fields, methods, constructors, nested types, and initialization behavior. Java has no free-standing functions, so even this procedural-looking example places its behavior in a class.
 
-- Do not treat `System.out.println` as syntax. It is a normal method call through a normal object reference stored in a static field.
-- Do not assume the file name, class name, and entry point are interchangeable. A public top-level class has file-name rules, while the VM starts from a class containing an appropriate `main` method.
-- Do not confuse compile-time type errors with runtime exceptions. They occur at different stages and require different fixes.
-- Do not skip package thinking. Even early examples use `java.lang`, and larger programs depend on packages for naming and organization.
-- Do not overread quick-tour code as complete style guidance. It is intentionally compact and is followed by precise chapters that refine the rules.
+The conventional application entry point is a `public static` method named `main` with a `String[]` parameter. It belongs to the class, and the virtual machine invokes it to start the application. The parameter holds references to the command-line argument strings.
 
-## Connections
+Each modifier has a job. `public` permits the launcher to access the method. `static` means no `QuickTourDemo` instance is needed. `void` means the method returns no status value to its caller. Process success is normally represented by returning from `main`; `System.exit(int)` can request a particular process status but also begins virtual-machine shutdown immediately.
+
+The parameter spelling `String... args` is also valid because a variable-arity parameter is represented as an array. Command-line parsing happens outside `main`; Java receives already separated strings. Quotes used by a shell usually group one argument and are removed before Java sees it, with details depending on the operating system and launcher environment.
+
+The example also previews constants, local variables, arrays, a conditional expression, a loop, string concatenation, and a library call. Those features are compact here; later chapters supply the exact typing and execution rules.
+
+## Two selections in `System.out.println`
+
+`System.out.println("Hello")` contains ordinary field selection and method invocation:
+
+1. `System` names a class from `java.lang`, whose types are automatically available without an explicit import.
+2. `System.out` selects the static field `out`. Its value is a reference to a `PrintStream` object associated with standard output.
+3. `.println` selects a method from that object, and the string literal becomes its argument.
+4. The method writes the characters followed by a line separator, then control returns to the next statement.
+
+A **reference** is a value through which a program interacts with an object. Variables of class, interface, array, and enum types hold references; they do not contain the entire object inline. `System.out` is therefore library state reached through normal Java syntax, not a special printing construct.
+
+Tracing each dot is a useful first reading technique: ask which type or object supplies the selected field or method.
+
+Overloading is resolved from the compile-time argument types. `PrintStream` has several `println` methods, so `println(42)` selects an integer overload while `println("42")` selects a string overload. Both display similar characters, but the calls reached different method signatures.
+
+The `+` operator in the example also changes role. `i + 1` is integer addition. Once a string operand participates, later additions on that left-associated expression become string concatenation. Parentheses around `(i + 1)` ensure the number is computed before it is appended; without them, `" #" + i + 1` appends the two digits separately. At `i == 0`, the parenthesized form ends in `1`, while the unparenthesized form ends in `01`.
+
+## From `Welcome.java` to a running method
+
+Suppose `Welcome.java` declares class `Welcome` with a `main` method.
+
+1. `javac` parses and type-checks the source, then writes bytecode and metadata to `Welcome.class`.
+2. The virtual machine locates the class through a class loader.
+3. Linking includes verification that the class file is structurally valid and that its bytecode obeys JVM type-safety rules.
+4. The VM initializes the class when required, locates the entry method, and invokes it.
+5. Execution may create objects, call library methods, load more classes, throw exceptions, and eventually terminate.
+
+**Bytecode** is the instruction representation stored in class files. The **Java virtual machine** supplies its execution environment: class loading, linking, initialization, runtime data areas, thread coordination, interpretation or compilation, and garbage collection.
+
+A class file stores more than a stream of opcodes. Its constant pool contains symbolic references, literals, and names; method entries contain descriptors, bytecode, exception tables, and optional debugging attributes. References to other classes and methods can remain symbolic until linking resolves them. The format gives different JVM implementations a shared input contract.
+
+Loading, linking, and initialization are distinct. Loading creates the VM's representation of a class from its binary form. Linking verifies it, prepares static storage, and may resolve symbolic references. Initialization executes static field initializers and static blocks in textual order when the class is first actively used. Merely having a class file on the class path does not mean its initialization code has run.
+
+```mermaid
+flowchart TD
+  Source["Java source file: .java"] --> Javac["javac compiler: parse, type-check, generate bytecode"]
+  Javac --> ClassFile[".class file: constant pool, fields, methods, bytecode, attributes"]
+  ClassFile --> Loader["Class loader: locate, load, link, initialize classes"]
+  Loader --> Verify["Bytecode verifier: stack maps, type safety, access rules"]
+  Verify --> Runtime[JVM runtime data areas]
+
+  subgraph Areas[Runtime data areas]
+    direction TB
+    Heap[Heap objects and arrays]
+    Stacks["Per-thread Java stacks: frames, locals, operand stacks"]
+    Meta[Class metadata and runtime constant pools]
+    Native[Native method interface and stacks]
+  end
+
+  Runtime --> Areas
+  Areas --> Main["Invoke public static void main(String#lsqb;"] args)"]
+  Main --> Interpreter[Interpreter executes bytecode]
+  Interpreter --> Hot{"Hot method or loop?"}
+  Hot -- yes --> JIT[JIT compiler emits optimized native code]
+  Hot -- no --> Interpreter
+  JIT --> NativeCode[Native code runs under JVM control]
+  NativeCode --> GC[Garbage collector traces reachable objects]
+  Interpreter --> GC
+  GC --> Heap
+  Main --> Stdlib["Standard library objects: System.out, collections, I/O"]
+```
+
+The diagram separates responsibilities that otherwise blur together. A syntax or type error belongs to compilation; a malformed class-file error belongs to loading or verification; and a thrown exception belongs to execution. Reading an error by its stage narrows the search immediately.
+
+### Following one invocation frame
+
+When the VM invokes `main`, the main thread receives a stack frame. That frame holds local slots for `args`, `target`, and the loop index, plus an operand stack used by bytecode instructions. The literal `"Java"` and the argument strings refer to objects; the references occupy local slots while the objects live in heap-managed storage.
+
+For the first loop iteration with no arguments, the execution can be traced as follows:
+
+1. `args.length` evaluates to $0$, so the conditional expression selects `"Java"`.
+2. `i` is initialized to $0$ and the test `i < 3` succeeds.
+3. `(i + 1)` evaluates to integer $1$.
+4. Concatenation constructs the displayed text `Hello, Java #1` through compiler-selected string-building operations.
+5. `println` writes the text and a line separator through the current `System.out` object.
+6. `i++` changes `i` to $1$, and the loop test repeats.
+
+After three iterations, the test fails at `i == 3`; `main` returns and its frame is removed. Objects created during concatenation become eligible for collection once no reachable references remain. Eligibility does not promise immediate reclamation.
+
+The bytecode interpreter may begin by dispatching one instruction at a time. A just-in-time compiler can later translate frequently executed methods or loops to native machine code using observed run-time information. Both routes must preserve Java's specified behavior. Optimization changes how execution is implemented, not the source-level result.
+
+## Compile, launch, and pass arguments
+
+Assume the source file is stored as `QuickTourDemo.java` in the current directory with no package declaration. The basic commands are:
+
+```text
+javac QuickTourDemo.java
+java QuickTourDemo Ada
+```
+
+The compiler produces `QuickTourDemo.class`. The launcher argument is a binary class name, not a filename: use `QuickTourDemo`, not `QuickTourDemo.class`. The remaining token `Ada` becomes `args[0]`, so `target` is `"Ada"` and the program prints three numbered greetings.
+
+With a declaration such as `package notes.tour;`, the class's binary name becomes `notes.tour.QuickTourDemo`. The class file normally sits below a class-path root at `notes/tour/QuickTourDemo.class`, and the launcher receives the fully qualified name:
+
+```text
+java -cp <class-path-root> notes.tour.QuickTourDemo Ada
+```
+
+Running from inside the package directory with only the simple name fails because the class loader starts from class-path roots and maps the binary name to its package path. Package name, directory layout, and class path must describe the same location.
+
+### A failure at each stage
+
+Consider three different messages:
+
+- A missing semicolon is rejected by `javac`; no new valid class file is produced for that source.
+- `ClassNotFoundException` or a launcher message about not finding the main class means class lookup failed before `main` began. Check the binary name and class path.
+- `ArrayIndexOutOfBoundsException` from `args[0]` means the program launched and then indexed an empty array. The fix is an input check such as the conditional expression in the example.
+
+These failures can look equally final at a terminal, but they occurred in separate systems. Changing source punctuation cannot fix a class path, and changing a class path cannot make an unsafe array access valid.
+
+## Three layers to inspect on each line
+
+Early examples become clearer when read at three levels:
+
+- **Syntax:** Do the tokens form a legal declaration, statement, or expression?
+- **Types:** What does each name denote, and which operations does its type permit?
+- **Runtime:** Which classes load, which objects are created, which methods run, and where can an exception propagate?
+
+Names and comments support the same reading process. A named constant records the role of a value; a useful comment explains a constraint or decision that the code cannot state directly.
+
+One line can cross all three levels. In `String target = args.length == 0 ? "Java" : args[0];`, syntax groups a conditional expression, typing requires both alternatives to be compatible with `String`, and run time evaluates only the selected alternative. Because `args[0]` is skipped when the array is empty, the expression is safe. Replacing `?:` with a non-short-circuiting helper that evaluates both candidates could lose that property.
+
+## What portability does and does not promise
+
+Class files and standard APIs shield application code from many processor and operating-system differences. Primitive widths, array behavior, exception rules, and bytecode semantics do not change merely because the host CPU does. A conforming implementation can interpret or compile the same program differently while preserving those rules.
+
+Programs still meet their host through file paths, default character encodings, locales, time zones, network configuration, native libraries, process permissions, and available memory. A program that assumes a Unix path separator or a particular default locale is using a platform detail even though its source compiles everywhere.
+
+Native methods and the Java Native Interface deliberately cross the managed boundary. They can access operating-system facilities absent from the standard library, but they bring platform-specific binaries, manual resource ownership, and memory-safety risks. Portability is a property of the entire dependency set, not a reward granted by the `.java` extension.
+
+Garbage collection also has a limited promise: unreachable managed objects may have storage reclaimed. It does not close files at a deterministic line, release a lock that code forgot to unlock, or guarantee a finalizer runs before process exit. External resources need explicit lifetime management.
+
+## Where the tour continues
+
+| Quick-tour feature | Later detailed note |
+|---|---|
+| Variables, primitive values, operators | [Tokens, Values, and Variables](/cs/programming/java/tokens-values-variables), [Primitives, Operators, and Conversions](/cs/programming/java/primitives-operators-conversions) |
+| `if`, loops, arrays, strings | [Control Flow, Arrays, and Strings](/cs/programming/java/control-flow-arrays-strings) |
+| Classes, methods, constructors | [Classes, Objects, and Encapsulation](/cs/programming/java/classes-objects-encapsulation), [Constructors, Methods, and Overloading](/cs/programming/java/constructors-methods-overloading) |
+| Inheritance and interfaces | [Inheritance, Polymorphism, and Object](/cs/programming/java/inheritance-polymorphism-object), [Interfaces, Nested Classes, and Enums](/cs/programming/java/interfaces-nested-classes-enums) |
+
+## Stage errors and early misconceptions
+
+- `System.out.println` is a library method call, not Java syntax for printing.
+- A source-file name, a class name, and an entry method have related but different rules. A public top-level class constrains the file name; the VM starts from the requested class's entry point.
+- Compile-time type errors and runtime exceptions occur at different stages and call for different fixes.
+- Even the first example depends on a package: `System` and `String` come from `java.lang`.
+- Quick-tour code favors breadth and compactness. It previews features rather than defining complete style guidance.
+- The `java` launcher takes a class name; handing it a `.class` path confuses the lookup model.
+- JIT compilation does not create a second set of Java semantics. It optimizes under the same observable rules.
+- “Runs on a JVM” does not standardize host files, locale defaults, permissions, or native dependencies.
+
+## Next notes after the tour
 
 - [Tokens, Values, and Variables](/cs/programming/java/tokens-values-variables): explains the names and values used in first programs.
-- [Classes, Objects, and Encapsulation](/cs/programming/java/classes-objects-encapsulation): develops the class model behind every Java source file.
-- [Exceptions and Assertions](/cs/programming/java/exceptions-assertions): explains runtime failures that can interrupt first programs.
-- [Packages, Documentation, System, and Internationalization](/cs/programming/java/packages-documentation-system-i18n): returns to packages and system classes.
+- [Classes, Objects, and Encapsulation](/cs/programming/java/classes-objects-encapsulation): develops the class model behind Java source files.
+- [Exceptions and Assertions](/cs/programming/java/exceptions-assertions): separates runtime failures from compile-time rejection.
+- [Packages, Documentation, System, and Internationalization](/cs/programming/java/packages-documentation-system-i18n): returns to packages and system services.

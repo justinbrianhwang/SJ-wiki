@@ -7,13 +7,9 @@ sidebar_position: 13
 
 Sequences and series apply the limit concept to infinite lists and infinite sums. A sequence asks whether the terms $a_n$ settle toward a value. A series asks whether the accumulated partial sums $a_1+a_2+\cdots+a_n$ settle toward a finite total. These are related questions, but they are not the same question.
 
-![A Sierpinski triangle repeats triangular holes at smaller and smaller scales.](https://commons.wikimedia.org/wiki/Special:FilePath/Big_Sierpinski_triangle.svg)
-
-*Figure: The Sierpinski triangle connects recursion, self-similarity, and geometric counting. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Big_Sierpinski_triangle.svg), Medvedev, public domain.*
-
 Infinite series are essential for approximating functions, solving differential equations, estimating errors, and understanding power series. The work is mostly diagnostic: identify the structure of the terms, choose an appropriate convergence test, and state exactly what the test proves.
 
-## Definitions
+## Terms, partial sums, and benchmark families
 
 A sequence is an ordered list
 
@@ -67,7 +63,7 @@ $$
 
 It converges if $p\gt 1$ and diverges if $p\le 1$.
 
-## Key results
+## A field guide to convergence tests
 
 The nth-term test for divergence says:
 
@@ -136,7 +132,7 @@ $$
 
 Taking $N\to\infty$ gives a sum of $1$. Telescoping is one of the few cases where the partial sums can be written explicitly.
 
-The distinction between convergence of terms and convergence of sums is the most important conceptual point. A convergent series must have terms that go to zero because the partial sums cannot settle if the added pieces stay large. But small pieces can still accumulate forever. The harmonic series $\sum 1/n$ is the standard example: terms shrink to zero, but the accumulated sum grows without bound.
+Keep convergence of terms separate from convergence of sums. A convergent series must have terms that go to zero because the partial sums cannot settle if the added pieces stay large. Small pieces can still accumulate forever. The harmonic series $\sum 1/n$ is the standard example: its terms shrink to zero, but the accumulated sum grows without bound.
 
 Series tests should be chosen from the shape of $a_n$. Rational functions of $n$ often compare to $p$-series. Factorials and exponentials often suggest the Ratio Test. Alternating signs suggest checking absolute convergence first, then the Alternating Series Test if absolute convergence fails. Logarithms may require the Integral Test or comparison with known slow-growth benchmarks.
 
@@ -166,8 +162,6 @@ Monotone bounded sequences provide another foundational result. If a sequence is
 
 That viewpoint links sequence limits directly to series convergence.
 
-## Visual
-
 ```mermaid
 graph TD
   A[Series sum a_n] --> B{"Does a_n -> 0?"}
@@ -192,7 +186,7 @@ graph TD
 | alternating | alternating decreasing terms | $b_n\downarrow 0$ | monotonicity or limit fails |
 | ratio | factorials and exponentials | $L\lt 1$ | $L=1$ |
 
-## Worked example 1: choose tests for two positive series
+## Comparing two rational-term series
 
 **Problem.** Determine whether each series converges:
 
@@ -244,7 +238,7 @@ $$
 
 **Checked answer.** The first series converges by comparison with a $p$-series with $p=2$. The second diverges by comparison with the harmonic series.
 
-## Worked example 2: alternating series and error estimate
+## Turning alternating convergence into an error guarantee
 
 **Problem.** Approximate
 
@@ -311,9 +305,9 @@ $$
 
 so $N=31$ terms are enough. The alternating structure gives a practical stopping rule without knowing the exact infinite sum.
 
-This is why alternating series are valuable computationally. Even when the exact sum is unknown, the next term gives a certified error bound, so the approximation can be matched to a required tolerance.
+Thus an alternating series can be used computationally even when its exact sum is unknown: the next term certifies an error bound that can be matched to a required tolerance.
 
-## Code
+## Watching the partial sums settle
 
 ```python
 def partial_sum(term, n):
@@ -324,19 +318,23 @@ for n in [4, 10, 100]:
     print(n, partial_sum(alt, n))
 ```
 
-## Common pitfalls
+## Conclusions the tests do not support
 
-- Using the nth-term test backward. $a_n\to 0$ does not prove convergence.
-- Forgetting positivity conditions for comparison and integral tests.
-- Applying the Alternating Series Test without checking that $b_n$ decreases to $0$.
-- Treating ratio test result $L=1$ as convergence. It is inconclusive.
-- Confusing a sequence $\{a_n\}$ with the series $\sum a_n$.
-- Ignoring absolute convergence when rearranging or combining series.
-- Comparing to the wrong benchmark power. Leading-order behavior usually decides rational terms.
+- The condition $a_n\to 0$ is necessary for convergence of $\sum a_n$, but it is not sufficient.
+- Comparison and integral tests require the relevant positivity and regularity hypotheses.
+- Alternating signs alone are not enough; the magnitudes must eventually decrease to zero.
+- A Ratio Test limit of $L=1$ gives no conclusion.
+- The sequence $\{a_n\}$ and the series $\sum a_n$ have different limits to study: terms versus partial sums.
+- Rearrangements behave predictably under absolute convergence, not merely conditional convergence.
+- For rational terms, the benchmark power should match the leading-order behavior.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Limits and Continuity](/math/calculus/limits-and-continuity): sequence convergence is a limit at infinity.
 - [Integration Techniques and Improper Integrals](/math/calculus/integration-techniques-improper-integrals): the integral test links series and improper integrals.
 - [Power Series and Taylor Polynomials](/math/calculus/power-series-and-taylor-polynomials): power series are series whose terms contain powers of a variable.
 - [Exponential Log and Inverse Functions](/math/calculus/exponential-log-inverse-functions): growth rates guide comparison tests.
+
+</div>

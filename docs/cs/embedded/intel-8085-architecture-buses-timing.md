@@ -7,9 +7,9 @@ sidebar_position: 3
 
 The 8085 is the book's central microprocessor example. It is a good teaching CPU because the external bus is visible, the instruction set is compact, and the timing signals directly show how a processor talks to memory and I/O. Learning the 8085 is less about memorizing pins and more about understanding how one instruction becomes a sequence of bus cycles.
 
-The architecture page sits between the simple microprocessor model and the instruction-set pages. It names the blocks that execute instructions, but it also explains why extra hardware is needed around the chip: the lower address bus is multiplexed with the data bus, memory and I/O chips need selection signals, and slow devices may require wait states.
+The architecture sits between the simple microprocessor model and the instruction set. Its blocks execute instructions, while the external signals explain why the chip needs support hardware: the lower address bus is multiplexed with the data bus, memory and I/O chips need selection signals, and slow devices may require wait states.
 
-## Definitions
+## Inside the CPU and at its pins
 
 The **8085** is an 8-bit microprocessor with a 16-bit address bus. It can address 64 KiB of memory and has a separate I/O address space of 256 ports when I/O-mapped instructions are used.
 
@@ -29,7 +29,7 @@ The **control signals** `RD` and `WR` request a read or write operation. The sta
 
 A **machine cycle** is one bus operation. An **instruction cycle** is the complete time required to execute one instruction and may include several machine cycles.
 
-## Key results
+## How an instruction becomes bus cycles
 
 The first key result is the need to demultiplex the 8085 low address/data bus. During the first clock state of a bus cycle, `AD7`-`AD0` contain `A7`-`A0`. After `ALE` falls, these lines are reused for data. If external memory connected directly to `AD7`-`AD0` as address inputs, the selected address would disappear during the data phase. Therefore a latch, commonly a 74LS373 or equivalent, stores the low address while `ALE` is active.
 
@@ -45,7 +45,7 @@ The fourth key result concerns wait states. A fast CPU can be slowed for a slow 
 
 The fifth key result is that resets and interrupts are control-flow events with hardware causes. Reset initializes the program counter, and interrupts cause the CPU to suspend normal instruction flow after a suitable boundary, save the return address, and branch to a service routine or interrupt vector depending on the interrupt type.
 
-## Visual
+### Reading the core and bus timing together
 
 ```mermaid
 flowchart TB
@@ -94,8 +94,6 @@ flowchart TB
   Ctrl -. "READY can stretch cycle" .-> ReadCycle
 ```
 
-This 8085 diagram combines the CPU core, external bus pins, demultiplexing latch, decoder, and read-cycle timing. It labels the accumulator, flags, register pairs, PC, SP, ALU, instruction decoder, and timing unit, then shows how `AD7`-`AD0` switch roles from low address to data. The timing subgraph explains why `ALE`, `RD`, `IO/M`, and `READY` are architectural facts for board design rather than incidental pin names.
-
 | 8085 signal or group | Main purpose | Common mistake |
 |---|---|---|
 | `A15`-`A8` | High address byte | Treating them as data lines |
@@ -106,7 +104,7 @@ This 8085 diagram combines the CPU core, external bus pins, demultiplexing latch
 | `IO/M` | Selects I/O versus memory cycle | Assuming all I/O is memory-mapped |
 | `READY` | Adds wait states for slow devices | Replacing it with a software loop |
 
-## Worked example 1: Demultiplexing an address
+## Demultiplexing address `3A7CH`
 
 Problem: During a memory read, the 8085 must read the byte at address `3A7CH`. Describe what appears on the address and data pins during the bus cycle and what an external latch must hold.
 
@@ -130,7 +128,7 @@ Answer: `A15`-`A8` carry `3AH`; the latch captures `7CH`; later `AD7`-`AD0` carr
 
 Check: If the latch were missing, the memory chip would see its low address change when data appeared. That would make a stable read impossible.
 
-## Worked example 2: Counting bus cycles for an instruction
+## Counting the reads in `LDA 2050H`
 
 Problem: Determine the basic bus activity for the 8085 instruction `LDA 2050H`, which loads the accumulator from memory address `2050H`.
 
@@ -152,7 +150,7 @@ Answer: `LDA 2050H` requires one opcode fetch, two memory reads for the address 
 
 Check: The instruction contains three bytes, but it requires four bus read operations because one of the bytes names an additional memory location that must also be read.
 
-## Code
+## Watching reads and writes in a short 8085 program
 
 ```asm
 ; 8085: demonstrate memory read, register pair use, and memory write.
@@ -165,7 +163,7 @@ Check: The instruction contains three bytes, but it requires four bus read opera
         HLT
 ```
 
-## Common pitfalls
+## Mistakes that break the external bus
 
 - Connecting memory address input `A0`-`A7` directly to `AD0`-`AD7` without a latch. This fails because those pins later carry data.
 - Decoding only low address bits. Partial decoding can make the same device appear at many addresses, which may be acceptable in a small trainer but dangerous in a real map.
@@ -174,9 +172,8 @@ Check: The instruction contains three bytes, but it requires four bus read opera
 - Assuming every instruction takes the same time. Instruction length and bus activity vary widely.
 - Confusing memory-mapped I/O with I/O-mapped I/O. The 8085 supports special `IN` and `OUT` instructions for I/O ports, but memory-mapped devices use ordinary memory read/write cycles.
 
-## Connections
+<div className="see-also">
 
-- [Microprocessor and microcomputer basics](/cs/embedded/microprocessor-microcomputer-basics)
-- [8085 instruction set and addressing](/cs/embedded/8085-instruction-set-addressing)
-- [8085 I/O, memory, and DMA interfacing](/cs/embedded/8085-io-memory-dma-interfacing)
-- [8255 programmable peripheral interface](/cs/embedded/8255-programmable-peripheral-interface)
+See also: [Microprocessor and microcomputer basics](/cs/embedded/microprocessor-microcomputer-basics) · [8085 instruction set and addressing](/cs/embedded/instruction-set-addressing) · [8085 I/O, memory, and DMA interfacing](/cs/embedded/io-memory-dma-interfacing) · [8255 programmable peripheral interface](/cs/embedded/programmable-peripheral-interface)
+
+</div>

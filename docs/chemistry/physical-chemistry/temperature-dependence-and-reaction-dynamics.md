@@ -9,7 +9,7 @@ Temperature dependence links empirical kinetics to molecular energy, barriers, a
 
 Atkins develops Arrhenius behavior, transition-state theory, collision theory, RRK/RRKM ideas for unimolecular reactions, photochemical dynamics, and electron transfer. The unifying concept is that rate constants reflect both how often systems attempt reaction and how likely those attempts are to cross the required barrier.
 
-## Definitions
+## Arrhenius and Eyring forms
 
 The Arrhenius equation is
 
@@ -64,7 +64,7 @@ $$
 =\frac{(\lambda+\Delta_rG^\circ)^2}{4\lambda}
 $$
 
-## Key results
+## Reading activation parameters from temperature dependence
 
 An Arrhenius plot of $\ln k$ against $1/T$ has slope
 
@@ -110,23 +110,9 @@ Marcus theory predicts a normal region where more negative $\Delta_rG^\circ$ spe
 
 Arrhenius behavior is empirical but widely useful because many rate constants are controlled by Boltzmann access to high-energy configurations. A plot of $\ln k$ versus $1/T$ is linear only when $E_a$ and $A$ are effectively constant over the temperature range. Curvature can signal a change in mechanism, tunneling, temperature-dependent heat capacities of activation, diffusion control, or falloff behavior in unimolecular reactions.
 
-The pre-exponential factor contains more than collision frequency. It can include orientation requirements, entropy of activation, transmission probability, solvent cage effects, and dynamical recrossing. Two reactions with similar activation energies can have very different rates because one transition state is entropically difficult to organize while another is readily accessed. This is why activation entropy is often as informative as activation enthalpy.
+The pre-exponential factor contains more than collision frequency. It can include orientation requirements, entropy of activation, transmission probability, solvent cage effects, and dynamical recrossing. Two reactions with similar activation energies can have very different rates because one transition state is entropically difficult to organize while another is readily accessed. Activation entropy can therefore be as informative as activation enthalpy.
 
-Transition-state theory assumes a dividing surface between reactants and products. Reactants are in quasi-equilibrium with configurations near this surface, and successful crossing leads to products. If trajectories cross and then return to reactants, the simple theory overestimates the rate. The transmission coefficient $\kappa$ corrects for this in a coarse way. Modern reaction dynamics studies the actual motion on potential energy surfaces to understand such effects.
-
-Collision theory is most transparent for gas-phase bimolecular reactions. Molecules must collide with enough relative kinetic energy and suitable orientation. The steric factor can be much less than 1 for reactions requiring a specific geometry. For reactions between complex molecules, only a small fraction of collisions align reactive sites properly, so collision frequency alone greatly overestimates rates.
-
-Unimolecular reactions require energy activation within a single molecule. The Lindemann mechanism treats activation by collision, followed by either deactivation or reaction. At high pressure, activation is frequent enough that the rate becomes first order in reactant. At low pressure, activation collisions limit the rate, and the reaction can become second order overall. RRK and RRKM theories refine this by considering how energy is distributed among molecular modes.
-
-Diffusion control is the opposite limit from barrier control. If every encounter reacts, the rate constant is governed by how fast reactants find each other. In solution, viscosity, solvent structure, and electrostatic attraction or repulsion influence encounter rates. Many radical recombinations and proton-transfer processes approach diffusion control. If an activation barrier remains after encounter, the observed rate is lower.
-
-Potential energy surfaces provide the geometry of reaction. A minimum is a stable intermediate or reactant/product structure. A first-order saddle point is a transition state with one imaginary vibrational frequency along the reaction coordinate. Reaction paths connect minima through saddle points. For polyatomic reactions, surfaces are high-dimensional, and dynamics can involve energy redistribution, roaming pathways, and nonstatistical behavior.
-
-Electron transfer is distinctive because the transferring electron can move faster than nuclei reorganize. Marcus theory separates nuclear reorganization from electronic coupling. The activation barrier depends on how much solvent and molecular geometry must reorganize to make reactant and product electronic states degenerate. The inverted region is one of the striking predictions: after an optimum driving force, making the reaction more exergonic can increase the barrier.
-
-Ultrafast spectroscopy tests dynamics directly. Femtosecond pump-probe experiments can watch wavepacket motion, internal conversion, bond breaking, and electron transfer before thermal equilibrium is restored. These experiments connect the rate constants of kinetics to real-time molecular motion.
-
-## Visual
+## Competing pictures of barrier crossing
 
 ```mermaid
 graph LR
@@ -149,7 +135,21 @@ graph LR
 | Diffusion control | $k\sim4\pi RDN_A$ | fast solution reactions | encounter may not guarantee reaction |
 | Marcus theory | $\Delta^\ddagger G=(\lambda+\Delta G)^2/(4\lambda)$ | electron transfer | needs reorganization parameters |
 
-## Worked example 1: Activation energy from two rate constants
+Transition-state theory assumes a dividing surface between reactants and products. Reactants are in quasi-equilibrium with configurations near this surface, and successful crossing leads to products. If trajectories cross and then return to reactants, the simple theory overestimates the rate. The transmission coefficient $\kappa$ corrects for this in a coarse way. Modern reaction dynamics studies the actual motion on potential energy surfaces to understand such effects.
+
+Collision theory is most transparent for gas-phase bimolecular reactions. Molecules must collide with enough relative kinetic energy and suitable orientation. The steric factor can be much less than 1 for reactions requiring a specific geometry. For reactions between complex molecules, only a small fraction of collisions align reactive sites properly, so collision frequency alone greatly overestimates rates.
+
+Unimolecular reactions require energy activation within a single molecule. The Lindemann mechanism treats activation by collision, followed by either deactivation or reaction. At high pressure, activation is frequent enough that the rate becomes first order in reactant. At low pressure, activation collisions limit the rate, and the reaction can become second order overall. RRK and RRKM theories refine this by considering how energy is distributed among molecular modes.
+
+Diffusion control is the opposite limit from barrier control. If every encounter reacts, the rate constant is governed by how fast reactants find each other. In solution, viscosity, solvent structure, and electrostatic attraction or repulsion influence encounter rates. Many radical recombinations and proton-transfer processes approach diffusion control. If an activation barrier remains after encounter, the observed rate is lower.
+
+Potential energy surfaces provide the geometry of reaction. A minimum is a stable intermediate or reactant/product structure. A first-order saddle point is a transition state with one imaginary vibrational frequency along the reaction coordinate. Reaction paths connect minima through saddle points. For polyatomic reactions, surfaces are high-dimensional, and dynamics can involve energy redistribution, roaming pathways, and nonstatistical behavior.
+
+Electron transfer is distinctive because the transferring electron can move faster than nuclei reorganize. Marcus theory separates nuclear reorganization from electronic coupling. The activation barrier depends on how much solvent and molecular geometry must reorganize to make reactant and product electronic states degenerate. The inverted region is one of the striking predictions: after an optimum driving force, making the reaction more exergonic can increase the barrier.
+
+Ultrafast spectroscopy tests dynamics directly. Femtosecond pump-probe experiments can watch wavepacket motion, internal conversion, bond breaking, and electron transfer before thermal equilibrium is restored. These experiments connect the rate constants of kinetics to real-time molecular motion.
+
+## Estimating $E_a$ from two rate constants
 
 **Problem.** A reaction has $k_1=1.20\times10^{-3}\ \mathrm{s^{-1}}$ at $300.0\ \mathrm{K}$ and $k_2=8.50\times10^{-3}\ \mathrm{s^{-1}}$ at $330.0\ \mathrm{K}$. Estimate $E_a$.
 
@@ -195,7 +195,7 @@ $$
 
 **Checked answer.** $E_a=53.7\ \mathrm{kJ\ mol^{-1}}$. The rate increases by about sevenfold over $30\ \mathrm{K}$, consistent with a moderate barrier.
 
-## Worked example 2: Activation parameters from Eyring data
+## Recovering activation entropy from Eyring data
 
 **Problem.** At $298.15\ \mathrm{K}$, a reaction has $k=2.00\times10^2\ \mathrm{s^{-1}}$ and $\Delta^\ddagger H^\circ=45.0\ \mathrm{kJ\ mol^{-1}}$. Estimate $\Delta^\ddagger S^\circ$ using transition-state theory with $\kappa=1$.
 
@@ -254,7 +254,7 @@ $$
 
 **Checked answer.** The negative activation entropy suggests a more organized activated complex, common for associative processes.
 
-## Code
+## Computing Arrhenius and Eyring parameters
 
 ```python
 import numpy as np
@@ -275,7 +275,7 @@ print("Ea kJ/mol:", arrhenius_Ea(1.20e-3, 300.0, 8.50e-3, 330.0) / 1000)
 print("Delta S^ddagger J/K/mol:", eyring_entropy(2.00e2, 298.15, 45.0))
 ```
 
-## Common pitfalls
+## Diagnosing misleading activation parameters
 
 - Treating $A$ in the Arrhenius equation as always temperature-independent. It can contain temperature-dependent factors.
 - Calling $E_a$ the same as $\Delta^\ddagger H^\circ$. They are related but not identical.
@@ -283,19 +283,16 @@ print("Delta S^ddagger J/K/mol:", eyring_entropy(2.00e2, 298.15, 45.0))
 - Assuming every collision reacts. Orientation and energy disposal matter.
 - Forgetting the possibility of recrossing in transition-state theory; $\kappa$ accounts for this imperfectly.
 
-When extracting activation parameters, use a temperature range narrow enough for the model but broad enough for a reliable slope. Too narrow a range amplifies experimental noise; too broad a range can hide curvature. Plot residuals, not just the fitted line. If the Arrhenius plot curves, consider mechanism change, tunneling, diffusion limitation, or heat-capacity effects before reporting a single activation energy.
+When extracting activation parameters, use a temperature range narrow enough for the model but broad enough for a reliable slope. Too narrow a range amplifies experimental noise; too broad a range can hide curvature. Plot residuals as well as the fitted line. If the Arrhenius plot curves, consider mechanism change, tunneling, diffusion limitation, or heat-capacity effects before reporting a single activation energy.
 
 Distinguish energy-controlled and entropy-controlled effects. A reaction can be slow because the enthalpic barrier is high, because the transition state is entropically demanding, or both. Associative reactions often have negative activation entropies because two species must organize into one activated complex. Dissociative processes can have less negative or positive activation entropies because the activated structure has more freedom.
 
 For reaction dynamics, remember that a rate constant is an average over many microscopic events. Individual trajectories can exchange energy differently, scatter into different angles, or recross the dividing surface. Bulk kinetics smooths over these details, while molecular beams and ultrafast spectroscopy reveal them. Both descriptions are valid at different levels.
 
-A useful diagnostic is to compare activation parameters across related reactions rather than interpreting one number alone. A substituent, solvent, isotope, or catalyst that lowers $\Delta^\ddagger H$ but makes $\Delta^\ddagger S$ more negative may have a mixed effect on rate. Trends reveal whether the reaction is becoming electronically easier, geometrically more organized, diffusion-limited, or mechanistically different.
+A useful diagnostic is to compare activation parameters across related reactions rather than interpreting one number alone. A substituent, solvent, isotope, or catalyst that lowers $\Delta^\ddagger H$ but makes $\Delta^\ddagger S$ more negative may have a mixed effect on rate. Trends reveal whether the reaction is becoming electronically easier, geometrically more organized, diffusion-limited, or mechanistically different. Report the temperature scale in kelvins.
 
-Report the temperature scale in kelvins.
+<div className="see-also">
 
-## Connections
+See also: [Rate laws and reaction mechanisms](/chemistry/physical-chemistry/rate-laws-and-reaction-mechanisms) · [Quantum models of motion](/chemistry/physical-chemistry/quantum-models-of-motion) · [Catalysis, surfaces, macromolecules, and solids](/chemistry/physical-chemistry/catalysis-surfaces-macromolecules-and-solids) · [Boltzmann distribution and partition functions](/chemistry/physical-chemistry/boltzmann-distribution-and-partition-functions)
 
-- [Rate laws and reaction mechanisms](/chemistry/physical-chemistry/rate-laws-and-reaction-mechanisms)
-- [Quantum models of motion](/chemistry/physical-chemistry/quantum-models-of-motion)
-- [Catalysis, surfaces, macromolecules, and solids](/chemistry/physical-chemistry/catalysis-surfaces-macromolecules-and-solids)
-- [Boltzmann distribution and partition functions](/chemistry/physical-chemistry/boltzmann-distribution-and-partition-functions)
+</div>

@@ -5,23 +5,11 @@ sidebar_position: 1
 
 # Quantum Sensing
 
-Quantum sensing treats measurement as a controlled parameter-estimation problem. A probe is prepared in a known quantum state, allowed to interact with an unknown physical parameter, and then measured so that the parameter can be inferred. The parameter might be a magnetic field, acceleration, rotation, gravitational potential, frequency shift, optical phase, force, or a tiny displacement. The central question is not merely whether the parameter can be detected, but how precisely it can be estimated under a specified resource budget: number of probes, interrogation time, optical power, energy, bandwidth, volume, or damage allowed to a sample.
+Quantum sensing treats measurement as a controlled parameter-estimation problem. A probe is prepared in a known quantum state, allowed to interact with an unknown physical parameter, and then measured so that the parameter can be inferred. The parameter might be a magnetic field, acceleration, rotation, gravitational potential, frequency shift, optical phase, force, or a tiny displacement. Detection alone is not enough; precision must be stated against a resource budget such as probe number, interrogation time, optical power, energy, bandwidth, volume, or damage allowed to a sample.
 
-The subject sits between [quantum mechanics](/physics/quantum-mechanics/), statistical estimation, and experimental device physics. Quantum effects matter because probes can be prepared in superposition, entangled across many particles, spin-squeezed to redistribute uncertainty, or read out with photon-counting and phase-sensitive measurements. These features can improve sensitivity, bandwidth, spatial resolution, or calibration stability, but they do not remove ordinary constraints such as loss, technical noise, decoherence, finite duty cycle, and imperfect readout.
+The subject sits between [quantum mechanics](/physics/quantum-mechanics/intro), statistical estimation, and experimental device physics. Quantum effects matter because probes can be prepared in superposition, entangled across many particles, spin-squeezed to redistribute uncertainty, or read out with photon-counting and phase-sensitive measurements. These features can improve sensitivity, bandwidth, spatial resolution, or calibration stability, but they do not remove ordinary constraints such as loss, technical noise, decoherence, finite duty cycle, and imperfect readout.
 
-![A fluorescence microscope image shows a bright irradiated spot in diamond containing many nitrogen-vacancy centers.](https://commons.wikimedia.org/wiki/Special:FilePath/Irradiated_spot_of_diamond_with_high_concentration_of_nitrogen-vacancy_centers.jpg)
-
-*Figure: NV-center sensing becomes a laboratory instrument when diamond defects, optical pumping, fluorescence collection, and microwave control are combined. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Irradiated_spot_of_diamond_with_high_concentration_of_nitrogen-vacancy_centers.jpg), Hughes et al., CC BY 4.0.*
-
-![A historic NIST cesium beam frequency standard shows the apparatus behind early atomic-clock metrology.](https://commons.wikimedia.org/wiki/Special:FilePath/Atomic_Clock045.jpg)
-
-*Figure: Atomic clocks are quantum sensors whose output is a disciplined frequency or time scale rather than an image or a single event count. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Atomic_Clock045.jpg), National Institute of Standards and Technology, public domain.*
-
-![The LIGO Hanford interferometer has two long perpendicular arms used for precision laser interferometry.](https://commons.wikimedia.org/wiki/Special:FilePath/LIGO_at_Hanford%2C_Washington_%28LIGO_Pic_16-CC%29.jpg)
-
-*Figure: LIGO makes quantum sensing visible at facility scale: displacement readout, laser power, mirror motion, seismic isolation, and quantum noise all enter the measurement budget. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:LIGO_at_Hanford%2C_Washington_%28LIGO_Pic_16-CC%29.jpg), LIGO Laboratory, CC BY 4.0.*
-
-## Definitions
+## Encoding a parameter into a quantum state
 
 **Quantum metrology** is the use of quantum systems and quantum measurement theory to estimate parameters as precisely as possible. In its simplest mathematical form, an unknown scalar parameter $\theta$ is encoded into a probe state:
 
@@ -106,7 +94,7 @@ $$
 
 This formula makes the physics transparent. A probe estimates $\theta$ well when the initial state has a large spread over eigenvalues of the generator $G$, because a large generator variance makes the state change rapidly as $\theta$ changes.
 
-## Key results
+## From Fisher information to quantum limits
 
 ### Fisher information in Ramsey interferometry
 
@@ -166,7 +154,7 @@ F_\theta
 \end{aligned}
 $$
 
-away from points where the displayed measurement basis has zero slope and an adaptive phase setting is needed. With $N$ independent probes, Fisher information adds, so $F_\theta=N$ and
+at regular operating points. At a perfectly dark or bright fringe, the expression is understood by continuity and the phase can be locally ambiguous, so experiments usually work near quadrature or use adaptive phase control. With $N$ independent probes, Fisher information adds, so $F_\theta=N$ and
 
 $$
 \Delta\theta_{\mathrm{SQL}} \ge \frac{1}{\sqrt{\nu N}}.
@@ -240,7 +228,7 @@ The important warning is that the Heisenberg limit is a scaling law for an ideal
 
 **Photon-counting sensors.** Single-photon avalanche diodes, superconducting nanowire single-photon detectors, transition-edge sensors, and related devices are not always "quantum sensors" in the entanglement-enhanced metrology sense, but they are essential quantum measurement devices. They detect individual quanta and enable low-light astronomy, fluorescence microscopy, lidar, quantum communication, biological imaging with reduced illumination dose, and time-correlated single-photon counting. Their advantages are high sensitivity and timing resolution; their limits include dark counts, dead time, afterpulsing, saturation, cryogenic requirements for some technologies, and detector calibration.
 
-## Visual
+### Ramsey, NV-center, and atomic-clock signal chains
 
 ```mermaid
 flowchart TB
@@ -282,7 +270,7 @@ flowchart TB
   ClockOut --> Sens
 ```
 
-The diagram expands the generic prepare-interact-measure loop into three concrete sensing architectures. Ramsey interferometry labels the two $\pi/2$ pulses, free-evolution phase accumulation, shot-based readout, and estimator; the NV block shows green optical pumping, microwave spin control, magnetic-field interaction, and red fluorescence readout. The atomic-clock block makes the feedback path explicit: the measured atomic transition creates an error signal that steers the local oscillator through the actuator.
+Ramsey interferometry uses two $\pi/2$ pulses around free phase accumulation, followed by shot-based readout and estimation. The NV block combines green optical pumping, microwave spin control, magnetic-field interaction, and red fluorescence readout. In the atomic-clock loop, the measured transition creates an error signal that steers the local oscillator through the actuator.
 
 | Platform | Parameter sensed | Typical sensitivity or scale | Frequency or time range | Maturity |
 |---|---|---:|---|---|
@@ -310,7 +298,7 @@ Delta theta
        1      10      100
 ```
 
-## Worked example 1: SQL versus Heisenberg scaling for ten probes
+## Ten probes at the SQL and Heisenberg limits
 
 **Problem.** Compare the phase uncertainty for $N=10$ independent Ramsey probes at the standard quantum limit with an ideal $N=10$ entangled GHZ or NOON probe at the Heisenberg limit. Use one experimental block and ignore constant prefactors.
 
@@ -381,9 +369,9 @@ $$
 \end{aligned}
 $$
 
-**Checked answer.** Ten perfectly entangled probes improve the phase uncertainty by a factor of $\sqrt{10}\approx 3.16$ compared with ten independent probes, under the same idealized resource count. If the whole experiment is repeated $\nu$ times, both uncertainties acquire the same extra factor $1/\sqrt{\nu}$, so the relative improvement remains $\sqrt{10}$.
+Ten perfectly entangled probes improve the phase uncertainty by a factor of $\sqrt{10}\approx 3.16$ compared with ten independent probes under the same idealized resource count. If the whole experiment is repeated $\nu$ times, both uncertainties acquire the same factor $1/\sqrt{\nu}$, so the relative improvement remains $\sqrt{10}$.
 
-## Worked example 2: NV-center Ramsey magnetometry estimate
+## An idealized NV-center sensitivity estimate
 
 **Problem.** Estimate the magnetic-field sensitivity of an idealized single NV-center Ramsey magnetometer. Suppose the measurement contrast is $C=0.20$, the free precession time is $\tau=10~\mu\mathrm{s}$, the full experimental cycle time is $t_c=20~\mu\mathrm{s}$, and the total integration time is $T_{\mathrm{int}}=1~\mathrm{s}$. Use the electron gyromagnetic ratio
 
@@ -478,9 +466,9 @@ $$
 \eta_B \approx 13~\mathrm{nT}/\sqrt{\mathrm{Hz}}.
 $$
 
-**Checked answer.** Under the idealized assumptions, the NV magnetometer reaches about $13~\mathrm{nT}/\sqrt{\mathrm{Hz}}$. Real single-NV experiments may be worse or better depending on fluorescence collection, spin readout protocol, $T_2^*$, pulse overhead, background light, and whether repeated or ensemble readout is available.
+Under the idealized assumptions, the NV magnetometer reaches about $13~\mathrm{nT}/\sqrt{\mathrm{Hz}}$. A real single-NV result depends on fluorescence collection, spin readout protocol, $T_2^*$, pulse overhead, background light, and whether repeated or ensemble readout is available.
 
-## Code
+## Computing Ramsey Fisher information
 
 The following Python sketch computes the classical Fisher information for the two-outcome Ramsey measurement above. It also shows why the value is one for an ideal single two-level probe over most phases.
 
@@ -521,7 +509,7 @@ print("Improvement factor:", sql_uncertainty / heisenberg_uncertainty)
 
 This code clips probabilities only to avoid division by zero at exactly dark or bright fringes. In an experiment one normally works near a quadrature point or uses adaptive feedback so the chosen measurement has good local slope.
 
-## Common pitfalls
+## When metrological advantage disappears
 
 - Confusing the SQL with a non-quantum limit. The SQL is the scaling for independent quantum probes; it is still a quantum measurement limit.
 - Quoting Heisenberg scaling without a resource model. The comparison changes if one counts total time, total energy, preparation failures, or adaptive measurements.
@@ -532,7 +520,7 @@ This code clips probabilities only to avoid division by zero at exactly dark or 
 - Assuming every photon-counting or low-noise instrument demonstrates a quantum advantage. A quantum sensor should be compared against the best classical or conventional sensor under the same constraints.
 - Equating laboratory sensitivity with field utility. Deployable sensors also need calibration, robustness, size, power control, environmental rejection, and maintainable operation.
 
-## Applications
+## Where quantum sensors earn their complexity
 
 Quantum sensing is most useful when a physical parameter is weak, localized, or must be measured with a severe resource constraint. In GPS-denied navigation, atom interferometers and advanced clocks can provide inertial or timing information when satellite signals are unavailable or unreliable. Defense-related use cases are usually framed around resilient navigation, timing, and field detection rather than speculative claims of universal target finding.
 
@@ -540,16 +528,20 @@ Biomedical imaging is another major target. NV-diamond magnetometers can measure
 
 Quantum sensors also support fundamental physics. Clock networks and magnetometers can search for dark matter candidates that would shift constants or produce oscillating fields. Atom interferometers can test gravity, measure constants, and probe equivalence-principle violations. Gravitational-wave detectors use squeezed light to improve astrophysical reach. In all of these applications, the key engineering question is whether the quantum method beats the best non-quantum baseline after stability, bandwidth, size, power, calibration, and cost are included.
 
-## Connections
-
-- [Quantum computing](/quantum-information-science/quantum-computing/) shares hardware with sensing: trapped ions, superconducting circuits, neutral atoms, spins in solids, and photonic systems can be qubits, clocks, or probes depending on how they are controlled and read out.
-- [Quantum mechanics](/physics/quantum-mechanics/) supplies the measurement postulates, unitary evolution, spin dynamics, superposition, entanglement, and decoherence models used throughout quantum sensing.
-- [Probability and random variables](/math/probability-and-random-variables/) gives the language of likelihoods, variance, independent trials, and Fisher information.
-- [Estimation and confidence intervals](/math/statistics/estimation-and-confidence-intervals) connects the Cramer-Rao bound to estimator bias, variance, asymptotic normality, and confidence intervals.
-- [Quantum communication](/quantum-information-science/quantum-communication/) overlaps through photon sources, single-photon detectors, squeezed states, and phase-sensitive optical measurement.
-
 ## Further reading
 
 - Degen, Reinhard, and Cappellaro, "Quantum Sensing," Reviews of Modern Physics, 2017. This is a broad review of definitions, platforms, and performance metrics.
 - Pezze, Smerzi, Oberthaler, Schmied, and Treutlein, "Quantum metrology with non-classical states of atomic ensembles," Reviews of Modern Physics, 2018. This is a detailed reference for spin squeezing and many-body metrology.
 - Giovannetti, Lloyd, and Maccone, "Quantum-Enhanced Measurements: Beating the Standard Quantum Limit," Science, 2004, and later follow-up reviews. These papers are standard starting points for Heisenberg scaling and resource-counting issues.
+
+<div className="see-also">
+
+See also:
+
+- [Quantum computing](/quantum-information-science/quantum-computing/intro) shares hardware with sensing: trapped ions, superconducting circuits, neutral atoms, spins in solids, and photonic systems can be qubits, clocks, or probes depending on how they are controlled and read out.
+- [Quantum mechanics](/physics/quantum-mechanics/intro) supplies the measurement postulates, unitary evolution, spin dynamics, superposition, entanglement, and decoherence models used throughout quantum sensing.
+- [Probability](/math/probability/intro) gives the language of likelihoods, variance, independent trials, and Fisher information.
+- [Estimation and confidence intervals](/math/statistics/estimation-and-confidence-intervals) connects the Cramer-Rao bound to estimator bias, variance, asymptotic normality, and confidence intervals.
+- [Quantum communication](/quantum-information-science/quantum-communication/intro) overlaps through photon sources, single-photon detectors, squeezed states, and phase-sensitive optical measurement.
+
+</div>

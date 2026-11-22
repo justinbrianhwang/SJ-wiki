@@ -7,13 +7,9 @@ sidebar_position: 1
 
 These notes follow the scanned textbook *Microprocessors & Microcontroller Systems* by D.A. Godse and A.P. Godse. The PDF is image-based in this workspace, so the usable source signals are its metadata and visually inspected table of contents. That contents shows a course centered on the 8085 microprocessor and the MCS-51/8051 microcontroller, then extended through 8255 interfacing, external devices, serial buses, serial EEPROM/DS1307, 89C51 derivatives, AVR AT90S2313, and PIC16CXX.
 
-![An Intel P8051 chip photo shows the microcontroller as an actual integrated circuit package.](https://commons.wikimedia.org/wiki/Special:FilePath/KL_Intel_P8051.jpg)
-
-*Figure: The 8051 pages discuss an architecture that existed as widely used embedded chips. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:KL_Intel_P8051.jpg), Konrad Lischka, CC BY-SA 3.0/GFDL.*
-
 The subject is about building a working digital system from a processor, memory, I/O circuits, and software. The 8085 chapters teach external bus thinking: address decoding, machine cycles, memory maps, I/O-mapped ports, DMA, and assembly programs. The 8051 chapters shift to microcontroller thinking: on-chip RAM, SFRs, ports, timers, serial communication, interrupts, and device interfacing. The later chapters show that once the vocabulary is clear, new controller families can be compared by memory organization, peripheral set, interrupt model, power modes, and programming style.
 
-## Definitions
+## Processor, controller, and interface boundaries
 
 A **microprocessor** is a CPU on an integrated circuit. In this course the main microprocessor is the Intel 8085, an 8-bit CPU with a 16-bit address bus. It requires external memory and I/O hardware to form a complete system.
 
@@ -25,25 +21,25 @@ An **embedded system** is a computer built into a product or instrument to contr
 
 An **interface** is the hardware and software boundary between the processor and another device. It may be a memory bus, an I/O port, a keyboard matrix, an ADC, a DAC, a serial bus, or a protocol such as Modbus.
 
-The generated detail pages are:
+Reading order:
 
 | Sidebar | Page | Source coverage |
 |---:|---|---|
 | 2 | [Microprocessor and microcomputer basics](/cs/embedded/microprocessor-microcomputer-basics) | Chapter 1 foundations |
 | 3 | [8085 architecture, buses, and timing](/cs/embedded/intel-8085-architecture-buses-timing) | Chapter 2 architecture and cycles |
-| 4 | [8085 instruction set and addressing](/cs/embedded/8085-instruction-set-addressing) | Chapter 3 instruction set |
-| 5 | [8085 assembly programming patterns](/cs/embedded/8085-assembly-programming-patterns) | Chapters 4 and 5 programming, stacks, subroutines |
-| 6 | [8085 I/O, memory, and DMA interfacing](/cs/embedded/8085-io-memory-dma-interfacing) | Chapter 6 I/O and memory interface |
-| 7 | [8051 architecture, memory, and ports](/cs/embedded/8051-architecture-memory-ports) | Chapter 7 8051 hardware |
-| 8 | [8051 instruction set and programming](/cs/embedded/8051-instruction-set-programming) | Chapter 8 8051 instructions |
-| 9 | [8051 timers, serial port, and interrupts](/cs/embedded/8051-timers-serial-interrupts) | Chapters 9, 10, and 11 |
-| 10 | [8255 programmable peripheral interface](/cs/embedded/8255-programmable-peripheral-interface) | Chapter 12 8255 |
-| 11 | [8051 external-world interfacing](/cs/embedded/8051-external-world-interfacing) | Chapter 13 devices and converters |
+| 4 | [8085 instruction set and addressing](/cs/embedded/instruction-set-addressing) | Chapter 3 instruction set |
+| 5 | [8085 assembly programming patterns](/cs/embedded/assembly-programming-patterns) | Chapters 4 and 5 programming, stacks, subroutines |
+| 6 | [8085 I/O, memory, and DMA interfacing](/cs/embedded/io-memory-dma-interfacing) | Chapter 6 I/O and memory interface |
+| 7 | [8051 architecture, memory, and ports](/cs/embedded/architecture-memory-ports) | Chapter 7 8051 hardware |
+| 8 | [8051 instruction set and programming](/cs/embedded/instruction-set-programming) | Chapter 8 8051 instructions |
+| 9 | [8051 timers, serial port, and interrupts](/cs/embedded/timers-serial-interrupts) | Chapters 9, 10, and 11 |
+| 10 | [8255 programmable peripheral interface](/cs/embedded/programmable-peripheral-interface) | Chapter 12 8255 |
+| 11 | [8051 external-world interfacing](/cs/embedded/external-world-interfacing) | Chapter 13 devices and converters |
 | 12 | [Serial buses and embedded protocols](/cs/embedded/serial-buses-embedded-protocols) | Chapter 14 buses and protocols |
 | 13 | [Serial EEPROM and DS1307 RTC interfacing](/cs/embedded/serial-eeprom-rtc-ds1307) | Chapter 15 EEPROM and RTC |
 | 14 | [Microcontroller derivatives, AVR, and PIC](/cs/embedded/microcontroller-derivatives-avr-pic) | Chapters 16, 17, and 18 |
 
-## Key results
+## Memory maps, timing, and two-sided interfaces
 
 The first key result is that processor architecture and system architecture are different. The 8085 CPU has registers, an ALU, flags, a program counter, and bus-control logic; the surrounding system must still supply memory, latches, decoders, I/O ports, and devices. The 8051 integrates more of this system, so the designer configures internal SFRs instead of wiring every function externally.
 
@@ -57,7 +53,7 @@ The fifth key result is that assembly language is a precision tool. It reveals f
 
 The sixth key result is that microcontroller families share patterns but not details. 8051, AVR, and PIC devices all have program memory, data storage, ports, timers, interrupts, and watchdog concepts, but their instruction sets, register files, memory banking, vector rules, and peripheral registers differ. Transfer the questions, not the exact code.
 
-## Visual
+## External-bus and single-chip designs
 
 ```mermaid
 flowchart TB
@@ -109,7 +105,7 @@ This overview diagram contrasts the two architectural styles used throughout the
 | Communication | How do devices exchange messages? | RS-232, RS-485, I2C, Modbus, DS1307, EEPROM |
 | Derivatives | What changes across families? | 89C51RD, AT90S2313, PIC16CXX |
 
-## Worked example 1: Classifying a small controller design
+## Classifying an 8085 laboratory trainer
 
 Problem: A laboratory trainer uses an 8085 CPU, a separate EPROM, a separate RAM chip, a 74LS373 latch for `AD7`-`AD0`, an address decoder, and an 8255 for switches and LEDs. Is this best described as a microprocessor system or a microcontroller system?
 
@@ -129,7 +125,7 @@ Answer: it is a microprocessor-based microcomputer system, not a single-chip mic
 
 Check: The presence of an 8255 does not make it a microcontroller. It confirms that I/O is being added externally to a microprocessor system.
 
-## Worked example 2: Choosing the right topic path for a data logger
+## Designing the reading path for a data logger
 
 Problem: A student wants to build an 8051-based data logger that reads an analog temperature sensor once per second, stores readings in serial EEPROM, and timestamps each reading with a DS1307. Which note pages should be studied first, and why?
 
@@ -151,7 +147,7 @@ Answer: the recommended path is 8051 architecture -> 8051 programming -> timers/
 
 Check: Beginning with Modbus or PIC derivatives would not help the immediate logger design; those topics are useful later for communication networks or family comparison.
 
-## Code
+## Firmware shape for the data logger
 
 ```c
 /* High-level embedded C skeleton for the data-logger example.
@@ -186,7 +182,7 @@ int main(void) {
 }
 ```
 
-## Common pitfalls
+## Boundaries that embedded code cannot ignore
 
 - Reading the whole subject as a list of chips instead of a chain of design problems: CPU, memory, I/O, timing, peripherals, protocols, and reliability.
 - Mixing 8085 and 8051 instruction rules. The names, memory spaces, registers, and flags are different.
@@ -195,11 +191,8 @@ int main(void) {
 - Ignoring electrical details because the software seems simple. Serial links, ADCs, displays, and motors all require correct hardware assumptions.
 - Forgetting that these notes are organized from architecture toward application. Jumping directly to protocols is harder without the earlier bus and register model.
 
-## Connections
+<div className="see-also">
 
-- [Microprocessor and microcomputer basics](/cs/embedded/microprocessor-microcomputer-basics)
-- [8085 architecture, buses, and timing](/cs/embedded/intel-8085-architecture-buses-timing)
-- [8051 architecture, memory, and ports](/cs/embedded/8051-architecture-memory-ports)
-- [Serial buses and embedded protocols](/cs/embedded/serial-buses-embedded-protocols)
-- [Microcontroller derivatives, AVR, and PIC](/cs/embedded/microcontroller-derivatives-avr-pic)
+See also: [Microprocessor and microcomputer basics](/cs/embedded/microprocessor-microcomputer-basics) · [8085 architecture, buses, and timing](/cs/embedded/intel-8085-architecture-buses-timing) · [8051 architecture, memory, and ports](/cs/embedded/architecture-memory-ports) · [Serial buses and embedded protocols](/cs/embedded/serial-buses-embedded-protocols) · [Microcontroller derivatives, AVR, and PIC](/cs/embedded/microcontroller-derivatives-avr-pic)
 
+</div>

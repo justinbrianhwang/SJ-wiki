@@ -5,166 +5,472 @@ sidebar_position: 4
 
 # Two-Dimensional Motion: Projectiles and Circular Motion
 
-Two-dimensional motion is where vector components become necessary. A projectile can accelerate downward while moving horizontally, and uniform circular motion can have constant speed while velocity changes every instant. Perpendicular components can often be analyzed independently when acceleration components are known.
+Motion in a plane is governed by the same definitions as motion on a line, but position, velocity, and acceleration are vectors. The main choice is the coordinate system. Fixed horizontal and vertical axes make projectile motion nearly separable. Tangential and normal directions follow a curved path and expose the two distinct ways velocity can change: its magnitude can change, and its direction can turn.
 
-Projectile motion and circular motion teach complementary lessons. Projectile motion separates into horizontal constant-velocity motion and vertical constant-acceleration motion when air resistance is neglected. Circular motion keeps radius fixed and bends velocity with inward acceleration.
+Projectiles and circular motion are often taught together because each defeats a common shortcut. A projectile has one time coordinate shared by two component equations; the components are not two separate journeys. An object moving around a circle can have constant speed while retaining a nonzero acceleration.
 
-## Definitions
+## Vector kinematics in a fixed plane
 
-- **Projectile motion** is motion under gravity alone after launch.
-- The ideal projectile acceleration is $\vec a=(0,-g)$ for horizontal $x$ and upward $y$.
-- **Range** is horizontal displacement to a specified landing height.
-- **Uniform circular motion** has constant speed on a circle but nonzero acceleration.
-- **Centripetal acceleration** points inward with magnitude $a_c=v^2/r=\omega^2r$.
-- **Angular speed** is $\omega=d\theta/dt$, and $v=r\omega$ for rigid circular motion.
+Write the position as
 
-The definitions in this page are meant to be operational. A symbol is useful only after you know how it would be measured, what units it carries, what sign convention is being used, and which idealizations are being assumed. Before substituting numbers, identify the system boundary and the relevant state variables. For a particle problem the state variables might be position and velocity; for a circuit they might be charge, current, and potential difference; for a thermodynamic process they might be pressure, volume, temperature, and internal energy.
+$$
+\mathbf r(t)=x(t)\mathbf i+y(t)\mathbf j.
+$$
 
-A second habit is to separate model statements from algebra. A model statement says something physical, such as "air resistance is negligible", "the string is massless", "the gas is ideal", "the process is quasistatic", or "the field is uniform". Algebra then follows from those statements. If the model changes, the algebra may still look familiar but the result can become invalid. Write the model assumptions as part of the solution, not as an afterthought.
+Differentiation gives
 
-## Key results
+$$
+\mathbf v=\dot x\mathbf i+\dot y\mathbf j,
+\qquad
+\mathbf a=\ddot x\mathbf i+\ddot y\mathbf j.
+$$
 
-For a projectile launched with speed $v_0$ at angle $\theta$,
+If acceleration is constant, integration produces the vector equations
+
+$$
+\mathbf v=\mathbf v_0+\mathbf a t,
+$$
+
+$$
+\mathbf r=\mathbf r_0+\mathbf v_0t+\frac12\mathbf a t^2.
+$$
+
+These are shorthand for independent scalar equations along fixed perpendicular axes. The independence comes from vector addition, not from separate clocks: the same $t$ appears in every component.
+
+## Building the projectile equations
+
+Neglect air resistance and treat gravity as uniform near Earth's surface. Taking $x$ horizontal and $y$ upward,
+
+$$
+\mathbf a=-g\mathbf j.
+$$
+
+A launch speed $v_0$ at angle $\theta$ above horizontal has components
+
+$$
+v_{0x}=v_0\cos\theta,
+\qquad
+v_{0y}=v_0\sin\theta.
+$$
+
+If the launch point is $(x_0,y_0)$, integration gives
 
 $$
 \begin{aligned}
-x(t)&=v_0\cos\theta\,t,\\
-y(t)&=v_0\sin\theta\,t-\frac12gt^2,\\
+x(t)&=x_0+v_0\cos\theta\,t,\\
+y(t)&=y_0+v_0\sin\theta\,t-\frac12gt^2,\\
 v_x(t)&=v_0\cos\theta,\\
 v_y(t)&=v_0\sin\theta-gt.
 \end{aligned}
 $$
 
-If launch and landing heights are equal,
+At the top of the trajectory, $v_y=0$ but $v_x$ remains unchanged, so the projectile is not momentarily at rest unless it was launched vertically. The time to the apex is
 
 $$
-T=\frac{2v_0\sin\theta}{g},\quad R=\frac{v_0^2\sin2\theta}{g}.
+t_{top}=\frac{v_0\sin\theta}{g},
 $$
 
-For circular motion,
+and the height gained above launch is
 
 $$
-a_c=\frac{v^2}{r}=\omega^2r,\quad T=\frac{2\pi r}{v}.
+\Delta y_{max}=\frac{v_0^2\sin^2\theta}{2g}.
 $$
 
-The inward acceleration in uniform circular motion changes direction of velocity, not its magnitude.
-
-These formulas are conditional statements. Each equation is powerful inside its domain and misleading outside it. Constant-acceleration kinematics requires constant acceleration. Conservation of mechanical energy requires either no nonconservative work or an explicit accounting of it. Gauss's law is always true, but it directly gives an electric field only when symmetry lets the flux integral simplify. Bernoulli's equation assumes steady, incompressible, nonviscous flow along a streamline. Keeping the conditions attached to the formula is part of the formula.
-
-For numerical work, solve symbolically before inserting values whenever possible. A symbolic expression exposes dimensions and limiting behavior. If a mass should cancel, it should cancel before arithmetic. If an answer should decrease when distance grows, the final expression should show that trend. If an answer becomes infinite in an unphysical limit, that usually marks the boundary where the model has stopped applying.
-
-## Visual
-
-```mermaid
-graph LR
-  A[Physical situation] --> B[Choose model]
-  B --> C[Define variables]
-  C --> D[Apply key law]
-  D --> E[Solve symbolically]
-  E --> F[Check units and limits]
-```
-
-| Quantity or idea | Use | Check |
-|---|---|---|
-| Projectile $x$ | $a_x=0$ | horizontal velocity stays constant |
-| Projectile $y$ | $a_y=-g$ | vertical velocity changes linearly |
-| Circular speed | $v=r\omega$ | radians are dimensionless |
-| Centripetal acceleration | $v^2/r$ | points inward |
-
-## Worked example 1: Projectile range
-
-**Problem.** A ball is launched at $20\,\mathrm{m/s}$ and $35^\circ$ above horizontal from ground level. Find flight time and range.
-
-**Method.** Resolve initial velocity and use vertical motion for time.
-
-1. Components:
+Eliminating time gives the path itself. From $t=(x-x_0)/(v_0\cos\theta)$,
 
 $$
-v_{0x}=20\cos35^\circ=16.38\,\mathrm{m/s},
-\quad v_{0y}=20\sin35^\circ=11.47\,\mathrm{m/s}.
+y-y_0=(x-x_0)\tan\theta
+-\frac{g(x-x_0)^2}{2v_0^2\cos^2\theta}.
 $$
 
-2. Landing condition $y=0$:
+The negative quadratic coefficient identifies a parabola. This result depends on uniform vertical acceleration and zero horizontal acceleration; aerodynamic drag destroys the exact parabolic form.
+
+## Equal-height range and its restricted optimum
+
+When the projectile lands at its launch elevation, set $y-y_0=0$:
 
 $$
-0=t(v_{0y}-\frac12gt).
+0=t\left(v_0\sin\theta-\frac12gt\right).
 $$
 
-3. Nonzero time:
+The root $t=0$ represents launch. The later root gives the flight time
 
 $$
-t=\frac{2v_{0y}}{g}=\frac{2(11.47)}{9.8}=2.34\,\mathrm{s}.
+T=\frac{2v_0\sin\theta}{g}.
 $$
 
-4. Range:
+Multiplying by the constant horizontal velocity gives
 
 $$
-R=v_{0x}t=(16.38)(2.34)=38.3\,\mathrm{m}.
+R=v_0\cos\theta\,T
+=\frac{v_0^2\sin2\theta}{g}.
 $$
 
-**Checked answer.** Range is less than $v_0t$ because not all launch speed is horizontal.
+For fixed $v_0$ and equal launch and landing heights, $\sin2\theta$ is largest at $2\theta=90^\circ$, so the range is maximal at $45^\circ$. Complementary angles, such as $30^\circ$ and $60^\circ$, have the same ideal range. Neither statement survives unchanged when launch height, drag, or terrain geometry changes.
 
-## Worked example 2: Turntable acceleration
+### Worked example: launch and landing at the same height
 
-**Problem.** A point $0.15\,\mathrm{m}$ from the center of a turntable rotates at $45\,\mathrm{rpm}$. Find speed and centripetal acceleration.
+A ball is launched at $20.0\,\mathrm{m/s}$ and $35.0^\circ$ above horizontal. Find the time of flight, maximum height, and range using $g=9.81\,\mathrm{m/s^2}$.
 
-**Method.** Convert rpm to rad/s, then use $v=r\omega$ and $a_c=\omega^2r$.
-
-1. Angular speed:
+Resolve the initial velocity:
 
 $$
-\omega=45\frac{\mathrm{rev}}{\mathrm{min}}\frac{2\pi\,\mathrm{rad}}{\mathrm{rev}}\frac{1\,\mathrm{min}}{60\,\mathrm{s}}=4.71\,\mathrm{rad/s}.
+v_{0x}=20.0\cos35.0^\circ=16.38\,\mathrm{m/s},
 $$
 
-2. Speed:
-
 $$
-v=(0.15)(4.71)=0.707\,\mathrm{m/s}.
+v_{0y}=20.0\sin35.0^\circ=11.47\,\mathrm{m/s}.
 $$
 
-3. Acceleration:
+The nonzero landing-time root is
 
 $$
-a_c=(4.71)^2(0.15)=3.33\,\mathrm{m/s^2}.
+T=\frac{2v_{0y}}{g}
+=\frac{2(11.47)}{9.81}
+=2.34\,\mathrm s.
 $$
 
-**Checked answer.** Acceleration is inward and about one third of $g$.
+The height above launch at the apex is
 
-## Code
+$$
+\Delta y_{max}=\frac{v_{0y}^2}{2g}
+=\frac{(11.47)^2}{2(9.81)}
+=6.71\,\mathrm m.
+$$
 
-```python
-import math
-v0, theta, g = 20.0, math.radians(35), 9.8
-vx, vy = v0*math.cos(theta), v0*math.sin(theta)
-t = 2*vy/g
-omega = 45*2*math.pi/60
-r = 0.15
-print(f"time = {t:.2f} s, range = {vx*t:.1f} m")
-print(f"speed = {r*omega:.3f} m/s, ac = {omega**2*r:.2f} m/s^2")
-```
+Finally,
 
-## Common pitfalls
+$$
+R=v_{0x}T=(16.38)(2.34)=38.3\,\mathrm m.
+$$
 
-- Using equal-height range formulas when final height differs.
-- Forgetting both components share the same time.
-- Calling centripetal acceleration a force.
-- Assuming constant speed means zero acceleration.
-- Always check units, signs, and limiting cases before treating a numerical result as finished.
+As a check, the compact range formula gives $20.0^2\sin70^\circ/9.81=38.3\,\mathrm m$.
 
-A final check is to perturb one input mentally. Doubling a distance, mass, charge, stiffness, frequency, or temperature should change the answer in a way that matches the physical story. If the algebra says the opposite, revisit the setup before blaming arithmetic. Also remember that a negative answer is often information: it may indicate direction opposite to the chosen axis, work done by a system rather than on it, or a potential change that lowers the energy of a positive or negative charge differently.
+## Landing at another elevation
 
-When a problem feels difficult, the hidden issue is often not the last algebraic step but the first modeling decision. Re-read the words and mark what is being idealized: frictionless surface, ideal string, point charge, thin lens, small angle, steady flow, reversible process, nonrelativistic particle, or uniform field. Then mark what is conserved, if anything. Energy conservation, momentum conservation, angular momentum conservation, charge conservation, and entropy constraints are not interchangeable; each one has a system boundary and a transfer condition. If an external impulse acts, momentum may not be conserved for the chosen system. If friction acts within a block-floor system, mechanical energy is not conserved even though total energy is. If a Gaussian surface encloses no net charge, flux is zero, but the field at points on the surface need not be zero.
+If the final elevation differs by $\Delta y=y_f-y_0$, the vertical condition is
 
-Another common pitfall is using a memorized equation in only its most familiar direction. A formula is a relationship, so practice solving it for different unknowns. In kinematics, solve for time, acceleration, or displacement depending on what the data support. In circuits, solve Ohm's law for voltage, current, or resistance and then check power. In optics, solve the thin-lens equation for image distance, object distance, or focal length and compare the sign with a ray diagram. In thermodynamics, rearrange the first law only after deciding whether work is done by the system or on the system. This flexibility prevents formula matching from replacing reasoning.
+$$
+\Delta y=v_0\sin\theta\,t-\frac12gt^2.
+$$
 
-Finally, keep scale awareness. Introductory physics problems often use idealized numbers, but the answers should still sit on recognizable scales: walking speeds are meters per second, orbital speeds are kilometers per second, visible wavelengths are hundreds of nanometers, household currents are often amperes or less, and thermal energies per molecule at room temperature are small in joules but meaningful in electron-volts. When an answer is many orders of magnitude away from these anchors, check unit conversions first. Prefix errors such as nano versus micro, centimeters versus meters, and milliseconds versus seconds are among the fastest ways to turn correct physics into a wrong result.
+Rearranging and applying the quadratic formula gives
 
-For exam preparation, make the worked examples bidirectional. After solving a forward problem, change the target: ask what initial speed, resistance, angle, charge, temperature change, or wavelength would have produced the stated answer. This exposes whether you understand the structure or only followed the arithmetic once. Then make one assumption false and describe what would change. If air resistance is no longer negligible, projectile motion no longer separates into a constant horizontal speed. If a pulley has rotational inertia, the two string tensions need not match. If a lens is not thin, the thin-lens equation becomes an approximation. If a gas process is not reversible, entropy must be found from a reversible path connecting the same states, not from the literal irreversible path. These small variations turn a page of notes into a usable problem-solving tool.
+$$
+t=\frac{v_0\sin\theta
+\pm\sqrt{v_0^2\sin^2\theta-2g\Delta y}}{g}.
+$$
 
-Before leaving the problem, write one complete sentence that states the result in physical language. That sentence should name the object or system, the direction or sign when relevant, and the assumption under which the answer was obtained.
+Only roots that are real, nonnegative, and compatible with the physical interval are retained. Two positive roots can occur when the projectile crosses a chosen height once while rising and once while falling. A negative discriminant means that height cannot be reached with the specified launch.
 
-## Connections
+### Worked example: horizontal launch from a cliff
 
-- [One-Dimensional Kinematics](/physics/general/one-dimensional-kinematics)
-- [Newton's Laws and Applications](/physics/general/newtons-laws-and-applications)
-- [Rotation and Angular Momentum](/physics/general/rotation-torque-and-angular-momentum)
+A stone leaves a $45.0\,\mathrm m$ cliff horizontally at $12.0\,\mathrm{m/s}$. Find the impact time, horizontal distance, and impact speed.
+
+Set the launch point to $y_0=0$, so the ground is $y=-45.0\,\mathrm m$. Since $v_{0y}=0$,
+
+$$
+-45.0=-\frac12(9.81)t^2.
+$$
+
+Thus
+
+$$
+t=\sqrt{\frac{2(45.0)}{9.81}}=3.03\,\mathrm s.
+$$
+
+Horizontal displacement is
+
+$$
+x=(12.0)(3.03)=36.4\,\mathrm m.
+$$
+
+At impact,
+
+$$
+v_x=12.0\,\mathrm{m/s},
+\qquad
+v_y=-gt=-(9.81)(3.03)=-29.7\,\mathrm{m/s}.
+$$
+
+The speed is the magnitude of the velocity vector:
+
+$$
+v=\sqrt{v_x^2+v_y^2}
+=\sqrt{12.0^2+29.7^2}
+=32.0\,\mathrm{m/s}.
+$$
+
+The vertical fall time does not depend on the horizontal launch speed under the ideal model.
+
+## Tangential and normal acceleration along a curve
+
+At any smooth point on a path, define unit vector $\mathbf e_t$ tangent to the motion and $\mathbf e_n$ toward the local center of curvature. Then
+
+$$
+\mathbf v=v\mathbf e_t
+$$
+
+and
+
+$$
+\mathbf a=\frac{dv}{dt}\mathbf e_t+\frac{v^2}{\rho}\mathbf e_n,
+$$
+
+where $\rho$ is the local radius of curvature. The tangential component changes speed; the normal component turns the velocity vector. A straight path has $\rho\to\infty$ and therefore no normal acceleration.
+
+For a circle of fixed radius $r$,
+
+$$
+a_n=\frac{v^2}{r}=\omega^2r,
+\qquad
+v=r\omega.
+$$
+
+Uniform circular motion means constant speed, so $a_t=0$, while $a_n$ remains directed inward. “Centripetal” describes this inward net acceleration or the required inward resultant force. It is not an extra force to add to gravity, tension, friction, or a normal force.
+
+For nonuniform circular motion,
+
+$$
+a_t=r\alpha,
+$$
+
+and the total acceleration magnitude is
+
+$$
+a=\sqrt{(r\alpha)^2+(r\omega^2)^2}.
+$$
+
+The period and frequency satisfy
+
+$$
+T=\frac{2\pi r}{v}=\frac{2\pi}{\omega},
+\qquad f=\frac1T.
+$$
+
+Angular speed in these equations must be in radians per second.
+
+### Worked example: turntable kinematics
+
+A point $0.150\,\mathrm m$ from a turntable's center rotates at $45.0\,\mathrm{rpm}$. Find its speed and inward acceleration.
+
+Convert the rotation rate:
+
+$$
+\omega=45.0\frac{\mathrm{rev}}{\mathrm{min}}
+\frac{2\pi\,\mathrm{rad}}{1\,\mathrm{rev}}
+\frac{1\,\mathrm{min}}{60\,\mathrm s}
+=4.71\,\mathrm{rad/s}.
+$$
+
+Then
+
+$$
+v=r\omega=(0.150)(4.71)=0.707\,\mathrm{m/s},
+$$
+
+and
+
+$$
+a_n=r\omega^2=(0.150)(4.71)^2=3.33\,\mathrm{m/s^2}.
+$$
+
+The acceleration direction changes with the point's location, even though its magnitude remains constant.
+
+## Forces that maintain circular motion
+
+Newton's second law in tangential-normal components reads
+
+$$
+\sum F_t=m\frac{dv}{dt},
+\qquad
+\sum F_n=m\frac{v^2}{r}.
+$$
+
+On a level road, static friction may supply the inward force for a turning car. With maximum friction $\mu_smg$,
+
+$$
+\frac{mv^2}{r}\le\mu_smg,
+$$
+
+so
+
+$$
+v\le\sqrt{\mu_sgr}.
+$$
+
+On an ideally banked frictionless curve of angle $\beta$, the normal force has vertical and horizontal components:
+
+$$
+N\cos\beta=mg,
+\qquad
+N\sin\beta=\frac{mv^2}{r}.
+$$
+
+Dividing eliminates $N$ and $m$:
+
+$$
+\tan\beta=\frac{v^2}{rg}.
+$$
+
+This is a design speed, not a universal safe speed. At other speeds friction generally participates, and real roads impose additional limits.
+
+## Relative velocity in a plane
+
+Many two-dimensional problems concern motion as seen from another moving object. If $A$ and $B$ are observed from the same inertial frame,
+
+$$
+\mathbf v_{A/B}=\mathbf v_A-\mathbf v_B.
+$$
+
+Rearranging gives $\mathbf v_A=\mathbf v_{A/B}+\mathbf v_B$. The vectors must be added by components; their speeds cannot normally be added as scalars. The same relation describes a boat relative to water and shore, an aircraft relative to air and ground, or rain relative to a moving car.
+
+**Problem.** A river flows east at $3.0\,\mathrm{m/s}$. A boat can move at $5.0\,\mathrm{m/s}$ relative to the water. The river is $120$ m wide north-south. Find the heading needed to land directly north of the start, and the crossing time.
+
+To cancel the current, the boat needs a westward relative-water component of $3.0\,\mathrm{m/s}$. If $\theta$ is the angle west of north,
+
+$$
+5.0\sin\theta=3.0,
+$$
+
+so
+
+$$
+\theta=\sin^{-1}(0.600)=36.9^\circ.
+$$
+
+The northward component is
+
+$$
+v_N=5.0\cos36.9^\circ=4.0\,\mathrm{m/s}.
+$$
+
+The ground velocity has zero east-west component and northward magnitude $4.0\,\mathrm{m/s}$. Therefore
+
+$$
+t=\frac{120}{4.0}=30\,\mathrm s.
+$$
+
+Heading straight north would cross faster, in $24$ s, but the boat would drift $72$ m east. “Shortest time” and “arrive directly opposite” impose different conditions.
+
+Relative acceleration follows the same subtraction rule in translating inertial frames. If the reference frame accelerates or rotates, additional apparent terms enter. Treating a rotating platform as an ordinary inertial frame misses centrifugal and Coriolis effects.
+
+## Polar coordinates for changing radius and angle
+
+Circular motion holds radius fixed, but many planar paths are more naturally described by $r(t)$ and $\theta(t)$. The polar unit vectors rotate with the particle. Differentiating the position $\mathbf r=r\mathbf e_r$ gives
+
+$$
+\mathbf v=\dot r\mathbf e_r+r\dot\theta\mathbf e_\theta,
+$$
+
+and a second derivative gives
+
+$$
+\mathbf a=(\ddot r-r\dot\theta^2)\mathbf e_r
++(r\ddot\theta+2\dot r\dot\theta)\mathbf e_\theta.
+$$
+
+The radial velocity $\dot r$ changes distance from the origin; the transverse term $r\dot\theta$ sweeps around it. Even with constant $r$ and constant $\dot\theta$, radial acceleration remains $-r\dot\theta^2$. If $r$ changes while the line rotates, the $2\dot r\dot\theta$ term contributes transverse acceleration.
+
+Consider a bead sliding outward in a straight slot that rotates at constant $\omega=2.0\,\mathrm{rad/s}$. At an instant, $r=0.40$ m, $\dot r=0.30\,\mathrm{m/s}$, and $\ddot r=0$. Since $\ddot\theta=0$,
+
+$$
+a_r=-r\omega^2=-(0.40)(2.0)^2=-1.60\,\mathrm{m/s^2},
+$$
+
+$$
+a_\theta=2\dot r\omega=2(0.30)(2.0)=1.20\,\mathrm{m/s^2}.
+$$
+
+The acceleration magnitude is
+
+$$
+a=\sqrt{1.60^2+1.20^2}=2.00\,\mathrm{m/s^2}.
+$$
+
+Calling the motion “constant angular speed” would not remove either component.
+
+## What air resistance changes
+
+The vacuum projectile model has constant horizontal velocity, symmetric ascent and descent between equal heights, and a parabolic path. A drag force opposes the velocity, so its components evolve as the velocity direction changes. Horizontal and vertical equations become coupled differential equations.
+
+At low speed in a viscous regime, drag may be approximately proportional to speed. For many ordinary projectiles in air, a quadratic model is closer:
+
+$$
+\mathbf F_D=-\frac12\rho C_DA|\mathbf v|\mathbf v.
+$$
+
+Here $\rho$ is air density, $C_D$ a shape-dependent drag coefficient, and $A$ reference area. No constant-acceleration shortcut solves the full trajectory. Numerical integration advances velocity and position in small time steps.
+
+Qualitatively, drag reduces range and maximum height. For an equal-height shot it makes descent steeper than ascent and shifts the range-maximizing launch angle below $45^\circ$ in many conditions. The exact optimum depends on speed, size, mass, shape, spin, and atmospheric properties, so there is no universal corrected angle.
+
+Spin introduces a lift-like Magnus force that can curve the trajectory sideways or change vertical motion. Wind is best handled first as a relative-velocity problem: aerodynamic force depends on projectile velocity relative to air, not ground. These effects matter for balls and long trajectories but are intentionally excluded from elementary component equations.
+
+## Geometry checks at limiting cases
+
+Limiting cases expose algebra errors quickly. A launch angle of zero gives zero initial vertical velocity; for equal launch and landing height in the ideal model, the nonzero flight time collapses to zero. A launch angle approaching $90^\circ$ gives zero horizontal range. The equal-height range expression is symmetric under $\theta\to90^\circ-\theta$ because $\sin2\theta$ is unchanged.
+
+For circular motion, letting radius grow without bound at fixed speed makes $v^2/r$ approach zero, recovering straight-line motion locally. At fixed angular speed, however, $a_n=\omega^2r$ grows with radius because tangential speed also grows. Holding $v$ fixed and holding $\omega$ fixed describe different comparisons.
+
+## Intercept and closest-approach problems
+
+To decide whether one moving object meets another, equate their position vectors at the same time. Let a target begin at $\mathbf r_{T0}$ with constant velocity $\mathbf v_T$, and an interceptor begin at $\mathbf r_{I0}$ with fixed speed $u$ but selectable direction. Interception requires
+
+$$
+\mathbf r_{I0}+\mathbf v_It
+=\mathbf r_{T0}+\mathbf v_Tt,
+$$
+
+with $\vert \mathbf v_I\vert =u$. Rearranging gives
+
+$$
+\mathbf v_I=\frac{\mathbf r_{T0}-\mathbf r_{I0}}{t}+\mathbf v_T.
+$$
+
+Taking the magnitude produces an equation for positive encounter time. Aiming at the target's initial location generally misses because the target moves while the interceptor travels.
+
+The existence of a solution depends on geometry and relative speed. An interceptor slower than a fleeing target may still meet it if initially ahead or if paths cross, but it cannot catch a target receding along the same line from behind. A quadratic time equation may yield two positive encounters, one tangent encounter, or no real encounter. Roots need geometric interpretation.
+
+Closest approach uses the relative position
+
+$$
+\mathbf r_{A/B}(t)=\mathbf r_{A/B}(0)+\mathbf v_{A/B}t.
+$$
+
+Minimizing its squared magnitude gives
+
+$$
+t_*=-\frac{\mathbf r_{A/B}(0)\cdot\mathbf v_{A/B}}
+{|\mathbf v_{A/B}|^2},
+$$
+
+when relative velocity is nonzero. A negative value means the closest approach under constant velocities occurred in the past, so future separation is already increasing.
+
+## Assumptions to inspect before using a compact formula
+
+## Choosing coordinates without changing the physics
+
+Coordinate axes are bookkeeping choices. Rotating them changes vector components but not the physical trajectory, speed, or acceleration magnitude. Horizontal-vertical axes are efficient for uniform gravity because one acceleration component vanishes. Tangential-normal axes are efficient when path geometry and speed are known. Polar axes are efficient when forces or constraints point toward a center.
+
+A poor coordinate choice is not wrong, but it creates extra projections and sign opportunities. On a banked curve, horizontal-vertical axes expose weight balance and inward acceleration. On a bead constrained to a known curved track, tangential-normal axes separate speed change from contact-force calculation. Mixing force components from one basis with acceleration components from another is wrong unless an explicit projection connects them.
+
+Unit vectors also behave differently by basis. Cartesian unit vectors remain fixed, which is why component differentiation is direct. Tangential-normal and polar unit vectors rotate along the motion, producing curvature and angular-rate terms. Omitting those derivatives is equivalent to pretending a moving basis remains fixed.
+
+Dimensional checks remain useful across every basis. Position components have units of length, velocity components length per time, and acceleration components length per time squared. Angles in derivatives are measured in radians, so angular velocity can combine with radius without an extra conversion factor. A result for range should not retain time, and a centripetal acceleration should scale as speed squared divided by length.
+
+Finally, signs belong to components rather than magnitudes. A negative vertical velocity means downward motion under an upward-positive convention. Speed, radius of curvature, flight duration, and traveled distance remain nonnegative. Keeping that distinction prevents a negative component from being discarded merely because it looks unfamiliar.
+
+- The equal-height flight-time and range formulas require identical launch and landing elevations. Use the vertical landing equation otherwise.
+- At an apex, only the vertical velocity component vanishes. Acceleration remains $-g\mathbf j$.
+- Components share one time variable. Solving separate horizontal and vertical times and then combining them has no physical basis.
+- A negative velocity component indicates direction; a negative speed is not meaningful.
+- Uniform circular motion has zero tangential acceleration, not zero total acceleration.
+- Convert revolutions to radians before using $v=r\omega$ or $a_n=r\omega^2$.
+- Air resistance depends on velocity and couples horizontal and vertical motion. Long-range, light, or fast projectiles can depart strongly from the vacuum model.
+- The inward force is the sum of actual force components. Do not draw an additional “centripetal force” on the free-body diagram.
+
+<div className="see-also">
+
+See also: [One-Dimensional Kinematics](/physics/general/one-dimensional-kinematics) · [Newton's Laws and Applications](/physics/general/newtons-laws-and-applications) · [Rotation, Torque, and Angular Momentum](/physics/general/rotation-torque-and-angular-momentum) · [Particle Kinematics](/physics/mechanics/particle-kinematics)
+
+</div>

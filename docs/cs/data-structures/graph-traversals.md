@@ -247,10 +247,8 @@ Parallel edges do not require special visited handling: the first edge may disco
 
 When reconstructing a path, stop at the source or at a sentinel parent. Following an uninitialized parent for an unreachable target is a memory error in C, not merely a wrong answer. Check reachability before walking the chain.
 
-## Related pages
+<div className="see-also">
 
-- [graph representation](/cs/data-structures/graph-representation)
-- [queues](/cs/data-structures/queues)
-- [stacks](/cs/data-structures/stacks)
-- [minimum spanning trees](/cs/data-structures/minimum-spanning-trees)
-- [shortest paths](/cs/data-structures/shortest-paths)
+See also: [graph representation](/cs/data-structures/graph-representation) · [queues](/cs/data-structures/queues) · [stacks](/cs/data-structures/stacks) · [minimum spanning trees](/cs/data-structures/minimum-spanning-trees) · [shortest paths](/cs/data-structures/shortest-paths)
+
+</div>

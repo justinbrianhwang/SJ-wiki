@@ -9,7 +9,7 @@ Sequence labeling assigns one label to each token in a sequence. Jurafsky and Ma
 
 This topic matters because many NLP annotations are token-aligned: POS tags, named entity BIO tags, chunk labels, morphological tags, dialogue acts, and some semantic roles. The key idea is to score whole tag sequences rather than independent token decisions, so the model can prefer globally coherent outputs.
 
-## Definitions
+## Tag sequences and local factorization
 
 Given tokens $w_1,\ldots,w_T$, a **sequence labeling** model predicts tags $y_1,\ldots,y_T$. If there are $K$ possible tags, the number of tag sequences is $K^T$, so exhaustive enumeration is usually impossible.
 
@@ -43,7 +43,7 @@ $$
 
 Backpointers recover the best sequence.
 
-## Key results
+## Why Viterbi stays tractable
 
 The output space is exponential, but a first-order Markov or linear-chain decomposition makes exact decoding polynomial. With $T$ tokens and $K$ tags, Viterbi takes $O(TK^2)$ time because each cell considers $K$ possible predecessor tags.
 
@@ -59,7 +59,7 @@ $$
 
 Smoothing is especially important for emissions because vocabularies are much larger than tag sets.
 
-CRFs are discriminative. They do not need to model $P(w)$, and they can use arbitrary overlapping features of the observed input. This is why CRFs historically outperformed HMMs on NER and other feature-rich sequence tasks. CRF training requires computing the partition function, but the forward algorithm makes this efficient for linear chains.
+CRFs are discriminative. They do not need to model $P(w)$, and they can use arbitrary overlapping features of the observed input. That flexibility helped CRFs outperform HMMs on NER and other feature-rich sequence tasks. CRF training requires computing the partition function, but the forward algorithm makes this efficient for linear chains.
 
 BIO tagging is common for named entities. `B-PER` begins a person mention, `I-PER` continues it, and `O` marks outside. Sequence models are useful because some tag transitions are invalid or unlikely, such as `I-ORG` immediately after `B-PER`.
 
@@ -69,15 +69,13 @@ The HMM-to-CRF progression is a useful example of changing what the model is res
 
 Unknown words expose the difference. An HMM can smooth emissions or use special unknown-word buckets, but adding features such as `ends in -ing`, `contains digit`, `is capitalized`, or `previous word is Mr.` is awkward in the generative story. A CRF can include all of these as overlapping feature functions. Neural taggers learn many such cues automatically from characters, subwords, and contextual encoders, but they still benefit from a structured decoder when label consistency matters.
 
-A final practical issue is span reconstruction. In NER, the model predicts token labels, but the application consumes entity spans. Invalid transitions, subword splits, punctuation, and nested names can all create mismatch between token accuracy and entity-level usefulness. Always inspect both token-level errors and reconstructed-span errors.
+A further issue is span reconstruction. In NER, the model predicts token labels, but the application consumes entity spans. Invalid transitions, subword splits, punctuation, and nested names can all create mismatch between token accuracy and entity-level usefulness. Always inspect both token-level errors and reconstructed-span errors.
 
 Sequence labeling also illustrates exposure to domain shift. A POS tagger trained on edited newswire may perform poorly on social media, code-switched text, clinical notes, or speech transcripts with disfluencies. The label inventory may be the same, but tokenization, capitalization, spelling, punctuation, and vocabulary all change. Robust systems therefore evaluate by domain and often adapt with character features, subwords, contextual models, or small amounts of in-domain annotation.
 
 The same framework also applies below and above the word. Character-level sequence labeling can segment words or detect spelling errors; sentence-level sequence labeling can assign dialogue acts or discourse functions. What changes is the unit being labeled and the feature representation. The inference issue remains: neighboring labels are usually not independent.
 
 When teaching or debugging these models, always draw the trellis. The trellis makes it clear which local scores are available, where backpointers point, and why a locally attractive tag can lose after later transition costs are considered.
-
-## Visual
 
 ```mermaid
 flowchart TB
@@ -113,7 +111,7 @@ flowchart TB
   Back --> Decode(("Best tag sequence y_1..y_T"))
 ```
 
-This sequence-labeling diagram shows the chain structure and the dynamic-programming decoder. Observed token features connect to each position, adjacent tags contribute transition scores, and Viterbi stores the best score ending in each tag plus a backpointer. The recurrence makes the `O(TK^2)` computation visible: every tag at position `t` considers every previous tag.
+This sequence-labeling diagram shows the chain structure and the dynamic-programming decoder. Observed token features connect to each position, adjacent tags contribute transition scores, and Viterbi stores the best score ending in each tag plus a backpointer. The `O(TK^2)` cost comes from every tag at position `t` considering every previous tag.
 
 | Model | Probability modeled | Features | Decoding | Main weakness |
 |---|---|---|---|---|
@@ -122,9 +120,11 @@ This sequence-labeling diagram shows the chain structure and the dynamic-program
 | CRF | $P(y\mid w)$ | arbitrary local input features | Viterbi | training is more expensive |
 | Neural tagger | $P(y_t\mid h_t)$ | learned contextual states | per token or CRF | needs data and compute |
 
-## Worked example 1: Viterbi with two tags
+## Decoding and validating tag sequences
 
-Problem: tag the two-word sentence `fish swim` with tags $N$ and $V$. Use log scores.
+### Decoding `fish swim` with two tags
+
+Tag the two-word sentence `fish swim` with tags $N$ and $V$, using log scores.
 
 Transition and emission local scores:
 
@@ -171,11 +171,11 @@ $$
 =\max(0+0,-3-2)+0=0.
 $$
 
-Checked answer: the best final tag is $V$ with score $0$, and its backpointer comes from $N$. The best sequence is $N,V$.
+The best final tag is $V$ with score $0$, and its backpointer comes from $N$. The best sequence is $N,V$.
 
-## Worked example 2: BIO transition check
+### Repairing an invalid BIO sequence
 
-Problem: decide whether the predicted BIO tag sequence is valid:
+Decide whether the predicted BIO tag sequence is valid:
 
 ```text
 New      I-LOC
@@ -196,9 +196,9 @@ is       O
 busy     O
 ```
 
-Checked answer: the original sequence is invalid under strict BIO. A CRF can learn or enforce low scores for such transitions.
+The original sequence is invalid under strict BIO. A CRF can learn or enforce low scores for such transitions.
 
-## Code
+## A two-tag Viterbi decoder
 
 ```python
 import torch
@@ -231,7 +231,7 @@ path.reverse()
 print([tags[i] for i in path], v.max().item())
 ```
 
-## Common pitfalls
+## Failures at token and span boundaries
 
 - Tagging each token independently and then being surprised by impossible BIO sequences.
 - Forgetting log space in Viterbi for probabilistic HMMs.
@@ -241,9 +241,8 @@ print([tags[i] for i in path], v.max().item())
 - Letting subword tokenization misalign labels.
 - Confusing CRF decoding with CRF training; decoding uses Viterbi, training uses normalization over all sequences.
 
-## Connections
+<div className="see-also">
 
-- [Regular expressions and normalization](/cs/nlp/regular-expressions-normalization-edit-distance)
-- [RNNs and LSTMs for sequence modeling](/cs/nlp/rnns-lstms-sequence-modeling)
-- [Pretrained language models](/cs/nlp/pretrained-language-models)
-- [Information extraction](/cs/nlp/information-extraction)
+See also: [Regular expressions and normalization](/cs/nlp/regular-expressions-normalization-edit-distance) · [RNNs and LSTMs for sequence modeling](/cs/nlp/rnns-lstms-sequence-modeling) · [Pretrained language models](/cs/nlp/pretrained-language-models) · [Information extraction](/cs/nlp/information-extraction)
+
+</div>

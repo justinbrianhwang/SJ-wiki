@@ -9,11 +9,11 @@ Classical controllers add simple dynamics to reshape steady-state error, transie
 
 ![A compact PID controller block shows proportional, integral, and derivative action.](https://commons.wikimedia.org/wiki/Special:FilePath/PID_Controller.png)
 
-*Figure: PID control turns error history into a practical actuator command. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PID_Controller.png), Hew, public domain.*
+*Figure: PID control combines present error, accumulated error, and error rate in the actuator command. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PID_Controller.png), Hew, public domain.*
 
-This page emphasizes what each compensator changes structurally. A controller is not chosen because its name is familiar; it is chosen because the plant's deficiencies are clear. If the system is too slow, lacks damping, or has inadequate phase margin, lead or derivative action may help. If tracking error is too large, integral or lag action may help. If both are inadequate, combined compensation is needed.
+Each compensator changes the loop structure in a specific way. A controller is chosen from the plant's deficiencies: lead or derivative action can address poor damping, speed, or phase margin; integral or lag action can address excessive tracking error; combined compensation is needed when both sets of requirements fail.
 
-## Definitions
+## PID actions as poles and zeros
 
 The ideal PID controller is
 
@@ -59,7 +59,7 @@ $$
 
 and products of these factors for lag-lead compensation.
 
-## Key results
+## How each compensator reshapes the loop
 
 The compensator effects can be summarized:
 
@@ -81,7 +81,7 @@ Practical PID control includes saturation handling. When an actuator saturates, 
 
 The three PID terms can be viewed through the same pole-zero language as lead and lag compensation. PI adds a pole at the origin and a finite zero. The pole increases type; the zero helps recover phase lost by the integrator. PD adds a finite zero and therefore resembles an ideal lead element without the high-frequency pole needed for physical filtering. PID combines an integrator with two zeros, allowing one zero to improve transient response while the integrator improves low-frequency accuracy.
 
-Setpoint weighting is a practical refinement. In many industrial controllers, proportional and derivative actions are not applied to the reference in exactly the same way they are applied to the measured output. This prevents a sudden setpoint step from creating an unnecessarily large derivative kick or proportional jump. The linear transfer-function framework can still represent these choices, but the block diagram must distinguish reference paths from feedback paths.
+Setpoint weighting is common in industrial controllers. Proportional and derivative actions are not always applied to the reference in exactly the same way they are applied to the measured output. This prevents a sudden setpoint step from creating an unnecessarily large derivative kick or proportional jump. The linear transfer-function framework can still represent these choices, but the block diagram must distinguish reference paths from feedback paths.
 
 Derivative action should almost always be taken on the measured output rather than on the error when references change abruptly. If $e=r-y$, then a step in $r$ has an impulse-like derivative. A derivative kick can saturate the actuator even though the plant has not yet moved. Filtering derivative action and applying it to $-y$ reduces this issue while retaining damping against rapid output motion.
 
@@ -91,11 +91,9 @@ Tuning methods such as trial-and-error, Ziegler-Nichols-style rules, root locus,
 
 Controller form also matters. The "parallel" PID form $K_p+K_i/s+K_ds$ and the "series" or "interacting" form built from first-order factors do not use the same numerical parameters. Commercial controllers may define reset time, rate time, derivative filter ratio, setpoint weights, and output limits differently. Before transferring gains between software, hardware, or a textbook calculation, convert the controller form explicitly.
 
-Derivative filtering and anti-windup are not optional embellishments in most real systems. They determine how the controller behaves under noisy measurement and saturation, exactly where ideal linear PID assumptions are weakest. A good implementation document states the filter time constant, saturation limits, integral clamping or back-calculation rule, and sample time for digital PID.
+Derivative filtering and anti-windup determine how the controller behaves under noisy measurement and saturation, exactly where ideal linear PID assumptions are weakest. An implementation record should state the filter time constant, saturation limits, integral clamping or back-calculation rule, sample time for digital PID, and the plant model used for tuning.
 
-The best PID settings are plant-specific.
-
-## Visual
+### One map from implementation blocks to frequency response
 
 ```mermaid
 flowchart TB
@@ -158,7 +156,7 @@ This diagram links PID terms to the same pole-zero language used for lead, lag, 
 | high frequency | gain returns lower | may increase noise gain |
 | root-locus view | near-origin pole-zero pair | zero-pole pair supplies angle |
 
-## Worked example 1: PI controller and system type
+## How PI action changes system type and step error
 
 Problem: A plant is
 
@@ -219,7 +217,7 @@ $$
 
 Checked answer: proportional control gives step error $0.2$; PI control eliminates step error, assuming the closed loop remains stable.
 
-## Worked example 2: derivative zero placement
+## Placing a PD zero at a prescribed location
 
 Problem: A PD controller has
 
@@ -269,7 +267,7 @@ $$
 
 Checked answer: the controller is $G_{PD}(s)=2+0.5s$, with zero at $-K_p/K_d=-4$.
 
-## Code
+## Comparing proportional and PI step responses
 
 ```python
 import numpy as np
@@ -302,7 +300,7 @@ print("P final value:", y_p[-1])
 print("PI final value:", y_pi[-1])
 ```
 
-## Common pitfalls
+## Implementation failures hidden by the ideal formulas
 
 - Using ideal derivative action without filtering in a noisy measurement loop.
 - Adding integral action without checking stability margins or actuator saturation.
@@ -311,10 +309,14 @@ print("PI final value:", y_pi[-1])
 - Placing compensator zeros to cancel unstable plant poles. Exact cancellation is not robust and can hide dangerous internal dynamics.
 - Ignoring units. $K_p$, $K_i$, and $K_d$ have different dimensions.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Steady-state errors](/cs/control-engineering/steady-state-errors-and-sensitivity) explains why integral and lag action reduce final error.
 - [Root-locus design](/cs/control-engineering/root-locus-design-and-classical-compensation) designs compensator pole-zero locations in the $s$-plane.
 - [Bode plots](/cs/control-engineering/bode-plots-and-frequency-response) show the phase and gain effects of lead and lag.
 - [Frequency-response design](/cs/control-engineering/frequency-response-compensator-design) tunes lead and lag by margins.
 - [Applied vehicle control](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley) uses PID alongside geometric and optimization-based controllers.
+
+</div>

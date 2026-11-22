@@ -9,7 +9,7 @@ The Boltzmann equation describes the evolution of the one-particle distribution 
 
 Schwabl derives the equation, studies the H-theorem, linearizes it near local equilibrium, and discusses the relaxation-time approximation. The key approximation is molecular chaos: before a binary collision, two-particle probabilities factor into one-particle distributions.
 
-## Definitions
+## Streaming, collisions, and local equilibrium
 
 The Boltzmann equation is
 
@@ -26,7 +26,7 @@ $$
 f_{\mathrm{loc}}(x,p,t)
 =n(x,t)\left({1\over 2\pi m k_BT(x,t)}\right)^{3/2}
 \exp\left[
--{(p-mu(x,t))^2\over 2mk_BT(x,t)}
+-{(\mathbf p-m\mathbf u(x,t))^2\over 2mk_BT(x,t)}
 \right],
 $$
 
@@ -47,7 +47,7 @@ $$
 
 They lead to conservation of particle number, momentum, and energy.
 
-## Key results
+## From the collision operator to hydrodynamics
 
 Boltzmann's $H$ functional is
 
@@ -85,7 +85,7 @@ $$
 
 The detailed coefficients require solving the linearized Boltzmann equation.
 
-The collision integral has a gain-minus-loss structure. The loss term removes particles from momentum $p_1$ when they collide with particles of momentum $p_2$. The gain term adds particles into $p_1$ from inverse collisions. Conservation of energy and momentum in each binary collision guarantees that the collision invariants survive integration over momentum. This is why hydrodynamics follows from kinetic theory even though the detailed distribution relaxes.
+The collision integral has a gain-minus-loss structure. The loss term removes particles from momentum $p_1$ when they collide with particles of momentum $p_2$. The gain term adds particles into $p_1$ from inverse collisions. Conservation of energy and momentum in each binary collision guarantees that the collision invariants survive integration over momentum. Hydrodynamic balance laws therefore survive even while the detailed distribution relaxes.
 
 Local equilibrium is not global equilibrium. In local equilibrium, each small fluid element has a Maxwell distribution characterized by fields $n(x,t)$, $u(x,t)$, and $T(x,t)$. Gradients of these fields drive deviations from local equilibrium. Those deviations are small in the hydrodynamic regime, where the mean free path is short compared with macroscopic length scales. The Knudsen number
 
@@ -99,7 +99,7 @@ The H-theorem's equality condition is restrictive. The entropy production vanish
 
 In quantum gases, kinetic equations are modified by Bose enhancement and Pauli blocking factors. A final state with occupation $f$ contributes a factor $1+f$ for bosons and $1-f$ for fermions. These factors are the transport counterpart of the equilibrium occupation rules and become important in degenerate gases.
 
-Transport theory therefore sits between microscopic mechanics and continuum physics. It retains enough molecular information to compute coefficients but discards enough detail to produce closed macroscopic equations.
+Transport theory sits between microscopic mechanics and continuum physics: it retains enough molecular information to compute coefficients while discarding enough detail to close the macroscopic equations.
 
 The relaxation-time approximation is useful but blunt. A single $\tau$ cannot capture the fact that different angular distortions of the distribution may decay at different rates. More accurate treatments expand deviations from equilibrium in orthogonal functions and solve an integral equation for the collision operator. Schwabl's linearized discussion points in this direction by treating the collision operator's eigenfunctions and hydrodynamic zero modes.
 
@@ -109,11 +109,9 @@ The H-theorem should therefore be read at the kinetic level. It proves monotonic
 
 Boundary conditions matter in kinetic theory just as they do in diffusion. A gas near a wall may have a distribution that differs from the bulk local Maxwellian, producing slip, temperature jumps, or Knudsen layers. These effects are small in the hydrodynamic limit but important in rarefied gases and microfluidic systems.
 
-External fields add another layer. In plasmas or electron gases, forces can drive distributions far from equilibrium, while collisions try to restore local equilibrium. The competition between streaming, forcing, and collision terms is the practical content of the Boltzmann equation.
+External fields add another layer. In plasmas or electron gases, forces can drive distributions far from equilibrium, while collisions try to restore local equilibrium. The Boltzmann equation resolves the competition among streaming, forcing, and collisions.
 
-The equation is therefore a controlled compromise: richer than hydrodynamics because it retains momentum dependence, but simpler than the full BBGKY hierarchy because it closes at the one-particle level.
-
-## Visual
+The resulting description is richer than hydrodynamics because it retains momentum dependence, but simpler than the full BBGKY hierarchy because it closes at the one-particle level.
 
 ```mermaid
 flowchart LR
@@ -134,11 +132,9 @@ flowchart LR
 | Local equilibrium | slowly varying $n,u,T$ | hydrodynamic fields |
 | Relaxation time | collision operator $=-(f-f_{\mathrm{loc}})/\tau$ | simple transport formulas |
 
-## Worked example 1: Drude conductivity from relaxation time
+## Drude conductivity from relaxation time
 
-Problem: Derive $\sigma=nq^2\tau/m$ for particles of charge $q$ and mass $m$ in a weak uniform electric field.
-
-Method:
+For particles of charge $q$ and mass $m$ in a weak uniform electric field, the relaxation-time equation gives $\sigma=nq^2\tau/m$.
 
 1. In steady uniform conditions, the relaxation-time Boltzmann equation is
 
@@ -176,13 +172,11 @@ $$
 \sigma={nq^2\tau\over m}.
 $$
 
-Checked answer: the result is the Drude formula, now read as a relaxation-time solution of the linearized Boltzmann equation.
+The result is the Drude formula, here obtained as a relaxation-time solution of the linearized Boltzmann equation.
 
-## Worked example 2: Mean free path estimate of viscosity
+## A mean-free-path estimate of viscosity
 
-Problem: A dilute gas has density $n=2.5\times 10^{25}\,\mathrm{m^{-3}}$, molecular mass $m=4.8\times 10^{-26}\,\mathrm{kg}$, mean speed $\bar v=500\,\mathrm{m/s}$, and mean free path $\ell=7.0\times 10^{-8}\,\mathrm m$. Estimate $\eta$ using $\eta\sim n m\bar v\ell/3$.
-
-Method:
+A dilute gas has density $n=2.5\times 10^{25}\,\mathrm{m^{-3}}$, molecular mass $m=4.8\times 10^{-26}\,\mathrm{kg}$, mean speed $\bar v=500\,\mathrm{m/s}$, and mean free path $\ell=7.0\times 10^{-8}\,\mathrm m$. Using $\eta\sim n m\bar v\ell/3$:
 
 1. Compute mass density:
 
@@ -210,24 +204,9 @@ $$
 \eta\sim 1.4\times 10^{-5}\,\mathrm{Pa\,s}.
 $$
 
-Checked answer: the magnitude is close to ordinary gas viscosities, showing why mean-free-path estimates are useful.
+The magnitude is close to ordinary gas viscosities; the remaining numerical factor depends on solving the linearized collision problem more carefully.
 
-## Code
-
-```python
-def drude_conductivity(n, q, tau, m):
-    return n * q**2 * tau / m
-
-def viscosity_estimate(n, m, vbar, mean_free_path):
-    return n * m * vbar * mean_free_path / 3.0
-
-e = 1.602176634e-19
-me = 9.1093837015e-31
-print("metal sigma estimate", drude_conductivity(8.5e28, e, 2.5e-14, me))
-print("gas eta estimate", viscosity_estimate(2.5e25, 4.8e-26, 500.0, 7.0e-8))
-```
-
-## Common pitfalls
+## Limits of the kinetic approximations
 
 - Forgetting that the Boltzmann equation is for dilute gases; dense fluids require more correlations.
 - Treating molecular chaos as a consequence of Hamiltonian mechanics alone. It is a statistical assumption about correlations.
@@ -235,10 +214,8 @@ print("gas eta estimate", viscosity_estimate(2.5e25, 4.8e-26, 500.0, 7.0e-8))
 - Confusing local Maxwellian equilibrium with global equilibrium; local fields may vary in space and time.
 - Ignoring normalization conventions for $f$, which affect factors of $h^3$ or $(2\pi\hbar)^3$.
 
-## Connections
+<div className="see-also">
 
-- [Brownian motion, Langevin, and Fokker-Planck dynamics](/physics/statistical-mechanics/brownian-motion-langevin-and-fokker-planck-dynamics)
-- [Linear response, fluctuation-dissipation, and Onsager theory](/physics/statistical-mechanics/linear-response-fluctuation-dissipation-and-onsager-theory)
-- [Irreversibility, master equations, and finite-temperature field theory](/physics/statistical-mechanics/irreversibility-master-equations-and-finite-temperature-field-theory)
-- [Classical ideal gas and Maxwell distribution](/physics/statistical-mechanics/classical-ideal-gas-and-maxwell-distribution)
-- [Thermodynamics](/physics/thermodynamics/intro)
+See also: [Brownian motion, Langevin, and Fokker-Planck dynamics](/physics/statistical-mechanics/brownian-motion-langevin-and-fokker-planck-dynamics) · [Linear response, fluctuation-dissipation, and Onsager theory](/physics/statistical-mechanics/linear-response-fluctuation-dissipation-and-onsager-theory) · [Irreversibility, master equations, and finite-temperature field theory](/physics/statistical-mechanics/irreversibility-master-equations-and-finite-temperature-field-theory) · [Classical ideal gas and Maxwell distribution](/physics/statistical-mechanics/classical-ideal-gas-and-maxwell-distribution) · [Thermodynamics](/physics/thermodynamics/intro)
+
+</div>

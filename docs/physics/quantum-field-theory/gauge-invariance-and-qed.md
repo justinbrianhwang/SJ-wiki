@@ -434,11 +434,8 @@ $$
 
 is invariant because the integral of $\partial_\mu\alpha$ around a closed contour vanishes for a single-valued gauge function. By Stokes' theorem it measures electromagnetic flux through a spanning surface. Open Wilson lines transform at their endpoints and can be combined with charged fields there to form a gauge-invariant composite. These objects express the phase accumulated by transporting charge and lead to the Aharonov--Bohm effect even in regions where the local field strength vanishes along the particle paths.
 
-## Related pages
+<div className="see-also">
 
-- [Dirac Fields and Spinors](/physics/quantum-field-theory/dirac-fields-and-spinors)
-- [Perturbation Theory and Feynman Diagrams](/physics/quantum-field-theory/perturbation-and-feynman-diagrams)
-- [Renormalization and Counterterms](/physics/quantum-field-theory/renormalization-and-counterterms)
-- [Renormalization Group](/physics/quantum-field-theory/renormalization-group)
-- [Yang--Mills Theory and QCD](/physics/quantum-field-theory/yang-mills-theory-and-qcd)
+See also: [Dirac Fields and Spinors](/physics/quantum-field-theory/dirac-fields-and-spinors) · [Perturbation Theory and Feynman Diagrams](/physics/quantum-field-theory/perturbation-and-feynman-diagrams) · [Renormalization and Counterterms](/physics/quantum-field-theory/renormalization-and-counterterms) · [Renormalization Group](/physics/quantum-field-theory/renormalization-group) · [Yang--Mills Theory and QCD](/physics/quantum-field-theory/yang-mills-theory-and-qcd)
 
+</div>

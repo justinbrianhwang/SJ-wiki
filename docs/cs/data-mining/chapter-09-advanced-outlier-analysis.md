@@ -284,10 +284,8 @@ The example fits and scores the same five observations, which is suitable for il
 - Treating unseen categories caused by a schema change as behavioral anomalies rather than pipeline failures.
 - Refreshing the baseline during an attack or outage so quickly that the abnormal regime becomes the new normal.
 
-## Related pages
+<div className="see-also">
 
-- [Outlier Analysis](/cs/data-mining/chapter-08-outlier-analysis)
-- [Feature Selection and Dimensionality Reduction](/cs/data-mining/chapter-02-feature-selection-dimensionality-reduction)
-- [Advanced Clustering Concepts](/cs/data-mining/chapter-07-advanced-clustering)
-- [Mining Data Streams and Big Data](/cs/data-mining/chapter-12-mining-data-streams)
-- [Mining Web Data and Recommenders](/cs/data-mining/chapter-18-mining-web-data)
+See also: [Outlier Analysis](/cs/data-mining/chapter-08-outlier-analysis) · [Feature Selection and Dimensionality Reduction](/cs/data-mining/chapter-02-feature-selection-dimensionality-reduction) · [Advanced Clustering Concepts](/cs/data-mining/chapter-07-advanced-clustering) · [Mining Data Streams and Big Data](/cs/data-mining/chapter-12-mining-data-streams) · [Mining Web Data and Recommenders](/cs/data-mining/chapter-18-mining-web-data)
+
+</div>

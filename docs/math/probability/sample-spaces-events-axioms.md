@@ -397,10 +397,8 @@ Now let $B$ be the event that $X$ is irrational. The rational numbers in $[0,1]$
 - Defining events vaguely. "A high value" is not an event until the cutoff is specified.
 - Assuming probability one means guaranteed in every philosophical sense. In continuous probability, probability-one events may still exclude exceptional outcomes.
 
-## Related pages
+<div className="see-also">
 
-- [conditional probability and Bayes' theorem](/math/probability/conditional-probability-bayes)
-- [random variables and distributions](/math/probability/random-variables-distributions)
-- [counting principles](/math/probability/counting-principles)
-- [discrete probability](/math/discrete/discrete-probability)
-- [sampling distributions and CLT](/math/statistics/sampling-distributions-and-clt)
+See also: [conditional probability and Bayes' theorem](/math/probability/conditional-probability-bayes) · [random variables and distributions](/math/probability/random-variables-distributions) · [counting principles](/math/probability/counting-principles) · [discrete probability](/math/discrete/discrete-probability) · [sampling distributions and CLT](/math/statistics/sampling-distributions-and-clt)
+
+</div>

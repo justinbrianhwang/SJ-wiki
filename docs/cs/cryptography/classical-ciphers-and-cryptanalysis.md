@@ -7,13 +7,9 @@ sidebar_position: 2
 
 Classical ciphers are the right place to begin cryptography because their designs are simple enough to compute by hand, but their failures already show the central lessons of the modern subject. A shift cipher, substitution cipher, and Vigenere cipher all hide a message by transforming letters according to a secret key. They fail because their transformations preserve too much structure: letter frequencies, repeated patterns, word boundaries, or predictable relations between plaintext and ciphertext.
 
-![An Enigma cipher machine shows historical cryptography as electromechanical hardware.](https://commons.wikimedia.org/wiki/Special:FilePath/Enigma-Machine.jpg)
-
-*Figure: Enigma provides historical context for classical ciphers and cryptanalysis. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Enigma-Machine.jpg), United States Central Intelligence Agency, public domain.*
-
 Katz and Lindell use these examples to motivate the modern move from clever-looking secrecy to definitions, assumptions, and proofs. Smart's treatment is more historical and computational: it gives more hand examples of shift, substitution, Vigenere, Enigma-like thinking, and the attacker's view. Read together, the sources make one point clear: a cipher is not secure because its rule looks complicated. It is secure only relative to a precise attack model.
 
-## Definitions
+## Ciphers, keys, and attack models
 
 A **plaintext** is the message before encryption. A **ciphertext** is the encoded output sent over an insecure channel. A **key** is the secret input that selects one transformation from a family of possible transformations. In a private-key cipher, sender and receiver share the same secret key.
 
@@ -44,15 +40,15 @@ The **Vigenere cipher** uses a short key word as a repeating sequence of shifts.
 
 **Cryptanalysis** is the study of attacks. In a **ciphertext-only attack**, the adversary sees ciphertexts only. In a **known-plaintext attack**, the adversary sees some plaintext-ciphertext pairs. In a **chosen-plaintext attack**, the adversary can request encryptions of messages it chooses. Classical ciphers often fail even in the weakest ciphertext-only setting.
 
-Kerckhoffs' principle says that the security of a cipher should depend on the secrecy of the key, not on the secrecy of the algorithm. This is not just a slogan. It is what makes public analysis possible, permits standardization, and prevents a design from collapsing when one implementation is reverse engineered.
+Kerckhoffs' principle says that the security of a cipher should depend on the secrecy of the key, not on the secrecy of the algorithm. The principle permits public analysis and standardization, and it prevents a design from collapsing when one implementation is reverse engineered.
 
-## Key results
+## What survives encryption becomes an attack
 
 The first key result is that key-space size alone is not a security proof. A shift cipher has only 26 possible keys, so brute force is immediate. A substitution cipher has an enormous key space, but frequency analysis breaks it because the encryption preserves the distribution of letters. If `E` is common in English, then the ciphertext symbol representing `E` will tend to be common too. Digraphs such as `TH`, `HE`, and `IN` give even more evidence.
 
 The second key result is that repeating structure leaks. The Vigenere cipher was historically treated as strong because the same plaintext letter is not always encrypted to the same ciphertext letter. But if the key length is $t$, then letters in positions congruent modulo $t$ are all encrypted by the same shift. Once an attacker estimates $t$, the cipher becomes $t$ independent shift ciphers. Repeated phrases in the plaintext also produce repeated spacing patterns in the ciphertext, which is the idea behind Kasiski-style analysis.
 
-The third result is that attack models must be explicit. A classical cipher may look acceptable if the attacker only sees one short ciphertext, but fail badly when the attacker sees many messages, knows a greeting format, or can choose messages. Modern definitions formalize this. They ask not "Can I think of an attack?" but "What advantage can any efficient adversary obtain in a specified experiment?"
+Attack models must be explicit. A classical cipher may look acceptable if the attacker only sees one short ciphertext, but fail badly when the attacker sees many messages, knows a greeting format, or can choose messages. Modern definitions formalize this by asking what advantage any efficient adversary obtains in a specified experiment.
 
 The fourth result is that determinism is dangerous for repeated encryption. If the same plaintext always gives the same ciphertext under the same key, then equality patterns survive. This is exactly why modern encryption schemes for multiple messages use randomness, nonces, counters, or state. The lesson from classical ciphers reappears later as the failure of ECB mode for block ciphers.
 
@@ -62,18 +58,18 @@ Smart's information-theoretic discussion also explains why classical ciphers bec
 
 The classical setting also separates two failures that students often merge. A cipher can be broken because the key space is too small, as with the shift cipher, or because the key space has exploitable structure, as with substitution and Vigenere. Modern designs fight both problems. They use large keys, but they also try to make every efficient test on the ciphertext behave as if it were seeing random data.
 
-## Visual
+### The frequency-analysis loop
 
 ```mermaid
 flowchart LR
-  A[Plaintext corpus] --> B[Language statistics]
-  C[Ciphertext] --> D[Observed frequencies]
-  B --> E[Match likely letters]
+  A["Plaintext corpus"] --> B["Language statistics"]
+  C["Ciphertext"] --> D["Observed frequencies"]
+  B --> E["Match likely letters"]
   D --> E
-  E --> F[Propose key]
-  F --> G[Decrypt trial text]
+  E --> F["Propose key"]
+  F --> G["Decrypt trial text"]
   G --> H{"Readable?"}
-  H -->|yes| I[Recover message]
+  H -->|yes| I["Recover message"]
   H -->|no| E
 ```
 
@@ -85,11 +81,9 @@ flowchart LR
 | Permutation/transposition | rearrange positions | preserves letters and often word statistics | anagramming, known plaintext |
 | Enigma-style rotor systems | changing substitutions | operational patterns and known plaintexts | crib-based search and machinery |
 
-## Worked example 1: breaking a shift cipher
+## Exhausting the Caesar key space
 
-Problem: decrypt the ciphertext `KHOOR` assuming it was produced by a shift cipher over the English alphabet.
-
-Method:
+Decrypt the ciphertext `KHOOR`, assuming a shift cipher over the English alphabet.
 
 1. Convert letters to numbers with $A=0,\dots,Z=25$:
 
@@ -117,13 +111,11 @@ $$
 H\mapsto K,\quad E\mapsto H,\quad L\mapsto O,\quad L\mapsto O,\quad O\mapsto R.
 $$
 
-So the checked answer is `HELLO`, with key $k=3$.
+The plaintext is `HELLO`, with key $k=3$.
 
-## Worked example 2: attacking a Vigenere cipher when the period is known
+## When a Vigenere crib fails
 
-Problem: decrypt `RIJVSUYVJN` if it is known that a Vigenere cipher used period $2$, and the first two plaintext letters are likely `HE`.
-
-Method:
+Try to decrypt `RIJVSUYVJN` under the claims that the Vigenere key has period $2$ and the first two plaintext letters are likely `HE`.
 
 1. Write the ciphertext in two columns by position parity:
 
@@ -171,9 +163,9 @@ $$
 R-24=T,\ I-1=H,\ J-24=L,\ V-1=U,\ S-24=U,\ U-1=T,\ Y-24=A,\ V-1=U,\ J-24=L,\ N-1=M.
 $$
 
-This also looks bad, so the checked answer is not a plaintext but a conclusion: knowing only the period and a weak crib is insufficient. The method is correct, but the evidence fails. A real attack would score all 26 shifts for each column using English frequencies, then check the combined plaintext.
+This also looks bad. The calculation does not recover a plaintext; it rejects the weak crib, and possibly the claimed period. A fuller attack scores all 26 shifts for each column using English frequencies, then checks the combined candidates.
 
-## Code
+## Ranking Caesar candidates
 
 ```python
 from collections import Counter
@@ -203,7 +195,7 @@ for score, key, plain in rank_shift_keys("KHOOR")[:5]:
     print(key, score, plain)
 ```
 
-## Common pitfalls
+## Misreadings to avoid
 
 - Treating a large key space as a proof of security. Structure can matter more than count.
 - Forgetting that classical ciphers are usually deterministic, so repeated plaintext patterns survive.
@@ -212,9 +204,8 @@ for score, key, plain in rank_shift_keys("KHOOR")[:5]:
 - Overtrusting a short attack sample. Frequency analysis becomes more reliable as text length grows.
 - Thinking Vigenere is safe merely because it uses several shifts. A short repeated key turns it into several shift ciphers.
 
-## Connections
+<div className="see-also">
 
-- [Perfect secrecy and the one-time pad](/cs/cryptography/perfect-secrecy-one-time-pad)
-- [Computational security definitions](/cs/cryptography/computational-security-definitions)
-- [Symmetric encryption modes](/cs/cryptography/symmetric-encryption-modes)
-- [TLS protocol overview](/cs/cryptography/tls-protocol-overview)
+See also: [Perfect secrecy and the one-time pad](/cs/cryptography/perfect-secrecy-one-time-pad) · [Computational security definitions](/cs/cryptography/computational-security-definitions) · [Symmetric encryption modes](/cs/cryptography/symmetric-encryption-modes) · [TLS protocol overview](/cs/cryptography/tls-protocol-overview)
+
+</div>

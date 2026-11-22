@@ -439,10 +439,8 @@ print("P(2 failures before 3 successes):", nbinom.pmf(2, 3, 0.25))
 - A per-trial probability such as $0.01$ is unitless and bounded by $1$; a rate such as two events per meter changes with the length of the interval.
 - Direct factorials overflow quickly. Combination routines, log probabilities, or a distribution library are safer for large inputs, and early decimal rounding can distort a small tail.
 
-## Related pages
+<div className="see-also">
 
-- [counting principles](/math/probability/counting-principles)
-- [random variables and distributions](/math/probability/random-variables-distributions)
-- [expectation, variance, and moments](/math/probability/expectation-variance-moments)
-- [limit theorems](/math/probability/limit-theorems)
-- [normal, t, chi-square, and F distributions](/math/statistics/normal-t-chi-square-and-f-distributions)
+See also: [counting principles](/math/probability/counting-principles) · [random variables and distributions](/math/probability/random-variables-distributions) · [expectation, variance, and moments](/math/probability/expectation-variance-moments) · [limit theorems](/math/probability/limit-theorems) · [normal, t, chi-square, and F distributions](/math/statistics/normal-t-chi-square-and-f-distributions)
+
+</div>

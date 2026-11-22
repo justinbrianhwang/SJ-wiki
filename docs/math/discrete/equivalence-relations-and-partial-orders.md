@@ -13,7 +13,7 @@ The contrast is useful. Equivalence relations collapse a set into blocks of obje
 
 *Figure: Hasse diagram for the power set of a three-element set. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hasse_diagram_of_powerset_of_3.svg), KSmrq, CC BY-SA 3.0.*
 
-## Definitions
+## Two ways to impose structure on a set
 
 A relation $R$ on $A$ is an **equivalence relation** if it is reflexive, symmetric, and transitive.
 
@@ -33,7 +33,7 @@ A **Hasse diagram** represents a finite poset by drawing only cover relations an
 
 A **minimal** element has no strictly smaller element. A **maximal** element has no strictly larger element. A **least** element is below every element, and a **greatest** element is above every element. Least and greatest elements, if they exist, are unique; minimal and maximal elements need not be.
 
-## Key results
+## From classes to partitions, from orders to schedules
 
 Equivalence relations and partitions are two views of the same structure.
 
@@ -41,13 +41,13 @@ If $R$ is an equivalence relation on $A$, then its equivalence classes partition
 
 Conversely, given a partition of $A$, define $aRb$ if $a$ and $b$ lie in the same block. This relation is reflexive because each element lies in a block, symmetric because "same block" has no direction, and transitive because if $a$ and $b$ share a block and $b$ and $c$ share a block, then all three are in the same block.
 
-For a partial order, antisymmetry prevents cycles among distinct elements: if $aRb$ and $bRa$, then $a=b$. This is why Hasse diagrams can be drawn upward without directed cycles.
+For a partial order, antisymmetry prevents cycles among distinct elements: if $aRb$ and $bRa$, then $a=b$. Hasse diagrams can therefore be drawn upward without directed cycles.
 
 Every finite nonempty poset has at least one minimal element and at least one maximal element. Starting from any element and repeatedly moving downward must eventually stop because the set is finite; where it stops is minimal. The upward argument gives a maximal element.
 
 Topological sorting takes a finite partial order and produces a linear order compatible with it. This is fundamental for scheduling tasks with prerequisites.
 
-## Visual
+For example, the following Hasse diagram represents divisibility on ${1,2,3,6,12}$:
 
 ```mermaid
 graph BT
@@ -58,7 +58,7 @@ graph BT
   D --> E[12]
 ```
 
-This Hasse diagram represents divisibility on $\{1,2,3,6,12\}$. Edges point upward from smaller to larger elements; implied transitive edges such as $1\mid6$ are omitted.
+Edges point upward from smaller to larger elements; implied transitive edges such as $1\mid6$ are omitted.
 
 | Structure | Relation properties | Output structure | Example |
 | --- | --- | --- | --- |
@@ -67,7 +67,7 @@ This Hasse diagram represents divisibility on $\{1,2,3,6,12\}$. Edges point upwa
 | total order | partial order plus comparability | linear order | $\le$ on integers |
 | strict order | irreflexive and transitive | directed acyclic comparison | $\lt $ on integers |
 
-## Worked example 1: Find equivalence classes modulo 4
+## Residue classes modulo four
 
 **Problem.** On $\mathbb{Z}$, define $aRb$ if $a\equiv b\pmod4$. Prove this is an equivalence relation and list its classes.
 
@@ -97,7 +97,7 @@ $$
 
 **Checked answer.** Congruence modulo $4$ is an equivalence relation, and its four equivalence classes partition the integers.
 
-## Worked example 2: Analyze a subset poset
+## Least, greatest, and incomparable subsets
 
 **Problem.** Consider $\mathcal{P}(\{a,b,c\})$ ordered by inclusion. Find the least element, greatest element, minimal elements, maximal elements, and determine whether it is a total order.
 
@@ -126,7 +126,7 @@ $$
 
 **Checked answer.** The least and only minimal element is $\emptyset$; the greatest and only maximal element is $\{a,b,c\}$; the poset is not totally ordered.
 
-## Code
+## Computing classes and incomparable pairs
 
 ```python
 from itertools import combinations
@@ -156,7 +156,7 @@ print(incomparable[:5])
 
 The first computation builds residue classes modulo $4$ on a finite sample. The second finds incomparable pairs in a subset poset.
 
-## Common pitfalls
+## Distinctions that matter in proofs and diagrams
 
 - Calling a relation an equivalence relation after checking only two of reflexive, symmetric, and transitive.
 - Confusing equivalence classes with individual representatives. Many representatives can name the same class.
@@ -167,7 +167,7 @@ The first computation builds residue classes modulo $4$ on a finite sample. The 
 
 For equivalence relations, the fastest way to understand a relation is often to identify its invariant. Congruence modulo $m$ preserves remainder. Same birthday preserves month and day. Same connected component in a graph preserves reachability. The invariant tells you what the equivalence classes should be and helps prove the three required properties.
 
-Equivalence classes are either identical or disjoint. They cannot partially overlap. This fact is often the key step when moving from a relation to a partition. If two classes share even one element, transitivity and symmetry force every member of one class to be a member of the other. This is why residue classes modulo $m$ cleanly split the integers.
+Equivalence classes are either identical or disjoint. They cannot partially overlap. This fact is often the key step when moving from a relation to a partition. If two classes share even one element, transitivity and symmetry force every member of one class to be a member of the other. Residue classes modulo $m$ therefore split the integers cleanly.
 
 For partial orders, draw a few comparable and incomparable pairs before looking for least or greatest elements. A least element must compare below every other element, not merely have nothing below it. A minimal element only needs no smaller element. In a set of tasks with two independent starting tasks, both can be minimal while neither is least.
 
@@ -179,10 +179,14 @@ When proving a relation comes from a partition, use the phrase "same block" as t
 
 For posets, examples with small power sets are useful test cases. In $\mathcal{P}(\{a,b\})$, the sets $\{a\}$ and $\{b\}$ are incomparable. This single example prevents the mistaken belief that subset inclusion is always a total order. Many scheduling and dependency orders have the same incomparability.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Relations](/math/discrete/relations) defines reflexive, symmetric, antisymmetric, and transitive.
 - [Modular arithmetic and cryptography](/math/discrete/modular-arithmetic-and-cryptography) supplies congruence classes.
 - [Sets and set operations](/math/discrete/sets-and-set-operations) supplies partitions and power sets.
 - [Graphs basics](/math/discrete/graphs-basics) gives graph representations of relations and Hasse diagrams.
 - [Algorithms and complexity](/math/discrete/algorithms-and-complexity) connects partial orders to topological sorting and scheduling.
+
+</div>

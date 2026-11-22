@@ -7,9 +7,9 @@ sidebar_position: 4
 
 Federated learning reduces raw-data collection, but it does not automatically solve privacy. Model updates can reveal sensitive information, a curious server may inspect gradients, malicious clients may infer membership, and a malicious server may choose models or protocols that amplify leakage. Privacy engineering for FL therefore stacks multiple tools: data minimization, update clipping, differential privacy, secure aggregation, encrypted or multiparty computation, access control, auditing, and sometimes trusted execution environments.
 
-The two anchor papers in this chapter expose the tension. Bonawitz et al. build a practical secure-aggregation protocol so the server learns only an aggregate update, not individual client vectors [1]. Zhu et al.'s Deep Leakage from Gradients shows that shared gradients can reconstruct private inputs and labels in vision and language settings, overturning the naive belief that gradients are safe to reveal [2]. Differential privacy limits the influence of any record or client, while secure aggregation hides individual updates; neither alone is a complete privacy story.
+Two results expose the tension. Bonawitz et al. build a secure-aggregation protocol so the server learns only an aggregate update, not individual client vectors [1]. Zhu et al.'s Deep Leakage from Gradients shows that shared gradients can reconstruct private inputs and labels in vision and language settings, overturning the naive belief that gradients are safe to reveal [2]. Differential privacy limits the influence of any record or client, while secure aggregation hides individual updates; neither alone is a complete privacy story.
 
-## Definitions
+## Threat models and units of protection
 
 **Threat models** specify who may deviate or observe. An **honest-but-curious server** follows the protocol but inspects whatever messages it receives. A **malicious server** may choose model states, select clients adaptively, or lie about dropouts. **Malicious clients** may send poisoned updates, infer information from the global model, or collude with the server. A **network adversary** can observe or tamper unless transport encryption and authentication are used. **Membership inference** asks whether a particular record or client participated in training.
 
@@ -33,7 +33,7 @@ Practical training over many rounds uses composition, moments accountant, or Ren
 
 ![A secure aggregation protocol diagram shows pairwise masks, Diffie-Hellman key agreement, and Shamir secret sharing that allow a server to sum masked updates without learning individual contributions.](https://ar5iv.labs.arxiv.org/html/1611.04482/assets/x1.png)
 
-*Figure: Bonawitz et al.'s secure aggregation lets a server compute the sum of client updates without learning any individual update, with dropout robustness from threshold secret sharing. From [Bonawitz et al., 2017](https://arxiv.org/abs/1611.04482) — embedded under educational fair use with attribution.*
+*Figure: Bonawitz et al.'s protocol computes the sum of client updates without exposing any surviving client's vector; threshold secret sharing handles dropouts. From [Bonawitz et al., 2017](https://arxiv.org/abs/1611.04482), reproduced with attribution for discussion.*
 
 **Secure aggregation** computes $\sum_k x_k$ without revealing individual $x_k$ to the server. Bonawitz et al. use pairwise masks from key agreement, pseudorandom generators, and secret sharing to handle dropouts [1].
 
@@ -51,15 +51,15 @@ When the server sums all $z_k$, every pairwise mask cancels.
 
 **Trusted execution environments** run aggregation inside hardware-backed enclaves. TEEs can simplify engineering, but they shift trust to hardware vendors, side-channel mitigations, attestation, and enclave operations.
 
-## Key results
+## Why masking and differential privacy need each other
 
 Secure aggregation protects individual updates from the server, but only at aggregation time. The Bonawitz protocol is designed for high-dimensional vectors, mobile dropouts, and a server-mediated network where clients do not naturally communicate directly [1]. The key idea is pairwise cancellation: client $u$ and client $v$ agree on a pseudorandom mask. One adds it, the other subtracts it. If both survive, the masks cancel in the aggregate. If one drops out, secret shares allow the server to remove the missing client's mask without revealing surviving clients' inputs. The full protocol uses Diffie-Hellman key agreement, authenticated encryption, signatures, Shamir secret sharing, and a consistency check for stronger adversary models.
 
-Secure aggregation is not the same as differential privacy. It hides the individual update from the server, but the aggregate itself can still reveal information if the cohort is small, the model is maliciously chosen, or repeated rounds isolate a user. DP adds a statistical privacy bound to the released aggregate, often after clipping each contribution. In practice, secure aggregation and DP are complementary: secure aggregation hides who sent what, while DP limits what the sum can reveal.
+Secure aggregation is not the same as differential privacy. It hides the individual update from the server, but the aggregate itself can still reveal information if the cohort is small, the model is maliciously chosen, or repeated rounds isolate a user. DP adds a statistical privacy bound to the released aggregate, often after clipping each contribution. The two mechanisms are complementary: secure aggregation hides who sent what, while DP limits what the sum can reveal.
 
 ![A Deep Leakage from Gradients figure shows that optimizing dummy inputs to match observed gradients can recover near-pixel-accurate training images.](https://ar5iv.labs.arxiv.org/html/1906.08935/assets/x1.png)
 
-*Figure: DLG recovers private training images directly from shared gradients, refuting the assumption that exchanging gradients alone is privacy-preserving and motivating clipping plus noise. From [Zhu et al., 2019](https://arxiv.org/abs/1906.08935) — embedded under educational fair use with attribution.*
+*Figure: DLG recovers private training images from shared gradients, refuting the assumption that gradient exchange alone preserves privacy. From [Zhu et al., 2019](https://arxiv.org/abs/1906.08935), reproduced with attribution for discussion.*
 
 Gradient inversion makes this complementarity concrete. Deep Leakage from Gradients sets up a dummy input $x^*$ and label $y^*$, computes dummy gradients, and optimizes the dummy data to match the observed real gradients [2]:
 
@@ -71,7 +71,7 @@ If matching succeeds, the dummy input becomes a reconstruction of the private tr
 
 Batch size, model architecture, and update form matter. Single-example gradients are much easier to invert than large aggregated batches. Larger batches introduce permutations and mixed signals. Secure aggregation increases the effective batch by hiding individual updates inside a sum. DP noise and clipping degrade the attack objective. But none of these defenses should be described as absolute; stronger attackers can use priors, generative models, malicious model choices, or repeated observations.
 
-Privacy accounting is the discipline that prevents hand-waving. If a training run has $T$ rounds, sampling rate $q$, clipping norm $C$, noise multiplier $z$, and target $\delta$, the final $\varepsilon$ is not just the per-round $\varepsilon$ multiplied in a casual way. Basic composition is simple but pessimistic. Advanced composition improves the bound. Moments accountant and RDP track privacy loss more tightly for Gaussian mechanisms and subsampled training [3], [4], [5].
+Privacy accounting prevents hand-waving. If a training run has $T$ rounds, sampling rate $q$, clipping norm $C$, noise multiplier $z$, and target $\delta$, the final $\varepsilon$ cannot be obtained by casually multiplying the per-round value. Basic composition is simple but pessimistic. Advanced composition improves the bound. Moments accountant and RDP track privacy loss more tightly for Gaussian mechanisms and subsampled training [3], [4], [5].
 
 Membership inference remains relevant even when raw gradients are hidden. A model can behave differently on records it trained on than on records it did not. In FL, membership can mean example-level membership in a client's dataset or client-level participation in a round. Defenses include regularization, DP, limiting overfitting, larger aggregation cohorts, secure aggregation, and careful evaluation against privacy attacks [7].
 
@@ -87,8 +87,6 @@ The privacy stack is therefore layered:
 | TEE | Server software exposure | Hardware and side-channel trust |
 | HE/MPC | Plaintext computation exposure | Heavy computation and deployment complexity |
 | Auditing | Governance and accountability | Mathematical privacy alone |
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -116,7 +114,7 @@ flowchart TD
   Mask --> DH --> Share --> Sum --> Unmask --> Noise --> Account --> Release
 ```
 
-## Worked example 1: DP-FedAvg noise scale
+## Why basic composition produces unusable noise
 
 **Problem.** A simplified DP-FedAvg deployment clips each client's update to norm $C=1.5$. It wants total privacy budget $\varepsilon_{\mathrm{total}}=2.0$ and $\delta_{\mathrm{total}}=10^{-5}$ over $T=100$ rounds. Use very conservative basic composition by assigning $\varepsilon_r=2.0/100=0.02$ and $\delta_r=10^{-5}/100=10^{-7}$ to each round. Compute the Gaussian noise scale using
 
@@ -150,7 +148,7 @@ $$
 
 **Checked answer.** The per-coordinate Gaussian standard deviation would be about $428.8$ in the same units as the clipped update. This is intentionally pessimistic because basic composition spends privacy evenly per round. Real DP-FedAvg analyses use subsampling and RDP or moments accounting to obtain a more useful noise-privacy tradeoff.
 
-## Worked example 2: Secure aggregation masks with three clients
+## Watching pairwise masks cancel
 
 **Problem.** Three clients have scalar updates $x_1=8$, $x_2=5$, and $x_3=11$. Pairwise masks are $s_{2,1}=4$, $s_{3,1}=7$, and $s_{3,2}=2$, following
 
@@ -192,7 +190,7 @@ $$
 
 **Checked answer.** The masks cancel exactly in the aggregate. The server sees $-3$, $7$, and $20$ in this toy version, but in a secure protocol it should not be able to remove masks for any surviving individual client.
 
-## Code
+## Checking the noise and mask arithmetic
 
 ```python
 import math
@@ -222,7 +220,7 @@ masked = secure_agg_masked_values(xs, masks)
 print(masked, sum(masked), sum(xs))
 ```
 
-## Common pitfalls
+## Privacy claims that omit part of the threat model
 
 - Saying FL is private because raw data is not uploaded; gradients and model deltas can leak.
 - Treating secure aggregation and differential privacy as interchangeable.
@@ -238,17 +236,6 @@ print(masked, sum(masked), sum(xs))
 - Proposing homomorphic encryption without estimating vector dimension, ciphertext expansion, and latency.
 - Publishing per-client metrics or logs that bypass the privacy guarantees of the training protocol.
 - Reusing privacy budgets across experiments without tracking cumulative releases.
-
-## Connections
-
-- [Foundations and FedAvg](/cs/federated-learning/foundations-and-fedavg)
-- [Communication Efficiency and Robustness](/cs/federated-learning/communication-efficiency-and-robustness)
-- [Perfect secrecy and one-time pad](/cs/cryptography/perfect-secrecy-one-time-pad)
-- [Discrete log and Diffie-Hellman](/cs/cryptography/discrete-log-diffie-hellman)
-- [Authenticated encryption GCM](/cs/cryptography/authenticated-encryption-gcm)
-- [Privacy-preserving data mining](/cs/data-mining/chapter-20-privacy-preserving-data-mining)
-- [Threat models and attack taxonomy](/cs/adversarial-attacks/threat-models-and-attack-taxonomy)
-- [White-box attacks](/cs/adversarial-attacks/white-box-attacks)
 
 ## References
 
@@ -285,3 +272,9 @@ print(masked, sum(masked), sum(xs))
 [16] O. Ohrimenko et al., "Oblivious Multi-Party Machine Learning on Trusted Processors," USENIX Security, 2016. https://www.usenix.org/conference/usenixsecurity16/technical-sessions/presentation/ohrimenko
 
 [17] B. Hitaj, G. Ateniese, and F. Perez-Cruz, "Deep Models Under the GAN: Information Leakage from Collaborative Deep Learning," CCS, 2017. https://arxiv.org/abs/1702.07464
+
+<div className="see-also">
+
+See also: [Foundations and FedAvg](/cs/federated-learning/foundations-and-fedavg) · [Communication Efficiency and Robustness](/cs/federated-learning/communication-efficiency-and-robustness) · [Perfect secrecy and one-time pad](/cs/cryptography/perfect-secrecy-one-time-pad) · [Discrete log and Diffie-Hellman](/cs/cryptography/discrete-log-diffie-hellman) · [Authenticated encryption GCM](/cs/cryptography/authenticated-encryption-gcm) · [Privacy-preserving data mining](/cs/data-mining/chapter-20-privacy-preserving-data-mining) · [Threat models and attack taxonomy](/cs/adversarial-attacks/threat-models-and-attack-taxonomy) · [White-box attacks](/cs/adversarial-attacks/white-box-attacks)
+
+</div>

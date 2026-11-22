@@ -9,7 +9,7 @@ The relational model is the mathematical core of most database systems. It descr
 
 Relational algebra is the procedural query language that gives this model its basic operators. It is not usually the language people type into production systems, but it is the language behind query rewriting, equivalence rules, join ordering, and many optimizer proofs. SQL adds bags, nulls, grouping, ordering, and many conveniences, but the first mental model for SQL should still be relation in, relation out.
 
-## Definitions
+## Relations, schemas, and declared constraints
 
 A **relation schema** names a relation and its attributes, such as `Student(id, name, dept_name, credits)`. Each attribute has a **domain**, which is the set of legal values for that attribute. A **tuple** is one row matching the schema, and a **relation instance** is a finite set of tuples. In the pure model, tuples are unordered, attributes are referred to by name, and duplicate tuples do not occur.
 
@@ -33,7 +33,7 @@ Relational algebra operators include:
 
 Two relations are **union-compatible** if they have the same number of attributes and corresponding domains. A join predicate is usually a comparison between attributes from different relations, such as `takes.course_id = course.course_id`.
 
-## Key results
+## Algebraic laws and query structure
 
 Relational algebra is **closed**: every operation returns a relation. Closure lets complex queries be built by nesting smaller expressions. For example, a selection can feed a projection, whose result can feed a join.
 
@@ -61,11 +61,9 @@ Natural join is convenient but risky because it depends on matching attribute na
 
 Division is useful for "for all" queries. If `Takes(student_id, course_id)` records completed courses and `Required(course_id)` records required courses, then `Takes \div Required` returns students who took every required course. Division can be rewritten with projection, product, and difference, so it is not essential, but it is a compact way to recognize universal quantification.
 
-A practical habit is to name intermediate relations when translating a question. Names such as `CSInstructors`, `HighSalary`, and `RequiredPairs` make the level of detail explicit and prevent accidental mixing of attributes from different stages. This habit also mirrors what optimizers do internally: a complex SQL query is represented as a tree of smaller algebraic operators before physical algorithms are chosen.
+Name intermediate relations when translating a question. Names such as `CSInstructors`, `HighSalary`, and `RequiredPairs` make the level of detail explicit and prevent accidental mixing of attributes from different stages. Optimizers use a related representation: a complex SQL query becomes a tree of smaller algebraic operators before physical algorithms are chosen.
 
 Keys should be read as universal claims, not observations from the current rows. If `ID` is a key for `Student`, the schema is saying that two legal student tuples can never share an `ID`. If the current instance merely happens to have unique names, that does not make `name` a key. This distinction matters because design, normalization, and query optimization rely on constraints that remain true after future inserts and updates.
-
-## Visual
 
 ```mermaid
 graph TD
@@ -85,11 +83,9 @@ graph TD
 | Set semantics | Duplicate tuples are absent in the theory | SQL differs because it uses bags unless `DISTINCT` is requested |
 | Constraints | Legal instances are restricted | The DBMS can reject invalid updates and improve plans |
 
-## Worked example 1: Algebra for department instructors
+## Selecting department instructors
 
-Problem: Given `Instructor(ID, name, dept_name, salary)`, find the names and salaries of instructors in the `Comp. Sci.` department who earn more than 90000.
-
-Method:
+Given `Instructor(ID, name, dept_name, salary)`, we want the names and salaries of instructors in the `Comp. Sci.` department who earn more than 90000.
 
 1. Start with the full relation:
 
@@ -121,13 +117,11 @@ $$
 R_3 = \pi_{name, salary}(\sigma_{dept\_name = 'Comp. Sci.' \land salary > 90000}(Instructor))
 $$
 
-Checked answer: the expression returns exactly two columns, `name` and `salary`, and it excludes every tuple that fails either condition. If two instructors have the same name and salary, pure relational algebra returns one tuple because projection removes duplicates. SQL without `DISTINCT` would return both rows.
+The expression returns exactly two columns, `name` and `salary`, and excludes every tuple that fails either condition. If two instructors have the same name and salary, pure relational algebra returns one tuple because projection removes duplicates. SQL without `DISTINCT` would return both rows.
 
-## Worked example 2: Students who took every required course
+## Expressing “every required course”
 
-Problem: `Takes(student_id, course_id)` records completed courses. `Required(course_id)` lists required database courses. Find students who completed all required courses.
-
-Method:
+Suppose `Takes(student_id, course_id)` records completed courses and `Required(course_id)` lists required database courses. The target is the set of students who completed all required courses.
 
 1. Identify the universal pattern. The phrase "every required course" means: for a student `s`, there must not exist a required course `c` such that `(s, c)` is missing from `Takes`.
 
@@ -163,9 +157,9 @@ $$
 Answer = Students - \pi_{student\_id}(Missing)
 $$
 
-Checked answer: if a student took all required courses, no pair for that student appears in `Missing`, so the student remains in `Answer`. If even one required course is absent, the student's id is projected from `Missing` and removed.
+If a student took all required courses, no pair for that student appears in `Missing`, so the student remains in `Answer`. If even one required course is absent, the student's id is projected from `Missing` and removed.
 
-## Code
+## Division in SQL and Python
 
 ```sql
 -- SQL version of the division-style query.
@@ -204,7 +198,7 @@ print(relational_division(
 ))
 ```
 
-## Common pitfalls
+## Where the relational model and SQL diverge
 
 - Treating a relation as an ordered table. The model does not define row order; use explicit ordering only at presentation time.
 - Forgetting that projection removes duplicates in pure algebra. SQL needs `DISTINCT` to match this behavior.
@@ -213,9 +207,8 @@ print(relational_division(
 - Assuming foreign keys are optional documentation. If declared and enforced, they restrict legal database states.
 - Translating "for all" queries as ordinary joins. Universal queries usually need division, double `NOT EXISTS`, or grouping with counts.
 
-## Connections
+<div className="see-also">
 
-- [SQL DDL, DML, and Basic Queries](/cs/databases/sql-ddl-dml-and-basic-queries)
-- [SQL Joins, Subqueries, and Set Operations](/cs/databases/sql-joins-subqueries-and-set-operations)
-- [Normalization and Functional Dependencies](/cs/databases/normalization-functional-dependencies)
-- [Query Optimization and Cost Estimation](/cs/databases/query-optimization-and-cost-estimation)
+See also: [SQL DDL, DML, and Basic Queries](/cs/databases/sql-ddl-dml-and-basic-queries) · [SQL Joins, Subqueries, and Set Operations](/cs/databases/sql-joins-subqueries-and-set-operations) · [Normalization and Functional Dependencies](/cs/databases/normalization-functional-dependencies) · [Query Optimization and Cost Estimation](/cs/databases/query-optimization-and-cost-estimation)
+
+</div>

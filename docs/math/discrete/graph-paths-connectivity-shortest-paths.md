@@ -9,7 +9,7 @@ Paths are how local edges become global structure. Connectivity asks whether ver
 
 These ideas are the algorithmic core of graph theory. A graph representation tells us who is adjacent; traversal algorithms turn that local information into reachability, components, spanning trees, and distances. Weighted graphs then require more careful algorithms because the fewest edges need not give the lowest total cost.
 
-## Definitions
+## Walks, components, and weighted distance
 
 A **walk** in an undirected graph is a sequence of vertices where consecutive vertices are adjacent. Its **length** is the number of edges used. A **trail** has no repeated edges. A **path** often means no repeated vertices, although some texts use "path" for any walk and "simple path" for no repeated vertices.
 
@@ -21,7 +21,7 @@ A directed graph is **strongly connected** if every vertex can reach every other
 
 In a weighted graph, each edge has a numerical weight. A **shortest path** from $s$ to $t$ minimizes total edge weight, not necessarily number of edges. A **spanning tree** of a connected graph is a subgraph that includes every vertex and is a tree.
 
-## Key results
+## Why BFS and Dijkstra finalize correct distances
 
 If a simple graph with $n$ vertices has a walk from $u$ to $v$, then it has a path from $u$ to $v$ of length at most $n-1$. If a walk repeats a vertex, remove the closed portion between repeated occurrences. Repeating this process eventually gives a walk with no repeated vertices.
 
@@ -33,7 +33,7 @@ Dijkstra's algorithm finds shortest paths from one source when all edge weights 
 
 The adjacency matrix $A$ of a graph also counts walks: the $(i,j)$ entry of $A^k$ is the number of walks of length $k$ from vertex $i$ to vertex $j$ in a simple graph. This links graph theory with matrix arithmetic.
 
-## Visual
+For the weighted graph below, the edge count and total weight give different notions of distance:
 
 ```mermaid
 graph LR
@@ -52,7 +52,7 @@ graph LR
 | Dijkstra | nonnegative weights | shortest weighted paths | $O((n+m)\log n)$ with heap |
 | matrix powers | small dense graphs | number of walks of fixed length | matrix multiplication cost |
 
-## Worked example 1: Run BFS by layers
+## BFS layers from a source vertex
 
 **Problem.** In the graph with adjacency list
 
@@ -88,9 +88,9 @@ $$
 
 The BFS tree can use predecessor edges $(a,b),(a,c),(b,d),(d,e)$.
 
-## Worked example 2: Run Dijkstra's algorithm
+## Dijkstra's relaxations on a weighted graph
 
-**Problem.** In the weighted graph from the visual, find shortest distances from $a$.
+**Problem.** In the weighted graph above, find shortest distances from $a$.
 
 **Method.**
 
@@ -129,7 +129,7 @@ $$
 
 The shortest path to $e$ is $a\to b\to c\to d\to e$ with total weight $2+1+1+3=7$.
 
-## Code
+## Queue-based and heap-based implementations
 
 ```python
 from collections import deque
@@ -168,7 +168,7 @@ print(dijkstra(W, "a"))
 
 BFS uses a queue because vertices are processed by distance layer. Dijkstra uses a priority queue because the next safest vertex is the one with smallest tentative weighted distance.
 
-## Common pitfalls
+## Choosing an algorithm from the cost model
 
 - Using BFS for weighted shortest paths when weights are not all equal.
 - Applying Dijkstra's algorithm to graphs with negative edge weights.
@@ -195,10 +195,14 @@ When a graph is disconnected, shortest-path distances from one source are undefi
 
 If several shortest paths have the same length, BFS or Dijkstra may return any one of them depending on neighbor order or priority-queue tie-breaking. The distance is unique, but the predecessor tree need not be.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Graphs basics](/math/discrete/graphs-basics) supplies graph representations and degree language.
 - [Algorithms and complexity](/math/discrete/algorithms-and-complexity) analyzes BFS, DFS, and Dijkstra.
 - [Trees](/math/discrete/trees) appear as BFS and DFS spanning trees.
 - [Euler, Hamilton, planarity, and coloring](/math/discrete/euler-hamilton-planarity-coloring) studies special paths, circuits, and graph constraints.
 - [Relations](/math/discrete/relations) interprets reachability as transitive closure.
+
+</div>

@@ -9,7 +9,7 @@ Eigenvectors reveal directions that a matrix does not turn. Along those directio
 
 The definition is simple, but its consequences are broad. Instead of asking how a matrix acts on every vector at once, eigenanalysis looks for special directions where the action is one-dimensional. If enough such directions exist, the matrix can be understood by studying independent scalar multiplications.
 
-## Definitions
+## Eigenspaces from singular shifts
 
 Let $A$ be an $n\times n$ matrix. A nonzero vector $\mathbf{x}$ is an eigenvector of $A$ if
 
@@ -45,7 +45,7 @@ $$
 
 Because eigenvectors are required to be nonzero, the zero vector is not itself an eigenvector. However, the eigenspace includes the zero vector because it is a subspace.
 
-## Key results
+## Spectral facts that carry the computation
 
 The eigenvalues of $A$ are the roots of the characteristic polynomial. For an $n\times n$ matrix, the characteristic polynomial has degree $n$, though it may have repeated roots or complex roots.
 
@@ -88,8 +88,6 @@ For repeated eigenvalues, the characteristic polynomial alone does not tell the 
 
 In dynamical systems, the absolute values of eigenvalues control long-term behavior when the matrix is diagonalizable or nearly so. Eigenvalues with $\vert \lambda\vert \lt 1$ correspond to decaying modes. Eigenvalues with $\vert \lambda\vert \gt 1$ correspond to growing modes. Eigenvalues with negative sign introduce alternating direction. This modal interpretation is one of the main reasons eigenvectors are more than a calculation exercise.
 
-## Visual
-
 ```mermaid
 flowchart TD
   A["Square matrix A"] --> B["Compute det(A - lambda I)"]
@@ -108,7 +106,7 @@ flowchart TD
 | Algebraic multiplicity | multiplicity as polynomial root | characteristic-polynomial count |
 | Geometric multiplicity | $\dim(E_\lambda)$ | number of independent eigenvectors for $\lambda$ |
 
-## Worked example 1: Find eigenvalues and eigenvectors of a 2 by 2 matrix
+## Resolving two eigenspaces by hand
 
 Problem: find the eigenvalues and eigenspaces of
 
@@ -189,7 +187,7 @@ $$
 
 Checked answer: $A\begin{bmatrix}1\\1\end{bmatrix}=\begin{bmatrix}5\\5\end{bmatrix}$ and $A\begin{bmatrix}1\\-2\end{bmatrix}=\begin{bmatrix}2\\-4\end{bmatrix}$.
 
-## Worked example 2: Interpret eigenvectors in a repeated process
+## A steady direction under repeated updates
 
 Problem: suppose a process updates states by
 
@@ -270,7 +268,7 @@ $$
 
 The direction is unchanged by the update.
 
-## Code
+## Checking numerical eigenpairs
 
 ```python
 import numpy as np
@@ -289,7 +287,7 @@ for i, lam in enumerate(values):
 
 Numerical eigenvectors are usually scaled differently from hand-computed eigenvectors. Any nonzero scalar multiple of an eigenvector is still an eigenvector for the same eigenvalue.
 
-## Common pitfalls
+## Multiplicity, scaling, and reliable checks
 
 - Allowing the zero vector as an eigenvector. It is in every eigenspace but is not called an eigenvector.
 - Solving $\det(A-\lambda I)=0$ and stopping before finding eigenspaces.
@@ -318,9 +316,8 @@ For triangular matrices, do not expand the characteristic determinant unnecessar
 
 If a matrix is symmetric, its eigenvectors have extra structure: eigenvectors from distinct eigenspaces are orthogonal, and an orthonormal eigenbasis exists. That stronger result belongs to the spectral theorem, but it is useful to remember because symmetric eigenvalue problems are common and especially well behaved.
 
-## Connections
+<div className="see-also">
 
-- [Determinants](/math/linear-algebra/determinants)
-- [Diagonalization and Similarity](/math/linear-algebra/diagonalization-and-similarity)
-- [Quadratic Forms and Spectral Theorems](/math/linear-algebra/quadratic-forms-and-spectral-theorems)
-- [Applications and Modeling](/math/linear-algebra/applications-and-modeling)
+See also: [Determinants](/math/linear-algebra/determinants) · [Diagonalization and Similarity](/math/linear-algebra/diagonalization-and-similarity) · [Quadratic Forms and Spectral Theorems](/math/linear-algebra/quadratic-forms-and-spectral-theorems) · [Applications and Modeling](/math/linear-algebra/applications-and-modeling)
+
+</div>

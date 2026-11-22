@@ -5,141 +5,151 @@ sidebar_position: 2
 
 # Mathematical Preliminaries and Error Analysis
 
-Numerical analysis begins with a simple tension: calculus and linear algebra describe exact objects, while a computer stores finitely many numbers and performs finitely many operations. The purpose of error analysis is not to make this tension disappear. It is to make the size, direction, and consequences of the error visible enough that an algorithm can be trusted for the intended problem.
+Numerical analysis begins with a simple tension: calculus and linear algebra describe exact objects, while a computer stores finitely many numbers and performs finitely many operations. Error analysis does not remove that tension. It makes the size, source, and consequences of an error visible enough to decide whether an algorithm is trustworthy for the intended problem.
 
-This page sits before root finding, interpolation, quadrature, differential equations, and matrix algorithms because every later method uses the same vocabulary. We compare exact and approximate quantities, track how local truncation errors become global errors, and distinguish mathematical convergence from practical reliability.
+The same vocabulary recurs in root finding, interpolation, quadrature, differential equations, and matrix algorithms. In each setting, one must distinguish the exact object from its approximation, trace local errors into global ones, and separate mathematical convergence from practical reliability.
 
-## Definitions
+## Measuring error on the right scale
 
-An **exact value** is the mathematical quantity being approximated, usually denoted $p$, $y(t)$, $I$, or $x$. An **approximation** is a computed value such as $p_n$, $w_i$, $Q_h$, or $\hat{x}$. The **absolute error** and **relative error** are
+For an exact value $p$ and a computed approximation $\hat p$, the absolute and relative errors are
 
 $$
-E_{abs}=|p-\hat p|,
+E_{\mathrm{abs}}=|p-\hat p|,
 \qquad
-E_{rel}=\frac{|p-\hat p|}{|p|}, \quad p\ne 0.
+E_{\mathrm{rel}}=\frac{|p-\hat p|}{|p|}, \quad p\ne 0.
 $$
 
-Relative error is usually more meaningful when the scale of the exact answer matters. An absolute error of $10^{-4}$ is excellent for a number near $10^3$ and poor for a number near $10^{-6}$. When $p=0$ or is very small, relative error can be undefined or misleading, so the absolute scale must be reported.
+Relative error is often more informative when the scale of the answer matters. An absolute error of $10^{-4}$ is excellent for a number near $10^3$ and poor for a number near $10^{-6}$. When $p=0$ or is very small, relative error is undefined or misleading, so an absolute or problem-specific scale is needed.
 
-A sequence $\{p_n\}$ **converges** to $p$ if for every tolerance $\varepsilon\gt 0$ there is an index $N$ such that $\vert p_n-p\vert \lt\varepsilon$ for all $n\ge N$. In computations, this definition is turned into a stopping rule such as $\vert p_{n+1}-p_n\vert \lt\mathrm{tol}$, $\vert f(p_n)\vert \lt\mathrm{tol}$, or an estimated error bound. These tests are not equivalent, so the chosen test should match the question being answered.
+| Error quantity | Typical form | What it measures | Warning sign |
+|---|---:|---|---|
+| Absolute error | $\lvert p-\hat p\rvert$ | distance from the exact value | difficult to compare across scales |
+| Relative error | $\lvert p-\hat p\rvert/\lvert p\rvert$ | error relative to answer size | unreliable when $p\approx 0$ |
+| Truncation error | $O(h^q)$ | error from replacing an exact process by a finite formula | competes with roundoff as $h$ shrinks |
+| Roundoff error | typically tied to unit roundoff $u$ | error from finite-precision arithmetic | cancellation, overflow, or accumulated rounding |
+| Residual | $\lvert f(\hat p)\rvert$ or $\|b-A\hat x\|$ | how closely the computed value satisfies the equation | may be small despite a large forward error |
 
-The notation $O(h^q)$ means that, as $h\to 0$, the magnitude of the term is bounded by a constant times $h^q$. More precisely, $R(h)=O(h^q)$ if there are constants $C$ and $h_0$ such that $\vert R(h)\vert \le C\vert h\vert ^q$ whenever $0\lt \vert h\vert \lt h_0$. This notation is central to Taylor formulas, finite differences, interpolation remainders, and quadrature error estimates.
+The residual and the forward error answer different questions. A small residual says that the equation is nearly satisfied. Turning that statement into a bound on the solution error requires information about conditioning.
 
-## Key results
+## Convergence, rate, and stopping tests
 
-Taylor's theorem is the main bridge between exact analysis and numerical formulas. If $f$ has $n+1$ continuous derivatives near $a$, then
+A sequence $\{p_n\}$ converges to $p$ if, for every $\varepsilon\gt 0$, there is an index $N$ such that
+
+$$
+|p_n-p|<\varepsilon
+$$
+
+for all $n\geq N$. A computation replaces this definition with an observable stopping test such as
+
+$$
+|p_{n+1}-p_n|<\mathrm{tol},
+\qquad
+|f(p_n)|<\mathrm{tol},
+$$
+
+or a certified error estimate. These tests are not interchangeable. Consecutive iterates can be close because the iteration has stalled, while a small residual can coexist with a large solution error in an ill-conditioned problem.
+
+A useful convergence claim names its hypotheses, its limiting object, and its rate. If
+
+$$
+|p_n-p|\leq C\alpha^n, \quad 0<\alpha<1,
+$$
+
+the convergence is linear. More generally, a method has order $q$ near the limit when
+
+$$
+|p_{n+1}-p|\leq C|p_n-p|^q.
+$$
+
+For $q\gt 1$, the convergence is superlinear. These are asymptotic descriptions: early iterations may instead reflect poor scaling, an unfavorable starting value, or roundoff.
+
+## Taylor expansion as an error engine
+
+Taylor's theorem connects exact analysis to finite formulas. If $f$ has $n+1$ continuous derivatives near $a$, then
 
 $$
 f(a+h)=f(a)+hf'(a)+\frac{h^2}{2}f''(a)+\cdots+\frac{h^n}{n!}f^{(n)}(a)+R_{n+1}(h),
 $$
 
-where one common form of the remainder is
+with the Lagrange remainder
 
 $$
 R_{n+1}(h)=\frac{h^{n+1}}{(n+1)!}f^{(n+1)}(\xi)
 $$
 
-for some $\xi$ between $a$ and $a+h$. The theorem explains why the forward difference has first-order truncation error, the centered difference has second-order truncation error, and Simpson's rule is exact for cubic polynomials.
+for some $\xi$ between $a$ and $a+h$. This expansion explains, among many other results, the first-order error of a forward difference, the second-order error of a centered difference, and the exactness of Simpson's rule for cubic polynomials.
 
-A typical convergence statement has three parts: the hypotheses under which the result is true, the limiting object, and the rate. If
-
-$$
-|p_n-p|\le C\alpha^n, \quad 0\lt\alpha\lt 1,
-$$
-
-then convergence is linear. If
+The notation $R(h)=O(h^q)$ means that constants $C$ and $h_0$ exist such that
 
 $$
-|p_{n+1}-p|\le C|p_n-p|^q, \quad q\gt 1,
+|R(h)|\leq C|h|^q
 $$
 
-then the method has order $q$ near the limit. These asymptotic rates describe late-stage behavior; early iterations can be dominated by poor scaling, bad starting values, or roundoff.
+whenever $0\lt \vert h\vert \lt h_0$. It is an asymptotic bound, not an equality and not a statement of the leading constant.
 
-Error analysis also separates **truncation error** from **roundoff error**. Truncation error is caused by replacing an infinite or exact mathematical process with a finite one, such as replacing a derivative by a difference quotient. Roundoff error is caused by storing and operating on finite precision numbers. Reducing the step size $h$ often lowers truncation error but can increase roundoff amplification, so the best step is frequently a balance rather than the smallest representable number.
+## Truncation and roundoff pull in opposite directions
 
-A reliable way to use these results is to keep the analysis tied to the actual numerical question rather than to the formula alone. For mathematical preliminaries and error analysis, the input record should include the exact quantity, approximation, norm, scale, and stopping criterion. Without that record, two computations that look similar on paper may have different numerical meanings. The same formula can be a safe production tool in one scaling and a fragile experiment in another. This is why the examples on this page show the intermediate arithmetic: the goal is not only to reach a number, but to expose what assumptions made that number meaningful.
+Truncation error comes from replacing an exact or infinite process by a finite one, such as replacing a derivative with a difference quotient. Roundoff error comes from representing numbers and operations in finite precision. Decreasing a step size often reduces truncation error while amplifying roundoff, so the best step is generally a balance rather than the smallest representable number.
 
-The next record is the verification record. Useful diagnostics for this topic include absolute error, relative error, residuals, and observed convergence rates. A diagnostic should be chosen before the computation is trusted, not after a pleasing answer appears. When an exact answer is unavailable, compare two independent approximations, refine the mesh or tolerance, check a residual, or test the method on a neighboring problem with known behavior. If several diagnostics disagree, treat the disagreement as information about conditioning, stability, or implementation rather than as a nuisance to be averaged away.
+For a credible computation, record the exact quantity or mathematical target, the approximation, its norm and scale, and the stopping criterion. The main cost may be iterations, function evaluations, or extra stages in a higher-order method. Compare methods by the work required to reach a verified tolerance, not by asymptotic order alone.
 
-The cost record matters as well. In this topic the dominant costs are usually iterations, function evaluations, and the balance between truncation and roundoff. Numerical analysis is full of methods that are mathematically attractive but computationally mismatched to the problem size. A dense factorization may be acceptable for a classroom matrix and impossible for a PDE grid. A high-order rule may use fewer steps but more expensive stages. A guaranteed method may take many iterations but provide a bound that a faster method cannot. The right comparison is therefore cost to reach a verified tolerance, not order or elegance in isolation.
+It also helps to keep four layers distinct:
 
-Finally, every method here has a recognizable failure mode: using the wrong error scale, overreading asymptotic notation, and ignoring roundoff. These failures are not edge cases to memorize; they are signals that the hypotheses behind the result have been violated or that a different numerical model is needed. A good implementation makes such failures visible through exceptions, warnings, residual reports, or conservative stopping rules. A good hand solution does the same thing in prose by naming the assumption being used and checking it at the point where it matters.
+1. the continuous mathematical problem;
+2. the discrete approximation;
+3. the algebraic or iterative algorithm;
+4. the diagnostic used to judge the result.
 
-For study purposes, the most useful habit is to separate four layers: the continuous mathematical problem, the discrete approximation, the algebraic or iterative algorithm used to compute it, and the diagnostic used to judge the result. Many mistakes come from mixing these layers. A small algebraic residual may not mean a small modeling error. A small step-to-step change may not mean the discrete equations are solved. A high-order truncation formula may not help when the data are noisy or the arithmetic is unstable. Keeping the layers separate makes the results on this page portable to larger examples.
+A high-order discretization can still be undermined by noisy data or unstable arithmetic, and a small algebraic residual does not measure modeling error.
 
-## Visual
+## Error in the approximation $3.1416\approx\pi$
 
-| Error idea | Typical symbol | What it measures | Common control knob | Warning sign |
-|---|---:|---|---|---|
-| Absolute error | $\vert p-\hat p\vert $ | Physical distance from exact value | More iterations, smaller step | Misleading across scales |
-| Relative error | $\vert p-\hat p\vert /\vert p\vert $ | Error compared with answer size | Scaling and normalization | Bad when $p\approx 0$ |
-| Truncation error | $O(h^q)$ | Error from a finite formula | Decrease $h$ or raise order | Competes with roundoff |
-| Roundoff error | about $u$ per rounded operation | Error from finite precision | Stable formula, rescaling | Cancellation, overflow |
-| Residual | $\vert f(\hat p)\vert $ or $\|b-A\hat x\|$ | Equation mismatch | Iteration refinement | Small residual can hide ill-conditioning |
-
-## Worked example 1: absolute and relative error
-
-**Problem.** A computation gives $\hat p=3.1416$ for $p=\pi$. Find the absolute and relative error, and interpret the result.
-
-**Method.** Use the definitions directly.
-
-1. Compute the absolute error:
+Taking $p=\pi$ and $\hat p=3.1416$, the absolute error is
 
 $$
-|p-\hat p|=|3.141592653589793-3.1416|=0.000007346410207\ldots.
+|p-\hat p|=|3.141592653589793-3.1416|
+=0.000007346410207\ldots.
 $$
 
-2. Compute the relative error:
+The relative error is
 
 $$
 \frac{|p-\hat p|}{|p|}
 =\frac{0.000007346410207\ldots}{3.141592653589793}
-=2.338434996\times 10^{-6}\ldots.
+=2.338434996\times 10^{-6}\ldots,
 $$
 
-3. Convert to a percent if desired:
+or about $0.0002338435\%$. Thus the absolute error is about $7.35\times 10^{-6}$ and the relative error is about $2.34\times 10^{-6}$; reporting $3.1416$ to five significant digits is justified.
+
+## Reading the first neglected Taylor term
+
+To show that
 
 $$
-100E_{rel}\approx 0.0002338435\%.
+\cos h+\frac{h^2}{2}=1+O(h^4),
 $$
 
-**Checked answer.** The approximation has absolute error about $7.35\times 10^{-6}$ and relative error about $2.34\times 10^{-6}$. The final digit is not exact, but the first five significant digits are reliable for ordinary reporting.
-
-## Worked example 2: Taylor order check
-
-**Problem.** Show that
-
-$$
-\cos h+\frac{h^2}{2}=1+O(h^4)
-$$
-
-as $h\to 0$.
-
-**Method.** Expand $\cos h$ about $0$ through the fourth-degree term.
-
-1. Taylor's theorem gives
+expand $\cos h$ about zero with a fourth-order remainder:
 
 $$
 \cos h=1-\frac{h^2}{2}+\frac{h^4}{24}\cos(\xi)
 $$
 
-for some $\xi$ between $0$ and $h$.
-
-2. Add $h^2/2$ to both sides:
+for some $\xi$ between $0$ and $h$. Therefore
 
 $$
 \cos h+\frac{h^2}{2}=1+\frac{h^4}{24}\cos(\xi).
 $$
 
-3. Since $\vert \cos(\xi)\vert \le 1$,
+Since $\vert \cos(\xi)\vert \leq 1$,
 
 $$
-\left|\frac{h^4}{24}\cos(\xi)\right|\le \frac{|h|^4}{24}.
+\left|\frac{h^4}{24}\cos(\xi)\right|\leq \frac{|h|^4}{24}.
 $$
 
-**Checked answer.** The remainder is bounded by a constant times $h^4$, so $\cos h+h^2/2=1+O(h^4)$. This check is typical: identify the first nonzero neglected Taylor term, then bound its coefficient.
+The remainder is bounded by a constant times $h^4$, which proves the claim. The first nonzero neglected term usually identifies the expected order; bounding its coefficient completes the argument.
 
-## Code
+## Estimating error and observed order in Python
 
 ```python
 import math
@@ -170,17 +180,19 @@ print("errors", errors)
 print("observed orders", observed_order(errors, hs))
 ```
 
-## Common pitfalls
+The ratio estimate is meaningful only while the errors are in the asymptotic regime and still above the roundoff floor. If the observed orders drift, refine the test carefully rather than forcing a single rate onto the data.
 
-- Reporting a residual as if it were automatically a forward error. A small residual only says the equation is nearly satisfied; conditioning determines how far the computed answer may be from the exact answer.
-- Using relative error when the exact value is zero or close to zero. In that case, report absolute error or use a problem-specific scale.
-- Treating $O(h^q)$ as an equality. It describes an asymptotic bound, not the exact leading constant.
-- Decreasing $h$ without considering roundoff. Difference formulas often get worse after $h$ becomes too small.
-- Stopping an iteration because consecutive iterates are close even though the residual is still large. A stalled sequence can pass an increment test.
+## Checks that catch misleading answers
 
-## Connections
+- Use absolute error or a problem-specific scale when the exact value is zero or nearly zero.
+- Treat $O(h^q)$ as a bound on asymptotic behavior, not as the exact error.
+- Do not decrease $h$ indefinitely; difference formulas eventually lose accuracy to roundoff and cancellation.
+- Pair an increment test with a residual or error estimate, since close iterates can merely indicate stagnation.
+- When the exact answer is unavailable, compare independent approximations, refine the mesh or tolerance, and test the method on a nearby problem with a known result.
+- If diagnostics disagree, investigate conditioning, stability, and implementation rather than averaging the evidence away.
 
-- [floating point conditioning and stability](/math/numerical-analysis/floating-point-conditioning-stability)
-- [bisection and fixed point iteration](/math/numerical-analysis/bisection-fixed-point)
-- [numerical differentiation and Richardson extrapolation](/math/numerical-analysis/numerical-differentiation-richardson)
-- [Newton Cotes and Romberg integration](/math/numerical-analysis/newton-cotes-romberg-integration)
+<div className="see-also">
+
+See also: [floating point conditioning and stability](/math/numerical-analysis/floating-point-conditioning-stability) · [bisection and fixed point iteration](/math/numerical-analysis/bisection-fixed-point) · [numerical differentiation and Richardson extrapolation](/math/numerical-analysis/numerical-differentiation-richardson) · [Newton Cotes and Romberg integration](/math/numerical-analysis/newton-cotes-romberg-integration)
+
+</div>

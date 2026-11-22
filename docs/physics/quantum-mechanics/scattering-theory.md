@@ -9,7 +9,7 @@ Scattering turns quantum mechanics into an experimental engine. Instead of prepa
 
 Sakurai treats scattering through time-dependent perturbation ideas, amplitudes, Born approximation, partial waves, and symmetry. Ballentine has a broad scattering chapter with cross sections, spherical potentials, scattering operators, resonances, and identical-particle effects. The Gottfried-named notes touch scattering through diffraction and perturbation methods. Schiff's classic account is a standard source for partial waves and potential scattering notation.
 
-## Definitions
+## From the asymptotic wave to a cross section
 
 For elastic scattering from a localized potential, the asymptotic stationary wave function has the form
 
@@ -39,7 +39,7 @@ $$
 
 The real quantities $\delta_\ell$ are **phase shifts**. They encode how the potential changes each angular-momentum channel.
 
-## Key results
+## Three useful descriptions of the amplitude
 
 The optical theorem relates forward scattering to the total cross section:
 
@@ -79,8 +79,6 @@ for distinguishable spinless particles under the simplest assumptions.
 
 Resonances occur when a phase shift passes rapidly through $\pi/2$. They signal long-lived intermediate states or quasi-bound behavior. Ballentine's scattering chapter treats this connection explicitly, while Sakurai emphasizes how amplitudes and symmetries organize the calculation.
 
-## Visual
-
 ```mermaid
 flowchart TB
   Input["Scattering setup<br/>incident plane wave with wave number k"] --> Potential["Localized potential V(r)<br/>or channel interaction"]
@@ -112,7 +110,7 @@ flowchart TB
   Amp --> Optical["optical theorem<br/>sigma_tot proportional to Im f(0)"]
 ```
 
-The scattering diagram shows the common I/O contract first: an incident wave and localized potential determine an outgoing amplitude and observable cross section. The partial-wave subgraph exposes the channel-by-channel route through radial equations, phase shifts, unitarity, and resonances; the Born subgraph exposes the Lippmann-Schwinger series and first-Born Fourier-transform approximation. The optical-theorem node links the forward amplitude back to total probability conservation.
+An incident wave and localized potential determine an outgoing amplitude and observable cross section. The partial-wave branch follows the radial equations through phase shifts, unitarity, and resonances; the Born branch follows the Lippmann-Schwinger series to the first-Born Fourier-transform approximation. The optical theorem links the forward amplitude back to total probability conservation.
 
 | Method | Best regime | Main output | Failure mode |
 |---|---|---|---|
@@ -121,7 +119,7 @@ The scattering diagram shows the common I/O contract first: an incident wave and
 | Low-energy scattering length | $ka_s$ small | universal s-wave cross section | misses effective range/resonances |
 | S-matrix | general scattering | unitarity and channels | abstract unless tied to observables |
 
-## Worked example 1: Born amplitude for a Gaussian potential
+## Fourier-transforming a Gaussian target
 
 **Problem.** For
 
@@ -170,7 +168,7 @@ $$
 
 **Checked answer.** The amplitude is largest at small momentum transfer and decays rapidly for large scattering angles.
 
-## Worked example 2: Total cross section from s-wave scattering
+## Integrating an isotropic s-wave cross section
 
 **Problem.** Suppose low-energy scattering is dominated by a real scattering length $a_s$. Find the total cross section for distinguishable spinless particles.
 
@@ -208,23 +206,7 @@ $$
 
 **Checked answer.** The result is independent of angle and energy at this leading level, as expected for s-wave dominance.
 
-## Code
-
-```python
-import numpy as np
-
-def gaussian_born_shape(q, a=1.0):
-    return np.exp(-(a * q) ** 2 / 4)
-
-angles = np.linspace(0, np.pi, 7)
-k = 2.0
-q = 2 * k * np.sin(angles / 2)
-
-for theta, value in zip(angles, gaussian_born_shape(q)):
-    print(round(theta, 3), round(value, 5))
-```
-
-## Common pitfalls
+## Checks before trusting a cross section
 
 - Confusing amplitude with probability. Cross sections involve $\vert f\vert ^2$ and flux normalization.
 - Forgetting that Born-approximation prefactors depend on normalization convention.
@@ -236,28 +218,22 @@ for theta, value in zip(angles, gaussian_born_shape(q)):
 
 Scattering notation is compact because it hides preparation and detection details. The incident beam defines a flux, the target defines an interaction region, and the detector samples outgoing particles per solid angle. Cross section has dimensions of area because it converts incident flux into event rate. If a calculation gives a dimensionless total cross section or an angular distribution with the wrong units, the normalization has been mishandled.
 
-The Born approximation is best understood as a Fourier probe. Large scattering angles correspond to large momentum transfer, so they test short-distance structure of the potential. Smooth broad potentials have Fourier transforms concentrated near small $q$, while sharp potentials scatter more strongly into large angles. This interpretation is why diffraction, form factors, and scattering from composite objects share the same mathematical skeleton. Ballentine's diffraction-scattering sections reinforce this link between quantum amplitudes and spatial structure.
+The Born approximation is best understood as a Fourier probe. Large scattering angles correspond to large momentum transfer, so they test short-distance structure of the potential. Smooth broad potentials have Fourier transforms concentrated near small $q$, while sharp potentials scatter more strongly into large angles. Diffraction, form factors, and scattering from composite objects consequently share the same mathematical skeleton. Ballentine's diffraction-scattering sections reinforce this link between quantum amplitudes and spatial structure.
 
 Partial waves are the opposite organization: instead of momentum transfer, they sort scattering by angular momentum. At low energy, only small $\ell$ waves reach the interaction region effectively; higher partial waves are suppressed by centrifugal barriers. At higher energy, many partial waves contribute and the sum approaches more classical angular behavior. Resonances appear as rapid phase-shift changes because the wave spends extra time in the interaction region.
 
-Identical particles require amplitude-level symmetrization. If two final alternatives differ only by exchange of identical particles, they are not distinct outcomes. For bosons, the exchanged amplitude adds; for fermions, it subtracts, with spin state affecting the spatial symmetry. This is why scattering theory cannot be fully separated from the identical-particle page. Cross sections encode both interaction dynamics and the quantum statistics of the particles being scattered.
+Identical particles require amplitude-level symmetrization. If two final alternatives differ only by exchange of identical particles, they are not distinct outcomes. For bosons, the exchanged amplitude adds; for fermions, it subtracts, with spin state affecting the spatial symmetry. Scattering theory therefore depends directly on identical-particle structure. Cross sections encode both interaction dynamics and the quantum statistics of the particles being scattered.
 
-The S-matrix viewpoint packages scattering as a map from incoming asymptotic states to outgoing asymptotic states. Bound-state calculations focus on normalizable eigenstates, while scattering calculations use states that look free far before and far after the collision. The interaction is inferred from how phases and amplitudes differ from free propagation. This is why unitarity is so central: total probability distributed among all open channels must be conserved.
+The S-matrix viewpoint packages scattering as a map from incoming asymptotic states to outgoing asymptotic states. Bound-state calculations focus on normalizable eigenstates, while scattering calculations use states that look free far before and far after the collision. The interaction is inferred from how phases and amplitudes differ from free propagation. Unitarity then requires conservation of the total probability distributed among all open channels.
 
 Coulomb scattering is a special warning case. The formulas for short-range potentials assume an asymptotic form with a plane wave plus an outgoing spherical wave. The Coulomb potential falls off slowly, so its long-range phase modifies the usual assumptions. Rutherford scattering is recovered, but the derivation needs care. If a potential is not short-ranged, do not apply short-range scattering formulas without checking their conditions.
 
 Experimentally, cross sections are often averaged over spin states, detector acceptance, energy spread, and target structure. A clean formula such as $d\sigma/d\Omega=\vert f\vert ^2$ is the core theoretical object, but comparing to data may require summing or averaging over unresolved quantum numbers. This is another place where density matrices and identical-particle symmetries enter practical scattering.
 
-For consistency checks, examine the forward direction, low-energy limit, and unitarity. The forward amplitude is constrained by the optical theorem, low-energy behavior should match the expected dominant partial wave, and probabilities across all open channels must not exceed the incoming flux. These checks are often more revealing than algebraic simplification.
+For consistency checks, examine the forward direction, low-energy limit, and unitarity. The forward amplitude is constrained by the optical theorem, low-energy behavior should match the expected dominant partial wave, and probabilities across all open channels must not exceed the incoming flux. These checks often reveal normalization or regime errors that algebraic simplification misses.
 
-They also connect formal amplitudes directly to measurable rates.
+<div className="see-also">
 
-That link is essential.
+See also: [Time-dependent perturbation theory](/physics/quantum-mechanics/time-dependent-perturbation-theory) · [Angular momentum algebra](/physics/quantum-mechanics/angular-momentum-algebra) · [Identical particles and symmetrization](/physics/quantum-mechanics/identical-particles-symmetrization) · [Variational principle and WKB](/physics/quantum-mechanics/variational-principle-wkb) · [Symmetries and conservation laws](/physics/quantum-mechanics/symmetries-conservation-laws)
 
-## Connections
-
-- [Time-dependent perturbation theory](/physics/quantum-mechanics/time-dependent-perturbation-theory)
-- [Angular momentum algebra](/physics/quantum-mechanics/angular-momentum-algebra)
-- [Identical particles and symmetrization](/physics/quantum-mechanics/identical-particles-symmetrization)
-- [Variational principle and WKB](/physics/quantum-mechanics/variational-principle-wkb)
-- [Symmetries and conservation laws](/physics/quantum-mechanics/symmetries-conservation-laws)
+</div>

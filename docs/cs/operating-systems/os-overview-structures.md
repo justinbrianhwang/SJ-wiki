@@ -7,9 +7,9 @@ sidebar_position: 2
 
 An operating system is the control layer that makes bare hardware usable. It hides awkward device details, allocates shared resources, gives programs a stable execution environment, and prevents one program from casually damaging another. Silberschatz, Galvin, and Gagne frame the OS from two complementary views: to users and applications it is a convenient service provider, while to the hardware it is a resource allocator and control program.
 
-This page sits at the entrance to the rest of operating systems. Processes, memory, files, I/O, protection, and security are not separate inventions; they are services exposed through interfaces and implemented inside a kernel structure. Understanding that split between interface and implementation makes later topics easier: a file descriptor, page table, interrupt handler, and scheduler queue are all parts of the same larger design problem.
+Processes, memory, files, I/O, protection, and security are services exposed through interfaces and implemented inside a kernel structure. The split between interface and implementation ties together objects that otherwise look unrelated: file descriptors, page tables, interrupt handlers, and scheduler queues.
 
-## Definitions
+## The kernel boundary and its organizations
 
 An **operating system** is the software that manages hardware resources and provides services for programs. The textbook uses the common practical definition of the **kernel** as the program running at all times on the computer. System programs, libraries, command interpreters, graphical shells, daemons, and application programs may ship with an OS distribution, but they are not necessarily part of the kernel.
 
@@ -21,11 +21,13 @@ An OS also depends on hardware execution modes. In **user mode**, an application
 
 Common kernel structures include **monolithic kernels**, **layered systems**, **microkernels**, **modules**, and **hybrid systems**. A monolithic kernel keeps most services in one large kernel address space. A layered system organizes services above lower-level abstractions. A microkernel moves many services, such as file systems or device services, into user-space servers and leaves only small core mechanisms in the kernel. A modular kernel keeps a core kernel but loads components dynamically. Hybrid systems combine these ideas in pragmatic ways.
 
-## Key results
+## Separating mechanism from policy
 
-The most important design result is the separation between **policy** and **mechanism**. Mechanism answers "what operations are possible?" Policy answers "which operation should be chosen now?" A scheduling mechanism can switch from one thread to another; a scheduling policy decides whether round-robin, priority, shortest-job, or real-time order should run next. This split does not make an OS easy to design, but it prevents every policy change from requiring a new low-level mechanism.
+The separation between **policy** and **mechanism** is a recurring design rule. Mechanism answers "what operations are possible?" Policy answers "which operation should be chosen now?" A scheduling mechanism can switch from one thread to another; a scheduling policy decides whether round-robin, priority, shortest-job, or real-time order should run next. The split prevents every policy change from requiring a new low-level mechanism.
 
 System calls usually follow a standard path. First, a user program calls a library wrapper. Second, the wrapper places a system-call number and arguments where the calling convention requires them. Third, a trap instruction switches to kernel mode and enters a dispatch table. Fourth, the kernel validates arguments, checks permissions, performs the requested service, stores a return value or error code, and returns to user mode. This path matters because it explains both safety and cost: crossing the boundary is more expensive than an ordinary function call, but it lets the kernel enforce protection.
+
+## Services kept behind the boundary
 
 Operating-system services can be grouped by purpose:
 
@@ -44,7 +46,7 @@ Kernel structure is a trade-off between performance, reliability, evolvability, 
 
 Booting follows a layered handoff. Firmware runs first, initializes enough hardware to find a boot loader, the boot loader loads the kernel, the kernel initializes devices and memory management, and then the first user-space process starts system services. On UNIX-like systems this first process is historically `init`; more recent Linux systems often use `systemd`, but the conceptual role is the same: create the early user-space service tree.
 
-## Visual
+## System-call and boot paths
 
 ```mermaid
 flowchart TB
@@ -90,9 +92,9 @@ flowchart TB
 
 This system-call diagram follows one controlled crossing from user mode into kernel mode and back. It labels the ABI setup, trap entry, saved CPU state, dispatch table, validation checks, service modules, interrupt completion, and final register restore. The boot subgraph shows how firmware and the loader create the initial kernel context before ordinary system calls can use these structures.
 
-## Worked example 1: tracing a file read
+### Tracing one file read across the boundary
 
-Problem: A C program executes `read(fd, buffer, 4096)` on a file descriptor that refers to a disk file. Trace what must happen conceptually and identify where protection checks occur.
+A C program executes `read(fd, buffer, 4096)` on a file descriptor that refers to a disk file. Trace what must happen conceptually and identify where protection checks occur.
 
 1. The program calls the C library wrapper for `read`. This wrapper is ordinary user-space code, so it cannot touch the disk controller or kernel file table directly.
 2. The wrapper places the system-call identifier for `read` and the arguments `fd`, `buffer`, and `4096` in the expected registers or stack locations.
@@ -103,11 +105,11 @@ Problem: A C program executes `read(fd, buffer, 4096)` on a file descriptor that
 7. The disk controller performs the transfer, possibly using DMA. When the device completes, it raises an interrupt.
 8. The interrupt handler wakes the waiting process, the kernel copies the bytes into `buffer`, updates the file offset, and returns the number of bytes read.
 
-Checked answer: A file read crosses the user-kernel boundary once on entry and once on return. Protection happens at the file descriptor permission check and at the user-buffer validation step. Performance depends on whether the data is already cached; the same system call can be memory-speed or disk-speed.
+A file read crosses the user-kernel boundary once on entry and once on return. Protection happens at the file descriptor permission check and at the user-buffer validation step. Performance depends on whether the data is already cached; the same system call can be memory-speed or disk-speed.
 
-## Worked example 2: choosing a kernel organization
+## Matching kernel organization to constraints
 
-Problem: A small embedded controller needs predictable timing, a narrow set of devices, and high reliability. A research workstation needs frequent file-system and network experiments. Which structure fits each case better?
+A small embedded controller needs predictable timing, a narrow set of devices, and high reliability. A research workstation needs frequent file-system and network experiments. Which structure fits each case better?
 
 1. Identify the embedded controller's constraints. It probably has limited memory, fixed hardware, and a small application set. Dynamic extensibility matters less than predictable control over every path.
 2. A compact monolithic or carefully layered kernel may fit. It avoids user-space server message overhead and can be validated around a narrow configuration. If the device has hard real-time constraints, unnecessary abstraction layers can be harmful.
@@ -115,9 +117,9 @@ Problem: A small embedded controller needs predictable timing, a narrow set of d
 4. A microkernel-like or modular design is more attractive. A file-system server or loadable module can be changed independently, and failures may be easier to isolate.
 5. Compare the trade-off. The embedded system values small, predictable paths. The research system values changeability and fault containment.
 
-Checked answer: The embedded controller leans toward a small integrated kernel; the research workstation leans toward modular or microkernel-style decomposition. There is no universal "best" structure; the right choice follows the environment's reliability, latency, and evolution requirements.
+The embedded controller leans toward a small integrated kernel; the research workstation leans toward modular or microkernel-style decomposition. There is no universal "best" structure; the right choice follows the environment's reliability, latency, and evolution requirements.
 
-## Code
+## Four POSIX services in one program
 
 ```c
 #include <errno.h>
@@ -153,7 +155,7 @@ int main(void) {
 
 This short POSIX program uses four kernel services: opening a file, reading data, writing to standard output, and closing the file descriptor. Each call looks like a normal C function but may become a system call.
 
-## Common pitfalls
+## Distinctions at the user-kernel boundary
 
 - Treating the shell or desktop as the kernel. They are user interfaces and system programs; the kernel is the privileged core underneath them.
 - Thinking a system call is just a library call. The wrapper may be a library function, but the service requires a controlled mode switch.
@@ -162,11 +164,8 @@ This short POSIX program uses four kernel services: opening a file, reading data
 - Assuming a microkernel is automatically more secure. Smaller trusted code can help, but security still depends on correct interfaces, authorization, and implementation.
 - Forgetting that mobile and embedded systems are operating systems too. Their constraints differ from desktop systems, but they still manage resources and protection.
 
-## Connections
+<div className="see-also">
 
-- [Processes](/cs/operating-systems/processes)
-- [Threads](/cs/operating-systems/threads)
-- [Main Memory](/cs/operating-systems/main-memory)
-- [File-System Interface](/cs/operating-systems/file-system-interface)
-- [Protection and Access Control](/cs/operating-systems/protection-access-control)
+See also: [Processes](/cs/operating-systems/processes) · [Threads](/cs/operating-systems/threads) · [Main Memory](/cs/operating-systems/main-memory) · [File-System Interface](/cs/operating-systems/file-system-interface) · [Protection and Access Control](/cs/operating-systems/protection-access-control)
 
+</div>

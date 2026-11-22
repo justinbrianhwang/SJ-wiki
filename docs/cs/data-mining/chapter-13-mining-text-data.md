@@ -299,10 +299,8 @@ Corpus construction also defines negative examples. Search relevance judgments u
 - Splitting documents randomly when near-duplicates, authors, or later revisions can cross the train-test boundary.
 - Using topic labels assigned by an analyst as if the model itself had named or validated the topics.
 
-## Related pages
+<div className="see-also">
 
-- [Similarity and Distances](/cs/data-mining/chapter-03-similarity-distances)
-- [Feature Selection and Dimensionality Reduction](/cs/data-mining/chapter-02-feature-selection-dimensionality-reduction)
-- [Data Classification](/cs/data-mining/chapter-10-data-classification)
-- [Mining Data Streams and Big Data](/cs/data-mining/chapter-12-mining-data-streams)
-- [Mining Web Data and Recommenders](/cs/data-mining/chapter-18-mining-web-data)
+See also: [Similarity and Distances](/cs/data-mining/chapter-03-similarity-distances) · [Feature Selection and Dimensionality Reduction](/cs/data-mining/chapter-02-feature-selection-dimensionality-reduction) · [Data Classification](/cs/data-mining/chapter-10-data-classification) · [Mining Data Streams and Big Data](/cs/data-mining/chapter-12-mining-data-streams) · [Mining Web Data and Recommenders](/cs/data-mining/chapter-18-mining-web-data)
+
+</div>

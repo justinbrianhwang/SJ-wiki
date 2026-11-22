@@ -7,11 +7,11 @@ sidebar_position: 9
 
 Transformers replace recurrence with attention over token representations. Jurafsky and Martin present self-attention, multihead attention, transformer blocks, positional embeddings, causal language modeling, generation, and harms. Eisenstein's 2018 text predates the full LLM era but includes the formal ingredients that transformers build on: embeddings, neural language models, attention-based neural machine translation, and non-recurrent sequence transduction.
 
-The key idea is that each token representation is updated by looking at other tokens. In causal language models, a token may attend only to previous tokens. In bidirectional encoders, it may attend to the whole input. This attention pattern, stacked with feedforward layers and residual connections, is the main architecture behind modern pretrained language models.
+Each token representation is updated by looking at other tokens. A causal language model restricts that view to the current and previous tokens, while a bidirectional encoder can use the whole input. Stacking attention with feedforward layers and residual connections gives the basic architecture behind modern pretrained language models.
 
-## Definitions
+## Computing self-attention
 
-Given input vectors $x_1,\ldots,x_n$, self-attention creates queries, keys, and values:
+Given input vectors $x_1,\ldots,x_n$, learned projections produce queries, keys, and values:
 
 $$
 Q=XW_Q,\qquad K=XW_K,\qquad V=XW_V.
@@ -24,59 +24,61 @@ $$
 \mathrm{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right)V.
 $$
 
-For a single token $i$, the attention weight on token $j$ is proportional to
+For token $i$, the weight assigned to token $j$ is proportional to
 
 $$
 \exp\left(\frac{q_i^\top k_j}{\sqrt{d_k}}\right).
 $$
 
-**Multihead attention** runs several attention heads with separate projections, concatenates their outputs, and projects again. Different heads can learn different relations, such as local syntax, delimiter matching, coreference cues, or positional patterns.
+The $\sqrt{d_k}$ divisor keeps the variance of the dot products under control as the key dimension grows. Without it, the softmax can saturate early in training and produce weak gradients.
 
-A **transformer block** usually contains multihead attention, a position-wise feedforward network, residual connections, and layer normalization. A **causal mask** prevents position $i$ from attending to future positions $j\gt i$. **Positional encodings** or position embeddings provide order information, because attention itself is permutation-invariant without them.
+Attention is content-dependent, so the same token can acquire different representations in different sentences. The representation of `bank` may attend to `river` in one context and `loan` in another. Such contextualization improved word-sense disambiguation, coreference, question answering, and many classification tasks over static word embeddings.
 
-An **autoregressive language model** factors text left-to-right:
+### A two-key calculation
 
-$$
-P(w_1,\ldots,w_T)=\prod_{t=1}^T P(w_t\mid w_1,\ldots,w_{t-1}).
-$$
-
-## Key results
-
-Self-attention directly connects any two positions in one layer. This short path is a major advantage over RNNs, where information from token $1$ must pass through many recurrent updates to affect token $T$. Transformers are also parallel during training because all positions in a sequence can compute their masked attention at once.
-
-The scaling factor $\sqrt{d_k}$ prevents dot products from growing too large as dimension increases. Without scaling, the softmax can become extremely peaked early in training, which weakens gradients.
-
-The transformer block is more than attention. The feedforward network applies nonlinear transformations independently at each position; residual connections preserve a stream of information across layers; layer normalization stabilizes training. The residual stream view is useful: attention and MLP sublayers write updates into a shared token representation.
-
-Causal transformers generate by repeated next-token prediction. Decoding choices include greedy search, beam search, temperature sampling, top-$k$, and nucleus sampling. Greedy decoding often becomes repetitive; high-temperature sampling can become incoherent. Decoding is therefore a modeling decision, not just an implementation detail.
-
-The cost of full self-attention is quadratic in sequence length because it forms all pairwise token scores:
+Let one query attend over two keys:
 
 $$
-O(n^2d).
+q=[1,1],\quad k_1=[1,0],\quad k_2=[0,2],
 $$
 
-This cost motivates context-window limits, sparse attention, retrieval augmentation, recurrence-like memory, and other long-context methods.
+with $d_k=2$. Their dot products are
 
-Transformers can encode social biases, memorize data, produce toxic or private content, and generate fluent falsehoods. These harms are not side notes; they follow from training large models on broad text distributions and using them in open-ended settings.
+$$
+q^\top k_1=1,\qquad q^\top k_2=2.
+$$
 
-A transformer layer can be read as two alternating operations. Attention moves information across positions: a pronoun can gather information from a candidate antecedent, or a verb can gather information from its subject. The feedforward network then transforms each position independently, applying nonlinear feature computation to the updated representation. Stacking many layers lets the model alternate communication and computation.
+Scaling by $\sqrt{2}\approx1.414$ gives
 
-The architecture also changes how batching works. RNNs have a hard sequential dependency across time, while transformer training can compute attention for all positions in a sequence with large matrix multiplications. This matches GPU and TPU hardware well and is one reason transformers scaled so effectively. The price is memory: the attention matrix has one score for every ordered pair of tokens, so long documents are expensive.
+$$
+s_1=\frac{1}{1.414}=0.707,\qquad s_2=\frac{2}{1.414}=1.414.
+$$
 
-Attention masks define the task. Causal masks create left-to-right generation. No mask creates bidirectional encoding. Encoder-decoder masks let target tokens attend to all source tokens but not to future target tokens. Many modeling mistakes are mask mistakes, and they can silently leak answers during training.
+After exponentiation,
 
-Finally, a transformer is not automatically a pretrained language model. The architecture is a computation pattern. The behavior associated with modern LLMs comes from the combination of architecture, tokenization, massive training data, objective, scale, fine-tuning, prompting, decoding, and deployment constraints.
+$$
+e^{s_1}\approx2.028,\qquad e^{s_2}\approx4.113.
+$$
 
-The residual stream also explains why depth matters. Early layers often represent local lexical and positional information, middle layers can combine syntactic or entity cues, and later layers become more task- or objective-specific. This is a useful heuristic, not a law, but it guides probing and fine-tuning. For example, token classification tasks may benefit from intermediate layers, while generation uses the final layer because it is trained to feed the language modeling head.
+The normalized weights are therefore
 
-Because attention is content-dependent, the same token can behave differently in different sentences. This is a major difference from static word embeddings. The representation of `bank` can attend to `river` in one context and `loan` in another, producing different hidden states. That contextualization is one reason transformers improved WSD, coreference, QA, and many classification tasks.
+$$
+\alpha_1=\frac{2.028}{2.028+4.113}=0.330,
+$$
 
-A final diagnostic is to inspect sequence length. If quality drops on long inputs, the cause may be truncation, attention dilution, positional extrapolation, retrieval failure, or simply missing information. Long-context behavior should be tested directly rather than assumed from the advertised context window.
+$$
+\alpha_2=\frac{4.113}{6.141}=0.670.
+$$
 
-For classroom calculations, small attention matrices are worth doing by hand. They make the query-key comparison, masking, normalization, and value mixing visible before those operations are hidden inside large tensor libraries.
+The query places about $33.0\%$ of its weight on key $1$ and $67.0\%$ on key $2$. Small matrices like this are useful classroom calculations because they expose query-key comparison, masking, normalization, and value mixing before tensor libraries hide the individual operations. When implementing attention, the softmax must run across the key dimension for each query.
 
-## Visual
+## Inside a transformer block
+
+**Multihead attention** repeats the attention calculation with separate projections, concatenates the head outputs, and projects the result once more. Individual heads can learn local syntax, delimiter matching, coreference cues, or positional patterns.
+
+A **transformer block** combines multihead attention with a position-wise feedforward network, residual connections, and layer normalization. Attention communicates across positions: a pronoun can gather information from a candidate antecedent, or a verb from its subject. The feedforward network then applies a nonlinear transformation independently at every position.
+
+The residual-stream view treats attention and MLP sublayers as updates written into a shared token representation. Residual connections preserve information across layers, while layer normalization stabilizes optimization. Repeating the block alternates communication between positions with computation at each position.
 
 ```mermaid
 flowchart TD
@@ -91,9 +93,17 @@ flowchart TD
   H --> I[Next-token distribution]
 ```
 
-![Original Transformer architecture — the figure shows encoder and decoder stacks with multi-head attention, feed-forward layers, residual connections, and softmax output.](https://ar5iv.labs.arxiv.org/html/1706.03762/assets/x1.png)
+![Original Transformer architecture showing encoder and decoder stacks with multihead attention, feedforward layers, residual connections, and softmax output.](https://ar5iv.labs.arxiv.org/html/1706.03762/assets/x1.png)
 
-*Figure: The original Transformer separates encoder self-attention, decoder masked self-attention, and encoder-decoder attention. From [Vaswani et al., 2017](https://arxiv.org/abs/1706.03762) — embedded under educational fair use with attribution.*
+*Figure: The original Transformer separates encoder self-attention, decoder masked self-attention, and encoder-decoder attention. From [Vaswani et al., 2017](https://arxiv.org/abs/1706.03762), embedded under educational fair use with attribution.*
+
+Depth allows later blocks to combine features built by earlier ones. Early layers often emphasize local lexical and positional information, middle layers may combine syntactic or entity cues, and later layers tend to become more specific to the training objective. This is a heuristic rather than a law. Token-classification tasks can benefit from intermediate layers, whereas generation uses the final layer trained to feed the language-modeling head.
+
+Positional encodings or learned position embeddings supply order information. Without them, self-attention is permutation-equivariant: permuting the input tokens permutes the outputs in the same way. Omitting position information therefore leaves the model unable to distinguish sequences that differ only in order.
+
+## Masks choose the information flow
+
+Attention masks define which token pairs may interact. Causal masks produce left-to-right generation. Bidirectional encoders omit the causal restriction, though they still mask padding as needed. In encoder-decoder models, target tokens can attend to all source states but only to current and earlier target states.
 
 | Attention type | Can attend to future? | Typical model | Common task |
 |---|---:|---|---|
@@ -102,64 +112,43 @@ flowchart TD
 | Cross-attention | attends to source states | encoder-decoder MT | translation, ASR, TTS |
 | Sparse attention | limited pattern | long-context models | long documents |
 
-## Worked example 1: one-token attention weights
-
-Problem: one query attends over two keys. Let
-
-$$
-q=[1,1],\quad k_1=[1,0],\quad k_2=[0,2],
-$$
-
-with $d_k=2$. Compute attention weights.
-
-1. Dot products:
-
-$$
-q^\top k_1=1,\qquad q^\top k_2=2.
-$$
-
-2. Scale by $\sqrt{2}\approx1.414$:
-
-$$
-s_1=\frac{1}{1.414}=0.707,\qquad s_2=\frac{2}{1.414}=1.414.
-$$
-
-3. Exponentiate:
-
-$$
-e^{s_1}\approx2.028,\qquad e^{s_2}\approx4.113.
-$$
-
-4. Normalize:
-
-$$
-\alpha_1=\frac{2.028}{2.028+4.113}=0.330,
-$$
-
-$$
-\alpha_2=\frac{4.113}{6.141}=0.670.
-$$
-
-Checked answer: the query places about $33.0\%$ weight on key $1$ and $67.0\%$ on key $2$.
-
-## Worked example 2: applying a causal mask
-
-Problem: a sequence has four tokens. At position $3$, which positions may a causal decoder attend to? Then describe the attention mask row for position $3$ using zero for allowed and $-\infty$ for blocked.
-
-1. In a causal model, position $i$ can attend to positions $j\le i$.
-2. For $i=3$, allowed positions are $1,2,3$.
-3. Future position $4$ is blocked.
-4. The mask row is
+For a four-token sequence, position $3$ in a causal decoder may attend to positions $1$, $2$, and $3$, but not future position $4$. With zero for allowed positions and $-\infty$ for blocked ones, its mask row is
 
 $$
 [0,\;0,\;0,\;-\infty].
 $$
 
-5. Before softmax, this mask is added to attention scores. The fourth score becomes $-\infty$, so its softmax probability becomes $0$.
+The mask is added to the attention scores before softmax. The fourth score becomes $-\infty$, so its probability becomes $0$. A missing or reversed causal mask silently leaks the next-token target during training, making mask tests an important part of model validation.
 
-Checked answer: token $3$ can use itself and earlier context, but cannot see token $4$. This is what makes next-token prediction nontrivial during training.
+## Parallel training and the long-context cost
 
-## Code
+Self-attention connects any two positions in one layer. An RNN instead passes information from token $1$ through many recurrent updates before it can affect token $T$. Transformer training can compute all positions in a sequence with large matrix multiplications, which fits GPU and TPU hardware well; an RNN retains a hard sequential dependency across time.
+
+Full self-attention forms a score for every ordered pair of tokens. Its attention computation costs
+
+$$
+O(n^2d),
+$$
+
+and the $n\times n$ score matrix is expensive to store for long inputs. Projection and feedforward costs also matter, so big-O alone does not settle comparisons between transformer and recurrent models on real hardware. The quadratic attention term nevertheless motivates limited context windows, sparse attention, retrieval augmentation, recurrence-like memory, and other long-context methods.
+
+Long-input failures need more diagnosis than checking the advertised context window. Truncation, attention dilution, positional extrapolation, retrieval failure, or absent source information can all lower quality. Test long-context behavior directly and confirm how much of the input reaches the model.
+
+## From transformer blocks to a language model
+
+An autoregressive language model factors text left to right:
+
+$$
+P(w_1,\ldots,w_T)=\prod_{t=1}^T P(w_t\mid w_1,\ldots,w_{t-1}).
+$$
+
+A causal transformer generates by repeatedly predicting the next token. Decoding may use greedy search, beam search, temperature sampling, top-$k$ sampling, or nucleus sampling. Greedy decoding often becomes repetitive, while a high temperature can make output incoherent. Beam search can also produce dull, repetitive text in open-ended generation. The choice of decoder changes model behavior and belongs in the modeling decision, not merely the implementation.
+
+The transformer architecture alone does not produce the behavior associated with a pretrained language model. Tokenization, training data, objective, scale, fine-tuning, prompting, decoding, and deployment constraints all contribute.
+
+## Building one masked block in PyTorch
+
+This small pre-normalized block keeps the two residual updates explicit. In PyTorch's boolean attention masks, `True` marks a blocked query-key pair.
 
 ```python
 import torch
@@ -173,37 +162,36 @@ attn = nn.MultiheadAttention(
     num_heads=4,
     batch_first=True,
 )
-
-# True entries are blocked in PyTorch's attention mask.
-causal_mask = torch.triu(torch.ones(length, length, dtype=torch.bool), diagonal=1)
-out, weights = attn(x, x, x, attn_mask=causal_mask)
-
+norm1 = nn.LayerNorm(dim)
+norm2 = nn.LayerNorm(dim)
 ffn = nn.Sequential(
-    nn.LayerNorm(dim),
     nn.Linear(dim, 4 * dim),
     nn.GELU(),
     nn.Linear(4 * dim, dim),
 )
 
-block_out = x + out
-block_out = block_out + ffn(block_out)
+causal_mask = torch.triu(
+    torch.ones(length, length, dtype=torch.bool), diagonal=1
+)
+attn_input = norm1(x)
+attn_out, weights = attn(
+    attn_input, attn_input, attn_input, attn_mask=causal_mask
+)
+hidden = x + attn_out
+block_out = hidden + ffn(norm2(hidden))
+
 print(block_out.shape)
 print(weights.shape)
 ```
 
-## Common pitfalls
+## Interpreting outputs and accounting for harm
 
-- Forgetting the causal mask and accidentally letting a language model see the answer.
-- Treating attention weights as a complete explanation; they are useful diagnostics but not definitive causal explanations.
-- Omitting positional information and expecting the model to know word order.
-- Comparing transformer and RNN complexity only by big-O without considering parallel hardware.
-- Applying softmax over the wrong dimension in attention.
-- Using beam search for open-ended generation and getting dull, repetitive outputs.
-- Ignoring context-window limits and assuming a model can use all prompt information equally well.
+Attention weights can be useful diagnostics, but they are not definitive causal explanations of a prediction. Information also flows through values, residual connections, feedforward layers, and later attention heads. Head patterns should be paired with interventions or other attribution methods before making strong interpretive claims.
 
-## Connections
+Transformers can encode social biases, memorize training data, emit toxic or private content, and produce fluent falsehoods. These outcomes follow from broad training distributions and open-ended deployment. Evaluation therefore needs bias, privacy, toxicity, and factuality tests that match the intended setting, not only aggregate language-model loss.
 
-- [Pretrained language models](/cs/nlp/pretrained-language-models)
-- [RNNs and LSTMs for sequence modeling](/cs/nlp/rnns-lstms-sequence-modeling)
-- [Machine translation](/cs/nlp/machine-translation)
-- [Dialogue and chatbots](/cs/nlp/dialogue-and-chatbots)
+<div className="see-also">
+
+See also: [Pretrained language models](/cs/nlp/pretrained-language-models) · [RNNs and LSTMs for sequence modeling](/cs/nlp/rnns-lstms-sequence-modeling) · [Machine translation](/cs/nlp/machine-translation) · [Dialogue and chatbots](/cs/nlp/dialogue-and-chatbots)
+
+</div>

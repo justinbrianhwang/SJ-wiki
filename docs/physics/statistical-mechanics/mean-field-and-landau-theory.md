@@ -412,10 +412,8 @@ The wall broadens on approach to $T_c$. Substituting the solution back into the 
 - Solving $df/dm=0$ finds stationary points, including maxima and metastable minima. Curvature and global free energy both need checking.
 - An incorrect order parameter or a missing conserved or gapless field cannot be repaired by retaining more powers of the same scalar $m$.
 
-## Related pages
+<div className="see-also">
 
-- [Phase transitions and order parameters](/physics/statistical-mechanics/phase-transitions-and-order-parameters)
-- [Magnetism, lattice gases, and binary alloys](/physics/statistical-mechanics/magnetism-lattice-gases-and-binary-alloys)
-- [Scaling, universality, and renormalization group](/physics/statistical-mechanics/scaling-universality-and-renormalization-group)
-- [Scalar phi-four theory](/physics/quantum-field-theory/scalar-phi-four-theory)
-- [Renormalization group in QFT](/physics/quantum-field-theory/renormalization-group)
+See also: [Phase transitions and order parameters](/physics/statistical-mechanics/phase-transitions-and-order-parameters) · [Magnetism, lattice gases, and binary alloys](/physics/statistical-mechanics/magnetism-lattice-gases-and-binary-alloys) · [Scaling, universality, and renormalization group](/physics/statistical-mechanics/scaling-universality-and-renormalization-group) · [Scalar phi-four theory](/physics/quantum-field-theory/scalar-phi-four-theory) · [Renormalization group in QFT](/physics/quantum-field-theory/renormalization-group)
+
+</div>

@@ -5,159 +5,364 @@ sidebar_position: 15
 
 # Chemical Equilibrium
 
-Chemical equilibrium is a dynamic state in which forward and reverse reactions continue at equal rates. The equilibrium constant describes the composition favored at a given temperature, while the reaction quotient tells whether a particular mixture will shift toward products or reactants.
+Chemical equilibrium is dynamic. Individual forward and reverse events continue, but their rates are equal and the macroscopic composition no longer changes. A sealed vessel at equilibrium therefore looks static without being molecularly frozen.
 
-In the Ebbing and Gammon sequence this topic sits near dynamic equilibrium, equilibrium constants, heterogeneous equilibria, reaction quotient, equilibrium concentrations, and Le Chatelier's principle. That placement matters because general chemistry is cumulative: a later calculation usually reuses earlier ideas about measurement, atomic structure, bonding, molecular motion, or equilibrium. The aim of this page is to turn the chapter-level ideas into a working reference that can be used for problem solving without copying the textbook's wording or examples.
+The equilibrium constant describes the composition favored at a specified temperature. It says nothing by itself about how quickly that composition is reached. Diamond converting to graphite is the familiar warning: thermodynamic favorability and observable rate are different questions.
 
-![A Gibbs energy curve shows a reaction mixture relaxing toward an equilibrium composition.](https://commons.wikimedia.org/wiki/Special:FilePath/Gibbs-Energie-Veranschaulichung.svg)
+## The mass-action expression
 
-*Figure: Gibbs energy minimum as the thermodynamic picture of chemical equilibrium. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Gibbs-Energie-Veranschaulichung.svg), Johannes Schneider, CC BY-SA 4.0.*
+For a reaction written as
 
-## Definitions
+$$
+\mathrm{aA+bB\rightleftharpoons cC+dD},
+$$
 
-The following definitions give the vocabulary and notation used in this page. Treat them as operational definitions: each one says what can be counted, measured, compared, or conserved in a chemical argument.
+the thermodynamic equilibrium constant is
 
-- Dynamic equilibrium means microscopic forward and reverse processes continue with no net macroscopic change.
-- Equilibrium constant $K_c$ is the concentration ratio for a balanced reaction at equilibrium.
-- $K_p$ is an equilibrium constant written with gas partial pressures.
-- Reaction quotient $Q$ has the same form as $K$ but uses current, not necessarily equilibrium, amounts.
-- Homogeneous equilibrium has all species in one phase.
-- Heterogeneous equilibrium includes species in different phases; pure solids and liquids are omitted from $K$.
-- ICE table tracks initial, change, and equilibrium amounts.
-- Le Chatelier's principle predicts that a system at equilibrium shifts to reduce a stress.
+$$
+K=\frac{a_C^c a_D^d}{a_A^a a_B^b},
+$$
 
-Definitions in chemistry often connect a symbolic representation to a physical sample. A formula such as $\mathrm{H_2O}$ names a substance, gives the atomic ratio inside one molecule, and supplies the molar mass used in a macroscopic calculation. A state symbol such as $\mathrm{(aq)}$ is not cosmetic; it says the species is dispersed in water and may be treated as ions when writing a net ionic equation. In the same way, constants such as $R$, $K_w$, $F$, or $N_A$ are compact definitions of the measurement system being used.
+where each $a_i$ is a dimensionless activity relative to a standard state. Activities account for the fact that particles in real mixtures interact. In dilute solutions, $a_i$ is often approximated by concentration divided by the standard concentration; in ideal-gas mixtures it is approximated by partial pressure divided by the standard pressure. Introductory notation usually suppresses those standard-state factors and writes $K_c$ or $K_p$.
 
-## Key results
+Pure solids and pure liquids are omitted because their activities are essentially constant at fixed temperature and pressure. For
 
-The central results are:
+$$
+\mathrm{CaCO_3(s)\rightleftharpoons CaO(s)+CO_2(g)},
+$$
 
-- For $\mathrm{aA+bB\rightleftharpoons cC+dD}$, $K_c=[C]^c[D]^d/[A]^a[B]^b$.
-- For gases, $K_p=K_c(RT)^{\Delta n_{gas}}$.
-- If $Q\lt K$, reaction proceeds forward; if $Q\gt K$, reaction proceeds reverse.
-- Reverse reaction constant is $1/K$.
-- Multiplying a reaction by $n$ raises $K$ to the $n$ power.
-- Catalysts do not change $K$; temperature changes can change $K$.
+the pressure-form expression is simply
 
-Equilibrium constants are tied to balanced equations. Changing the equation changes the mathematical expression and therefore the numerical value of $K$. The most reliable equilibrium calculations combine a reaction table with chemical approximations that are checked afterward, rather than assumed blindly.
+$$
+K_p=P_{CO_2}.
+$$
 
-A good way to use these results is to state the chemical model first, then substitute numbers second. For chemical equilibrium, the model usually answers questions such as what particles are present, what is conserved, which process is idealized, and which measurement is being interpreted. Once that sentence is clear, the algebra becomes a bookkeeping problem rather than a search for a memorized pattern.
+Adding more calcium carbonate does not alter the equilibrium carbon dioxide pressure while both solid phases remain. Removing an entire phase can change the constraints, so “solids never matter” is too broad; their amounts do not appear in $K$, but their presence can be required for that heterogeneous equilibrium to exist.
 
-Units are part of the result, not decoration. Whenever a formula contains an empirical constant, a tabulated value, or a ratio of measured quantities, the units tell you whether the expression has been used in the intended form. This is especially important in general chemistry because several equations have nearly identical algebra but different meanings: pressure can be a measured state variable, an equilibrium correction, or a colligative effect; energy can be heat flow, enthalpy, internal energy, or free energy.
+The exponents come from the balanced reaction as written. Consequently:
 
-The strongest check is an independent chemical interpretation. Ask whether the sign agrees with direction, whether a concentration can be negative, whether a mole ratio follows the balanced equation, whether an equilibrium shift opposes the stress, and whether a microscopic description explains the macroscopic number. These checks connect chemical equilibrium to neighboring topics instead of leaving it as an isolated technique.
+| Change to the written equation | New equilibrium constant |
+|---|---|
+| reverse every species | $K^{-1}$ |
+| multiply all coefficients by $n$ | $K^n$ |
+| add reactions | multiply their constants |
 
-A second check is to compare the limiting cases. If a reactant amount goes to zero, a product amount cannot remain large. If temperature rises in a gas sample at fixed volume, pressure should not fall in an ideal model. If an acid is diluted, hydronium concentration should normally decrease unless a coupled equilibrium supplies more. Limiting cases often reveal algebra that has been rearranged correctly but applied to the wrong chemical situation.
+These rules follow directly from manipulating the activity quotients. They also mean that quoting a numerical $K$ without the corresponding balanced equation is incomplete.
 
-Finally, keep symbolic and particulate representations side by side. A balanced equation, an equilibrium expression, an orbital diagram, or a polymer repeat unit is a compact symbol for a population of particles. Translating that symbol into words forces you to say what is reacting, what is being counted, and what is being held constant. That translation is usually the difference between a calculation that can be adapted to a new problem and one that only imitates a worked example.
+## What the size of $K$ does and does not say
 
-## Visual
+If $K\gg1$, products predominate at equilibrium for ordinary starting compositions. If $K\ll1$, reactants predominate. A value near 1 permits appreciable amounts on both sides. “Predominate” does not mean “only”: even a very large finite constant allows some reactant, and a small constant allows some product.
+
+The numerical size also depends on how the reaction is written. Squaring all coefficients squares $K$, and reversing the equation replaces it with its reciprocal. Classification as product-favored or reactant-favored must use the stated direction.
+
+Equilibrium constants depend on temperature. Concentration, pressure, and catalysts can change the equilibrium composition or the time required to reach it, but at a fixed temperature they do not change the thermodynamic $K$. A catalyst lowers activation barriers for both directions and speeds relaxation toward the same equilibrium.
+
+The link to thermodynamics is
+
+$$
+\Delta_rG^\circ=-RT\ln K.
+$$
+
+A large $K$ corresponds to negative standard reaction Gibbs energy. Away from standard composition,
+
+$$
+\Delta_rG=\Delta_rG^\circ+RT\ln Q=RT\ln\frac{Q}{K}.
+$$
+
+The last form shows why the comparison of $Q$ and $K$ predicts spontaneous direction: when $Q\lt K$, the forward reaction has $\Delta_rG\lt 0$; when $Q\gt K$, the reverse direction lowers Gibbs energy. At equilibrium $Q=K$ and $\Delta_rG=0$ for an infinitesimal advance of the reaction.
+
+## The reaction quotient locates the current mixture
+
+The reaction quotient $Q$ has the same form as $K$ but uses the present, possibly nonequilibrium composition:
+
+- $Q\lt K$: net change proceeds toward products.
+- $Q\gt K$: net change proceeds toward reactants.
+- $Q=K$: the composition is at equilibrium.
+
+For
+
+$$
+\mathrm{H_2(g)+I_2(g)\rightleftharpoons2HI(g)},
+$$
+
+let $K_c=50.0$ and suppose $[H_2]=[I_2]=0.100\ \mathrm M$ and $[HI]=0.500\ \mathrm M$. Then
+
+$$
+Q_c=\frac{(0.500)^2}{(0.100)(0.100)}=25.0.
+$$
+
+Because $25.0\lt 50.0$, the forward reaction occurs. It raises $[HI]$ and lowers both reactant concentrations, increasing $Q_c$ until it reaches 50.0.
+
+If a denominator is initially zero while products are present, $Q$ tends to infinity and the reaction proceeds in reverse. If the numerator is zero and reactants are present, $Q=0$ and the forward direction is selected. These limiting cases are often easier to reason about before using a calculator.
+
+## ICE tables encode conservation
+
+An ICE table lists initial concentration or pressure, stoichiometric change, and equilibrium composition. It is not a separate law; it is a compact material balance. For a reaction advance $x$, every change must follow the coefficients.
 
 ```mermaid
-flowchart TB
-  Rxn["Balanced reaction<br/>aA + bB reversible cC + dD"] --> Expr["Write equilibrium expression<br/>K = activities(products)^coeff / activities(reactants)^coeff"]
-  Expr --> Initial["Initial row<br/>known molarity, pressure, or moles"]
-  Initial --> Qcalc["Compute reaction quotient Q<br/>same expression as K using current values"]
-  Qcalc --> Compare{"Compare Q with K"}
-
-  Compare -- "Q less than K" --> Forward["System shifts forward<br/>products increase"]
-  Compare -- "Q greater than K" --> Reverse["System shifts reverse<br/>reactants increase"]
-  Compare -- "Q = K" --> AtEq["Already at equilibrium"]
-
-  Forward --> ChangeF["Change row<br/>-a x, -b x, +c x, +d x"]
-  Reverse --> ChangeR["Change row<br/>+a x, +b x, -c x, -d x"]
-  ChangeF --> Equil["Equilibrium row<br/>initial plus stoichiometric change"]
-  ChangeR --> Equil
-  Equil --> Solve["Substitute into K<br/>solve polynomial or approximation"]
-  Solve --> Check{"Chemically valid?"}
-  Check -- "all concentrations nonnegative" --> Approx{"Approximation used?"}
-  Check -- "negative or impossible" --> Revise["Choose other root or redo direction"]
-  Approx -- "yes" --> Percent["Percent-change check<br/>usually less than 5 percent"]
-  Approx -- "no" --> Result["Report equilibrium composition"]
-  Percent -- "passes" --> Result
-  Percent -- "fails" --> SolveFull["Solve without approximation"]
-  SolveFull --> Result
-  AtEq --> Result
+flowchart TD
+  A["Write the balanced reaction and K"] --> B["Calculate Q from the initial mixture"]
+  B --> C{"Compare Q with K"}
+  C -->|"Q < K"| D["Assign a forward change"]
+  C -->|"Q > K"| E["Assign a reverse change"]
+  C -->|"Q = K"| F["No net composition change"]
+  D --> G["Build stoichiometric equilibrium expressions"]
+  E --> G
+  G --> H["Solve and reject nonphysical roots"]
+  H --> I["Substitute back into K"]
 ```
 
-The equilibrium diagram expands the ICE-table protocol into its inputs, routing decision, stoichiometric change row, algebraic solve, and validity checks. The branches make the direction of shift depend on $Q$ versus $K$, while the change-row nodes show how coefficients set the shape of the calculation. The final checks are part of the architecture because equilibrium concentrations must be nonnegative and any approximation must be justified.
+### Worked example: dinitrogen tetroxide dissociation
 
-| Stress | Typical shift | Note |
+For
+
+$$
+\mathrm{N_2O_4(g)\rightleftharpoons2NO_2(g)},
+$$
+
+take $K_c=0.36$, initial $[N_2O_4]=1.00\ \mathrm M$, and initial $[NO_2]=0$.
+
+Because there is initially no product, $Q_c=0$ and the reaction proceeds forward. Let $x$ molar $\mathrm{N_2O_4}$ dissociate:
+
+$$
+\begin{array}{c|cc}
+&\mathrm{N_2O_4}&\mathrm{NO_2}\\ \hline
+I&1.00&0\\
+C&-x&+2x\\
+E&1.00-x&2x
+\end{array}
+$$
+
+Substitution gives
+
+$$
+0.36=\frac{(2x)^2}{1.00-x}.
+$$
+
+Rearrange:
+
+$$
+4x^2+0.36x-0.36=0.
+$$
+
+The quadratic formula gives
+
+$$
+x=\frac{-0.36\pm\sqrt{(0.36)^2-4(4)(-0.36)}}{8}.
+$$
+
+The two roots are approximately $0.258$ and $-0.348$. The negative root would make a negative product concentration and contradict the forward direction, so it is rejected. Therefore,
+
+$$
+[N_2O_4]=1.00-0.258=0.742\ \mathrm M,
+$$
+
+$$
+[NO_2]=2(0.258)=0.516\ \mathrm M.
+$$
+
+Substitution checks the result:
+
+$$
+\frac{(0.516)^2}{0.742}=0.359,
+$$
+
+which agrees with $0.36$ within rounding.
+
+## When the small-change approximation works
+
+If $K$ is small and reactant concentration is reasonably large, an equilibrium change may be negligible in a sum or difference. For
+
+$$
+\mathrm{A\rightleftharpoons B},
+$$
+
+with initial $[A]=C$ and no B,
+
+$$
+K=\frac{x}{C-x}.
+$$
+
+Approximating $C-x\approx C$ gives $x\approx KC$. The approximation must be checked after solving, commonly by confirming $x/C\times100\%$ is below about five percent. That threshold is a convention tied to desired accuracy, not a chemical law.
+
+Do not discard $x$ from a term that would become zero or from the only source of a species. In the dinitrogen tetroxide example, replacing $1.00-x$ by 1.00 would be testable, but dropping the $2x$ numerator would erase all product. When an approximation fails, solve the polynomial or use a numerical root method while enforcing nonnegative concentrations.
+
+## Relating gas constants $K_p$ and $K_c$
+
+For an ideal gas, partial pressure and molar concentration obey
+
+$$
+P_i=[i]RT.
+$$
+
+Substitute that relation into a pressure quotient. Each gaseous product contributes a factor $RT$ raised to its coefficient, and each gaseous reactant contributes one in the denominator. Therefore,
+
+$$
+K_p=K_c(RT)^{\Delta n_{\mathrm{gas}}},
+$$
+
+where
+
+$$
+\Delta n_{\mathrm{gas}}=(\text{gaseous product coefficients})-(\text{gaseous reactant coefficients}).
+$$
+
+Only gas coefficients count. Solids, liquids, and dissolved solutes are excluded from $\Delta n_{\mathrm{gas}}$.
+
+### Worked example: converting $K_c$ to $K_p$
+
+For
+
+$$
+\mathrm{N_2(g)+3H_2(g)\rightleftharpoons2NH_3(g)},
+$$
+
+suppose $K_c=0.500$ at $400\ \mathrm K$. Here
+
+$$
+\Delta n_{\mathrm{gas}}=2-(1+3)=-2.
+$$
+
+Using $R=0.08206\ \mathrm{L\,atm\,mol^{-1}\,K^{-1}}$ in the conventional pressure/concentration expression,
+
+$$
+\begin{aligned}
+K_p&=0.500[(0.08206)(400)]^{-2}\\
+&=0.500(32.824)^{-2}\\
+&=4.64\times10^{-4}.
+\end{aligned}
+$$
+
+The numerical values differ because the reaction changes the number of gas particles and the conventional $K_c$ and $K_p$ forms use different standard-state representations. If $\Delta n_{\mathrm{gas}}=0$, the ideal-gas expressions give the same numerical value.
+
+## Disturbing an established equilibrium
+
+Le Châtelier's principle says that an equilibrium responds in the direction that partly opposes a disturbance. Calculating the immediate new $Q$ is more precise.
+
+**Changing concentration.** Adding reactant lowers $Q$ when that reactant appears in the denominator, so the reaction proceeds forward. Removing product also lowers $Q$. The shift partly consumes the disturbance; it does not generally restore every concentration to its old value.
+
+**Changing volume or pressure.** Compressing an ideal-gas mixture at constant temperature multiplies every partial pressure by the same factor. The quotient changes according to $\Delta n_{\mathrm{gas}}$. Compression favors the side with fewer gas moles; if the gas coefficients sum equally, $Q$ does not change. Adding an inert gas at constant volume leaves reacting-gas partial pressures unchanged and causes no shift. Adding it at constant pressure expands the container, lowering those partial pressures and potentially shifting the equilibrium.
+
+**Changing temperature.** Treat heat as a reactant for an endothermic forward reaction and as a product for an exothermic one. Raising temperature favors the endothermic direction. Unlike concentration and pressure changes, temperature changes the value of $K$ itself. The van 't Hoff relation gives the quantitative temperature dependence when the reaction enthalpy is approximately constant over the interval.
+
+**Adding a catalyst.** A catalyst changes neither $Q$ nor $K$. It provides faster pathways for both directions, so equilibrium is reached sooner without changing the final equilibrium composition.
+
+| Disturbance at fixed temperature | Immediate effect on $K$ | Direction test |
 |---|---|---|
-| Add reactant | toward products | consumes added reactant |
-| Remove product | toward products | replaces removed product |
-| Compress gas mixture | side with fewer gas moles | if gas mole counts differ |
-| Add catalyst | no equilibrium shift | equilibrium reached faster |
-| Increase temperature | favors endothermic direction | heat treated as reagent/product |
+| add or remove a reacting species | none | recalculate $Q$ |
+| change gas volume | none | recalculate $Q_p$ from partial pressures |
+| add a catalyst | none | no shift; faster relaxation |
+| add more pure solid while phase remains | none | no change in $Q$ |
+| change temperature | changes $K$ | use endothermic/exothermic direction or new $K$ |
 
-## Worked example 1: ICE table for a simple equilibrium
+## Coupled reactions and overall constants
 
-Problem. For $\mathrm{N_2O_4(g)\rightleftharpoons 2NO_2(g)}$, $K_c=0.36$ at a temperature. If initial $[\mathrm{N_2O_4}]=1.00\ \mathrm{M}$ and $[\mathrm{NO_2}]=0$, find equilibrium concentrations.
+Equilibria can be combined algebraically. If reaction 1 has $K_1$ and reaction 2 has $K_2$, adding the reactions cancels any intermediate species and gives
 
-    Method.
+$$
+K_{\mathrm{overall}}=K_1K_2.
+$$
 
-    1. Set up change: $\mathrm{N_2O_4}$ decreases by $x$, $\mathrm{NO_2}$ increases by $2x$.
-2. Equilibrium concentrations are $1.00-x$ and $2x$.
-3. Write $K_c=(2x)^2/(1.00-x)=0.36$.
-4. Rearrange: $4x^2=0.36(1.00-x)$, so $4x^2+0.36x-0.36=0$.
-5. Solve the quadratic: $x=[-0.36+\sqrt{0.36^2+4(4)(0.36)}]/8=0.258$.
-6. Find concentrations: $[\mathrm{N_2O_4}]=0.742\ \mathrm{M}$ and $[\mathrm{NO_2}]=0.516\ \mathrm{M}$.
+This multiplication explains relationships such as $K_aK_b=K_w$ for a conjugate acid-base pair. It is also why a highly favorable coupled reaction can pull an otherwise unfavorable step forward. The intermediate cancels from the summed equation and from the product of the quotients.
 
-    Checked answer. $[\mathrm{N_2O_4}]=0.742\ \mathrm{M}$ and $[\mathrm{NO_2}]=0.516\ \mathrm{M}$. $(0.516)^2/0.742=0.359$, matching $K_c$ within rounding.
+## Checks before trusting an equilibrium calculation
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+- Write $K$ from the balanced equation, not from subscripts in chemical formulas. Stoichiometric coefficients become exponents.
+- Keep pure solids and liquids out of the quotient, but confirm that the required phases are actually present.
+- Use $Q$ to choose the sign of the ICE-table change. Guessing a direction often leads to an algebraically valid but chemically impossible root.
+- Reject roots producing negative concentrations or consuming more material than was initially available.
+- Verify every approximation after solving and substitute the final composition back into the original, unapproximated expression.
+- Pressure changes affect equilibrium through reacting-gas partial pressures, not through a vague rule that all high pressure favors products.
+- A catalyst changes rate, not $K$, $Q$, or the equilibrium composition.
 
-## Worked example 2: Reaction quotient direction
+## Material balance and charge balance
 
-Problem. For $\mathrm{H_2(g)+I_2(g)\rightleftharpoons 2HI(g)}$, $K_c=50.0$. A mixture has $[H_2]=0.100$, $[I_2]=0.100$, and $[HI]=0.500\ \mathrm{M}$. Which way does it shift?
+An ICE table is sufficient when one reaction and a few species dominate. More complicated equilibria are organized by independent equations: equilibrium expressions, material balances, charge balance, and any fixed analytical totals.
 
-    Method.
+If a monoprotic acid is prepared at formal concentration $C_T$, conservation of acid-containing species gives
 
-    1. Write the quotient: $Q_c=[HI]^2/([H_2][I_2])$.
-2. Substitute: $Q_c=(0.500)^2/(0.100)(0.100)$.
-3. Calculate numerator $0.250$ and denominator $0.0100$.
-4. Thus $Q_c=25.0$.
-5. Compare with $K_c=50.0$: $Q\lt K$.
-6. The mixture has too little product relative to equilibrium, so it shifts forward.
+$$
+C_T=[HA]+[A^-].
+$$
 
-    Checked answer. The reaction shifts toward $\mathrm{HI}$ formation. Forward shift increases the numerator and decreases the denominator, raising $Q$ toward $K$.
+Electroneutrality requires total positive charge concentration to equal total negative charge concentration. For a solution containing only that acid and water,
 
-    The important habit is to identify the conserved quantity before reaching for an equation. In this example the units, coefficients, charges, or particles chosen in the first step control every later step. The final numerical answer is not accepted merely because it came from a formula; it is checked against the chemical picture. If the magnitude, sign, units, or limiting condition contradicts that picture, the calculation has to be restarted from the definition rather than patched at the end.
+$$
+[H_3O^+]=[A^-]+[OH^-].
+$$
 
-## Code
+Together with $K_a$ and $K_w$, these equations determine the composition without assuming in advance that water or acid ionization is negligible. Approximations reduce the equations only after their relative sizes are assessed.
 
-```python
-from math import sqrt
+This framework scales to metal complexes, polyprotic acids, and solubility systems. Each conserved chemical component gets a balance; every solution gets one charge balance. Writing a separate ICE table for every reaction can double-count the same species, while the balance method keeps the shared concentrations consistent.
 
-def n2o4_equilibrium(K, initial):
-    # 4x^2 + Kx - K*initial = 0
-    x = (-K + sqrt(K*K + 16*K*initial)) / 8
-    return initial - x, 2 * x
+## Equilibrium yield versus complete conversion
 
-def reaction_direction(Q, K):
-    if Q < K:
-        return "forward"
-    if Q > K:
-        return "reverse"
-    return "at equilibrium"
+Industrial reactions rarely stop at a textbook equilibrium calculation. The equilibrium conversion sets a thermodynamic ceiling for one pass under fixed conditions, while reactor residence time and catalyst determine how closely the stream approaches it. Separating products and recycling unreacted feed can raise overall process yield without changing the equilibrium constant.
 
-n2o4, no2 = n2o4_equilibrium(0.36, 1.00)
-Q = 0.500**2 / (0.100 * 0.100)
-print(n2o4, no2, reaction_direction(Q, 50.0))
-```
+The Haber reaction illustrates the compromises:
 
-## Common pitfalls
+$$
+\mathrm{N_2(g)+3H_2(g)\rightleftharpoons2NH_3(g)}.
+$$
 
-- Including pure solids or liquids in equilibrium expressions. Avoid it by omitting phases with constant activity.
-- Forgetting to raise concentrations to coefficients. Avoid it by copying the balanced equation into the expression carefully.
-- Using initial concentrations directly as equilibrium values. Avoid it by computing $Q$ first or building an ICE table.
-- Applying Le Chatelier's principle without stoichiometry. Avoid it by checking gas mole counts and reaction direction.
-- Saying catalysts change equilibrium composition. Avoid it by remembering catalysts alter rate, not $K$.
-- Treating $K$ as temperature independent. Avoid it by holding temperature constant unless the problem changes it.
+Lower temperature favors ammonia because the forward reaction is exothermic, but it also slows the reaction. Higher pressure favors the side with fewer gas molecules and raises equilibrium conversion, yet compression costs energy and demands stronger equipment. A catalyst improves rate at the selected conditions but cannot change the equilibrium composition.
 
-## Connections
+Removing ammonia from the reacting mixture lowers $Q$ and permits more reactants to convert. This does not violate equilibrium; the system is repeatedly displaced while products are separated. The distinction between equilibrium conversion, single-pass conversion, and overall plant yield prevents misuse of Le Châtelier's principle.
 
-- [chemical kinetics](/chemistry/general/chemical-kinetics)
-- [acid-base equilibria, buffers, and titrations](/chemistry/general/acid-base-equilibria-buffers-and-titrations)
-- [solubility and complex-ion equilibria](/chemistry/general/solubility-and-complex-ion-equilibria)
-- [thermodynamics and free energy](/chemistry/general/thermodynamics-and-free-energy)
+## Temperature dependence in quantitative form
+
+For two temperatures and approximately constant standard reaction enthalpy, the integrated van 't Hoff equation is
+
+$$
+\ln\frac{K_2}{K_1}
+=-\frac{\Delta_rH^\circ}{R}
+\left(\frac{1}{T_2}-\frac{1}{T_1}\right).
+$$
+
+The grouping must be read carefully: the enthalpy factor multiplies the reciprocal-temperature difference. If the forward reaction is endothermic, $\Delta_rH^\circ\gt 0$. Raising temperature makes $1/T_2-1/T_1$ negative, so the right side is positive and $K_2\gt K_1$. For an exothermic reaction the sign reverses.
+
+Suppose an endothermic reaction has $K_1=2.00$ at $300\ \mathrm K$ and $\Delta_rH^\circ=50.0\ \mathrm{kJ\,mol^{-1}}$. Estimate $K_2$ at $350\ \mathrm K$:
+
+$$
+\ln\frac{K_2}{2.00}
+=-\frac{50000}{8.314}
+\left(\frac{1}{350}-\frac{1}{300}\right).
+$$
+
+The reciprocal-temperature difference is $-4.76\times10^{-4}\ \mathrm{K^{-1}}$, so
+
+$$
+\ln\frac{K_2}{2.00}=2.86.
+$$
+
+Therefore,
+
+$$
+K_2=2.00e^{2.86}=34.9.
+$$
+
+The large increase is consistent with heating an endothermic reaction. The constant-enthalpy assumption becomes less reliable over a wide temperature interval.
+
+## Equilibrium with several gas reactions
+
+When more than one independent gas reaction occurs, one extent variable is needed for each independent reaction. The equilibrium partial pressures depend on all extents and the changing total mole number. Guessing one shift at a time can miss their coupling.
+
+An inert gas provides a useful boundary case. At fixed volume and temperature, adding it raises total pressure but leaves each reacting species amount and partial pressure $n_iRT/V$ unchanged. No reaction quotient changes. At fixed total pressure, the volume expands; reacting partial pressures fall together, and a reaction with nonzero $\Delta n_{gas}$ may shift.
+
+The phrase “increase pressure” is therefore incomplete. Compression, inert-gas addition at fixed volume, and inert-gas addition at fixed pressure produce different partial-pressure changes even if the same total pressure is eventually displayed.
+
+## Metastability and equilibrium
+
+A system can remain in a metastable state when the path to lower Gibbs energy has a large activation barrier. A supersaturated solution may stay clear until a seed crystal or scratch promotes nucleation. A mixture of hydrogen and oxygen can persist until ignition despite a favorable water-forming reaction.
+
+Such observations do not contradict thermodynamics. Equilibrium identifies the minimum available Gibbs energy, while kinetics controls access to it. When nucleation or another rare event is rate limiting, the apparent composition can remain unchanged much longer than ordinary collision times suggest.
+
+Equilibrium sampling can also disturb the state being measured. Removing gas changes pressure, cooling a sample changes its constant, and dilution shifts association equilibria. Analytical methods should either perturb negligibly or account for the new condition. A measured composition represents the original equilibrium only when sampling, quenching, and analysis preserve or reconstruct it.
+
+Reported constants should include temperature and the reaction convention. For ionic solutions, the concentration scale and activity model may also matter. Comparing constants from different conventions without conversion can create an apparent disagreement where none exists.
+
+<div className="see-also">
+
+See also: [chemical kinetics](/chemistry/general/chemical-kinetics) · [acid-base equilibria, buffers, and titrations](/chemistry/general/acid-base-equilibria-buffers-and-titrations) · [solubility and complex-ion equilibria](/chemistry/general/solubility-and-complex-ion-equilibria) · [thermodynamics and free energy](/chemistry/general/thermodynamics-and-free-energy)
+
+</div>

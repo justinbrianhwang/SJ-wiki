@@ -9,17 +9,13 @@ The quantum internet is a network architecture whose main service is not ordinar
 
 This area sits between [quantum communication](/quantum-information-science/quantum-communication/intro), [quantum computing](/quantum-information-science/quantum-computing/intro), and the quantum mechanics of [density operators and entanglement](/physics/quantum-mechanics/density-operator-entanglement-decoherence). Quantum key distribution can work with relatively simple prepare-and-measure links. A full quantum internet needs stronger primitives: heralded entanglement, quantum memories, entanglement swapping, purification, and eventually fault-tolerant network nodes. In that setting, teleportation becomes the routing primitive: the payload state never travels as a copied packet, but is reconstructed at the destination after an entanglement-assisted Bell measurement and two classical bits.
 
-Nielsen and Chuang's *Quantum Computation and Quantum Information* is the primary reference for the foundational layer of this section. It does not present a modern quantum-internet stack, but it supplies the formal primitives that the stack spends: teleportation from Section 1.3.7, the postulates and reduced density operators from Chapter 2, quantum operations and Kraus maps from Chapter 8, entropy from Chapter 11, and entanglement distillation plus channel-capacity ideas from Chapter 12. The pages in this folder synthesize that canonical treatment with quantum-network terminology rather than creating a separate set of Nielsen-Chuang notes.
-
-![A quantum buffer diagram shows entangled optical images passing through rubidium vapor cells.](https://commons.wikimedia.org/wiki/Special:FilePath/Quantum_buffer_%285940501733%29.jpg)
-
-*Figure: Networked quantum systems need timing, buffering, memory interfaces, and heralding hardware, not just abstract Bell-pair symbols. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quantum_buffer_%285940501733%29.jpg), National Institute of Standards and Technology / A. Marino, public domain.*
+Nielsen and Chuang's *Quantum Computation and Quantum Information* is the primary reference for the foundational layer. It predates a modern quantum-internet stack, but supplies the formal primitives that the stack spends: teleportation from Section 1.3.7, the postulates and reduced density operators from Chapter 2, quantum operations and Kraus maps from Chapter 8, entropy from Chapter 11, and entanglement distillation plus channel-capacity ideas from Chapter 12. The network terminology used here is layered on that canonical treatment.
 
 ![A quantum teleportation circuit shows Alice's Bell measurement and Bob's classically controlled Pauli corrections.](https://commons.wikimedia.org/wiki/Special:FilePath/Quantum_teleportation_circuit_pauli_gates.svg)
 
 *Figure: Teleportation is the routing primitive that converts pre-shared entanglement plus two classical bits into a one-qubit channel. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quantum_teleportation_circuit_pauli_gates.svg), Buecherdiebin, CC BY-SA 4.0.*
 
-## Definitions
+## Nodes, channels, memories, and Bell pairs
 
 A **quantum node** is a device that can prepare, store, manipulate, and measure one or more qubits. Early nodes may be single-qubit devices; advanced nodes may contain many logical qubits protected by [quantum error correction](/quantum-information-science/quantum-computing/error-correction).
 
@@ -54,7 +50,7 @@ Stephanie Wehner, David Elkouss, and Ronald Hanson popularized a six-stage techn
 | 5 | Few-qubit fault-tolerant networks | Small protected processors, clock synchronization, stronger distributed primitives |
 | 6 | Quantum computing networks | Distributed quantum computation across networked quantum processors |
 
-## Key results
+## Why the network allocates entanglement
 
 The first organizing result is that unknown quantum states cannot be forwarded like classical data. Suppose a device could copy every pure qubit state by a unitary transformation $U$:
 
@@ -81,7 +77,7 @@ $$
 
 where $\alpha$ is attenuation in dB per kilometer. Direct transmission success therefore falls exponentially in distance. A [quantum repeater](/quantum-information-science/quantum-internet/quantum-repeater) divides distance into elementary links, stores successful links, swaps entanglement across them, and optionally distills higher-fidelity pairs from multiple noisy pairs.
 
-A useful abstraction is that a quantum internet does not merely connect devices; it allocates entanglement. Applications consume that resource in different ways. QKD consumes measured entanglement to create correlated secret bits. Teleportation consumes one Bell pair and two classical bits to move one qubit. Distributed computing consumes many high-fidelity pairs to implement nonlocal gates, share logical qubits, or coordinate remote processors. Clock synchronization and sensing may consume multipartite entanglement or repeated pair generation to beat classical precision limits under suitable assumptions.
+A useful abstraction treats the quantum internet as an entanglement allocator. Applications consume that resource in different ways. QKD measures entanglement to create correlated secret bits. Teleportation consumes one Bell pair and two classical bits to move one qubit. Distributed computing consumes many high-fidelity pairs to implement nonlocal gates, share logical qubits, or coordinate remote processors. Clock synchronization and sensing may consume multipartite entanglement or repeated pair generation to beat classical precision limits under suitable assumptions.
 
 The fourth organizing result is that noisy links are quantum channels, not just lossy pipes. In Nielsen and Chuang's operator-sum language, a link acts as
 
@@ -91,7 +87,7 @@ $$
 
 Sending half of a Bell pair through such a channel produces a shared state whose quality determines whether a pair can be used directly, distilled, or discarded. This is the conceptual connection between Chapter 8 quantum operations, Chapter 12 distillable entanglement, and the practical [quantum repeater](/quantum-information-science/quantum-internet/quantum-repeater) pipeline.
 
-## Visual
+### From elementary links to application resources
 
 ```mermaid
 flowchart TB
@@ -136,7 +132,7 @@ flowchart TB
   Accounting -. "service contract" .-> Req
 ```
 
-The diagram presents a quantum internet as an entanglement allocation machine rather than a packet-copying network. It labels the key state transitions: lossy elementary link attempts become stored pairs, swapping extends distance, distillation trades rate for fidelity, and applications consume the resulting Bell or multipartite resource. The dotted arrows show the classical control messages that make heralding, routing, memory scheduling, and Pauli-frame updates work.
+Lossy elementary-link attempts become stored pairs, swapping extends distance, and distillation trades rate for fidelity. Applications then consume the resulting Bell or multipartite resource. The dotted arrows carry the classical messages required for heralding, routing, memory scheduling, and Pauli-frame updates.
 
 | Classical internet habit | Quantum-internet replacement |
 |---|---|
@@ -146,7 +142,7 @@ The diagram presents a quantum internet as an entanglement allocation machine ra
 | Reliability through retransmission of identical data | Reliability through heralding, memory, purification, and error correction |
 | Security mostly computational or protocol based | Some tasks use physical disturbance and entanglement tests |
 
-## Worked example 1: Teleportation as a network service
+## Teleportation as a network service
 
 **Problem.** Alice wants to send the unknown qubit
 
@@ -181,9 +177,9 @@ Z\left(\frac{3}{5}\lvert 0\rangle - \frac{4}{5}\lvert 1\rangle\right)
 = \frac{3}{5}\lvert 0\rangle + \frac{4}{5}\lvert 1\rangle.
 $$
 
-**Checked answer.** Bob's state before correction is $\frac{3}{5}\lvert 0\rangle-\frac{4}{5}\lvert 1\rangle$. After applying $Z$, Bob holds the original state $\lvert\psi\rangle$. Alice no longer has an independent copy because the Bell measurement consumed her input.
+Bob's state before correction is $\frac{3}{5}\lvert 0\rangle-\frac{4}{5}\lvert 1\rangle$. After applying $Z$, Bob holds the original state $\lvert\psi\rangle$. Alice no longer has an independent copy because the Bell measurement consumed her input.
 
-## Worked example 2: Direct loss versus segmented links
+## Direct loss versus segmented links
 
 **Problem.** A fiber has attenuation $\alpha=0.2$ dB/km. Compare the probability that a photon survives direct transmission over $L=100$ km with the probability that it survives one elementary segment when the distance is divided into four equal 25 km links. Ignore coupling loss and detector loss.
 
@@ -215,9 +211,9 @@ $$
 \frac{\eta(25)}{\eta(100)}\approx \frac{0.316}{0.01}=31.6.
 $$
 
-**Checked answer.** Direct survival over 100 km is $0.01$. A 25 km elementary segment has survival about $0.316$. The repeater challenge is to convert many more local successes into an end-to-end entangled pair without losing the stored qubits to memory decoherence.
+Direct survival over 100 km is $0.01$. A 25 km elementary segment has survival about $0.316$. A repeater must convert these more frequent local successes into an end-to-end entangled pair before the stored qubits decohere.
 
-## Code
+## Checking the Pauli correction in NumPy
 
 ```python
 import numpy as np
@@ -249,7 +245,7 @@ print("corrected =", corrected)
 print("fidelity  =", abs(np.vdot(psi, corrected)) ** 2)
 ```
 
-## Common pitfalls
+## Constraints hidden by abstract network diagrams
 
 - Treating teleportation as faster-than-light communication. The correction requires classical bits, so no usable information arrives before the classical message.
 - Thinking the qubit travels through the classical channel. The classical bits identify a Pauli correction; they do not contain enough information to reconstruct an arbitrary unknown state.
@@ -258,13 +254,8 @@ print("fidelity  =", abs(np.vdot(psi, corrected)) ** 2)
 - Assuming all entanglement is equally useful. Fidelity, rate, latency, memory lifetime, and application tolerance determine whether a delivered pair is valuable.
 - Reading the six stages as a guaranteed deployment schedule. They are a capability roadmap, and real systems may mix features from adjacent stages.
 
-## Connections
+<div className="see-also">
 
-- [Entanglement as a Network Resource](/quantum-information-science/quantum-internet/entanglement)
-- [Quantum Teleportation](/quantum-information-science/quantum-internet/teleportation)
-- [Quantum Repeater](/quantum-information-science/quantum-internet/quantum-repeater)
-- [Quantum Communication](/quantum-information-science/quantum-communication/intro)
-- [Quantum Network](/quantum-information-science/quantum-communication/quantum-network)
-- [BB84 Protocol](/quantum-information-science/quantum-communication/bb84)
-- [Quantum Error Correction](/quantum-information-science/quantum-computing/error-correction)
-- [Density Operator, Entanglement, and Decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence)
+See also: [Entanglement as a Network Resource](/quantum-information-science/quantum-internet/entanglement) · [Quantum Teleportation](/quantum-information-science/quantum-internet/teleportation) · [Quantum Repeater](/quantum-information-science/quantum-internet/quantum-repeater) · [Quantum Communication](/quantum-information-science/quantum-communication/intro) · [Quantum Network](/quantum-information-science/quantum-communication/quantum-network) · [BB84 Protocol](/quantum-information-science/quantum-communication/bb84) · [Quantum Error Correction](/quantum-information-science/quantum-computing/error-correction) · [Density Operator, Entanglement, and Decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence)
+
+</div>

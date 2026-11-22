@@ -9,7 +9,7 @@ Program analysis computes facts about programs without running every concrete ex
 
 The central pattern is: choose an abstract domain, define transfer functions for program statements, solve a fixed-point problem over the control-flow graph, and prove the result safely approximates concrete executions. Precision, cost, and termination are engineering choices, not afterthoughts.
 
-## Definitions
+## Lattices behind dataflow facts
 
 A **control-flow graph** (CFG) has program points as nodes and possible transfers of control as edges. A **dataflow fact** is an element of a domain such as a set of definitions, a set of live variables, or an interval environment.
 
@@ -50,7 +50,7 @@ IN[n]=transfer_n(OUT[n]),
 OUT[n]=\bigvee_{s\in succ(n)} IN[s].
 $$
 
-**Meet-over-paths** (MOP) combines facts from all concrete paths. **Maximum fixed point** or **minimum fixed point** solutions are what iterative algorithms compute. For distributive frameworks, MOP and MFP coincide; for merely monotone frameworks, MFP is a safe approximation that may be less precise.
+**Meet-over-paths** (MOP) combines facts from all concrete paths. Iterative algorithms compute a **maximal fixed-point** (MFP) solution under the framework's chosen information order. For distributive frameworks, MOP and MFP coincide; for merely monotone frameworks, MFP is a safe approximation that may be less precise.
 
 **Abstract interpretation** relates a concrete domain $C$ and abstract domain $A$ by abstraction and concretization maps:
 
@@ -68,7 +68,7 @@ Common abstract domains include signs, intervals, congruences, octagons, and pol
 
 Pointer analyses include Andersen's inclusion-based analysis and Steensgaard's unification-based analysis. Information-flow analysis tracks confidentiality and integrity labels [5]. Control-flow analysis such as $k$-CFA approximates possible function calls in higher-order languages.
 
-## Key results
+## Fixed points, precision, and termination
 
 **Worklist termination on finite lattices.** If the lattice has finite height and transfer functions are monotone, chaotic iteration with a fair worklist eventually stabilizes. Each update moves facts monotonically upward or downward, and only finitely many strict moves are possible.
 
@@ -96,15 +96,13 @@ A widening such as $[l,u]\nabla[l',u']=[l'',u'']$, where bounds that keep moving
 
 **Alias analysis affects everything downstream.** For imperative languages, many optimizations depend on whether two expressions may refer to the same memory. Andersen-style analysis creates inclusion constraints such as $pts(x)\supseteq pts(y)$ for assignments. Steensgaard-style analysis unifies points-to sets, making it faster but usually less precise. The result feeds constant propagation, dead-store elimination, race detection, escape analysis, and security checks. Unsound alias assumptions are especially dangerous because they let compilers reorder memory operations incorrectly.
 
-**Information flow is a semantic property.** Explicit flows copy secret data into public variables. Implicit flows occur when control decisions leak information, as in `if secret then public := 1 else public := 0`. A type-and-effect or dataflow system can conservatively reject such programs by tracking labels through expressions and control dependence. This connects program analysis to security: the goal is not just optimization but noninterference, a property saying low-observable outputs do not depend on high-secret inputs [5].
+**Information flow is a semantic property.** Explicit flows copy secret data into public variables. Implicit flows occur when control decisions leak information, as in `if secret then public := 1 else public := 0`. A type-and-effect or dataflow system can conservatively reject such programs by tracking labels through expressions and control dependence. Beyond optimization, the security goal is noninterference: low-observable outputs do not depend on high-secret inputs [5].
 
 **Correlation loss explains false alarms.** Suppose an analysis knows $x\in[0,10]$ and $y\in[0,10]$ but has forgotten the relation $x=y$. After a branch that preserves equality, an interval domain still cannot prove $x-y=0$ because intervals track variables independently. A polyhedral domain could keep the equality but would cost more. This is the central abstract-interpretation tradeoff: false alarms are often not bugs in transfer functions, but consequences of choosing an abstract domain that intentionally forgets correlations.
 
 A good analyzer design therefore starts from the client: an optimizer, security checker, and bug finder may need different facts, different tolerances for false positives, and different runtime budgets.
 
 It also starts from the language semantics. Exceptions, closures, reflection, threads, and undefined behavior all change the concrete executions that the analysis must safely cover during compilation or verification.
-
-## Visual
 
 ```mermaid
 graph TD
@@ -129,7 +127,7 @@ graph TD
 | Octagons | $\pm x \pm y \le c$ | limited variable relations | nonlinear facts |
 | Polyhedra | linear inequalities | rich linear relations | high performance |
 
-## Worked example 1: live variables by backward analysis
+## Solving liveness backward
 
 Problem: compute live variables for the program:
 
@@ -201,7 +199,38 @@ $$
 
 Checked result: $x$ is live after line 1, $y$ after line 2, $z$ after line 3, and no variable is live before the whole program.
 
-## Worked example 2: interval analysis with widening
+## A worklist solver for liveness
+
+```python
+from collections import deque
+
+def live_variables(nodes, succ, use, define):
+    in_fact = {n: set() for n in nodes}
+    out_fact = {n: set() for n in nodes}
+    work = deque(nodes)
+
+    pred = {n: set() for n in nodes}
+    for n in nodes:
+        for s in succ[n]:
+            pred[s].add(n)
+
+    while work:
+        n = work.popleft()
+        old_in = set(in_fact[n])
+        out_fact[n] = set().union(*(in_fact[s] for s in succ[n]))
+        in_fact[n] = use[n] | (out_fact[n] - define[n])
+        if in_fact[n] != old_in:
+            work.extend(pred[n])
+    return in_fact, out_fact
+
+nodes = [1, 2, 3, 4]
+succ = {1: [2], 2: [3], 3: [4], 4: []}
+use = {1: set(), 2: {"x"}, 3: {"y"}, 4: {"z"}}
+define = {1: {"x"}, 2: {"y"}, 3: {"z"}, 4: set()}
+print(live_variables(nodes, succ, use, define))
+```
+
+## Widening an interval loop invariant
 
 Problem: analyze
 
@@ -241,38 +270,7 @@ Step 5: a narrowing phase can combine the widened invariant with the guard/assig
 
 Checked interpretation: widening may first jump to $[0,\infty]$, which is sound but imprecise. Narrowing can recover the useful upper bound for warning suppression or optimization.
 
-## Code
-
-```python
-from collections import deque
-
-def live_variables(nodes, succ, use, define):
-    in_fact = {n: set() for n in nodes}
-    out_fact = {n: set() for n in nodes}
-    work = deque(nodes)
-
-    pred = {n: set() for n in nodes}
-    for n in nodes:
-        for s in succ[n]:
-            pred[s].add(n)
-
-    while work:
-        n = work.popleft()
-        old_in = set(in_fact[n])
-        out_fact[n] = set().union(*(in_fact[s] for s in succ[n]))
-        in_fact[n] = use[n] | (out_fact[n] - define[n])
-        if in_fact[n] != old_in:
-            work.extend(pred[n])
-    return in_fact, out_fact
-
-nodes = [1, 2, 3, 4]
-succ = {1: [2], 2: [3], 3: [4], 4: []}
-use = {1: set(), 2: {"x"}, 3: {"y"}, 4: {"z"}}
-define = {1: {"x"}, 2: {"y"}, 3: {"z"}, 4: set()}
-print(live_variables(nodes, succ, use, define))
-```
-
-## Common pitfalls
+## Precision traps and incorrect initializations
 
 - Mixing up forward and backward equations.
 - Mixing up may and must analyses, especially the join/meet operator.
@@ -288,14 +286,6 @@ print(live_variables(nodes, succ, use, define))
 - Assuming $k$-CFA scales monotonically in practice; precision improvements can be costly.
 - Ignoring information-flow implicit flows through control dependence.
 
-## Connections
-
-- [Operational and Denotational Semantics](/cs/programming-language-theory/operational-and-denotational-semantics) supplies the concrete behavior being approximated.
-- [Axiomatic Semantics and Program Logic](/cs/programming-language-theory/axiomatic-semantics-and-program-logic) uses invariants that abstract interpretation can infer.
-- [Polymorphism, Subtyping, and Type Inference](/cs/programming-language-theory/polymorphism-subtyping-and-inference) shares constraints, fixed points, and lattice reasoning.
-- [Compilers](/cs/compilers/intro) uses dataflow for optimization and warnings.
-- [Discrete Math](/math/discrete/intro), [Theory of Computation](/cs/theory/intro), and [Cryptography](/cs/cryptography/intro) connect lattices, decidability, and information-flow security.
-
 ## References
 
 [1] F. Nielson, H. R. Nielson, and C. Hankin, *Principles of Program Analysis*. Springer, 1999.  
@@ -305,3 +295,15 @@ print(live_variables(nodes, succ, use, define))
 [5] A. Sabelfeld and A. C. Myers, "Language-based information-flow security," *IEEE Journal on Selected Areas in Communications*, 2003.  
 [6] L. O. Andersen, "Program analysis and specialization for the C programming language," Ph.D. dissertation, 1994.  
 [7] B. Steensgaard, "Points-to analysis in almost linear time," POPL, 1996.
+
+<div className="see-also">
+
+See also:
+
+- [Operational and Denotational Semantics](/cs/programming-language-theory/operational-and-denotational-semantics) supplies the concrete behavior being approximated.
+- [Axiomatic Semantics and Program Logic](/cs/programming-language-theory/axiomatic-semantics-and-program-logic) uses invariants that abstract interpretation can infer.
+- [Polymorphism, Subtyping, and Type Inference](/cs/programming-language-theory/polymorphism-subtyping-and-inference) shares constraints, fixed points, and lattice reasoning.
+- [Compilers](/cs/compilers/intro) uses dataflow for optimization and warnings.
+- [Discrete Math](/math/discrete/intro), [Theory of Computation](/cs/theory/intro), and [Cryptography](/cs/cryptography/intro) connect lattices, decidability, and information-flow security.
+
+</div>

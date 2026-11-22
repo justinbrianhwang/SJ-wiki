@@ -5,435 +5,416 @@ sidebar_position: 17
 
 # Vector Functions and Motion
 
-Vector functions describe curves and motion in the plane or in space. Instead of tracking one output, a vector function tracks several coordinates at once. The derivative of a vector function gives velocity, and the second derivative gives acceleration. This makes vector calculus a natural extension of parametric calculus.
+A vector-valued function records a point that depends on a parameter. Read geometrically, its image is a curve. Read kinematically, the parameter is time and the function gives a particle's position. These readings use the same derivatives but answer different questions: the curve has a shape independent of traversal speed, while velocity and acceleration depend on how the curve is parametrized.
 
-Motion problems become clearer when position, velocity, acceleration, speed, tangent direction, and curvature are separated. The vector notation keeps direction and magnitude together while still allowing ordinary differentiation component by component.
+## A curve together with a schedule
 
-## Definitions
-
-A vector-valued function in space has form
+In three dimensions, write
 
 $$
-\mathbf{r}(t)=\langle x(t),y(t),z(t)\rangle.
+\mathbf r(t)=\langle x(t),y(t),z(t)\rangle.
 $$
 
-Its derivative is
+Limits, derivatives, and integrals are taken componentwise. Thus
 
 $$
-\mathbf{r}'(t)=\langle x'(t),y'(t),z'(t)\rangle.
-$$
-
-For motion, position is $\mathbf{r}(t)$, velocity is
-
-$$
-\mathbf{v}(t)=\mathbf{r}'(t),
-$$
-
-and acceleration is
-
-$$
-\mathbf{a}(t)=\mathbf{v}'(t)=\mathbf{r}''(t).
-$$
-
-Speed is the magnitude of velocity:
-
-$$
-|\mathbf{v}(t)|.
-$$
-
-The unit tangent vector is
-
-$$
-\mathbf{T}(t)=\frac{\mathbf{r}'(t)}{|\mathbf{r}'(t)|}
-$$
-
-when $\mathbf{r}'(t)\ne \mathbf{0}$.
-
-Arc length from $t=a$ to $t=b$ is
-
-$$
-L=\int_a^b |\mathbf{r}'(t)|\,dt.
-$$
-
-Curvature measures how quickly the tangent direction changes with respect to arc length. In space,
-
-$$
-\kappa(t)=\frac{|\mathbf{r}'(t)\times\mathbf{r}''(t)|}{|\mathbf{r}'(t)|^3}
-$$
-
-when the denominator is nonzero.
-
-## Key results
-
-Vector differentiation is componentwise:
-
-$$
-\frac{d}{dt}\langle f(t),g(t),h(t)\rangle
+\mathbf r'(t)=\langle x'(t),y'(t),z'(t)\rangle,
+\qquad
+\int \mathbf r(t)\,dt
 =
-\langle f'(t),g'(t),h'(t)\rangle.
+\left\langle
+\int x(t)\,dt,
+\int y(t)\,dt,
+\int z(t)\,dt
+\right\rangle.
 $$
 
-Dot and cross products obey product rules:
+This componentwise rule follows from the Euclidean norm. A vector difference tends to zero exactly when each coordinate difference tends to zero. Ordinary one-variable calculus can therefore be applied to each coordinate, while dot and cross products put the components back into geometric form.
+
+The parametrizations
 
 $$
-\frac{d}{dt}[\mathbf{u}\cdot\mathbf{v}]
-=
-\mathbf{u}'\cdot\mathbf{v}+\mathbf{u}\cdot\mathbf{v}',
+\mathbf r_1(t)=\langle\cos t,\sin t\rangle,
+\qquad
+\mathbf r_2(t)=\langle\cos 2t,\sin 2t\rangle
 $$
 
-and
+have the same unit-circle image. The second completes a revolution in half the time. Replacing $t$ by a monotone function changes the schedule along the curve; it may change velocity and acceleration even when it does not change the traced points.
+
+A curve is regular at $t_0$ when $\mathbf r'(t_0)\ne\mathbf 0$. Regularity ensures that the first derivative supplies a tangent direction. A zero derivative does not automatically mean the geometric image has a corner. For example, $\mathbf r(t)=\langle t^3,t^6\rangle$ has zero velocity at $0$, yet its image lies on the smooth parabola $y=x^2$. The parametrization stalls there. One may need a different parametrization or a limiting tangent argument.
+
+## Position, velocity, speed, and acceleration
+
+For motion,
 
 $$
-\frac{d}{dt}[\mathbf{u}\times\mathbf{v}]
-=
-\mathbf{u}'\times\mathbf{v}+\mathbf{u}\times\mathbf{v}'.
+\mathbf v(t)=\mathbf r'(t),
+\qquad
+\mathbf a(t)=\mathbf v'(t)=\mathbf r''(t).
 $$
 
-If speed is constant, then velocity and acceleration are orthogonal. This follows by differentiating
+Velocity contains direction and rate; speed is the scalar
 
 $$
-\mathbf{v}\cdot\mathbf{v}=|\mathbf{v}|^2.
+v(t)=\lVert\mathbf v(t)\rVert.
 $$
 
-If $\vert \mathbf{v}\vert $ is constant, the derivative of the left side is
+For a short time increment $\Delta t$, differentiability gives
 
 $$
-2\mathbf{v}\cdot\mathbf{a}=0,
+\mathbf r(t+\Delta t)-\mathbf r(t)
+=\mathbf v(t)\Delta t+o(\Delta t).
 $$
 
-so $\mathbf{v}\cdot\mathbf{a}=0$.
-
-Acceleration splits into tangential and normal components:
+Thus velocity points along the local displacement. The tangent line at a regular point is
 
 $$
-\mathbf{a}=a_T\mathbf{T}+a_N\mathbf{N}.
+\mathbf L(s)=\mathbf r(t_0)+s\mathbf r'(t_0).
 $$
 
-The tangential component changes speed:
+In space, the plane through $\mathbf r(t_0)$ perpendicular to the velocity is the normal plane:
 
 $$
-a_T=\frac{d}{dt}|\mathbf{v}|.
+\mathbf r'(t_0)\cdot
+\bigl(\mathbf x-\mathbf r(t_0)\bigr)=0.
 $$
 
-The normal component changes direction. One formula is
+Dot and cross products obey product rules because both operations are bilinear:
 
 $$
-a_N=\sqrt{|\mathbf{a}|^2-a_T^2}.
+\frac{d}{dt}(\mathbf u\cdot\mathbf v)
+=\mathbf u'\cdot\mathbf v+\mathbf u\cdot\mathbf v',
 $$
 
-Projectile motion without air resistance has constant acceleration
-
 $$
-\mathbf{a}(t)=\langle0,-g\rangle
-$$
-
-in the plane. Integrating gives velocity and position, with constants determined by initial velocity and initial position.
-
-A curve is regular at $t$ if $\mathbf{r}'(t)\ne \mathbf{0}$. Regularity matters because tangent direction and curvature require a nonzero velocity vector. A parametrization may stop momentarily even when the geometric curve continues smoothly, so conclusions about tangents should distinguish the parametrization from the curve itself.
-
-Arc length can be used to reparametrize a curve. Define
-
-$$
-s(t)=\int_a^t |\mathbf{r}'(u)|\,du.
+\frac{d}{dt}(\mathbf u\times\mathbf v)
+=\mathbf u'\times\mathbf v+\mathbf u\times\mathbf v'.
 $$
 
-If $s$ can be inverted, the curve can be written in terms of arc length. In an arc-length parametrization, speed is $1$, and curvature simplifies to
+The first identity explains the relation between speed and acceleration. Since $v^2=\mathbf v\cdot\mathbf v$,
 
 $$
-\kappa=\left|\frac{d\mathbf{T}}{ds}\right|.
+2v\frac{dv}{dt}=2\mathbf v\cdot\mathbf a.
 $$
 
-This is conceptually important even when the inversion is algebraically difficult.
-
-The unit normal vector $\mathbf{N}$ points in the direction the curve is turning:
+When $v\ne0$,
 
 $$
-\mathbf{N}=\frac{\mathbf{T}'(t)}{|\mathbf{T}'(t)|}
+\frac{dv}{dt}=\frac{\mathbf v\cdot\mathbf a}{\lVert\mathbf v\rVert}.
 $$
 
-when $\mathbf{T}'(t)\ne \mathbf{0}$. The binormal vector is
+Positive $\mathbf v\cdot\mathbf a$ means speed is increasing; a negative value means it is decreasing. If speed is constant, velocity and acceleration are perpendicular. The converse holds on an interval for differentiable motion: if $\mathbf v\cdot\mathbf a=0$ throughout the interval, then $v^2$ is constant.
+
+## Arc length removes the timing
+
+Approximating a curve by short chords leads to the arc-length integral
 
 $$
-\mathbf{B}=\mathbf{T}\times\mathbf{N}.
+L=\int_a^b\lVert\mathbf r'(t)\rVert\,dt.
 $$
 
-Together, $\mathbf{T}$, $\mathbf{N}$, and $\mathbf{B}$ form the moving frame used to describe space curves.
-
-Tangential and normal acceleration separate speed change from direction change. If an object moves at constant speed around a circle, its tangential acceleration is zero but its normal acceleration is not. This is the vector reason uniform circular motion still has acceleration.
-
-Vector integrals are componentwise. If
+Define distance traveled from a fixed starting parameter $a$ by
 
 $$
-\mathbf{v}(t)=\langle f(t),g(t),h(t)\rangle,
+s(t)=\int_a^t\lVert\mathbf r'(u)\rVert\,du.
 $$
 
-then
+The Fundamental Theorem of Calculus gives $ds/dt=\lVert\mathbf r'(t)\rVert$. If the curve is regular, $s$ is strictly increasing locally and can be inverted. Writing the curve in terms of $s$ gives unit speed:
 
 $$
-\int \mathbf{v}(t)\,dt
-=
-\left\langle\int f(t)\,dt,\int g(t)\,dt,\int h(t)\,dt\right\rangle.
+\left\lVert\frac{d\mathbf r}{ds}\right\rVert=1.
 $$
 
-Constants of integration become constant vectors, fixed by initial position.
+Arc length is invariant under an orientation-preserving regular reparametrization. If $t=\phi(u)$ with $\phi'(u)\gt 0$, then the new speed is $\lVert\mathbf r'(\phi(u))\rVert\phi'(u)$; substitution in the integral cancels the changed schedule. If the parameter reverses direction, an absolute value on $\phi'$ preserves the positive length.
 
-A smooth curve can be studied as geometry or as motion. The same set of points may have different parametrizations with different speeds. For example, $\langle\cos t,\sin t\rangle$ and $\langle\cos 2t,\sin 2t\rangle$ trace the same unit circle, but the second moves twice as fast. Curvature is geometric and does not depend on speed, while velocity and acceleration do depend on the parametrization.
+The unit tangent is
 
-For plane curves, curvature can also be written in terms of coordinate functions:
+$$
+\mathbf T=\frac{\mathbf v}{\lVert\mathbf v\rVert}
+=\frac{d\mathbf r}{ds}.
+$$
+
+It records direction without speed. Since $\mathbf T\cdot\mathbf T=1$, differentiation with respect to $s$ gives $\mathbf T\cdot d\mathbf T/ds=0$. A changing unit tangent therefore changes only in a perpendicular direction.
+
+## Curvature and the moving frame
+
+Curvature is the rate at which the unit tangent turns per unit distance:
+
+$$
+\kappa=\left\lVert\frac{d\mathbf T}{ds}\right\rVert.
+$$
+
+When $\kappa\ne0$, the principal unit normal points in the turning direction,
+
+$$
+\mathbf N=\frac{d\mathbf T/ds}{\lVert d\mathbf T/ds\rVert},
+$$
+
+and the binormal is $\mathbf B=\mathbf T\times\mathbf N$. The orthonormal frame $\mathbf T,\mathbf N,\mathbf B$ moves along a regular space curve. A straight segment has $\kappa=0$, so it has no preferred principal normal.
+
+To obtain a formula in an arbitrary parameter, note that $d\mathbf T/dt=(d\mathbf T/ds)(ds/dt)=\kappa v\mathbf N$. A standard calculation using the component of acceleration perpendicular to velocity gives
+
+$$
+\kappa(t)=
+\frac{\lVert\mathbf r'(t)\times\mathbf r''(t)\rVert}
+{\lVert\mathbf r'(t)\rVert^3}.
+$$
+
+For a plane curve $\mathbf r=\langle x,y\rangle$, regard the vectors as having zero third coordinate:
 
 $$
 \kappa(t)=
 \frac{|x'(t)y''(t)-y'(t)x''(t)|}
-{\left((x'(t))^2+(y'(t))^2\right)^{3/2}}.
+{\bigl((x'(t))^2+(y'(t))^2\bigr)^{3/2}}.
 $$
 
-This is the two-dimensional version of the cross-product formula.
+The radius of curvature is $\rho=1/\kappa$ where curvature is nonzero. It is the radius of the circle that best matches the curve to second order at the point.
 
-The tangent line to a vector curve at $t=t_0$ is
+## Splitting acceleration into two effects
 
-$$
-\mathbf{L}(s)=\mathbf{r}(t_0)+s\mathbf{r}'(t_0),
-$$
-
-provided $\mathbf{r}'(t_0)\ne \mathbf{0}$. The normal plane in space is
+Because $\mathbf v=v\mathbf T$, differentiate with respect to time:
 
 $$
-\mathbf{r}'(t_0)\cdot(\mathbf{r}-\mathbf{r}(t_0))=0.
+\begin{aligned}
+\mathbf a
+&=\frac{d}{dt}(v\mathbf T)\\
+&=\frac{dv}{dt}\mathbf T
++v\frac{d\mathbf T}{dt}\\
+&=\frac{dv}{dt}\mathbf T+\kappa v^2\mathbf N.
+\end{aligned}
 $$
 
-These formulas mirror line and plane geometry: the tangent line uses the velocity as direction, and the normal plane uses velocity as normal.
-
-Energy intuition can also help. Acceleration parallel to velocity changes speed; acceleration perpendicular to velocity changes direction. The dot product $\mathbf{v}\cdot\mathbf{a}$ detects the tangential part. If it is positive, speed is increasing; if negative, speed is decreasing; if zero, speed is momentarily constant.
-
-Line integrals later use the same parametrized motion language. A vector field $\mathbf{F}$ evaluated along a path becomes $\mathbf{F}(\mathbf{r}(t))$, and the differential displacement is $d\mathbf{r}=\mathbf{r}'(t)\,dt$. Thus the work integral
+Hence
 
 $$
-\int_C \mathbf{F}\cdot d\mathbf{r}
+\mathbf a=a_T\mathbf T+a_N\mathbf N,
+\qquad
+a_T=\frac{dv}{dt},
+\qquad
+a_N=\kappa v^2.
 $$
 
-is built from velocity along a vector-parametrized curve.
-
-For numerical work, vector functions are sampled componentwise. A small time step estimates displacement by
+The tangential component changes speed. The normal component changes direction and points toward the local center of curvature. Since the components are perpendicular,
 
 $$
-\Delta\mathbf{r}\approx \mathbf{v}(t)\Delta t.
+a_N=\sqrt{\lVert\mathbf a\rVert^2-a_T^2}.
 $$
 
-More accurate methods use acceleration and higher derivatives, but the geometric interpretation remains: velocity gives the local tangent displacement.
-
-When acceleration is constant, the vector kinematic formula is
-
-$$
-\mathbf{r}(t)=\mathbf{r}_0+\mathbf{v}_0t+\frac12\mathbf{a}t^2.
-$$
-
-This is just the componentwise antiderivative of constant acceleration. It works in two or three dimensions as long as the acceleration vector is constant. Projectile motion is the standard example, with gravity contributing only to the vertical component in the simplest model.
-
-Speed controls arc length but not position alone. Two particles can pass through the same point at the same time with different velocities, or trace the same curve with different timing. The vector function includes both the geometric path and the schedule along that path, which is why the parameter interval and initial conditions are part of the model.
-
-## Visual
+Uniform circular motion has $a_T=0$ but $a_N=v^2/R$. Constant speed therefore does not imply zero acceleration. Conversely, straight-line motion may have nonzero tangential acceleration and zero normal acceleration.
 
 ```mermaid
-graph LR
-  A["Position r(t)"] -->|differentiate| B["Velocity v(t)"]
-  B -->|magnitude| C["Speed |v|"]
-  B -->|differentiate| D["Acceleration a(t)"]
-  B -->|normalize| E[Unit tangent T]
-  D --> F[Tangential component changes speed]
-  D --> G[Normal component changes direction]
-  B --> H[Arc length integral]
+flowchart LR
+  R["position r(t)"] -->|differentiate| V["velocity v(t)"]
+  V -->|magnitude| S["speed v"]
+  V -->|differentiate| A["acceleration a(t)"]
+  V -->|normalize| T["unit tangent T"]
+  A --> AT["tangential part: changes speed"]
+  A --> AN["normal part: changes direction"]
+  S --> L["integrate over time: arc length"]
 ```
 
-| Quantity | Formula | Meaning |
-|---|---:|---|
-| Position | $\mathbf{r}(t)$ | location |
-| Velocity | $\mathbf{r}'(t)$ | rate of change of position |
-| Speed | $\vert \mathbf{r}'(t)\vert $ | scalar rate of travel |
-| Acceleration | $\mathbf{r}''(t)$ | rate of change of velocity |
-| Unit tangent | $\mathbf{T}=\mathbf{r}'/\vert \mathbf{r}'\vert $ | direction of motion |
-| Curvature | $\vert \mathbf{r}'\times\mathbf{r}''\vert /\vert \mathbf{r}'\vert ^3$ | turning per unit length |
+## Worked example: a circular helix
 
-## Worked example 1: helix motion
-
-**Problem.** Let
+Let
 
 $$
-\mathbf{r}(t)=\langle \cos t,\sin t,t\rangle.
+\mathbf r(t)=\langle 3\cos t,3\sin t,4t\rangle.
 $$
 
-Find velocity, speed, acceleration, and curvature.
-
-**Method.**
-
-1. Differentiate position:
+Differentiate once and twice:
 
 $$
-\mathbf{v}(t)=\mathbf{r}'(t)=\langle-\sin t,\cos t,1\rangle.
+\mathbf v(t)=\langle-3\sin t,3\cos t,4\rangle,
 $$
 
-2. Compute speed:
-
 $$
-|\mathbf{v}(t)|
-=\sqrt{\sin^2 t+\cos^2 t+1}
-=\sqrt{2}.
+\mathbf a(t)=\langle-3\cos t,-3\sin t,0\rangle.
 $$
 
-3. Differentiate velocity:
+The speed is
 
 $$
-\mathbf{a}(t)=\mathbf{r}''(t)=\langle-\cos t,-\sin t,0\rangle.
+v=\sqrt{9\sin^2t+9\cos^2t+16}=5.
 $$
 
-4. Compute the cross product:
+It is constant, so $a_T=0$. Directly,
 
 $$
-\mathbf{r}'(t)\times\mathbf{r}''(t)
-=\langle \sin t,-\cos t,1\rangle.
+\mathbf v\cdot\mathbf a
+=9\sin t\cos t-9\sin t\cos t=0,
 $$
 
-5. Its magnitude is
+which confirms orthogonality. The arc length from $0$ to $b\gt 0$ is
 
 $$
-\sqrt{\sin^2 t+\cos^2 t+1}=\sqrt{2}.
+L=\int_0^b5\,dt=5b.
 $$
 
-6. Curvature is
+For curvature, compute
 
 $$
-\kappa(t)=\frac{\sqrt2}{(\sqrt2)^3}=\frac12.
+\mathbf v\times\mathbf a
+=\langle12\sin t,-12\cos t,9\rangle.
 $$
 
-**Checked answer.** The helix has constant speed $\sqrt2$ and constant curvature $1/2$. Constant speed also implies $\mathbf{v}\cdot\mathbf{a}=0$, which can be checked directly.
-
-Indeed,
+Its magnitude is
 
 $$
-\mathbf{v}\cdot\mathbf{a}
-=(-\sin t)(-\cos t)+(\cos t)(-\sin t)+1\cdot 0
-=0.
+\sqrt{144\sin^2t+144\cos^2t+81}=15.
 $$
 
-The acceleration is not zero; it points inward toward the axis of the helix's circular projection. This illustrates the difference between changing direction and changing speed.
-
-## Worked example 2: projectile motion
-
-**Problem.** A projectile starts at the origin with initial velocity
+Therefore
 
 $$
-\mathbf{v}(0)=\langle 30,40\rangle
+\kappa=\frac{15}{5^3}=\frac{3}{25}.
 $$
 
-ft/s and acceleration
+The normal acceleration is
 
 $$
-\mathbf{a}(t)=\langle0,-32\rangle
+a_N=\kappa v^2=\frac{3}{25}\cdot25=3,
 $$
 
-ft/s$^2$. Find position and the time when it returns to ground level.
+which agrees with $\lVert\mathbf a\rVert=3$. The horizontal projection is a circle of radius $3$, but the helix curvature is less than $1/3$ because some motion goes vertically rather than turning around that circle.
 
-**Method.**
+## Worked example: projectile motion from initial data
 
-1. Integrate acceleration:
-
-$$
-\mathbf{v}(t)=\langle C_1,-32t+C_2\rangle.
-$$
-
-2. Use $\mathbf{v}(0)=\langle30,40\rangle$:
+Take feet and seconds, ignore air resistance, and let
 
 $$
-\mathbf{v}(t)=\langle30,40-32t\rangle.
+\mathbf a(t)=\langle0,-32\rangle,
+\qquad
+\mathbf v(0)=\langle30,40\rangle,
+\qquad
+\mathbf r(0)=\langle0,5\rangle.
 $$
 
-3. Integrate velocity:
+Integrating acceleration introduces a constant vector:
 
 $$
-\mathbf{r}(t)=\langle30t+D_1,40t-16t^2+D_2\rangle.
+\mathbf v(t)=\langle C_1,-32t+C_2\rangle.
 $$
 
-4. Since the projectile starts at the origin, $\mathbf{r}(0)=\langle0,0\rangle$, so $D_1=D_2=0$.
-
-5. The height is
+The initial velocity sets $C_1=30$ and $C_2=40$, so
 
 $$
-y(t)=40t-16t^2.
+\mathbf v(t)=\langle30,40-32t\rangle.
 $$
 
-6. Return to ground level means $y(t)=0$:
+Integrate again and apply the initial position:
 
 $$
-40t-16t^2=0
-\quad\Rightarrow\quad
-8t(5-2t)=0.
+\mathbf r(t)=\langle30t,5+40t-16t^2\rangle.
 $$
 
-7. The positive return time is
+At maximum height, the vertical velocity vanishes:
 
 $$
-t=\frac52.
+40-32t=0
+\quad\Longrightarrow\quad
+t=\frac54.
 $$
 
-**Checked answer.** Position is
+The height then is
 
 $$
-\mathbf{r}(t)=\langle30t,40t-16t^2\rangle,
+y\left(\frac54\right)
+=5+40\left(\frac54\right)
+-16\left(\frac54\right)^2
+=30.
 $$
 
-and the projectile returns to ground level at $t=2.5$ seconds.
-
-The horizontal range is found by substituting $t=2.5$ into $x(t)=30t$:
+Landing occurs when $y(t)=0$:
 
 $$
-x(2.5)=75.
+5+40t-16t^2=0.
 $$
 
-So the projectile lands $75$ ft from the starting point. The vertical velocity at impact is
+The quadratic formula gives
 
 $$
-40-32(2.5)=-40,
+t=\frac{-40\pm\sqrt{40^2+4(16)(5)}}{-32}
+=\frac{5\pm3\sqrt5}{4}.
 $$
 
-which has the same magnitude as the initial vertical velocity but opposite sign because the launch and landing heights match.
-
-The speed at impact is therefore
+Only the positive root is physical:
 
 $$
-\sqrt{30^2+(-40)^2}=50\text{ ft/s}.
+t_{\mathrm{land}}=\frac{5+3\sqrt5}{4}\approx2.927.
 $$
 
-This equals the initial speed $\sqrt{30^2+40^2}=50$ ft/s in the ideal no-air-resistance model, another consistency check.
+The horizontal range is
 
-If launch and landing heights differed, that equality would generally fail because gravity would change kinetic energy relative to the starting height.
+$$
+x(t_{\mathrm{land}})
+=30\left(\frac{5+3\sqrt5}{4}\right)
+\approx87.8\text{ ft}.
+$$
 
-## Code
+Because the projectile lands below its launch point, its impact speed exceeds its initial speed. Substituting the landing time into $40-32t$ gives the vertical impact component, while the horizontal component remains $30$ in this model.
 
-```python
-from math import sin, cos, sqrt
+## Checks that prevent common errors
 
-def helix(t):
-    r = (cos(t), sin(t), t)
-    v = (-sin(t), cos(t), 1)
-    a = (-cos(t), -sin(t), 0)
-    speed = sqrt(sum(component * component for component in v))
-    return r, v, a, speed
+- Velocity and speed have different types: one is a vector and the other is a nonnegative scalar. An equation that adds them is already suspect.
+- In general, $d\lVert\mathbf r\rVert/dt$ is not $\lVert\mathbf r'\rVert$. Differentiating the squared norm gives $d\lVert\mathbf r\rVert/dt=(\mathbf r\cdot\mathbf r')/\lVert\mathbf r\rVert$ when $\mathbf r\ne0$.
+- Curvature formulas require nonzero velocity. Substitution at a singular parameter can create division by zero even if the image has a recoverable geometric tangent.
+- Parameter time equals arc length only for unit-speed motion. The notation $s$ is conventionally reserved for arc length to keep this distinction apparent.
+- Componentwise kinematics still requires one consistent coordinate system and unit system. A sign error in the chosen vertical direction propagates through both velocity and position.
+- A particle can revisit the same point with a different velocity. Position alone does not determine its current direction or speed.
 
-for t in [0, 1, 2]:
-    print(t, helix(t))
-```
+## Reparametrization without changing the trace
 
-## Common pitfalls
+It helps to separate three objects that are often compressed into one notation: the set of points forming the trace, the direction in which that trace is followed, and the rate of travel. A new parameter can alter the latter two while leaving the first unchanged. If a new parameter increases strictly with the old one, orientation is preserved. If it decreases, orientation reverses. If its derivative vanishes, the new parametrization may cease to be regular even when the geometric curve is smooth.
 
-- Confusing velocity with speed. Velocity is a vector; speed is its magnitude.
-- Differentiating vector magnitudes as if $\vert \mathbf{r}\vert '=\vert \mathbf{r}'\vert $. This is not generally true.
-- Forgetting that constant speed does not mean zero acceleration. Direction can change.
-- Using scalar projectile formulas without tracking vector components and units.
-- Computing curvature when $\mathbf{r}'(t)=\mathbf{0}$ without checking regularity.
-- Treating parameter $t$ as arc length when speed is not $1$.
+Consider a circle described once over a standard interval. Replacing the parameter by twice itself traverses the same circle twice as fast and may also traverse it more than once over the same stated interval. Replacing it by its negative reverses the direction. Squaring the parameter on an interval containing zero creates a more subtle problem: points on one side can be retraced, and the chain-rule factor vanishes at zero. Any claim that two parametrizations are equivalent should therefore include the intervals and whether the parameter change is one-to-one.
 
-## Connections
+Orientation matters for velocity, work, and circulation. Arc length and unsigned curvature do not care which way the curve is followed. The unit tangent changes sign under reversal, while the principal normal for an ordinary plane curve usually continues to point toward the same local center of curvature. Signed curvature, used in some treatments of plane curves, does change with orientation. Keeping track of which quantities are signed prevents apparent contradictions between formulas.
 
-- [Vectors and Geometry of Space](/math/calculus/vectors-and-geometry-of-space): vector operations support motion formulas.
-- [Parametric Polar and Conic Curves](/math/calculus/parametric-polar-conics): vector functions generalize parametric curves.
-- [Partial Derivatives and the Gradient](/math/calculus/partial-derivatives-and-gradient): curves through surfaces support directional derivatives.
-- [Vector Calculus](/math/calculus/vector-calculus): line integrals use vector fields along vector-parametrized curves.
+Arc-length parametrization is conceptually clean but often inconvenient to obtain in closed form. Computing the integral for distance may be straightforward while solving that relation for the old parameter is impossible using elementary functions. One can still use arc length implicitly: derivatives with respect to distance follow by dividing time derivatives by speed. The geometric conclusions do not require an explicit inverse formula.
+
+## Recovering motion from acceleration and initial data
+
+Acceleration alone does not determine a trajectory. Integrating once introduces a constant velocity vector, and integrating again introduces a constant position vector. Initial velocity and initial position supply these constants. In three dimensions this amounts to six scalar initial values. Forgetting either vector produces a family of motions rather than one motion.
+
+When acceleration depends on time only, componentwise integration is direct. When it depends on position or velocity, the problem becomes a differential equation or system. Central-force motion, drag, and guided motion along a constrained track all require more than the constant-acceleration formula. The geometric vocabulary still applies: velocity remains tangent to the path and acceleration still separates into tangential and normal effects wherever the motion is regular.
+
+Initial conditions also serve as unit checks. Position, velocity, and acceleration have dimensions of length, length per time, and length per time squared. An integration constant added to velocity must have velocity units. A term in position that contains acceleration must be multiplied by time squared. Dimensional disagreement usually exposes a missing factor of time or an incorrectly integrated component.
+
+For constant acceleration, displacement over a time interval can be read as initial-velocity displacement plus the accumulated acceleration contribution. Average velocity equals the mean of initial and final velocities in that special case. Neither shortcut survives arbitrary acceleration without replacing it by an integral. Treating a variable-acceleration problem with constant-acceleration formulas can give the correct units and still be wrong.
+
+## Curvature as a property of the trace
+
+The cross-product curvature formula may look tied to time because it contains first and second time derivatives. Its powers of speed cancel the timing dependence. Under a smooth increasing parameter change, both derivatives acquire chain-rule factors, and the component of the second derivative parallel to velocity disappears in the cross product. What remains scales by exactly the third power needed to cancel the denominator. That cancellation is the algebraic expression of curvature belonging to the trace rather than the schedule.
+
+Curvature also distinguishes a bend from a change in speed. If a car accelerates along a straight road, its acceleration may be large while curvature remains zero. If it rounds a tight bend at steady speed, tangential acceleration is zero but normal acceleration may be large. The product of curvature and speed squared quantifies that second effect, so doubling speed on the same bend multiplies normal acceleration by four.
+
+At an inflection point of a plane curve, curvature may vanish because the direction of bending changes. The principal normal obtained by normalizing the tangent derivative then becomes undefined at the point itself. Normal vectors on the two sides may point in opposite directions. A plot that draws a continuous chosen normal through such a point is using an extra convention, not the principal-normal formula alone.
+
+For a space curve, curvature measures bending but not twisting out of the osculating plane. Torsion supplies that additional quantity. A plane curve has zero torsion wherever the standard frame is defined; a helix has nonzero torsion. Curvature and torsion together determine a regular space curve up to rigid motion under suitable hypotheses, which explains why the moving frame carries more information than a tangent line by itself.
+
+## Measurements and numerical derivatives
+
+Recorded position data arrive at discrete times and usually contain noise. A forward difference estimates velocity from two samples, but its error combines truncation error with amplified measurement noise. A centered difference uses samples on both sides and generally has better truncation accuracy in the interior. Acceleration requires another differentiation and is even more sensitive to noise.
+
+Smoothing, fitting a local polynomial, or using a model-based estimator can be more reliable than repeatedly differencing raw coordinates. The choice changes what small-scale motion is retained, so the sampling interval and smoothing assumptions belong with the reported velocity or curvature. A beautifully smooth curvature plot can be an artifact of aggressive filtering.
+
+Discrete arc length is less fragile: sum the distances between successive samples. This polygonal length approaches the smooth curve length as sampling becomes finer under suitable regularity. It tends to underestimate a curved segment because a chord is shorter than the arc. Uneven sampling is acceptable if actual time gaps and spatial distances are used rather than assuming a constant step.
+
+Numerical checks can preserve geometric structure. Estimated speed should be nonnegative, a computed unit tangent should have norm near one, and constant-speed data should give a small velocity–acceleration dot product relative to their magnitudes. Such residual checks are more informative than comparing rounded coordinate formulas term by term.
+
+## Where the same parametrization reappears
+
+Line integrals use a curve as a schedule for sampling a field. Along $C$, a vector field becomes $\mathbf F(\mathbf r(t))$, while differential displacement is $d\mathbf r=\mathbf r'(t)\,dt$. Work is therefore written
+
+$$
+\int_C\mathbf F\cdot d\mathbf r
+=\int_a^b\mathbf F(\mathbf r(t))\cdot\mathbf r'(t)\,dt.
+$$
+
+The tangent, normal, and curvature also feed into mechanics, road and track design, and numerical path following. Their separation of geometry from timing is the central organizing idea: $\kappa$ belongs to the path, while $a_T$ and $a_N$ describe how a particular motion uses that path.
+
+<div className="see-also">
+
+See also: [Vectors and geometry of space](/math/calculus/vectors-and-geometry-of-space) · [Parametric, polar, and conic curves](/math/calculus/parametric-polar-conics) · [Partial derivatives and the gradient](/math/calculus/partial-derivatives-and-gradient) · [Vector calculus](/math/calculus/vector-calculus)
+
+</div>

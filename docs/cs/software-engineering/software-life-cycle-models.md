@@ -5,11 +5,11 @@ sidebar_position: 2
 
 # Software Life Cycle Models
 
-Software engineering begins by making work visible. A software life cycle is the ordered set of activities, deliverables, checkpoints, and decisions that move an idea from feasibility to a maintained product. Gustafson's first chapter treats the life cycle as a management structure as much as a technical structure: phases help teams know what work is expected, what artifacts should exist, and when progress can be judged by an observable milestone.
+Software engineering needs observable work. A software life cycle is the ordered set of activities, deliverables, checkpoints, and decisions that move an idea from feasibility to a maintained product. Gustafson's first chapter treats the life cycle as a management structure as much as a technical structure: phases help teams know what work is expected, what artifacts should exist, and when progress can be judged by an observable milestone.
 
 The chapter is intentionally practical. It names common development activities such as requirements, design, implementation, testing, delivery, and maintenance; it also names the documents that make those activities inspectable. Life cycle models then arrange the same kinds of work in different patterns. The waterfall model emphasizes a mostly sequential flow, prototyping uses a throwaway system to clarify ideas, incremental development delivers useful subsets, and the spiral model repeatedly revisits planning, risk, engineering, construction, and customer evaluation.
 
-## Definitions
+## Activities, deliverables, and milestones
 
 A **software life cycle** is the sequence of major activities used to develop and evolve software. The term does not mean that every project must use the same steps or the same degree of formality. It means that software work can be described as a set of recognizable activities with outputs that can be reviewed.
 
@@ -38,7 +38,7 @@ An **increment** is a small but useful subset of the final system. The increment
 
 The **spiral model** organizes development as repeated cycles around major concerns such as customer communication, planning, risk analysis, engineering, construction and release, and customer evaluation. Its signature feature is explicit attention to risk during each cycle.
 
-## Key results
+## Choosing where feedback and risk enter the cycle
 
 Life cycle models are not recipes for success by themselves. Their value is that they expose assumptions about order, feedback, risk, and customer involvement. The same activity, such as testing, has a different meaning in each model. In a strict waterfall process, most system testing appears after implementation. In incremental development, testing happens for each increment. In a spiral approach, risk analysis may cause the next engineering work to be a prototype, an experiment, or a partial implementation.
 
@@ -54,7 +54,7 @@ The incremental model improves feedback and value delivery. Each increment shoul
 
 The spiral model is most useful when risk dominates the project. It asks the team to identify, estimate, and address risks repeatedly instead of treating risk as a one-time planning note. It is heavier than a simple waterfall diagram, but that extra structure is justified for large, uncertain, or high-stakes systems.
 
-## Visual
+### Four ways to arrange the same engineering work
 
 ```mermaid
 flowchart TB
@@ -110,11 +110,11 @@ This diagram places waterfall, V-model, spiral, and agile lifecycles side by sid
 | Incremental | repeated useful subsets | systems that can be sliced into releases | early value, needs extensible architecture |
 | Spiral | repeated risk-driven cycles | large or risky projects | explicit risk handling, higher process cost |
 
-## Worked example 1: Mapping deliverables to phases
+## Placing project artifacts in the life cycle
 
-**Problem.** A small team is building a course registration system. The current artifact list is: statement of work, software requirements specification, cost estimate, architecture diagram, source code, unit test report, user manual, and defect report. Place each artifact in the life cycle activity where it is normally produced or primarily used.
+A small team building a course registration system has a statement of work, software requirements specification, cost estimate, architecture diagram, source code, unit test report, user manual, and defect report. Each artifact belongs with the life-cycle activity where it is normally produced or primarily used.
 
-**Method.** Use the purpose of each artifact rather than its filename.
+Classify each artifact by its purpose rather than its filename.
 
 1. The **statement of work** gives a preliminary description of desired capabilities. That makes it a feasibility artifact, because it supports the decision about whether the project should proceed.
 
@@ -132,7 +132,7 @@ This diagram places waterfall, V-model, spiral, and agile lifecycles side by sid
 
 8. The **defect report** records dissatisfaction with specific system behavior. It can appear during testing, delivery, or maintenance. If the report is from customer use after release, classify it as maintenance input; if it is from formal test execution before release, classify it as testing output.
 
-**Checked answer.**
+The resulting placement is:
 
 | Artifact | Phase |
 |---|---|
@@ -147,11 +147,11 @@ This diagram places waterfall, V-model, spiral, and agile lifecycles side by sid
 
 The answer is checked by asking whether each phase could proceed without the artifact. Design needs requirements; implementation needs design; acceptance needs test evidence and delivery materials.
 
-## Worked example 2: Choosing a life cycle model
+## A model for uncertain scanner workflows
 
-**Problem.** A company wants a new inventory system for warehouse scanners. The hardware API is stable, but warehouse supervisors are unsure about the screen flow. The company needs a usable receiving module in two months, then picking and shipping later. Which life cycle model should the team use?
+A company wants a new inventory system for warehouse scanners. The hardware API is stable, but warehouse supervisors are unsure about the screen flow. The company needs a usable receiving module in two months, then picking and shipping later. Those constraints favor a particular combination of life-cycle models.
 
-**Method.** Compare project facts with model strengths.
+Compare the project facts with the strengths and costs of each model.
 
 1. A pure waterfall model is attractive because the hardware API is stable. However, the screen flow is uncertain. If the team freezes requirements too early, it may build the wrong operator workflow.
 
@@ -161,11 +161,11 @@ The answer is checked by asking whether each phase could proceed without the art
 
 4. The project does not sound dominated by unknown technical risks. The spiral model's risk focus might be helpful, but it would be heavier than necessary unless scanner performance, safety, or integration uncertainty becomes severe.
 
-**Checked answer.** Use an **incremental model with an early throwaway prototype** for the scanner workflow. The first increment should deliver receiving. Before detailed implementation, build a prototype that lets supervisors test screen order, error messages, and barcode exception paths. Then preserve the lessons, discard the prototype if it was not built to production quality, and implement the receiving increment on the real architecture.
+Use an **incremental model with an early throwaway prototype** for the scanner workflow. The first increment should deliver receiving. Before detailed implementation, build a prototype that lets supervisors test screen order, error messages, and barcode exception paths. Then preserve the lessons, discard the prototype if it was not built to production quality, and implement the receiving increment on the real architecture.
 
 This answer is checked against the project goals: it handles uncertain requirements through prototyping, satisfies early business value through incremental delivery, and avoids imposing the full spiral model where risk does not justify it.
 
-## Code
+## Testing whether a milestone is observable
 
 ```python
 from dataclasses import dataclass
@@ -205,7 +205,7 @@ for item in milestones:
         print(f"  - {problem}")
 ```
 
-## Common pitfalls
+## Lifecycle choices that hide trouble
 
 - Treating the life cycle as paperwork instead of as a visibility mechanism. The documents matter because they support decisions, reviews, and coordination.
 - Calling every date a milestone. A date is only useful when it is connected to an observable event and a meaningful artifact.
@@ -214,10 +214,8 @@ for item in milestones:
 - Splitting increments by technical layer only. An increment should usually deliver a user-visible slice of capability, not just "the database layer."
 - Forgetting maintenance. The life cycle does not end when the first version is installed.
 
-## Connections
+<div className="see-also">
 
-- [Software process models and diagrams](/cs/software-engineering/software-process-models-and-diagrams)
-- [Project planning and estimation](/cs/software-engineering/project-planning-and-estimation)
-- [Requirements engineering](/cs/software-engineering/requirements-engineering)
-- [Software testing](/cs/software-engineering/software-testing)
-- [Risk analysis and management](/cs/software-engineering/risk-analysis-and-management)
+See also: [Software process models and diagrams](/cs/software-engineering/software-process-models-and-diagrams) · [Project planning and estimation](/cs/software-engineering/project-planning-and-estimation) · [Requirements engineering](/cs/software-engineering/requirements-engineering) · [Software testing](/cs/software-engineering/software-testing) · [Risk analysis and management](/cs/software-engineering/risk-analysis-and-management)
+
+</div>

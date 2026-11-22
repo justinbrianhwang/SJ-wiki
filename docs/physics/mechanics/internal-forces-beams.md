@@ -353,9 +353,8 @@ Statics alone also cannot find reactions in a statically indeterminate beam. Ext
 - The condition $V=0$ locates smooth interior extrema of $M$, not every possible maximum. Check boundaries and both sides of jumps as well.
 - Units can conceal a factor of one thousand. If force is in kN and distance in m, moment is in kN m; stress work often requires conversion to N and mm.
 
-## Related pages
+<div className="see-also">
 
-- [Rigid-body equilibrium](/physics/mechanics/rigid-body-equilibrium)
-- [Centroids and second moments](/physics/mechanics/centroids-second-moments)
-- [Trusses, frames, and machines](/physics/mechanics/trusses-frames-machines)
-- [Equilibrium and elasticity](/physics/general/equilibrium-and-elasticity)
+See also: [Rigid-body equilibrium](/physics/mechanics/rigid-body-equilibrium) · [Centroids and second moments](/physics/mechanics/centroids-second-moments) · [Trusses, frames, and machines](/physics/mechanics/trusses-frames-machines) · [Equilibrium and elasticity](/physics/general/equilibrium-and-elasticity)
+
+</div>

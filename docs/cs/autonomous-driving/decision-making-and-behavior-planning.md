@@ -7,9 +7,9 @@ sidebar_position: 10
 
 Behavior planning chooses what kind of maneuver the vehicle should perform before motion planning computes the exact trajectory. It answers questions like: should the ego vehicle yield, proceed, change lanes, creep forward, stop for a pedestrian, pull over, or wait for a clearer gap? This layer gives structure to driving decisions that are too semantic for pure trajectory optimization but too concrete for route planning.
 
-This page covers finite-state machines, behavior trees, POMDPs, rule-based and learned planners, and hybrid approaches. It connects the responsibility and ODD concepts from [SAE levels](/cs/autonomous-driving/sae-levels-and-operational-design-domain) to the algorithmic layers in [prediction](/cs/autonomous-driving/prediction-and-motion-forecasting), [motion planning](/cs/autonomous-driving/motion-planning), [control](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley), and [safety](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing).
+Finite-state machines, behavior trees, POMDPs, and learned policies impose different structures on these tactical choices. Deployed planners commonly combine them with explicit legal and safety constraints.
 
-## Definitions
+## The tactical-planning vocabulary
 
 A **behavior** is a tactical driving mode or maneuver class: lane keep, follow, yield, stop, nudge, merge, change lane, park, unprotected turn, or minimal-risk stop.
 
@@ -25,7 +25,7 @@ A **hybrid planner** combines rules, learned predictions, learned costs, and opt
 
 **RSS**, Responsibility-Sensitive Safety, is a formal safety model proposed by Mobileye that defines longitudinal and lateral safe-distance rules under specified assumptions. It is not a complete planner, but it is an important reference for safety envelopes.
 
-## Key results
+## State, belief, and arbitration
 
 Behavior planning often decomposes driving into three layers:
 
@@ -71,7 +71,7 @@ Behavior planning also needs arbitration. Multiple behaviors can be simultaneous
 
 Hysteresis and memory are part of correctness, not cosmetic smoothing. A behavior planner that forgets why it stopped may creep repeatedly into the same blocked intersection. A planner that changes its mind every frame can confuse other road users. State should capture commitments, timers, negotiations, and the reason for a maneuver when those facts affect safe behavior.
 
-## Visual
+### A minimal tactical state machine
 
 ```mermaid
 stateDiagram-v2
@@ -87,7 +87,7 @@ stateDiagram-v2
   Follow --> MinimalRiskStop: "ODD exit or critical fault"
 ```
 
-## Worked example 1: Designing FSM transition guards
+## Giving a lane change stable transition guards
 
 Problem: Design transition guards for a lane-change behavior from `LaneKeep` to `PrepareLaneChange` to `LaneChange`. The route requires being in the left lane within 300 m. The ego vehicle has speed 20 m/s. A safe target-lane gap requires at least 2.5 s behind and 2.0 s ahead.
 
@@ -123,7 +123,7 @@ Answer: the planner should enter `PrepareLaneChange` now, but only execute `Lane
 
 Check: The behavior state is not equivalent to steering. `PrepareLaneChange` may adjust speed to create a gap before lateral motion begins.
 
-## Worked example 2: Belief update for a pedestrian intention
+## Updating belief about a pedestrian's intent
 
 Problem: A pedestrian near a crosswalk may either cross or wait. Prior belief is $P(\mathrm{cross})=0.4$ and $P(\mathrm{wait})=0.6$. The observation is that the pedestrian looks toward traffic and steps closer to the curb. Likelihoods are $P(o \mid \mathrm{cross})=0.8$ and $P(o \mid \mathrm{wait})=0.3$. Compute the posterior.
 
@@ -161,7 +161,7 @@ Answer: the belief that the pedestrian will cross rises from 0.4 to 0.64.
 
 Check: The observation is more likely under the crossing hypothesis, so the posterior shifts toward crossing but does not become certain.
 
-## Code
+## Encoding priority and hysteresis
 
 ```python
 from enum import Enum, auto
@@ -204,7 +204,7 @@ ctx = {
 print(next_behavior(Behavior.PREPARE_LANE_CHANGE, ctx))
 ```
 
-## Common pitfalls
+## How behavior logic becomes brittle
 
 - Encoding every case as another FSM state. Large flat state machines become hard to test and reason about.
 - Omitting hysteresis. Noisy perception can make behavior oscillate between incompatible modes.
@@ -213,12 +213,8 @@ print(next_behavior(Behavior.PREPARE_LANE_CHANGE, ctx))
 - Ignoring planner-prediction coupling. Other agents react to the ego vehicle's choices.
 - Making fallback a last-minute patch. Minimal-risk behavior should be designed and tested as part of the behavior system.
 
-## Connections
+<div className="see-also">
 
-- [SAE levels and operational design domain](/cs/autonomous-driving/sae-levels-and-operational-design-domain)
-- [Prediction and motion forecasting](/cs/autonomous-driving/prediction-and-motion-forecasting)
-- [Motion planning](/cs/autonomous-driving/motion-planning)
-- [Control: PID, MPC, pure pursuit, and Stanley](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley)
-- [Safety, ISO 26262, SOTIF, and scenario testing](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing)
-- [Reinforcement learning](/cs/reinforcement-learning/)
-- Further reading: behavior trees in robotics, POMDP planning, Mobileye RSS, imitation learning for driving, and rule-based motion planning in autonomous vehicles.
+See also: [SAE levels and operational design domain](/cs/autonomous-driving/sae-levels-and-operational-design-domain) · [Prediction and motion forecasting](/cs/autonomous-driving/prediction-and-motion-forecasting) · [Motion planning](/cs/autonomous-driving/motion-planning) · [Control: PID, MPC, pure pursuit, and Stanley](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley) · [Safety, ISO 26262, SOTIF, and scenario testing](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing) · [Reinforcement learning](/cs/reinforcement-learning/intro)
+
+</div>

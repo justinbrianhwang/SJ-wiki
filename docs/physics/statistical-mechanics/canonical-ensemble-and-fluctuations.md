@@ -403,10 +403,8 @@ Checked answer: the zero-point energy contributes to $\langle E\rangle$ but not 
 - The chain rule is a frequent source of sign and temperature-power errors: $\partial_\beta=-k_BT^2\partial_T$.
 - A negative canonical heat capacity would imply a negative energy variance and is impossible for a stable canonical equilibrium. Negative heat capacities can occur under microcanonical constraints in nonadditive systems, so the ensemble must be stated.
 
-## Related pages
+<div className="see-also">
 
-- [Microcanonical ensemble and entropy](/physics/statistical-mechanics/microcanonical-ensemble-and-entropy)
-- [Grand canonical ensemble and particle exchange](/physics/statistical-mechanics/grand-canonical-ensemble-and-particle-exchange)
-- [Classical ideal gas and Maxwell distribution](/physics/statistical-mechanics/classical-ideal-gas-and-maxwell-distribution)
-- [Harmonic oscillator in quantum mechanics](/physics/quantum-mechanics/harmonic-oscillator-ladder-operators)
-- [Thermodynamics](/physics/thermodynamics/intro)
+See also: [Microcanonical ensemble and entropy](/physics/statistical-mechanics/microcanonical-ensemble-and-entropy) · [Grand canonical ensemble and particle exchange](/physics/statistical-mechanics/grand-canonical-ensemble-and-particle-exchange) · [Classical ideal gas and Maxwell distribution](/physics/statistical-mechanics/classical-ideal-gas-and-maxwell-distribution) · [Harmonic oscillator in quantum mechanics](/physics/quantum-mechanics/harmonic-oscillator-ladder-operators) · [Thermodynamics](/physics/thermodynamics/intro)
+
+</div>

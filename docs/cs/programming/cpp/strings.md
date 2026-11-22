@@ -320,10 +320,8 @@ C-string interfaces often accept a pointer with no capacity because they predate
 
 Case-insensitive comparison is not obtained safely by lowercasing bytes in every language. Even ASCII-oriented code should cast through `unsigned char`; international text additionally needs Unicode normalization and case-folding rules. State the accepted character set when a parser or identifier comparison deliberately uses ASCII rules.
 
-## Related pages
+<div className="see-also">
 
-- [arrays](/cs/programming/cpp/arrays)
-- [streams and file I/O](/cs/programming/cpp/streams-and-file-io)
-- [pointers and dynamic memory](/cs/programming/cpp/pointers-and-dynamic-memory)
-- [classes and encapsulation](/cs/programming/cpp/classes-and-encapsulation)
-- [STL containers](/cs/programming/cpp/stl-containers)
+See also: [arrays](/cs/programming/cpp/arrays) · [streams and file I/O](/cs/programming/cpp/streams-and-file-io) · [pointers and dynamic memory](/cs/programming/cpp/pointers-and-dynamic-memory) · [classes and encapsulation](/cs/programming/cpp/classes-and-encapsulation) · [STL containers](/cs/programming/cpp/stl-containers)
+
+</div>

@@ -363,10 +363,8 @@ $$
 
 The union bound is the first term of inclusion-exclusion and overestimates by the pairwise-overlap correction. If the events are mutually exclusive, the exact probability is $np$ as long as such a model is possible. The same marginal probabilities can therefore lead to very different union probabilities; dependence information cannot be recovered from the marginals alone.
 
-## Related pages
+<div className="see-also">
 
-- [Counting and combinatorics](/math/probability-and-random-variables/counting-and-combinatorics)
-- [Conditional probability, Bayes, and independence](/math/probability-and-random-variables/conditional-probability-bayes-independence)
-- [Discrete random variables, expectation, and variance](/math/probability-and-random-variables/discrete-random-variables-expectation-variance)
-- [Probability pitfalls and intuition](/math/probability/probability-pitfalls-intuition)
-- [Counting principles](/math/probability/counting-principles)
+See also: [Counting and combinatorics](/math/probability-and-random-variables/counting-and-combinatorics) · [Conditional probability, Bayes, and independence](/math/probability-and-random-variables/conditional-probability-bayes-independence) · [Discrete random variables, expectation, and variance](/math/probability-and-random-variables/discrete-random-variables-expectation-variance) · [Probability pitfalls and intuition](/math/probability/probability-pitfalls-intuition) · [Counting principles](/math/probability/counting-principles)
+
+</div>

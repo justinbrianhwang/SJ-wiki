@@ -7,13 +7,9 @@ sidebar_position: 22
 
 Privacy-preserving data mining studies how to extract useful patterns while reducing the risk of exposing sensitive information about individuals or organizations. Aggarwal's final chapter covers privacy during data collection, privacy-preserving data publishing, output privacy, and distributed privacy. The topic matters because mining systems often combine large, detailed, linkable data sets, and utility can conflict directly with confidentiality.
 
-![A hash list diagram links data blocks to hashes that can verify later blocks.](https://commons.wikimedia.org/wiki/Special:FilePath/Hash_list.svg)
+The algorithmic scope includes randomization, anonymization, $k$-anonymity-style publishing, l-diversity and t-closeness intuition, output privacy, distributed privacy, and evaluation of the privacy-utility tradeoff. It does not replace legal or governance review.
 
-*Figure: Hash lists connect hashing to integrity checking and authenticated data structures. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hash_list.svg), David Gothberg and DataWraith, public domain.*
-
-This page covers randomization, anonymization, $k$-anonymity-style publishing, l-diversity and t-closeness intuition, output privacy, distributed privacy, and evaluation of the privacy-utility tradeoff. It is not legal advice; it is an algorithmic summary.
-
-## Definitions
+## Threats at collection, release, and output
 
 **Identifier attributes** directly identify an individual, such as name or government ID.
 
@@ -33,7 +29,7 @@ A **sensitive attribute** is the value to protect, such as diagnosis, salary, po
 
 **Distributed privacy-preserving mining** computes results across parties without fully sharing raw data.
 
-## Key results
+## What anonymization protects—and what it leaves exposed
 
 **Removing identifiers is not enough.** Quasi-identifiers can reidentify people when linked with external data. Privacy must consider combinations of attributes.
 
@@ -47,7 +43,7 @@ A **sensitive attribute** is the value to protect, such as diagnosis, salary, po
 
 **Distributed privacy separates computation from data sharing.** Secure protocols, local models, or summary exchange can compute mining results without centralizing all raw records, but communication cost and leakage through outputs remain concerns.
 
-**Privacy and utility must be evaluated together.** A release that is perfectly private but useless does not support mining; a highly accurate release that exposes individuals is unacceptable. Practical work reports both disclosure risk and analytical loss, such as classification accuracy drop, aggregate error, pattern distortion, or query error. The right tradeoff depends on data sensitivity, attacker assumptions, and the intended analysis.
+**Privacy and utility must be evaluated together.** A release that is perfectly private but useless does not support mining; a highly accurate release that exposes individuals is unacceptable. Evaluations report both disclosure risk and analytical loss, such as classification accuracy drop, aggregate error, pattern distortion, or query error. The right tradeoff depends on data sensitivity, attacker assumptions, and the intended analysis.
 
 **Repeated releases compound risk.** One anonymized table may satisfy a privacy criterion, but releasing several overlapping tables, model outputs, or query answers can allow differencing attacks. Privacy-preserving data mining therefore treats the release process as a whole. Output privacy, query auditing, and limits on repeated access are as important as anonymizing the original table.
 
@@ -65,7 +61,7 @@ A **sensitive attribute** is the value to protect, such as diagnosis, salary, po
 
 **Model release is a release.** Publishing coefficients, tree paths, nearest-neighbor examples, or synthetic data can leak training information. Privacy review should cover trained artifacts, not only raw tables.
 
-## Visual
+## Choosing a protection point in the pipeline
 
 ```mermaid
 flowchart TD
@@ -89,7 +85,9 @@ flowchart TD
 | Perturbation | Exact value disclosure | Noise or randomization | Accuracy loss |
 | Distributed privacy | Central raw-data sharing | Secure or local computation | Output leakage, cost |
 
-## Worked example 1: Checking k-anonymity
+## Auditing a protected release
+
+### Checking equivalence-class sizes
 
 **Problem.** A released table has quasi-identifiers age range and ZIP prefix:
 
@@ -113,7 +111,7 @@ Is the table 2-anonymous with respect to age_range and zip_prefix?
 
 **Checked answer.** The table is 2-anonymous. It is not 3-anonymous because the first equivalence class has only 2 records.
 
-## Worked example 2: Attribute disclosure despite k-anonymity
+### Seeing attribute disclosure through an anonymous group
 
 **Problem.** Modify the previous table so records 1 and 2 both have diagnosis `flu`. The first equivalence class is still size 2. Explain the privacy weakness.
 
@@ -133,7 +131,7 @@ Is the table 2-anonymous with respect to age_range and zip_prefix?
 
 **Checked answer.** $k$-anonymity alone is insufficient here. A diversity requirement would reject this equivalence class for sensitive diagnosis.
 
-## Code
+### Auditing anonymity and sensitive-value diversity
 
 Pseudocode for checking k-anonymity:
 
@@ -169,7 +167,7 @@ diversity = df.groupby(quasi)["diagnosis"].nunique().rename("distinct_sensitive"
 print(diversity)
 ```
 
-## Common pitfalls
+## Releases that appear safer than they are
 
 - Believing deidentification means only removing names.
 - Publishing high-dimensional quasi-identifiers where almost every record remains unique.
@@ -179,10 +177,8 @@ print(diversity)
 - Ignoring graph and social-network privacy, where edges can identify people.
 - Treating privacy as only an algorithmic setting rather than a data governance requirement.
 
-## Connections
+<div className="see-also">
 
-- [Data Mining Process and Data Types](/cs/data-mining/chapter-01-process-data-types)
-- [Data Preparation](/cs/data-mining/chapter-02-data-preparation)
-- [Mining Data Streams and Big Data](/cs/data-mining/chapter-12-mining-data-streams)
-- [Mining Graph Data](/cs/data-mining/chapter-17-mining-graph-data)
-- [Social Network Analysis](/cs/data-mining/chapter-19-social-network-analysis)
+See also: [Data Mining Process and Data Types](/cs/data-mining/chapter-01-process-data-types) · [Data Preparation](/cs/data-mining/chapter-02-data-preparation) · [Mining Data Streams and Big Data](/cs/data-mining/chapter-12-mining-data-streams) · [Mining Graph Data](/cs/data-mining/chapter-17-mining-graph-data) · [Social Network Analysis](/cs/data-mining/chapter-19-social-network-analysis)
+
+</div>

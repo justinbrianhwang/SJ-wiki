@@ -367,9 +367,8 @@ These examples matter because “control for another variable” is not automati
 
 Natural-frequency tables remain a good arithmetic check. Choose a hypothetical population size that turns base rates into counts, pass each subgroup through its corresponding likelihood, and condition by restricting to the observed row. If the resulting denominator disagrees with the law of total probability, an event has likely been reversed or omitted.
 
-## Related pages
+<div className="see-also">
 
-- [Probability axioms and inclusion-exclusion](/math/probability-and-random-variables/probability-axioms-and-inclusion-exclusion)
-- [Discrete random variables, expectation, and variance](/math/probability-and-random-variables/discrete-random-variables-expectation-variance)
-- [Joint distributions, transformations, and independence](/math/probability-and-random-variables/joint-distributions-transformations-independence)
-- [Conditional expectation](/math/probability-and-random-variables/covariance-correlation-conditional-expectation)
+See also: [Probability axioms and inclusion-exclusion](/math/probability-and-random-variables/probability-axioms-and-inclusion-exclusion) · [Discrete random variables, expectation, and variance](/math/probability-and-random-variables/discrete-random-variables-expectation-variance) · [Joint distributions, transformations, and independence](/math/probability-and-random-variables/joint-distributions-transformations-independence) · [Conditional expectation](/math/probability-and-random-variables/covariance-correlation-conditional-expectation)
+
+</div>

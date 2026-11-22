@@ -223,13 +223,11 @@ A trusted holdout set is useful only if its acquisition path is independent of t
 
 Common evaluation mistakes include testing only one square trigger, tuning a detector on the attack used for the final result, leaking triggered samples into threshold selection, and reporting clean accuracy without a matched baseline. Another error is to evaluate a data sanitization defense against a malicious checkpoint: the defense and attacker act at different parts of the pipeline.
 
-## Related pages
+<div className="see-also">
 
-- [Threat models and attack taxonomy](/cs/adversarial-attacks/threat-models-and-attack-taxonomy)
-- [Evaluation and benchmarks](/cs/adversarial-attacks/evaluation-and-benchmarks)
-- [Physical-world and patch attacks](/cs/adversarial-attacks/physical-world-and-patch-attacks)
-- [Adversarial training](/cs/adversarial-attacks/adversarial-training)
-- [Machine learning system design](/cs/machine-learning/learning-problems-and-system-design)
+See also: [Threat models and attack taxonomy](/cs/adversarial-attacks/threat-models-and-attack-taxonomy) · [Evaluation and benchmarks](/cs/adversarial-attacks/evaluation-and-benchmarks) · [Physical-world and patch attacks](/cs/adversarial-attacks/physical-world-and-patch-attacks) · [Adversarial training](/cs/adversarial-attacks/adversarial-training) · [Machine learning system design](/cs/machine-learning/learning-problems-and-system-design)
+
+</div>
 
 ## References
 

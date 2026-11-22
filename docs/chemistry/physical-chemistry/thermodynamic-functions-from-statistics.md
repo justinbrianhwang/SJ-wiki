@@ -9,7 +9,7 @@ The power of statistical thermodynamics is that once the partition function is k
 
 Atkins uses this machinery to show that classical thermodynamic quantities are not independent assumptions. They emerge from molecular state counting, especially through the canonical partition function $Q$ and the Helmholtz energy $A=-kT\ln Q$.
 
-## Definitions
+## The canonical route from $Q$ to $A$
 
 The canonical ensemble describes systems with fixed $N$, $V$, and $T$, in thermal contact with a heat reservoir. Its partition function is
 
@@ -59,7 +59,31 @@ $$
 
 For reactions, molecular partition functions lead to equilibrium constants through standard molar Gibbs energies and through ratios of partition functions for products and reactants.
 
-## Key results
+## Differentiating the partition function
+
+Once the molecular energy levels determine $q$, the remaining thermodynamic quantities follow in a fixed chain:
+
+```mermaid
+flowchart TD
+  A[Molecular energy levels] --> B[Molecular partition function q]
+  B --> C[Canonical Q]
+  C --> D["A = -kT ln Q"]
+  D --> E["S = -dA/dT"]
+  D --> F["p = -dA/dV"]
+  D --> G["mu = dA/dN"]
+  E --> H["U = A + TS"]
+  H --> I["Cv = dU/dT"]
+  G --> J[Equilibrium constants]
+```
+
+| Function | Statistical route | Physical interpretation |
+|---|---:|---|
+| $A$ | $-kT\ln Q$ | free energy at fixed $T,V$ |
+| $U$ | $- \partial\ln Q/\partial\beta$ | mean internal energy |
+| $S$ | $-(\partial A/\partial T)_V$ | accessible microstates plus energy spread |
+| $p$ | $-(\partial A/\partial V)_T$ | response to volume change |
+| $\mu$ | $(\partial A/\partial N)_{T,V}$ | cost of adding a molecule |
+| $C_V$ | $(\partial U/\partial T)_V$ | thermal accessibility of energy modes |
 
 If $Q=q^N/N!$, then
 
@@ -160,31 +184,7 @@ This equation explains why heat capacity is nonnegative in stable canonical syst
 
 The statistical route also clarifies the limits of classical thermodynamics. Classical thermodynamics gives relationships among properties without identifying molecular origins. Statistical thermodynamics predicts those properties from masses, moments of inertia, frequencies, degeneracies, and interaction models. The two approaches agree when the molecular model is accurate and the system is large enough for fluctuations to be negligible on the macroscopic scale.
 
-## Visual
-
-```mermaid
-flowchart TD
-  A[Molecular energy levels] --> B[Molecular partition function q]
-  B --> C[Canonical Q]
-  C --> D["A = -kT ln Q"]
-  D --> E["S = -dA/dT"]
-  D --> F["p = -dA/dV"]
-  D --> G["mu = dA/dN"]
-  E --> H["U = A + TS"]
-  H --> I["Cv = dU/dT"]
-  G --> J[Equilibrium constants]
-```
-
-| Function | Statistical route | Physical interpretation |
-|---|---:|---|
-| $A$ | $-kT\ln Q$ | free energy at fixed $T,V$ |
-| $U$ | $- \partial\ln Q/\partial\beta$ | mean internal energy |
-| $S$ | $-(\partial A/\partial T)_V$ | accessible microstates plus energy spread |
-| $p$ | $-(\partial A/\partial V)_T$ | response to volume change |
-| $\mu$ | $(\partial A/\partial N)_{T,V}$ | cost of adding a molecule |
-| $C_V$ | $(\partial U/\partial T)_V$ | thermal accessibility of energy modes |
-
-## Worked example 1: Deriving ideal gas pressure from $Q$
+## Deriving ideal-gas pressure from translational states
 
 **Problem.** Show explicitly that the translational partition function gives $pV=NkT$ for a monatomic gas.
 
@@ -242,7 +242,7 @@ $$
 
 **Checked answer.** The equation of state follows from translational states because $q_{\mathrm{trans}}$ is proportional to $V$.
 
-## Worked example 2: Heat capacity of a two-level system
+## Populating a two-level system
 
 **Problem.** A mole of independent molecules has two nondegenerate levels separated by $\epsilon$ with $\epsilon/k=300\ \mathrm{K}$. Calculate the molar internal energy above the ground state at $T=300\ \mathrm{K}$.
 
@@ -290,7 +290,7 @@ $$
 
 **Checked answer.** The energy is less than the equal-population limit $R(300)/2=1247\ \mathrm{J\ mol^{-1}}$, as expected at $T=\epsilon/k$.
 
-## Code
+## Scanning a two-level system with temperature
 
 ```python
 import numpy as np
@@ -311,7 +311,7 @@ for T in [50, 100, 300, 1000]:
     print(f"T={T:5.0f} K  U={two_level_energy(300,T):8.2f} J/mol  Cv={two_level_cv(300,T):7.3f} J/K/mol")
 ```
 
-## Common pitfalls
+## Where partition-function derivations go wrong
 
 - Differentiating $q$ when the correct thermodynamic object is $Q$. For gases, the $N!$ factor affects entropy and chemical potential.
 - Forgetting which variables are held constant in derivatives.
@@ -327,15 +327,10 @@ The statistical view also clarifies standard-state corrections. Translational pa
 
 As a final check, compare statistical results with thermodynamic identities already known. A monatomic ideal gas should give $U=3nRT/2$, $pV=nRT$, and a positive entropy that increases with $V$ and $T$. If a partition-function derivation violates these limits, the error is usually in distinguishability, the volume dependence, the chosen energy zero, or the variables held constant during differentiation.
 
-For finite systems, fluctuations are not negligible. The canonical formulas still define ensemble averages, but small clusters, nanoscale systems, and simulations may show noticeable deviations from smooth macroscopic behavior.
+For finite systems, fluctuations are not negligible. The canonical formulas still define ensemble averages, but small clusters, nanoscale systems, and simulations may show noticeable deviations from smooth macroscopic behavior. Time averages and ensemble averages agree only under appropriate ergodic sampling, so poor sampling can make a correct statistical formula look wrong. Inspect convergence before interpreting molecular thermodynamics.
 
-In simulations, time averages and ensemble averages agree only under appropriate ergodic sampling. Poor sampling can make a correct statistical formula look wrong.
+<div className="see-also">
 
-Always inspect convergence before interpreting molecular thermodynamics.
+See also: [Boltzmann distribution and partition functions](/chemistry/physical-chemistry/boltzmann-distribution-and-partition-functions) · [Molecular partition functions](/chemistry/physical-chemistry/molecular-partition-functions) · [Chemical equilibrium](/chemistry/physical-chemistry/chemical-equilibrium) · [Multiple integrals](/math/calculus/multiple-integrals)
 
-## Connections
-
-- [Boltzmann distribution and partition functions](/chemistry/physical-chemistry/boltzmann-distribution-and-partition-functions)
-- [Molecular partition functions](/chemistry/physical-chemistry/molecular-partition-functions)
-- [Chemical equilibrium](/chemistry/physical-chemistry/chemical-equilibrium)
-- [Multiple integrals](/math/calculus/multiple-integrals)
+</div>

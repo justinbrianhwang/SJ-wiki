@@ -9,7 +9,7 @@ Query processing is the path from a declarative SQL statement to executable oper
 
 Joins are the central expensive operation in relational systems because they combine rows from different relations. A join can be implemented by nested loops, indexed lookups, sorting, hashing, or parallel variants. The best algorithm depends on relation sizes, available memory, indexes, sort order, predicate type, and whether results can be pipelined to later operators.
 
-## Definitions
+## From access paths to physical operators
 
 A **query plan** is a tree or graph of physical operators. Leaves read base tables or indexes. Internal nodes perform operations such as selection, projection, join, grouping, sorting, or duplicate elimination. The root produces the query result.
 
@@ -29,7 +29,7 @@ Common join algorithms:
 
 A **pipeline** passes tuples directly from one operator to the next without materializing a full intermediate result. **Materialization** writes an intermediate result to memory or disk before the next operator consumes it.
 
-## Key results
+## How join algorithms spend I/O and memory
 
 The naive nested-loop join of relations `R` and `S` compares every pair, so CPU comparisons are:
 
@@ -56,8 +56,6 @@ Expression evaluation can be tuple-at-a-time, vectorized, or compiled. Tradition
 Temporary files are a sign that an operator exceeded available memory or deliberately materialized data for reuse. External sort writes runs and merges them. Hash join may partition inputs to disk. These spills are correct behavior, but they can dominate runtime. Memory settings, row width, and earlier projection pushdown all influence whether a plan stays in memory.
 
 Parallel execution adds another layer. A scan can be split across workers, a hash join can partition rows by hash value, and an aggregation can compute partial results before a final merge. Parallelism helps only when coordination, skew, and data movement do not exceed the saved work.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -97,7 +95,7 @@ flowchart TD
   Buffer --> Result(("Result rows"))
 ```
 
-This query-processing diagram distinguishes the logical relational expression from the executable physical plan. The chosen plan labels concrete operator choices, including two hash joins, build/probe roles, index scanning, and projected payloads, while the side branch lists nested-loop, index nested-loop, sort-merge, and partitioned hash alternatives. The dotted catalog edge shows that plan selection depends on statistics, memory, and index metadata rather than only SQL syntax.
+The diagram distinguishes a logical relational expression from its executable physical plan. The chosen plan labels two hash joins, their build and probe roles, index scanning, and projected payloads. The side branch lists nested-loop, index nested-loop, sort-merge, and partitioned hash alternatives; the dotted catalog edge supplies statistics, memory, and index metadata.
 
 | Join algorithm | Equality only? | Uses indexes? | Memory sensitivity | Output order |
 | --- | --- | --- | --- | --- |
@@ -107,11 +105,9 @@ This query-processing diagram distinguishes the logical relational expression fr
 | Sort-merge | no for some ordered predicates, strongest for equality/ranges | can use ordered indexes | sorting needs memory | join-key order |
 | Hash join | yes for standard form | no required index | high | unordered |
 
-## Worked example 1: Block nested-loop I/O cost
+### Deriving the block nested-loop I/O cost
 
-Problem: Relation `R` has 1,000 pages. Relation `S` has 2,000 pages. The DBMS has 102 buffer pages, and a block nested-loop join uses `M - 2` pages for chunks of `R`. Estimate I/O cost with `R` as outer.
-
-Method:
+Relation `R` has 1,000 pages, relation `S` has 2,000 pages, and the DBMS has 102 buffer pages. A block nested-loop join uses `M - 2` pages for chunks of `R`; with `R` as the outer input, its I/O cost follows directly.
 
 1. Compute usable outer block pages:
 
@@ -144,13 +140,11 @@ $$
 1000 + 20000 = 21000\ \text{page reads}
 $$
 
-Checked answer: with `R` as outer, the estimated cost is 21,000 page reads. If `S` were outer, the cost would be `2000 + ceil(2000/100) * 1000 = 22,000`, slightly worse.
+With `R` as outer, the estimated cost is 21,000 page reads. If `S` were outer, the cost would be `2000 + ceil(2000/100) * 1000 = 22,000`, slightly worse.
 
-## Worked example 2: Choose hash join or index nested-loop
+### When an index nested-loop beats a hash join
 
-Problem: `student` has 50,000 rows and 2,000 pages. `takes` has 500,000 rows and 20,000 pages. Query joins `student.ID = takes.ID` for one department containing 500 students. There is an index on `takes(ID)`. Which join plan is plausible?
-
-Method:
+`student` has 50,000 rows and 2,000 pages; `takes` has 500,000 rows and 20,000 pages. A query joins `student.ID = takes.ID` for one department containing 500 students, and `takes(ID)` is indexed.
 
 1. Apply the selection first:
 
@@ -172,9 +166,9 @@ $$
 
 5. A hash join would likely scan `takes` once and hash the 500 students, costing at least the scan of 20,000 `takes` pages. That can be good for large selected departments but wasteful here.
 
-Checked answer: index nested-loop is plausible because the outer input after selection is small and the inner relation has a useful index on the join key. The exact winner depends on clustering and buffer hits.
+Index nested-loop is plausible because the outer input after selection is small and the inner relation has a useful index on the join key. The exact winner depends on clustering and buffer hits.
 
-## Code
+### A small cost calculator and an `EXPLAIN`
 
 ```python
 from math import ceil
@@ -197,7 +191,7 @@ JOIN takes AS t
 WHERE s.dept_name = 'Comp. Sci.';
 ```
 
-## Common pitfalls
+## What join-cost shortcuts leave out
 
 - Judging a join algorithm without considering earlier selections. The best join depends on input sizes after filtering.
 - Assuming indexes always make joins faster. Many random lookups can lose to a sequential scan.
@@ -206,7 +200,7 @@ WHERE s.dept_name = 'Comp. Sci.';
 - Ignoring output requirements. A sort-merge join may be attractive if the next operator needs join-key order.
 - Materializing every intermediate result mentally. Many engines pipeline operators when possible.
 
-## Connections
+## Reading around the execution engine
 
 - [SQL Joins, Subqueries, and Set Operations](/cs/databases/sql-joins-subqueries-and-set-operations)
 - [Indexing with B+ Trees, Hashing, and Bitmaps](/cs/databases/indexing-bplus-hash-bitmap)

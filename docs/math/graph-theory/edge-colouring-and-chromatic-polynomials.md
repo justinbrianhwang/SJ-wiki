@@ -1,4 +1,4 @@
----
+﻿---
 title: Edge Colouring and Chromatic Polynomials
 sidebar_position: 11
 ---
@@ -7,13 +7,9 @@ sidebar_position: 11
 
 Edge colouring assigns colours to edges so that adjacent edges receive different colours. It is the natural model for scheduling pairwise interactions: games sharing a team, jobs sharing a machine, or communication links sharing a port cannot happen in the same time slot. Unlike vertex colouring, edge colouring is controlled closely by the maximum degree, but the exact answer still contains subtle structure.
 
-![A planar map is colored so adjacent regions have different colors.](https://commons.wikimedia.org/wiki/Special:FilePath/Fourcolorsmap.svg)
-
-*Figure: A four-colour map example connects graph colouring to planar regions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Fourcolorsmap.svg), Germo, public domain.*
-
 Chromatic polynomials count proper vertex colourings as a function of the number of available colours. They refine the yes/no question "is this graph $k$-colourable?" into "how many $k$-colourings does it have?" This gives a bridge from graph theory to algebra and combinatorics.
 
-## Definitions
+## Two colouring problems
 
 A **proper edge colouring** of a graph $G$ assigns colours to edges so that any two edges sharing an endpoint have different colours. The **chromatic index** $\chi'(G)$ is the least number of colours needed.
 
@@ -27,7 +23,7 @@ The **chromatic polynomial** $P_G(k)$ counts the number of proper vertex colouri
 
 For an edge $e$ that is not a loop, $G-e$ denotes deletion of $e$, and $G/e$ denotes contraction of $e$.
 
-## Key results
+## Degree bounds and deletion-contraction
 
 **Lower bound for edge colouring.**
 
@@ -83,8 +79,6 @@ $$
 
 Colour choices on different components are independent.
 
-## Visual
-
 The triangle needs three edge colours because every pair of edges is adjacent.
 
 ```mermaid
@@ -102,11 +96,9 @@ graph LR
 | Complete graph $K_3$ | 2 | 3 | $k(k-1)(k-2)$ |
 | Complete bipartite $K_{r,s}$ | $\max(r,s)$ | $\max(r,s)$ | no single short form |
 
-## Worked example 1: Edge-colour an odd cycle
+## Why an odd cycle needs a third edge colour
 
-**Problem.** Find $\chi'(C_5)$.
-
-**Method.**
+Find $\chi'(C_5)$.
 
 1. The graph $C_5$ has maximum degree
 
@@ -125,19 +117,15 @@ $$
 5. So $\chi'(C_5)\ge 3$.
 6. Three colours suffice: colour the first four edges $1,2,1,2$ and the last edge $3$.
 
-**Checked answer.**
-
 $$
 \chi'(C_5)=3.
 $$
 
 This agrees with the general rule that odd cycles are Class 2.
 
-## Worked example 2: Compute a chromatic polynomial by deletion-contraction
+## Deletion-contraction on $P_3$
 
-**Problem.** Compute $P_{P_3}(k)$ for the path $a-b-c$ using deletion-contraction on edge $bc$.
-
-**Method.**
+Compute $P_{P_3}(k)$ for the path $a-b-c$ using deletion-contraction on edge $bc$.
 
 Let $G=P_3$ and $e=bc$.
 
@@ -180,7 +168,7 @@ $$
 
 The path has $3$ vertices and $2$ edges, so the first two terms should be $k^3-2k^2$, exactly as computed.
 
-## Code
+### Symbolic deletion-contraction
 
 This exact chromatic-polynomial routine uses deletion-contraction symbolically through SymPy. It is meant for small simple graphs.
 
@@ -222,7 +210,7 @@ For edge-colouring, do the analogous check at a maximum-degree vertex. If a vert
 
 For chromatic polynomial computations, keep the graph operation visible beside the algebra. Deleting an edge and contracting an edge produce different graphs, and the subtraction order matters. For edge-colouring, sketch the line graph only when it clarifies adjacency among edges; otherwise, checking edge conflicts directly in the original graph is often cleaner.
 
-## Common pitfalls
+## Keeping the two colouring conventions separate
 
 - Confusing vertex colouring with edge colouring. Adjacent edges share an endpoint; adjacent vertices share an edge.
 - Assuming every graph satisfies $\chi'(G)=\Delta(G)$. Odd cycles and many complete graphs require $\Delta+1$ colours.
@@ -231,9 +219,8 @@ For chromatic polynomial computations, keep the graph operation visible beside t
 - Counting colourings "up to renaming colours" when computing $P_G(k)$. The chromatic polynomial counts actual assignments from a fixed colour set.
 - Using deletion-contraction with the signs reversed.
 
-## Connections
+<div className="see-also">
 
-- [Vertex and map colouring](/math/graph-theory/vertex-and-map-colouring)
-- [Matchings Hall and Konig](/math/graph-theory/matchings-hall-and-konig)
-- [Algebraic graph theory basics](/math/graph-theory/algebraic-graph-theory-basics)
-- [Ramsey theory basics](/math/graph-theory/ramsey-theory-basics)
+See also: [Vertex and map colouring](/math/graph-theory/vertex-and-map-colouring) · [Matchings Hall and Konig](/math/graph-theory/matchings-hall-and-konig) · [Algebraic graph theory basics](/math/graph-theory/algebraic-graph-theory-basics) · [Ramsey theory basics](/math/graph-theory/ramsey-theory-basics)
+
+</div>

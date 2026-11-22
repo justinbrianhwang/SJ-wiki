@@ -5,76 +5,96 @@ sidebar_position: 19
 
 # Recommender Systems
 
-D2L's recommender-system material introduces a major applied setting where deep learning meets sparse user-item interaction data. The goal is to predict what a user may like, click, buy, watch, or rate. Unlike standard supervised learning tables, recommender data is mostly missing, feedback can be explicit or implicit, and the absence of an interaction does not always mean negative preference.
+D2L's recommender-system material covers a setting where deep learning meets sparse user-item interaction data. The system predicts what a user may like, click, buy, watch, or rate. Most possible interactions are missing, feedback may be explicit or implicit, and no interaction does not necessarily mean negative preference.
 
-The chapter surveys collaborative filtering, matrix factorization, autoencoders, factorization machines, neural collaborative filtering, and sequence-aware recommendation. These methods differ in architecture, but they share a central representation idea: learn user and item features from observed behavior, then score candidate items for each user.
+Collaborative filtering, matrix factorization, autoencoders, factorization machines, neural collaborative filtering, and sequence-aware models all learn from observed behavior. Their common core is a scoring function over users, items, and sometimes context; their differences lie in what they represent and how they construct training comparisons.
 
-## Definitions
+## The interaction matrix is mostly unknown
 
-Let $R \in \mathbb{R}^{m \times n}$ be a user-item matrix, where $R_{ui}$ is a rating or interaction for user $u$ and item $i$. Most entries are unobserved.
+Let $R \in \mathbb{R}^{m \times n}$ be a user-item matrix, where $R_{ui}$ records a rating or interaction for user $u$ and item $i$. Most entries are unobserved.
 
-**Collaborative filtering** uses patterns across users and items to recommend. It does not require explicit item content, although hybrid systems can include content features.
+**Collaborative filtering** uses patterns across users and items without requiring explicit item content, though hybrid systems may add metadata. **Explicit feedback** includes ratings and likes. **Implicit feedback** includes clicks, views, dwell time, purchases, and other behavioral signals.
 
-**Explicit feedback** includes ratings or likes. **Implicit feedback** includes clicks, views, dwell time, purchases, and other behavioral signals.
-
-**Matrix factorization** learns user vectors $p_u \in \mathbb{R}^k$ and item vectors $q_i \in \mathbb{R}^k$, then predicts
+Missing data has different meanings in the two settings. For an explicit-rating objective, only observed entries should normally contribute:
 
 $$
-\hat{r}_{ui} = p_u^T q_i + b_u + b_i + \mu,
+\sum_{(u,i)\in \Omega}(R_{ui}-\hat{r}_{ui})^2
++ \lambda\left(\sum_u\|p_u\|^2+\sum_i\|q_i\|^2\right),
 $$
 
-where $b_u$, $b_i$, and $\mu$ are optional user, item, and global biases.
+where $\Omega$ is the observed set. Treating every other entry as a zero rating introduces a biased target. For implicit feedback, an unobserved item may have been disliked, ignored, or never exposed to the user, so negative sampling and confidence weighting become part of the model definition.
 
-An **autoencoder recommender** reconstructs a user's interaction vector from a compressed hidden representation.
+## Low-rank scores and bias terms
 
-A **factorization machine** models feature interactions using latent vectors:
+Matrix factorization assigns user vectors $p_u \in \mathbb{R}^k$ and item vectors $q_i \in \mathbb{R}^k$, then predicts
 
 $$
-\hat{y}(x)=w_0+\sum_i w_ix_i+\sum_{i<j}\langle v_i,v_j\rangle x_ix_j.
+\hat{r}_{ui} = p_u^T q_i + b_u + b_i + \mu.
 $$
 
-**Neural collaborative filtering** replaces or augments dot products with neural networks over user and item embeddings.
-
-**Sequence-aware recommendation** models the order of interactions, predicting the next item from recent history.
-
-## Key results
-
-Matrix factorization is a low-rank model. If $P \in \mathbb{R}^{m \times k}$ stores user factors and $Q \in \mathbb{R}^{n \times k}$ stores item factors, then predicted ratings are approximately
+With $P \in \mathbb{R}^{m \times k}$ and $Q \in \mathbb{R}^{n \times k}$, the interaction component has low-rank form
 
 $$
 \hat{R}=PQ^T.
 $$
 
-Only observed entries should contribute to the explicit-feedback loss:
+The bias terms absorb broad effects that latent interactions should not have to explain. Some users rate generously, some items are popular, and each dataset has a global rating level. Exposure can make popularity bias even stronger in implicit logs.
+
+### Computing one rating
+
+Take $p_u=[1,2]$, $q_i=[3,1]$, $b_u=0.2$, $b_i=-0.1$, and $\mu=3.5$. The dot product is
 
 $$
-\sum_{(u,i)\in \Omega}(R_{ui}-\hat{r}_{ui})^2
-+ \lambda(\|p_u\|^2+\|q_i\|^2),
+p_u^Tq_i = 1(3)+2(1)=5,
 $$
 
-where $\Omega$ is the set of observed interactions. Treating all missing entries as zeros can create a biased objective unless the task is intentionally implicit-feedback ranking.
+so
 
-Implicit feedback often requires negative sampling or confidence weighting. A user not clicking an item may mean dislike, lack of exposure, or simply no opportunity. This makes evaluation and data construction more subtle than ordinary classification.
+$$
+\hat{r}_{ui}=5+0.2-0.1+3.5=8.6.
+$$
 
-Factorization machines are useful when interactions involve more than user and item ids. They can model pairwise interactions among user features, item features, context features, and device features without manually enumerating every cross feature.
+The unbounded prediction exceeds a $1$--$5$ rating scale. A rating model may clip, constrain, or transform its output; a ranking model can treat the value as an unrestricted preference score.
 
-Sequence-aware recommenders use RNNs, CNNs, attention, or transformers to capture changing intent. A user looking at several cameras may need different recommendations from the same user browsing books a week earlier.
+## What richer recommenders add
 
-Ranking metrics such as precision@k, recall@k, hit rate, and NDCG are often more relevant than rating RMSE because recommender systems usually present a short ranked list.
+An **autoencoder recommender** reconstructs a user's interaction vector from a compressed hidden representation. A **factorization machine** models pairwise interactions among arbitrary sparse features:
 
-Data splitting is especially sensitive in recommendation. A random split over interactions can place a user's future behavior in the training set while evaluating on earlier behavior, which is unrealistic for next-item prediction. Time-based splits better match deployment when the system recommends future items from past interactions. User-level cold-start evaluation is different again: it tests behavior on users unseen during training.
+$$
+\hat{y}(x)=w_0+\sum_i w_ix_i+\sum_{i<j}\langle v_i,v_j\rangle x_ix_j.
+$$
 
-Bias terms are not a minor detail. Some users rate generously, some items are broadly popular, and some datasets have a global rating level. User and item biases let the latent factors focus more on interaction-specific preference rather than explaining popularity or rating-scale habits. For implicit feedback, popularity bias can be even stronger because exposed items receive more interactions.
+This covers user, item, context, and device features without explicitly materializing every cross feature. **Neural collaborative filtering** replaces or augments the dot product with a neural network over user and item embeddings. **Sequence-aware recommendation** uses RNNs, CNNs, attention, or transformers to predict from ordered history and capture current intent.
 
-Neural recommenders increase flexibility, but they also increase the risk of learning exposure artifacts. If an item was never shown to a user, the missing interaction is ambiguous. Negative sampling should reflect the intended task: ranking among exposed items, ranking among all catalog items, or predicting the next item in a session. The evaluation candidate set must match that choice.
+| Method | Main representation | Strength | Caution |
+|---|---|---|---|
+| User-based CF | Similar users | Simple intuition | Sparse data problems |
+| Item-based CF | Similar items | Stable item relations | Cold-start items |
+| Matrix factorization | User/item latent factors | Scalable baseline | Dot product may be too simple |
+| Autoencoder | Compressed interaction vector | Nonlinear reconstruction | Missing-data handling |
+| Factorization machine | Feature interaction factors | Works with side features | Pairwise interaction design |
+| Neural CF | Embeddings plus MLP | Flexible scoring | More data and tuning needed |
+| Sequence-aware | Ordered history | Captures current intent | More complex evaluation |
 
-Recommendation objectives can be pointwise, pairwise, or listwise. A pointwise objective predicts a rating or click label for one user-item pair. A pairwise objective trains the model to rank an observed item above an unobserved or less preferred item. A listwise objective optimizes a whole ranked set more directly. Matrix factorization with squared error is pointwise, while many implicit-feedback recommenders use pairwise ranking losses.
+### One factorization-machine interaction
 
-Serving constraints are part of recommender design. Scoring every item for every user may be too expensive for a large catalog, so systems often use a two-stage design: candidate generation retrieves a smaller set, and a ranker scores those candidates more carefully. D2L's models describe scoring functions, but deployed recommenders also need retrieval, freshness, filtering, and feedback loops.
+Suppose $x_1=1$, $x_2=1$, and $x_3=0$, with latent vectors $v_1=[1,0]$, $v_2=[2,3]$, and $v_3=[4,1]$. The pairwise term is
 
-Because recommendations influence future interactions, evaluation is partly causal. Showing an item can create feedback that would not have existed otherwise, so offline logs are an incomplete view of user preference.
+$$
+\sum_{i<j}\langle v_i,v_j\rangle x_ix_j.
+$$
 
-## Visual
+Only the first two features are jointly active:
+
+$$
+\langle v_1,v_2\rangle = 1(2)+0(3)=2.
+$$
+
+Every pair involving $x_3$ contributes zero, leaving a total interaction of $2$. Sparse one-hot data only activates a small fraction of the available feature pairs.
+
+## Retrieval and ranking solve different scale problems
+
+Scoring every catalog item with a rich model can be too expensive. Large systems commonly retrieve a manageable candidate set with matrix factorization, a two-tower model, rules, or freshness signals, then apply a slower ranker with cross features and business constraints.
 
 ```mermaid
 flowchart TB
@@ -91,7 +111,7 @@ flowchart TB
     IB --> Sum
   end
 
-  subgraph NeuMF["Neural collaborative filtering, NeuMF"]
+  subgraph NeuMF["Neural collaborative filtering: NeuMF"]
     direction TB
     U2["User id"] --> GMFU["GMF user embedding"]
     I2["Item id"] --> GMFI["GMF item embedding"]
@@ -99,106 +119,52 @@ flowchart TB
     GMFI --> Had
     U2 --> MLPUser["MLP user embedding"]
     I2 --> MLPItem["MLP item embedding"]
-    MLPUser --> Cat["Concatenate user/item embeddings"]
+    MLPUser --> Cat["Concatenate user and item embeddings"]
     MLPItem --> Cat
     Cat --> MLP["Dense layers + ReLU"]
     Had --> Join["Concatenate GMF and MLP features"]
     MLP --> Join
-    Join --> NeuScore["Prediction head -> click/rating score"]
+    Join --> NeuScore["Prediction head -> click or rating score"]
   end
 
   subgraph TwoTower["Two-tower retrieval"]
     direction LR
     UserFeat["User features + recent history"] --> UserTower["User tower -> query vector (d)"]
-    ItemFeat["Item metadata/content/id"] --> ItemTower["Item tower -> item vector (d)"]
-    UserTower --> ANN["Approx nearest-neighbor search by dot product"]
+    ItemFeat["Item metadata + content + id"] --> ItemTower["Item tower -> item vector (d)"]
+    UserTower --> ANN["Approximate nearest-neighbor search by dot product"]
     ItemTower --> ANN
     ANN --> Cand["Top-K candidate items"]
   end
 
   subgraph Serve["Candidate generation plus ranking"]
     direction TB
-    Request["Serving request for user/context"] --> Retrieve["Candidate generators: MF, two-tower, rules, freshness"]
-    Retrieve --> Merge["Merge, dedupe, filter unavailable items"]
-    Merge --> Ranker["Ranking model with user, item, context, cross features"]
-    Ranker --> Calib["Calibration, business rules, diversity constraints"]
+    Request["Serving request for user and context"] --> Retrieve["Candidate generators: MF, two-tower, rules, freshness"]
+    Retrieve --> Merge["Merge, deduplicate, and filter unavailable items"]
+    Merge --> Ranker["Ranker with user, item, context, and cross features"]
+    Ranker --> Calib["Calibration, business rules, and diversity constraints"]
     Calib --> List(("Final ranked recommendation list"))
   end
 ```
 
-The recommender diagram separates scoring architectures from serving architecture. Matrix factorization uses a dot product plus biases, NeuMF combines a generalized matrix-factorization path with an MLP path, and the two-tower design supports fast approximate retrieval by embedding users and items separately. The final serving subgraph shows why production recommenders usually retrieve a candidate set first and then apply a richer ranker.
+The scoring subgraphs separate a simple dot product, NeuMF's combined generalized-matrix-factorization and MLP paths, and a two-tower model that supports approximate retrieval. The serving path adds filtering, freshness, calibration, and diversity around those learned scores.
 
-| Method | Main representation | Strength | Caution |
-|---|---|---|---|
-| User-based CF | Similar users | Simple intuition | Sparse data problems |
-| Item-based CF | Similar items | Stable item relations | Cold-start items |
-| Matrix factorization | User/item latent factors | Scalable baseline | Dot product may be too simple |
-| Autoencoder | Compressed interaction vector | Nonlinear reconstruction | Missing-data handling |
-| Factorization machine | Feature interaction factors | Works with side features | Pairwise interaction design |
-| Neural CF | Embeddings plus MLP | Flexible scoring | More data and tuning needed |
-| Sequence-aware | Ordered history | Captures current intent | More complex evaluation |
+## The objective must match the candidate set
 
-## Worked example 1: matrix factorization prediction
+A pointwise objective predicts a rating or click label for one pair. A pairwise objective trains an observed item to outrank an unobserved or less preferred item. A listwise objective operates on a ranked set more directly. Squared-error matrix factorization is pointwise; implicit-feedback models often use pairwise ranking losses.
 
-Problem: a recommender uses user vector $p_u=[1,2]$, item vector $q_i=[3,1]$, user bias $b_u=0.2$, item bias $b_i=-0.1$, and global mean $\mu=3.5$. Predict the rating.
+The choice of negatives depends on the intended question: rank among exposed items, rank across the full catalog, or predict the next item in a session. Training and evaluation candidate sets must agree. Otherwise a model can score well on an artificial sampled task while failing at catalog retrieval.
 
-Method:
+Neural models can fit exposure artifacts more readily than simple baselines. An unseen user or item also has no reliable interaction embedding, so cold-start evaluation should be reported separately and usually requires metadata, onboarding signals, or fallback policies.
 
-1. Compute dot product:
+Recommendations change later observations. Showing an item can create a click or purchase that would never appear under another policy, making offline logs an incomplete and partly causal view of preference.
 
-$$
-p_u^Tq_i = 1(3)+2(1)=5.
-$$
+## Splits and metrics should resemble deployment
 
-2. Add biases:
+Random interaction splits can leak future behavior into training while testing on earlier events. Time-based splits better represent next-item deployment, while user-level holdouts test a distinct cold-start problem.
 
-$$
-\hat{r}_{ui}=5+0.2-0.1+3.5.
-$$
+Rating RMSE answers a point-prediction question. A product that displays a short list usually cares more about precision@k, recall@k, hit rate, or NDCG. Baselines matter here: item popularity, item-based collaborative filtering, and matrix factorization establish whether a more flexible neural scorer earns its added cost.
 
-3. Combine:
-
-$$
-5+0.2=5.2,
-\qquad
-5.2-0.1=5.1,
-\qquad
-5.1+3.5=8.6.
-$$
-
-4. If the rating scale is $1$ to $5$, the raw score may be clipped or interpreted as an unbounded preference score depending on the model.
-
-Checked answer: the unbounded prediction is $8.6$. The value is high because the latent dot product is large; practical rating models may regularize, constrain, or transform outputs.
-
-## Worked example 2: factorization-machine interaction
-
-Problem: a factorization machine has active binary features $x_1=1$, $x_2=1$, $x_3=0$. The latent vectors are $v_1=[1,0]$, $v_2=[2,3]$, and $v_3=[4,1]`. Compute the pairwise interaction term.
-
-Method:
-
-1. The interaction term is
-
-$$
-\sum_{i<j}\langle v_i,v_j\rangle x_ix_j.
-$$
-
-2. Pair $(1,2)$ is active because $x_1x_2=1$:
-
-$$
-\langle v_1,v_2\rangle = 1(2)+0(3)=2.
-$$
-
-3. Pair $(1,3)$ has $x_1x_3=0$, so it contributes $0$.
-4. Pair $(2,3)$ has $x_2x_3=0$, so it contributes $0$.
-5. Total interaction:
-
-$$
-2 + 0 + 0 = 2.
-$$
-
-Checked answer: the pairwise interaction contribution is $2$. In sparse one-hot data, only interactions among active features matter.
-
-## Code
+## A matrix-factorization baseline in PyTorch
 
 ```python
 import torch
@@ -239,19 +205,10 @@ print("training RMSE:", torch.sqrt(loss_fn(model(users, items), ratings)).item()
 print("score user 0 item 2:", model(torch.tensor([0]), torch.tensor([2])).item())
 ```
 
-## Common pitfalls
+This tiny dataset only demonstrates parameterization and optimization. It does not test ranking, cold start, exposure bias, or generalization; those require a time-aware held-out protocol and a candidate set that reflects the intended service.
 
-- Treating every missing rating as a known negative rating.
-- Evaluating only RMSE when the product needs top-k ranking quality.
-- Splitting interactions randomly without respecting time, causing future behavior to leak into training.
-- Ignoring cold-start users and items that have no interaction history.
-- Training on implicit feedback without considering exposure bias.
-- Overcomplicating the model before establishing matrix factorization and item-based baselines.
+<div className="see-also">
 
-## Connections
+See also: [Machine learning](/cs/machine-learning/intro) · [NLP pretraining and applications](/cs/deep-learning/nlp-pretraining-and-applications) · [Attention and transformers](/cs/deep-learning/attention-transformers) · [Probability and random variables](/math/probability-and-random-variables/intro) · [Linear algebra](/math/linear-algebra/intro)
 
-- [Machine learning](/cs/machine-learning/)
-- [NLP pretraining and applications](/cs/deep-learning/nlp-pretraining-and-applications)
-- [Attention and transformers](/cs/deep-learning/attention-transformers)
-- [Probability and random variables](/math/probability-and-random-variables/)
-- [Linear algebra](/math/linear-algebra/)
+</div>

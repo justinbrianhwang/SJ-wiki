@@ -13,7 +13,7 @@ Boolean algebra is the algebra of two values, $0$ and $1$. It is equivalent in s
 
 The value of Boolean algebra is that symbolic laws can simplify hardware. Equivalent expressions compute the same function, but one may use fewer gates, fewer inputs, or a more convenient universal gate type. This makes the topic a meeting point for logic, algebra, and computer engineering.
 
-## Definitions
+## Expressions, literals, and gates
 
 The basic Boolean operations on $\{0,1\}$ are:
 
@@ -33,7 +33,7 @@ A **literal** is a variable or its complement. A **minterm** is a product contai
 
 Logic gates implement Boolean operations: NOT, AND, OR, NAND, NOR, XOR, and XNOR. A set of gates is **functionally complete** if every Boolean function can be implemented using only gates from that set.
 
-## Key results
+## Canonical forms and universal gates
 
 There are
 
@@ -80,7 +80,7 @@ $$
 
 Thus NAND can build NOT, AND, OR, and therefore every Boolean expression.
 
-## Visual
+The same operations appear in logic, set algebra, and circuit diagrams:
 
 | Logic | Boolean algebra | Set algebra | Circuit gate |
 | --- | --- | --- | --- |
@@ -102,7 +102,7 @@ flowchart LR
   D --> F[example output]
 ```
 
-## Worked example 1: Build a sum-of-products expression
+## Building a function from its true rows
 
 **Problem.** A Boolean function $F(x,y,z)$ is $1$ exactly on input tuples $001$, $010$, and $111$. Write a sum-of-products expression.
 
@@ -134,7 +134,7 @@ $$
 
 **Checked answer.** Each minterm is $1$ on exactly one of the listed tuples and $0$ elsewhere. Their Boolean sum is $1$ exactly on the union of those three input cases.
 
-## Worked example 2: Simplify a Boolean expression
+## Eliminating a redundant input
 
 **Problem.** Simplify
 
@@ -176,7 +176,7 @@ $$
 
 **Checked answer.** The simplified expression is $F=x$. A truth table confirms that the original output depends only on $x$.
 
-## Code
+## Checking identities by exhaustive truth table
 
 ```python
 from itertools import product
@@ -198,7 +198,7 @@ for bits in product([0, 1], repeat=3):
 
 The first two output columns match for every input tuple, verifying the simplification by exhaustive truth table.
 
-## Common pitfalls
+## Algebraic equality versus circuit cost
 
 - Treating Boolean sum as ordinary integer addition. In Boolean algebra, $1+1=1$ for OR.
 - Forgetting that $xy$ means AND, not multiplication over ordinary integers.
@@ -209,7 +209,7 @@ The first two output columns match for every input tuple, verifying the simplifi
 
 Truth tables are the safest correctness check for small Boolean functions. With $n$ variables there are only $2^n$ rows, so for $n=2,3,4$ it is realistic to compare an original expression, a simplified expression, and a proposed circuit directly. A simplification is valid only if every row matches. Matching on the rows where the function is $1$ is not enough unless the rows where it is $0$ have also been accounted for by the construction.
 
-For circuit design, cost depends on the gate library. An expression with fewer algebraic symbols may not be cheaper if it requires gates that are unavailable or expensive. A NAND-only implementation, for example, may intentionally introduce double negations because NAND is the available universal gate. This is why algebraic simplification and technology mapping are related but distinct steps.
+For circuit design, cost depends on the gate library. An expression with fewer algebraic symbols may not be cheaper if it requires gates that are unavailable or expensive. A NAND-only implementation, for example, may intentionally introduce double negations because NAND is the available universal gate. Algebraic simplification and technology mapping are therefore related but distinct steps.
 
 Minterm expansions are canonical but not necessarily minimal. They are excellent for constructing a function from a truth table because each $1$ row contributes exactly one product term. However, adjacent minterms often combine. For instance, $xy+x\overline{y}=x$ eliminates a variable. Karnaugh maps visualize this combining process for small numbers of variables by placing adjacent input tuples next to each other.
 
@@ -229,11 +229,15 @@ For small designs, keep both a truth table and an algebraic simplification. The 
 
 When converting a truth table to a circuit, decide whether to use rows where the output is $1$ or rows where the output is $0$. Sum-of-products uses the $1$ rows. Product-of-sums uses the $0$ rows. Choosing the shorter side can lead to a simpler expression before any further minimization.
 
-For sequential circuits, Boolean logic describes the combinational part, while stored state supplies memory. This page focuses on combinational logic; finite-state machines add feedback through state registers and transition functions.
+For sequential circuits, Boolean logic describes the combinational part, while stored state supplies memory. Finite-state machines add feedback through state registers and transition functions.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Propositional logic](/math/discrete/propositional-logic) gives the logical connectives mirrored by Boolean operations.
 - [Sets and set operations](/math/discrete/sets-and-set-operations) mirrors Boolean identities with set identities.
 - [Functions, sequences, and sums](/math/discrete/functions-sequences-sums) frames Boolean functions as maps from $\{0,1\}^n$ to $\{0,1\}$.
 - [Finite-state machines and computation](/math/discrete/finite-state-machines-and-computation) uses Boolean logic in digital state machines.
+
+</div>

@@ -548,8 +548,8 @@ Unlike $Ad^2$, the product $Ad_xd_y$ carries a sign determined by the centroid's
 - Area moments must have fourth-power length units. A result in mm$^2$ or mm$^3$ signals that either the integral or the units were mishandled.
 - $J=I_x+I_y$ holds for perpendicular area axes through the same point. It does not state that every section's torsional stiffness equals $GJ/L$.
 
-## Related pages
+<div className="see-also">
 
-- [Rigid-body equilibrium](/physics/mechanics/rigid-body-equilibrium)
-- [Internal forces in beams](/physics/mechanics/internal-forces-beams)
-- [Planar rigid-body motion](/physics/mechanics/planar-rigid-body-motion)
+See also: [Rigid-body equilibrium](/physics/mechanics/rigid-body-equilibrium) · [Internal forces in beams](/physics/mechanics/internal-forces-beams) · [Planar rigid-body motion](/physics/mechanics/planar-rigid-body-motion)
+
+</div>

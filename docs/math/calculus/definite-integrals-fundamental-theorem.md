@@ -13,7 +13,7 @@ This topic is the hinge between differential and integral calculus. Derivatives 
 
 *Figure: Riemann-sum approximation of area under a curve. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Riemannsumme.svg), Emes2k, public domain.*
 
-## Definitions
+## From finite sums to accumulated change
 
 Let $f$ be defined on $[a,b]$. Partition the interval into subintervals
 
@@ -57,7 +57,7 @@ Different choices of sample points produce familiar approximations. Left endpoin
 
 The symbol $dx$ records the variable and the limiting slice width. In a one-variable integral, it reminds us that the thin piece has width measured in $x$ units. In substitution and multivariable calculus, this bookkeeping becomes essential because changing variables changes the differential factor.
 
-## Key results
+## The two halves of the Fundamental Theorem
 
 The Fundamental Theorem of Calculus has two common parts.
 
@@ -179,8 +179,6 @@ Continuity is a sufficient condition for integrability, but not the only one. Ma
 
 The orientation rule $\int_a^b f=-\int_b^a f$ is more than notation. It keeps substitution formulas consistent when a change of variables reverses limits. If $u=g(x)$ decreases as $x$ increases, then the transformed bounds may appear in reverse order, and the negative sign is handled automatically by the integral orientation convention.
 
-## Visual
-
 ```mermaid
 graph LR
   A[Rate f] --> B[Accumulate by Riemann sums]
@@ -212,7 +210,7 @@ ASCII view of signed area:
    -   |             \__ area below axis counts -
 ```
 
-## Worked example 1: exact integral from an antiderivative
+## Signed area from an antiderivative
 
 **Problem.** Evaluate
 
@@ -268,7 +266,7 @@ The sign changes at $x=1/3$ and $x=1$. The total area on $[0,2]$ would require i
 
 If the original problem asks for displacement, the signed integral is the correct quantity. If it asks for total distance or total geometric area, signs must not cancel. The same computed integral can therefore answer different applied questions only after the interpretation is specified.
 
-## Worked example 2: derivative of an accumulation function
+## Differentiating a moving endpoint
 
 **Problem.** Let
 
@@ -314,7 +312,7 @@ $$
 
 **Checked answer.** $G'(x)=2x\sqrt{1+x^6}$. The factor $2x$ is required by the chain rule because the accumulation endpoint moves at rate $2x$.
 
-## Code
+## A numerical check with the trapezoidal rule
 
 ```python
 def trapezoid(f, a, b, n=10000):
@@ -330,18 +328,22 @@ def f(x):
 print(trapezoid(f, 0, 2))
 ```
 
-## Common pitfalls
+## Where the inverse relationship needs care
 
-- Forgetting that definite integrals give signed area, not always total area.
-- Omitting endpoint evaluation order. $\int_a^b f=F(b)-F(a)$, not $F(a)-F(b)$.
-- Dropping the chain-rule factor when differentiating $\int_a^{g(x)}f(t)\,dt$.
-- Including $+C$ in a definite integral evaluation. Constants cancel in $F(b)-F(a)$.
-- Ignoring units. An integral of a rate has accumulated units.
-- Assuming every Riemann sum uses right endpoints. Left, right, midpoint, and arbitrary sample points can all converge to the same integral for integrable functions.
+- A definite integral records signed accumulation. Total area or total distance requires splitting where the integrand changes sign, or integrating an absolute value.
+- Endpoint order matters: $\int_a^b f=F(b)-F(a)$, not $F(a)-F(b)$.
+- For $\int_a^{g(x)}f(t)\,dt$, the endpoint moves at rate $g'(x)$, so the chain-rule factor cannot be dropped.
+- The constant $+C$ belongs to a family of indefinite antiderivatives; it cancels from the definite difference $F(b)-F(a)$.
+- Units accumulate with the differential. Integrating a rate must produce the units of the corresponding accumulated quantity.
+- Right endpoints are only one choice for a Riemann sum. Left, midpoint, and arbitrary sample points converge to the same value when the function is integrable and the mesh shrinks appropriately.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Optimization Newton and Antiderivatives](/math/calculus/optimization-newton-antiderivatives): antiderivatives provide the evaluation step in the FTC.
 - [Integration Techniques and Improper Integrals](/math/calculus/integration-techniques-improper-integrals): techniques expand the set of computable antiderivatives.
 - [Applications of Integrals](/math/calculus/applications-of-integrals): area, volume, work, and mass use definite integrals.
 - [Multiple Integrals](/math/calculus/multiple-integrals): Riemann sums extend to regions in the plane and space.
+
+</div>

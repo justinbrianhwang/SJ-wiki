@@ -7,15 +7,11 @@ sidebar_position: 2
 
 Entanglement is the native currency of a quantum internet. A classical network treats a link as a pipe for bits. A quantum network treats a link as a way to create nonclassical correlations between distant systems, then spends those correlations on teleportation, key generation, distributed gates, or sensing. The simplest useful unit is a Bell pair, but real networks must track multipartite states, noisy mixed states, conversion rates, and the operations allowed when parties are separated.
 
-This page focuses on entanglement as a **network resource** rather than only as a paradox of quantum mechanics. The key questions are operational: how many high-quality pairs can a link deliver, how quickly can noisy pairs be distilled, how does multipartite entanglement differ from many pairwise links, and what can be done using only local operations and classical communication?
+Here entanglement is treated as a **network resource** rather than only as a paradox of quantum mechanics. The key questions are operational: how many high-quality pairs can a link deliver, how quickly can noisy pairs be distilled, how does multipartite entanglement differ from many pairwise links, and what can be done using only local operations and classical communication?
 
 Nielsen and Chuang are the primary reference for the mathematical layer used here. Chapter 2 gives the postulates, reduced density operators, Schmidt decomposition, and purifications; Chapter 11 gives von Neumann entropy; Chapter 12 treats entanglement as an interconvertible physical resource. Modern quantum-internet papers often add hardware, routing, and scheduling language, but the invariant quantities underneath are the same: spectra of reduced states, LOCC convertibility, channel noise, and fidelity to Bell states.
 
-![An optical-table experiment illustrates entangled photon generation through spontaneous parametric down-conversion.](https://commons.wikimedia.org/wiki/Special:FilePath/Quantum_Entanglement_Experiment_via_Spontaneous_Parametric_Down-Conversion_%28SPDC%29.jpg)
-
-*Figure: Network entanglement starts as a physical resource from sources, optics, detectors, and timing logic before it becomes a Bell-pair symbol in a protocol. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Quantum_Entanglement_Experiment_via_Spontaneous_Parametric_Down-Conversion_%28SPDC%29.jpg), Farbodk, CC BY-SA 4.0.*
-
-## Definitions
+## Bell pairs and the Schmidt spectrum
 
 For two qubits, use the computational basis ordered as
 
@@ -62,7 +58,7 @@ $$
 \lvert\psi\rangle=\sum_{ij} a_{ij}\lvert i\rangle_A\lvert j\rangle_B,
 $$
 
-then the coefficient matrix $A=(a_{ij})$ has an SVD $A=UDV^\dagger$. The nonzero diagonal entries of $D$ are the Schmidt coefficients, and the columns of $U$ and complex conjugates of the columns of $V$ define the two local Schmidt bases. This is why local unitary basis changes cannot alter the Schmidt coefficients: they only multiply $A$ on the left or right by unitary matrices.
+then the coefficient matrix $A=(a_{ij})$ has an SVD $A=UDV^\dagger$. The nonzero diagonal entries of $D$ are the Schmidt coefficients, and the columns of $U$ and complex conjugates of the columns of $V$ define the two local Schmidt bases. Local unitary basis changes cannot alter the Schmidt coefficients because they only multiply $A$ on the left or right by unitary matrices.
 
 The reduced state of subsystem $A$ is
 
@@ -106,7 +102,7 @@ They are not interchangeable resources. GHZ entanglement is highly global: if on
 
 **LOCC** means local operations and classical communication. Alice, Bob, and other nodes may perform arbitrary quantum operations on systems they locally hold, and they may exchange classical messages. They may not apply a joint quantum gate across separated laboratories unless a quantum channel or previously shared entanglement supplies the missing nonlocal resource.
 
-## Key results
+## Conversion rates under LOCC
 
 For pure bipartite states, Schmidt coefficients completely characterize entanglement up to local unitaries. If two states have the same Schmidt coefficients, Alice and Bob can convert one to the other by local basis changes. For example,
 
@@ -140,7 +136,7 @@ and there are bound entangled states for which entanglement is present but no Be
 
 Nielsen and Chuang emphasize the communication meaning of $E_D$. If Alice sends half of many Bell pairs through a noisy quantum channel, Alice and Bob share many copies of the channel's output state. Any distillation protocol for that state becomes an entanglement-assisted error-correction method: distill good pairs first, then use [teleportation](/quantum-information-science/quantum-internet/teleportation) to transmit unknown qubits. This is one conceptual bridge from static entanglement theory to repeater chains.
 
-LOCC cannot create entanglement from scratch. This is why entanglement is a resource: if separated parties start with a separable state, any LOCC protocol leaves them with a separable state on average. Classical messages can coordinate choices and postselection, but they cannot replace a quantum channel or shared entanglement.
+LOCC cannot create entanglement from scratch. If separated parties start with a separable state, any LOCC protocol leaves them with a separable state on average. Classical messages can coordinate choices and postselection, but they cannot replace a quantum channel or shared entanglement.
 
 Monogamy limits how widely strong entanglement can be shared. For three qubits, a common statement uses concurrence:
 
@@ -168,7 +164,7 @@ $$
 
 Bell pairs per input pair. This rate is meaningful only when the uncertainty is below one bit. Hashing is conceptually important because it links entanglement purification with error syndromes and classical coding.
 
-## Visual
+### From source circuits to usable network entanglement
 
 ```mermaid
 flowchart TB
@@ -205,7 +201,7 @@ flowchart TB
   GOut --> Use
 ```
 
-The diagram makes the entanglement resources concrete before showing how a network handles noise. The Bell circuit uses a Hadamard followed by a CNOT, and the GHZ circuit adds fanout CNOTs from the first qubit to create multipartite correlation. The resource-handling branch labels the fidelity decision point and shows distillation as an explicit block that consumes multiple noisy pairs to produce fewer better ones.
+The Bell circuit uses a Hadamard followed by a CNOT. The GHZ circuit adds fanout CNOTs from the first qubit to create multipartite correlation. The resource-handling branch then follows a generated state through noise, fidelity screening, and distillation, which consumes multiple noisy pairs to produce fewer better ones.
 
 | Resource | State form | Network use | Caveat |
 |---|---|---|---|
@@ -215,7 +211,7 @@ The diagram makes the entanglement resources concrete before showing how a netwo
 | Bell-diagonal mixture | $\sum_i p_i\lvert B_i\rangle\langle B_i\rvert$ | Distillation analysis and repeater links | Fidelity alone may not describe all noise |
 | Cluster or graph state | Stabilizer-defined multipartite state | Measurement-based repeaters and all-photonic schemes | Requires many controlled entangling operations |
 
-## Worked example 1: Schmidt decomposition of a two-qubit state
+## Example: Schmidt decomposition of a two-qubit state
 
 **Problem.** Find the Schmidt decomposition and entanglement entropy of
 
@@ -293,7 +289,7 @@ $$
 
 **Checked answer.** The state is entangled because both Schmidt coefficients are nonzero. It is not maximally entangled because the squared Schmidt coefficients are unequal, giving about $0.355$ ebits rather than $1$ ebit.
 
-## Worked example 2: Hashing yield for a Bell-diagonal source
+## Example: Hashing yield for a Bell-diagonal source
 
 **Problem.** A link produces Bell-diagonal pairs with probabilities
 
@@ -332,7 +328,7 @@ $$
 
 **Checked answer.** The estimated hashing yield is about $0.153$ Bell pairs per noisy input pair. The positive yield indicates that the Bell-state uncertainty is below one bit; if the distribution were more uniform, hashing would no longer give a positive rate.
 
-## Code
+## Computing the two examples numerically
 
 ```python
 import numpy as np
@@ -358,7 +354,7 @@ hashing_yield = 1 + np.sum(p * np.log2(p))
 print("Hashing yield lower bound:", hashing_yield)
 ```
 
-## Common pitfalls
+## Where resource accounting goes wrong
 
 - Treating any strong correlation as entanglement. Classical mixtures can be correlated without being entangled; separability depends on whether the state is a mixture of product states.
 - Using fidelity as the only quality metric. Two states with the same Bell fidelity can have different error structure, which matters for distillation and swapping.
@@ -368,13 +364,8 @@ print("Hashing yield lower bound:", hashing_yield)
 - Applying pure-state entropy formulas blindly to mixed states. For mixed states, $S(\rho_A)$ includes local uncertainty and is not by itself an entanglement measure.
 - Ignoring monogamy in network scheduling. A qubit maximally entangled with one neighbor cannot simultaneously serve as an independent high-quality Bell pair with another neighbor.
 
-## Connections
+<div className="see-also">
 
-- [Quantum Internet](/quantum-information-science/quantum-internet/intro)
-- [Quantum Teleportation](/quantum-information-science/quantum-internet/teleportation)
-- [Quantum Repeater](/quantum-information-science/quantum-internet/quantum-repeater)
-- [Density Operator, Entanglement, and Decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence)
-- [Inner Product Spaces](/math/linear-algebra/inner-product-spaces)
-- [Singular Value Decomposition](/math/linear-algebra/singular-value-decomposition)
-- [Quantum Communication](/quantum-information-science/quantum-communication/intro)
-- [Quantum Error Correction](/quantum-information-science/quantum-computing/error-correction)
+See also: [Quantum Internet](/quantum-information-science/quantum-internet/intro) · [Quantum Teleportation](/quantum-information-science/quantum-internet/teleportation) · [Quantum Repeater](/quantum-information-science/quantum-internet/quantum-repeater) · [Density Operator, Entanglement, and Decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence) · [Inner Product Spaces](/math/linear-algebra/inner-product-spaces) · [Singular Value Decomposition](/math/linear-algebra/singular-value-decomposition) · [Quantum Communication](/quantum-information-science/quantum-communication/intro) · [Quantum Error Correction](/quantum-information-science/quantum-computing/error-correction)
+
+</div>

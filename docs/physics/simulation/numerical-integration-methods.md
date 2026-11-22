@@ -11,13 +11,13 @@ Klee and Allen introduce elementary methods before moving to Runge-Kutta, adapti
 
 ![Euler's method advances along tangent-line steps compared with the exact curve.](https://commons.wikimedia.org/wiki/Special:FilePath/Euler_method.svg)
 
-*Figure: Euler stepping makes local truncation error visible as the gap between a tangent advance and the true trajectory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Euler_method.svg), Oleg Alexandrov, public domain.*
+*Figure: In Euler stepping, local truncation error appears as the gap between a tangent advance and the true trajectory. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Euler_method.svg), Oleg Alexandrov, public domain.*
 
 ![Several one-step numerical methods are compared against an exact solution curve.](https://commons.wikimedia.org/wiki/Special:FilePath/Runge-kutta.svg)
 
 *Figure: Runge-Kutta comparisons show how staged slopes improve simulated trajectories over simple Euler steps. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Runge-kutta.svg), T.gauster, CC BY-SA 3.0.*
 
-## Definitions
+## Four ways to advance one step
 
 For an initial value problem
 
@@ -69,7 +69,7 @@ $$
 
 The same formula applies componentwise for vector states.
 
-## Key results
+## Accuracy, stability, and solver purpose
 
 Local truncation error measures the error made in one step assuming the starting value is exact. Global error measures the accumulated error over an interval. For smooth problems, explicit Euler has first-order global accuracy, trapezoidal and common second-order Runge-Kutta variants have second-order global accuracy, and classical RK4 has fourth-order global accuracy.
 
@@ -94,8 +94,6 @@ MATLAB's `ode45` is an adaptive explicit Runge-Kutta method suited to many nonst
 Solver choice should be tied to the purpose of the run. If the goal is to understand a model, an adaptive solver with tight tolerances and dense plotting is usually appropriate. If the goal is to implement a controller on a processor, a fixed-step method with the intended sample period is more relevant even if it is less elegant numerically. If the goal is to teach integration error, a low-order method such as Euler is valuable precisely because its limitations are visible.
 
 The time-response plot is part of the numerical diagnosis. A jagged curve, alternating sign decay, or response that changes dramatically when the output grid is refined usually indicates a step-size or stability problem. A smooth curve is not proof of correctness, because interpolation can hide missed events and phase error. For this reason, serious simulation reports should include solver name, tolerances or fixed step, initial conditions, and at least one convergence or analytical check.
-
-## Visual
 
 ```mermaid
 flowchart TB
@@ -155,7 +153,7 @@ This integration diagram expands one simulation step into explicit, RK4, adaptiv
 | RK4 | Explicit one-step | 4 | 4 | Smooth nonstiff systems with fixed step |
 | Adaptive RK | Explicit variable-step | Variable | Usually 4/5 or similar | General nonstiff MATLAB simulation |
 
-## Worked example 1: Euler integration of a first-order decay
+## Watching Euler run ahead of an exact decay
 
 Problem: Approximate $\dot{x}=-2x+1$ with $x(0)=0$ using explicit Euler and step size $h=0.1$ for the first three steps. Compare with the exact solution form.
 
@@ -205,7 +203,7 @@ Checked answer: Euler gives $0.244$, which is higher than the exact value after 
 
 Simulink description: a fixed-step discrete implementation would use a Unit Delay or Memory block and gains implementing $x_{k+1}=0.8x_k+0.1$. A continuous Simulink implementation would use an Integrator block and a fixed-step Euler solver for the same numerical method.
 
-## Worked example 2: One RK4 step for a nonlinear equation
+## Expanding one nonlinear RK4 step
 
 Problem: Use one RK4 step with $h=0.2$ for
 
@@ -277,7 +275,7 @@ Checked answer: the result is plausible because the slope begins near $0.25$ and
 
 Simulink description: this nonlinear equation can be built with Product and Sum blocks feeding an Integrator. Using a variable-step RK solver should produce a smooth trajectory; using a fixed-step RK4 solver with $h=0.2$ should pass through approximately the same first-step value.
 
-## Code
+## Comparing Euler, RK4, and `ode45`
 
 ```matlab
 clear; clc; close all;
@@ -312,7 +310,7 @@ title('Numerical integration comparison');
 
 The plotted Euler curve should visibly deviate more than RK4 for the same fixed step. `ode45` will usually lie on top of the exact and RK4 curves for this smooth problem. In a Simulink version, changing the solver and fixed step size should reproduce the same qualitative comparison.
 
-## Common pitfalls
+## Misreading solver output
 
 - Judging a method only by its order. Stability, stiffness, event handling, and real-time constraints can matter more than formal order.
 - Comparing two solvers without using the same tolerances, output times, and initial conditions.
@@ -321,9 +319,8 @@ The plotted Euler curve should visibly deviate more than RK4 for the same fixed 
 - Using fixed-step Euler on a fast stable mode without checking the stability limit.
 - Treating adaptive solver output spacing as the internal step spacing. MATLAB often interpolates output at requested times while taking different internal steps.
 
-## Connections
+<div className="see-also">
 
-- [Step Size, Accuracy, and Stability](/physics/simulation/step-size-accuracy-stability)
-- [State-Space Representation](/physics/simulation/state-space-representation)
-- [MATLAB Scripting for Simulation](/physics/simulation/matlab-scripting-for-simulation)
-- [Discrete-Time and Sampled-Data Systems](/physics/simulation/discrete-time-sampled-data-systems)
+See also: [Step Size, Accuracy, and Stability](/physics/simulation/step-size-accuracy-stability) · [State-Space Representation](/physics/simulation/state-space-representation) · [MATLAB Scripting for Simulation](/physics/simulation/matlab-scripting-for-simulation) · [Discrete-Time and Sampled-Data Systems](/physics/simulation/discrete-time-sampled-data-systems)
+
+</div>

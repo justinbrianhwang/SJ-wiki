@@ -318,10 +318,8 @@ The simulation shows the distribution of sample means becoming more symmetric an
 - Ignoring dependence. Clustered, repeated, or networked observations can make the usual standard error too small.
 - Treating one simulated sampling distribution as a substitute for understanding the sampling design.
 
-## Related pages
+<div className="see-also">
 
-- [Summarizing distributions](/math/statistics/summarizing-distributions)
-- [Normal, t, chi-square, and F distributions](/math/statistics/normal-t-chi-square-and-f-distributions)
-- [Estimation and confidence intervals](/math/statistics/estimation-and-confidence-intervals)
-- [Hypothesis testing logic](/math/statistics/hypothesis-testing-logic)
-- [Tests for means](/math/statistics/tests-for-means)
+See also: [Summarizing distributions](/math/statistics/summarizing-distributions) · [Normal, t, chi-square, and F distributions](/math/statistics/normal-t-chi-square-and-f-distributions) · [Estimation and confidence intervals](/math/statistics/estimation-and-confidence-intervals) · [Hypothesis testing logic](/math/statistics/hypothesis-testing-logic) · [Tests for means](/math/statistics/tests-for-means)
+
+</div>

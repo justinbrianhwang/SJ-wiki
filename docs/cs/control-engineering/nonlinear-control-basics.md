@@ -5,11 +5,11 @@ sidebar_position: 19
 
 # Nonlinear Control Basics
 
-Nise's main development is linear control, but the book repeatedly notes nonlinear effects such as saturation, dead zone, backlash, and small-signal linearization. This page is a short supplementary bridge into nonlinear control ideas that commonly follow an undergraduate linear-control course: describing functions, phase-plane analysis, and Lyapunov stability. It stays light because these topics are not the central scope of Nise's text.
+Nise's main development is linear control, but the book repeatedly notes nonlinear effects such as saturation, dead zone, backlash, and small-signal linearization. Describing functions, phase-plane analysis, and Lyapunov stability provide a short bridge from that undergraduate linear-control sequence into nonlinear control.
 
-The practical lesson is that every real control system is nonlinear somewhere. Linear design is valuable because it works near an operating point and gives strong intuition, but actuator limits, friction, geometry, quantization, and switching logic can dominate behavior when signals become large. Nonlinear analysis asks what remains true outside the small-signal model.
+Every real control system is nonlinear somewhere. Linear design remains valuable near an operating point, but actuator limits, friction, geometry, quantization, and switching logic can dominate when signals become large. Nonlinear analysis asks what remains true outside the small-signal model.
 
-## Definitions
+## Equilibria and the three main analysis tools
 
 A nonlinear system violates superposition or homogeneity. A state-space nonlinear model has the form
 
@@ -51,7 +51,7 @@ $$
 
 then the equilibrium is stable under standard Lyapunov conditions. If $\dot V\lt 0$ for $\mathbf x\ne0$, asymptotic stability can often be concluded.
 
-## Key results
+## What local, harmonic, and energy arguments can establish
 
 Common nonlinearities in control systems:
 
@@ -92,11 +92,11 @@ Describing functions are useful when a relay, saturation, or dead zone sits in a
 
 Lyapunov methods generalize the energy intuition behind stable mechanical systems. The difficult part is finding a suitable $V(\mathbf x)$. Once found, the method can prove stability over a region rather than only along one simulated trajectory. This makes Lyapunov analysis central in advanced nonlinear, adaptive, and robotic control, even though Nise's undergraduate linear sequence only gestures toward the topic.
 
-Nonlinear systems may have multiple equilibria. A pendulum has a downward equilibrium and an upright equilibrium; one is locally stable without control, while the other is unstable unless actively balanced. A linear transfer function around one equilibrium says little about behavior near another. This is why nonlinear analysis often talks about regions of attraction: the set of initial states from which the system returns to a chosen equilibrium.
+Nonlinear systems may have multiple equilibria. A pendulum has a downward equilibrium and an upright equilibrium; one is locally stable without control, while the other is unstable unless actively balanced. A linear transfer function around one equilibrium says little about behavior near another. Nonlinear analysis therefore uses a **region of attraction**: the set of initial states from which the system returns to a chosen equilibrium.
 
 Simulation is indispensable but not conclusive. A nonlinear simulation can reveal saturation recovery, limit cycles, and large-signal failure modes, but it samples only the initial conditions and parameter values that were tried. Lyapunov analysis, invariant-set reasoning, and conservative bounds complement simulation by proving statements over sets. A serious nonlinear design usually uses both: simulation for insight and proof techniques for guarantees where they are needed.
 
-## Visual
+### Choosing the model that matches the excursion
 
 ```mermaid
 flowchart TD
@@ -123,7 +123,7 @@ M |        _______
 -M|__/____________> input
 ```
 
-## Worked example 1: small-angle pendulum linearization
+## Linearizing a pendulum about its downward equilibrium
 
 Problem: A simple pendulum without damping satisfies
 
@@ -179,7 +179,7 @@ $$
 
 Checked answer: the small-angle undamped pendulum is marginally stable in the linear natural-response sense, oscillating at $\omega_n=\sqrt{g/L}$.
 
-## Worked example 2: Lyapunov energy for a damped mass-spring system
+## Proving mass-spring stability from stored energy
 
 Problem: Show stability of
 
@@ -237,7 +237,7 @@ $$
 
 Checked answer: energy never increases. With additional invariance reasoning, the damped mass-spring equilibrium is asymptotically stable because the only trajectory that can keep $\dot V=0$ is the origin.
 
-## Code
+## Simulating an actuator-limited mass-spring system
 
 ```python
 import numpy as np
@@ -263,7 +263,7 @@ print("final energy:", energy[-1])
 print("final state:", sol.y[:, -1])
 ```
 
-## Common pitfalls
+## Claims that the nonlinear analysis does not support
 
 - Assuming a linearized stable model proves global nonlinear stability. Linearization is local.
 - Ignoring actuator saturation in simulations of aggressive controllers.
@@ -272,10 +272,14 @@ print("final state:", sol.y[:, -1])
 - Forgetting that $\dot V\le0$ may prove stability but not automatically asymptotic stability without additional arguments.
 - Simulating nonlinear systems from only one initial condition and assuming the result generalizes.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Linearization and transfer functions](/cs/control-engineering/laplace-transfer-functions-and-linearization) gives the small-signal bridge from nonlinear equations to LTI models.
 - [Time response](/cs/control-engineering/time-response-first-and-second-order) explains local pole-based behavior after linearization.
 - [PID and compensators](/cs/control-engineering/pid-lead-lag-and-lag-lead-compensators) must be checked against saturation and windup.
-- [Simulation](/physics/simulation/) is essential for nonlinear behavior outside analytic approximations.
+- [Simulation](/physics/simulation/intro) is essential for nonlinear behavior outside analytic approximations.
 - [Autonomous driving control](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley) contains applied nonlinear and constrained-control examples.
+
+</div>

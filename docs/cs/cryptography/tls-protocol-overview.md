@@ -7,13 +7,13 @@ sidebar_position: 15
 
 TLS is the protocol layer that turns cryptographic primitives into secure client-server communication. It negotiates algorithms, authenticates endpoints, establishes shared secrets, derives traffic keys, and protects application records. It is not a single primitive; it is a carefully sequenced protocol combining key exchange, signatures or certificates, KDFs, AEAD, transcript hashing, alerts, and version negotiation.
 
-Katz and Lindell use SSL/TLS as a culmination of private-key encryption, MACs, public-key encryption, signatures, certificates, and key exchange. Smart's material on certificates, key exchange, signatures, and hybrid encryption fills in the infrastructure view. For current TLS 1.3 details, the primary standard is [RFC 8446](https://www.rfc-editor.org/rfc/rfc8446), published in August 2018.
+Katz and Lindell use SSL/TLS as a culmination of private-key encryption, MACs, public-key encryption, signatures, certificates, and key exchange. Smart's material on certificates, key exchange, signatures, and hybrid encryption fills in the infrastructure view. The current TLS 1.3 standard is [RFC 9846](https://www.rfc-editor.org/rfc/rfc9846), published in July 2026 as a backward-compatible update that obsoletes RFC 8446.
 
-## Definitions
+## The pieces TLS 1.3 composes
 
 **TLS**, Transport Layer Security, protects application-layer traffic over a network connection. It aims to prevent passive eavesdropping, active tampering, and message forgery when configured correctly.
 
-A **handshake** establishes cryptographic parameters and traffic secrets. In TLS 1.3, the main full handshake uses ephemeral Diffie-Hellman, usually ECDHE, plus server authentication by a certificate signature.
+A **handshake** establishes cryptographic parameters and traffic secrets. A certificate-authenticated TLS 1.3 full handshake commonly uses ephemeral Diffie-Hellman, usually ECDHE, plus server authentication by a certificate signature. Extensions can define KEM-based asymmetric key exchange as well.
 
 A **record** is a protected unit of application data. After the handshake, records are encrypted and authenticated with AEAD keys derived from the handshake.
 
@@ -27,9 +27,9 @@ A **transcript hash** is a running hash of handshake messages. Signatures and ke
 
 **0-RTT data** lets clients send early data during resumption, but it has weaker replay properties and must be used carefully.
 
-## Key results
+## Authenticating a fresh key exchange
 
-TLS 1.3 removed many legacy options that complicated earlier versions. The core full handshake uses ephemeral (EC)DHE for key agreement, certificate-based signatures for authentication, HKDF for key derivation, and AEAD for records. RSA key transport, static DH, compression, many old ciphers, and custom DH groups are not part of the TLS 1.3 core design.
+TLS 1.3 removed many legacy options that complicated earlier versions. A common full handshake uses ephemeral (EC)DHE for key agreement, certificate-based signatures for authentication, HKDF for key derivation, and AEAD for records; extensions can instead define KEM-based asymmetric exchange. RSA key transport, static DH, compression, many old ciphers, and custom DH groups are not part of the TLS 1.3 core design.
 
 The handshake has two intertwined purposes. First, it creates shared secrets from fresh key exchange. Second, it authenticates the transcript so that the client knows which server key participated and both sides agree on negotiated parameters. Without transcript binding, downgrade and substitution attacks become possible.
 
@@ -47,9 +47,13 @@ Replay and ordering are protocol issues. AEAD protects each record with nonces d
 
 Post-quantum TLS migration usually means replacing or hybridizing the key exchange first, because large quantum computers would threaten classical DH and RSA. Symmetric AEAD and hash functions can often be adjusted by using larger security margins.
 
-TLS 1.3's handshake key schedule has several stages rather than one direct hash of the DH secret. Early secrets handle PSK and resumption inputs, handshake secrets protect encrypted handshake messages, and application secrets protect records after the Finished messages. This staged design gives key separation and lets the protocol authenticate progressively more of the transcript. It also supports exporters, resumption master secrets, and key updates without reusing the same bytes for multiple purposes.
+## Walking the staged key schedule
+
+TLS 1.3's handshake key schedule has several stages rather than one direct hash of the key-exchange secret. Early secrets handle PSK and resumption inputs, handshake secrets protect encrypted handshake messages, and application secrets protect records after the Finished messages. This staged design gives key separation and lets the protocol authenticate progressively more of the transcript. It also supports exporters, resumption secrets, and key updates without reusing the same bytes for multiple purposes.
 
 The Finished messages are small but conceptually important. They are MACs over the transcript using keys derived from the handshake secrets. If an attacker changes any earlier handshake byte, the transcript hash changes and Finished verification fails. CertificateVerify authenticates the server's identity and key share; Finished confirms that both sides derived the same secrets and saw the same negotiation.
+
+## Record nonces, resumption, and deployment boundaries
 
 Record nonces in TLS 1.3 are derived from a static per-direction IV and a sequence number. The sequence number is not sent as a separate plaintext field in the same way older mental models might suggest, but both sides maintain it. This prevents nonce reuse as long as keys are updated before sequence numbers wrap and implementations do not roll state backward.
 
@@ -59,29 +63,29 @@ Operational TLS security includes more than the RFC message flow. Servers need v
 
 TLS also separates handshake authentication from application authentication. A successful server-authenticated handshake tells the client it is talking to the holder of a private key certified for the server name. It does not identify the human user, authorize a bank transfer, or decide whether an HTTP request is replay-safe. Those decisions happen above TLS, but they rely on TLS to provide a confidential and integrity-protected channel.
 
-Version negotiation is deliberately transcript-bound. A server and client may support several versions and groups, but the final choice must be authenticated so an attacker cannot strip stronger options. This is the same design pattern seen throughout cryptography: negotiation is data, and security-critical data must be included in what gets signed, MACed, or derived into keys.
+Version negotiation is deliberately transcript-bound. A server and client may support several versions and groups, but the final choice must be authenticated so an attacker cannot strip stronger options. Negotiation is security-critical data, so it must be included in what gets signed, MACed, or derived into keys.
 
-This makes TLS a useful capstone topic. Every earlier primitive appears with operational constraints: DH for shared secrets, signatures for authentication, hashes for transcripts, HMAC/HKDF for derivation, AEAD for records, and certificates for public-key binding. The protocol is the composition test.
+TLS combines DH for shared secrets, signatures for authentication, hashes for transcripts, HMAC/HKDF for derivation, AEAD for records, and certificates for public-key binding. Each primitive carries operational constraints into the composition.
 
-## Visual
+## Reading a TLS 1.3 ECDHE message flow
 
 ```mermaid
 sequenceDiagram
   participant C as Client
   participant S as Server
-  C->>S: ClientHello: versions, cipher suites, random, key_share, extensions
-  S->>C: ServerHello: selected suite, random, key_share
-  Note over C,S: Both compute ECDHE shared secret and derive handshake traffic keys with HKDF
-  S->>C: EncryptedExtensions under server handshake key
-  S->>C: Certificate chain
-  S->>C: CertificateVerify: signature over transcript hash
-  S->>C: Finished: MAC over transcript with server finished key
-  Note over C: Verify certificate, signature, transcript, and Finished MAC
-  C->>S: Finished: MAC over transcript with client finished key
-  Note over C,S: Derive application traffic secrets and update record nonces
-  C->>S: AEAD application record: seq, nonce, ciphertext, tag
-  S->>C: AEAD application record: seq, nonce, ciphertext, tag
-  Note over C,S: KeyUpdate can derive fresh traffic keys without a new handshake
+  C->>S: "ClientHello: versions, cipher suites, random, key_share, extensions"
+  S->>C: "ServerHello: selected suite, random, key_share"
+  Note over C,S: "Both compute ECDHE shared secret and derive handshake traffic keys with HKDF"
+  S->>C: "EncryptedExtensions under server handshake key"
+  S->>C: "Certificate chain"
+  S->>C: "CertificateVerify: signature over transcript hash"
+  S->>C: "Finished: MAC over transcript with server finished key"
+  Note over C: "Verify certificate, signature, transcript, and Finished MAC"
+  C->>S: "Finished: MAC over transcript with client finished key"
+  Note over C,S: "Derive application traffic secrets and update record nonces"
+  C->>S: "AEAD application record: seq, nonce, ciphertext, tag"
+  S->>C: "AEAD application record: seq, nonce, ciphertext, tag"
+  Note over C,S: "KeyUpdate can derive fresh traffic keys without a new handshake"
 ```
 
 This sequence expands the TLS 1.3 handshake into its authenticated key-exchange and record-protection layers. The ServerHello key share establishes handshake encryption, CertificateVerify and Finished bind authentication to the transcript, and application records use separate AEAD traffic keys and nonces derived from the HKDF schedule.
@@ -95,11 +99,9 @@ This sequence expands the TLS 1.3 handshake into its authenticated key-exchange 
 | Record protection | confidentiality and integrity | AEAD such as AES-GCM |
 | Certificates | public-key binding | signatures and PKI |
 
-## Worked example 1: why transcript binding matters
+## Detecting a downgrade through transcript binding
 
-Problem: a client offers two cipher choices, strong `A` and weak `B`. An attacker changes the ClientHello so the server sees only `B`. How does TLS 1.3 detect this?
-
-Method:
+A client offers two cipher choices, strong `A` and weak `B`. An attacker changes the ClientHello so the server sees only `B`; TLS 1.3 detects the change through the authenticated transcript.
 
 1. The real client sends a ClientHello containing:
 
@@ -119,13 +121,11 @@ Method:
 
 5. When the client verifies `CertificateVerify` and `Finished`, the values do not match the client's transcript.
 
-Checked answer: transcript binding causes verification failure. The attacker cannot silently downgrade the negotiation without producing valid authentication over the client's transcript.
+Transcript binding causes verification failure. The attacker cannot silently downgrade the negotiation without producing valid authentication over the client's transcript.
 
-## Worked example 2: deriving separate traffic keys conceptually
+## Separating client and server traffic keys
 
-Problem: a handshake produces a shared secret `S`. Explain why client-to-server and server-to-client traffic should not use the same AEAD key.
-
-Method:
+Suppose a handshake produces a shared secret `S`. Client-to-server and server-to-client traffic should not use the same AEAD key.
 
 1. If both directions used the same key and nonce space, nonce collisions could occur across directions.
 
@@ -143,9 +143,11 @@ $$
 
 4. Each direction can then maintain its own sequence-number-derived nonces.
 
-Checked answer: derive separate directional keys with labeled KDF inputs. This avoids key/nonce overlap and supports cleaner analysis.
+Separate directional keys derived with labeled KDF inputs avoid key and nonce overlap and support cleaner analysis.
 
-## Code
+## Sketching directional derivation with HKDF
+
+This small model demonstrates labeled key separation. It is not a byte-for-byte implementation of the TLS 1.3 schedule, which uses `HKDF-Expand-Label` and transcript-derived inputs.
 
 ```python
 import hashlib
@@ -174,18 +176,17 @@ print(server_key.hex())
 print(client_key != server_key)
 ```
 
-## Common pitfalls
+## Failures at the protocol boundary
 
-- Thinking TLS is just "RSA plus AES." Modern TLS composes several primitives with strict transcript binding.
-- Disabling certificate validation during testing and leaving it disabled.
-- Assuming a valid certificate chain is enough without hostname and usage checks.
-- Reusing nonces or sequence numbers in record protection.
-- Sending non-idempotent actions in 0-RTT data without replay defenses.
-- Supporting legacy versions and ciphers without understanding downgrade risk.
+- Modern TLS is a composition of several primitives with strict transcript binding, not "RSA plus AES."
+- Certificate validation disabled during testing must not survive into deployed configurations.
+- A valid certificate chain still requires hostname and usage checks.
+- Record protection must never reuse nonces or roll sequence numbers backward.
+- Non-idempotent actions do not belong in 0-RTT data without replay defenses.
+- Legacy versions and ciphers add downgrade and configuration risk.
 
-## Connections
+<div className="see-also">
 
-- [Discrete logarithms and Diffie-Hellman](/cs/cryptography/discrete-log-diffie-hellman)
-- [Digital signatures](/cs/cryptography/digital-signatures)
-- [Authenticated encryption and GCM](/cs/cryptography/authenticated-encryption-gcm)
-- [Post-quantum cryptography](/cs/cryptography/post-quantum-cryptography)
+See also: [Discrete logarithms and Diffie-Hellman](/cs/cryptography/discrete-log-diffie-hellman) · [Digital signatures](/cs/cryptography/digital-signatures) · [Authenticated encryption and GCM](/cs/cryptography/authenticated-encryption-gcm) · [Post-quantum cryptography](/cs/cryptography/post-quantum-cryptography)
+
+</div>

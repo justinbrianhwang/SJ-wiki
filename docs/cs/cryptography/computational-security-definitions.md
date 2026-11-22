@@ -9,7 +9,7 @@ Computational security is the bridge from perfect secrecy to practical cryptogra
 
 Katz and Lindell make this shift central: modern cryptography needs definitions, assumptions, and reductions. Smart presents the same reductionist spirit later in the text through semantic security, indistinguishability, random oracles, and hybrid encryption. The shared message is that "secure" is not an adjective; it is a quantified statement about adversaries, resources, and success probabilities.
 
-## Definitions
+## Efficiency, parameters, and negligible advantage
 
 A **probabilistic polynomial-time adversary**, abbreviated PPT adversary, is an algorithm that may use randomness and whose running time is bounded by a polynomial in the security parameter $n$.
 
@@ -31,6 +31,8 @@ $$
 
 An **experiment** is a game between a challenger and an adversary. The challenger samples keys, flips hidden coins, answers allowed oracle queries, and checks whether the adversary wins. The adversary's **advantage** is its success probability beyond a trivial baseline.
 
+## The indistinguishability game
+
 For private-key encryption, a basic indistinguishability experiment is:
 
 1. The challenger samples $k\leftarrow\mathrm{Gen}(1^n)$.
@@ -41,7 +43,26 @@ For private-key encryption, a basic indistinguishability experiment is:
 
 The scheme is secure if every PPT adversary wins with probability at most $1/2+\mu(n)$.
 
-## Key results
+```mermaid
+sequenceDiagram
+  participant A as "Adversary A"
+  participant C as "Challenger"
+  C->>C: "sample key k and hidden bit b"
+  A->>C: "send m0, m1 with equal length"
+  C->>A: "return c = Enc_k(m_b)"
+  A->>C: "output guess b'"
+  C->>C: "win iff b' = b"
+```
+
+| Concept | Informal meaning | Role in a definition |
+|---|---|---|
+| PPT adversary | efficient randomized attacker | rules out unlimited brute force |
+| negligible function | smaller than any inverse polynomial | formalizes vanishing advantage |
+| experiment | precise attack game | removes ambiguity from “secure” |
+| reduction | converts an attack into a primitive break | ties schemes to assumptions |
+| hybrid argument | changes one piece at a time | handles multi-step constructions |
+
+## From semantic security to reductions
 
 Indistinguishability and semantic security are equivalent for standard encryption settings. Indistinguishability says the adversary cannot tell which of two chosen messages was encrypted. Semantic security says the adversary cannot compute meaningful information about the plaintext from the ciphertext beyond what it could compute without the ciphertext. The equivalence is powerful because indistinguishability is usually easier to prove, while semantic security matches the intuition of "learns nothing useful."
 
@@ -74,32 +95,9 @@ The phrase "for every PPT adversary" is doing heavy work. It means security is n
 
 Negligible probabilities are closed under polynomial sums, which is why the definition is stable. If a protocol has polynomially many bad events and each occurs with negligible probability, the union bound still gives a negligible total failure probability. This closure property is one reason cryptography does not use an arbitrary phrase such as "very small" in its core definitions.
 
-## Visual
+## Three functions under the negligibility test
 
-```mermaid
-sequenceDiagram
-  participant A as "Adversary A"
-  participant C as Challenger
-  C->>C: sample key k and hidden bit b
-  A->>C: send m0, m1 with equal length
-  C->>A: return c = Enc_k(m_b)
-  A->>C: output guess b'
-  C->>C: win iff b' = b
-```
-
-| Concept | Informal meaning | Why it matters |
-|---|---|---|
-| PPT adversary | efficient randomized attacker | rules out unlimited brute force |
-| negligible function | smaller than any inverse polynomial | formalizes "vanishing advantage" |
-| experiment | precise attack game | removes ambiguity from "secure" |
-| reduction | converts an attack into a primitive break | ties schemes to assumptions |
-| hybrid argument | changes one piece at a time | handles multi-step constructions |
-
-## Worked example 1: checking negligibility
-
-Problem: decide whether $2^{-n}$, $1/n^3$, and $2^{-\sqrt n}$ are negligible.
-
-Method:
+Decide whether $2^{-n}$, $1/n^3$, and $2^{-\sqrt n}$ are negligible.
 
 1. For $2^{-n}$, compare to any inverse polynomial $1/n^c$. Exponential growth eventually beats polynomial growth:
 
@@ -131,13 +129,11 @@ $$
 
    which holds for all sufficiently large $n$. Thus $2^{-\sqrt n}$ is negligible, although much larger than $2^{-n}$.
 
-Checked answer: $2^{-n}$ and $2^{-\sqrt n}$ are negligible; $1/n^3$ is not.
+$2^{-n}$ and $2^{-\sqrt n}$ are negligible; $1/n^3$ is not.
 
-## Worked example 2: computing distinguishing advantage
+## Reading a measured distinguishing advantage
 
-Problem: in an encryption experiment an adversary guesses the hidden bit correctly with probability $0.56$. What is its advantage, and is that automatically a break?
-
-Method:
+Suppose an adversary guesses the hidden bit correctly with probability $0.56$.
 
 1. The trivial random-guess success probability is $1/2=0.50$.
 
@@ -151,26 +147,9 @@ $$
 
 4. If instead the measured $0.06$ happens only at a toy parameter such as $n=8$, the asymptotic definition alone does not decide the real implementation. Concrete security would ask for exact resources, exact key sizes, and exact success probabilities.
 
-Checked answer: the advantage is $0.06$. It is a formal asymptotic break only if a PPT adversary maintains non-negligible advantage as $n$ grows.
+The advantage is $0.06$. It is a formal asymptotic break only if a PPT adversary maintains non-negligible advantage as $n$ grows.
 
-## Code
-
-```python
-from fractions import Fraction
-
-def advantage(success_probability: Fraction) -> Fraction:
-    return success_probability - Fraction(1, 2)
-
-def empirical_success(correct_guesses: int, trials: int) -> Fraction:
-    return Fraction(correct_guesses, trials)
-
-success = empirical_success(560, 1000)
-adv = advantage(success)
-print("success =", float(success))
-print("advantage =", float(adv), "=", adv)
-```
-
-## Common pitfalls
+## Where proofs and deployments part company
 
 - Treating "polynomial time" as "fast in practice." A polynomial can still be unusable.
 - Calling $1/n^c$ negligible. It is small, but not negligible by the cryptographic definition.
@@ -179,9 +158,8 @@ print("advantage =", float(adv), "=", adv)
 - Ignoring oracle access. CPA and CCA security are different experiments.
 - Losing too much in a reduction. A mathematically valid reduction may still give weak concrete parameters.
 
-## Connections
+<div className="see-also">
 
-- [Perfect secrecy and the one-time pad](/cs/cryptography/perfect-secrecy-one-time-pad)
-- [Pseudorandom generators and functions](/cs/cryptography/pseudorandom-generators-functions)
-- [Message authentication codes](/cs/cryptography/message-authentication-codes)
-- [Public-key encryption](/cs/cryptography/public-key-encryption-elgamal-hybrid)
+See also: [Perfect secrecy and the one-time pad](/cs/cryptography/perfect-secrecy-one-time-pad) · [Pseudorandom generators and functions](/cs/cryptography/pseudorandom-generators-functions) · [Message authentication codes](/cs/cryptography/message-authentication-codes) · [Public-key encryption](/cs/cryptography/public-key-encryption-elgamal-hybrid)
+
+</div>

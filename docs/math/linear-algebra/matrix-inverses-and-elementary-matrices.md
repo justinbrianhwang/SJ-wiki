@@ -7,9 +7,9 @@ sidebar_position: 5
 
 An inverse matrix undoes a linear process. Elementary matrices make this idea concrete: every row operation is the same as multiplying by a simple invertible matrix. This connects row reduction, solving systems, and algebraic invertibility into one framework.
 
-The main point is not merely that some square matrices have formulas for inverses. The deeper point is that invertibility is an equivalence of many ideas: no information is lost, the system $A\mathbf{x}=\mathbf{b}$ has exactly one solution for every $\mathbf{b}$, the columns form a basis, the determinant is nonzero, and row reduction reaches the identity. Elementary matrices are the bridge between the algorithm and these structural statements.
+Formulas for inverses are secondary to the equivalence behind invertibility: no information is lost, the system $A\mathbf{x}=\mathbf{b}$ has exactly one solution for every $\mathbf{b}$, the columns form a basis, the determinant is nonzero, and row reduction reaches the identity. Elementary matrices are the bridge between the algorithm and these structural statements.
 
-## Definitions
+## Reversing a matrix with row operations
 
 A square matrix $A$ is invertible if there is a matrix $A^{-1}$ such that
 
@@ -52,7 +52,7 @@ $$
 
 provided $ad-bc\neq0$.
 
-## Key results
+## Equivalent tests for invertibility
 
 The inverse of an invertible matrix is unique. If $B$ and $C$ both satisfy the inverse equations for $A$, then
 
@@ -92,8 +92,6 @@ For a square matrix $A$, the following are equivalent:
 
 These equivalences are often called the invertible matrix theorem in an introductory course.
 
-## Visual
-
 ```mermaid
 flowchart TD
   A["A is invertible"] --> B["rref(A) = I"]
@@ -110,7 +108,7 @@ flowchart TD
 | Scale $R_i$ by $c\neq0$ | scale row $i$ of $I$ | scale by $1/c$ |
 | Replace $R_i$ by $R_i+cR_j$ | add $c$ times row $j$ to row $i$ | add $-c$ times row $j$ to row $i$ |
 
-## Worked example 1: Compute an inverse by row reduction
+## Extracting an inverse from an augmented matrix
 
 Problem: compute the inverse of
 
@@ -185,7 +183,7 @@ $$
 
 The checked answer is correct.
 
-## Worked example 2: Use an inverse to solve a system
+## Reusing the inverse to solve a system
 
 Problem: solve
 
@@ -241,7 +239,7 @@ $$
 
 Checked answer: $(x,y)=(1,2)$. Substitution gives $1+4=5$ and $3+14=17$.
 
-## Code
+## Numerical inverse versus a direct solve
 
 ```python
 import numpy as np
@@ -261,7 +259,7 @@ print(np.allclose(A @ x, b))
 
 In numerical work, directly forming an inverse is usually less stable and less efficient than solving $A\mathbf{x}=\mathbf{b}$ with a factorization. The inverse is still conceptually important, especially for proving structural facts.
 
-## Common pitfalls
+## Order, singularity, and computational use
 
 - Writing $A^{-1}=1/A$. Matrix inversion is not entrywise division.
 - Reversing the inverse product rule incorrectly. The correct identity is $(AB)^{-1}=B^{-1}A^{-1}$.
@@ -278,7 +276,7 @@ A quick singularity check is to look for dependence among columns or rows. If on
 
 For products, imagine undoing actions. If a vector is first transformed by $B$ and then by $A$, the combined action is $AB$. To reverse it, undo $A$ first and then $B$, so the inverse is $B^{-1}A^{-1}$. This mental model is often safer than memorizing the formula alone.
 
-It is also worth distinguishing left inverses and right inverses in rectangular settings. A square matrix inverse satisfies both $AA^{-1}=I$ and $A^{-1}A=I$. For a non-square matrix, one may have a matrix that reverses the action on one side but not the other. This connects directly to one-to-one and onto behavior: full column rank supports left-inverse behavior, while full row rank supports right-inverse behavior. The square invertible case is the special situation where both happen at once.
+Left and right inverses must be distinguished in rectangular settings. A square matrix inverse satisfies both $AA^{-1}=I$ and $A^{-1}A=I$. For a non-square matrix, one may have a matrix that reverses the action on one side but not the other. This connects directly to one-to-one and onto behavior: full column rank supports left-inverse behavior, while full row rank supports right-inverse behavior. The square invertible case is the special situation where both happen at once.
 
 Elementary matrices give a compact way to reason about algorithms. If elimination reduces $A$ to an upper triangular matrix $U$, then a product of elementary matrices has transformed $A$ into $U$. Rearranging that statement is the beginning of LU factorization. Thus inverse theory is not isolated from numerical methods; it is the algebraic background behind practical solvers.
 
@@ -296,13 +294,10 @@ The inverse also clarifies equations with transformed variables. If $\mathbf{y}=
 
 In proofs, it is often better to use the defining inverse equations than to compute the inverse. For example, to show that an equation has at most one solution, suppose $A\mathbf{x}=A\mathbf{y}$ and multiply by $A^{-1}$ to get $\mathbf{x}=\mathbf{y}$. This kind of argument is the real reason inverse notation is powerful.
 
-Before using an inverse in a solution, ask what it proves: existence, uniqueness, reversibility, or a concrete formula. Those are related but distinct purposes, and separating them keeps both computations and proofs cleaner.
+Before using an inverse in a solution, ask what it proves: existence, uniqueness, reversibility, or a concrete formula. Those are related but distinct purposes, and separating them keeps both computations and proofs cleaner. When the purpose is only to solve one system, a direct solve is usually the better computational expression of the same idea.
 
-When the purpose is only to solve one system, a direct solve is usually the better computational expression of the same idea.
+<div className="see-also">
 
-## Connections
+See also: [Gaussian Elimination](/math/linear-algebra/gaussian-elimination) · [Determinants](/math/linear-algebra/determinants) · [Bases, Dimension, and Rank](/math/linear-algebra/bases-dimension-and-rank) · [Linear Transformations](/math/linear-algebra/linear-transformations)
 
-- [Gaussian Elimination](/math/linear-algebra/gaussian-elimination)
-- [Determinants](/math/linear-algebra/determinants)
-- [Bases, Dimension, and Rank](/math/linear-algebra/bases-dimension-and-rank)
-- [Linear Transformations](/math/linear-algebra/linear-transformations)
+</div>

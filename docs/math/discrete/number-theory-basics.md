@@ -7,9 +7,9 @@ sidebar_position: 9
 
 Number theory studies integers and their divisibility structure. In discrete mathematics it supplies proof examples, efficient algorithms, and the arithmetic foundation for cryptography. The central objects are divisibility, primes, greatest common divisors, and integer representations.
 
-The topic is both ancient and computational. Divisibility statements train proof writing; Euclid's algorithm is one of the oldest efficient algorithms; prime factorization leads directly to modern public-key cryptography. The habit to build here is to move between equations, divisibility notation, and algorithms without losing track of hypotheses such as "nonzero" or "positive."
+The topic is both ancient and computational. Divisibility statements train proof writing; Euclid's algorithm is one of the oldest efficient algorithms; prime factorization leads directly to modern public-key cryptography. Equations, divisibility notation, and algorithms all carry hypotheses such as "nonzero" or "positive," and dropping one can invalidate an argument.
 
-## Definitions
+## Divisibility, primes, and integer representations
 
 For integers $a$ and $b$ with $a\ne0$, $a$ **divides** $b$, written $a\mid b$, if there is an integer $k$ such that $b=ak$. If no such integer exists, write $a\nmid b$. Divisibility is a statement about exact integer multiples, not approximate division.
 
@@ -33,7 +33,7 @@ $$
 
 where each digit satisfies $0\le a_i\lt b$ and $a_k\ne0$.
 
-## Key results
+## What factorization and remainders give us
 
 Basic divisibility facts:
 
@@ -43,7 +43,7 @@ $$
 
 for all integers $m,n$. Proof: if $b=as$ and $c=at$, then $mb+nc=a(ms+nt)$, and $ms+nt$ is an integer.
 
-The **fundamental theorem of arithmetic** states that every integer greater than $1$ can be written uniquely as a product of primes, up to the order of the factors. This is why prime factorization can be used to compute gcds, lcms, and divisibility.
+The **fundamental theorem of arithmetic** states that every integer greater than $1$ can be written uniquely as a product of primes, up to the order of the factors. Prime factorization can therefore be used to compute gcds, lcms, and divisibility.
 
 If $n$ is composite, then $n$ has a prime divisor at most $\sqrt n$. Proof: write $n=ab$ with $1\lt a\lt n$ and $1\lt b\lt n$. If both $a$ and $b$ were greater than $\sqrt n$, then $ab\gt n$, impossible. So one factor is at most $\sqrt n$, and that factor has a prime divisor at most itself.
 
@@ -54,6 +54,14 @@ $$
 $$
 
 If $a=bq+r$, then a common divisor of $a$ and $b$ also divides $r=a-bq$, and a common divisor of $b$ and $r$ also divides $a=bq+r$. Thus the common divisors are the same.
+
+```mermaid
+flowchart TD
+  A[Start with a and b] --> B{"Is b zero?"}
+  B -->|yes| C["gcd is abs(a)"]
+  B -->|no| D["Replace (a, b) by (b, a mod b)"]
+  D --> B
+```
 
 There are infinitely many primes. Suppose there were only finitely many, $p_1,\dots,p_k$. Let
 
@@ -71,17 +79,6 @@ $$
 
 This follows by comparing prime exponents: the gcd takes minimum exponents, the lcm takes maximum exponents, and the sum of the minimum and maximum is the sum of the two original exponents.
 
-## Visual
-
-```mermaid
-flowchart TD
-  A[Start with a and b] --> B{"Is b zero?"}
-  B -->|yes| C["gcd is abs(a)"]
-  B -->|no| D[Replace a by b]
-  D --> E[Replace b by a mod b]
-  E --> B
-```
-
 | Task | Main tool | Key bound or fact |
 | --- | --- | --- |
 | test divisibility | definition $b=ak$ | quotient must be integer |
@@ -91,11 +88,9 @@ flowchart TD
 | compute lcm | gcd-lcm identity | $\operatorname{lcm}(a,b)=ab/\gcd(a,b)$ for positive $a,b$ |
 | convert base | repeated division | remainders become digits |
 
-## Worked example 1: Use the Euclidean algorithm and back-substitution
+## Euclid's algorithm with Bezout back-substitution
 
 **Problem.** Compute $\gcd(252,198)$ and express it as an integer combination of $252$ and $198$.
-
-**Method.**
 
 1. Apply the Euclidean algorithm:
 
@@ -135,13 +130,11 @@ $$
 \end{aligned}
 $$
 
-**Checked answer.** $\gcd(252,198)=18$, and $18=4\cdot252-5\cdot198$. The combination confirms that any common divisor of $252$ and $198$ must divide $18$.
+$\gcd(252,198)=18$, and $18=4\cdot252-5\cdot198$. The combination confirms that any common divisor of $252$ and $198$ must divide $18$.
 
-## Worked example 2: Test primality and factor a number
+## Factoring $221$ at the square-root cutoff
 
 **Problem.** Determine whether $221$ is prime. If it is composite, factor it.
-
-**Method.**
 
 1. Compute the square-root cutoff:
 
@@ -157,9 +150,9 @@ $$
 7. Check $11$: $11\cdot20=220$, so $11\nmid221$.
 8. Check $13$: $13\cdot17=221$.
 
-**Checked answer.** $221$ is composite, and $221=13\cdot17$. The search could stop as soon as the factor $13$ was found. If no prime up to $\sqrt{221}$ had divided it, then $221$ would have been prime.
+$221$ is composite, and $221=13\cdot17$. The search could stop as soon as the factor $13$ was found. If no prime up to $\sqrt{221}$ had divided it, then $221$ would have been prime.
 
-## Code
+## Gcd, trial division, and base conversion
 
 ```python
 def gcd(a, b):
@@ -196,7 +189,7 @@ print(to_base(241, 2))
 
 The `factor` function is trial division. It is suitable for small examples and for learning the logic, but large-scale factoring requires much more sophisticated algorithms.
 
-## Common pitfalls
+## Hypotheses and stopping conditions worth checking
 
 - Calling $1$ prime. It is neither prime nor composite; otherwise unique factorization would fail.
 - Forgetting the condition $a\ne0$ in the definition of $a\mid b$.
@@ -232,9 +225,13 @@ For primality testing, test divisibility only by primes up to the square root, n
 
 When using prime factorizations, keep the same prime list for both numbers by allowing exponent $0$. For example, $12=2^2 3^1 5^0$ and $20=2^2 3^0 5^1$. Then minimum and maximum exponents can be read componentwise for gcd and lcm without forgetting primes that appear in only one number.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Proof techniques](/math/discrete/proof-techniques) explains the direct and contradiction proofs used for divisibility and primes.
 - [Modular arithmetic and cryptography](/math/discrete/modular-arithmetic-and-cryptography) builds congruences and RSA from gcds and primes.
 - [Algorithms and complexity](/math/discrete/algorithms-and-complexity) analyzes Euclid's algorithm, trial division, and base conversion.
 - [Induction and recursion](/math/discrete/induction-and-recursion) proves statements about integer representations and recursive algorithms.
+
+</div>

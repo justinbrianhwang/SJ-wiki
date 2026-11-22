@@ -388,9 +388,8 @@ An underdetermined system needs more information, not an arbitrary symmetry assu
 - Reconsider the particle idealization if a couple acts, forces are nonconcurrent, or support spacing affects the answer.
 - Avoid rounding direction cosines until the final step, especially when cable directions are nearly dependent.
 
-## Related pages
+<div className="see-also">
 
-- [Force vectors, resultants, and components](/physics/mechanics/force-vectors-resultants-components)
-- [Rigid-body equilibrium](/physics/mechanics/rigid-body-equilibrium)
-- [Trusses, frames, and machines](/physics/mechanics/trusses-frames-machines)
-- [Particle kinetics with Newton's second law](/physics/mechanics/particle-kinetics-newton)
+See also: [Force vectors, resultants, and components](/physics/mechanics/force-vectors-resultants-components) · [Rigid-body equilibrium](/physics/mechanics/rigid-body-equilibrium) · [Trusses, frames, and machines](/physics/mechanics/trusses-frames-machines) · [Particle kinetics with Newton's second law](/physics/mechanics/particle-kinetics-newton)
+
+</div>

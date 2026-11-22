@@ -9,7 +9,7 @@ I/O systems are where operating systems confront hardware diversity directly. A 
 
 The textbook's I/O chapter brings together hardware, application interfaces, kernel services, request transformation, STREAMS, and performance. The central design problem is bridging the gap between device-controller reality and programmer-facing uniformity. That bridge includes interrupts, polling, DMA, buffering, caching, spooling, device drivers, and error handling.
 
-## Definitions
+## Controllers, drivers, and transfer modes
 
 An **I/O device** communicates with the computer through a **device controller**. The controller exposes registers for data, status, and control. The CPU and controller communicate through port-mapped I/O or memory-mapped I/O.
 
@@ -25,7 +25,7 @@ The **application I/O interface** classifies devices into standard categories su
 
 **Buffering** stores data temporarily during transfer. **Caching** keeps copies of data for reuse. **Spooling** queues output for a device that cannot interleave multiple users' output safely, such as a printer.
 
-## Key results
+## Choosing how an operation waits and completes
 
 The I/O subsystem exists because devices are slow, varied, and failure-prone compared with the CPU. The OS provides uniform naming, protection, buffering, error handling, and scheduling, while drivers handle device-specific details.
 
@@ -43,6 +43,8 @@ Blocking, nonblocking, and asynchronous I/O differ in control flow. Blocking I/O
 
 DMA improves throughput but introduces coordination issues. The OS must pin or otherwise manage memory involved in a DMA transfer, ensure cache coherence where hardware requires it, and prevent a device from writing into unauthorized memory. I/O is therefore also a protection problem.
 
+## Data movement, errors, and device-specific controls
+
 Performance is often improved by reducing context switches, reducing data copies, batching requests, using DMA, caching intelligently, and placing computation near data when possible. However, buffering and caching can conflict with latency or durability. A write that returns after data reaches a memory cache is faster than one that waits for stable storage, but it gives a different failure guarantee.
 
 STREAMS, discussed in the textbook through UNIX System V, is a framework for composing full-duplex communication paths from modules. The broader lesson is modular I/O processing: terminal handling, protocol processing, and driver interaction can be arranged as reusable layers.
@@ -53,11 +55,9 @@ Synchronous, asynchronous, blocking, and nonblocking are related but distinct te
 
 I/O performance is often limited by data movement. A naive path might copy data from a device to a kernel buffer, from the kernel buffer to a user buffer, and then from that user buffer to another kernel buffer for network transmission. Techniques such as memory mapping, scatter-gather I/O, vectored I/O, and zero-copy transfer reduce copying or let one request describe several memory regions. The improvement is not only CPU time; fewer copies also reduce cache pollution and memory bandwidth pressure.
 
-Device independence is always partial. The OS can present many devices as files or handles, but it still needs escape hatches for device-specific control. UNIX-like systems use operations such as `ioctl`; other systems expose structured device-control APIs. These calls are less elegant than `read` and `write`, but they are necessary for actions such as setting terminal modes, querying disk geometry, configuring network interfaces, or controlling specialized hardware. The generic interface and special controls coexist.
+Device independence is always partial. The OS can present many devices as files or handles, but it still needs escape hatches for device-specific control. UNIX-like systems use operations such as `ioctl`; other systems expose structured device-control APIs. These calls are less elegant than `read` and `write`, but they are necessary for actions such as setting terminal modes, querying disk geometry, configuring network interfaces, or controlling specialized hardware. Generic operations and special controls therefore coexist.
 
-That compromise is normal.
-
-## Visual
+## From `read` to DMA completion
 
 ```mermaid
 sequenceDiagram
@@ -78,9 +78,9 @@ sequenceDiagram
 
 The application sees a `read`; the kernel sees queues, drivers, controller registers, DMA mappings, interrupts, and wakeups.
 
-## Worked example 1: polling versus interrupts
+### Counting the cost of continuous polling
 
-Problem: A device becomes ready after 5 ms. Checking its status register takes 1 microsecond. If the CPU polls continuously, how many checks occur before readiness? Why might interrupts be better?
+A device becomes ready after 5 ms. Checking its status register takes 1 microsecond. If the CPU polls continuously, how many checks occur before readiness? Why might interrupts be better?
 
 1. Convert 5 ms to microseconds:
 
@@ -99,11 +99,11 @@ $$
 5. With interrupt-driven I/O, the CPU can run another process while the device works. The device interrupts when ready.
 6. Polling may still be better if the expected wait is extremely short or interrupts are too expensive relative to the device speed.
 
-Checked answer: Continuous polling performs about 5000 status checks. Interrupts are better when wait time is long enough that the CPU should do other work.
+Continuous polling performs about 5000 status checks. Interrupts are better when wait time is long enough that the CPU should do other work.
 
-## Worked example 2: DMA copy reduction
+### Estimating CPU work with DMA
 
-Problem: A program reads a 64 KiB disk block. Without DMA, assume the CPU copies each byte from a device register into memory. With DMA, assume the CPU only sets up a 2000-instruction transfer and handles a 1000-instruction completion path. Compare CPU work at a high level.
+A program reads a 64 KiB disk block. Without DMA, assume the CPU copies each byte from a device register into memory. With DMA, assume the CPU only sets up a 2000-instruction transfer and handles a 1000-instruction completion path. Compare CPU work at a high level.
 
 1. Without DMA, the CPU performs one byte-transfer action per byte:
 
@@ -127,9 +127,9 @@ $$
    units are not exactly comparable because one is byte-copy steps and the other is instructions, but the scale shows the benefit.
 5. The device controller performs the bulk transfer while the CPU can schedule other work.
 
-Checked answer: DMA greatly reduces CPU involvement for block transfers. The OS still must set up, validate, and complete the operation safely.
+DMA greatly reduces CPU involvement for block transfers. The OS still must set up, validate, and complete the operation safely.
 
-## Code
+## Readiness-driven socket I/O
 
 ```python
 import selectors
@@ -158,7 +158,7 @@ for key, _ in selector.select(timeout=0.1):
 
 This small event-loop sketch uses nonblocking sockets and readiness notification. It avoids dedicating one blocked thread to each connection.
 
-## Common pitfalls
+## Where the uniform I/O interface leaks
 
 - Assuming interrupts are always better than polling. For very short waits, polling can avoid interrupt overhead.
 - Treating DMA as only a performance feature. It also requires memory protection and cache-coherence handling.
@@ -167,10 +167,8 @@ This small event-loop sketch uses nonblocking sockets and readiness notification
 - Placing device-specific logic in generic code. Drivers exist to isolate hardware protocols.
 - Ignoring error paths. Devices time out, disappear, return partial transfers, and report media errors.
 
-## Connections
+<div className="see-also">
 
-- [Mass Storage and RAID](/cs/operating-systems/mass-storage-raid)
-- [File-System Implementation](/cs/operating-systems/file-system-implementation)
-- [Virtual Memory](/cs/operating-systems/virtual-memory)
-- [Protection and Access Control](/cs/operating-systems/protection-access-control)
-- [Linux Case Study](/cs/operating-systems/linux-case-study)
+See also: [Mass Storage and RAID](/cs/operating-systems/mass-storage-raid) · [File-System Implementation](/cs/operating-systems/file-system-implementation) · [Virtual Memory](/cs/operating-systems/virtual-memory) · [Protection and Access Control](/cs/operating-systems/protection-access-control) · [Linux Case Study](/cs/operating-systems/linux-case-study)
+
+</div>

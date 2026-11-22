@@ -13,7 +13,7 @@ Optimization uses derivatives to find the best value of a quantity under stated 
 
 The shared habit is to turn a problem into a function, then use derivative information carefully. In optimization, zeros of $f'$ identify candidates. In Newton's method, $f'$ determines a tangent-line correction. In antiderivatives, knowing a derivative pattern lets us reconstruct a family of original functions.
 
-## Definitions
+## Three ways derivatives guide the problem
 
 An optimization problem asks for an absolute maximum or minimum of an objective function, often on a specified interval or under a constraint. Critical numbers and endpoints are candidates for extrema.
 
@@ -47,7 +47,7 @@ where $C$ is an arbitrary constant. The constant is necessary because functions 
 
 Initial value problems choose the constant from a condition such as $F(a)=b$. For example, if $v(t)$ is velocity, then position is an antiderivative of velocity, and an initial position determines the constant.
 
-## Key results
+## Choosing candidates, corrections, and constants
 
 The closed interval method for optimizing a continuous function on $[a,b]$ is:
 
@@ -97,7 +97,7 @@ Optimization modeling usually follows a repeatable workflow. First identify the 
 
 The second derivative test is often efficient in optimization, but it is not the only justification. If the objective is continuous on a closed interval, comparing candidate values is decisive. If the objective is a quadratic with negative leading coefficient, its graph opens downward and its vertex is a maximum. If a derivative sign chart changes from positive to negative, the first derivative test proves a local maximum even when the second derivative is unavailable.
 
-Newton's method is local. Near a simple root, the number of correct digits often roughly doubles at each step, a property called quadratic convergence. Far from the root, the tangent line may point to an irrelevant region. For functions with multiple roots, flat tangents, or discontinuities, a bracketing method such as bisection may be slower but more reliable. A practical numerical workflow often combines methods: bracket a root first, then use Newton's method once a good starting value is known.
+Newton's method is local. Near a simple root, the number of correct digits often roughly doubles at each step, a property called quadratic convergence. Far from the root, the tangent line may point to an irrelevant region. For functions with multiple roots, flat tangents, or discontinuities, a bracketing method such as bisection may be slower but more reliable. A robust numerical workflow often combines methods: bracket a root first, then use Newton's method once a good starting value is known.
 
 Antiderivatives should always be checked by differentiating the result. This is the simplest way to catch missing constants, wrong powers, and sign errors in trigonometric antiderivatives. For instance,
 
@@ -106,8 +106,6 @@ $$
 $$
 
 so $\int \sin x\,dx=-\cos x+C$. The sign is not a convention; it is forced by differentiation.
-
-## Visual
 
 ```mermaid
 graph TD
@@ -129,7 +127,7 @@ graph TD
 | Antiderivatives | reverse known derivative rules | include $+C$ |
 | Motion recovery | integrate acceleration or velocity | initial conditions set constants |
 
-## Worked example 1: optimize area with fixed perimeter
+## A fixed-perimeter rectangle
 
 **Problem.** A rectangle has perimeter $40$ meters. Find the dimensions that maximize its area.
 
@@ -191,7 +189,7 @@ the area function is concave down, so the critical point is a maximum.
 
 **Checked answer.** The maximum-area rectangle is $10$ m by $10$ m, a square. Its area is $100$ square meters.
 
-## Worked example 2: Newton's method and an antiderivative
+## Approximating a root and recovering motion
 
 **Problem.** Use Newton's method to approximate $\sqrt{10}$ by solving $x^2-10=0$, starting with $x_0=3$. Then find the position $s(t)$ if acceleration is $a(t)=6t$, velocity satisfies $v(0)=4$, and position satisfies $s(0)=1$.
 
@@ -309,7 +307,7 @@ That final interpretation step is where calculus returns to the applied question
 
 Without it, optimization is only algebra and symbolic exercise.
 
-## Code
+## A reusable Newton iterator
 
 ```python
 def newton(f, fp, x0, steps=5):
@@ -320,27 +318,22 @@ def newton(f, fp, x0, steps=5):
 
 root = newton(lambda x: x*x - 10, lambda x: 2*x, 3.0, 4)
 print(root)
-
-def position(t):
-    return t**3 + 4*t + 1
-
-for t in [0, 1, 2]:
-    print(t, position(t))
 ```
 
-## Common pitfalls
+## Where the setup can go wrong
 
-- Forgetting to check endpoints in closed-interval optimization.
-- Optimizing a formula outside the domain allowed by the physical problem.
-- Assuming every critical point is a maximum or minimum without a sign or second derivative check.
-- Using Newton's method when $f'(x_n)=0$ or nearly zero.
-- Stopping Newton's method without checking whether $f(x_n)$ is actually small.
-- Omitting the constant $C$ in an indefinite integral.
-- Using an initial condition for velocity to determine the position constant, or vice versa.
+- Closed-interval optimization includes the endpoints; $f'=0$ only finds interior candidates.
+- A critical number outside the physical domain is not a solution to the modeled problem, and a critical point still needs a sign, concavity, or value comparison argument.
+- Newton's update is unreliable when $f'(x_n)$ is zero or nearly zero. A small change in $x_n$ is also not enough on its own: check that the residual $f(x_n)$ is small.
+- An indefinite integral needs its arbitrary constant. In a motion problem, the velocity and position constants come from their respective initial conditions.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Applications of Derivatives](/math/calculus/applications-of-derivatives): optimization uses derivative tests from curve analysis.
 - [Implicit Differentiation and Linearization](/math/calculus/implicit-related-rates-linearization): Newton's method is repeated tangent-line approximation.
 - [Definite Integrals and the Fundamental Theorem](/math/calculus/definite-integrals-fundamental-theorem): antiderivatives become evaluation tools for definite integrals.
 - [Integration Techniques and Improper Integrals](/math/calculus/integration-techniques-improper-integrals): more advanced antiderivative methods extend the basic rules.
+
+</div>

@@ -9,7 +9,7 @@ The source chapter titled "Interfacing to External World" collects the practical
 
 An 8051 pin can set a logic level, but most real devices need more: debouncing, current drivers, address decoding, handshaking, conversion time, scaling, or protection. The right software pattern depends on the device's interface. A keyboard is scanned, a display is refreshed, an ADC is started and polled, a DAC is fed with a sample code, and a stepper motor receives a sequence of coil patterns.
 
-## Definitions
+## The interfaces around the chip
 
 **External program memory** stores code outside the 8051. Classic 8051 systems use `PSEN` to read external code memory, while ports 0 and 2 provide address and data signals.
 
@@ -31,25 +31,23 @@ An **ADC** converts an analog input to a digital code. ADC0804 and ADC0808/0809 
 
 A **stepper motor** moves in discrete steps by energizing windings in a controlled sequence.
 
-## Key results
+## Pin ownership, timing, and calibration
 
-The first key result is that external memory changes port availability. In a classic external-memory 8051 system, Port 0 carries multiplexed low address/data and Port 2 carries high address. These pins cannot simultaneously be treated as ordinary GPIO without additional design constraints.
+External memory changes port availability. In a classic external-memory 8051 system, Port 0 carries multiplexed low address/data and Port 2 carries high address. Those pins cannot simultaneously serve as ordinary GPIO without additional hardware.
 
-The second key result is that keyboard software must separate scanning from debouncing. A scan identifies candidate row and column. Debouncing confirms that the state is stable long enough to count as a real press.
+Keyboard software separates scanning from debouncing. A scan identifies a candidate row and column; repeated sampling after a delay confirms that it is a real press.
 
-The third key result is that display multiplexing trades pins for time. Instead of driving every digit continuously with its own segment lines, a controller rapidly enables one digit at a time while sharing segment data. The refresh rate must be high enough to avoid visible flicker.
+Display multiplexing trades pins for time. Instead of driving every digit continuously with its own segment lines, a controller rapidly enables one digit at a time while sharing segment data. The refresh rate must be high enough to avoid visible flicker.
 
-The fourth key result is that ADC and DAC interface code must respect analog timing. A DAC may require settling time after a new code. An ADC requires acquisition and conversion time before its result is valid. Reading too early gives unstable or old data.
+ADC and DAC interface code must respect analog timing. A DAC may require settling time after a new code. An ADC requires acquisition and conversion time before its result is valid. Reading too early gives unstable or old data.
 
-The fifth key result is that motors and relays need drivers. A microcontroller pin cannot directly supply the current or voltage transients required by inductive loads. Driver transistors, arrays, optocouplers, flyback diodes, or motor-driver ICs are part of the interface.
+Motors and relays need drivers. A microcontroller pin cannot directly supply the current or absorb the voltage transients required by inductive loads. Driver transistors, arrays, optocouplers, flyback diodes, or motor-driver ICs are part of the interface.
 
-The sixth key result is that memory and I/O maps should be documented like software APIs. The address of each device register, direction of each port bit, active level of each control signal, and timing rule should be recorded before code is written.
+Treat memory and I/O maps like software interfaces. Record each device-register address, port-bit direction, control-signal polarity, and timing rule before writing code.
 
-A seventh key result is that analog interfaces require calibration thinking. An 8-bit ADC code is not a temperature, voltage, or pressure by itself; it is a count relative to a reference voltage and input scaling circuit. Likewise, a DAC code is not automatically an output voltage unless the reference current, resistor network, and output amplifier are known. Software should keep conversion formulas beside the hardware assumptions so that changing a reference or sensor does not silently invalidate readings.
+Analog interfaces also require calibration. An 8-bit ADC code is a count relative to a reference voltage and input scaling circuit, not a temperature, voltage, or pressure by itself. A DAC code determines an output only when the reference current, resistor network, and output amplifier are known. Keep conversion formulas beside those hardware assumptions so that a reference or sensor change does not silently invalidate readings.
 
-An eighth key result is that interface timing should be designed for worst case, not typical case. LCD busy times, ADC conversion times, EEPROM write times, and motor settling times vary with supply voltage, temperature, and device grade. A lab example may work with a short delay, but a robust design either polls a real ready flag or delays longer than the specified worst-case time.
-
-## Visual
+Interface timing must cover the specified worst case. LCD busy times, ADC conversion times, EEPROM write times, and motor settling times vary with supply voltage, temperature, and device grade. A lab example may work with a short delay, but robust code either polls a real ready flag or waits longer than the worst-case time.
 
 ```mermaid
 graph LR
@@ -74,7 +72,7 @@ graph LR
 | DAC0808 | Data bus, reference, output current | Write sample code, wait settling | Requires analog output stage |
 | Stepper motor | Coil drive phases | Output phase sequence with delay | Use driver and flyback protection |
 
-## Worked example 1: Scanning a 4 by 4 matrix keyboard
+### Scanning a 4 by 4 matrix keyboard
 
 Problem: Design the basic scan method for a 4 by 4 keyboard connected with rows on `P1.0`-`P1.3` and columns on `P1.4`-`P1.7`. Assume columns read high when no key is pressed and low when the driven row contains the pressed key.
 
@@ -98,7 +96,7 @@ Answer: the key identity is the first stable row-column pair found by driving on
 
 Check: If more than one key is pressed, ghosting can occur unless diodes or a more careful scanning policy is used.
 
-## Worked example 2: Reading an ADC0804-style converter
+### Sequencing an ADC0804-style conversion
 
 Problem: An ADC is connected to an 8051 through an 8-bit data port and control lines `START`, `EOC`, and `OE`. Describe the conversion sequence and the point at which the data byte is valid.
 
@@ -120,7 +118,7 @@ Answer: the data byte is valid only after end-of-conversion is signaled and outp
 
 Check: A fixed delay can replace polling only if the delay is longer than the worst-case conversion time over voltage, temperature, and clock tolerance.
 
-## Code
+## A single-pass keyboard scanner
 
 ```c
 /* 8051 C-style matrix keyboard scan.
@@ -147,19 +145,18 @@ unsigned char key_scan_once(void) {
 }
 ```
 
-## Common pitfalls
+## Failure modes at the electrical boundary
 
-- Driving an inductive load directly from an 8051 pin. Use a driver and protection components.
+- An inductive load connected directly to an 8051 pin can exceed the pin-current limit and produce damaging flyback voltage. Put a suitable driver and protection components between them.
 - Forgetting that Port 0 may need pull-ups and may be unavailable as GPIO in external-memory designs.
-- Reading a mechanical switch once and treating the result as final. Debounce is required for reliable user input.
+- A single mechanical-switch sample is not reliable input; accept a transition only after it remains stable through the debounce interval.
 - Multiplexing displays too slowly, causing flicker, or too quickly without enough segment current.
 - Reading an ADC before conversion completes.
 - Writing a DAC code and sampling the analog output before settling time has elapsed.
-- Not documenting active-high versus active-low control lines; this causes inverted software logic.
+- Undocumented active-high and active-low control lines readily produce inverted software logic.
 
-## Connections
+<div className="see-also">
 
-- [8051 architecture, memory, and ports](/cs/embedded/8051-architecture-memory-ports)
-- [8255 programmable peripheral interface](/cs/embedded/8255-programmable-peripheral-interface)
-- [Serial EEPROM and DS1307 RTC interfacing](/cs/embedded/serial-eeprom-rtc-ds1307)
-- [Serial buses and embedded protocols](/cs/embedded/serial-buses-embedded-protocols)
+See also: [8051 architecture, memory, and ports](/cs/embedded/architecture-memory-ports) · [8255 programmable peripheral interface](/cs/embedded/programmable-peripheral-interface) · [Serial EEPROM and DS1307 RTC interfacing](/cs/embedded/serial-eeprom-rtc-ds1307) · [Serial buses and embedded protocols](/cs/embedded/serial-buses-embedded-protocols)
+
+</div>

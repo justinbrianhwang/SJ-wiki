@@ -13,7 +13,7 @@ The common theme is exploiting structure. The Euclidean algorithm replaces divis
 
 *Figure: The sieve of Eratosthenes marks multiples of each prime to enumerate primes efficiently. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sieve_of_Eratosthenes_animation.gif), public domain or CC-BY-SA via Wikimedia Commons.*
 
-## Definitions
+## Arithmetic objects and cost models
 
 For integers $a$ and $b$, $\gcd(a,b)$ is the largest positive integer dividing both. Bezout's identity says there exist integers $x,y$ such that
 
@@ -27,7 +27,7 @@ Modular exponentiation asks for $a^e\bmod m$. Repeated squaring uses the binary 
 
 A primality test decides whether $n$ is prime. A factorization algorithm finds nontrivial factors of composite $n$. A discrete logarithm problem asks for $x$ such that $g^x\equiv h\pmod p$. A polynomial multiplication algorithm computes coefficients of $C(x)=A(x)B(x)$. A linear recurrence can be encoded in a matrix so that fast matrix exponentiation jumps to the $n$-th term.
 
-## Key results
+## Euclid, primality, factorization, and transforms
 
 The Euclidean algorithm follows from $\gcd(a,b)=\gcd(b,a\bmod b)$ and runs in $O(\log \min(a,b))$ arithmetic steps. The extended version back-substitutes remainders to compute Bezout coefficients. This is the workhorse behind modular inverses, CRT, rational reconstruction, and many cryptographic protocols.
 
@@ -54,8 +54,6 @@ in $O(N\log N)$ time by splitting even and odd indices [8]. Polynomial multiplic
 Karatsuba and Toom-Cook reduce the number of recursive integer multiplications by evaluating at selected points and interpolating [7]. Schonhage-Strassen uses FFT ideas for very large integer multiplication [13]. Matrix exponentiation computes linear recurrences such as Fibonacci by raising a companion matrix in $O(k^3\log n)$ time for order $k$ recurrences, or faster with specialized matrix structure.
 
 CRT is also a performance tool. Large modular computations can be split across several machine-word primes, computed independently, and reconstructed at the end. This is common in exact polynomial multiplication and computer algebra. The same idea appears in NTT implementations that combine several NTT-friendly primes when one modulus cannot hold the full coefficient range.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -85,7 +83,9 @@ flowchart TD
 | Discrete log | baby-step giant-step | $O(\sqrt p)$ | high memory |
 | Polynomial product | FFT or NTT | $O(n\log n)$ | precision or modulus constraints |
 
-## Worked example 1: extended Euclidean algorithm for gcd(252,198)
+## Arithmetic by hand
+
+### Extended Euclid on 252 and 198
 
 **Problem.** Compute $\gcd(252,198)$ and Bezout coefficients $x,y$ such that $252x+198y=\gcd(252,198)$.
 
@@ -113,7 +113,7 @@ $$18=4(252-198)-198=4\cdot252-5\cdot198.$$
 
 **Checked answer.** $\gcd(252,198)=18$, with Bezout coefficients $x=4$, $y=-5$. Check: $252\cdot4+198\cdot(-5)=1008-990=18$.
 
-## Worked example 2: Miller-Rabin witness for n = 561
+### Finding a Miller-Rabin witness for 561
 
 **Problem.** Show that base $a=2$ is a Miller-Rabin witness for $n=561$, a Carmichael number.
 
@@ -138,7 +138,7 @@ $$67^2\bmod561=1.$$
 
 **Checked answer.** Miller-Rabin declares $561$ composite for base $2$. This is stronger than Fermat's test: $561$ is a Carmichael number, so it can satisfy $a^{560}\equiv1\pmod{561}$ for many coprime bases, but the strong witness sequence exposes compositeness.
 
-## Code
+## Modular arithmetic and primality routines
 
 ```python
 def gcd_ext(a, b):
@@ -211,7 +211,7 @@ def miller_rabin(n, bases=(2, 3, 5, 7, 11, 13, 17)):
     return True
 ```
 
-## Common pitfalls
+## Arithmetic assumptions that break implementations
 
 - Forgetting that a modular inverse exists only when $\gcd(a,m)=1$.
 - Letting intermediate powers grow instead of reducing modulo $m$ after each multiplication.
@@ -225,15 +225,6 @@ def miller_rabin(n, bases=(2, 3, 5, 7, 11, 13, 17)):
 - Choosing an NTT modulus without a suitable primitive root and transform length.
 - Computing matrix powers with naive repeated multiplication instead of exponentiation by squaring.
 - Ignoring bit complexity when numbers grow far beyond machine-word size.
-
-## Connections
-
-- [Cryptography](/cs/cryptography/intro) for modular inverses, primality, discrete logs, and RSA-style arithmetic.
-- [Divide and Conquer](/cs/algorithms/divide-and-conquer) for Karatsuba, FFT, and recurrence analysis.
-- [Randomized Algorithms](/cs/algorithms/randomized-algorithms) for Miller-Rabin, Pollard rho, and fingerprinting.
-- [String Algorithms](/cs/algorithms/string-algorithms) for rolling hashes and FFT-based matching.
-- [Dynamic Programming](/cs/algorithms/dynamic-programming) for linear recurrences and matrix exponentiation alternatives.
-- [Discrete Math](/math/discrete/intro) for modular arithmetic, groups, and number theory.
 
 ## References
 
@@ -264,3 +255,16 @@ def miller_rabin(n, bases=(2, 3, 5, 7, 11, 13, 17)):
 [13] A. Schonhage and V. Strassen, "Schnelle Multiplikation grosser Zahlen," *Computing*, vol. 7, pp. 281-292, 1971.
 
 [14] D. Shanks, "Class number, a theory of factorization, and genera," *Proceedings of Symposia in Pure Mathematics*, vol. 20, pp. 415-440, 1971.
+
+<div className="see-also">
+
+See also:
+
+- [Cryptography](/cs/cryptography/intro) for modular inverses, primality, discrete logs, and RSA-style arithmetic.
+- [Divide and Conquer](/cs/algorithms/divide-and-conquer) for Karatsuba, FFT, and recurrence analysis.
+- [Randomized Algorithms](/cs/algorithms/randomized-algorithms) for Miller-Rabin, Pollard rho, and fingerprinting.
+- [String Algorithms](/cs/algorithms/string-algorithms) for rolling hashes and FFT-based matching.
+- [Dynamic Programming](/cs/algorithms/dynamic-programming) for linear recurrences and matrix exponentiation alternatives.
+- [Discrete Math](/math/discrete/intro) for modular arithmetic, groups, and number theory.
+
+</div>

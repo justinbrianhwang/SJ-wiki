@@ -5,11 +5,11 @@ sidebar_position: 7
 
 # Systems of ODEs and Phase Planes
 
-Systems of ODEs model several state variables changing together. A mass-spring system uses position and velocity, a predator-prey model uses two populations, and an electrical network may use several currents and capacitor voltages. The phase plane replaces a single graph $y(t)$ with trajectories in state space, making stability and long-term behavior visible.
+Systems of ODEs model several state variables changing together. A mass-spring system uses position and velocity, a predator-prey model uses two populations, and an electrical network may use several currents and capacitor voltages. The phase plane replaces a single graph $y(t)$ with trajectories in state space, exposing stability and long-term behavior geometrically.
 
 Linear systems connect ODEs to eigenvalues and eigenvectors. Nonlinear systems are often understood by equilibria, linearization, nullclines, and numerical trajectories. The goal is not only to solve equations, but to classify behavior: attraction, repulsion, spiraling, saddle behavior, periodic motion, and sensitivity to initial conditions.
 
-## Definitions
+## State equations, equilibria, and nullclines
 
 A first-order system is
 
@@ -62,7 +62,7 @@ g_x & g_y
 \end{bmatrix}_{\mathbf{x}=\mathbf{x}_*}.
 $$
 
-## Key results
+## Eigenstructure and local linearization
 
 If $A$ has a basis of eigenvectors $\mathbf{v}_1,\ldots,\mathbf{v}_n$ with eigenvalues $\lambda_1,\ldots,\lambda_n$, then the general solution of $\mathbf{x}'=A\mathbf{x}$ is
 
@@ -92,7 +92,7 @@ Conservation laws can create closed orbits. For example, the undamped oscillator
 
 The phase portrait is a picture of state, not a picture of each component against time. A single point in the phase plane represents the whole current state. As time evolves, the point moves along a trajectory. If two trajectories for an autonomous system intersect in a uniqueness region, they must be the same trajectory with a different time parametrization; otherwise one initial state would have two futures. This is the system version of the noncrossing rule for scalar ODEs.
 
-Linear systems with real eigenvectors have straight-line invariant directions. If the initial condition lies exactly on an eigenvector line, the solution stays on that line and grows or decays with the corresponding exponential. General initial conditions decompose into eigenvector components. Over time, the component with the largest real part usually dominates. This is why unstable modes can be visible even when their initial coefficient is small.
+Linear systems with real eigenvectors have straight-line invariant directions. If the initial condition lies exactly on an eigenvector line, the solution stays on that line and grows or decays with the corresponding exponential. General initial conditions decompose into eigenvector components. Over time, the component with the largest real part usually dominates, so even a small unstable component eventually controls the trajectory.
 
 For complex eigenvalues in a real system, trajectories rotate. The sign of the real part determines whether the spiral moves inward or outward, while the imaginary part determines angular speed. The direction of rotation is not determined by the eigenvalues alone; it must be read from the vector field at a convenient point. For example, evaluating the vector field on the positive $x$-axis shows whether motion initially points upward or downward.
 
@@ -102,7 +102,9 @@ Linearization is a local method. It describes behavior close to an equilibrium, 
 
 Systems also make scaling important. Variables may have different units and magnitudes, so a phase portrait can look distorted if axes are chosen poorly. A trajectory that appears nearly horizontal may simply reflect that one variable is plotted in thousands and another in fractions. Nondimensionalization or rescaling can reveal the real geometry and improve numerical conditioning.
 
-## Visual
+## Classifying equilibria in the phase plane
+
+The Jacobian supplies the local eigenvalues, while nullclines and trajectories show how that local classification fits the wider nonlinear flow.
 
 ```mermaid
 flowchart TD
@@ -126,7 +128,7 @@ flowchart TD
 | Complex $\alpha\pm i\beta$, $\alpha\gt 0$ | Spiral source | Unstable |
 | Pure imaginary | Center in linear system | Stable but not asymptotically stable |
 
-## Worked example 1: Linear system with a source node
+## A linear source node and its invariant directions
 
 Problem. Solve and classify
 
@@ -214,7 +216,7 @@ Check. Both eigenvalues are positive, so this is a source node, not a saddle. Ev
 
 The eigenvector directions give the shape of that departure. Initial data on the line $y=x$ stay on that line and grow like $e^{4t}$. Initial data on the line $y=-x$ stay on that line and grow like $e^{2t}$. For most other initial data, the $e^{4t}$ component eventually dominates, so trajectories become tangent to the faster eigenvector direction as they move outward.
 
-## Worked example 2: Linearization of a predator-prey equilibrium
+## Linearizing a predator-prey equilibrium
 
 Problem. For
 
@@ -289,7 +291,7 @@ Check. This system is the undamped Lotka-Volterra form and has closed level curv
 
 The conclusion should be stated carefully. The linearized matrix predicts rotation but has no decay. It does not prove attraction. In a damped ecological model, extra terms could turn the same equilibrium into a spiral sink or spiral source, so the nonlinear equations must be considered.
 
-## Code
+## Integrating a predator-prey trajectory
 
 ```python
 import numpy as np
@@ -306,7 +308,7 @@ print(sol.y[:, -1])
 print(np.min(sol.y[0]), np.max(sol.y[0]))
 ```
 
-## Common pitfalls
+## Limits of phase-plane classification
 
 - Calling every pair of pure imaginary eigenvalues a stable nonlinear center. Linearization is inconclusive when eigenvalues have zero real part.
 - Forgetting that a negative determinant in a $2\times2$ linear system forces a saddle.
@@ -317,9 +319,8 @@ print(np.min(sol.y[0]), np.max(sol.y[0]))
 - Losing variables when converting a higher-order scalar ODE into a first-order system.
 - Forgetting to keep only physically meaningful regions, such as nonnegative populations.
 
-## Connections
+<div className="see-also">
 
-- [Eigenvalues and Diagonalization](/math/engineering-math/eigenvalues-and-diagonalization)
-- [Second-Order Linear ODEs](/math/engineering-math/second-order-linear-odes)
-- [Direction Fields and Existence](/math/engineering-math/direction-fields-and-existence)
-- [Numerical Methods Overview](/math/engineering-math/numerical-methods-overview)
+See also: [Eigenvalues and Diagonalization](/math/engineering-math/eigenvalues-and-diagonalization) · [Second-Order Linear ODEs](/math/engineering-math/second-order-linear-odes) · [Direction Fields and Existence](/math/engineering-math/direction-fields-and-existence) · [Numerical Methods Overview](/math/engineering-math/numerical-methods-overview)
+
+</div>

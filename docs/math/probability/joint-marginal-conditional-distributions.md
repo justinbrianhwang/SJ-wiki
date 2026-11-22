@@ -597,10 +597,8 @@ print("sample mean Y:", y.mean())
 - Forgetting support constraints when integrating. In triangular or curved regions, limits depend on the other variable.
 - Treating zero covariance as independence. That implication holds only under special conditions, not generally.
 
-## Related pages
+<div className="see-also">
 
-- [conditional probability and Bayes' theorem](/math/probability/conditional-probability-bayes)
-- [covariance, correlation, and independence](/math/probability/covariance-correlation-independence)
-- [functions of random variables](/math/probability/transformations-random-variables)
-- [Markov chains intro](/math/probability/markov-chains)
-- [bivariate data and correlation](/math/statistics/bivariate-data-and-correlation)
+See also: [conditional probability and Bayes' theorem](/math/probability/conditional-probability-bayes) · [covariance, correlation, and independence](/math/probability/covariance-correlation-independence) · [functions of random variables](/math/probability/transformations-random-variables) · [Markov chains intro](/math/probability/markov-chains) · [bivariate data and correlation](/math/statistics/bivariate-data-and-correlation)
+
+</div>

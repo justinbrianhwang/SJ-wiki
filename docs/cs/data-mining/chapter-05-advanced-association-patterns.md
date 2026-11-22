@@ -7,13 +7,9 @@ sidebar_position: 7
 
 Basic association mining can produce too many itemsets and rules. Aggarwal's advanced association chapter addresses this output-management problem with summarization, querying, constraints, and applications. Instead of treating every frequent itemset as equally useful, the analyst can mine closed patterns, maximal patterns, approximate patterns, constrained patterns, or preprocessed structures that answer many pattern queries efficiently.
 
-![A hash list diagram links data blocks to hashes that can verify later blocks.](https://commons.wikimedia.org/wiki/Special:FilePath/Hash_list.svg)
+Building on Apriori and FP-growth, the central issue shifts from "can we find all frequent itemsets?" to "which representation of the pattern space is compact, queryable, and useful for the downstream task?"
 
-*Figure: Hash lists connect hashing to integrity checking and authenticated data structures. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hash_list.svg), David Gothberg and DataWraith, public domain.*
-
-This page builds directly on Apriori and FP-growth. The central issue is no longer only "can we find all frequent itemsets?" It is "which representation of the pattern space is compact, queryable, and useful for the downstream task?"
-
-## Definitions
+## Compressing the frequent-pattern lattice
 
 A frequent itemset $X$ is **maximal frequent** if no proper superset of $X$ is frequent. Maximal patterns summarize the boundary of frequency but do not preserve exact support counts for all subsets.
 
@@ -29,11 +25,11 @@ A **monotone constraint** has the property that if an itemset satisfies it, ever
 
 **Convertible constraints** can become monotone or anti-monotone after imposing a useful item ordering.
 
-## Key results
+## What each summary preserves
 
 **Maximal patterns are compact but lossy.** If \{A,B,C\} is maximal frequent, then \{A,B\}, \{A,C\}, \{B,C\}, A, B, and C are frequent by downward closure. However, their exact support counts cannot be recovered from the maximal set alone.
 
-**Closed patterns are a lossless support summary.** If $X$ is frequent but not closed, there exists a closed superset $Y\supset X$ with the same supporting transactions. The support of $X$ can be recovered by finding the smallest closed superset sharing its transaction set. In practice, closed patterns often reduce output size while preserving counts.
+**Closed patterns are a lossless support summary.** If $X$ is frequent but not closed, there exists a closed superset $Y\supset X$ with the same supporting transactions. The support of $X$ can be recovered by finding the smallest closed superset sharing its transaction set. Closed patterns often reduce output size while preserving counts.
 
 **Constraint pushing reduces the search space.** If a constraint can be evaluated during candidate generation or conditional pattern growth, the miner avoids producing patterns that will be discarded later. The gain is largest when constraints are selective and pruning-safe.
 
@@ -42,8 +38,6 @@ A **monotone constraint** has the property that if an itemset satisfies it, ever
 **Associations are useful beyond baskets.** Frequent patterns can become classification rules, cluster descriptions, outlier explanations, recommender features, web usage summaries, and biological or demographic profile descriptors. In those settings, the best pattern is not necessarily the most frequent one; interpretability and discriminative power matter.
 
 **Advanced pattern mining is mainly about controlling the search and the output.** The raw frequent-pattern lattice grows exponentially in the number of items, so even an efficient miner can overwhelm the analyst. Closed and maximal summaries reduce output size; constraints focus the search on domain-relevant regions; query structures support repeated exploration; and approximation can absorb noise. These techniques should be chosen according to what must be preserved: exact supports, only boundary information, answer speed, or tolerance to imperfect data.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -68,7 +62,9 @@ flowchart TD
 | Approximate | Often | Model-dependent | Noisy data |
 | Constrained | Depends | For selected query | Domain-specific mining |
 
-## Worked example 1: Maximal vs. closed patterns
+## Two ways to constrain the output
+
+### Separating maximal from closed patterns
 
 **Problem.** Consider transactions:
 
@@ -111,7 +107,7 @@ Let minimum support count be $\sigma=2$. Identify frequent, maximal frequent, an
 
 **Checked answer.** Maximal frequent set: \{ABC\}. Closed frequent sets: \{A\}, \{AB\}, \{ABC\}. Maximal is smaller but loses the support count of AB and A.
 
-## Worked example 2: Constraint pushing
+### Pushing support and price constraints
 
 **Problem.** Mine frequent itemsets with minimum support 2, but only report patterns whose total price is at least 10. Items have prices:
 
@@ -155,7 +151,7 @@ The transactions are:
 
 **Checked answer.** Report \{B,C\} and \{B,D\}. During search, support pruning removes supersets of infrequent pairs, while price monotonicity helps reason about which extensions could eventually satisfy the reporting constraint.
 
-## Code
+## Filtering closed and maximal itemsets
 
 Pseudocode for closed-pattern filtering after frequent itemsets are known:
 
@@ -210,7 +206,7 @@ print("closed:", {tuple(sorted(k)): v for k, v in closed.items()})
 print("maximal:", {tuple(sorted(k)): v for k, v in maximal.items()})
 ```
 
-## Common pitfalls
+## Information that compression can lose
 
 - Treating maximal patterns as if they preserve exact support counts for all subsets.
 - Mining all patterns first and only then applying constraints that could have pruned the search.
@@ -220,10 +216,8 @@ print("maximal:", {tuple(sorted(k)): v for k, v in maximal.items()})
 - Forgetting that a pattern useful for classification may be rare but discriminative.
 - Building a pattern index without considering the actual query workload.
 
-## Connections
+<div className="see-also">
 
-- [Association Pattern Mining](/cs/data-mining/chapter-04-association-pattern-mining)
-- [Data Classification](/cs/data-mining/chapter-10-data-classification)
-- [Advanced Classification Concepts](/cs/data-mining/chapter-11-advanced-classification)
-- [Mining Web Data and Recommenders](/cs/data-mining/chapter-18-mining-web-data)
-- [Mining Discrete Sequences](/cs/data-mining/chapter-15-mining-discrete-sequences)
+See also: [Association Pattern Mining](/cs/data-mining/chapter-04-association-pattern-mining) · [Data Classification](/cs/data-mining/chapter-10-data-classification) · [Advanced Classification Concepts](/cs/data-mining/chapter-11-advanced-classification) · [Mining Web Data and Recommenders](/cs/data-mining/chapter-18-mining-web-data) · [Mining Discrete Sequences](/cs/data-mining/chapter-15-mining-discrete-sequences)
+
+</div>

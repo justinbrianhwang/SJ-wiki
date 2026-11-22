@@ -5,347 +5,480 @@ sidebar_position: 2
 
 # First-Order ODEs
 
-A first-order ordinary differential equation relates an unknown function to its first derivative. In engineering models the derivative is usually a rate: current changing in a circuit, temperature relaxing toward the surroundings, concentration changing in a mixing tank, or velocity responding to drag. The mathematical work is only one part of the task. A useful solution also records the modeling assumptions, the interval where the solution is valid, the initial condition, and the physical meaning of constants.
+A first-order ordinary differential equation relates an unknown function to its first derivative. In models, that derivative is usually a rate: heat leaving a body, charge changing in a circuit, material entering a tank, or a population responding to crowding. Solving the algebra is only part of the job. The initial condition, domain, units, and maximal interval determine what the formula actually represents.
 
-![Euler method advances along short tangent-line steps.](https://commons.wikimedia.org/wiki/Special:FilePath/Euler_method.svg)
+## Recognize the structure before manipulating it
 
-*Figure: Euler method approximates an ODE solution by repeatedly stepping in the current slope direction. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Euler_method.svg), Oleg Alexandrov, public domain.*
-
-This page sits between qualitative ideas such as slope fields and later linear-system methods. The main theme is recognition: identify whether the equation is separable, linear, exact, Bernoulli, homogeneous in $y/x$, or best handled numerically. Many errors in first-order ODEs come from forcing an equation into a favorite method instead of checking its actual structure.
-
-## Definitions
-
-A first-order ODE can be written implicitly as
+An equation may be implicit,
 
 $$
-F(x,y,y')=0
+F(x,y,y')=0,
 $$
 
-or explicitly as
+or explicit,
 
 $$
 y'=f(x,y).
 $$
 
-An initial value problem adds one condition,
+An initial condition $y(x_0)=y_0$ selects a curve from a family when existence and uniqueness apply. Recognition determines the useful first move:
+
+| Form | Recognition cue | Main move |
+|---|---|---|
+| separable | $y'=g(x)h(y)$ | place $y$ terms with $dy$ and $x$ terms with $dx$ |
+| linear | $y'+p(x)y=r(x)$ | multiply by an integrating factor |
+| exact | $M(x,y)\,dx+N(x,y)\,dy=0$ with $M_y=N_x$ | recover a potential function |
+| Bernoulli | $y'+p(x)y=g(x)y^a$ | substitute $v=y^{1-a}$ |
+| homogeneous ratio | $y'=F(y/x)$ | set $y=vx$ |
+| autonomous | $y'=f(y)$ | locate equilibria and use separation or a phase line |
+
+These classes overlap. An equation can be both separable and linear; use whichever path has less algebra. If no pattern fits, qualitative analysis or a numerical solver is a legitimate method rather than a last-resort symbolic failure.
+
+Before dividing by an expression involving $y$, record its zeros. Before taking logarithms or roots, record sign restrictions. After finding a formula, substitute it into the original equation and apply the initial condition. These checks catch most missing branches and sign errors.
+
+## Separation preserves a balance of differentials
+
+For
 
 $$
-y(x_0)=y_0,
+\frac{dy}{dx}=g(x)h(y),
 $$
 
-which selects one curve from a family of solution curves. A solution on an interval $I$ is a differentiable function $y=h(x)$ such that $h'(x)=f(x,h(x))$ for all $x\in I$.
-
-A separable equation has the form
+and on a region where $h(y)\ne0$, rearrange and integrate:
 
 $$
-\frac{dy}{dx}=g(x)h(y).
+\frac{1}{h(y)}\,dy=g(x)\,dx,
 $$
 
-Where $h(y)\ne 0$, separate and integrate:
-
 $$
-\begin{aligned}
-\frac{1}{h(y)}\,dy &= g(x)\,dx,\\
-\int \frac{1}{h(y)}\,dy &= \int g(x)\,dx+C.
-\end{aligned}
+\int\frac{1}{h(y)}\,dy
+=\int g(x)\,dx+C.
 $$
 
-A linear first-order equation has standard form
+The resulting relation may stay implicit. Solving explicitly for $y$ is useful only when it is possible and does not obscure branches.
+
+Division by $h(y)$ discards any constant solution satisfying $h(y_*)=0$. These equilibria must be checked separately. They often carry the most important long-term behavior in an autonomous model.
+
+### Worked example: logistic growth
+
+Solve
+
+$$
+y'=0.3y\left(1-\frac{y}{12}\right),
+\qquad y(0)=3.
+$$
+
+The equilibrium solutions are $y=0$ and $y=12$. The initial value is neither, so separation is allowed near the solution:
+
+$$
+\frac{dy}{y(1-y/12)}=0.3\,dt.
+$$
+
+Since $1-y/12=(12-y)/12$,
+
+$$
+\frac{1}{y(1-y/12)}
+=\frac{12}{y(12-y)}
+=\frac1y+\frac{1}{12-y}.
+$$
+
+Integrating requires the minus sign from $d(12-y)=-dy$:
+
+$$
+\ln|y|-\ln|12-y|=0.3t+C.
+$$
+
+Combine logarithms and exponentiate:
+
+$$
+\frac{y}{12-y}=Ce^{0.3t}.
+$$
+
+The solution stays between $0$ and $12$, so no absolute-value branch change occurs. Solve for $y$:
+
+$$
+y=\frac{12Ce^{0.3t}}{1+Ce^{0.3t}}
+=\frac{12}{1+C^{-1}e^{-0.3t}}.
+$$
+
+Use $y(0)=3$:
+
+$$
+3=\frac{12}{1+C^{-1}}
+\quad\Longrightarrow\quad
+C^{-1}=3.
+$$
+
+Thus
+
+$$
+y(t)=\frac{12}{1+3e^{-0.3t}}.
+$$
+
+At $t=0$, the formula gives $3$. As $t\to\infty$, the exponential vanishes and $y\to12$, matching the stable carrying capacity seen from the sign of the right side. The discarded equilibria $y=0$ and $y=12$ remain additional solutions for their own initial data.
+
+## The integrating factor for linear equations
+
+A first-order linear equation has normalized form
 
 $$
 y'+p(x)y=r(x).
 $$
 
-The integrating factor
+Seek a multiplier $\mu(x)$ that turns the left side into $(\mu y)'$. Expanding,
 
 $$
-\mu(x)=e^{\int p(x)\,dx}
+(\mu y)'=\mu y'+\mu'y.
 $$
 
-makes the left side a product derivative:
+After multiplying the ODE by $\mu$, the coefficient of $y$ is $\mu p$. Therefore require
 
 $$
-\begin{aligned}
-\mu y'+\mu p y &= \mu r,\\
-(\mu y)' &= \mu r.
-\end{aligned}
+\mu'=p\mu.
 $$
 
-An exact equation has differential form
+Its nonzero solutions are constant multiples of
 
 $$
-M(x,y)\,dx+N(x,y)\,dy=0
+\mu(x)=e^{\int p(x)\,dx}.
 $$
 
-and is exact on a simply connected region when $M_y=N_x$. Then there is a potential function $u(x,y)$ with $u_x=M$ and $u_y=N$, and the implicit solution is $u(x,y)=C$.
-
-A Bernoulli equation is
+The constant multiple is irrelevant. Then
 
 $$
-y'+p(x)y=g(x)y^a,\qquad a\ne 0,1.
+(\mu y)'=\mu r,
 $$
 
-The substitution $v=y^{1-a}$ converts it into a linear equation for $v$.
-
-## Key results
-
-The existence and uniqueness theorem gives the basic local guarantee. If $f(x,y)$ and $f_y(x,y)$ are continuous in a rectangle around $(x_0,y_0)$, then the initial value problem $y'=f(x,y)$, $y(x_0)=y_0$, has exactly one solution near $x_0$. The theorem is local: it does not promise that the solution exists forever, and it does not say that the formula will be elementary.
-
-For separable equations, constant solutions can be lost by division. If $y'=y(1-y)$, separating by dividing through by $y(1-y)$ assumes $y\ne 0$ and $y\ne 1$, so the equilibrium solutions $y=0$ and $y=1$ must be added separately. These equilibria often control the long-term behavior.
-
-For linear equations, the integrating factor formula is
+so
 
 $$
 y(x)=\frac{1}{\mu(x)}
-\left(
-\int \mu(x)r(x)\,dx+C
-\right).
+\left(\int\mu(x)r(x)\,dx+C\right).
 $$
 
-For exact equations, a reliable construction is
+Normalize first if the coefficient of $y'$ is not $1$. The interval must avoid points where that division or the coefficients fail.
+
+### Worked example: salt in a mixing tank
+
+A $100$ L tank initially contains $20$ g of salt. Brine containing $0.5$ g/L enters at $4$ L/min, and well-mixed liquid leaves at the same rate. Let $A(t)$ be the salt amount in grams.
+
+Equal flow rates keep volume at $100$ L. The inflow rate of salt is
 
 $$
-\begin{aligned}
-u(x,y)&=\int M(x,y)\,dx+\phi(y),\\
-u_y(x,y)&=N(x,y).
-\end{aligned}
+0.5\frac{\mathrm g}{\mathrm L}
+\cdot4\frac{\mathrm L}{\mathrm{min}}
+=2\frac{\mathrm g}{\mathrm{min}}.
 $$
 
-The second line determines $\phi'(y)$. If the leftover expression still contains $x$, the equation was not exact or a computation error occurred.
-
-For autonomous equations $y'=f(y)$, the phase line gives stability without solving. An equilibrium $y_*$ satisfies $f(y_*)=0$. If $f(y)\gt 0$ below $y_*$ and $f(y)\lt 0$ above it, nearby solutions move toward $y_*$ and the equilibrium is stable. If arrows point away, it is unstable.
-
-Most engineering uses of first-order equations start from a balance law rather than from a ready-made formula. In a mixing problem, the dependent variable is usually amount, not concentration, because the balance is most naturally written as amount per time. In a cooling problem, the dependent variable is temperature, and the proportional term must use the difference from ambient temperature, not the absolute temperature. In a circuit model, Kirchhoff's law determines whether the state variable should be charge, current, or capacitor voltage. Choosing the state variable well often makes the equation linear.
-
-The interval of validity is part of the answer. A formula may contain a logarithm, a denominator, or a square root that restricts $x$, and the initial point must lie in the chosen interval. For example, the solution of $y'=y^2$, $y(0)=1$, is $y=1/(1-x)$, which blows up at $x=1$. The existence theorem gives local existence near $0$, but it does not contradict finite-time blow-up.
-
-Some equations become linear only after a change of variables. Bernoulli equations are the standard example, but homogeneous equations of the form $y'=F(y/x)$ use $v=y/x$, so $y=vx$ and $y'=v+xv'$. Equations with a shifted center, such as $y'=F((y-2)/(x+1))$, may require translating coordinates before applying that idea. The point is not to memorize many named types; it is to look for algebraic structure that lowers the equation to one of the dependable forms.
-
-Exact equations require a region condition as well as the derivative test. The equality $M_y=N_x$ is normally used on a simply connected region where the partial derivatives are continuous. Holes in the region can produce path-dependent behavior, which is why the assumptions matter. In elementary engineering ODE problems the region is usually a rectangle or half-plane, but checking the domain prevents subtle mistakes when denominators vanish.
-
-Integrating factors beyond the linear case exist but are not automatic. For a nonexact equation $M\,dx+N\,dy=0$, a factor depending only on $x$ may be found if
+The tank concentration is $A/100$ g/L, so outflow removes
 
 $$
-\frac{M_y-N_x}{N}
+\frac{A}{100}\frac{\mathrm g}{\mathrm L}
+\cdot4\frac{\mathrm L}{\mathrm{min}}
+=\frac{A}{25}\frac{\mathrm g}{\mathrm{min}}.
 $$
 
-is a function of $x$ alone. A factor depending only on $y$ may be found if
+Rate in minus rate out gives
 
 $$
-\frac{N_x-M_y}{M}
+A'+\frac1{25}A=2,
+\qquad A(0)=20.
 $$
 
-is a function of $y$ alone. These tests are useful, but they should be applied after the simpler classifications have been checked.
-
-## Visual
-
-```mermaid
-flowchart TD
-  A[First-order ODE] --> B{"Can write y' = g(x)h(y)?"}
-  B -->|yes| C[Separate variables]
-  B -->|no| D{"Linear: y' + p(x)y = r(x)?"}
-  D -->|yes| E[Use integrating factor]
-  D -->|no| F{"Exact: M_y = N_x?"}
-  F -->|yes| G["Find potential u(x,y)"]
-  F -->|no| H{"Bernoulli form?"}
-  H -->|yes| I["Substitute v = y^(1-a)"]
-  H -->|no| J[Use qualitative or numerical method]
-```
-
-| Form | Recognition cue | Main move | Frequent check |
-|---|---|---|---|
-| Separable | $y'=g(x)h(y)$ | Put $y$ terms with $dy$ and $x$ terms with $dx$ | Add lost equilibrium solutions |
-| Linear | $y'+p(x)y=r(x)$ | Multiply by $\mu=e^{\int p\,dx}$ | Left side becomes $(\mu y)'$ |
-| Exact | $M\,dx+N\,dy=0$, $M_y=N_x$ | Find $u_x=M$, $u_y=N$ | Final answer is implicit $u=C$ |
-| Bernoulli | $y'+py=gy^a$ | Use $v=y^{1-a}$ | Exclude $a=0,1$ cases |
-| Autonomous | $y'=f(y)$ | Phase line and equilibria | Arrows match sign of $f$ |
-
-## Worked example 1: Mixing tank with a linear equation
-
-Problem. A tank initially contains $100$ L of water with $20$ g of salt. Brine containing $0.5$ g/L enters at $4$ L/min, and the well-mixed solution leaves at $4$ L/min. Find the salt amount $A(t)$.
-
-Method.
-
-1. The volume stays $100$ L because inflow equals outflow.
-2. Rate in is
+The integrating factor is
 
 $$
-0.5\frac{\mathrm{g}}{\mathrm{L}}\cdot 4\frac{\mathrm{L}}{\mathrm{min}}=2\frac{\mathrm{g}}{\mathrm{min}}.
+\mu(t)=e^{t/25}.
 $$
 
-3. Rate out uses tank concentration $A(t)/100$:
+Multiplication produces
 
 $$
-\frac{A(t)}{100}\frac{\mathrm{g}}{\mathrm{L}}\cdot 4\frac{\mathrm{L}}{\mathrm{min}}=\frac{A(t)}{25}\frac{\mathrm{g}}{\mathrm{min}}.
+(e^{t/25}A)'=2e^{t/25}.
 $$
 
-4. The balance law gives
+Integrate:
 
 $$
-A'=2-\frac{A}{25},\qquad A(0)=20.
+e^{t/25}A=50e^{t/25}+C,
 $$
 
-5. Put it in linear standard form:
-
 $$
-A'+\frac{1}{25}A=2.
+A=50+Ce^{-t/25}.
 $$
 
-6. The integrating factor is
-
-$$
-\mu(t)=e^{\int (1/25)\,dt}=e^{t/25}.
-$$
-
-7. Multiply and integrate:
-
-$$
-\begin{aligned}
-e^{t/25}A'+\frac{1}{25}e^{t/25}A &= 2e^{t/25},\\
-(e^{t/25}A)' &= 2e^{t/25},\\
-e^{t/25}A &= 50e^{t/25}+C.
-\end{aligned}
-$$
-
-8. Hence
-
-$$
-A(t)=50+Ce^{-t/25}.
-$$
-
-9. Use $A(0)=20$:
-
-$$
-20=50+C,\qquad C=-30.
-$$
-
-Answer.
+The initial condition gives $20=50+C$, so
 
 $$
 A(t)=50-30e^{-t/25}.
 $$
 
-Check. The steady amount is $50$ g because the incoming concentration $0.5$ g/L in a $100$ L tank corresponds to $50$ g. Since the initial amount is $20$ g, the solution increases toward $50$.
+The steady amount is $50$ g, equal to $100$ L times the incoming concentration. The solution rises from $20$ toward $50$ without overshoot, consistent with the balance law. Units also check: every term in the ODE is grams per minute.
 
-## Worked example 2: Bernoulli equation reduced to linear form
+### Shifting by the steady state
 
-Problem. Solve
-
-$$
-y'+\frac{2}{x}y=x^2y^2,\qquad x>0.
-$$
-
-Method.
-
-1. This is Bernoulli with $a=2$, $p(x)=2/x$, and $g(x)=x^2$.
-2. Use
+Constant-forcing linear equations become especially clear after subtracting equilibrium. If
 
 $$
-v=y^{1-a}=y^{-1}.
+y'+ky=b,
+\qquad k\ne0,
 $$
 
-3. Differentiate:
+the constant steady value is $y_*=b/k$. Set $u=y-y_*$. Since $y_*'=0$ and $ky_*=b$, substitution gives
 
 $$
-v'=-y^{-2}y'.
+u'+ku=0.
 $$
 
-4. Divide the original equation by $y^2$ where $y\ne 0$:
+Thus
 
 $$
-y^{-2}y'+\frac{2}{x}y^{-1}=x^2.
+y(x)=y_*+Ce^{-kx}.
 $$
 
-5. Substitute $y^{-2}y'=-v'$ and $y^{-1}=v$:
+This derivation separates the long-term level from the transient. For the tank, $A_*=2/(1/25)=50$ and $A-50=-30e^{-t/25}$. The time constant is $25$ minutes: after one time constant, the displacement from equilibrium is multiplied by $e^{-1}$.
+
+Newton cooling has the same structure. If a body at temperature $T$ sits in constant ambient temperature $T_a$ and obeys
 
 $$
--v'+\frac{2}{x}v=x^2.
+T'=-k(T-T_a),
 $$
 
-6. Multiply by $-1$:
+then $u=T-T_a$ satisfies $u'=-ku$. Hence
 
 $$
-v'-\frac{2}{x}v=-x^2.
+T(t)=T_a+(T_0-T_a)e^{-kt}.
 $$
 
-7. This is linear. The integrating factor is
+For $k\gt 0$, the sign of $T-T_a$ never changes in the ideal model: an initially hotter body approaches ambient from above, while a colder one approaches from below. If ambient temperature varies with time, the equation remains linear but the steady-state shift is no longer constant; the integrating-factor method handles the forcing $kT_a(t)$.
+
+## Exact equations recover a hidden potential
+
+Write an implicit first-order equation as
 
 $$
-\mu(x)=e^{\int -2/x\,dx}=e^{-2\ln x}=x^{-2}.
+M(x,y)\,dx+N(x,y)\,dy=0.
 $$
 
-8. Multiply:
+It is exact on a suitable region if a function $U$ exists with
 
 $$
-x^{-2}v'-2x^{-3}v=-1.
+U_x=M,
+\qquad U_y=N.
 $$
 
-9. Recognize the product derivative:
+Then along a solution,
 
 $$
-\begin{aligned}
-(x^{-2}v)'&=-1,\\
-x^{-2}v&=-x+C,\\
-v&=Cx^2-x^3.
-\end{aligned}
+\frac{d}{dx}U(x,y(x))
+=U_x+U_yy'=0,
 $$
 
-10. Return to $y$:
+and the solution curves are level sets $U(x,y)=C$.
+
+With continuous first partial derivatives on a simply connected region, the test is
 
 $$
-\frac{1}{y}=Cx^2-x^3=x^2(C-x).
+M_y=N_x.
 $$
 
-Answer.
+To construct $U$, integrate one component while treating the other variable as constant, then recover the missing single-variable term from the other derivative.
+
+For example, solve
 
 $$
-y(x)=\frac{1}{x^2(C-x)},\qquad x>0,
+(2xy+3)\,dx+(x^2+4y)\,dy=0.
 $$
 
-with the additional solution $y=0$ from the original equation.
-
-Check. Substituting $v=x^2(C-x)$ into $v'-(2/x)v=-x^2$ gives
+Here
 
 $$
-2x(C-x)-x^2-\frac{2}{x}x^2(C-x)=-x^2,
+M_y=2x,
+\qquad N_x=2x,
 $$
 
-so the transformed equation is satisfied.
+so the equation is exact on $\mathbb R^2$. Integrate $M$ with respect to $x$:
 
-## Code
+$$
+U=x^2y+3x+g(y).
+$$
 
-```python
-import numpy as np
-from scipy.integrate import solve_ivp
+Differentiate with respect to $y$ and compare with $N$:
 
-def tank_rhs(t, A):
-    return 2.0 - A[0] / 25.0
+$$
+U_y=x^2+g'(y)=x^2+4y.
+$$
 
-t_eval = np.linspace(0.0, 150.0, 301)
-sol = solve_ivp(tank_rhs, (0.0, 150.0), [20.0], t_eval=t_eval)
-exact = 50.0 - 30.0 * np.exp(-t_eval / 25.0)
-max_error = np.max(np.abs(sol.y[0] - exact))
+Thus $g'(y)=4y$ and $g(y)=2y^2$. The implicit family is
 
-print(f"computed final amount = {sol.y[0, -1]:.4f} g")
-print(f"exact final amount    = {exact[-1]:.4f} g")
-print(f"max error on grid     = {max_error:.2e}")
-```
+$$
+x^2y+3x+2y^2=C.
+$$
 
-## Common pitfalls
+For an initial condition $y(0)=1$, $C=2$. Leaving the answer implicit avoids an unnecessary quadratic formula and keeps both possible local branches apparent. The implicit-function theorem determines where a branch can be solved locally for $y$.
 
-- Dividing by $y$, $1-y$, or another factor without checking whether it gives an equilibrium solution.
-- Using the integrating factor before the equation is in the normalized form $y'+p(x)y=r(x)$.
-- Forgetting the constant of integration after integrating $(\mu y)'$.
-- Treating an implicit solution $u(x,y)=C$ as if it must always be solved explicitly for $y$.
-- Missing interval restrictions such as $x\gt 0$ when $\ln x$ or $x^{-1}$ appears.
-- Ignoring units in models; a term with units of amount cannot be added to a term with units of amount per time.
-- Reporting only the algebraic family and skipping the initial condition. For an initial value problem, the constant must be determined and the final curve should be checked against the starting value.
-- Assuming every first-order model has a closed elementary form. Direction fields and numerical solvers are legitimate tools when recognition tests fail.
+Some nonexact equations become exact after multiplication by an integrating factor. If $(M_y-N_x)/N$ depends only on $x$, then an $x$-dependent factor may be found by exponentiating its integral. A similar criterion using $(N_x-M_y)/M$ applies to a factor depending only on $y$. These tests cover special cases, not every nonexact equation.
 
-## Connections
+## Bernoulli equations become linear after a power change
 
-- [Direction Fields and Existence](/math/engineering-math/direction-fields-and-existence)
-- [Second-Order Linear ODEs](/math/engineering-math/second-order-linear-odes)
-- [Systems of ODEs and Phase Planes](/math/engineering-math/systems-of-odes-and-phase-plane)
-- [Laplace Transform](/math/engineering-math/laplace-transform)
-- [Numerical Methods Overview](/math/engineering-math/numerical-methods-overview)
+A Bernoulli equation has form
+
+$$
+y'+p(x)y=g(x)y^a,
+\qquad a\ne0,1.
+$$
+
+Set $v=y^{1-a}$. Since
+
+$$
+v'=(1-a)y^{-a}y',
+$$
+
+division by $y^a$ and multiplication by $1-a$ gives the linear equation
+
+$$
+v'+(1-a)p(x)v=(1-a)g(x).
+$$
+
+For
+
+$$
+y'+\frac2x y=x^2y^2,
+\qquad x>0,
+$$
+
+take $v=y^{-1}$. Dividing by $y^2$ for nonzero solutions gives
+
+$$
+-v'+\frac2xv=x^2,
+$$
+
+or
+
+$$
+v'-\frac2xv=-x^2.
+$$
+
+The integrating factor is
+
+$$
+e^{\int-2/x\,dx}=x^{-2}
+$$
+
+on $x\gt 0$. Therefore
+
+$$
+(x^{-2}v)'=-1,
+$$
+
+$$
+x^{-2}v=-x+C,
+$$
+
+$$
+v=Cx^2-x^3.
+$$
+
+Returning to $y$,
+
+$$
+y(x)=\frac{1}{x^2(C-x)}.
+$$
+
+Division by $y^2$ omitted $y=0$, which is also a solution. The formula's interval cannot cross $x=0$ or $x=C$ and must be restricted to the connected interval containing any specified initial point.
+
+## Homogeneous ratio substitutions
+
+An equation of the form
+
+$$
+y'=F(y/x)
+$$
+
+is called homogeneous in this first-order sense; it is unrelated to the use of “homogeneous” for a linear equation with zero forcing. Set
+
+$$
+y=vx,
+\qquad y'=v+xv'.
+$$
+
+Then
+
+$$
+v+xv'=F(v),
+$$
+
+which is separable if $F(v)-v$ can be handled. Lines $y=vx$ for roots of $F(v)=v$ may be lost during division and should be restored.
+
+Translated ratios such as $(y-b)/(x-a)$ suggest shifting coordinates first. The substitution works only on intervals that avoid $x=0$ in the original ratio, or $x=a$ after translation.
+
+## Solution intervals and singular behavior
+
+An algebraic expression without an interval is incomplete. The initial point selects one connected interval on which the formula and the original equation are defined. For
+
+$$
+y'=y^2,
+\qquad y(0)=1,
+$$
+
+the solution $y=1/(1-x)$ has maximal interval $(-\infty,1)$, not merely “$x\ne1$.” The disconnected interval $(1,\infty)$ does not contain the initial point.
+
+Finite endpoints can arise from a coefficient singularity, a boundary of the domain of $f$, or blow-up of the solution. The local existence theorem does not promise a global solution. A numerical solver also cannot be trusted past such a boundary merely because it returns numbers.
+
+When symbolic recognition fails, a solver should report its interval, tolerances, and event conditions. Known invariants and equilibria make good numerical checks. For the tank model, for example, a computed solution should remain between $20$ and $50$ and approach $50$ monotonically.
+
+## A compact verification routine
+
+After solving, run these checks in order:
+
+- Differentiate the candidate and substitute into the original equation, before any divided form.
+- Apply the initial condition to the final expression.
+- Restore equilibrium or zero solutions lost by division.
+- State the maximal connected interval containing the initial point.
+- Check units in modeled equations and signs in rate-in-minus-rate-out balances.
+- Compare limiting behavior with equilibria or the direction field.
+- For implicit solutions, differentiate implicitly rather than forcing an explicit branch.
+
+These checks are method-independent. They also catch solutions introduced by squaring, exponentiating, or choosing an incompatible logarithm branch.
+
+## Modeling starts before the differential equation
+
+A state variable should contain enough information to determine its rate under the model. In a mixing tank, amount is a better state than concentration when volume changes, because amount obeys a direct conservation balance. In cooling, temperature difference from ambient isolates the decaying part. In a circuit, charge or current may be natural depending on the element law and the measured output.
+
+Every rate term needs a sign convention and units. “Rate in minus rate out” is reliable only after each stream has been converted to amount per unit time. A concentration cannot be subtracted from a mass flow. If the volume varies, the outflow concentration uses the current volume, and the time interval ends if the tank empties or overflows under the stated physical setup.
+
+Parameters also encode assumptions. A constant cooling coefficient assumes the heat-transfer regime and surrounding conditions remain suitable. Logistic growth assumes a fixed carrying capacity and an instantaneous density effect. A good solution distinguishes what follows from the differential equation from what was assumed when selecting it.
+
+Steady states provide an early plausibility check. Set the rate to zero before solving. Their units and signs should fit the system, and the vector field should point toward or away from them as the modeled mechanism suggests. If a tank solution approaches an amount inconsistent with incoming concentration and volume, the balance law was probably assembled incorrectly.
+
+## Implicit solutions and branch selection
+
+An implicit relation can describe several branches at once. The initial condition selects a point, and local uniqueness selects the branch through it. Solving algebraically for the dependent variable may introduce plus-or-minus choices; only a branch satisfying the initial value and differentiability requirements belongs to the initial value problem.
+
+The implicit-function condition also identifies where an explicit graph can fail. If the derivative of the implicit relation with respect to the dependent variable vanishes, solving locally for that variable may become impossible even though the level curve continues. Such points deserve direct substitution into the original differential equation rather than blind differentiation of a chosen branch.
+
+Logarithmic implicit answers carry hidden sign intervals. An equation involving the logarithm of an absolute value is valid on components that avoid its zeros. Exponentiating introduces a nonzero constant whose sign may distinguish solution regions. Absorbing every sign into an unnamed constant is convenient, but the initial condition must still place the solution in the correct region.
+
+## Long-time behavior without a closed form
+
+For an autonomous scalar equation, the phase line often determines the limit. A bounded monotone solution has a finite limit. Under continuity, substituting that limiting behavior into the field shows that the limit must be an equilibrium; otherwise the derivative would retain a sign bounded away from zero and the solution could not settle.
+
+This argument needs boundedness and continued existence. A monotonically increasing solution can instead blow up in finite time, as the quadratic growth example shows. An equilibrium barrier and uniqueness can supply the needed bound. When no such barrier exists, comparison with a simpler equation can reveal growth or blow-up.
+
+Linear equations separate transient and forced response. With positive decay coefficient, the memory of initial data is multiplied by a decaying exponential. The forcing contributes a weighted history, with recent values often receiving more weight than distant ones. This interpretation remains useful even when the forcing integral has no elementary antiderivative.
+
+Periodic forcing does not automatically produce a periodic total solution. A decaying transient may accompany a periodic steady response; only after the transient dies out does the observed motion approach periodic behavior. Initial conditions determine the transient amplitude, while the equation and forcing determine the steady response.
+
+## Comparing symbolic and numerical answers
+
+A symbolic expression should be evaluated near the initial point and near suspected singularities. Cancellation can hide loss of precision, while a mathematically equivalent form may behave better numerically. Exponentials with large opposite terms and differences of nearly equal quantities need particular care.
+
+Numerical solvers estimate local error and adjust step size, but tolerances are not guarantees of model accuracy. Event detection should stop integration at empty-tank times, impacts, or singular boundaries. A solver that steps past such an event is computing an extension of the equations, not necessarily an extension of the physical system.
+
+When an exact solution is available, compare numerical error across several tolerances or step sizes. When it is not, compare independent methods, monitor conserved or bounded quantities, and inspect residuals obtained by substituting an interpolated numerical solution into the equation. Agreement of a single plotted curve with intuition is weak evidence.
+
+<div className="see-also">
+
+See also: [Direction fields and existence](/math/engineering-math/direction-fields-and-existence) · [Second-order linear ODEs](/math/engineering-math/second-order-linear-odes) · [Systems of ODEs and phase planes](/math/engineering-math/systems-of-odes-and-phase-plane) · [Laplace transform](/math/engineering-math/laplace-transform) · [Numerical methods overview](/math/engineering-math/numerical-methods-overview)
+
+</div>

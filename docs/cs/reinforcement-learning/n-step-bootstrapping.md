@@ -340,9 +340,8 @@ Compare horizons using several random seeds and an equal amount of environment i
 
 Plot performance by episode length or reward delay. If long $n$ helps only on long episodes, it may be solving propagation rather than general optimization. If variance grows sharply across seeds, the average curve alone conceals the cost. Eligibility traces are attractive when no single horizon works consistently, but their $\lambda$ and step size still require tuning.
 
-## Related pages
+<div className="see-also">
 
-- [Temporal-difference learning](/cs/reinforcement-learning/temporal-difference-learning)
-- [Monte Carlo methods](/cs/reinforcement-learning/monte-carlo-methods)
-- [Eligibility traces](/cs/reinforcement-learning/eligibility-traces)
-- [Planning and learning with tabular methods](/cs/reinforcement-learning/planning-and-learning)
+See also: [Temporal-difference learning](/cs/reinforcement-learning/temporal-difference-learning) · [Monte Carlo methods](/cs/reinforcement-learning/monte-carlo-methods) · [Eligibility traces](/cs/reinforcement-learning/eligibility-traces) · [Planning and learning with tabular methods](/cs/reinforcement-learning/planning-and-learning)
+
+</div>

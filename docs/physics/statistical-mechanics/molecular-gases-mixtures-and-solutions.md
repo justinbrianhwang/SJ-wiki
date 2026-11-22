@@ -380,10 +380,8 @@ print("mixing entropy", mixing_entropy([1000, 1000]))
 - Equilibrium constants vary with temperature because internal partition functions and energy differences vary in their statistical weight.
 - Colligative effects count independently moving species. Dissociation, association, and ion correlations can change the effective particle count.
 
-## Related pages
+<div className="see-also">
 
-- [Classical ideal gas and Maxwell distribution](/physics/statistical-mechanics/classical-ideal-gas-and-maxwell-distribution)
-- [Real gases, virial expansion, and van der Waals theory](/physics/statistical-mechanics/real-gases-virial-expansion-and-van-der-waals-theory)
-- [Thermodynamic potentials and phase equilibrium](/physics/statistical-mechanics/thermodynamic-potentials-and-phase-equilibrium)
-- [Grand canonical ensemble and particle exchange](/physics/statistical-mechanics/grand-canonical-ensemble-and-particle-exchange)
-- [Thermodynamics](/physics/thermodynamics/intro)
+See also: [Classical ideal gas and Maxwell distribution](/physics/statistical-mechanics/classical-ideal-gas-and-maxwell-distribution) · [Real gases, virial expansion, and van der Waals theory](/physics/statistical-mechanics/real-gases-virial-expansion-and-van-der-waals-theory) · [Thermodynamic potentials and phase equilibrium](/physics/statistical-mechanics/thermodynamic-potentials-and-phase-equilibrium) · [Grand canonical ensemble and particle exchange](/physics/statistical-mechanics/grand-canonical-ensemble-and-particle-exchange) · [Thermodynamics](/physics/thermodynamics/intro)
+
+</div>

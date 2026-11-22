@@ -7,9 +7,9 @@ sidebar_position: 13
 
 Autonomous driving depends on data twice: first to train and evaluate perception, prediction, planning, and control, and second to build a safety case that the system behaves acceptably across its operational design domain. Real-world driving logs are indispensable, but they are expensive, imbalanced, and risky for rare events. Simulation fills the gap by replaying logs, generating scenarios, testing closed-loop behavior, and creating synthetic sensor data.
 
-This page introduces CARLA, NVIDIA DRIVE Sim, AirSim, LGSVL or SVL, scenario generation, synthetic data, sim-to-real transfer, log replay, and data mining. It connects every stack layer from [sensors](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu) through [safety](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing), because no AV module can be evaluated seriously without a strategy for data coverage and closed-loop testing.
+CARLA, NVIDIA DRIVE Sim, AirSim, LGSVL or SVL, scenario generation, synthetic data, log replay, and case mining provide different kinds of evidence. Every stack layer from [sensors](/cs/autonomous-driving/sensors-cameras-lidar-radar-imu) through [safety](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing) needs an explicit plan for data coverage and closed-loop testing.
 
-## Definitions
+## Test modes and data artifacts
 
 **Log replay** re-runs recorded sensor data and annotations through the autonomy stack. It is useful for deterministic regression testing and measuring perception or prediction changes on real scenes. Standard log replay is usually open-loop: the ego vehicle does not change the recorded future.
 
@@ -25,7 +25,7 @@ This page introduces CARLA, NVIDIA DRIVE Sim, AirSim, LGSVL or SVL, scenario gen
 
 **Data engine** refers to the loop of collecting fleet data, mining interesting cases, labeling or auto-labeling them, training models, evaluating regressions, and redeploying. Public descriptions of Tesla, Waymo, and other AV developers often emphasize this loop, though internal details differ.
 
-## Key results
+## Matching the evidence to the question
 
 Open-loop evaluation answers: "Given the recorded past, did the module predict or classify the recorded future?" Closed-loop evaluation answers: "When the system acts, does the resulting interaction remain safe and useful?" Both are needed. A planner can match logged expert behavior open-loop but fail when a simulated agent reacts differently to a hesitant maneuver.
 
@@ -56,7 +56,7 @@ Rare-event acceleration is useful when natural frequency is low. Instead of wait
 
 Human review remains useful even in automated data engines. Expert triage can identify whether a failure is a model weakness, a bad label, a simulator artifact, a map issue, or an ambiguous policy choice.
 
-## Visual
+### The data-engine feedback loop
 
 ```mermaid
 flowchart TD
@@ -72,9 +72,9 @@ flowchart TD
   I --> J["Track and road testing"]
 ```
 
-## Worked example 1: Counting scenario combinations
+## Counting a cut-in scenario grid
 
-Problem: A test team defines a cut-in scenario with 5 ego speeds, 4 cut-in gaps, 3 weather settings, 3 road-curvature settings, and 2 lighting conditions. How many parameter combinations exist before repetitions?
+A cut-in scenario varies 5 ego speeds, 4 cut-in gaps, 3 weather settings, 3 road-curvature settings, and 2 lighting conditions. Count the parameter combinations before repetitions.
 
 1. Identify independent parameter counts:
 
@@ -100,13 +100,13 @@ $$
 N = 20 \times 18 = 360.
 $$
 
-Answer: there are 360 combinations before random seeds, agent variations, sensor noise, or map variations.
+There are 360 combinations before random seeds, agent variations, sensor noise, or map variations.
 
-Check: If each combination is run with 10 random seeds, the suite becomes 3600 simulations. Scenario design must balance coverage and compute budget.
+Ten random seeds per combination expand the suite to 3,600 simulations, so coverage immediately becomes a compute-budget decision.
 
-## Worked example 2: Measuring a closed-loop regression
+## Catching a severity-weighted regression
 
-Problem: A planner release candidate is tested on 1000 simulated unprotected-left scenarios. The previous version had 12 hard-brake events and 0 collisions. The new version has 6 hard-brake events and 2 collisions. A hard brake costs 1 severity point and a collision costs 100 severity points. Compare severity totals.
+A planner release candidate is tested on 1,000 simulated unprotected-left scenarios. The previous version had 12 hard-brake events and no collisions; the new version has 6 hard-brake events and 2 collisions. Assign 1 severity point to a hard brake and 100 to a collision.
 
 1. Previous severity:
 
@@ -126,11 +126,11 @@ $$
 \Delta S = 206 - 12 = 194.
 $$
 
-Answer: despite fewer hard brakes, the new version is much worse under this severity model because collisions dominate.
+Despite fewer hard brakes, the new version is much worse under this severity model because collisions dominate.
 
-Check: Comfort metrics cannot be evaluated without safety metrics. A model that reduces braking by accepting unsafe gaps should be rejected.
+The comfort improvement cannot offset the safety regression: reducing braking by accepting unsafe gaps fails the release gate.
 
-## Code
+## Enumerating the scenario grid
 
 ```python
 from itertools import product
@@ -157,7 +157,7 @@ print(suite[0])
 print(suite[-1])
 ```
 
-## Common pitfalls
+## Where evaluation gives a false sense of progress
 
 - Treating log replay as sufficient for planning. Open-loop logs do not show how the world responds to new ego actions.
 - Measuring only average performance. Rare failures dominate safety risk.
@@ -166,12 +166,12 @@ print(suite[-1])
 - Ignoring label quality. A large dataset with inconsistent boxes, lanes, or tracks can teach the wrong behavior.
 - Failing to version data, maps, simulator code, and metrics. Reproducibility is impossible if any part of the evaluation pipeline drifts silently.
 
-## Connections
+## Platforms and datasets to consult
 
-- [SAE levels and operational design domain](/cs/autonomous-driving/sae-levels-and-operational-design-domain)
-- [Motion planning](/cs/autonomous-driving/motion-planning)
-- [Control: PID, MPC, pure pursuit, and Stanley](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley)
-- [Safety, ISO 26262, SOTIF, and scenario testing](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing)
-- [Deep learning](/cs/deep-learning/)
-- [Embedded systems](/cs/embedded/)
-- Further reading: CARLA papers and documentation, NVIDIA DRIVE Sim materials, AirSim, SVL Simulator, PEGASUS scenario concepts, and AV dataset papers from KITTI, nuScenes, Argoverse, and Waymo.
+Useful sources include CARLA papers and documentation, NVIDIA DRIVE Sim materials, AirSim, SVL Simulator, PEGASUS scenario concepts, and the KITTI, nuScenes, Argoverse, and Waymo dataset papers.
+
+<div className="see-also">
+
+See also: [SAE levels and operational design domain](/cs/autonomous-driving/sae-levels-and-operational-design-domain) · [Motion planning](/cs/autonomous-driving/motion-planning) · [Control: PID, MPC, pure pursuit, and Stanley](/cs/autonomous-driving/control-pid-mpc-pure-pursuit-stanley) · [Safety, ISO 26262, SOTIF, and scenario testing](/cs/autonomous-driving/safety-iso26262-sotif-scenario-testing) · [Deep learning](/cs/deep-learning/intro) · [Embedded systems](/cs/embedded/intro)
+
+</div>

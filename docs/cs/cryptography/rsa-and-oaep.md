@@ -9,7 +9,7 @@ RSA is the best-known public-key cryptosystem and a central example of trapdoor 
 
 Katz and Lindell distinguish plain RSA, RSA assumptions, padded RSA, OAEP, CCA security, and implementation pitfalls. Smart gives complementary arithmetic examples, implementation notes, and public-key attack context. Taken together, they show why modern RSA encryption is normally used as a KEM or through standardized padding, not as $c=m^e\bmod N$ on raw messages.
 
-## Definitions
+## The RSA trapdoor function
 
 RSA key generation:
 
@@ -53,7 +53,7 @@ It is deterministic and malleable, and therefore not CPA secure.
 
 **OAEP**, Optimal Asymmetric Encryption Padding, is a randomized encoding method that uses hash-like masks before applying the RSA function. It is used in RSAES-OAEP and supports strong security proofs in the random-oracle model.
 
-## Key results
+## From algebraic correctness to secure encryption
 
 RSA correctness follows from Euler-style exponent arithmetic. Since $ed=1+t\varphi(N)$, for $m\in\mathbb Z_N^\ast$:
 
@@ -102,7 +102,7 @@ OAEP's label field is often empty, but it is still part of the encoding. If a pr
 
 RSA is now more common for signatures than for new encryption designs, and many modern protocols prefer elliptic-curve or post-quantum key exchange for establishing session secrets. Still, RSA remains important because of deployed certificates, legacy protocols, hardware support, and the conceptual clarity of trapdoor permutations. Understanding why textbook RSA fails is one of the best ways to learn why padding standards exist.
 
-The relation between factoring and RSA inversion is subtle. Knowing $p$ and $q$ lets the holder compute $\varphi(N)$ and invert the public exponent. Therefore factoring breaks RSA. The reverse direction is not known to be equivalent in all formulations: an algorithm that inverts RSA on random inputs may or may not directly factor $N$ depending on assumptions and details. This is why textbooks state an RSA assumption separately from a factoring assumption.
+The relation between factoring and RSA inversion is subtle. Knowing $p$ and $q$ lets the holder compute $\varphi(N)$ and invert the public exponent. Therefore factoring breaks RSA. The reverse direction is not known to be equivalent in all formulations: an algorithm that inverts RSA on random inputs may or may not directly factor $N$ depending on assumptions and details. Textbooks therefore state an RSA assumption separately from a factoring assumption.
 
 For signatures, do not reuse encryption padding. RSA-OAEP is for encryption. RSA-PSS or carefully analyzed hash-and-sign variants are for signatures. The same trapdoor arithmetic underlies both, but the security experiments and encodings differ.
 
@@ -110,11 +110,9 @@ CRT optimization illustrates the tension between speed and robustness. Private R
 
 Blinding protects against timing and power leakage by randomizing the value before private exponentiation. For decryption, one can multiply the ciphertext by $r^e$, exponentiate, and then remove $r$ afterward. The mathematical result is unchanged, but side-channel traces vary with fresh randomness rather than directly with the attacker's chosen ciphertext. This is another example where the textbook formula is correct but incomplete as an implementation recipe.
 
-RSA ciphertext sizes are fixed by the modulus. A 2048-bit modulus produces 256-byte ciphertexts, regardless of whether the message being wrapped is a 32-byte session key. OAEP padding consumes some of that space for randomness and checks, so RSA encryption is naturally a key-wrapping or KEM-like tool rather than a bulk-data mechanism. Large data belongs in the symmetric DEM.
+RSA ciphertext sizes are fixed by the modulus. A 2048-bit modulus produces 256-byte ciphertexts, regardless of whether the message being wrapped is a 32-byte session key. OAEP padding consumes some of that space for randomness and checks, so RSA encryption is naturally a key-wrapping or KEM-like tool rather than a bulk-data mechanism. Large data belongs in the symmetric DEM, one reason hybrid encryption is the default pattern.
 
-This size limit is another practical reason hybrid encryption is the default pattern.
-
-## Visual
+## OAEP's two-mask encoding
 
 ```mermaid
 flowchart TB
@@ -174,11 +172,9 @@ This diagram shows OAEP as a two-mask encoding wrapped by the RSA permutation. T
 | RSAES-OAEP | yes | yes under ROM assumptions | must implement checks carefully |
 | RSA-KEM | yes | can be CCA-secure with DEM | KDF and encapsulation details matter |
 
-## Worked example 1: toy RSA correctness
+## Checking RSA correctness by hand
 
-Problem: use $p=5$, $q=11$, $N=55$, $\varphi(N)=40$, public exponent $e=3$. Find $d$, encrypt $m=7$, and decrypt.
-
-Method:
+Take $p=5$, $q=11$, $N=55$, $\varphi(N)=40$, and public exponent $e=3$. The calculation finds $d$, encrypts $m=7$, and decrypts the result.
 
 1. Find $d$ such that:
 
@@ -219,13 +215,11 @@ $$
 
    $31\cdot36=1116\equiv16$, $16\cdot4=64\equiv9$, $9\cdot13=117\equiv7$.
 
-Checked answer: ciphertext $c=13$, decrypted message $m'=7$.
+The ciphertext is $c=13$, and decryption recovers $m'=7$.
 
-## Worked example 2: textbook RSA malleability
+## Exploiting textbook RSA's multiplicative structure
 
-Problem: with the toy RSA key above, a ciphertext $c=13$ encrypts $m=7$. Show that an attacker can create a ciphertext decrypting to $2m\bmod55$ without knowing $d$.
-
-Method:
+With the toy RSA key above, a ciphertext $c=13$ encrypts $m=7$. An attacker can create a ciphertext that decrypts to $2m\bmod55$ without knowing $d$.
 
 1. Choose multiplier $r=2$.
 
@@ -259,9 +253,9 @@ $$
 49^{27}\bmod55=14.
 $$
 
-Checked answer: $c'=49$ decrypts to $14$. Textbook RSA is malleable.
+The modified ciphertext $c'=49$ decrypts to $14$, confirming the malleability calculation.
 
-## Code
+## Reproducing the toy calculations in Python
 
 ```python
 def egcd(a, b):
@@ -287,18 +281,17 @@ print(N, e, d, c, pow(c, d, N))
 print("malleated:", (c * pow(2, e, N)) % N)
 ```
 
-## Common pitfalls
+## Boundaries an implementation must enforce
 
-- Calling textbook RSA encryption secure.
-- Using deterministic or ad hoc padding.
-- Forgetting that RSA encryption and RSA signatures need different padding schemes and different security arguments.
-- Returning detailed OAEP padding errors.
-- Using small messages with small exponents without randomized encoding.
-- Implementing RSA private operations without blinding or CRT fault checks.
+- Textbook RSA is a deterministic, malleable arithmetic operation, not a secure encryption scheme.
+- Deterministic or ad hoc padding provides no substitute for a standardized, analyzed encoding.
+- RSA encryption and RSA signatures require different padding schemes and different security arguments.
+- OAEP rejection must not reveal which padding check failed.
+- Small messages and small public exponents are unsafe without randomized encoding.
+- Private RSA operations need blinding and, when CRT is used, fault detection.
 
-## Connections
+<div className="see-also">
 
-- [Number theory background](/cs/cryptography/number-theory-background)
-- [Public-key encryption](/cs/cryptography/public-key-encryption-elgamal-hybrid)
-- [Digital signatures](/cs/cryptography/digital-signatures)
-- [Hash functions and random oracles](/cs/cryptography/hash-functions-random-oracles)
+See also: [Number theory background](/cs/cryptography/number-theory-background) · [Public-key encryption](/cs/cryptography/public-key-encryption-elgamal-hybrid) · [Digital signatures](/cs/cryptography/digital-signatures) · [Hash functions and random oracles](/cs/cryptography/hash-functions-random-oracles)
+
+</div>

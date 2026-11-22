@@ -13,7 +13,7 @@ The chemical potential is the central quantity that lets thermodynamics handle c
 
 *Figure: Gibbs energy minimum as the thermodynamic basis of chemical potential and equilibrium. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Gibbs-Energie-Veranschaulichung.svg), Johannes Schneider, CC BY-SA 4.0.*
 
-## Definitions
+## Potentials for controlled constraints
 
 The Helmholtz energy is
 
@@ -77,7 +77,7 @@ $$
 
 at constant temperature and pressure.
 
-## Key results
+## Chemical potential and material equilibrium
 
 At constant temperature and volume,
 
@@ -85,10 +85,10 @@ $$
 dA\le 0
 $$
 
-with equality at equilibrium. The maximum non-expansion work available from a closed system at constant $T$ and $V$ is
+with equality at equilibrium. The maximum non-expansion work obtainable from a closed system at constant $T$ and $V$ is
 
 $$
-w_{\mathrm{add,max}}=\Delta A
+w_{\mathrm{nonexp,max,by}}=-\Delta A
 $$
 
 At constant temperature and pressure,
@@ -97,10 +97,10 @@ $$
 dG\le 0
 $$
 
-with equality at equilibrium. The maximum non-expansion work available at constant $T$ and $p$ is
+with equality at equilibrium. The maximum non-expansion work obtainable at constant $T$ and $p$ is
 
 $$
-w_{\mathrm{add,max}}=\Delta G
+w_{\mathrm{nonexp,max,by}}=-\Delta G
 $$
 
 The natural variables of $G$ imply Maxwell relations. Starting from $dG=Vdp-SdT$, identify
@@ -153,9 +153,9 @@ $$
 
 Thus a negative $\Delta G$ is not a new law; it is the Second Law rewritten for a common set of constraints. If the constraints change, the correct potential may change. For example, at constant $T$ and $V$, $A$ replaces $G$.
 
-Chemical potential is powerful because it turns composition change into ordinary calculus. If a small amount $dn_J$ of component $J$ is added to a mixture at fixed $T$ and $p$, the Gibbs energy changes by $\mu_Jdn_J$ plus corresponding terms for any other changes. Material equilibrium requires equality of chemical potential for each component across phases. A volatile liquid is in equilibrium with its vapor when the chemical potential of the liquid equals that of the vapor. A solute diffuses because its chemical potential is not uniform, not simply because its concentration is not uniform.
+Chemical potential turns composition change into ordinary calculus. If a small amount $dn_J$ of component $J$ is added to a mixture at fixed $T$ and $p$, the Gibbs energy changes by $\mu_Jdn_J$ plus corresponding terms for any other changes. Material equilibrium requires equality of chemical potential for each component across phases. A volatile liquid is in equilibrium with its vapor when the chemical potential of the liquid equals that of the vapor. A solute diffuses in response to a chemical-potential gradient, which need not match its concentration gradient.
 
-The logarithmic pressure dependence of $\mu$ for a perfect gas has several consequences. Compressing a gas increases its chemical potential, and expansion lowers it. This is why gases tend to flow from high pressure to low pressure: the direction lowers total Gibbs energy. For mixtures, each gas has its own chemical potential governed by partial pressure in the ideal limit. Reaction quotients are built from these chemical potentials, which is why pressure appears in gas equilibrium constants.
+The logarithmic pressure dependence of $\mu$ for a perfect gas has several consequences. Compressing a gas increases its chemical potential, and expansion lowers it. Gases tend to flow from high pressure to low pressure because that direction lowers total Gibbs energy. For mixtures, each gas has its own chemical potential governed by partial pressure in the ideal limit. Reaction quotients are built from these chemical potentials, so pressure appears in gas equilibrium constants.
 
 Activities preserve the same formal structure when ideality fails. Instead of abandoning
 
@@ -182,8 +182,6 @@ relates entropy changes with pressure to thermal expansion. Such identities are 
 
 Partial molar quantities also prevent a common misconception about mixtures. The contribution of one mole of a substance to a mixture is not necessarily its pure molar property. Adding a mole of salt to water can contract the solution; adding a volatile solute can lower solvent chemical potential; adding one component to a binary mixture can force the other component's chemical potential to change through the Gibbs-Duhem equation. The mixture is a coupled thermodynamic object.
 
-## Visual
-
 ```mermaid
 graph TD
   U[Internal energy U] --> H["H = U + pV"]
@@ -204,7 +202,7 @@ graph TD
 | $G$ | $H-TS$ | $T,p,\{n_J\}$ | decreases at constant $T,p$ |
 | $\mu_J$ | $(\partial G/\partial n_J)_{T,p}$ | mixture composition | equal at material equilibrium |
 
-## Worked example 1: Gibbs energy change for gas compression
+## Free-energy cost of compressing a perfect gas
 
 **Problem.** Calculate $\Delta G_m$ when $1.00\ \mathrm{mol}$ of a perfect gas at $298.15\ \mathrm{K}$ is compressed isothermally from $1.00\ \mathrm{bar}$ to $10.0\ \mathrm{bar}$.
 
@@ -239,7 +237,7 @@ $$
 
 **Checked answer.** Compression raises chemical potential, so $\Delta G_m$ is positive. The logarithmic dependence means a tenfold pressure increase costs about $5.7\ \mathrm{kJ\ mol^{-1}}$ at room temperature.
 
-## Worked example 2: Gibbs-Duhem relation in a binary mixture
+## The Gibbs-Duhem constraint in a binary mixture
 
 **Problem.** A binary liquid mixture at fixed $T$ and $p$ has $n_A=3.00\ \mathrm{mol}$ and $n_B=1.00\ \mathrm{mol}$. If a composition change causes $d\mu_A=+20.0\ \mathrm{J\ mol^{-1}}$, what must $d\mu_B$ be?
 
@@ -269,27 +267,7 @@ $$
 
 **Checked answer.** The chemical potentials cannot vary independently. Because there is three times as much $A$ as $B$, a small increase in $\mu_A$ must be balanced by a larger decrease in $\mu_B$.
 
-## Code
-
-```python
-import numpy as np
-
-R = 8.314462618
-T = 298.15
-
-pressures = np.array([0.1, 1.0, 2.0, 5.0, 10.0, 100.0])  # bar
-mu_relative = R * T * np.log(pressures / 1.0) / 1000.0   # kJ/mol
-
-for p, dmu in zip(pressures, mu_relative):
-    print(f"p={p:7.2f} bar  mu-mu_standard={dmu:8.3f} kJ/mol")
-
-def gibbs_duhem_binary(nA, nB, dmuA):
-    return -(nA / nB) * dmuA
-
-print("dmu_B:", gibbs_duhem_binary(3.0, 1.0, 20.0), "J/mol")
-```
-
-## Common pitfalls
+## Choosing the right potential and standard state
 
 - Treating $G$ as always minimized. The simple $dG\le 0$ criterion requires constant $T$ and $p$ with appropriate work restrictions.
 - Confusing $\Delta G$ with $\Delta G^\circ$. Standard values refer to standard states; actual values include composition or pressure terms.
@@ -299,15 +277,14 @@ print("dmu_B:", gibbs_duhem_binary(3.0, 1.0, 20.0), "J/mol")
 
 A good way to choose the correct free energy is to ask what the surroundings hold fixed. If $S$ and $V$ are fixed, $U$ is natural. If $S$ and $p$ are fixed, $H$ is natural. If $T$ and $V$ are fixed, $A$ is natural. If $T$ and $p$ are fixed, $G$ is natural. Chemical laboratory problems usually use $G$ because temperature and pressure are controlled, but electrochemical, surface, and biological systems may require attention to additional work terms.
 
-Chemical potential should also be interpreted locally. Matter flows from high chemical potential to low chemical potential when allowed, just as heat flows from high temperature to low temperature. A concentration gradient contributes to a chemical-potential gradient, but electrical potential, pressure, interactions, and external fields can contribute too. This is why ions in membranes move according to electrochemical potential rather than concentration alone.
+Chemical potential should also be interpreted locally. Matter flows from high chemical potential to low chemical potential when allowed, just as heat flows from high temperature to low temperature. A concentration gradient contributes to a chemical-potential gradient, but electrical potential, pressure, interactions, and external fields can contribute too. Ions in membranes therefore move according to electrochemical potential rather than concentration alone.
 
 In calculations, never put a dimensional quantity directly inside a logarithm. Expressions like $RT\ln p$ are shorthand for $RT\ln(p/p^\circ)$. The standard state may be hidden typographically, but it is conceptually present. This matters when comparing tables, deriving equilibrium constants, or switching between bar and pascal.
 
 When a result seems to say that a process with positive $\Delta G^\circ$ "cannot happen," translate it into actual conditions. Positive standard Gibbs energy only says the standard-state comparison favors reactants. Changing activities, coupling to another process, applying electrical work, or removing products can make the actual $\Delta G$ negative.
 
-## Connections
+<div className="see-also">
 
-- [Second law and entropy](/chemistry/physical-chemistry/second-law-and-entropy)
-- [Mixtures, solutions, and activities](/chemistry/physical-chemistry/mixtures-solutions-and-activities)
-- [Chemical equilibrium](/chemistry/physical-chemistry/chemical-equilibrium)
-- [Engineering math partial derivatives](/math/engineering-math/)
+See also: [Second law and entropy](/chemistry/physical-chemistry/second-law-and-entropy) · [Mixtures, solutions, and activities](/chemistry/physical-chemistry/mixtures-solutions-and-activities) · [Chemical equilibrium](/chemistry/physical-chemistry/chemical-equilibrium) · [Engineering math partial derivatives](/math/engineering-math/intro)
+
+</div>

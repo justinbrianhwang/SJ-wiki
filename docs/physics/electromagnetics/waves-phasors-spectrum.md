@@ -7,9 +7,9 @@ sidebar_position: 2
 
 Applied electromagnetics begins with a simple observation: fields carry influence through space, and when sources vary sinusoidally the influence often travels as a wave. A transmission-line voltage pulse, a radio signal, a beam of visible light, and a microwave oven field are different engineering faces of the same wave idea. The details differ because the medium, geometry, and boundary conditions differ, but the recurring quantities are phase, wavelength, frequency, attenuation, and power flow.
 
-Phasors are the language that makes sinusoidal steady state manageable. Instead of carrying $\cos(\omega t+\phi)$ through every equation, we encode amplitude and phase in a complex number, solve algebraic equations in the frequency domain, and take the real part at the end. This page reviews the wave and phasor tools that support transmission lines, plane waves, antennas, and many frequency-domain views in [signals and systems](/physics/signals-systems/).
+Phasors are the language that makes sinusoidal steady state manageable. Instead of carrying $\cos(\omega t+\phi)$ through every equation, we encode amplitude and phase in a complex number, solve algebraic equations in the frequency domain, and take the real part at the end. The same wave and phasor tools support transmission lines, plane waves, antennas, and frequency-domain work in [signals and systems](/physics/signals-systems/intro).
 
-## Definitions
+## Encoding propagation and phase
 
 A one-dimensional traveling wave moving in the $+z$ direction can be written as
 
@@ -73,7 +73,7 @@ $$
 
 The factor $20$ appears because power is proportional to amplitude squared.
 
-## Key results
+## What the phasor transform buys us
 
 The main reason phasors are powerful is that differentiation and integration in time become algebraic operations:
 
@@ -87,7 +87,7 @@ $$
 \int u(t)\,dt\quad \Longleftrightarrow \quad \frac{\tilde U}{j\omega},
 $$
 
-up to any dc constant. This is why circuit impedances appear as $Z_R=R$, $Z_L=j\omega L$, and $Z_C=1/(j\omega C)$.
+up to any dc constant. Circuit impedances consequently appear as $Z_R=R$, $Z_L=j\omega L$, and $Z_C=1/(j\omega C)$.
 
 For a uniform plane electromagnetic wave in a simple lossless medium, later pages show that
 
@@ -113,9 +113,9 @@ Phasor methods assume all sources share one angular frequency $\omega$. They do 
 
 The phasor transformation is linear. If $u_1(t)$ and $u_2(t)$ are sinusoids at the same $\omega$, then $a u_1(t)+b u_2(t)$ corresponds to $a\tilde U_1+b\tilde U_2$. That is why superposition, impedance division, and transfer functions work so cleanly in sinusoidal steady state. Nonlinear devices break this simple picture because they generate new frequencies, so a single phasor at one $\omega$ no longer contains the whole response.
 
-A useful interpretation of $\beta z$ is accumulated phase delay. If two observation points are separated by $\Delta z$, the phase difference for a $+z$ traveling wave is $\beta\Delta z$. When $\Delta z=\lambda/4$, the phase shift is $90^\circ$; when $\Delta z=\lambda/2$, it is $180^\circ$. This is why quarter-wave and half-wave line sections have special impedance-transforming properties.
+A useful interpretation of $\beta z$ is accumulated phase delay. If two observation points are separated by $\Delta z$, the phase difference for a $+z$ traveling wave is $\beta\Delta z$. When $\Delta z=\lambda/4$, the phase shift is $90^\circ$; when $\Delta z=\lambda/2$, it is $180^\circ$. Quarter-wave and half-wave line sections therefore have special impedance-transforming properties.
 
-## Visual
+### A compact map of wave quantities
 
 | Quantity | Symbol | Units | Physical meaning | Common relation |
 |---|---:|---:|---|---|
@@ -136,7 +136,7 @@ flowchart LR
   C --> F["Spatial propagation exp(-gamma z)"]
 ```
 
-## Worked example 1: Phase and wavelength from a measured wave
+## Reading phase and wavelength from a measured wave
 
 Problem: A voltage wave on a lossless line is
 
@@ -172,7 +172,7 @@ $$
 
 Check: The wave uses $\omega t-\beta z$, so it moves in $+z$. A velocity below $c$ is plausible for a dielectric-filled line.
 
-## Worked example 2: Phasor solution of a sinusoidal circuit
+## Solving a sinusoidal $R$-$L$ circuit
 
 Problem: A series $R$-$L$ circuit has $R=30\ \Omega$, $L=20\ \mathrm{mH}$, and source
 
@@ -224,7 +224,7 @@ $$
 
 Check: The current lags the source because the load is inductive. The magnitude is less than $100/30$ A because the inductor adds reactance.
 
-## Code
+## Comparing lossless and attenuated wave snapshots
 
 ```python
 import numpy as np
@@ -251,20 +251,24 @@ plt.legend()
 plt.show()
 ```
 
-## Common pitfalls
+## Conventions that change the answer
 
-- Confusing $\omega$ and $f$. The factor $2\pi$ matters because radians are used in derivatives and phasors.
-- Reading $\cos(\omega t+\beta z)$ as a $+z$ wave. With the usual convention, $-\beta z$ means $+z$ propagation and $+\beta z$ means $-z$ propagation.
-- Forgetting that phasor answers are not physical time signals until multiplied by $e^{j\omega t}$ and the real part is taken.
-- Mixing degrees and radians inside calculator or code steps.
-- Applying one phasor solution to sources with different frequencies. Each frequency component requires its own frequency-domain solve.
-- Treating attenuation in dB/m and Np/m as identical. Power and amplitude decibel conversions use different factors.
-- Assuming complex notation means the physical field is complex. The measurable field is the real time-domain quantity reconstructed from the phasor.
+- Angular frequency $\omega$ and ordinary frequency $f$ differ by $2\pi$, which matters in derivatives and phasor impedances.
+- Under the stated convention, $\cos(\omega t-\beta z)$ travels in $+z$ and $\cos(\omega t+\beta z)$ travels in $-z$.
+- A phasor becomes a physical time signal only after multiplication by $e^{j\omega t}$ and taking the real part.
+- Degrees and radians cannot be mixed inside calculator or code steps.
+- Sources at different frequencies require separate frequency-domain solutions.
+- dB/m and Np/m are different attenuation units, and power and amplitude ratios use different decibel factors.
+- Complex notation is bookkeeping; the measurable field is the reconstructed real time-domain quantity.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Complex functions and analyticity](/math/engineering-math/complex-functions-and-analyticity) for complex arithmetic and Euler form.
-- [Signals and systems](/physics/signals-systems/) for frequency response and Fourier viewpoints.
-- [General electromagnetism](/physics/general/) for intro-level electric and magnetic fields.
+- [Signals and systems](/physics/signals-systems/intro) for frequency response and Fourier viewpoints.
+- [General electromagnetism](/physics/general/intro) for intro-level electric and magnetic fields.
 - [Plane waves in media](/physics/electromagnetics/plane-waves-lossless-lossy-polarization) for the field version of the wave formulas.
 - [Transmission-line models](/physics/electromagnetics/transmission-line-models-and-wave-equations) for guided waves in circuit form.
+
+</div>

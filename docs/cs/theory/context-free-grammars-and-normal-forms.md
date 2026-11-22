@@ -5,48 +5,39 @@ sidebar_position: 7
 
 # Context-Free Grammars and Normal Forms
 
-Context-free grammars describe recursive syntax. They are stronger than finite automata because a nonterminal can expand into smaller instances of the same pattern, which naturally represents nesting and balanced structure. This is why CFGs appear in programming-language syntax, arithmetic expressions, markup languages, and parse trees.
+Context-free grammars describe recursive syntax. A nonterminal can expand into smaller instances of the same pattern, so CFGs naturally represent nesting, balanced structure, arithmetic expressions, and programming-language syntax. The viewpoint is generative: a language consists of the terminal strings derivable from a start variable.
 
-The grammar viewpoint is generative: a language is the set of terminal strings that can be derived from a start variable. The same language may have many grammars, and a grammar may admit several parse trees for one string. Normal forms such as Chomsky normal form make grammars easier to analyze and connect them to algorithms and pushdown automata.
+The same language may have many grammars, and one grammar may assign several parse trees to a single string. Chomsky normal form trades readable productions for a uniform binary shape that supports proofs and parsing algorithms.
 
-## Definitions
+## Grammars as recursive specifications
 
-A **context-free grammar**, or **CFG**, is a 4-tuple $(V,\Sigma,R,S)$. The set $V$ contains variables or nonterminals, $\Sigma$ contains terminals, $R$ is a finite set of production rules, and $S\in V$ is the start variable.
+A **context-free grammar** is a 4-tuple $(V,\Sigma,R,S)$. The set $V$ contains variables or nonterminals, $\Sigma$ contains terminals, $R$ is a finite set of production rules, and $S\in V$ is the start variable. Every rule has one variable on its left side; recursion alone does not make a grammar context-free if that condition fails.
 
-A **derivation** applies productions to replace variables by strings of variables and terminals. If $S\Rightarrow^* w$ and $w\in\Sigma^*$, then the grammar generates $w$. The language of a grammar is $L(G)=\{w\in\Sigma^*:S\Rightarrow^*w\}$.
+A **derivation** replaces variables according to the productions. If $S\Rightarrow^* w$ for $w\in\Sigma^*$, then the grammar generates $w$. Formally,
 
-A **parse tree** is a tree representation of a derivation. Internal nodes are variables, leaves are terminals or $\epsilon$, and children record the right-hand side of the production used at that node.
+$$
+L(G)=\{w\in\Sigma^*:S\Rightarrow^*w\}.
+$$
 
-A grammar is **ambiguous** if some string in its language has two distinct parse trees, or equivalently two distinct leftmost derivations. A language is **inherently ambiguous** if every CFG for it is ambiguous.
+Good grammar design begins with the recursive decomposition of the strings. For $0^n1^n$, the outer symbols are linked, suggesting $S\to0S1$. A balanced-parentheses string can contain a pair around a smaller balanced string followed by another balanced string, suggesting $S\to(S)S\mid\epsilon$. For arithmetic, variables such as expression, term, and factor record precedence instead of acting like arbitrary machine states.
 
-A grammar is in **Chomsky normal form**, or **CNF**, if every production has form $A\to BC$ or $A\to a$, with a possible special rule $S\to\epsilon$ when the language contains the empty string. Here $A,B,C$ are variables and $a$ is a terminal.
+## Reading a derivation as a tree
 
-## Key results
+A **parse tree** records derivation structure. Internal nodes are variables, leaves are terminals or $\epsilon$, and the children of a node spell the right-hand side of the production used there. Leftmost and rightmost derivations can expand nodes in different orders while describing the same tree.
 
-CFGs can generate many nonregular languages. The grammar $S\to 0S1\mid\epsilon$ generates $\{0^n1^n:n\ge0\}$ by placing one matching `0` and `1` around a smaller balanced string. A finite automaton cannot enforce this unbounded matching, but a recursive grammar can.
+For the grammar
 
-Every context-free language has a grammar in Chomsky normal form, except that the empty string requires a controlled special case. The conversion removes useless symbols, removes epsilon rules, removes unit rules, and breaks long right-hand sides into binary productions. CNF is useful because every nonempty string of length $n$ then has parse trees with exactly $2n-1$ variable-labeled nodes.
+$$
+S\to0S1\mid\epsilon,
+$$
 
-The CYK algorithm decides membership for CFGs in CNF in polynomial time. It fills a table where entry $(i,\ell)$ records variables that can derive the substring beginning at position $i$ with length $\ell$. Binary productions combine smaller spans. This connects grammar theory to parsing algorithms.
+the string `0011` has the derivation
 
-Ambiguity is a property of grammars, not only of languages. A grammar for arithmetic expressions may be ambiguous if it does not encode precedence and associativity. The language of arithmetic expressions may still have an unambiguous grammar once the grammar separates expressions, terms, and factors.
+$$
+S\Rightarrow0S1\Rightarrow00S11\Rightarrow0011.
+$$
 
-Grammar design is usually about choosing the right recursive decomposition. For $0^n1^n$, the outermost symbols are linked, so $S\to0S1$ is natural. For balanced parentheses, a string may be a pair around a smaller balanced string or a concatenation of two balanced strings, giving rules such as $S\to (S)S\mid\epsilon$. For arithmetic expressions, the decomposition must encode precedence, so expressions expand into terms and terms expand into factors. The variables of a good grammar name syntactic categories, not arbitrary states.
-
-Parse trees are often more informative than derivation sequences. A leftmost derivation and a rightmost derivation may differ only in expansion order while representing the same tree. Ambiguity is about different trees because different trees can assign different structure, such as whether `a+a*a` groups multiplication before addition. In programming-language grammars, ambiguity is not just aesthetic; it can change the meaning assigned by a parser or compiler.
-
-Chomsky normal form is not meant for human-friendly grammar writing. It is a technical normal form that makes parse trees binary and bounded in a useful way. The conversion process must preserve the generated terminal language, except for the carefully handled empty string. Removing epsilon rules prevents variables from disappearing unpredictably. Removing unit rules prevents long chains of aliases. Replacing terminals in long rules and binarizing long right-hand sides gives uniform productions for algorithms.
-
-The CYK membership algorithm illustrates why normal forms matter. In a CNF grammar, any derivation of a substring of length greater than one ends with a rule $A\to BC$, splitting the substring into two smaller substrings. This gives a dynamic-programming recurrence over spans. Without a normal form, productions of many shapes would require many special cases. Normalization converts grammar theory into a table algorithm.
-
-In proofs involving CFGs, keep two directions separate. If a grammar generates a string, show the string has the intended property by induction on the parse tree. If a string has the intended property, show the grammar can generate it, often by induction on a size parameter such as length or nesting depth. Both directions are needed for language equality.
-
-When converting a grammar or proving a grammar correct, it helps to keep the generated language separate from the intended informal language. For example, the grammar $S\to SS\mid (S)\mid\epsilon$ is intended to generate balanced parentheses. The proof is not "it looks balanced." One direction shows that every production preserves balance: concatenating balanced strings is balanced, surrounding a balanced string by matching parentheses is balanced, and $\epsilon$ is balanced. The other direction shows that every nonempty balanced string can be decomposed into either one matched outer pair followed by a balanced remainder or a concatenation of smaller balanced strings. That decomposition is what makes the recursive grammar complete.
-
-Ambiguity should be checked with parse trees, not just with strings. A grammar may generate the same terminal string by two different derivation orders that still correspond to the same parse tree; that is not ambiguity. To prove ambiguity, exhibit one string and two genuinely different tree structures or two different leftmost derivations. To remove ambiguity, introduce variables that encode precedence, associativity, or syntactic category. The unambiguous grammar may be longer, but the extra variables carry semantic information.
-
-Normal-form conversions also require a preservation mindset. Removing a nullable variable means adding alternatives where that variable is omitted, but not accidentally adding the empty string everywhere. Removing unit productions means copying the non-unit productions of the target variable back to the source variable. Each step should preserve exactly the terminal strings generated from each relevant variable, or at least preserve the start language after the standard setup. This is why CNF conversion is algorithmic but still easy to get wrong by hand.
-## Visual
+Its parse tree exposes the two nested matching pairs:
 
 ```mermaid
 graph TD
@@ -59,50 +50,95 @@ graph TD
   E --> G[epsilon]
 ```
 
-| Grammar feature | Meaning | Typical issue |
+Every recursive step places a `0` to the left and a `1` to the right of the remaining sentential form. All generated strings therefore have the form $0^n1^n$. Conversely, $n$ recursive expansions followed by $S\to\epsilon$ generate every such string. The grammar cannot generate `0101`, because it never puts a `0` after a generated `1`.
+
+| Grammar feature | Meaning | Role in analysis |
 |---|---|---|
-| leftmost derivation | always expand leftmost variable | useful for parser traces |
-| parse tree | derivation structure independent of expansion order | reveals ambiguity |
-| epsilon rule | variable may disappear | must be controlled in normal forms |
+| leftmost derivation | always expand the leftmost variable | useful for parser traces |
+| parse tree | structure independent of expansion order | reveals ambiguity |
+| epsilon rule | a variable may disappear | controlled during normalization |
 | unit rule | $A\to B$ | removed during CNF conversion |
-| binary rule | $A\to BC$ | core form in CNF |
+| binary rule | $A\to BC$ | core production shape in CNF |
 
-## Worked example 1: Deriving a balanced string
+## Ambiguity changes the assigned structure
 
-**Problem.** Use the grammar $S\to 0S1\mid\epsilon$ to derive `0011`, and explain why `0101` is not generated.
+A grammar is **ambiguous** if one generated string has two distinct parse trees, equivalently two distinct leftmost derivations. Merely finding two derivation orders is insufficient: they may visit the same tree in a different sequence.
 
-**Method.** Apply the recursive rule once per matching pair.
+Arithmetic grammars show why the distinction matters. If a grammar allows `a+a*a` to group as either `(a+a)*a` or `a+(a*a)`, the parse trees assign different meanings. Introducing variables for expressions, terms, and factors can encode precedence and associativity and remove that ambiguity.
 
-1. Start with $S$.
-2. Apply $S\to 0S1$ to get $0S1$.
-3. Apply $S\to 0S1$ again to the remaining variable: $00S11$.
-4. Apply $S\to\epsilon$ to get $0011$.
-5. Every use of $S\to0S1$ places a `0` to the left and a `1` to the right of the remaining middle.
-6. Therefore all zeros are produced before all ones.
-7. The string `0101` has a `0` after a `1`, so it cannot have the form $0^n1^n$.
+Ambiguity belongs first to a grammar. A language is **inherently ambiguous** only when every CFG generating it is ambiguous. One ambiguous grammar does not establish inherent ambiguity, and replacing it with a longer unambiguous grammar may be possible.
 
-**Checked answer.** `0011` is generated by two recursive expansions and one epsilon expansion. `0101` is not generated because the grammar never interleaves zeros and ones.
+## Proving that a grammar generates exactly the intended language
 
-## Worked example 2: Eliminating a long right-hand side for CNF
+Language equality needs both inclusions.
 
-**Problem.** Convert the production $A\to BCDE$ into CNF-style binary productions.
+- **Soundness of the grammar:** prove that every generated terminal string has the intended property, usually by induction on the parse tree or derivation.
+- **Completeness of the grammar:** prove that every intended string can be generated, usually by induction on length, nesting depth, or another size measure.
 
-**Method.** Introduce helper variables so each production has two variables on the right.
+For $S\to SS\mid(S)\mid\epsilon$, soundness follows because concatenating balanced strings, surrounding one with a matching pair, and producing $\epsilon$ all preserve balance. Completeness uses the structure of a nonempty balanced string: its first opening parenthesis has a matching closing parenthesis, splitting the string into the balanced interior and a balanced remainder. That decomposition supplies the recursive derivation.
 
-1. The right-hand side has length four, so it is not allowed in CNF.
-2. Keep the first symbol and group the rest under a new variable: $A\to BX_1$.
-3. Let $X_1\to CX_2$.
-4. Let $X_2\to DE$.
-5. Now every new production has exactly two variables on the right.
-6. The derivation $A\Rightarrow BX_1\Rightarrow BCX_2\Rightarrow BCDE$ reproduces the original expansion.
+The generated language must remain separate from its informal description throughout the proof. “The productions look balanced” is evidence for the design, not a proof of equality.
 
-**Checked answer.** The equivalent binary chain is $A\to BX_1$, $X_1\to CX_2$, and $X_2\to DE$.
+## Converting a grammar to Chomsky normal form
 
-## Code
+A grammar is in **Chomsky normal form** when every production has one of the shapes
+
+$$
+A\to BC
+\qquad\text{or}\qquad
+A\to a,
+$$
+
+with a controlled special rule $S\to\epsilon$ if the language contains the empty string. Here $A,B,C$ are variables and $a$ is a terminal. Every context-free language has a CNF grammar, subject to that empty-string convention.
+
+A standard conversion proceeds through several preservation steps:
+
+1. Remove symbols that cannot contribute to a terminal derivation from the start variable.
+2. Remove epsilon productions, adding the alternatives obtained by omitting nullable variables without introducing unwanted empty strings.
+3. Remove unit productions $A\to B$ by transferring the target's non-unit productions to the source.
+4. Replace terminals that occur inside long right-hand sides with variables.
+5. Break every right-hand side of more than two variables into binary productions.
+
+For example, replace $A\to BCDE$ by
+
+$$
+A\to BX_1,
+\qquad
+X_1\to CX_2,
+\qquad
+X_2\to DE.
+$$
+
+Then
+
+$$
+A\Rightarrow BX_1\Rightarrow BCX_2\Rightarrow BCDE,
+$$
+
+so terminal order is unchanged. Helper variables must be fresh; reusing a variable with other productions can change the language.
+
+CNF is a technical representation rather than a pleasant notation for humans. Its payoff is a binary parse tree: every nonempty string of length $n$ has a CNF parse tree with exactly $2n-1$ variable-labeled nodes.
+
+## Why CNF leads to the CYK recurrence
+
+The CYK algorithm decides CFG membership after conversion to CNF. A table entry $(i,\ell)$ stores the variables that derive the length-$\ell$ substring starting at position $i$.
+
+If $\ell\gt 1$, any derivation of that substring ends with some rule $A\to BC$ and some split $k$:
+
+$$
+B\Rightarrow^* w[i:i+k]
+\qquad\text{and}\qquad
+C\Rightarrow^* w[i+k:i+\ell].
+$$
+
+The algorithm tries all splits and binary productions, building longer spans from shorter ones. Uniform production shapes keep the recurrence small; arbitrary productions would require additional cases. With a conventional implementation, CYK runs in $O(n^3\vert G\vert )$ time for a string of length $n$.
+
+## Small grammar transformations in Python
+
+The first function recognizes the particular language generated by $S\to0S1\mid\epsilon$. The second constructs the binary chain used for a long right-hand side whose symbols are represented by single characters.
 
 ```python
 def derives_0n1n_by_grammar(w):
-    # Specialized recognizer for S -> 0 S 1 | epsilon.
     if len(w) % 2:
         return False
     n = len(w) // 2
@@ -124,17 +160,15 @@ print(derives_0n1n_by_grammar("0011"))
 print(cnf_binary_chain("A", "BCDE"))
 ```
 
-## Common pitfalls
+This transformation assumes that `X1`, `X2`, and so on are fresh grammar variables. A production representation based on strings also assumes each original symbol occupies one character; a parser implementation should use token sequences instead.
 
-- Confusing a derivation with a parse tree. Different derivation orders can produce the same parse tree.
-- Calling a language ambiguous because one grammar is ambiguous. Ambiguity of the language requires all grammars to be ambiguous.
-- Forgetting to preserve or handle $\epsilon$ separately during CNF conversion.
-- Introducing helper variables that accidentally change terminal order.
-- Assuming every recursive grammar is context-free. The left side of each CFG production must be a single variable.
+<div className="see-also">
 
-## Connections
+See also:
 
 - Regular-language limitations are proved in [regular expressions and nonregularity](/cs/theory/regular-expressions-and-nonregularity).
 - Stack machines for the same languages appear in [pushdown automata and deterministic CFLs](/cs/theory/pushdown-automata-and-deterministic-cfls).
 - Non-CFL proofs use the CFL pumping lemma in [non-context-free languages](/cs/theory/non-context-free-languages).
 - CFG membership algorithms are part of [Turing machine variants and decidable problems](/cs/theory/turing-machine-variants-and-decidable-problems).
+
+</div>

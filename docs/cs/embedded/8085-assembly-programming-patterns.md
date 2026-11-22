@@ -7,9 +7,9 @@ sidebar_position: 5
 
 The programming chapters in the source move from isolated instructions to complete assembly language programs. That shift is important: real 8085 work is about arranging instructions into loops, counters, conversions, subroutines, stack usage, and I/O sequences that are easy to trace and test. The same ideas later reappear in 8051 assembly, but with different registers and memory spaces.
 
-This page focuses on reusable patterns rather than a large catalog of opcodes. If a student can design a counted loop, build a delay loop, pass a parameter to a subroutine, save registers on the stack, and convert between binary and display codes, then many textbook examples become variations of a few reliable methods.
+The useful unit of study here is a reusable pattern rather than a large catalog of opcodes. Counted loops, delay loops, subroutine parameters, saved registers, and representation conversions account for many textbook programs.
 
-## Definitions
+## The recurring pieces of an assembly program
 
 An **assembly language program** is a symbolic program written with mnemonics, labels, constants, and directives. An assembler translates it into machine code.
 
@@ -27,11 +27,11 @@ The **stack** is a last-in, first-out region of RAM addressed by `SP`. The 8085 
 
 **Code conversion** changes representation without changing the underlying meaning. Typical examples include BCD-to-binary, binary-to-BCD, BCD-to-seven-segment, binary-to-ASCII, and ASCII-to-binary.
 
-## Key results
+## Loops, calls, and conversion boundaries
 
-The first key result is that every loop needs four pieces: initialization, body, update, and termination test. Omitting any one of those pieces either skips work or creates an endless loop.
+Every loop needs four pieces: initialization, body, update, and termination test. Omitting any one either skips work or creates an endless loop.
 
-The second key result is that software delay is determined by instruction timing. If a loop body takes $T$ clock states and runs $N$ times on a processor with clock frequency $f$, the approximate delay is:
+Software delay is determined by instruction timing. If a loop body takes $T$ clock states and runs $N$ times on a processor with clock frequency $f$, the approximate delay is:
 
 $$
 \text{delay} = \frac{N \cdot T}{f}
@@ -39,21 +39,19 @@ $$
 
 Nested loops multiply the counts. A loop with outer count $M$ and inner count $N$ runs the inner body about $M \cdot N$ times, plus overhead for reloading and decrementing the outer counter.
 
-The third key result is that subroutines create a calling convention even on a small processor. The programmer must decide which registers hold inputs, which registers hold outputs, and which registers the subroutine is allowed to destroy. If this convention is not written down, programs become fragile.
+Subroutines create a calling convention even on a small processor. Decide which registers hold inputs and outputs and which registers the subroutine may destroy. If that convention is not written down, programs become fragile.
 
-The fourth key result is that the stack must be initialized before `PUSH`, `POP`, `CALL`, or interrupt handling is used. A common mistake is writing subroutines before assigning `SP` to a valid RAM region.
+The stack must be initialized before `PUSH`, `POP`, `CALL`, or interrupt handling is used. Writing subroutines before assigning `SP` to a valid RAM region leaves their return addresses at the mercy of reset state.
 
-The fifth key result is that code conversion programs are table-friendly. For seven-segment display conversion, a lookup table is often clearer and faster than deriving segment bits each time. The input digit indexes a table containing the display pattern.
+Code conversion programs are often table-friendly. For seven-segment display conversion, a lookup table is clearer and faster than deriving segment bits each time. The input digit indexes a table containing the display pattern.
 
-The sixth key result is that recursion is theoretically possible with a stack but rarely appropriate on small 8085 systems. Re-entrant and recursive subroutines require careful saving of state and enough stack space for nested calls.
+Recursion is theoretically possible with a stack but rarely appropriate on small 8085 systems. Re-entrant and recursive subroutines require careful saving of state and enough stack space for nested calls.
 
-The seventh key result is that a good assembly listing is also documentation. Labels such as `NEXT`, `SKIP`, and `DONE` are better than raw addresses, but larger programs need labels that describe intent: `SCAN_KEY`, `ADD_BYTE`, `DISPLAY_DIGIT`, or `WAIT_READY`. Small comments should record register roles at subroutine boundaries, because a future edit that reuses `B` or `HL` can silently break a caller.
+An assembly listing also serves as documentation. Labels such as `NEXT`, `SKIP`, and `DONE` are better than raw addresses, but larger programs need labels that describe intent: `SCAN_KEY`, `ADD_BYTE`, `DISPLAY_DIGIT`, or `WAIT_READY`. Short comments should record register roles at subroutine boundaries, because a future edit that reuses `B` or `HL` can silently break a caller.
 
-The eighth key result is that conversion programs should state their input range. A BCD-to-seven-segment routine that assumes digits `0` through `9` is not correct for an arbitrary byte. A binary-to-ASCII routine may work for one nibble, one byte, or a multi-digit decimal conversion depending on its algorithm. Defining the input range prevents a table lookup or subtraction loop from reading outside intended data.
+Conversion routines must state their input range. A BCD-to-seven-segment routine that assumes digits `0` through `9` is not correct for an arbitrary byte. A binary-to-ASCII routine may handle one nibble, one byte, or a multi-digit decimal value depending on its algorithm. A stated range keeps a table lookup or subtraction loop inside its intended data.
 
-The ninth key result is that debugging assembly is easiest when memory locations are chosen deliberately. Reserve separate regions for inputs, outputs, temporary data, lookup tables, stack, and code. When a program stores its result at `2500H`, the test setup should make sure that address is writable RAM and not a ROM, port, or stack area.
-
-## Visual
+Debugging is easier when memory locations are chosen deliberately. Reserve separate regions for inputs, outputs, temporary data, lookup tables, stack, and code. When a program stores its result at `2500H`, the test setup must ensure that address is writable RAM rather than ROM, a port, or the stack.
 
 ```mermaid
 flowchart TD
@@ -73,7 +71,7 @@ flowchart TD
 | Register save | `PUSH B`, `PUSH D`, `PUSH H` | Pops occur in reverse order |
 | Table lookup | Add index to base address | Index is within table range |
 
-## Worked example 1: Building a counted sum loop
+### Summing a block with a carry count
 
 Problem: Sum ten unsigned bytes starting at `2400H`. Store the low byte of the sum at `2500H` and the carry count at `2501H`. Use 8085 registers.
 
@@ -119,7 +117,7 @@ NO_CARRY:
 
 Check: `DCR C` does not change the carry flag, so the carry from `ADD M` must be tested before `DCR C`. The program does that.
 
-## Worked example 2: Estimating a nested software delay
+### Estimating a nested software delay
 
 Problem: A simple nested delay has an outer count of `04H` and an inner count of `C8H` decimal 200. Suppose the inner loop body is approximated as 14 clock states per iteration and ignore setup overhead. Estimate the delay on a 3 MHz 8085.
 
@@ -165,7 +163,7 @@ Answer: the approximate delay is 3.73 ms, excluding setup and outer-loop overhea
 
 Check: The estimate is intentionally low because setup, reloading the inner count, and outer-loop branch time were ignored. A precise textbook timing calculation would include each instruction's T-states.
 
-## Code
+### Converting a hexadecimal nibble to ASCII
 
 ```asm
 ; 8085: subroutine converts one hexadecimal nibble in A to ASCII.
@@ -190,7 +188,7 @@ DIGIT:  ADI 30H        ; 00H -> 30H ('0')
         HLT
 ```
 
-## Common pitfalls
+## Stack, flag, and timing mistakes
 
 - Placing the stack in memory used by variables or program code. Stack collisions are difficult to debug.
 - Forgetting that `CALL` and interrupts use the stack even if the program never explicitly uses `PUSH`.
@@ -200,9 +198,8 @@ DIGIT:  ADI 30H        ; 00H -> 30H ('0')
 - Letting lookup-table indexes exceed the table length. A bad index silently reads unrelated memory.
 - Assuming a subroutine preserves registers. Decide and document a convention for every subroutine.
 
-## Connections
+<div className="see-also">
 
-- [8085 instruction set and addressing](/cs/embedded/8085-instruction-set-addressing)
-- [8085 I/O, memory, and DMA interfacing](/cs/embedded/8085-io-memory-dma-interfacing)
-- [8051 instruction set and programming](/cs/embedded/8051-instruction-set-programming)
-- [8051 timers, serial port, and interrupts](/cs/embedded/8051-timers-serial-interrupts)
+See also: [8085 instruction set and addressing](/cs/embedded/instruction-set-addressing) · [8085 I/O, memory, and DMA interfacing](/cs/embedded/io-memory-dma-interfacing) · [8051 instruction set and programming](/cs/embedded/instruction-set-programming) · [8051 timers, serial port, and interrupts](/cs/embedded/timers-serial-interrupts)
+
+</div>

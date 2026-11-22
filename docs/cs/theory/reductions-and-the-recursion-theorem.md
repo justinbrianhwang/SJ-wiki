@@ -5,121 +5,147 @@ sidebar_position: 13
 
 # Reductions and the Recursion Theorem
 
-Reductions are the main transport mechanism for impossibility results. Instead of proving every undecidable problem from scratch by diagonalization, we transform known hard instances into new instances. If a solver for the new problem would give a solver for the old problem, then the new problem cannot be decidable.
+Reductions transport impossibility results. Instead of diagonalizing afresh for every undecidable problem, transform an instance of a known hard language into an instance of the new one. If a solver for the target would decide the source, the target solver cannot exist.
 
-The recursion theorem deepens the same theme of self-reference. It says, roughly, that a Turing machine can obtain and use its own description. This formalizes self-reproducing and self-aware constructions without relying on informal paradoxes. Together, reductions and self-reference explain why many semantic program questions are beyond total algorithmic decision.
+The recursion theorem handles a different recurring device: a machine using its own description. It supplies fixed points for computable transformations of programs, making self-reference part of the formal model rather than an appeal to source files or informal paradox.
 
-## Definitions
+## A reduction turns a target solver into a source solver
 
-A **mapping reduction** from language $A$ to language $B$, written $A\le_m B$, is a computable function $f$ such that for every string $w$, $w\in A$ if and only if $f(w)\in B$.
+A **mapping reduction** from $A$ to $B$, written $A\le_m B$, is a total computable function $f$ such that
 
-A **computable function** is a function on strings whose output is produced by some Turing machine that halts on every input.
+$$
+w\in A\quad\Longleftrightarrow\quad f(w)\in B
+$$
 
-A language $B$ is **undecidable by reduction** if a known undecidable language $A$ maps to $B$. If $B$ were decidable, then deciding $A$ would be possible by computing $f(w)$ and running the decider for $B$.
-
-A **many-one reduction** is another name for mapping reduction. It converts one instance into one instance and then uses only the final yes-or-no answer.
-
-The **recursion theorem** states that for any computable transformation $t$ that maps machine descriptions to machine descriptions, there is a Turing machine $R$ whose behavior is the behavior of the machine described by $t(\langle R\rangle)$. Informally, programs can be constructed with access to their own descriptions.
-
-## Key results
-
-Mapping reductions preserve decidability downward. If $A\le_m B$ and $B$ is decidable, then $A$ is decidable. The contrapositive is the common use: if $A$ is undecidable and $A\le_m B$, then $B$ is undecidable.
-
-Mapping reductions also preserve recognizability downward. If $A\le_m B$ and $B$ is recognizable, then $A$ is recognizable. The recognizer for $A$ computes $f(w)$ and runs the recognizer for $B$. Contrapositives involving nonrecognizability are often useful.
-
-Many language-theory problems are undecidable by reductions from $A_{TM}$ or $HALT_{TM}$. Examples include emptiness of Turing-machine languages, equivalence of Turing-machine languages, and ambiguity or equality questions for sufficiently expressive grammar systems. The construction usually embeds one computation question into the behavior of a new machine or grammar.
-
-The recursion theorem gives rigorous self-reference. It can prove the existence of machines that print their own descriptions, machines that refer to their own code inside a reduction, and fixed points for computable program transformations. It supports the idea that self-referential programs are not loopholes in the formal model; they are part of it.
-
-A reduction proof should be readable as an algorithm plus two lemmas. The algorithm takes an arbitrary source instance and produces a target instance. The first lemma proves that yes source instances become yes target instances. The second lemma proves that no source instances become no target instances. If the target property is about a constructed machine, these lemmas usually analyze what that machine does in the cases where the original machine accepts, rejects, or loops.
-
-For undecidability, the reduction function may perform extensive syntactic construction, but it may not solve the source problem along the way. When reducing from $A_{TM}$, the function can write code for a new machine that simulates $M$ on $w$ later. It cannot first determine whether $M$ accepts $w$ and then choose an output accordingly, because that would already solve the undecidable problem. This distinction between building a simulator and knowing its outcome is essential.
-
-Mapping reductions are stricter than Turing reductions. A mapping reduction gets one transformed instance and then uses the target answer directly. A Turing reduction may ask multiple adaptive oracle questions. Sipser's core development emphasizes mapping reductions because they are simple, composable, and strong enough for many undecidability and NP-completeness proofs. Later advanced topics may use broader reducibility notions.
-
-Self-reference through the recursion theorem is often surprising because it removes the need for informal "this program reads its own file" assumptions. The theorem says that for any computable way of transforming program descriptions, some program is a fixed point of that transformation. This is a formal version of a quine, but it is also a proof tool. It lets machines refer to their own descriptions inside diagonal arguments without smuggling in an external naming mechanism.
-
-In language-theory undecidability, reductions often build machines whose languages have a property exactly when the source computation behaves a certain way. For emptiness, the machine may accept everything if $M$ accepts $w$ and nothing otherwise. For equivalence, two machines may be constructed to differ only in the accepting case. For grammar-related problems, computation histories can be encoded so that a grammar generates invalid histories, making validity equivalent to a computation question.
-
-It is useful to classify reductions by what the constructed object does on irrelevant inputs. In the $A_{TM}$ to nonemptiness reduction, the new machine ignores its own input entirely. That is allowed because the target property is about whether the language has at least one string. For other target properties, irrelevant inputs may need careful behavior. For equivalence, the constructed machines must agree in one case and disagree in the other. For universality, the constructed machine may accept all strings exactly in the accepting case.
-
-Reduction functions manipulate descriptions, not running computations. A reduction can output a machine that contains the code of $M$ and the literal string $w$ embedded inside it. This is a finite syntactic operation, so it halts even if $M$ would loop on $w$. The later behavior of the constructed machine carries the undecidable information into the target instance.
-
-The recursion theorem is not needed for every self-reference proof, but it clarifies why self-reference is legitimate. In informal programming, a program can sometimes read its own source file, but file systems are not part of the Turing-machine model. The recursion theorem gives an internal mechanism: for computable transformations on descriptions, fixed-point machines exist. That is the formal basis for quines and for deeper undecidability constructions involving machines that know their own descriptions.
-## Visual
+for every string $w$. “Computable” here means that a Turing machine outputs $f(w)$ and halts on every input. A **many-one reduction** is the same notion: it produces one target instance and uses the resulting yes-or-no answer directly.
 
 ```mermaid
 graph LR
   A[Known hard language A] -->|compute f| B[Target language B]
   B -->|hypothetical decider| C["Answer for f(w)"]
   C --> D[Answer for w in A]
-  D --> E[Contradiction if A undecidable]
+  D --> E[Contradiction if A is undecidable]
 ```
 
-| Goal | Reduction setup | Conclusion |
+| Goal | Reduction setup | Consequence of a target solver |
 |---|---|---|
 | prove $B$ undecidable | $A_{TM}\le_m B$ | a decider for $B$ would decide $A_{TM}$ |
 | prove $B$ not recognizable | $\overline{A_{TM}}\le_m B$ | a recognizer for $B$ would recognize $\overline{A_{TM}}$ |
-| prove complexity hardness | known hard $A\le_p B$ | efficient solver for $B$ gives efficient solver for $A$ |
-| use recursion theorem | machine accesses own description | self-reference becomes formal |
+| prove complexity hardness | known hard $A\le_p B$ | an efficient solver for $B$ gives one for $A$ |
+| construct self-reference | apply the recursion theorem | a computable program transformer has a behavioral fixed point |
 
-## Worked example 1: Reducing $A_{TM}$ to TM emptiness complement
+Mapping reductions preserve decidability and recognizability downward:
 
-**Problem.** Let $NE_{TM}=\{\langle M\rangle:L(M)\ne\emptyset\}$. Show that $A_{TM}\le_m NE_{TM}$.
+$$
+A\le_m B\text{ and }B\text{ decidable}
+\quad\Longrightarrow\quad
+A\text{ decidable},
+$$
 
-**Method.** Given $\langle M,w\rangle$, build a machine $N$ whose language is nonempty exactly when $M$ accepts $w$.
+$$
+A\le_m B\text{ and }B\text{ recognizable}
+\quad\Longrightarrow\quad
+A\text{ recognizable}.
+$$
 
-1. Input to the reduction is $\langle M,w\rangle$.
-2. Construct machine $N$ as follows: on any input $x$, ignore $x$ and simulate $M$ on $w$.
-3. If $M$ accepts $w$, then $N$ accepts $x$.
-4. If $M$ rejects or loops on $w$, then $N$ does not accept $x$.
-5. If $M$ accepts $w$, then $N$ accepts every input, so $L(N)\ne\emptyset$.
-6. If $M$ does not accept $w$, then $N$ accepts no input, so $L(N)=\emptyset$.
+Their contrapositives are the usual hardness arguments. To prove $B$ hard, the arrow must point from the known hard problem to $B$.
 
-**Checked answer.** The computable map $\langle M,w\rangle\mapsto\langle N\rangle$ satisfies $\langle M,w\rangle\in A_{TM}$ exactly when $\langle N\rangle\in NE_{TM}$.
+## Write the proof as an algorithm and two cases
 
-## Worked example 2: A self-printing program idea
+A clean mapping reduction has three parts:
 
-**Problem.** Explain the recursion-theorem idea behind a program that prints its own description.
+1. On an arbitrary source encoding $w$, describe the terminating syntactic procedure that produces $f(w)$.
+2. Prove that source yes-instances become target yes-instances.
+3. Prove that source no-instances become target no-instances.
 
-**Method.** Use a computable transformation that inserts a description into a printer.
+If the target is a property of a constructed machine, analyze what that machine does when the embedded source computation accepts, rejects, or loops. The reduction itself must halt in all three cases.
 
-1. Define a computable transformation $t(x)$ that returns the description of a program $P_x$.
-2. Program $P_x$ ignores its input and prints the string $x$.
-3. The recursion theorem gives a machine $R$ whose behavior is the behavior of $P_{\langle R\rangle}$.
-4. Therefore $R$ ignores its input and prints $\langle R\rangle$.
-5. No infinite regress is needed; the theorem supplies a fixed point of the transformation.
+The transformation may write a new machine containing the code of $M$ and a literal input $w$. That is a finite operation on descriptions. It may not first run $M$ to completion and choose the output according to whether $M$ accepts, since such a transformation would already solve the source problem.
 
-**Checked answer.** The existence of a self-printing machine follows from the recursion theorem as a fixed point of a computable program transformer.
+This distinction is easy to state and central to the method: build code that performs the simulation later; do not try to know the simulation's outcome while computing the reduction.
 
-## Code
+## From acceptance to nonempty machine languages
 
-```python
-def mapping_reduction_A_to_NE(M_accepts_w):
-    # This is a Python analogy of the construction:
-    # build N_x that ignores x and accepts iff M accepts w.
-    def N(x):
-        return M_accepts_w()
-    return N
+Define
 
-def sample_M_accepts_w():
-    return True
+$$
+NE_{TM}=\{\langle N\rangle:L(N)\ne\emptyset\}.
+$$
 
-N = mapping_reduction_A_to_NE(sample_M_accepts_w)
-print(N("anything"))
-```
+To show $A_{TM}\le_m NE_{TM}$, take an arbitrary pair $\langle M,w\rangle$ and construct a machine $N$:
 
-## Common pitfalls
+> On input $x$, ignore $x$ and simulate $M$ on $w$. If $M$ accepts, accept $x$. If $M$ rejects, reject; if it loops, continue forever.
 
-- Reducing in the wrong direction. To prove $B$ hard, reduce a known hard problem to $B$, not $B$ to the known hard problem.
-- Building a function that is not total. A mapping reduction must halt and output an instance for every input.
-- Preserving only one implication. Mapping reductions require $w\in A$ if and only if $f(w)\in B$.
-- Assuming the target problem's decider exists in the construction itself. The reduction must compute instances without using the hypothetical decider.
-- Treating the recursion theorem as a programming trick only. It is a theorem about fixed points of computable transformations.
+Writing this description of $N$ is computable even when the embedded simulation would never halt.
 
-## Connections
+If $M$ accepts $w$, then $N$ accepts every input, so $L(N)=\Sigma^*$ and is nonempty. If $M$ does not accept $w$, then $N$ accepts no input, so $L(N)=\emptyset$. Therefore
+
+$$
+\langle M,w\rangle\in A_{TM}
+\quad\Longleftrightarrow\quad
+\langle N\rangle\in NE_{TM}.
+$$
+
+A decider for $NE_{TM}$ would consequently decide $A_{TM}$, proving $NE_{TM}$ undecidable.
+
+Ignoring $x$ is deliberate. The target asks only whether at least one string is accepted, so the constructed language may be all strings in one case and no strings in the other. A universality or equivalence reduction would arrange irrelevant inputs differently to match its target property.
+
+## Many-one reductions versus oracle access
+
+A mapping reduction commits to one target instance before seeing its answer. A **Turing reduction** may ask several target-oracle questions, with later queries depending on earlier answers. Many-one reductions are stricter, simple to compose, and sufficient for most introductory undecidability and NP-completeness arguments.
+
+The reducibility notion matters when transferring recognizability, completeness, or quantitative resource bounds. A result proved with an adaptive oracle reduction should not be silently restated as a mapping reduction.
+
+## The recursion theorem as a behavioral fixed point
+
+Let $t$ be any total computable transformation that maps machine descriptions to machine descriptions. The **recursion theorem** guarantees a machine $R$ such that
+
+$$
+\varphi_R=\varphi_{t(\langle R\rangle)},
+$$
+
+where $\varphi_M$ denotes the partial function computed by $M$. The descriptions need not be textually identical; their machines have the same behavior.
+
+The theorem removes the need for an external “read my own source file” operation. It says that computable transformations of program descriptions have programmatic fixed points. Machines can therefore be constructed whose behavior depends on their own encodings within the ordinary Turing-machine model.
+
+## Obtaining a self-printing machine
+
+Define a computable transformation $t(x)$ that returns the description of a machine $P_x$ with the behavior:
+
+> Ignore the input and print the fixed string $x$.
+
+By the recursion theorem, there is a machine $R$ behaviorally equivalent to $P_{\langle R\rangle}$. It ignores its input and prints $\langle R\rangle$. The fixed-point theorem supplies the self-description without infinite regress.
+
+A quine is the familiar programming analogue, but the theorem is broader. It supports reductions and diagonal constructions in which a machine embeds, compares, or transforms its own description.
+
+## Encoding semantic properties into constructed machines
+
+Many undecidability reductions make a target machine's language depend on one source computation:
+
+- For emptiness or nonemptiness, accept no strings in one source case and at least one in the other.
+- For universality, accept all strings exactly when the source computation has the selected outcome.
+- For equivalence, construct two machines that agree in one case and differ in the other.
+- For grammar problems, encode computation histories so that language membership or ambiguity reflects whether a valid accepting history exists.
+
+Each target property requires its own treatment of inputs unrelated to the embedded computation. The common mechanism is syntactic: output a finite machine or grammar description whose later behavior carries the undecidable information.
+
+The recursion theorem is unnecessary when the construction only embeds a separately supplied $M$ and $w$. It becomes relevant when the constructed machine must refer to its own description. Keeping those uses separate avoids invoking self-reference where an ordinary reduction suffices.
+
+## Checks that catch invalid reductions
+
+- The reduction machine must halt and output a valid target instance for every source string, including malformed encodings under the chosen convention.
+- The equivalence needs both implications, not only preservation of yes-instances.
+- A target decider or recognizer may appear only in the contradiction after the reduction is defined, not inside the computation of $f$.
+- The direction $A\le_m B$ supports hardness of $B$, while $B\le_m A$ supplies an upper comparison for $B$.
+- The recursion theorem concerns behavioral fixed points of computable transformations, not merely a source-code trick.
+
+<div className="see-also">
+
+See also:
 
 - The source undecidable languages are in [decidability and the halting problem](/cs/theory/decidability-and-the-halting-problem).
 - Encodings and computable functions rely on [Turing machines and the Church-Turing thesis](/cs/theory/turing-machines-and-the-church-turing-thesis).
 - Polynomial-time reductions appear in [NP-completeness and classic reductions](/cs/theory/np-completeness-and-classic-reductions).
 - Space-bounded reductions matter in [space complexity](/cs/theory/space-complexity).
+
+</div>

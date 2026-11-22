@@ -13,7 +13,7 @@ Derivatives are the first major payoff of limits. They connect local graph shape
 
 *Figure: Tangent-line interpretation of a derivative. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Derivative_with_tangent.svg), Olivier Cleynen, CC0 1.0.*
 
-## Definitions
+## From secant slopes to a local rate
 
 For a function $f$, the derivative at $a$ is
 
@@ -73,7 +73,7 @@ The derivative exists exactly when the two one-sided derivative limits exist and
 
 Higher derivatives repeat the same operation. The second derivative $f''(x)$ measures how $f'(x)$ changes, and in graph language it measures concavity. If $f''(x)\gt 0$, slopes are increasing and the graph is concave up. If $f''(x)\lt 0$, slopes are decreasing and the graph is concave down. This makes the derivative a bridge from local linear change to the larger shape of the graph.
 
-## Key results
+## What differentiability buys us
 
 If $f$ is differentiable at $a$, then $f$ is continuous at $a$. A proof sketch starts from
 
@@ -121,8 +121,6 @@ Another useful interpretation is sensitivity. If $f'(a)$ has large magnitude, a 
 
 Derivative notation should be chosen to match the setting. Prime notation is compact for one-variable functions, while Leibniz notation makes the independent variable and units explicit. In applied problems, $\frac{dP}{dt}$ is often clearer than $P'$ because it states that population is changing with respect to time rather than with respect to another parameter directly.
 
-## Visual
-
 ```mermaid
 graph LR
   A[Two points on graph] --> B[Secant slope]
@@ -141,7 +139,7 @@ graph LR
 | Acceleration | $s''(t)$ | Instantaneous change in velocity |
 | Marginal cost | $C'(q)$ | Approximate extra cost for one more unit |
 
-## Worked example 1: derivative from the limit definition
+## Recovering $d(x^2)/dx$ from the limit
 
 **Problem.** Use the definition to find the derivative of $f(x)=x^2$ at a general point $x$.
 
@@ -185,7 +183,7 @@ $$
 y=9+6(x-3)=6x-9.
 $$
 
-## Worked example 2: velocity, speed, and acceleration
+## Reading a particle's motion from $s(t)$
 
 **Problem.** A particle moves along a line with position
 
@@ -231,7 +229,7 @@ At the exact instant $t=3$, the speed is $\vert v(3)\vert =0$. Immediately after
 
 **Checked answer.** The velocity is $3t^2-12t+9$, acceleration is $6t-12$, and the rest times are $t=1$ and $t=3$. At $t=3$ the object is momentarily stopped; just after that instant it speeds up to the right.
 
-## Code
+## Estimating velocity with a central difference
 
 ```python
 def derivative_central(f, x, h=1e-5):
@@ -245,18 +243,22 @@ for t in [0, 1, 2, 3, 4]:
     print(t, round(velocity_estimate, 6))
 ```
 
-## Common pitfalls
+## Interpretive checks on a derivative
 
-- Treating the derivative as a fraction before learning what the limit notation means. The notation is powerful, but the derivative is defined by a limit.
-- Forgetting units. A derivative of distance with respect to time is not measured in meters; it is measured in meters per second.
-- Assuming continuity implies differentiability. Corners such as $\vert x\vert $ are continuous but not differentiable at the corner.
-- Assuming a zero derivative always means a local maximum or minimum. A function such as $x^3$ has $f'(0)=0$ but no extremum at $0$.
-- Confusing velocity and speed. Velocity can be negative; speed is never negative.
-- Using a numerical derivative with too large or too small a step without checking stability. Floating-point rounding can distort the estimate.
+- Leibniz notation resembles a fraction and can often be manipulated suggestively, but the derivative itself is defined by a limit.
+- Units belong in the interpretation: differentiating distance with respect to time gives meters per second, not meters.
+- Continuity does not imply differentiability. The graph of $\vert x\vert$ is continuous at its corner, while its one-sided slopes disagree there.
+- A horizontal tangent is not automatically an extremum; $x^3$ has $f'(0)=0$ and continues increasing through the origin.
+- Velocity carries direction and may be negative. Speed is its nonnegative magnitude.
+- A numerical derivative should be recomputed with several step sizes. Large steps incur truncation error, while extremely small steps can amplify floating-point cancellation.
 
-## Connections
+<div className="see-also">
+
+See also:
 
 - [Limits and Continuity](/math/calculus/limits-and-continuity): the derivative is built from a limit.
 - [Differentiation Rules](/math/calculus/differentiation-rules): rules make derivative computation efficient after the definition is understood.
 - [Applications of Derivatives](/math/calculus/applications-of-derivatives): signs of derivatives explain increasing, decreasing, and concavity.
 - [Vector Functions and Motion](/math/calculus/vector-functions-and-motion): velocity and acceleration extend to curves in space.
+
+</div>

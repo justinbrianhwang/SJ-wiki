@@ -9,7 +9,7 @@ Separation of variables solves certain linear PDEs by looking for product soluti
 
 The method is most useful for linear homogeneous boundary conditions on simple domains. It explains why Fourier series, Legendre polynomials, and Bessel functions appear in heat, wave, and potential problems. The core idea is modal evolution: solve the spatial shapes once, then determine how each shape changes in time or another variable.
 
-## Definitions
+## Turning a PDE into two ODEs
 
 A partial differential equation involves derivatives with respect to more than one independent variable. Standard examples include the heat equation
 
@@ -61,7 +61,7 @@ $$
 u(x,0)=f(x).
 $$
 
-## Key results
+## Boundary conditions select the modes
 
 Separation works because a function of $x$ equals a function of $t$ for all $x,t$ only when both are constant. That constant becomes the eigenvalue parameter in the spatial problem. The boundary conditions select admissible eigenvalues and eigenfunctions.
 
@@ -113,11 +113,13 @@ The zero mode deserves attention. With insulated endpoints, cosine modes include
 
 Linearity is what permits adding separated solutions. A single product solution rarely matches a general initial condition. The infinite sum is not an afterthought; it is the mechanism for fitting arbitrary data. For nonlinear PDEs, sums of solutions usually are not solutions, so separation can at best produce special solutions unless further structure is present.
 
-In practice, the eigenfunction expansion is often truncated. The truncation error depends on the smoothness of the data and the time variable. For heat equations, high modes decay rapidly, so a modest number of modes may be enough for $t\gt 0$. For wave equations, high modes persist as oscillations, so truncating can lose important sharp features or produce visible artifacts.
+Eigenfunction expansions are usually truncated for computation. The truncation error depends on the smoothness of the data and the time variable. For heat equations, high modes decay rapidly, so a modest number of modes may be enough for $t\gt 0$. For wave equations, high modes persist as oscillations, so truncating can lose important sharp features or produce visible artifacts.
 
 Physical units help check separated equations. In the heat equation, $k$ has units of length squared per time, and $\lambda$ has units of inverse length squared, so $k\lambda t$ is dimensionless. If the exponent in a heat solution has units, a scaling error has occurred. Similar checks catch missing factors of $L$ and $\pi$.
 
-## Visual
+## The separation pipeline
+
+The spatial eigenproblem and the remaining one-variable ODE can be solved independently, then recombined after the initial or boundary data have been projected onto the admissible modes.
 
 ```mermaid
 flowchart TD
@@ -140,7 +142,7 @@ flowchart TD
 | Laplace equation | Sine/cosine plus hyperbolic factors | Boundary interpolation |
 | Polar PDEs | Bessel and angular modes | Geometry-dependent |
 
-## Worked example 1: Heat equation on a rod
+## Heat flow along a fixed-temperature rod
 
 Problem. Solve
 
@@ -222,7 +224,7 @@ Check. At $x=0$ and $x=L$, every sine term vanishes. For $t\gt 0$, higher modes 
 
 The formula also shows smoothing. Even if $f$ has corners or jumps, the factors $e^{-k(n\pi/L)^2t}$ suppress large $n$ very strongly for any fixed positive $t$. The initial condition may be represented only in the Fourier sense at $t=0$, but the solution becomes smoother immediately afterward.
 
-## Worked example 2: Laplace equation in a rectangle
+## Harmonic extension from one edge of a rectangle
 
 Problem. Solve
 
@@ -306,7 +308,7 @@ Check. The quotient equals $0$ at $y=0$ and $1$ at $y=H$, so the bottom and top 
 
 This solution is a boundary interpolation formula. Each sine component of the top boundary is continued harmonically into the rectangle, with hyperbolic sine controlling how it decays away from the top. High-frequency boundary oscillations decay quickly as one moves into the interior.
 
-## Code
+## Evaluating a truncated heat expansion
 
 ```python
 import numpy as np
@@ -326,7 +328,7 @@ print(heat_solution(x, 0.1, L, 0.02, coeffs).max())
 
 The code evaluates a truncated heat expansion. Increasing time damps the higher modes more strongly. Increasing the number of coefficients improves the representation of the initial condition, but for positive time the heat equation smooths high-frequency errors quickly.
 
-## Common pitfalls
+## Where separation goes wrong
 
 - Trying to separate a PDE before making boundary conditions homogeneous.
 - Choosing the wrong sign for the separation constant and keeping only trivial spatial solutions.
@@ -340,9 +342,8 @@ The code evaluates a truncated heat expansion. Increasing time damps the higher 
 - Applying initial data before deriving the eigenfunctions from the boundary conditions.
 - Forgetting that product solutions are building blocks, not usually the final general solution.
 
-## Connections
+<div className="see-also">
 
-- [Fourier Series](/math/engineering-math/fourier-series)
-- [Orthogonal Functions and Sturm-Liouville Problems](/math/engineering-math/orthogonal-functions-and-sturm-liouville)
-- [Wave and Heat Equations](/math/engineering-math/wave-and-heat-equations)
-- [Laplace Equation and Potential](/math/engineering-math/laplace-equation-and-potential)
+See also: [Fourier Series](/math/engineering-math/fourier-series) · [Orthogonal Functions and Sturm-Liouville Problems](/math/engineering-math/orthogonal-functions-and-sturm-liouville) · [Wave and Heat Equations](/math/engineering-math/wave-and-heat-equations) · [Laplace Equation and Potential](/math/engineering-math/laplace-equation-and-potential)
+
+</div>

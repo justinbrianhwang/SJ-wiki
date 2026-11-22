@@ -561,10 +561,8 @@ print("theory:", 1 / lam, 1 / lam**2)
 - Adding standard deviations instead of variances for independent sums.
 - Using variance formulas that require independence without checking independence.
 
-## Related pages
+<div className="see-also">
 
-- [random variables and distributions](/math/probability/random-variables-distributions)
-- [covariance, correlation, and independence](/math/probability/covariance-correlation-independence)
-- [moment generating and characteristic functions](/math/probability/generating-functions)
-- [limit theorems](/math/probability/limit-theorems)
-- [summarizing distributions](/math/statistics/summarizing-distributions)
+See also: [random variables and distributions](/math/probability/random-variables-distributions) · [covariance, correlation, and independence](/math/probability/covariance-correlation-independence) · [moment generating and characteristic functions](/math/probability/generating-functions) · [limit theorems](/math/probability/limit-theorems) · [summarizing distributions](/math/statistics/summarizing-distributions)
+
+</div>

@@ -9,7 +9,7 @@ Software metrics try to make important software attributes measurable. Gustafson
 
 This topic sits between project management and quality assurance. Managers need measures to estimate, track, and improve work; engineers need measures that signal complexity, maintainability, and test risk. The chapter covers common size and complexity measures such as LOC, McCabe's cyclomatic number, Halstead's software science measures, Henry-Kafura information flow, productivity, and GQM.
 
-## Definitions
+## Measurement scales and complexity formulas
 
 **Software measurement** is the mapping of symbols or numbers to software objects or processes so that some attribute can be quantified. Examples include mapping a module to its lines of code, mapping a control flow graph to a cyclomatic complexity number, or mapping a process to defects found per reviewer-hour.
 
@@ -35,7 +35,7 @@ $$
 C = e - n + 2p
 $$
 
-where $e$ is the number of edges, $n$ is the number of nodes, and $p$ is the number of strongly connected components, normally 1 for a single routine. For many structured programs, $C$ is also one more than the number of decisions.
+where $e$ is the number of edges, $n$ is the number of nodes, and $p$ is the number of connected components, normally 1 for a single routine. For many structured programs, $C$ is also one more than the number of decisions.
 
 **Halstead's measures** treat a program as operators and operands. Let $n_1$ be the number of distinct operators, $n_2$ the number of distinct operands, $N_1$ the total operator occurrences, and $N_2$ the total operand occurrences. Vocabulary is $n = n_1 + n_2$, length is $N = N_1 + N_2$, and volume is:
 
@@ -53,11 +53,11 @@ where the weight may be a size or complexity measure.
 
 **GQM**, Goal-Question-Metric, starts with goals, derives questions about those goals, and only then chooses metrics.
 
-## Key results
+## Valid measures start with a decision
 
 Metrics should be selected from goals, not collected because they are easy. LOC, defects, effort, and coverage can all be useful, but each can also distort behavior. If a team is rewarded for high LOC, it may write more code than necessary. If it is rewarded for low defect counts, it may underreport defects. A measurement program should include interpretation rules and quality checks.
 
-McCabe's cyclomatic number is useful because it connects control-flow structure to test and maintenance difficulty. The common threshold of 10 is not a mathematical law, but it is a practical warning point: modules above that value deserve review, refactoring, or stronger tests. The decision-count method is valuable because building a full control flow graph for large code is expensive.
+McCabe's cyclomatic number connects control-flow structure to test and maintenance difficulty. The common threshold of 10 is not a mathematical law, but it can flag modules for review, refactoring, or stronger tests. The decision-count method is useful because building a full control-flow graph for large code is expensive.
 
 Halstead's basic counts remain historically important because they focus on tokens and algorithm expression. Gustafson notes that some of Halstead's more elaborate prediction formulas are questionable, especially when they are not monotonic. The lesson is broader than Halstead: a metric can be easy to calculate and still be invalid for the decision being made.
 
@@ -67,7 +67,7 @@ Process metrics measure how work is being performed. Examples include defects pe
 
 GQM is a guardrail against metric clutter. A goal such as "improve customer satisfaction" leads to questions such as "Are customers reporting fewer defects?" and "Are fixes delivered faster?" Those questions lead to metrics such as customer defect reports, reopened defects, and median time to resolution. Without the goal and question layers, the team may collect numbers that no one uses.
 
-## Visual
+### Goal-Question-Metric and the choice of measure
 
 ```mermaid
 flowchart TD
@@ -91,11 +91,11 @@ flowchart TD
 | Defects/KLOC | observed defect density | useful for trend comparison | depends on detection effort |
 | GQM metrics | goal-driven measurement | avoids collecting unused numbers | requires careful goal definition |
 
-## Worked example 1: Cyclomatic complexity from decisions
+## Counting independent paths from branch points
 
-**Problem.** A function has this logic: if the input is missing, return an error; otherwise loop over records; inside the loop, if the record is active, process it; after the loop, if no active record was found, return a warning. Estimate McCabe's cyclomatic number using the decision-count method.
+A function returns an error if its input is missing, otherwise loops over records and processes each active record, then returns a warning if none was active. Its McCabe number can be estimated from the decision count.
 
-**Method.** Count decisions that split control flow.
+Count the decisions that split control flow.
 
 1. The first `if input is missing` is one decision.
 
@@ -117,13 +117,13 @@ $$
 C = 4 + 1 = 5
 $$
 
-**Checked answer.** The cyclomatic number is 5. This means at least five independent paths are needed for basis-path style structural testing. The answer is checked by listing the four branch points: missing input, loop continuation, active record, and no-active-record warning.
+The cyclomatic number is 5. At least five independent paths are needed for basis-path structural testing. The four branch points are missing input, loop continuation, active record, and the no-active-record warning.
 
-## Worked example 2: Halstead volume for a small expression
+## Counting Halstead tokens consistently
 
-**Problem.** Compute Halstead vocabulary, length, and volume for the expression `total = price * quantity + tax` using a simple counting rule. Operators are `=`, `*`, and `+`. Operands are `total`, `price`, `quantity`, and `tax`.
+For `total = price * quantity + tax`, take `=`, `*`, and `+` as operators and `total`, `price`, `quantity`, and `tax` as operands. This counting rule determines the Halstead vocabulary, length, and volume.
 
-**Method.** Count distinct and total operators and operands.
+Count distinct and total operators and operands under the stated token rule.
 
 1. Distinct operators:
 
@@ -172,9 +172,9 @@ V &= N\log_2(n) \\
 \end{aligned}
 $$
 
-**Checked answer.** The expression has vocabulary 7, length 7, and volume about 19.65. The check is that every token was classified exactly once under the chosen rule. Different organizations may count syntax differently, so the counting rule must be stated before comparing values.
+The expression has vocabulary 7, length 7, and volume about 19.65. Every token was classified exactly once under the chosen rule. Different organizations may count syntax differently, so the rule must be stated before comparing values.
 
-## Code
+## A small Halstead counter
 
 ```python
 import math
@@ -206,7 +206,7 @@ for name, value in metrics.items():
     print(f"{name}: {value:.2f}" if isinstance(value, float) else f"{name}: {value}")
 ```
 
-## Common pitfalls
+## How measurement programs get gamed
 
 - Collecting metrics before stating the decision they support.
 - Comparing LOC across languages, teams, or generated-code policies without normalization.
@@ -216,10 +216,8 @@ for name, value in metrics.items():
 - Optimizing the metric rather than improving the process or product.
 - Forgetting that process metrics depend on detection effort and reporting culture.
 
-## Connections
+<div className="see-also">
 
-- [Project management and process improvement](/cs/software-engineering/project-management-and-process-improvement)
-- [Project planning and estimation](/cs/software-engineering/project-planning-and-estimation)
-- [Software quality assurance](/cs/software-engineering/software-quality-assurance)
-- [Software testing](/cs/software-engineering/software-testing)
-- [Object-oriented metrics](/cs/software-engineering/object-oriented-metrics)
+See also: [Project management and process improvement](/cs/software-engineering/project-management-and-process-improvement) · [Project planning and estimation](/cs/software-engineering/project-planning-and-estimation) · [Software quality assurance](/cs/software-engineering/software-quality-assurance) · [Software testing](/cs/software-engineering/software-testing) · [Object-oriented metrics](/cs/software-engineering/object-oriented-metrics)
+
+</div>

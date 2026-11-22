@@ -13,7 +13,7 @@ Series methods solve differential equations near points where elementary closed 
 
 The method is central in engineering mathematics because many special functions, including Bessel and Legendre functions, arise as series solutions of variable-coefficient ODEs. Series also give local approximations for numerical work, asymptotic analysis, and checking software results near singular points.
 
-## Definitions
+## Taylor and Frobenius ansatzes
 
 A power series centered at $x_0$ is
 
@@ -46,7 +46,7 @@ $$
 
 The exponent $r$ is found from the indicial equation.
 
-## Key results
+## Aligning powers and deriving recurrences
 
 At an ordinary point, a second-order linear equation has two linearly independent power-series solutions. The initial values $y(x_0)$ and $y'(x_0)$ usually become the free coefficients $a_0$ and $a_1$, while the differential equation recursively determines $a_2,a_3,\ldots$.
 
@@ -74,7 +74,9 @@ Series are also useful for approximating special functions numerically. Tables a
 
 When a recurrence contains parameters, special parameter values may cause the series to terminate. A terminating power series is a polynomial solution. Legendre polynomials arise this way: requiring bounded polynomial behavior selects certain parameter values. This is an early example of an eigenvalue condition, and it connects series methods to Sturm-Liouville theory.
 
-## Visual
+## Choosing the local series form
+
+The point classification determines whether an ordinary power series is sufficient or whether the leading factor $(x-x_0)^r$ must be included.
 
 ```mermaid
 flowchart TD
@@ -95,7 +97,7 @@ flowchart TD
 | Regular singular | $(x-x_0)p$, $(x-x_0)^2q$ analytic | $(x-x_0)^r\sum a_n(x-x_0)^n$ |
 | Irregular singular | Fails regular singular test | Problem-specific asymptotics |
 
-## Worked example 1: Power series for Airy-type equation
+## Recurrence for an Airy-type equation
 
 Problem. Find a recurrence for
 
@@ -153,7 +155,7 @@ Check. The free coefficients are $a_0$ and $a_1$, as expected for a second-order
 
 The recurrence also separates the coefficients into three chains because it relates $a_{k+2}$ to $a_{k-1}$. Starting from $a_0$ produces coefficients $a_3,a_6,\ldots$, starting from $a_1$ produces $a_4,a_7,\ldots$, and $a_2=0$ forces the third chain $a_2,a_5,a_8,\ldots$ to vanish. This structure is easy to miss if the recurrence is used only mechanically.
 
-## Worked example 2: Frobenius indicial equation
+## The indicial equation for Bessel's equation
 
 Problem. Find the indicial equation for
 
@@ -213,7 +215,7 @@ Check. These exponents match the known leading behaviors of Bessel functions nea
 
 If $\nu\gt 0$, the $r=-\nu$ branch is usually more singular at $x=0$ than the $r=\nu$ branch. In boundary-value problems on a disk or cylinder, finiteness at the origin often selects the less singular solution. The differential equation alone gives both formal branches; the physical or boundary condition decides which one is admissible.
 
-## Code
+## Generating exact Airy coefficients
 
 ```python
 from fractions import Fraction
@@ -234,7 +236,7 @@ print(airy_coefficients(0, 1, 10))
 
 The function returns exact rational coefficients for the two independent series determined by $(a_0,a_1)=(1,0)$ and $(0,1)`. Exact arithmetic is useful while deriving a recurrence because it avoids hiding a wrong denominator behind decimal roundoff. For plotting, the fractions can be converted to floating-point values.
 
-## Common pitfalls
+## Index and convergence checks
 
 - Forgetting to shift indices so powers match before equating coefficients.
 - Treating a truncated series as an exact solution.
@@ -247,9 +249,8 @@ The function returns exact rational coefficients for the two independent series 
 - Forgetting that a recurrence may determine only every other coefficient, leaving even and odd solution families separate.
 - Choosing a center at a singular point and then trying an ordinary Taylor series without first testing the point type.
 
-## Connections
+<div className="see-also">
 
-- [Special Functions: Legendre and Bessel](/math/engineering-math/special-functions-legendre-bessel)
-- [Second-Order Linear ODEs](/math/engineering-math/second-order-linear-odes)
-- [Complex Functions and Analyticity](/math/engineering-math/complex-functions-and-analyticity)
-- [Orthogonal Functions and Sturm-Liouville Problems](/math/engineering-math/orthogonal-functions-and-sturm-liouville)
+See also: [Special Functions: Legendre and Bessel](/math/engineering-math/special-functions-legendre-bessel) · [Second-Order Linear ODEs](/math/engineering-math/second-order-linear-odes) · [Complex Functions and Analyticity](/math/engineering-math/complex-functions-and-analyticity) · [Orthogonal Functions and Sturm-Liouville Problems](/math/engineering-math/orthogonal-functions-and-sturm-liouville)
+
+</div>

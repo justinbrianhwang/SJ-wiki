@@ -1,4 +1,4 @@
----
+﻿---
 title: Counting Trees and Pruefer Sequences
 sidebar_position: 7
 ---
@@ -9,7 +9,7 @@ Tree counting asks how many different tree shapes or labelled trees are possible
 
 This is one of the best examples of a bijective proof in graph theory. Rather than deriving Cayley's formula by algebra alone, we build a reversible encoding. The encoding also reveals how degrees are distributed in a labelled tree, because the number of times a label appears in the Pruefer code is directly tied to the degree of that vertex.
 
-## Definitions
+## The reversible leaf-deletion code
 
 A **labelled tree** on $[n]=\{1,2,\dots,n\}$ is a tree whose vertices are those exact labels. Two labelled trees are different if their edge sets are different, even if the unlabelled shape is the same.
 
@@ -24,7 +24,7 @@ The resulting sequence lies in $[n]^{n-2}$, the set of all sequences of length $
 
 To decode a Pruefer sequence, repeatedly connect the smallest label not appearing in the current sequence to the first sequence entry, delete that first entry, and continue until two labels remain. Connect the final two labels.
 
-## Key results
+## Cayley's formula and degree multiplicities
 
 **Cayley's formula.** The number of labelled trees on $n$ vertices is
 
@@ -68,8 +68,6 @@ This formula is often the quickest way to count labelled trees with prescribed l
 
 **Unlabelled contrast.** Counting unlabelled trees is much harder because symmetries collapse many labelled trees into the same shape. For example, all stars on $n$ vertices have the same unlabelled shape, but there are $n$ different labelled stars depending on the center. Cayley's formula is therefore a labelled result; it should not be used for chemical isomer counts or rooted shape counts without additional symmetry analysis.
 
-## Visual
-
 Here is a labelled tree whose Pruefer code is computed in the first worked example.
 
 ```mermaid
@@ -88,15 +86,13 @@ graph TD
 | 3 | $3$ | $4$ | $(4,4,4)$ |
 | 4 | $4$ | $5$ | $(4,4,4,5)$ |
 
-## Worked example 1: Encode a labelled tree
+## Encoding a labelled tree
 
-**Problem.** Find the Pruefer code of the tree with edges
+Find the Pruefer code of the tree with edges
 
 $$
 14,\ 24,\ 34,\ 45,\ 56.
 $$
-
-**Method.**
 
 The vertices are $\{1,2,3,4,5,6\}$, so the code has length $6-2=4$.
 
@@ -122,17 +118,15 @@ $$
 
 This is a useful guard against encoding errors. If the multiplicities in a proposed code produce degrees whose sum is not $2n-2$, then either the code length or the vertex set has been misread.
 
-## Worked example 2: Decode a Pruefer sequence
+## Decoding back to an edge set
 
-**Problem.** Decode the Pruefer sequence
+Decode the Pruefer sequence
 
 $$
 (2,5,2,4)
 $$
 
 on vertex set $\{1,2,3,4,5,6\}$.
-
-**Method.**
 
 Start with labels $\{1,2,3,4,5,6\}$ and sequence $(2,5,2,4)$.
 
@@ -158,7 +152,7 @@ $$
 
 The decoded edge list gives exactly those degrees.
 
-## Code
+### Heap-based decoding
 
 ```python
 from collections import Counter
@@ -196,7 +190,7 @@ The decoder uses a min-heap so that the smallest currently available leaf can be
 
 For Pruefer-sequence exercises, keep a running table of current leaves, the recorded neighbor, and the remaining sequence. This prevents two common errors: deleting the wrong leaf and forgetting that a vertex can become a leaf only after all but one of its incident edges have been removed. The degree formula is an independent check after the encoding or decoding is complete.
 
-## Common pitfalls
+## Bookkeeping errors in the correspondence
 
 - Removing the largest leaf instead of the smallest leaf when using the standard Pruefer encoding. A different deterministic rule would give a different code.
 - Recording the deleted leaf instead of its neighbor. The Pruefer code records neighbors.
@@ -205,9 +199,8 @@ For Pruefer-sequence exercises, keep a running table of current leaves, the reco
 - Applying Cayley's formula to unlabelled trees. $n^{n-2}$ counts labelled trees.
 - Misreading the degree formula. A label appearing $a$ times has degree $a+1$, not $a$.
 
-## Connections
+<div className="see-also">
 
-- [Trees and spanning trees](/math/graph-theory/trees-and-spanning-trees)
-- [Algebraic graph theory basics](/math/graph-theory/algebraic-graph-theory-basics)
-- [Random graphs basics](/math/graph-theory/random-graphs-basics)
-- [Matroids and graph duality](/math/graph-theory/matroids-and-graph-duality)
+See also: [Trees and spanning trees](/math/graph-theory/trees-and-spanning-trees) · [Algebraic graph theory basics](/math/graph-theory/algebraic-graph-theory-basics) · [Random graphs basics](/math/graph-theory/random-graphs-basics) · [Matroids and graph duality](/math/graph-theory/matroids-and-graph-duality)
+
+</div>

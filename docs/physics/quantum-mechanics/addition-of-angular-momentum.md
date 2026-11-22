@@ -297,10 +297,8 @@ After constructing the states, test one operator identity rather than trusting a
 
 When a Hamiltonian is supplied, compare its largest terms with the available commuting sets before choosing a basis. A dot product favors coupled states; separate projection terms favor product states. If neither dominates, retain the conserved total projection to block-diagonalize the matrix and diagonalize within each block. This procedure keeps the symmetry savings even when no standard coupling scheme diagonalizes the entire Hamiltonian.
 
-## Related pages
+<div className="see-also">
 
-- [Angular momentum algebra](/physics/quantum-mechanics/angular-momentum-algebra)
-- [Spin-$1/2$ systems](/physics/quantum-mechanics/spin-one-half-systems)
-- [Central potentials and the hydrogen atom](/physics/quantum-mechanics/central-potentials-hydrogen-atom)
-- [Identical particles and symmetrization](/physics/quantum-mechanics/identical-particles-symmetrization)
-- [Time-independent perturbation theory](/physics/quantum-mechanics/time-independent-perturbation-theory)
+See also: [Angular momentum algebra](/physics/quantum-mechanics/angular-momentum-algebra) · [Spin-$1/2$ systems](/physics/quantum-mechanics/spin-one-half-systems) · [Central potentials and the hydrogen atom](/physics/quantum-mechanics/central-potentials-hydrogen-atom) · [Identical particles and symmetrization](/physics/quantum-mechanics/identical-particles-symmetrization) · [Time-independent perturbation theory](/physics/quantum-mechanics/time-independent-perturbation-theory)
+
+</div>

@@ -5,49 +5,13 @@ sidebar_position: 8
 
 # Packages, Crates, and Modules
 
-As Rust projects grow, the problem changes from "can this file compile?" to "where should this item live, who can use it, and how do names resolve?" The book's module-system chapter answers those questions with packages, crates, modules, paths, visibility, and `use`. These concepts are Rust's way to separate public API from private implementation while keeping compilation units explicit.
+Once a Rust project grows beyond one file, its design includes placement and visibility: where an item belongs, which code may use it, and which path names it. Cargo packages and compiler crates set the outer compilation boundaries; modules, paths, and `use` organize names inside a crate.
 
-This page follows the custom-type pages because modules are often where structs, enums, functions, and traits become part of a library boundary. It also prepares for [Cargo workflows](/cs/programming/rust/cargo-crates-io-workflow), where packages are published, versioned, and consumed by other crates.
+## From a Cargo package to the module tree
 
-## Definitions
+A package is a Cargo unit described by `Cargo.toml`. It contains one or more crates, with at most one library crate and any number of binary crates.
 
-A package is a Cargo feature: a bundle containing a `Cargo.toml` manifest and one or more crates. A package can contain at most one library crate, but it may contain multiple binary crates.
-
-A crate is a compilation unit. The crate root is the source file from which the compiler starts building the crate's module tree. For a binary crate, the default root is `src/main.rs`. For a library crate, the default root is `src/lib.rs`.
-
-A module groups items inside a crate. Modules can contain functions, structs, enums, traits, constants, other modules, and implementations. A module tree starts at the crate root.
-
-A path names an item. An absolute path starts from the crate root with `crate`. A relative path starts from the current module and can use `self` or `super`.
-
-Visibility controls whether code outside a module can access an item. Items are private to their parent modules by default. `pub` makes an item visible to parent modules and external users according to where it appears. Public structs still have private fields unless each field is marked `pub`. Public enum variants are public when the enum is public.
-
-`use` brings a path into scope, reducing repetition. It does not make the item public by itself. `pub use` both brings a name into scope and re-exports it as part of the module's public API.
-
-The `as` keyword renames an imported item, which is useful when two paths contain items with the same final name.
-
-## Key results
-
-The first key result is that modules define privacy boundaries. A child module can use items from its ancestor modules, but parent modules cannot access private items inside child modules unless those items are made public.
-
-The second key result is that public API design is deliberate. Marking a type `pub` does not automatically expose its internal fields. This lets a crate expose constructors and methods while preserving invariants.
-
-The third key result is that the file layout follows the module tree but is not the module system itself. The declarations in `mod` statements tell Rust which modules exist. Files such as `src/front_of_house.rs` or `src/front_of_house/hosting.rs` are ways to store module contents.
-
-The fourth key result is that idiomatic `use` paths often import a parent module for functions and a final type name for structs, enums, and other items. For example, `use std::collections::HashMap;` is common, while `use std::fmt;` keeps calls such as `fmt::Result` clear.
-
-Proof sketch for privacy: if a module exposes a function that constructs a value but keeps the fields private, outside code cannot build invalid values directly. It must call the public function or methods, which can enforce checks. The compiler enforces this boundary during name resolution and field access.
-
-A practical result is that module design should follow the reader's path through the API, not only the author's file organization. Internal files may be split for maintainability, but public names should guide users toward the stable concepts they need. Re-exporting with `pub use` can make a deep internal path appear as a short public path. That is useful when the internal module tree is more detailed than the public API should be. It is also a commitment: downstream users may write that re-exported path in their code. Therefore the question is not "can this compile if it is public?" but "do I want to support this name as part of the crate's interface?" This is why module privacy belongs with API design rather than with mere housekeeping.
-
-The file-system forms introduced by the book are another source of precision. A module named `garden` may live in `src/garden.rs` or `src/garden/mod.rs`, and a child module named `vegetables` may live in `src/garden/vegetables.rs` or `src/garden/vegetables/mod.rs`. Modern Rust style usually prefers the non-`mod.rs` file when possible, but the important point is that the `mod garden;` declaration is what tells the compiler to include that module.
-
-This is why missing-module errors should be read as name-resolution errors first and file-placement errors second. Rust is asking whether the declared module can be found and whether the requested path is visible from the current location.
-
-Good module names are therefore part of readability: they should explain ownership of concepts, not mirror every temporary implementation detail.
-
-As a project evolves, moving code between private modules should be cheap. Moving public paths is expensive because users may depend on them.
-
-## Visual
+A crate is a compilation unit. The compiler begins at its crate root: normally `src/main.rs` for a binary target and `src/lib.rs` for a library target. From there, module declarations form a tree of functions, structs, enums, traits, constants, implementations, and nested modules.
 
 ```mermaid
 flowchart TD
@@ -55,26 +19,30 @@ flowchart TD
   B --> C[hosting]
   B --> D[serving]
   A --> E[back_of_house]
-  E --> F[Appetizer enum]
-  E --> G[Breakfast struct]
+  E --> F[Appetizer]
+  E --> G[Breakfast]
   C --> H[add_to_waitlist]
   D --> I[take_order]
 ```
 
-| Concept | Example | Meaning |
+A path locates an item in that tree:
+
+| Form | Example | Starting point or effect |
 |---|---|---|
-| Absolute path | `crate::front_of_house::hosting::add_to_waitlist` | Start at crate root |
-| Relative path | `front_of_house::hosting::add_to_waitlist` | Start at current module |
-| Parent path | `super::serve_order()` | Start at parent module |
-| Private item | `fn cook_order()` | Visible only in current module and children |
-| Public item | `pub fn eat_at_restaurant()` | Exposed through module boundary |
-| Re-export | `pub use front_of_house::hosting;` | Public shortcut in API |
+| Absolute path | `crate::front_of_house::hosting::add_to_waitlist` | Crate root |
+| Relative path | `front_of_house::hosting::add_to_waitlist` | Current module |
+| Parent path | `super::serve_order()` | Parent module |
+| Private item | `fn cook_order()` | Current module and its descendants |
+| Public item | `pub fn eat_at_restaurant()` | Callers that can reach its public path |
+| Re-export | `pub use front_of_house::hosting;` | A new public path in the API |
 
-## Worked example 1: making a restaurant API public
+`self` can make the current-module starting point explicit. Absolute and relative forms are both useful; the clearer choice depends on how stable and nearby the referenced item is.
 
-Problem: expose a restaurant function that lets outside code add a customer to a waitlist while keeping internal serving functions private.
+## Privacy defines the public API
 
-1. Start with the module tree:
+Items are private to their parent module by default. Descendant modules can access items from their ancestors, but an ancestor cannot enter a child's private namespace. Every segment on an external path must have sufficient visibility.
+
+Consider a restaurant crate:
 
 ```rust
 mod front_of_house {
@@ -86,29 +54,15 @@ mod front_of_house {
         fn take_order() {}
     }
 }
-```
 
-2. Check visibility. `front_of_house` is private to the crate root, but code in the crate root can access it because it is a child module. The `hosting` module is public, and `add_to_waitlist` is public inside it.
-
-3. Write a public crate-level function:
-
-```rust
 pub fn eat_at_restaurant() {
     crate::front_of_house::hosting::add_to_waitlist();
 }
 ```
 
-4. Try to call `serving::take_order` from outside `front_of_house`. This fails because `serving` is private and `take_order` is private. The implementation detail stays hidden.
+The crate root can access its private child `front_of_house`. Inside that module, `hosting` and `add_to_waitlist` are public, so the crate-level function can reach the operation. Outside callers use `eat_at_restaurant`; they cannot reach the private `serving::take_order` implementation.
 
-5. Check the answer. External users can call `eat_at_restaurant`, and the crate can internally route that call to the public hosting operation. They cannot call the serving internals.
-
-This is the smallest version of an API boundary: one public function backed by private organization.
-
-## Worked example 2: public struct with private fields
-
-Problem: allow users to create a breakfast order but prevent them from changing a required seasonal field directly.
-
-1. Define the struct:
+Visibility is granular. Making a struct public does not expose its fields:
 
 ```rust
 mod back_of_house {
@@ -116,40 +70,50 @@ mod back_of_house {
         pub toast: String,
         seasonal_fruit: String,
     }
-}
-```
 
-2. Notice the mixed visibility. The type is public. The `toast` field is public. The `seasonal_fruit` field is private.
-
-3. Add a constructor:
-
-```rust
-impl Breakfast {
-    pub fn summer(toast: &str) -> Breakfast {
-        Breakfast {
-            toast: String::from(toast),
-            seasonal_fruit: String::from("peaches"),
+    impl Breakfast {
+        pub fn summer(toast: &str) -> Breakfast {
+            Breakfast {
+                toast: String::from(toast),
+                seasonal_fruit: String::from("peaches"),
+            }
         }
     }
 }
 ```
 
-4. Use it:
+Callers may construct a breakfast through `Breakfast::summer` and replace the public `toast` field. They cannot assign to `seasonal_fruit`, so the constructor retains control of that invariant. Public enum variants follow a different rule: when an enum is public, its variants are public too.
+
+## Files store modules; declarations create them
+
+The module tree is a language structure, not a directory scan. A declaration such as `mod garden;` tells Rust that the module exists and directs it to the corresponding source file.
+
+A `garden` module can be stored in `src/garden.rs` or the older `src/garden/mod.rs` form. A child named `vegetables`, declared inside `garden`, can live in `src/garden/vegetables.rs` or `src/garden/vegetables/mod.rs`. Current projects usually prefer the non-`mod.rs` form when possible.
+
+Missing-module errors therefore involve two questions: whether the module was declared at the right point in the tree, and whether Rust can find the file for that declaration. Moving a file without updating the relevant `mod` statements breaks the tree even if the new directory layout looks plausible.
+
+## Imports and re-exports shape the names callers see
+
+`use` brings a path into the current scope; it does not change the imported item's visibility. Idiomatic imports often bring a function's parent module into scope, preserving useful context at the call site, while structs, enums, and other named types are commonly imported directly:
 
 ```rust
-let mut meal = back_of_house::Breakfast::summer("Rye");
-meal.toast = String::from("Wheat");
+use std::fmt;
+use std::collections::HashMap;
 ```
 
-5. Check what cannot be done:
+`as` resolves collisions between final names. Keeping one or both module-qualified is another clear option.
+
+`pub use` both imports and re-exports. It can present a short stable API even when the private implementation tree is deeper:
 
 ```rust
-meal.seasonal_fruit = String::from("blueberries");
+pub use crate::front_of_house::hosting;
 ```
 
-That assignment is rejected outside `back_of_house`. The checked answer is that callers can customize toast but cannot break the seasonal-fruit invariant.
+That convenience is also a compatibility commitment. Downstream code may name the re-exported path, so reorganizing private files is cheap while changing public paths can break users.
 
-## Code
+## A controlled inventory type
+
+The following module exposes the operations callers need while retaining control of the `category` field:
 
 ```rust
 mod inventory {
@@ -188,22 +152,152 @@ fn main() {
 }
 ```
 
-The field `name` is public and can be read directly. The field `category` is private, so outside code uses a method. This keeps the representation controlled while still exposing needed information.
+The public constructor can validate future representation changes, and the accessor exposes a borrow rather than allowing arbitrary replacement. Internal file splits may follow maintenance needs; the public names should follow the concepts callers need.
 
-## Common pitfalls
+## Diagnosing path and visibility errors
 
-- Making a module `pub` but forgetting to make the item inside it `pub`.
-- Making a struct `pub` and assuming its fields are public.
-- Overusing `use crate::...` when a short relative path would be clearer inside nearby modules.
-- Re-exporting implementation details with `pub use` and accidentally committing to them as public API.
-- Confusing packages and crates. A package is the Cargo bundle; a crate is a compilation unit.
-- Moving files around without updating `mod` declarations.
-- Importing two items with the same final name without using `as` or keeping module-qualified names.
+Several near-misses recur in larger trees:
 
-## Connections
+- a module is `pub`, but the item inside it remains private;
+- a struct is `pub`, but code assumes its fields are public too;
+- a re-export leaks an implementation detail that later becomes hard to move;
+- package and crate are treated as synonyms even though one package may build several crates;
+- a file moves without the corresponding `mod` declaration changing;
+- two imports introduce the same final name without `as` or module qualification;
+- every nearby reference uses a long `crate::...` path even where a short relative path would read more clearly.
 
-- [Getting started, toolchain, and Cargo](/cs/programming/rust/getting-started-toolchain-cargo)
-- [Structs, methods, and enums](/cs/programming/rust/structs-methods-enums)
-- [Common collections](/cs/programming/rust/common-collections)
-- [Cargo and crates.io workflow](/cs/programming/rust/cargo-crates-io-workflow)
-- [Object-oriented and advanced features](/cs/programming/rust/object-oriented-and-advanced-features)
+The useful debugging sequence is to identify the target in the module tree, trace every path segment from the current module, then check visibility and file placement.
+
+## Worked example: split one library into files
+
+Suppose a package exposes gardening types and also builds a small command-line program. Its source tree is:
+
+```text
+garden_app/
+  Cargo.toml
+  src/
+    lib.rs
+    garden.rs
+    garden/
+      vegetables.rs
+    main.rs
+```
+
+The declarations, rather than the directories alone, create the module tree. `src/lib.rs` contains:
+
+```rust
+pub mod garden;
+pub use garden::vegetables::Asparagus;
+```
+
+`src/garden.rs` contains:
+
+```rust
+pub mod vegetables;
+
+pub fn season() -> &'static str {
+    "summer"
+}
+```
+
+`src/garden/vegetables.rs` contains:
+
+```rust
+#[derive(Debug)]
+pub struct Asparagus {
+    pub length_cm: u32,
+}
+```
+
+Compilation starts at `lib.rs`. The declaration `pub mod garden;` loads `garden.rs` and creates the child module `garden`. Its `pub mod vegetables;` loads `garden/vegetables.rs` as a child. The re-export in `lib.rs` gives external callers the shorter path `garden_app::Asparagus` while the defining path remains `garden_app::garden::vegetables::Asparagus`.
+
+The binary root `main.rs` is a separate crate in the same package:
+
+```rust
+use garden_app::{garden, Asparagus};
+
+fn main() {
+    let plant = Asparagus { length_cm: 24 };
+    println!("{plant:?} grows in {}", garden::season());
+}
+```
+
+The binary accesses the library as an external crate by its crate name. It cannot use the library's private items merely because both targets share a package. That separation catches accidental reliance on internals and keeps the reusable API honest.
+
+If `pub mod garden` became plain `mod garden`, the root could still re-export `Asparagus`, but the binary could no longer name `garden::season` through the public path. Visibility is checked along the entire path. A public leaf hidden behind a private ancestor is unreachable unless another public re-export exposes it.
+
+## `pub(crate)`, `pub(super)`, and restricted visibility
+
+Visibility need not be only private or globally public. `pub(crate)` exposes an item throughout the current crate but not to downstream crates. It is useful for helpers shared across internal modules. `pub(super)` exposes an item to the parent module. Restricted forms such as `pub(in crate::path)` can name an ancestor scope.
+
+Narrow visibility records architectural intent. A parser helper used by two sibling modules may be crate-visible without becoming a compatibility promise to users. Making everything `pub` to silence an access error grows the external API and allows callers to depend on representation details.
+
+Privacy is relative to the module tree. A parent can define policy through public methods while children use private ancestors' items according to Rust's descendant access rules. When an access error appears, identify the item and the caller's module; file proximity does not decide permission.
+
+## Imports affect names, not ownership or loading
+
+`use` creates a shorter name in the current scope. It does not copy the item, execute a module, or make a private definition public. Child modules have their own scopes and do not automatically inherit a parent's `use` declarations. They can refer through `super`, import directly, or sometimes use names re-exported by an ancestor.
+
+Grouped imports reduce repetition when they remain readable:
+
+```rust
+use std::{cmp::Ordering, collections::HashMap, io::{self, Write}};
+```
+
+`self` in the nested group imports the `io` module alongside `io::Write`. A glob import brings every public name from a path into scope. It is common in test modules or preludes with deliberate conventions, but broad globs in application code can hide where names originate and can introduce conflicts when an upstream crate adds exports.
+
+Two types named `Result` or `Error` can coexist through aliases:
+
+```rust
+use std::fmt::Result as FmtResult;
+use std::io::Result as IoResult;
+```
+
+Alternatively, importing the parent modules and writing `fmt::Result` and `io::Result` keeps context at each use. The better form is the one that reduces ambiguity in that module.
+
+## Worked example: protect a constructor invariant
+
+Consider a percentage that must remain between zero and one hundred:
+
+```rust
+pub mod metrics {
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub struct Percent(u8);
+
+    impl Percent {
+        pub fn new(value: u8) -> Option<Self> {
+            (value <= 100).then_some(Self(value))
+        }
+
+        pub fn get(self) -> u8 {
+            self.0
+        }
+    }
+}
+```
+
+The struct is public, but its tuple field is private. External code can name `Percent` and store it, yet `Percent(200)` fails outside the defining module. `new(85)` checks the range and returns `Some(Percent(85))`; `new(200)` returns `None`. Once constructed, `get` can safely return the inner value because the module controls every creation path.
+
+Making the field public would erase the invariant. Making only the module public would not be enough if the struct remained private. Every segment and the final item participate in reachability, while field privacy separately controls construction and mutation.
+
+An enum differs because its variants define how values are constructed and matched. Public enum variants are public with the enum. When callers should not exhaustively match future states, a public struct with private representation and methods may offer more evolution room; alternatively, a non-exhaustive design can signal that variants or fields may grow.
+
+## Public paths become compatibility commitments
+
+Files can move freely when public paths remain stable through re-exports. A crate might define a type deep under an internal module and expose it at the root. Downstream code then depends on the root path, not the file layout. This lets maintainers reorganize implementation without forcing import changes.
+
+Re-exporting the same item from several public paths can be convenient during a migration, but it also leaves multiple documented names. A deliberate facade module often gives a library a smaller surface than exposing every internal module. API documentation, examples, and compiler diagnostics then point callers toward concepts rather than storage decisions.
+
+Cycles in the conceptual design do not require circular file declarations. Modules form one tree rooted at the crate. Sibling modules can refer to each other through crate-relative paths when visibility permits, even though neither contains the other in the filesystem. If two modules need extensive access to each other's internals, their responsibilities may be too entangled.
+
+## Packages with several targets
+
+One package may have a library, the default binary, additional binaries under `src/bin`, examples, integration tests, and benchmarks. Each target is a crate with its own root and compilation context. Integration tests under `tests` are separate crates that can use only the library's public API. Unit tests inside a source module can access that module's private items through a child test module.
+
+A workspace groups several packages under shared dependency resolution and a common target directory. Workspace membership does not merge their module trees or privacy boundaries. Each package still declares dependencies on the others it uses. Choose another package when a component needs an independent version, dependency set, or compilation boundary; choose another module for ordinary organization within one crate.
+
+<div className="see-also">
+
+See also: [Getting started, toolchain, and Cargo](/cs/programming/rust/getting-started-toolchain-cargo) · [Structs, methods, and enums](/cs/programming/rust/structs-methods-enums) · [Common collections](/cs/programming/rust/common-collections) · [Cargo and crates.io workflow](/cs/programming/rust/cargo-crates-io-workflow) · [Object-oriented and advanced features](/cs/programming/rust/object-oriented-and-advanced-features)
+
+</div>

@@ -474,9 +474,8 @@ One draw exceeds $0.8$ with probability $0.2$, but two chances to exceed the thr
 - Under $Y=a+bX$, the mean changes to $a+bE[X]$, while the variance becomes $b^2\operatorname{Var}(X)$. The translation $a$ has no effect on variance.
 - “Chosen at random” does not automatically mean uniform. A mechanism or symmetry argument must justify why equal-length regions should have equal chances.
 
-## Related pages
+<div className="see-also">
 
-- [Discrete random variables, expectation, and variance](/math/probability-and-random-variables/discrete-random-variables-expectation-variance)
-- [Normal, exponential, gamma, beta, and Cauchy laws](/math/probability-and-random-variables/normal-exponential-gamma-beta-cauchy)
-- [Joint distributions, transformations, and independence](/math/probability-and-random-variables/joint-distributions-transformations-independence)
-- [Sums, convolutions, and order statistics](/math/probability-and-random-variables/sums-convolutions-order-statistics)
+See also: [Discrete random variables, expectation, and variance](/math/probability-and-random-variables/discrete-random-variables-expectation-variance) · [Normal, exponential, gamma, beta, and Cauchy laws](/math/probability-and-random-variables/normal-exponential-gamma-beta-cauchy) · [Joint distributions, transformations, and independence](/math/probability-and-random-variables/joint-distributions-transformations-independence) · [Sums, convolutions, and order statistics](/math/probability-and-random-variables/sums-convolutions-order-statistics)
+
+</div>

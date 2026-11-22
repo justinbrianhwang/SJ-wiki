@@ -13,7 +13,7 @@ Atkins develops quantum mechanics as the structure language of physical chemistr
 
 *Figure: Double-slit interference as context for wave behavior in quantum mechanics. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Double_slit.svg), Epzcaw, CC BY-SA 3.0.*
 
-## Definitions
+## From quanta to wavefunctions
 
 Planck's relation connects photon energy and frequency:
 
@@ -71,7 +71,33 @@ $$
 \langle A\rangle=\int \psi^\ast \hat A\psi\,d\tau
 $$
 
-## Key results
+## Operators, uncertainty, and boundary conditions
+
+The main ideas fit together as follows:
+
+```mermaid
+flowchart TD
+  A[Experimental failures of classical physics] --> B[Quantized energy]
+  A --> C[Wave-particle duality]
+  B --> D[Schrodinger equation]
+  C --> D
+  D --> E[Wavefunctions]
+  E --> F[Born probability]
+  E --> G[Operators and observables]
+  G --> H[Expectation values]
+  G --> I[Uncertainty from noncommutation]
+  D --> J[Boundary conditions]
+  J --> K[Discrete spectra]
+```
+
+| Concept | Mathematical form | Chemical consequence |
+|---|---:|---|
+| Photon quantization | $E=h\nu$ | spectra measure energy gaps |
+| Matter waves | $\lambda=h/p$ | electron diffraction, orbitals |
+| Born rule | probability density $\vert \psi\vert ^2$ | electron density and orbital interpretation |
+| Schrodinger equation | $\hat H\psi=E\psi$ | allowed molecular energies |
+| Operator expectation | $\langle A\rangle=\int\psi^\ast\hat A\psi d\tau$ | measurable averages |
+| Uncertainty | $\Delta x\Delta p\ge\hbar/2$ | no classical electron orbits |
 
 The uncertainty principle for position and momentum is
 
@@ -127,43 +153,17 @@ $$
 
 where $d\tau$ may be $dx\,dy\,dz$ or a coordinate-appropriate volume element such as $r^2\sin\theta\,dr\,d\theta\,d\phi$. Coordinate changes therefore matter. A radial wavefunction in an atom may be largest at the nucleus, while the radial probability distribution includes the $4\pi r^2$ shell-volume factor and may peak away from the nucleus.
 
-Operators encode measurement. The Hamiltonian operator corresponds to total energy, the momentum operator to momentum, and position acts by multiplication. If a system is in an eigenstate of an operator, measurement of that observable gives the corresponding eigenvalue with certainty. If not, the wavefunction can be expanded in eigenfunctions, and the squared coefficients give probabilities for the different outcomes. This is why superposition is physically consequential rather than merely algebraic.
+Operators encode measurement. The Hamiltonian operator corresponds to total energy, the momentum operator to momentum, and position acts by multiplication. If a system is in an eigenstate of an operator, measurement of that observable gives the corresponding eigenvalue with certainty. If not, the wavefunction can be expanded in eigenfunctions, and the squared coefficients give probabilities for the different outcomes. Superposition is therefore physically consequential rather than merely algebraic.
 
-Commutation determines compatibility. If two operators commute, they can have simultaneous eigenfunctions and their observables can be specified together. If they do not commute, there is an uncertainty relation. Position and momentum are the classic pair, but angular momentum components also fail to commute with one another. This is why an orbital can have well-defined $L^2$ and $L_z$, but not simultaneous definite $L_x$, $L_y$, and $L_z$.
+Commutation determines compatibility. If two operators commute, they can have simultaneous eigenfunctions and their observables can be specified together. If they do not commute, there is an uncertainty relation. Position and momentum are the classic pair, but angular momentum components also fail to commute with one another. An orbital can therefore have well-defined $L^2$ and $L_z$, but not simultaneous definite $L_x$, $L_y$, and $L_z$.
 
 Complex wavefunctions are not an exotic extra. Traveling waves naturally use complex exponentials, and time-dependent quantum mechanics uses phase factors such as $e^{-iEt/\hbar}$. The measurable probability density is real, but relative phase affects interference and transition amplitudes. Molecular orbital signs, phases, and nodal patterns therefore matter deeply even though only $\vert \psi\vert ^2$ is directly interpreted as probability density.
 
-Boundary conditions supply much of chemistry. A wavefunction confined by a box, attracted by a Coulomb potential, or localized in a bond must satisfy mathematical restrictions. Only certain shapes fit, and those shapes determine energies. This is why confinement in conjugated molecules changes color, why smaller quantum dots absorb at shorter wavelengths, and why vibrational frequencies depend on bond strength and reduced mass.
+Boundary conditions supply much of chemistry. A wavefunction confined by a box, attracted by a Coulomb potential, or localized in a bond must satisfy mathematical restrictions. Only certain shapes fit, and those shapes determine energies. Confinement changes the color of conjugated molecules, makes smaller quantum dots absorb at shorter wavelengths, and links vibrational frequencies to bond strength and reduced mass.
 
-The postulates of quantum mechanics also explain why spectroscopy is selective. A transition is not allowed merely because two levels have the right energy difference. Radiation interacts through an operator, often the electric dipole moment, and the transition moment integral must be nonzero. Symmetry and overlap decide whether this happens. Thus the foundations here connect directly to group theory and spectroscopy later in the wiki.
+The postulates of quantum mechanics also explain why spectroscopy is selective. A transition is not allowed merely because two levels have the right energy difference. Radiation interacts through an operator, often the electric dipole moment, and the transition moment integral must be nonzero. Symmetry and overlap decide whether this happens, linking the postulates directly to group theory and spectroscopy.
 
-## Visual
-
-```mermaid
-flowchart TD
-  A[Experimental failures of classical physics] --> B[Quantized energy]
-  A --> C[Wave-particle duality]
-  B --> D[Schrodinger equation]
-  C --> D
-  D --> E[Wavefunctions]
-  E --> F[Born probability]
-  E --> G[Operators and observables]
-  G --> H[Expectation values]
-  G --> I[Uncertainty from noncommutation]
-  D --> J[Boundary conditions]
-  J --> K[Discrete spectra]
-```
-
-| Concept | Mathematical form | Chemical consequence |
-|---|---:|---|
-| Photon quantization | $E=h\nu$ | spectra measure energy gaps |
-| Matter waves | $\lambda=h/p$ | electron diffraction, orbitals |
-| Born rule | probability density $\vert \psi\vert ^2$ | electron density and orbital interpretation |
-| Schrodinger equation | $\hat H\psi=E\psi$ | allowed molecular energies |
-| Operator expectation | $\langle A\rangle=\int\psi^\ast\hat A\psi d\tau$ | measurable averages |
-| Uncertainty | $\Delta x\Delta p\ge\hbar/2$ | no classical electron orbits |
-
-## Worked example 1: de Broglie wavelength of an electron
+## Electron wavelength after a 100 V acceleration
 
 **Problem.** Estimate the de Broglie wavelength of an electron accelerated through $100\ \mathrm{V}$ from rest. Ignore relativistic effects.
 
@@ -204,7 +204,7 @@ $$
 
 **Checked answer.** $\lambda=0.123\ \mathrm{nm}$, comparable to atomic spacings, which is why electrons can diffract from crystals.
 
-## Worked example 2: Normalizing a simple wavefunction
+## Normalizing a finite-interval wavefunction
 
 **Problem.** Normalize $\psi(x)=Nx$ on $0\le x\le a$ and $\psi=0$ elsewhere.
 
@@ -245,7 +245,7 @@ $$
 
 **Checked answer.** The normalized function is $\psi(x)=\sqrt{3/a^3}\,x$. Its units are $L^{-1/2}$, correct for a one-dimensional wavefunction.
 
-## Code
+## Numerical checks for wavelength and normalization
 
 ```python
 import numpy as np
@@ -268,7 +268,7 @@ print("normalization constant:", N)
 print("integral:", integral, "error estimate:", error)
 ```
 
-## Common pitfalls
+## Keeping the mathematical objects straight
 
 - Treating $\psi$ itself as a probability. The probability density is $\vert \psi\vert ^2$.
 - Forgetting normalization before calculating expectation values.
@@ -278,7 +278,7 @@ print("integral:", integral, "error estimate:", error)
 
 A useful habit is to state the Hilbert-space object before interpreting it. Are you discussing a wavefunction, a probability density, an operator, an eigenvalue, or an expectation value? Many conceptual mistakes come from sliding between these. For example, an orbital drawing is usually a surface of constant amplitude or density, not a literal boundary that contains an electron.
 
-When evaluating integrals, include the correct volume element. In spherical coordinates, $d\tau=r^2\sin\theta\,dr\,d\theta\,d\phi$, so radial probability includes an $r^2$ factor. This is why an electron in a hydrogen $1s$ orbital has maximum density at the nucleus but maximum radial probability at a nonzero radius. Density and shell probability answer different questions.
+When evaluating integrals, include the correct volume element. In spherical coordinates, $d\tau=r^2\sin\theta\,dr\,d\theta\,d\phi$, so radial probability includes an $r^2$ factor. An electron in a hydrogen $1s$ orbital consequently has maximum density at the nucleus but maximum radial probability at a nonzero radius. Density and shell probability answer different questions.
 
 For uncertainty, avoid the measurement-disturbance oversimplification. Disturbance can occur, but the deeper statement is that some operators do not share exact simultaneous eigenstates. The spread is built into the state. This interpretation is essential for understanding zero-point energy, tunneling, and the absence of classical rest for confined particles.
 
@@ -286,13 +286,10 @@ Dimensional analysis is a useful guardrail in quantum work. A one-dimensional no
 
 When a result is complex-valued, ask whether the observable should be real. Probabilities, energies, and expectation values of Hermitian operators must be real even when the intermediate wavefunctions and amplitudes are complex.
 
-Approximation is normal in quantum chemistry. The important habit is to state the approximation, identify the small parameter or neglected coupling, and check whether the conclusion depends on what was neglected.
+Approximation is normal in quantum chemistry. State the approximation, identify the small parameter or neglected coupling, and check whether the conclusion depends on what was neglected, especially when moving from one-particle models to many-electron molecules.
 
-This is especially important when moving from one-particle models to many-electron molecules.
+<div className="see-also">
 
-## Connections
+See also: [Quantum models of motion](/chemistry/physical-chemistry/quantum-models-of-motion) · [Atomic structure and spectra](/chemistry/physical-chemistry/atomic-structure-and-spectra) · [Physics quantum mechanics](/physics/quantum-mechanics/intro) · [Engineering math differential equations](/math/engineering-math/intro)
 
-- [Quantum models of motion](/chemistry/physical-chemistry/quantum-models-of-motion)
-- [Atomic structure and spectra](/chemistry/physical-chemistry/atomic-structure-and-spectra)
-- [Physics quantum mechanics](/physics/quantum-mechanics/)
-- [Engineering math differential equations](/math/engineering-math/)
+</div>

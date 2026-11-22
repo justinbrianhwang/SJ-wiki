@@ -13,7 +13,7 @@ Machine translation maps text from a source language to a target language. Juraf
 
 MT is a compact view of NLP as a whole. It needs tokenization, language modeling, sequence modeling, search, semantics, evaluation, and awareness of social context. A translation must be adequate, preserving meaning, and fluent, sounding natural in the target language. Those goals are easy to state and hard to optimize directly.
 
-## Definitions
+## Translation as conditional generation
 
 Given a source sentence $x$ and target sentence $y$, machine translation seeks
 
@@ -39,7 +39,7 @@ An **encoder-decoder transformer** uses self-attention in the encoder, causal se
 
 **Parallel corpora** or **bitexts** contain aligned source-target sentence pairs. **Backtranslation** creates synthetic parallel data by translating monolingual target-language text back into the source language.
 
-## Key results
+## Alignment, attention, and decoding
 
 Translation is not word substitution. Languages differ in word order, morphology, agreement, pronoun use, politeness, tense, evidentiality, and what must be made explicit. These divergences explain why phrase-based SMT, syntax-based SMT, and encoder-decoder neural models all needed mechanisms beyond dictionary lookup.
 
@@ -66,8 +66,6 @@ A deployment-oriented MT system also needs uncertainty handling. Some sentences 
 Search errors and model errors should be separated when debugging. If the gold or a good translation has high model probability but beam search fails to find it, decoding is the issue. If the model assigns high probability to a bad translation, training data, objective, or architecture is the issue. This distinction mirrors the search-versus-learning theme in Eisenstein.
 
 Human post-editing data is especially informative because it shows what a professional translator had to change. Edits can be grouped into terminology, word order, omission, addition, agreement, style, and meaning errors, giving more actionable feedback than a single corpus BLEU score.
-
-## Visual
 
 ```mermaid
 flowchart TB
@@ -123,9 +121,11 @@ This MT architecture diagram shows the full encoder-decoder Transformer path use
 | Neural MT | encoder-decoder states | autoregressive decoding | fluent and generalizing | hallucination and data hunger |
 | Transformer MT | self-attention plus cross-attention | beam or sampling | parallel training, strong quality | quadratic attention and bias risks |
 
-## Worked example 1: beam search
+## Search and evaluation by hand
 
-Problem: decode two steps with beam width $k=2$. At step 1, the decoder offers:
+### Tracing a width-two beam
+
+Decode two steps with beam width $k=2$. At step 1, the decoder offers:
 
 | token | log probability |
 |---|---:|
@@ -152,11 +152,11 @@ after "a": witch -0.4, house -0.6
    - `the witch` with $-0.5$
    - `the green` with $-1.0$
 
-Checked answer: after two steps, the beam contains `the witch` and `the green`. A later token may still make the second hypothesis better, which is why beam search delays commitment.
+After two steps, the beam contains `the witch` and `the green`. A later token may still make the second hypothesis better, so beam search delays commitment.
 
-## Worked example 2: clipped unigram precision for BLEU
+### Why BLEU clips repeated words
 
-Problem: candidate translation is `the the the cat`; reference is `the cat sat`. Compute clipped unigram precision.
+The candidate translation is `the the the cat`; the reference is `the cat sat`. Compute clipped unigram precision.
 
 1. Candidate unigram counts:
    - `the`: $3$
@@ -186,13 +186,11 @@ $$
 p_1=\frac{2}{4}=0.5.
 $$
 
-Checked answer: clipped unigram precision is $0.5$. Clipping prevents repeated `the` from receiving unlimited credit.
+Clipped unigram precision is $0.5$. Clipping prevents repeated `the` from receiving unlimited credit.
 
-## Code
+## A compact beam decoder
 
 ```python
-from math import log
-
 def beam_decode(next_logprobs, beam_size=2, max_steps=3):
     beam = [([], 0.0)]
     for _ in range(max_steps):
@@ -218,7 +216,7 @@ def toy_model(prefix):
 print(beam_decode(toy_model, beam_size=2, max_steps=3))
 ```
 
-## Common pitfalls
+## Errors that corpus scores can hide
 
 - Treating bilingual dictionaries as sufficient for translation.
 - Evaluating with BLEU or chrF on single sentences and over-interpreting the result.
@@ -228,9 +226,8 @@ print(beam_decode(toy_model, beam_size=2, max_steps=3))
 - Training low-resource systems without involving speakers and domain experts.
 - Ignoring document context, terminology constraints, and politeness or register.
 
-## Connections
+<div className="see-also">
 
-- [Transformers and self-attention](/cs/nlp/transformers-self-attention)
-- [RNNs and LSTMs for sequence modeling](/cs/nlp/rnns-lstms-sequence-modeling)
-- [N-gram language models](/cs/nlp/n-gram-language-models)
-- [Speech recognition and synthesis](/cs/nlp/speech-recognition-and-synthesis)
+See also: [Transformers and self-attention](/cs/nlp/transformers-self-attention) · [RNNs and LSTMs for sequence modeling](/cs/nlp/rnns-lstms-sequence-modeling) · [N-gram language models](/cs/nlp/n-gram-language-models) · [Speech recognition and synthesis](/cs/nlp/speech-recognition-and-synthesis)
+
+</div>

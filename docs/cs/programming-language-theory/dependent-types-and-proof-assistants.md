@@ -7,9 +7,9 @@ sidebar_position: 5
 
 Dependent type theory lets types mention values. That single move turns types from coarse program classifiers into precise specifications: a vector type may include its length, a parser type may state the grammar it recognizes, and a theorem may be represented as the type of its proofs. TAPL mentions dependent types as an advanced direction, while Software Foundations makes the Curry-Howard style concrete through machine-checked definitions, inductive propositions, tactics, and proofs about small programming languages [1], [2].
 
-This page is a combined treatment of the source material plus modern context. Coq, Lean, Agda, and Idris differ in syntax, automation, and universe choices, but they share the same central idea: programming and proving are both construction of typed terms. The practical challenge is to keep the logic consistent, type checking decidable, and proof scripts maintainable.
+Coq, Lean, Agda, and Idris differ in syntax, automation, and universe choices, but they share the same central idea: programming and proving are both construction of typed terms. The engineering challenge is to keep the logic consistent, type checking decidable, and proof scripts maintainable.
 
-## Definitions
+## Types indexed by values
 
 A **dependent function type** or Pi type
 
@@ -53,7 +53,7 @@ A **proof assistant** is an interactive system that maintains proof goals, check
 
 Decidable type checking means the system can always determine whether a submitted term has a claimed type. This usually requires totality or guardedness checks for recursive definitions. Consistency means not every proposition is inhabited; in particular, there should be no closed proof of `False`.
 
-## Key results
+## From inductive data to checked proofs
 
 **Curry-Howard in depth.** Propositions are types and proofs are programs. Conjunction corresponds to product types, disjunction to sum types, implication to function types, universal quantification to Pi types, and existential quantification to Sigma types. Normalizing a proof term corresponds to simplifying a proof [2], [4].
 
@@ -76,8 +76,6 @@ Decidable type checking means the system can always determine whether a submitte
 **Equality is not one thing.** Definitional equality is what the type checker computes automatically, such as reducing $0+n$ to $n$ when addition recurses on its first argument. Propositional equality is an explicit type of evidence, such as a proof that $n+0=n$. Extensional equality says two functions are equal if they return equal outputs for all inputs; many systems do not make full function extensionality definitional. Confusing these levels leads to stuck proofs: the term may be true, but the kernel needs a lemma, rewrite, or axiom to see it.
 
 A reliable workflow is to simplify first, inspect the remaining goal, then decide whether the missing step is computation, induction, rewriting, or an imported theorem.
-
-## Visual
 
 ```mermaid
 graph TD
@@ -104,7 +102,7 @@ graph TD
 | $\exists x:A.P(x)$ | $\Sigma(x:A).P(x)$ | dependent pair |
 | induction | eliminator | structural recursion |
 
-## Worked example 1: proving `n + 0 = n` by induction
+## Induction for `n + 0 = n`
 
 Problem: prove for all natural numbers $n$:
 
@@ -167,7 +165,7 @@ $$
 
 After rewriting $n+0$ to $n$, the goal is $S(n)=S(n)$, again reflexivity. The checked proof term is a function taking $n$ and returning evidence of equality.
 
-## Worked example 2: dependent vectors and length-preserving append
+## Encoding length preservation in `append`
 
 Problem: specify append for length-indexed vectors:
 
@@ -214,7 +212,7 @@ $$
 
 By the computation rule for addition on the first argument, $S(k)+n$ reduces to $S(k+n)$. The types match definitionally, so no separate theorem is needed if addition was oriented this way. The checked answer is a program whose type guarantees length preservation.
 
-## Code
+## A length-indexed vector in Coq
 
 ```coq
 Inductive nat : Type :=
@@ -239,7 +237,7 @@ Fixpoint append {A : Type} {m n : nat}
   end.
 ```
 
-## Common pitfalls
+## Boundaries of the type theory
 
 - Thinking dependent types automatically prove properties; they let properties be stated in types, but proofs still must be constructed.
 - Confusing type checking with proof search.
@@ -254,14 +252,6 @@ Fixpoint append {A : Type} {m n : nat}
 - Over-indexing every datatype; precise types can become cumbersome if the index is not useful.
 - Believing consistency proves a library theorem is true in classical mathematics; the theorem is true in the logic and axioms the assistant accepts.
 
-## Connections
-
-- [Type Systems and Type Soundness](/cs/programming-language-theory/type-systems-and-type-soundness) gives the metatheorems often mechanized in Coq.
-- [Polymorphism, Subtyping, and Type Inference](/cs/programming-language-theory/polymorphism-subtyping-and-inference) leads from $\forall$ types to richer dependent quantification.
-- [Axiomatic Semantics and Program Logic](/cs/programming-language-theory/axiomatic-semantics-and-program-logic) uses proof assistants to verify imperative programs.
-- [Cryptography](/cs/cryptography/intro) connects to machine-checked protocol and proof verification.
-- [Discrete Math](/math/discrete/intro), [Theory of Computation](/cs/theory/intro), and [Compilers](/cs/compilers/intro) support induction, decidability, and extraction.
-
 ## References
 
 [1] B. C. Pierce, *Types and Programming Languages*. MIT Press, 2002.  
@@ -270,3 +260,15 @@ Fixpoint append {A : Type} {m n : nat}
 [4] W. A. Howard, "The formulae-as-types notion of construction," 1980.  
 [5] P. Martin-Lof, *Intuitionistic Type Theory*. Bibliopolis, 1984.  
 [6] Y. Bertot and P. Casteran, *Interactive Theorem Proving and Program Development*. Springer, 2004.
+
+<div className="see-also">
+
+See also:
+
+- [Type Systems and Type Soundness](/cs/programming-language-theory/type-systems-and-type-soundness) gives the metatheorems often mechanized in Coq.
+- [Polymorphism, Subtyping, and Type Inference](/cs/programming-language-theory/polymorphism-subtyping-and-inference) leads from $\forall$ types to richer dependent quantification.
+- [Axiomatic Semantics and Program Logic](/cs/programming-language-theory/axiomatic-semantics-and-program-logic) uses proof assistants to verify imperative programs.
+- [Cryptography](/cs/cryptography/intro) connects to machine-checked protocol and proof verification.
+- [Discrete Math](/math/discrete/intro), [Theory of Computation](/cs/theory/intro), and [Compilers](/cs/compilers/intro) support induction, decidability, and extraction.
+
+</div>

@@ -9,7 +9,7 @@ Object-oriented metrics measure properties of class-based software that traditio
 
 The subject remains partly research-oriented in the source. The chapter does not claim final consensus; it presents metrics that were influential and useful for reasoning about OO designs. The key engineering lesson is to measure the structural properties that actually create maintenance and testing risk: too many methods, deep inheritance, excessive children, high coupling, large response sets, low cohesion, weak encapsulation, and uncontrolled polymorphism.
 
-## Definitions
+## The CK and MOOD metric families
 
 The **Chidamber and Kemerer (CK) metrics suite** includes six class-level design metrics:
 
@@ -40,7 +40,7 @@ $$
 
 The **MOOD metrics** measure system-level OO properties: encapsulation, inheritance, coupling, and polymorphism. The source covers method hiding factor (MHF), attribute hiding factor (AHF), method inheritance factor (MIF), attribute inheritance factor (AIF), coupling factor (CF), and polymorphism factor (PF).
 
-## Key results
+## Reading the numbers in context
 
 OO metrics should match OO abstractions. A class with tiny methods can still be hard to maintain if it is coupled to many classes, inherits behavior from a deep hierarchy, and has a large response set. Traditional control-flow metrics may see simple methods and miss design complexity.
 
@@ -60,7 +60,7 @@ Class-level and system-level metrics answer different questions. A high CBO valu
 
 Metrics should be interpreted with design intent. A framework base class may have high NOC because many stable plugins derive from it. That can be healthy if the parent interface is narrow and tested. A domain service may have high RFC because it coordinates a workflow. That can be acceptable if the calls are explicit and cohesive. The metric raises the question; the design review answers it.
 
-## Visual
+### Where OO complexity accumulates
 
 ```mermaid
 classDiagram
@@ -98,11 +98,11 @@ classDiagram
 | MHF/AHF | strong hiding | verify needed operations remain accessible |
 | CF | dense system coupling | refactor dependencies |
 
-## Worked example 1: CK metrics for a small class model
+## CK metrics for `ReservationService`
 
-**Problem.** Consider class `ReservationService` with methods `searchVacancy`, `createReservation`, `cancelReservation`, and `printSchedule`. Each method has weight 1. The class uses `Calendar`, `Reservation`, `Customer`, and `PaymentGateway`. `createReservation` calls `PaymentGateway.authorize`, and `printSchedule` calls `Calendar.weekView`. There is no inheritance. Compute WMC, DIT, NOC, CBO, and a simple RFC.
+Consider class `ReservationService` with methods `searchVacancy`, `createReservation`, `cancelReservation`, and `printSchedule`. Each method has weight 1. The class uses `Calendar`, `Reservation`, `Customer`, and `PaymentGateway`. `createReservation` calls `PaymentGateway.authorize`, and `printSchedule` calls `Calendar.weekView`. There is no inheritance. These facts are enough to compute WMC, DIT, NOC, CBO, and a simple RFC.
 
-**Method.** Apply each definition directly.
+Apply each metric under an explicit counting convention.
 
 1. WMC with unit weights:
 
@@ -138,13 +138,13 @@ $$
 RFC = |RS| = 6
 $$
 
-**Checked answer.** WMC is 4, DIT is 0 under the stated convention, NOC is 0, CBO is 4, and RFC is 6. The check is that every counted external class or method is explicitly named.
+WMC is 4, DIT is 0 under the stated convention, NOC is 0, CBO is 4, and RFC is 6. Every counted external class and method is named in the model.
 
-## Worked example 2: LCOM from shared attributes
+## Computing LCOM from attribute overlap
 
-**Problem.** A class has three methods and three attributes. Method `m1` uses `{name, phone}`. Method `m2` uses `{phone}`. Method `m3` uses `{balance}`. Compute LCOM using method-pair intersections.
+A class has three methods and three attributes. Method `m1` uses `{name, phone}`. Method `m2` uses `{phone}`. Method `m3` uses `{balance}`. LCOM follows from the intersections of the three method pairs.
 
-**Method.** List all method pairs and classify each as sharing or not sharing an attribute.
+List every method pair and classify it by whether the methods share an attribute.
 
 1. Pair `(m1, m2)`:
 
@@ -182,9 +182,9 @@ $$
 LCOM = \max(2 - 1, 0) = 1
 $$
 
-**Checked answer.** LCOM is 1. The result suggests mild lack of cohesion: `balance` behavior may belong with billing rather than with contact data. The answer is checked by verifying that there are exactly three method pairs for three methods.
+LCOM is 1. The result suggests mild lack of cohesion: `balance` behavior may belong with billing rather than with contact data. Three methods produce exactly three method pairs, so the pair enumeration is complete.
 
-## Code
+## Calculating LCOM from method data
 
 ```python
 from itertools import combinations
@@ -211,7 +211,7 @@ print("Q:", q_count)
 print("LCOM:", value)
 ```
 
-## Common pitfalls
+## Misreadings to avoid
 
 - Applying procedural metrics to OO code and assuming they capture design complexity.
 - Counting trivial methods the same as complex methods without explaining the weighting rule.
@@ -221,10 +221,8 @@ print("LCOM:", value)
 - Ignoring coupling created by attributes, callbacks, events, or framework dependencies.
 - Using LCOM mechanically without looking at the domain responsibility of the class.
 
-## Connections
+<div className="see-also">
 
-- [Software metrics](/cs/software-engineering/software-metrics)
-- [Object-oriented development](/cs/software-engineering/object-oriented-development)
-- [Software design](/cs/software-engineering/software-design)
-- [Object-oriented testing](/cs/software-engineering/object-oriented-testing)
-- [Formal specifications and OCL](/cs/software-engineering/formal-specifications-and-ocl)
+See also: [Software metrics](/cs/software-engineering/software-metrics) · [Object-oriented development](/cs/software-engineering/object-oriented-development) · [Software design](/cs/software-engineering/software-design) · [Object-oriented testing](/cs/software-engineering/object-oriented-testing) · [Formal specifications and OCL](/cs/software-engineering/formal-specifications-and-ocl)
+
+</div>

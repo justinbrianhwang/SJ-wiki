@@ -5,7 +5,7 @@ sidebar_position: 23
 
 # Numerical Methods Overview
 
-Numerical methods approximate mathematical problems when exact formulas are unavailable, inconvenient, or too expensive. In engineering mathematics they solve nonlinear equations, linear systems, eigenvalue problems, ODEs, PDEs, interpolation, integration, and least-squares problems. The goal is not just to get a number, but to know how reliable that number is.
+Numerical methods approximate mathematical problems when exact formulas are unavailable, inconvenient, or too expensive. In engineering mathematics they solve nonlinear equations, linear systems, eigenvalue problems, ODEs, PDEs, interpolation, integration, and least-squares problems. A computed number is useful only with some account of its reliability.
 
 ![Four Runge-Kutta slope samples are drawn along one ODE step.](https://commons.wikimedia.org/wiki/Special:FilePath/Runge-Kutta_slopes.svg)
 
@@ -13,7 +13,7 @@ Numerical methods approximate mathematical problems when exact formulas are unav
 
 Every numerical method has assumptions, cost, and error behavior. A method that is excellent for a smooth nonstiff ODE may fail for a stiff system. A direct linear solver may be ideal for a dense moderate system but impractical for a huge sparse system. Numerical thinking is the discipline of matching the method to the problem.
 
-## Definitions
+## Error, iteration, and finite precision
 
 Error is the difference between the exact value and the approximation:
 
@@ -53,7 +53,7 @@ $$
 
 Classical fourth-order Runge-Kutta uses four slope evaluations per step and has much higher accuracy for smooth nonstiff problems.
 
-## Key results
+## Convergence, stability, and conditioning
 
 Convergence means the approximation approaches the exact answer as the discretization is refined. Stability means errors are not amplified uncontrollably. Consistency means the discrete formula approximates the original equation locally. For many time-stepping methods, convergence depends on both consistency and stability.
 
@@ -95,7 +95,9 @@ Validation is different from verification. Verification asks whether the equatio
 
 Reproducibility requires recording method choices: tolerances, step sizes, grid resolution, solver type, initial guesses, random seeds, and software versions when relevant. Without these details, a numerical result may be difficult to audit or reproduce, even if the final number looks plausible.
 
-## Visual
+## Matching a method to a problem
+
+The calculation is part of a loop: choose a representation, compute, estimate the error, and refine only what the evidence identifies as inadequate.
 
 ```mermaid
 flowchart TD
@@ -117,7 +119,9 @@ flowchart TD
 | Quadrature | Trapezoidal, Simpson, adaptive | Singularities and oscillation |
 | PDEs | Finite difference, finite element, spectral | Mesh resolution and stability |
 
-## Worked example 1: Newton's method
+The table is a starting point rather than a solver-selection rule. Smoothness, sparsity, conditioning, stiffness, geometry, and the required accuracy narrow the choice.
+
+## Newton iteration for $\sqrt{2}$
 
 Problem. Approximate the positive root of
 
@@ -163,7 +167,7 @@ Check. The true value is $\sqrt{2}\approx 1.4142135624$, so the error is about $
 
 The rapid improvement happens because the initial guess is close enough to a simple root. If the starting value were $0$, Newton's formula would divide by zero. If the function had several roots, a different starting value might converge to a different root. Bracketing methods are slower but provide stronger global guarantees when a sign change is known.
 
-## Worked example 2: One RK4 step
+## Advancing $y'=y$ by one RK4 step
 
 Problem. Use one RK4 step with $h=0.1$ for
 
@@ -238,7 +242,7 @@ Check. The exact value is $e^{0.1}\approx 1.1051709181$, so one RK4 step is alre
 
 The example is smooth and nonstiff, which is the setting where RK4 performs well. For a stiff equation such as $y'=-1000(y-\cos t)-\sin t$, the same step size logic may fail because stability, not local Taylor accuracy, controls the computation.
 
-## Code
+## Reproducing the RK4 step
 
 ```python
 import numpy as np
@@ -260,7 +264,7 @@ The code repeats the RK4 calculation and compares it with the exact exponential.
 
 A refinement study should keep the mathematical problem fixed. If the grid, tolerance, and model parameters all change simultaneously, it becomes unclear which change caused the result to move. Controlled refinement is a basic numerical experiment.
 
-## Common pitfalls
+## Checks before trusting a result
 
 - Reporting many digits without an error estimate or tolerance.
 - Confusing residual size with actual solution error, especially for ill-conditioned systems.
@@ -273,9 +277,8 @@ A refinement study should keep the mathematical problem fixed. If the grid, tole
 - Using default solver tolerances without checking whether they match the scale of the variables.
 - Forgetting that nondimensionalization can improve conditioning and interpretability.
 
-## Connections
+<div className="see-also">
 
-- [Matrices and Linear Systems](/math/engineering-math/matrices-and-linear-systems)
-- [Direction Fields and Existence](/math/engineering-math/direction-fields-and-existence)
-- [Wave and Heat Equations](/math/engineering-math/wave-and-heat-equations)
-- [Fourier Integrals and Transforms](/math/engineering-math/fourier-integrals-and-transforms)
+See also: [Matrices and Linear Systems](/math/engineering-math/matrices-and-linear-systems) · [Direction Fields and Existence](/math/engineering-math/direction-fields-and-existence) · [Wave and Heat Equations](/math/engineering-math/wave-and-heat-equations) · [Fourier Integrals and Transforms](/math/engineering-math/fourier-integrals-and-transforms)
+
+</div>

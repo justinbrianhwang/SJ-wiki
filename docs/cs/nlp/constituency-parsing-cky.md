@@ -9,7 +9,7 @@ Constituency parsing analyzes a sentence as nested phrases. Jurafsky and Martin 
 
 The main idea is that natural language has hierarchical structure. A noun phrase can contain a determiner and nominal; a verb phrase can contain a verb and noun phrase; larger phrases can be built recursively. CKY shows how to search the enormous space of possible trees efficiently when the grammar is in a suitable binary form.
 
-## Definitions
+## Grammar, trees, and chart cells
 
 A **context-free grammar** is a tuple $G=(N,\Sigma,R,S)$ where $N$ is a set of nonterminals, $\Sigma$ is a set of terminals, $R$ is a set of productions, and $S$ is the start symbol. Productions have a single nonterminal on the left:
 
@@ -31,7 +31,7 @@ The **CKY chart** is a triangular table. Cell $[i,j]$ stores nonterminals that c
 
 A **probabilistic CFG** assigns probabilities to rules. The probability of a tree is the product of its rule probabilities, often computed in log space.
 
-## Key results
+## How CKY assembles and scores spans
 
 CKY is dynamic programming over spans. It avoids repeated work because once a constituent is found for a span, that result can be reused in every larger span. For a sentence of length $n$ and a grammar in CNF, there are $O(n^2)$ spans and $O(n)$ split points per span, giving an $O(n^3)$ parsing structure, multiplied by grammar lookup costs.
 
@@ -54,17 +54,15 @@ Neural span-based parsers keep the chart idea but replace hand-written grammar s
 
 Parser evaluation commonly uses labeled precision, labeled recall, and $F_1$ over constituents. A predicted constituent is correct if its span and label match the gold tree, usually after standard preprocessing conventions.
 
-CKY is also a template for thinking about chart algorithms. The chart stores completed subanalyses, not partial guesses that must be recomputed. This is why dynamic programming works for ambiguous grammars: two larger parses can share the same noun phrase analysis for a span. The same idea appears in semiring parsing, where changing the operations changes the computation. A max-plus semiring finds the best parse; a sum-product semiring computes total probability; a boolean semiring performs recognition.
+CKY is also a template for thinking about chart algorithms. The chart stores completed subanalyses, not partial guesses that must be recomputed. Dynamic programming works for ambiguous grammars because two larger parses can share the same noun phrase analysis for a span. The same idea appears in semiring parsing, where changing the operations changes the computation. A max-plus semiring finds the best parse; a sum-product semiring computes total probability; a boolean semiring performs recognition.
 
-Weighted grammars make the independence assumptions visible. A PCFG assumes that the probability of expanding a nonterminal depends only on that nonterminal, not on its parent, lexical head, or wider context. This is often too weak for natural language. Grammar refinements, parent annotation, lexicalization, and neural span scores all add context back into the scoring function while trying to preserve tractable search.
+Weighted grammars expose the independence assumptions. A PCFG assumes that the probability of expanding a nonterminal depends only on that nonterminal, not on its parent, lexical head, or wider context. This is often too weak for natural language. Grammar refinements, parent annotation, lexicalization, and neural span scores all add context back into the scoring function while trying to preserve tractable search.
 
 Constituency parsing remains useful even when dependency parsing is more compact. Constituents identify spans that behave as units, which is valuable for question answering, summarization, semantic role labeling, and grammar checking. A dependency tree says which word is head of a phrase; a constituency tree says where the phrase begins and ends. Many applications need both views.
 
 Treebanks make parsing measurable but also define what counts as syntax. The Penn Treebank, for example, uses conventions for flat noun phrases, traces, function tags, and punctuation that affect both training and evaluation. A parser trained on one treebank learns those annotation decisions, not a universal truth about grammar. When applying a parser to another domain or language, check whether the target annotation scheme expects the same structures.
 
 For hand calculations, it is useful to separate the recognizer from the scorer. First verify that every span can be built by grammar rules; then add probabilities or neural span scores. This prevents arithmetic mistakes from hiding grammar mistakes.
-
-## Visual
 
 ```mermaid
 flowchart TB
@@ -120,9 +118,9 @@ The CKY visual lays out the chart cells by span length and shows the exact binar
 | Backpointer | chosen rule and split | reconstructs parse tree |
 | Weight | log rule or span score | chooses among ambiguous parses |
 
-## Worked example 1: CKY recognition
+## Filling the chart for `book the flight`
 
-Problem: parse `book the flight` with this CNF grammar:
+Parse `book the flight` with this CNF grammar:
 
 ```text
 S  -> V NP
@@ -139,7 +137,7 @@ Use positions `0 book 1 the 2 flight 3`.
    - `[1,2]` contains `Det` because `Det -> the`.
    - `[2,3]` contains `N` because `N -> flight`.
 2. Fill length-two span `[0,2]`:
-   - Split at $k=1$: left `[0,1]={V}`, right `[1,2]={Det}`.
+   - Split at $k=1$: left `[0,1]=\{V\}`, right `[1,2]=\{Det\}`.
    - No rule expands to `V Det`, so add nothing.
 3. Fill length-two span `[1,3]`:
    - Split at $k=2$: left `Det`, right `N`.
@@ -149,11 +147,11 @@ Use positions `0 book 1 the 2 flight 3`.
    - Rule `S -> V NP` applies, so add `S`.
    - Split at $k=2`: `[0,2]` is empty, so nothing else.
 
-Checked answer: because `S` is in `[0,3]`, the sentence is recognized and has parse `(S (V book) (NP (Det the) (N flight)))`.
+Because `S` is in `[0,3]`, the sentence is recognized and has parse `(S (V book) (NP (Det the) (N flight)))`.
 
-## Worked example 2: choosing a weighted parse
+## Choosing between two weighted derivations
 
-Problem: a span `[0,3]` can be built as `VP -> V NP` in two ways:
+A span `[0,3]` can be built as `VP -> V NP` in two ways:
 
 1. Split $k=1$: score of left `V` is $-0.1$, right `NP` is $-1.0$, rule score is $-0.2$.
 2. Split $k=2$: score of left `V` is $-2.0$, right `NP` is $-0.3$, rule score is $-0.2$.
@@ -178,9 +176,9 @@ $$
 -1.3 > -2.5.
 $$
 
-Checked answer: choose split $k=1$ and store its backpointer. In probability space, this is the higher-probability derivation because log probabilities closer to zero are larger.
+Choose split $k=1$ and store its backpointer. In probability space, this is the higher-probability derivation because log probabilities closer to zero are larger.
 
-## Code
+## A minimal recognizer with backpointers
 
 ```python
 from collections import defaultdict
@@ -219,7 +217,7 @@ print("S" in chart[0][n])
 print(chart[0][n])
 ```
 
-## Common pitfalls
+## Where CKY implementations go wrong
 
 - Running CKY on a grammar that has not been converted to CNF or otherwise adapted.
 - Confusing recognition with parsing; recognition only says whether a parse exists.
@@ -229,9 +227,8 @@ print(chart[0][n])
 - Evaluating by exact whole-tree match only; constituent precision and recall give more informative diagnostics.
 - Treating neural span parsers as unrelated to CKY when many still use chart-style dynamic programming.
 
-## Connections
+<div className="see-also">
 
-- [Dependency parsing](/cs/nlp/dependency-parsing)
-- [Sequence labeling with HMMs and CRFs](/cs/nlp/sequence-labeling-hmms-crfs)
-- [Semantic role labeling and word-sense disambiguation](/cs/nlp/semantic-role-labeling-and-word-sense-disambiguation)
-- [Transformers and self-attention](/cs/nlp/transformers-self-attention)
+See also: [Dependency parsing](/cs/nlp/dependency-parsing) · [Sequence labeling with HMMs and CRFs](/cs/nlp/sequence-labeling-hmms-crfs) · [Semantic role labeling and word-sense disambiguation](/cs/nlp/semantic-role-labeling-and-word-sense-disambiguation) · [Transformers and self-attention](/cs/nlp/transformers-self-attention)
+
+</div>

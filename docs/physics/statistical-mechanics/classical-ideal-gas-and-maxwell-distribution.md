@@ -429,10 +429,8 @@ print("most probable grid speed", v[np.argmax(P)])
 - The thermal wavelength is a quantum overlap scale, not a molecular diameter. Interaction diluteness and quantum nondegeneracy are separate conditions.
 - A velocity-selected or flux-selected sample is not distributed like molecules chosen uniformly from the volume. Effusion is the standard counterexample.
 
-## Related pages
+<div className="see-also">
 
-- [Canonical ensemble and fluctuations](/physics/statistical-mechanics/canonical-ensemble-and-fluctuations)
-- [Microcanonical ensemble and entropy](/physics/statistical-mechanics/microcanonical-ensemble-and-entropy)
-- [Molecular gases, mixtures, and solutions](/physics/statistical-mechanics/molecular-gases-mixtures-and-solutions)
-- [Boltzmann equation and transport](/physics/statistical-mechanics/boltzmann-equation-and-transport)
-- [Thermodynamics](/physics/thermodynamics/intro)
+See also: [Canonical ensemble and fluctuations](/physics/statistical-mechanics/canonical-ensemble-and-fluctuations) · [Microcanonical ensemble and entropy](/physics/statistical-mechanics/microcanonical-ensemble-and-entropy) · [Molecular gases, mixtures, and solutions](/physics/statistical-mechanics/molecular-gases-mixtures-and-solutions) · [Boltzmann equation and transport](/physics/statistical-mechanics/boltzmann-equation-and-transport) · [Thermodynamics](/physics/thermodynamics/intro)
+
+</div>

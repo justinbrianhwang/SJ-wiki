@@ -7,13 +7,9 @@ sidebar_position: 6
 
 Association pattern mining finds combinations of items, events, or attribute values that occur together more often than a user-defined threshold or more interestingly than chance. Aggarwal treats this as one of the four major data mining building blocks because it converts large transaction collections into interpretable co-occurrence structure. The classic setting is market basket analysis, but the same ideas apply to web paths, text terms, categorical profiles, biological markers, and many discretized data sets.
 
-![A hash list diagram links data blocks to hashes that can verify later blocks.](https://commons.wikimedia.org/wiki/Special:FilePath/Hash_list.svg)
+The basic model leads to association rules, Apriori, pattern growth, and interest measures. Closed and maximal patterns, querying, constraints, and downstream uses extend the same framework.
 
-*Figure: Hash lists connect hashing to integrity checking and authenticated data structures. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hash_list.svg), David Gothberg and DataWraith, public domain.*
-
-This page covers the basic frequent itemset model, association rules, Apriori, pattern growth, and interest measures. The advanced chapter adds closed and maximal patterns, querying, constraints, and downstream uses.
-
-## Definitions
+## Transactions, itemsets, and rules
 
 Let $I=\{i_1,\dots,i_m\}$ be a set of items. A **transaction** $T$ is a subset of $I$. A transaction database $\mathcal{D}$ is a multiset of transactions.
 
@@ -39,7 +35,7 @@ The **Apriori property** states that every subset of a frequent itemset is frequ
 
 **FP-growth** mines frequent patterns by compressing transactions into an FP-tree and recursively mining conditional pattern bases, avoiding the breadth-first candidate explosion of Apriori in many dense cases.
 
-## Key results
+## Why downward closure makes Apriori possible
 
 **Downward closure enables pruning.** If itemset $X$ is not frequent, then any $Y\supseteq X$ cannot be frequent because every transaction containing $Y$ also contains $X$. Therefore $\mathrm{supcount}(Y)\le \mathrm{supcount}(X)\lt \sigma$.
 
@@ -59,13 +55,11 @@ A value above 1 suggests positive association; below 1 suggests negative associa
 
 **FP-growth trades candidates for conditional recursion.** It compresses common prefixes in the transaction database. When data have many shared prefixes after frequency ordering, the tree is much smaller than the raw database.
 
-**Frequent does not mean useful.** A very common pattern may simply restate the obvious, such as every grocery basket containing a checkout item. A rare pattern may be more actionable if it is highly discriminative or expensive. Practical association mining therefore combines support thresholds with interest measures, domain constraints, redundancy control, and sometimes statistical testing. The analyst should also inspect whether patterns survive on a holdout period, because co-occurrences in small or seasonal data can be unstable.
+**Frequent does not mean useful.** A very common pattern may simply restate the obvious, such as every grocery basket containing a checkout item. A rare pattern may be more actionable if it is highly discriminative or expensive. Association mining therefore combines support thresholds with interest measures, domain constraints, redundancy control, and sometimes statistical testing. The analyst should also inspect whether patterns survive on a holdout period, because co-occurrences in small or seasonal data can be unstable.
 
 **Transaction construction is a major modeling choice.** A web basket might be one session, one user-day, or one user's full history. A retail basket might include returns or exclude them. A medical transaction might represent one visit or one patient. These choices change support counts and rule meanings, so they should be documented before interpreting the mined patterns.
 
 **Rule direction is not causality.** The rule $X\Rightarrow Y$ means that $Y$ is common among transactions containing $X$; it does not prove that buying $X$ caused buying $Y$. In many applications the direction is chosen for actionability, not because the data establish cause. Temporal ordering, experiments, or stronger assumptions are needed for causal claims.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -96,6 +90,8 @@ flowchart TD
 
 This Apriori diagram shows candidate generation, subset pruning, support counting, level-wise termination, and rule generation as separate stages. The labels identify the sets `C_k` and `L_k`, the minimum support threshold, and the confidence calculation for rules after frequent itemsets are known. The example branch illustrates downward closure: a candidate of size 3 can only survive if all of its size-2 subsets were frequent.
 
+## Comparing rule-interest measures
+
 | Measure | Formula | Interpretation | Limitation |
 |---|---|---|---|
 | Support | $P(X\cup Y)$ | How common the full pattern is | Misses rare but strong patterns |
@@ -104,7 +100,9 @@ This Apriori diagram shows candidate generation, subset pruning, support countin
 | Cosine | $P(XY)/\sqrt{P(X)P(Y)}$ | Symmetric co-occurrence strength | Less direct than confidence |
 | Jaccard | $P(XY)/P(X\cup Y)$ | Overlap among occurrences | Ignores joint absence |
 
-## Worked example 1: Apriori support counting
+## Working one basket database by hand
+
+### Counting support level by level
 
 **Problem.** Mine frequent itemsets with minimum support count $\sigma=3$.
 
@@ -144,7 +142,7 @@ This Apriori diagram shows candidate generation, subset pruning, support countin
 
 **Checked answer.** The frequent itemsets are the four frequent singletons and four frequent pairs listed above. No 3-itemset reaches support count 3.
 
-## Worked example 2: Rule confidence and lift
+### Checking the diaper-to-beer rule
 
 **Problem.** From the same data, evaluate the rule
 
@@ -172,7 +170,7 @@ $$
 
 **Checked answer.** The rule has confidence $0.75$ and lift $1.25$. It is stronger than independence in this toy database, but the database is small, so the estimate is not stable.
 
-## Code
+## Implementing the Apriori join-and-prune loop
 
 Pseudocode for Apriori:
 
@@ -233,7 +231,7 @@ for itemset, count in apriori(3).items():
     print(set(itemset), count)
 ```
 
-## Common pitfalls
+## Threshold and interpretation traps
 
 - Setting minimum support so high that only obvious patterns remain.
 - Setting minimum support so low that the output explodes into millions of patterns.
@@ -243,10 +241,8 @@ for itemset, count in apriori(3).items():
 - Forgetting to sort or order items consistently in candidate generation.
 - Mining continuous attributes without meaningful discretization.
 
-## Connections
+<div className="see-also">
 
-- [Advanced Association Patterns](/cs/data-mining/chapter-05-advanced-association-patterns)
-- [Data Preparation](/cs/data-mining/chapter-02-data-preparation)
-- [Mining Data Streams and Big Data](/cs/data-mining/chapter-12-mining-data-streams)
-- [Mining Text Data](/cs/data-mining/chapter-13-mining-text-data)
-- [Mining Web Data and Recommenders](/cs/data-mining/chapter-18-mining-web-data)
+See also: [Advanced Association Patterns](/cs/data-mining/chapter-05-advanced-association-patterns) · [Data Preparation](/cs/data-mining/chapter-02-data-preparation) · [Mining Data Streams and Big Data](/cs/data-mining/chapter-12-mining-data-streams) · [Mining Text Data](/cs/data-mining/chapter-13-mining-text-data) · [Mining Web Data and Recommenders](/cs/data-mining/chapter-18-mining-web-data)
+
+</div>

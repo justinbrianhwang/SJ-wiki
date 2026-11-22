@@ -13,7 +13,7 @@ These descriptions are useful because many curves fail the vertical line test, l
 
 *Figure: Cardioid curve $r=a(1+\cos\theta)$. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Cardioid.svg), D.328, CC BY-SA 2.1 JP.*
 
-## Definitions
+## Three ways to describe a curve
 
 A parametrized plane curve is given by
 
@@ -54,7 +54,7 @@ $$
 
 Conic sections can be defined as sets of points whose distances from a focus and a directrix have constant ratio $e$, the eccentricity. If $e=1$, the conic is a parabola. If $0\lt e\lt 1$, it is an ellipse. If $e\gt 1$, it is a hyperbola.
 
-## Key results
+## Translating calculus into each coordinate system
 
 For parametric curves, the tangent line at $t=t_0$ uses the point
 
@@ -171,7 +171,7 @@ $$
 A=\frac12\int (x\,dy-y\,dx).
 $$
 
-Even in single-variable calculus, the key is that $dx$ becomes $x'(t)\,dt$.
+In the parameter $t$, the differential $dx$ becomes $x'(t)\,dt$.
 
 For conics, completing the square is the main algebraic skill. An equation such as
 
@@ -197,9 +197,7 @@ This nonuniqueness is useful but can create tracing errors. A table of key angle
 
 Parameter orientation also affects signed quantities. If a curve is traversed in the opposite direction, a signed area integral such as $\int y\,dx$ may change sign, even though the geometric area is unchanged. Arc length is different because speed is nonnegative, so reversing the parameter interval does not change total length when handled with the correct bounds.
 
-For conics, focus and directrix definitions are not just historical. They explain reflective properties: rays parallel to a parabola's axis reflect through the focus, and ellipses reflect rays from one focus to the other. These geometric properties are why conics appear in optics, satellite dishes, planetary motion, and whispering galleries.
-
-## Visual
+The focus-directrix definitions also explain reflective properties: rays parallel to a parabola's axis reflect through the focus, and ellipses reflect rays from one focus to the other. These geometric properties account for the appearance of conics in optics, satellite dishes, planetary motion, and whispering galleries.
 
 | Representation | Coordinates | Strength | Calculus formula |
 |---|---|---|---|
@@ -219,7 +217,7 @@ graph LR
   E --> H["Focus, directrix, eccentricity"]
 ```
 
-## Worked example 1: tangent and concavity for a parametric curve
+## Reading tangent and concavity from the parameter
 
 **Problem.** For
 
@@ -294,7 +292,7 @@ $$
 
 The curve is concave up at the tangent point.
 
-## Worked example 2: polar area
+## Finding the area of one rose petal
 
 **Problem.** Find the area inside one petal of
 
@@ -354,40 +352,26 @@ $$
 
 **Checked answer.** One petal has area $\pi/3$. The full curve has three petals, so the total area is $\pi$.
 
-The bounds are the most important part of this example. Integrating from $0$ to $2\pi$ would count the three-petal rose more than once for some rose equations. A reliable approach is to find consecutive zeros of $r$ that enclose one traced loop and then use symmetry only after confirming how many distinct loops occur.
+The bounds carry most of the work in this example. Integrating from $0$ to $2\pi$ would count the three-petal rose more than once for some rose equations. Find consecutive zeros of $r$ that enclose one traced loop, then use symmetry only after confirming how many distinct loops occur.
 
 The maximum radius of this petal occurs when $\sin(3\theta)=1$, so $3\theta=\pi/2$ and $\theta=\pi/6$. At that angle, $r=2$, matching the midpoint of the interval $[0,\pi/3]$.
 
 Checking a midpoint angle is a quick way to confirm that the selected interval traces a full petal rather than only half of one.
 
-## Code
+## Tracing intervals, signs, and shifted centers
 
-```python
-from math import sin, cos, pi
+- The Cartesian slope is $(dy/dt)/(dx/dt)$, not $dy/dt$ alone. When $dx/dt=0$, check for a vertical tangent instead of dividing by zero.
+- Polar area carries the sector factor $1/2$, and its bounds must trace the intended region exactly once.
+- A negative value of $r$ is valid: it places the point in the direction opposite to $	heta$.
+- A shifted conic should be put in standard form by completing the square before it is classified.
 
-def polar_to_cartesian(r, theta):
-    return r * cos(theta), r * sin(theta)
+<div className="see-also">
 
-def rose(theta):
-    return 2 * sin(3 * theta)
-
-for k in range(4):
-    theta = k * pi / 9
-    print(theta, polar_to_cartesian(rose(theta), theta))
-```
-
-## Common pitfalls
-
-- Using $dy/dt$ as the slope of a parametric curve. The Cartesian slope is $(dy/dt)/(dx/dt)$.
-- Dividing by $dx/dt$ when $dx/dt=0$ without checking for a vertical tangent.
-- Forgetting the factor $1/2$ in polar area.
-- Integrating a polar curve over too large an interval and counting petals or loops more than once.
-- Treating negative $r$ values as impossible. In polar coordinates, negative $r$ plots in the opposite direction.
-- Classifying conics from equations without completing the square when the center is shifted.
-
-## Connections
+See also:
 
 - [Derivatives and Rates](/math/calculus/derivatives-and-rates): parametric tangents still come from derivative ratios.
 - [Applications of Integrals](/math/calculus/applications-of-integrals): polar area and parametric arc length are integral applications.
 - [Vectors and Geometry of Space](/math/calculus/vectors-and-geometry-of-space): parametrized curves lead naturally to vector functions.
 - [Vector Functions and Motion](/math/calculus/vector-functions-and-motion): vector motion generalizes parametric curves to space.
+
+</div>

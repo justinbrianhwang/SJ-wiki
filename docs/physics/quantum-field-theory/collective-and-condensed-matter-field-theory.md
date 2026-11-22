@@ -13,7 +13,7 @@ In condensed matter, the vacuum is replaced by a material ground state, Lorentz 
 
 *Figure: The Mexican-hat potential visualizes spontaneous symmetry breaking as a choice among degenerate minima. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mexican_hat_potential_polar.svg), Rupert Millard, public domain.*
 
-## Definitions
+## Choosing the slow fields
 
 A nonrelativistic bosonic field $\psi(t,\mathbf{x})$ can be described by
 
@@ -57,7 +57,7 @@ S_{\text{CS}}=
 \frac{k}{4\pi}\int d^3x\,\epsilon^{\mu\nu\rho}a_\mu\partial_\nu a_\rho.
 $$
 
-## Key results
+## Broken symmetry, criticality, and topological response
 
 Superfluids show the field-theory connection between broken global $U(1)$ symmetry and a gapless phase mode. Density fluctuations are often massive or less important at long distance, while the phase field controls low-energy hydrodynamics. Vortices occur because the phase is compact:
 
@@ -103,9 +103,7 @@ The fractional quantum Hall effect is different because its low-energy response 
 
 Disorder and replicas illustrate how far QFT methods can be stretched. Averaging over random potentials is hard because one needs the average of $\log Z$, not just $Z$. The replica trick studies $Z^n$ and analytically continues $n\to0$. This method is formal, but it has generated deep field theories of localization, random matrices, and disordered critical points.
 
-The common message is that the field is chosen for the scale of interest. It may be a phase, height, magnetization, density, gauge field, or matrix. The microscopic atoms remain real, but the long-distance theory uses the variables that fluctuate slowly.
-
-## Visual
+The field is chosen for the scale of interest. It may be a phase, height, magnetization, density, gauge field, or matrix. The microscopic atoms remain real, but the long-distance theory uses the variables that fluctuate slowly.
 
 ```mermaid
 flowchart TD
@@ -127,32 +125,28 @@ flowchart TD
 | Fractional Hall fluid | emergent gauge field $a_\mu$ | Chern-Simons term | anyons, quantized response |
 | Surface growth | height field $h$ | stochastic field equation | dynamic scaling |
 
-## Worked example 1: Quantized circulation in a superfluid
+## Quantized circulation from phase winding
 
-Problem: Show why a superfluid vortex has quantized circulation when $\psi=\sqrt{\rho}e^{i\theta}$.
-
-Step 1: The condensate wavefunction must be single-valued. Moving around a closed loop $C$,
+For a superfluid vortex with $\psi=\sqrt{\rho}e^{i\theta}$, the condensate wavefunction must be single-valued. After following a closed loop $C$ back to the same point,
 
 $$
-\psi\to\psi
+\psi\to\psi.
 $$
 
-after returning to the same point.
-
-Step 2: The amplitude $\sqrt{\rho}$ returns to itself, so the phase can only change by an integer multiple of $2\pi$:
+The amplitude $\sqrt{\rho}$ also returns to itself, so the phase can change only by an integer multiple of $2\pi$:
 
 $$
 \Delta\theta=2\pi n,
 \qquad n\in\mathbb{Z}.
 $$
 
-Step 3: Write the phase change as a line integral:
+Equivalently,
 
 $$
 \Delta\theta=\oint_C \nabla\theta\cdot d\mathbf{\ell}.
 $$
 
-Step 4: The superfluid velocity is proportional to the phase gradient:
+The superfluid velocity is proportional to the phase gradient,
 
 $$
 \mathbf{v}=\frac{1}{m}\nabla\theta
@@ -160,7 +154,7 @@ $$
 
 in units with $\hbar=1$.
 
-Step 5: Therefore the circulation is
+and therefore the circulation is
 
 $$
 \oint_C \mathbf{v}\cdot d\mathbf{\ell}
@@ -168,32 +162,30 @@ $$
 =\frac{2\pi n}{m}.
 $$
 
-The checked answer is quantized circulation. The integer $n$ is a topological winding number, stable unless the order parameter vanishes somewhere so the phase becomes undefined.
+The integer $n$ is a topological winding number. It cannot change continuously; changing it requires the order parameter to vanish somewhere so that the phase becomes undefined.
 
-## Worked example 2: Mean-field critical exponent in Landau theory
+## Extracting the mean-field exponent
 
-Problem: For
+Take
 
 $$
 f(\phi)=\frac{r}{2}\phi^2+\frac{u}{4}\phi^4,
 \qquad u>0,
 $$
 
-with $r=a(T-T_c)$, find the order parameter below $T_c$ and the mean-field exponent $\beta$.
-
-Step 1: Minimize the free-energy density:
+with $r=a(T-T_c)$. Minimizing the free-energy density gives
 
 $$
 \frac{df}{d\phi}=r\phi+u\phi^3.
 $$
 
-Step 2: Set the derivative to zero:
+Stationarity requires
 
 $$
 \phi(r+u\phi^2)=0.
 $$
 
-Step 3: Solutions are
+so the solutions are
 
 $$
 \phi=0
@@ -205,25 +197,25 @@ $$
 \phi^2=-\frac{r}{u}.
 $$
 
-Step 4: Below $T_c$, $T-T_c\lt 0$, so $r\lt 0$. The nonzero solution is real:
+Below $T_c$, $T-T_c\lt 0$ and $r\lt 0$, making the nonzero solution real:
 
 $$
 |\phi|=\sqrt{\frac{-r}{u}}.
 $$
 
-Step 5: Substitute $r=a(T-T_c)$:
+Substitution of $r=a(T-T_c)$ gives
 
 $$
 |\phi|=\sqrt{\frac{a(T_c-T)}{u}}.
 $$
 
-Step 6: Compare with the definition
+Comparing this result with
 
 $$
 |\phi|\sim (T_c-T)^\beta.
 $$
 
-The checked answer is
+shows that the mean-field exponent is
 
 $$
 \beta=\frac{1}{2}
@@ -231,23 +223,7 @@ $$
 
 in mean-field theory. Fluctuations modify this exponent below the upper critical dimension.
 
-## Code
-
-```python
-import math
-
-def mean_field_order_parameter(temp, tc, a=1.0, u=1.0):
-    r = a * (temp - tc)
-    if r >= 0:
-        return 0.0
-    return math.sqrt(-r / u)
-
-tc = 1.0
-for temp in [1.2, 1.0, 0.9, 0.75, 0.5]:
-    print(temp, mean_field_order_parameter(temp, tc, a=2.0, u=0.5))
-```
-
-## Common pitfalls
+## Where the effective description can mislead
 
 - Assuming relativistic notation implies relativistic physics. Many condensed-matter field theories are nonrelativistic.
 - Treating the order parameter as microscopic truth. It is a coarse-grained variable chosen for the long-distance problem.
@@ -259,11 +235,8 @@ for temp in [1.2, 1.0, 0.9, 0.75, 0.5]:
 - Forgetting that emergent fields need not be fundamental. Phonons, magnons, order parameters, and emergent gauge fields are effective variables selected by the phase and scale.
 - Applying particle-physics intuition too literally. In a material, the medium defines preferred frames, velocities, cutoffs, and quasiparticle lifetimes.
 
-## Connections
+<div className="see-also">
 
-This page is the reminder that QFT is a language for phases and excitations, not only for elementary particles. It should be read alongside symmetry breaking and RG: order parameters explain which field is slow, while RG explains why microscopic differences can disappear. The EFT page gives the general logic behind writing low-energy actions, and the path-integral page explains why Euclidean field theory and statistical mechanics share the same mathematical machinery.
+See also: [Path Integral Formulation](/physics/quantum-field-theory/path-integral-formulation) · [Symmetry Breaking, Goldstone Bosons, and Higgs Physics](/physics/quantum-field-theory/symmetry-breaking-goldstone-higgs) · [Renormalization Group](/physics/quantum-field-theory/renormalization-group) · [Effective Field Theory](/physics/quantum-field-theory/effective-field-theory)
 
-- [Path Integral Formulation](/physics/quantum-field-theory/path-integral-formulation)
-- [Symmetry Breaking, Goldstone Bosons, and Higgs Physics](/physics/quantum-field-theory/symmetry-breaking-goldstone-higgs)
-- [Renormalization Group](/physics/quantum-field-theory/renormalization-group)
-- [Effective Field Theory](/physics/quantum-field-theory/effective-field-theory)
+</div>

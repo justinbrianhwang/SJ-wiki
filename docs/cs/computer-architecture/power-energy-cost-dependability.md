@@ -270,9 +270,8 @@ Several errors recur. Low power is called efficient without checking how long th
 
 The remedy is to state the workload, measurement boundary, time interval, and failure model next to the number. A result with those assumptions exposed can be revised when the system changes.
 
-## Related pages
+<div className="see-also">
 
-- [Quantitative Design and Performance](/cs/computer-architecture/quantitative-design-and-performance)
-- [Warehouse-Scale Computers](/cs/computer-architecture/warehouse-scale-computers)
-- [Storage, RAID, and SSDs](/cs/computer-architecture/storage-raid-ssds)
-- [Domain-Specific Accelerators](/cs/computer-architecture/domain-specific-accelerators)
+See also: [Quantitative Design and Performance](/cs/computer-architecture/quantitative-design-and-performance) · [Warehouse-Scale Computers](/cs/computer-architecture/warehouse-scale-computers) · [Storage, RAID, and SSDs](/cs/computer-architecture/storage-raid-ssds) · [Domain-Specific Accelerators](/cs/computer-architecture/domain-specific-accelerators)
+
+</div>

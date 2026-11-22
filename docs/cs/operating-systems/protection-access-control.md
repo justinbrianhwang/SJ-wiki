@@ -7,13 +7,9 @@ sidebar_position: 14
 
 Protection is the internal control problem: once users, processes, files, memory, and devices exist, who may do what to which resource? It is narrower than security but foundational for it. A system cannot defend against external attack if it cannot reliably enforce internal access rules among its own subjects and objects.
 
-![The Linux mascot marks the operating-system pages that use Linux as a recurring case study.](https://commons.wikimedia.org/wiki/Special:FilePath/Tux.svg)
+The textbook distinguishes protection from security. Protection provides mechanisms for specifying and enforcing access to resources. Security includes broader threats such as authentication failure, malware, network attacks, and cryptography. Domains, access matrices, access-control lists, capability lists, revocation, and language-based protection supply the internal enforcement model.
 
-*Figure: Linux provides the concrete kernel case study for many OS abstractions. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tux.svg), Larry Ewing, Simon Budig, and Garrett LeSage, CC0/attribution permission.*
-
-The textbook distinguishes protection from security. Protection provides mechanisms for specifying and enforcing access to resources. Security includes broader threats such as authentication failure, malware, network attacks, and cryptography. This page focuses on domains, access matrices, access-control lists, capability lists, revocation, and language-based protection.
-
-## Definitions
+## Domains, objects, and rights
 
 A **protection domain** is a set of objects and the operations allowed on each object. A process executes within a domain, and the domain determines what the process can access. Domains may correspond to users, processes, procedures, roles, or protection rings.
 
@@ -29,7 +25,7 @@ An **access-control list** (ACL) stores, with each object, the domains or users 
 
 **Language-based protection** uses programming-language and runtime features such as type safety, visibility, modules, memory safety, and managed execution to restrict access before or in addition to OS-level checks.
 
-## Key results
+## From an access matrix to sparse enforcement
 
 The access matrix is a clean model because it separates subjects, objects, and rights:
 
@@ -49,6 +45,8 @@ Protection rings implement a hardware-supported hierarchy of privilege. The kern
 
 Language-based protection can reduce the number of dangerous operations that reach the OS. For example, a memory-safe language can prevent arbitrary pointer arithmetic from corrupting another object in the same process. However, language protection relies on trusted compilers, runtimes, and escape-hatch controls.
 
+## Delegation, revocation, and privilege lifetime
+
 The access matrix also explains delegation. If domain `D1` has a right that includes copy or owner authority, it may be able to grant a right to `D2`. That is useful for collaboration but dangerous without limits. Systems need rules about who can grant, copy, transfer, or revoke rights. Otherwise, temporary access can become permanent access through uncontrolled propagation.
 
 Capabilities must be unforgeable. A plain integer object ID is not a capability if any process can guess or manufacture it. Real capability systems protect tokens through hardware tags, kernel-managed tables, cryptographic construction, or language/runtime restrictions. Once capabilities are protected, possession can be the authorization check, which makes delegation simple: pass the capability to the component that needs exactly that authority.
@@ -61,11 +59,9 @@ Access control also has usability limits. If users cannot understand the policy,
 
 Protection decisions are also time-dependent. A process may be allowed to open a file, then lose the permission later; the system must define whether the existing open handle remains valid. A capability may expire; an ACL may be edited; a role may be revoked after logout. Clear rules avoid surprising security gaps.
 
-The safest systems document these lifetime rules because ambiguity usually becomes over-permissive behavior in real deployments.
+Systems need explicit lifetime rules because ambiguity often becomes over-permissive behavior in deployment. Those rules must be predictable enough to audit as part of the protection mechanism.
 
-Auditable, predictable rules are part of the protection mechanism, not merely documentation.
-
-## Visual
+## Making the protection check unavoidable
 
 ```mermaid
 flowchart LR
@@ -80,9 +76,9 @@ flowchart LR
 
 The enforcement step must be unavoidable. Whether rights come from ACLs, capabilities, roles, or rings, the kernel or trusted runtime must mediate access.
 
-## Worked example 1: reading an access matrix
+### Evaluating rights in domain `D2`
 
-Problem: A system has domains `D1`, `D2`, and `D3`; objects `F1`, `F2`, and `Printer`. The rights are:
+A system has domains `D1`, `D2`, and `D3`; objects `F1`, `F2`, and `Printer`. The rights are:
 
 | Domain | F1 | F2 | Printer |
 |---|---|---|---|
@@ -98,11 +94,11 @@ Can a process in `D2` write `F1`, read `F2`, and print?
 4. For `Printer`, the entry is `none`. Printing is denied.
 5. The allowed operation set for this process is exactly what the row grants unless it changes domain.
 
-Checked answer: In domain `D2`, the process may read `F2`; it may not write `F1`; it may not print.
+In domain `D2`, the process may read `F2`; it may not write `F1`; it may not print.
 
-## Worked example 2: ACL versus capability choice
+### Choosing object-centered or delegated authority
 
-Problem: A shared project file should be readable by every member of a class but writable only by three teaching assistants. A temporary build worker should receive access to exactly one output directory and then lose that access after the build. Which protection style is natural for each?
+A shared project file should be readable by every member of a class but writable only by three teaching assistants. A temporary build worker should receive access to exactly one output directory and then lose that access after the build. Which protection style is natural for each?
 
 1. The project file policy is object-centered. The administrator wants to inspect and edit the file's allowed readers and writers.
 2. An ACL is natural: attach entries such as `class: read` and `ta-group: read, write` to the file.
@@ -110,9 +106,9 @@ Problem: A shared project file should be readable by every member of a class but
 4. A capability is natural if the system can issue an unforgeable token for that directory with expiration or revocation.
 5. Consider revocation. The ACL file change is easy to audit at the object. The build capability should expire automatically or be invalidated through an indirection table.
 
-Checked answer: Use an ACL-style representation for the shared class file and a capability-style delegation for the temporary build worker. Real systems often combine both patterns.
+Use an ACL-style representation for the shared class file and a capability-style delegation for the temporary build worker. Real systems often combine both patterns.
 
-## Code
+## Encoding the matrix directly
 
 ```python
 access_matrix = {
@@ -135,9 +131,9 @@ for test in tests:
     print(test, can(*test))
 ```
 
-This toy model stores the full access matrix directly. Real operating systems use sparse representations and protect the representation itself from user modification.
+The model stores the full access matrix directly. Real operating systems use sparse representations and protect the representation itself from user modification.
 
-## Common pitfalls
+## Authority mistakes and revocation gaps
 
 - Treating protection and security as synonyms. Protection is about controlled internal access; security includes wider threats and defenses.
 - Granting privileges for convenience and forgetting to remove them. Least privilege must be maintained over time.
@@ -146,10 +142,8 @@ This toy model stores the full access matrix directly. Real operating systems us
 - Trusting set-user-ID or elevated programs without careful input validation. Privilege changes magnify bugs.
 - Depending only on language protection. OS-level isolation is still needed for files, devices, processes, and untrusted code.
 
-## Connections
+<div className="see-also">
 
-- [Security](/cs/operating-systems/security)
-- [OS Overview, Services, and Structures](/cs/operating-systems/os-overview-structures)
-- [Processes](/cs/operating-systems/processes)
-- [File-System Interface](/cs/operating-systems/file-system-interface)
-- [I/O Systems](/cs/operating-systems/io-systems)
+See also: [Security](/cs/operating-systems/security) · [OS Overview, Services, and Structures](/cs/operating-systems/os-overview-structures) · [Processes](/cs/operating-systems/processes) · [File-System Interface](/cs/operating-systems/file-system-interface) · [I/O Systems](/cs/operating-systems/io-systems)
+
+</div>

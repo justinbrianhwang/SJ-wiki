@@ -9,7 +9,7 @@ Software project management is the discipline of making technical work coordinat
 
 The chapter sits between life cycle theory and detailed planning. A life cycle tells us what kinds of activities exist; project management asks who will do them, how the team will know whether work is on track, what practices deserve special attention, and how the organization learns from completed projects. It also introduces earned value analysis, which connects planned cost, actual cost, and completed work into objective progress indicators.
 
-## Definitions
+## Control, maturity, and individual discipline
 
 **Software project management** is the application of planning, organizing, monitoring, and corrective action to software development. It covers people, tasks, artifacts, estimates, risks, defects, reviews, and process improvement.
 
@@ -29,7 +29,7 @@ The **Personal Software Process (PSP)** focuses on individual discipline. It ask
 
 A **postmortem review** is a structured review after a project or release. It identifies what worked, what failed, and what process changes should be made.
 
-## Key results
+## Making progress observable
 
 Management has to make progress observable. A project can appear busy while producing little earned value, accumulating defects, or pushing key decisions into the future. The solution is not more status meetings by itself. The solution is a set of artifacts, measures, and review points that expose true project state.
 
@@ -57,7 +57,7 @@ Error tracking should support analysis as well as repair. A defect record should
 
 Postmortems close the loop. A postmortem that merely assigns blame is harmful. A useful review turns project experience into process changes, checklist updates, estimation calibration, training, or architectural guidelines.
 
-## Visual
+### The management feedback loop
 
 ```mermaid
 flowchart TD
@@ -80,11 +80,11 @@ flowchart TD
 | Managed process | measurements guide control | problems remain anecdotal |
 | Optimizing process | process changes are tested and institutionalized | lessons are forgotten after each release |
 
-## Worked example 1: Earned value analysis
+## Reading an earned-value checkpoint
 
-**Problem.** A project has a planned budget of 100 person-days for the first month. At the month checkpoint, the plan says 40 percent of the budgeted work should be complete. The team has actually completed work worth 30 person-days and spent 36 person-days. Compute PV, EV, AC, SV, CV, SPI, and CPI. Interpret the result.
+A project has a planned budget of 100 person-days for the first month. At the month checkpoint, the plan says 40 percent of the budgeted work should be complete. The team has actually completed work worth 30 person-days and spent 36 person-days. PV, EV, AC, SV, CV, SPI, and CPI describe its position.
 
-**Method.** Convert the statement into earned-value quantities.
+Convert the checkpoint data into the three earned-value quantities first.
 
 1. Planned value is the budgeted value of scheduled work. The planned budget for the whole baseline is 100 person-days, and 40 percent should be complete:
 
@@ -128,13 +128,13 @@ $$
 CPI = \frac{EV}{AC} = \frac{30}{36} \approx 0.83
 $$
 
-**Checked answer.** The project is behind schedule and over cost. It has earned only 75 percent of the value planned for this point, and each person-day spent is producing about 0.83 budgeted person-days of earned value. The check is consistent: both variances are negative and both performance indexes are below 1.
+The project is behind schedule and over cost. It has earned only 75 percent of the value planned for this point, and each person-day spent is producing about 0.83 budgeted person-days of earned value. Both variances are negative and both performance indexes are below 1.
 
-## Worked example 2: Turning defect data into a management action
+## Turning a defect cluster into a process change
 
-**Problem.** A team logs 80 defects during system testing. The defect categories are: 30 interface mismatches, 20 missing requirements, 18 boundary-condition failures, and 12 cosmetic issues. What management action should be taken first?
+A team logs 80 defects during system testing: 30 interface mismatches, 20 missing requirements, 18 boundary-condition failures, and 12 cosmetic issues. The distribution points to the first management action.
 
-**Method.** Separate symptom count from process cause.
+Separate the observed counts from the process causes they suggest.
 
 1. Interface mismatches are the largest category: $30/80 = 37.5\%$ of defects.
 
@@ -146,9 +146,9 @@ $$
 
 5. The two largest serious categories are interface mismatches and missing requirements. Both are expensive to find during system testing because they should be caught during requirements review, interface design, or integration planning.
 
-**Checked answer.** The first management action should be to add or strengthen an **interface review and requirements validation checkpoint** before implementation and before integration. The team should require reviewed interface specifications, trace interface assumptions to requirements, and add early integration tests for the most common mismatch patterns. The answer is checked by verifying that it targets 50 of 80 defects, or 62.5 percent of the observed failures, rather than optimizing a smaller cosmetic category.
+The first management action should be to add or strengthen an **interface review and requirements validation checkpoint** before implementation and before integration. The team should require reviewed interface specifications, trace interface assumptions to requirements, and add early integration tests for the most common mismatch patterns. That action targets 50 of 80 defects, or 62.5 percent of the observed failures, rather than a smaller cosmetic category.
 
-## Code
+## Computing an earned-value report
 
 ```python
 def earned_value_report(planned_value, earned_value, actual_cost):
@@ -174,7 +174,7 @@ for key, value in report.items():
         print(f"{key}: {value}")
 ```
 
-## Common pitfalls
+## Signals that management data is misleading
 
 - Reporting percent spent as percent complete. A project can spend 60 percent of its budget and earn much less than 60 percent of planned value.
 - Treating process maturity as a documentation contest. The goal is predictable, improvable work, not binders of unused procedures.
@@ -183,10 +183,8 @@ for key, value in report.items():
 - Running postmortems too late or turning them into blame sessions. Useful reviews focus on causes and process changes.
 - Comparing teams by raw defect counts without normalizing for size, complexity, phase, and detection effort.
 
-## Connections
+<div className="see-also">
 
-- [Software life cycle models](/cs/software-engineering/software-life-cycle-models)
-- [Project planning and estimation](/cs/software-engineering/project-planning-and-estimation)
-- [Software metrics](/cs/software-engineering/software-metrics)
-- [Risk analysis and management](/cs/software-engineering/risk-analysis-and-management)
-- [Software quality assurance](/cs/software-engineering/software-quality-assurance)
+See also: [Software life cycle models](/cs/software-engineering/software-life-cycle-models) · [Project planning and estimation](/cs/software-engineering/project-planning-and-estimation) · [Software metrics](/cs/software-engineering/software-metrics) · [Risk analysis and management](/cs/software-engineering/risk-analysis-and-management) · [Software quality assurance](/cs/software-engineering/software-quality-assurance)
+
+</div>

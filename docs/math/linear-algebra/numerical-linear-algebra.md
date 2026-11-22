@@ -9,7 +9,7 @@ Exact row reduction explains the theory, but computers work with finite precisio
 
 The central shift is from "Can this be solved?" to "Can this be solved accurately, quickly, and repeatedly on real hardware?" A formula may be mathematically correct and still be a poor computational method. Numerical linear algebra asks how errors propagate and how algorithms behave as problem sizes grow.
 
-## Definitions
+## LU factors, conditioning, and dominant modes
 
 An LU decomposition factors a square matrix as
 
@@ -37,7 +37,7 @@ $$
 
 A large condition number means the problem is sensitive: small changes in input can cause large changes in the solution.
 
-## Key results
+## Factor once, solve repeatedly
 
 If a square matrix can be reduced to row echelon form without row interchanges, then it has an LU decomposition. The multipliers used during Gaussian elimination become the subdiagonal entries of $L$, while the final echelon matrix gives $U$.
 
@@ -101,9 +101,7 @@ $$
 \mathbf{r}=\mathbf{b}-A\hat{\mathbf{x}},
 $$
 
-which can be computed from the proposed solution. The forward error is $\hat{\mathbf{x}}-\mathbf{x}$, which requires knowing the exact solution. A small residual is reassuring, but for an ill-conditioned matrix it may still correspond to a large forward error. This is why condition estimates are reported by serious numerical software.
-
-## Visual
+which can be computed from the proposed solution. The forward error is $\hat{\mathbf{x}}-\mathbf{x}$, which requires knowing the exact solution. A small residual is reassuring, but for an ill-conditioned matrix it may still correspond to a large forward error. Serious numerical software therefore reports condition estimates.
 
 ```mermaid
 flowchart TD
@@ -124,7 +122,7 @@ flowchart TD
 | Power method | dominant eigenpair | matrix-vector products | needs spectral gap |
 | SVD | rank, conditioning, robust least squares | higher than QR | most reliable for rank issues |
 
-## Worked example 1: Solve using LU
+## Two triangular solves from one LU factorization
 
 Problem: solve $A\mathbf{x}=\mathbf{b}$ using the factorization
 
@@ -205,7 +203,7 @@ $$
 
 Checked answer: $\mathbf{x}=\begin{bmatrix}1&3\end{bmatrix}^T$, and $A\mathbf{x}=\begin{bmatrix}5&13\end{bmatrix}^T$.
 
-## Worked example 2: Two steps of the power method
+## Watching power iteration approach the dominant direction
 
 Problem: approximate the dominant eigenvector of
 
@@ -269,7 +267,7 @@ $$
 
 Step 3: interpret. The dominant eigenvector is in the direction $\begin{bmatrix}1&1\end{bmatrix}^T$, and the iterates are moving toward that direction. Checked answer: the second iterate ratio is already $0.8$.
 
-## Code
+## Using pivoted LU and normalized iteration
 
 ```python
 import numpy as np
@@ -294,7 +292,7 @@ print(v)
 
 The LU calls use pivoting internally. For the power method, normalization prevents overflow and makes the direction easy to compare between iterations.
 
-## Common pitfalls
+## Stability, scaling, and stopping criteria
 
 - Forming $A^{-1}$ explicitly when a solve or factorization is more appropriate.
 - Ignoring pivoting in floating-point Gaussian elimination.
@@ -315,11 +313,10 @@ Sparse matrices change the algorithmic picture. A matrix with mostly zero entrie
 
 Backward error is another useful idea. An algorithm has small backward error if the computed answer is the exact solution to a nearby problem. For many stable algorithms, this is the right guarantee: floating-point arithmetic slightly perturbs the input, but the algorithm solves that nearby problem accurately. Conditioning then determines whether the nearby exact solution is close to the original exact solution.
 
-In practice, reliable numerical work combines mathematical checks with software checks. Inspect residuals, estimate condition numbers, use tolerances, and prefer library routines that expose factorization choices. The theory explains what can go wrong; mature numerical libraries encode decades of algorithmic safeguards.
+Reliable numerical work combines mathematical checks with software checks. Inspect residuals, estimate condition numbers, use tolerances, and prefer library routines that expose factorization choices. The theory explains what can go wrong; mature numerical libraries encode decades of algorithmic safeguards.
 
-## Connections
+<div className="see-also">
 
-- [Gaussian Elimination](/math/linear-algebra/gaussian-elimination)
-- [Orthogonality, Gram-Schmidt, and QR](/math/linear-algebra/orthogonality-qr-gram-schmidt)
-- [Least Squares](/math/linear-algebra/least-squares)
-- [Singular Value Decomposition](/math/linear-algebra/singular-value-decomposition)
+See also: [Gaussian Elimination](/math/linear-algebra/gaussian-elimination) · [Orthogonality, Gram-Schmidt, and QR](/math/linear-algebra/orthogonality-qr-gram-schmidt) · [Least Squares](/math/linear-algebra/least-squares) · [Singular Value Decomposition](/math/linear-algebra/singular-value-decomposition)
+
+</div>

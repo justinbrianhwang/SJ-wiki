@@ -133,6 +133,16 @@ body {
   color: var(--ink-soft);
 }
 
+/* Trailing "See also" line, like a notebook backlink footer. */
+.see-also {
+  margin-top: 3rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--rule);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
 code {
   border: none;
 }

@@ -333,10 +333,8 @@ Split-operator methods alternate kinetic and potential exponentials and use Four
 
 Norm conservation alone is not a complete accuracy test. A unitary method can still accumulate phase error or fail to resolve a resonance. Convergence should be checked by reducing the time step and monitoring the observables relevant to the problem, along with any exactly conserved quantities.
 
-## Related pages
+<div className="see-also">
 
-- [Postulates of quantum mechanics](/physics/quantum-mechanics/postulates-of-quantum-mechanics)
-- [Spin-1/2 systems](/physics/quantum-mechanics/spin-one-half-systems)
-- [Symmetries and conservation laws](/physics/quantum-mechanics/symmetries-conservation-laws)
-- [Time-dependent perturbation theory](/physics/quantum-mechanics/time-dependent-perturbation-theory)
-- [Path integral formulation](/physics/quantum-mechanics/path-integral-formulation)
+See also: [Postulates of quantum mechanics](/physics/quantum-mechanics/postulates-of-quantum-mechanics) · [Spin-1/2 systems](/physics/quantum-mechanics/spin-one-half-systems) · [Symmetries and conservation laws](/physics/quantum-mechanics/symmetries-conservation-laws) · [Time-dependent perturbation theory](/physics/quantum-mechanics/time-dependent-perturbation-theory) · [Path integral formulation](/physics/quantum-mechanics/path-integral-formulation)
+
+</div>

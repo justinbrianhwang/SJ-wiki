@@ -507,10 +507,8 @@ The overlap exists when the lower limit does not exceed the upper limit. Changes
 - Dropping boundary cases in finite pulse convolution. Draw overlap intervals and compute lengths.
 - Assuming causal means stable. A causal impulse response can still fail absolute integrability or summability.
 
-## Related pages
+<div className="see-also">
 
-- [System Properties](/physics/signals-systems/system-properties)
-- [Continuous-Time Fourier Transform](/physics/signals-systems/continuous-time-fourier-transform)
-- [Discrete-Time Fourier Transform](/physics/signals-systems/discrete-time-fourier-transform)
-- [Laplace Transform and ROC](/physics/signals-systems/laplace-transform-roc)
-- [Z-Transform and ROC](/physics/signals-systems/z-transform-roc)
+See also: [System Properties](/physics/signals-systems/system-properties) · [Continuous-Time Fourier Transform](/physics/signals-systems/continuous-time-fourier-transform) · [Discrete-Time Fourier Transform](/physics/signals-systems/discrete-time-fourier-transform) · [Laplace Transform and ROC](/physics/signals-systems/laplace-transform-roc) · [Z-Transform and ROC](/physics/signals-systems/z-transform-roc)
+
+</div>

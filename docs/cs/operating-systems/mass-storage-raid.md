@@ -7,9 +7,9 @@ sidebar_position: 12
 
 Mass storage is where file systems meet physical devices. The OS cannot treat disks, SSDs, and storage arrays as abstract infinite boxes; their physical behavior shapes performance and reliability. Traditional hard disks have seek time and rotational latency. SSDs have no mechanical head but have erase blocks, write amplification, and finite write endurance. RAID arrays combine devices to improve capacity, performance, reliability, or some mixture of these.
 
-This page follows the textbook's mass-storage chapter: disk structure, attachment, scheduling, disk management, swap-space management, RAID, and stable storage. The goal is not to memorize every device detail, but to understand why operating systems schedule I/O, manage bad blocks, reserve swap space, and use redundancy.
+The important topics are disk structure, attachment, scheduling, disk management, swap-space management, RAID, and stable storage. Device details matter where they explain why an operating system schedules I/O, manages bad blocks, reserves swap space, or uses redundancy.
 
-## Definitions
+## Device cost models and request scheduling
 
 A **hard disk drive** stores data magnetically on rotating platters. A disk surface is divided into tracks, tracks into sectors, and tracks at the same arm position across platters form a cylinder. A disk access includes **seek time**, **rotational latency**, and **transfer time**.
 
@@ -25,7 +25,7 @@ A **solid-state disk** stores data in flash memory. It has no mechanical seek, b
 
 **Stable storage** is an abstraction that attempts to make data survive failures by storing redundant copies and carefully ordering writes.
 
-## Key results
+## Moving a mechanical head fairly
 
 Mechanical disk performance is dominated by movement:
 
@@ -43,6 +43,8 @@ Disk scheduling reduces total head movement and improves throughput, but fairnes
 | C-SCAN | Sweep one direction | More uniform waits | Return sweep does no service |
 | LOOK | SCAN but stops at last request | Avoids unnecessary travel | Still directional |
 | C-LOOK | C-SCAN over request range | Avoids end travel | More bookkeeping |
+
+## Striping, mirrors, and parity
 
 RAID levels have different meanings:
 
@@ -68,11 +70,9 @@ Modern storage stacks also queue requests below the OS scheduler. SATA, SAS, NVM
 
 Storage reliability has both device and software dimensions. A disk can report a write as complete before data is truly stable unless caches are flushed correctly. A controller can reorder writes unless barriers or flush commands enforce ordering. A file system can journal metadata but still leave application data vulnerable if the application never requested durability. Correct storage design therefore crosses API, file-system, driver, controller, and hardware boundaries. Each layer must preserve the assumptions made by the layer above it.
 
-Performance and correctness both depend on those assumptions staying true during failures.
+Performance and correctness both depend on those assumptions staying true during failures, so storage policies need tests under normal load and simulated failure.
 
-Storage policies should therefore be tested under both normal load and simulated failure.
-
-## Visual
+## Following a request through the storage stack
 
 ```mermaid
 flowchart TB
@@ -124,9 +124,9 @@ flowchart TB
 
 This storage-stack diagram follows a request from a file offset through cache, block I/O, scheduling, driver submission, controller execution, and completion. The disk-scheduling branch includes the SSTF head-movement order from the worked example, while the SSD/NVMe branch shows why modern devices emphasize queue depth and write behavior instead of cylinder seek distance. The RAID 5 subgraph labels data and parity placement so the storage target is not treated as a single opaque box.
 
-## Worked example 1: SSTF disk scheduling
+### Tracing the SSTF request order
 
-Problem: The disk head is at cylinder 53. Pending requests are `98, 183, 37, 122, 14, 124, 65, 67`. Use SSTF and compute total head movement.
+The disk head is at cylinder 53. Pending requests are `98, 183, 37, 122, 14, 124, 65, 67`. Use SSTF and compute total head movement.
 
 1. Start at 53. Distances: to 65 is 12, to 67 is 14, to 37 is 16, to 14 is 39, to 98 is 45, to 122 is 69, to 124 is 71, to 183 is 130. Choose 65.
 2. Move 53 to 65: movement 12. Current 65.
@@ -138,11 +138,11 @@ Problem: The disk head is at cylinder 53. Pending requests are `98, 183, 37, 122
 8. Nearest from 122 is 124, distance 2. Total 177. Current 124.
 9. Last is 183, distance 59. Total 236.
 
-Checked answer: SSTF order is `65, 67, 37, 14, 98, 122, 124, 183`, with total head movement 236 cylinders.
+SSTF order is `65, 67, 37, 14, 98, 122, 124, 183`, with total head movement 236 cylinders.
 
-## Worked example 2: RAID 5 usable capacity
+### Computing RAID 5 usable capacity
 
-Problem: A RAID 5 array uses six 4 TB disks. What is the usable capacity, and how many disk failures can it tolerate?
+A RAID 5 array uses six 4 TB disks. What is the usable capacity, and how many disk failures can it tolerate?
 
 1. RAID 5 uses distributed parity equivalent to one disk's capacity.
 2. Usable disk count:
@@ -166,9 +166,9 @@ $$
 
    but could tolerate two disk failures.
 
-Checked answer: RAID 5 provides 20 TB usable capacity and tolerates one disk failure.
+RAID 5 provides 20 TB usable capacity and tolerates one disk failure.
 
-## Code
+## Simulating SSTF head movement
 
 ```python
 def sstf(start, requests):
@@ -192,7 +192,7 @@ print(sstf(53, requests))
 
 This simulator models only cylinder movement. Real devices also have rotational latency, queue reordering inside controllers, caches, and different behavior for SSDs.
 
-## Common pitfalls
+## Old disk models and modern failure modes
 
 - Applying HDD scheduling intuition blindly to SSDs. SSDs have different costs, though batching and write behavior still matter.
 - Treating SSTF as always best. It can starve far-away requests.
@@ -201,10 +201,8 @@ This simulator models only cylinder movement. Real devices also have rotational 
 - Ignoring rebuild risk. Large arrays can be vulnerable while reconstructing after a disk failure.
 - Putting swap space on slow or overloaded storage. Paging performance depends heavily on swap placement and contention.
 
-## Connections
+<div className="see-also">
 
-- [File-System Implementation](/cs/operating-systems/file-system-implementation)
-- [Virtual Memory](/cs/operating-systems/virtual-memory)
-- [I/O Systems](/cs/operating-systems/io-systems)
-- [Security](/cs/operating-systems/security)
-- [Linux Case Study](/cs/operating-systems/linux-case-study)
+See also: [File-System Implementation](/cs/operating-systems/file-system-implementation) · [Virtual Memory](/cs/operating-systems/virtual-memory) · [I/O Systems](/cs/operating-systems/io-systems) · [Security](/cs/operating-systems/security) · [Linux Case Study](/cs/operating-systems/linux-case-study)
+
+</div>

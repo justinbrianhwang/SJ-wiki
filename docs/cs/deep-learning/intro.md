@@ -11,7 +11,7 @@ These notes follow Aston Zhang, Zachary C. Lipton, Mu Li, and Alexander J. Smola
 
 *Figure: A compact network diagram gives deep-learning pages a quick visual model of learned weights. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Neural_network.svg), Dake and Mysid, CC BY 1.0.*
 
-The later pages cover the main deep learning families: multilayer perceptrons, convolutional networks, recurrent networks, attention, transformers, NLP applications, computer vision systems, recommender systems, GANs, reinforcement learning, Gaussian processes, and hyperparameter optimization. Code examples use PyTorch for portability. For classical context, compare these notes with [machine learning](/cs/machine-learning/); for prerequisites, see [linear algebra](/math/linear-algebra/) and [probability](/math/probability-and-random-variables/).
+The later pages cover the main deep learning families: multilayer perceptrons, convolutional networks, recurrent networks, attention, transformers, NLP applications, computer vision systems, recommender systems, GANs, reinforcement learning, Gaussian processes, and hyperparameter optimization. Code examples use PyTorch for portability. For classical context, compare these notes with [machine learning](/cs/machine-learning/intro); for prerequisites, see [linear algebra](/math/linear-algebra/intro) and [probability](/math/probability-and-random-variables/intro).
 
 ```mermaid
 flowchart TB

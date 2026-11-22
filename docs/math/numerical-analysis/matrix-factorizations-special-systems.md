@@ -430,9 +430,8 @@ print(thomas([-1.0, -1.0], [2.0, 2.0, 2.0], [-1.0, -1.0], [1.0, 0.0, 1.0]))
 - Forgetting that a tridiagonal algorithm assumes nonzero modified pivots.
 - Ignoring storage costs. For large structured systems, memory can matter as much as arithmetic.
 
-## Related pages
+<div className="see-also">
 
-- [Gaussian elimination pivoting and LU](/math/numerical-analysis/gaussian-elimination-pivoting-lu)
-- [least squares and Chebyshev approximation](/math/numerical-analysis/least-squares-chebyshev-approximation)
-- [finite difference methods for PDEs](/math/numerical-analysis/finite-difference-pdes)
-- [cubic splines and parametric curves](/math/numerical-analysis/cubic-splines-parametric-curves)
+See also: [Gaussian elimination pivoting and LU](/math/numerical-analysis/gaussian-elimination-pivoting-lu) · [least squares and Chebyshev approximation](/math/numerical-analysis/least-squares-chebyshev-approximation) · [finite difference methods for PDEs](/math/numerical-analysis/finite-difference-pdes) · [cubic splines and parametric curves](/math/numerical-analysis/cubic-splines-parametric-curves)
+
+</div>

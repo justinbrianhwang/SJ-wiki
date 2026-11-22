@@ -343,9 +343,8 @@ Evaluate greedy actions and their margins. If the top two values differ by less 
 
 Finally, test the target formulas on one deterministic transition before running an environment. Give successor actions conspicuously different values and verify that SARSA, Expected SARSA, and Q-learning produce the intended numbers. Most algorithm swaps require changing one target line; that same similarity makes silent swaps easy.
 
-## Related pages
+<div className="see-also">
 
-- [Monte Carlo methods](/cs/reinforcement-learning/monte-carlo-methods)
-- [n-step bootstrapping](/cs/reinforcement-learning/n-step-bootstrapping)
-- [Eligibility traces](/cs/reinforcement-learning/eligibility-traces)
-- [Off-policy approximation](/cs/reinforcement-learning/off-policy-approximation)
+See also: [Monte Carlo methods](/cs/reinforcement-learning/monte-carlo-methods) · [n-step bootstrapping](/cs/reinforcement-learning/n-step-bootstrapping) · [Eligibility traces](/cs/reinforcement-learning/eligibility-traces) · [Off-policy approximation](/cs/reinforcement-learning/off-policy-approximation)
+
+</div>

@@ -7,9 +7,9 @@ sidebar_position: 12
 
 Adversarial ML began with image classifiers in much of the modern deep-learning literature, but the same security questions appear in text, speech, reinforcement learning, recommender systems, multimodal models, and LLM applications. The perturbation set changes: a text edit is discrete and semantic, an audio perturbation passes through acoustics, an RL perturbation can change a trajectory, and an LLM prompt injection may be an instruction placed in retrieved content or tool output.
 
-This page gives the vocabulary needed to connect image adversarial examples to other modalities without pretending that every domain fits an $\ell_p$ ball. Representative papers such as HotFlip, TextFooler, BERT-Attack, audio attacks, and RF universal perturbations are folded into the topical modality sections below.
+The useful connection to image adversarial examples is the optimization framework, not the assumption that every domain fits an $\ell_p$ ball. HotFlip, TextFooler, BERT-Attack, audio attacks, and RF universal perturbations each replace the pixel budget with constraints native to their modality.
 
-## Definitions
+## What counts as a valid perturbation outside images
 
 A **text adversarial example** changes a text input so that a model changes its prediction while the meaning, fluency, or label should remain stable. The perturbation set may include character edits, word substitutions, paraphrases, syntax changes, or distractor sentences.
 
@@ -38,7 +38,7 @@ An **RL adversarial attack** perturbs observations, rewards, dynamics, or polici
 
 A **jailbreak** attempts to make an LLM produce behavior disallowed by its instruction hierarchy or safety policy. A **prompt injection** places instructions in user content, retrieved documents, web pages, tool outputs, or other context so the model follows untrusted instructions over trusted ones. These are not usually norm-bounded perturbations; they are instruction and context attacks.
 
-## Key results
+## The constraint comes from the modality
 
 The main lesson across modalities is that validity constraints are domain-specific. For images, $\ell_\infty$ and $\ell_2$ budgets are convenient approximations. For text, preserving label and meaning is a semantic constraint. For audio, imperceptibility and over-the-air robustness depend on human hearing and the playback-recording channel. For RL, the attack objective may be cumulative reward rather than one-step classification loss. For LLM systems, the target is often policy compliance, tool misuse, data exfiltration, or instruction hierarchy failure.
 
@@ -90,7 +90,7 @@ HotFlip is the discrete analogue of a first-order attack, but validity is lingui
 
 ### Semantics-constrained word substitutions
 
-Jin et al. [2] introduced TextFooler as a black-box word-substitution attack for text classification and entailment. Its contribution was a practical pipeline: rank important words, propose semantically similar substitutions, filter candidates, and query the victim model until the prediction changes.
+Jin et al. [2] introduced TextFooler as a black-box word-substitution attack for text classification and entailment. Its contribution was an operational pipeline: rank important words, propose semantically similar substitutions, filter candidates, and query the victim model until the prediction changes.
 
 A common importance score masks or removes word $i$ and measures true-label confidence drop:
 
@@ -185,7 +185,7 @@ Worked micro-example: if $\|v\|_2^2=25$ and the allowed energy is $P=9$, then $\
 
 RF attacks should be reported with signal representation, sample rate, SNR distribution, power and spectral constraints, channel assumptions, and whether the perturbation was digitally injected, replayed, or transmitted.
 
-## Visual
+### Comparing the attack surfaces
 
 ```mermaid
 flowchart TD
@@ -212,9 +212,9 @@ flowchart TD
 | Multimodal | Image, text, audio, document layout | Cross-modal consistency | Misclassification or instruction hijack | Hidden text and channel interactions |
 | Radio modulation | I/Q samples or spectrum features | Power, spectrum, timing, channel | Wrong modulation label or accuracy drop | Channel and hardware assumptions |
 
-## Worked example 1: Word-substitution attack budget
+## Measuring a word-substitution budget
 
-Problem: A sentiment classifier processes a 20-token sentence. An attack changes 3 tokens using synonym substitutions that preserve the human label. Compute the token edit fraction and explain why this is not the same as an $\ell_\infty$ image budget.
+Consider a 20-token sentence for which an attack changes 3 tokens using synonym substitutions that preserve the human label. Compute the token edit fraction and compare it with an $\ell_\infty$ image budget.
 
 1. Total tokens:
 
@@ -242,11 +242,11 @@ $$
 
 5. In images, an $\ell_\infty$ budget limits every coordinate by a small continuous amount. In text, a single token replacement can be a large discrete jump in embedding space but small in meaning, or it can completely change the label.
 
-Checked answer: the edit fraction is $15\%$. The attack must be judged by semantic and grammatical validity, not by direct analogy to pixel-wise $\epsilon$.
+The edit fraction is $15\%$. The attack still has to be judged by semantic and grammatical validity rather than by direct analogy to pixel-wise $\epsilon$.
 
-## Worked example 2: Prompt-injection threat modeling
+## Threat-modeling indirect prompt injection
 
-Problem: An LLM assistant summarizes web pages using a browsing tool. The web page contains untrusted text that asks the assistant to ignore prior instructions and reveal private notes. Classify the attack surface and state the correct robustness question without writing an attack prompt.
+An LLM assistant summarizes web pages using a browsing tool. One page contains untrusted text asking the assistant to ignore prior instructions and reveal private notes. Classify the attack surface and state the correct robustness question without writing an attack prompt.
 
 1. The attacker's capability is control over retrieved page content:
 
@@ -270,9 +270,9 @@ $$
 
 5. A good evaluation would include tool-output isolation, retrieval labeling, refusal behavior, permission checks, and tests where untrusted content conflicts with user or system instructions.
 
-Checked answer: this is a prompt-injection threat model against an LLM system, not a norm-bounded adversarial example. Robustness depends on instruction hierarchy and system boundaries.
+The relevant threat model is prompt injection against an LLM system, not a norm-bounded adversarial example. Robustness depends on instruction hierarchy and system boundaries.
 
-## Code
+## Scoring HotFlip replacement candidates
 
 ```python
 import torch
@@ -296,7 +296,7 @@ def top_replacement_candidates(embedding_grad, embedding_matrix, token_id, banne
 
 This is a gradient-based candidate scorer for discrete text substitutions. It does not decide whether a replacement preserves meaning, grammar, or label; a real text attack must add those constraints and should be evaluated with human or high-quality semantic checks.
 
-## Common pitfalls
+## Where cross-modal analogies break
 
 - Forcing every modality into image-style $\ell_p$ notation when the validity constraint is semantic, acoustic, temporal, or procedural.
 - Counting text attacks as successful when they change the true human label.
@@ -306,7 +306,25 @@ This is a gradient-based candidate scorer for discrete text substitutions. It do
 - Describing LLM jailbreaks without separating model behavior from application-level tool permissions and context isolation.
 - Treating prompt injection as solved by output filtering alone; the system must manage untrusted instructions before tool use and data access.
 
-## Connections
+## Reading by modality
+
+- Ebrahimi et al., "HotFlip: White-Box Adversarial Examples for Text Classification."
+- Jin et al., "Is BERT Really Robust? A Strong Baseline for Natural Language Attack on Text Classification and Entailment" (TextFooler).
+- Carlini and Wagner, work on audio adversarial examples for speech recognition.
+- Huang et al. and follow-up work on adversarial attacks against reinforcement-learning policies.
+- Recent LLM security literature on jailbreaks, indirect prompt injection, tool-use risks, and instruction hierarchy evaluation.
+
+## Cited attack papers
+
+[1] J. Ebrahimi, A. Rao, D. Lowd, D. Dou. *HotFlip: White-Box Adversarial Examples for Text Classification*. ACL 2018.
+[2] D. Jin, Z. Jin, J. T. Zhou, P. Szolovits. *Is BERT Really Robust? A Strong Baseline for Natural Language Attack on Text Classification and Entailment*. AAAI 2020.
+[3] L. Li, R. Ma, Q. Guo, X. Xue, X. Qiu. *BERT-Attack: Adversarial Attack Against BERT Using BERT*. EMNLP 2020.
+[4] N. Carlini, D. Wagner. *Audio Adversarial Examples: Targeted Attacks on Speech-to-Text*. IEEE Security and Privacy Workshops 2018.
+[5] Y. Wang, J. Wang, S. Gong, Y. Yang, Z. Yang. *Universal Attack Against Automatic Modulation Classification DNNs Under Frequency and Data Constraints*. IEEE Transactions on Information Forensics and Security 2023.
+
+<div className="see-also">
+
+See also:
 
 - [Threat models and attack taxonomy](/cs/adversarial-attacks/threat-models-and-attack-taxonomy) gives the goal, knowledge, capability, and budget template used here.
 - [Physical-world and patch attacks](/cs/adversarial-attacks/physical-world-and-patch-attacks) covers transformation-aware constraints for physical sensing.
@@ -315,18 +333,4 @@ This is a gradient-based candidate scorer for discrete text substitutions. It do
 - [Reinforcement learning](/cs/reinforcement-learning/intro) is the neighboring section for policy attacks.
 - [Deep learning](/cs/deep-learning/intro) covers sequence models and representation learning used across these modalities.
 
-## Further reading
-
-- Ebrahimi et al., "HotFlip: White-Box Adversarial Examples for Text Classification."
-- Jin et al., "Is BERT Really Robust? A Strong Baseline for Natural Language Attack on Text Classification and Entailment" (TextFooler).
-- Carlini and Wagner, work on audio adversarial examples for speech recognition.
-- Huang et al. and follow-up work on adversarial attacks against reinforcement-learning policies.
-- Recent LLM security literature on jailbreaks, indirect prompt injection, tool-use risks, and instruction hierarchy evaluation.
-
-## References
-
-[1] J. Ebrahimi, A. Rao, D. Lowd, D. Dou. *HotFlip: White-Box Adversarial Examples for Text Classification*. ACL 2018.
-[2] D. Jin, Z. Jin, J. T. Zhou, P. Szolovits. *Is BERT Really Robust? A Strong Baseline for Natural Language Attack on Text Classification and Entailment*. AAAI 2020.
-[3] L. Li, R. Ma, Q. Guo, X. Xue, X. Qiu. *BERT-Attack: Adversarial Attack Against BERT Using BERT*. EMNLP 2020.
-[4] N. Carlini, D. Wagner. *Audio Adversarial Examples: Targeted Attacks on Speech-to-Text*. IEEE Security and Privacy Workshops 2018.
-[5] Y. Wang, J. Wang, S. Gong, Y. Yang, Z. Yang. *Universal Attack Against Automatic Modulation Classification DNNs Under Frequency and Data Constraints*. IEEE Transactions on Information Forensics and Security 2023.
+</div>

@@ -5,11 +5,11 @@ sidebar_position: 3
 
 # Syntax, Variables, and Types
 
-Python syntax is designed to make structure visible. Instead of braces around blocks, Python uses indentation; instead of type declarations for ordinary variables, it uses dynamic typing; instead of a mandatory program wrapper, a file can begin with useful statements immediately. Halvorsen's textbook introduces these ideas through small programs: assign a number, print it, combine values in a formula, inspect a variable's type, and gradually build longer scripts.
+Python syntax exposes structure directly. Instead of braces around blocks, Python uses indentation; instead of type declarations for ordinary variables, it uses dynamic typing; instead of a mandatory program wrapper, a file can begin with useful statements immediately. Halvorsen's textbook introduces these ideas through small programs: assign a number, print it, combine values in a formula, inspect a variable's type, and gradually build longer scripts.
 
 The practical lesson is that Python code is close to executable pseudocode, but it is still precise. Whitespace matters. Names are case-sensitive. Values have types even when variables do not have declared types. A beginner who understands those rules can read most simple Python programs and can diagnose many first errors without guessing.
 
-## Definitions
+## Names bind to typed objects
 
 A **statement** is an instruction Python executes, such as assignment, `if`, `for`, `import`, or `return`. An **expression** is code that produces a value, such as `2 + 3`, `len(name)`, or `temperature > 25`.
 
@@ -36,11 +36,11 @@ def area(width, height):
     return width * height
 ```
 
-## Key results
+## Indentation, binding, and runtime type checks
 
-The first key result is that indentation is syntax. A block begins after a colon and continues as long as indentation stays aligned. This affects `if`, `for`, `while`, `def`, `class`, `try`, `with`, and related constructs. Four spaces per indentation level is the standard convention.
+Indentation is syntax. A block begins after a colon and continues as long as indentation stays aligned. This affects `if`, `for`, `while`, `def`, `class`, `try`, `with`, and related constructs. Four spaces per indentation level is the standard convention.
 
-The second result is that assignment binds names; it does not copy every value. For immutable values such as integers and strings, this distinction rarely surprises beginners. For mutable values such as lists and dictionaries, aliasing matters:
+Assignment binds names; it does not copy every value. For immutable values such as integers and strings, this distinction rarely surprises beginners. For mutable values such as lists and dictionaries, aliasing matters:
 
 ```python
 a = [1, 2, 3]
@@ -51,7 +51,7 @@ print(a)  # [1, 2, 3, 4]
 
 Both names refer to the same list. To make a shallow copy, use `a.copy()`, `list(a)`, or slicing for lists.
 
-The third result is that Python has strong dynamic typing. "Dynamic" means names can be bound without declared types and types are checked while the program runs. "Strong" means Python does not silently combine incompatible types in arbitrary ways:
+Python has strong dynamic typing. "Dynamic" means names can be bound without declared types and types are checked while the program runs. "Strong" means Python does not silently combine incompatible types in arbitrary ways:
 
 ```python
 "2" + 2  # TypeError
@@ -63,17 +63,17 @@ You must state the conversion:
 int("2") + 2  # 4
 ```
 
-The fourth result is that truth values follow clear rules. `False`, `None`, numeric zero, empty strings, and empty containers are falsey. Most other objects are truthy. This makes code such as `if names:` idiomatic when you mean "if this list is not empty."
+Truth values follow clear rules. `False`, `None`, numeric zero, empty strings, and empty containers are falsey. Most other objects are truthy. This makes code such as `if names:` idiomatic when you mean "if this list is not empty."
 
-The fifth result is that readable naming is part of correctness. A name such as `temperature_c` carries units; `t` does not. In short exercises, `x` and `y` are acceptable. In programs that will be reread, descriptive names prevent mistakes.
+Readable naming is part of correctness. A name such as `temperature_c` carries units; `t` does not. In short exercises, `x` and `y` are acceptable. In programs that will be reread, descriptive names prevent mistakes.
 
-A sixth result is that Python's apparent freedom should be balanced with local discipline. Because the interpreter does not require declarations, programmers have to create clarity through naming, small functions, and checks near the boundary of the program. If a value arrives from `input()`, a file, JSON, command-line arguments, or a web request, its type should be treated as unknown until converted or validated. Inside the core of a program, values should have stable meanings. For example, avoid using `value` as text in one half of a function and as a float in the other half. Use `value_text` for the raw string and `value` or `value_c` for the converted number.
+Python's apparent freedom should be balanced with local discipline. Because the interpreter does not require declarations, programmers have to create clarity through naming, small functions, and checks near the boundary of the program. If a value arrives from `input()`, a file, JSON, command-line arguments, or a web request, its type should be treated as unknown until converted or validated. Inside the core of a program, values should have stable meanings. For example, avoid using `value` as text in one half of a function and as a float in the other half. Use `value_text` for the raw string and `value` or `value_c` for the converted number.
 
-A seventh result is that syntax errors and type errors point to different stages of understanding. A syntax error means Python could not parse the program; inspect punctuation, indentation, quotes, colons, and parentheses. A type error means Python understood the statement but rejected the operation for the values supplied at runtime. Reading that distinction early makes later debugging easier. When a beginner sees `TypeError: can only concatenate str (not "int") to str`, the fix is not random punctuation; it is a conversion or a different operation.
+Syntax errors and type errors point to different stages of understanding. A syntax error means Python could not parse the program; inspect punctuation, indentation, quotes, colons, and parentheses. A type error means Python understood the statement but rejected the operation for the values supplied at runtime. Reading that distinction early makes later debugging easier. When a beginner sees `TypeError: can only concatenate str (not "int") to str`, the fix is not random punctuation; it is a conversion or a different operation.
 
 Finally, comments and docstrings should not compensate for vague code. If a comment says `# convert celsius to fahrenheit`, the function name `celsius_to_fahrenheit` is better. Use comments for assumptions that are not visible in the syntax: units from a sensor, why a threshold is chosen, or why a value is rounded before comparison.
 
-## Visual
+Parsing succeeds before any statement runs; type-dependent operations are checked later, during execution:
 
 ```mermaid
 flowchart LR
@@ -97,7 +97,7 @@ flowchart LR
 | `"Python"` | `str` | `"Python".lower()` | Immutable Unicode text |
 | `None` | `NoneType` | `result is None` | Represents no value or missing result |
 
-## Worked example 1: trace assignments and types
+## Tracing assignments through mixed numeric types
 
 Problem: predict the output and types in a short script.
 
@@ -139,7 +139,7 @@ The original `label` remains `"total"` unless the uppercase result is assigned b
 label = label.upper()
 ```
 
-## Worked example 2: fix input conversion
+## Converting input before arithmetic
 
 Problem: a user types two numbers, but the program concatenates them instead of adding them.
 
@@ -189,7 +189,7 @@ $$
 
 3. The output is now `15.0`. If integer-only input is required, use `int()` instead of `float()`.
 
-## Code
+## Inspecting representation, type, and truth value
 
 ```python
 def summarize_value(name, value):
@@ -210,9 +210,9 @@ for name, value in values.items():
     summarize_value(name, value)
 ```
 
-The snippet is useful for learning because it shows representation, type, and truth value side by side. The `!r` conversion in an f-string uses `repr()`, making strings and `None` easier to distinguish from printed prose.
+The loop shows representation, type, and truth value side by side. The `!r` conversion in an f-string uses `repr()`, making strings and `None` easier to distinguish from printed prose.
 
-## Common pitfalls
+## First errors to classify before fixing
 
 - Forgetting that indentation is part of the grammar. Misaligned blocks can change meaning or raise `IndentationError`.
 - Using a variable before assigning it. Python raises `NameError` because the name has no binding in the current scope.
@@ -222,9 +222,8 @@ The snippet is useful for learning because it shows representation, type, and tr
 - Assuming `a = b` copies a list or dictionary. It creates another reference to the same object.
 - Comparing to `None` with `==`. Prefer `is None`, because `None` is a singleton.
 
-## Connections
+<div className="see-also">
 
-- [Setup, REPL, and Environments](/cs/programming/python/setup-repl-and-environments)
-- [Operators and Expressions](/cs/programming/python/operators-and-expressions)
-- [Control Flow and Comprehensions](/cs/programming/python/control-flow-and-comprehensions)
-- [Containers and Idioms](/cs/programming/python/containers-and-idioms)
+See also: [Setup, REPL, and Environments](/cs/programming/python/setup-repl-and-environments) · [Operators and Expressions](/cs/programming/python/operators-and-expressions) · [Control Flow and Comprehensions](/cs/programming/python/control-flow-and-comprehensions) · [Containers and Idioms](/cs/programming/python/containers-and-idioms)
+
+</div>

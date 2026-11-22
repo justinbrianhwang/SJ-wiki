@@ -312,9 +312,8 @@ Then approximately 35 ticks of latency plus 965 timer ticks make the reload-to-r
 - Sharing ISR data without considering atomicity, compiler optimization, or buffer overflow.
 - Measuring a square-wave period without accounting for two timer events per full high–low cycle.
 
-## Related pages
+<div className="see-also">
 
-- [8051 architecture, memory, and ports](/cs/embedded/8051-architecture-memory-ports)
-- [8051 instruction set and programming](/cs/embedded/8051-instruction-set-programming)
-- [Serial buses and embedded protocols](/cs/embedded/serial-buses-embedded-protocols)
-- [Microcontroller derivatives, AVR, and PIC](/cs/embedded/microcontroller-derivatives-avr-pic)
+See also: [8051 architecture, memory, and ports](/cs/embedded/architecture-memory-ports) · [8051 instruction set and programming](/cs/embedded/instruction-set-programming) · [Serial buses and embedded protocols](/cs/embedded/serial-buses-embedded-protocols) · [Microcontroller derivatives, AVR, and PIC](/cs/embedded/microcontroller-derivatives-avr-pic)
+
+</div>

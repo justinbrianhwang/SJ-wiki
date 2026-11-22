@@ -7,9 +7,9 @@ sidebar_position: 3
 
 A process is a program in execution, but that phrase is only the beginning. The executable file is passive bytes on storage; the process is active state: an address space, a program counter, CPU registers, open files, accounting data, scheduling information, and relationships to other processes. Modern operating systems are built around this abstraction because many activities must appear to progress at once even when the machine has fewer CPUs than runnable activities.
 
-Processes connect the user-level idea of "running a program" to the kernel-level mechanisms of scheduling, memory isolation, resource ownership, and interprocess communication. The process page therefore prepares for CPU scheduling, synchronization, virtual memory, file systems, and protection. Once a program becomes a process, it is no longer just code; it is a managed object in the kernel.
+Processes connect the user-level idea of "running a program" to the kernel mechanisms of scheduling, memory isolation, resource ownership, and interprocess communication. The executing program becomes a managed kernel object rather than a passive code image.
 
-## Definitions
+## Anatomy and states of a process
 
 A **process** is an executing program with its current activity and resources. It includes a **text section** containing program code, a **data section** for global variables, a **heap** for dynamically allocated memory, and a **stack** for function calls, parameters, local variables, and return addresses.
 
@@ -23,7 +23,7 @@ Common process states are **new**, **running**, **waiting**, **ready**, and **te
 
 **Interprocess communication** (IPC) lets cooperating processes exchange data. The two classic models are **shared memory**, where processes map a common region and coordinate access, and **message passing**, where the kernel or a communication facility transfers messages through operations such as send and receive.
 
-## Key results
+## The PCB and the cost of context switching
 
 The central result is that the process abstraction lets the OS multiplex the CPU while preserving the illusion of private execution. A context switch saves the state of one process and restores the state of another. No useful user computation occurs during the switch itself, so context switching is overhead. However, without it, a time-sharing system could not keep many interactive, I/O-bound, and background activities responsive.
 
@@ -39,6 +39,8 @@ The PCB is the unit that makes context switching possible:
 | Accounting info | CPU used, owner, limits | Enables quotas and auditing |
 | I/O status | open files, devices, pending I/O | Connects process to external resources |
 
+## Process families, IPC, and resource ownership
+
 Process relationships form trees. A parent may wait for a child to terminate and collect its exit status. In UNIX terminology, a **zombie** process has terminated but still has an entry so the parent can read its status. An **orphan** process continues after its parent exits and is adopted by a system process.
 
 IPC has a major design trade-off. Shared memory is usually faster after setup because processes communicate by ordinary memory loads and stores, but it requires synchronization to avoid races. Message passing is easier to reason about across machines and between untrusted processes, but the data path may involve copying, buffering, blocking semantics, and kernel mediation.
@@ -49,7 +51,7 @@ Process creation policy differs by environment. A traditional UNIX shell creates
 
 A process is also a resource-accounting container. The kernel can charge CPU time, memory use, open files, signals, and child processes to it. Quotas, limits, priorities, and credentials attach naturally to this container. Threads share much of that container, which is why a thread bug can corrupt the whole process, while a process boundary gives the OS a stronger isolation point. Choosing process versus thread structure is therefore both a performance decision and a reliability decision.
 
-## Visual
+## From PCB creation to final reaping
 
 ```mermaid
 flowchart TB
@@ -86,9 +88,11 @@ flowchart TB
 
 This process-state diagram separates runnable work from blocked work by showing the ready queue, device/event wait queues, and the PCB fields that move between them. The scheduler and dispatcher path makes context switching explicit: CPU state is saved to one PCB and restored from another before returning to user mode. The dotted arrows highlight metadata dependencies rather than direct execution flow, while the terminal path distinguishes process exit from final PCB reaping.
 
-## Worked example 1: following a context switch
+## Process behavior in two workloads
 
-Problem: Process `P1` is running when it issues a disk read. Process `P2` is already in the ready queue. Trace the state changes and PCB operations.
+### Blocking `P1` and dispatching `P2`
+
+Process `P1` is running when it issues a disk read. Process `P2` is already in the ready queue. Trace the state changes and PCB operations.
 
 1. Initially, `P1` is running and `P2` is ready.
 2. `P1` calls `read()`. The kernel determines that the requested disk block is not in cache, so `P1` cannot continue until the I/O completes.
@@ -98,11 +102,11 @@ Problem: Process `P1` is running when it issues a disk read. Process `P2` is alr
 6. The dispatcher loads `P2`'s saved registers and program counter from `P2`'s PCB, changes `P2` to running, and returns to user mode.
 7. Later, the disk interrupt arrives. The interrupt handler marks the I/O complete, moves `P1` from waiting to ready, and places it on the ready queue.
 
-Checked answer: `P1` does not return directly from its `read()` call until after the disk interrupt and a later scheduling decision give it the CPU again. The PCB is the durable kernel object that preserves both processes across these transitions.
+`P1` does not return directly from its `read()` call until after the disk interrupt and a later scheduling decision give it the CPU again. The PCB is the durable kernel object that preserves both processes across these transitions.
 
-## Worked example 2: choosing shared memory or messages
+### Moving video frames between two processes
 
-Problem: Two processes on the same machine produce and consume video frames. Each frame is 8 MB, and the producer creates 30 frames per second. Should they use shared memory or message passing for the frame data?
+Two processes on the same machine produce and consume video frames. Each frame is 8 MB, and the producer creates 30 frames per second. Should they use shared memory or message passing for the frame data?
 
 1. Compute the raw data rate:
 
@@ -120,9 +124,9 @@ $$
 4. Synchronization is still required. The producer and consumer need indexes, full/empty counts, or semaphores so that the producer does not overwrite a frame before the consumer has finished.
 5. If the processes were on different machines, shared memory would no longer be the natural choice, and messages or streaming sockets would fit better.
 
-Checked answer: On the same host, shared memory is the better data path for large high-rate frames, provided synchronization is correct. Message passing may still be used for small control messages such as "new frame available" or "change resolution."
+On the same host, shared memory is the better data path for large high-rate frames, provided synchronization is correct. Message passing may still be used for small control messages such as "new frame available" or "change resolution."
 
-## Code
+## The `fork`–`exec`–`wait` sequence
 
 ```c
 #include <stdio.h>
@@ -157,7 +161,7 @@ int main(void) {
 
 This POSIX example shows the classic split between creation and program replacement: the child is created with `fork()`, then it becomes a different program with `execlp()`, while the parent waits for termination.
 
-## Common pitfalls
+## State and lifetime distinctions
 
 - Confusing a program with a process. The same executable can have many simultaneous processes, each with different state.
 - Assuming a blocked process is still competing for the CPU. Waiting processes need an event; ready processes need CPU scheduling.
@@ -166,10 +170,8 @@ This POSIX example shows the classic split between creation and program replacem
 - Treating `fork()` as portable to all OS families. It is central to UNIX-like systems but not the usual Windows creation model.
 - Ignoring child collection. A parent that never waits for children can leave zombie entries until the system adopts or cleans them.
 
-## Connections
+<div className="see-also">
 
-- [OS Overview, Services, and Structures](/cs/operating-systems/os-overview-structures)
-- [Threads](/cs/operating-systems/threads)
-- [CPU Scheduling](/cs/operating-systems/cpu-scheduling)
-- [Process Synchronization](/cs/operating-systems/process-synchronization)
-- [Protection and Access Control](/cs/operating-systems/protection-access-control)
+See also: [OS Overview, Services, and Structures](/cs/operating-systems/os-overview-structures) · [Threads](/cs/operating-systems/threads) · [CPU Scheduling](/cs/operating-systems/cpu-scheduling) · [Process Synchronization](/cs/operating-systems/process-synchronization) · [Protection and Access Control](/cs/operating-systems/protection-access-control)
+
+</div>

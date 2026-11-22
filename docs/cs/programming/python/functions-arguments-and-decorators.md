@@ -9,7 +9,7 @@ Functions are the first major abstraction in Python. They turn a sequence of sta
 
 Modern Python functions go further than simple `def name(x): return y`. They support positional arguments, keyword arguments, defaults, variable-length argument lists, closures, lambdas, decorators, annotations, and multiple return values through tuples. These features should serve readability. A good function makes one idea easy to call and easy to test; a clever signature that hides behavior is usually worse than a few explicit lines.
 
-## Definitions
+## From parameters to wrappers
 
 A **function definition** binds a name to a callable object:
 
@@ -48,11 +48,11 @@ key = lambda item: item["score"]
 
 A **decorator** is a callable that receives a function and returns a replacement function, often a wrapper that adds behavior before or after the original call.
 
-## Key results
+## Function contracts and callable interfaces
 
-The first key result is that a function should have a clear contract: what it expects, what it returns, and what side effects it performs. A calculation function should usually return a value rather than printing directly. Printing is useful at the user-interface boundary; returning is useful for tests and reuse.
+A function should have a clear contract: what it expects, what it returns, and what side effects it performs. A calculation function should usually return a value rather than printing directly. Printing is useful at the user-interface boundary; returning is useful for tests and reuse.
 
-The second result is that Python naturally returns multiple values by returning a tuple. This is the technique used in many beginner exercises:
+Python naturally returns multiple values by returning a tuple. This is the technique used in many beginner exercises:
 
 ```python
 def min_max(values):
@@ -61,7 +61,7 @@ def min_max(values):
 low, high = min_max([3, 1, 4])
 ```
 
-The third result is that default values are evaluated once, when the function is defined, not each time it is called. Therefore mutable defaults are dangerous:
+Default values are evaluated once, when the function is defined, not each time it is called. Therefore mutable defaults are dangerous:
 
 ```python
 def add_item(item, items=[]):  # avoid
@@ -71,9 +71,9 @@ def add_item(item, items=[]):  # avoid
 
 Use `None` as the default and create the list inside the function.
 
-The fourth result is that scope follows the LEGB rule: local, enclosing, global, built-in. Assignment inside a function creates a local name unless declared `global` or `nonlocal`. Most functions should avoid modifying globals; pass values in and return values out.
+Scope follows the LEGB rule: local, enclosing, global, built-in. Assignment inside a function creates a local name unless declared `global` or `nonlocal`. Most functions should avoid modifying globals; pass values in and return values out.
 
-The fifth result is that decorators are just function transformations. The syntax:
+Decorators are just function transformations. The syntax:
 
 ```python
 @decorator
@@ -90,20 +90,20 @@ def f():
 f = decorator(f)
 ```
 
-The sixth result is that type hints document expectations and help tools, but they do not enforce types at runtime by themselves:
+Type hints document expectations and help tools, but they do not enforce types at runtime by themselves:
 
 ```python
 def area(width: float, height: float) -> float:
     return width * height
 ```
 
-A seventh result is that function size should follow testability. A function that reads input, parses text, calculates a value, writes a file, and prints a report has too many reasons to change. Splitting those steps into `parse_input`, `calculate`, `save`, and `display` creates small contracts. The calculation can be tested without files. The file writer can be tested with temporary paths. The display function can be changed without touching the formula.
+Function size should follow testability. A function that reads input, parses text, calculates a value, writes a file, and prints a report has too many reasons to change. Splitting those steps into `parse_input`, `calculate`, `save`, and `display` creates small contracts. The calculation can be tested without files. The file writer can be tested with temporary paths. The display function can be changed without touching the formula.
 
-An eighth result is that argument order is part of the interface. Put required, stable, central parameters first. Put optional tuning parameters after them, usually with defaults. If a call has several boolean flags or numbers whose meaning is not obvious, keyword arguments are clearer than positional arguments. `plot(values, normalize=True, window=5)` is easier to review than `plot(values, True, 5)`.
+Argument order is part of the interface. Put required, stable, central parameters first. Put optional tuning parameters after them, usually with defaults. If a call has several boolean flags or numbers whose meaning is not obvious, keyword arguments are clearer than positional arguments. `plot(values, normalize=True, window=5)` is easier to review than `plot(values, True, 5)`.
 
-Finally, decorators should be introduced only when the repeated pattern is real. Logging, timing, caching, authorization, validation, and retry behavior are common decorator uses. A decorator used once may hide more than it helps. Before writing one, ask whether a direct helper function or context manager would make the control flow more visible.
+Finally, decorators should be introduced only when the repeated pattern is real. Logging, timing, caching, authorization, validation, and retry behavior are common decorator uses. A decorator used once may hide more than it helps. Before writing one, ask whether a direct helper function or context manager would leave the control flow clearer.
 
-## Visual
+Arguments enter a function through its parameters; an explicit `return` sends a value back, while falling off the end sends `None`:
 
 ```mermaid
 flowchart LR
@@ -126,7 +126,7 @@ flowchart LR
 | Lambda | `lambda x: x.score` | Small callback | Avoid complex lambda bodies |
 | Decorator | `@timer` | Cross-cutting behavior | Preserve metadata with `wraps` |
 
-## Worked example 1: write and test a conversion function
+## Conversion functions with a round-trip check
 
 Problem: implement Celsius-to-Fahrenheit and Fahrenheit-to-Celsius functions, then check a round trip.
 
@@ -189,7 +189,7 @@ round(back_to_c, 10) == 37
 
 Rounding in the final check avoids false failures from tiny floating-point representation differences.
 
-## Worked example 2: build a decorator for timing
+## Timing calls without losing function metadata
 
 Problem: create a decorator that prints how long a function call takes, then apply it to a slow function.
 
@@ -240,7 +240,7 @@ Step-by-step:
 
 Checked answer: `answer` is `5`, and a timing line near `0.200 s` is printed.
 
-## Code
+## When shared validation earns a decorator
 
 ```python
 from functools import wraps
@@ -264,7 +264,7 @@ The decorator separates validation from the average formula. For small programs 
 
 In ordinary coursework, write the direct version first. After two or three functions repeat the same validation, timing, logging, or conversion code, then consider a decorator. This keeps the abstraction earned by repetition. The same discipline applies to `*args`, `**kwargs`, and higher-order functions: they are valuable when they simplify a real calling pattern, but they can make beginner code harder to trace if introduced before the basic function contract is stable.
 
-## Common pitfalls
+## Signature and wrapper mistakes
 
 - Printing from a function that should return a value. This makes reuse and testing harder.
 - Using mutable default arguments such as `[]` or `{}`.
@@ -274,9 +274,8 @@ In ordinary coursework, write the direct version first. After two or three funct
 - Omitting `functools.wraps` in decorators, which hides the original function metadata.
 - Using lambdas for multi-step logic. Define a named function when the operation deserves a name.
 
-## Connections
+<div className="see-also">
 
-- [Control Flow and Comprehensions](/cs/programming/python/control-flow-and-comprehensions)
-- [Containers and Idioms](/cs/programming/python/containers-and-idioms)
-- [Modules, Packages, and Environments](/cs/programming/python/modules-packages-and-environments)
-- [Testing and the Scientific Stack](/cs/programming/python/testing-and-scientific-stack)
+See also: [Control Flow and Comprehensions](/cs/programming/python/control-flow-and-comprehensions) · [Containers and Idioms](/cs/programming/python/containers-and-idioms) · [Modules, Packages, and Environments](/cs/programming/python/modules-packages-and-environments) · [Testing and the Scientific Stack](/cs/programming/python/testing-and-scientific-stack)
+
+</div>

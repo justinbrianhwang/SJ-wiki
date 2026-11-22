@@ -5,11 +5,11 @@ sidebar_position: 1
 
 # Basic Concepts, Units, and Measurements
 
-Engineering thermodynamics begins by deciding what portion of the world is being analyzed and how its measurable state is described. The vocabulary is deliberately strict: a system is not the same thing as the surroundings, a property is not the same thing as a path quantity, and a temperature reading is meaningful only because the zeroth law makes thermometers possible. This page collects the foundational language used by the later energy, entropy, exergy, cycle, and flow analyses.
+Engineering thermodynamics begins by deciding what portion of the world is being analyzed and how its measurable state is described. The vocabulary is deliberately strict: a system differs from its surroundings, a property differs from a path quantity, and a temperature reading is meaningful because the zeroth law makes thermometers possible. These distinctions support later energy, entropy, exergy, cycle, and flow analyses.
 
 The emphasis is practical. Before solving for turbine power or refrigerator performance, an engineer must choose the system boundary, decide whether mass crosses it, convert units without changing physical meaning, and distinguish absolute pressure and temperature from gage readings and temperature differences. These choices look elementary, but they prevent many of the largest errors in thermodynamics homework and design calculations.
 
-## Definitions
+## Boundaries, states, and properties
 
 - A **system** is the mass or region selected for study. Everything outside it is the surroundings, and the boundary may be real or imaginary, fixed or moving. A closed system contains a fixed mass; a control volume is an open system that permits mass flow.
 - A **property** is a macroscopic characteristic that has a definite value at a state. Pressure, temperature, specific volume, internal energy, enthalpy, and entropy are properties. Heat and work are not properties because they describe energy crossing a boundary during a process.
@@ -23,11 +23,11 @@ The emphasis is practical. Before solving for turbine power or refrigerator perf
 - **Density** is $\rho=m/V$ and specific volume is $v=V/m=1/\rho$. Specific gravity compares density with a reference density, usually liquid water near standard conditions for liquids.
 
 A disciplined setup starts by drawing the boundary and labeling what can cross it: heat, work, mass, momentum, or species. Then choose a property basis, often per unit mass for closed systems and per unit time for control volumes. Finally, check that all temperatures in ratios are absolute and that all pressure data are on the same absolute or gage basis.
-For this topic, a complete engineering model should state the boundary, the time basis, the property model, and the sign convention before any numbers are substituted. In basic concepts, units, and measurements, that habit is especially important because several formulas look similar while answering different physical questions. A closed-system expression, a steady-flow expression, an ideal-gas relation, and a property-table interpolation may all contain pressure, temperature, or enthalpy, but they do not have the same assumptions. The safest workflow is to write the general balance or defining relation first, cancel terms with a written reason, and only then insert table values or constants.
+Before substituting numbers, state the boundary, time basis, property model, and sign convention. Then write the defining relation or general balance and remove terms only for stated physical reasons.
 
-The second modeling habit is to keep the basis visible. Some calculations are per unit mass, some per mole, some per kg dry air, and some per unit time. A correct formula on the wrong basis is a common source of errors that look numerically plausible. When a table gives $\mathrm{kJ/kg}$, multiply by $\dot m$ to get $\mathrm{kW}$; when a reaction is balanced in kmol, convert to mass only after the element balance is complete; when a mixture property uses mole fraction, do not substitute mass fraction without conversion.
+Keep the basis visible: per-unit-mass, molar, total, and rate quantities are not interchangeable. Multiplying $\mathrm{kJ/kg}$ by $\dot m$ gives a power only when the mass flow rate is in $\mathrm{kg/s}$.
 
-## Key results
+## Measurement relations and unit discipline
 
 The foundational formulas are mostly conversion and measurement relations, but they control later first-law and second-law work:
 
@@ -47,14 +47,10 @@ $$
 
 where $\Delta z$ is the vertical depth measured downward. This relation underlies manometers, barometers, tank pressure readings, and many checks on pressure sensor data.
 
-Dimensional homogeneity is a theorem-level habit rather than a cosmetic rule. Every term in a valid physical equation must have the same dimensions. For example, $P V$ has units of energy because $\mathrm{kPa\,m^3}=\mathrm{kJ}$. This fact is why boundary work can be computed from the area under a $P$-$V$ curve and why the ideal-gas relation $Pv=RT$ is dimensionally consistent when $R$ is chosen in matching units.
+Dimensional homogeneity is a theorem-level habit rather than a cosmetic rule. Every term in a valid physical equation must have the same dimensions. For example, $P V$ has units of energy because $\mathrm{kPa\,m^3}=\mathrm{kJ}$. Consequently, boundary work can be computed from the area under a $P$-$V$ curve, and the ideal-gas relation $Pv=RT$ is dimensionally consistent when $R$ is chosen in matching units.
 
 The state postulate is used most often by asking whether the substance is simple and compressible, then selecting two independent intensive properties. A piston-cylinder of water in the two-phase dome is not fixed by $T$ and $P$ alone; it also needs a quality, specific volume, or another independent property. By contrast, an ideal gas at known $T$ and $P$ has $v=RT/P$.
-These results should be read as a hierarchy rather than a list of isolated equations. Conservation of mass and energy set the allowed accounting; property relations supply the missing state data; the second law or equilibrium criterion decides direction, limits, and losses. A numerical answer is not finished until it passes three checks: the units reduce to the requested quantity, the sign matches the stated energy or entropy transfer direction, and the magnitude is reasonable compared with a limiting case. Useful limiting cases include zero heat transfer, reversible operation, incompressible behavior, ideal-gas behavior, saturated-liquid or saturated-vapor endpoints, and equal reservoir temperatures.
-
-Because the textbook often moves between exact laws and engineering approximations, the approximation should be named in the solution. Examples include constant specific heats, negligible kinetic energy, negligible pump work, adiabatic devices, isentropic turbomachinery, ideal-gas mixtures, dry-air approximations, and linear interpolation. Naming the approximation makes later refinement straightforward: replace the approximate property model or restore the neglected term without rebuilding the whole analysis.
-
-## Visual
+Use limiting cases as measurement checks: zero gage pressure must equal local atmospheric pressure, and doubling a system must double its extensive properties without changing its intensive properties. Record the phase region, property basis, and units beside every table value.
 
 | Concept | Mathematical cue | Engineering consequence |
 |---|---:|---|
@@ -74,7 +70,7 @@ absolute vacuum:        P = 0
 local atmosphere:        P_atm --------------------- measured pressure
 ```
 
-## Worked example 1: absolute pressure from a manometer
+## Reading absolute pressure from a manometer
 
 **Problem.** A gas tank is connected to a U-tube manometer containing mercury. The mercury level on the open-atmosphere side is $0.180\ \mathrm{m}$ higher than on the tank side. Local atmospheric pressure is $99.0\ \mathrm{kPa}$. Estimate the absolute tank pressure using $\rho_{\mathrm{Hg}}=13,600\ \mathrm{kg/m^3}$.
 
@@ -99,7 +95,7 @@ $$
 
 **Checked answer.** The tank pressure is about $123\ \mathrm{kPa}$ absolute. The sign is reasonable because the tank-side mercury column is depressed, which requires a gas pressure above atmospheric.
 
-## Worked example 2: using the state postulate with an ideal gas
+## Fixing an ideal-gas state from two properties
 
 **Problem.** A rigid tank contains $0.75\ \mathrm{kg}$ of air at $25{}^{\circ}C$ and $150\ \mathrm{kPa}$ absolute. Treat air as an ideal gas with $R=0.287\ \mathrm{kJ/(kg\,K)}$. Find the tank volume and explain why the state is fixed.
 
@@ -134,43 +130,16 @@ $$
 
 **Checked answer.** The tank volume is $0.428\ \mathrm{m^3}$. The result is physically plausible: air at pressure above atmospheric has a specific volume smaller than roughly $0.85\ \mathrm{m^3/kg}$ at room temperature and $1\ \mathrm{atm}$.
 
-## Code
-
-```python
-def tank_volume_air(m_kg, T_C, P_kPa, R=0.287):
-    T_K = T_C + 273.15
-    v = R * T_K / P_kPa  # kJ/kg divided by kPa = m^3/kg
-    return m_kg * v
-
-def hydrostatic_head_pressure(rho, h, g=9.81):
-    return rho * g * h / 1000.0  # kPa
-
-print(round(tank_volume_air(0.75, 25.0, 150.0), 3))
-print(round(99.0 + hydrostatic_head_pressure(13600.0, 0.180), 1))
-```
-
-## Common pitfalls
+## Checks before calculation
 
 - Using gage pressure in $Pv=RT$ or saturated-property calculations. Convert to absolute pressure first.
 - Treating Celsius temperatures as absolute in ratios such as $T_L/T_H$.
 - Calling heat or work a property. They are boundary interactions, not stored quantities.
 - Assuming $T$ and $P$ are independent inside the saturated liquid-vapor dome.
 - Forgetting that a control volume may have real and imaginary boundary segments.
-- Starting from a special-case equation before checking that its assumptions actually hold. Write the general balance or definition first, then reduce it.
-- Leaving property-table values unlabeled. Record the substance, phase region, pressure or temperature row, interpolation fraction, and units so the result can be audited.
-- Rounding intermediate states too aggressively. Keep extra digits through property lookup, quality calculation, and efficiency ratios, then round the final answer to justified precision.
-- Skipping a limiting-case check. Test the result against reversible operation, zero pressure drop, saturated endpoints, ideal-gas behavior, or equal-temperature reservoirs when those limits are meaningful.
-- Treating a numerical solver or chart as a substitute for physical reasoning. Software can return a precise-looking number even when the selected phase, reference state, or boundary model is wrong.
-- Forgetting to state whether the reported answer is specific, total, or rate based.
 
-## Connections
+<div className="see-also">
 
-- [energy, heat, work, and the first law](/physics/thermodynamics/energy-heat-work-and-first-law)
-- [pure substances and property tables](/physics/thermodynamics/pure-substances-and-property-tables)
-- [control-volume mass and energy analysis](/physics/thermodynamics/control-volume-mass-and-energy-analysis)
-- [microscopic foundations](/physics/statistical-mechanics/)
-- [basic thermal physics](/physics/general/)
-- [thermochemistry](/chemistry/general/thermochemistry)
-- [physical chemistry](/chemistry/physical-chemistry/)
-- [engineering mathematics](/math/engineering-math/)
-- [thermal systems control](/cs/control-engineering/)
+See also: [energy, heat, work, and the first law](/physics/thermodynamics/energy-heat-work-and-first-law) · [pure substances and property tables](/physics/thermodynamics/pure-substances-and-property-tables) · [control-volume mass and energy analysis](/physics/thermodynamics/control-volume-mass-and-energy-analysis) · [microscopic foundations](/physics/statistical-mechanics/intro) · [basic thermal physics](/physics/general/intro) · [thermochemistry](/chemistry/general/thermochemistry) · [physical chemistry](/chemistry/physical-chemistry/intro) · [engineering mathematics](/math/engineering-math/intro) · [thermal systems control](/cs/control-engineering/intro)
+
+</div>

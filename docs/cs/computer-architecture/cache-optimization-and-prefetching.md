@@ -9,7 +9,7 @@ Basic cache design chooses size, block size, associativity, and write policy. Ad
 
 H&P organizes cache optimizations around measurable causes of memory stalls. The right question is not "does this reduce misses?" but "which term in execution time does this improve, and what does it damage?" That framing is especially important once multicore processors create shared-cache contention and bandwidth pressure.
 
-## Definitions
+## The levers on a cache miss
 
 Hit time is the time to access a cache when the requested block is present. Miss rate is the fraction of accesses that miss. Miss penalty is the additional time to service a miss from lower levels.
 
@@ -28,7 +28,7 @@ Loop transformations improve locality:
 - Fusion combines loops that touch the same data.
 - Padding changes layout to reduce conflict misses.
 
-## Key results
+## Matching each optimization to an AMAT term
 
 Cache optimizations can be grouped by the AMAT terms they target:
 
@@ -55,8 +55,6 @@ Nonblocking caches are most valuable when the processor has independent work to 
 Compiler transformations and hardware prefetching are complementary. A compiler can understand loop structure, array dimensions, and future iterations, but it may lack exact runtime addresses or know whether a branch will be taken. Hardware sees actual addresses and can adapt to streams, but it may waste effort on patterns that stop suddenly. Many systems use both, relying on profiling or programmer annotations for difficult kernels.
 
 Energy can reverse a purely performance-based conclusion. A prefetcher that improves time by 2% but increases memory traffic by 30% may be unacceptable in a mobile or WSC setting. Similarly, a highly associative cache may reduce misses but consume more dynamic energy on every hit. The best optimization is the one that improves the dominant bottleneck within the system's power and bandwidth budget.
-
-## Visual
 
 ```mermaid
 flowchart TD
@@ -97,7 +95,7 @@ flowchart TD
     Compiler -. "changes access stream and working set" .-> Access
 ```
 
-This cache-optimization diagram ties specific mechanisms to the miss path rather than listing them as independent tricks. Nonblocking caches use MSHRs to keep hits and multiple misses in flight, critical-word-first reduces effective miss penalty, and prefetching competes for the same bandwidth and tracking entries it tries to help. The compiler-transform branch shows that loop order, tiling, and padding change the access stream before hardware ever sees it.
+Along the miss path, nonblocking caches use MSHRs to keep hits and multiple misses in flight, critical-word-first reduces effective miss penalty, and prefetching competes for the same bandwidth and tracking entries it tries to help. Loop order, tiling, and padding alter that access stream before hardware sees it.
 
 | Optimization | Target | Helps most when | Can hurt by |
 |---|---|---|---|
@@ -108,7 +106,7 @@ This cache-optimization diagram ties specific mechanisms to the miss path rather
 | Prefetching | Effective miss penalty | Access pattern is predictable | Pollution and wasted bandwidth |
 | Blocking | Capacity miss rate | Nested loops reuse data | More complex code |
 
-## Worked example 1: Choosing prefetch distance
+## Choosing a prefetch lead distance
 
 Problem: A loop processes one array element per iteration. Each iteration takes 6 cycles excluding cache misses. Main-memory latency is 90 cycles. The cache block holds 8 elements, and the hardware does not prefetch. Estimate a software prefetch distance in iterations.
 
@@ -143,7 +141,7 @@ $$
 
 Checked answer: Prefetch about 16 iterations ahead, ideally at block boundaries. This gives slightly more than the 90 cycles required, while matching the 8-element block size.
 
-## Worked example 2: Blocking a matrix computation
+## Sizing matrix-multiplication tiles
 
 Problem: A naive matrix loop repeatedly accesses rows of `A` and columns of `B` for matrix multiplication. Suppose a cache can hold 32 KiB of useful data, elements are 8-byte doubles, and we want a square tile of `A`, `B`, and `C` to fit together. Estimate a tile dimension $b$ such that three $b \times b$ tiles fit.
 
@@ -172,7 +170,7 @@ b &\le 36.95
 \end{aligned}
 $$
 
-4. Choose a practical tile size. Powers of two or multiples matching vector widths are common. Choose $b=32$.
+4. Choose a usable tile size. Powers of two or multiples matching vector widths are common. Choose $b=32$.
 
 5. Check capacity.
 
@@ -182,7 +180,7 @@ $$
 
 Checked answer: A $32 \times 32$ tile uses 24 KiB for the three tiles, leaving room for other data and avoiding a too-tight capacity assumption.
 
-## Code
+## Estimating distances and tile sizes
 
 ```python
 from math import ceil, sqrt
@@ -209,7 +207,7 @@ The tile-size calculation is similarly conservative. A tile that fits mathematic
 
 A useful validation step is to classify the remaining misses after each optimization. If compulsory misses dominate, associativity will not help much. If conflict misses dominate, padding or associativity may help. If capacity misses dominate, blocking or a larger cache is more plausible. This keeps optimization tied to cause rather than folklore.
 
-## Common pitfalls
+## When locality optimizations backfire
 
 - Prefetching too late, which turns the prefetch into an ordinary miss.
 - Prefetching too early, which evicts the data before use.
@@ -218,9 +216,8 @@ A useful validation step is to classify the remaining misses after each optimiza
 - Using blocking sizes that exactly fill the cache and leave no room for other data.
 - Assuming compiler transformations preserve performance when aliasing or layout differs.
 
-## Connections
+<div className="see-also">
 
-- [Cache Organization and AMAT](/cs/computer-architecture/cache-organization-amat)
-- [Vector, SIMD, and GPU Architectures](/cs/computer-architecture/vector-simd-gpu)
-- [Dynamic Scheduling and Tomasulo](/cs/computer-architecture/dynamic-scheduling-tomasulo)
-- [Storage, RAID, and SSDs](/cs/computer-architecture/storage-raid-ssds)
+See also: [Cache Organization and AMAT](/cs/computer-architecture/cache-organization-amat) · [Vector, SIMD, and GPU Architectures](/cs/computer-architecture/vector-simd-gpu) · [Dynamic Scheduling and Tomasulo](/cs/computer-architecture/dynamic-scheduling-tomasulo) · [Storage, RAID, and SSDs](/cs/computer-architecture/storage-raid-ssds)
+
+</div>

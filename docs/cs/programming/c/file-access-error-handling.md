@@ -9,7 +9,7 @@ K&R's I/O chapter moves from standard input and output to named files, error rep
 
 The central design idea is that a file is accessed through a stream, represented by `FILE *`. The stream buffers data, records status, and presents text or binary input in a standard form. Error handling is explicit: check return values, report failures on `stderr`, and return a useful status from `main`.
 
-## Definitions
+## Opening and operating on streams
 
 A file is opened with:
 
@@ -59,7 +59,7 @@ exit(EXIT_FAILURE);
 
 The standard library also provides helpers that K&R connects to I/O work: `<string.h>` for strings, `<ctype.h>` for character tests and conversions, `ungetc` for one-character pushback, `system` for command execution, and `malloc`/`free` for storage.
 
-## Key results
+## The stream model and its failure modes
 
 Open failure is normal, not exceptional. A program may lack permission, the file may not exist, or a path may name a directory. Always test `fopen` before using the stream.
 
@@ -69,11 +69,11 @@ Line input is safer than unbounded input. `fgets` reads at most `n - 1` characte
 
 `gets` is unsafe. K&R lists it because it existed in the standard library of the time, but modern C removed it because it cannot be used safely; it has no buffer-size argument.
 
-Update mode requires care. When a stream is open for both reading and writing, the standard requires a positioning or flushing operation between a read and a write in many cases. This prevents buffered state from becoming ambiguous.
+Update mode requires care. Output followed by input needs an intervening `fflush` or positioning operation. Input followed by output needs a positioning operation unless the input operation reached end-of-file. These rules keep buffered state unambiguous.
 
 File status and conversion status differ. End-of-file, I/O error, and parse failure are different conditions. Use return values first, then `feof`, `ferror`, or `perror` when needed.
 
-The portable stream interface is intentionally higher-level than UNIX file descriptors. A `FILE *` stream may buffer input, buffer output, translate text newlines, and remember error and end-of-file indicators. This is why a program should not treat the stream as if it were only a thin integer handle. The stream object belongs to the library, and the program interacts with it through functions. That extra layer is what lets the same source code read a text file on systems with different physical newline representations.
+The portable stream interface is intentionally higher-level than UNIX file descriptors. A `FILE *` stream may buffer input, buffer output, translate text newlines, and remember error and end-of-file indicators. A program should not treat the stream as a thin integer handle. The stream object belongs to the library, and the program interacts with it through functions. That extra layer lets the same source code read a text file on systems with different physical newline representations.
 
 Error handling should preserve useful context. A message such as `cannot open file` is less useful than `prog: cannot open notes.txt`. K&R examples often include the program name and the file name, and modern code can add `perror` or `strerror(errno)` to include the system reason. The important design rule is to report errors on the diagnostic stream without corrupting normal output. A filter that writes transformed data to `stdout` should keep errors on `stderr` so it can still be used safely in a pipeline.
 
@@ -83,7 +83,7 @@ A second design choice is whether an error should stop the whole program or only
 
 The file-positioning functions add another layer of state. After `fseek`, the next input or output operation observes the new position. This is useful for fixed-size records and binary files, but text streams can have implementation-specific restrictions on meaningful offsets. When portability matters, use positions returned by `ftell` or stay with sequential processing.
 
-## Visual
+The normal lifetime of a named stream includes checks at acquisition, transfer, and close:
 
 ```mermaid
 flowchart TD
@@ -109,67 +109,57 @@ flowchart TD
 | `fprintf` | formatted stream output | character count | negative |
 | `fflush` | flush output buffer | `0` | `EOF` |
 
-## Worked example 1: Copying a file with checked streams
+## Copying a file without losing an error path
 
-Problem: copy text from `in.txt` to `out.txt`, reporting an error if either file cannot be opened.
-
-Method:
-
-1. Open input:
+To copy text from `in.txt` to `out.txt`, first open the input:
 
    ```c
    in = fopen("in.txt", "r");
    ```
 
-2. If `in == NULL`, print a diagnostic to `stderr` and return failure.
-3. Open output:
+If `in == NULL`, print a diagnostic to `stderr` and return failure. Then open the output:
 
    ```c
    out = fopen("out.txt", "w");
    ```
 
-4. If output open fails, close `in` before returning failure.
-5. Copy:
+If output open fails, close `in` before returning failure. Once both streams exist, copy one character at a time:
 
    ```c
    while ((c = getc(in)) != EOF)
        putc(c, out);
    ```
 
-6. Close both streams.
-7. Check the conceptual result: every character read before `EOF` is written once.
+Every character read before `EOF` is written once. Both streams must be closed, and the output close must be checked because a buffered write error may only appear while flushing. If the opens, writes, and close all succeed, `out.txt` contains the same character sequence that was read from `in.txt`.
 
-Checked answer: if both opens succeed and no write error occurs, `out.txt` contains the same character sequence that was read from `in.txt`.
+## Detecting a split line from `fgets`
 
-## Worked example 2: Detecting a long line with `fgets`
-
-Problem: read into `char buf[8]` using `fgets(buf, sizeof buf, fp)` when the next input line is:
+Consider `char buf[8]` and a call to `fgets(buf, sizeof buf, fp)` when the next input line is:
 
 ```text
 abcdefghi\n
 ```
 
-Method:
+`sizeof buf` is 8, so `fgets` can store at most 7 characters plus `'\0'`.
 
-1. `sizeof buf` is 8, so `fgets` can store at most 7 characters plus `'\0'`.
-2. It reads characters until newline, EOF, or 7 stored characters.
-3. The first call stores:
+1. The call reads until newline, EOF, or 7 stored characters.
+2. The first chunk is:
 
    ```text
    a b c d e f g \0
    ```
 
-4. The newline has not been read yet, because the buffer filled first.
-5. To detect truncation, test whether the stored string contains `'\n'`.
-6. The remaining input starts with:
+3. The newline has not been read because the buffer filled first.
+4. Testing whether the stored string contains `'\n'` detects that the logical line is incomplete.
+5. The remaining input starts with:
 
    ```text
    h i \n
    ```
 
-Checked answer: the first buffer contains `"abcdefg"` with no newline. The logical input line was longer than the buffer chunk, so code that processes whole lines must continue reading and combine or discard the remainder.
+The first buffer contains `"abcdefg"` with no newline. Code that processes whole lines must continue reading and either combine or discard the remainder.
 
-## Code
+## A checked binary file-copy implementation
 
 ```c
 #include <stdio.h>
@@ -218,7 +208,7 @@ int main(int argc, char *argv[])
 }
 ```
 
-## Common pitfalls
+## Errors that appear late or masquerade as EOF
 
 - Using a `FILE *` after `fopen` returned `NULL`.
 - Printing diagnostics to `stdout`, where they may mix with normal program output.
@@ -229,10 +219,8 @@ int main(int argc, char *argv[])
 - Mixing reads and writes on an update stream without an intervening flush or positioning operation.
 - Treating `EOF` from `getc` as definitely end-of-file without considering `ferror`.
 
-## Connections
+<div className="see-also">
 
-- [Standard I/O and Formatted I/O](/cs/programming/c/standard-io-formatted-io)
-- [Standard Library Reference](/cs/programming/c/standard-library-reference)
-- [Unix System Interface](/cs/programming/c/unix-system-interface)
-- [Storage Allocation](/cs/programming/c/storage-allocation)
-- [Modern C Considerations](/cs/programming/c/modern-c-considerations)
+See also: [Standard I/O and Formatted I/O](/cs/programming/c/standard-io-formatted-io) · [Standard Library Reference](/cs/programming/c/standard-library-reference) · [Unix System Interface](/cs/programming/c/unix-system-interface) · [Storage Allocation](/cs/programming/c/storage-allocation) · [Modern C Considerations](/cs/programming/c/modern-c-considerations)
+
+</div>

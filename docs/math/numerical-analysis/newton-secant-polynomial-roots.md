@@ -5,77 +5,136 @@ sidebar_position: 5
 
 # Newton Secant and Polynomial Roots
 
-Newton's method and the secant method are local root-finding algorithms. They are often much faster than bisection once a good starting point is available, because they use slope information, either explicitly or implicitly. Polynomial root algorithms add another layer: the function has algebraic structure, so evaluation, derivative computation, and deflation can be organized efficiently.
+Newton's method and the secant method are local root finders. Once an iterate is close to a simple root, both are much faster than bisection because they use slope information, either explicitly or through a finite secant. Polynomial problems add useful algebraic structure: Horner evaluation, derivative evaluation, and deflation can all be organized around the coefficient list.
 
-![Newton iteration follows tangent lines toward a root of a curve.](https://commons.wikimedia.org/wiki/Special:FilePath/Newton_iteration.svg)
+Fast local convergence does not replace bracketing. Robust solvers often guard Newton or secant steps with interval checks, step limits, damping, or a fallback bisection step.
 
-*Figure: Newton iteration uses local linearization to turn calculus into a fast root-finding algorithm. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Newton_iteration.svg), Oleg Alexandrov and Pbroks13, public domain.*
+## Tangent steps and secant steps
 
-These methods should be read as part of a toolkit rather than as replacements for bracketing. In production solvers, Newton or secant steps are frequently guarded by interval tests, step-size limits, or fallback bisection. The mathematical rate is important, but so is the behavior when the derivative is small, the starting value is poor, or roots are multiple.
-
-## Definitions
-
-Newton's method for $f(x)=0$ is
+Newton's iteration for $f(x)=0$ is
 
 $$
 p_{n+1}=p_n-\frac{f(p_n)}{f'(p_n)}.
 $$
 
-It is obtained by replacing $f$ near $p_n$ with the tangent line and taking the tangent line's root as the next approximation. The method requires a derivative and can fail if $f'(p_n)$ is zero or very small. A damped Newton method replaces the full step by $p_{n+1}=p_n-\lambda f(p_n)/f'(p_n)$ with $0\lt \lambda\le 1$ to improve global behavior.
-
-The secant method replaces the derivative by a finite slope through two previous points:
+It comes from solving the tangent-line approximation to $f$ at $p_n$. A zero or very small derivative can produce an undefined or unreasonably large step. Damping replaces the full correction by
 
 $$
-p_{n+1}=p_n-f(p_n)\frac{p_n-p_{n-1}}{f(p_n)-f(p_{n-1})}.
+p_{n+1}=p_n-\lambda\frac{f(p_n)}{f'(p_n)},
+\qquad 0<\lambda\leq 1,
 $$
 
-It uses one new function evaluation per step after initialization and avoids analytic derivatives. It is not a bracketing method unless extra logic preserves an interval.
+which can improve behavior away from the root.
 
-For a polynomial
+More explicitly, linearize around the current point:
 
 $$
-P(x)=a_nx^n+a_{n-1}x^{n-1}+\cdots+a_0,
+f(p_n+s)\approx f(p_n)+f'(p_n)s.
 $$
 
-Horner's method rewrites evaluation as nested multiplication. If $r$ is an approximate root, synthetic division can deflate the polynomial, but deflation must be used carefully because errors in early roots perturb later factors.
+Setting the right side to zero gives $s=-f(p_n)/f'(p_n)$. The approximation is trustworthy only when the step stays in a region where the derivative changes moderately. Newton is also fixed-point iteration for $g(x)=x-f(x)/f'(x)$; at a simple root $p$, $g'(p)=0$, which hints at the unusually fast local rate.
 
-## Key results
+With a bracket $[a,b]$ satisfying $f(a)f(b)\lt 0$, a safeguarded update accepts the Newton point only if it lies inside the bracket and offers adequate progress. Otherwise it bisects. After evaluating the accepted point, replace the endpoint with the same sign. This retains bisection's existence guarantee while taking Newton steps when the local model is credible.
+
+The secant method estimates the derivative from the last two iterates:
+
+$$
+p_{n+1}=p_n-f(p_n)
+\frac{p_n-p_{n-1}}{f(p_n)-f(p_{n-1})}.
+$$
+
+After initialization it needs one new function evaluation per step and no analytic derivative. It is not a bracketing method unless separate logic preserves an interval, and nearly equal function values make its denominator dangerous.
+
+The formula is symmetric in the two previous points and can also be read as inverse linear interpolation: fit $x$ as a linear function of $f$, then evaluate that line at $f=0$. Regula falsi uses the same intersection but keeps opposite-sign endpoints; its guarantee is stronger, though one endpoint can remain fixed for many iterations and slow convergence.
+
+## What the local convergence rates promise
 
 If $f$ is twice continuously differentiable, $p$ is a simple root, and $p_0$ is sufficiently close to $p$, Newton's method converges quadratically:
 
 $$
-|p_{n+1}-p|\le C|p_n-p|^2.
+|p_{n+1}-p|\leq C|p_n-p|^2.
 $$
 
-Quadratic convergence means the number of correct digits can roughly double after the asymptotic regime begins. Before that regime begins, Newton steps can leave the region of interest or divide by a poor derivative.
-
-The secant method has superlinear order
+The number of correct digits can roughly double from one step to the next after the asymptotic regime begins. The secant method is superlinear with order
 
 $$
-\alpha=\frac{1+\sqrt{5}}{2}\approx 1.618,
+\alpha=\frac{1+\sqrt{5}}{2}\approx 1.618
 $$
 
-under similar simple-root assumptions. It is slower per iteration than Newton's method but may be competitive when derivatives are expensive or unavailable.
+under analogous simple-root assumptions. It takes more iterations than Newton's method but can still win when derivatives are unavailable or expensive.
 
-Multiple roots reduce the apparent order. If $p$ is a root of multiplicity $m$, ordinary Newton iteration is typically only linearly convergent. A modified Newton step
+Let $e_n=p_n-p$. Taylor expansion about $p_n$ gives
+
+$$
+0=f(p)=f(p_n)-f'(p_n)e_n+\frac12f''(\xi_n)e_n^2.
+$$
+
+Subtracting the Newton update from $p$ yields
+
+$$
+e_{n+1}=\frac{f''(\xi_n)}{2f'(p_n)}e_n^2.
+$$
+
+Near a simple root, the denominator remains bounded away from zero, producing the quadratic bound. The constant matters: a large ratio $\vert f''/f'\vert $ can delay the clean digit-doubling regime.
+
+For the secant method, local expansion leads approximately to $\vert e_{n+1}\vert \approx C\vert e_n\vert \vert e_{n-1}\vert $. If errors behave like $\vert e_n\vert \approx K\vert e_{n-1}\vert ^\alpha$, consistency of exponents requires $\alpha^2=\alpha+1$. The positive solution is the golden ratio. This is an asymptotic argument; erratic early secant steps need not display that order.
+
+A root of multiplicity $m\gt 1$ changes the picture. Ordinary Newton iteration is generally only linearly convergent, whereas
 
 $$
 p_{n+1}=p_n-m\frac{f(p_n)}{f'(p_n)}
 $$
 
-restores quadratic convergence when $m$ is known, but estimating $m$ reliably is itself a numerical problem. For polynomial work, Horner's method evaluates $P$ in $O(n)$ arithmetic operations and can evaluate $P'$ at the same time by a second nested pass. This matters because the cost of root finding is often dominated by repeated function and derivative evaluations.
+recovers quadratic convergence when $m$ is known. Estimating multiplicity reliably is itself a numerical task.
 
-A reliable way to use these results is to keep the analysis tied to the actual numerical question rather than to the formula alone. For Newton, secant, and polynomial root methods, the input record should include initial guesses, derivatives or secant history, polynomial coefficients, and safeguards. Without that record, two computations that look similar on paper may have different numerical meanings. The same formula can be a safe production tool in one scaling and a fragile experiment in another. This is why the examples on this page show the intermediate arithmetic: the goal is not only to reach a number, but to expose what assumptions made that number meaningful.
+Write $f(x)=(x-p)^mh(x)$ with $h(p)\ne0$. Then $f/f'=(x-p)/m+O((x-p)^2)$, and ordinary Newton gives
 
-The next record is the verification record. Useful diagnostics for this topic include residuals, step sizes, derivative magnitudes, and multiplicity indicators. A diagnostic should be chosen before the computation is trusted, not after a pleasing answer appears. When an exact answer is unavailable, compare two independent approximations, refine the mesh or tolerance, check a residual, or test the method on a neighboring problem with known behavior. If several diagnostics disagree, treat the disagreement as information about conditioning, stability, or implementation rather than as a nuisance to be averaged away.
+$$
+e_{n+1}=\left(1-\frac1m\right)e_n+O(e_n^2).
+$$
 
-The cost record matters as well. In this topic the dominant costs are usually function evaluations, derivative evaluations, and Horner passes. Numerical analysis is full of methods that are mathematically attractive but computationally mismatched to the problem size. A dense factorization may be acceptable for a classroom matrix and impossible for a PDE grid. A high-order rule may use fewer steps but more expensive stages. A guaranteed method may take many iterations but provide a bound that a faster method cannot. The right comparison is therefore cost to reach a verified tolerance, not order or elegance in isolation.
+The modified factor $m$ cancels the linear term. An alternative that does not require a known $m$ applies Newton to $u=f/f'$:
 
-Finally, every method here has a recognizable failure mode: zero derivatives, bad deflation, and assuming local convergence is global. These failures are not edge cases to memorize; they are signals that the hypotheses behind the result have been violated or that a different numerical model is needed. A good implementation makes such failures visible through exceptions, warnings, residual reports, or conservative stopping rules. A good hand solution does the same thing in prose by naming the assumption being used and checking it at the point where it matters.
+$$
+p_{n+1}=p_n-\frac{f(p_n)f'(p_n)}{[f'(p_n)]^2-f(p_n)f''(p_n)}.
+$$
 
-For study purposes, the most useful habit is to separate four layers: the continuous mathematical problem, the discrete approximation, the algebraic or iterative algorithm used to compute it, and the diagnostic used to judge the result. Many mistakes come from mixing these layers. A small algebraic residual may not mean a small modeling error. A small step-to-step change may not mean the discrete equations are solved. A high-order truncation formula may not help when the data are noisy or the arithmetic is unstable. Keeping the layers separate makes the results on this page portable to larger examples.
+It restores quadratic convergence near a multiple root but needs a second derivative and can have its own small denominator.
 
-## Visual
+| Method | Data per step | Local order | Main advantage | Typical breakdown |
+|---|---|---:|---|---|
+| Newton | $f$ and $f'$ | $2$ for a simple root | very fast near the root | derivative zero or poor starting point |
+| Secant | $f$ only | about $1.618$ | no analytic derivative | nearly zero secant denominator |
+| Modified Newton | $f$, $f'$, and multiplicity | $2$ if $m$ is known | restores speed at multiple roots | multiplicity is usually unknown |
+| Horner evaluation | polynomial coefficients | not iterative | cheap repeated evaluation | sensitive to coefficient scaling |
+
+These rates describe local behavior, not a guarantee from arbitrary initial values. Function cost, derivative cost, and safeguards can matter more than the formal order.
+
+## Exploiting polynomial structure
+
+For
+
+$$
+P(x)=a_nx^n+a_{n-1}x^{n-1}+\cdots+a_0,
+$$
+
+Horner's method evaluates $P$ using $O(n)$ arithmetic operations. A second nested pass can evaluate $P'$ at the same point, which makes Newton iterations on polynomials cheap.
+
+If the Horner recursion is $b_n=a_n$ and $b_k=a_k+xb_{k+1}$, then $P(x)=b_0$. A companion recursion $c_n=b_n$ and $c_k=b_k+xc_{k+1}$ for $k=n-1,\ldots,1$ gives $P'(x)=c_1$. This simultaneous evaluation uses linear work and avoids separately forming derivative coefficients.
+
+Once an approximate root $r$ has been accepted, synthetic division can remove an approximate factor $x-r$. Deflation is not innocuous: error in an early root perturbs the coefficients of the reduced polynomial and can degrade every root found afterward. Closely spaced or multiple roots deserve particular caution.
+
+Root sensitivity can be read from the same derivative. A coefficient perturbation changes the polynomial value near a simple root by $\delta P(p)$, so first-order expansion gives
+
+$$
+\delta p\approx-\frac{\delta P(p)}{P'(p)}.
+$$
+
+A small $\vert P'(p)\vert $ means that the root is sensitive. At a multiple root $P'(p)=0$, and the response is no longer linear: tiny coefficient perturbations can split one multiple root into a cluster. Scaling the variable and coefficients reduces avoidable arithmetic problems but cannot remove intrinsic sensitivity.
+
+Computing all polynomial roots by repeated scalar Newton steps is rarely the best general algorithm. Companion-matrix eigenvalue methods find the full set without serial deflation, and specialized methods can update several roots simultaneously. Newton remains valuable for polishing roots once good approximations are known.
+
+The full solver loop makes the safeguards explicit:
 
 ```mermaid
 flowchart TB
@@ -118,110 +177,114 @@ flowchart TB
   Report --> Root(("root estimate"))
 ```
 
-The root-finding diagram exposes the shared loop around Newton, secant, and polynomial-specific work. Each branch shows the data needed per iteration, the guard against zero denominators or derivatives, and the accept-or-safeguard decision before updating. The polynomial subgraph adds Horner evaluation and optional deflation, making clear where numerical error can enter repeated-root workflows.
+The Newton and secant branches differ in how they obtain a slope but share the same acceptance and convergence checks. The polynomial branch adds efficient evaluation and optional deflation at the point where error can propagate to later roots.
 
-| Method | Data per step | Local order | Strength | Failure mode |
-|---|---|---:|---|---|
-| Newton | $f$ and $f'$ | $2$ for simple roots | very fast near root | derivative zero or bad start |
-| Secant | $f$ only | about $1.618$ | no analytic derivative | denominator nearly zero |
-| Modified Newton | $f$, $f'$, multiplicity | $2$ if $m$ known | handles multiple roots | multiplicity usually unknown |
-| Horner evaluation | polynomial coefficients | not iterative by itself | stable, cheap evaluation | coefficient scaling matters |
+## Newton iteration for $\cos x-x$
 
-## Worked example 1: Newton's method for $\cos x-x$
-
-**Problem.** Approximate the fixed point of cosine, equivalently the root of
+For
 
 $$
 f(x)=\cos x-x,
+\qquad
+f'(x)=-\sin x-1,
 $$
 
-using Newton's method from $p_0=1$.
-
-**Method.** Since $f'(x)=-\sin x-1$,
+Newton's method from $p_0=1$ gives
 
 $$
 p_{n+1}=p_n-\frac{\cos p_n-p_n}{-\sin p_n-1}.
 $$
 
-1. First step:
+At the first step,
 
 $$
-f(1)=\cos(1)-1=-0.4596976941,
+f(1)=-0.4596976941,
+\qquad
+f'(1)=-1.8414709848,
 $$
 
-$$
-f'(1)=-\sin(1)-1=-1.8414709848,
-$$
+so
 
 $$
-p_1=1-\frac{-0.4596976941}{-1.8414709848}=0.7503638678.
+p_1=1-\frac{-0.4596976941}{-1.8414709848}
+=0.7503638678.
 $$
 
-2. Second step:
+The second step uses
 
 $$
-f(p_1)=\cos(0.7503638678)-0.7503638678=-0.0189230738,
+f(p_1)=-0.0189230738,
+\qquad
+f'(p_1)=-1.6819049529
 $$
 
-$$
-f'(p_1)=-\sin(0.7503638678)-1=-1.6819049529,
-$$
+and yields
 
 $$
-p_2=0.7503638678-\frac{-0.0189230738}{-1.6819049529}=0.7391128909.
+p_2=0.7391128909.
 $$
 
-3. A third step gives $p_3\approx 0.7390851334$.
+A third step gives $p_3\approx0.7390851334$, whose residual is about $3.1\times10^{-10}$. One more step reaches the double-precision root $p\approx0.7390851332$.
 
-**Checked answer.** The residual at $0.7390851334$ is about machine precision in double arithmetic, and the root is $p\approx 0.7390851332$. The iterates also show the characteristic jump from moderate accuracy to many correct digits.
+## Horner evaluation before a Newton correction
 
-## Worked example 2: Horner's method and one Newton correction
-
-**Problem.** For
+Consider
 
 $$
-P(x)=x^3-6x^2+11x-6,
+P(x)=x^3-6x^2+11x-6
 $$
 
-use Horner's method at $x=2.1$ and compute one Newton step.
-
-**Method.** Horner evaluation for coefficients $1,-6,11,-6$ proceeds as follows.
-
-1. Start $b_3=1$.
-
-2. Multiply and add:
+at $x=2.1$. Horner evaluation with coefficients $1,-6,11,-6$ produces
 
 $$
-b_2=-6+2.1(1)=-3.9,
+b_3=1,
+\qquad
+b_2=-6+2.1b_3=-3.9,
 $$
 
 $$
-b_1=11+2.1(-3.9)=2.81,
+b_1=11+2.1b_2=2.81,
+\qquad
+b_0=-6+2.1b_1=-0.099.
 $$
 
-$$
-b_0=-6+2.1(2.81)=-0.099.
-$$
-
-Thus $P(2.1)=-0.099$.
-
-3. Compute the derivative exactly:
+Thus $P(2.1)=-0.099$. Since
 
 $$
 P'(x)=3x^2-12x+11,
 \qquad
-P'(2.1)=13.23-25.2+11=-0.97.
+P'(2.1)=-0.97,
 $$
 
-4. Newton correction:
+one Newton correction gives
 
 $$
-p_1=2.1-\frac{-0.099}{-0.97}=1.9979381443\ldots.
+p_1=2.1-\frac{-0.099}{-0.97}
+=1.9979381443\ldots.
 $$
 
-**Checked answer.** The polynomial factors as $(x-1)(x-2)(x-3)$, so the nearby root is $2$. One Newton step from $2.1$ moves very close to it.
+The factorization $P(x)=(x-1)(x-2)(x-3)$ confirms that the nearby root is $2$.
 
-## Code
+## A double root slows ordinary Newton
+
+Take $f(x)=(x-1)^2$ with $p_0=2$. Ordinary Newton gives
+
+$$
+p_{n+1}=p_n-\frac{(p_n-1)^2}{2(p_n-1)}
+=\frac{p_n+1}{2}.
+$$
+
+Thus $p_1=1.5$, $p_2=1.25$, and $p_3=1.125$. The error is halved at every step, exactly matching the factor $1-1/m=1/2$. The residual, however, is squared error: at $p_3$ it is only $0.015625$, which can make progress look better than the root error really is.
+
+Using the known multiplicity changes the update to
+
+$$
+p_1=2-2\frac{(2-1)^2}{2(2-1)}=1.
+$$
+
+For this exact quadratic it reaches the root in one step. On a general function with a double root, the same modification removes the linear error term and leaves quadratic convergence locally.
+
+## Implementing the iterations with two stopping checks
 
 ```python
 import math
@@ -233,7 +296,7 @@ def newton(f, fp, p0, tol=1e-12, max_iter=50):
         if slope == 0:
             raise ZeroDivisionError("Newton derivative vanished")
         q = p - f(p) / slope
-        if abs(q - p) < tol:
+        if abs(q - p) < tol and abs(f(q)) < tol:
             return q, k
         p = q
     raise RuntimeError("Newton method did not converge")
@@ -245,10 +308,11 @@ def secant(f, p0, p1, tol=1e-12, max_iter=50):
         if denom == 0:
             raise ZeroDivisionError("secant denominator vanished")
         p2 = p1 - f1 * (p1 - p0) / denom
-        if abs(p2 - p1) < tol:
+        f2 = f(p2)
+        if abs(p2 - p1) < tol and abs(f2) < tol:
             return p2, k
         p0, p1 = p1, p2
-        f0, f1 = f1, f(p1)
+        f0, f1 = f1, f2
     raise RuntimeError("secant method did not converge")
 
 def horner(coeffs, x):
@@ -264,18 +328,58 @@ print(secant(f, 0.5, 1.0))
 print(horner([1.0, -6.0, 11.0, -6.0], 2.1))
 ```
 
-## Common pitfalls
+For scaled production problems, the derivative, denominator, step, and residual checks should use scale-aware thresholds rather than comparisons with zero or a single absolute tolerance.
 
-- Applying Newton's method without checking that $f'(p_n)$ is safely away from zero.
-- Confusing fast local convergence with global convergence. Newton's method can diverge from poor starting values.
-- Using secant steps when $f(p_n)$ and $f(p_{n-1})$ are nearly equal; the denominator can amplify noise.
-- Deflating a polynomial after an inaccurate root and then trusting all later roots equally.
-- Stopping solely on small step size for a multiple root. Also check the residual.
-- Ranking methods only by convergence order. Function cost, derivative availability, and safeguards can dominate runtime.
+## Stopping rules and error estimates
 
-## Connections
+The residual $\vert f(p_n)\vert $ has the units and scaling of the function, while the step $\vert p_{n+1}-p_n\vert $ has the units of the root. Either alone can mislead. Multiplying $f$ by a huge constant changes a residual test without changing the root. Near a multiple or flat root, a tiny residual can accompany a substantial root error. Conversely, a badly scaled function can have a large residual at an accurate root.
 
-- [bisection and fixed point iteration](/math/numerical-analysis/bisection-fixed-point)
-- [nonlinear systems](/math/numerical-analysis/nonlinear-systems)
-- [floating point conditioning and stability](/math/numerical-analysis/floating-point-conditioning-stability)
-- [eigenvalue methods](/math/numerical-analysis/eigenvalue-methods)
+For a simple root with $\vert f'(x)\vert \geq m\gt 0$ on an interval containing $p_n$ and the root, the mean value theorem gives
+
+$$
+|p_n-p|\leq\frac{|f(p_n)|}{m}.
+$$
+
+This is a genuine error bound when such an $m$ is known. In routine computation, a combined condition such as small scaled residual and small relative step is more common. Iteration limits and finite-value checks remain necessary because neither test handles NaNs or wandering iterates.
+
+The Newton correction itself estimates the remaining error near a well-conditioned simple root. If corrections shrink quadratically, the next error is much smaller than the current correction. That estimate should not be trusted before the local regime is evident.
+
+## Dependence on the starting point
+
+Newton's map can converge to an unintended root, enter a cycle, or escape. For $f(x)=x^3-2x+2$, starting at $0$ gives $p_1=1$, while starting at $1$ gives $p_1=0$; the method cycles between two nonroots. A line search that requires a residual decrease rejects these full steps, and a bracketed hybrid avoids the cycle if a sign-changing interval is available.
+
+For $f(x)=\sqrt{x}-1$, a Newton step from a positive point can leave the domain if the model is not guarded. Transformed variables or interval constraints may be more natural than repeatedly clipping invalid iterates. Discontinuities are worse: a tangent or secant can cross a jump and report a small step where no zero exists.
+
+Complex polynomial roots show the starting-point dependence vividly. Newton applied to $z^3-1$ partitions the complex plane into three basins, one for each cube root of unity, with intricate boundaries. The iteration formula is unchanged over complex arithmetic, but ordering and bracketing no longer apply.
+
+## Deflation and polishing
+
+Suppose synthetic division by $x-r$ returns quotient coefficients and remainder $P(r)$. A small remainder relative to coefficient and input scales is necessary before accepting the deflation. Even then, the reduced coefficients inherit error in $r$. Finding all roots by successive deflation tends to make later roots less accurate, especially when roots are clustered.
+
+One remedy is to polish every computed root against the original polynomial after the full set is available. Another is to deflate conjugate pairs together for a real polynomial, preserving real coefficients through a quadratic factor. Companion-matrix methods avoid serial dependence but have their own scaling and conditioning issues.
+
+Polynomial coefficients should be ordered and normalized explicitly. Horner code written for descending powers gives a different value if fed ascending coefficients. Scaling $x=sy$ can bring root magnitudes closer to one and reduce overflow in powers, while dividing all coefficients by a common scale leaves the roots unchanged.
+
+## Where fast iterations go wrong
+
+- A small derivative makes a Newton correction large and noise-sensitive. Damping, a trusted bracket, or a method switch is safer than accepting it blindly.
+- Similar secant function values create the same problem in the finite-slope denominator.
+- Small consecutive steps do not prove convergence, especially near a multiple root; inspect the residual as well.
+- Deflating after an inaccurate root transfers that error into all subsequent polynomial factors.
+- Initial guesses, safeguards, derivative magnitudes, residuals, and step sizes belong in the computation record. Without them, a reported root is hard to assess or reproduce.
+
+## Brackets, multiplicity, and certification
+
+A sign-changing bracket certifies at least one root only when $f$ is continuous. It may contain three or another odd number of roots, and it misses even-multiplicity roots because the sign does not change there. Plotting or sampling can suggest brackets but cannot prove that every root was found.
+
+For polynomials, root counts on an interval can be certified with algebraic tools such as Sturm sequences. Interval arithmetic can certify that a Newton map sends an interval into itself and that the derivative stays away from zero. These methods cost more than a floating-point residual but answer a stronger question: existence and uniqueness of an exact root inside a stated interval.
+
+Derivative evaluation by automatic differentiation can make Newton attractive when analytic formulas are tedious. Finite differences introduce a step-size tradeoff between truncation and cancellation; the resulting inexact slope can reduce convergence speed. The secant method builds its derivative approximation from iterates and naturally updates it, while multidimensional analogues lead toward quasi-Newton methods.
+
+When function evaluation is noisy, superlinear convergence eventually stops because differences and residuals reach the noise floor. Tightening the iteration tolerance then produces unstable steps rather than new digits. A stopping threshold should reflect function uncertainty as well as machine precision.
+
+<div className="see-also">
+
+See also: [bisection and fixed point iteration](/math/numerical-analysis/bisection-fixed-point) · [nonlinear systems](/math/numerical-analysis/nonlinear-systems) · [floating point conditioning and stability](/math/numerical-analysis/floating-point-conditioning-stability) · [eigenvalue methods](/math/numerical-analysis/eigenvalue-methods)
+
+</div>

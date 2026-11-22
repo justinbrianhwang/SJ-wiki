@@ -314,10 +314,8 @@ At extremely long times, spectral bounds and threshold behavior can produce none
 
 Stimulated and spontaneous processes also need distinction. A classical time-dependent perturbation describes absorption and stimulated emission driven by an applied field. Spontaneous emission requires quantizing the electromagnetic field so that the atom couples to vacuum modes. The golden-rule structure survives, but the final-state continuum includes photon states and their density of modes.
 
-## Related pages
+<div className="see-also">
 
-- [Quantum dynamics and pictures](/physics/quantum-mechanics/quantum-dynamics-pictures)
-- [Time-independent perturbation theory](/physics/quantum-mechanics/time-independent-perturbation-theory)
-- [Scattering theory](/physics/quantum-mechanics/scattering-theory)
-- [Density operator, entanglement, and decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence)
-- [Measurement and interpretation](/physics/quantum-mechanics/measurement-interpretation)
+See also: [Quantum dynamics and pictures](/physics/quantum-mechanics/quantum-dynamics-pictures) · [Time-independent perturbation theory](/physics/quantum-mechanics/time-independent-perturbation-theory) · [Scattering theory](/physics/quantum-mechanics/scattering-theory) · [Density operator, entanglement, and decoherence](/physics/quantum-mechanics/density-operator-entanglement-decoherence) · [Measurement and interpretation](/physics/quantum-mechanics/measurement-interpretation)
+
+</div>

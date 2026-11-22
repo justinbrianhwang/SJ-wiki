@@ -270,9 +270,8 @@ Arrays can store repeated model or simulation output compactly, but not every co
 - Treating a small residual as proof that an ill-conditioned system has stable coefficients.
 - Permuting array axes without carrying their semantic names along.
 
-## Related pages
+<div className="see-also">
 
-- [Vectors, arithmetic, and comparison](/cs/programming/r/vectors-arithmetic-comparison)
-- [Indexing, names, and recycling](/cs/programming/r/indexing-names-recycling)
-- [Apply family](/cs/programming/r/apply-family)
-- [Linear and generalized models](/cs/programming/r/linear-and-generalized-models)
+See also: [Vectors, arithmetic, and comparison](/cs/programming/r/vectors-arithmetic-comparison) · [Indexing, names, and recycling](/cs/programming/r/indexing-names-recycling) · [Apply family](/cs/programming/r/apply-family) · [Linear and generalized models](/cs/programming/r/linear-and-generalized-models)
+
+</div>

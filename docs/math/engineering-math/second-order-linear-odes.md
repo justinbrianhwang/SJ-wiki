@@ -7,13 +7,9 @@ sidebar_position: 4
 
 Second-order linear ODEs model systems with inertia or storage in two forms: displacement and velocity, charge and current, or position and momentum. The second derivative records acceleration or curvature, so these equations appear in vibrations, circuits, beams, control systems, and diffusion approximations after modal decomposition.
 
-![An inverted pendulum is balanced above a movable base.](https://commons.wikimedia.org/wiki/Special:FilePath/2-D_inverted_pendulum.svg)
+The main advantage of linearity is superposition. Once two independent homogeneous solutions are known, their linear combination gives the full homogeneous response. Nonhomogeneous problems then add a particular response determined by the forcing. The homogeneous constant-coefficient case supplies the language needed for later forced problems.
 
-*Figure: The inverted pendulum is a compact physical model for stability, linearization, and control. Image: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:2-D_inverted_pendulum.svg), Arne Nordmann, CC BY-SA 3.0.*
-
-The main advantage of linearity is superposition. Once two independent homogeneous solutions are known, their linear combination gives the full homogeneous response. Nonhomogeneous problems then add a particular response determined by the forcing. This page focuses on the homogeneous constant-coefficient case and the language needed for later forced problems.
-
-## Definitions
+## Equation, initial data, and solution basis
 
 A second-order linear ODE has the form
 
@@ -56,7 +52,7 @@ $$
 a\lambda^2+b\lambda+c=0.
 $$
 
-## Key results
+## Reading the characteristic roots
 
 If $p,q,r$ are continuous on an interval containing $x_0$, then the initial value problem has a unique solution on that interval. This is stronger than the local first-order theorem because linearity and continuity prevent branching while the coefficients remain finite.
 
@@ -114,11 +110,11 @@ Because the ODE has real coefficients, the real and imaginary parts are both rea
 
 It is important to normalize the equation only when doing so is harmless. Dividing by $a$ in $ay''+by'+cy=0$ is fine if $a$ is a nonzero constant. For variable coefficients, dividing by a leading coefficient that vanishes at some point changes the interval on which the standard theorem applies. The interval must avoid zeros of the leading coefficient and discontinuities of the normalized coefficient functions.
 
-The same characteristic-root method reappears in systems of first-order equations. Setting $x_1=y$ and $x_2=y'$ turns a second-order equation into a two-dimensional first-order system. The characteristic roots of the scalar equation become eigenvalues of the system matrix. This is why damping cases correspond to node, spiral, and repeated-eigenvalue behavior in the phase plane.
+The same characteristic-root method reappears in systems of first-order equations. Setting $x_1=y$ and $x_2=y'$ turns a second-order equation into a two-dimensional first-order system. The characteristic roots of the scalar equation become eigenvalues of the system matrix. The damping cases therefore correspond to node, spiral, and repeated-eigenvalue behavior in the phase plane.
 
 For checking a solution, direct substitution is the final authority, but three quick checks are efficient. First, the number of independent constants should match the order of the homogeneous equation. Second, the initial values should be verified after differentiating. Third, the qualitative behavior should match the roots: no oscillation for real roots, oscillation for nonzero imaginary parts, and decay only when the real parts are negative.
 
-## Visual
+## From the characteristic polynomial to a real basis
 
 ```mermaid
 flowchart TD
@@ -130,7 +126,7 @@ flowchart TD
   D -->|complex alpha +/- i beta| G["exp(alpha x)(c1 cos beta x + c2 sin beta x)"]
 ```
 
-## Worked example 1: Distinct real roots with initial data
+## Distinct real roots with initial data
 
 Problem. Solve
 
@@ -204,7 +200,7 @@ Check. At $x=0$, $y=3+1=4$ and $y'=6-1=5$.
 
 The two terms also explain the future behavior. The $e^{2x}$ term grows while the $e^{-x}$ term decays, so the coefficient $3$ controls the long-term sign and growth. If the initial conditions had made $c_1=0$, the solution would have been purely decaying. This kind of modal interpretation is useful in design because it shows which initial data excite unstable or slowly decaying modes.
 
-## Worked example 2: Underdamped vibration
+## An underdamped initial-value problem
 
 Problem. Solve
 
@@ -273,7 +269,7 @@ Check. The envelope $e^{-x}$ decays, so the solution is a damped oscillation. Th
 
 The damping classification is underdamped because the roots have nonzero imaginary parts. The angular frequency of oscillation is $2$, while the exponential decay rate is $1$. A plot should cross the axis repeatedly with shrinking amplitude. If a numerical solution instead drifts upward or stops oscillating immediately, the derivative or characteristic-root calculation should be inspected.
 
-## Code
+## Checking the underdamped solution in SymPy
 
 ```python
 import sympy as sp
@@ -286,7 +282,7 @@ solution = sp.dsolve(ode, ics={y(0): 1, sp.diff(y(x), x).subs(x, 0): 0})
 print(solution)
 ```
 
-## Common pitfalls
+## Signs, repeated roots, and stability checks
 
 - Forgetting the factor $x$ in the second solution for a repeated characteristic root.
 - Using complex exponentials as the final answer when a real-valued engineering problem expects the equivalent sine-cosine form.
@@ -298,9 +294,8 @@ print(solution)
 - Forgetting that the independent variable need not be time. The same formulas apply to spatial beam or boundary-value models, but the interpretation of growth and decay changes.
 - Calling a solution stable because one mode decays while another grows. Stability requires every homogeneous mode allowed by the initial data to remain bounded, and asymptotic stability requires decay.
 
-## Connections
+<div className="see-also">
 
-- [Nonhomogeneous ODEs and Applications](/math/engineering-math/nonhomogeneous-odes-and-applications)
-- [Higher-Order Linear ODEs](/math/engineering-math/higher-order-linear-odes)
-- [Laplace Transform](/math/engineering-math/laplace-transform)
-- [Systems of ODEs and Phase Planes](/math/engineering-math/systems-of-odes-and-phase-plane)
+See also: [Nonhomogeneous ODEs and Applications](/math/engineering-math/nonhomogeneous-odes-and-applications) · [Higher-Order Linear ODEs](/math/engineering-math/higher-order-linear-odes) · [Laplace Transform](/math/engineering-math/laplace-transform) · [Systems of ODEs and Phase Planes](/math/engineering-math/systems-of-odes-and-phase-plane)
+
+</div>

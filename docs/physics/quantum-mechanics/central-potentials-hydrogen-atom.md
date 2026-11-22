@@ -314,10 +314,8 @@ Magnetic fields expose a different hierarchy. When spin–orbit coupling dominat
 
 Real spectra also depend on nuclear motion. Using the reduced mass already shifts every gross-structure level relative to the infinite-mass result and creates isotope shifts. Nuclear size, nuclear spin, radiative effects, and relativistic dynamics add smaller corrections. Stating the Hamiltonian is therefore part of stating any quoted hydrogen energy.
 
-## Related pages
+<div className="see-also">
 
-- [Angular momentum algebra](/physics/quantum-mechanics/angular-momentum-algebra)
-- [Addition of angular momentum](/physics/quantum-mechanics/addition-of-angular-momentum)
-- [Time-independent perturbation theory](/physics/quantum-mechanics/time-independent-perturbation-theory)
-- [Variational principle and WKB](/physics/quantum-mechanics/variational-principle-wkb)
-- [Symmetries and conservation laws](/physics/quantum-mechanics/symmetries-conservation-laws)
+See also: [Angular momentum algebra](/physics/quantum-mechanics/angular-momentum-algebra) · [Addition of angular momentum](/physics/quantum-mechanics/addition-of-angular-momentum) · [Time-independent perturbation theory](/physics/quantum-mechanics/time-independent-perturbation-theory) · [Variational principle and WKB](/physics/quantum-mechanics/variational-principle-wkb) · [Symmetries and conservation laws](/physics/quantum-mechanics/symmetries-conservation-laws)
+
+</div>

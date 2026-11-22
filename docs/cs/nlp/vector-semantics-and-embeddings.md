@@ -344,9 +344,8 @@ Extrinsic evaluation inserts the representation into a downstream system. It mea
 
 Nearest-neighbor inspection remains valuable as qualitative error analysis. Query frequent, rare, polysemous, demographic, and domain-specific terms rather than selecting only appealing examples. Hubness in high-dimensional spaces can cause a few vectors to appear as neighbors of many queries. Measuring reverse-neighbor counts exposes these hubs and tempers semantic interpretations.
 
-## Related pages
+<div className="see-also">
 
-- [Pretrained language models](/cs/nlp/pretrained-language-models)
-- [Logistic regression for text](/cs/nlp/logistic-regression-for-text)
-- [Semantic role labeling and word-sense disambiguation](/cs/nlp/semantic-role-labeling-and-word-sense-disambiguation)
-- [Information extraction](/cs/nlp/information-extraction)
+See also: [Pretrained language models](/cs/nlp/pretrained-language-models) · [Logistic regression for text](/cs/nlp/logistic-regression-for-text) · [Semantic role labeling and word-sense disambiguation](/cs/nlp/semantic-role-labeling-and-word-sense-disambiguation) · [Information extraction](/cs/nlp/information-extraction)
+
+</div>

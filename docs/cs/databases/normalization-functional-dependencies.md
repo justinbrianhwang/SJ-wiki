@@ -9,13 +9,13 @@ Normalization is the discipline of designing relation schemas so that facts are 
 
 This topic follows E-R design because a first relational schema often comes from conceptual modeling. Normalization then checks whether each relation has a clean meaning. A relation should say one kind of thing. If it mixes independent facts, such as instructor salary and department building in every course row, updates become unsafe and constraints become hard to enforce.
 
-## Definitions
+## Functional dependencies as schema constraints
 
 A **functional dependency** (FD) on a relation schema `R` is written `X -> Y`, where `X` and `Y` are sets of attributes from `R`. It means that in every legal instance of `R`, any two tuples that agree on all attributes in `X` must also agree on all attributes in `Y`.
 
 The **closure** of an attribute set `X`, written `X+`, is the set of all attributes functionally determined by `X` under a given set of dependencies. If `X+` contains every attribute of relation `R`, then `X` is a superkey for `R`.
 
-An FD is **trivial** if `Y` is a subset of `X`. For example, `{ID, name} -> ID` is trivial. The interesting dependencies determine attributes not already on the left side.
+An FD is **trivial** if `Y` is a subset of `X`. For example, `\{ID, name\} -> ID` is trivial. The interesting dependencies determine attributes not already on the left side.
 
 **Armstrong's axioms** are sound and complete inference rules for FDs:
 
@@ -29,7 +29,7 @@ Useful derived rules include union, decomposition, and pseudotransitivity.
 
 **First normal form (1NF)** requires atomic attribute domains: each attribute value is a single value from its domain, not a repeating group or nested relation. **Boyce-Codd normal form (BCNF)** requires that for every nontrivial FD `X -> Y`, `X` is a superkey. **Third normal form (3NF)** relaxes BCNF slightly to preserve dependencies in some cases.
 
-## Key results
+## From attribute closure to BCNF
 
 The attribute-closure algorithm decides whether a set of attributes is a superkey and whether an FD follows from a set of FDs:
 
@@ -66,8 +66,6 @@ Normalization is not opposed to performance engineering. The usual workflow is t
 
 It is also normal for different relations in the same database to be normalized to different degrees. Core transactional facts usually deserve stricter normalization, while derived reporting tables may intentionally store summaries. The important point is to know which tables are authoritative and which are maintained copies.
 
-## Visual
-
 ```mermaid
 flowchart TD
   A["Relation schema R"] --> B["List functional dependencies"]
@@ -86,11 +84,9 @@ flowchart TD
 | 3NF | every FD has superkey determinant or prime RHS | most FD-based anomalies with dependency preservation |
 | BCNF | every nontrivial FD has a superkey determinant | stronger FD-based redundancy |
 
-## Worked example 1: Compute an attribute closure
+### Computing $A^+$ one dependency at a time
 
-Problem: For relation `R(A, B, C, D, E)` with FDs `A -> BC`, `CD -> E`, `B -> D`, and `E -> A`, compute `A+`. Decide whether `A` is a superkey.
-
-Method:
+For relation `R(A, B, C, D, E)` with FDs `A -> BC`, `CD -> E`, `B -> D`, and `E -> A`, compute $A^+$ to decide whether `A` is a superkey.
 
 1. Initialize closure with the starting attributes:
 
@@ -118,13 +114,11 @@ $$
 
 5. Apply `E -> A` if desired, but `A` is already present. No new attributes appear.
 
-Checked answer: `A+` contains every attribute of `R`, so `A` is a superkey. Since no proper subset of `{A}` exists except the empty set, `A` is also a candidate key.
+$A^+$ contains every attribute of `R`, so `A` is a superkey. Since no proper subset of `\{A\}` exists except the empty set, `A` is also a candidate key.
 
-## Worked example 2: Detect and fix a BCNF violation
+### Separating department facts from instructor facts
 
-Problem: Relation `InstDept(ID, name, dept_name, building, salary)` has FDs `ID -> name, dept_name, salary` and `dept_name -> building`. Is it in BCNF? If not, decompose it.
-
-Method:
+Relation `InstDept(ID, name, dept_name, building, salary)` has FDs `ID -> name, dept_name, salary` and `dept_name -> building`. The second dependency determines whether a BCNF decomposition is needed.
 
 1. Compute whether `ID` is a superkey. From `ID`, we get `name`, `dept_name`, and `salary`. Since we then have `dept_name`, we get `building`. Therefore `ID+` is all attributes. `ID` is a superkey.
 
@@ -150,9 +144,9 @@ $$
 
 5. Check losslessness. The intersection is `dept_name`. In `R1`, `dept_name -> building`, so the intersection determines all attributes of `R1`. The decomposition is lossless.
 
-Checked answer: the decomposed schema stores each department building once and each instructor fact once. Updating a department's building no longer requires changing many instructor rows.
+The decomposed schema stores each department building once and each instructor fact once. Updating a department's building no longer requires changing many instructor rows.
 
-## Code
+### A closure routine for checking implications
 
 ```python
 def closure(attributes, fds):
@@ -178,7 +172,7 @@ print(closure("A", fds))
 print(closure("D", fds))
 ```
 
-## Common pitfalls
+## Faulty normalization arguments
 
 - Treating every dependency found in a sample instance as a true FD. FDs describe all legal instances, not accidental current data.
 - Forgetting to compute closure iteratively. A dependency may become usable only after another dependency adds attributes.
@@ -187,7 +181,7 @@ print(closure("D", fds))
 - Normalizing away intentional denormalization used for performance without considering maintenance strategy.
 - Ignoring 1NF by storing lists, JSON blobs, or comma-separated values when the data should be queried relationally.
 
-## Connections
+## Where dependency reasoning leads next
 
 - [E-R Modeling and Relational Mapping](/cs/databases/er-modeling-and-relational-mapping)
 - [Higher Normal Forms and Decomposition](/cs/databases/higher-normal-forms-and-decomposition)

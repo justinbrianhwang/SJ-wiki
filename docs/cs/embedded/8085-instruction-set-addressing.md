@@ -9,7 +9,7 @@ The 8085 instruction set is small enough to learn systematically but rich enough
 
 Instruction study should not be reduced to opcode memorization. A useful mental model asks four questions for every instruction: where are the operands, where is the result stored, which flags change, and how many bytes must be fetched? Those questions explain both program behavior and bus timing.
 
-## Definitions
+## From opcode bytes to operands
 
 An **instruction** is a binary command executed by the CPU. In assembly language it is written as a mnemonic such as `MOV`, `MVI`, `ADD`, `JMP`, or `CALL`.
 
@@ -35,13 +35,13 @@ The common 8085 **addressing modes** are:
 
 The **condition flags** record result properties. `Z` is set for zero result, `S` reflects bit 7, `P` is set for even parity, `CY` records carry or borrow, and `AC` records carry from bit 3 to bit 4 for BCD support.
 
-## Key results
+## Operand location, flags, and program flow
 
-The first key result is that `MOV` copies; it does not erase the source. For example, `MOV A,B` changes `A` but leaves `B` unchanged. This is fundamental when tracing register values.
+`MOV` copies; it does not erase the source. For example, `MOV A,B` changes `A` but leaves `B` unchanged. That distinction matters when tracing register values.
 
-The second key result is that arithmetic and logical instructions usually affect flags, while simple data transfers usually do not. This matters for conditional branches. A `JZ` after `ADD B` tests the sum; a `JZ` after `MOV C,A` still tests whatever previous instruction last changed `Z`.
+Arithmetic and logical instructions usually affect flags, while simple data transfers usually do not. A `JZ` after `ADD B` tests the sum; a `JZ` after `MOV C,A` still tests whatever earlier instruction last changed `Z`.
 
-The third key result is that `CMP r` performs an internal subtraction without storing the result:
+`CMP r` performs an internal subtraction without storing the result:
 
 $$
 A - r
@@ -49,17 +49,15 @@ $$
 
 The flags are set as if the subtraction happened. If `A = r`, then `Z = 1`. If `A < r`, the carry flag is set to represent borrow. This makes `CMP` the standard instruction for decisions.
 
-The fourth key result is that the `HL` pair is the main memory pointer. The symbol `M` does not name a physical register; it names the memory byte at the address contained in `HL`. Thus `MOV A,M` reads memory, and `MOV M,A` writes memory.
+The `HL` pair is the main memory pointer. The symbol `M` does not name a physical register; it names the memory byte at the address contained in `HL`. Thus `MOV A,M` reads memory, and `MOV M,A` writes memory.
 
-The fifth key result is that multi-byte data is stored little-endian in 8085 instruction operands: the low byte appears first, then the high byte. For `LXI H,2050H`, the machine bytes after the opcode are `50H` then `20H`.
+Multi-byte data is stored little-endian in 8085 instruction operands: the low byte appears first, then the high byte. For `LXI H,2050H`, the machine bytes after the opcode are `50H` then `20H`.
 
-The sixth key result is that BCD arithmetic needs decimal adjustment. After adding two packed BCD values with `ADD` or `ADC`, the `DAA` instruction corrects the accumulator into valid BCD form using the auxiliary carry and carry flags.
+BCD arithmetic needs decimal adjustment. After adding two packed BCD values with `ADD` or `ADC`, the `DAA` instruction corrects the accumulator into valid BCD form using the auxiliary carry and carry flags.
 
-The seventh key result is that instruction length changes program-counter movement. A one-byte instruction such as `MOV A,B` advances `PC` by one during normal flow. A two-byte instruction such as `MVI A,data` advances past the opcode and immediate data. A three-byte instruction such as `JMP addr` or `LDA addr` contains a 16-bit address after the opcode. Branch targets must account for these byte lengths when reading machine-code listings or hand-assembling small examples.
+Instruction length changes program-counter movement. A one-byte instruction such as `MOV A,B` advances `PC` by one during normal flow. A two-byte instruction such as `MVI A,data` advances past the opcode and immediate data. A three-byte instruction such as `JMP addr` or `LDA addr` contains a 16-bit address after the opcode. These lengths matter when reading machine-code listings or hand-assembling small examples.
 
-The eighth key result is that signed interpretation is a software convention on the 8085. The sign flag copies bit 7 of the result, but the CPU does not know whether the programmer intended unsigned data, two's-complement signed data, BCD, ASCII, or a bit mask. Conditional jumps based on carry are often used for unsigned comparisons, while sign and overflow reasoning for signed arithmetic must be designed explicitly.
-
-## Visual
+Signed interpretation is a software convention on the 8085. The sign flag copies bit 7 of the result, but the CPU does not know whether the programmer intended unsigned data, two's-complement signed data, BCD, ASCII, or a bit mask. Conditional jumps based on carry are often used for unsigned comparisons, while signed overflow must be inferred explicitly because the 8085 has no overflow flag.
 
 | Instruction group | Examples | Typical operands | Flags affected? | Typical use |
 |---|---|---|---|---|
@@ -79,7 +77,7 @@ graph TD
   B -->|Implied by opcode| G[Implicit addressing]
 ```
 
-## Worked example 1: Flag result after addition
+## Tracing carry through an 8-bit addition
 
 Problem: The accumulator contains `F2H`, register `B` contains `34H`, and the instruction `ADD B` executes. Find the accumulator result and the carry flag.
 
@@ -131,7 +129,7 @@ Answer: `A = 26H`, `CY = 1`.
 
 Check: In decimal, `F2H = 242` and `34H = 52`; sum is `294`. Since `294 - 256 = 38`, the stored result is `38 decimal = 26H`, with carry set.
 
-## Worked example 2: Choosing an addressing mode
+## Choosing the shortest addressing form
 
 Problem: Write the smallest natural instruction sequence for each task: load `A` with constant `55H`, load `A` from memory location `2050H`, and load `A` from the memory location currently pointed to by `HL`.
 
@@ -161,7 +159,7 @@ Answer: use `MVI A,55H`, `LDA 2050H`, and `MOV A,M`, respectively.
 
 Check: If the third task used `LDA`, it would need a literal address. Since the problem says the address is already in `HL`, `MOV A,M` is the intended 8085 idiom.
 
-## Code
+## Counting nonzero bytes through `HL`
 
 ```asm
 ; 8085: count nonzero bytes in a 16-byte block.
@@ -186,7 +184,7 @@ SKIP:   INX H          ; move to next byte
         HLT
 ```
 
-## Common pitfalls
+## Flag and addressing traps
 
 - Reading `M` as a register. In 8085 assembly, `M` means memory addressed by `HL`.
 - Assuming every instruction changes flags. Data transfer instructions generally leave flags unchanged.
@@ -196,9 +194,8 @@ SKIP:   INX H          ; move to next byte
 - Treating `CMP` as destructive. It changes flags but not the accumulator.
 - Forgetting that `INR` and `DCR` do not affect the carry flag, even though they affect several other flags.
 
-## Connections
+<div className="see-also">
 
-- [8085 architecture, buses, and timing](/cs/embedded/intel-8085-architecture-buses-timing)
-- [8085 assembly programming patterns](/cs/embedded/8085-assembly-programming-patterns)
-- [8085 I/O, memory, and DMA interfacing](/cs/embedded/8085-io-memory-dma-interfacing)
-- [8051 instruction set and programming](/cs/embedded/8051-instruction-set-programming)
+See also: [8085 architecture, buses, and timing](/cs/embedded/intel-8085-architecture-buses-timing) · [8085 assembly programming patterns](/cs/embedded/assembly-programming-patterns) · [8085 I/O, memory, and DMA interfacing](/cs/embedded/io-memory-dma-interfacing) · [8051 instruction set and programming](/cs/embedded/instruction-set-programming)
+
+</div>
